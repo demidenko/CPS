@@ -26,16 +26,16 @@
         android:text="Saved" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/textViewUserInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="TextView"
-        android:textSize="18dp"
+        android:textSize="18sp"
         />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/textViewSuggestions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

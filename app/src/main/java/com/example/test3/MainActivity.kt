@@ -5,11 +5,11 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
-import android.widget.*
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.*
-import java.net.URL
+import java.util.*
 
 
 class MainActivity : AppCompatActivity(){
@@ -17,6 +17,8 @@ class MainActivity : AppCompatActivity(){
     val scope = CoroutineScope(Job() + Dispatchers.Main)
 
     var defaultTextColor: Int = 0
+
+    private lateinit var buttonReload: Button
 
     lateinit var codeforcesAccountManager: CodeforcesAccountManager
     lateinit var atcoderAccountManager: AtCoderAccountManager
@@ -118,14 +120,52 @@ class MainActivity : AppCompatActivity(){
                 }
                 textMain.setTextColor(color ?: defaultTextColor)
                 textAdditional.setTextColor(color ?: defaultTextColor)
+
+                /*if(color!=null) {
+                    circle.color = color
+                    circle.invalidate()
+                }*/
             }
+
+            /*lateinit var circle: TopCoderCircle
+
+            override fun additionalBuild() {
+                circle = TopCoderCircle(activity)
+                circle.id = View.generateViewId()
+
+                val kostil = LinearLayout(activity).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    id = View.generateViewId()
+                    gravity = Gravity.CENTER
+                }
+
+                layout.removeView(textMain)
+
+                val params = LinearLayout.LayoutParams(50, 50)
+                kostil.addView(circle, params)
+                kostil.addView(textMain)
+
+                layout.addView(kostil)
+
+                (textAdditional.layoutParams as RelativeLayout.LayoutParams).apply {
+                    addRule(RelativeLayout.BELOW, kostil.id)
+                }
+            }
+
+            inner class TopCoderCircle(context: Context) : View(context) {
+                var color: Int = defaultTextColor
+                val shape = ShapeDrawable(OvalShape())
+                override fun onDraw(canvas: Canvas) {
+                    println("onDraw")
+                    shape.apply {
+                        println(color)
+                        paint.color = color
+                        setBounds(0, 0, 50, 50)
+                    }.draw(canvas)
+                }
+            }*/
         }
 
-
-        codeforcesPanel.buildAndAdd(30F, 25F)
-        atcoderPanel.buildAndAdd(30F, 25F)
-        topcoderPanel.buildAndAdd(30F, 25F)
-        acmpPanel.buildAndAdd(17F, 14F)
 
         panels = listOf(
             codeforcesPanel,
@@ -134,17 +174,23 @@ class MainActivity : AppCompatActivity(){
             acmpPanel
         )
 
+        assert( panels.map { it.manager.preferences_file_name }.toSet().size == panels.size)
+
+        codeforcesPanel.buildAndAdd(30F, 25F)
+        atcoderPanel.buildAndAdd(30F, 25F)
+        topcoderPanel.buildAndAdd(30F, 25F)
+        acmpPanel.buildAndAdd(17F, 14F)
+
+
         panels.forEach { it.show() }
 
 
-        val buttonReload: Button = findViewById(R.id.buttonReload)
+        buttonReload = findViewById(R.id.buttonReload)
         buttonReload.setOnClickListener {
-            buttonReload.isEnabled = false
             scope.launch {
-                panels.map {
+                panels.forEach {
                     launch { it.reload() }
-                }.joinAll()
-                buttonReload.isEnabled = true
+                }
             }
         }
 
@@ -173,18 +219,31 @@ class MainActivity : AppCompatActivity(){
 
     }
 
-    override fun onResume() {
-        super.onResume()
 
+    val toggleSet = TreeSet<String>()
+    fun toggleReload(s: String){
+        if(toggleSet.contains(s)){
+            toggleSet.remove(s)
+            if(toggleSet.isEmpty()) buttonReload.isEnabled = true
+        }else{
+            if(toggleSet.isEmpty()) buttonReload.isEnabled = false
+            toggleSet.add(s)
+        }
+    }
+
+    override fun onResume() {
         println("main resume")
+        super.onResume()
     }
 
 
 
     override fun onDestroy() {
+        println("main destroy")
         scope.cancel()
         super.onDestroy()
     }
+
 
     companion object {
         const val CALL_SETTINGS = 1

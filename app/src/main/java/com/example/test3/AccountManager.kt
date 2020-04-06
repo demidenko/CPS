@@ -109,13 +109,11 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
     override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? {
         val s = readURLData("https://codeforces.com/data/handles?q=$str") ?: return null
         val res = ArrayList<Pair<String, String>>()
-        s.split('\n').forEach {
-            if(!it.contains('=')) {
-                val i = it.indexOf('|')
-                if (i != -1) {
-                    val handle = it.substring(i + 1)
-                    res += Pair(handle, handle)
-                }
+        s.split('\n').filter { !it.contains('=') }.forEach {
+            val i = it.indexOf('|')
+            if (i != -1) {
+                val handle = it.substring(i + 1)
+                res += Pair(handle, handle)
             }
         }
         return res

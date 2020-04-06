@@ -40,8 +40,8 @@ class Settings: AppCompatActivity() {
 
         handleEditor.setText(savedInfo.usedID)
 
-        val preview = findViewById<TextView>(R.id.textView2).also { it.text="" }
-        val suggestionsView = findViewById<TextView>(R.id.textView3).also { it.text="" }
+        val preview = findViewById<TextView>(R.id.textViewUserInfo).apply { text="" }
+        val suggestionsView = findViewById<TextView>(R.id.textViewSuggestions).apply { text="" }
 
         var lastLoadedInfo: UserInfo? = null
 
@@ -82,6 +82,7 @@ class Settings: AppCompatActivity() {
 
         saveButton.setOnClickListener{
             if(saveButton.text == "Save"){
+                //TODO for null after load error
                 val currentHandle = lastLoadedInfo!!.usedID
                 manager.saveInfo(lastLoadedInfo!!)
                 savedInfo = lastLoadedInfo!!
