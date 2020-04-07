@@ -57,9 +57,14 @@ class Settings: AppCompatActivity() {
             preview.text = "..."
             scope.launch {
                 delay(300)
-                val info = manager.loadInfo(handle)
+                var info = manager.loadInfo(handle)
                 if(handle == it.toString()){
-                    preview.text = info?.makeInfoString() ?: "error"
+                    if(info == null){
+                        preview.text = "error"
+                        info = manager.emptyInfo(handle)
+                    }else{
+                        preview.text = info.makeInfoString()
+                    }
                     lastLoadedInfo = info
                     saveButton.isEnabled = true
                 }

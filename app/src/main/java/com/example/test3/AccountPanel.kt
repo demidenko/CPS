@@ -67,12 +67,14 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
 
 
         layout.setOnClickListener {
-            reloadButton.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
-                reloadButton.visibility = View.VISIBLE
-                reloadButton.animate().setStartDelay(5000).setDuration(2000).alpha(0f)
-                    .withEndAction {
-                        reloadButton.visibility = View.GONE
-                    }
+            if(reloadButton.isEnabled) {
+                reloadButton.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
+                    reloadButton.visibility = View.VISIBLE
+                    reloadButton.animate().setStartDelay(5000).setDuration(2000).alpha(0f)
+                        .withEndAction {
+                            reloadButton.visibility = View.GONE
+                        }
+                }
             }
             if(settingsButton.isEnabled) {
                 settingsButton.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {

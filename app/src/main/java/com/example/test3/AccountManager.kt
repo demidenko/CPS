@@ -19,13 +19,26 @@ import javax.net.ssl.HttpsURLConnection
 abstract class AccountManager(val activity: AppCompatActivity) {
     abstract val preferences_file_name: String
 
+    abstract fun emptyInfo(data: String): UserInfo
+
     abstract suspend fun loadInfo(data: String): UserInfo?
     open suspend fun loadSuggestions(str: String): List<Pair<String,String>>? {
         return null
     }
 
-    abstract fun getSavedInfo(): UserInfo
-    abstract fun saveInfo(info: UserInfo): Boolean
+    protected abstract var cachedInfo: UserInfo?
+    protected abstract fun readInfo(): UserInfo
+    fun getSavedInfo(): UserInfo{
+        if(cachedInfo == null) cachedInfo = readInfo()
+        return cachedInfo!! //idk why !! needs :(
+    }
+    protected abstract fun writeInfo(info: UserInfo): Boolean
+    fun saveInfo(info: UserInfo){
+        if(info == cachedInfo) return
+        writeInfo(info)
+        cachedInfo = info
+        println("rewrite to ${info.makeInfoString()}")
+    }
 
     abstract fun getColor(info: UserInfo): Int?
 
@@ -44,7 +57,7 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
 
     data class CodeforcesUserInfo(
         var handle: String,
-        var rating: Int
+        var rating: Int = NOT_FOUND
     ): UserInfo() {
         override var usedID: String
             get() = handle
@@ -66,6 +79,12 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
 
         const val NOT_RATED = Int.MIN_VALUE
         const val NOT_FOUND = Int.MAX_VALUE
+
+        var __cachedInfo: CodeforcesUserInfo? = null
+    }
+
+    override fun emptyInfo(data: String): UserInfo {
+        return CodeforcesUserInfo(data)
     }
 
     override suspend fun loadInfo(data: String): CodeforcesUserInfo? {
@@ -79,14 +98,18 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
         return res
     }
 
-    override fun getSavedInfo(): CodeforcesUserInfo = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE)){
+    override var cachedInfo: UserInfo?
+        get() = __cachedInfo
+        set(value) { __cachedInfo = value as CodeforcesUserInfo }
+
+    override fun readInfo(): CodeforcesUserInfo = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE)){
         return CodeforcesUserInfo(
             getString(preferences_handle, "") ?: "",
             getInt(preferences_rating, NOT_FOUND)
         )
     }
 
-    override fun saveInfo(info: UserInfo) = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE).edit()){
+    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE).edit()){
         info as CodeforcesUserInfo
         putString(preferences_handle, info.handle)
         putInt(preferences_rating, info.rating)
@@ -126,7 +149,7 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
 
     data class AtCoderUserInfo(
         var handle: String,
-        var rating: Int
+        var rating: Int = NOT_FOUND
     ): UserInfo(){
         override var usedID: String
             get() = handle
@@ -148,6 +171,12 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
 
         const val NOT_RATED = Int.MIN_VALUE
         const val NOT_FOUND = Int.MAX_VALUE
+
+        var __cachedInfo: AtCoderUserInfo? = null
+    }
+
+    override fun emptyInfo(data: String): UserInfo {
+        return AtCoderUserInfo(data)
     }
 
     override suspend fun loadInfo(data: String): UserInfo? {
@@ -166,14 +195,18 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
         return res
     }
 
-    override fun getSavedInfo(): AtCoderUserInfo = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE)){
+    override var cachedInfo: UserInfo?
+        get() = __cachedInfo
+        set(value) { __cachedInfo = value as AtCoderUserInfo }
+
+    override fun readInfo(): AtCoderUserInfo = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE)){
         return AtCoderUserInfo(
             getString(preferences_handle, "") ?: "",
             getInt(preferences_rating, NOT_FOUND)
         )
     }
 
-    override fun saveInfo(info: UserInfo) = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE).edit()){
+    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE).edit()){
         info as AtCoderUserInfo
         putString(preferences_handle, info.handle)
         putInt(preferences_rating, info.rating)
@@ -218,7 +251,7 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
 
     data class TopCoderUserInfo(
         var handle: String,
-        var rating_algorithm: Int
+        var rating_algorithm: Int = NOT_FOUND
     ) : UserInfo(){
         override var usedID: String
             get() = handle
@@ -240,6 +273,12 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
 
         const val NOT_RATED = Int.MIN_VALUE
         const val NOT_FOUND = Int.MAX_VALUE
+
+        var __cachedInfo: TopCoderUserInfo? = null
+    }
+
+    override fun emptyInfo(data: String): UserInfo {
+        return TopCoderUserInfo(data)
     }
 
     override suspend fun loadInfo(data: String): UserInfo? {
@@ -257,14 +296,18 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
         return res
     }
 
-    override fun getSavedInfo(): TopCoderUserInfo = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE)){
+    override var cachedInfo: UserInfo?
+        get() = __cachedInfo
+        set(value) { __cachedInfo = value as TopCoderUserInfo }
+
+    override fun readInfo(): TopCoderUserInfo = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE)){
         return TopCoderUserInfo(
             getString(preferences_handle, "") ?: "",
             getInt(preferences_rating_algorithm, NOT_FOUND)
         )
     }
 
-    override fun saveInfo(info: UserInfo) = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE).edit()){
+    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE).edit()){
         info as TopCoderUserInfo
         putString(preferences_handle, info.handle)
         putInt(preferences_rating_algorithm, info.rating_algorithm)
@@ -289,7 +332,7 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
 class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) {
     data class ACMPUserInfo(
         var id: String,
-        var userName: String,
+        var userName: String = "",
         var rating: Int = 0,
         var solvedTasks: Int = 0
     ): UserInfo() {
@@ -298,9 +341,13 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
             set(value) {id = value}
 
         override fun makeInfoString(): String {
-            if(userName.isEmpty()) return "[Not found]"
+            if(userName.isEmpty()) return "[$id Not found]"
             return "$userName [$solvedTasks / $rating]"
         }
+    }
+
+    override fun emptyInfo(data: String): UserInfo {
+        return ACMPUserInfo(data)
     }
 
     override val preferences_file_name = "acmp"
@@ -309,6 +356,8 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         const val preferences_username = "username"
         const val preferences_rating = "rating"
         const val preferences_count_of_solved_tasks = "count_of_solved_tasks"
+
+        var __cachedInfo: ACMPUserInfo? = null
     }
 
     override suspend fun loadInfo(data: String): ACMPUserInfo? {
@@ -332,7 +381,11 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         return res
     }
 
-    override fun getSavedInfo(): ACMPUserInfo = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE)){
+    override var cachedInfo: UserInfo?
+        get() = __cachedInfo
+        set(value) { __cachedInfo = value as ACMPUserInfo }
+
+    override fun readInfo(): ACMPUserInfo = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE)){
         return ACMPUserInfo(
             getString(preferences_userid, "") ?: "",
             getString(preferences_username, "") ?: "",
@@ -341,7 +394,7 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         )
     }
 
-    override fun saveInfo(info: UserInfo) = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE).edit()){
+    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE).edit()){
         info as ACMPUserInfo
         putString(preferences_userid, info.id)
         putString(preferences_username, info.userName)
