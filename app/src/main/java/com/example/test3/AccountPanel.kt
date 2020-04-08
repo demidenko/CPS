@@ -23,7 +23,7 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
         visibility = View.GONE
         setOnClickListener {
             val intent = Intent(activity, Settings::class.java).putExtra("manager", type)
-            activity.startActivityForResult(intent, MainActivity.CALL_SETTINGS)
+            activity.startActivityForResult(intent, MainActivity.CALL_ACCOUNT_SETTINGS)
         }
     }
     val reloadButton = ImageButton(activity).apply {
@@ -36,38 +36,41 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
     }
 
 
-    fun buildAndAdd(textMainSize: Float, textAdditionalSize: Float){
-        reloadButton.id = View.generateViewId()
-        var params = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
-        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-        layout.addView(reloadButton, params)
-
-        params = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
-        params.addRule(RelativeLayout.LEFT_OF, reloadButton.id)
-        layout.addView(settingsButton, params)
-
+    fun buildAndAdd(textMainSize: Float, textAdditionalSize: Float, view: View){
         textMain.id = View.generateViewId()
         textMain.setTextSize(TypedValue.COMPLEX_UNIT_SP, textMainSize)
-        params = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
-        params.addRule(RelativeLayout.ALIGN_PARENT_START)
-        layout.addView(textMain, params)
+        layout.addView(textMain, RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
+            addRule(RelativeLayout.ALIGN_PARENT_START)
+        })
 
         textAdditional.id = View.generateViewId()
         textAdditional.setTextSize(TypedValue.COMPLEX_UNIT_SP, textAdditionalSize)
-        params = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
-        params.addRule(RelativeLayout.BELOW, textMain.id)
-        layout.addView(textAdditional, params)
+        layout.addView(textAdditional, RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
+            addRule(RelativeLayout.BELOW, textMain.id)
+        })
 
-        var p = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        val pix = 30
-        p.setMargins(pix, 0, pix, pix)
-        activity.findViewById<LinearLayout>(R.id.panels_layout).addView(layout, p)
+        reloadButton.id = View.generateViewId()
+        layout.addView(reloadButton, RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
+            addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+        })
+
+        layout.addView(settingsButton, RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
+            addRule(RelativeLayout.LEFT_OF, reloadButton.id)
+        })
+
+        activity.findViewById<LinearLayout>(R.id.panels_layout).addView(layout, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+            val pix = 30
+            setMargins(pix, 0, pix, pix)
+        })
+
+
 
         additionalBuild()
 
 
         layout.setOnClickListener {
             if(reloadButton.isEnabled) {
+                reloadButton.clearAnimation()
                 reloadButton.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
                     reloadButton.visibility = View.VISIBLE
                     reloadButton.animate().setStartDelay(5000).setDuration(2000).alpha(0f)
@@ -106,11 +109,13 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
     suspend fun reload(){
         settingsButton.isEnabled = false
         reloadButton.isEnabled = false
-        activity.toggleReload(manager.preferences_file_name)
+        activity.accountsFragment.toggleReload(manager.preferences_file_name)
+
 
         settingsButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
             settingsButton.visibility = View.GONE
         }
+
         reloadButton.animate().setStartDelay(0).alpha(1f).setDuration(0).withStartAction {
             reloadButton.setColorFilter(activity.defaultTextColor)
             reloadButton.visibility = View.VISIBLE
@@ -121,22 +126,22 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
         val savedInfo = manager.getSavedInfo() as I
         val info = manager.loadInfo(savedInfo.usedID) as I?
 
-        reloadButton.clearAnimation()
-
         if(info!=null){
             if (info != savedInfo) manager.saveInfo(info)
             show(info)
             reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {
+                reloadButton.clearAnimation()
                 reloadButton.visibility = View.GONE
             }
         }else{
             show(savedInfo)
             Toast.makeText(activity, "${manager.preferences_file_name} load error", Toast.LENGTH_LONG).show()
+            reloadButton.clearAnimation()
             reloadButton.setColorFilter(Color.rgb(200,64,64))
         }
 
 
-        activity.toggleReload(manager.preferences_file_name)
+        activity.accountsFragment.toggleReload(manager.preferences_file_name)
         reloadButton.isEnabled = true
         settingsButton.isEnabled = true
     }
