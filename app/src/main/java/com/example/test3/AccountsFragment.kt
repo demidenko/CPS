@@ -182,10 +182,10 @@ class AccountsFragment(): Fragment() {
         val activity = activity!! as MainActivity //:)
 
 
-        codeforcesPanel.buildAndAdd(30F, 25F, view)
-        atcoderPanel.buildAndAdd(30F, 25F, view)
-        topcoderPanel.buildAndAdd(30F, 25F, view)
-        acmpPanel.buildAndAdd(17F, 14F, view)
+        codeforcesPanel.buildAndAdd(30F, 25F)
+        atcoderPanel.buildAndAdd(30F, 25F)
+        topcoderPanel.buildAndAdd(30F, 25F)
+        acmpPanel.buildAndAdd(17F, 14F)
 
         panels.forEach { it.show() }
 

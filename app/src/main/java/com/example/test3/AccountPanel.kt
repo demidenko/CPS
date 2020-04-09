@@ -36,7 +36,7 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
     }
 
 
-    fun buildAndAdd(textMainSize: Float, textAdditionalSize: Float, view: View){
+    fun buildAndAdd(textMainSize: Float, textAdditionalSize: Float){
         textMain.id = View.generateViewId()
         textMain.setTextSize(TypedValue.COMPLEX_UNIT_SP, textMainSize)
         layout.addView(textMain, RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
