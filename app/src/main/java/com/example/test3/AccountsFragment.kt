@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.launch
 import java.util.*
@@ -171,7 +170,7 @@ class AccountsFragment(): Fragment() {
             acmpPanel
         )
 
-        assert( panels.map { it.manager.preferences_file_name }.toSet().size == panels.size)
+        assert( panels.map { it.manager.PREFERENCES_FILE_NAME }.toSet().size == panels.size)
 
         return view
     }

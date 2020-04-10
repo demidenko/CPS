@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity(){
         println("on result $resultCode")
         if(requestCode == CALL_ACCOUNT_SETTINGS && resultCode == Activity.RESULT_OK){
             val who: String = data!!.getStringExtra("manager")!!
-            accountsFragment.panels.first { it.manager.preferences_file_name==who }.show()
+            accountsFragment.panels.first { it.manager.PREFERENCES_FILE_NAME==who }.show()
         }
         super.onActivityResult(requestCode, resultCode, data)
     }

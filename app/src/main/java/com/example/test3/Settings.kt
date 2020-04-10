@@ -30,13 +30,13 @@ class Settings: AppCompatActivity() {
             else -> throw Exception("Unknown type of manager")
         }
 
-        supportActionBar?.title =  manager.preferences_file_name + " settings"
+        supportActionBar?.title =  manager.PREFERENCES_FILE_NAME + " settings"
 
         val handleEditor: EditText = findViewById(R.id.editText)
 
         val saveButton: Button = findViewById(R.id.buttonSave)
 
-        var savedInfo = manager.getSavedInfo()
+        var savedInfo = manager.savedInfo
 
         handleEditor.setText(savedInfo.usedID)
 
@@ -87,9 +87,8 @@ class Settings: AppCompatActivity() {
 
         saveButton.setOnClickListener{
             if(saveButton.text == "Save"){
-                //TODO for null after load error
                 val currentHandle = lastLoadedInfo!!.usedID
-                manager.saveInfo(lastLoadedInfo!!)
+                manager.savedInfo = lastLoadedInfo!!
                 savedInfo = lastLoadedInfo!!
                 saveButton.text = "Saved"
                 handleEditor.setText(currentHandle)
@@ -100,7 +99,7 @@ class Settings: AppCompatActivity() {
 
     override fun onBackPressed(){
         println("back")
-        setResult(Activity.RESULT_OK, Intent().putExtra("manager", manager.preferences_file_name))
+        setResult(Activity.RESULT_OK, Intent().putExtra("manager", manager.PREFERENCES_FILE_NAME))
         finish()
         super.onBackPressed()
     }

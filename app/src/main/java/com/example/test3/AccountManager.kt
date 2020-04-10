@@ -4,11 +4,6 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.BufferedReader
-import java.io.FileNotFoundException
-import java.io.InputStreamReader
-import java.io.StringReader
-import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
 import java.net.URL
 import java.net.URLEncoder
@@ -17,7 +12,7 @@ import javax.net.ssl.HttpsURLConnection
 
 
 abstract class AccountManager(val activity: AppCompatActivity) {
-    abstract val preferences_file_name: String
+    abstract val PREFERENCES_FILE_NAME: String
 
     abstract fun emptyInfo(data: String): UserInfo
 
@@ -26,26 +21,24 @@ abstract class AccountManager(val activity: AppCompatActivity) {
         return null
     }
 
-    protected abstract var cachedInfo: UserInfo?
     protected abstract fun readInfo(): UserInfo
-    fun getSavedInfo(): UserInfo{
-        if(cachedInfo == null) cachedInfo = readInfo()
-        return cachedInfo!! //idk why !! needs :(
-    }
     protected abstract fun writeInfo(info: UserInfo): Boolean
-    fun saveInfo(info: UserInfo){
-        if(info == cachedInfo) return
-        writeInfo(info)
-        cachedInfo = info
-        println("rewrite to ${info.makeInfoString()}")
-    }
+    protected abstract var cachedInfo: UserInfo?
+
+    var savedInfo: UserInfo
+        get() = cachedInfo ?: readInfo().also { cachedInfo = it }
+        set(info) {
+            if(info == cachedInfo) return
+            writeInfo(info)
+            cachedInfo = info
+            println("${PREFERENCES_FILE_NAME} rewrited to ${info.makeInfoString()}")
+        }
 
     abstract fun getColor(info: UserInfo): Int?
-
 }
 
 abstract class UserInfo{
-    abstract var usedID: String
+    abstract val usedID: String
     abstract fun makeInfoString(): String
 }
 
@@ -59,9 +52,8 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
         var handle: String,
         var rating: Int = NOT_FOUND
     ): UserInfo() {
-        override var usedID: String
+        override val usedID: String
             get() = handle
-            set(value) {handle = value}
 
         override fun makeInfoString(): String {
             return when(rating){
@@ -72,7 +64,7 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
         }
     }
 
-    override val preferences_file_name = "codeforces"
+    override val PREFERENCES_FILE_NAME = "codeforces"
     companion object{
         const val preferences_handle = "handle"
         const val preferences_rating = "rating"
@@ -102,14 +94,14 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
         get() = __cachedInfo
         set(value) { __cachedInfo = value as CodeforcesUserInfo }
 
-    override fun readInfo(): CodeforcesUserInfo = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE)){
+    override fun readInfo(): CodeforcesUserInfo = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)){
         return CodeforcesUserInfo(
             getString(preferences_handle, "") ?: "",
             getInt(preferences_rating, NOT_FOUND)
         )
     }
 
-    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE).edit()){
+    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE).edit()){
         info as CodeforcesUserInfo
         putString(preferences_handle, info.handle)
         putInt(preferences_rating, info.rating)
@@ -151,9 +143,8 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
         var handle: String,
         var rating: Int = NOT_FOUND
     ): UserInfo(){
-        override var usedID: String
+        override val usedID: String
             get() = handle
-            set(value) {handle = value}
 
         override fun makeInfoString(): String {
             return when(rating){
@@ -164,7 +155,7 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
         }
     }
 
-    override val preferences_file_name = "atcoder"
+    override val PREFERENCES_FILE_NAME = "atcoder"
     companion object{
         const val preferences_handle = "handle"
         const val preferences_rating = "rating"
@@ -199,14 +190,14 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
         get() = __cachedInfo
         set(value) { __cachedInfo = value as AtCoderUserInfo }
 
-    override fun readInfo(): AtCoderUserInfo = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE)){
+    override fun readInfo(): AtCoderUserInfo = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)){
         return AtCoderUserInfo(
             getString(preferences_handle, "") ?: "",
             getInt(preferences_rating, NOT_FOUND)
         )
     }
 
-    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE).edit()){
+    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE).edit()){
         info as AtCoderUserInfo
         putString(preferences_handle, info.handle)
         putInt(preferences_rating, info.rating)
@@ -253,9 +244,8 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
         var handle: String,
         var rating_algorithm: Int = NOT_FOUND
     ) : UserInfo(){
-        override var usedID: String
+        override val usedID: String
             get() = handle
-            set(value) { handle = value }
 
         override fun makeInfoString(): String {
             return when(rating_algorithm){
@@ -266,7 +256,7 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
         }
     }
 
-    override val preferences_file_name = "topcoder"
+    override val PREFERENCES_FILE_NAME = "topcoder"
     companion object{
         const val preferences_handle = "handle"
         const val preferences_rating_algorithm = "rating_algorithm"
@@ -300,14 +290,14 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
         get() = __cachedInfo
         set(value) { __cachedInfo = value as TopCoderUserInfo }
 
-    override fun readInfo(): TopCoderUserInfo = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE)){
+    override fun readInfo(): TopCoderUserInfo = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)){
         return TopCoderUserInfo(
             getString(preferences_handle, "") ?: "",
             getInt(preferences_rating_algorithm, NOT_FOUND)
         )
     }
 
-    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE).edit()){
+    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE).edit()){
         info as TopCoderUserInfo
         putString(preferences_handle, info.handle)
         putInt(preferences_rating_algorithm, info.rating_algorithm)
@@ -336,9 +326,8 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         var rating: Int = 0,
         var solvedTasks: Int = 0
     ): UserInfo() {
-        override var usedID: String
+        override val usedID: String
             get() = id
-            set(value) {id = value}
 
         override fun makeInfoString(): String {
             if(userName.isEmpty()) return "[$id Not found]"
@@ -350,7 +339,7 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         return ACMPUserInfo(data)
     }
 
-    override val preferences_file_name = "acmp"
+    override val PREFERENCES_FILE_NAME = "acmp"
     companion object{
         const val preferences_userid = "userid"
         const val preferences_username = "username"
@@ -385,7 +374,7 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         get() = __cachedInfo
         set(value) { __cachedInfo = value as ACMPUserInfo }
 
-    override fun readInfo(): ACMPUserInfo = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE)){
+    override fun readInfo(): ACMPUserInfo = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)){
         return ACMPUserInfo(
             getString(preferences_userid, "") ?: "",
             getString(preferences_username, "") ?: "",
@@ -394,7 +383,7 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         )
     }
 
-    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(preferences_file_name, Context.MODE_PRIVATE).edit()){
+    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE).edit()){
         info as ACMPUserInfo
         putString(preferences_userid, info.id)
         putString(preferences_username, info.userName)

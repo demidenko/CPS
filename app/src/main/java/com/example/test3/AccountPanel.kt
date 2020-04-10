@@ -1,6 +1,7 @@
 package com.example.test3
 
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Color
 import android.util.TypedValue
 import android.view.View
@@ -49,12 +50,14 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
             addRule(RelativeLayout.BELOW, textMain.id)
         })
 
+        val buttonSize = 100
+
         reloadButton.id = View.generateViewId()
-        layout.addView(reloadButton, RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
+        layout.addView(reloadButton, RelativeLayout.LayoutParams(buttonSize, buttonSize).apply {
             addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
         })
 
-        layout.addView(settingsButton, RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
+        layout.addView(settingsButton, RelativeLayout.LayoutParams(buttonSize, buttonSize).apply {
             addRule(RelativeLayout.LEFT_OF, reloadButton.id)
         })
 
@@ -69,11 +72,13 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
 
 
         layout.setOnClickListener {
+            val startDelay = 3000L
+            val duration = 2000L
             if(reloadButton.isEnabled) {
                 reloadButton.clearAnimation()
                 reloadButton.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
                     reloadButton.visibility = View.VISIBLE
-                    reloadButton.animate().setStartDelay(5000).setDuration(2000).alpha(0f)
+                    reloadButton.animate().setStartDelay(startDelay).setDuration(duration).alpha(0f)
                         .withEndAction {
                             reloadButton.visibility = View.GONE
                         }
@@ -82,7 +87,7 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
             if(settingsButton.isEnabled) {
                 settingsButton.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
                     settingsButton.visibility = View.VISIBLE
-                    settingsButton.animate().setStartDelay(5000).setDuration(2000).alpha(0f)
+                    settingsButton.animate().setStartDelay(startDelay).setDuration(duration).alpha(0f)
                         .withEndAction {
                             settingsButton.visibility = View.GONE
                         }
@@ -96,7 +101,7 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
     abstract fun show(info: I)
 
     fun show(){
-        show(manager.getSavedInfo() as I)
+        show(manager.savedInfo as I)
     }
 
     val rotateAnimation = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f).apply {
@@ -109,7 +114,7 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
     suspend fun reload(){
         settingsButton.isEnabled = false
         reloadButton.isEnabled = false
-        activity.accountsFragment.toggleReload(manager.preferences_file_name)
+        activity.accountsFragment.toggleReload(manager.PREFERENCES_FILE_NAME)
 
 
         settingsButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
@@ -123,11 +128,11 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
         reloadButton.startAnimation(rotateAnimation)
 
         textAdditional.text = "..."
-        val savedInfo = manager.getSavedInfo() as I
+        val savedInfo = manager.savedInfo as I
         val info = manager.loadInfo(savedInfo.usedID) as I?
 
         if(info!=null){
-            if (info != savedInfo) manager.saveInfo(info)
+            manager.savedInfo = info
             show(info)
             reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {
                 reloadButton.clearAnimation()
@@ -135,13 +140,13 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
             }
         }else{
             show(savedInfo)
-            Toast.makeText(activity, "${manager.preferences_file_name} load error", Toast.LENGTH_LONG).show()
+            Toast.makeText(activity, "${manager.PREFERENCES_FILE_NAME} load error", Toast.LENGTH_LONG).show()
             reloadButton.clearAnimation()
-            reloadButton.setColorFilter(Color.rgb(200,64,64))
+            reloadButton.setColorFilter(activity.resources.getColor(R.color.fail, null))
         }
 
 
-        activity.accountsFragment.toggleReload(manager.preferences_file_name)
+        activity.accountsFragment.toggleReload(manager.PREFERENCES_FILE_NAME)
         reloadButton.isEnabled = true
         settingsButton.isEnabled = true
     }

@@ -18,7 +18,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/panels_layout"
-        android:text="RELOAD" />
+        android:layout_alignParentBottom="true"
+
+        android:text="RELOAD"
+        />
 
 </RelativeLayout>
