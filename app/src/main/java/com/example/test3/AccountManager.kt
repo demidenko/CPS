@@ -2,8 +2,11 @@ package com.example.test3
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
+import com.squareup.moshi.JsonReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okio.Okio
+import java.io.ByteArrayInputStream
 import java.net.SocketTimeoutException
 import java.net.URL
 import java.net.URLEncoder
@@ -79,14 +82,34 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
         return CodeforcesUserInfo(data)
     }
 
+    val NAMES = JsonReader.Options.of("handle", "rating")
     override suspend fun loadInfo(data: String): CodeforcesUserInfo? {
         val handle = data
         val s = readURLData("https://codeforces.com/api/user.info?handles=$handle") ?: return null
-        var i = s.indexOf("\"handle\"")
-        if(i==-1) return CodeforcesUserInfo(data, NOT_FOUND)
-        val res = CodeforcesUserInfo(s.substring(i+10, s.indexOf('"',i+10)), NOT_RATED)
-        i = s.indexOf("\"rating\"")
-        if(i!=-1) res.rating = s.substring(i+9, s.indexOf(',',i+9)).toInt()
+        val jreader = JsonReader.of(Okio.buffer(Okio.source(ByteArrayInputStream(s.toByteArray()))))!! //TODO read from inputstream
+
+        val res = CodeforcesUserInfo(handle, NOT_FOUND)
+        with(jreader){
+            beginObject()
+            nextName()
+            val status = nextString()
+            if(status == "FAILED") return res
+            assert(status == "OK")
+            res.rating = NOT_RATED
+            nextName()
+            beginArray()
+            beginObject()
+            while(hasNext()){
+                when (selectName(NAMES)){
+                    0 -> res.handle = nextString()
+                    1 -> res.rating = nextInt()
+                    else -> {
+                        skipName()
+                        skipValue()
+                    }
+                }
+            }
+        }
         return res
     }
 
@@ -414,10 +437,15 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
     }
 }
 
+suspend fun createConnection(address: String): HttpsURLConnection = withContext(Dispatchers.IO){
+    (URL(address).openConnection() as HttpsURLConnection).apply {
+        connectTimeout = 30000
+        readTimeout = 30000
+    }
+}
+
 suspend fun readURLData(address: String, charset: Charset = Charsets.UTF_8): String? = withContext(Dispatchers.IO){
-    val c = URL(address).openConnection() as HttpsURLConnection
-    c.connectTimeout = 30000
-    c.readTimeout = 30000
+    val c = createConnection(address)
     return@withContext try{
         when(c.responseCode) {
             HttpsURLConnection.HTTP_OK -> c.inputStream

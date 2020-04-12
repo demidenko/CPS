@@ -22,6 +22,10 @@
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true"
 
+        android:background="@android:color/black"
+        app:itemIconTint="@android:color/holo_blue_dark"
+        app:itemTextColor="@color/textColor"
+
         app:menu="@menu/navigation_bar"
         >
 
