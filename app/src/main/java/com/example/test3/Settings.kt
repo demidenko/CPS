@@ -38,24 +38,28 @@ class Settings: AppCompatActivity() {
 
         var savedInfo = manager.savedInfo
 
-        handleEditor.setText(savedInfo.usedID)
+        handleEditor.setText(savedInfo.userID)
 
         val preview = findViewById<TextView>(R.id.textViewUserInfo).apply { text="" }
         val suggestionsView = findViewById<TextView>(R.id.textViewSuggestions).apply { text="" }
 
         var lastLoadedInfo: UserInfo? = null
 
+        var jobInfo: Job? = null
+        var jobSuggestions: Job? = null
+
         handleEditor.addTextChangedListener {
             val handle = it!!.toString()
-            saveButton.text = if(handle.equals(savedInfo.usedID,true)) "Saved" else "Save"
+            saveButton.text = if(handle.equals(savedInfo.userID,true)) "Saved" else "Save"
 
-            if(lastLoadedInfo!=null && handle == lastLoadedInfo!!.usedID) return@addTextChangedListener
+            if(lastLoadedInfo!=null && handle == lastLoadedInfo!!.userID) return@addTextChangedListener
 
             saveButton.isEnabled = false
             lastLoadedInfo = null
 
             preview.text = "..."
-            scope.launch {
+            jobInfo?.cancel()
+            jobInfo = scope.launch {
                 delay(300)
                 var info = manager.loadInfo(handle)
                 if(handle == it.toString()){
@@ -73,7 +77,8 @@ class Settings: AppCompatActivity() {
             if(handle.length < 3) suggestionsView.text = ""
             else{
                 suggestionsView.text = "..."
-                scope.launch {
+                jobSuggestions?.cancel()
+                jobSuggestions = scope.launch {
                     delay(300)
                     val suggestions = manager.loadSuggestions(handle)
                     if(handle == it.toString()){
@@ -87,7 +92,7 @@ class Settings: AppCompatActivity() {
 
         saveButton.setOnClickListener{
             if(saveButton.text == "Save"){
-                val currentHandle = lastLoadedInfo!!.usedID
+                val currentHandle = lastLoadedInfo!!.userID
                 manager.savedInfo = lastLoadedInfo!!
                 savedInfo = lastLoadedInfo!!
                 saveButton.text = "Saved"

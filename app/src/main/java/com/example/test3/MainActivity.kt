@@ -3,11 +3,9 @@ package com.example.test3
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 
@@ -21,6 +19,7 @@ class MainActivity : AppCompatActivity(){
 
     val accountsFragment = AccountsFragment()
     val newsFragment = NewsFragment()
+    val testFragment = TestFragment()
     lateinit var activeFragment: Fragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,33 +34,27 @@ class MainActivity : AppCompatActivity(){
         activeFragment = accountsFragment
         supportFragmentManager.beginTransaction().add(R.id.container_fragment, activeFragment).commit()
 
-        navigation.setOnNavigationItemSelectedListener(object : BottomNavigationView.OnNavigationItemSelectedListener{
-            val addedFragments = mutableSetOf(navigation.menu.getItem(0).itemId)
-            override fun onNavigationItemSelected(item: MenuItem): Boolean {
-                val id = item.itemId
-                val selectedFragment =
-                    when(id){
-                        R.id.navigation_accounts -> accountsFragment
-                        R.id.navigation_news -> newsFragment
-                        else -> throw Exception("unknown selected navigation bar item: $id")
-                    }
-
-                if(selectedFragment!=activeFragment) {
-                    println("$id selected")
-                    supportFragmentManager.beginTransaction().hide(activeFragment).run {
-                        if(addedFragments.contains(id)) show(selectedFragment)
-                        else{
-                            addedFragments.add(id)
-                            add(R.id.container_fragment, selectedFragment)
-                        }
-                    }.commit()
-                    activeFragment = selectedFragment
+        navigation.setOnNavigationItemSelectedListener { item ->
+            val id = item.itemId
+            val selectedFragment =
+                when(id){
+                    R.id.navigation_accounts -> accountsFragment
+                    R.id.navigation_news -> newsFragment
+                    R.id.navigation_test -> testFragment
+                    else -> throw Exception("unknown selected navigation bar item: $id")
                 }
 
-                return true
+            if(selectedFragment!=activeFragment) {
+                println("$id selected")
+                supportFragmentManager.beginTransaction().hide(activeFragment).run {
+                    if(selectedFragment.isAdded) show(selectedFragment)
+                    else add(R.id.container_fragment, selectedFragment)
+                }.commit()
+                activeFragment = selectedFragment
             }
 
-        })
+            true
+        }
 
     }
 

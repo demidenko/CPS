@@ -1,7 +1,6 @@
 package com.example.test3
 
 import android.content.Intent
-import android.content.res.Resources
 import android.graphics.Color
 import android.util.TypedValue
 import android.view.View
@@ -37,7 +36,7 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
     }
 
 
-    fun buildAndAdd(textMainSize: Float, textAdditionalSize: Float){
+    fun buildAndAdd(textMainSize: Float, textAdditionalSize: Float, view: View){
         textMain.id = View.generateViewId()
         textMain.setTextSize(TypedValue.COMPLEX_UNIT_SP, textMainSize)
         layout.addView(textMain, RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
@@ -61,7 +60,7 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
             addRule(RelativeLayout.LEFT_OF, reloadButton.id)
         })
 
-        activity.findViewById<LinearLayout>(R.id.panels_layout).addView(layout, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+        view.findViewById<LinearLayout>(R.id.panels_layout).addView(layout, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
             val pix = 30
             setMargins(pix, 0, pix, pix)
         })
@@ -129,7 +128,7 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
 
         textAdditional.text = "..."
         val savedInfo = manager.savedInfo as I
-        val info = manager.loadInfo(savedInfo.usedID) as I?
+        val info = manager.loadInfo(savedInfo.userID) as I?
 
         if(info!=null){
             manager.savedInfo = info

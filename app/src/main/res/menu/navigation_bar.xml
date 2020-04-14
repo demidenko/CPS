@@ -11,4 +11,9 @@
         android:icon="@drawable/ic_news"
         android:title="news"/>
 
+    <item
+        android:id="@+id/navigation_test"
+        android:icon="@drawable/ic_test"
+        android:title="test"/>
+
 </menu>

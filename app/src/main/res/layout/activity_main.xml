@@ -23,8 +23,8 @@
         android:layout_alignParentBottom="true"
 
         android:background="@android:color/black"
-        app:itemIconTint="@android:color/holo_blue_dark"
-        app:itemTextColor="@color/textColor"
+        app:itemIconTint="@color/bottom_view_color"
+        app:itemTextColor="@color/bottom_view_color"
 
         app:menu="@menu/navigation_bar"
         >

@@ -27,14 +27,18 @@ class AccountsFragment(): Fragment() {
     lateinit var acmpPanel: AccountPanel<ACMPAccountManager, ACMPAccountManager.ACMPUserInfo>
 
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        println("fragment accounts onCreateView")
         val view = inflater.inflate(R.layout.fragment_accounts, container, false)
-        val activity = activity!! as MainActivity //:)
+        val activity = requireActivity() as MainActivity
 
 
         codeforcesAccountManager = CodeforcesAccountManager(activity)
@@ -172,19 +176,23 @@ class AccountsFragment(): Fragment() {
 
         assert( panels.map { it.manager.PREFERENCES_FILE_NAME }.toSet().size == panels.size)
 
+
+        codeforcesPanel.buildAndAdd(30F, 25F, view)
+        atcoderPanel.buildAndAdd(30F, 25F, view)
+        topcoderPanel.buildAndAdd(30F, 25F, view)
+        acmpPanel.buildAndAdd(17F, 14F, view)
+
+
+
+
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        println("fragment accounts onViewCreated")
         super.onViewCreated(view, savedInstanceState)
 
-        val activity = activity!! as MainActivity //:)
-
-
-        codeforcesPanel.buildAndAdd(30F, 25F)
-        atcoderPanel.buildAndAdd(30F, 25F)
-        topcoderPanel.buildAndAdd(30F, 25F)
-        acmpPanel.buildAndAdd(17F, 14F)
+        val activity = requireActivity() as MainActivity
 
         panels.forEach { it.show() }
 
@@ -197,6 +205,7 @@ class AccountsFragment(): Fragment() {
             }
         }
     }
+
 
     val toggleSet = TreeSet<String>()
     fun toggleReload(s: String){

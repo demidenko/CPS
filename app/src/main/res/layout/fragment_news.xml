@@ -5,12 +5,29 @@
     >
 
     <TextView
-        android:id="@+id/codeforces_news"
-        android:layout_width="wrap_content"
+        android:id="@+id/news_head"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="NEWS ALPHA"
+        android:gravity="center"
         android:layout_centerHorizontal="true"
-        android:text="TODO: CF MAIN + TOP"
+        android:layout_alignParentTop="true"
         />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/cf_news_tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/news_head"
+        />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/cf_news_pager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cf_news_tab_layout"
+         />
+
 
     <Button
         android:id="@+id/button_reload_cf"
@@ -18,7 +35,6 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-
         android:text="RELOAD"
         />
 

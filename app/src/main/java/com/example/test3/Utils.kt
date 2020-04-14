@@ -1,0 +1,80 @@
+package com.example.test3
+
+import com.squareup.moshi.JsonReader
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okio.Okio
+import java.io.InputStream
+import java.net.SocketTimeoutException
+import java.net.URL
+import java.nio.charset.Charset
+import javax.net.ssl.HttpsURLConnection
+
+
+
+suspend fun createConnectionStream(address: String): InputStream? = withContext(Dispatchers.IO){
+    val c = (URL(address).openConnection() as HttpsURLConnection).apply {
+        connectTimeout = 30000
+        readTimeout = 30000
+    }
+    return@withContext try {
+        when (c.responseCode) {
+            HttpsURLConnection.HTTP_OK -> c.inputStream
+            else -> c.errorStream
+        }
+    }catch (e : SocketTimeoutException){
+        null
+    }
+}
+
+suspend fun readURLData(address: String, charset: Charset = Charsets.UTF_8): String? = withContext(Dispatchers.IO){
+    val c = createConnectionStream(address)
+    c?.reader(charset)?.readText()
+}
+
+
+///JsonReader help
+suspend fun JsonReaderFromURL(address: String): JsonReader?{
+    return JsonReader.of(Okio.buffer(Okio.source(createConnectionStream(address)?: return null)))
+}
+
+inline fun JsonReader.readObject(body: () -> Unit) {
+    beginObject()
+    while (hasNext()) body()
+    endObject()
+}
+
+fun JsonReader.readObjectFields(vararg strings: String): Array<Any?> {
+    beginObject()
+    val names = JsonReader.Options.of(*strings)
+    val res = Array<Any?>(strings.size){ null }
+    while(hasNext()){
+        val i = selectName(names)
+        if(0<=i && i<res.size) res[i] = readJsonValue()
+        else skipValue()
+    }
+    endObject()
+    return res
+}
+
+
+inline fun JsonReader.readArray(body: () -> Unit) {
+    beginArray()
+    while (hasNext()) body()
+    endArray()
+}
+
+inline fun JsonReader.readArrayIndexed(body: (index: Int) -> Unit) {
+    beginArray()
+    var i = 0
+    while (hasNext()){
+        body(i)
+        ++i
+    }
+    endArray()
+}
+
+fun JsonReader.skipNameAndValue() {
+    skipName()
+    skipValue()
+}

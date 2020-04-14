@@ -2,6 +2,8 @@ package com.example.test3
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.JsonReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -41,7 +43,7 @@ abstract class AccountManager(val activity: AppCompatActivity) {
 }
 
 abstract class UserInfo{
-    abstract val usedID: String
+    abstract val userID: String
     abstract fun makeInfoString(): String
 }
 
@@ -55,7 +57,7 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
         var handle: String,
         var rating: Int = NOT_FOUND
     ): UserInfo() {
-        override val usedID: String
+        override val userID: String
             get() = handle
 
         override fun makeInfoString(): String {
@@ -76,41 +78,40 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
         const val NOT_FOUND = Int.MAX_VALUE
 
         var __cachedInfo: CodeforcesUserInfo? = null
+
+        val NAMES = JsonReader.Options.of("handle", "rating")
     }
 
     override fun emptyInfo(data: String): UserInfo {
         return CodeforcesUserInfo(data)
     }
 
-    val NAMES = JsonReader.Options.of("handle", "rating")
-    override suspend fun loadInfo(data: String): CodeforcesUserInfo? {
+    override suspend fun loadInfo(data: String): CodeforcesUserInfo? = withContext(Dispatchers.IO){
         val handle = data
-        val s = readURLData("https://codeforces.com/api/user.info?handles=$handle") ?: return null
-        val jreader = JsonReader.of(Okio.buffer(Okio.source(ByteArrayInputStream(s.toByteArray()))))!! //TODO read from inputstream
-
-        val res = CodeforcesUserInfo(handle, NOT_FOUND)
-        with(jreader){
-            beginObject()
-            nextName()
-            val status = nextString()
-            if(status == "FAILED") return res
-            assert(status == "OK")
-            res.rating = NOT_RATED
-            nextName()
-            beginArray()
-            beginObject()
-            while(hasNext()){
-                when (selectName(NAMES)){
-                    0 -> res.handle = nextString()
-                    1 -> res.rating = nextInt()
-                    else -> {
-                        skipName()
-                        skipValue()
+        with(JsonReaderFromURL("https://codeforces.com/api/user.info?handles=$handle") ?: return@withContext null) {
+            try {
+                beginObject()
+                nextName()
+                val status = nextString()
+                if (status == "FAILED") return@withContext CodeforcesUserInfo(handle, NOT_FOUND)
+                val res = CodeforcesUserInfo(handle, NOT_RATED)
+                nextName()
+                beginArray()
+                beginObject()
+                while (hasNext()) {
+                    when (selectName(NAMES)) {
+                        0 -> res.handle = nextString()
+                        1 -> res.rating = nextInt()
+                        else -> skipNameAndValue()
                     }
                 }
+                res
+            }catch (e: JsonEncodingException){
+                null
+            }catch (e: JsonDataException){
+                null
             }
         }
-        return res
     }
 
     override var cachedInfo: UserInfo?
@@ -166,7 +167,7 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
         var handle: String,
         var rating: Int = NOT_FOUND
     ): UserInfo(){
-        override val usedID: String
+        override val userID: String
             get() = handle
 
         override fun makeInfoString(): String {
@@ -267,7 +268,7 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
         var handle: String,
         var rating_algorithm: Int = NOT_FOUND
     ) : UserInfo(){
-        override val usedID: String
+        override val userID: String
             get() = handle
 
         override fun makeInfoString(): String {
@@ -288,25 +289,44 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
         const val NOT_FOUND = Int.MAX_VALUE
 
         var __cachedInfo: TopCoderUserInfo? = null
+
+        val NAMES = JsonReader.Options.of("handle", "ratingSummary", "error")
     }
 
     override fun emptyInfo(data: String): UserInfo {
         return TopCoderUserInfo(data)
     }
 
-    override suspend fun loadInfo(data: String): UserInfo? {
+    override suspend fun loadInfo(data: String): UserInfo? = withContext(Dispatchers.IO) {
         val handle = data
-        val s = readURLData("https://api.topcoder.com/v2/users/$handle") ?: return null
-        if(s.contains("\"name\": \"Not Found\"")) return TopCoderUserInfo(handle, NOT_FOUND)
-        var i = s.indexOf("\"handle\"")
-        i = s.indexOf("\"", i+10)
-        val res = TopCoderUserInfo(s.substring(i+1, s.indexOf('"',i+1)), NOT_RATED)
-        i = s.indexOf("\"name\": \"Algorithm\"")
-        if(i!=-1){
-            i = s.indexOf("\"rating\":", i+1)
-            res.rating_algorithm = s.substring(s.indexOf(": ",i)+2, s.indexOf(",",i)).toInt()
+        with(JsonReaderFromURL("https://api.topcoder.com/v2/users/$handle") ?: return@withContext null) {
+            val res = TopCoderUserInfo(handle, NOT_RATED)
+            readObject {
+                when(selectName(NAMES)){
+                    0 -> res.handle = nextString()
+                    1 -> readArray{
+                        var name: String? = null
+                        var rating: Int? = null
+                        readObject {
+                            while(hasNext()){
+                                when(nextName()){
+                                    "name" -> name = nextString()
+                                    "rating" -> rating = nextInt()
+                                    else -> skipValue()
+                                }
+                            }
+                        }
+                        if(name == "Algorithm") res.rating_algorithm = rating!!
+                    }
+                    2 -> { //error
+                        res.rating_algorithm = NOT_FOUND
+                        return@with res
+                    }
+                    else -> skipNameAndValue()
+                }
+            }
+            res
         }
-        return res
     }
 
     override var cachedInfo: UserInfo?
@@ -349,7 +369,7 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         var rating: Int = 0,
         var solvedTasks: Int = 0
     ): UserInfo() {
-        override val usedID: String
+        override val userID: String
             get() = id
 
         override fun makeInfoString(): String {
@@ -437,21 +457,4 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
     }
 }
 
-suspend fun createConnection(address: String): HttpsURLConnection = withContext(Dispatchers.IO){
-    (URL(address).openConnection() as HttpsURLConnection).apply {
-        connectTimeout = 30000
-        readTimeout = 30000
-    }
-}
 
-suspend fun readURLData(address: String, charset: Charset = Charsets.UTF_8): String? = withContext(Dispatchers.IO){
-    val c = createConnection(address)
-    return@withContext try{
-        when(c.responseCode) {
-            HttpsURLConnection.HTTP_OK -> c.inputStream
-            else -> c.errorStream
-        }.reader(charset).readText()
-    }catch (e : SocketTimeoutException){
-        null
-    }
-}
