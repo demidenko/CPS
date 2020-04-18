@@ -8,7 +8,7 @@
         android:id="@+id/news_head"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="NEWS ALPHA"
+        android:text="NEWS BETA"
         android:gravity="center"
         android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"

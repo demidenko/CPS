@@ -58,6 +58,7 @@ const val preferences_status = "preferences_status"
 abstract class UserInfo{
     abstract val userID: String
     abstract val status: STATUS
+
     protected abstract fun makeInfoOKString(): String
     fun makeInfoString(): String {
         return when(status){
@@ -273,7 +274,8 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
     data class TopCoderUserInfo(
         override var status: STATUS,
         var handle: String,
-        var rating_algorithm: Int = NOT_RATED
+        var rating_algorithm: Int = NOT_RATED,
+        var rating_marathon: Int = NOT_RATED
     ) : UserInfo(){
         override val userID: String
             get() = handle
@@ -287,6 +289,7 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
     companion object{
         const val preferences_handle = "handle"
         const val preferences_rating_algorithm = "rating_algorithm"
+        const val preferences_rating_marathon = "rating_marathon"
 
         var __cachedInfo: TopCoderUserInfo? = null
 
@@ -315,10 +318,13 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
                                     }
                                 }
                             }
-                            if(name == "Algorithm") res.rating_algorithm = rating!!
+                            when (name) {
+                                "Algorithm" -> res.rating_algorithm = rating!!
+                                "Marathon Match" -> res.rating_marathon = rating!!
+                            }
                         }
-                        //error
                         2 -> {
+                            //error
                             if((readObjectFields("name")[0] as String) == "Not Found") return@with res.apply { status = STATUS.NOT_FOUND }
                             return@with res
                         }
@@ -342,7 +348,8 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
         return TopCoderUserInfo(
             STATUS.valueOf(getString(preferences_status, null) ?: STATUS.FAILED.name),
             getString(preferences_handle, "") ?: "",
-            getInt(preferences_rating_algorithm, NOT_RATED)
+            getInt(preferences_rating_algorithm, NOT_RATED),
+            getInt(preferences_rating_marathon, NOT_RATED)
         )
     }
 
@@ -351,6 +358,7 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
         info as TopCoderUserInfo
         putString(preferences_handle, info.handle)
         putInt(preferences_rating_algorithm, info.rating_algorithm)
+        putInt(preferences_rating_marathon, info.rating_marathon)
         commit()
     }
 
@@ -466,3 +474,5 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
 }
 
 
+//-------ProjectEuler---------
+//TODO

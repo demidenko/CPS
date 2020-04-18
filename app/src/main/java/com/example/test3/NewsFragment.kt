@@ -1,6 +1,8 @@
 package com.example.test3
 
+import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +10,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
@@ -15,6 +20,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import java.lang.Exception
+import java.net.URI
 
 
 class NewsFragment() : Fragment() {
@@ -53,6 +59,11 @@ class NewsFragment() : Fragment() {
             codeforcesNewsAdapter.fragment1,
             codeforcesNewsAdapter.fragment2
         )
+
+
+
+
+
 
         view.findViewById<Button>(R.id.button_reload_cf).apply {
             setOnClickListener { button -> button as Button
@@ -109,25 +120,61 @@ class CodeforcesNewsFragment(val address: String) : Fragment() {
         return inflater.inflate(R.layout.fragment_cf_news_page, container, false)
     }
 
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var viewAdapter: MyAdapter
+    private lateinit var viewManager: RecyclerView.LayoutManager
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val textView: TextView = view.findViewById(R.id.news_cf_textview)
-        textView.setLineSpacing(0f, 1.3f)
+        viewManager = LinearLayoutManager(context)
+
+        viewAdapter = MyAdapter(requireActivity(), arrayListOf())
+
+        recyclerView = view.findViewById<RecyclerView>(R.id.cf_news_page_recyclerview).apply {
+            setHasFixedSize(true)
+            layoutManager = viewManager
+            adapter = viewAdapter
+        }
     }
 
     suspend fun reload(){
-        val t = view!!.findViewById<TextView>(R.id.news_cf_textview)
         readURLData(address)?.let { s ->
-            var res: String = ""
+            val res = arrayListOf<Pair<String,Int>>()
             var i = 0
             while (true) {
                 i = s.indexOf("<div class=\"topic\"", i + 1)
                 if (i == -1) break
                 val title = s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i))
-                res += title + "\n"
+                i = s.indexOf("entry/", i)
+                val id = s.substring(i+6, s.indexOf('"',i)).toInt()
+                res.add(Pair(title,id))
             }
-            t.text = res
+            viewAdapter.data = res
+            viewAdapter.notifyDataSetChanged()
         }
     }
+}
+
+
+class MyAdapter(val c: FragmentActivity, var data: ArrayList<Pair<String,Int>>): RecyclerView.Adapter<MyAdapter.MyViewHolder>(){
+    class MyViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView){
+
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+        val textView = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_item, parent, false) as TextView
+
+        return MyViewHolder(textView)
+    }
+
+    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        holder.textView.text = data[position].first
+        holder.textView.setOnClickListener {
+            println(data[position].second)
+            c.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${data[position].second}")))
+        }
+    }
+
+    override fun getItemCount() = data.size
+
 }
