@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         defaultTextColor = ContextCompat.getColor(this, R.color.textColor)
 
         supportActionBar?.title = "Competitive Programming & Solving"
@@ -63,7 +64,10 @@ class MainActivity : AppCompatActivity(){
         super.onResume()
     }
 
-
+    override fun onStop() {
+        println("main stop")
+        super.onStop()
+    }
 
     override fun onDestroy() {
         println("main destroy")

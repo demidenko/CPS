@@ -19,9 +19,14 @@ import javax.net.ssl.HttpsURLConnection
 abstract class AccountManager(val activity: AppCompatActivity) {
     abstract val PREFERENCES_FILE_NAME: String
 
-    abstract fun emptyInfo(data: String): UserInfo
 
-    abstract suspend fun loadInfo(data: String): UserInfo?
+    protected abstract suspend fun downloadInfo(data: String): UserInfo
+    suspend fun loadInfo(data: String): UserInfo {
+        return withContext(Dispatchers.IO){
+            downloadInfo(data)
+        }
+    }
+
     open suspend fun loadSuggestions(str: String): List<Pair<String,String>>? {
         return null
     }
@@ -42,9 +47,25 @@ abstract class AccountManager(val activity: AppCompatActivity) {
     abstract fun getColor(info: UserInfo): Int?
 }
 
+enum class STATUS{
+    OK,
+    NOT_FOUND,
+    FAILED
+}
+const val NOT_RATED = Int.MIN_VALUE
+const val preferences_status = "preferences_status"
+
 abstract class UserInfo{
     abstract val userID: String
-    abstract fun makeInfoString(): String
+    abstract val status: STATUS
+    protected abstract fun makeInfoOKString(): String
+    fun makeInfoString(): String {
+        return when(status){
+            STATUS.FAILED -> "Error on load $userID"
+            STATUS.NOT_FOUND -> "Not found: $userID"
+            else -> makeInfoOKString()
+        }
+    }
 }
 
 
@@ -54,18 +75,15 @@ abstract class UserInfo{
 class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(activity) {
 
     data class CodeforcesUserInfo(
+        override var status: STATUS,
         var handle: String,
-        var rating: Int = NOT_FOUND
+        var rating: Int = NOT_RATED
     ): UserInfo() {
         override val userID: String
             get() = handle
 
-        override fun makeInfoString(): String {
-            return when(rating){
-                NOT_FOUND -> "Not found: $handle"
-                NOT_RATED -> "$handle [not rated]"
-                else -> "$handle $rating"
-            }
+        override fun makeInfoOKString(): String {
+            return if(rating == NOT_RATED) "$handle [not rated]" else "$handle $rating"
         }
     }
 
@@ -74,43 +92,35 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
         const val preferences_handle = "handle"
         const val preferences_rating = "rating"
 
-        const val NOT_RATED = Int.MIN_VALUE
-        const val NOT_FOUND = Int.MAX_VALUE
-
         var __cachedInfo: CodeforcesUserInfo? = null
 
         val NAMES = JsonReader.Options.of("handle", "rating")
     }
 
-    override fun emptyInfo(data: String): UserInfo {
-        return CodeforcesUserInfo(data)
-    }
-
-    override suspend fun loadInfo(data: String): CodeforcesUserInfo? = withContext(Dispatchers.IO){
+    override suspend fun downloadInfo(data: String): CodeforcesUserInfo {
         val handle = data
-        with(JsonReaderFromURL("https://codeforces.com/api/user.info?handles=$handle") ?: return@withContext null) {
-            try {
-                beginObject()
-                nextName()
-                val status = nextString()
-                if (status == "FAILED") return@withContext CodeforcesUserInfo(handle, NOT_FOUND)
-                val res = CodeforcesUserInfo(handle, NOT_RATED)
-                nextName()
-                beginArray()
-                beginObject()
-                while (hasNext()) {
-                    when (selectName(NAMES)) {
-                        0 -> res.handle = nextString()
-                        1 -> res.rating = nextInt()
-                        else -> skipNameAndValue()
+        return try {
+            val res = CodeforcesUserInfo(STATUS.FAILED, handle)
+            with(JsonReaderFromURL("https://codeforces.com/api/user.info?handles=$handle") ?: return res) {
+                readObject {
+                    if(nextString("status") == "FAILED") return res.apply { status = STATUS.NOT_FOUND }
+                    nextName()
+                    readArrayOfObjects {
+                        while (hasNext()) {
+                            when (selectName(NAMES)) {
+                                0 -> res.handle = nextString()
+                                1 -> res.rating = nextInt()
+                                else -> skipNameAndValue()
+                            }
+                        }
                     }
                 }
-                res
-            }catch (e: JsonEncodingException){
-                null
-            }catch (e: JsonDataException){
-                null
+                res.apply { status = STATUS.OK }
             }
+        }catch (e: JsonEncodingException){
+            CodeforcesUserInfo(STATUS.FAILED, handle)
+        }catch (e: JsonDataException){
+            CodeforcesUserInfo(STATUS.FAILED, handle)
         }
     }
 
@@ -120,12 +130,14 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
 
     override fun readInfo(): CodeforcesUserInfo = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)){
         return CodeforcesUserInfo(
+            STATUS.valueOf(getString(preferences_status, null) ?: STATUS.FAILED.name),
             getString(preferences_handle, "") ?: "",
-            getInt(preferences_rating, NOT_FOUND)
+            getInt(preferences_rating, NOT_RATED)
         )
     }
 
     override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE).edit()){
+        putString(preferences_status, info.status.name)
         info as CodeforcesUserInfo
         putString(preferences_handle, info.handle)
         putInt(preferences_rating, info.rating)
@@ -133,7 +145,7 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
     }
 
     override fun getColor(info: UserInfo): Int? = with(info as CodeforcesUserInfo){
-        if(rating == NOT_FOUND || rating == NOT_RATED) return null
+        if(status != STATUS.OK || rating == NOT_RATED) return null
         return when{
             rating < 1200 -> 0xFF808080 //gray
             rating < 1400 -> 0xFF008000 //green
@@ -164,18 +176,15 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
 class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activity){
 
     data class AtCoderUserInfo(
+        override var status: STATUS,
         var handle: String,
-        var rating: Int = NOT_FOUND
+        var rating: Int = NOT_RATED
     ): UserInfo(){
         override val userID: String
             get() = handle
 
-        override fun makeInfoString(): String {
-            return when(rating){
-                NOT_FOUND -> "Not found: $handle"
-                NOT_RATED -> "$handle [not rated]"
-                else -> "$handle $rating"
-            }
+        override fun makeInfoOKString(): String {
+            return if(rating == NOT_RATED) "$handle [not rated]" else "$handle $rating"
         }
     }
 
@@ -184,22 +193,16 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
         const val preferences_handle = "handle"
         const val preferences_rating = "rating"
 
-        const val NOT_RATED = Int.MIN_VALUE
-        const val NOT_FOUND = Int.MAX_VALUE
-
         var __cachedInfo: AtCoderUserInfo? = null
     }
 
-    override fun emptyInfo(data: String): UserInfo {
-        return AtCoderUserInfo(data)
-    }
 
-    override suspend fun loadInfo(data: String): UserInfo? {
+    override suspend fun downloadInfo(data: String): UserInfo {
         val handle = data
-        val s = readURLData("https://atcoder.jp/users/$handle") ?: return null
-        val res = AtCoderUserInfo(handle, NOT_FOUND)
+        val res = AtCoderUserInfo(STATUS.FAILED, handle)
+        val s = readURLData("https://atcoder.jp/users/$handle") ?: return res
         var i = s.lastIndexOf("class=\"username\"")
-        if(i==-1) return res
+        if(i==-1) return res.apply { status = STATUS.NOT_FOUND }
         i = s.indexOf("</span", i)
         res.handle = s.substring(s.lastIndexOf('>',i)+1, i)
         i = s.indexOf("<th class=\"no-break\">Rating</th>")
@@ -207,6 +210,7 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
             i = s.indexOf("</span", i)
             res.rating = s.substring(s.lastIndexOf('>',i)+1, i).toInt()
         }else res.rating = NOT_RATED
+        res.status = STATUS.OK
         return res
     }
 
@@ -216,12 +220,14 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
 
     override fun readInfo(): AtCoderUserInfo = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)){
         return AtCoderUserInfo(
+            STATUS.valueOf(getString(preferences_status, null) ?: STATUS.FAILED.name),
             getString(preferences_handle, "") ?: "",
-            getInt(preferences_rating, NOT_FOUND)
+            getInt(preferences_rating, NOT_RATED)
         )
     }
 
     override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE).edit()){
+        putString(preferences_status, info.status.name)
         info as AtCoderUserInfo
         putString(preferences_handle, info.handle)
         putInt(preferences_rating, info.rating)
@@ -229,7 +235,7 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
     }
 
     override fun getColor(info: UserInfo): Int?  = with(info as AtCoderUserInfo){
-        if(rating == NOT_FOUND || rating == NOT_RATED) return null
+        if(status != STATUS.OK || rating == NOT_RATED) return null
         return when{
             rating < 400 -> 0xFF808080 //gray
             rating < 800 -> 0xFF804000 //brown
@@ -265,18 +271,15 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
 class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activity) {
 
     data class TopCoderUserInfo(
+        override var status: STATUS,
         var handle: String,
-        var rating_algorithm: Int = NOT_FOUND
+        var rating_algorithm: Int = NOT_RATED
     ) : UserInfo(){
         override val userID: String
             get() = handle
 
-        override fun makeInfoString(): String {
-            return when(rating_algorithm){
-                NOT_FOUND -> "Not found: $handle"
-                NOT_RATED -> "$handle [not rated]"
-                else -> "$handle $rating_algorithm"
-            }
+        override fun makeInfoOKString(): String {
+            return if(rating_algorithm == NOT_RATED) "$handle [not rated]" else "$handle $rating_algorithm"
         }
     }
 
@@ -285,47 +288,49 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
         const val preferences_handle = "handle"
         const val preferences_rating_algorithm = "rating_algorithm"
 
-        const val NOT_RATED = Int.MIN_VALUE
-        const val NOT_FOUND = Int.MAX_VALUE
-
         var __cachedInfo: TopCoderUserInfo? = null
 
         val NAMES = JsonReader.Options.of("handle", "ratingSummary", "error")
     }
 
-    override fun emptyInfo(data: String): UserInfo {
-        return TopCoderUserInfo(data)
-    }
 
-    override suspend fun loadInfo(data: String): UserInfo? = withContext(Dispatchers.IO) {
+
+    override suspend fun downloadInfo(data: String): UserInfo {
         val handle = data
-        with(JsonReaderFromURL("https://api.topcoder.com/v2/users/$handle") ?: return@withContext null) {
-            val res = TopCoderUserInfo(handle, NOT_RATED)
-            readObject {
-                when(selectName(NAMES)){
-                    0 -> res.handle = nextString()
-                    1 -> readArray{
-                        var name: String? = null
-                        var rating: Int? = null
-                        readObject {
-                            while(hasNext()){
-                                when(nextName()){
-                                    "name" -> name = nextString()
-                                    "rating" -> rating = nextInt()
-                                    else -> skipValue()
+        return try{
+            val res = TopCoderUserInfo(STATUS.FAILED, handle)
+            with(JsonReaderFromURL("https://api.topcoder.com/v2/users/$handle") ?: return res) {
+                readObject {
+                    when(selectName(NAMES)){
+                        0 -> res.handle = nextString()
+                        1 -> readArray{
+                            var name: String? = null
+                            var rating: Int? = null
+                            readObject {
+                                while(hasNext()){
+                                    when(nextName()){
+                                        "name" -> name = nextString()
+                                        "rating" -> rating = nextInt()
+                                        else -> skipValue()
+                                    }
                                 }
                             }
+                            if(name == "Algorithm") res.rating_algorithm = rating!!
                         }
-                        if(name == "Algorithm") res.rating_algorithm = rating!!
+                        //error
+                        2 -> {
+                            if((readObjectFields("name")[0] as String) == "Not Found") return@with res.apply { status = STATUS.NOT_FOUND }
+                            return@with res
+                        }
+                        else -> skipNameAndValue()
                     }
-                    2 -> { //error
-                        res.rating_algorithm = NOT_FOUND
-                        return@with res
-                    }
-                    else -> skipNameAndValue()
                 }
+                res.apply { status = STATUS.OK }
             }
-            res
+        } catch (e: JsonEncodingException){
+            TopCoderUserInfo(STATUS.FAILED, handle)
+        } catch (e: JsonDataException){
+            TopCoderUserInfo(STATUS.FAILED, handle)
         }
     }
 
@@ -335,12 +340,14 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
 
     override fun readInfo(): TopCoderUserInfo = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)){
         return TopCoderUserInfo(
+            STATUS.valueOf(getString(preferences_status, null) ?: STATUS.FAILED.name),
             getString(preferences_handle, "") ?: "",
-            getInt(preferences_rating_algorithm, NOT_FOUND)
+            getInt(preferences_rating_algorithm, NOT_RATED)
         )
     }
 
     override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE).edit()){
+        putString(preferences_status, info.status.name)
         info as TopCoderUserInfo
         putString(preferences_handle, info.handle)
         putInt(preferences_rating_algorithm, info.rating_algorithm)
@@ -348,7 +355,7 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
     }
 
     override fun getColor(info: UserInfo): Int? = with(info as TopCoderUserInfo){
-        if(rating_algorithm == NOT_FOUND || rating_algorithm == NOT_RATED) return null
+        if(status != STATUS.OK || rating_algorithm == NOT_RATED) return null
         return when{
             rating_algorithm < 900 -> 0xFF999999 //gray
             rating_algorithm < 1200 -> 0xFF00A900 //green
@@ -364,6 +371,7 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
 
 class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) {
     data class ACMPUserInfo(
+        override var status: STATUS,
         var id: String,
         var userName: String = "",
         var rating: Int = 0,
@@ -372,15 +380,12 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         override val userID: String
             get() = id
 
-        override fun makeInfoString(): String {
-            if(userName.isEmpty()) return "[$id Not found]"
+        override fun makeInfoOKString(): String {
             return "$userName [$solvedTasks / $rating]"
         }
     }
 
-    override fun emptyInfo(data: String): UserInfo {
-        return ACMPUserInfo(data)
-    }
+
 
     override val PREFERENCES_FILE_NAME = "acmp"
     companion object{
@@ -392,10 +397,10 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         var __cachedInfo: ACMPUserInfo? = null
     }
 
-    override suspend fun loadInfo(data: String): ACMPUserInfo? {
-        val s  = readURLData("https://acmp.ru/index.asp?main=user&id=$data", Charset.forName("windows-1251")) ?: return null
-        val res = ACMPUserInfo(data, "")
-        if(!s.contains("index.asp?main=status&id_mem=$data")) return res
+    override suspend fun downloadInfo(data: String): ACMPUserInfo {
+        val res = ACMPUserInfo(STATUS.FAILED, data)
+        val s  = readURLData("https://acmp.ru/index.asp?main=user&id=$data", Charset.forName("windows-1251")) ?: return res
+        if(!s.contains("index.asp?main=status&id_mem=$data")) return res.apply { status = STATUS.NOT_FOUND }
         var i = s.indexOf("<title>")
         if(i!=-1){
             res.userName = s.substring(s.indexOf('>',i)+1, s.indexOf("</title>"))
@@ -410,6 +415,7 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
             i = s.indexOf(':', i)
             res.rating = s.substring(i+2, s.indexOf('/', i)-1).toInt()
         }
+        res.status = STATUS.OK
         return res
     }
 
@@ -419,6 +425,7 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
 
     override fun readInfo(): ACMPUserInfo = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)){
         return ACMPUserInfo(
+            STATUS.valueOf(getString(preferences_status,null) ?: STATUS.FAILED.name),
             getString(preferences_userid, "") ?: "",
             getString(preferences_username, "") ?: "",
             getInt(preferences_rating,0),
@@ -427,6 +434,7 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
     }
 
     override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE).edit()){
+        putString(preferences_status, info.status.name)
         info as ACMPUserInfo
         putString(preferences_userid, info.id)
         putString(preferences_username, info.userName)

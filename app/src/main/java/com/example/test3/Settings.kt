@@ -63,12 +63,7 @@ class Settings: AppCompatActivity() {
                 delay(300)
                 var info = manager.loadInfo(handle)
                 if(handle == it.toString()){
-                    if(info == null){
-                        preview.text = "error"
-                        info = manager.emptyInfo(handle)
-                    }else{
-                        preview.text = info.makeInfoString()
-                    }
+                    preview.text = info.makeInfoString()
                     lastLoadedInfo = info
                     saveButton.isEnabled = true
                 }

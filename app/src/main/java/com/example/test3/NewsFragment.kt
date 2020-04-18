@@ -1,5 +1,6 @@
 package com.example.test3
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -39,9 +40,11 @@ class NewsFragment() : Fragment() {
         codeforcesNewsViewPager = view.findViewById(R.id.cf_news_pager)
         codeforcesNewsViewPager.adapter = codeforcesNewsAdapter
 
+        val tabTitles = arrayOf("CF TOP", "CF MAIN")
+
         val tabLayout: TabLayout = view.findViewById(R.id.cf_news_tab_layout)
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
-            tab.text = if(position==0) "CF TOP" else "CF MAIN"
+            tab.text = tabTitles[position]
         }.attach()
 
         codeforcesNewsViewPager.offscreenPageLimit = 2
@@ -56,22 +59,12 @@ class NewsFragment() : Fragment() {
                 button.text = "..."
                 button.isEnabled = false
                 activity.scope.launch {
-                    tabs.map { fragment ->
+                    tabs.mapIndexed { index, fragment ->
+                        val tab = tabLayout.getTabAt(index)!!
                         launch {
-                            fragment.view?.run {
-                                val t = findViewById<TextView>(R.id.news_cf_textview)
-                                readURLData(fragment.address)?.let { s ->
-                                    var res: String = ""
-                                    var i = 0
-                                    while (true) {
-                                        i = s.indexOf("<div class=\"topic\"", i + 1)
-                                        if (i == -1) break
-                                        val title = s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i))
-                                        res += title + "\n"
-                                    }
-                                    t.text = res
-                                }
-                            }
+                            tab.text = "..."
+                            fragment.reload()
+                            tab.text = tabTitles[index]
                         }
                     }.joinAll()
                     button.isEnabled = true
@@ -91,6 +84,7 @@ class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
     override fun getItemCount(): Int {
         return 2
     }
+
 
     val fragment1 = CodeforcesNewsFragment("https://codeforces.com/top?locale=ru")
     val fragment2 = CodeforcesNewsFragment("https://codeforces.com/?locale=ru")
@@ -115,8 +109,25 @@ class CodeforcesNewsFragment(val address: String) : Fragment() {
         return inflater.inflate(R.layout.fragment_cf_news_page, container, false)
     }
 
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val textView: TextView = view.findViewById(R.id.news_cf_textview)
         textView.setLineSpacing(0f, 1.3f)
+    }
+
+    suspend fun reload(){
+        val t = view!!.findViewById<TextView>(R.id.news_cf_textview)
+        readURLData(address)?.let { s ->
+            var res: String = ""
+            var i = 0
+            while (true) {
+                i = s.indexOf("<div class=\"topic\"", i + 1)
+                if (i == -1) break
+                val title = s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i))
+                res += title + "\n"
+            }
+            t.text = res
+        }
     }
 }

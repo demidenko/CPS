@@ -1,7 +1,5 @@
 package com.example.test3
 
-import android.app.NotificationManager
-import android.content.Context.NOTIFICATION_SERVICE
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,8 +8,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
@@ -49,53 +45,54 @@ class TestFragment() : Fragment() {
                 textView.text = "???"
                 var rank: Int? = null
                 var points: Int? = null
-                var time: Int? = null
-                val tasks = arrayListOf<Pair<Int,String>>()
+                var currentTime: Int? = null
                 var tasks_prev: ArrayList<Pair<Int, String>>? = null
                 var problemNames: ArrayList<String>? = null
 
                 while (true) {
                     var phase: String? = null
+                    val tasks = arrayListOf<Pair<Int,String>>()
                     try {
                         withContext(Dispatchers.IO) {
-                            with(JsonReaderFromURL(address) ?: return@withContext) {
+                            with(JsonReaderFromURL(address) ?: return@withContext ) {
                                 beginObject()
-                                assert(nextName() == "status")
-                                if (nextString() == "FAILED") return@withContext
-                                assert(nextName() == "result")
+                                if (nextString("status") == "FAILED") return@withContext
+                                nextName()
                                 readObject {
                                     while (hasNext()) when (nextName()) {
                                         "contest" -> readObject {
                                             while (hasNext()) when (nextName()) {
                                                 "phase" -> phase = nextString()
-                                                "relativeTimeSeconds" -> time = nextInt()
+                                                "relativeTimeSeconds" -> currentTime = nextInt()
                                                 "name" -> contestName = nextString()
                                                 else -> skipValue()
                                             }
                                         }
-                                        "problems" -> if (problemNames == null) {
-                                            val tmp = ArrayList<String>()
-                                            readArray { tmp.add(readObjectFields("index")[0] as String) }
-                                            problemNames = tmp
+                                        "problems" -> {
+                                            if (problemNames == null) {
+                                                val tmp = ArrayList<String>()
+                                                readArray { tmp.add(readObjectFields("index")[0] as String) }
+                                                problemNames = tmp
+                                            } else skipValue()
                                         }
-                                        "rows" -> readArray {
-                                            readObject {
-                                                while (hasNext()) when (nextName()) {
-                                                    "rank" -> rank = nextInt()
-                                                    "points" -> points = nextInt()
-                                                    "problemResults" -> readArray {
-                                                        val arr = readObjectFields("points", "type")
-                                                        val pts = (arr[0] as Double).toInt()
-                                                        val status = arr[1] as String
-                                                        tasks.add(Pair(pts, status))
-                                                    }
-                                                    else -> skipValue()
+                                        "rows" -> readArrayOfObjects {
+                                            while (hasNext()) when (nextName()) {
+                                                "rank" -> rank = nextInt()
+                                                "points" -> points = nextInt()
+                                                "problemResults" -> readArray {
+                                                    val arr = readObjectFields("points", "type")
+                                                    val pts = (arr[0] as Double).toInt()
+                                                    val status = arr[1] as String
+                                                    tasks.add(Pair(pts, status))
                                                 }
+                                                else -> skipValue()
                                             }
                                         }
                                         else -> skipValue()
                                     }
                                 }
+                                this.close()
+
                             }
                         }
                     }catch (e: JsonEncodingException){
@@ -104,45 +101,48 @@ class TestFragment() : Fragment() {
 
                     }
 
-                    var s = "$handle\n\n"
+                    var str = "$handle\n\n"
 
-                    s+="$contestName\n$phase\n"
+                    str+="$contestName\n$phase\n"
 
                     if(phase == "SYSTEM_TEST"){
                         withContext(Dispatchers.IO){
-                            val page = readURLData("https://codeforces.com/contest/1335") ?: return@withContext
+                            val page = readURLData("https://codeforces.com/contest/$contestID") ?: return@withContext
                             var i = page.indexOf("<span class=\"contest-state-regular\">")
                             if(i!=-1){
                                 i = page.indexOf(">", i+1)
                                 val progress = page.substring(i+1, page.indexOf("</",i+1));
-                                s+=progress+"\n"
+                                str+=progress+"\n"
                             }
                         }
                     }
 
-                    if(phase == "CODING") time?.let{
+                    if(phase == "CODING") currentTime?.let{
                         val SS = it % 60
                         val MM = it / 60 % 60
-                        val HH = it /60 / 60
-                        s+="${HH/10}${HH%10}:${MM/10}${MM%10}:${SS/10}${SS%10}\n"
+                        val HH = it / 60 / 60
+                        str+=String.format("%02d:%02d:%02d\n", HH, MM, SS)
                     }
 
-                    if(rank!=null){
-                        s+="\nrank: $rank \n"
-                        s+="points: $points \n\n"
+                    str+="\nrank: $rank \n"
+                    rank?.let{
+                        str+="points: $points \n\n"
+                        println("tasks ${tasks.size}")
                         tasks.forEachIndexed { index, (pts,status) ->
-                            val pname = problemNames!![index]
-                            s+="$pname\t\t$pts\t\t[$status] \n"
-                            if(phase=="SYSTEM_TEST" && tasks_prev?.elementAt(index)?.second!=status){
-                                //Toast.makeText(activity, "$pname -> $pts points", Toast.LENGTH_LONG).show()
+                            val problemName = problemNames!![index]
+                            str+="$problemName\t\t$pts\t\t[$status] \n"
+                            if(phase=="SYSTEM_TEST"){
+                                tasks_prev?.let {
+                                    if(it.elementAt(index).second!=status)
+                                        Toast.makeText(activity, "$problemName -> $pts points", Toast.LENGTH_LONG).show()
+                                }
                             }
                         }
+                        tasks_prev = tasks
                     }
 
-                    if(phase=="SYSTEM_TEST") tasks_prev = tasks
-
                     if(phase=="FINISHED"){
-                        manager.loadInfo(handle)?.let { info->
+                        manager.loadInfo(handle)?.let { info -> info as CodeforcesAccountManager.CodeforcesUserInfo
                             val old = manager.savedInfo as CodeforcesAccountManager.CodeforcesUserInfo
                             if(info!=old){
                                 Toast.makeText(activity, "$handle Rating: ${old.rating} -> ${info.rating}", Toast.LENGTH_LONG).show()
@@ -159,12 +159,14 @@ class TestFragment() : Fragment() {
                                 manager.savedInfo = info
                                 activity.accountsFragment.codeforcesPanel.show()
 
+                                button.text = "run"
+                                button.isEnabled = true
                                 return@launch
                             }
                         }
                     }
 
-                    textView.text = s
+                    textView.text = str
 
                     when(phase){
                         "CODING", "SYSTEM_TEST" -> delay(1_000)
@@ -178,4 +180,6 @@ class TestFragment() : Fragment() {
 
     }
 }
+
+
 

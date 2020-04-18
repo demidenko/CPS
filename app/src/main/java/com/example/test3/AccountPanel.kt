@@ -128,9 +128,9 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
 
         textAdditional.text = "..."
         val savedInfo = manager.savedInfo as I
-        val info = manager.loadInfo(savedInfo.userID) as I?
+        val info = manager.loadInfo(savedInfo.userID) as I
 
-        if(info!=null){
+        if(info.status != STATUS.FAILED){
             manager.savedInfo = info
             show(info)
             reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {

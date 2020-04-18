@@ -1,5 +1,6 @@
 package com.example.test3
 
+import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -64,12 +65,12 @@ inline fun JsonReader.readArray(body: () -> Unit) {
     endArray()
 }
 
-inline fun JsonReader.readArrayIndexed(body: (index: Int) -> Unit) {
+inline fun JsonReader.readArrayOfObjects(body: () -> Unit) {
     beginArray()
-    var i = 0
     while (hasNext()){
-        body(i)
-        ++i
+        beginObject()
+        body()
+        endObject()
     }
     endArray()
 }
@@ -77,4 +78,10 @@ inline fun JsonReader.readArrayIndexed(body: (index: Int) -> Unit) {
 fun JsonReader.skipNameAndValue() {
     skipName()
     skipValue()
+}
+
+fun JsonReader.nextString(name: String): String {
+    val s = nextName()
+    if(s != name) throw JsonDataException("name $name expected but $s found")
+    return nextString()
 }

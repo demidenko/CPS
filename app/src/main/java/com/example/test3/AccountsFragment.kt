@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.launch
+import java.lang.Exception
+import java.lang.NullPointerException
 import java.util.*
 
 class AccountsFragment(): Fragment() {
@@ -27,16 +29,13 @@ class AccountsFragment(): Fragment() {
     lateinit var acmpPanel: AccountPanel<ACMPAccountManager, ACMPAccountManager.ACMPUserInfo>
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        println("fragment accounts onCreateView")
+        println("fragment accounts onCreateView "+savedInstanceState)
         val view = inflater.inflate(R.layout.fragment_accounts, container, false)
         val activity = requireActivity() as MainActivity
 
@@ -47,17 +46,11 @@ class AccountsFragment(): Fragment() {
                 textMain.text = info.handle
                 textAdditional.text = ""
                 val color = manager.getColor(info)
-                when (info.rating) {
-                    CodeforcesAccountManager.NOT_FOUND -> {
-                        textMain.typeface = Typeface.DEFAULT
-                    }
-                    CodeforcesAccountManager.NOT_RATED -> {
-                        textMain.typeface = Typeface.DEFAULT
-                    }
-                    else -> {
-                        textMain.typeface = Typeface.DEFAULT_BOLD
-                        textAdditional.text = "${info.rating}"
-                    }
+                if(info.status == STATUS.OK){
+                    textMain.typeface = Typeface.DEFAULT_BOLD
+                    textAdditional.text = if(info.rating == NOT_RATED) "[not rated]" else "${info.rating}"
+                }else{
+                    textMain.typeface = Typeface.DEFAULT
                 }
                 textMain.setTextColor(color ?: activity.defaultTextColor)
                 textAdditional.setTextColor(color ?: activity.defaultTextColor)
@@ -69,8 +62,13 @@ class AccountsFragment(): Fragment() {
         acmpPanel = object : AccountPanel<ACMPAccountManager, ACMPAccountManager.ACMPUserInfo>(activity, acmpAccountManager, ACMPAccountManager::class.java.name){
             override fun show(info: ACMPAccountManager.ACMPUserInfo) {
                 with(info){
-                    textMain.text = userName
-                    textAdditional.text = "Задач: $solvedTasks  Рейтинг: $rating"
+                    if (status == STATUS.OK) {
+                        textMain.text = userName
+                        textAdditional.text = "Задач: $solvedTasks  Рейтинг: $rating"
+                    }else{
+                        textMain.text = id
+                        textAdditional.text = ""
+                    }
                 }
                 textMain.setTextColor(activity.defaultTextColor)
                 textAdditional.setTextColor(activity.defaultTextColor)
@@ -83,17 +81,11 @@ class AccountsFragment(): Fragment() {
                 textMain.text = info.handle
                 textAdditional.text = ""
                 val color = manager.getColor(info)
-                when (info.rating) {
-                    AtCoderAccountManager.NOT_FOUND -> {
-                        textMain.typeface = Typeface.DEFAULT
-                    }
-                    AtCoderAccountManager.NOT_RATED -> {
-                        textMain.typeface = Typeface.DEFAULT
-                    }
-                    else -> {
-                        textMain.typeface = Typeface.DEFAULT_BOLD
-                        textAdditional.text = "${info.rating}"
-                    }
+                if(info.status == STATUS.OK){
+                    textMain.typeface = Typeface.DEFAULT_BOLD
+                    textAdditional.text = if(info.rating == NOT_RATED) "[not rated]" else "${info.rating}"
+                }else{
+                    textMain.typeface = Typeface.DEFAULT
                 }
                 textMain.setTextColor(color ?: activity.defaultTextColor)
                 textAdditional.setTextColor(color ?: activity.defaultTextColor)
@@ -106,17 +98,11 @@ class AccountsFragment(): Fragment() {
                 textMain.text = info.handle
                 textAdditional.text = ""
                 val color = manager.getColor(info)
-                when (info.rating_algorithm) {
-                    TopCoderAccountManager.NOT_FOUND -> {
-                        textMain.typeface = Typeface.DEFAULT
-                    }
-                    TopCoderAccountManager.NOT_RATED -> {
-                        textMain.typeface = Typeface.DEFAULT
-                    }
-                    else -> {
-                        textMain.typeface = Typeface.DEFAULT_BOLD
-                        textAdditional.text = "${info.rating_algorithm}"
-                    }
+                if(info.status == STATUS.OK){
+                    textMain.typeface = Typeface.DEFAULT_BOLD
+                    textAdditional.text = if(info.rating_algorithm == NOT_RATED) "[not rated]" else "${info.rating_algorithm}"
+                }else{
+                    textMain.typeface = Typeface.DEFAULT
                 }
                 textMain.setTextColor(color ?: activity.defaultTextColor)
                 textAdditional.setTextColor(color ?: activity.defaultTextColor)
@@ -171,10 +157,11 @@ class AccountsFragment(): Fragment() {
             codeforcesPanel,
             atcoderPanel,
             topcoderPanel,
+            acmpPanel,
             acmpPanel
         )
 
-        assert( panels.map { it.manager.PREFERENCES_FILE_NAME }.toSet().size == panels.size)
+        //assert( panels.map { it.manager.PREFERENCES_FILE_NAME }.distinct().size == panels.size)
 
 
         codeforcesPanel.buildAndAdd(30F, 25F, view)
@@ -189,7 +176,7 @@ class AccountsFragment(): Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        println("fragment accounts onViewCreated")
+        println("fragment accounts onViewCreated "+savedInstanceState)
         super.onViewCreated(view, savedInstanceState)
 
         val activity = requireActivity() as MainActivity
@@ -206,6 +193,10 @@ class AccountsFragment(): Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        println("fragment accounts onDestroyView")
+        super.onDestroyView()
+    }
 
     val toggleSet = TreeSet<String>()
     fun toggleReload(s: String){
