@@ -1,9 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_width="wrap_content"
-    android:textSize="19sp"
-    android:layout_marginBottom="5sp"
+    android:layout_marginBottom="5sp">
 
-    />
+    <TextView
+        android:id="@+id/news_item_title"
+        android:text="TITLE"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:textSize="19sp"
+        android:layout_marginBottom="1sp"
+        android:layout_marginLeft="3sp"
+        android:layout_marginRight="3sp"
+        />
+
+    <TextView
+        android:id="@+id/news_item_author"
+        android:text="AUTHOR"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/news_item_title"
+        android:layout_alignStart="@id/news_item_title"
+        android:layout_marginEnd="5sp"
+        />
+
+    <TextView
+        android:id="@+id/news_item_time"
+        android:text="WHEN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/news_item_author"
+        android:layout_alignBottom="@id/news_item_author"
+        android:textSize="12sp"
+        android:layout_marginBottom="1sp"
+        android:textColor="@color/blog_time"
+        />
+
+    <TextView
+        android:id="@+id/news_item_rating"
+        android:text="RATING"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/news_item_title"
+        android:layout_alignEnd="@id/news_item_title"
+        android:layout_marginStart="5sp"
+        android:layout_marginEnd="3sp"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/news_item_comments"
+        android:text="COMMENTS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/news_item_title"
+        android:layout_toStartOf="@id/news_item_rating"
+        />
+
+
+</RelativeLayout>
