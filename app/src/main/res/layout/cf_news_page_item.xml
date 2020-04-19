@@ -2,17 +2,21 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="5sp">
+    android:layout_marginBottom="5sp"
+    android:layout_marginStart="3sp"
+    android:layout_marginEnd="3sp"
+
+    >
 
     <TextView
         android:id="@+id/news_item_title"
         android:text="TITLE"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:textSize="19sp"
         android:layout_marginBottom="1sp"
-        android:layout_marginLeft="3sp"
-        android:layout_marginRight="3sp"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@id/news_item_rating"
         />
 
     <TextView
@@ -22,18 +26,18 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/news_item_title"
         android:layout_alignStart="@id/news_item_title"
-        android:layout_marginEnd="5sp"
         />
 
     <TextView
         android:id="@+id/news_item_time"
-        android:text="WHEN"
+        android:text="TIME"
+        android:textSize="12sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/news_item_author"
         android:layout_alignBottom="@id/news_item_author"
-        android:textSize="12sp"
         android:layout_marginBottom="1sp"
+        android:layout_marginStart="5sp"
         android:textColor="@color/blog_time"
         />
 
@@ -42,10 +46,8 @@
         android:text="RATING"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/news_item_title"
-        android:layout_alignEnd="@id/news_item_title"
-        android:layout_marginStart="5sp"
-        android:layout_marginEnd="3sp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@id/news_item_title"
         android:textStyle="bold"
         />
 
@@ -55,7 +57,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/news_item_title"
-        android:layout_toStartOf="@id/news_item_rating"
+        android:layout_alignParentEnd="true"
         />
 
 

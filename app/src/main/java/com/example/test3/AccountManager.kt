@@ -96,6 +96,46 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
         var __cachedInfo: CodeforcesUserInfo? = null
 
         val NAMES = JsonReader.Options.of("handle", "rating")
+
+    }
+
+    enum class HandleColor(val rgb: Int){
+        GRAY(0x808080),
+        GREEN(0x008000),
+        CYAN(0x03A89E),
+        BLUE(0x0000FF),
+        VIOLET(0xAA00AA),
+        ORANGE(0xFF8C00),
+        RED(0xFF0000);
+
+        val argb = (rgb + 0xFF000000).toInt()
+
+        companion object {
+            fun getColorByRating(rating: Int): HandleColor {
+                return when {
+                    rating < 1200 -> GRAY
+                    rating < 1400 -> GREEN
+                    rating < 1600 -> CYAN
+                    rating < 1900 -> BLUE
+                    rating < 2100 -> VIOLET
+                    rating < 2400 -> ORANGE
+                    else -> RED
+                }
+            }
+
+            fun getColorByTag(tag: String): HandleColor? {
+                return when (tag) {
+                    "user-gray" -> GRAY
+                    "user-green" -> GREEN
+                    "user-cyan" -> CYAN
+                    "user-blue" -> BLUE
+                    "user-violet" -> VIOLET
+                    "user-orange" -> ORANGE
+                    "user-red", "user-legendary" -> RED
+                    else -> null
+                }
+            }
+        }
     }
 
     override suspend fun downloadInfo(data: String): CodeforcesUserInfo {
@@ -147,15 +187,7 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
 
     override fun getColor(info: UserInfo): Int? = with(info as CodeforcesUserInfo){
         if(status != STATUS.OK || rating == NOT_RATED) return null
-        return when{
-            rating < 1200 -> 0xFF808080 //gray
-            rating < 1400 -> 0xFF008000 //green
-            rating < 1600 -> 0xFF03A89E //cyan
-            rating < 1900 -> 0xFF0000FF //blue
-            rating < 2100 -> 0xFFAA00AA //violet
-            rating < 2400 -> 0xFFFF8C00 //orange
-            else -> 0xFFFF0000 //red
-        }.toInt()
+        return HandleColor.getColorByRating(info.rating).argb
     }
 
     override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? {

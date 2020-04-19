@@ -1,6 +1,7 @@
 package com.example.test3
 
 import android.content.Intent
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.text.Html
@@ -127,7 +128,7 @@ class CodeforcesNewsFragment(val address: String) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewManager = LinearLayoutManager(context)
 
-        viewAdapter = CodeforcesNewsItemsAdapter(requireActivity(), arrayListOf())
+        viewAdapter = CodeforcesNewsItemsAdapter(requireActivity() as MainActivity, arrayListOf())
 
         recyclerView = view.findViewById<RecyclerView>(R.id.cf_news_page_recyclerview).apply {
             setHasFixedSize(true)
@@ -152,11 +153,14 @@ class CodeforcesNewsFragment(val address: String) : Fragment() {
                 val id = s.substring(i+6, s.indexOf('"',i))
 
                 i = s.indexOf("<div class=\"info\"", i)
-                i = s.indexOf("</a>", i)
-                val author = s.substring(s.lastIndexOf('>',i-1)+1,i).trim()
+                i = s.indexOf("/profile/", i)
+                val author = s.substring(i+9,s.indexOf('"',i))
 
-                i = s.indexOf("</span>", i)
-                val time = s.substring(s.lastIndexOf('>',i-1)+1,i)
+                i = s.indexOf("rated-user user-",i)
+                val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
+
+                i = s.indexOf("<span class=\"format-humantime\"", i)
+                val time = s.substring(s.indexOf('>',i)+1, s.indexOf("</span>",i))
 
                 i = s.indexOf("<div class=\"roundbox meta\"", i)
                 i = s.indexOf("</span>", i)
@@ -167,7 +171,7 @@ class CodeforcesNewsFragment(val address: String) : Fragment() {
                 i = s.lastIndexOf("</a>", i)
                 val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim()
 
-                res.add(arrayListOf(id,title,author,time,comments,rating))
+                res.add(arrayListOf(id,title,author,authorColor,time,comments,rating))
             }
             viewAdapter.data = res
             viewAdapter.notifyDataSetChanged()
@@ -176,7 +180,7 @@ class CodeforcesNewsFragment(val address: String) : Fragment() {
 }
 
 
-class CodeforcesNewsItemsAdapter(private val activity: FragmentActivity, var data: ArrayList<ArrayList<String>>): RecyclerView.Adapter<CodeforcesNewsItemsAdapter.CodeforcesNewsItemViewHolder>(){
+class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: ArrayList<ArrayList<String>>): RecyclerView.Adapter<CodeforcesNewsItemsAdapter.CodeforcesNewsItemViewHolder>(){
     class CodeforcesNewsItemViewHolder(val view: RelativeLayout) : RecyclerView.ViewHolder(view){
         val title: TextView = view.findViewById(R.id.news_item_title)
         val author: TextView = view.findViewById(R.id.news_item_author)
@@ -196,15 +200,24 @@ class CodeforcesNewsItemsAdapter(private val activity: FragmentActivity, var dat
         holder.view.setOnClickListener { activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${info[0]}"))) }
         holder.title.text = info[1]
 
+        holder.author.apply {
+            text = info[2]
+            val tag = info[3]
+            setTextColor(CodeforcesAccountManager.HandleColor.getColorByTag(tag)?.argb ?: activity.defaultTextColor)
+            //typeface = if(tag=="user-black") Typeface.DEFAULT else Typeface.DEFAULT_BOLD
+        }
 
-        holder.author.text = info[2]
-        holder.time.text = info[3]
-        holder.comments.text = info[4]
 
-        holder.rating.text = info[5]
-        holder.rating.setTextColor(activity.resources.getColor(
-            if(info[5].startsWith('+')) R.color.blog_rating_positive else R.color.blog_rating_negative,
-            null))
+        holder.time.text = info[4]
+        holder.comments.text = info[5]
+
+        holder.rating.apply{
+            text = info[6]
+            setTextColor(activity.resources.getColor(
+                if(info[6].startsWith('+')) R.color.blog_rating_positive else R.color.blog_rating_negative,
+                null)
+            )
+        }
     }
 
     override fun getItemCount() = data.size
