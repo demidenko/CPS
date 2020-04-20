@@ -1,5 +1,6 @@
 package com.example.test3
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
@@ -13,7 +14,6 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,8 +21,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 
 class NewsFragment() : Fragment() {
@@ -48,34 +47,46 @@ class NewsFragment() : Fragment() {
         codeforcesNewsViewPager = view.findViewById(R.id.cf_news_pager)
         codeforcesNewsViewPager.adapter = codeforcesNewsAdapter
 
-        val tabTitles = arrayOf("CF TOP", "CF MAIN")
 
         val tabLayout: TabLayout = view.findViewById(R.id.cf_news_tab_layout)
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
-            tab.text = tabTitles[position]
+            tab.text = codeforcesNewsAdapter.fragments[position].title
         }.attach()
 
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                tab?.run{
+                    val fragment = codeforcesNewsAdapter.fragments[position]
+                    if(fragment.forSave && text.toString().endsWith(')')){
+                        text = fragment.title
+                        fragment.save()
+                    }
+                }
+            }
+
+        })
+
         codeforcesNewsViewPager.offscreenPageLimit = 2
-
-        val tabs = arrayListOf(
-            codeforcesNewsAdapter.fragment1,
-            codeforcesNewsAdapter.fragment2
-        )
-
-
-
 
         view.findViewById<Button>(R.id.button_reload_cf_news).apply {
             setOnClickListener { button -> button as Button
                 button.text = "..."
                 button.isEnabled = false
                 activity.scope.launch {
-                    tabs.mapIndexed { index, fragment ->
+                    codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
                         val tab = tabLayout.getTabAt(index)!!
                         launch {
                             tab.text = "..."
-                            fragment.reload()
-                            tab.text = tabTitles[index]
+                            val newBlogs = fragment.reload()
+                            if(newBlogs>0){
+                                tab.text = fragment.title + " ($newBlogs)"
+                                if(tab.isSelected) fragment.save()
+                            }else{
+                                tab.text = fragment.title
+                            }
                         }
                     }.joinAll()
                     button.isEnabled = true
@@ -96,21 +107,18 @@ class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
         return 2
     }
 
-
-    val fragment1 = CodeforcesNewsFragment("https://codeforces.com/top?locale=ru")
-    val fragment2 = CodeforcesNewsFragment("https://codeforces.com/?locale=ru")
+    val fragments = arrayListOf(
+        CodeforcesNewsFragment("https://codeforces.com/top?locale=ru", "CF TOP", false),
+        CodeforcesNewsFragment("https://codeforces.com/?locale=ru", "CF MAIN", true)
+    )
 
     override fun createFragment(position: Int): Fragment {
-        return when(position){
-            0 -> fragment1
-            1 -> fragment2
-            else -> throw Exception("cf news tabs bad position")
-        }
+        return fragments[position]
     }
 
 }
 
-class CodeforcesNewsFragment(val address: String) : Fragment() {
+class CodeforcesNewsFragment(val address: String, val title: String, val forSave: Boolean) : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -138,7 +146,7 @@ class CodeforcesNewsFragment(val address: String) : Fragment() {
         }
     }
 
-    suspend fun reload(){
+    suspend fun reload(): Int {
         readURLData(address)?.let { s ->
             val res = arrayListOf<ArrayList<String>>()
             var i = 0
@@ -173,10 +181,29 @@ class CodeforcesNewsFragment(val address: String) : Fragment() {
 
                 res.add(arrayListOf(id,title,author,authorColor,time,comments,rating))
             }
+            if(res.isEmpty()) return 0
+
             viewAdapter.data = res
             viewAdapter.notifyDataSetChanged()
+
+            if(!forSave) return 0
+
+            requireActivity().getSharedPreferences("CodeforcesNewsFragmentData $title", Context.MODE_PRIVATE)?.run{
+                val savedBlogs = getStringSet("blogs", null) ?: emptySet()
+                val currentBlogs = res.map{ it[0] }.filter{ !savedBlogs.contains(it) }
+                return currentBlogs.size
+            }
         }
+
+        return 0
     }
+
+    fun save() = with(requireActivity().getSharedPreferences("CodeforcesNewsFragmentData $title", Context.MODE_PRIVATE).edit()){
+        val toSave = viewAdapter.data.map { it[0] }.toSet()
+        putStringSet("blogs", toSave)
+        commit()
+    }
+
 }
 
 
@@ -204,7 +231,7 @@ class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: A
             text = info[2]
             val tag = info[3]
             setTextColor(CodeforcesAccountManager.HandleColor.getColorByTag(tag)?.argb ?: activity.defaultTextColor)
-            //typeface = if(tag=="user-black") Typeface.DEFAULT else Typeface.DEFAULT_BOLD
+            typeface = if(tag=="user-black") Typeface.DEFAULT else Typeface.DEFAULT_BOLD
         }
 
 

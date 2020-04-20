@@ -5,7 +5,7 @@
     <color name="textColor">#D6D6D6</color>
     <color name="background">#212121</color>
     <color name="fail">#C84040</color>
-    <color name="blog_rating_positive">#388E3C</color>
+    <color name="blog_rating_positive">#3C963C</color>
     <color name="blog_rating_negative">#969696</color>
     <color name="blog_time">#939393</color>
 </resources>
