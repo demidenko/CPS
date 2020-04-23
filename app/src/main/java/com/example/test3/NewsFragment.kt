@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.example.test3.account_manager.CodeforcesAccountManager
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.*
@@ -139,7 +140,6 @@ class CodeforcesNewsFragment(val address: String, val title: String, val forSave
         viewAdapter = CodeforcesNewsItemsAdapter(requireActivity() as MainActivity, arrayListOf())
 
         recyclerView = view.findViewById<RecyclerView>(R.id.cf_news_page_recyclerview).apply {
-            setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))

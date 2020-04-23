@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
+import com.example.test3.account_manager.*
 import kotlinx.coroutines.*
 import java.lang.Exception
 
@@ -23,10 +24,10 @@ class Settings: AppCompatActivity() {
         val managerType = intent.getStringExtra("manager")!!
 
         manager = when(managerType){
-            CodeforcesAccountManager::class.java.name ->    CodeforcesAccountManager(this)
-            AtCoderAccountManager::class.java.name ->       AtCoderAccountManager(this)
-            TopCoderAccountManager::class.java.name ->      TopCoderAccountManager(this)
-            ACMPAccountManager::class.java.name ->          ACMPAccountManager(this)
+            CodeforcesAccountManager.preferences_file_name -> CodeforcesAccountManager(this)
+            AtCoderAccountManager.preferences_file_name -> AtCoderAccountManager(this)
+            TopCoderAccountManager.preferences_file_name -> TopCoderAccountManager(this)
+            ACMPAccountManager.preferences_file_name -> ACMPAccountManager(this)
             else -> throw Exception("Unknown type of manager")
         }
 
@@ -61,7 +62,7 @@ class Settings: AppCompatActivity() {
             jobInfo?.cancel()
             jobInfo = scope.launch {
                 delay(300)
-                var info = manager.loadInfo(handle)
+                val info = manager.loadInfo(handle)
                 if(handle == it.toString()){
                     preview.text = info.makeInfoString()
                     lastLoadedInfo = info

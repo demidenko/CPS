@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okio.Okio
 import java.io.InputStream
+import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.URL
 import java.nio.charset.Charset
@@ -23,7 +24,9 @@ suspend fun createConnectionStream(address: String): InputStream? = withContext(
             HttpsURLConnection.HTTP_OK -> c.inputStream
             else -> c.errorStream
         }
-    }catch (e : SocketTimeoutException){
+    }catch (e: ConnectException){
+        null
+    }catch (e: SocketTimeoutException){
         null
     }catch (e: SSLException){
         ignoreBadSSL()

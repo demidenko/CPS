@@ -8,12 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import com.example.test3.account_manager.*
 import kotlinx.coroutines.launch
-import java.lang.Exception
-import java.lang.NullPointerException
 import java.util.*
 
-class AccountsFragment(): Fragment() {
+class AccountsFragment: Fragment() {
 
     private lateinit var buttonReload: Button
 
@@ -35,14 +34,14 @@ class AccountsFragment(): Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        println("fragment accounts onCreateView "+savedInstanceState)
+        println("fragment accounts onCreateView $savedInstanceState")
         val view = inflater.inflate(R.layout.fragment_accounts, container, false)
         val activity = requireActivity() as MainActivity
 
 
         codeforcesAccountManager = CodeforcesAccountManager(activity)
-        codeforcesPanel = object : AccountPanel<CodeforcesAccountManager, CodeforcesAccountManager.CodeforcesUserInfo>(activity, codeforcesAccountManager, CodeforcesAccountManager::class.java.name){
-            override fun show(info: CodeforcesAccountManager.CodeforcesUserInfo) {
+        codeforcesPanel = object : AccountPanel<CodeforcesAccountManager, CodeforcesAccountManager.CodeforcesUserInfo>(activity, codeforcesAccountManager){
+            override fun show(info: UserInfo) { info as CodeforcesAccountManager.CodeforcesUserInfo
                 textMain.text = info.handle
                 textAdditional.text = ""
                 val color = manager.getColor(info)
@@ -58,26 +57,9 @@ class AccountsFragment(): Fragment() {
             }
         }
 
-        acmpAccountManager = ACMPAccountManager(activity)
-        acmpPanel = object : AccountPanel<ACMPAccountManager, ACMPAccountManager.ACMPUserInfo>(activity, acmpAccountManager, ACMPAccountManager::class.java.name){
-            override fun show(info: ACMPAccountManager.ACMPUserInfo) {
-                with(info){
-                    if (status == STATUS.OK) {
-                        textMain.text = userName
-                        textAdditional.text = "Задач: $solvedTasks  Рейтинг: $rating"
-                    }else{
-                        textMain.text = id
-                        textAdditional.text = ""
-                    }
-                }
-                textMain.setTextColor(activity.defaultTextColor)
-                textAdditional.setTextColor(activity.defaultTextColor)
-            }
-        }
-
         atcoderAccountManager = AtCoderAccountManager(activity)
-        atcoderPanel = object : AccountPanel<AtCoderAccountManager, AtCoderAccountManager.AtCoderUserInfo>(activity, atcoderAccountManager, AtCoderAccountManager::class.java.name){
-            override fun show(info: AtCoderAccountManager.AtCoderUserInfo) {
+        atcoderPanel = object : AccountPanel<AtCoderAccountManager, AtCoderAccountManager.AtCoderUserInfo>(activity, atcoderAccountManager){
+            override fun show(info: UserInfo) { info as AtCoderAccountManager.AtCoderUserInfo
                 textMain.text = info.handle
                 textAdditional.text = ""
                 val color = manager.getColor(info)
@@ -93,8 +75,8 @@ class AccountsFragment(): Fragment() {
         }
 
         topcoderAccountManager = TopCoderAccountManager(activity)
-        topcoderPanel = object : AccountPanel<TopCoderAccountManager, TopCoderAccountManager.TopCoderUserInfo>(activity, topcoderAccountManager, TopCoderAccountManager::class.java.name){
-            override fun show(info: TopCoderAccountManager.TopCoderUserInfo) {
+        topcoderPanel = object : AccountPanel<TopCoderAccountManager, TopCoderAccountManager.TopCoderUserInfo>(activity, topcoderAccountManager){
+            override fun show(info: UserInfo) { info as TopCoderAccountManager.TopCoderUserInfo
                 textMain.text = info.handle
                 textAdditional.text = ""
                 val color = manager.getColor(info)
@@ -152,6 +134,22 @@ class AccountsFragment(): Fragment() {
             }*/
         }
 
+        acmpAccountManager = ACMPAccountManager(activity)
+        acmpPanel = object : AccountPanel<ACMPAccountManager, ACMPAccountManager.ACMPUserInfo>(activity, acmpAccountManager){
+            override fun show(info: UserInfo) { info as ACMPAccountManager.ACMPUserInfo
+                with(info){
+                    if (status == STATUS.OK) {
+                        textMain.text = userName
+                        textAdditional.text = "Задач: $solvedTasks  Рейтинг: $rating"
+                    }else{
+                        textMain.text = id
+                        textAdditional.text = ""
+                    }
+                }
+                textMain.setTextColor(activity.defaultTextColor)
+                textAdditional.setTextColor(activity.defaultTextColor)
+            }
+        }
 
         panels = listOf(
             codeforcesPanel,

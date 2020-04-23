@@ -6,13 +6,13 @@ import android.util.TypedValue
 import android.view.View
 import android.view.animation.*
 import android.widget.*
+import com.example.test3.account_manager.*
 import kotlinx.coroutines.launch
 
 
-abstract class AccountPanel<A:AccountManager,I:UserInfo>(
+abstract class AccountPanel<A: AccountManager,I: UserInfo>(
     val activity: MainActivity,
-    val manager: A,
-    val type: String
+    val manager: A
 ){
     val layout = RelativeLayout(activity)
     val textMain = TextView(activity)
@@ -22,7 +22,7 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
         setBackgroundColor(Color.TRANSPARENT)
         visibility = View.GONE
         setOnClickListener {
-            val intent = Intent(activity, Settings::class.java).putExtra("manager", type)
+            val intent = Intent(activity, Settings::class.java).putExtra("manager", manager.PREFERENCES_FILE_NAME)
             activity.startActivityForResult(intent, MainActivity.CALL_ACCOUNT_SETTINGS)
         }
     }
@@ -97,10 +97,10 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
 
     open fun additionalBuild(){ }
 
-    abstract fun show(info: I)
+    abstract fun show(info: UserInfo)
 
     fun show(){
-        show(manager.savedInfo as I)
+        show(manager.savedInfo)
     }
 
     val rotateAnimation = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f).apply {
@@ -127,8 +127,8 @@ abstract class AccountPanel<A:AccountManager,I:UserInfo>(
         reloadButton.startAnimation(rotateAnimation)
 
         textAdditional.text = "..."
-        val savedInfo = manager.savedInfo as I
-        val info = manager.loadInfo(savedInfo.userID) as I
+        val savedInfo = manager.savedInfo
+        val info = manager.loadInfo(savedInfo.userID)
 
         if(info.status != STATUS.FAILED){
             manager.savedInfo = info
