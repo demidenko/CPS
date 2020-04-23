@@ -21,11 +21,11 @@ class AccountsFragment: Fragment() {
     lateinit var topcoderAccountManager: TopCoderAccountManager
     lateinit var acmpAccountManager: ACMPAccountManager
 
-    lateinit var panels: List<AccountPanel<out AccountManager, out UserInfo>>
-    lateinit var codeforcesPanel: AccountPanel<CodeforcesAccountManager, CodeforcesAccountManager.CodeforcesUserInfo>
-    lateinit var atcoderPanel: AccountPanel<AtCoderAccountManager, AtCoderAccountManager.AtCoderUserInfo>
-    lateinit var topcoderPanel: AccountPanel<TopCoderAccountManager, TopCoderAccountManager.TopCoderUserInfo>
-    lateinit var acmpPanel: AccountPanel<ACMPAccountManager, ACMPAccountManager.ACMPUserInfo>
+    lateinit var panels: List<AccountPanel>
+    lateinit var codeforcesPanel: AccountPanel
+    lateinit var atcoderPanel: AccountPanel
+    lateinit var topcoderPanel: AccountPanel
+    lateinit var acmpPanel: AccountPanel
 
 
 
@@ -40,7 +40,7 @@ class AccountsFragment: Fragment() {
 
 
         codeforcesAccountManager = CodeforcesAccountManager(activity)
-        codeforcesPanel = object : AccountPanel<CodeforcesAccountManager, CodeforcesAccountManager.CodeforcesUserInfo>(activity, codeforcesAccountManager){
+        codeforcesPanel = object : AccountPanel(activity, codeforcesAccountManager){
             override fun show(info: UserInfo) { info as CodeforcesAccountManager.CodeforcesUserInfo
                 textMain.text = info.handle
                 textAdditional.text = ""
@@ -58,7 +58,7 @@ class AccountsFragment: Fragment() {
         }
 
         atcoderAccountManager = AtCoderAccountManager(activity)
-        atcoderPanel = object : AccountPanel<AtCoderAccountManager, AtCoderAccountManager.AtCoderUserInfo>(activity, atcoderAccountManager){
+        atcoderPanel = object : AccountPanel(activity, atcoderAccountManager){
             override fun show(info: UserInfo) { info as AtCoderAccountManager.AtCoderUserInfo
                 textMain.text = info.handle
                 textAdditional.text = ""
@@ -75,7 +75,7 @@ class AccountsFragment: Fragment() {
         }
 
         topcoderAccountManager = TopCoderAccountManager(activity)
-        topcoderPanel = object : AccountPanel<TopCoderAccountManager, TopCoderAccountManager.TopCoderUserInfo>(activity, topcoderAccountManager){
+        topcoderPanel = object : AccountPanel(activity, topcoderAccountManager){
             override fun show(info: UserInfo) { info as TopCoderAccountManager.TopCoderUserInfo
                 textMain.text = info.handle
                 textAdditional.text = ""
@@ -135,7 +135,7 @@ class AccountsFragment: Fragment() {
         }
 
         acmpAccountManager = ACMPAccountManager(activity)
-        acmpPanel = object : AccountPanel<ACMPAccountManager, ACMPAccountManager.ACMPUserInfo>(activity, acmpAccountManager){
+        acmpPanel = object : AccountPanel(activity, acmpAccountManager){
             override fun show(info: UserInfo) { info as ACMPAccountManager.ACMPUserInfo
                 with(info){
                     if (status == STATUS.OK) {

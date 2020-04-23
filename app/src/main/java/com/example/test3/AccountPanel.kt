@@ -10,9 +10,9 @@ import com.example.test3.account_manager.*
 import kotlinx.coroutines.launch
 
 
-abstract class AccountPanel<A: AccountManager,I: UserInfo>(
+abstract class AccountPanel(
     val activity: MainActivity,
-    val manager: A
+    val manager: AccountManager
 ){
     val layout = RelativeLayout(activity)
     val textMain = TextView(activity)
