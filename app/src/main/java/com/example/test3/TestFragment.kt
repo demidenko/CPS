@@ -17,7 +17,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class TestFragment() : Fragment() {
+class TestFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,7 +47,7 @@ class TestFragment() : Fragment() {
                 var rank: Int? = null
                 var points: Int? = null
                 var currentTime: Int? = null
-                var tasks_prev: ArrayList<Pair<Int, String>>? = null
+                var tasksPrevious: ArrayList<Pair<Int, String>>? = null
                 var problemNames: ArrayList<String>? = null
 
                 while (true) {
@@ -112,7 +112,7 @@ class TestFragment() : Fragment() {
                             var i = page.indexOf("<span class=\"contest-state-regular\">")
                             if(i!=-1){
                                 i = page.indexOf(">", i+1)
-                                val progress = page.substring(i+1, page.indexOf("</",i+1));
+                                val progress = page.substring(i+1, page.indexOf("</",i+1))
                                 str+=progress+"\n"
                             }
                         }
@@ -133,37 +133,36 @@ class TestFragment() : Fragment() {
                             val problemName = problemNames!![index]
                             str+="$problemName\t\t$pts\t\t[$status] \n"
                             if(phase=="SYSTEM_TEST"){
-                                tasks_prev?.let {
+                                tasksPrevious?.let {
                                     if(it.elementAt(index).second!=status)
                                         Toast.makeText(activity, "$problemName -> $pts points", Toast.LENGTH_LONG).show()
                                 }
                             }
                         }
-                        tasks_prev = tasks
+                        tasksPrevious = tasks
                     }
 
                     if(phase=="FINISHED"){
-                        manager.loadInfo(handle)?.let { info -> info as CodeforcesAccountManager.CodeforcesUserInfo
-                            val old = manager.savedInfo as CodeforcesAccountManager.CodeforcesUserInfo
-                            if(info!=old){
-                                Toast.makeText(activity, "$handle Rating: ${old.rating} -> ${info.rating}", Toast.LENGTH_LONG).show()
+                        val info = manager.loadInfo(handle) as CodeforcesAccountManager.CodeforcesUserInfo
+                        val old = manager.savedInfo as CodeforcesAccountManager.CodeforcesUserInfo
+                        if(info!=old){
+                            Toast.makeText(activity, "$handle Rating: ${old.rating} -> ${info.rating}", Toast.LENGTH_LONG).show()
 
-                                /*val builder = NotificationCompat.Builder(activity, "test_channel").apply {
-                                    setContentTitle("$handle new rating: ${info.rating}")
-                                    val diff = (if (info.rating < old.rating) "" else "+") + (info.rating - old.rating)
-                                    setContentText("$diff, rank: $rank")
-                                    setSubText("CodeForces rating changes")
-                                    color = manager.getColor(info) ?: activity.defaultTextColor
-                                }
-                                (activity.getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(1, builder.build());*/
-
-                                manager.savedInfo = info
-                                activity.accountsFragment.codeforcesPanel.show()
-
-                                button.text = "run"
-                                button.isEnabled = true
-                                return@launch
+                            /*val builder = NotificationCompat.Builder(activity, "test_channel").apply {
+                                setContentTitle("$handle new rating: ${info.rating}")
+                                val diff = (if (info.rating < old.rating) "" else "+") + (info.rating - old.rating)
+                                setContentText("$diff, rank: $rank")
+                                setSubText("CodeForces rating changes")
+                                color = manager.getColor(info) ?: activity.defaultTextColor
                             }
+                            (activity.getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(1, builder.build());*/
+
+                            manager.savedInfo = info
+                            activity.accountsFragment.codeforcesPanel.show()
+
+                            button.text = "run"
+                            button.isEnabled = true
+                            return@launch
                         }
                     }
 

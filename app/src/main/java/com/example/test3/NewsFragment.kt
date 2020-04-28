@@ -47,6 +47,7 @@ class NewsFragment() : Fragment() {
         codeforcesNewsAdapter = CodeforcesNewsAdapter(this)
         codeforcesNewsViewPager = view.findViewById(R.id.cf_news_pager)
         codeforcesNewsViewPager.adapter = codeforcesNewsAdapter
+        codeforcesNewsViewPager.offscreenPageLimit = codeforcesNewsAdapter.fragments.size - 1
 
 
         val tabLayout: TabLayout = view.findViewById(R.id.cf_news_tab_layout)
@@ -70,7 +71,6 @@ class NewsFragment() : Fragment() {
 
         })
 
-        codeforcesNewsViewPager.offscreenPageLimit = 2
 
         view.findViewById<Button>(R.id.button_reload_cf_news).apply {
             setOnClickListener { button -> button as Button
@@ -105,11 +105,12 @@ class NewsFragment() : Fragment() {
 
 class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int {
-        return 2
+        return fragments.size
     }
 
-    val fragments = arrayListOf(
+    val fragments = arrayOf(
         CodeforcesNewsFragment("https://codeforces.com/top?locale=ru", "CF TOP", false),
+        CodeforcesNewsRecentFragment("https://codeforces.com/?locale=ru", "CF RECENT"),
         CodeforcesNewsFragment("https://codeforces.com/?locale=ru", "CF MAIN", true)
     )
 
@@ -119,7 +120,9 @@ class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
 
 }
 
-class CodeforcesNewsFragment(val address: String, val title: String, val forSave: Boolean) : Fragment() {
+
+
+open class CodeforcesNewsFragment(val address: String, val title: String, val forSave: Boolean) : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -130,14 +133,14 @@ class CodeforcesNewsFragment(val address: String, val title: String, val forSave
     }
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var viewAdapter: CodeforcesNewsItemsAdapter
+    protected lateinit var viewAdapter: CodeforcesNewsItemsAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewManager = LinearLayoutManager(context)
 
-        viewAdapter = CodeforcesNewsItemsAdapter(requireActivity() as MainActivity, arrayListOf())
+        viewAdapter = CodeforcesNewsItemsAdapter(requireActivity() as MainActivity, arrayOf())
 
         recyclerView = view.findViewById<RecyclerView>(R.id.cf_news_page_recyclerview).apply {
             layoutManager = viewManager
@@ -146,9 +149,9 @@ class CodeforcesNewsFragment(val address: String, val title: String, val forSave
         }
     }
 
-    suspend fun reload(): Int {
+    open suspend fun reload(): Int {
         readURLData(address)?.let { s ->
-            val res = arrayListOf<ArrayList<String>>()
+            val res = arrayListOf<Array<String>>()
             var i = 0
             while (true) {
                 i = s.indexOf("<div class=\"topic\"", i + 1)
@@ -179,12 +182,11 @@ class CodeforcesNewsFragment(val address: String, val title: String, val forSave
                 i = s.lastIndexOf("</a>", i)
                 val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim()
 
-                res.add(arrayListOf(id,title,author,authorColor,time,comments,rating))
+                res.add(arrayOf(id,title,author,authorColor,time,comments,rating))
             }
             if(res.isEmpty()) return 0
 
-            viewAdapter.data = res
-            viewAdapter.notifyDataSetChanged()
+            viewAdapter.setNewData(res.toTypedArray())
 
             if(!forSave) return 0
 
@@ -203,11 +205,46 @@ class CodeforcesNewsFragment(val address: String, val title: String, val forSave
         putStringSet("blogs", toSave)
         commit()
     }
+}
 
+class CodeforcesNewsRecentFragment(address: String, title: String): CodeforcesNewsFragment(address, title, false){
+
+    override suspend fun reload(): Int {
+        readURLData(address)?.let { s ->
+            val res = arrayListOf<Array<String>>()
+            var i = s.indexOf("<div class=\"recent-actions\">")
+            if(i==-1) return 0
+            while(true){
+                i = s.indexOf("<div style=\"font-size:0.9em;padding:0.5em 0;\">", i+1)
+                if(i==-1) break
+
+                i = s.indexOf("/profile/", i)
+                val author = s.substring(i+9,s.indexOf('"',i))
+
+                i = s.indexOf("rated-user user-",i)
+                val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
+
+                i = s.indexOf("entry/", i)
+                val id = s.substring(i+6, s.indexOf('"',i))
+
+                val title = s.substring(s.indexOf(">",i)+1, s.indexOf("</a",i))
+
+                val time = ""
+                val comments = ""
+                val rating = ""
+
+                res.add(arrayOf(id,title,author,authorColor,time,comments,rating))
+            }
+            if(res.isEmpty()) return 0
+
+            viewAdapter.setNewData(res.toTypedArray())
+        }
+        return 0
+    }
 }
 
 
-class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: ArrayList<ArrayList<String>>): RecyclerView.Adapter<CodeforcesNewsItemsAdapter.CodeforcesNewsItemViewHolder>(){
+class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: Array<Array<String>>): RecyclerView.Adapter<CodeforcesNewsItemsAdapter.CodeforcesNewsItemViewHolder>(){
     class CodeforcesNewsItemViewHolder(val view: RelativeLayout) : RecyclerView.ViewHolder(view){
         val title: TextView = view.findViewById(R.id.news_item_title)
         val author: TextView = view.findViewById(R.id.news_item_author)
@@ -249,4 +286,8 @@ class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: A
 
     override fun getItemCount() = data.size
 
+    fun setNewData(a: Array<Array<String>>){
+        data = a
+        notifyDataSetChanged()
+    }
 }

@@ -12,7 +12,7 @@
     <TextView
         android:id="@+id/news_item_title"
         android:text="TITLE"
-        android:textSize="19sp"
+        android:textSize="18.5sp"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_marginBottom="1dp"
@@ -52,6 +52,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignBottom="@id/news_item_title"
         android:textStyle="bold"
+        android:layout_marginStart="3sp"
         />
 
     <TextView

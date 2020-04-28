@@ -53,7 +53,7 @@ class Settings: AppCompatActivity() {
             val handle = it!!.toString()
             saveButton.text = if(handle.equals(savedInfo.userID,true)) "Saved" else "Save"
 
-            if(lastLoadedInfo!=null && handle == lastLoadedInfo!!.userID) return@addTextChangedListener
+            if(handle == lastLoadedInfo?.userID) return@addTextChangedListener
 
             saveButton.isEnabled = false
             lastLoadedInfo = null
