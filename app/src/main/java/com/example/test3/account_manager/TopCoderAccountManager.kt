@@ -6,8 +6,9 @@ import com.example.test3.*
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.JsonReader
+import java.lang.Exception
 
-class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activity) {
+class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activity), ColoredHandles {
 
     data class TopCoderUserInfo(
         override var status: STATUS,
@@ -109,13 +110,28 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
 
     override fun getColor(info: UserInfo): Int? = with(info as TopCoderUserInfo){
         if(status != STATUS.OK || rating_algorithm == NOT_RATED) return null
+        return getHandleColor(info.rating_algorithm).getARGB(this@TopCoderAccountManager)
+    }
+
+    override fun getHandleColor(rating: Int): HandleColor {
         return when{
-            rating_algorithm < 900 -> 0xFF999999 //gray
-            rating_algorithm < 1200 -> 0xFF00A900 //green
-            rating_algorithm < 1500 -> 0xFF6666FE //blue
-            rating_algorithm < 2200 -> 0xFFDDCC00 //yellow
-            else -> 0xFFEE0000 //red
-        }.toInt()
+            rating < 900 -> HandleColor.GRAY
+            rating < 1200 -> HandleColor.GREEN
+            rating < 1500 -> HandleColor.BLUE
+            rating < 2200 -> HandleColor.YELLOW
+            else -> HandleColor.RED
+        }
+    }
+
+    override fun getColor(tag: HandleColor): Int {
+        return when(tag){
+            HandleColor.GRAY -> 0x999999
+            HandleColor.GREEN -> 0x00A900
+            HandleColor.BLUE -> 0x6666FE
+            HandleColor.YELLOW -> 0xDDCC00
+            HandleColor.RED -> 0xEE0000
+            else -> throw Exception("${tag.name} is invalid color for manager ")
+        }
     }
 
 }

@@ -9,7 +9,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.test3.account_manager.CodeforcesAccountManager
+import com.example.test3.account_manager.*
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import kotlinx.coroutines.*
@@ -27,9 +27,18 @@ class TestFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val activity = requireActivity() as MainActivity
 
+
+        view.findViewById<Button>(R.id.button_colors).setOnClickListener { button -> button as Button
+            useCommonColors = !useCommonColors
+            activity.accountsFragment.panels.forEach { it.show() }
+            activity.newsFragment.refresh()
+        }
+
+
         //monitor alpha
         var job: Job? = null
-        view.findViewById<Button>(R.id.button_test).setOnClickListener {button -> button as Button
+        view.findViewById<Button>(R.id.button_watcher).setOnClickListener { button -> button as Button
+
             if(button.text == "running..."){
                 job?.cancel()
                 job = null

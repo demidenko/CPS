@@ -3,8 +3,9 @@ package com.example.test3.account_manager
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import com.example.test3.readURLData
+import java.lang.Exception
 
-class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activity){
+class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activity), ColoredHandles{
 
     data class AtCoderUserInfo(
         override var status: STATUS,
@@ -70,16 +71,7 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
 
     override fun getColor(info: UserInfo): Int?  = with(info as AtCoderUserInfo){
         if(status != STATUS.OK || rating == NOT_RATED) return null
-        return when{
-            rating < 400 -> 0xFF808080 //gray
-            rating < 800 -> 0xFF804000 //brown
-            rating < 1200 -> 0xFF008000 //green
-            rating < 1600 -> 0xFF00C0C0 //cyan
-            rating < 2000 -> 0xFF0000FF //blue
-            rating < 2400 -> 0xFFC0C000 //yellow
-            rating < 2800 -> 0xFFFF8000 //orange
-            else -> 0xFFFF0000 //red
-        }.toInt()
+        return getHandleColor(info.rating).getARGB(this@AtCoderAccountManager)
     }
 
     override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? {
@@ -97,5 +89,32 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
             res += Pair("$handle $rating", handle)
         }
         return res
+    }
+
+    override fun getHandleColor(rating: Int): HandleColor {
+        return when{
+            rating < 400 -> HandleColor.GRAY
+            rating < 800 -> HandleColor.BROWN
+            rating < 1200 -> HandleColor.GREEN
+            rating < 1600 -> HandleColor.CYAN
+            rating < 2000 -> HandleColor.BLUE
+            rating < 2400 -> HandleColor.YELLOW
+            rating < 2800 -> HandleColor.ORANGE
+            else -> HandleColor.RED
+        }
+    }
+
+    override fun getColor(tag: HandleColor): Int {
+        return when(tag){
+            HandleColor.GRAY -> 0x808080
+            HandleColor.BROWN -> 0x804000 //brown
+            HandleColor.GREEN -> 0x008000 //green
+            HandleColor.CYAN -> 0x00C0C0 //cyan
+            HandleColor.BLUE -> 0x0000FF //blue
+            HandleColor.YELLOW -> 0xC0C000 //yellow
+            HandleColor.ORANGE -> 0xFF8000 //orange
+            HandleColor.RED -> 0xFF0000 //red
+            else -> throw Exception("${tag.name} is invalid color for manager ")
+        }
     }
 }

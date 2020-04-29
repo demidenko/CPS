@@ -1,6 +1,5 @@
 package com.example.test3.account_manager
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import com.example.test3.readURLData
 import java.net.URLEncoder
@@ -81,10 +80,6 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         putInt(preferences_rating, info.rating)
         putInt(preferences_count_of_solved_tasks, info.solvedTasks)
         commit()
-    }
-
-    override fun getColor(info: UserInfo): Int? {
-        return null
     }
 
     override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? {

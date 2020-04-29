@@ -1,13 +1,13 @@
 package com.example.test3.account_manager
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import com.example.test3.*
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.JsonReader
+import java.lang.Exception
 
-class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(activity) {
+class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(activity), ColoredHandles {
 
     data class CodeforcesUserInfo(
         override var status: STATUS,
@@ -36,45 +36,6 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
 
         val NAMES = JsonReader.Options.of("handle", "rating", "contribution")
 
-    }
-
-    enum class HandleColor(rgb: Int){
-        GRAY(0x808080),
-        GREEN(0x008000),
-        CYAN(0x03A89E),
-        BLUE(0x0000FF),
-        VIOLET(0xAA00AA),
-        ORANGE(0xFF8C00),
-        RED(0xFF0000);
-
-        val argb = (rgb + 0xFF000000).toInt()
-
-        companion object {
-            fun getColorByRating(rating: Int): HandleColor {
-                return when {
-                    rating < 1200 -> GRAY
-                    rating < 1400 -> GREEN
-                    rating < 1600 -> CYAN
-                    rating < 1900 -> BLUE
-                    rating < 2100 -> VIOLET
-                    rating < 2400 -> ORANGE
-                    else -> RED
-                }
-            }
-
-            fun getColorByTag(tag: String): HandleColor? {
-                return when (tag) {
-                    "user-gray" -> GRAY
-                    "user-green" -> GREEN
-                    "user-cyan" -> CYAN
-                    "user-blue" -> BLUE
-                    "user-violet" -> VIOLET
-                    "user-orange" -> ORANGE
-                    "user-red", "user-legendary" -> RED
-                    else -> null
-                }
-            }
-        }
     }
 
     override suspend fun downloadInfo(data: String): CodeforcesUserInfo {
@@ -129,7 +90,7 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
 
     override fun getColor(info: UserInfo): Int? = with(info as CodeforcesUserInfo){
         if(status != STATUS.OK || rating == NOT_RATED) return null
-        return HandleColor.getColorByRating(info.rating).argb
+        return getHandleColor(info.rating).getARGB(this@CodeforcesAccountManager)
     }
 
     override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? {
@@ -143,5 +104,43 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
             }
         }
         return res
+    }
+
+    override fun getHandleColor(rating: Int): HandleColor {
+        return when {
+            rating < 1200 -> HandleColor.GRAY
+            rating < 1400 -> HandleColor.GREEN
+            rating < 1600 -> HandleColor.CYAN
+            rating < 1900 -> HandleColor.BLUE
+            rating < 2100 -> HandleColor.VIOLET
+            rating < 2400 -> HandleColor.ORANGE
+            else -> HandleColor.RED
+        }
+    }
+
+    override fun getColor(tag: HandleColor): Int {
+        return when (tag){
+            HandleColor.GRAY -> 0x808080
+            HandleColor.GREEN -> 0x008000
+            HandleColor.CYAN -> 0x03A89E
+            HandleColor.BLUE -> 0x0000FF
+            HandleColor.VIOLET -> 0xAA00AA
+            HandleColor.ORANGE -> 0xFF8C00
+            HandleColor.RED -> 0xFF0000
+            else -> throw Exception("${tag.name} is invalid color for manager ")
+        }
+    }
+
+    fun getHandleColorByTag(tag: String): Int? {
+        return when (tag) {
+            "user-gray" -> HandleColor.GRAY
+            "user-green" -> HandleColor.GREEN
+            "user-cyan" -> HandleColor.CYAN
+            "user-blue" -> HandleColor.BLUE
+            "user-violet" -> HandleColor.VIOLET
+            "user-orange" -> HandleColor.ORANGE
+            "user-red", "user-legendary" -> HandleColor.RED
+            else -> null
+        }?.getARGB(this)
     }
 }

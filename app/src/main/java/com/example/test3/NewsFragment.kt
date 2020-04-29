@@ -19,13 +19,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.example.test3.account_manager.CodeforcesAccountManager
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.*
 
 
-class NewsFragment() : Fragment() {
+class NewsFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,6 +37,13 @@ class NewsFragment() : Fragment() {
     private lateinit var codeforcesNewsAdapter: CodeforcesNewsAdapter
     private lateinit var codeforcesNewsViewPager: ViewPager2
 
+    fun refresh(){
+        try {
+            codeforcesNewsAdapter.fragments.forEach { it.viewAdapter.notifyDataSetChanged() }
+        }catch (e: UninitializedPropertyAccessException){
+
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -133,7 +139,7 @@ open class CodeforcesNewsFragment(val address: String, val title: String, val fo
     }
 
     private lateinit var recyclerView: RecyclerView
-    protected lateinit var viewAdapter: CodeforcesNewsItemsAdapter
+    lateinit var viewAdapter: CodeforcesNewsItemsAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
 
 
@@ -270,7 +276,7 @@ class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: A
         holder.author.apply {
             text = info[2]
             val tag = info[3]
-            setTextColor(CodeforcesAccountManager.HandleColor.getColorByTag(tag)?.argb ?: activity.defaultTextColor)
+            setTextColor(activity.accountsFragment.codeforcesAccountManager.getHandleColorByTag(tag) ?: activity.defaultTextColor) // kill me
             typeface = if(tag=="user-black") Typeface.DEFAULT else Typeface.DEFAULT_BOLD
         }
 

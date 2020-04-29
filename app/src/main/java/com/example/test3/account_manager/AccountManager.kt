@@ -17,9 +17,7 @@ abstract class AccountManager(val activity: AppCompatActivity) {
         }
     }
 
-    open suspend fun loadSuggestions(str: String): List<Pair<String,String>>? {
-        return null
-    }
+    open suspend fun loadSuggestions(str: String): List<Pair<String,String>>? = null
 
     protected abstract var cachedInfo: UserInfo?
     protected abstract fun readInfo(): UserInfo
@@ -34,7 +32,7 @@ abstract class AccountManager(val activity: AppCompatActivity) {
             println("${PREFERENCES_FILE_NAME} rewrited to ${info.makeInfoString()}")
         }
 
-    abstract fun getColor(info: UserInfo): Int?
+    open fun getColor(info: UserInfo): Int? = null
 }
 
 enum class STATUS{
@@ -59,8 +57,25 @@ abstract class UserInfo{
     }
 }
 
-enum class CommonHandleColors(rgb: Int) {
-    BLUE(0x3E80FF),
+var useCommonColors: Boolean = true
+enum class HandleColor(private val rgb: Int) {
+    GRAY(0x999999),
+    BROWN(0x804000),
+    GREEN(0x009000),
+    CYAN(0x03A89E),
+    BLUE(0x3E64FF),
     VIOLET(0xAA50C5), //0xB455EE
-    RED(0xED3B1C)
+    YELLOW(0xCCCC00),
+    ORANGE(0xFF8C00),
+    RED(0xED3B1C);
+
+    fun getARGB(manager: ColoredHandles): Int {
+        return ((if(useCommonColors) rgb else manager.getColor(this)) + 0xFF000000).toInt()
+    }
 }
+
+interface ColoredHandles {
+    fun getHandleColor(rating: Int): HandleColor
+    fun getColor(tag: HandleColor): Int
+}
+
