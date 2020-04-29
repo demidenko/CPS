@@ -114,7 +114,7 @@ abstract class AccountPanel(
             show(savedInfo)
             Toast.makeText(activity, "${manager.PREFERENCES_FILE_NAME} load error", Toast.LENGTH_LONG).show()
             reloadButton.clearAnimation()
-            reloadButton.setColorFilter(activity.resources.getColor(R.color.fail, null))
+            reloadButton.setColorFilter(activity.resources.getColor(R.color.reload_fail, null))
         }
 
 

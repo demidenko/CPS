@@ -10,6 +10,7 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.*
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.util.*
 
 class AccountsFragment: Fragment() {
@@ -155,11 +156,10 @@ class AccountsFragment: Fragment() {
             codeforcesPanel,
             atcoderPanel,
             topcoderPanel,
-            acmpPanel,
             acmpPanel
         )
 
-        //assert( panels.map { it.manager.PREFERENCES_FILE_NAME }.distinct().size == panels.size)
+        if(panels.map { it.manager.PREFERENCES_FILE_NAME }.distinct().size != panels.size) throw Exception("not different file names in panels managers")
 
 
         codeforcesPanel.buildAndAdd(30F, 25F, view)

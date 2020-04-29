@@ -89,16 +89,16 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
         get() = __cachedInfo
         set(value) { __cachedInfo = value as TopCoderUserInfo }
 
-    override fun readInfo(): TopCoderUserInfo = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)){
-        return TopCoderUserInfo(
+    override fun readInfo(): TopCoderUserInfo = with(prefs){
+        TopCoderUserInfo(
             STATUS.valueOf(getString(preferences_status, null) ?: STATUS.FAILED.name),
-            getString(preferences_handle, "") ?: "",
-            getInt(preferences_rating_algorithm, NOT_RATED),
-            getInt(preferences_rating_marathon, NOT_RATED)
+            handle = getString(preferences_handle, null) ?: "",
+            rating_algorithm = getInt(preferences_rating_algorithm, NOT_RATED),
+            rating_marathon = getInt(preferences_rating_marathon, NOT_RATED)
         )
     }
 
-    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE).edit()){
+    override fun writeInfo(info: UserInfo) = with(prefs.edit()){
         putString(preferences_status, info.status.name)
         info as TopCoderUserInfo
         putString(preferences_handle, info.handle)

@@ -63,17 +63,17 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         get() = __cachedInfo
         set(value) { __cachedInfo = value as ACMPUserInfo }
 
-    override fun readInfo(): ACMPUserInfo = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)){
-        return ACMPUserInfo(
+    override fun readInfo(): ACMPUserInfo = with(prefs){
+        ACMPUserInfo(
             STATUS.valueOf(getString(preferences_status, null) ?: STATUS.FAILED.name),
-            getString(preferences_userid, "") ?: "",
-            getString(preferences_username, "") ?: "",
-            getInt(preferences_rating, 0),
-            getInt(preferences_count_of_solved_tasks, 0)
+            id = getString(preferences_userid, null) ?: "",
+            userName = getString(preferences_username, null) ?: "",
+            rating = getInt(preferences_rating, 0),
+            solvedTasks = getInt(preferences_count_of_solved_tasks, 0)
         )
     }
 
-    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE).edit()){
+    override fun writeInfo(info: UserInfo) = with(prefs.edit()){
         putString(preferences_status, info.status.name)
         info as ACMPUserInfo
         putString(preferences_userid, info.id)

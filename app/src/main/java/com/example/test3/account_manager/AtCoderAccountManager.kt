@@ -52,15 +52,15 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
         get() = __cachedInfo
         set(value) { __cachedInfo = value as AtCoderUserInfo }
 
-    override fun readInfo(): AtCoderUserInfo = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)){
-        return AtCoderUserInfo(
+    override fun readInfo(): AtCoderUserInfo = with(prefs){
+        AtCoderUserInfo(
             STATUS.valueOf(getString(preferences_status, null) ?: STATUS.FAILED.name),
-            getString(preferences_handle, "") ?: "",
-            getInt(preferences_rating, NOT_RATED)
+            handle = getString(preferences_handle, null) ?: "",
+            rating = getInt(preferences_rating, NOT_RATED)
         )
     }
 
-    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE).edit()){
+    override fun writeInfo(info: UserInfo) = with(prefs.edit()){
         putString(preferences_status, info.status.name)
         info as AtCoderUserInfo
         putString(preferences_handle, info.handle)

@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         println("main create")
-        super.onCreate(savedInstanceState)
+        super.onCreate(savedInstanceState) //TODO
         setContentView(R.layout.activity_main)
 
 

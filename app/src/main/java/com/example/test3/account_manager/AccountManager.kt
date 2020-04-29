@@ -1,5 +1,6 @@
 package com.example.test3.account_manager
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -7,7 +8,7 @@ import kotlinx.coroutines.withContext
 
 abstract class AccountManager(val activity: AppCompatActivity) {
     abstract val PREFERENCES_FILE_NAME: String
-
+    val prefs = activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
 
     protected abstract suspend fun downloadInfo(data: String): UserInfo
     suspend fun loadInfo(data: String): UserInfo {
@@ -20,9 +21,9 @@ abstract class AccountManager(val activity: AppCompatActivity) {
         return null
     }
 
+    protected abstract var cachedInfo: UserInfo?
     protected abstract fun readInfo(): UserInfo
     protected abstract fun writeInfo(info: UserInfo): Boolean
-    protected abstract var cachedInfo: UserInfo?
 
     var savedInfo: UserInfo
         get() = cachedInfo ?: readInfo().also { cachedInfo = it }
@@ -58,3 +59,8 @@ abstract class UserInfo{
     }
 }
 
+enum class CommonHandleColors(rgb: Int) {
+    BLUE(0x3E80FF),
+    VIOLET(0xAA50C5), //0xB455EE
+    RED(0xED3B1C)
+}

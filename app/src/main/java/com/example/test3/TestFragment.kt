@@ -12,10 +12,7 @@ import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 class TestFragment : Fragment() {
     override fun onCreateView(
@@ -31,10 +28,17 @@ class TestFragment : Fragment() {
         val activity = requireActivity() as MainActivity
 
         //monitor alpha
+        var job: Job? = null
         view.findViewById<Button>(R.id.button_test).setOnClickListener {button -> button as Button
-            button.isEnabled = false
+            if(button.text == "running..."){
+                job?.cancel()
+                job = null
+                button.text = "run"
+                return@setOnClickListener
+            }
+
             button.text = "running..."
-            activity.scope.launch {
+            job = activity.scope.launch {
                 val manager = activity.accountsFragment.codeforcesAccountManager
                 val contestID = view.findViewById<EditText>(R.id.text_editor).text.toString().toInt()
                 var contestName: String? = null
@@ -93,7 +97,6 @@ class TestFragment : Fragment() {
                                     }
                                 }
                                 this.close()
-
                             }
                         }
                     }catch (e: JsonEncodingException){
@@ -161,7 +164,6 @@ class TestFragment : Fragment() {
                             activity.accountsFragment.codeforcesPanel.show()
 
                             button.text = "run"
-                            button.isEnabled = true
                             return@launch
                         }
                     }

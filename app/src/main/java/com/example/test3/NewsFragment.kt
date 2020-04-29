@@ -149,6 +149,10 @@ open class CodeforcesNewsFragment(val address: String, val title: String, val fo
         }
     }
 
+    fun fromHTML(s: String): String {
+        return Html.fromHtml(s, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
+    }
+
     open suspend fun reload(): Int {
         readURLData(address)?.let { s ->
             val res = arrayListOf<Array<String>>()
@@ -156,9 +160,8 @@ open class CodeforcesNewsFragment(val address: String, val title: String, val fo
             while (true) {
                 i = s.indexOf("<div class=\"topic\"", i + 1)
                 if (i == -1) break
-                val title = Html.fromHtml(
-                    s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i)),
-                    HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
+
+                val title = fromHTML(s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i)))
 
                 i = s.indexOf("entry/", i)
                 val id = s.substring(i+6, s.indexOf('"',i))
@@ -227,7 +230,7 @@ class CodeforcesNewsRecentFragment(address: String, title: String): CodeforcesNe
                 i = s.indexOf("entry/", i)
                 val id = s.substring(i+6, s.indexOf('"',i))
 
-                val title = s.substring(s.indexOf(">",i)+1, s.indexOf("</a",i))
+                val title = fromHTML(s.substring(s.indexOf(">",i)+1, s.indexOf("</a",i)))
 
                 val time = ""
                 val comments = ""

@@ -12,7 +12,8 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
     data class CodeforcesUserInfo(
         override var status: STATUS,
         var handle: String,
-        var rating: Int = NOT_RATED
+        var rating: Int = NOT_RATED,
+        var contribution: Int = 0
     ): UserInfo() {
         override val userID: String
             get() = handle
@@ -29,10 +30,11 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
         const val preferences_file_name = "codeforces"
         const val preferences_handle = "handle"
         const val preferences_rating = "rating"
+        const val preferences_contribution = "contribution"
 
         var __cachedInfo: CodeforcesUserInfo? = null
 
-        val NAMES = JsonReader.Options.of("handle", "rating")
+        val NAMES = JsonReader.Options.of("handle", "rating", "contribution")
 
     }
 
@@ -88,6 +90,7 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
                             when (selectName(NAMES)) {
                                 0 -> res.handle = nextString()
                                 1 -> res.rating = nextInt()
+                                2 -> res.contribution = nextInt()
                                 else -> skipNameAndValue()
                             }
                         }
@@ -106,19 +109,21 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
         get() = __cachedInfo
         set(value) { __cachedInfo = value as CodeforcesUserInfo }
 
-    override fun readInfo(): CodeforcesUserInfo = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)){
-        return CodeforcesUserInfo(
+    override fun readInfo(): CodeforcesUserInfo = with(prefs){
+        CodeforcesUserInfo(
             STATUS.valueOf(getString(preferences_status, null) ?: STATUS.FAILED.name),
-            getString(preferences_handle, "") ?: "",
-            getInt(preferences_rating, NOT_RATED)
+            handle = getString(preferences_handle, null) ?: "",
+            rating = getInt(preferences_rating, NOT_RATED),
+            contribution = getInt(preferences_contribution, 0)
         )
     }
 
-    override fun writeInfo(info: UserInfo) = with(activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE).edit()){
+    override fun writeInfo(info: UserInfo) = with(prefs.edit()){
         putString(preferences_status, info.status.name)
         info as CodeforcesUserInfo
         putString(preferences_handle, info.handle)
         putInt(preferences_rating, info.rating)
+        putInt(preferences_contribution, info.contribution)
         commit()
     }
 
