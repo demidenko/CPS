@@ -28,17 +28,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_above="@id/button_colors"
+        android:layout_alignParentBottom="true"
         android:text="run"
         />
 
-    <Button
-        android:id="@+id/button_colors"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:text="toggle colors"
-        />
 
 </RelativeLayout>

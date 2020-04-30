@@ -23,17 +23,13 @@ class TestFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_test, container, false)
     }
 
+    lateinit var textView: TextView
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?){
         super.onViewCreated(view, savedInstanceState)
         val activity = requireActivity() as MainActivity
 
-
-        view.findViewById<Button>(R.id.button_colors).setOnClickListener { button -> button as Button
-            useCommonColors = !useCommonColors
-            activity.accountsFragment.panels.forEach { it.show() }
-            activity.newsFragment.refresh()
-        }
-
+        textView = activity.findViewById(R.id.stuff_textview)
 
         //monitor alpha
         var job: Job? = null
@@ -55,7 +51,6 @@ class TestFragment : Fragment() {
                 val address = "https://codeforces.com/api/contest.standings?contestId=$contestID&showUnofficial=false&handles=$handle"
                 println(address)
 
-                val textView: TextView = activity.findViewById(R.id.stuff_textview)
                 textView.text = "???"
                 var rank: Int? = null
                 var points: Int? = null

@@ -1,13 +1,25 @@
 package com.example.test3
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.text.bold
+import androidx.core.text.color
 import androidx.fragment.app.Fragment
+import com.example.test3.account_manager.ColoredHandles
+import com.example.test3.account_manager.HandleColor
+import com.example.test3.account_manager.useRealColors
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 
 
 class MainActivity : AppCompatActivity(){
@@ -57,7 +69,60 @@ class MainActivity : AppCompatActivity(){
             true
         }
 
+        with(getPreferences(Context.MODE_PRIVATE)){
+            useRealColors = getBoolean("use_real_colors", true)
+        }
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.color_switcher -> {
+                useRealColors = !useRealColors
+                accountsFragment.panels.forEach { it.show() }
+                newsFragment.refresh()
+
+                with(getPreferences(Context.MODE_PRIVATE).edit()){
+                    putBoolean("use_real_colors", useRealColors)
+                    apply()
+                }
+
+                if(testFragment.isVisible){
+                    val s = SpannableStringBuilder("colors example\n")
+                    val backup = useRealColors
+                    for(color in HandleColor.values()){
+                        s.bold {
+                            useRealColors = false
+                            color(color.getARGB(accountsFragment.codeforcesAccountManager)) { append(color.name+" ") }
+                            useRealColors = true
+                            arrayOf(
+                                accountsFragment.codeforcesAccountManager,
+                                accountsFragment.atcoderAccountManager,
+                                accountsFragment.topcoderAccountManager
+                            ).forEach {
+                                try {
+                                    color(color.getARGB(it as ColoredHandles)) { append(color.name + " ") }
+                                }catch (e: HandleColor.UnknownHandleColorException){
+                                    color(defaultTextColor){ append("--- ") }
+                                }
+                            }
+                            append("\n")
+                        }
+                    }
+                    testFragment.textView.text = s
+                    useRealColors = backup
+                }
+
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 
     override fun onResume() {
         println("main resume")

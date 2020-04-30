@@ -57,21 +57,23 @@ abstract class UserInfo{
     }
 }
 
-var useCommonColors: Boolean = true
+var useRealColors: Boolean = false
 enum class HandleColor(private val rgb: Int) {
-    GRAY(0x999999),
-    BROWN(0x804000),
+    GRAY(0x888888),
+    BROWN(0x80461B),
     GREEN(0x009000),
-    CYAN(0x03A89E),
-    BLUE(0x3E64FF),
-    VIOLET(0xAA50C5), //0xB455EE
+    CYAN(0x00A89E),
+    BLUE(0x3E64F0),
+    VIOLET(0xBB55EE),
     YELLOW(0xCCCC00),
-    ORANGE(0xFF8C00),
-    RED(0xED3B1C);
+    ORANGE(0xFB8000),
+    RED(0xED301C);
 
     fun getARGB(manager: ColoredHandles): Int {
-        return ((if(useCommonColors) rgb else manager.getColor(this)) + 0xFF000000).toInt()
+        return ((if(useRealColors) manager.getColor(this) else rgb) + 0xFF000000).toInt()
     }
+
+    class UnknownHandleColorException(color: HandleColor): Exception("${color.name} is invalid color for manager ")
 }
 
 interface ColoredHandles {

@@ -127,7 +127,7 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
             HandleColor.VIOLET -> 0xAA00AA
             HandleColor.ORANGE -> 0xFF8C00
             HandleColor.RED -> 0xFF0000
-            else -> throw Exception("${tag.name} is invalid color for manager ")
+            else -> throw HandleColor.UnknownHandleColorException(tag)
         }
     }
 

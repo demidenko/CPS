@@ -130,7 +130,7 @@ class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activi
             HandleColor.BLUE -> 0x6666FE
             HandleColor.YELLOW -> 0xDDCC00
             HandleColor.RED -> 0xEE0000
-            else -> throw Exception("${tag.name} is invalid color for manager ")
+            else -> throw HandleColor.UnknownHandleColorException(tag)
         }
     }
 

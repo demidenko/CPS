@@ -107,14 +107,14 @@ class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activit
     override fun getColor(tag: HandleColor): Int {
         return when(tag){
             HandleColor.GRAY -> 0x808080
-            HandleColor.BROWN -> 0x804000 //brown
-            HandleColor.GREEN -> 0x008000 //green
-            HandleColor.CYAN -> 0x00C0C0 //cyan
-            HandleColor.BLUE -> 0x0000FF //blue
-            HandleColor.YELLOW -> 0xC0C000 //yellow
-            HandleColor.ORANGE -> 0xFF8000 //orange
-            HandleColor.RED -> 0xFF0000 //red
-            else -> throw Exception("${tag.name} is invalid color for manager ")
+            HandleColor.BROWN -> 0x804000
+            HandleColor.GREEN -> 0x008000
+            HandleColor.CYAN -> 0x00C0C0
+            HandleColor.BLUE -> 0x0000FF
+            HandleColor.YELLOW -> 0xC0C000
+            HandleColor.ORANGE -> 0xFF8000
+            HandleColor.RED -> 0xFF0000
+            else -> throw HandleColor.UnknownHandleColorException(tag)
         }
     }
 }
