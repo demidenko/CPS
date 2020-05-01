@@ -9,6 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:tabInlineLabel="true"
+        app:tabTextColor="@color/bottom_view_color"
+        app:tabIndicatorColor="?attr/colorAccent"
         />
 
     <androidx.viewpager2.widget.ViewPager2
@@ -20,7 +22,7 @@
          />
 
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/button_reload_cf_news"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

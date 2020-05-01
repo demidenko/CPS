@@ -17,13 +17,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="contestID"
-        android:layout_toLeftOf="@id/button_watcher"
+        android:layout_toStartOf="@id/button_watcher"
         android:layout_alignBottom="@id/button_watcher"
         android:layout_centerHorizontal="true"
         android:inputType="numberDecimal"
         />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/button_watcher"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

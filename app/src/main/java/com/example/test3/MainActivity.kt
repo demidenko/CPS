@@ -82,15 +82,6 @@ class MainActivity : AppCompatActivity(){
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.color_switcher -> {
-                useRealColors = !useRealColors
-                accountsFragment.panels.forEach { it.show() }
-                newsFragment.refresh()
-
-                with(getPreferences(Context.MODE_PRIVATE).edit()){
-                    putBoolean("use_real_colors", useRealColors)
-                    apply()
-                }
-
                 if(testFragment.isVisible){
                     val s = SpannableStringBuilder("colors example\n")
                     val backup = useRealColors
@@ -115,6 +106,16 @@ class MainActivity : AppCompatActivity(){
                     }
                     testFragment.textView.text = s
                     useRealColors = backup
+                    return true
+                }
+
+                useRealColors = !useRealColors
+                accountsFragment.panels.forEach { it.show() }
+                newsFragment.refresh()
+
+                with(getPreferences(Context.MODE_PRIVATE).edit()){
+                    putBoolean("use_real_colors", useRealColors)
+                    apply()
                 }
 
                 return true

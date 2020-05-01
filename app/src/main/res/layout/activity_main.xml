@@ -27,10 +27,7 @@
         app:itemTextColor="@color/bottom_view_color"
 
         app:menu="@menu/navigation_bar"
-        >
-
-
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+        />
 
 
 

@@ -58,7 +58,14 @@ class NewsFragment : Fragment() {
 
         val tabLayout: TabLayout = view.findViewById(R.id.cf_news_tab_layout)
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
-            tab.text = codeforcesNewsAdapter.fragments[position].title
+            val title = codeforcesNewsAdapter.fragments[position].title
+            tab.text = title
+            if(title == "CF MAIN"){
+                tab.orCreateBadge.apply {
+                    backgroundColor = resources.getColor(android.R.color.holo_green_light, null)
+                    isVisible = false
+                }
+            }
         }.attach()
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
@@ -68,9 +75,12 @@ class NewsFragment : Fragment() {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 tab?.run{
                     val fragment = codeforcesNewsAdapter.fragments[position]
-                    if(fragment.forSave && text.toString().endsWith(')')){
-                        text = fragment.title
-                        fragment.save()
+                    if(fragment.forSave) badge?.apply{
+                        if(hasNumber()){
+                            fragment.save()
+                            isVisible = false
+                            clearNumber()
+                        }
                     }
                 }
             }
@@ -83,19 +93,24 @@ class NewsFragment : Fragment() {
                 button.text = "..."
                 button.isEnabled = false
                 activity.scope.launch {
+                    val rx = codeforcesNewsAdapter.fragments.map { it.address }.toSet().map { it to async { readURLData(it) } }.toMap()
                     codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
                         val tab = tabLayout.getTabAt(index)!!
                         launch {
                             tab.text = "..."
-                            val newBlogs = fragment.reload()
+                            val newBlogs = rx[fragment.address]!!.await()?.let { fragment.parseData(it) } ?: 0
+                            tab.text = fragment.title
                             if(newBlogs>0){
-                                tab.text = fragment.title + " ($newBlogs)"
                                 if(tab.isSelected) fragment.save()
-                            }else{
-                                tab.text = fragment.title
+                                else{
+                                    tab.badge?.apply{
+                                        number = newBlogs
+                                        isVisible = true
+                                    }
+                                }
                             }
                         }
-                    }.joinAll()
+                    } .joinAll()
                     button.isEnabled = true
                     button.text = "RELOAD"
                 }
@@ -159,54 +174,56 @@ open class CodeforcesNewsFragment(val address: String, val title: String, val fo
         return Html.fromHtml(s, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
     }
 
-    open suspend fun reload(): Int {
-        readURLData(address)?.let { s ->
-            val res = arrayListOf<Array<String>>()
-            var i = 0
-            while (true) {
-                i = s.indexOf("<div class=\"topic\"", i + 1)
-                if (i == -1) break
+    open suspend fun parseData(s: String): Int {
+        val res = arrayListOf<Array<String>>()
+        var i = 0
+        while (true) {
+            i = s.indexOf("<div class=\"topic\"", i + 1)
+            if (i == -1) break
 
-                val title = fromHTML(s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i)))
+            val title = fromHTML(s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i)))
 
-                i = s.indexOf("entry/", i)
-                val id = s.substring(i+6, s.indexOf('"',i))
+            i = s.indexOf("entry/", i)
+            val id = s.substring(i+6, s.indexOf('"',i))
 
-                i = s.indexOf("<div class=\"info\"", i)
-                i = s.indexOf("/profile/", i)
-                val author = s.substring(i+9,s.indexOf('"',i))
+            i = s.indexOf("<div class=\"info\"", i)
+            i = s.indexOf("/profile/", i)
+            val author = s.substring(i+9,s.indexOf('"',i))
 
-                i = s.indexOf("rated-user user-",i)
-                val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
+            i = s.indexOf("rated-user user-",i)
+            val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
 
-                i = s.indexOf("<span class=\"format-humantime\"", i)
-                val time = s.substring(s.indexOf('>',i)+1, s.indexOf("</span>",i))
+            i = s.indexOf("<span class=\"format-humantime\"", i)
+            val time = s.substring(s.indexOf('>',i)+1, s.indexOf("</span>",i))
 
-                i = s.indexOf("<div class=\"roundbox meta\"", i)
-                i = s.indexOf("</span>", i)
-                val rating = s.substring(s.lastIndexOf('>',i-1)+1,i)
+            i = s.indexOf("<div class=\"roundbox meta\"", i)
+            i = s.indexOf("</span>", i)
+            val rating = s.substring(s.lastIndexOf('>',i-1)+1,i)
 
-                i = s.indexOf("<div class=\"right-meta\">", i)
-                i = s.indexOf("</ul>", i)
-                i = s.lastIndexOf("</a>", i)
-                val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim()
+            i = s.indexOf("<div class=\"right-meta\">", i)
+            i = s.indexOf("</ul>", i)
+            i = s.lastIndexOf("</a>", i)
+            val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim()
 
-                res.add(arrayOf(id,title,author,authorColor,time,comments,rating))
-            }
-            if(res.isEmpty()) return 0
+            res.add(arrayOf(id,title,author,authorColor,time,comments,rating))
+        }
+        if(res.isEmpty()) return 0
 
-            viewAdapter.setNewData(res.toTypedArray())
+        viewAdapter.setNewData(res.toTypedArray())
 
-            if(!forSave) return 0
+        if(!forSave) return 0
 
-            requireActivity().getSharedPreferences("CodeforcesNewsFragmentData $title", Context.MODE_PRIVATE)?.run{
-                val savedBlogs = getStringSet("blogs", null) ?: emptySet()
-                val currentBlogs = res.map{ it[0] }.filter{ !savedBlogs.contains(it) }
-                return currentBlogs.size
-            }
+        requireActivity().getSharedPreferences("CodeforcesNewsFragmentData $title", Context.MODE_PRIVATE)?.run{
+            val savedBlogs = getStringSet("blogs", null) ?: emptySet()
+            val currentBlogs = res.map{ it[0] }.filter{ !savedBlogs.contains(it) }
+            return currentBlogs.size
         }
 
         return 0
+    }
+
+    suspend fun reload(): Int {
+        return parseData(readURLData(address)?:return 0)
     }
 
     fun save() = with(requireActivity().getSharedPreferences("CodeforcesNewsFragmentData $title", Context.MODE_PRIVATE).edit()){
@@ -218,36 +235,35 @@ open class CodeforcesNewsFragment(val address: String, val title: String, val fo
 
 class CodeforcesNewsRecentFragment(address: String, title: String): CodeforcesNewsFragment(address, title, false){
 
-    override suspend fun reload(): Int {
-        readURLData(address)?.let { s ->
-            val res = arrayListOf<Array<String>>()
-            var i = s.indexOf("<div class=\"recent-actions\">")
-            if(i==-1) return 0
-            while(true){
-                i = s.indexOf("<div style=\"font-size:0.9em;padding:0.5em 0;\">", i+1)
-                if(i==-1) break
+    override suspend fun parseData(s:  String): Int {
+        val res = arrayListOf<Array<String>>()
+        var i = s.indexOf("<div class=\"recent-actions\">")
+        if(i==-1) return 0
+        while(true){
+            i = s.indexOf("<div style=\"font-size:0.9em;padding:0.5em 0;\">", i+1)
+            if(i==-1) break
 
-                i = s.indexOf("/profile/", i)
-                val author = s.substring(i+9,s.indexOf('"',i))
+            i = s.indexOf("/profile/", i)
+            val author = s.substring(i+9,s.indexOf('"',i))
 
-                i = s.indexOf("rated-user user-",i)
-                val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
+            i = s.indexOf("rated-user user-",i)
+            val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
 
-                i = s.indexOf("entry/", i)
-                val id = s.substring(i+6, s.indexOf('"',i))
+            i = s.indexOf("entry/", i)
+            val id = s.substring(i+6, s.indexOf('"',i))
 
-                val title = fromHTML(s.substring(s.indexOf(">",i)+1, s.indexOf("</a",i)))
+            val title = fromHTML(s.substring(s.indexOf(">",i)+1, s.indexOf("</a",i)))
 
-                val time = ""
-                val comments = ""
-                val rating = ""
+            val time = ""
+            val comments = ""
+            val rating = ""
 
-                res.add(arrayOf(id,title,author,authorColor,time,comments,rating))
-            }
-            if(res.isEmpty()) return 0
-
-            viewAdapter.setNewData(res.toTypedArray())
+            res.add(arrayOf(id,title,author,authorColor,time,comments,rating))
         }
+        if(res.isEmpty()) return 0
+
+        viewAdapter.setNewData(res.toTypedArray())
+
         return 0
     }
 }
