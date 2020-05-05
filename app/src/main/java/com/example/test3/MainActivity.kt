@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity(){
         }
 
         with(getPreferences(Context.MODE_PRIVATE)){
-            useRealColors = getBoolean("use_real_colors", true)
+            useRealColors = getBoolean(use_real_colors, false)
         }
     }
 
@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity(){
                 newsFragment.refresh()
 
                 with(getPreferences(Context.MODE_PRIVATE).edit()){
-                    putBoolean("use_real_colors", useRealColors)
+                    putBoolean(use_real_colors, useRealColors)
                     apply()
                 }
 
@@ -143,8 +143,11 @@ class MainActivity : AppCompatActivity(){
 
 
     companion object {
+        const val use_real_colors = "use_real_colors"
+
         const val CALL_ACCOUNT_SETTINGS = 1
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         println("on result $resultCode")
         if(requestCode == CALL_ACCOUNT_SETTINGS && resultCode == Activity.RESULT_OK){

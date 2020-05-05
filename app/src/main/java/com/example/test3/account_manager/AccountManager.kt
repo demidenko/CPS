@@ -63,11 +63,11 @@ enum class HandleColor(private val rgb: Int) {
     BROWN(0x80461B),
     GREEN(0x009000),
     CYAN(0x00A89E),
-    BLUE(0x3E64F0),
-    VIOLET(0xBB55EE),
+    BLUE(0x3F68F0),
+    VIOLET(0xB04ECC),
     YELLOW(0xCCCC00),
     ORANGE(0xFB8000),
-    RED(0xED301C);
+    RED(0xED301D);
 
     fun getARGB(manager: ColoredHandles): Int {
         return ((if(useRealColors) manager.getColor(this) else rgb) + 0xFF000000).toInt()

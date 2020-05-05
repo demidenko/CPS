@@ -2,6 +2,7 @@ package com.example.test3
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
@@ -36,6 +37,8 @@ class NewsFragment : Fragment() {
 
     private lateinit var codeforcesNewsAdapter: CodeforcesNewsAdapter
     private lateinit var codeforcesNewsViewPager: ViewPager2
+    private lateinit var tabLayout: TabLayout
+    private lateinit var buttonReload: Button
 
     fun refresh(){
         try {
@@ -44,6 +47,7 @@ class NewsFragment : Fragment() {
 
         }
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -56,9 +60,10 @@ class NewsFragment : Fragment() {
         codeforcesNewsViewPager.offscreenPageLimit = codeforcesNewsAdapter.fragments.size - 1
 
 
-        val tabLayout: TabLayout = view.findViewById(R.id.cf_news_tab_layout)
+        tabLayout = view.findViewById(R.id.cf_news_tab_layout)
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
-            val title = codeforcesNewsAdapter.fragments[position].title
+            val fragment = codeforcesNewsAdapter.fragments[position]
+            val title = fragment.title
             tab.text = title
             if(title == "CF MAIN"){
                 tab.orCreateBadge.apply {
@@ -68,6 +73,8 @@ class NewsFragment : Fragment() {
             }
         }.attach()
 
+
+
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
             override fun onTabReselected(tab: TabLayout.Tab?) {}
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -75,7 +82,7 @@ class NewsFragment : Fragment() {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 tab?.run{
                     val fragment = codeforcesNewsAdapter.fragments[position]
-                    if(fragment.forSave) badge?.apply{
+                    if(fragment is CodeforcesNewsMainFragment) badge?.run{
                         if(hasNumber()){
                             fragment.save()
                             isVisible = false
@@ -88,7 +95,7 @@ class NewsFragment : Fragment() {
         })
 
 
-        view.findViewById<Button>(R.id.button_reload_cf_news).apply {
+        buttonReload = view.findViewById<Button>(R.id.button_reload_cf_news).apply {
             setOnClickListener { button -> button as Button
                 button.text = "..."
                 button.isEnabled = false
@@ -98,25 +105,31 @@ class NewsFragment : Fragment() {
                         val tab = tabLayout.getTabAt(index)!!
                         launch {
                             tab.text = "..."
-                            val newBlogs = rx[fragment.address]!!.await()?.let { fragment.parseData(it) } ?: 0
+                            fragment.reload(rx)
                             tab.text = fragment.title
-                            if(newBlogs>0){
+                            if(fragment is CodeforcesNewsMainFragment && fragment.newBlogs>0){
                                 if(tab.isSelected) fragment.save()
                                 else{
                                     tab.badge?.apply{
-                                        number = newBlogs
+                                        number = fragment.newBlogs
                                         isVisible = true
                                     }
                                 }
                             }
                         }
-                    } .joinAll()
+                    }.joinAll()
                     button.isEnabled = true
                     button.text = "RELOAD"
                 }
             }
-            callOnClick()
         }
+
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        buttonReload.callOnClick()
 
     }
 
@@ -130,9 +143,9 @@ class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
     }
 
     val fragments = arrayOf(
-        CodeforcesNewsFragment("https://codeforces.com/top?locale=ru", "CF TOP", false),
+        CodeforcesNewsFragment("https://codeforces.com/top?locale=ru", "CF TOP"),
         CodeforcesNewsRecentFragment("https://codeforces.com/?locale=ru", "CF RECENT"),
-        CodeforcesNewsFragment("https://codeforces.com/?locale=ru", "CF MAIN", true)
+        CodeforcesNewsMainFragment("https://codeforces.com/?locale=ru", "CF MAIN")
     )
 
     override fun createFragment(position: Int): Fragment {
@@ -143,7 +156,7 @@ class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
 
 
 
-open class CodeforcesNewsFragment(val address: String, val title: String, val forSave: Boolean) : Fragment() {
+open class CodeforcesNewsFragment(val address: String, val title: String) : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -174,7 +187,8 @@ open class CodeforcesNewsFragment(val address: String, val title: String, val fo
         return Html.fromHtml(s, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
     }
 
-    open suspend fun parseData(s: String): Int {
+    open suspend fun parseData(data: Map<String,Deferred<String?>>): ArrayList<Array<String>>? {
+        val s = data[address]?.await() ?: return null
         val res = arrayListOf<Array<String>>()
         var i = 0
         while (true) {
@@ -207,38 +221,102 @@ open class CodeforcesNewsFragment(val address: String, val title: String, val fo
 
             res.add(arrayOf(id,title,author,authorColor,time,comments,rating))
         }
-        if(res.isEmpty()) return 0
 
-        viewAdapter.setNewData(res.toTypedArray())
+        return res
+    }
 
-        if(!forSave) return 0
-
-        requireActivity().getSharedPreferences("CodeforcesNewsFragmentData $title", Context.MODE_PRIVATE)?.run{
-            val savedBlogs = getStringSet("blogs", null) ?: emptySet()
-            val currentBlogs = res.map{ it[0] }.filter{ !savedBlogs.contains(it) }
-            return currentBlogs.size
+    open suspend fun reload(data: Map<String,Deferred<String?>>) {
+        parseData(data)?.let {
+            if(it.isNotEmpty()) viewAdapter.setNewData(it.toTypedArray())
         }
-
-        return 0
     }
 
-    suspend fun reload(): Int {
-        return parseData(readURLData(address)?:return 0)
+
+}
+
+class CodeforcesNewsMainFragment(address: String, title: String): CodeforcesNewsFragment(address, title){
+
+    companion object {
+        const val CODEFORCES_NEWS_MAIN = "codeforces_news_main"
+        const val blogs = "blogs"
     }
 
-    fun save() = with(requireActivity().getSharedPreferences("CodeforcesNewsFragmentData $title", Context.MODE_PRIVATE).edit()){
+    private lateinit var prefs: SharedPreferences
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        prefs = requireActivity().getSharedPreferences(CODEFORCES_NEWS_MAIN, Context.MODE_PRIVATE)
+    }
+
+    var newBlogs: Int = 0
+
+    override suspend fun reload(data: Map<String, Deferred<String?>>) {
+        super.reload(data)
+
+        val savedBlogs = prefs.getStringSet(blogs, null) ?: emptySet()
+        newBlogs = viewAdapter.data.map { it[0] }.count { !savedBlogs.contains(it) }
+    }
+
+    fun save() = with(prefs.edit()){
         val toSave = viewAdapter.data.map { it[0] }.toSet()
-        putStringSet("blogs", toSave)
+        putStringSet(blogs, toSave)
         commit()
     }
 }
 
-class CodeforcesNewsRecentFragment(address: String, title: String): CodeforcesNewsFragment(address, title, false){
 
-    override suspend fun parseData(s:  String): Int {
+
+
+
+class CodeforcesNewsRecentFragment(address: String, title: String): CodeforcesNewsFragment(address, title){
+
+    override suspend fun parseData(data: Map<String, Deferred<String?>>): ArrayList<Array<String>>? {
+
+        val call = (requireActivity() as MainActivity).scope.async {
+            withContext(Dispatchers.IO) {
+                mutableMapOf<String,MutableList<String>>().apply {
+                    JsonReaderFromURL("https://codeforces.com/api/recentActions?maxCount=100&locale=ru")?.run {
+                        readObject {
+                            if (nextString("status") != "OK") return@run
+                            nextName()
+                            readArrayOfObjects {
+                                var blogID: String? = null
+                                var commentID: String? = null
+                                var handle: String? = null
+                                while (hasNext()) when (nextName()) {
+                                    "comment" -> {
+                                        readObjectFields("commentatorHandle", "id").apply {
+                                            handle = get(0) as String
+                                            commentID = (get(1) as Double).toInt().toString()
+                                        }
+                                    }
+                                    "blogEntry" -> {
+                                        blogID =
+                                            (readObjectFields("id")[0] as Double).toInt().toString()
+                                    }
+                                    else -> {
+                                        skipValue()
+                                    }
+                                }
+                                getOrPut(blogID!!) { mutableListOf(commentID!!) }.add(handle!!)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        val (s, commentators) = listOf(data[address]!!, call).awaitAll().run {
+            Pair(
+                get(0) as String,
+                get(1) as MutableMap<String,MutableList<String>>
+            )
+        }
+
         val res = arrayListOf<Array<String>>()
         var i = s.indexOf("<div class=\"recent-actions\">")
-        if(i==-1) return 0
+        if(i==-1) return null
         while(true){
             i = s.indexOf("<div style=\"font-size:0.9em;padding:0.5em 0;\">", i+1)
             if(i==-1) break
@@ -255,16 +333,34 @@ class CodeforcesNewsRecentFragment(address: String, title: String): CodeforcesNe
             val title = fromHTML(s.substring(s.indexOf(">",i)+1, s.indexOf("</a",i)))
 
             val time = ""
-            val comments = ""
             val rating = ""
+            /*val (time, rating) =
+            JsonReaderFromURL("https://codeforces.com/api/blogEntry.view?blogEntryId=$id")?.run {
+                readObject {
+                    if(nextString("status")!="OK") return@run null
+                    nextName()
+                    val res = readObjectFields("rating", "modificationTimeSeconds")
+                    val rating = (res[0] as Double).toInt()
+                    val time = System.currentTimeMillis()/1000 -  (res[1] as Double).toInt()
+                    return@run Pair("$time", (if(rating<0) "" else "+") + rating)
+                }
+                null
+            } ?: Pair("","")*/
 
-            res.add(arrayOf(id,title,author,authorColor,time,comments,rating))
+
+            val (comments, lastCommentId) = commentators.getOrDefault(id, mutableListOf()).let{
+                var cid: String = ""
+                if(it.isNotEmpty()){
+                    cid = it[0]
+                    it.removeAt(0)
+                }
+                Pair(it.distinct().joinToString(), cid)
+            }
+
+            res.add(arrayOf(id,title,author,authorColor,time,comments,rating,lastCommentId))
         }
-        if(res.isEmpty()) return 0
 
-        viewAdapter.setNewData(res.toTypedArray())
-
-        return 0
+        return res
     }
 }
 
@@ -286,7 +382,12 @@ class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: A
 
     override fun onBindViewHolder(holder: CodeforcesNewsItemViewHolder, position: Int) {
         val info = data[position]
-        holder.view.setOnClickListener { activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${info[0]}"))) }
+        holder.view.setOnClickListener {
+            var suf = info[0]
+            if(info.size>7 && info[7].isNotBlank()) suf+="#comment-${info[7]}"
+            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/$suf")))
+        }
+
         holder.title.text = info[1]
 
         holder.author.apply {
@@ -303,8 +404,7 @@ class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: A
         holder.rating.apply{
             text = info[6]
             setTextColor(activity.resources.getColor(
-                if(info[6].startsWith('+')) R.color.blog_rating_positive else R.color.blog_rating_negative,
-                null)
+                if(info[6].startsWith('+')) R.color.blog_rating_positive else R.color.blog_rating_negative, null)
             )
         }
     }

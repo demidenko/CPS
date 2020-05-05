@@ -1,12 +1,10 @@
 package com.example.test3.account_manager
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import com.example.test3.*
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.JsonReader
-import java.lang.Exception
 
 class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activity), ColoredHandles {
 

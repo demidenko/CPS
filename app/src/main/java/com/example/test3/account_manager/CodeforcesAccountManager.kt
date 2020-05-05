@@ -5,7 +5,6 @@ import com.example.test3.*
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.JsonReader
-import java.lang.Exception
 
 class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(activity), ColoredHandles {
 

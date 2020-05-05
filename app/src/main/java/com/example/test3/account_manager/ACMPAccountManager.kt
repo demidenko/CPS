@@ -11,7 +11,8 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         var id: String,
         var userName: String = "",
         var rating: Int = 0,
-        var solvedTasks: Int = 0
+        var solvedTasks: Int = 0,
+        var place: Int = 0
     ): UserInfo() {
         override val userID: String
             get() = id
@@ -32,6 +33,8 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         const val preferences_username = "username"
         const val preferences_rating = "rating"
         const val preferences_count_of_solved_tasks = "count_of_solved_tasks"
+        const val preferences_place = "place"
+
 
         var __cachedInfo: ACMPUserInfo? = null
     }
@@ -53,6 +56,9 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         if(i!=-1){
             i = s.indexOf(':', i)
             res.rating = s.substring(i+2, s.indexOf('/', i)-1).toInt()
+            i = s.lastIndexOf("<b class=btext>Место:", i)
+            i = s.indexOf(':', i)
+            res.place = s.substring(i+2, s.indexOf('/', i)-1).toInt()
         }
         res.status = STATUS.OK
         return res
@@ -68,7 +74,8 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
             id = getString(preferences_userid, null) ?: "",
             userName = getString(preferences_username, null) ?: "",
             rating = getInt(preferences_rating, 0),
-            solvedTasks = getInt(preferences_count_of_solved_tasks, 0)
+            solvedTasks = getInt(preferences_count_of_solved_tasks, 0),
+            place = getInt(preferences_place, 0)
         )
     }
 
@@ -79,6 +86,7 @@ class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) 
         putString(preferences_username, info.userName)
         putInt(preferences_rating, info.rating)
         putInt(preferences_count_of_solved_tasks, info.solvedTasks)
+        putInt(preferences_place, info.place)
         commit()
     }
 

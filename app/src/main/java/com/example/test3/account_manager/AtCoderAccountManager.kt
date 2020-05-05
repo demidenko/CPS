@@ -1,9 +1,7 @@
 package com.example.test3.account_manager
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import com.example.test3.readURLData
-import java.lang.Exception
 
 class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activity), ColoredHandles{
 
