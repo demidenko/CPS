@@ -22,7 +22,10 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 
 
 class NewsFragment : Fragment() {
@@ -143,8 +146,8 @@ class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
     }
 
     val fragments = arrayOf(
+        CodeforcesNewsRecentFragment("https://codeforces.com/recent-actions?locale=ru", "CF RECENT"),
         CodeforcesNewsFragment("https://codeforces.com/top?locale=ru", "CF TOP"),
-        CodeforcesNewsRecentFragment("https://codeforces.com/?locale=ru", "CF RECENT"),
         CodeforcesNewsMainFragment("https://codeforces.com/?locale=ru", "CF MAIN")
     )
 
@@ -266,56 +269,35 @@ class CodeforcesNewsMainFragment(address: String, title: String): CodeforcesNews
 
 
 
-
-
 class CodeforcesNewsRecentFragment(address: String, title: String): CodeforcesNewsFragment(address, title){
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewAdapter.type = 1
+    }
+
     override suspend fun parseData(data: Map<String, Deferred<String?>>): ArrayList<Array<String>>? {
+        val s = data[address]?.await() ?: return null
+        val commentators = mutableMapOf<String,MutableList<String>>()
 
-        val call = (requireActivity() as MainActivity).scope.async {
-            withContext(Dispatchers.IO) {
-                mutableMapOf<String,MutableList<String>>().apply {
-                    JsonReaderFromURL("https://codeforces.com/api/recentActions?maxCount=100&locale=ru")?.run {
-                        readObject {
-                            if (nextString("status") != "OK") return@run
-                            nextName()
-                            readArrayOfObjects {
-                                var blogID: String? = null
-                                var commentID: String? = null
-                                var handle: String? = null
-                                while (hasNext()) when (nextName()) {
-                                    "comment" -> {
-                                        readObjectFields("commentatorHandle", "id").apply {
-                                            handle = get(0) as String
-                                            commentID = (get(1) as Double).toInt().toString()
-                                        }
-                                    }
-                                    "blogEntry" -> {
-                                        blogID =
-                                            (readObjectFields("id")[0] as Double).toInt().toString()
-                                    }
-                                    else -> {
-                                        skipValue()
-                                    }
-                                }
-                                getOrPut(blogID!!) { mutableListOf(commentID!!) }.add(handle!!)
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        var i = 0
+        while(true){
+            i = s.indexOf("<table class=\"comment-table\">", i+1)
+            if(i==-1) break
 
+            i = s.indexOf("class=\"rated-user", i)
+            val handle = s.substring(s.indexOf('>',i)+1, s.indexOf('<',i))
 
-        val (s, commentators) = listOf(data[address]!!, call).awaitAll().run {
-            Pair(
-                get(0) as String,
-                get(1) as MutableMap<String,MutableList<String>>
-            )
+            i = s.indexOf("#comment-", i)
+            val commentID = s.substring(s.indexOf('-',i)+1, s.indexOf('"',i))
+
+            val blogID = s.substring(s.lastIndexOf('/',i)+1, i)
+
+            commentators.getOrPut(blogID) { mutableListOf(commentID) }.add(handle)
         }
 
         val res = arrayListOf<Array<String>>()
-        var i = s.indexOf("<div class=\"recent-actions\">")
+        i = s.indexOf("<div class=\"recent-actions\">")
         if(i==-1) return null
         while(true){
             i = s.indexOf("<div style=\"font-size:0.9em;padding:0.5em 0;\">", i+1)
@@ -362,7 +344,9 @@ class CodeforcesNewsRecentFragment(address: String, title: String): CodeforcesNe
 
         return res
     }
+
 }
+
 
 
 class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: Array<Array<String>>): RecyclerView.Adapter<CodeforcesNewsItemsAdapter.CodeforcesNewsItemViewHolder>(){
@@ -374,8 +358,19 @@ class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: A
         val comments: TextView = view.findViewById(R.id.news_item_comments)
     }
 
+    var type: Int = 0
+
+    override fun getItemViewType(position: Int): Int {
+        return type
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesNewsItemViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_item, parent, false) as RelativeLayout
+        val view =
+            when(viewType){
+                0 -> LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_item, parent, false) as RelativeLayout
+                1 -> LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_item, parent, false) as RelativeLayout
+                else -> throw Exception()
+            }
 
         return CodeforcesNewsItemViewHolder(view)
     }
@@ -410,6 +405,8 @@ class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: A
     }
 
     override fun getItemCount() = data.size
+
+
 
     fun setNewData(a: Array<Array<String>>){
         data = a

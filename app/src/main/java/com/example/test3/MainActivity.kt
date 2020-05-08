@@ -1,6 +1,9 @@
 package com.example.test3
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -37,12 +40,15 @@ class MainActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         println("main create")
         super.onCreate(savedInstanceState) //TODO
-        setContentView(R.layout.activity_main)
 
+
+        createNotificationChannel()
+
+        setContentView(R.layout.activity_main)
 
         defaultTextColor = ContextCompat.getColor(this, R.color.textColor)
 
-        supportActionBar?.title = "Competitive Programming & Solving"
+        supportActionBar?.title = "Competitive Programming & Solving" //"Compete, Program, Solve"
 
         activeFragment = accountsFragment
         supportFragmentManager.beginTransaction().add(R.id.container_fragment, activeFragment).commit()
@@ -120,6 +126,12 @@ class MainActivity : AppCompatActivity(){
 
                 return true
             }
+            R.id.app_info -> {
+                AlertDialog.Builder(this)
+                    .setTitle("CPS")
+                    .setMessage("version ${BuildConfig.VERSION_NAME}")
+                    .create().show()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -157,4 +169,19 @@ class MainActivity : AppCompatActivity(){
         super.onActivityResult(requestCode, resultCode, data)
     }
 
+
+
+
+    fun createNotificationChannel(){
+
+        val channel = NotificationChannel(
+            "test",
+            "test channel",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+
+        }
+        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(channel)
+    }
 }
+

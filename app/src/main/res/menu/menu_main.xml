@@ -6,9 +6,12 @@
         android:id="@+id/color_switcher"
         android:title="Colors"
         android:icon="@drawable/ic_colors"
-        app:showAsAction="always"
-        >
+        />
 
-    </item>
+    <item
+        android:id="@+id/app_info"
+        android:title="About"
+        />
+
 
 </menu>

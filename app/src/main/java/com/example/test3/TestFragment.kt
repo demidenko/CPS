@@ -1,5 +1,7 @@
 package com.example.test3
 
+import android.app.NotificationManager
+import android.content.Context.NOTIFICATION_SERVICE
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,9 +9,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
+import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
-import com.example.test3.account_manager.*
+import com.example.test3.account_manager.CodeforcesAccountManager
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import kotlinx.coroutines.*
@@ -141,8 +143,15 @@ class TestFragment : Fragment() {
                             str+="$problemName\t\t$pts\t\t[$status] \n"
                             if(phase=="SYSTEM_TEST"){
                                 tasksPrevious?.let {
-                                    if(it.elementAt(index).second!=status)
-                                        Toast.makeText(activity, "$problemName -> $pts points", Toast.LENGTH_LONG).show()
+                                    if(it.elementAt(index).second!=status){
+                                        //Toast.makeText(activity, "$problemName -> $pts points", Toast.LENGTH_LONG).show()
+                                        val builder = NotificationCompat.Builder(activity, "test").apply {
+                                            setContentTitle("problems")
+                                            setContentText("$problemName -> $pts points")
+                                            setSmallIcon(R.drawable.ic_news)
+                                        }
+                                        (activity.getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(2 + index, builder.build());
+                                    }
                                 }
                             }
                         }
@@ -152,17 +161,17 @@ class TestFragment : Fragment() {
                     if(phase=="FINISHED"){
                         val info = manager.loadInfo(handle) as CodeforcesAccountManager.CodeforcesUserInfo
                         val old = manager.savedInfo as CodeforcesAccountManager.CodeforcesUserInfo
-                        if(info!=old){
-                            Toast.makeText(activity, "$handle Rating: ${old.rating} -> ${info.rating}", Toast.LENGTH_LONG).show()
-
-                            /*val builder = NotificationCompat.Builder(activity, "test_channel").apply {
+                        if(info.rating!=old.rating){
+                            val builder = NotificationCompat.Builder(activity, "test").apply {
+                                val difference = info.rating - old.rating
                                 setContentTitle("$handle new rating: ${info.rating}")
-                                val diff = (if (info.rating < old.rating) "" else "+") + (info.rating - old.rating)
-                                setContentText("$diff, rank: $rank")
+                                val diff_str = (if (info.rating < old.rating) "" else "+") + difference
+                                setContentText("$diff_str, rank: $rank")
                                 setSubText("CodeForces rating changes")
-                                color = manager.getColor(info) ?: activity.defaultTextColor
+                                setSmallIcon(if(difference<0) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
+                                //color = manager.getColor(info) ?: activity.defaultTextColor
                             }
-                            (activity.getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(1, builder.build());*/
+                            (activity.getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(1, builder.build());
 
                             manager.savedInfo = info
                             activity.accountsFragment.codeforcesPanel.show()

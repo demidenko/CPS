@@ -2,15 +2,14 @@ package com.example.test3
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import com.example.test3.account_manager.*
 import kotlinx.coroutines.*
-import java.lang.Exception
 
 
 class Settings: AppCompatActivity() {
@@ -31,7 +30,8 @@ class Settings: AppCompatActivity() {
             else -> throw Exception("Unknown type of manager")
         }
 
-        supportActionBar?.title =  manager.PREFERENCES_FILE_NAME + " settings"
+        supportActionBar?.title = "Settings"
+        supportActionBar?.subtitle = manager.PREFERENCES_FILE_NAME
 
         val handleEditor: EditText = findViewById(R.id.editText)
 

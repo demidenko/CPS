@@ -10,7 +10,6 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.*
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import java.util.*
 
 class AccountsFragment: Fragment() {
@@ -89,50 +88,7 @@ class AccountsFragment: Fragment() {
                 }
                 textMain.setTextColor(color ?: activity.defaultTextColor)
                 textAdditional.setTextColor(color ?: activity.defaultTextColor)
-
-                /*if(color!=null) {
-                    circle.color = color
-                    circle.invalidate()
-                }*/
             }
-
-            /*lateinit var circle: TopCoderCircle
-
-            override fun additionalBuild() {
-                circle = TopCoderCircle(activity)
-                circle.id = View.generateViewId()
-
-                val kostil = LinearLayout(activity).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                    id = View.generateViewId()
-                    gravity = Gravity.CENTER
-                }
-
-                layout.removeView(textMain)
-
-                val params = LinearLayout.LayoutParams(50, 50)
-                kostil.addView(circle, params)
-                kostil.addView(textMain)
-
-                layout.addView(kostil)
-
-                (textAdditional.layoutParams as RelativeLayout.LayoutParams).apply {
-                    addRule(RelativeLayout.BELOW, kostil.id)
-                }
-            }
-
-            inner class TopCoderCircle(context: Context) : View(context) {
-                var color: Int = defaultTextColor
-                val shape = ShapeDrawable(OvalShape())
-                override fun onDraw(canvas: Canvas) {
-                    println("onDraw")
-                    shape.apply {
-                        println(color)
-                        paint.color = color
-                        setBounds(0, 0, 50, 50)
-                    }.draw(canvas)
-                }
-            }*/
         }
 
         acmpAccountManager = ACMPAccountManager(activity)
