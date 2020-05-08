@@ -60,14 +60,22 @@
         android:id="@+id/news_item_comments"
         android:text="COMMENTS"
         android:textSize="13sp"
-        android:gravity="end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/news_item_title"
-        android:layout_toEndOf="@id/news_item_time"
         android:layout_alignParentEnd="true"
         android:singleLine="true"
         />
 
+    <ImageView
+        android:id="@+id/news_item_comment_icon"
+        android:src="@drawable/ic_comments"
+        android:layout_width="11sp"
+        android:layout_height="11sp"
+        android:layout_toStartOf="@id/news_item_comments"
+        android:layout_alignBottom="@id/news_item_comments"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="2dp"
+        />
 
 </RelativeLayout>

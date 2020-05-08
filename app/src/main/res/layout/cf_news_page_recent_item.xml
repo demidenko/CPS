@@ -15,7 +15,6 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@id/news_item_rating"
         />
 
     <TextView
@@ -29,34 +28,6 @@
         />
 
     <TextView
-        android:id="@+id/news_item_time"
-        android:text="TIME"
-        android:textSize="11sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/news_item_author"
-        android:layout_alignBottom="@id/news_item_author"
-        android:layout_marginBottom="1dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
-        android:textColor="@color/blog_time"
-        android:visibility="gone"
-        />
-
-    <TextView
-        android:id="@+id/news_item_rating"
-        android:text="RATING"
-        android:textSize="14sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@id/news_item_title"
-        android:textStyle="bold"
-        android:layout_marginStart="3dp"
-        android:visibility="gone"
-        />
-
-    <TextView
         android:id="@+id/news_item_comments"
         android:text="COMMENTS"
         android:textSize="13sp"
@@ -64,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/news_item_title"
-        android:layout_toEndOf="@id/news_item_time"
+        android:layout_toEndOf="@id/news_item_author"
         android:layout_alignParentEnd="true"
         android:singleLine="true"
         android:layout_marginStart="7dp"

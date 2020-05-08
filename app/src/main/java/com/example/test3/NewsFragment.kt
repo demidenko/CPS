@@ -6,14 +6,12 @@ import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,13 +37,12 @@ class NewsFragment : Fragment() {
     }
 
     private lateinit var codeforcesNewsAdapter: CodeforcesNewsAdapter
-    private lateinit var codeforcesNewsViewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
     private lateinit var buttonReload: Button
 
     fun refresh(){
         try {
-            codeforcesNewsAdapter.fragments.forEach { it.viewAdapter.notifyDataSetChanged() }
+            codeforcesNewsAdapter.fragments.forEach { it.refresh() }
         }catch (e: UninitializedPropertyAccessException){
 
         }
@@ -58,7 +55,8 @@ class NewsFragment : Fragment() {
         val activity = requireActivity() as MainActivity
 
         codeforcesNewsAdapter = CodeforcesNewsAdapter(this)
-        codeforcesNewsViewPager = view.findViewById(R.id.cf_news_pager)
+
+        val codeforcesNewsViewPager: ViewPager2 = view.findViewById(R.id.cf_news_pager)
         codeforcesNewsViewPager.adapter = codeforcesNewsAdapter
         codeforcesNewsViewPager.offscreenPageLimit = codeforcesNewsAdapter.fragments.size - 1
 
@@ -131,9 +129,7 @@ class NewsFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         buttonReload.callOnClick()
-
     }
 
 }
@@ -141,9 +137,6 @@ class NewsFragment : Fragment() {
 
 
 class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    override fun getItemCount(): Int {
-        return fragments.size
-    }
 
     val fragments = arrayOf(
         CodeforcesNewsRecentFragment("https://codeforces.com/recent-actions?locale=ru", "CF RECENT"),
@@ -151,10 +144,8 @@ class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
         CodeforcesNewsMainFragment("https://codeforces.com/?locale=ru", "CF MAIN")
     )
 
-    override fun createFragment(position: Int): Fragment {
-        return fragments[position]
-    }
-
+    override fun createFragment(position: Int): Fragment = fragments[position]
+    override fun getItemCount(): Int = fragments.size
 }
 
 
@@ -169,29 +160,87 @@ open class CodeforcesNewsFragment(val address: String, val title: String) : Frag
         return inflater.inflate(R.layout.fragment_cf_news_page, container, false)
     }
 
-    private lateinit var recyclerView: RecyclerView
-    lateinit var viewAdapter: CodeforcesNewsItemsAdapter
-    private lateinit var viewManager: RecyclerView.LayoutManager
+    protected lateinit var viewAdapter: CodeforcesNewsItemsAdapter
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewManager = LinearLayoutManager(context)
+        viewAdapter = CodeforcesNewsItemsClassicAdapter(requireActivity() as MainActivity)
 
-        viewAdapter = CodeforcesNewsItemsAdapter(requireActivity() as MainActivity, arrayOf())
-
-        recyclerView = view.findViewById<RecyclerView>(R.id.cf_news_page_recyclerview).apply {
-            layoutManager = viewManager
+        view.findViewById<RecyclerView>(R.id.cf_news_page_recyclerview).apply {
+            layoutManager = LinearLayoutManager(context)
             adapter = viewAdapter
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
     }
 
-    fun fromHTML(s: String): String {
-        return Html.fromHtml(s, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
+    open suspend fun reload(data: Map<String,Deferred<String?>>) {
+        val s = data[address]?.await() ?: return
+        viewAdapter.parseData(s)
     }
 
-    open suspend fun parseData(data: Map<String,Deferred<String?>>): ArrayList<Array<String>>? {
-        val s = data[address]?.await() ?: return null
+    fun refresh(){
+        viewAdapter.notifyDataSetChanged()
+    }
+
+}
+
+class CodeforcesNewsMainFragment(address: String, title: String): CodeforcesNewsFragment(address, title){
+
+    companion object {
+        const val CODEFORCES_NEWS_MAIN = "codeforces_news_main"
+        const val blogs = "blogs"
+    }
+
+    private lateinit var prefs: SharedPreferences
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        prefs = requireActivity().getSharedPreferences(CODEFORCES_NEWS_MAIN, Context.MODE_PRIVATE)
+    }
+
+    var newBlogs: Int = 0
+
+    override suspend fun reload(data: Map<String, Deferred<String?>>) {
+        super.reload(data)
+
+        val savedBlogs = prefs.getStringSet(blogs, null) ?: emptySet()
+        newBlogs = viewAdapter.getBlogIDs().count { !savedBlogs.contains(it) }
+    }
+
+    fun save() = with(prefs.edit()){
+        val toSave = viewAdapter.getBlogIDs().toSet()
+        putStringSet(blogs, toSave)
+        commit()
+    }
+}
+
+
+
+class CodeforcesNewsRecentFragment(address: String, title: String): CodeforcesNewsFragment(address, title){
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        viewAdapter = CodeforcesNewsItemsRecentAdapter(requireActivity() as MainActivity)
+
+        view.findViewById<RecyclerView>(R.id.cf_news_page_recyclerview).apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = viewAdapter
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        }
+    }
+
+}
+
+
+///---------------data adapters--------------------
+
+abstract class CodeforcesNewsItemsAdapter(protected val activity: MainActivity): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+    abstract fun parseData(s: String)
+    abstract fun getBlogIDs(): List<String>
+}
+
+class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): CodeforcesNewsItemsAdapter(activity){
+
+    override fun parseData(s: String) {
         val res = arrayListOf<Array<String>>()
         var i = 0
         while (true) {
@@ -225,131 +274,13 @@ open class CodeforcesNewsFragment(val address: String, val title: String) : Frag
             res.add(arrayOf(id,title,author,authorColor,time,comments,rating))
         }
 
-        return res
-    }
-
-    open suspend fun reload(data: Map<String,Deferred<String?>>) {
-        parseData(data)?.let {
-            if(it.isNotEmpty()) viewAdapter.setNewData(it.toTypedArray())
+        if(res.isNotEmpty()){
+            rows = res.toTypedArray()
+            notifyDataSetChanged()
         }
     }
 
 
-}
-
-class CodeforcesNewsMainFragment(address: String, title: String): CodeforcesNewsFragment(address, title){
-
-    companion object {
-        const val CODEFORCES_NEWS_MAIN = "codeforces_news_main"
-        const val blogs = "blogs"
-    }
-
-    private lateinit var prefs: SharedPreferences
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        prefs = requireActivity().getSharedPreferences(CODEFORCES_NEWS_MAIN, Context.MODE_PRIVATE)
-    }
-
-    var newBlogs: Int = 0
-
-    override suspend fun reload(data: Map<String, Deferred<String?>>) {
-        super.reload(data)
-
-        val savedBlogs = prefs.getStringSet(blogs, null) ?: emptySet()
-        newBlogs = viewAdapter.data.map { it[0] }.count { !savedBlogs.contains(it) }
-    }
-
-    fun save() = with(prefs.edit()){
-        val toSave = viewAdapter.data.map { it[0] }.toSet()
-        putStringSet(blogs, toSave)
-        commit()
-    }
-}
-
-
-
-class CodeforcesNewsRecentFragment(address: String, title: String): CodeforcesNewsFragment(address, title){
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewAdapter.type = 1
-    }
-
-    override suspend fun parseData(data: Map<String, Deferred<String?>>): ArrayList<Array<String>>? {
-        val s = data[address]?.await() ?: return null
-        val commentators = mutableMapOf<String,MutableList<String>>()
-
-        var i = 0
-        while(true){
-            i = s.indexOf("<table class=\"comment-table\">", i+1)
-            if(i==-1) break
-
-            i = s.indexOf("class=\"rated-user", i)
-            val handle = s.substring(s.indexOf('>',i)+1, s.indexOf('<',i))
-
-            i = s.indexOf("#comment-", i)
-            val commentID = s.substring(s.indexOf('-',i)+1, s.indexOf('"',i))
-
-            val blogID = s.substring(s.lastIndexOf('/',i)+1, i)
-
-            commentators.getOrPut(blogID) { mutableListOf(commentID) }.add(handle)
-        }
-
-        val res = arrayListOf<Array<String>>()
-        i = s.indexOf("<div class=\"recent-actions\">")
-        if(i==-1) return null
-        while(true){
-            i = s.indexOf("<div style=\"font-size:0.9em;padding:0.5em 0;\">", i+1)
-            if(i==-1) break
-
-            i = s.indexOf("/profile/", i)
-            val author = s.substring(i+9,s.indexOf('"',i))
-
-            i = s.indexOf("rated-user user-",i)
-            val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
-
-            i = s.indexOf("entry/", i)
-            val id = s.substring(i+6, s.indexOf('"',i))
-
-            val title = fromHTML(s.substring(s.indexOf(">",i)+1, s.indexOf("</a",i)))
-
-            val time = ""
-            val rating = ""
-            /*val (time, rating) =
-            JsonReaderFromURL("https://codeforces.com/api/blogEntry.view?blogEntryId=$id")?.run {
-                readObject {
-                    if(nextString("status")!="OK") return@run null
-                    nextName()
-                    val res = readObjectFields("rating", "modificationTimeSeconds")
-                    val rating = (res[0] as Double).toInt()
-                    val time = System.currentTimeMillis()/1000 -  (res[1] as Double).toInt()
-                    return@run Pair("$time", (if(rating<0) "" else "+") + rating)
-                }
-                null
-            } ?: Pair("","")*/
-
-
-            val (comments, lastCommentId) = commentators.getOrDefault(id, mutableListOf()).let{
-                var cid: String = ""
-                if(it.isNotEmpty()){
-                    cid = it[0]
-                    it.removeAt(0)
-                }
-                Pair(it.distinct().joinToString(), cid)
-            }
-
-            res.add(arrayOf(id,title,author,authorColor,time,comments,rating,lastCommentId))
-        }
-
-        return res
-    }
-
-}
-
-
-
-class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: Array<Array<String>>): RecyclerView.Adapter<CodeforcesNewsItemsAdapter.CodeforcesNewsItemViewHolder>(){
     class CodeforcesNewsItemViewHolder(val view: RelativeLayout) : RecyclerView.ViewHolder(view){
         val title: TextView = view.findViewById(R.id.news_item_title)
         val author: TextView = view.findViewById(R.id.news_item_author)
@@ -358,29 +289,21 @@ class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: A
         val comments: TextView = view.findViewById(R.id.news_item_comments)
     }
 
-    var type: Int = 0
+    private var rows: Array<Array<String>> = emptyArray()
 
-    override fun getItemViewType(position: Int): Int {
-        return type
-    }
+    override fun getItemCount() = rows.size
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesNewsItemViewHolder {
-        val view =
-            when(viewType){
-                0 -> LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_item, parent, false) as RelativeLayout
-                1 -> LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_item, parent, false) as RelativeLayout
-                else -> throw Exception()
-            }
-
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_item, parent, false) as RelativeLayout
         return CodeforcesNewsItemViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: CodeforcesNewsItemViewHolder, position: Int) {
-        val info = data[position]
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        holder as CodeforcesNewsItemViewHolder
+        val info = rows[position]
         holder.view.setOnClickListener {
-            var suf = info[0]
-            if(info.size>7 && info[7].isNotBlank()) suf+="#comment-${info[7]}"
-            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/$suf")))
+            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${info[0]}")))
         }
 
         holder.title.text = info[1]
@@ -404,12 +327,107 @@ class CodeforcesNewsItemsAdapter(private val activity: MainActivity, var data: A
         }
     }
 
-    override fun getItemCount() = data.size
+    override fun getBlogIDs(): List<String> {
+        return rows.map { it[0] }
+    }
+}
 
 
+class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsItemsAdapter(activity){
 
-    fun setNewData(a: Array<Array<String>>){
-        data = a
-        notifyDataSetChanged()
+    override fun parseData(s: String) {
+        val commentators = mutableMapOf<String,MutableList<String>>()
+
+        var i = 0
+        while(true){
+            i = s.indexOf("<table class=\"comment-table\">", i+1)
+            if(i==-1) break
+
+            i = s.indexOf("class=\"rated-user", i)
+            val handle = s.substring(s.indexOf('>',i)+1, s.indexOf('<',i))
+
+            i = s.indexOf("#comment-", i)
+            val commentID = s.substring(s.indexOf('-',i)+1, s.indexOf('"',i))
+
+            val blogID = s.substring(s.lastIndexOf('/',i)+1, i)
+
+            commentators.getOrPut(blogID) { mutableListOf(commentID) }.add(handle)
+        }
+
+        val res = arrayListOf<Array<String>>()
+        i = s.indexOf("<div class=\"recent-actions\">")
+        if(i==-1) return
+        while(true){
+            i = s.indexOf("<div style=\"font-size:0.9em;padding:0.5em 0;\">", i+1)
+            if(i==-1) break
+
+            i = s.indexOf("/profile/", i)
+            val author = s.substring(i+9,s.indexOf('"',i))
+
+            i = s.indexOf("rated-user user-",i)
+            val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
+
+            i = s.indexOf("entry/", i)
+            val id = s.substring(i+6, s.indexOf('"',i))
+
+            val title = fromHTML(s.substring(s.indexOf(">",i)+1, s.indexOf("</a",i)))
+
+            val (comments, lastCommentId) = commentators.getOrDefault(id, mutableListOf()).let{
+                var cid = ""
+                if(it.isNotEmpty()){
+                    cid = it[0]
+                    it.removeAt(0)
+                }
+                Pair(it.distinct().joinToString(), cid)
+            }
+
+            res.add(arrayOf(id,title,author,authorColor,comments,lastCommentId))
+        }
+
+        if(res.isNotEmpty()){
+            rows = res.toTypedArray()
+            notifyDataSetChanged()
+        }
+    }
+
+    class CodeforcesNewsItemViewHolder(val view: RelativeLayout) : RecyclerView.ViewHolder(view){
+        val title: TextView = view.findViewById(R.id.news_item_title)
+        val author: TextView = view.findViewById(R.id.news_item_author)
+        val comments: TextView = view.findViewById(R.id.news_item_comments)
+    }
+
+    private var rows: Array<Array<String>> = emptyArray()
+
+    override fun getItemCount() = rows.size
+
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesNewsItemViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_item, parent, false) as RelativeLayout
+        return CodeforcesNewsItemViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        holder as CodeforcesNewsItemViewHolder
+        val info = rows[position]
+        holder.view.setOnClickListener {
+            var suf = info[0]
+            if(info[5].isNotBlank()) suf+="#comment-${info[5]}"
+            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/$suf")))
+        }
+
+        holder.title.text = info[1]
+
+        holder.author.apply {
+            text = info[2]
+            val tag = info[3]
+            setTextColor(activity.accountsFragment.codeforcesAccountManager.getHandleColorByTag(tag) ?: activity.defaultTextColor) // kill me
+            typeface = if(tag=="user-black") Typeface.DEFAULT else Typeface.DEFAULT_BOLD
+        }
+
+        holder.comments.text = info[4]
+    }
+
+    override fun getBlogIDs(): List<String> {
+        return rows.map { it[0] }
     }
 }

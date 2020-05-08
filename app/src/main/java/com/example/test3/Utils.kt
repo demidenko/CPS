@@ -1,5 +1,7 @@
 package com.example.test3
 
+import android.text.Html
+import androidx.core.text.HtmlCompat
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +14,10 @@ import java.net.URL
 import java.nio.charset.Charset
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
-import javax.net.ssl.*
+import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLException
+import javax.net.ssl.X509TrustManager
 
 suspend fun createConnectionStream(address: String): InputStream? = withContext(Dispatchers.IO){
     val c = (URL(address).openConnection() as HttpsURLConnection).apply {
@@ -50,6 +55,7 @@ fun ignoreBadSSL(){
     HttpsURLConnection.setDefaultHostnameVerifier { _, _ -> true }
 }
 
+fun fromHTML(s: String): String = Html.fromHtml(s, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
 
 ///JsonReader help
 suspend fun JsonReaderFromURL(address: String): JsonReader?{
