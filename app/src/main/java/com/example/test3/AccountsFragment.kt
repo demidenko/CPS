@@ -42,7 +42,7 @@ class AccountsFragment: Fragment() {
         codeforcesAccountManager = CodeforcesAccountManager(activity)
         codeforcesPanel = object : AccountPanel(activity, codeforcesAccountManager){
             override fun show(info: UserInfo) { info as CodeforcesAccountManager.CodeforcesUserInfo
-                textMain.text = info.handle
+                textMain.text = codeforcesAccountManager.makeSpan(info)
                 textAdditional.text = ""
                 val color = manager.getColor(info)
                 if(info.status == STATUS.OK){

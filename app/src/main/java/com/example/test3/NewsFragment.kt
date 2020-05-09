@@ -3,9 +3,9 @@ package com.example.test3
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -240,8 +240,18 @@ abstract class CodeforcesNewsItemsAdapter(protected val activity: MainActivity):
 
 class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): CodeforcesNewsItemsAdapter(activity){
 
+    data class Info(
+        val blogID: String,
+        val title: String,
+        val author: String,
+        val authorColorTag: String,
+        val time: String,
+        val comments: String,
+        val rating: String
+    );
+
     override fun parseData(s: String) {
-        val res = arrayListOf<Array<String>>()
+        val res = arrayListOf<Info>()
         var i = 0
         while (true) {
             i = s.indexOf("<div class=\"topic\"", i + 1)
@@ -271,7 +281,7 @@ class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): CodeforcesNewsI
             i = s.lastIndexOf("</a>", i)
             val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim()
 
-            res.add(arrayOf(id,title,author,authorColor,time,comments,rating))
+            res.add(Info(id,title,author,authorColor,time,comments,rating))
         }
 
         if(res.isNotEmpty()){
@@ -289,7 +299,7 @@ class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): CodeforcesNewsI
         val comments: TextView = view.findViewById(R.id.news_item_comments)
     }
 
-    private var rows: Array<Array<String>> = emptyArray()
+    private var rows: Array<Info> = emptyArray()
 
     override fun getItemCount() = rows.size
 
@@ -302,41 +312,44 @@ class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): CodeforcesNewsI
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         holder as CodeforcesNewsItemViewHolder
         val info = rows[position]
+
         holder.view.setOnClickListener {
-            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${info[0]}")))
+            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${info.blogID}")))
         }
 
-        holder.title.text = info[1]
+        holder.title.text = info.title
 
-        holder.author.apply {
-            text = info[2]
-            val tag = info[3]
-            setTextColor(activity.accountsFragment.codeforcesAccountManager.getHandleColorByTag(tag) ?: activity.defaultTextColor) // kill me
-            typeface = if(tag=="user-black") Typeface.DEFAULT else Typeface.DEFAULT_BOLD
-        }
+        holder.author.text = activity.accountsFragment.codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
 
-
-        holder.time.text = info[4]
-        holder.comments.text = info[5]
+        holder.time.text = info.time
+        holder.comments.text = info.comments
 
         holder.rating.apply{
-            text = info[6]
+            text = info.rating
             setTextColor(activity.resources.getColor(
-                if(info[6].startsWith('+')) R.color.blog_rating_positive else R.color.blog_rating_negative, null)
+                if(info.rating.startsWith('+')) R.color.blog_rating_positive else R.color.blog_rating_negative, null)
             )
         }
     }
 
-    override fun getBlogIDs(): List<String> {
-        return rows.map { it[0] }
-    }
+    override fun getBlogIDs(): List<String> = rows.map { it.blogID }
 }
 
 
 class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsItemsAdapter(activity){
 
+    data class Info(
+        val blogID: String,
+        val title: String,
+        val author: String,
+        val authorColorTag: String,
+        val lastCommentId: String,
+        val comments: Array<Pair<String,String>>
+    );
+
     override fun parseData(s: String) {
         val commentators = mutableMapOf<String,MutableList<String>>()
+        val commentatorsColors = mutableMapOf<String,String>()
 
         var i = 0
         while(true){
@@ -344,7 +357,10 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
             if(i==-1) break
 
             i = s.indexOf("class=\"rated-user", i)
-            val handle = s.substring(s.indexOf('>',i)+1, s.indexOf('<',i))
+            val handleColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
+
+            i = s.lastIndexOf("/profile/",i)
+            val handle = s.substring(s.indexOf('/',i+1)+1, s.indexOf('"',i))
 
             i = s.indexOf("#comment-", i)
             val commentID = s.substring(s.indexOf('-',i)+1, s.indexOf('"',i))
@@ -352,9 +368,10 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
             val blogID = s.substring(s.lastIndexOf('/',i)+1, i)
 
             commentators.getOrPut(blogID) { mutableListOf(commentID) }.add(handle)
+            commentatorsColors[handle] = handleColor
         }
 
-        val res = arrayListOf<Array<String>>()
+        val res = arrayListOf<Info>()
         i = s.indexOf("<div class=\"recent-actions\">")
         if(i==-1) return
         while(true){
@@ -372,16 +389,15 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
 
             val title = fromHTML(s.substring(s.indexOf(">",i)+1, s.indexOf("</a",i)))
 
-            val (comments, lastCommentId) = commentators.getOrDefault(id, mutableListOf()).let{
-                var cid = ""
-                if(it.isNotEmpty()){
-                    cid = it[0]
-                    it.removeAt(0)
-                }
-                Pair(it.distinct().joinToString(), cid)
+            val comments = mutableListOf<Pair<String,String>>()
+            var lastCommentId = ""
+
+            commentators[id]?.distinct()?.mapIndexed{ index, handle ->
+                if(index==0) lastCommentId = handle
+                else comments.add(Pair(handle,commentatorsColors[handle]!!))
             }
 
-            res.add(arrayOf(id,title,author,authorColor,comments,lastCommentId))
+            res.add(Info(id,title,author,authorColor,lastCommentId,comments.toTypedArray()))
         }
 
         if(res.isNotEmpty()){
@@ -396,7 +412,7 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
         val comments: TextView = view.findViewById(R.id.news_item_comments)
     }
 
-    private var rows: Array<Array<String>> = emptyArray()
+    private var rows: Array<Info> = emptyArray()
 
     override fun getItemCount() = rows.size
 
@@ -409,25 +425,29 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         holder as CodeforcesNewsItemViewHolder
         val info = rows[position]
+
         holder.view.setOnClickListener {
-            var suf = info[0]
-            if(info[5].isNotBlank()) suf+="#comment-${info[5]}"
+            var suf = info.blogID
+            if(info.lastCommentId.isNotBlank()) suf+="#comment-${info.lastCommentId}"
             activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/$suf")))
         }
 
-        holder.title.text = info[1]
+        holder.title.text =  info.title
 
-        holder.author.apply {
-            text = info[2]
-            val tag = info[3]
-            setTextColor(activity.accountsFragment.codeforcesAccountManager.getHandleColorByTag(tag) ?: activity.defaultTextColor) // kill me
-            typeface = if(tag=="user-black") Typeface.DEFAULT else Typeface.DEFAULT_BOLD
+        val codeforcesAccountManager = activity.accountsFragment.codeforcesAccountManager
+
+        holder.author.text = codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
+
+        holder.comments.text = SpannableStringBuilder().apply {
+            var flag = false
+            info.comments.forEach {(handle, colorTag) ->
+                if(flag) append(", ")
+                append(codeforcesAccountManager.makeSpan(handle,colorTag))
+                flag = true
+            }
         }
-
-        holder.comments.text = info[4]
     }
 
-    override fun getBlogIDs(): List<String> {
-        return rows.map { it[0] }
-    }
+    override fun getBlogIDs(): List<String> = rows.map { it.blogID }
+
 }
