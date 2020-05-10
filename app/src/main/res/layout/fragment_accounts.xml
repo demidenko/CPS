@@ -22,4 +22,12 @@
         android:text="RELOAD"
         />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonAddAccount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="ADD"
+        />
+
 </RelativeLayout>

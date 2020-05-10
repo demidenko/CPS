@@ -1,11 +1,13 @@
 package com.example.test3
 
+import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.*
@@ -143,6 +145,23 @@ class AccountsFragment: Fragment() {
                 panels.forEach {
                     launch { it.reload() }
                 }
+            }
+        }
+
+        view.findViewById<Button>(R.id.buttonAddAccount).setOnClickListener {
+            val emptyPanels = panels.filter { it.isEmpty() }
+
+            if(emptyPanels.isNotEmpty()) {
+                val adapter = ArrayAdapter<String>(activity, android.R.layout.select_dialog_item)
+                emptyPanels.forEach {
+                    adapter.add(it.manager.PREFERENCES_FILE_NAME)
+                }
+
+                AlertDialog.Builder(activity)
+                    .setTitle("Add account")
+                    .setAdapter(adapter) { _, index ->
+                        emptyPanels[index].settingsButton.callOnClick()
+                    }.create().show()
             }
         }
     }

@@ -1,13 +1,16 @@
 package com.example.test3
 
 import android.content.Intent
-import android.graphics.Color
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
-import android.view.animation.*
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
+import android.view.animation.RotateAnimation
 import android.widget.*
-import com.example.test3.account_manager.*
+import com.example.test3.account_manager.AccountManager
+import com.example.test3.account_manager.STATUS
+import com.example.test3.account_manager.UserInfo
 import kotlinx.coroutines.launch
 
 
@@ -70,9 +73,16 @@ abstract class AccountPanel(
 
     open fun additionalBuild(){ }
 
-    abstract fun show(info: UserInfo)
+    fun isEmpty() = manager.savedInfo.userID.isBlank()
+
+    protected abstract fun show(info: UserInfo)
 
     fun show(){
+        if(isEmpty()){
+            layout.visibility = View.GONE
+            return
+        }
+        layout.visibility = View.VISIBLE
         show(manager.savedInfo)
     }
 
@@ -84,6 +94,8 @@ abstract class AccountPanel(
     }
 
     suspend fun reload(){
+        if(isEmpty()) return
+
         settingsButton.isEnabled = false
         reloadButton.isEnabled = false
         activity.accountsFragment.toggleReload(manager.PREFERENCES_FILE_NAME)
