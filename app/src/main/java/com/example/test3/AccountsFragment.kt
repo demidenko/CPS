@@ -22,12 +22,14 @@ class AccountsFragment: Fragment() {
     lateinit var atcoderAccountManager: AtCoderAccountManager
     lateinit var topcoderAccountManager: TopCoderAccountManager
     lateinit var acmpAccountManager: ACMPAccountManager
+    lateinit var timusAccountManager: TimusAccountManager
 
     lateinit var panels: List<AccountPanel>
     lateinit var codeforcesPanel: AccountPanel
     lateinit var atcoderPanel: AccountPanel
     lateinit var topcoderPanel: AccountPanel
     lateinit var acmpPanel: AccountPanel
+    lateinit var timusPanel: AccountPanel
 
 
 
@@ -110,11 +112,29 @@ class AccountsFragment: Fragment() {
             }
         }
 
+        timusAccountManager = TimusAccountManager(activity)
+        timusPanel = object : AccountPanel(activity, timusAccountManager){
+            override fun show(info: UserInfo) { info as TimusAccountManager.TimusUserInfo
+                with(info){
+                    if (status == STATUS.OK) {
+                        textMain.text = userName
+                        textAdditional.text = "Задач: $solvedTasks Место: $placeTasks"
+                    }else{
+                        textMain.text = id
+                        textAdditional.text = ""
+                    }
+                }
+                textMain.setTextColor(activity.defaultTextColor)
+                textAdditional.setTextColor(activity.defaultTextColor)
+            }
+        }
+
         panels = listOf(
             codeforcesPanel,
             atcoderPanel,
             topcoderPanel,
-            acmpPanel
+            acmpPanel,
+            timusPanel
         )
 
         if(panels.map { it.manager.PREFERENCES_FILE_NAME }.distinct().size != panels.size) throw Exception("not different file names in panels managers")
@@ -124,6 +144,7 @@ class AccountsFragment: Fragment() {
         atcoderPanel.buildAndAdd(30F, 25F, view)
         topcoderPanel.buildAndAdd(30F, 25F, view)
         acmpPanel.buildAndAdd(17F, 14F, view)
+        timusPanel.buildAndAdd(17F, 14F, view)
 
 
 

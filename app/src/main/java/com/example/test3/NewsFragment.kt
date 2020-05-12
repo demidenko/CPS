@@ -105,15 +105,17 @@ class NewsFragment : Fragment() {
                     codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
                         val tab = tabLayout.getTabAt(index)!!
                         launch {
-                            tab.text = "..."
-                            fragment.reload(rx)
-                            tab.text = fragment.title
-                            if(fragment is CodeforcesNewsMainFragment && fragment.newBlogs>0){
-                                if(tab.isSelected) fragment.save()
-                                else{
-                                    tab.badge?.apply{
-                                        number = fragment.newBlogs
-                                        isVisible = true
+                            if(tab.isSelected || System.currentTimeMillis()-fragment.lastReloadTime>1000*60) {
+                                tab.text = "..."
+                                fragment.reload(rx)
+                                tab.text = fragment.title
+                                if (fragment is CodeforcesNewsMainFragment && fragment.newBlogs > 0) {
+                                    if (tab.isSelected) fragment.save()
+                                    else {
+                                        tab.badge?.apply {
+                                            number = fragment.newBlogs
+                                            isVisible = true
+                                        }
                                     }
                                 }
                             }
@@ -173,9 +175,12 @@ open class CodeforcesNewsFragment(val address: String, val title: String) : Frag
         }
     }
 
+    var lastReloadTime = 0L
+
     open suspend fun reload(data: Map<String,Deferred<String?>>) {
         val s = data[address]?.await() ?: return
         viewAdapter.parseData(s)
+        lastReloadTime = System.currentTimeMillis()
     }
 
     fun refresh(){
@@ -248,7 +253,7 @@ class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): CodeforcesNewsI
         val time: String,
         val comments: String,
         val rating: String
-    );
+    )
 
     override fun parseData(s: String) {
         val res = arrayListOf<Info>()
@@ -345,7 +350,7 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
         val authorColorTag: String,
         val lastCommentId: String,
         val comments: Array<Pair<String,String>>
-    );
+    )
 
     override fun parseData(s: String) {
         val commentators = mutableMapOf<String,MutableList<String>>()

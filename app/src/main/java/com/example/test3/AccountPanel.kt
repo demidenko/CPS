@@ -47,6 +47,8 @@ abstract class AccountPanel(
         additionalBuild()
 
         layout.setOnClickListener {
+            println("info = " + manager.savedInfo)
+
             val startDelay = 3000L
             val duration = 2000L
             if(reloadButton.isEnabled) {

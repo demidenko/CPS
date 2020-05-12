@@ -27,6 +27,7 @@ class Settings: AppCompatActivity() {
             AtCoderAccountManager.preferences_file_name -> AtCoderAccountManager(this)
             TopCoderAccountManager.preferences_file_name -> TopCoderAccountManager(this)
             ACMPAccountManager.preferences_file_name -> ACMPAccountManager(this)
+            TimusAccountManager.preferences_file_name -> TimusAccountManager(this)
             else -> throw Exception("Unknown type of manager")
         }
 

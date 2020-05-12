@@ -1,7 +1,9 @@
 package com.example.test3
 
+import android.app.IntentService
 import android.app.NotificationManager
 import android.content.Context.NOTIFICATION_SERVICE
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.CodeforcesAccountManager
@@ -33,9 +36,18 @@ class TestFragment : Fragment() {
 
         textView = activity.findViewById(R.id.stuff_textview)
 
+
+
         //monitor alpha
         var job: Job? = null
         view.findViewById<Button>(R.id.button_watcher).setOnClickListener { button -> button as Button
+
+            //activity.stopService(Intent(activity, CodeforcesContestWatchService::class.java))
+
+            //activity.startService(Intent(activity, CodeforcesContestWatchService::class.java).putExtra("id", view.findViewById<EditText>(R.id.text_editor).text.toString()))
+
+            //return@setOnClickListener
+
 
             if(button.text == "running..."){
                 job?.cancel()
@@ -198,3 +210,18 @@ class TestFragment : Fragment() {
 
 
 
+class CodeforcesContestWatchService : IntentService("cf-contest-watch"){
+    val scope = CoroutineScope(Job() + Dispatchers.Main)
+
+    override fun onCreate() {
+        super.onCreate()
+        Toast.makeText(this@CodeforcesContestWatchService, "created", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onHandleIntent(intent: Intent?) {
+        scope.launch {
+            delay(10000)
+            Toast.makeText(this@CodeforcesContestWatchService, "finished " + (intent?.extras?.getString("id") ?: ""), Toast.LENGTH_LONG).show()
+        }
+    }
+}
