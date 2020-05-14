@@ -1,22 +1,14 @@
 package com.example.test3
 
 import android.app.IntentService
-import android.app.NotificationManager
-import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
-import androidx.core.app.NotificationCompat
+import android.widget.*
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
-import com.example.test3.account_manager.CodeforcesAccountManager
-import com.squareup.moshi.JsonDataException
-import com.squareup.moshi.JsonEncodingException
 import kotlinx.coroutines.*
 
 class TestFragment : Fragment() {
@@ -28,186 +20,104 @@ class TestFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_test, container, false)
     }
 
-    lateinit var textView: TextView
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?){
         super.onViewCreated(view, savedInstanceState)
         val activity = requireActivity() as MainActivity
 
-        textView = activity.findViewById(R.id.stuff_textview)
 
+
+        val watcher_layout = layoutInflater.inflate(R.layout.watcher_panel, view.findViewById(R.id.watcher_panel)) as RelativeLayout
+        val problems_layout = watcher_layout.findViewById<LinearLayout>(R.id.watcher_problems)
 
 
         //monitor alpha
-        var job: Job? = null
+        var watcher: CodeforcesContestWatcher? = null
         view.findViewById<Button>(R.id.button_watcher).setOnClickListener { button -> button as Button
 
-            //activity.stopService(Intent(activity, CodeforcesContestWatchService::class.java))
-
-            //activity.startService(Intent(activity, CodeforcesContestWatchService::class.java).putExtra("id", view.findViewById<EditText>(R.id.text_editor).text.toString()))
-
-            //return@setOnClickListener
-
-
             if(button.text == "running..."){
-                job?.cancel()
-                job = null
+                watcher?.stop()
+                watcher = null
                 button.text = "run"
                 return@setOnClickListener
             }
 
+            val manager = activity.accountsFragment.codeforcesAccountManager
+            val handle = manager.savedInfo.userID
+            val contestID = view.findViewById<EditText>(R.id.text_editor).text.toString().toInt()
+
+            watcher_layout.findViewById<TextView>(R.id.watcher_handle).text = handle
+
             button.text = "running..."
-            job = activity.scope.launch {
-                val manager = activity.accountsFragment.codeforcesAccountManager
-                val contestID = view.findViewById<EditText>(R.id.text_editor).text.toString().toInt()
-                var contestName: String? = null
-                val handle = manager.savedInfo.userID
-                val address = "https://codeforces.com/api/contest.standings?contestId=$contestID&showUnofficial=false&handles=$handle"
-                println(address)
-
-                textView.text = "???"
-                var rank: Int? = null
-                var points: Int? = null
-                var currentTime: Int? = null
-                var tasksPrevious: ArrayList<Pair<Int, String>>? = null
-                var problemNames: ArrayList<String>? = null
-
-                while (true) {
-                    var phase: String? = null
-                    val tasks = arrayListOf<Pair<Int,String>>()
-                    try {
-                        withContext(Dispatchers.IO) {
-                            with(JsonReaderFromURL(address) ?: return@withContext ) {
-                                beginObject()
-                                if (nextString("status") == "FAILED") return@withContext
-                                nextName()
-                                readObject {
-                                    while (hasNext()) when (nextName()) {
-                                        "contest" -> readObject {
-                                            while (hasNext()) when (nextName()) {
-                                                "phase" -> phase = nextString()
-                                                "relativeTimeSeconds" -> currentTime = nextInt()
-                                                "name" -> contestName = nextString()
-                                                else -> skipValue()
-                                            }
-                                        }
-                                        "problems" -> {
-                                            if (problemNames == null) {
-                                                val tmp = ArrayList<String>()
-                                                readArray { tmp.add(readObjectFields("index")[0] as String) }
-                                                problemNames = tmp
-                                            } else skipValue()
-                                        }
-                                        "rows" -> readArrayOfObjects {
-                                            while (hasNext()) when (nextName()) {
-                                                "rank" -> rank = nextInt()
-                                                "points" -> points = nextInt()
-                                                "problemResults" -> readArray {
-                                                    val arr = readObjectFields("points", "type")
-                                                    val pts = (arr[0] as Double).toInt()
-                                                    val status = arr[1] as String
-                                                    tasks.add(Pair(pts, status))
-                                                }
-                                                else -> skipValue()
-                                            }
-                                        }
-                                        else -> skipValue()
-                                    }
-                                }
-                                this.close()
-                            }
-                        }
-                    }catch (e: JsonEncodingException){
-
-                    }catch (e: JsonDataException){
-
+            watcher = CodeforcesContestWatcher(handle, contestID, activity.scope).apply {
+                addCodeforcesContestWatchListener(object : CodeforcesContestWatchListener() {
+                    override fun onSetContestName(contestName: String) {
+                        watcher_layout.findViewById<TextView>(R.id.watcher_contest_name).text = contestName
                     }
 
-                    var str = "$handle\n\n"
-
-                    str+="$contestName\n$phase\n"
-
-                    if(phase == "SYSTEM_TEST"){
-                        withContext(Dispatchers.IO){
-                            val page = readURLData("https://codeforces.com/contest/$contestID") ?: return@withContext
-                            var i = page.indexOf("<span class=\"contest-state-regular\">")
-                            if(i!=-1){
-                                i = page.indexOf(">", i+1)
-                                val progress = page.substring(i+1, page.indexOf("</",i+1))
-                                str+=progress+"\n"
+                    lateinit var problems: Array<String>
+                    override suspend fun onSetProblemNames(problemNames: Array<String>) {
+                        problems = problemNames
+                        withContext(Dispatchers.Main) {
+                            problems_layout.removeAllViews()
+                            problems.forEach { s ->
+                                val t = TextView(activity)
+                                t.text = "$s\n0"
+                                problems_layout.addView(t)
                             }
                         }
                     }
 
-                    if(phase == "CODING") currentTime?.let{
-                        val SS = it % 60
-                        val MM = it / 60 % 60
-                        val HH = it / 60 / 60
-                        str+=String.format("%02d:%02d:%02d\n", HH, MM, SS)
+                    var phase = ""
+                    var progress = ""
+                    fun showPhaseAndProgress(){
+                        watcher_layout.findViewById<TextView>(R.id.watcher_phase).text = "$phase $progress"
                     }
 
-                    str+="\nrank: $rank \n"
-                    rank?.let{
-                        str+="points: $points \n\n"
-                        println("tasks ${tasks.size}")
-                        tasks.forEachIndexed { index, (pts,status) ->
-                            val problemName = problemNames!![index]
-                            str+="$problemName\t\t$pts\t\t[$status] \n"
-                            if(phase=="SYSTEM_TEST"){
-                                tasksPrevious?.let {
-                                    if(it.elementAt(index).second!=status){
-                                        //Toast.makeText(activity, "$problemName -> $pts points", Toast.LENGTH_LONG).show()
-                                        val builder = NotificationCompat.Builder(activity, "test").apply {
-                                            setContentTitle("problems")
-                                            setContentText("$problemName -> $pts points")
-                                            setSmallIcon(R.drawable.ic_news)
-                                        }
-                                        (activity.getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(2 + index, builder.build());
-                                    }
-                                }
-                            }
-                        }
-                        tasksPrevious = tasks
+                    override fun onSetContestPhase(phaseCodeforces: CodeforcesContestPhase) {
+                        phase = phaseCodeforces.name
+                        showPhaseAndProgress()
                     }
 
-                    if(phase=="FINISHED"){
-                        val info = manager.loadInfo(handle) as CodeforcesAccountManager.CodeforcesUserInfo
-                        val old = manager.savedInfo as CodeforcesAccountManager.CodeforcesUserInfo
-                        if(info.rating!=old.rating){
-                            val builder = NotificationCompat.Builder(activity, "test").apply {
-                                val difference = info.rating - old.rating
-                                setContentTitle("$handle new rating: ${info.rating}")
-                                val diff_str = (if (info.rating < old.rating) "" else "+") + difference
-                                setContentText("$diff_str, rank: $rank")
-                                setSubText("CodeForces rating changes")
-                                setSmallIcon(if(difference<0) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
-                                //color = manager.getColor(info) ?: activity.defaultTextColor
-                            }
-                            (activity.getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(1, builder.build());
-
-                            manager.savedInfo = info
-                            activity.accountsFragment.codeforcesPanel.show()
-
-                            button.text = "run"
-                            return@launch
-                        }
+                    override fun onSetRemainingTime(time: String) {
+                        progress = time
+                        showPhaseAndProgress()
                     }
 
-                    textView.text = str
-
-                    when(phase){
-                        "CODING", "SYSTEM_TEST" -> delay(1_000)
-                        "FINISHED" -> delay(30_000)
-                        else -> delay(60_000)
+                    override fun onSetSysTestProgress(percents: Int) {
+                        progress = "$percents%"
+                        showPhaseAndProgress()
                     }
-                }
+
+                    var _rank = ""
+                    var _points = ""
+                    fun showRankAndPoints(){
+                        watcher_layout.findViewById<TextView>(R.id.watcher_contestant_info).text = "rank: $_rank | score: $_points"
+                    }
+
+                    override fun onSetContestantRank(rank: Int) {
+                        _rank = rank.toString()
+                        showRankAndPoints()
+                    }
+
+                    override fun onSetContestantPoints(points: Int) {
+                        _points = points.toString()
+                        showRankAndPoints()
+                    }
+
+
+                    override fun onSetProblemStatus(problem: String, status: String, points: Int) {
+                        val index = problems.indexOf(problem)
+                        val t = problems_layout[index] as TextView
+                        t.text = "${problems[index]}\n$points"
+                    }
+
+                })
+                start()
             }
-
         }
 
     }
 }
-
 
 
 class CodeforcesContestWatchService : IntentService("cf-contest-watch"){

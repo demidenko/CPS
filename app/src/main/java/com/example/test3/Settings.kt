@@ -18,7 +18,7 @@ class Settings: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings_codeforces)
+        setContentView(R.layout.activity_account_settings)
 
         val managerType = intent.getStringExtra("manager")!!
 

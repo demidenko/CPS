@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <TextView
+        android:id="@+id/watcher_contest_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="contest"
+        />
+
+    <TextView
+        android:id="@+id/watcher_phase"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="phase &amp; progress"
+        android:layout_below="@id/watcher_contest_name"
+        />
+
+    <TextView
+        android:id="@+id/watcher_handle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/watcher_phase"
+        android:text="handle"
+        android:layout_marginTop="5dp"
+        />
+
+    <TextView
+        android:id="@+id/watcher_contestant_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="place &amp; points"
+        android:layout_below="@id/watcher_handle"
+        />
+
+    <LinearLayout
+        android:id="@+id/watcher_problems"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_toEndOf="@id/watcher_contestant_info"
+        android:layout_below="@id/watcher_phase"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="10dp"
+        >
+    </LinearLayout>
+
+
+</RelativeLayout>

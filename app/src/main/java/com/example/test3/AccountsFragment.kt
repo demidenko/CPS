@@ -101,7 +101,7 @@ class AccountsFragment: Fragment() {
                 with(info){
                     if (status == STATUS.OK) {
                         textMain.text = userName
-                        textAdditional.text = "Задач: $solvedTasks  Рейтинг: $rating  Место: $place"
+                        textAdditional.text = "Задач: $solvedTasks  Место: $place  Рейтинг: $rating"
                     }else{
                         textMain.text = id
                         textAdditional.text = ""
@@ -118,7 +118,7 @@ class AccountsFragment: Fragment() {
                 with(info){
                     if (status == STATUS.OK) {
                         textMain.text = userName
-                        textAdditional.text = "Задач: $solvedTasks Место: $placeTasks"
+                        textAdditional.text = "Задач: $solvedTasks  Место: $placeTasks"
                     }else{
                         textMain.text = id
                         textAdditional.text = ""

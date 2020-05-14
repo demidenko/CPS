@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.text.bold
@@ -110,7 +111,7 @@ class MainActivity : AppCompatActivity(){
                             append("\n")
                         }
                     }
-                    testFragment.textView.text = s
+                    findViewById<TextView>(R.id.stuff_textview).text = s
                     useRealColors = backup
                     return true
                 }
