@@ -33,14 +33,15 @@ class MainActivity : AppCompatActivity(){
     var defaultTextColor: Int = 0
 
 
-    val accountsFragment = AccountsFragment()
-    val newsFragment = NewsFragment()
-    val testFragment = TestFragment()
+    lateinit var accountsFragment: AccountsFragment
+    lateinit var  newsFragment: NewsFragment
+    lateinit var  testFragment: TestFragment
     lateinit var activeFragment: Fragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         println("main create")
-        super.onCreate(savedInstanceState) //TODO
+        println(savedInstanceState)
+        super.onCreate(savedInstanceState)
 
 
         createNotificationChannel()
@@ -51,8 +52,24 @@ class MainActivity : AppCompatActivity(){
 
         supportActionBar?.title = "Competitive Programming & Solving" //"Compete, Program, Solve"
 
-        activeFragment = accountsFragment
-        supportFragmentManager.beginTransaction().add(R.id.container_fragment, activeFragment).commit()
+
+        supportFragmentManager.fragments.forEach { fragment ->
+            println("!!! $fragment")
+            when(fragment){
+                is AccountsFragment -> accountsFragment = fragment
+                is NewsFragment -> newsFragment = fragment
+                is TestFragment -> testFragment = fragment
+            }
+            if(fragment.isVisible) activeFragment = fragment
+        }
+
+        if(!this::accountsFragment.isInitialized) accountsFragment = AccountsFragment()
+        if(!this::newsFragment.isInitialized) newsFragment = NewsFragment()
+        if(!this::testFragment.isInitialized) testFragment = TestFragment()
+
+        if(!this::activeFragment.isInitialized) activeFragment = accountsFragment
+        if(!activeFragment.isAdded) supportFragmentManager.beginTransaction().add(R.id.container_fragment, activeFragment).commit()
+
 
         navigation.setOnNavigationItemSelectedListener { item ->
             val id = item.itemId
@@ -75,6 +92,7 @@ class MainActivity : AppCompatActivity(){
 
             true
         }
+
 
         with(getPreferences(Context.MODE_PRIVATE)){
             useRealColors = getBoolean(use_real_colors, false)
@@ -131,12 +149,17 @@ class MainActivity : AppCompatActivity(){
                 AlertDialog.Builder(this)
                     .setTitle("CPS")
                     .setMessage("version ${BuildConfig.VERSION_NAME}")
-                    .create().show()
+                    .create()
+                    .show()
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        println("main on save bundle")
+        super.onSaveInstanceState(outState)
+    }
 
     override fun onResume() {
         println("main resume")
