@@ -15,6 +15,7 @@ import kotlinx.coroutines.Job
 class CodeforcesContestWatchService: Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
+    val notificationID = 1
 
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
     private lateinit var notificationManager: NotificationManager
@@ -31,19 +32,25 @@ class CodeforcesContestWatchService: Service() {
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         Toast.makeText(this, "created $watcher", Toast.LENGTH_SHORT).show()
-
-        startForeground(1, notification.build())
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Toast.makeText(this, "start command $intent", Toast.LENGTH_SHORT).show()
+        val action = intent!!.action
+        Toast.makeText(this, "on start $action $intent", Toast.LENGTH_SHORT).show()
 
-        val handle = intent!!.getStringExtra("handle")!!
-        val contestID = intent.getIntExtra("contestID", -1)
-        println("service onStartCommand $handle $contestID")
-
-        stop()
-        start(handle, contestID)
+        when(action){
+            "start" -> {
+                val handle = intent.getStringExtra("handle")!!
+                val contestID = intent.getIntExtra("contestID", -1)
+                println("service onStartCommand $handle $contestID")
+                stop()
+                start(handle, contestID)
+            }
+            "stop" -> {
+                stop()
+                stopForeground(true)
+            }
+        }
 
         return super.onStartCommand(intent, flags, startId)
     }
@@ -63,6 +70,8 @@ class CodeforcesContestWatchService: Service() {
     }
 
     private fun start(handle: String, contestID: Int){
+        startForeground(notificationID, notification.build())
+
         watcher = CodeforcesContestWatcher(
             handle,
             contestID,
@@ -77,7 +86,7 @@ class CodeforcesContestWatchService: Service() {
 
                 override fun onSetContestName(contestName: String) {
                     changes = true
-                    notification.setSubText("$handle - $contestName")
+                    notification.setSubText("$handle • $contestName")
                 }
 
                 override suspend fun onSetProblemNames(problemNames: Array<String>) {
@@ -122,13 +131,14 @@ class CodeforcesContestWatchService: Service() {
                     changes = false
 
                     notification.setContentTitle(
-                        contestPhase.name +
-                            if(progress.isEmpty()) "" else " - " + progress
+                        contestPhase.name
+                        + (if(progress.isEmpty()) "" else " • $progress")
+                        //+ (if(contestPhase == CodeforcesContestPhase.FINISHED) " "+System.currentTimeMillis().toString() else "")
                     )
 
-                    notification.setContentText("rank: $contestantRank  points: $contestantPoints")
+                    notification.setContentText("rank: $contestantRank | points: $contestantPoints")
 
-                    notificationManager.notify(1, notification.build())
+                    notificationManager.notify(notificationID, notification.build())
                 }
             })
             start()

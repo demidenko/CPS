@@ -42,5 +42,15 @@
         android:text="run"
         />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_watcher_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@id/button_watcher"
+        android:layout_marginStart="10dp"
+        android:text="stop"
+        />
+
 
 </RelativeLayout>

@@ -122,7 +122,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                 //------------------------
                 commit()
                 when(phaseCodeforces.value){
-                    CodeforcesContestPhase.CODING -> delay(2_000)
+                    CodeforcesContestPhase.CODING -> delay(1_500)
                     CodeforcesContestPhase.SYSTEM_TEST -> delay(3_000)
                     CodeforcesContestPhase.FINISHED -> return@launch
                     else -> delay(60_000)

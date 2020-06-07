@@ -1,5 +1,6 @@
 package com.example.test3
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -24,18 +25,35 @@ class TestFragment : Fragment() {
         val activity = requireActivity() as MainActivity
 
 
+        val editText = view.findViewById<EditText>(R.id.text_editor)
+        val prefs = activity.getSharedPreferences("test", Context.MODE_PRIVATE)
+        editText.setText(prefs.getInt("contest_id", 0).toString())
+
+
         //monitor alpha
         view.findViewById<Button>(R.id.button_watcher).setOnClickListener { button -> button as Button
 
             val manager = activity.accountsFragment.codeforcesAccountManager
             val handle = manager.savedInfo.userID
-            val contestID = view.findViewById<EditText>(R.id.text_editor).text.toString().toInt()
-            activity.startForegroundService(
+            val contestID = editText.text.toString().toInt()
+            activity.startService(
                 Intent(activity, CodeforcesContestWatchService::class.java)
+                    .setAction("start")
                     .putExtra("handle", handle)
                     .putExtra("contestID", contestID)
             )
+
+            with(prefs.edit()){
+                putInt("contest_id", contestID)
+                apply()
+            }
         }
 
+        view.findViewById<Button>(R.id.button_watcher_stop).setOnClickListener { button -> button as Button
+            activity.startService(
+                Intent(activity, CodeforcesContestWatchService::class.java)
+                    .setAction("stop")
+            )
+        }
     }
 }
