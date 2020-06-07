@@ -30,6 +30,7 @@
         android:layout_alignBottom="@id/button_watcher"
         android:layout_centerHorizontal="true"
         android:inputType="numberDecimal"
+        android:text="1361"
         />
 
     <com.google.android.material.button.MaterialButton
