@@ -7,28 +7,41 @@ import kotlinx.coroutines.*
 
 class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope: CoroutineScope): CodeforcesContestWatchListener(){
 
-    private val address = "https://codeforces.com/api/contest.standings?contestId=$contestID&showUnofficial=false&handles=$handle"
+    fun address(contestID: Int, handle: String, participationType: ParticipationType): String {
+        return "https://codeforces.com/api/contest.standings?contestId=$contestID&handles=$handle&showUnofficial=" + if(participationType == ParticipationType.OFFICIAL) "false" else "true"
+    }
+
+    enum class ParticipationType{
+        NOTPARTICIPATED, OFFICIAL, UNOFFICIAL
+    }
 
     private var job: Job? = null
 
     fun start(){
         job = scope.launch {
             val contestName = ChangingValue("")
+            val phaseCodeforces = ChangingValue(CodeforcesContestPhase.UNKNOWN)
             val rank = ChangingValue(-1)
             val pointsTotal = ChangingValue(0)
             var timeSecondsFromStart: Int? = null
             var durationSeconds: Int? = null
             var tasksPrevious: ArrayList<Pair<Int, String>>? = null
             var problemNames: ArrayList<String>? = null
+            val participationType = ChangingValue(ParticipationType.NOTPARTICIPATED)
 
             while (true) {
-                val phaseCodeforces = ChangingValue(CodeforcesContestPhase.UNKNOWN)
                 val tasks = arrayListOf<Pair<Int,String>>()
                 try {
                     withContext(Dispatchers.IO) {
-                        with(JsonReaderFromURL(address) ?: return@withContext) {
+                        with(JsonReaderFromURL(address(contestID, handle, participationType.value)) ?: return@withContext) {
                             beginObject()
-                            if (nextString("status") == "FAILED") return@withContext
+                            if (nextString("status") == "FAILED"){
+                                phaseCodeforces.value = CodeforcesContestPhase.UNKNOWN
+                                val reason = nextString("comment")
+                                if(reason == "contestId: Contest with id $contestID has not started")
+                                    phaseCodeforces.value = CodeforcesContestPhase.BEFORE
+                                return@withContext
+                            }
                             nextName()
                             readObject {
                                 while (hasNext()) when (nextName()) {
@@ -50,10 +63,18 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                                         } else skipValue()
                                     }
                                     "rows" -> readArrayOfObjects {
+                                        lateinit var tp : String
                                         while (hasNext()) when (nextName()) {
-                                            "rank" -> rank.value = nextInt()
-                                            "points" -> pointsTotal.value = nextInt()
-                                            "problemResults" -> readArray {
+                                            "party" -> {
+                                                tp = readObjectFields("participantType")[0] as String
+                                                when(tp){
+                                                    "CONTESTANT" -> participationType.value = ParticipationType.OFFICIAL
+                                                    "OUT_OF_COMPETITION" -> participationType.value = ParticipationType.UNOFFICIAL
+                                                }
+                                            }
+                                            "rank" -> if(tp=="PRACTICE") skipValue() else rank.value = nextInt()
+                                            "points" -> if(tp=="PRACTICE") skipValue() else pointsTotal.value = nextInt()
+                                            "problemResults" -> if(tp=="PRACTICE") skipValue() else readArray {
                                                 val arr = readObjectFields("points", "type")
                                                 val pts = (arr[0] as Double).toInt()
                                                 val status = arr[1] as String
@@ -78,10 +99,19 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                 if(contestName.isChanged()) onSetContestName(contestName.value)
                 if(phaseCodeforces.isChanged()) onSetContestPhase(phaseCodeforces.value)
 
+                if(participationType.isChanged()){
+                    onSetParticipationType(participationType.value)
+                    if(participationType.value == ParticipationType.OFFICIAL){
+                        pointsTotal.value = 0
+                        rank.value = -1
+                        continue
+                    }
+                }
+
+
                 if(phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST){
                     //get progress of testing (0% ... 100%)
-                    readURLData("https://codeforces.com/contest/$contestID")
-                        ?.let { page ->
+                    readURLData("https://codeforces.com/contest/$contestID")?.let { page ->
                         var i = page.indexOf("<span class=\"contest-state-regular\">")
                         if (i != -1) {
                             i = page.indexOf(">", i + 1)
@@ -174,6 +204,10 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         listeners.forEach { l -> l.onSetProblemStatus(problem, status, points) }
     }
 
+    override fun onSetParticipationType(type: ParticipationType) {
+        listeners.forEach { l -> l.onSetParticipationType(type) }
+    }
+
     override fun commit() {
         listeners.forEach { l -> l.commit() }
     }
@@ -198,6 +232,7 @@ abstract class CodeforcesContestWatchListener{
     abstract fun onSetContestantRank(rank: Int)
     abstract fun onSetContestantPoints(points: Int)
     abstract fun onSetProblemStatus(problem: String, status: String, points: Int)
+    abstract fun onSetParticipationType(type: CodeforcesContestWatcher.ParticipationType)
     abstract fun commit()
 }
 

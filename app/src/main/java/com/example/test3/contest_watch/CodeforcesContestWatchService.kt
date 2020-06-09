@@ -20,11 +20,6 @@ class CodeforcesContestWatchService: Service() {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
     private lateinit var notificationManager: NotificationManager
 
-    private val notification = NotificationCompat.Builder(this, "test").apply {
-        setSmallIcon(R.drawable.ic_news)
-        setShowWhen(false)
-        setNotificationSilent()
-    }
 
     override fun onCreate() {
         super.onCreate()
@@ -44,7 +39,12 @@ class CodeforcesContestWatchService: Service() {
                 val contestID = intent.getIntExtra("contestID", -1)
                 println("service onStartCommand $handle $contestID")
                 stop()
-                start(handle, contestID)
+                start(handle, contestID, NotificationCompat.Builder(this, "test").apply {
+                    setSmallIcon(R.drawable.ic_news)
+                    setSubText(handle)
+                    setShowWhen(false)
+                    setNotificationSilent()
+                })
             }
             "stop" -> {
                 stop()
@@ -69,7 +69,7 @@ class CodeforcesContestWatchService: Service() {
         watcher = null
     }
 
-    private fun start(handle: String, contestID: Int){
+    private fun start(handle: String, contestID: Int, notification: NotificationCompat.Builder){
         startForeground(notificationID, notification.build())
 
         watcher = CodeforcesContestWatcher(
@@ -83,6 +83,7 @@ class CodeforcesContestWatchService: Service() {
                 var progress = ""
                 var contestantRank = -1
                 var contestantPoints = 0
+                var participationType = CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED
 
                 override fun onSetContestName(contestName: String) {
                     changes = true
@@ -122,6 +123,11 @@ class CodeforcesContestWatchService: Service() {
                     contestantPoints = points
                 }
 
+                override fun onSetParticipationType(type: CodeforcesContestWatcher.ParticipationType) {
+                    changes = true
+                    participationType = type
+                }
+
                 override fun onSetProblemStatus(problem: String, status: String, points: Int) {
                     //TODO("Not yet implemented")
                 }
@@ -135,8 +141,13 @@ class CodeforcesContestWatchService: Service() {
                         + (if(progress.isEmpty()) "" else " • $progress")
                         //+ (if(contestPhase == CodeforcesContestPhase.FINISHED) " "+System.currentTimeMillis().toString() else "")
                     )
-
-                    notification.setContentText("rank: $contestantRank | points: $contestantPoints")
+                    notification.setContentText(
+                        when(participationType){
+                            CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED -> "not participated"
+                            CodeforcesContestWatcher.ParticipationType.OFFICIAL -> "rank: $contestantRank | points: $contestantPoints"
+                            CodeforcesContestWatcher.ParticipationType.UNOFFICIAL -> "rank: *$contestantRank | points: $contestantPoints"
+                        }
+                    )
 
                     notificationManager.notify(notificationID, notification.build())
                 }
