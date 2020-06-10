@@ -5,8 +5,8 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import com.example.test3.NotificationChannels
 import com.example.test3.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,12 +26,10 @@ class CodeforcesContestWatchService: Service() {
         println("service onCreate")
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        Toast.makeText(this, "created $watcher", Toast.LENGTH_SHORT).show()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val action = intent!!.action
-        Toast.makeText(this, "on start $action $intent", Toast.LENGTH_SHORT).show()
 
         when(action){
             "start" -> {
@@ -39,7 +37,7 @@ class CodeforcesContestWatchService: Service() {
                 val contestID = intent.getIntExtra("contestID", -1)
                 println("service onStartCommand $handle $contestID")
                 stop()
-                start(handle, contestID, NotificationCompat.Builder(this, "test").apply {
+                start(handle, contestID, NotificationCompat.Builder(this, NotificationChannels.codeforces_contest_watcher).apply {
                     setSmallIcon(R.drawable.ic_news)
                     setSubText(handle)
                     setShowWhen(false)
@@ -53,12 +51,6 @@ class CodeforcesContestWatchService: Service() {
         }
 
         return super.onStartCommand(intent, flags, startId)
-    }
-
-    override fun onDestroy() {
-        Toast.makeText(this, "destroy", Toast.LENGTH_SHORT).show()
-
-        super.onDestroy()
     }
 
 

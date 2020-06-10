@@ -2,8 +2,6 @@ package com.example.test3
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -43,8 +41,7 @@ class MainActivity : AppCompatActivity(){
         println(savedInstanceState)
         super.onCreate(savedInstanceState)
 
-
-        createNotificationChannel()
+        createNotificationChannels(this)
 
         setContentView(R.layout.activity_main)
 
@@ -193,19 +190,5 @@ class MainActivity : AppCompatActivity(){
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-
-
-
-    fun createNotificationChannel(){
-
-        val channel = NotificationChannel(
-            "test",
-            "test channel",
-            NotificationManager.IMPORTANCE_DEFAULT
-        ).apply {
-
-        }
-        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(channel)
-    }
 }
 

@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.*
 import kotlinx.coroutines.launch
@@ -172,7 +173,8 @@ class AccountsFragment: Fragment() {
         view.findViewById<Button>(R.id.buttonAddAccount).setOnClickListener {
             val emptyPanels = panels.filter { it.isEmpty() }
 
-            if(emptyPanels.isNotEmpty()) {
+            if(emptyPanels.isEmpty()) Toast.makeText(activity, "Nothing to add", Toast.LENGTH_SHORT).show()
+            else{
                 val adapter = ArrayAdapter<String>(activity, android.R.layout.select_dialog_item)
                 emptyPanels.forEach {
                     adapter.add(it.manager.PREFERENCES_FILE_NAME)
