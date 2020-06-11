@@ -73,7 +73,7 @@ fun createNotificationChannels(activity: MainActivity){
     ))
     m.createNotificationChannel(NotificationChannel(
         NotificationChannels.project_euler_problems,
-        "New Problems",
+        "Recent Problems",
         NotificationManager.IMPORTANCE_DEFAULT
     ).apply {
         group = group_id_project_euler

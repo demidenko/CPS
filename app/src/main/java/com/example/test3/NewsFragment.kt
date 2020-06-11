@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
@@ -101,7 +102,7 @@ class NewsFragment : Fragment() {
                 button.text = "..."
                 button.isEnabled = false
                 activity.scope.launch {
-                    val rx = codeforcesNewsAdapter.fragments.map { it.address }.toSet().map { it to async { readURLData(it) } }.toMap()
+                    val rx = codeforcesNewsAdapter.fragments.map { it.address }.toSet().map { it to async { if(it.isNotEmpty()) readURLData(it) else "" } }.toMap()
                     codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
                         val tab = tabLayout.getTabAt(index)!!
                         launch {
@@ -129,9 +130,19 @@ class NewsFragment : Fragment() {
 
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        buttonReload.callOnClick()
+
+    private var firstRun = true
+    override fun onResume() {
+        super.onResume()
+        if(firstRun){
+            firstRun = false
+            buttonReload.callOnClick()
+            Handler().postDelayed({
+                codeforcesNewsAdapter.fragments.forEachIndexed { index, codeforcesNewsFragment ->
+                    if(codeforcesNewsFragment.title == "CF TOP") tabLayout.selectTab(tabLayout.getTabAt(index))
+                }
+            },100)
+        }
     }
 
 }
@@ -141,9 +152,10 @@ class NewsFragment : Fragment() {
 class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     val fragments = arrayOf(
-        CodeforcesNewsRecentFragment("https://codeforces.com/recent-actions?locale=ru", "CF RECENT"),
-        CodeforcesNewsFragment("https://codeforces.com/top?locale=ru", "CF TOP"),
-        CodeforcesNewsMainFragment("https://codeforces.com/?locale=ru", "CF MAIN")
+        CodeforcesNewsMainFragment("CF MAIN", "https://codeforces.com/?locale=ru"),
+        CodeforcesNewsFragment("CF TOP", "https://codeforces.com/top?locale=ru"),
+        CodeforcesNewsRecentFragment("CF RECENT", "https://codeforces.com/recent-actions?locale=ru"),
+        CodeforcesNewsLostRecentFragment("CF LOST")
     )
 
     override fun createFragment(position: Int): Fragment = fragments[position]
@@ -152,7 +164,7 @@ class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
 
 
 
-open class CodeforcesNewsFragment(val address: String, val title: String) : Fragment() {
+open class CodeforcesNewsFragment(val title: String, val address: String) : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -189,7 +201,7 @@ open class CodeforcesNewsFragment(val address: String, val title: String) : Frag
 
 }
 
-class CodeforcesNewsMainFragment(address: String, title: String): CodeforcesNewsFragment(address, title){
+class CodeforcesNewsMainFragment(title: String, address: String) : CodeforcesNewsFragment(title, address) {
 
     companion object {
         const val CODEFORCES_NEWS_MAIN = "codeforces_news_main"
@@ -221,7 +233,7 @@ class CodeforcesNewsMainFragment(address: String, title: String): CodeforcesNews
 
 
 
-class CodeforcesNewsRecentFragment(address: String, title: String): CodeforcesNewsFragment(address, title){
+class CodeforcesNewsRecentFragment(title: String, address: String) : CodeforcesNewsFragment(title, address) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewAdapter = CodeforcesNewsItemsRecentAdapter(requireActivity() as MainActivity)
@@ -232,6 +244,10 @@ class CodeforcesNewsRecentFragment(address: String, title: String): CodeforcesNe
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
     }
+
+}
+
+class CodeforcesNewsLostRecentFragment(title: String) : CodeforcesNewsFragment(title, "") {
 
 }
 
