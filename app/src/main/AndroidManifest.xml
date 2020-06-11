@@ -22,6 +22,10 @@
         </activity>
 
         <service android:name=".contest_watch.CodeforcesContestWatchService" />
+
+        <service android:name=".CodeforcesNewsLostRecentJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
     </application>
 
 </manifest>

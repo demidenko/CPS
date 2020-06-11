@@ -1,5 +1,6 @@
 package com.example.test3
 
+import android.app.job.JobInfo
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -8,8 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.test3.contest_watch.CodeforcesContestWatchService
+import java.util.concurrent.TimeUnit
 
 class TestFragment : Fragment() {
     override fun onCreateView(
@@ -54,6 +57,17 @@ class TestFragment : Fragment() {
                 Intent(activity, CodeforcesContestWatchService::class.java)
                     .setAction("stop")
             )
+        }
+
+        view.findViewById<Button>(R.id.button_run_jobservice).setOnClickListener {
+            activity.makeSchedule(
+                activity,
+                1,
+                CodeforcesNewsLostRecentJobService::class.java,
+                TimeUnit.MINUTES.toMillis(15),
+                JobInfo.NETWORK_TYPE_UNMETERED
+            )
+            Toast.makeText(activity, "job scheduled", Toast.LENGTH_SHORT).show()
         }
     }
 }

@@ -359,6 +359,65 @@ class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): CodeforcesNewsI
 
 class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsItemsAdapter(activity){
 
+    companion object {
+        fun parsePage(s: String): ArrayList<Info> {
+            val commentators = mutableMapOf<String,MutableList<String>>()
+            val commentatorsColors = mutableMapOf<String,String>()
+
+            var i = 0
+            while(true){
+                i = s.indexOf("<table class=\"comment-table\">", i+1)
+                if(i==-1) break
+
+                i = s.indexOf("class=\"rated-user", i)
+                val handleColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
+
+                i = s.lastIndexOf("/profile/",i)
+                val handle = s.substring(s.indexOf('/',i+1)+1, s.indexOf('"',i))
+
+                i = s.indexOf("#comment-", i)
+                val commentID = s.substring(s.indexOf('-',i)+1, s.indexOf('"',i))
+
+                val blogID = s.substring(s.lastIndexOf('/',i)+1, i)
+
+                commentators.getOrPut(blogID) { mutableListOf(commentID) }.add(handle)
+                commentatorsColors[handle] = handleColor
+            }
+
+            val res = arrayListOf<Info>()
+            i = s.indexOf("<div class=\"recent-actions\">")
+            if(i==-1) return res
+
+            while(true){
+                i = s.indexOf("<div style=\"font-size:0.9em;padding:0.5em 0;\">", i+1)
+                if(i==-1) break
+
+                i = s.indexOf("/profile/", i)
+                val author = s.substring(i+9,s.indexOf('"',i))
+
+                i = s.indexOf("rated-user user-",i)
+                val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
+
+                i = s.indexOf("entry/", i)
+                val id = s.substring(i+6, s.indexOf('"',i))
+
+                val title = fromHTML(s.substring(s.indexOf(">",i)+1, s.indexOf("</a",i)))
+
+                val comments = mutableListOf<Pair<String,String>>()
+                var lastCommentId = ""
+
+                commentators[id]?.distinct()?.mapIndexed{ index, handle ->
+                    if(index==0) lastCommentId = handle
+                    else comments.add(Pair(handle,commentatorsColors[handle]!!))
+                }
+
+                res.add(Info(id,title,author,authorColor,lastCommentId,comments.toTypedArray()))
+            }
+
+            return res
+        }
+    }
+
     data class Info(
         val blogID: String,
         val title: String,
@@ -369,58 +428,7 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
     )
 
     override fun parseData(s: String) {
-        val commentators = mutableMapOf<String,MutableList<String>>()
-        val commentatorsColors = mutableMapOf<String,String>()
-
-        var i = 0
-        while(true){
-            i = s.indexOf("<table class=\"comment-table\">", i+1)
-            if(i==-1) break
-
-            i = s.indexOf("class=\"rated-user", i)
-            val handleColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
-
-            i = s.lastIndexOf("/profile/",i)
-            val handle = s.substring(s.indexOf('/',i+1)+1, s.indexOf('"',i))
-
-            i = s.indexOf("#comment-", i)
-            val commentID = s.substring(s.indexOf('-',i)+1, s.indexOf('"',i))
-
-            val blogID = s.substring(s.lastIndexOf('/',i)+1, i)
-
-            commentators.getOrPut(blogID) { mutableListOf(commentID) }.add(handle)
-            commentatorsColors[handle] = handleColor
-        }
-
-        val res = arrayListOf<Info>()
-        i = s.indexOf("<div class=\"recent-actions\">")
-        if(i==-1) return
-        while(true){
-            i = s.indexOf("<div style=\"font-size:0.9em;padding:0.5em 0;\">", i+1)
-            if(i==-1) break
-
-            i = s.indexOf("/profile/", i)
-            val author = s.substring(i+9,s.indexOf('"',i))
-
-            i = s.indexOf("rated-user user-",i)
-            val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
-
-            i = s.indexOf("entry/", i)
-            val id = s.substring(i+6, s.indexOf('"',i))
-
-            val title = fromHTML(s.substring(s.indexOf(">",i)+1, s.indexOf("</a",i)))
-
-            val comments = mutableListOf<Pair<String,String>>()
-            var lastCommentId = ""
-
-            commentators[id]?.distinct()?.mapIndexed{ index, handle ->
-                if(index==0) lastCommentId = handle
-                else comments.add(Pair(handle,commentatorsColors[handle]!!))
-            }
-
-            res.add(Info(id,title,author,authorColor,lastCommentId,comments.toTypedArray()))
-        }
-
+        val res = parsePage(s)
         if(res.isNotEmpty()){
             rows = res.toTypedArray()
             notifyDataSetChanged()

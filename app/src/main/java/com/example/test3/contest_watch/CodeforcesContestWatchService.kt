@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.example.test3.NotificationChannels
+import com.example.test3.NotificationIDs
 import com.example.test3.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,8 +15,6 @@ import kotlinx.coroutines.Job
 
 class CodeforcesContestWatchService: Service() {
     override fun onBind(intent: Intent?): IBinder? = null
-
-    val notificationID = 1
 
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
     private lateinit var notificationManager: NotificationManager
@@ -62,7 +61,7 @@ class CodeforcesContestWatchService: Service() {
     }
 
     private fun start(handle: String, contestID: Int, notification: NotificationCompat.Builder){
-        startForeground(notificationID, notification.build())
+        startForeground(NotificationIDs.codeforces_contest_watcher, notification.build())
 
         watcher = CodeforcesContestWatcher(
             handle,
@@ -141,7 +140,7 @@ class CodeforcesContestWatchService: Service() {
                         }
                     )
 
-                    notificationManager.notify(notificationID, notification.build())
+                    notificationManager.notify(NotificationIDs.codeforces_contest_watcher, notification.build())
                 }
             })
             start()

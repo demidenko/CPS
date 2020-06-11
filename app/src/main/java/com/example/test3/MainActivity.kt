@@ -2,6 +2,9 @@ package com.example.test3
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -94,6 +97,7 @@ class MainActivity : AppCompatActivity(){
         with(getPreferences(Context.MODE_PRIVATE)){
             useRealColors = getBoolean(use_real_colors, false)
         }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -188,6 +192,20 @@ class MainActivity : AppCompatActivity(){
             accountsFragment.panels.first { it.manager.PREFERENCES_FILE_NAME==who }.show()
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    fun makeSchedule(
+        context: Context,
+        id: Int,
+        c: Class<*>?,
+        millis: Long,
+        network_type: Int
+    ) {
+        val builder = JobInfo.Builder(id, ComponentName(context, c!!))
+        builder.setPeriodic(millis)
+        builder.setRequiredNetworkType(network_type)
+        val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        jobScheduler.schedule(builder.build())
     }
 
 }

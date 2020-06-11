@@ -52,5 +52,12 @@
         android:text="stop"
         />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_run_jobservice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="JOB"
+        />
+
 
 </RelativeLayout>
