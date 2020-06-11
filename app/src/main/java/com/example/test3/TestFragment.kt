@@ -64,7 +64,7 @@ class TestFragment : Fragment() {
                 activity,
                 1,
                 CodeforcesNewsLostRecentJobService::class.java,
-                TimeUnit.MINUTES.toMillis(15),
+                TimeUnit.MINUTES.toMillis(60),
                 JobInfo.NETWORK_TYPE_UNMETERED
             )
             Toast.makeText(activity, "job scheduled", Toast.LENGTH_SHORT).show()

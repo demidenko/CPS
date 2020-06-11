@@ -32,30 +32,34 @@ class CodeforcesNewsLostRecentJobService : JobService(), CoroutineScope{
     private val highRated = arrayListOf("user-orange", "user-red", "user-legendary")
     suspend fun job(){
         val recentBlogs = CodeforcesNewsItemsRecentAdapter.parsePage(readURLData("https://codeforces.com/recent-actions?locale=ru") ?: return)
-
-        val recentBlogIDs = recentBlogs.mapTo(HashSet()){ it.blogID.toInt() }
+        if(recentBlogs.isEmpty()) return
 
         val currentTime = System.currentTimeMillis()
-        val newSuspects = recentBlogs
-            .filter { it.authorColorTag in highRated }
-            .mapNotNull {
-                val creationTime = CodeforcesUtils.getBlogCreationTimeSeconds(it.blogID) * 1000L
-                if(currentTime - creationTime <= TimeUnit.DAYS.toMillis(1))
-                    Pair(it.blogID.toInt(), creationTime)
-                else
-                    null
-            }
 
-        val suspects = getSuspects().toHashSet()
-        println("suspects = $suspects")
+        val suspects = getSuspects()
+            .filter { (id,time) ->
+                currentTime - time <= TimeUnit.DAYS.toMillis(1)
+            }
+            .toHashSet()
+
+        val newSuspects = mutableListOf<Pair<Int,Long>>()
+        recentBlogs.forEach { blog ->
+            val blogID = blog.blogID.toInt()
+            if(blog.authorColorTag in highRated && suspects.find { it.first == blogID } == null){
+                val creationTime = CodeforcesUtils.getBlogCreationTimeMillis(blog.blogID)
+                if(currentTime - creationTime <= TimeUnit.DAYS.toMillis(1)){
+                    newSuspects.add(Pair(blogID,creationTime))
+                }
+            }
+        }
 
         suspects.addAll(newSuspects)
+        println("suspects = $suspects")
 
+        val recentBlogIDs = recentBlogs.mapTo(HashSet()){ it.blogID.toInt() }
         val newLost = mutableListOf<Int>()
-
         saveSuspects(
             suspects
-            .filter { (id,time) -> currentTime - time <= TimeUnit.DAYS.toMillis(1) }
             .filter { (id, time) ->
                 if(id !in recentBlogIDs){
                     newLost.add(id)
@@ -63,7 +67,7 @@ class CodeforcesNewsLostRecentJobService : JobService(), CoroutineScope{
                 }else{
                     true
                 }
-            }.toHashSet()
+            }
         )
 
         if(newLost.isNotEmpty()){
@@ -71,7 +75,8 @@ class CodeforcesNewsLostRecentJobService : JobService(), CoroutineScope{
                 this,
                 NotificationIDs.test,
                 "lost detected",
-                newLost.joinToString()
+                newLost.joinToString(),
+                false
             )
         }
 

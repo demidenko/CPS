@@ -6,18 +6,18 @@ import kotlinx.coroutines.withContext
 
 class CodeforcesUtils {
     companion object {
-        suspend fun getBlogCreationTimeSeconds(blogID: String): Int = withContext(Dispatchers.IO){
-            with(JsonReaderFromURL("https://codeforces.com/api/blogEntry.view?blogEntryId=$blogID&locale=ru") ?: return@withContext 0 ){
+        suspend fun getBlogCreationTimeMillis(blogID: String): Long = withContext(Dispatchers.IO){
+            with(JsonReaderFromURL("https://codeforces.com/api/blogEntry.view?blogEntryId=$blogID&locale=ru") ?: return@withContext 0L ){
                 beginObject()
                 if(nextString("status") != "OK"){
                     if(nextString("comment") == "Call limit exceeded"){
                         delay(500)
-                        return@withContext getBlogCreationTimeSeconds(blogID)
+                        return@withContext getBlogCreationTimeMillis(blogID)
                     }
-                    return@withContext 0
+                    return@withContext 0L
                 }
                 nextName()
-                return@withContext (readObjectFields("creationTimeSeconds")[0] as Double).toInt()
+                return@withContext (readObjectFields("creationTimeSeconds")[0] as Double).toInt() * 1000L
             }
         }
     }
