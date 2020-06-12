@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -18,8 +20,8 @@ android {
         applicationId "com.example.test3"
         minSdkVersion 29
         targetSdkVersion 29
-        versionCode = 18
-        versionName '0.7.1'
+        versionCode = 19
+        versionName '0.8.0'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -43,5 +45,6 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     implementation "com.google.android.material:material:1.1.0"
     implementation "com.squareup.moshi:moshi-kotlin:1.9.2"
+    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.9.2'
     implementation "androidx.recyclerview:recyclerview:1.1.0"
 }

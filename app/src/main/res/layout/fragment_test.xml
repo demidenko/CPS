@@ -19,6 +19,7 @@
         android:layout_centerHorizontal="true"
         android:text="stuff"
         android:layout_below="@id/watcher_panel"
+        android:layout_toEndOf="@id/button_running_jobs"
         />
 
     <EditText
@@ -53,11 +54,20 @@
         />
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_running_jobs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="JOBS"
+        />
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/button_run_jobservice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/button_running_jobs"
         android:text="JOB"
         />
+
 
 
 </RelativeLayout>

@@ -1,6 +1,7 @@
 package com.example.test3
 
 import android.app.job.JobInfo
+import android.app.job.JobScheduler
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -9,10 +10,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.test3.contest_watch.CodeforcesContestWatchService
 import java.util.concurrent.TimeUnit
+
 
 class TestFragment : Fragment() {
     override fun onCreateView(
@@ -28,6 +31,7 @@ class TestFragment : Fragment() {
         val activity = requireActivity() as MainActivity
 
 
+        val stuff = view.findViewById<TextView>(R.id.stuff_textview)
         val editText = view.findViewById<EditText>(R.id.text_editor)
         val prefs = activity.getSharedPreferences("test", Context.MODE_PRIVATE)
         editText.setText(prefs.getInt("contest_id", 0).toString())
@@ -68,6 +72,16 @@ class TestFragment : Fragment() {
                 JobInfo.NETWORK_TYPE_UNMETERED
             )
             Toast.makeText(activity, "job scheduled", Toast.LENGTH_SHORT).show()
+        }
+
+        view.findViewById<Button>(R.id.button_running_jobs).setOnClickListener {
+            stuff.text = ""
+            val scheduler = activity.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+            for(info in scheduler.allPendingJobs){
+                var s = "Job " + info.id
+                s += ": " + info.service.shortClassName
+                stuff.append(s+"\n")
+            }
         }
     }
 }

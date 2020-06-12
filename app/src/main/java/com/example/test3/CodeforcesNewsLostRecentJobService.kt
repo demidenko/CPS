@@ -3,6 +3,9 @@ package com.example.test3
 import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.Context
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonClass
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -13,6 +16,21 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.HashSet
 import kotlin.coroutines.CoroutineContext
+
+
+@JsonClass(generateAdapter = true)
+data class BlogInfo(
+    val id: Int,
+    val title: String,
+    val author: String,
+    val authorColorTag: String,
+    val creationTime: Long
+){
+    companion object{
+        val jsonAdapter: JsonAdapter<BlogInfo> = Moshi.Builder().build().adapter(BlogInfo::class.java)
+    }
+}
+
 
 class CodeforcesNewsLostRecentJobService : JobService(), CoroutineScope{
     override val coroutineContext: CoroutineContext = Job() + Dispatchers.Main
@@ -36,19 +54,24 @@ class CodeforcesNewsLostRecentJobService : JobService(), CoroutineScope{
 
         val currentTime = System.currentTimeMillis()
 
-        val suspects = getSuspects()
-            .filter { (id,time) ->
-                currentTime - time <= TimeUnit.DAYS.toMillis(1)
-            }
-            .toHashSet()
+        val suspects = getBlogs(CF_LOST_SUSPECTS)
+            .filter {
+                currentTime - it.creationTime <= TimeUnit.DAYS.toMillis(1)
+            }.toHashSet()
 
-        val newSuspects = mutableListOf<Pair<Int,Long>>()
+        val newSuspects = mutableListOf<BlogInfo>()
         recentBlogs.forEach { blog ->
             val blogID = blog.blogID.toInt()
-            if(blog.authorColorTag in highRated && suspects.find { it.first == blogID } == null){
+            if(blog.authorColorTag in highRated && suspects.find { it.id == blogID } == null){
                 val creationTime = CodeforcesUtils.getBlogCreationTimeMillis(blog.blogID)
                 if(currentTime - creationTime <= TimeUnit.DAYS.toMillis(1)){
-                    newSuspects.add(Pair(blogID,creationTime))
+                    newSuspects.add(BlogInfo(
+                        id = blogID,
+                        creationTime = creationTime,
+                        title = blog.title,
+                        author = blog.author,
+                        authorColorTag = blog.authorColorTag
+                    ))
                 }
             }
         }
@@ -57,12 +80,23 @@ class CodeforcesNewsLostRecentJobService : JobService(), CoroutineScope{
         println("suspects = $suspects")
 
         val recentBlogIDs = recentBlogs.mapTo(HashSet()){ it.blogID.toInt() }
-        val newLost = mutableListOf<Int>()
-        saveSuspects(
+        val lost = getBlogs(CF_LOST)
+            .filter {
+                currentTime - it.creationTime <= TimeUnit.DAYS.toMillis(7)
+            }.toHashSet()
+
+        saveBlogs(CF_LOST_SUSPECTS,
             suspects
-            .filter { (id, time) ->
-                if(id !in recentBlogIDs){
-                    newLost.add(id)
+            .filter {
+                if(it.id !in recentBlogIDs){
+                    makeSimpleNotification(
+                        this,
+                        NotificationIDs.test,
+                        "lost detected",
+                        it.title,
+                        false
+                    )
+                    lost.add(it)
                     false
                 }else{
                     true
@@ -70,28 +104,20 @@ class CodeforcesNewsLostRecentJobService : JobService(), CoroutineScope{
             }
         )
 
-        if(newLost.isNotEmpty()){
-            makeSimpleNotification(
-                this,
-                NotificationIDs.test,
-                "lost detected",
-                newLost.joinToString(),
-                false
-            )
-        }
+        saveBlogs(CF_LOST, lost)
 
     }
 
     private val CF_LOST_SUSPECTS = "cf_lost_suspects.txt"
+    private val CF_LOST = "cf_lost.txt"
 
-    private fun getSuspects(): List<Pair<Int,Long>> {
+    private fun getBlogs(file_name: String): List<BlogInfo> {
         try {
-            val input = Scanner(openFileInput(CF_LOST_SUSPECTS))
-            val res = mutableListOf<Pair<Int, Long>>()
-            while (input.hasNext()) {
-                val blogID = input.nextInt()
-                val creationTime = input.nextLong()
-                res.add(Pair(blogID, creationTime))
+            val res = mutableListOf<BlogInfo>()
+            val sc = Scanner(openFileInput(file_name))
+            while(sc.hasNextLine()){
+                val str = sc.nextLine()
+                res.add(BlogInfo.jsonAdapter.fromJson(str)!!)
             }
             return res
         }catch (e: FileNotFoundException){
@@ -99,14 +125,15 @@ class CodeforcesNewsLostRecentJobService : JobService(), CoroutineScope{
         }
     }
 
-    private fun saveSuspects(suspects: Collection<Pair<Int,Long>>){
-        val out = PrintWriter(openFileOutput(CF_LOST_SUSPECTS, Context.MODE_PRIVATE))
-        suspects.forEach { (blogID, creationTime) ->
-            out.print(blogID)
-            out.print(' ')
-            out.println(creationTime)
+    private fun saveBlogs(file_name: String, blogs: Collection<BlogInfo>){
+        println("save $file_name: $blogs")
+        val out = PrintWriter(openFileOutput(file_name, Context.MODE_PRIVATE))
+        blogs.forEach {
+            val str = BlogInfo.jsonAdapter.toJson(it)
+            out.println(str)
         }
         out.flush()
         out.close()
     }
+
 }
