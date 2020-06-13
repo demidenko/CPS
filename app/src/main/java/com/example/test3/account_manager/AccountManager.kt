@@ -1,14 +1,13 @@
 package com.example.test3.account_manager
 
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 
-abstract class AccountManager(val activity: AppCompatActivity) {
+abstract class AccountManager(val context: Context) {
     abstract val PREFERENCES_FILE_NAME: String
-    val prefs = activity.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
+    val prefs = context.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
 
     protected abstract suspend fun downloadInfo(data: String): UserInfo
     suspend fun loadInfo(data: String): UserInfo {

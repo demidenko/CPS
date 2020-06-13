@@ -1,12 +1,12 @@
 package com.example.test3.account_manager
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import com.example.test3.*
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.JsonReader
 
-class TopCoderAccountManager(activity: AppCompatActivity): AccountManager(activity), ColoredHandles {
+class TopCoderAccountManager(context: Context): AccountManager(context), ColoredHandles {
 
     data class TopCoderUserInfo(
         override var status: STATUS,

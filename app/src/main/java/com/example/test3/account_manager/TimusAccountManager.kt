@@ -1,10 +1,10 @@
 package com.example.test3.account_manager
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import com.example.test3.fromHTML
 import com.example.test3.readURLData
 
-class TimusAccountManager(activity: AppCompatActivity): AccountManager(activity) {
+class TimusAccountManager(context: Context): AccountManager(context) {
     data class TimusUserInfo(
         override var status: STATUS,
         var id: String,

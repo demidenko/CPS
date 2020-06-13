@@ -1,8 +1,11 @@
-package com.example.test3
+package com.example.test3.job_services
 
 import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.Context
+import com.example.test3.CodeforcesNewsItemsRecentAdapter
+import com.example.test3.CodeforcesUtils
+import com.example.test3.readURLData
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
@@ -112,17 +115,18 @@ class CodeforcesNewsLostRecentJobService : JobService(), CoroutineScope{
 
         val recentBlogIDs = recentBlogs.mapTo(HashSet()){ it.blogID.toInt() }
         val lost = getBlogs(this, CF_LOST)
-            .filter {
-                currentTime - it.creationTime <= TimeUnit.DAYS.toMillis(7)
+            .filter { blog ->
+                currentTime - blog.creationTime <= TimeUnit.DAYS.toMillis(7)
+                    &&
+                blog.id !in recentBlogIDs
             }.toHashSet()
 
         saveBlogs(this, CF_LOST_SUSPECTS,
-            suspects
-            .filter {
-                if(it.id !in recentBlogIDs){
+            suspects.filter {
+                if (it.id !in recentBlogIDs) {
                     lost.add(it)
                     false
-                }else{
+                } else {
                     true
                 }
             }

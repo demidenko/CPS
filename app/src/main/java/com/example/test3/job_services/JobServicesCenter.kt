@@ -1,4 +1,4 @@
-package com.example.test3
+package com.example.test3.job_services
 
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
@@ -27,8 +27,7 @@ class JobServicesCenter {
                 setPeriodic(millis)
                 setRequiredNetworkType(network_type)
             }
-            val jobScheduler =
-                context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+            val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
             jobScheduler.schedule(builder.build())
         }
 

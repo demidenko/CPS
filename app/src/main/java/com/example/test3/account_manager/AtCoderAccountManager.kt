@@ -1,9 +1,9 @@
 package com.example.test3.account_manager
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import com.example.test3.readURLData
 
-class AtCoderAccountManager(activity: AppCompatActivity): AccountManager(activity), ColoredHandles{
+class AtCoderAccountManager(context: Context): AccountManager(context), ColoredHandles{
 
     data class AtCoderUserInfo(
         override var status: STATUS,

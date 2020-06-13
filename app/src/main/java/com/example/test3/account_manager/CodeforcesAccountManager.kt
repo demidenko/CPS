@@ -1,17 +1,17 @@
 package com.example.test3.account_manager
 
+import android.content.Context
 import android.graphics.Typeface
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.set
 import com.example.test3.*
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.JsonReader
 
-class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(activity), ColoredHandles {
+class CodeforcesAccountManager(context: Context): AccountManager(context), ColoredHandles {
 
     data class CodeforcesUserInfo(
         override var status: STATUS,
@@ -149,14 +149,14 @@ class CodeforcesAccountManager(activity: AppCompatActivity): AccountManager(acti
     }
 
     fun makeSpan(handle: String, tag: String) = SpannableString(handle).apply {
-        val def = (activity as MainActivity).defaultTextColor
+        val def = (context as MainActivity).defaultTextColor
         set(0, handle.length, ForegroundColorSpan(getHandleColorByTag(tag)?:def))
         if(tag!="user-black") set(0, handle.length, StyleSpan(Typeface.BOLD))
         if(tag=="user-legendary") set(0, 1, ForegroundColorSpan(def))
     }
 
     fun makeSpan(info: CodeforcesUserInfo) = SpannableString(info.handle).apply {
-        val def = (activity as MainActivity).defaultTextColor
+        val def = (context as MainActivity).defaultTextColor
         set(0, info.handle.length, ForegroundColorSpan(getColor(info)?:def))
         if(info.rating!= NOT_RATED) set(0, info.handle.length, StyleSpan(Typeface.BOLD))
         if(info.rating>=3000) set(0, 1, ForegroundColorSpan(def))

@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.test3.contest_watch.CodeforcesContestWatchService
+import com.example.test3.job_services.JobServicesCenter
 
 
 class TestFragment : Fragment() {

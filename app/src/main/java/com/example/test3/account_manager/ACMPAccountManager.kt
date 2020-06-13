@@ -1,11 +1,11 @@
 package com.example.test3.account_manager
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import com.example.test3.readURLData
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
-class ACMPAccountManager(activity: AppCompatActivity): AccountManager(activity) {
+class ACMPAccountManager(context: Context): AccountManager(context) {
     data class ACMPUserInfo(
         override var status: STATUS,
         var id: String,
