@@ -40,7 +40,7 @@ class TestFragment : Fragment() {
             val manager = activity.accountsFragment.codeforcesAccountManager
             val handle = manager.savedInfo.userID
             val contestID = editText.text.toString().toInt()
-            activity.startService(
+            activity.startForegroundService(
                 Intent(activity, CodeforcesContestWatchService::class.java)
                     .setAction("start")
                     .putExtra("handle", handle)

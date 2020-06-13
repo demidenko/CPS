@@ -1,7 +1,5 @@
 package com.example.test3.job_services
 
-import android.app.job.JobParameters
-import android.app.job.JobService
 import android.content.Context
 import com.example.test3.CodeforcesNewsItemsRecentAdapter
 import com.example.test3.CodeforcesUtils
@@ -9,16 +7,11 @@ import com.example.test3.readURLData
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.HashSet
-import kotlin.coroutines.CoroutineContext
 
 
 @JsonClass(generateAdapter = true)
@@ -35,7 +28,7 @@ data class BlogInfo(
 }
 
 
-class CodeforcesNewsLostRecentJobService : JobService(), CoroutineScope{
+class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
     companion object {
         private val CF_LOST_SUSPECTS = "cf_lost_suspects.txt"
         val CF_LOST = "cf_lost.txt"
@@ -66,23 +59,8 @@ class CodeforcesNewsLostRecentJobService : JobService(), CoroutineScope{
         }
     }
 
-
-    override val coroutineContext: CoroutineContext = Job() + Dispatchers.Main
-
-    override fun onStopJob(params: JobParameters?): Boolean {
-        return false
-    }
-
-    override fun onStartJob(params: JobParameters?): Boolean {
-        launch {
-            job()
-            jobFinished(params, false)
-        }
-        return true
-    }
-
     private val highRated = arrayListOf("user-orange", "user-red", "user-legendary")
-    suspend fun job(){
+    override suspend fun doJob(){
         val recentBlogs = CodeforcesNewsItemsRecentAdapter.parsePage(readURLData("https://codeforces.com/recent-actions?locale=ru") ?: return)
         if(recentBlogs.isEmpty()) return
 
