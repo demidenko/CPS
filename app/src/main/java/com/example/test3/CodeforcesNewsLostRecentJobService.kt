@@ -120,13 +120,6 @@ class CodeforcesNewsLostRecentJobService : JobService(), CoroutineScope{
             suspects
             .filter {
                 if(it.id !in recentBlogIDs){
-                    makeSimpleNotification(
-                        this,
-                        NotificationIDs.test,
-                        "lost detected",
-                        it.title,
-                        false
-                    )
                     lost.add(it)
                     false
                 }else{

@@ -28,8 +28,8 @@ class NotificationIDs {
     }
 }
 
-fun createNotificationChannels(activity: MainActivity){
-    val m = (activity.getSystemService(AppCompatActivity.NOTIFICATION_SERVICE) as NotificationManager)
+fun createNotificationChannels(context: Context){
+    val m = (context.getSystemService(AppCompatActivity.NOTIFICATION_SERVICE) as NotificationManager)
 
     //test
     val group_id_test = "test"

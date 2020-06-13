@@ -2,9 +2,6 @@ package com.example.test3
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.job.JobInfo
-import android.app.job.JobScheduler
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -45,6 +42,7 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
 
         createNotificationChannels(this)
+        JobServicesCenter.startJobServices(this)
 
         setContentView(R.layout.activity_main)
 
@@ -194,19 +192,7 @@ class MainActivity : AppCompatActivity(){
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    fun makeSchedule(
-        context: Context,
-        id: Int,
-        c: Class<*>?,
-        millis: Long,
-        network_type: Int
-    ) {
-        val builder = JobInfo.Builder(id, ComponentName(context, c!!))
-        builder.setPeriodic(millis)
-        builder.setRequiredNetworkType(network_type)
-        val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        jobScheduler.schedule(builder.build())
-    }
+
 
 }
 
