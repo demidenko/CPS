@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -25,6 +26,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 
 class NewsFragment : Fragment() {
@@ -67,7 +69,7 @@ class NewsFragment : Fragment() {
             val fragment = codeforcesNewsAdapter.fragments[position]
             val title = fragment.title
             tab.text = title
-            if(title == "CF MAIN"){
+            if(fragment is CodeforcesNewsMainFragment){
                 tab.orCreateBadge.apply {
                     backgroundColor = resources.getColor(android.R.color.holo_green_light, null)
                     isVisible = false
@@ -201,18 +203,18 @@ open class CodeforcesNewsFragment(val title: String, val address: String) : Frag
 
 }
 
-class CodeforcesNewsMainFragment(title: String, address: String) : CodeforcesNewsFragment(title, address) {
+open class CodeforcesNewsMainFragment(title: String, address: String) : CodeforcesNewsFragment(title, address) {
 
     companion object {
-        const val CODEFORCES_NEWS_MAIN = "codeforces_news_main"
-        const val blogs = "blogs"
+        const val CODEFORCES_NEWS_VIEWED = "codeforces_news_viewed"
     }
 
     private lateinit var prefs: SharedPreferences
+    private val prefs_key: String = this::class.java.simpleName
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        prefs = requireActivity().getSharedPreferences(CODEFORCES_NEWS_MAIN, Context.MODE_PRIVATE)
+        prefs = requireActivity().getSharedPreferences(CODEFORCES_NEWS_VIEWED, Context.MODE_PRIVATE)
     }
 
     var newBlogs: Int = 0
@@ -220,13 +222,13 @@ class CodeforcesNewsMainFragment(title: String, address: String) : CodeforcesNew
     override suspend fun reload(data: Map<String, Deferred<String?>>) {
         super.reload(data)
 
-        val savedBlogs = prefs.getStringSet(blogs, null) ?: emptySet()
+        val savedBlogs = prefs.getStringSet(prefs_key, null) ?: emptySet()
         newBlogs = viewAdapter.getBlogIDs().count { !savedBlogs.contains(it) }
     }
 
     fun save() = with(prefs.edit()){
         val toSave = viewAdapter.getBlogIDs().toSet()
-        putStringSet(blogs, toSave)
+        putStringSet(prefs_key, toSave)
         commit()
     }
 }
@@ -247,19 +249,28 @@ class CodeforcesNewsRecentFragment(title: String, address: String) : CodeforcesN
 
 }
 
-class CodeforcesNewsLostRecentFragment(title: String) : CodeforcesNewsFragment(title, "") {
+class CodeforcesNewsLostRecentFragment(title: String) : CodeforcesNewsMainFragment(title, "") {
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        viewAdapter = CodeforcesNewsItemsLostRecentAdapter(requireActivity() as MainActivity)
+
+        view.findViewById<RecyclerView>(R.id.cf_news_page_recyclerview).apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = viewAdapter
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        }
+    }
 }
 
 
 ///---------------data adapters--------------------
 
-abstract class CodeforcesNewsItemsAdapter(protected val activity: MainActivity): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+abstract class CodeforcesNewsItemsAdapter(val activity: MainActivity): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     abstract fun parseData(s: String)
     abstract fun getBlogIDs(): List<String>
 }
 
-class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): CodeforcesNewsItemsAdapter(activity){
+open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): CodeforcesNewsItemsAdapter(activity){
 
     data class Info(
         val blogID: String,
@@ -318,9 +329,10 @@ class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): CodeforcesNewsI
         val time: TextView = view.findViewById(R.id.news_item_time)
         val rating: TextView = view.findViewById(R.id.news_item_rating)
         val comments: TextView = view.findViewById(R.id.news_item_comments)
+        val commentsIcon: ImageView = view.findViewById(R.id.news_item_comment_icon)
     }
 
-    private var rows: Array<Info> = emptyArray()
+    protected var rows: Array<Info> = emptyArray()
 
     override fun getItemCount() = rows.size
 
@@ -342,8 +354,10 @@ class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): CodeforcesNewsI
 
         holder.author.text = activity.accountsFragment.codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
 
-        holder.time.text = info.time
+        holder.time.text = timeRUtoEN(info.time)
+
         holder.comments.text = info.comments
+        holder.commentsIcon.visibility = if(info.comments.isEmpty()) View.INVISIBLE else View.VISIBLE
 
         holder.rating.apply{
             text = info.rating
@@ -479,4 +493,57 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
 
     override fun getBlogIDs(): List<String> = rows.map { it.blogID }
 
+}
+
+class CodeforcesNewsItemsLostRecentAdapter(activity: MainActivity) : CodeforcesNewsItemsClassicAdapter(activity) {
+    override fun parseData(s: String) {
+        val blogs = CodeforcesNewsLostRecentJobService.getBlogs(activity, CodeforcesNewsLostRecentJobService.CF_LOST)
+
+        if(blogs.isNotEmpty()){
+            val currentTime = System.currentTimeMillis()
+            rows = blogs
+                .sortedByDescending { it.creationTime }
+                .map {
+                Info(
+                    blogID = it.id.toString(),
+                    title = it.title,
+                    author = it.author,
+                    authorColorTag = it.authorColorTag,
+                    time = timeDifference(it.creationTime, currentTime),
+                    comments = "",
+                    rating = ""
+                )
+            }.toTypedArray()
+
+            notifyDataSetChanged()
+        }
+    }
+
+    fun timeDifference(fromTime: Long, toTime: Long): String {
+        val t = toTime - fromTime
+        return when {
+            t <= TimeUnit.MINUTES.toMillis(2) -> "${TimeUnit.MILLISECONDS.toSeconds(t)} seconds"
+            t <= TimeUnit.HOURS.toMillis(2) -> "${TimeUnit.MILLISECONDS.toMinutes(t)} minutes"
+            t <= TimeUnit.HOURS.toMillis(24 * 2) -> "${TimeUnit.MILLISECONDS.toHours(t)} hours"
+            else -> "${TimeUnit.MILLISECONDS.toDays(t)} days"
+        } + " ago"
+    }
+}
+
+fun timeRUtoEN(time: String): String{
+    val s = time.split(' ')
+    if(s.size == 3 && s.last()=="назад" && s.first().toIntOrNull()!=null){
+        val w = s[1]
+        return s.first() + " " + when {
+            w.startsWith("сек") -> "seconds"
+            w.startsWith("мин") -> "minutes"
+            w.startsWith("час") -> "hours"
+            w.startsWith("д") -> "days"
+            w.startsWith("нед") -> "weeks"
+            w.startsWith("мес") -> "months"
+            w=="лет" || w=="год" -> "years"
+            else -> w
+        } + " ago"
+    }
+    return time
 }
