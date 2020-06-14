@@ -3,9 +3,13 @@ package com.example.test3
 import android.app.NotificationChannel
 import android.app.NotificationChannelGroup
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 
 class NotificationChannels {
     companion object {
@@ -21,11 +25,17 @@ class NotificationChannels {
 class NotificationIDs {
     companion object {
         private var id = 0
+
         //codeforces
         val codeforces_contest_watcher = ++id
+
+        //project euler
+        fun makeProjectEulerRecentProblemNotificationID(id: Int): Int = 1_000_000 + id
+
         //test
         val test = ++id
     }
+
 }
 
 fun createNotificationChannels(context: Context){
@@ -100,7 +110,6 @@ fun createNotificationChannels(context: Context){
 }
 
 fun makeSimpleNotification(context: Context, id: Int, title: String, content: String, silent: Boolean = true){
-    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     val n = NotificationCompat.Builder(context, "test").apply {
         setSmallIcon(R.drawable.ic_news)
         setShowWhen(true)
@@ -108,5 +117,9 @@ fun makeSimpleNotification(context: Context, id: Int, title: String, content: St
         setContentText(content)
         if(silent) setNotificationSilent()
     }
-    notificationManager.notify(id, n.build())
+    NotificationManagerCompat.from(context).notify(id, n.build())
+}
+
+fun makePendingIntentOpenURL(url: String, context: Context): PendingIntent {
+    return PendingIntent.getActivity(context, 0, Intent(Intent.ACTION_VIEW, Uri.parse(url)), 0)
 }

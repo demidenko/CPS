@@ -1,19 +1,22 @@
 package com.example.test3.job_services
 
-import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
-import com.example.test3.NotificationChannels
-import com.example.test3.R
-import com.example.test3.readURLData
+import androidx.core.app.NotificationManagerCompat
+import com.example.test3.*
 
 class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
+
+    companion object {
+        private const val PREFERENCES_FILE_NAME = "project_euler"
+        private const val LAST_RECENT_PROBLEM_ID = "last_recent_problem_id"
+    }
 
     override suspend fun doJob() {
         val s = readURLData("https://projecteuler.net/recent") ?: return
 
-        val prefs = getSharedPreferences("test", Context.MODE_PRIVATE)
-        val lastViewedProblemID = prefs.getInt("pe_problem_id", 0)
+        val prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
+        val lastViewedProblemID = prefs.getInt(LAST_RECENT_PROBLEM_ID, 0)
 
         val newProblems = mutableListOf<Pair<Int,String>>()
 
@@ -23,11 +26,10 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
             if(i==-1) break
 
             val problemID = s.substring(s.indexOf('>',i)+1, s.indexOf('<',i+1)).toInt()
+            if(problemID == lastViewedProblemID) break
 
             i = s.indexOf("</a",i)
             val problemName = s.substring(s.lastIndexOf('>',i)+1, i)
-
-            if(problemID == lastViewedProblemID) break
 
             newProblems.add(Pair(problemID, problemName))
         }
@@ -35,23 +37,26 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
         if(newProblems.isEmpty()) return
 
         if(lastViewedProblemID != 0){
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             newProblems.forEach { (id, name) ->
                 val n = NotificationCompat.Builder(this, NotificationChannels.project_euler_problems).apply {
-                    setSmallIcon(R.drawable.ic_news)
                     setSubText("Project Euler • New problem published!")
-                    setShowWhen(true)
                     setContentTitle("Problem $id")
                     setContentText(name)
+                    setStyle(NotificationCompat.BigTextStyle())
+                    setSmallIcon(R.drawable.ic_new_post)
+                    setShowWhen(true)
+                    setContentIntent(makePendingIntentOpenURL("https://projecteuler.net/problem=$id", this@ProjectEulerRecentProblemsJobService))
                 }
-                notificationManager.notify(id, n.build())
+                NotificationManagerCompat.from(this).notify(NotificationIDs.makeProjectEulerRecentProblemNotificationID(id), n.build())
             }
         }
 
-        with(prefs.edit()){
-            val firstID = newProblems.first().first
-            putInt("pe_problem_id", firstID)
-            apply()
+        val firstID = newProblems.first().first
+        if(firstID != lastViewedProblemID) {
+            with(prefs.edit()) {
+                putInt(LAST_RECENT_PROBLEM_ID, firstID)
+                apply()
+            }
         }
     }
 

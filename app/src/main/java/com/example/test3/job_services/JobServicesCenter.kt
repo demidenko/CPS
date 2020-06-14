@@ -51,7 +51,7 @@ class JobServicesCenter {
             )
             getRunningJobServices(context).forEach{ calls.remove(it.id) }
             calls.forEach { it.value(context) }
-            Toast.makeText(context, "${calls.size} jobs scheduled", Toast.LENGTH_SHORT).show()
+            if(calls.isNotEmpty()) Toast.makeText(context, "${calls.size} jobs scheduled", Toast.LENGTH_SHORT).show()
         }
 
         private fun startCodeforcesNewsLostRecentJobService(context: Context){

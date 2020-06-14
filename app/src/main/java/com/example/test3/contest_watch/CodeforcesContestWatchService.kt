@@ -37,7 +37,7 @@ class CodeforcesContestWatchService: Service() {
                 println("service onStartCommand $handle $contestID")
                 stop()
                 start(handle, contestID, NotificationCompat.Builder(this, NotificationChannels.codeforces_contest_watcher).apply {
-                    setSmallIcon(R.drawable.ic_news)
+                    setSmallIcon(R.drawable.ic_contest)
                     setSubText(handle)
                     setShowWhen(false)
                     setNotificationSilent()
