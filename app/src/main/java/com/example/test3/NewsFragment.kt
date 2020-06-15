@@ -40,7 +40,7 @@ class NewsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_news, container, false)
     }
 
-    private lateinit var codeforcesNewsAdapter: CodeforcesNewsAdapter
+    private val codeforcesNewsAdapter: CodeforcesNewsAdapter by lazy { CodeforcesNewsAdapter(this) }
     private lateinit var tabLayout: TabLayout
     private lateinit var buttonReload: Button
 
@@ -57,8 +57,6 @@ class NewsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val activity = requireActivity() as MainActivity
-
-        codeforcesNewsAdapter = CodeforcesNewsAdapter(this)
 
         val codeforcesNewsViewPager: ViewPager2 = view.findViewById(R.id.cf_news_pager)
         codeforcesNewsViewPager.adapter = codeforcesNewsAdapter
@@ -210,13 +208,8 @@ open class CodeforcesNewsMainFragment(title: String, address: String) : Codeforc
         const val CODEFORCES_NEWS_VIEWED = "codeforces_news_viewed"
     }
 
-    private lateinit var prefs: SharedPreferences
+    private val prefs: SharedPreferences by lazy { requireActivity().getSharedPreferences(CODEFORCES_NEWS_VIEWED, Context.MODE_PRIVATE) }
     private val prefs_key: String = this::class.java.simpleName
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        prefs = requireActivity().getSharedPreferences(CODEFORCES_NEWS_VIEWED, Context.MODE_PRIVATE)
-    }
 
     var newBlogs: Int = 0
 

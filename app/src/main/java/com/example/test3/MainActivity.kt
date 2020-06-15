@@ -29,12 +29,12 @@ class MainActivity : AppCompatActivity(){
 
     val scope = CoroutineScope(Job() + Dispatchers.Main)
 
-    var defaultTextColor: Int = 0
+    val defaultTextColor by lazy { ContextCompat.getColor(this, R.color.textColor) }
 
 
     lateinit var accountsFragment: AccountsFragment
-    lateinit var  newsFragment: NewsFragment
-    lateinit var  testFragment: TestFragment
+    lateinit var newsFragment: NewsFragment
+    lateinit var testFragment: TestFragment
     lateinit var activeFragment: Fragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,8 +46,6 @@ class MainActivity : AppCompatActivity(){
         JobServicesCenter.startJobServices(this)
 
         setContentView(R.layout.activity_main)
-
-        defaultTextColor = ContextCompat.getColor(this, R.color.textColor)
 
         supportActionBar?.title = "Competitive Programming & Solving" //"Compete, Program, Solve"
 

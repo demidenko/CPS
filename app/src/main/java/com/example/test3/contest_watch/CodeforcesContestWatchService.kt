@@ -17,14 +17,12 @@ class CodeforcesContestWatchService: Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
-    private lateinit var notificationManager: NotificationManager
+    private val notificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
 
 
     override fun onCreate() {
         super.onCreate()
         println("service onCreate")
-
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

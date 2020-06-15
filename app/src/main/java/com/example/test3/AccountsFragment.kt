@@ -25,12 +25,20 @@ class AccountsFragment: Fragment() {
     lateinit var acmpAccountManager: ACMPAccountManager
     lateinit var timusAccountManager: TimusAccountManager
 
-    lateinit var panels: List<AccountPanel>
     lateinit var codeforcesPanel: AccountPanel
     lateinit var atcoderPanel: AccountPanel
     lateinit var topcoderPanel: AccountPanel
     lateinit var acmpPanel: AccountPanel
     lateinit var timusPanel: AccountPanel
+    val panels: List<AccountPanel> by lazy {
+        listOf(
+            codeforcesPanel,
+            atcoderPanel,
+            topcoderPanel,
+            acmpPanel,
+            timusPanel
+        )
+    }
 
 
 
@@ -130,16 +138,8 @@ class AccountsFragment: Fragment() {
             }
         }
 
-        panels = listOf(
-            codeforcesPanel,
-            atcoderPanel,
-            topcoderPanel,
-            acmpPanel,
-            timusPanel
-        )
 
         if(panels.map { it.manager.PREFERENCES_FILE_NAME }.distinct().size != panels.size) throw Exception("not different file names in panels managers")
-
 
         codeforcesPanel.buildAndAdd(30F, 25F, view)
         atcoderPanel.buildAndAdd(30F, 25F, view)
