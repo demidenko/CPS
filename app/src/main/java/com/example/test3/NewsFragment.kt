@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
@@ -42,6 +41,7 @@ class NewsFragment : Fragment() {
 
     private val codeforcesNewsAdapter: CodeforcesNewsAdapter by lazy { CodeforcesNewsAdapter(this) }
     private lateinit var tabLayout: TabLayout
+    private lateinit var codeforcesNewsViewPager: ViewPager2
     private lateinit var buttonReload: Button
 
     fun refresh(){
@@ -58,9 +58,10 @@ class NewsFragment : Fragment() {
 
         val activity = requireActivity() as MainActivity
 
-        val codeforcesNewsViewPager: ViewPager2 = view.findViewById(R.id.cf_news_pager)
-        codeforcesNewsViewPager.adapter = codeforcesNewsAdapter
-        codeforcesNewsViewPager.offscreenPageLimit = codeforcesNewsAdapter.fragments.size - 1
+        codeforcesNewsViewPager = view.findViewById<ViewPager2>(R.id.cf_news_pager).apply {
+            adapter = codeforcesNewsAdapter
+            offscreenPageLimit = codeforcesNewsAdapter.fragments.size - 1
+        }
 
 
         tabLayout = view.findViewById(R.id.cf_news_tab_layout)
@@ -74,6 +75,10 @@ class NewsFragment : Fragment() {
                     isVisible = false
                 }
             }
+            /*tab.view.setOnLongClickListener {
+                Snackbar.make(view, title, Snackbar.LENGTH_SHORT).show()
+                true
+            }*/
         }.attach()
 
 
@@ -137,12 +142,13 @@ class NewsFragment : Fragment() {
         super.onResume()
         if(firstRun){
             firstRun = false
-            buttonReload.callOnClick()
-            Handler().postDelayed({
-                codeforcesNewsAdapter.fragments.forEachIndexed { index, codeforcesNewsFragment ->
-                    if(codeforcesNewsFragment.title == "CF TOP") tabLayout.selectTab(tabLayout.getTabAt(index))
+            codeforcesNewsAdapter.fragments.forEachIndexed { index, codeforcesNewsFragment ->
+                if(codeforcesNewsFragment.title == "CF TOP"){
+                    tabLayout.selectTab(tabLayout.getTabAt(index))
+                    codeforcesNewsViewPager.setCurrentItem(index, false)
                 }
-            },100)
+            }
+            buttonReload.callOnClick()
         }
     }
 
