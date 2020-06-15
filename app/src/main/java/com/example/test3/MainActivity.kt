@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity(){
         println(savedInstanceState)
         super.onCreate(savedInstanceState)
 
-        createNotificationChannels(this)
+        NotificationChannels.createNotificationChannels(this)
         JobServicesCenter.startJobServices(this)
 
         setContentView(R.layout.activity_main)

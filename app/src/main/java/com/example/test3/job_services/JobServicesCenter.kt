@@ -14,65 +14,61 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
-class JobServiceIDs {
-    companion object{
-        private var id = 0
-        val codeforces_lost_recent_news = ++id
-        val project_euler_recent_problems = ++id
-    }
+object JobServiceIDs {
+    private var id = 0
+    val codeforces_lost_recent_news = ++id
+    val project_euler_recent_problems = ++id
 }
 
-class JobServicesCenter {
-    companion object {
-        private fun makeSchedule(
-            context: Context,
-            id: Int,
-            c: Class<*>?,
-            millis: Long,
-            network_type: Int
-        ) {
-            val builder = JobInfo.Builder(id, ComponentName(context, c!!)).apply {
-                setPeriodic(millis)
-                setRequiredNetworkType(network_type)
-            }
-            val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-            jobScheduler.schedule(builder.build())
+object JobServicesCenter {
+    private fun makeSchedule(
+        context: Context,
+        id: Int,
+        c: Class<*>?,
+        millis: Long,
+        network_type: Int
+    ) {
+        val builder = JobInfo.Builder(id, ComponentName(context, c!!)).apply {
+            setPeriodic(millis)
+            setRequiredNetworkType(network_type)
         }
+        val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        jobScheduler.schedule(builder.build())
+    }
 
-        fun getRunningJobServices(context: Context): List<JobInfo> {
-            val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-            return scheduler.allPendingJobs
-        }
+    fun getRunningJobServices(context: Context): List<JobInfo> {
+        val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        return scheduler.allPendingJobs
+    }
 
-        fun startJobServices(context: Context){
-            val calls = mutableMapOf<Int, (Context)->Unit >(
-                JobServiceIDs.codeforces_lost_recent_news to ::startCodeforcesNewsLostRecentJobService,
-                JobServiceIDs.project_euler_recent_problems to ::startProjectEulerRecentProblemsJobService
-            )
-            getRunningJobServices(context).forEach{ calls.remove(it.id) }
-            calls.forEach { it.value(context) }
-            if(calls.isNotEmpty()) Toast.makeText(context, "${calls.size} jobs scheduled", Toast.LENGTH_SHORT).show()
-        }
+    fun startJobServices(context: Context){
+        val calls = mutableMapOf<Int, (Context)->Unit >(
+            JobServiceIDs.codeforces_lost_recent_news to ::startCodeforcesNewsLostRecentJobService,
+            JobServiceIDs.project_euler_recent_problems to ::startProjectEulerRecentProblemsJobService
+        )
+        getRunningJobServices(context).forEach{ calls.remove(it.id) }
+        calls.forEach { it.value(context) }
+        if(calls.isNotEmpty()) Toast.makeText(context, "${calls.size} jobs scheduled", Toast.LENGTH_SHORT).show()
+    }
 
-        private fun startCodeforcesNewsLostRecentJobService(context: Context){
-            makeSchedule(
-                context,
-                JobServiceIDs.codeforces_lost_recent_news,
-                CodeforcesNewsLostRecentJobService::class.java,
-                TimeUnit.HOURS.toMillis(1),
-                JobInfo.NETWORK_TYPE_ANY
-            )
-        }
+    private fun startCodeforcesNewsLostRecentJobService(context: Context){
+        makeSchedule(
+            context,
+            JobServiceIDs.codeforces_lost_recent_news,
+            CodeforcesNewsLostRecentJobService::class.java,
+            TimeUnit.HOURS.toMillis(1),
+            JobInfo.NETWORK_TYPE_ANY
+        )
+    }
 
-        private fun startProjectEulerRecentProblemsJobService(context: Context){
-            makeSchedule(
-                context,
-                JobServiceIDs.project_euler_recent_problems,
-                ProjectEulerRecentProblemsJobService::class.java,
-                TimeUnit.HOURS.toMillis(1),
-                JobInfo.NETWORK_TYPE_ANY
-            )
-        }
+    private fun startProjectEulerRecentProblemsJobService(context: Context){
+        makeSchedule(
+            context,
+            JobServiceIDs.project_euler_recent_problems,
+            ProjectEulerRecentProblemsJobService::class.java,
+            TimeUnit.HOURS.toMillis(1),
+            JobInfo.NETWORK_TYPE_ANY
+        )
     }
 }
 
