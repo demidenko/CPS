@@ -26,6 +26,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -69,6 +70,9 @@ class NewsFragment : Fragment() {
             val fragment = codeforcesNewsAdapter.fragments[position]
             val title = fragment.title
             tab.text = title
+            //tab.setIcon(R.drawable.ic_cf_logo)
+            //tab.setCustomView(R.layout.cf_news_tab_layout)
+            //tab.customView!!.findViewById<TextView>(R.id.cf_news_tab_title).text = title
             if(fragment is CodeforcesNewsMainFragment){
                 tab.orCreateBadge.apply {
                     backgroundColor = resources.getColor(android.R.color.holo_green_light, null)
@@ -85,7 +89,18 @@ class NewsFragment : Fragment() {
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
             override fun onTabReselected(tab: TabLayout.Tab?) {}
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                tab?.run{
+                    val fragment = codeforcesNewsAdapter.fragments[position]
+                    if(fragment is CodeforcesNewsMainFragment) badge?.run{
+                        if(hasNumber()){
+                            isVisible = false
+                            clearNumber()
+                        }
+                    }
+                }
+            }
 
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 tab?.run{
@@ -93,8 +108,6 @@ class NewsFragment : Fragment() {
                     if(fragment is CodeforcesNewsMainFragment) badge?.run{
                         if(hasNumber()){
                             fragment.save()
-                            isVisible = false
-                            clearNumber()
                         }
                     }
                 }
@@ -116,14 +129,12 @@ class NewsFragment : Fragment() {
                                 tab.text = "..."
                                 fragment.reload(rx)
                                 tab.text = fragment.title
-                                if (fragment is CodeforcesNewsMainFragment && fragment.newBlogs > 0) {
-                                    if (tab.isSelected) fragment.save()
-                                    else {
-                                        tab.badge?.apply {
-                                            number = fragment.newBlogs
-                                            isVisible = true
-                                        }
+                                if (fragment is CodeforcesNewsMainFragment && fragment.newBlogs.isNotEmpty()) {
+                                    tab.badge?.apply {
+                                        number = fragment.newBlogs.size
+                                        isVisible = true
                                     }
+                                    if (tab.isSelected) fragment.save()
                                 }
                             }
                         }
@@ -137,20 +148,14 @@ class NewsFragment : Fragment() {
     }
 
 
-    private var firstRun = true
-    override fun onResume() {
-        super.onResume()
-        if(firstRun){
-            firstRun = false
-            codeforcesNewsAdapter.fragments.forEachIndexed { index, codeforcesNewsFragment ->
-                if(codeforcesNewsFragment.title == "CF TOP"){
-                    tabLayout.selectTab(tabLayout.getTabAt(index))
-                    codeforcesNewsViewPager.setCurrentItem(index, false)
-                }
-            }
-            buttonReload.callOnClick()
-        }
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        val defaultTabIndex = 1
+        tabLayout.selectTab(tabLayout.getTabAt(defaultTabIndex))
+        codeforcesNewsViewPager.setCurrentItem(defaultTabIndex, false)
+        buttonReload.callOnClick()
     }
+
 
 }
 
@@ -217,19 +222,22 @@ open class CodeforcesNewsMainFragment(title: String, address: String) : Codeforc
     private val prefs: SharedPreferences by lazy { requireActivity().getSharedPreferences(CODEFORCES_NEWS_VIEWED, Context.MODE_PRIVATE) }
     private val prefs_key: String = this::class.java.simpleName
 
-    var newBlogs: Int = 0
+    var newBlogs = hashSetOf<String>()
 
     override suspend fun reload(data: Map<String, Deferred<String?>>) {
         super.reload(data)
 
         val savedBlogs = prefs.getStringSet(prefs_key, null) ?: emptySet()
-        newBlogs = viewAdapter.getBlogIDs().count { !savedBlogs.contains(it) }
+        newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.toHashSet()
     }
 
-    fun save() = with(prefs.edit()){
-        val toSave = viewAdapter.getBlogIDs().toSet()
-        putStringSet(prefs_key, toSave)
-        commit()
+    fun save() {
+        with(prefs.edit()) {
+            val toSave = viewAdapter.getBlogIDs().toSet()
+            putStringSet(prefs_key, toSave)
+            apply()
+        }
+        (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.showNew(newBlogs)
     }
 }
 
@@ -279,7 +287,8 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
         val authorColorTag: String,
         val time: String,
         val comments: String,
-        val rating: String
+        val rating: String,
+        var isNew: Boolean = false
     )
 
     override fun parseData(s: String) {
@@ -330,6 +339,7 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
         val rating: TextView = view.findViewById(R.id.news_item_rating)
         val comments: TextView = view.findViewById(R.id.news_item_comments)
         val commentsIcon: ImageView = view.findViewById(R.id.news_item_comment_icon)
+        val newDot: View = view.findViewById(R.id.new_item_dot_new)
     }
 
     protected var rows: Array<Info> = emptyArray()
@@ -343,31 +353,44 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        holder as CodeforcesNewsItemViewHolder
-        val info = rows[position]
+        with(holder as CodeforcesNewsItemViewHolder){
+            val info = rows[position]
 
-        holder.view.setOnClickListener {
-            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${info.blogID}")))
-        }
+            view.setOnClickListener {
+                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${info.blogID}")))
+            }
 
-        holder.title.text = info.title
+            title.text = info.title
 
-        holder.author.text = activity.accountsFragment.codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
+            author.text = activity.accountsFragment.codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
 
-        holder.time.text = timeRUtoEN(info.time)
+            time.text = timeRUtoEN(info.time)
 
-        holder.comments.text = info.comments
-        holder.commentsIcon.visibility = if(info.comments.isEmpty()) View.INVISIBLE else View.VISIBLE
+            newDot.visibility = if(info.isNew) View.VISIBLE else View.GONE
 
-        holder.rating.apply{
-            text = info.rating
-            setTextColor(activity.resources.getColor(
-                if(info.rating.startsWith('+')) R.color.blog_rating_positive else R.color.blog_rating_negative, null)
-            )
+            comments.text = info.comments
+            commentsIcon.visibility = if(info.comments.isEmpty()) View.INVISIBLE else View.VISIBLE
+
+            rating.apply{
+                text = info.rating
+                setTextColor(activity.resources.getColor(
+                    if(info.rating.startsWith('+')) R.color.blog_rating_positive else R.color.blog_rating_negative, null)
+                )
+            }
         }
     }
 
     override fun getBlogIDs(): List<String> = rows.map { it.blogID }
+
+    fun showNew(newBlogs: HashSet<String>){
+        rows.forEachIndexed { index, info ->
+            val isNew = info.blogID in newBlogs
+            if(rows[index].isNew != isNew){
+                rows[index].isNew = isNew
+                notifyItemChanged(index)
+            }
+        }
+    }
 }
 
 
@@ -466,27 +489,28 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        holder as CodeforcesNewsItemViewHolder
-        val info = rows[position]
+        with(holder as CodeforcesNewsItemViewHolder){
+            val info = rows[position]
 
-        holder.view.setOnClickListener {
-            var suf = info.blogID
-            if(info.lastCommentId.isNotBlank()) suf+="#comment-${info.lastCommentId}"
-            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/$suf")))
-        }
+            view.setOnClickListener {
+                var suf = info.blogID
+                if(info.lastCommentId.isNotBlank()) suf+="#comment-${info.lastCommentId}"
+                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/$suf")))
+            }
 
-        holder.title.text =  info.title
+            title.text =  info.title
 
-        val codeforcesAccountManager = activity.accountsFragment.codeforcesAccountManager
+            val codeforcesAccountManager = activity.accountsFragment.codeforcesAccountManager
 
-        holder.author.text = codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
+            author.text = codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
 
-        holder.comments.text = SpannableStringBuilder().apply {
-            var flag = false
-            info.comments.forEach {(handle, colorTag) ->
-                if(flag) append(", ")
-                append(codeforcesAccountManager.makeSpan(handle,colorTag))
-                flag = true
+            comments.text = SpannableStringBuilder().apply {
+                var flag = false
+                info.comments.forEach {(handle, colorTag) ->
+                    if(flag) append(", ")
+                    append(codeforcesAccountManager.makeSpan(handle,colorTag))
+                    flag = true
+                }
             }
         }
     }
