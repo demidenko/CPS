@@ -20,6 +20,9 @@ object NotificationChannels {
     const val project_euler_news = "pe_news"
     const val project_euler_problems = "pe_problems"
 
+    //acmp
+    const val acmp_news = "acmp_news"
+
     fun createNotificationChannels(context: Context){
         val m = (context.getSystemService(AppCompatActivity.NOTIFICATION_SERVICE) as NotificationManager)
 
@@ -89,6 +92,22 @@ object NotificationChannels {
         ).apply {
             group = group_id_project_euler
         })
+
+        //acmp channels
+        val group_id_acmp = "acmp"
+        m.createNotificationChannelGroup(
+            NotificationChannelGroup(
+                group_id_acmp,
+                "ACMP"
+            )
+        )
+        m.createNotificationChannel(NotificationChannel(
+            acmp_news,
+            "News",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            group = group_id_acmp
+        })
     }
 }
 
@@ -99,7 +118,15 @@ object NotificationIDs {
     val codeforces_contest_watcher = ++id
 
     //project euler
-    fun makeProjectEulerRecentProblemNotificationID(id: Int): Int = 1_000_000 + id
+    fun makeProjectEulerRecentProblemNotificationID(problemID: Int): Int = 1_000_000 + problemID
+    fun makeProjectEulerNewsNotificationID(title: String): Int {
+        var res = title.hashCode() % 1_000_000
+        if(res<0) res += 1_000_000
+        return 1_000_000 + res
+    }
+
+    //acmp
+    fun makeACMPNewsNotificationID(newsID: Int): Int = 2_000_000 + newsID
 
     //test
     val test = ++id

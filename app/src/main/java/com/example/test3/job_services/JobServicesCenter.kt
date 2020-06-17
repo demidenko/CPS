@@ -16,6 +16,7 @@ import kotlin.coroutines.CoroutineContext
 
 object JobServiceIDs {
     private var id = 0
+    val news_parsers = ++id
     val codeforces_lost_recent_news = ++id
     val project_euler_recent_problems = ++id
 }
@@ -43,12 +44,23 @@ object JobServicesCenter {
 
     fun startJobServices(context: Context){
         val calls = mutableMapOf<Int, (Context)->Unit >(
+            JobServiceIDs.news_parsers to ::startNewsJobService,
             JobServiceIDs.codeforces_lost_recent_news to ::startCodeforcesNewsLostRecentJobService,
             JobServiceIDs.project_euler_recent_problems to ::startProjectEulerRecentProblemsJobService
         )
         getRunningJobServices(context).forEach{ calls.remove(it.id) }
         calls.forEach { it.value(context) }
         if(calls.isNotEmpty()) Toast.makeText(context, "${calls.size} jobs scheduled", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun startNewsJobService(context: Context){
+        makeSchedule(
+            context,
+            JobServiceIDs.news_parsers,
+            NewsJobService::class.java,
+            TimeUnit.HOURS.toMillis(16),
+            JobInfo.NETWORK_TYPE_ANY
+        )
     }
 
     private fun startCodeforcesNewsLostRecentJobService(context: Context){
@@ -70,6 +82,8 @@ object JobServicesCenter {
             JobInfo.NETWORK_TYPE_ANY
         )
     }
+
+
 }
 
 abstract class CoroutineJobService : JobService(), CoroutineScope{
