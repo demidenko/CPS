@@ -16,18 +16,65 @@
         android:layout_alignParentTop="true"
         />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
+
+    <LinearLayout
         android:id="@+id/navigation"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        >
 
-        android:background="@android:color/black"
-        app:itemIconTint="@color/bottom_view_color"
-        app:itemTextColor="@color/bottom_view_color"
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            >
 
-        app:menu="@menu/navigation_bar"
-        />
+            <com.google.android.material.bottomappbar.BottomAppBar
+                android:id="@+id/navigation_additional"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@android:color/black"
+
+                app:menu="@menu/navigation_accounts"
+
+
+
+                >
+
+            </com.google.android.material.bottomappbar.BottomAppBar>
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/darker_gray"
+            />
+
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/navigation_main"
+
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+
+            android:background="@android:color/black"
+            app:itemIconTint="@color/bottom_view_color"
+            app:labelVisibilityMode="unlabeled"
+
+            app:menu="@menu/navigation_bar"
+            />
+
+    </LinearLayout>
+
+
+
+
 
 
 

@@ -37,6 +37,8 @@ class MainActivity : AppCompatActivity(){
     lateinit var testFragment: TestFragment
     lateinit var activeFragment: Fragment
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         println("main create")
         println(savedInstanceState)
@@ -60,21 +62,40 @@ class MainActivity : AppCompatActivity(){
             if(fragment.isVisible) activeFragment = fragment
         }
 
+        fun navigationSelectUpdateUI(fragment: Fragment){
+
+            supportActionBar?.subtitle = when(fragment){
+                accountsFragment -> "accounts"
+                newsFragment -> "news"
+                testFragment -> "develop"
+                else -> ""
+            }
+
+            navigation_additional.replaceMenu(
+                when(fragment){
+                    accountsFragment -> R.menu.navigation_accounts
+                    newsFragment -> R.menu.navigation_news
+                    else -> R.menu.navigation_empty
+                }
+            )
+        }
+
         if(!this::accountsFragment.isInitialized) accountsFragment = AccountsFragment()
         if(!this::newsFragment.isInitialized) newsFragment = NewsFragment()
         if(!this::testFragment.isInitialized) testFragment = TestFragment()
 
         if(!this::activeFragment.isInitialized) activeFragment = accountsFragment
         if(!activeFragment.isAdded) supportFragmentManager.beginTransaction().add(R.id.container_fragment, activeFragment).commit()
+        navigationSelectUpdateUI(activeFragment)
 
-
-        navigation.setOnNavigationItemSelectedListener { item ->
+        navigation_main.setOnNavigationItemSelectedListener { item ->
             val id = item.itemId
+
             val selectedFragment =
                 when(id){
                     R.id.navigation_accounts -> accountsFragment
                     R.id.navigation_news -> newsFragment
-                    R.id.navigation_test -> testFragment
+                    R.id.navigation_develop -> testFragment
                     else -> throw Exception("unknown selected navigation bar item: $id")
                 }
 
@@ -85,6 +106,7 @@ class MainActivity : AppCompatActivity(){
                     else add(R.id.container_fragment, selectedFragment)
                 }.commit()
                 activeFragment = selectedFragment
+                navigationSelectUpdateUI(selectedFragment)
             }
 
             true
@@ -106,29 +128,7 @@ class MainActivity : AppCompatActivity(){
         when(item.itemId){
             R.id.color_switcher -> {
                 if(testFragment.isVisible){
-                    val s = SpannableStringBuilder("colors example\n")
-                    val backup = useRealColors
-                    for(color in HandleColor.values()){
-                        s.bold {
-                            useRealColors = false
-                            color(color.getARGB(accountsFragment.codeforcesAccountManager)) { append(color.name+" ") }
-                            useRealColors = true
-                            arrayOf(
-                                accountsFragment.codeforcesAccountManager,
-                                accountsFragment.atcoderAccountManager,
-                                accountsFragment.topcoderAccountManager
-                            ).forEach {
-                                try {
-                                    color(color.getARGB(it as ColoredHandles)) { append(color.name + " ") }
-                                }catch (e: HandleColor.UnknownHandleColorException){
-                                    color(defaultTextColor){ append("--- ") }
-                                }
-                            }
-                            append("\n")
-                        }
-                    }
-                    findViewById<TextView>(R.id.stuff_textview).text = s
-                    useRealColors = backup
+                    showColorsTable()
                     return true
                 }
 
@@ -140,8 +140,6 @@ class MainActivity : AppCompatActivity(){
                     putBoolean(use_real_colors, useRealColors)
                     apply()
                 }
-
-                return true
             }
             R.id.app_info -> {
                 AlertDialog.Builder(this)
@@ -152,6 +150,32 @@ class MainActivity : AppCompatActivity(){
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun showColorsTable(){
+        val s = SpannableStringBuilder("colors example\n")
+        val backup = useRealColors
+        for(color in HandleColor.values()){
+            s.bold {
+                useRealColors = false
+                color(color.getARGB(accountsFragment.codeforcesAccountManager)) { append(color.name+" ") }
+                useRealColors = true
+                arrayOf<ColoredHandles>(
+                    accountsFragment.codeforcesAccountManager,
+                    accountsFragment.atcoderAccountManager,
+                    accountsFragment.topcoderAccountManager
+                ).forEach {
+                    try {
+                        color(color.getARGB(it)) { append(color.name + " ") }
+                    }catch (e: HandleColor.UnknownHandleColorException){
+                        color(defaultTextColor){ append("--- ") }
+                    }
+                }
+                append("\n")
+            }
+        }
+        findViewById<TextView>(R.id.stuff_textview).text = s
+        useRealColors = backup
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

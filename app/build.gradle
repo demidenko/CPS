@@ -20,8 +20,8 @@ android {
         applicationId "com.example.test3"
         minSdkVersion 29
         targetSdkVersion 29
-        versionCode = 25
-        versionName '0.10.0'
+        versionCode = 26
+        versionName '0.11.alpha'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -47,4 +47,5 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:1.9.2"
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.9.2'
     implementation "androidx.recyclerview:recyclerview:1.1.0"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 }

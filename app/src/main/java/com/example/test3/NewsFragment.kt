@@ -129,12 +129,19 @@ class NewsFragment : Fragment() {
                                 tab.text = "..."
                                 fragment.reload(rx)
                                 tab.text = fragment.title
-                                if (fragment is CodeforcesNewsMainFragment && fragment.newBlogs.isNotEmpty()) {
-                                    tab.badge?.apply {
-                                        number = fragment.newBlogs.size
-                                        isVisible = true
+                                if (fragment is CodeforcesNewsMainFragment) {
+                                    if (fragment.newBlogs.isEmpty()) {
+                                        tab.badge?.apply{
+                                            isVisible = false
+                                            clearNumber()
+                                        }
+                                    } else {
+                                        tab.badge?.apply {
+                                            number = fragment.newBlogs.size
+                                            isVisible = true
+                                        }
+                                        if (tab.isSelected) fragment.save()
                                     }
-                                    if (tab.isSelected) fragment.save()
                                 }
                             }
                         }
