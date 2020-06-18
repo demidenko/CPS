@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
@@ -132,7 +133,13 @@ object NotificationIDs {
     val test = ++id
 }
 
+object NotificationColors {
+    //project euler
+    val project_euler_main = Color.parseColor("#6B4E3D")
 
+    //acmp
+    val acmp_main = Color.parseColor("#006600")
+}
 
 fun makeSimpleNotification(context: Context, id: Int, title: String, content: String, silent: Boolean = true){
     val n = NotificationCompat.Builder(context, "test").apply {

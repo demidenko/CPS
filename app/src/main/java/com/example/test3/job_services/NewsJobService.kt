@@ -1,7 +1,6 @@
 package com.example.test3.job_services
 
 import android.content.Context
-import android.graphics.Color
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.test3.*
@@ -49,7 +48,6 @@ class NewsJobService : CoroutineJobService() {
 
         if(lastNewsID != 0){
             val group = "acmp_news_group"
-            val color = Color.argb(0xFF, 0, 0x66, 0)
 
             news.forEach { (id, title) ->
                 val n = NotificationCompat.Builder(this, NotificationChannels.acmp_news).apply {
@@ -57,7 +55,7 @@ class NewsJobService : CoroutineJobService() {
                     setContentText(title)
                     setStyle(NotificationCompat.BigTextStyle())
                     setSmallIcon(R.drawable.ic_news)
-                    setColor(color)
+                    setColor(NotificationColors.acmp_main)
                     setShowWhen(true)
                     setAutoCancel(true)
                     setGroup(group)
@@ -69,7 +67,7 @@ class NewsJobService : CoroutineJobService() {
             val n = NotificationCompat.Builder(this, NotificationChannels.acmp_news).apply {
                 setStyle(NotificationCompat.InboxStyle().setSummaryText("acmp news"))
                 setSmallIcon(R.drawable.ic_news)
-                setColor(color)
+                setColor(NotificationColors.acmp_main)
                 setAutoCancel(true)
                 setGroup(group)
                 setGroupSummary(true)
@@ -117,7 +115,7 @@ class NewsJobService : CoroutineJobService() {
                     setContentText(fromHTML(content))
                     setStyle(NotificationCompat.BigTextStyle())
                     setSmallIcon(R.drawable.ic_news)
-                    setColor(Color.parseColor("#6b4e3d"))
+                    setColor(NotificationColors.project_euler_main)
                     setShowWhen(true)
                     setAutoCancel(true)
                     setContentIntent(makePendingIntentOpenURL("https://projecteuler.net/news", this@NewsJobService))
