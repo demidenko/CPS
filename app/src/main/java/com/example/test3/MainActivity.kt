@@ -8,6 +8,9 @@ import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -71,13 +74,23 @@ class MainActivity : AppCompatActivity(){
                 else -> ""
             }
 
-            navigation_additional.replaceMenu(
-                when(fragment){
-                    accountsFragment -> R.menu.navigation_accounts
-                    newsFragment -> R.menu.navigation_news
-                    else -> R.menu.navigation_empty
+            when(fragment){
+                accountsFragment -> {
+                    navigation_news.visibility = View.GONE
+                    navigation_dev.visibility = View.GONE
+                    navigation_accounts.visibility = View.VISIBLE
                 }
-            )
+                newsFragment -> {
+                    navigation_accounts.visibility = View.GONE
+                    navigation_dev.visibility = View.GONE
+                    navigation_news.visibility = View.VISIBLE
+                }
+                testFragment -> {
+                    navigation_accounts.visibility = View.GONE
+                    navigation_news.visibility = View.GONE
+                    navigation_dev.visibility = View.VISIBLE
+                }
+            }
         }
 
         if(!this::accountsFragment.isInitialized) accountsFragment = AccountsFragment()
@@ -117,6 +130,21 @@ class MainActivity : AppCompatActivity(){
             useRealColors = getBoolean(use_real_colors, false)
         }
 
+        navigation_accounts.setOnMenuItemClickListener {
+            when(it.itemId){
+                R.id.navigation_accounts_reload -> accountsFragment.reloadAccounts()
+                R.id.navigation_accounts_add -> accountsFragment.addAccount()
+            }
+            true
+        }
+
+        navigation_news.setOnMenuItemClickListener {
+            when(it.itemId){
+                R.id.navigation_news_reload -> newsFragment.reloadTabs()
+            }
+            true
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -134,7 +162,7 @@ class MainActivity : AppCompatActivity(){
 
                 useRealColors = !useRealColors
                 accountsFragment.panels.forEach { it.show() }
-                newsFragment.refresh()
+                if(newsFragment.isAdded) newsFragment.refresh()
 
                 with(getPreferences(Context.MODE_PRIVATE).edit()){
                     putBoolean(use_real_colors, useRealColors)
@@ -153,28 +181,56 @@ class MainActivity : AppCompatActivity(){
     }
 
     fun showColorsTable(){
-        val s = SpannableStringBuilder("colors example\n")
+
+        val table = findViewById<LinearLayout>(R.id.table_handle_colors)
+        table.removeAllViews()
+
+        fun addRow(row: ArrayList<CharSequence>) {
+            val l = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+            row.forEach { s->
+                l.addView(
+                    TextView(this).apply{ text = s },
+                    LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT).apply { weight = 1f }
+                )
+            }
+            table.addView(l)
+        }
+
+        addRow(arrayListOf(
+            "app",
+            "Codeforces",
+            "AtCoder",
+            "Topcoder"
+        ))
+
         val backup = useRealColors
         for(color in HandleColor.values()){
-            s.bold {
-                useRealColors = false
-                color(color.getARGB(accountsFragment.codeforcesAccountManager)) { append(color.name+" ") }
-                useRealColors = true
-                arrayOf<ColoredHandles>(
-                    accountsFragment.codeforcesAccountManager,
-                    accountsFragment.atcoderAccountManager,
-                    accountsFragment.topcoderAccountManager
-                ).forEach {
+            val row = arrayListOf<CharSequence>()
+
+            useRealColors = false
+            row.add(
+                SpannableStringBuilder().bold {
+                    color(color.getARGB(accountsFragment.codeforcesAccountManager)) { append(color.name) }
+                }
+            )
+            useRealColors = true
+            arrayOf<ColoredHandles>(
+                accountsFragment.codeforcesAccountManager,
+                accountsFragment.atcoderAccountManager,
+                accountsFragment.topcoderAccountManager
+            ).forEach {
+                val s = SpannableStringBuilder().bold {
                     try {
-                        color(color.getARGB(it)) { append(color.name + " ") }
-                    }catch (e: HandleColor.UnknownHandleColorException){
-                        color(defaultTextColor){ append("--- ") }
+                        color(color.getARGB(it)) { append(color.name) }
+                    } catch (e: HandleColor.UnknownHandleColorException) {
+                        append("")
                     }
                 }
-                append("\n")
+                row.add(s)
             }
+            addRow(row)
         }
-        findViewById<TextView>(R.id.stuff_textview).text = s
+
         useRealColors = backup
     }
 

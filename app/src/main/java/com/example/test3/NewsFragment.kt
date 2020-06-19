@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
+import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.Deferred
@@ -116,42 +117,39 @@ class NewsFragment : Fragment() {
         })
 
 
-        buttonReload = view.findViewById<Button>(R.id.button_reload_cf_news).apply {
-            setOnClickListener { button -> button as Button
-                button.text = "..."
-                button.isEnabled = false
-                activity.scope.launch {
-                    val rx = codeforcesNewsAdapter.fragments.map { it.address }.toSet().map { it to async { if(it.isNotEmpty()) readURLData(it) else "" } }.toMap()
-                    codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
-                        val tab = tabLayout.getTabAt(index)!!
-                        launch {
-                            if(tab.isSelected || System.currentTimeMillis()-fragment.lastReloadTime>1000*60) {
-                                tab.text = "..."
-                                fragment.reload(rx)
-                                tab.text = fragment.title
-                                if (fragment is CodeforcesNewsMainFragment) {
-                                    if (fragment.newBlogs.isEmpty()) {
-                                        tab.badge?.apply{
-                                            isVisible = false
-                                            clearNumber()
-                                        }
-                                    } else {
-                                        tab.badge?.apply {
-                                            number = fragment.newBlogs.size
-                                            isVisible = true
-                                        }
-                                        if (tab.isSelected) fragment.save()
-                                    }
+    }
+
+    fun reloadTabs() {
+        val activity = requireActivity() as MainActivity
+        activity.findViewById<BottomAppBar>(R.id.navigation_news).menu.findItem(R.id.navigation_news_reload).isEnabled = false
+        activity.scope.launch {
+            val rx = codeforcesNewsAdapter.fragments.map { it.address }.toSet().map { it to async { if(it.isNotEmpty()) readURLData(it) else "" } }.toMap()
+            codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
+                val tab = tabLayout.getTabAt(index)!!
+                launch {
+                    if(tab.isSelected || System.currentTimeMillis()-fragment.lastReloadTime>1000*60) {
+                        tab.text = "..."
+                        fragment.reload(rx)
+                        tab.text = fragment.title
+                        if (fragment is CodeforcesNewsMainFragment) {
+                            if (fragment.newBlogs.isEmpty()) {
+                                tab.badge?.apply{
+                                    isVisible = false
+                                    clearNumber()
                                 }
+                            } else {
+                                tab.badge?.apply {
+                                    number = fragment.newBlogs.size
+                                    isVisible = true
+                                }
+                                if (tab.isSelected) fragment.save()
                             }
                         }
-                    }.joinAll()
-                    button.isEnabled = true
-                    button.text = "RELOAD"
+                    }
                 }
-            }
+            }.joinAll()
+            activity.findViewById<BottomAppBar>(R.id.navigation_news).menu.findItem(R.id.navigation_news_reload).isEnabled = true
         }
-
     }
 
 
@@ -160,7 +158,7 @@ class NewsFragment : Fragment() {
         val defaultTabIndex = 1
         tabLayout.selectTab(tabLayout.getTabAt(defaultTabIndex))
         codeforcesNewsViewPager.setCurrentItem(defaultTabIndex, false)
-        buttonReload.callOnClick()
+        reloadTabs()
     }
 
 

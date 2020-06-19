@@ -6,7 +6,6 @@ import android.app.job.JobScheduler
 import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
-import android.widget.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -50,7 +49,6 @@ object JobServicesCenter {
         )
         getRunningJobServices(context).forEach{ calls.remove(it.id) }
         calls.forEach { it.value(context) }
-        if(calls.isNotEmpty()) Toast.makeText(context, "${calls.size} jobs scheduled", Toast.LENGTH_SHORT).show()
     }
 
     private fun startNewsJobService(context: Context){

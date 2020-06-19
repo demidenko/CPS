@@ -12,6 +12,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.*
+import com.google.android.material.bottomappbar.BottomAppBar
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -157,50 +158,45 @@ class AccountsFragment: Fragment() {
         println("fragment accounts onViewCreated "+savedInstanceState)
         super.onViewCreated(view, savedInstanceState)
 
-        val activity = requireActivity() as MainActivity
-
         panels.forEach { it.show() }
 
-        buttonReload = view.findViewById(R.id.buttonReload)
-        buttonReload.setOnClickListener {
-            activity.scope.launch {
-                panels.forEach {
-                    launch { it.reload() }
-                }
+    }
+
+    fun addAccount() {
+        val emptyPanels = panels.filter { it.isEmpty() }
+
+        if(emptyPanels.isEmpty()) Toast.makeText(activity, "Nothing to add", Toast.LENGTH_SHORT).show()
+        else{
+            val adapter = ArrayAdapter<String>(context!!, android.R.layout.select_dialog_item)
+            emptyPanels.forEach {
+                adapter.add(it.manager.PREFERENCES_FILE_NAME)
             }
-        }
 
-        view.findViewById<Button>(R.id.buttonAddAccount).setOnClickListener {
-            val emptyPanels = panels.filter { it.isEmpty() }
-
-            if(emptyPanels.isEmpty()) Toast.makeText(activity, "Nothing to add", Toast.LENGTH_SHORT).show()
-            else{
-                val adapter = ArrayAdapter<String>(activity, android.R.layout.select_dialog_item)
-                emptyPanels.forEach {
-                    adapter.add(it.manager.PREFERENCES_FILE_NAME)
-                }
-
-                AlertDialog.Builder(activity)
-                    .setTitle("Add account")
-                    .setAdapter(adapter) { _, index ->
-                        emptyPanels[index].settingsButton.callOnClick()
-                    }.create().show()
-            }
+            AlertDialog.Builder(activity)
+                .setTitle("Add account")
+                .setAdapter(adapter) { _, index ->
+                    emptyPanels[index].settingsButton.callOnClick()
+                }.create().show()
         }
     }
 
-    override fun onDestroyView() {
-        println("fragment accounts onDestroyView")
-        super.onDestroyView()
+    fun reloadAccounts() {
+        if(toggleSet.isNotEmpty()) throw java.lang.Exception("...")
+        (requireActivity() as MainActivity).scope.launch {
+            panels.forEach {
+                launch { it.reload() }
+            }
+        }
     }
 
     val toggleSet = TreeSet<String>()
     fun toggleReload(s: String){
+        val activity = requireActivity() as MainActivity
         if(toggleSet.contains(s)){
             toggleSet.remove(s)
-            if(toggleSet.isEmpty()) buttonReload.isEnabled = true
+            if(toggleSet.isEmpty()) activity.findViewById<BottomAppBar>(R.id.navigation_accounts).menu.findItem(R.id.navigation_accounts_reload).isEnabled = true
         }else{
-            if(toggleSet.isEmpty()) buttonReload.isEnabled = false
+            if(toggleSet.isEmpty()) activity.findViewById<BottomAppBar>(R.id.navigation_accounts).menu.findItem(R.id.navigation_accounts_reload).isEnabled = false
             toggleSet.add(s)
         }
     }
@@ -208,6 +204,11 @@ class AccountsFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         println("AccountsFragment onResume")
+    }
+
+    override fun onDestroyView() {
+        println("fragment accounts onDestroyView")
+        super.onDestroyView()
     }
 
 }

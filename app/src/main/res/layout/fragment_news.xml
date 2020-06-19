@@ -18,17 +18,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/cf_news_tab_layout"
-        android:layout_above="@id/button_reload_cf_news"
-         />
-
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/button_reload_cf_news"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        android:text="RELOAD"
         />
+
+
 
 </RelativeLayout>

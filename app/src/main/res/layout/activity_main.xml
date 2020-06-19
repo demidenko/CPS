@@ -32,19 +32,35 @@
             >
 
             <com.google.android.material.bottomappbar.BottomAppBar
-                android:id="@+id/navigation_additional"
-
+                android:id="@+id/navigation_accounts"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:backgroundTint="@android:color/black"
 
                 app:menu="@menu/navigation_accounts"
+                />
 
+            <com.google.android.material.bottomappbar.BottomAppBar
+                android:id="@+id/navigation_news"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@android:color/black"
 
+                app:menu="@menu/navigation_news"
 
-                >
+                />
 
-            </com.google.android.material.bottomappbar.BottomAppBar>
+            <com.google.android.material.bottomappbar.BottomAppBar
+                android:id="@+id/navigation_dev"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@android:color/black"
+
+                app:menu="@menu/navigation_empty"
+                />
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -52,7 +68,7 @@
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@android:color/darker_gray"
+            android:background="@drawable/navigation_separator"
             />
 
 
