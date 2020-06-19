@@ -9,7 +9,6 @@ import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -23,8 +22,6 @@ import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import java.util.*
@@ -44,7 +41,6 @@ class NewsFragment : Fragment() {
     private val codeforcesNewsAdapter: CodeforcesNewsAdapter by lazy { CodeforcesNewsAdapter(this) }
     private lateinit var tabLayout: TabLayout
     private lateinit var codeforcesNewsViewPager: ViewPager2
-    private lateinit var buttonReload: Button
 
     fun refresh(){
         try {
@@ -58,13 +54,10 @@ class NewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val activity = requireActivity() as MainActivity
-
         codeforcesNewsViewPager = view.findViewById<ViewPager2>(R.id.cf_news_pager).apply {
             adapter = codeforcesNewsAdapter
             offscreenPageLimit = codeforcesNewsAdapter.fragments.size - 1
         }
-
 
         tabLayout = view.findViewById(R.id.cf_news_tab_layout)
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
@@ -85,8 +78,6 @@ class NewsFragment : Fragment() {
                 true
             }*/
         }.attach()
-
-
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
             override fun onTabReselected(tab: TabLayout.Tab?) {}
@@ -113,23 +104,24 @@ class NewsFragment : Fragment() {
                     }
                 }
             }
-
         })
 
 
     }
 
+    private val reloadButton by lazy {
+        activity!!.findViewById<BottomAppBar>(R.id.navigation_news).menu.findItem(R.id.navigation_news_reload)
+    }
     fun reloadTabs() {
-        val activity = requireActivity() as MainActivity
-        activity.findViewById<BottomAppBar>(R.id.navigation_news).menu.findItem(R.id.navigation_news_reload).isEnabled = false
-        activity.scope.launch {
-            val rx = codeforcesNewsAdapter.fragments.map { it.address }.toSet().map { it to async { if(it.isNotEmpty()) readURLData(it) else "" } }.toMap()
+        reloadButton.isEnabled = false
+        (requireActivity() as MainActivity).scope.launch {
+            val currentTime = System.currentTimeMillis()
             codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
                 val tab = tabLayout.getTabAt(index)!!
                 launch {
-                    if(tab.isSelected || System.currentTimeMillis()-fragment.lastReloadTime>1000*60) {
+                    if(tab.isSelected || currentTime - fragment.lastReloadTime > TimeUnit.MINUTES.toMillis(1)) {
                         tab.text = "..."
-                        fragment.reload(rx)
+                        fragment.reload()
                         tab.text = fragment.title
                         if (fragment is CodeforcesNewsMainFragment) {
                             if (fragment.newBlogs.isEmpty()) {
@@ -148,7 +140,7 @@ class NewsFragment : Fragment() {
                     }
                 }
             }.joinAll()
-            activity.findViewById<BottomAppBar>(R.id.navigation_news).menu.findItem(R.id.navigation_news_reload).isEnabled = true
+            reloadButton.isEnabled = true
         }
     }
 
@@ -206,8 +198,8 @@ open class CodeforcesNewsFragment(val title: String, val address: String) : Frag
 
     var lastReloadTime = 0L
 
-    open suspend fun reload(data: Map<String,Deferred<String?>>) {
-        val s = data[address]?.await() ?: return
+    open suspend fun reload() {
+        val s = if(address.isEmpty()) "" else readURLData(address) ?: return
         viewAdapter.parseData(s)
         lastReloadTime = System.currentTimeMillis()
     }
@@ -229,8 +221,8 @@ open class CodeforcesNewsMainFragment(title: String, address: String) : Codeforc
 
     var newBlogs = hashSetOf<String>()
 
-    override suspend fun reload(data: Map<String, Deferred<String?>>) {
-        super.reload(data)
+    override suspend fun reload() {
+        super.reload()
 
         val savedBlogs = prefs.getStringSet(prefs_key, null) ?: emptySet()
         newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.toHashSet()
