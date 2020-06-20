@@ -35,11 +35,9 @@ class MainActivity : AppCompatActivity(){
     val defaultTextColor by lazy { ContextCompat.getColor(this, R.color.textColor) }
 
 
-    lateinit var accountsFragment: AccountsFragment
-    lateinit var newsFragment: NewsFragment
-    lateinit var testFragment: TestFragment
-    lateinit var activeFragment: Fragment
-
+    val accountsFragment: AccountsFragment by lazy { supportFragmentManager.fragments.find { it is AccountsFragment } as? AccountsFragment ?: AccountsFragment() }
+    val newsFragment: NewsFragment by lazy { supportFragmentManager.fragments.find { it is NewsFragment } as? NewsFragment ?: NewsFragment() }
+    val testFragment: TestFragment by lazy { supportFragmentManager.fragments.find { it is TestFragment } as? TestFragment ?: TestFragment() }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,16 +52,6 @@ class MainActivity : AppCompatActivity(){
 
         supportActionBar?.title = "Competitive Programming & Solving" //"Compete, Program, Solve"
 
-
-        supportFragmentManager.fragments.forEach { fragment ->
-            println("!!! $fragment")
-            when(fragment){
-                is AccountsFragment -> accountsFragment = fragment
-                is NewsFragment -> newsFragment = fragment
-                is TestFragment -> testFragment = fragment
-            }
-            if(fragment.isVisible) activeFragment = fragment
-        }
 
         fun navigationSelectUpdateUI(fragment: Fragment){
 
@@ -93,11 +81,7 @@ class MainActivity : AppCompatActivity(){
             }
         }
 
-        if(!this::accountsFragment.isInitialized) accountsFragment = AccountsFragment()
-        if(!this::newsFragment.isInitialized) newsFragment = NewsFragment()
-        if(!this::testFragment.isInitialized) testFragment = TestFragment()
-
-        if(!this::activeFragment.isInitialized) activeFragment = accountsFragment
+        var activeFragment = supportFragmentManager.fragments.find { it.isVisible } ?: accountsFragment
         if(!activeFragment.isAdded) supportFragmentManager.beginTransaction().add(R.id.container_fragment, activeFragment).commit()
         navigationSelectUpdateUI(activeFragment)
 
