@@ -16,6 +16,7 @@ object NotificationChannels {
     //codeforces
     const val codeforces_contest_watcher = "cf_contest_watcher"
     const val codeforces_rating_changes = "cf_rating_changes"
+    const val codeforces_contribution_changes = "cf_contribution_changes"
 
     //project euler
     const val project_euler_news = "pe_news"
@@ -60,6 +61,13 @@ object NotificationChannels {
         m.createNotificationChannel(NotificationChannel(
             codeforces_rating_changes,
             "Rating changes",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            group = group_id_codeforces
+        })
+        m.createNotificationChannel(NotificationChannel(
+            codeforces_contribution_changes,
+            "Contribution changes",
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
             group = group_id_codeforces
@@ -117,13 +125,14 @@ object NotificationIDs {
 
     //codeforces
     val codeforces_contest_watcher = ++id
+    val codeforces_contribution_changes = ++id
 
     //project euler
     fun makeProjectEulerRecentProblemNotificationID(problemID: Int): Int = 1_000_000 + problemID
     fun makeProjectEulerNewsNotificationID(title: String): Int {
-        var res = title.hashCode() % 1_000_000
-        if(res<0) res += 1_000_000
-        return 1_000_000 + res
+        var res = title.hashCode() % 900_000
+        if(res<0) res += 900_000
+        return 1_100_000 + res
     }
 
     //acmp

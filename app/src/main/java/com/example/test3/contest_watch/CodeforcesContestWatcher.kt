@@ -28,6 +28,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
             var tasksPrevious: ArrayList<Pair<Int, String>>? = null
             var problemNames: ArrayList<String>? = null
             val participationType = ChangingValue(ParticipationType.NOTPARTICIPATED)
+            val sysTestPercentage = ChangingValue(-1)
 
             while (true) {
                 val tasks = arrayListOf<Pair<Int,String>>()
@@ -36,7 +37,6 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                         with(JsonReaderFromURL(address(contestID, handle, participationType.value)) ?: return@withContext) {
                             beginObject()
                             if (nextString("status") == "FAILED"){
-                                phaseCodeforces.value = CodeforcesContestPhase.UNKNOWN
                                 val reason = nextString("comment")
                                 if(reason == "contestId: Contest with id $contestID has not started")
                                     phaseCodeforces.value = CodeforcesContestPhase.BEFORE
@@ -116,8 +116,9 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                         if (i != -1) {
                             i = page.indexOf(">", i + 1)
                             val progress = page.substring(i + 1, page.indexOf("</", i + 1))
-                            if (progress.isNotEmpty() && progress.last() == '%') {
-                                onSetSysTestProgress(progress.substring(0, progress.length - 1).toInt())
+                            if (progress.endsWith('%')) {
+                                sysTestPercentage.value = progress.substring(0, progress.length - 1).toInt()
+                                if(sysTestPercentage.isChanged()) onSetSysTestProgress(sysTestPercentage.value)
                             }
                         }
                     }

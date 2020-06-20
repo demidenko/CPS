@@ -3,11 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/navigation_news_settings"
+        android:title="settings"
+        android:icon="@drawable/ic_settings"
+        app:showAsAction="always"
+        />
+
+    <item
         android:id="@+id/navigation_news_reload"
         android:title="reload"
         android:icon="@drawable/ic_refresh"
         app:showAsAction="always"
         />
-
 
 </menu>

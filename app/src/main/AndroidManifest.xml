@@ -26,6 +26,9 @@
         <service android:name=".job_services.NewsJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
 
+        <service android:name=".job_services.AccountsJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
         <service android:name=".job_services.CodeforcesNewsLostRecentJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
 

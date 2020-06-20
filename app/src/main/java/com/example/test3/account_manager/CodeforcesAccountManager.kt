@@ -10,6 +10,7 @@ import com.example.test3.*
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.JsonReader
+import kotlinx.coroutines.delay
 
 class CodeforcesAccountManager(context: Context): AccountManager(context), ColoredHandles {
 
@@ -48,7 +49,13 @@ class CodeforcesAccountManager(context: Context): AccountManager(context), Color
             val res = CodeforcesUserInfo(STATUS.FAILED, handle)
             with(JsonReaderFromURL("https://codeforces.com/api/user.info?handles=$handle") ?: return res) {
                 readObject {
-                    if(nextString("status") == "FAILED") return res.apply { status = STATUS.NOT_FOUND }
+                    if(nextString("status") == "FAILED") {
+                        if (nextString("comment") == "Call limit exceeded") {
+                            delay(500)
+                            return downloadInfo(data)
+                        }
+                        return res.apply { status = STATUS.NOT_FOUND }
+                    }
                     nextName()
                     readArrayOfObjects {
                         while (hasNext()) {

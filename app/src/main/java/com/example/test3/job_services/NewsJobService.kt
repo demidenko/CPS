@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.test3.*
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import java.nio.charset.Charset
 
@@ -20,8 +21,10 @@ class NewsJobService : CoroutineJobService() {
     }
 
     override suspend fun doJob() {
-        launch { parseACMP() }
-        launch { parseProjectEuler() }
+        arrayListOf(
+            launch { parseACMP() },
+            launch { parseProjectEuler() }
+        ).joinAll()
     }
 
     private suspend fun parseACMP() {

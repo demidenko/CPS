@@ -62,7 +62,7 @@ class TestFragment : Fragment() {
 
         view.findViewById<Button>(R.id.button_running_jobs).setOnClickListener {
             stuff.text = JobServicesCenter.getRunningJobServices(activity).joinToString(separator = "\n"){ info ->
-                "Job " + info.id + ": " + info.service.shortClassName
+                "Job " + info.id + ": " + info.service.shortClassName.removeSuffix("JobService").removePrefix(".job_services.")
             }
         }
     }

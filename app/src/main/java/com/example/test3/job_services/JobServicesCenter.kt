@@ -16,6 +16,7 @@ import kotlin.coroutines.CoroutineContext
 object JobServiceIDs {
     private var id = 0
     val news_parsers = ++id
+    val accounts_parsers = ++id
     val codeforces_lost_recent_news = ++id
     val project_euler_recent_problems = ++id
 }
@@ -44,6 +45,7 @@ object JobServicesCenter {
     fun startJobServices(context: Context){
         val calls = mutableMapOf<Int, (Context)->Unit >(
             JobServiceIDs.news_parsers to ::startNewsJobService,
+            JobServiceIDs.accounts_parsers to ::startAccountsJobService,
             JobServiceIDs.codeforces_lost_recent_news to ::startCodeforcesNewsLostRecentJobService,
             JobServiceIDs.project_euler_recent_problems to ::startProjectEulerRecentProblemsJobService
         )
@@ -81,6 +83,15 @@ object JobServicesCenter {
         )
     }
 
+    private fun startAccountsJobService(context: Context){
+        makeSchedule(
+            context,
+            JobServiceIDs.accounts_parsers,
+            AccountsJobService::class.java,
+            TimeUnit.MINUTES.toMillis(15),
+            JobInfo.NETWORK_TYPE_ANY
+        )
+    }
 
 }
 
