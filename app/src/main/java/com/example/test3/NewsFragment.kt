@@ -119,13 +119,14 @@ class NewsFragment : Fragment() {
     fun reloadTabs() {
         reloadButton.isEnabled = false
         (requireActivity() as MainActivity).scope.launch {
+            val lang = if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.news_codeforces_ru), true)) "ru" else "en"
             val currentTime = System.currentTimeMillis()
             codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
                 val tab = tabLayout.getTabAt(index)!!
                 launch {
                     if(tab.isSelected || currentTime - fragment.lastReloadTime > TimeUnit.MINUTES.toMillis(1)) {
                         tab.text = "..."
-                        fragment.reload()
+                        fragment.reload(lang)
                         tab.text = fragment.title
                         if (fragment is CodeforcesNewsMainFragment) {
                             if (fragment.newBlogs.isEmpty()) {
@@ -182,9 +183,9 @@ class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
     }
 
     val fragments = arrayOf(
-        CodeforcesNewsMainFragment("CF MAIN", "https://codeforces.com/?locale=ru"),
-        CodeforcesNewsFragment("CF TOP", "https://codeforces.com/top?locale=ru"),
-        CodeforcesNewsRecentFragment("CF RECENT", "https://codeforces.com/recent-actions?locale=ru"),
+        CodeforcesNewsMainFragment("CF MAIN", "https://codeforces.com/"),
+        CodeforcesNewsFragment("CF TOP", "https://codeforces.com/top"),
+        CodeforcesNewsRecentFragment("CF RECENT", "https://codeforces.com/recent-actions"),
         CodeforcesNewsLostRecentFragment("CF LOST")
     )
 
@@ -219,8 +220,8 @@ open class CodeforcesNewsFragment(val title: String, val address: String) : Frag
 
     var lastReloadTime = 0L
 
-    open suspend fun reload() {
-        val s = if(address.isEmpty()) "" else readURLData(address) ?: return
+    open suspend fun reload(lang: String) {
+        val s = if(address.isEmpty()) "" else readURLData("$address?locale=$lang") ?: return
         viewAdapter.parseData(s)
         lastReloadTime = System.currentTimeMillis()
     }
@@ -242,8 +243,8 @@ open class CodeforcesNewsMainFragment(title: String, address: String) : Codeforc
 
     var newBlogs = hashSetOf<String>()
 
-    override suspend fun reload() {
-        super.reload()
+    override suspend fun reload(lang: String) {
+        super.reload(lang)
 
         val savedBlogs = prefs.getStringSet(prefs_key, null) ?: emptySet()
         newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.toHashSet()
@@ -601,6 +602,8 @@ class SettingsNewsFragment : PreferenceFragmentCompat(){
             entryValues = CodeforcesNewsAdapter.titles
             setDefaultValue(CodeforcesNewsAdapter.titles[1])
         }
+
+
     }
 
 }

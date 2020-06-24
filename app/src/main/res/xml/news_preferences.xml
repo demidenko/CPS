@@ -3,13 +3,22 @@
 
     <PreferenceCategory
         android:icon="@drawable/ic_cf_logo"
-        android:title="Codeforces"
+        android:title="Codeforces tabs"
         >
         <DropDownPreference
             android:key="@string/news_codeforces_default_tab"
             android:title="Default tab"
             app:useSimpleSummaryProvider="true"
             />
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/news_codeforces_ru"
+            android:title="Russian content"
+            android:summaryOn="en + ru blogs"
+            android:summaryOff="en blogs only"
+            />
+
 
     </PreferenceCategory>
 
@@ -22,17 +31,17 @@
         <SwitchPreference
             android:key="@string/news_acmp_feed"
             android:defaultValue="false"
-            android:title="Project Euler News"
-            android:summaryOn="subscribed to projecteuler.org"
-            android:summaryOff="unsubscribed from projecteuler.org"
+            android:title="projecteuler.org"
+            android:summaryOn="subscribed"
+
             />
 
         <SwitchPreference
             android:key="@string/news_project_euler_feed"
             android:defaultValue="false"
-            android:title="ACMP News"
-            android:summaryOn="subscribed to acmp.ru"
-            android:summaryOff="unsubscribed from acmp.ru"
+            android:title="acmp.ru"
+            android:summaryOn="subscribed"
+
             />
     </PreferenceCategory>
 
