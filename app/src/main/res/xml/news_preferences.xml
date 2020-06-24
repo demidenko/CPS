@@ -1,0 +1,39 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:icon="@drawable/ic_cf_logo"
+        android:title="Codeforces"
+        >
+        <DropDownPreference
+            android:key="@string/news_codeforces_default_tab"
+            android:title="Default tab"
+            app:useSimpleSummaryProvider="true"
+            />
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:icon="@drawable/ic_rss_feed"
+        android:title="News feeds"
+        >
+
+        <SwitchPreference
+            android:key="@string/news_acmp_feed"
+            android:defaultValue="false"
+            android:title="Project Euler News"
+            android:summaryOn="subscribed to projecteuler.org"
+            android:summaryOff="unsubscribed from projecteuler.org"
+            />
+
+        <SwitchPreference
+            android:key="@string/news_project_euler_feed"
+            android:defaultValue="false"
+            android:title="ACMP News"
+            android:summaryOn="subscribed to acmp.ru"
+            android:summaryOff="unsubscribed from acmp.ru"
+            />
+    </PreferenceCategory>
+
+</PreferenceScreen>

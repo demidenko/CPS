@@ -13,6 +13,9 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.preference.DropDownPreference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -107,10 +110,11 @@ class NewsFragment : Fragment() {
         })
 
 
+
     }
 
     private val reloadButton by lazy {
-        activity!!.findViewById<BottomAppBar>(R.id.navigation_news).menu.findItem(R.id.navigation_news_reload)
+        requireActivity().findViewById<BottomAppBar>(R.id.navigation_news).menu.findItem(R.id.navigation_news_reload)
     }
     fun reloadTabs() {
         reloadButton.isEnabled = false
@@ -147,9 +151,17 @@ class NewsFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val defaultTabIndex = 1
-        tabLayout.selectTab(tabLayout.getTabAt(defaultTabIndex))
-        codeforcesNewsViewPager.setCurrentItem(defaultTabIndex, false)
+
+        val defaultTab =
+            PreferenceManager.getDefaultSharedPreferences(context).getString(getString(R.string.news_codeforces_default_tab),null)
+                ?: CodeforcesNewsAdapter.titles[1]
+        for(index in 0 until tabLayout.tabCount){
+            if(tabLayout.getTabAt(index)?.text == defaultTab){
+                tabLayout.selectTab(tabLayout.getTabAt(index))
+                codeforcesNewsViewPager.setCurrentItem(index, false)
+            }
+        }
+
         reloadTabs()
     }
 
@@ -159,6 +171,15 @@ class NewsFragment : Fragment() {
 
 
 class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+
+    companion object{
+        val titles = arrayOf(
+            "CF MAIN",
+            "CF TOP",
+            "CF RECENT",
+            "CF LOST"
+        )
+    }
 
     val fragments = arrayOf(
         CodeforcesNewsMainFragment("CF MAIN", "https://codeforces.com/?locale=ru"),
@@ -567,4 +588,19 @@ fun timeRUtoEN(time: String): String{
         } + " ago"
     }
     return time
+}
+
+
+///--------------SETTINGS------------
+class SettingsNewsFragment : PreferenceFragmentCompat(){
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.news_preferences)
+
+        findPreference<DropDownPreference>(getString(R.string.news_codeforces_default_tab))?.run {
+            entries = CodeforcesNewsAdapter.titles
+            entryValues = CodeforcesNewsAdapter.titles
+            setDefaultValue(CodeforcesNewsAdapter.titles[1])
+        }
+    }
+
 }

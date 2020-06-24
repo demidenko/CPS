@@ -114,6 +114,12 @@ class MainActivity : AppCompatActivity(){
             useRealColors = getBoolean(use_real_colors, false)
         }
 
+        configureNavigation()
+
+    }
+
+    fun configureNavigation(){
+
         navigation_accounts.setOnMenuItemClickListener {
             when(it.itemId){
                 R.id.navigation_accounts_reload -> accountsFragment.reloadAccounts()
@@ -125,10 +131,16 @@ class MainActivity : AppCompatActivity(){
         navigation_news.setOnMenuItemClickListener {
             when(it.itemId){
                 R.id.navigation_news_reload -> newsFragment.reloadTabs()
+                R.id.navigation_news_settings -> {
+                    supportFragmentManager.beginTransaction()
+                        .hide(newsFragment)
+                        .add(android.R.id.content, SettingsNewsFragment())
+                        .addToBackStack(null)
+                        .commit()
+                }
             }
             true
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

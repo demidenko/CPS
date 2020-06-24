@@ -3,7 +3,9 @@ package com.example.test3.job_services
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.preference.PreferenceManager
 import com.example.test3.*
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import java.nio.charset.Charset
@@ -21,10 +23,12 @@ class NewsJobService : CoroutineJobService() {
     }
 
     override suspend fun doJob() {
-        arrayListOf(
-            launch { parseACMP() },
-            launch { parseProjectEuler() }
-        ).joinAll()
+        val jobs = arrayListOf<Job>()
+        with(PreferenceManager.getDefaultSharedPreferences(this)){
+            if(getBoolean(getString(R.string.news_project_euler_feed),false)) jobs.add(launch { parseProjectEuler() })
+            if(getBoolean(getString(R.string.news_acmp_feed),false)) jobs.add(launch { parseACMP() })
+        }
+        jobs.joinAll()
     }
 
     private suspend fun parseACMP() {
