@@ -26,7 +26,10 @@ class AccountsJobService : CoroutineJobService() {
         if(info.status != STATUS.OK) return
 
         val handle = info.handle
-        val contribution = (accountManager.loadInfo(handle) as CodeforcesAccountManager.CodeforcesUserInfo).contribution
+        val contribution = (accountManager.loadInfo(handle) as CodeforcesAccountManager.CodeforcesUserInfo).let {
+            if(it.status != STATUS.OK) return
+            it.contribution
+        }
 
         if(info.contribution != contribution){
             accountManager.savedInfo = info.copy(contribution = contribution)
