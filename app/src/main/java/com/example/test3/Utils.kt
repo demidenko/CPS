@@ -7,6 +7,7 @@ import com.squareup.moshi.JsonReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okio.Okio
+import java.io.IOException
 import java.io.InputStream
 import java.net.ConnectException
 import java.net.SocketTimeoutException
@@ -36,6 +37,8 @@ suspend fun createConnectionStream(address: String): InputStream? = withContext(
     }catch (e: SSLException){
         ignoreBadSSL()
         createConnectionStream(address)
+    }catch (e: IOException){
+        null
     }
 }
 

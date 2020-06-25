@@ -58,8 +58,8 @@ abstract class AccountPanel(
                     reloadButton.animate().setStartDelay(startDelay).setDuration(duration).alpha(0f)
                         .withEndAction {
                             reloadButton.visibility = View.GONE
-                        }
-                }
+                        }.start()
+                }.start()
             }
             if(settingsButton.isEnabled) {
                 settingsButton.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
@@ -67,8 +67,8 @@ abstract class AccountPanel(
                     settingsButton.animate().setStartDelay(startDelay).setDuration(duration).alpha(0f)
                         .withEndAction {
                             settingsButton.visibility = View.GONE
-                        }
-                }
+                        }.start()
+                }.start()
             }
         }
     }
@@ -105,12 +105,12 @@ abstract class AccountPanel(
 
         settingsButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
             settingsButton.visibility = View.GONE
-        }
+        }.start()
 
         reloadButton.animate().setStartDelay(0).alpha(1f).setDuration(0).withStartAction {
             reloadButton.setColorFilter(activity.defaultTextColor)
             reloadButton.visibility = View.VISIBLE
-        }
+        }.start()
         reloadButton.startAnimation(rotateAnimation)
 
         //textAdditional.text = "..."
@@ -123,7 +123,7 @@ abstract class AccountPanel(
             reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {
                 reloadButton.clearAnimation()
                 reloadButton.visibility = View.GONE
-            }
+            }.start()
         }else{
             show(savedInfo)
             Toast.makeText(activity, "${manager.PREFERENCES_FILE_NAME} load error", Toast.LENGTH_LONG).show()
