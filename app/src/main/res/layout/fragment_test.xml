@@ -70,6 +70,15 @@
         android:text="stop"
         />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_test_notify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/button_watcher"
+        android:layout_alignParentEnd="true"
+        android:text="notify"
+        />
+
 
 
 </RelativeLayout>

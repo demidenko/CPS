@@ -22,16 +22,17 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
             val contestName = ChangingValue("")
             val phaseCodeforces = ChangingValue(CodeforcesContestPhase.UNKNOWN)
             val rank = ChangingValue(-1)
-            val pointsTotal = ChangingValue(0)
-            var timeSecondsFromStart: Int? = null
-            var durationSeconds: Int? = null
-            var tasksPrevious: ArrayList<Pair<Int, String>>? = null
+            val pointsTotal = ChangingValue(0.0)
+            val durationSeconds = ChangingValue(-1)
+            val startTimeSeconds = ChangingValue(-1)
+            var tasksPrevious: ArrayList<Pair<Double, String>>? = null
             var problemNames: ArrayList<String>? = null
             val participationType = ChangingValue(ParticipationType.NOTPARTICIPATED)
             val sysTestPercentage = ChangingValue(-1)
 
             while (true) {
-                val tasks = arrayListOf<Pair<Int,String>>()
+                val tasks = arrayListOf<Pair<Double,String>>()
+                var timeSecondsFromStart: Int? = null
                 try {
                     withContext(Dispatchers.IO) {
                         with(JsonReaderFromURL(address(contestID, handle, participationType.value)) ?: return@withContext) {
@@ -49,7 +50,8 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                                         while (hasNext()) when (nextName()) {
                                             "phase" -> phaseCodeforces.value = CodeforcesContestPhase.valueOf(nextString())
                                             "relativeTimeSeconds" -> timeSecondsFromStart = nextInt()
-                                            "durationSeconds" -> durationSeconds = nextInt()
+                                            "durationSeconds" -> durationSeconds.value = nextInt()
+                                            "startTimeSeconds" -> startTimeSeconds.value = nextInt()
                                             "name" -> contestName.value = nextString()
                                             else -> skipValue()
                                         }
@@ -73,10 +75,10 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                                                 }
                                             }
                                             "rank" -> if(tp=="PRACTICE") skipValue() else rank.value = nextInt()
-                                            "points" -> if(tp=="PRACTICE") skipValue() else pointsTotal.value = nextInt()
+                                            "points" -> if(tp=="PRACTICE") skipValue() else pointsTotal.value = nextDouble()
                                             "problemResults" -> if(tp=="PRACTICE") skipValue() else readArray {
                                                 val arr = readObjectFields("points", "type")
-                                                val pts = (arr[0] as Double).toInt()
+                                                val pts = arr[0] as Double
                                                 val status = arr[1] as String
                                                 tasks.add(Pair(pts, status))
                                             }
@@ -99,15 +101,10 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                 if(contestName.isChanged()) onSetContestName(contestName.value)
                 if(phaseCodeforces.isChanged()) onSetContestPhase(phaseCodeforces.value)
 
-                if(participationType.isChanged()){
-                    onSetParticipationType(participationType.value)
-                    if(participationType.value == ParticipationType.OFFICIAL){
-                        pointsTotal.value = 0
-                        rank.value = -1
-                        continue
-                    }
+                if(phaseCodeforces.value == CodeforcesContestPhase.CODING && (durationSeconds.isChanged() || startTimeSeconds.isChanged())) timeSecondsFromStart?.let{
+                    val remainingTime = durationSeconds.value - it
+                    onSetRemainingTime(remainingTime)
                 }
-
 
                 if(phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST){
                     //get progress of testing (0% ... 100%)
@@ -124,11 +121,15 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                     }
                 }
 
-                if(phaseCodeforces.value == CodeforcesContestPhase.CODING) timeSecondsFromStart?.let{
-                    val remainingTime = durationSeconds!! - it
-                    onSetRemainingTime(remainingTime)
-                }
 
+                if(participationType.isChanged()){
+                    onSetParticipationType(participationType.value)
+                    if(participationType.value == ParticipationType.OFFICIAL){
+                        pointsTotal.value = 0.0
+                        rank.value = -1
+                        continue
+                    }
+                }
 
                 if(rank.value != -1){
                     if(rank.isChanged()) onSetContestantRank(rank.value)
@@ -197,11 +198,11 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         listeners.forEach { l -> l.onSetContestantRank(rank) }
     }
 
-    override fun onSetContestantPoints(points: Int) {
+    override fun onSetContestantPoints(points: Double) {
         listeners.forEach { l -> l.onSetContestantPoints(points) }
     }
 
-    override fun onSetProblemStatus(problem: String, status: String, points: Int) {
+    override fun onSetProblemStatus(problem: String, status: String, points: Double) {
         listeners.forEach { l -> l.onSetProblemStatus(problem, status, points) }
     }
 
@@ -231,8 +232,8 @@ abstract class CodeforcesContestWatchListener{
     abstract fun onSetRemainingTime(timeSeconds: Int)
     abstract fun onSetSysTestProgress(percents: Int)
     abstract fun onSetContestantRank(rank: Int)
-    abstract fun onSetContestantPoints(points: Int)
-    abstract fun onSetProblemStatus(problem: String, status: String, points: Int)
+    abstract fun onSetContestantPoints(points: Double)
+    abstract fun onSetProblemStatus(problem: String, status: String, points: Double)
     abstract fun onSetParticipationType(type: CodeforcesContestWatcher.ParticipationType)
     abstract fun commit()
 }

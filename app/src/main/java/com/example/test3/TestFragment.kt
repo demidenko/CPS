@@ -3,15 +3,20 @@ package com.example.test3
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.RemoteViews
 import android.widget.TextView
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import com.example.test3.contest_watch.CodeforcesContestWatchService
 import com.example.test3.job_services.JobServicesCenter
+import java.util.concurrent.TimeUnit
 
 
 class TestFragment : Fragment() {
@@ -60,10 +65,36 @@ class TestFragment : Fragment() {
             )
         }
 
+        //show running jobs
         view.findViewById<Button>(R.id.button_running_jobs).setOnClickListener {
             stuff.text = JobServicesCenter.getRunningJobServices(activity).joinToString(separator = "\n"){ info ->
                 "Job " + info.id + ": " + info.service.shortClassName.removeSuffix("JobService").removePrefix(".job_services.")
             }
+        }
+
+        //test notify
+        val r = RemoteViews(activity.packageName, R.layout.cf_watcher_notification_small)
+        view.findViewById<Button>(R.id.button_test_notify).setOnClickListener{ button -> button as Button
+            val n = NotificationCompat.Builder(activity, "test").apply {
+                setSmallIcon(R.drawable.ic_develop)
+                setNotificationSilent()
+                setShowWhen(false)
+                setStyle(NotificationCompat.DecoratedCustomViewStyle())
+
+                r.setTextViewText(R.id.cf_watcher_notification_phase, "${System.currentTimeMillis()}")
+
+                if(System.currentTimeMillis()/10%2==0L) {
+                    r.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime(), null, false)
+                    r.setTextViewText(R.id.cf_watcher_notification_progress, "test")
+
+                }
+                else
+                    r.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime() + TimeUnit.HOURS.toMillis(2), null, true)
+
+                setCustomContentView(r)
+            }
+
+            NotificationManagerCompat.from(activity).notify(Int.MAX_VALUE, n.build())
         }
     }
 }
