@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
+        android:background="@android:color/black"
         >
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -68,7 +69,9 @@
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@drawable/navigation_separator"
+            android:background="#555555"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
             />
 
 

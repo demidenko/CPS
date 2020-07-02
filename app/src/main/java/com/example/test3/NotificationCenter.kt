@@ -41,14 +41,35 @@ object NotificationChannels {
             "test channel",
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
-
+            group = group_id_test
         })
         m.createNotificationChannel(NotificationChannel(
             "test2",
             "test2 channel",
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
-
+            group = group_id_test
+        })
+        m.createNotificationChannel(NotificationChannel(
+            "test3",
+            "test3 channel",
+            NotificationManager.IMPORTANCE_MIN
+        ).apply {
+            group = group_id_test
+        })
+        m.createNotificationChannel(NotificationChannel(
+            "test4",
+            "test4 channel",
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            group = group_id_test
+        })
+        m.createNotificationChannel(NotificationChannel(
+            "test5",
+            "test5 channel",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            group = group_id_test
         })
 
         //codeforces channels

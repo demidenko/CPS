@@ -65,7 +65,9 @@ class CodeforcesContestWatchService: Service() {
     private fun start(handle: String, contestID: Int, notification: NotificationCompat.Builder){
         startForeground(NotificationIDs.codeforces_contest_watcher, notification.build())
 
-        val rv = RemoteViews(packageName, R.layout.cf_watcher_notification_small)
+        val rview_small = RemoteViews(packageName, R.layout.cf_watcher_notification_small)
+        val rview_big = RemoteViews(packageName, R.layout.cf_watcher_notification_big)
+        val rviews = arrayOf(rview_small, rview_big)
 
 
         watcher = CodeforcesContestWatcher(
@@ -74,45 +76,71 @@ class CodeforcesContestWatchService: Service() {
             scope
         ).apply {
             addCodeforcesContestWatchListener(object : CodeforcesContestWatchListener(){
+                var contestType = "" //CF / ICPC / IOI
                 var changes = false
-                var contestantRank = -1
+                var contestantRank = ""
                 var contestantPoints = ""
                 var participationType = CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED
 
-                override fun onSetContestName(contestName: String) {
+                override fun onSetContestNameAndType(contestName: String, contestType: String) {
                     changes = true
                     notification.setSubText("$handle • $contestName")
+                    this.contestType = contestType
+                }
+
+                private fun str_pts(p: Double, isTotal: Boolean = false): String {
+                    if(p == 0.0) return ""
+                    if(contestType == "ICPC" && !isTotal) return "+"
+                    return p.toString().removeSuffix(".0")
+                }
+
+                private var problemNames = arrayOf<String>()
+                private val problemPoints = mutableMapOf<String,String>()
+                private fun buildTable(){
+                    rview_big.removeAllViews(R.id.cf_watcher_notification_table_tasks)
+
+                    problemNames.forEach { problemName ->
+                        val r = RemoteViews(packageName, R.layout.cf_watcher_notification_table_column)
+                        r.setTextViewText(R.id.cf_watcher_notification_table_column_header, problemName)
+                        r.setTextViewText(R.id.cf_watcher_notification_table_column_cell, problemPoints.getOrDefault(problemName,""))
+                        rview_big.addView(R.id.cf_watcher_notification_table_tasks, r)
+                    }
+
                 }
 
                 override suspend fun onSetProblemNames(problemNames: Array<String>) {
-                    //TODO("Not yet implemented")
+                    problemPoints.clear()
+                    this.problemNames = problemNames
+                    buildTable()
                 }
 
                 override fun onSetContestPhase(phaseCodeforces: CodeforcesContestPhase) {
                     changes = true
-                    rv.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime(), null, false)
-                    rv.setTextViewText(R.id.cf_watcher_notification_progress, "")
-                    rv.setTextViewText(R.id.cf_watcher_notification_phase, phaseCodeforces.name)
+                    rviews.forEach { it.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime(), null, false) }
+                    rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_progress, "") }
+                    rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_phase, phaseCodeforces.name) }
                 }
 
                 override fun onSetRemainingTime(timeSeconds: Int) {
                     changes = true
-                    rv.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime() + TimeUnit.SECONDS.toMillis(timeSeconds.toLong()), null, true)
+                    rviews.forEach { it.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime() + TimeUnit.SECONDS.toMillis(timeSeconds.toLong()), null, true) }
                 }
 
                 override fun onSetSysTestProgress(percents: Int) {
                     changes = true
-                    rv.setTextViewText(R.id.cf_watcher_notification_progress, "$percents%")
+                    rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_progress, "$percents%") }
                 }
 
                 override fun onSetContestantRank(rank: Int) {
                     changes = true
-                    contestantRank = rank
+                    contestantRank =
+                        if(participationType == CodeforcesContestWatcher.ParticipationType.OFFICIAL) "$rank"
+                        else "*$rank"
                 }
 
                 override fun onSetContestantPoints(points: Double) {
                     changes = true
-                    contestantPoints = points.toString().removeSuffix(".0") //genius
+                    contestantPoints = str_pts(points, true)
                 }
 
                 override fun onSetParticipationType(type: CodeforcesContestWatcher.ParticipationType) {
@@ -121,22 +149,32 @@ class CodeforcesContestWatchService: Service() {
                 }
 
                 override fun onSetProblemStatus(problem: String, status: String, points: Double) {
-                    //TODO("Not yet implemented")
+                    problemPoints[problem] = str_pts(points)
+                    buildTable()
                 }
 
                 override fun commit() {
                     if(!changes) return
                     changes = false
 
-                    rv.setTextViewText(R.id.cf_watcher_notification_rank,
-                        when(participationType){
-                            CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED -> "not participated"
-                            CodeforcesContestWatcher.ParticipationType.OFFICIAL -> "rank: $contestantRank | points: $contestantPoints"
-                            CodeforcesContestWatcher.ParticipationType.UNOFFICIAL -> "rank: *$contestantRank | points: $contestantPoints"
-                        }
-                    )
 
-                    notification.setCustomContentView(rv)
+                    rview_small.setTextViewText(R.id.cf_watcher_notification_rank,
+                        if(participationType == CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED) "not participated"
+                        else "rank: $contestantRank • points: $contestantPoints"
+                    )
+                    notification.setCustomContentView(rview_small)
+
+
+                    if (participationType == CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED) {
+                        notification.setCustomBigContentView(null)
+                    } else {
+                        rview_big.setTextViewText(R.id.cf_watcher_notification_rank, contestantRank)
+                        rview_big.setTextViewText(R.id.cf_watcher_notification_points, contestantPoints)
+                        notification.setCustomBigContentView(rview_big)
+                    }
+
+
+                    notification.setWhen(System.currentTimeMillis())
 
                     notificationManager.notify(NotificationIDs.codeforces_contest_watcher, notification.build())
                 }
