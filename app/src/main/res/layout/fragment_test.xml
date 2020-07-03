@@ -4,26 +4,12 @@
     android:layout_height="match_parent"
     >
 
-    <RelativeLayout
-        android:id="@+id/test_buttons_panel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        >
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_running_jobs"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="JOBS"
-            />
-    </RelativeLayout>
-
     <TextView
         android:id="@+id/stuff_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:text=""
-        android:layout_below="@id/test_buttons_panel"
         />
 
     <LinearLayout
@@ -70,14 +56,28 @@
         android:text="stop"
         />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/button_test_notify"
+
+
+    <LinearLayout
+        android:id="@+id/test_buttons_panel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_above="@id/button_watcher"
-        android:layout_alignParentEnd="true"
-        android:text="notify"
-        />
+        >
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_running_jobs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="JOBS"
+            />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_test_notify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="notify"
+            />
+    </LinearLayout>
 
 
 

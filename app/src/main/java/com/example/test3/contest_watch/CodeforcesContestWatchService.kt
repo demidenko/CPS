@@ -40,7 +40,7 @@ class CodeforcesContestWatchService: Service() {
                 start(handle, contestID, NotificationCompat.Builder(this, NotificationChannels.codeforces_contest_watcher).apply {
                     setSmallIcon(R.drawable.ic_contest)
                     setSubText(handle)
-                    //setShowWhen(false)
+                    setShowWhen(false)
                     setNotificationSilent()
                     setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 })
@@ -76,42 +76,41 @@ class CodeforcesContestWatchService: Service() {
             scope
         ).apply {
             addCodeforcesContestWatchListener(object : CodeforcesContestWatchListener(){
-                var contestType = "" //CF / ICPC / IOI
+                var contestType = CodeforcesContestWatcher.ContestType.UNDEFINED
                 var changes = false
                 var contestantRank = ""
                 var contestantPoints = ""
                 var participationType = CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED
 
-                override fun onSetContestNameAndType(contestName: String, contestType: String) {
+                override fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestWatcher.ContestType) {
                     changes = true
-                    notification.setSubText("$handle • $contestName")
+                    notification.setSubText("$contestName • $handle")
                     this.contestType = contestType
                 }
 
                 private fun str_pts(p: Double, isTotal: Boolean = false): String {
-                    if(p == 0.0) return ""
-                    if(contestType == "ICPC" && !isTotal) return "+"
+                    if(isTotal){
+
+                    }else{
+                        if(p == 0.0) return ""
+                        if(contestType == CodeforcesContestWatcher.ContestType.ICPC) return "+"
+                    }
+
                     return p.toString().removeSuffix(".0")
                 }
 
-                private var problemNames = arrayOf<String>()
-                private val problemPoints = mutableMapOf<String,String>()
-                private fun buildTable(){
+                private val rviewsByProblem = mutableMapOf<String,RemoteViews>()
+                override suspend fun onSetProblemNames(problemNames: Array<String>) {
+                    changes = true
                     rview_big.removeAllViews(R.id.cf_watcher_notification_table_tasks)
-
+                    rviewsByProblem.clear()
                     problemNames.forEach { problemName ->
                         val r = RemoteViews(packageName, R.layout.cf_watcher_notification_table_column)
                         r.setTextViewText(R.id.cf_watcher_notification_table_column_header, problemName)
-                        r.setTextViewText(R.id.cf_watcher_notification_table_column_cell, problemPoints.getOrDefault(problemName,""))
+                        r.setTextViewText(R.id.cf_watcher_notification_table_column_cell, "")
                         rview_big.addView(R.id.cf_watcher_notification_table_tasks, r)
+                        rviewsByProblem[problemName] = r
                     }
-
-                }
-
-                override suspend fun onSetProblemNames(problemNames: Array<String>) {
-                    problemPoints.clear()
-                    this.problemNames = problemNames
-                    buildTable()
                 }
 
                 override fun onSetContestPhase(phaseCodeforces: CodeforcesContestPhase) {
@@ -136,11 +135,13 @@ class CodeforcesContestWatchService: Service() {
                     contestantRank =
                         if(participationType == CodeforcesContestWatcher.ParticipationType.OFFICIAL) "$rank"
                         else "*$rank"
+                    rview_big.setTextViewText(R.id.cf_watcher_notification_rank, contestantRank)
                 }
 
                 override fun onSetContestantPoints(points: Double) {
                     changes = true
                     contestantPoints = str_pts(points, true)
+                    rview_big.setTextViewText(R.id.cf_watcher_notification_points, contestantPoints)
                 }
 
                 override fun onSetParticipationType(type: CodeforcesContestWatcher.ParticipationType) {
@@ -149,32 +150,29 @@ class CodeforcesContestWatchService: Service() {
                 }
 
                 override fun onSetProblemStatus(problem: String, status: String, points: Double) {
-                    problemPoints[problem] = str_pts(points)
-                    buildTable()
-                }
+                    changes = true
+                    rviewsByProblem[problem]?.run{
+                        setTextViewText(R.id.cf_watcher_notification_table_column_cell, str_pts(points))
+                        if(status == "FINAL") setTextColor(R.id.cf_watcher_notification_table_column_cell, resources.getColor(R.color.blog_rating_positive, null))
+                    }}
 
                 override fun commit() {
                     if(!changes) return
                     changes = false
 
 
-                    rview_small.setTextViewText(R.id.cf_watcher_notification_rank,
-                        if(participationType == CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED) "not participated"
-                        else "rank: $contestantRank • points: $contestantPoints"
+                    notification.setCustomContentView(rview_small.apply {
+                        setTextViewText(R.id.cf_watcher_notification_rank,
+                            if(participationType == CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED) "not participated"
+                            else "rank: $contestantRank • points: $contestantPoints"
+                        )
+                    })
+
+                    notification.setCustomBigContentView(
+                        if (participationType == CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED) null
+                        else rview_big
                     )
-                    notification.setCustomContentView(rview_small)
 
-
-                    if (participationType == CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED) {
-                        notification.setCustomBigContentView(null)
-                    } else {
-                        rview_big.setTextViewText(R.id.cf_watcher_notification_rank, contestantRank)
-                        rview_big.setTextViewText(R.id.cf_watcher_notification_points, contestantPoints)
-                        notification.setCustomBigContentView(rview_big)
-                    }
-
-
-                    notification.setWhen(System.currentTimeMillis())
 
                     notificationManager.notify(NotificationIDs.codeforces_contest_watcher, notification.build())
                 }

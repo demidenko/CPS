@@ -11,8 +11,12 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         return "https://codeforces.com/api/contest.standings?contestId=$contestID&handles=$handle&showUnofficial=" + if(participationType == ParticipationType.OFFICIAL) "false" else "true"
     }
 
-    enum class ParticipationType{
+    enum class ParticipationType {
         NOTPARTICIPATED, OFFICIAL, UNOFFICIAL
+    }
+
+    enum class ContestType {
+        CF, ICPC, IOI, UNDEFINED
     }
 
     private var job: Job? = null
@@ -20,7 +24,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
     fun start(){
         job = scope.launch {
             val contestName = ChangingValue("")
-            val contestType = ChangingValue("")
+            val contestType = ChangingValue(ContestType.UNDEFINED)
             val phaseCodeforces = ChangingValue(CodeforcesContestPhase.UNKNOWN)
             val rank = ChangingValue(-1)
             val pointsTotal = ChangingValue(0.0)
@@ -54,7 +58,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                                             "durationSeconds" -> durationSeconds.value = nextInt()
                                             "startTimeSeconds" -> startTimeSeconds.value = nextInt()
                                             "name" -> contestName.value = nextString()
-                                            "type" -> contestType.value = nextString()
+                                            "type" -> contestType.value = ContestType.valueOf(nextString())
                                             else -> skipValue()
                                         }
                                     }
@@ -183,7 +187,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
 
     fun addCodeforcesContestWatchListener(listener: CodeforcesContestWatchListener) = listeners.add(listener)
 
-    override fun onSetContestNameAndType(contestName: String, contestType: String) {
+    override fun onSetContestNameAndType(contestName: String, contestType: ContestType) {
         listeners.forEach { l -> l.onSetContestNameAndType(contestName, contestType) }
     }
 
@@ -235,7 +239,7 @@ enum class CodeforcesContestPhase{
 }
 
 abstract class CodeforcesContestWatchListener{
-    abstract fun onSetContestNameAndType(contestName: String, contestType: String)
+    abstract fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestWatcher.ContestType)
     abstract suspend fun onSetProblemNames(problemNames: Array<String>)
     abstract fun onSetContestPhase(phaseCodeforces: CodeforcesContestPhase)
     abstract fun onSetRemainingTime(timeSeconds: Int)
