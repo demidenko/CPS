@@ -29,26 +29,28 @@ class TestFragment : Fragment() {
 
 
         val stuff = view.findViewById<TextView>(R.id.stuff_textview)
-        val editText = view.findViewById<EditText>(R.id.text_editor)
+        val handleEditText = view.findViewById<EditText>(R.id.dev_text_editor_handle)
+        val contestIDEditText = view.findViewById<EditText>(R.id.dev_text_editor_contest_id)
         val prefs = activity.getSharedPreferences("test", Context.MODE_PRIVATE)
-        editText.setText(prefs.getInt("contest_id", 0).toString())
+        contestIDEditText.setText(prefs.getInt("contest_id", 0).toString())
+        handleEditText.setText(prefs.getString("handle", ""))
 
 
-        //monitor alpha
+        //monitor beta
         view.findViewById<Button>(R.id.button_watcher).setOnClickListener { button -> button as Button
 
-            val manager = activity.accountsFragment.codeforcesAccountManager
-            val handle = manager.savedInfo.userID
-            val contestID = editText.text.toString().toInt()
+            val handle = handleEditText.text.toString()
+            val contestID = contestIDEditText.text.toString().toInt()
             activity.startForegroundService(
                 Intent(activity, CodeforcesContestWatchService::class.java)
-                    .setAction("start")
+                    .setAction(CodeforcesContestWatchService.ACTION_START)
                     .putExtra("handle", handle)
                     .putExtra("contestID", contestID)
             )
 
             with(prefs.edit()){
                 putInt("contest_id", contestID)
+                putString("handle", handle)
                 apply()
             }
         }
@@ -56,7 +58,7 @@ class TestFragment : Fragment() {
         view.findViewById<Button>(R.id.button_watcher_stop).setOnClickListener { button -> button as Button
             activity.startService(
                 Intent(activity, CodeforcesContestWatchService::class.java)
-                    .setAction("stop")
+                    .setAction(CodeforcesContestWatchService.ACTION_STOP)
             )
         }
 

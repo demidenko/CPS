@@ -89,7 +89,7 @@ object NotificationChannels {
         m.createNotificationChannel(NotificationChannel(
             codeforces_contribution_changes,
             "Contribution changes",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_MIN
         ).apply {
             group = group_id_codeforces
         })

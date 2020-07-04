@@ -25,36 +25,48 @@
 
     </LinearLayout>
 
-
-    <EditText
-        android:id="@+id/text_editor"
+    <GridLayout
+        android:id="@+id/dev_watcher"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="contestID"
-        android:layout_toStartOf="@id/button_watcher"
-        android:layout_alignBottom="@id/button_watcher"
-        android:layout_centerHorizontal="true"
-        android:inputType="numberDecimal"
-        />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/button_watcher"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:columnCount="2"
         android:layout_alignParentBottom="true"
-        android:text="run"
-        />
+        android:layout_centerHorizontal="true"
+        >
+        <EditText
+            android:id="@+id/dev_text_editor_contest_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="contestID"
+            android:inputType="numberDecimal"
+            />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/button_watcher_stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@id/button_watcher"
-        android:layout_marginStart="10dp"
-        android:text="stop"
-        />
+        <EditText
+            android:id="@+id/dev_text_editor_handle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="handle"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_watcher_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="stop"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_watcher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="run"
+            />
+
+
+    </GridLayout>
+
+
+
 
 
 
@@ -63,7 +75,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_above="@id/button_watcher"
+        android:layout_above="@id/dev_watcher"
+        android:layout_centerHorizontal="true"
         >
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_running_jobs"

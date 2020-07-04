@@ -50,7 +50,7 @@ object JobServicesCenter {
             JobServiceIDs.project_euler_recent_problems to ::startProjectEulerRecentProblemsJobService
         )
         getRunningJobServices(context).forEach{ calls.remove(it.id) }
-        calls.forEach { it.value(context) }
+        calls.values.shuffled().forEach { it(context) }
     }
 
     private fun startNewsJobService(context: Context){

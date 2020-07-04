@@ -19,6 +19,11 @@ import java.util.concurrent.TimeUnit
 class CodeforcesContestWatchService: Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
+    companion object {
+        const val ACTION_START = "start"
+        const val ACTION_STOP = "stop"
+    }
+
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
     private val notificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
 
@@ -32,7 +37,7 @@ class CodeforcesContestWatchService: Service() {
         val action = intent!!.action
 
         when(action){
-            "start" -> {
+            ACTION_START -> {
                 val handle = intent.getStringExtra("handle")!!
                 val contestID = intent.getIntExtra("contestID", -1)
                 println("service onStartCommand $handle $contestID")
@@ -45,7 +50,7 @@ class CodeforcesContestWatchService: Service() {
                     setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 })
             }
-            "stop" -> {
+            ACTION_STOP -> {
                 stop()
                 stopForeground(true)
             }
@@ -153,7 +158,9 @@ class CodeforcesContestWatchService: Service() {
                     changes = true
                     rviewsByProblem[problem]?.run{
                         setTextViewText(R.id.cf_watcher_notification_table_column_cell, str_pts(points))
-                        if(status == "FINAL") setTextColor(R.id.cf_watcher_notification_table_column_cell, resources.getColor(R.color.blog_rating_positive, null))
+                        if(status == "FINAL"){
+                            setTextColor(R.id.cf_watcher_notification_table_column_cell, resources.getColor(R.color.blog_rating_positive, null))
+                        }
                     }}
 
                 override fun commit() {

@@ -42,11 +42,12 @@ class AccountsJobService : CoroutineJobService() {
             fun signed(x: Int): String = if(x>0) "+$x" else "$x"
 
             val n = NotificationCompat.Builder(this, NotificationChannels.codeforces_contribution_changes).apply {
-                setSubText("$handle • contribution change")
-                setContentTitle("${signed(oldShowedContribution)} → ${signed(contribution)}")
+                setSubText(handle)
+                setContentTitle("Contribution change:  ${signed(oldShowedContribution)} → ${signed(contribution)}")
                 setSmallIcon(R.drawable.ic_person)
                 setNotificationSilent()
                 setAutoCancel(true)
+                setShowWhen(false)
                 setContentIntent(makePendingIntentOpenURL("https://codeforces.com/profile/$handle", this@AccountsJobService))
                 extras = Bundle().apply {
                     putInt("contribution", oldShowedContribution)
