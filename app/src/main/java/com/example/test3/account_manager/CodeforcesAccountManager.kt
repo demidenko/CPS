@@ -6,11 +6,10 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import androidx.core.text.set
-import com.example.test3.*
-import com.squareup.moshi.JsonDataException
-import com.squareup.moshi.JsonEncodingException
-import com.squareup.moshi.JsonReader
-import kotlinx.coroutines.delay
+import com.example.test3.CF
+import com.example.test3.CodeforcesAPIStatus
+import com.example.test3.MainActivity
+import com.example.test3.readURLData
 
 class CodeforcesAccountManager(context: Context): AccountManager(context), ColoredHandles {
 
@@ -39,42 +38,24 @@ class CodeforcesAccountManager(context: Context): AccountManager(context), Color
 
         var __cachedInfo: CodeforcesUserInfo? = null
 
-        val NAMES = JsonReader.Options.of("handle", "rating", "contribution")
-
     }
 
     override suspend fun downloadInfo(data: String): CodeforcesUserInfo {
         val handle = data
-        return try {
-            val res = CodeforcesUserInfo(STATUS.FAILED, handle)
-            with(JsonReaderFromURL("https://codeforces.com/api/user.info?handles=$handle") ?: return res) {
-                readObject {
-                    if(nextString("status") == "FAILED") {
-                        if (nextString("comment") == "Call limit exceeded") {
-                            delay(500)
-                            return downloadInfo(data)
-                        }
-                        return res.apply { status = STATUS.NOT_FOUND }
-                    }
-                    nextName()
-                    readArrayOfObjects {
-                        while (hasNext()) {
-                            when (selectName(NAMES)) {
-                                0 -> res.handle = nextString()
-                                1 -> res.rating = nextInt()
-                                2 -> res.contribution = nextInt()
-                                else -> skipNameAndValue()
-                            }
-                        }
-                    }
-                }
-                res.apply { status = STATUS.OK }
-            }
-        }catch (e: JsonEncodingException){
-            CodeforcesUserInfo(STATUS.FAILED, handle)
-        }catch (e: JsonDataException){
-            CodeforcesUserInfo(STATUS.FAILED, handle)
+        val res = CodeforcesUserInfo(STATUS.FAILED, handle)
+        val response = CF.getUser(handle) ?: return res
+        if(response.status == CodeforcesAPIStatus.FAILED){
+            if(response.comment == "handles: User with handle $handle not found") return res.copy( status = STATUS.NOT_FOUND )
+            return res
         }
+
+        val info = response.result!![0]
+        return res.copy(
+            status = STATUS.OK,
+            handle = info.handle,
+            rating = info.rating,
+            contribution = info.contribution
+        )
     }
 
     override var cachedInfo: UserInfo?

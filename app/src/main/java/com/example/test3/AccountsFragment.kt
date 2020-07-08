@@ -162,9 +162,9 @@ class AccountsFragment: Fragment() {
     fun addAccount() {
         val emptyPanels = panels.filter { it.isEmpty() }
 
-        if(emptyPanels.isEmpty()) Toast.makeText(activity, "Nothing to add", Toast.LENGTH_SHORT).show()
+        if(emptyPanels.isEmpty()) Toast.makeText(requireActivity(), "Nothing to add", Toast.LENGTH_SHORT).show()
         else{
-            val adapter = ArrayAdapter<String>(context!!, android.R.layout.select_dialog_item)
+            val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item)
             emptyPanels.forEach {
                 adapter.add(it.manager.PREFERENCES_FILE_NAME)
             }

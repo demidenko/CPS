@@ -40,7 +40,6 @@ class CodeforcesContestWatchService: Service() {
             ACTION_START -> {
                 val handle = intent.getStringExtra("handle")!!
                 val contestID = intent.getIntExtra("contestID", -1)
-                println("service onStartCommand $handle $contestID")
                 stop()
                 start(handle, contestID, NotificationCompat.Builder(this, NotificationChannels.codeforces_contest_watcher).apply {
                     setSmallIcon(R.drawable.ic_contest)
