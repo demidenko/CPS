@@ -2,8 +2,8 @@ package com.example.test3.job_services
 
 import android.content.Context
 import com.example.test3.CodeforcesNewsItemsRecentAdapter
-import com.example.test3.CodeforcesUtils
-import com.example.test3.readURLData
+import com.example.test3.utils.CodeforcesAPI
+import com.example.test3.utils.CodeforcesUtils
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
@@ -61,7 +61,9 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
 
     private val highRated = arrayListOf("user-orange", "user-red", "user-legendary")
     override suspend fun doJob(){
-        val recentBlogs = CodeforcesNewsItemsRecentAdapter.parsePage(readURLData("https://codeforces.com/recent-actions?locale=ru") ?: return)
+        val recentBlogs = CodeforcesNewsItemsRecentAdapter.parsePage(
+            CodeforcesAPI.getPageSource("recent-actions", "ru") ?: return
+        )
         if(recentBlogs.isEmpty()) return
 
         val currentTime = System.currentTimeMillis()

@@ -1,6 +1,6 @@
 package com.example.test3.contest_watch
 
-import com.example.test3.*
+import com.example.test3.utils.*
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import kotlinx.coroutines.*
@@ -119,7 +119,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
 
                 if(phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST){
                     //get progress of testing (0% ... 100%)
-                    readURLData("https://codeforces.com/contest/$contestID")?.let { page ->
+                    CodeforcesAPI.getPageSource("contest/$contestID", "en")?.let { page ->
                         var i = page.indexOf("<span class=\"contest-state-regular\">")
                         if (i != -1) {
                             i = page.indexOf(">", i + 1)

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.test3.*
+import com.example.test3.utils.readURLData
 
 class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
 

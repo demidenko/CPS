@@ -1,4 +1,4 @@
-package com.example.test3
+package com.example.test3.utils
 
 import android.text.Html
 import androidx.core.text.HtmlCompat
@@ -6,6 +6,7 @@ import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 import okio.Okio
 import java.io.IOException
 import java.io.InputStream
@@ -19,6 +20,9 @@ import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLException
 import javax.net.ssl.X509TrustManager
+
+
+val httpClient = OkHttpClient()
 
 suspend fun createConnectionStream(address: String): InputStream? = withContext(Dispatchers.IO){
     val c = (URL(address).openConnection() as HttpsURLConnection).apply {
@@ -62,7 +66,7 @@ fun fromHTML(s: String): String = Html.fromHtml(s, HtmlCompat.FROM_HTML_MODE_LEG
 
 ///JsonReader help
 suspend fun JsonReaderFromURL(address: String): JsonReader?{
-    return JsonReader.of(Okio.buffer(Okio.source(createConnectionStream(address)?: return null)))
+    return JsonReader.of(Okio.buffer(Okio.source(createConnectionStream(address) ?: return null)))
 }
 
 inline fun JsonReader.readObject(body: () -> Unit) {

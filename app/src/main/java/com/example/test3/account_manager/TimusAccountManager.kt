@@ -1,8 +1,8 @@
 package com.example.test3.account_manager
 
 import android.content.Context
-import com.example.test3.fromHTML
-import com.example.test3.readURLData
+import com.example.test3.utils.fromHTML
+import com.example.test3.utils.readURLData
 
 class TimusAccountManager(context: Context): AccountManager(context) {
     data class TimusUserInfo(
@@ -104,7 +104,7 @@ class TimusAccountManager(context: Context): AccountManager(context) {
             if(i==-1) break
             i = s.indexOf("?id=", i+1)
             val userid = s.substring(i+4, s.indexOf('"',i))
-            val username = fromHTML(s.substring(s.indexOf('>',i)+1, s.indexOf("</A",i)))
+            val username = fromHTML(s.substring(s.indexOf('>', i) + 1, s.indexOf("</A", i)))
             res += Pair("$username $userid", userid)
         }
         return res

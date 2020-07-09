@@ -22,6 +22,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
+import com.example.test3.utils.CodeforcesAPI
+import com.example.test3.utils.fromHTML
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -183,9 +185,9 @@ class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
     }
 
     val fragments = arrayOf(
-        CodeforcesNewsMainFragment("CF MAIN", "https://codeforces.com/"),
-        CodeforcesNewsFragment("CF TOP", "https://codeforces.com/top"),
-        CodeforcesNewsRecentFragment("CF RECENT", "https://codeforces.com/recent-actions"),
+        CodeforcesNewsMainFragment("CF MAIN", ""),
+        CodeforcesNewsFragment("CF TOP", "top"),
+        CodeforcesNewsRecentFragment("CF RECENT", "recent-actions"),
         CodeforcesNewsLostRecentFragment("CF LOST")
     )
 
@@ -195,7 +197,7 @@ class CodeforcesNewsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
 
 
 
-open class CodeforcesNewsFragment(val title: String, val address: String) : Fragment() {
+open class CodeforcesNewsFragment(val title: String, val pageName: String?) : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -221,7 +223,7 @@ open class CodeforcesNewsFragment(val title: String, val address: String) : Frag
     var lastReloadTime = 0L
 
     open suspend fun reload(lang: String) {
-        val s = if(address.isEmpty()) "" else readURLData("$address?locale=$lang") ?: return
+        val s = pageName?.let { CodeforcesAPI.getPageSource(pageName, lang) ?: return } ?: ""
         viewAdapter.parseData(s)
         lastReloadTime = System.currentTimeMillis()
     }
@@ -232,7 +234,7 @@ open class CodeforcesNewsFragment(val title: String, val address: String) : Frag
 
 }
 
-open class CodeforcesNewsMainFragment(title: String, address: String) : CodeforcesNewsFragment(title, address) {
+open class CodeforcesNewsMainFragment(title: String, pageName: String?) : CodeforcesNewsFragment(title, pageName) {
 
     companion object {
         const val CODEFORCES_NEWS_VIEWED = "codeforces_news_viewed"
@@ -262,7 +264,7 @@ open class CodeforcesNewsMainFragment(title: String, address: String) : Codeforc
 
 
 
-class CodeforcesNewsRecentFragment(title: String, address: String) : CodeforcesNewsFragment(title, address) {
+class CodeforcesNewsRecentFragment(title: String, pageName: String) : CodeforcesNewsFragment(title, pageName) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewAdapter = CodeforcesNewsItemsRecentAdapter(requireActivity() as MainActivity)
@@ -276,7 +278,7 @@ class CodeforcesNewsRecentFragment(title: String, address: String) : CodeforcesN
 
 }
 
-class CodeforcesNewsLostRecentFragment(title: String) : CodeforcesNewsMainFragment(title, "") {
+class CodeforcesNewsLostRecentFragment(title: String) : CodeforcesNewsMainFragment(title, null) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewAdapter = CodeforcesNewsItemsLostRecentAdapter(requireActivity() as MainActivity)
@@ -317,7 +319,14 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
             i = s.indexOf("<div class=\"topic\"", i + 1)
             if (i == -1) break
 
-            val title = fromHTML(s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i)))
+            val title = fromHTML(
+                s.substring(
+                    s.indexOf(
+                        "<p>",
+                        i
+                    ) + 3, s.indexOf("</p>", i)
+                )
+            )
 
             i = s.indexOf("entry/", i)
             val id = s.substring(i+6, s.indexOf('"',i))
@@ -457,7 +466,14 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
                 i = s.indexOf("entry/", i)
                 val id = s.substring(i+6, s.indexOf('"',i))
 
-                val title = fromHTML(s.substring(s.indexOf(">",i)+1, s.indexOf("</a",i)))
+                val title = fromHTML(
+                    s.substring(
+                        s.indexOf(
+                            ">",
+                            i
+                        ) + 1, s.indexOf("</a", i)
+                    )
+                )
 
                 val comments = mutableListOf<Pair<String,String>>()
                 var lastCommentId = ""

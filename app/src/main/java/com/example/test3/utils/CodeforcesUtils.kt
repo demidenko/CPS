@@ -1,4 +1,4 @@
-package com.example.test3
+package com.example.test3.utils
 
 import com.example.test3.account_manager.NOT_RATED
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
@@ -8,17 +8,21 @@ import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import okhttp3.ResponseBody
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 import java.io.IOException
 
 object CodeforcesUtils {
 
     suspend fun getBlogCreationTimeMillis(blogID: String): Long = withContext(Dispatchers.IO){
-        val blogInfo = CF.getBlog(blogID.toInt()) ?: return@withContext 0L
+        val response = CodeforcesAPI.getBlogEntry(blogID.toInt()) ?: return@withContext 0L
+        val blogInfo = response.result ?: return@withContext 0L
         return@withContext blogInfo.creationTimeSeconds * 1000
     }
 
@@ -67,16 +71,16 @@ data class CodeforcesBlogEntry(
 )
 
 
-object CF {
+object CodeforcesAPI {
 
-    interface CFAPI {
+    interface API {
         @GET("user.info")
         fun getUser(
             @Query("handles") handle: String
         ): Call<CodeforcesAPIResponse<List<CodeforcesUser>>>
 
         @GET("blogEntry.view")
-        fun getBlog(
+        fun getBlogEntry(
             @Query("blogEntryId") blogID: Int,
             @Query("locale") lang: String = "ru"
         ): Call<CodeforcesAPIResponse<CodeforcesBlogEntry>>
@@ -88,29 +92,48 @@ object CF {
         ): Call<CodeforcesAPIResponse<List<CodeforcesBlogEntry>>>
     }
 
-    private val codeforcesAPI = Retrofit.Builder()
+    interface WEB {
+        @GET("data/handles")
+        fun getHandleSuggestions(
+            @Query("q") prefix: String
+        ): Call<ResponseBody>
+
+        @GET("{page}")
+        fun getPage(
+            @Path("page") page: String,
+            @Query("locale") lang: String
+        ): Call<ResponseBody>
+    }
+
+    private val api = Retrofit.Builder()
         .baseUrl("https://codeforces.com/api/")
         .addConverterFactory(MoshiConverterFactory.create())
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
+        .client(httpClient)
         .build()
-        .create(CFAPI::class.java)
+        .create(API::class.java)
+
+    private val web = Retrofit.Builder()
+        .baseUrl("https://codeforces.com/")
+        .addCallAdapterFactory(CoroutineCallAdapterFactory())
+        .client(httpClient)
+        .build()
+        .create(WEB::class.java)
 
     private suspend fun <T> makeCall(call: Call<CodeforcesAPIResponse<T>>): CodeforcesAPIResponse<T>? {
         var c = call
         while(true){
             try{
                 val r = c.execute()
-                if(!r.isSuccessful){
-                    val s = r.errorBody()?.string() ?: return null
-                    val er: CodeforcesAPIErrorResponse = CodeforcesAPIErrorResponse.jsonAdapter.fromJson(s) ?: return null
-                    if(er.comment == "Call limit exceeded"){
-                        delay(500)
-                        c = c.clone()
-                        continue
-                    }
-                    return CodeforcesAPIResponse(er)
+                if(r.isSuccessful) return r.body()
+                val s = r.errorBody()?.string() ?: return null
+                val er: CodeforcesAPIErrorResponse = CodeforcesAPIErrorResponse.jsonAdapter.fromJson(s) ?: return null
+                if(er.comment == "Call limit exceeded"){
+                    delay(500)
+                    c = c.clone()
+                    continue
                 }
-                return r.body()
+                return CodeforcesAPIResponse(er)
             }catch (e : IOException){
                 return null
             }
@@ -118,25 +141,27 @@ object CF {
     }
 
     suspend fun getUser(handle: String): CodeforcesAPIResponse<List<CodeforcesUser>>? {
-        return makeCall(codeforcesAPI.getUser(handle))
+        return makeCall(api.getUser(handle))
     }
 
-    suspend fun getBlog(blogID: Int): CodeforcesBlogEntry? {
-        val res = makeCall(codeforcesAPI.getBlog(blogID)) ?: return null
+    suspend fun getBlogEntry(blogID: Int): CodeforcesAPIResponse<CodeforcesBlogEntry>? {
+        return makeCall(api.getBlogEntry(blogID))
+    }
 
-        if(res.status == CodeforcesAPIStatus.OK){
-            return res.result
-        }else{
+    suspend fun getHandleSuggestions(str: String): Response<ResponseBody>? {
+        try {
+            return web.getHandleSuggestions(str).execute()
+        }catch (e: IOException){
             return null
         }
     }
 
-    suspend fun getUserBlogs(handle: String): List<CodeforcesBlogEntry>? {
-        val res = makeCall(codeforcesAPI.getUserBlogs(handle)) ?: return null
-
-        if(res.status == CodeforcesAPIStatus.OK){
-            return res.result
-        }else{
+    suspend fun getPageSource(page: String, lang: String): String? {
+        try {
+            return withContext(Dispatchers.IO){
+                web.getPage(page, lang).execute().body()?.string()
+            }
+        }catch (e: IOException){
             return null
         }
     }

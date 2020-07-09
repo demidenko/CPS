@@ -5,6 +5,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import com.example.test3.*
+import com.example.test3.utils.fromHTML
+import com.example.test3.utils.readURLData
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -46,7 +48,7 @@ class NewsJobService : CoroutineJobService() {
             val currentID = s.substring(s.indexOf("_",i)+1, s.indexOf(">",i)).toInt()
             if(lastNewsID!=-1 && currentID<=lastNewsID) break
 
-            val title = fromHTML(s.substring(i,s.indexOf("<br><br>", i)))
+            val title = fromHTML(s.substring(i, s.indexOf("<br><br>", i)))
 
             news.add(Pair(currentID,title))
         }

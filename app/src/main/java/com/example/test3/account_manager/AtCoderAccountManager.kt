@@ -1,7 +1,9 @@
 package com.example.test3.account_manager
 
 import android.content.Context
-import com.example.test3.readURLData
+import com.example.test3.utils.AtCoderAPI
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class AtCoderAccountManager(context: Context): AccountManager(context), ColoredHandles{
 
@@ -33,9 +35,13 @@ class AtCoderAccountManager(context: Context): AccountManager(context), ColoredH
     override suspend fun downloadInfo(data: String): UserInfo {
         val handle = data
         val res = AtCoderUserInfo(STATUS.FAILED, handle)
-        val s = readURLData("https://atcoder.jp/users/$handle") ?: return res
+        val response = AtCoderAPI.getUser(handle) ?: return res
+        if(!response.isSuccessful){
+            if(response.code() == 404) return res.apply{ status = STATUS.NOT_FOUND }
+            return res
+        }
+        val s = response.body()?.string() ?: return res
         var i = s.lastIndexOf("class=\"username\"")
-        if(i==-1) return res.apply { status = STATUS.NOT_FOUND }
         i = s.indexOf("</span", i)
         res.handle = s.substring(s.lastIndexOf('>',i)+1, i)
         i = s.indexOf("<th class=\"no-break\">Rating</th>")
@@ -72,8 +78,9 @@ class AtCoderAccountManager(context: Context): AccountManager(context), ColoredH
         return getHandleColor(info.rating).getARGB(this@AtCoderAccountManager)
     }
 
-    override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? {
-        val s = readURLData("https://atcoder.jp/ranking/all?f.UserScreenName=*$str*") ?: return null
+    override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? = withContext(Dispatchers.IO) {
+        val response = AtCoderAPI.getRankingSearch("*$str*") ?: return@withContext null
+        val s = response.body()?.string() ?: return@withContext null
         val res = ArrayList<Pair<String, String>>()
         var i = s.indexOf("<div class=\"table-responsive\">")
         while(true){
@@ -86,7 +93,7 @@ class AtCoderAccountManager(context: Context): AccountManager(context), ColoredH
             val rating = s.substring(s.indexOf("<b>",j)+3, s.indexOf("</b>",j))
             res += Pair("$handle $rating", handle)
         }
-        return res
+        return@withContext res
     }
 
     override fun getHandleColor(rating: Int): HandleColor {

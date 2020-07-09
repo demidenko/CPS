@@ -6,10 +6,11 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import androidx.core.text.set
-import com.example.test3.CF
-import com.example.test3.CodeforcesAPIStatus
 import com.example.test3.MainActivity
-import com.example.test3.readURLData
+import com.example.test3.utils.CodeforcesAPI
+import com.example.test3.utils.CodeforcesAPIStatus
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class CodeforcesAccountManager(context: Context): AccountManager(context), ColoredHandles {
 
@@ -43,12 +44,11 @@ class CodeforcesAccountManager(context: Context): AccountManager(context), Color
     override suspend fun downloadInfo(data: String): CodeforcesUserInfo {
         val handle = data
         val res = CodeforcesUserInfo(STATUS.FAILED, handle)
-        val response = CF.getUser(handle) ?: return res
+        val response = CodeforcesAPI.getUser(handle) ?: return res
         if(response.status == CodeforcesAPIStatus.FAILED){
             if(response.comment == "handles: User with handle $handle not found") return res.copy( status = STATUS.NOT_FOUND )
             return res
         }
-
         val info = response.result!![0]
         return res.copy(
             status = STATUS.OK,
@@ -85,8 +85,9 @@ class CodeforcesAccountManager(context: Context): AccountManager(context), Color
         return getHandleColor(info.rating).getARGB(this@CodeforcesAccountManager)
     }
 
-    override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? {
-        val s = readURLData("https://codeforces.com/data/handles?q=$str") ?: return null
+    override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? = withContext(Dispatchers.IO){
+        val response = CodeforcesAPI.getHandleSuggestions(str) ?: return@withContext null
+        val s = response.body()?.string() ?: return@withContext null
         val res = ArrayList<Pair<String, String>>()
         s.split('\n').filter { !it.contains('=') }.forEach {
             val i = it.indexOf('|')
@@ -95,7 +96,7 @@ class CodeforcesAccountManager(context: Context): AccountManager(context), Color
                 res += Pair(handle, handle)
             }
         }
-        return res
+        return@withContext res
     }
 
     override fun getHandleColor(rating: Int): HandleColor {

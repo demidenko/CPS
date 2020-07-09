@@ -1,7 +1,7 @@
 package com.example.test3.account_manager
 
 import android.content.Context
-import com.example.test3.readURLData
+import com.example.test3.utils.readURLData
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
