@@ -1,8 +1,9 @@
 package com.example.test3.utils
 
 import com.example.test3.account_manager.NOT_RATED
+import com.example.test3.contest_watch.CodeforcesContestPhase
+import com.example.test3.contest_watch.CodeforcesContestType
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
@@ -20,10 +21,10 @@ import java.io.IOException
 
 object CodeforcesUtils {
 
-    suspend fun getBlogCreationTimeMillis(blogID: String): Long = withContext(Dispatchers.IO){
-        val response = CodeforcesAPI.getBlogEntry(blogID.toInt()) ?: return@withContext 0L
-        val blogInfo = response.result ?: return@withContext 0L
-        return@withContext blogInfo.creationTimeSeconds * 1000
+    suspend fun getBlogCreationTimeMillis(blogID: String): Long {
+        val response = CodeforcesAPI.getBlogEntry(blogID.toInt()) ?: return 0L
+        val blogInfo = response.result ?: return 0L
+        return blogInfo.creationTimeSeconds * 1000
     }
 
 }
@@ -50,9 +51,21 @@ data class CodeforcesAPIErrorResponse(
     val comment: String
 ){
     companion object{
-        val jsonAdapter: JsonAdapter<CodeforcesAPIErrorResponse> = Moshi.Builder().build().adapter(CodeforcesAPIErrorResponse::class.java)
+        //val jsonAdapter: JsonAdapter<CodeforcesAPIErrorResponse> = Moshi.Builder().build().adapter(CodeforcesAPIErrorResponse::class.java)
+        val jsonAdapter = CodeforcesAPIErrorResponseJsonAdapter(Moshi.Builder().build())
     }
 }
+
+@JsonClass(generateAdapter = true)
+data class CodeforcesContest(
+    val id: Int,
+    val name: String,
+    val phase: CodeforcesContestPhase,
+    val type: CodeforcesContestType,
+    val durationSeconds: Long,
+    val startTimeSeconds: Long,
+    val relativeTimeSeconds: Long
+)
 
 @JsonClass(generateAdapter = true)
 data class CodeforcesUser(
@@ -74,6 +87,12 @@ data class CodeforcesBlogEntry(
 object CodeforcesAPI {
 
     interface API {
+        @GET("contest.list")
+        fun getContests(
+            @Query("locale") lang: String = "en",
+            @Query("gym") gym: Boolean = false
+        ): Call<CodeforcesAPIResponse<List<CodeforcesContest>>>
+
         @GET("user.info")
         fun getUser(
             @Query("handles") handle: String
@@ -140,13 +159,12 @@ object CodeforcesAPI {
         }
     }
 
-    suspend fun getUser(handle: String): CodeforcesAPIResponse<List<CodeforcesUser>>? {
-        return makeCall(api.getUser(handle))
-    }
+    suspend fun getContests(): CodeforcesAPIResponse<List<CodeforcesContest>>? = withContext(Dispatchers.IO){ makeCall(api.getContests()) }
 
-    suspend fun getBlogEntry(blogID: Int): CodeforcesAPIResponse<CodeforcesBlogEntry>? {
-        return makeCall(api.getBlogEntry(blogID))
-    }
+    suspend fun getUser(handle: String): CodeforcesAPIResponse<List<CodeforcesUser>>? = withContext(Dispatchers.IO){ makeCall(api.getUser(handle)) }
+
+    suspend fun getBlogEntry(blogID: Int): CodeforcesAPIResponse<CodeforcesBlogEntry>? = withContext(Dispatchers.IO){ makeCall(api.getBlogEntry(blogID)) }
+
 
     suspend fun getHandleSuggestions(str: String): Response<ResponseBody>? {
         try {

@@ -1,17 +1,22 @@
 package com.example.test3
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.test3.contest_watch.CodeforcesContestWatchService
 import com.example.test3.job_services.JobServicesCenter
+import com.example.test3.utils.CodeforcesAPI
+import com.example.test3.utils.CodeforcesContest
+import kotlinx.coroutines.launch
 
 
 class TestFragment : Fragment() {
@@ -60,6 +65,29 @@ class TestFragment : Fragment() {
                 Intent(activity, CodeforcesContestWatchService::class.java)
                     .setAction(CodeforcesContestWatchService.ACTION_STOP)
             )
+        }
+
+        view.findViewById<Button>(R.id.dev_choose_contest).setOnClickListener { button -> button as Button
+            button.isEnabled = false
+
+            activity.scope.launch {
+                val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item)
+                val contests = arrayListOf<CodeforcesContest>()
+                CodeforcesAPI.getContests()?.result?.forEach {
+                    if(it.phase.isFutureOrRunning()){
+                        adapter.add(it.name)
+                        contests.add(it)
+                    }
+                }
+
+                AlertDialog.Builder(activity)
+                    .setTitle("Running or Future Contests")
+                    .setAdapter(adapter) { _, index ->
+                        contestIDEditText.setText(contests[index].id.toString())
+                    }.create().show()
+
+                button.isEnabled = true
+            }
         }
 
         //show running jobs

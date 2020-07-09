@@ -80,13 +80,13 @@ class CodeforcesContestWatchService: Service() {
             scope
         ).apply {
             addCodeforcesContestWatchListener(object : CodeforcesContestWatchListener(){
-                var contestType = CodeforcesContestWatcher.ContestType.UNDEFINED
+                var contestType = CodeforcesContestType.UNDEFINED
                 var changes = false
                 var contestantRank = ""
                 var contestantPoints = ""
                 var participationType = CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED
 
-                override fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestWatcher.ContestType) {
+                override fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType) {
                     changes = true
                     notification.setSubText("$contestName • $handle")
                     this.contestType = contestType
@@ -97,7 +97,7 @@ class CodeforcesContestWatchService: Service() {
 
                     }else{
                         if(p == 0.0) return ""
-                        if(contestType == CodeforcesContestWatcher.ContestType.ICPC) return "+"
+                        if(contestType == CodeforcesContestType.ICPC) return "+"
                     }
 
                     return p.toString().removeSuffix(".0")

@@ -15,16 +15,12 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         NOTPARTICIPATED, OFFICIAL, UNOFFICIAL
     }
 
-    enum class ContestType {
-        CF, ICPC, IOI, UNDEFINED
-    }
-
     private var job: Job? = null
 
     fun start(){
         job = scope.launch {
             val contestName = ChangingValue("")
-            val contestType = ChangingValue(ContestType.UNDEFINED)
+            val contestType = ChangingValue(CodeforcesContestType.UNDEFINED)
             val phaseCodeforces = ChangingValue(CodeforcesContestPhase.UNKNOWN)
             val rank = ChangingValue(-1)
             val pointsTotal = ChangingValue(0.0)
@@ -58,7 +54,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                                             "durationSeconds" -> durationSeconds.value = nextInt()
                                             "startTimeSeconds" -> startTimeSeconds.value = nextInt()
                                             "name" -> contestName.value = nextString()
-                                            "type" -> contestType.value = ContestType.valueOf(nextString())
+                                            "type" -> contestType.value = CodeforcesContestType.valueOf(nextString())
                                             else -> skipValue()
                                         }
                                     }
@@ -187,7 +183,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
 
     fun addCodeforcesContestWatchListener(listener: CodeforcesContestWatchListener) = listeners.add(listener)
 
-    override fun onSetContestNameAndType(contestName: String, contestType: ContestType) {
+    override fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType) {
         listeners.forEach { l -> l.onSetContestNameAndType(contestName, contestType) }
     }
 
@@ -236,10 +232,19 @@ enum class CodeforcesContestPhase{
     PENDING_SYSTEM_TEST,
     SYSTEM_TEST,
     FINISHED
+    ;
+
+    fun isFutureOrRunning(): Boolean {
+        return this != UNKNOWN && this != FINISHED
+    }
+}
+
+enum class CodeforcesContestType {
+    CF, ICPC, IOI, UNDEFINED
 }
 
 abstract class CodeforcesContestWatchListener{
-    abstract fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestWatcher.ContestType)
+    abstract fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType)
     abstract suspend fun onSetProblemNames(problemNames: Array<String>)
     abstract fun onSetContestPhase(phaseCodeforces: CodeforcesContestPhase)
     abstract fun onSetRemainingTime(timeSeconds: Int)

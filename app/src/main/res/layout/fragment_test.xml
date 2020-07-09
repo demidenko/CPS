@@ -29,10 +29,18 @@
         android:id="@+id/dev_watcher"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:columnCount="2"
+        android:columnCount="3"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         >
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/dev_choose_contest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="choose"
+            />
+
         <EditText
             android:id="@+id/dev_text_editor_contest_id"
             android:layout_width="wrap_content"
