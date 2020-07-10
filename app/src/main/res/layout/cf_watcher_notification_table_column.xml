@@ -21,7 +21,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         style="@style/TextAppearance.Compat.Notification.Line2"
-        android:textStyle="bold"
         />
 
 </LinearLayout>

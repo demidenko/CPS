@@ -108,7 +108,14 @@ data class CodeforcesProblemResult(
     val rejectedAttemptCount: Int
 )
 
-
+@JsonClass(generateAdapter = true)
+data class CodeforcesSubmission(
+    val contestId: Int,
+    val problem: CodeforcesProblem,
+    val author: CodeforcesContestStandings.CodeforcesContestParticipant,
+    val verdict: CodeforcesProblemVerdict = CodeforcesProblemVerdict.UNDEFINED,
+    val passedTestCount: Int
+)
 
 
 @JsonClass(generateAdapter = true)
@@ -155,6 +162,12 @@ object CodeforcesAPI {
             //@Query("count") count: Int = 10,
             //@Query("from") from: Int = 1
         ): Call<CodeforcesAPIResponse<CodeforcesContestStandings>>
+
+        @GET("contest.status")
+        fun getContestStatus(
+            @Query("contestId") contestId: Int,
+            @Query("handle") handle: String
+        ): Call<CodeforcesAPIResponse<List<CodeforcesSubmission>>>
     }
 
     interface WEB {
@@ -205,16 +218,17 @@ object CodeforcesAPI {
         }
     }
 
-    suspend fun getContests(): CodeforcesAPIResponse<List<CodeforcesContest>>? = withContext(Dispatchers.IO){ makeCall(api.getContests()) }
+    suspend fun getContests() = withContext(Dispatchers.IO){ makeCall(api.getContests()) }
 
-    suspend fun getUsers(handles: Collection<String>): CodeforcesAPIResponse<List<CodeforcesUser>>? = withContext(Dispatchers.IO){ makeCall(api.getUser(handles.joinToString(separator = ";"))) }
+    suspend fun getUsers(handles: Collection<String>) = withContext(Dispatchers.IO){ makeCall(api.getUser(handles.joinToString(separator = ";"))) }
     suspend fun getUser(handle: String) = getUsers(listOf(handle))
 
-    suspend fun getBlogEntry(blogID: Int): CodeforcesAPIResponse<CodeforcesBlogEntry>? = withContext(Dispatchers.IO){ makeCall(api.getBlogEntry(blogID)) }
+    suspend fun getBlogEntry(blogID: Int) = withContext(Dispatchers.IO){ makeCall(api.getBlogEntry(blogID)) }
 
-    suspend fun getContestStandings(contestID: Int, handles: Collection<String>, showUnofficial: Boolean): CodeforcesAPIResponse<CodeforcesContestStandings>? = withContext(Dispatchers.IO){ makeCall(api.getContestStandings(contestID, handles.joinToString(separator = ";"), showUnofficial)) }
+    suspend fun getContestStandings(contestID: Int, handles: Collection<String>, showUnofficial: Boolean) = withContext(Dispatchers.IO){ makeCall(api.getContestStandings(contestID, handles.joinToString(separator = ";"), showUnofficial)) }
     suspend fun getContestStandings(contestID: Int, handle: String, showUnofficial: Boolean) = getContestStandings(contestID, listOf(handle), showUnofficial)
 
+    suspend fun getContestStatus(contestID: Int, handle: String) = withContext(Dispatchers.IO){ makeCall(api.getContestStatus(contestID, handle)) }
 
     suspend fun getHandleSuggestions(str: String): Response<ResponseBody>? {
         try {
@@ -237,27 +251,31 @@ object CodeforcesAPI {
 
 
 enum class CodeforcesContestPhase{
-    UNKNOWN,
-    BEFORE,
-    CODING,
-    PENDING_SYSTEM_TEST,
-    SYSTEM_TEST,
-    FINISHED
-    ;
+    UNDEFINED,
+    BEFORE, CODING, PENDING_SYSTEM_TEST, SYSTEM_TEST, FINISHED;
 
     fun isFutureOrRunning(): Boolean {
-        return this != UNKNOWN && this != FINISHED
+        return this != UNDEFINED && this != FINISHED
     }
 }
 
 enum class CodeforcesContestType {
-    CF, ICPC, IOI, UNDEFINED
+    UNDEFINED,
+    CF, ICPC, IOI
 }
 
 enum class CodeforcesParticipationType {
-    NOT_PARTICIPATED, CONTESTANT, OUT_OF_COMPETITION, PRACTICE, VIRTUAL
+    NOT_PARTICIPATED,
+    CONTESTANT, PRACTICE, VIRTUAL, MANAGER, OUT_OF_COMPETITION;
+
+    fun participatedInContest(): Boolean = (this == CONTESTANT || this == OUT_OF_COMPETITION)
 }
 
 enum class CodeforcesProblemStatus {
-    FINAL, PRELIMINARY, TESTING
+    FINAL, PRELIMINARY
+}
+
+enum class CodeforcesProblemVerdict {
+    UNDEFINED,
+    FAILED, OK, PARTIAL, COMPILATION_ERROR, RUNTIME_ERROR, WRONG_ANSWER, PRESENTATION_ERROR, TIME_LIMIT_EXCEEDED, MEMORY_LIMIT_EXCEEDED, IDLENESS_LIMIT_EXCEEDED, SECURITY_VIOLATED, CRASHED, INPUT_PREPARATION_CRASHED, CHALLENGED, SKIPPED, TESTING, REJECTED
 }

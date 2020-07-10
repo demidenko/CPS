@@ -14,7 +14,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         job = scope.launch {
             val contestName = ChangingValue("")
             val contestType = ChangingValue(CodeforcesContestType.UNDEFINED)
-            val phaseCodeforces = ChangingValue(CodeforcesContestPhase.UNKNOWN)
+            val phaseCodeforces = ChangingValue(CodeforcesContestPhase.UNDEFINED)
             val rank = ChangingValue(-1)
             val pointsTotal = ChangingValue(0.0)
             val durationSeconds = ChangingValue(-1L)
@@ -22,7 +22,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
             var problemNames: ArrayList<String>? = null
             val participationType = ChangingValue(CodeforcesParticipationType.NOT_PARTICIPATED)
             val sysTestPercentage = ChangingValue(-1)
-            var problemsPoints: List<ChangingValue<CodeforcesProblemResult>> = emptyList()
+            var problemsResults: List<ChangingValue<CodeforcesProblemResult>> = emptyList()
 
             while (true) {
                 var timeSecondsFromStart: Long? = null
@@ -47,16 +47,14 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                         contestType.value = contest.type
 
                         rows.find { row ->
-                            row.party.participantType == CodeforcesParticipationType.CONTESTANT
-                                ||
-                            row.party.participantType == CodeforcesParticipationType.OUT_OF_COMPETITION
+                            row.party.participantType.participatedInContest()
                         }?.let { row ->
                             participationType.value = row.party.participantType
                             rank.value = row.rank
                             pointsTotal.value = row.points
                             with(row.problemResults){
-                                if (this.size != problemsPoints.size) problemsPoints = this.map { ChangingValue(it, true) }
-                                else this.forEachIndexed { index, result -> problemsPoints[index].value = result }
+                                if (this.size != problemsResults.size) problemsResults = this.map { ChangingValue(it, true) }
+                                else this.forEachIndexed { index, result -> problemsResults[index].value = result }
                             }
                         }
                     }
@@ -92,7 +90,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                     if(participationType.value == CodeforcesParticipationType.CONTESTANT){
                         pointsTotal.value = 0.0
                         rank.value = -1
-                        problemsPoints = emptyList()
+                        problemsResults = emptyList()
                         continue
                     }
                 }
@@ -101,15 +99,13 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                     if(rank.isChanged()) onSetContestantRank(rank.value)
                     if(pointsTotal.isChanged()) onSetContestantPoints(pointsTotal.value)
 
-                    problemsPoints.forEachIndexed { index, changingValue ->
+                    problemsResults.forEachIndexed { index, changingValue ->
                         if(changingValue.isChanged()){
                             val result = changingValue.value
                             val problemName = problemNames!![index]
-                            onSetProblemStatus(problemName, result)
+                            onSetProblemResult(problemName, result)
                         }
-                        if(phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST){
-                            //TODO("watch problem passed/failed systest")
-                        }
+
                     }
                 }
 
@@ -149,8 +145,8 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         listeners.forEach { l -> l.onSetProblemNames(problemNames) }
     }
 
-    override fun onSetContestPhase(phaseCodeforces: CodeforcesContestPhase) {
-        listeners.forEach { l -> l.onSetContestPhase(phaseCodeforces) }
+    override fun onSetContestPhase(phase: CodeforcesContestPhase) {
+        listeners.forEach { l -> l.onSetContestPhase(phase) }
     }
 
     override fun onSetRemainingTime(timeSeconds: Long) {
@@ -169,8 +165,8 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         listeners.forEach { l -> l.onSetContestantPoints(points) }
     }
 
-    override fun onSetProblemStatus(problemName: String, result: CodeforcesProblemResult) {
-        listeners.forEach { l -> l.onSetProblemStatus(problemName, result) }
+    override fun onSetProblemResult(problemName: String, result: CodeforcesProblemResult) {
+        listeners.forEach { l -> l.onSetProblemResult(problemName, result) }
     }
 
     override fun onSetParticipationType(type: CodeforcesParticipationType) {
@@ -186,12 +182,12 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
 abstract class CodeforcesContestWatchListener{
     abstract fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType)
     abstract fun onSetProblemNames(problemNames: Array<String>)
-    abstract fun onSetContestPhase(phaseCodeforces: CodeforcesContestPhase)
+    abstract fun onSetContestPhase(phase: CodeforcesContestPhase)
     abstract fun onSetRemainingTime(timeSeconds: Long)
     abstract fun onSetSysTestProgress(percents: Int)
     abstract fun onSetContestantRank(rank: Int)
     abstract fun onSetContestantPoints(points: Double)
-    abstract fun onSetProblemStatus(problemName: String, result: CodeforcesProblemResult)
+    abstract fun onSetProblemResult(problemName: String, result: CodeforcesProblemResult)
     abstract fun onSetParticipationType(type: CodeforcesParticipationType)
     abstract fun commit()
 }

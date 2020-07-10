@@ -6,8 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.os.SystemClock
+import android.text.SpannableStringBuilder
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.text.bold
+import androidx.core.text.color
+import androidx.core.text.italic
 import com.example.test3.NotificationChannels
 import com.example.test3.NotificationIDs
 import com.example.test3.R
@@ -93,16 +97,42 @@ class CodeforcesContestWatchService: Service() {
                     this.contestType = contestType
                 }
 
-                private fun str_pts(p: Double, isTotal: Boolean = false): String {
-                    if(isTotal){
+                private fun doubleToString(x: Double) = x.toString().removeSuffix(".0")
 
-                    }else{
-                        if(p == 0.0) return ""
-                        if(contestType == CodeforcesContestType.ICPC) return "+"
+                private val successColor = resources.getColor(R.color.blog_rating_positive, null)
+                private val failColor = resources.getColor(R.color.reload_fail, null)
+                private fun spanForProblemResult(result: CodeforcesProblemResult): SpannableStringBuilder =
+                    SpannableStringBuilder().apply {
+                        val pts = doubleToString(result.points)
+                        when (contestType) {
+                            CodeforcesContestType.CF -> {
+                                when (result.type) {
+                                    CodeforcesProblemStatus.FINAL -> {
+                                        if(result.points == 0.0){
+                                            if(result.rejectedAttemptCount > 0) color(failColor){ append("-${result.rejectedAttemptCount}") }
+                                        }else{
+                                            bold { color(successColor){ append(pts) } }
+                                        }
+                                    }
+                                    CodeforcesProblemStatus.PRELIMINARY -> {
+                                        if(result.points == 0.0) italic { append("?") }
+                                        else bold { append(pts) }
+                                    }
+                                }
+                            }
+                            CodeforcesContestType.ICPC -> {
+                                if(result.points == 1.0) bold {
+                                    if(result.type == CodeforcesProblemStatus.FINAL) color(successColor){ append("+") }
+                                    else append("+")
+                                }else{
+                                    //if(result.rejectedAttemptCount > 0) append("-${result.rejectedAttemptCount}")
+                                }
+                            }
+                            CodeforcesContestType.IOI -> {
+                                if(result.points != 0.0 ) bold { append(pts) }
+                            }
+                        }
                     }
-
-                    return p.toString().removeSuffix(".0")
-                }
 
                 private val rviewsByProblem = mutableMapOf<String,RemoteViews>()
                 override fun onSetProblemNames(problemNames: Array<String>) {
@@ -118,11 +148,11 @@ class CodeforcesContestWatchService: Service() {
                     }
                 }
 
-                override fun onSetContestPhase(phaseCodeforces: CodeforcesContestPhase) {
+                override fun onSetContestPhase(phase: CodeforcesContestPhase) {
                     changes = true
                     rviews.forEach { it.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime(), null, false) }
                     rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_progress, "") }
-                    rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_phase, phaseCodeforces.name) }
+                    rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_phase, phase.name) }
                 }
 
                 override fun onSetRemainingTime(timeSeconds: Long) {
@@ -145,7 +175,7 @@ class CodeforcesContestWatchService: Service() {
 
                 override fun onSetContestantPoints(points: Double) {
                     changes = true
-                    contestantPoints = str_pts(points, true)
+                    contestantPoints = doubleToString(points)
                     rview_big.setTextViewText(R.id.cf_watcher_notification_points, contestantPoints)
                 }
 
@@ -154,14 +184,12 @@ class CodeforcesContestWatchService: Service() {
                     participationType = type
                 }
 
-                override fun onSetProblemStatus(problemName: String, result: CodeforcesProblemResult) {
+                override fun onSetProblemResult(problemName: String, result: CodeforcesProblemResult) {
                     changes = true
                     rviewsByProblem[problemName]?.run{
-                        setTextViewText(R.id.cf_watcher_notification_table_column_cell, str_pts(result.points))
-                        if(result.type == CodeforcesProblemStatus.FINAL){
-                            setTextColor(R.id.cf_watcher_notification_table_column_cell, resources.getColor(R.color.blog_rating_positive, null))
-                        }
-                    }}
+                        setTextViewText(R.id.cf_watcher_notification_table_column_cell, spanForProblemResult(result))
+                    }
+                }
 
                 override fun commit() {
                     if(!changes) return
