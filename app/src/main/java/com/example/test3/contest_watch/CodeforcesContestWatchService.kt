@@ -84,7 +84,7 @@ class CodeforcesContestWatchService: Service() {
                 var changes = false
                 var contestantRank = ""
                 var contestantPoints = ""
-                var participationType = CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED
+                var participationType = CodeforcesParticipationType.NOTPARTICIPATED
 
                 override fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType) {
                     changes = true
@@ -124,9 +124,9 @@ class CodeforcesContestWatchService: Service() {
                     rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_phase, phaseCodeforces.name) }
                 }
 
-                override fun onSetRemainingTime(timeSeconds: Int) {
+                override fun onSetRemainingTime(timeSeconds: Long) {
                     changes = true
-                    rviews.forEach { it.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime() + TimeUnit.SECONDS.toMillis(timeSeconds.toLong()), null, true) }
+                    rviews.forEach { it.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime() + TimeUnit.SECONDS.toMillis(timeSeconds), null, true) }
                 }
 
                 override fun onSetSysTestProgress(percents: Int) {
@@ -137,7 +137,7 @@ class CodeforcesContestWatchService: Service() {
                 override fun onSetContestantRank(rank: Int) {
                     changes = true
                     contestantRank =
-                        if(participationType == CodeforcesContestWatcher.ParticipationType.OFFICIAL) "$rank"
+                        if(participationType == CodeforcesParticipationType.CONTESTANT) "$rank"
                         else "*$rank"
                     rview_big.setTextViewText(R.id.cf_watcher_notification_rank, contestantRank)
                 }
@@ -148,7 +148,7 @@ class CodeforcesContestWatchService: Service() {
                     rview_big.setTextViewText(R.id.cf_watcher_notification_points, contestantPoints)
                 }
 
-                override fun onSetParticipationType(type: CodeforcesContestWatcher.ParticipationType) {
+                override fun onSetParticipationType(type: CodeforcesParticipationType) {
                     changes = true
                     participationType = type
                 }
@@ -169,13 +169,13 @@ class CodeforcesContestWatchService: Service() {
 
                     notification.setCustomContentView(rview_small.apply {
                         setTextViewText(R.id.cf_watcher_notification_rank,
-                            if(participationType == CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED) "not participated"
+                            if(participationType == CodeforcesParticipationType.NOTPARTICIPATED) "not participated"
                             else "rank: $contestantRank • points: $contestantPoints"
                         )
                     })
 
                     notification.setCustomBigContentView(
-                        if (participationType == CodeforcesContestWatcher.ParticipationType.NOTPARTICIPATED) null
+                        if (participationType == CodeforcesParticipationType.NOTPARTICIPATED) null
                         else rview_big
                     )
 

@@ -1,19 +1,15 @@
 package com.example.test3.contest_watch
 
-import com.example.test3.utils.*
+import com.example.test3.utils.CodeforcesAPI
+import com.example.test3.utils.CodeforcesAPIStatus
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope: CoroutineScope): CodeforcesContestWatchListener(){
-
-    fun address(contestID: Int, handle: String, participationType: ParticipationType): String {
-        return "https://codeforces.com/api/contest.standings?contestId=$contestID&handles=$handle&showUnofficial=" + if(participationType == ParticipationType.OFFICIAL) "false" else "true"
-    }
-
-    enum class ParticipationType {
-        NOTPARTICIPATED, OFFICIAL, UNOFFICIAL
-    }
 
     private var job: Job? = null
 
@@ -24,78 +20,47 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
             val phaseCodeforces = ChangingValue(CodeforcesContestPhase.UNKNOWN)
             val rank = ChangingValue(-1)
             val pointsTotal = ChangingValue(0.0)
-            val durationSeconds = ChangingValue(-1)
-            val startTimeSeconds = ChangingValue(-1)
+            val durationSeconds = ChangingValue(-1L)
+            val startTimeSeconds = ChangingValue(-1L)
             var problemNames: ArrayList<String>? = null
-            val participationType = ChangingValue(ParticipationType.NOTPARTICIPATED)
+            val participationType = ChangingValue(CodeforcesParticipationType.NOTPARTICIPATED)
             val sysTestPercentage = ChangingValue(-1)
             var problemsPoints: List<ChangingValue<Pair<Double, String>>> = emptyList()
 
             while (true) {
-
-                var timeSecondsFromStart: Int? = null
+                var timeSecondsFromStart: Long? = null
                 try {
-                    withContext(Dispatchers.IO) {
-                        with(JsonReaderFromURL(address(contestID, handle, participationType.value)) ?: return@withContext) {
-                            beginObject()
-                            if (nextString("status") == "FAILED"){
-                                val reason = nextString("comment")
-                                if(reason == "contestId: Contest with id $contestID has not started")
-                                    phaseCodeforces.value = CodeforcesContestPhase.BEFORE
-                                return@withContext
-                            }
-                            nextName()
-                            readObject {
-                                while (hasNext()) when (nextName()) {
-                                    "contest" -> readObject {
-                                        while (hasNext()) when (nextName()) {
-                                            "phase" -> phaseCodeforces.value = CodeforcesContestPhase.valueOf(nextString())
-                                            "relativeTimeSeconds" -> timeSecondsFromStart = nextInt()
-                                            "durationSeconds" -> durationSeconds.value = nextInt()
-                                            "startTimeSeconds" -> startTimeSeconds.value = nextInt()
-                                            "name" -> contestName.value = nextString()
-                                            "type" -> contestType.value = CodeforcesContestType.valueOf(nextString())
-                                            else -> skipValue()
-                                        }
-                                    }
-                                    "problems" -> {
-                                        if (problemNames == null) {
-                                            val tmp = ArrayList<String>()
-                                            readArray { tmp.add(readObjectFields("index")[0] as String) }
-                                            problemNames = tmp
-                                            onSetProblemNames(tmp.toTypedArray())
-                                        } else skipValue()
-                                    }
-                                    "rows" -> readArrayOfObjects {
-                                        lateinit var tp : String
-                                        val problemResults = arrayListOf<Pair<Double,String>>()
-                                        while (hasNext()) when (nextName()) {
-                                            "party" -> {
-                                                tp = readObjectFields("participantType")[0] as String
-                                                when(tp){
-                                                    "CONTESTANT" -> participationType.value = ParticipationType.OFFICIAL
-                                                    "OUT_OF_COMPETITION" -> participationType.value = ParticipationType.UNOFFICIAL
-                                                }
-                                            }
-                                            "rank" -> if(tp=="PRACTICE") skipValue() else rank.value = nextInt()
-                                            "points" -> if(tp=="PRACTICE") skipValue() else pointsTotal.value = nextDouble()
-                                            "problemResults" -> if(tp=="PRACTICE") skipValue() else readArray {
-                                                val arr = readObjectFields("points", "type")
-                                                val pts = arr[0] as Double
-                                                val status = arr[1] as String
-                                                problemResults.add(Pair(pts, status))
-                                            }
-                                            else -> skipValue()
-                                        }
-                                        if(tp != "PRACTICE") {
-                                            if (problemResults.size != problemsPoints.size) problemsPoints = problemResults.map { ChangingValue(it, true) }
-                                            else problemResults.forEachIndexed { index, pair -> problemsPoints[index].value = pair }
-                                        }
-                                    }
-                                    else -> skipValue()
-                                }
-                            }
-                            this.close()
+                    CodeforcesAPI.getContestStandings(contestID, handle, participationType.value!=CodeforcesParticipationType.CONTESTANT)?.run{
+                        if(status == CodeforcesAPIStatus.FAILED){
+                            if(comment == "contestId: Contest with id $contestID has not started")
+                                phaseCodeforces.value = CodeforcesContestPhase.BEFORE
+                            return@run
+                        }
+                        val res = result ?: return@run
+                        with(res.contest){
+                            phaseCodeforces.value = this.phase
+                            timeSecondsFromStart = this.relativeTimeSeconds
+                            durationSeconds.value = this.durationSeconds
+                            startTimeSeconds.value = this.startTimeSeconds
+                            contestName.value = this.name
+                            contestType.value = this.type
+                        }
+                        if(problemNames == null){
+                            val tmp = res.problems.mapTo(ArrayList()) { it.index }
+                            problemNames = tmp
+                            onSetProblemNames(tmp.toTypedArray())
+                        }
+                        result.rows.find { row ->
+                            row.party.participantType == CodeforcesParticipationType.CONTESTANT
+                                ||
+                            row.party.participantType == CodeforcesParticipationType.OUT_OF_COMPETITION
+                        }?.let { row ->
+                            participationType.value = row.party.participantType
+                            rank.value = row.rank
+                            pointsTotal.value = row.points
+                            val problemResults = row.problemResults.map { Pair(it.points, it.type) }
+                            if (problemResults.size != problemsPoints.size) problemsPoints = problemResults.map { ChangingValue(it, true) }
+                            else problemResults.forEachIndexed { index, pair -> problemsPoints[index].value = pair }
                         }
                     }
                 }catch (e: JsonEncodingException){
@@ -131,7 +96,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
 
                 if(participationType.isChanged()){
                     onSetParticipationType(participationType.value)
-                    if(participationType.value == ParticipationType.OFFICIAL){
+                    if(participationType.value == CodeforcesParticipationType.CONTESTANT){
                         pointsTotal.value = 0.0
                         rank.value = -1
                         problemsPoints = emptyList()
@@ -195,7 +160,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         listeners.forEach { l -> l.onSetContestPhase(phaseCodeforces) }
     }
 
-    override fun onSetRemainingTime(timeSeconds: Int) {
+    override fun onSetRemainingTime(timeSeconds: Long) {
         listeners.forEach { l -> l.onSetRemainingTime(timeSeconds) }
     }
 
@@ -215,13 +180,27 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         listeners.forEach { l -> l.onSetProblemStatus(problem, status, points) }
     }
 
-    override fun onSetParticipationType(type: ParticipationType) {
+    override fun onSetParticipationType(type: CodeforcesParticipationType) {
         listeners.forEach { l -> l.onSetParticipationType(type) }
     }
 
     override fun commit() {
         listeners.forEach { l -> l.commit() }
     }
+}
+
+
+abstract class CodeforcesContestWatchListener{
+    abstract fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType)
+    abstract suspend fun onSetProblemNames(problemNames: Array<String>)
+    abstract fun onSetContestPhase(phaseCodeforces: CodeforcesContestPhase)
+    abstract fun onSetRemainingTime(timeSeconds: Long)
+    abstract fun onSetSysTestProgress(percents: Int)
+    abstract fun onSetContestantRank(rank: Int)
+    abstract fun onSetContestantPoints(points: Double)
+    abstract fun onSetProblemStatus(problem: String, status: String, points: Double)
+    abstract fun onSetParticipationType(type: CodeforcesParticipationType)
+    abstract fun commit()
 }
 
 
@@ -243,19 +222,9 @@ enum class CodeforcesContestType {
     CF, ICPC, IOI, UNDEFINED
 }
 
-abstract class CodeforcesContestWatchListener{
-    abstract fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType)
-    abstract suspend fun onSetProblemNames(problemNames: Array<String>)
-    abstract fun onSetContestPhase(phaseCodeforces: CodeforcesContestPhase)
-    abstract fun onSetRemainingTime(timeSeconds: Int)
-    abstract fun onSetSysTestProgress(percents: Int)
-    abstract fun onSetContestantRank(rank: Int)
-    abstract fun onSetContestantPoints(points: Double)
-    abstract fun onSetProblemStatus(problem: String, status: String, points: Double)
-    abstract fun onSetParticipationType(type: CodeforcesContestWatcher.ParticipationType)
-    abstract fun commit()
+enum class CodeforcesParticipationType {
+    NOTPARTICIPATED, CONTESTANT, OUT_OF_COMPETITION, PRACTICE, VIRTUAL
 }
-
 
 class ChangingValue<T>(private var x: T, private var changingFlag: Boolean = false){
 

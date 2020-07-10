@@ -3,6 +3,7 @@ package com.example.test3.utils
 import com.example.test3.account_manager.NOT_RATED
 import com.example.test3.contest_watch.CodeforcesContestPhase
 import com.example.test3.contest_watch.CodeforcesContestType
+import com.example.test3.contest_watch.CodeforcesParticipationType
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
@@ -57,6 +58,13 @@ data class CodeforcesAPIErrorResponse(
 }
 
 @JsonClass(generateAdapter = true)
+data class CodeforcesUser(
+    val handle: String,
+    val rating: Int = NOT_RATED,
+    val contribution: Int = 0
+)
+
+@JsonClass(generateAdapter = true)
 data class CodeforcesContest(
     val id: Int,
     val name: String,
@@ -68,11 +76,43 @@ data class CodeforcesContest(
 )
 
 @JsonClass(generateAdapter = true)
-data class CodeforcesUser(
-    val handle: String,
-    val rating: Int = NOT_RATED,
-    val contribution: Int = 0
+data class CodeforcesContestStandings(
+    val contest: CodeforcesContest,
+    val problems: List<CodeforcesProblem>,
+    val rows: List<CodeforcesContestStandingsRow>
+){
+    @JsonClass(generateAdapter = true)
+    data class CodeforcesContestStandingsRow(
+        val rank: Int,
+        val points: Double,
+        val party: CodeforcesContestParticipant,
+        val problemResults: List<CodeforcesProblemResult>
+    )
+
+    @JsonClass(generateAdapter = true)
+    data class CodeforcesContestParticipant(
+        val contestId: Int,
+        val participantType: CodeforcesParticipationType,
+        val members: List<CodeforcesUser>
+    )
+}
+
+@JsonClass(generateAdapter = true)
+data class CodeforcesProblem(
+    val name: String,
+    val index: String,
+    val points: Int = 0
 )
+
+@JsonClass(generateAdapter = true)
+data class CodeforcesProblemResult(
+    val points: Double,
+    val type: String,
+    val rejectedAttemptCount: Int
+)
+
+
+
 
 @JsonClass(generateAdapter = true)
 data class CodeforcesBlogEntry(
@@ -95,7 +135,7 @@ object CodeforcesAPI {
 
         @GET("user.info")
         fun getUser(
-            @Query("handles") handle: String
+            @Query("handles") handles: String
         ): Call<CodeforcesAPIResponse<List<CodeforcesUser>>>
 
         @GET("blogEntry.view")
@@ -109,6 +149,15 @@ object CodeforcesAPI {
             @Query("handle") handle: String,
             @Query("locale") lang: String = "ru"
         ): Call<CodeforcesAPIResponse<List<CodeforcesBlogEntry>>>
+
+        @GET("contest.standings")
+        fun getContestStandings(
+            @Query("contestId") contestId: Int,
+            @Query("handles") handles: String,
+            @Query("showUnofficial") showUnofficial: Boolean
+            //@Query("count") count: Int = 10,
+            //@Query("from") from: Int = 1
+        ): Call<CodeforcesAPIResponse<CodeforcesContestStandings>>
     }
 
     interface WEB {
@@ -161,9 +210,13 @@ object CodeforcesAPI {
 
     suspend fun getContests(): CodeforcesAPIResponse<List<CodeforcesContest>>? = withContext(Dispatchers.IO){ makeCall(api.getContests()) }
 
-    suspend fun getUser(handle: String): CodeforcesAPIResponse<List<CodeforcesUser>>? = withContext(Dispatchers.IO){ makeCall(api.getUser(handle)) }
+    suspend fun getUsers(handles: Collection<String>): CodeforcesAPIResponse<List<CodeforcesUser>>? = withContext(Dispatchers.IO){ makeCall(api.getUser(handles.joinToString(separator = ";"))) }
+    suspend fun getUser(handle: String) = getUsers(listOf(handle))
 
     suspend fun getBlogEntry(blogID: Int): CodeforcesAPIResponse<CodeforcesBlogEntry>? = withContext(Dispatchers.IO){ makeCall(api.getBlogEntry(blogID)) }
+
+    suspend fun getContestStandings(contestID: Int, handles: Collection<String>, showUnofficial: Boolean): CodeforcesAPIResponse<CodeforcesContestStandings>? = withContext(Dispatchers.IO){ makeCall(api.getContestStandings(contestID, handles.joinToString(separator = ";"), showUnofficial)) }
+    suspend fun getContestStandings(contestID: Int, handle: String, showUnofficial: Boolean) = getContestStandings(contestID, listOf(handle), showUnofficial)
 
 
     suspend fun getHandleSuggestions(str: String): Response<ResponseBody>? {
