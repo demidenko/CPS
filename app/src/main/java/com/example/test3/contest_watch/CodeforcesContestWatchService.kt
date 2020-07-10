@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat
 import com.example.test3.NotificationChannels
 import com.example.test3.NotificationIDs
 import com.example.test3.R
+import com.example.test3.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -84,7 +85,7 @@ class CodeforcesContestWatchService: Service() {
                 var changes = false
                 var contestantRank = ""
                 var contestantPoints = ""
-                var participationType = CodeforcesParticipationType.NOTPARTICIPATED
+                var participationType = CodeforcesParticipationType.NOT_PARTICIPATED
 
                 override fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType) {
                     changes = true
@@ -104,7 +105,7 @@ class CodeforcesContestWatchService: Service() {
                 }
 
                 private val rviewsByProblem = mutableMapOf<String,RemoteViews>()
-                override suspend fun onSetProblemNames(problemNames: Array<String>) {
+                override fun onSetProblemNames(problemNames: Array<String>) {
                     changes = true
                     rview_big.removeAllViews(R.id.cf_watcher_notification_table_tasks)
                     rviewsByProblem.clear()
@@ -153,11 +154,11 @@ class CodeforcesContestWatchService: Service() {
                     participationType = type
                 }
 
-                override fun onSetProblemStatus(problem: String, status: String, points: Double) {
+                override fun onSetProblemStatus(problemName: String, result: CodeforcesProblemResult) {
                     changes = true
-                    rviewsByProblem[problem]?.run{
-                        setTextViewText(R.id.cf_watcher_notification_table_column_cell, str_pts(points))
-                        if(status == "FINAL"){
+                    rviewsByProblem[problemName]?.run{
+                        setTextViewText(R.id.cf_watcher_notification_table_column_cell, str_pts(result.points))
+                        if(result.type == CodeforcesProblemStatus.FINAL){
                             setTextColor(R.id.cf_watcher_notification_table_column_cell, resources.getColor(R.color.blog_rating_positive, null))
                         }
                     }}
@@ -169,13 +170,13 @@ class CodeforcesContestWatchService: Service() {
 
                     notification.setCustomContentView(rview_small.apply {
                         setTextViewText(R.id.cf_watcher_notification_rank,
-                            if(participationType == CodeforcesParticipationType.NOTPARTICIPATED) "not participated"
+                            if(participationType == CodeforcesParticipationType.NOT_PARTICIPATED) "not participated"
                             else "rank: $contestantRank • points: $contestantPoints"
                         )
                     })
 
                     notification.setCustomBigContentView(
-                        if (participationType == CodeforcesParticipationType.NOTPARTICIPATED) null
+                        if (participationType == CodeforcesParticipationType.NOT_PARTICIPATED) null
                         else rview_big
                     )
 

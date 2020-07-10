@@ -1,9 +1,6 @@
 package com.example.test3.contest_watch
 
-import com.example.test3.utils.CodeforcesAPI
-import com.example.test3.utils.CodeforcesAPIStatus
-import com.squareup.moshi.JsonDataException
-import com.squareup.moshi.JsonEncodingException
+import com.example.test3.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -23,34 +20,33 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
             val durationSeconds = ChangingValue(-1L)
             val startTimeSeconds = ChangingValue(-1L)
             var problemNames: ArrayList<String>? = null
-            val participationType = ChangingValue(CodeforcesParticipationType.NOTPARTICIPATED)
+            val participationType = ChangingValue(CodeforcesParticipationType.NOT_PARTICIPATED)
             val sysTestPercentage = ChangingValue(-1)
-            var problemsPoints: List<ChangingValue<Pair<Double, String>>> = emptyList()
+            var problemsPoints: List<ChangingValue<CodeforcesProblemResult>> = emptyList()
 
             while (true) {
                 var timeSecondsFromStart: Long? = null
-                try {
-                    CodeforcesAPI.getContestStandings(contestID, handle, participationType.value!=CodeforcesParticipationType.CONTESTANT)?.run{
-                        if(status == CodeforcesAPIStatus.FAILED){
-                            if(comment == "contestId: Contest with id $contestID has not started")
-                                phaseCodeforces.value = CodeforcesContestPhase.BEFORE
-                            return@run
-                        }
-                        val res = result ?: return@run
-                        with(res.contest){
-                            phaseCodeforces.value = this.phase
-                            timeSecondsFromStart = this.relativeTimeSeconds
-                            durationSeconds.value = this.durationSeconds
-                            startTimeSeconds.value = this.startTimeSeconds
-                            contestName.value = this.name
-                            contestType.value = this.type
-                        }
+                CodeforcesAPI.getContestStandings(contestID, handle, participationType.value!=CodeforcesParticipationType.CONTESTANT)?.run {
+                    if(status == CodeforcesAPIStatus.FAILED){
+                        if(comment == "contestId: Contest with id $contestID has not started")
+                            phaseCodeforces.value = CodeforcesContestPhase.BEFORE
+                        return@run
+                    }
+                    with(result ?: return@run){
                         if(problemNames == null){
-                            val tmp = res.problems.mapTo(ArrayList()) { it.index }
+                            val tmp = problems.mapTo(ArrayList()) { it.index }
                             problemNames = tmp
                             onSetProblemNames(tmp.toTypedArray())
                         }
-                        result.rows.find { row ->
+
+                        phaseCodeforces.value = contest.phase
+                        timeSecondsFromStart = contest.relativeTimeSeconds
+                        durationSeconds.value = contest.durationSeconds
+                        startTimeSeconds.value = contest.startTimeSeconds
+                        contestName.value = contest.name
+                        contestType.value = contest.type
+
+                        rows.find { row ->
                             row.party.participantType == CodeforcesParticipationType.CONTESTANT
                                 ||
                             row.party.participantType == CodeforcesParticipationType.OUT_OF_COMPETITION
@@ -58,15 +54,12 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                             participationType.value = row.party.participantType
                             rank.value = row.rank
                             pointsTotal.value = row.points
-                            val problemResults = row.problemResults.map { Pair(it.points, it.type) }
-                            if (problemResults.size != problemsPoints.size) problemsPoints = problemResults.map { ChangingValue(it, true) }
-                            else problemResults.forEachIndexed { index, pair -> problemsPoints[index].value = pair }
+                            with(row.problemResults){
+                                if (this.size != problemsPoints.size) problemsPoints = this.map { ChangingValue(it, true) }
+                                else this.forEachIndexed { index, result -> problemsPoints[index].value = result }
+                            }
                         }
                     }
-                }catch (e: JsonEncodingException){
-
-                }catch (e: JsonDataException){
-
                 }
 
 
@@ -110,9 +103,9 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
 
                     problemsPoints.forEachIndexed { index, changingValue ->
                         if(changingValue.isChanged()){
-                            val (pts, status) = changingValue.value
+                            val result = changingValue.value
                             val problemName = problemNames!![index]
-                            onSetProblemStatus(problemName, status, pts)
+                            onSetProblemStatus(problemName, result)
                         }
                         if(phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST){
                             //TODO("watch problem passed/failed systest")
@@ -152,7 +145,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         listeners.forEach { l -> l.onSetContestNameAndType(contestName, contestType) }
     }
 
-    override suspend fun onSetProblemNames(problemNames: Array<String>) {
+    override fun onSetProblemNames(problemNames: Array<String>) {
         listeners.forEach { l -> l.onSetProblemNames(problemNames) }
     }
 
@@ -176,8 +169,8 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         listeners.forEach { l -> l.onSetContestantPoints(points) }
     }
 
-    override fun onSetProblemStatus(problem: String, status: String, points: Double) {
-        listeners.forEach { l -> l.onSetProblemStatus(problem, status, points) }
+    override fun onSetProblemStatus(problemName: String, result: CodeforcesProblemResult) {
+        listeners.forEach { l -> l.onSetProblemStatus(problemName, result) }
     }
 
     override fun onSetParticipationType(type: CodeforcesParticipationType) {
@@ -192,39 +185,17 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
 
 abstract class CodeforcesContestWatchListener{
     abstract fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType)
-    abstract suspend fun onSetProblemNames(problemNames: Array<String>)
+    abstract fun onSetProblemNames(problemNames: Array<String>)
     abstract fun onSetContestPhase(phaseCodeforces: CodeforcesContestPhase)
     abstract fun onSetRemainingTime(timeSeconds: Long)
     abstract fun onSetSysTestProgress(percents: Int)
     abstract fun onSetContestantRank(rank: Int)
     abstract fun onSetContestantPoints(points: Double)
-    abstract fun onSetProblemStatus(problem: String, status: String, points: Double)
+    abstract fun onSetProblemStatus(problemName: String, result: CodeforcesProblemResult)
     abstract fun onSetParticipationType(type: CodeforcesParticipationType)
     abstract fun commit()
 }
 
-
-enum class CodeforcesContestPhase{
-    UNKNOWN,
-    BEFORE,
-    CODING,
-    PENDING_SYSTEM_TEST,
-    SYSTEM_TEST,
-    FINISHED
-    ;
-
-    fun isFutureOrRunning(): Boolean {
-        return this != UNKNOWN && this != FINISHED
-    }
-}
-
-enum class CodeforcesContestType {
-    CF, ICPC, IOI, UNDEFINED
-}
-
-enum class CodeforcesParticipationType {
-    NOTPARTICIPATED, CONTESTANT, OUT_OF_COMPETITION, PRACTICE, VIRTUAL
-}
 
 class ChangingValue<T>(private var x: T, private var changingFlag: Boolean = false){
 

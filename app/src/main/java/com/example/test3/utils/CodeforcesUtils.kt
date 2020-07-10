@@ -1,9 +1,6 @@
 package com.example.test3.utils
 
 import com.example.test3.account_manager.NOT_RATED
-import com.example.test3.contest_watch.CodeforcesContestPhase
-import com.example.test3.contest_watch.CodeforcesContestType
-import com.example.test3.contest_watch.CodeforcesParticipationType
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
@@ -107,7 +104,7 @@ data class CodeforcesProblem(
 @JsonClass(generateAdapter = true)
 data class CodeforcesProblemResult(
     val points: Double,
-    val type: String,
+    val type: CodeforcesProblemStatus,
     val rejectedAttemptCount: Int
 )
 
@@ -236,4 +233,31 @@ object CodeforcesAPI {
             return null
         }
     }
+}
+
+
+enum class CodeforcesContestPhase{
+    UNKNOWN,
+    BEFORE,
+    CODING,
+    PENDING_SYSTEM_TEST,
+    SYSTEM_TEST,
+    FINISHED
+    ;
+
+    fun isFutureOrRunning(): Boolean {
+        return this != UNKNOWN && this != FINISHED
+    }
+}
+
+enum class CodeforcesContestType {
+    CF, ICPC, IOI, UNDEFINED
+}
+
+enum class CodeforcesParticipationType {
+    NOT_PARTICIPATED, CONTESTANT, OUT_OF_COMPETITION, PRACTICE, VIRTUAL
+}
+
+enum class CodeforcesProblemStatus {
+    FINAL, PRELIMINARY, TESTING
 }
