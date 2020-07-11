@@ -23,6 +23,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
             val participationType = ChangingValue(CodeforcesParticipationType.NOT_PARTICIPATED)
             val sysTestPercentage = ChangingValue(-1)
             var problemsResults: List<ChangingValue<CodeforcesProblemResult>> = emptyList()
+            val testedSubmissions = mutableSetOf<Long>()
 
             while (true) {
                 var timeSecondsFromStart: Long? = null
@@ -71,7 +72,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
 
                 if(phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST){
                     //get progress of testing (0% ... 100%)
-                    CodeforcesAPI.getPageSource("contest/$contestID", "en")?.let { page ->
+                    CodeforcesAPI.getContestPageSource(contestID)?.let { page ->
                         var i = page.indexOf("<span class=\"contest-state-regular\">")
                         if (i != -1) {
                             i = page.indexOf(">", i + 1)
@@ -107,6 +108,25 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                         }
 
                     }
+                }
+
+                if(phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST
+                    && participationType.value.participatedInContest()
+                    && contestType.value == CodeforcesContestType.CF
+                    && problemsResults.count { it.value.type == CodeforcesProblemStatus.PRELIMINARY } > 0
+                ){
+                    CodeforcesAPI.getContestSubmissions(contestID, handle)?.result
+                        ?.filterNot { submission -> testedSubmissions.contains(submission.id) }
+                        ?.asSequence()
+                        ?.filter { submission -> submission.author.participantType.participatedInContest() }
+                        ?.filter { submission -> submission.testset == "TESTS" }
+                        ?.filter { submission -> submission.verdict != CodeforcesProblemVerdict.WAITING }
+                        ?.filter { submission -> submission.verdict != CodeforcesProblemVerdict.TESTING }
+                        ?.filter { submission -> submission.verdict != CodeforcesProblemVerdict.SKIPPED }
+                        ?.forEach { submission ->
+                            testedSubmissions.add(submission.id)
+                            onSetProblemSystestResult(submission)
+                        }
                 }
 
 
@@ -169,6 +189,10 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         listeners.forEach { l -> l.onSetProblemResult(problemName, result) }
     }
 
+    override fun onSetProblemSystestResult(submission: CodeforcesSubmission) {
+        listeners.forEach { l -> l.onSetProblemSystestResult(submission) }
+    }
+
     override fun onSetParticipationType(type: CodeforcesParticipationType) {
         listeners.forEach { l -> l.onSetParticipationType(type) }
     }
@@ -188,6 +212,7 @@ abstract class CodeforcesContestWatchListener{
     abstract fun onSetContestantRank(rank: Int)
     abstract fun onSetContestantPoints(points: Double)
     abstract fun onSetProblemResult(problemName: String, result: CodeforcesProblemResult)
+    abstract fun onSetProblemSystestResult(submission: CodeforcesSubmission)
     abstract fun onSetParticipationType(type: CodeforcesParticipationType)
     abstract fun commit()
 }

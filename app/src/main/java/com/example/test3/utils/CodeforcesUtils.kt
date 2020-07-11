@@ -113,8 +113,10 @@ data class CodeforcesSubmission(
     val contestId: Int,
     val problem: CodeforcesProblem,
     val author: CodeforcesContestStandings.CodeforcesContestParticipant,
-    val verdict: CodeforcesProblemVerdict = CodeforcesProblemVerdict.UNDEFINED,
-    val passedTestCount: Int
+    val verdict: CodeforcesProblemVerdict = CodeforcesProblemVerdict.WAITING,
+    val passedTestCount: Int,
+    val id: Long,
+    val testset: String
 )
 
 
@@ -166,7 +168,8 @@ object CodeforcesAPI {
         @GET("contest.status")
         fun getContestStatus(
             @Query("contestId") contestId: Int,
-            @Query("handle") handle: String
+            @Query("handle") handle: String,
+            @Query("count") count: Int = 1000000000
         ): Call<CodeforcesAPIResponse<List<CodeforcesSubmission>>>
     }
 
@@ -180,6 +183,11 @@ object CodeforcesAPI {
         fun getPage(
             @Path("page") page: String,
             @Query("locale") lang: String
+        ): Call<ResponseBody>
+
+        @GET("contest/{contestID}")
+        fun getContestPage(
+            @Path("contestID") contestID: Int
         ): Call<ResponseBody>
     }
 
@@ -228,7 +236,7 @@ object CodeforcesAPI {
     suspend fun getContestStandings(contestID: Int, handles: Collection<String>, showUnofficial: Boolean) = withContext(Dispatchers.IO){ makeCall(api.getContestStandings(contestID, handles.joinToString(separator = ";"), showUnofficial)) }
     suspend fun getContestStandings(contestID: Int, handle: String, showUnofficial: Boolean) = getContestStandings(contestID, listOf(handle), showUnofficial)
 
-    suspend fun getContestStatus(contestID: Int, handle: String) = withContext(Dispatchers.IO){ makeCall(api.getContestStatus(contestID, handle)) }
+    suspend fun getContestSubmissions(contestID: Int, handle: String) = withContext(Dispatchers.IO){ makeCall(api.getContestStatus(contestID, handle)) }
 
     suspend fun getHandleSuggestions(str: String): Response<ResponseBody>? {
         try {
@@ -247,12 +255,28 @@ object CodeforcesAPI {
             return null
         }
     }
+
+    suspend fun getContestPageSource(contestID: Int): String? {
+        try {
+            return withContext(Dispatchers.IO){
+                web.getContestPage(contestID).execute().body()?.string()
+            }
+        }catch (e: IOException){
+            return null
+        }
+    }
 }
 
 
-enum class CodeforcesContestPhase{
+enum class CodeforcesContestPhase(private val title: String? = null) {
     UNDEFINED,
-    BEFORE, CODING, PENDING_SYSTEM_TEST, SYSTEM_TEST, FINISHED;
+    BEFORE,
+    CODING,
+    PENDING_SYSTEM_TEST("WAITING SYSTEM TESTING"),
+    SYSTEM_TEST("SYSTEM TESTING"),
+    FINISHED;
+
+    fun getTitle(): String = title ?: name
 
     fun isFutureOrRunning(): Boolean {
         return this != UNDEFINED && this != FINISHED
@@ -276,6 +300,6 @@ enum class CodeforcesProblemStatus {
 }
 
 enum class CodeforcesProblemVerdict {
-    UNDEFINED,
+    WAITING,
     FAILED, OK, PARTIAL, COMPILATION_ERROR, RUNTIME_ERROR, WRONG_ANSWER, PRESENTATION_ERROR, TIME_LIMIT_EXCEEDED, MEMORY_LIMIT_EXCEEDED, IDLENESS_LIMIT_EXCEEDED, SECURITY_VIOLATED, CRASHED, INPUT_PREPARATION_CRASHED, CHALLENGED, SKIPPED, TESTING, REJECTED
 }

@@ -107,6 +107,11 @@ class NewsFragment : Fragment() {
                             fragment.save()
                         }
                     }
+
+                    val subtitle = "::news.${fragment.title.toLowerCase().replace("cf ", "codeforces.")}"
+                    arguments?.putString("subtitle", subtitle)
+
+                    (requireActivity() as MainActivity).setActionBarSubTitle(subtitle)
                 }
             }
         })

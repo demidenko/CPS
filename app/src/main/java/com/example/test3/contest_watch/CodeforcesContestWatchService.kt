@@ -15,6 +15,7 @@ import androidx.core.text.italic
 import com.example.test3.NotificationChannels
 import com.example.test3.NotificationIDs
 import com.example.test3.R
+import com.example.test3.makeSimpleNotification
 import com.example.test3.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -86,6 +87,7 @@ class CodeforcesContestWatchService: Service() {
         ).apply {
             addCodeforcesContestWatchListener(object : CodeforcesContestWatchListener(){
                 var contestType = CodeforcesContestType.UNDEFINED
+                var contestPhase = CodeforcesContestPhase.UNDEFINED
                 var changes = false
                 var contestantRank = ""
                 var contestantPoints = ""
@@ -115,8 +117,9 @@ class CodeforcesContestWatchService: Service() {
                                         }
                                     }
                                     CodeforcesProblemStatus.PRELIMINARY -> {
-                                        if(result.points == 0.0) italic { append("?") }
-                                        else bold { append(pts) }
+                                        if(result.points == 0.0){
+                                            if(contestPhase == CodeforcesContestPhase.SYSTEM_TEST) italic { append("?") }
+                                        } else bold { append(pts) }
                                     }
                                 }
                             }
@@ -150,9 +153,10 @@ class CodeforcesContestWatchService: Service() {
 
                 override fun onSetContestPhase(phase: CodeforcesContestPhase) {
                     changes = true
+                    contestPhase = phase
                     rviews.forEach { it.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime(), null, false) }
                     rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_progress, "") }
-                    rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_phase, phase.name) }
+                    rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_phase, phase.getTitle()) }
                 }
 
                 override fun onSetRemainingTime(timeSeconds: Long) {
@@ -189,6 +193,14 @@ class CodeforcesContestWatchService: Service() {
                     rviewsByProblem[problemName]?.run{
                         setTextViewText(R.id.cf_watcher_notification_table_column_cell, spanForProblemResult(result))
                     }
+                }
+
+                override fun onSetProblemSystestResult(submission: CodeforcesSubmission) {
+                    val problemName = submission.problem.index
+                    val result =
+                        if(submission.verdict == CodeforcesProblemVerdict.OK) "OK"
+                        else "${submission.verdict.name} #${submission.passedTestCount+1}"
+                    makeSimpleNotification(this@CodeforcesContestWatchService, submission.id.toInt(), "problem $problemName", result, false)
                 }
 
                 override fun commit() {

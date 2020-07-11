@@ -5,7 +5,9 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.style.TypefaceSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -35,9 +37,18 @@ class MainActivity : AppCompatActivity(){
     val defaultTextColor by lazy { ContextCompat.getColor(this, R.color.textColor) }
 
 
-    val accountsFragment: AccountsFragment by lazy { supportFragmentManager.fragments.find { it is AccountsFragment } as? AccountsFragment ?: AccountsFragment() }
-    val newsFragment: NewsFragment by lazy { supportFragmentManager.fragments.find { it is NewsFragment } as? NewsFragment ?: NewsFragment() }
-    val testFragment: TestFragment by lazy { supportFragmentManager.fragments.find { it is TestFragment } as? TestFragment ?: TestFragment() }
+    val accountsFragment: AccountsFragment by lazy {
+        supportFragmentManager.fragments.find { it is AccountsFragment } as? AccountsFragment
+            ?: AccountsFragment().apply { arguments = Bundle().apply { putString("subtitle", "::accounts") } }
+    }
+    val newsFragment: NewsFragment by lazy {
+        supportFragmentManager.fragments.find { it is NewsFragment } as? NewsFragment
+            ?: NewsFragment().apply { arguments = Bundle().apply { putString("subtitle", "::news") } }
+    }
+    val testFragment: TestFragment by lazy {
+        supportFragmentManager.fragments.find { it is TestFragment } as? TestFragment
+            ?: TestFragment().apply { arguments = Bundle().apply { putString("subtitle", "::develop") } }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,12 +66,7 @@ class MainActivity : AppCompatActivity(){
 
         fun navigationSelectUpdateUI(fragment: Fragment){
 
-            supportActionBar?.subtitle = when(fragment){
-                accountsFragment -> "accounts"
-                newsFragment -> "news"
-                testFragment -> "develop"
-                else -> ""
-            }
+            setActionBarSubTitle(fragment.arguments?.getString("subtitle", null) ?: "")
 
             when(fragment){
                 accountsFragment -> {
@@ -137,9 +143,18 @@ class MainActivity : AppCompatActivity(){
                         .add(android.R.id.content, SettingsNewsFragment())
                         .addToBackStack(null)
                         .commit()
+
+                    setActionBarSubTitle("::news.settings")
                 }
             }
             true
+        }
+    }
+
+    fun setActionBarSubTitle(text: String) {
+        supportActionBar?.subtitle = SpannableStringBuilder().apply {
+            append(text)
+            setSpan(TypefaceSpan("monospace"), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         }
     }
 
