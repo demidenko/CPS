@@ -37,18 +37,9 @@ class MainActivity : AppCompatActivity(){
     val defaultTextColor by lazy { ContextCompat.getColor(this, R.color.textColor) }
 
 
-    val accountsFragment: AccountsFragment by lazy {
-        supportFragmentManager.fragments.find { it is AccountsFragment } as? AccountsFragment
-            ?: AccountsFragment().apply { arguments = Bundle().apply { putString("subtitle", "::accounts") } }
-    }
-    val newsFragment: NewsFragment by lazy {
-        supportFragmentManager.fragments.find { it is NewsFragment } as? NewsFragment
-            ?: NewsFragment().apply { arguments = Bundle().apply { putString("subtitle", "::news") } }
-    }
-    val testFragment: TestFragment by lazy {
-        supportFragmentManager.fragments.find { it is TestFragment } as? TestFragment
-            ?: TestFragment().apply { arguments = Bundle().apply { putString("subtitle", "::develop") } }
-    }
+    val accountsFragment: AccountsFragment by lazy { supportFragmentManager.fragments.find { it is AccountsFragment } as? AccountsFragment ?: AccountsFragment() }
+    val newsFragment: NewsFragment by lazy { supportFragmentManager.fragments.find { it is NewsFragment } as? NewsFragment ?: NewsFragment() }
+    val testFragment: TestFragment by lazy { supportFragmentManager.fragments.find { it is TestFragment } as? TestFragment ?: TestFragment() }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,9 +56,6 @@ class MainActivity : AppCompatActivity(){
 
 
         fun navigationSelectUpdateUI(fragment: Fragment){
-
-            setActionBarSubTitle(fragment.arguments?.getString("subtitle", null) ?: "")
-
             when(fragment){
                 accountsFragment -> {
                     navigation_news.visibility = View.GONE
@@ -85,7 +73,12 @@ class MainActivity : AppCompatActivity(){
                     navigation_dev.visibility = View.VISIBLE
                 }
             }
+            setActionBarSubTitle(getFragmentSubTitle(fragment))
         }
+
+        setFragmentSubTitle(accountsFragment, "::accounts")
+        setFragmentSubTitle(newsFragment, "::news")
+        setFragmentSubTitle(testFragment, "::develop")
 
         var activeFragment = supportFragmentManager.fragments.find { it.isVisible } ?: accountsFragment
         if(!activeFragment.isAdded) supportFragmentManager.beginTransaction().add(R.id.container_fragment, activeFragment).commit()
@@ -286,3 +279,9 @@ class MainActivity : AppCompatActivity(){
 
 }
 
+fun getFragmentSubTitle(fragment: Fragment): String = fragment.arguments?.getString("subtitle",null)?:""
+
+fun setFragmentSubTitle(fragment: Fragment, title: String){
+    if(fragment.arguments == null) fragment.arguments = Bundle()
+    fragment.arguments?.putString("subtitle",title)
+}

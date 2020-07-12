@@ -109,8 +109,7 @@ class NewsFragment : Fragment() {
                     }
 
                     val subtitle = "::news.${fragment.title.toLowerCase().replace("cf ", "codeforces.")}"
-                    arguments?.putString("subtitle", subtitle)
-
+                    setFragmentSubTitle(this@NewsFragment, subtitle)
                     (requireActivity() as MainActivity).setActionBarSubTitle(subtitle)
                 }
             }
@@ -173,7 +172,12 @@ class NewsFragment : Fragment() {
         reloadTabs()
     }
 
-
+    override fun onHiddenChanged(hidden: Boolean) {
+        if(!hidden){
+            (requireActivity() as MainActivity).setActionBarSubTitle(getFragmentSubTitle(this))
+        }
+        super.onHiddenChanged(hidden)
+    }
 }
 
 
