@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity(){
 
         setContentView(R.layout.activity_main)
 
-        setActionBarTitle("Competitive Programming & Solving") //"Compete, Program, Solve"
+        setActionBarTitle("Competitive Programming && Solving") //"Compete, Program, Solve"
 
 
         fun navigationSelectUpdateUI(fragment: Fragment){
