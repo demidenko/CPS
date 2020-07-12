@@ -141,6 +141,7 @@ class MainActivity : AppCompatActivity(){
                         .commit()
 
                     setActionBarSubTitle("::news.settings")
+                    navigation.visibility = View.GONE
                 }
             }
             true

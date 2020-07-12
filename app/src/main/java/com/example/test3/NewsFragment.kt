@@ -27,6 +27,7 @@ import com.example.test3.utils.fromHTML
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import java.util.*
@@ -174,7 +175,10 @@ class NewsFragment : Fragment() {
 
     override fun onHiddenChanged(hidden: Boolean) {
         if(!hidden){
-            (requireActivity() as MainActivity).setActionBarSubTitle(getFragmentSubTitle(this))
+            with(requireActivity() as MainActivity){
+                setActionBarSubTitle(getFragmentSubTitle(this@NewsFragment))
+                navigation.visibility = View.VISIBLE
+            }
         }
         super.onHiddenChanged(hidden)
     }
