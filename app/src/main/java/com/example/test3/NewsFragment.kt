@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.core.text.color
 import androidx.fragment.app.Fragment
 import androidx.preference.DropDownPreference
 import androidx.preference.PreferenceFragmentCompat
@@ -45,11 +46,12 @@ class NewsFragment : Fragment() {
     }
 
     private val codeforcesNewsAdapter: CodeforcesNewsAdapter by lazy {
+        val activity = requireActivity() as MainActivity
         val fragments = listOf(
-            CodeforcesNewsFragment("CF MAIN", "/", true, CodeforcesNewsItemsClassicAdapter(requireActivity() as MainActivity)),
-            CodeforcesNewsFragment("CF TOP", "/top", false, CodeforcesNewsItemsClassicAdapter(requireActivity() as MainActivity)),
-            CodeforcesNewsFragment("CF RECENT", "/recent-actions", false, CodeforcesNewsItemsRecentAdapter(requireActivity() as MainActivity)),
-            CodeforcesNewsFragment("CF LOST", "", true, CodeforcesNewsItemsLostRecentAdapter(requireActivity() as MainActivity))
+            CodeforcesNewsFragment("CF MAIN", "/", true, CodeforcesNewsItemsClassicAdapter(activity)),
+            CodeforcesNewsFragment("CF TOP", "/top", false, CodeforcesNewsItemsClassicAdapter(activity)),
+            CodeforcesNewsFragment("CF RECENT", "/recent-actions", false, CodeforcesNewsItemsRecentAdapter(activity)),
+            CodeforcesNewsFragment("CF LOST", "", true, CodeforcesNewsItemsLostRecentAdapter(activity))
         )
         CodeforcesNewsAdapter(this, fragments)
     }
@@ -129,20 +131,27 @@ class NewsFragment : Fragment() {
                 launch {
                     if(tab.isSelected || currentTime - fragment.lastReloadTime > TimeUnit.MINUTES.toMillis(1)) {
                         tab.text = "..."
-                        fragment.reload(lang)
-                        tab.text = fragment.title
-                        if (fragment.isManagesNewEntries) {
-                            if (fragment.newBlogs.isEmpty()) {
-                                tab.badge?.apply{
-                                    isVisible = false
-                                    clearNumber()
+                        if(fragment.reload(lang)) {
+                            tab.text = fragment.title
+                            if (fragment.isManagesNewEntries) {
+                                if (fragment.newBlogs.isEmpty()) {
+                                    tab.badge?.apply {
+                                        isVisible = false
+                                        clearNumber()
+                                    }
+                                } else {
+                                    tab.badge?.apply {
+                                        number = fragment.newBlogs.size
+                                        isVisible = true
+                                    }
+                                    if (tab.isSelected) fragment.save()
                                 }
-                            } else {
-                                tab.badge?.apply {
-                                    number = fragment.newBlogs.size
-                                    isVisible = true
+                            }
+                        }else{
+                            tab.text = SpannableStringBuilder().apply {
+                                color(resources.getColor(R.color.reload_fail,null)) {
+                                    append(fragment.title)
                                 }
-                                if (tab.isSelected) fragment.save()
                             }
                         }
                     }
@@ -226,17 +235,19 @@ class CodeforcesNewsFragment(
     var lastReloadTime = 0L
     var newBlogs = hashSetOf<String>()
 
-    suspend fun reload(lang: String) {
+    suspend fun reload(lang: String): Boolean {
         val source =
-            if(pageName.startsWith('/')) CodeforcesAPI.getPageSource(pageName.substring(1), lang) ?: return
+            if(pageName.startsWith('/')) CodeforcesAPI.getPageSource(pageName.substring(1), lang) ?: return false
             else ""
-        viewAdapter.parseData(source)
+        if(!viewAdapter.parseData(source)) return false
         lastReloadTime = System.currentTimeMillis()
 
         if(isManagesNewEntries){
             val savedBlogs = prefs.getStringSet(prefs_key, null) ?: emptySet()
             newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.toHashSet()
         }
+
+        return true
     }
 
     fun save() {
@@ -265,7 +276,7 @@ class CodeforcesNewsFragment(
 ///---------------data adapters--------------------
 
 abstract class CodeforcesNewsItemsAdapter(val activity: MainActivity): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
-    abstract fun parseData(s: String)
+    abstract fun parseData(s: String): Boolean
     abstract fun getBlogIDs(): List<String>
 }
 
@@ -282,21 +293,14 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
         var isNew: Boolean = false
     )
 
-    override fun parseData(s: String) {
+    override fun parseData(s: String): Boolean {
         val res = arrayListOf<Info>()
         var i = 0
         while (true) {
             i = s.indexOf("<div class=\"topic\"", i + 1)
             if (i == -1) break
 
-            val title = fromHTML(
-                s.substring(
-                    s.indexOf(
-                        "<p>",
-                        i
-                    ) + 3, s.indexOf("</p>", i)
-                )
-            )
+            val title = fromHTML(s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i)))
 
             i = s.indexOf("entry/", i)
             val id = s.substring(i+6, s.indexOf('"',i))
@@ -327,6 +331,8 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
             rows = res.toTypedArray()
             notifyDataSetChanged()
         }
+
+        return true
     }
 
 
@@ -470,12 +476,14 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
         val comments: Array<Pair<String,String>>
     )
 
-    override fun parseData(s: String) {
+    override fun parseData(s: String): Boolean {
         val res = parsePage(s)
         if(res.isNotEmpty()){
             rows = res.toTypedArray()
             notifyDataSetChanged()
+            return true
         }
+        return false
     }
 
     class CodeforcesNewsItemViewHolder(val view: RelativeLayout) : RecyclerView.ViewHolder(view){
@@ -526,7 +534,7 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
 }
 
 class CodeforcesNewsItemsLostRecentAdapter(activity: MainActivity) : CodeforcesNewsItemsClassicAdapter(activity) {
-    override fun parseData(s: String) {
+    override fun parseData(s: String): Boolean {
         val blogs = CodeforcesNewsLostRecentJobService.getBlogs(activity, CodeforcesNewsLostRecentJobService.CF_LOST)
 
         if(blogs.isNotEmpty()){
@@ -547,6 +555,8 @@ class CodeforcesNewsItemsLostRecentAdapter(activity: MainActivity) : CodeforcesN
 
             notifyDataSetChanged()
         }
+
+        return true
     }
 }
 

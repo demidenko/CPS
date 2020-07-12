@@ -238,6 +238,8 @@ object CodeforcesAPI {
 
     suspend fun getContestSubmissions(contestID: Int, handle: String) = withContext(Dispatchers.IO){ makeCall(api.getContestStatus(contestID, handle)) }
 
+    suspend fun getUserBlogEntries(handle: String) = withContext(Dispatchers.IO){ makeCall(api.getUserBlogs(handle)) }
+
     suspend fun getHandleSuggestions(str: String): Response<ResponseBody>? {
         try {
             return web.getHandleSuggestions(str).execute()
