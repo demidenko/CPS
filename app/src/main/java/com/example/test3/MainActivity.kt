@@ -4,9 +4,12 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Spannable
+import android.text.SpannableString
 import android.text.SpannableStringBuilder
+import android.text.style.AbsoluteSizeSpan
 import android.text.style.TypefaceSpan
 import android.view.Menu
 import android.view.MenuItem
@@ -52,7 +55,7 @@ class MainActivity : AppCompatActivity(){
 
         setContentView(R.layout.activity_main)
 
-        supportActionBar?.title = "Competitive Programming & Solving" //"Compete, Program, Solve"
+        setActionBarTitle("Competitive Programming & Solving") //"Compete, Program, Solve"
 
 
         fun navigationSelectUpdateUI(fragment: Fragment){
@@ -145,9 +148,16 @@ class MainActivity : AppCompatActivity(){
     }
 
     fun setActionBarSubTitle(text: String) {
-        supportActionBar?.subtitle = SpannableStringBuilder().apply {
-            append(text)
-            setSpan(TypefaceSpan("monospace"), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+        supportActionBar?.subtitle = SpannableString(text).apply {
+            setSpan(TypefaceSpan(Typeface.MONOSPACE), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+            setSpan(AbsoluteSizeSpan(44), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+        }
+    }
+
+    fun setActionBarTitle(text: String) {
+        supportActionBar?.title = SpannableString(text).apply {
+            setSpan(TypefaceSpan(Typeface.MONOSPACE), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+            setSpan(AbsoluteSizeSpan(44), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         }
     }
 
