@@ -1,7 +1,9 @@
 package com.example.test3.job_services
 
 import android.content.Context
+import androidx.preference.PreferenceManager
 import com.example.test3.CodeforcesNewsItemsRecentAdapter
+import com.example.test3.R
 import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesUtils
 import com.squareup.moshi.JsonAdapter
@@ -61,6 +63,10 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
 
     private val highRated = arrayListOf("user-orange", "user-red", "user-legendary")
     override suspend fun doJob(){
+        val enabled = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.news_codeforces_lost_enabled), false)
+        if(!enabled) return
+
+
         val recentBlogs = CodeforcesNewsItemsRecentAdapter.parsePage(
             CodeforcesAPI.getPageSource("recent-actions", "ru") ?: return
         )

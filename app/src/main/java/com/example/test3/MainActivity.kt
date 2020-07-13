@@ -8,22 +8,14 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.SpannableStringBuilder
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.TypefaceSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.text.bold
-import androidx.core.text.color
 import androidx.fragment.app.Fragment
-import com.example.test3.account_manager.ColoredHandles
-import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.useRealColors
 import com.example.test3.job_services.JobServicesCenter
 import kotlinx.android.synthetic.main.activity_main.*
@@ -170,11 +162,6 @@ class MainActivity : AppCompatActivity(){
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.color_switcher -> {
-                if(testFragment.isVisible){
-                    showColorsTable()
-                    return true
-                }
-
                 useRealColors = !useRealColors
                 accountsFragment.panels.forEach { it.show() }
                 if(newsFragment.isAdded) newsFragment.refresh()
@@ -193,60 +180,6 @@ class MainActivity : AppCompatActivity(){
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    fun showColorsTable(){
-
-        val table = findViewById<LinearLayout>(R.id.table_handle_colors)
-        table.removeAllViews()
-
-        fun addRow(row: ArrayList<CharSequence>) {
-            val l = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-            row.forEach { s->
-                l.addView(
-                    TextView(this).apply{ text = s },
-                    LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT).apply { weight = 1f }
-                )
-            }
-            table.addView(l)
-        }
-
-        addRow(arrayListOf(
-            "app",
-            "Codeforces",
-            "AtCoder",
-            "Topcoder"
-        ))
-
-        val backup = useRealColors
-        for(color in HandleColor.values()){
-            val row = arrayListOf<CharSequence>()
-
-            useRealColors = false
-            row.add(
-                SpannableStringBuilder().bold {
-                    color(color.getARGB(accountsFragment.codeforcesAccountManager)) { append(color.name) }
-                }
-            )
-            useRealColors = true
-            arrayOf<ColoredHandles>(
-                accountsFragment.codeforcesAccountManager,
-                accountsFragment.atcoderAccountManager,
-                accountsFragment.topcoderAccountManager
-            ).forEach {
-                val s = SpannableStringBuilder().bold {
-                    try {
-                        color(color.getARGB(it)) { append(color.name) }
-                    } catch (e: HandleColor.UnknownHandleColorException) {
-                        append("")
-                    }
-                }
-                row.add(s)
-            }
-            addRow(row)
-        }
-
-        useRealColors = backup
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

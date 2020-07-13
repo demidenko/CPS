@@ -94,10 +94,10 @@
             android:text="JOBS"
             />
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_test_notify"
+            android:id="@+id/button_test_handle_colors"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="notify"
+            android:text="colors"
             />
     </LinearLayout>
 

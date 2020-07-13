@@ -4,14 +4,17 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
+import android.widget.*
+import androidx.core.text.bold
+import androidx.core.text.color
 import androidx.fragment.app.Fragment
+import com.example.test3.account_manager.ColoredHandles
+import com.example.test3.account_manager.HandleColor
+import com.example.test3.account_manager.useRealColors
 import com.example.test3.contest_watch.CodeforcesContestWatchService
 import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.utils.CodeforcesAPI
@@ -97,9 +100,61 @@ class TestFragment : Fragment() {
             }
         }
 
-        //test notify
-        view.findViewById<Button>(R.id.button_test_notify).setOnClickListener{ button -> button as Button
+        //colors
+        view.findViewById<Button>(R.id.button_test_handle_colors).setOnClickListener{ button -> button as Button
+            val table = view.findViewById<LinearLayout>(R.id.table_handle_colors)
+            table.removeAllViews()
 
+            fun addRow(row: ArrayList<CharSequence>) {
+                val l = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
+                row.forEach { s->
+                    l.addView(
+                        TextView(context).apply{ text = s },
+                        LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT).apply { weight = 1f }
+                    )
+                }
+                table.addView(l)
+            }
+
+            addRow(arrayListOf(
+                "app",
+                "Codeforces",
+                "AtCoder",
+                "Topcoder"
+            ))
+
+            val backup = useRealColors
+            for(color in HandleColor.values()){
+                val row = arrayListOf<CharSequence>()
+
+                useRealColors = false
+
+                val a = activity.accountsFragment
+
+                row.add(
+                    SpannableStringBuilder().bold {
+                        color(color.getARGB(a.codeforcesAccountManager)) { append(color.name) }
+                    }
+                )
+                useRealColors = true
+                arrayOf<ColoredHandles>(
+                    a.codeforcesAccountManager,
+                    a.atcoderAccountManager,
+                    a.topcoderAccountManager
+                ).forEach {
+                    val s = SpannableStringBuilder().bold {
+                        try {
+                            color(color.getARGB(it)) { append(color.name) }
+                        } catch (e: HandleColor.UnknownHandleColorException) {
+                            append("")
+                        }
+                    }
+                    row.add(s)
+                }
+                addRow(row)
+            }
+
+            useRealColors = backup
         }
     }
 }

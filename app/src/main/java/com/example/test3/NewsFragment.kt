@@ -47,12 +47,14 @@ class NewsFragment : Fragment() {
 
     private val codeforcesNewsAdapter: CodeforcesNewsAdapter by lazy {
         val activity = requireActivity() as MainActivity
-        val fragments = listOf(
+        val fragments = mutableListOf(
             CodeforcesNewsFragment("CF MAIN", "/", true, CodeforcesNewsItemsClassicAdapter(activity)),
             CodeforcesNewsFragment("CF TOP", "/top", false, CodeforcesNewsItemsClassicAdapter(activity)),
-            CodeforcesNewsFragment("CF RECENT", "/recent-actions", false, CodeforcesNewsItemsRecentAdapter(activity)),
-            CodeforcesNewsFragment("CF LOST", "", true, CodeforcesNewsItemsLostRecentAdapter(activity))
+            CodeforcesNewsFragment("CF RECENT", "/recent-actions", false, CodeforcesNewsItemsRecentAdapter(activity))
         )
+        if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.news_codeforces_lost_enabled), false)){
+            fragments.add(CodeforcesNewsFragment("CF LOST", "", true, CodeforcesNewsItemsLostRecentAdapter(activity)))
+        }
         CodeforcesNewsAdapter(this, fragments)
     }
     private lateinit var tabLayout: TabLayout
@@ -330,9 +332,10 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
         if(res.isNotEmpty()){
             rows = res.toTypedArray()
             notifyDataSetChanged()
+            return true
         }
 
-        return true
+        return false
     }
 
 
@@ -443,14 +446,7 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
                 i = s.indexOf("entry/", i)
                 val id = s.substring(i+6, s.indexOf('"',i))
 
-                val title = fromHTML(
-                    s.substring(
-                        s.indexOf(
-                            ">",
-                            i
-                        ) + 1, s.indexOf("</a", i)
-                    )
-                )
+                val title = fromHTML(s.substring(s.indexOf(">", i) + 1, s.indexOf("</a", i)))
 
                 val comments = mutableListOf<Pair<String,String>>()
                 var lastCommentId = ""
@@ -554,9 +550,10 @@ class CodeforcesNewsItemsLostRecentAdapter(activity: MainActivity) : CodeforcesN
             }.toTypedArray()
 
             notifyDataSetChanged()
+            return true
         }
 
-        return true
+        return false
     }
 }
 

@@ -206,7 +206,7 @@ object CodeforcesAPI {
         .build()
         .create(WEB::class.java)
 
-    private suspend fun <T> makeCall(call: Call<CodeforcesAPIResponse<T>>): CodeforcesAPIResponse<T>? {
+    private suspend fun <T> makeAPICall(call: Call<CodeforcesAPIResponse<T>>): CodeforcesAPIResponse<T>? {
         var c = call
         while(true){
             try{
@@ -226,19 +226,19 @@ object CodeforcesAPI {
         }
     }
 
-    suspend fun getContests() = withContext(Dispatchers.IO){ makeCall(api.getContests()) }
+    suspend fun getContests() = withContext(Dispatchers.IO){ makeAPICall(api.getContests()) }
 
-    suspend fun getUsers(handles: Collection<String>) = withContext(Dispatchers.IO){ makeCall(api.getUser(handles.joinToString(separator = ";"))) }
+    suspend fun getUsers(handles: Collection<String>) = withContext(Dispatchers.IO){ makeAPICall(api.getUser(handles.joinToString(separator = ";"))) }
     suspend fun getUser(handle: String) = getUsers(listOf(handle))
 
-    suspend fun getBlogEntry(blogID: Int) = withContext(Dispatchers.IO){ makeCall(api.getBlogEntry(blogID)) }
+    suspend fun getBlogEntry(blogID: Int) = withContext(Dispatchers.IO){ makeAPICall(api.getBlogEntry(blogID)) }
 
-    suspend fun getContestStandings(contestID: Int, handles: Collection<String>, showUnofficial: Boolean) = withContext(Dispatchers.IO){ makeCall(api.getContestStandings(contestID, handles.joinToString(separator = ";"), showUnofficial)) }
+    suspend fun getContestStandings(contestID: Int, handles: Collection<String>, showUnofficial: Boolean) = withContext(Dispatchers.IO){ makeAPICall(api.getContestStandings(contestID, handles.joinToString(separator = ";"), showUnofficial)) }
     suspend fun getContestStandings(contestID: Int, handle: String, showUnofficial: Boolean) = getContestStandings(contestID, listOf(handle), showUnofficial)
 
-    suspend fun getContestSubmissions(contestID: Int, handle: String) = withContext(Dispatchers.IO){ makeCall(api.getContestStatus(contestID, handle)) }
+    suspend fun getContestSubmissions(contestID: Int, handle: String) = withContext(Dispatchers.IO){ makeAPICall(api.getContestStatus(contestID, handle)) }
 
-    suspend fun getUserBlogEntries(handle: String) = withContext(Dispatchers.IO){ makeCall(api.getUserBlogs(handle)) }
+    suspend fun getUserBlogEntries(handle: String) = withContext(Dispatchers.IO){ makeAPICall(api.getUserBlogs(handle)) }
 
     suspend fun getHandleSuggestions(str: String): Response<ResponseBody>? {
         try {
