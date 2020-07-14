@@ -86,8 +86,7 @@ class CodeforcesAccountManager(context: Context): AccountManager(context), Color
     }
 
     override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? = withContext(Dispatchers.IO){
-        val response = CodeforcesAPI.getHandleSuggestions(str) ?: return@withContext null
-        val s = response.body()?.string() ?: return@withContext null
+        val s = CodeforcesAPI.getHandleSuggestions(str) ?: return@withContext null
         val res = ArrayList<Pair<String, String>>()
         s.split('\n').filter { !it.contains('=') }.forEach {
             val i = it.indexOf('|')

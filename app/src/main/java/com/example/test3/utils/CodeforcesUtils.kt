@@ -6,13 +6,14 @@ import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.Call
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
 import java.io.IOException
@@ -173,24 +174,6 @@ object CodeforcesAPI {
         ): Call<CodeforcesAPIResponse<List<CodeforcesSubmission>>>
     }
 
-    interface WEB {
-        @GET("data/handles")
-        fun getHandleSuggestions(
-            @Query("q") prefix: String
-        ): Call<ResponseBody>
-
-        @GET("{page}")
-        fun getPage(
-            @Path("page") page: String,
-            @Query("locale") lang: String
-        ): Call<ResponseBody>
-
-        @GET("contest/{contestID}")
-        fun getContestPage(
-            @Path("contestID") contestID: Int
-        ): Call<ResponseBody>
-    }
-
     private val api = Retrofit.Builder()
         .baseUrl("https://codeforces.com/api/")
         .addConverterFactory(MoshiConverterFactory.create())
@@ -198,13 +181,6 @@ object CodeforcesAPI {
         .client(httpClient)
         .build()
         .create(API::class.java)
-
-    private val web = Retrofit.Builder()
-        .baseUrl("https://codeforces.com/")
-        .addCallAdapterFactory(CoroutineCallAdapterFactory())
-        .client(httpClient)
-        .build()
-        .create(WEB::class.java)
 
     private suspend fun <T> makeAPICall(call: Call<CodeforcesAPIResponse<T>>): CodeforcesAPIResponse<T>? {
         var c = call
@@ -240,32 +216,77 @@ object CodeforcesAPI {
 
     suspend fun getUserBlogEntries(handle: String) = withContext(Dispatchers.IO){ makeAPICall(api.getUserBlogs(handle)) }
 
-    suspend fun getHandleSuggestions(str: String): Response<ResponseBody>? {
-        try {
-            return web.getHandleSuggestions(str).execute()
-        }catch (e: IOException){
-            return null
-        }
+
+
+    interface WEB {
+        @GET("data/handles")
+        fun getHandleSuggestions(
+            @Query("q") prefix: String,
+            @Header("Cookie") cookie: String = "RCPC=$RCPC"
+        ): Call<ResponseBody>
+
+        @GET("{page}")
+        fun getPage(
+            @Path("page") page: String,
+            @Query("locale") lang: String,
+            @Header("Cookie") cookie: String = "RCPC=$RCPC"
+        ): Call<ResponseBody>
+
+        @GET("contest/{contestID}")
+        fun getContestPage(
+            @Path("contestID") contestID: Int,
+            @Header("Cookie") cookie: String = "RCPC=$RCPC"
+        ): Call<ResponseBody>
     }
 
-    suspend fun getPageSource(page: String, lang: String): String? {
-        try {
-            return withContext(Dispatchers.IO){
-                web.getPage(page, lang).execute().body()?.string()
-            }
-        }catch (e: IOException){
-            return null
-        }
+    private val web = Retrofit.Builder()
+        .baseUrl("https://codeforces.com/")
+        .addCallAdapterFactory(CoroutineCallAdapterFactory())
+        .client(httpClient)
+        .build()
+        .create(WEB::class.java)
+
+
+    private var RCPC = "de8348da1b2b17aadf8efad8bbb82dbd"
+    private var last_c = "1089550d88d6daefc842642b47d4e2e1"
+    private fun recalcRCPC(source: String) = runBlocking {
+        val i = source.indexOf("c=toNumbers(")
+        val c = source.substring(source.indexOf("(\"",i)+2, source.indexOf("\")",i))
+        //println("c = $c")
+        if(c == last_c) return@runBlocking
+        RCPC = decodeAES(c)
+        last_c = c
+        //println("new RCPC = $RCPC")
     }
 
-    suspend fun getContestPageSource(contestID: Int): String? {
-        try {
-            return withContext(Dispatchers.IO){
-                web.getContestPage(contestID).execute().body()?.string()
-            }
-        }catch (e: IOException){
-            return null
+    suspend fun getHandleSuggestions(str: String): String? = withContext(Dispatchers.IO){
+        var s = web.getHandleSuggestions(str).execute().body()?.string() ?: return@withContext null
+        if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
+            recalcRCPC(s)
+            delay(300)
+            s = web.getHandleSuggestions(str).execute().body()?.string() ?: return@withContext null
         }
+        return@withContext s
+    }
+
+    suspend fun getPageSource(page: String, lang: String): String? = withContext(Dispatchers.IO){
+        var s = web.getPage(page,lang).execute().body()?.string() ?: return@withContext null
+        if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
+            recalcRCPC(s)
+            delay(300)
+            s = web.getPage(page,lang).execute().body()?.string() ?: return@withContext null
+        }
+        return@withContext s
+    }
+
+    suspend fun getContestPageSource(contestID: Int): String? = withContext(Dispatchers.IO){
+        var s = web.getContestPage(contestID).execute().body()?.string() ?: return@withContext null
+        if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
+            recalcRCPC(s)
+            delay(300)
+            s = web.getContestPage(contestID).execute().body()?.string() ?: return@withContext null
+        }
+        return@withContext s
     }
 }
 
