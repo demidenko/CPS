@@ -247,8 +247,8 @@ object CodeforcesAPI {
         .create(WEB::class.java)
 
 
-    private var RCPC = "de8348da1b2b17aadf8efad8bbb82dbd"
-    private var last_c = "1089550d88d6daefc842642b47d4e2e1"
+    private var RCPC = ""
+    private var last_c = ""
     private fun recalcRCPC(source: String) = runBlocking {
         val i = source.indexOf("c=toNumbers(")
         val c = source.substring(source.indexOf("(\"",i)+2, source.indexOf("\")",i))
@@ -259,35 +259,25 @@ object CodeforcesAPI {
         //println("new RCPC = $RCPC")
     }
 
-    suspend fun getHandleSuggestions(str: String): String? = withContext(Dispatchers.IO){
-        var s = web.getHandleSuggestions(str).execute().body()?.string() ?: return@withContext null
+    class CallStringInvoker(val block: ()->Call<ResponseBody> ){
+        operator fun invoke(): String? = block().execute().body()?.string()
+    }
+
+    suspend fun makeWEBCall(invoker: CallStringInvoker):String? = withContext(Dispatchers.IO) {
+        var s = invoker() ?: return@withContext null
         if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
             recalcRCPC(s)
             delay(300)
-            s = web.getHandleSuggestions(str).execute().body()?.string() ?: return@withContext null
+            s = invoker() ?: return@withContext null
         }
         return@withContext s
     }
 
-    suspend fun getPageSource(page: String, lang: String): String? = withContext(Dispatchers.IO){
-        var s = web.getPage(page,lang).execute().body()?.string() ?: return@withContext null
-        if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
-            recalcRCPC(s)
-            delay(300)
-            s = web.getPage(page,lang).execute().body()?.string() ?: return@withContext null
-        }
-        return@withContext s
-    }
+    suspend fun getHandleSuggestions(str: String) = makeWEBCall(CallStringInvoker { web.getHandleSuggestions(str) })
 
-    suspend fun getContestPageSource(contestID: Int): String? = withContext(Dispatchers.IO){
-        var s = web.getContestPage(contestID).execute().body()?.string() ?: return@withContext null
-        if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
-            recalcRCPC(s)
-            delay(300)
-            s = web.getContestPage(contestID).execute().body()?.string() ?: return@withContext null
-        }
-        return@withContext s
-    }
+    suspend fun getPageSource(page: String, lang: String) = makeWEBCall(CallStringInvoker { web.getPage(page,lang) })
+
+    suspend fun getContestPageSource(contestID: Int)= makeWEBCall(CallStringInvoker { web.getContestPage(contestID) })
 }
 
 
