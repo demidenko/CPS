@@ -6,6 +6,8 @@ import android.app.job.JobScheduler
 import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
+import androidx.preference.PreferenceManager
+import com.example.test3.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -48,14 +50,19 @@ object JobServicesCenter {
     }
 
     fun startJobServices(context: Context){
-        val calls = mutableMapOf<Int, (Context)->Unit >(
+        val toStart = mutableMapOf<Int, (Context)->Unit >(
             JobServiceIDs.news_parsers to ::startNewsJobService,
             JobServiceIDs.accounts_parsers to ::startAccountsJobService,
-            JobServiceIDs.codeforces_lost_recent_news to ::startCodeforcesNewsLostRecentJobService,
             JobServiceIDs.project_euler_recent_problems to ::startProjectEulerRecentProblemsJobService
         )
-        getRunningJobServices(context).forEach{ calls.remove(it.id) }
-        calls.values.shuffled().forEach { it(context) }
+        if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.news_codeforces_lost_enabled), false)){
+            toStart[JobServiceIDs.codeforces_lost_recent_news] = ::startCodeforcesNewsLostRecentJobService
+        }
+        getRunningJobServices(context).forEach {
+            if(toStart.containsKey(it.id)) toStart.remove(it.id)
+            else stopJobService(context, it.id)
+        }
+        toStart.values.shuffled().forEach { it(context) }
     }
 
     private fun startNewsJobService(context: Context){

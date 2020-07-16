@@ -45,7 +45,6 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
 
         NotificationChannels.createNotificationChannels(this)
-        JobServicesCenter.startJobServices(this)
 
         setContentView(R.layout.activity_main)
 
@@ -111,6 +110,7 @@ class MainActivity : AppCompatActivity(){
         }
 
         configureNavigation()
+        JobServicesCenter.startJobServices(this)
 
     }
 
