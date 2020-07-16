@@ -17,6 +17,7 @@ import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
 import java.io.IOException
+import java.net.SocketTimeoutException
 
 object CodeforcesUtils {
 
@@ -182,39 +183,40 @@ object CodeforcesAPI {
         .build()
         .create(API::class.java)
 
-    private suspend fun <T> makeAPICall(call: Call<CodeforcesAPIResponse<T>>): CodeforcesAPIResponse<T>? {
+    private suspend fun <T> makeAPICall(call: Call<CodeforcesAPIResponse<T>>): CodeforcesAPIResponse<T>? = withContext(Dispatchers.IO){
         var c = call
         while(true){
             try{
                 val r = c.execute()
-                if(r.isSuccessful) return r.body()
-                val s = r.errorBody()?.string() ?: return null
-                val er: CodeforcesAPIErrorResponse = CodeforcesAPIErrorResponse.jsonAdapter.fromJson(s) ?: return null
+                if(r.isSuccessful) return@withContext r.body()
+                val s = r.errorBody()?.string() ?: return@withContext null
+                val er: CodeforcesAPIErrorResponse = CodeforcesAPIErrorResponse.jsonAdapter.fromJson(s) ?: return@withContext null
                 if(er.comment == "Call limit exceeded"){
                     delay(500)
                     c = c.clone()
                     continue
                 }
-                return CodeforcesAPIResponse(er)
+                return@withContext CodeforcesAPIResponse<T>(er)
             }catch (e : IOException){
-                return null
+                return@withContext null
             }
         }
+        null
     }
 
-    suspend fun getContests() = withContext(Dispatchers.IO){ makeAPICall(api.getContests()) }
+    suspend fun getContests() = makeAPICall(api.getContests())
 
-    suspend fun getUsers(handles: Collection<String>) = withContext(Dispatchers.IO){ makeAPICall(api.getUser(handles.joinToString(separator = ";"))) }
+    suspend fun getUsers(handles: Collection<String>) = makeAPICall(api.getUser(handles.joinToString(separator = ";")))
     suspend fun getUser(handle: String) = getUsers(listOf(handle))
 
-    suspend fun getBlogEntry(blogID: Int) = withContext(Dispatchers.IO){ makeAPICall(api.getBlogEntry(blogID)) }
+    suspend fun getBlogEntry(blogID: Int) = makeAPICall(api.getBlogEntry(blogID))
 
-    suspend fun getContestStandings(contestID: Int, handles: Collection<String>, showUnofficial: Boolean) = withContext(Dispatchers.IO){ makeAPICall(api.getContestStandings(contestID, handles.joinToString(separator = ";"), showUnofficial)) }
+    suspend fun getContestStandings(contestID: Int, handles: Collection<String>, showUnofficial: Boolean) = makeAPICall(api.getContestStandings(contestID, handles.joinToString(separator = ";"), showUnofficial))
     suspend fun getContestStandings(contestID: Int, handle: String, showUnofficial: Boolean) = getContestStandings(contestID, listOf(handle), showUnofficial)
 
-    suspend fun getContestSubmissions(contestID: Int, handle: String) = withContext(Dispatchers.IO){ makeAPICall(api.getContestStatus(contestID, handle)) }
+    suspend fun getContestSubmissions(contestID: Int, handle: String) = makeAPICall(api.getContestStatus(contestID, handle))
 
-    suspend fun getUserBlogEntries(handle: String) = withContext(Dispatchers.IO){ makeAPICall(api.getUserBlogs(handle)) }
+    suspend fun getUserBlogEntries(handle: String) = makeAPICall(api.getUserBlogs(handle))
 
 
 
@@ -260,7 +262,15 @@ object CodeforcesAPI {
     }
 
     class CallStringInvoker(val block: ()->Call<ResponseBody> ){
-        operator fun invoke(): String? = block().execute().body()?.string()
+        operator fun invoke(): String? {
+            try {
+                return block().execute().body()?.string()
+            }catch (e: SocketTimeoutException){
+                return null
+            }catch (e: IOException){
+                return null
+            }
+        }
     }
 
     suspend fun makeWEBCall(invoker: CallStringInvoker):String? = withContext(Dispatchers.IO) {
