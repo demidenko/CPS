@@ -590,10 +590,6 @@ fun timeRUtoEN(time: String): String{
 ///--------------SETTINGS------------
 class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private var cf_lost_changed_to: Boolean? = null
-    private var cf_lost_enabled = false
-    private val prefs by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
-
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.news_preferences)
 
@@ -603,24 +599,16 @@ class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSha
             setDefaultValue(CodeforcesNewsAdapter.titles[1])
         }
 
-        cf_lost_enabled = prefs.getBoolean(getString(R.string.news_codeforces_lost_enabled), false)
-        prefs.registerOnSharedPreferenceChangeListener(this)
+        PreferenceManager.getDefaultSharedPreferences(requireContext()).registerOnSharedPreferenceChangeListener(this)
     }
-
-     override fun onDestroy() {
-         prefs.unregisterOnSharedPreferenceChangeListener(this)
-         when(cf_lost_changed_to){
-             true -> JobServicesCenter.startCodeforcesNewsLostRecentJobService(requireContext())
-             false -> JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_lost_recent_news)
-         }
-         super.onDestroy()
-     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         if(key == getString(R.string.news_codeforces_lost_enabled)){
-            val value = sharedPreferences.getBoolean(key, false)
-            //println("new = $value")
-            cf_lost_changed_to = if(value!=cf_lost_enabled) value else null
+            //spam possible
+            when(sharedPreferences.getBoolean(key, false)){
+                true -> JobServicesCenter.startCodeforcesNewsLostRecentJobService(requireContext())
+                false -> JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_lost_recent_news)
+            }
         }
     }
 }
