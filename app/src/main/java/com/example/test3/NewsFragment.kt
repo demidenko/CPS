@@ -23,6 +23,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
+import com.example.test3.job_services.JobServiceIDs
+import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.fromHTML
 import com.google.android.material.tabs.TabLayout
@@ -183,7 +185,6 @@ class NewsFragment : Fragment() {
     override fun onHiddenChanged(hidden: Boolean) {
         if(!hidden){
             with(requireActivity() as MainActivity){
-                setActionBarSubTitle(getFragmentSubTitle(this@NewsFragment))
                 navigation.visibility = View.VISIBLE
             }
         }
@@ -587,7 +588,12 @@ fun timeRUtoEN(time: String): String{
 
 
 ///--------------SETTINGS------------
-class SettingsNewsFragment : PreferenceFragmentCompat(){
+class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private var cf_lost_changed_to: Boolean? = null
+    private var cf_lost_enabled = false
+    private val prefs by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.news_preferences)
 
@@ -597,7 +603,24 @@ class SettingsNewsFragment : PreferenceFragmentCompat(){
             setDefaultValue(CodeforcesNewsAdapter.titles[1])
         }
 
-
+        cf_lost_enabled = prefs.getBoolean(getString(R.string.news_codeforces_lost_enabled), false)
+        prefs.registerOnSharedPreferenceChangeListener(this)
     }
 
+     override fun onDestroy() {
+         prefs.unregisterOnSharedPreferenceChangeListener(this)
+         when(cf_lost_changed_to){
+             true -> JobServicesCenter.startCodeforcesNewsLostRecentJobService(requireContext())
+             false -> JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_lost_recent_news)
+         }
+         super.onDestroy()
+     }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
+        if(key == getString(R.string.news_codeforces_lost_enabled)){
+            val value = sharedPreferences.getBoolean(key, false)
+            //println("new = $value")
+            cf_lost_changed_to = if(value!=cf_lost_enabled) value else null
+        }
+    }
 }

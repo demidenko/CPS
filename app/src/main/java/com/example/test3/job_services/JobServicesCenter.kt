@@ -42,6 +42,11 @@ object JobServicesCenter {
         return scheduler.allPendingJobs
     }
 
+    fun stopJobService(context: Context, jobID: Int) {
+        val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        scheduler.cancel(jobID)
+    }
+
     fun startJobServices(context: Context){
         val calls = mutableMapOf<Int, (Context)->Unit >(
             JobServiceIDs.news_parsers to ::startNewsJobService,
@@ -63,7 +68,7 @@ object JobServicesCenter {
         )
     }
 
-    private fun startCodeforcesNewsLostRecentJobService(context: Context){
+    fun startCodeforcesNewsLostRecentJobService(context: Context){
         makeSchedule(
             context,
             JobServiceIDs.codeforces_lost_recent_news,
