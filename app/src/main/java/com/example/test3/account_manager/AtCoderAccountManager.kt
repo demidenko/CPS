@@ -18,6 +18,8 @@ class AtCoderAccountManager(context: Context): AccountManager(context), ColoredH
         override fun makeInfoOKString(): String {
             return if(rating == NOT_RATED) "$handle [not rated]" else "$handle $rating"
         }
+
+        override fun link(): String = "https://atcoder.jp/users/$handle"
     }
 
     override val PREFERENCES_FILE_NAME: String

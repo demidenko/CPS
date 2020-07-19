@@ -26,6 +26,8 @@ class CodeforcesAccountManager(context: Context): AccountManager(context), Color
         override fun makeInfoOKString(): String {
             return if(rating == NOT_RATED) "$handle [not rated]" else "$handle $rating"
         }
+
+        override fun link(): String = "https://codeforces.com/profile/$handle"
     }
 
     override val PREFERENCES_FILE_NAME: String
@@ -49,7 +51,7 @@ class CodeforcesAccountManager(context: Context): AccountManager(context), Color
             if(response.comment == "handles: User with handle $handle not found") return res.copy( status = STATUS.NOT_FOUND )
             return res
         }
-        val info = response.result!![0]
+        val info = response.result!!
         return res.copy(
             status = STATUS.OK,
             handle = info.handle,

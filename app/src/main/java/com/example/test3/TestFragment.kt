@@ -18,6 +18,7 @@ import com.example.test3.account_manager.useRealColors
 import com.example.test3.contest_watch.CodeforcesContestWatchService
 import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.utils.CodeforcesAPI
+import com.example.test3.utils.CodeforcesAPIStatus
 import com.example.test3.utils.CodeforcesContest
 import kotlinx.coroutines.launch
 
@@ -49,12 +50,22 @@ class TestFragment : Fragment() {
 
             val handle = handleEditText.text.toString()
             val contestID = contestIDEditText.text.toString().toInt()
-            activity.startForegroundService(
-                Intent(activity, CodeforcesContestWatchService::class.java)
-                    .setAction(CodeforcesContestWatchService.ACTION_START)
-                    .putExtra("handle", handle)
-                    .putExtra("contestID", contestID)
-            )
+
+            activity.scope.launch {
+                CodeforcesAPI.getUser(handle)?.let { userInfo ->
+                    if(userInfo.status == CodeforcesAPIStatus.OK){
+                        activity.startForegroundService(
+                            Intent(activity, CodeforcesContestWatchService::class.java)
+                                .setAction(CodeforcesContestWatchService.ACTION_START)
+                                .putExtra("handle", userInfo.result!!.handle)
+                                .putExtra("contestID", contestID)
+                        )
+                    }else{
+                        Toast.makeText(activity, userInfo.comment, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+
 
             with(prefs.edit()){
                 putInt("contest_id", contestID)

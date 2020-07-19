@@ -16,13 +16,18 @@ import java.net.URL
 import java.nio.charset.Charset
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
+import java.util.concurrent.TimeUnit
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLException
 import javax.net.ssl.X509TrustManager
 
 
-val httpClient = OkHttpClient()
+val httpClient = OkHttpClient
+    .Builder()
+    .connectTimeout(30, TimeUnit.SECONDS)
+    .readTimeout(30, TimeUnit.SECONDS)
+    .build()
 
 suspend fun createConnectionStream(address: String): InputStream? = withContext(Dispatchers.IO){
     val c = (URL(address).openConnection() as HttpsURLConnection).apply {

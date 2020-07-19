@@ -207,7 +207,7 @@ object CodeforcesAPI {
     suspend fun getContests() = makeAPICall(api.getContests())
 
     suspend fun getUsers(handles: Collection<String>) = makeAPICall(api.getUser(handles.joinToString(separator = ";")))
-    suspend fun getUser(handle: String) = getUsers(listOf(handle))
+    suspend fun getUser(handle: String) = getUsers(listOf(handle))?.let { CodeforcesAPIResponse(it.status, it.result?.get(0), it.comment) }
 
     suspend fun getBlogEntry(blogID: Int) = makeAPICall(api.getBlogEntry(blogID))
 
@@ -273,7 +273,7 @@ object CodeforcesAPI {
         }
     }
 
-    suspend fun makeWEBCall(invoker: CallStringInvoker):String? = withContext(Dispatchers.IO) {
+    private suspend fun makeWEBCall(invoker: CallStringInvoker):String? = withContext(Dispatchers.IO) {
         var s = invoker() ?: return@withContext null
         if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
             recalcRCPC(s)
@@ -287,7 +287,7 @@ object CodeforcesAPI {
 
     suspend fun getPageSource(page: String, lang: String) = makeWEBCall(CallStringInvoker { web.getPage(page,lang) })
 
-    suspend fun getContestPageSource(contestID: Int)= makeWEBCall(CallStringInvoker { web.getContestPage(contestID) })
+    suspend fun getContestPageSource(contestID: Int) = makeWEBCall(CallStringInvoker { web.getContestPage(contestID) })
 }
 
 
@@ -295,7 +295,7 @@ enum class CodeforcesContestPhase(private val title: String? = null) {
     UNDEFINED,
     BEFORE,
     CODING,
-    PENDING_SYSTEM_TEST("WAITING SYSTEM TESTING"),
+    PENDING_SYSTEM_TEST("PENDING SYSTEM TESTING"),
     SYSTEM_TEST("SYSTEM TESTING"),
     FINISHED;
 

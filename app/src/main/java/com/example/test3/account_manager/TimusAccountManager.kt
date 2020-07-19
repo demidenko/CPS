@@ -20,6 +20,8 @@ class TimusAccountManager(context: Context): AccountManager(context) {
         override fun makeInfoOKString(): String {
             return "$userName [$solvedTasks / $rating]"
         }
+
+        override fun link(): String = "https://timus.online/author.aspx?id=$id"
     }
 
     override val PREFERENCES_FILE_NAME: String

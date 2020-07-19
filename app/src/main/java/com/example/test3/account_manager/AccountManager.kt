@@ -54,6 +54,8 @@ abstract class UserInfo{
             else -> makeInfoOKString()
         }
     }
+
+    abstract fun link(): String
 }
 
 var useRealColors: Boolean = false

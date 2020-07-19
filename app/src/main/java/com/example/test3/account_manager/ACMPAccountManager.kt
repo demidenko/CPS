@@ -20,6 +20,8 @@ class ACMPAccountManager(context: Context): AccountManager(context) {
         override fun makeInfoOKString(): String {
             return "$userName [$solvedTasks / $rating]"
         }
+
+        override fun link(): String = "https://acmp.ru/index.asp?main=user&id=$id"
     }
 
 

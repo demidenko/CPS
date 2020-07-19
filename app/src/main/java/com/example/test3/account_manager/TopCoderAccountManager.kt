@@ -20,6 +20,8 @@ class TopCoderAccountManager(context: Context): AccountManager(context), Colored
         override fun makeInfoOKString(): String {
             return if(rating_algorithm == NOT_RATED) "$handle [not rated]" else "$handle $rating_algorithm"
         }
+
+        override fun link(): String = "https://www.topcoder.com/members/$handle"
     }
 
     override val PREFERENCES_FILE_NAME: String

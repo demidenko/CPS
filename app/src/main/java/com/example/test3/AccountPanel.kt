@@ -1,6 +1,7 @@
 package com.example.test3
 
 import android.content.Intent
+import android.net.Uri
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +22,14 @@ abstract class AccountPanel(
     val layout = LayoutInflater.from(activity).inflate(R.layout.account_panel, null, false) as RelativeLayout
     val textMain: TextView = layout.findViewById(R.id.account_panel_textMain)
     val textAdditional: TextView = layout.findViewById(R.id.account_panel_textAdditional)
+    val linkButton: ImageButton = layout.findViewById<ImageButton>(R.id.account_panel_link_button).apply {
+        setOnClickListener {
+            val info = manager.savedInfo
+            if(info.status == STATUS.OK){
+                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(info.link())))
+            }
+        }
+    }
     val settingsButton: ImageButton = layout.findViewById<ImageButton>(R.id.account_panel_settings_button).apply {
         setOnClickListener {
             val intent = Intent(activity, Settings::class.java).putExtra("manager", manager.PREFERENCES_FILE_NAME)
@@ -41,7 +50,7 @@ abstract class AccountPanel(
 
         view.findViewById<LinearLayout>(R.id.panels_layout).addView(layout, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
             val pix = 30
-            setMargins(pix, 0, pix, pix)
+            setMargins(pix, pix, pix, 0)
         })
 
         additionalBuild()
@@ -67,6 +76,15 @@ abstract class AccountPanel(
                     settingsButton.animate().setStartDelay(startDelay).setDuration(duration).alpha(0f)
                         .withEndAction {
                             settingsButton.visibility = View.GONE
+                        }.start()
+                }.start()
+            }
+            if(linkButton.isEnabled) {
+                linkButton.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
+                    linkButton.visibility = View.VISIBLE
+                    linkButton.animate().setStartDelay(startDelay).setDuration(duration).alpha(0f)
+                        .withEndAction {
+                            linkButton.visibility = View.GONE
                         }.start()
                 }.start()
             }
@@ -99,12 +117,16 @@ abstract class AccountPanel(
         if(isEmpty()) return
 
         settingsButton.isEnabled = false
+        linkButton.isEnabled = false
         reloadButton.isEnabled = false
         activity.accountsFragment.toggleReload(manager.PREFERENCES_FILE_NAME)
 
 
         settingsButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
             settingsButton.visibility = View.GONE
+        }.start()
+        linkButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
+            linkButton.visibility = View.GONE
         }.start()
 
         reloadButton.animate().setStartDelay(0).alpha(1f).setDuration(0).withStartAction {
@@ -135,5 +157,6 @@ abstract class AccountPanel(
         activity.accountsFragment.toggleReload(manager.PREFERENCES_FILE_NAME)
         reloadButton.isEnabled = true
         settingsButton.isEnabled = true
+        linkButton.isEnabled = true
     }
 }
