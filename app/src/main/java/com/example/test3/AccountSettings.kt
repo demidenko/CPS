@@ -12,7 +12,7 @@ import com.example.test3.account_manager.*
 import kotlinx.coroutines.*
 
 
-class Settings: AppCompatActivity() {
+class AccountSettings: AppCompatActivity() {
     val scope = CoroutineScope(Job() + Dispatchers.Main)
     lateinit var manager: AccountManager
 

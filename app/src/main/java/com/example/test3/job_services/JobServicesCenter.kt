@@ -55,8 +55,8 @@ object JobServicesCenter {
             JobServiceIDs.accounts_parsers to ::startAccountsJobService,
             JobServiceIDs.project_euler_recent_problems to ::startProjectEulerRecentProblemsJobService
         )
-        if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.news_codeforces_lost_enabled), false)){
-            toStart[JobServiceIDs.codeforces_lost_recent_news] = ::startCodeforcesNewsLostRecentJobService
+        with(PreferenceManager.getDefaultSharedPreferences(context)){
+            if(getBoolean(context.getString(R.string.news_codeforces_lost_enabled), false)) toStart[JobServiceIDs.codeforces_lost_recent_news] = ::startCodeforcesNewsLostRecentJobService
         }
         getRunningJobServices(context).forEach {
             if(toStart.containsKey(it.id)) toStart.remove(it.id)

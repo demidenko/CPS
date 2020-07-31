@@ -32,7 +32,7 @@ abstract class AccountPanel(
     }
     val settingsButton: ImageButton = layout.findViewById<ImageButton>(R.id.account_panel_settings_button).apply {
         setOnClickListener {
-            val intent = Intent(activity, Settings::class.java).putExtra("manager", manager.PREFERENCES_FILE_NAME)
+            val intent = Intent(activity, AccountSettings::class.java).putExtra("manager", manager.PREFERENCES_FILE_NAME)
             activity.startActivityForResult(intent, MainActivity.CALL_ACCOUNT_SETTINGS)
         }
     }
@@ -57,38 +57,23 @@ abstract class AccountPanel(
 
         layout.setOnClickListener {
             println("info = " + manager.savedInfo)
-
             val startDelay = 3000L
             val duration = 2000L
-            if(reloadButton.isEnabled) {
-                reloadButton.clearAnimation()
-                reloadButton.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
-                    reloadButton.visibility = View.VISIBLE
-                    reloadButton.animate().setStartDelay(startDelay).setDuration(duration).alpha(0f)
-                        .withEndAction {
-                            reloadButton.visibility = View.GONE
-                        }.start()
-                }.start()
-            }
-            if(settingsButton.isEnabled) {
-                settingsButton.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
-                    settingsButton.visibility = View.VISIBLE
-                    settingsButton.animate().setStartDelay(startDelay).setDuration(duration).alpha(0f)
-                        .withEndAction {
-                            settingsButton.visibility = View.GONE
-                        }.start()
-                }.start()
-            }
-            if(linkButton.isEnabled) {
-                linkButton.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
-                    linkButton.visibility = View.VISIBLE
-                    linkButton.animate().setStartDelay(startDelay).setDuration(duration).alpha(0f)
-                        .withEndAction {
-                            linkButton.visibility = View.GONE
-                        }.start()
-                }.start()
+            listOf(reloadButton, settingsButton, linkButton).forEach { button ->
+                if(button.isEnabled) {
+                    button.clearAnimation()
+                    button.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
+                        button.visibility = View.VISIBLE
+                        button.animate().setStartDelay(startDelay).setDuration(duration).alpha(0f)
+                            .withEndAction {
+                                button.visibility = View.GONE
+                            }.start()
+                    }.start()
+                }
             }
         }
+
+
     }
 
     open fun additionalBuild(){ }
@@ -106,7 +91,7 @@ abstract class AccountPanel(
         show(manager.savedInfo)
     }
 
-    val rotateAnimation = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f).apply {
+    private val rotateAnimation = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f).apply {
         duration = 1000
         repeatCount = Animation.INFINITE
         repeatMode = Animation.INFINITE

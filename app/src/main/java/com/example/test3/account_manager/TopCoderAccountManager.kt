@@ -1,10 +1,7 @@
 package com.example.test3.account_manager
 
 import android.content.Context
-import com.example.test3.utils.*
-import com.squareup.moshi.JsonDataException
-import com.squareup.moshi.JsonEncodingException
-import com.squareup.moshi.JsonReader
+import com.example.test3.utils.TopCoderAPI
 
 class TopCoderAccountManager(context: Context): AccountManager(context), ColoredHandles {
 
@@ -34,56 +31,29 @@ class TopCoderAccountManager(context: Context): AccountManager(context), Colored
         const val preferences_rating_marathon = "rating_marathon"
 
         var __cachedInfo: TopCoderUserInfo? = null
-
-        val NAMES = JsonReader.Options.of(
-            "handle",
-            "ratingSummary",
-            "error"
-        )
     }
 
 
 
     override suspend fun downloadInfo(data: String): UserInfo {
         val handle = data
-        return try{
-            val res = TopCoderUserInfo(STATUS.FAILED, handle)
-            with(JsonReaderFromURL("https://api.topcoder.com/v2/users/$handle") ?: return res) {
-                readObject {
-                    when(selectName(NAMES)){
-                        0 -> res.handle = nextString()
-                        1 -> readArray{
-                            var name: String? = null
-                            var rating: Int? = null
-                            readObject {
-                                while(hasNext()){
-                                    when(nextName()){
-                                        "name" -> name = nextString()
-                                        "rating" -> rating = nextInt()
-                                        else -> skipValue()
-                                    }
-                                }
-                            }
-                            when (name) {
-                                "Algorithm" -> res.rating_algorithm = rating!!
-                                "Marathon Match" -> res.rating_marathon = rating!!
-                            }
-                        }
-                        2 -> {
-                            //error
-                            if((readObjectFields("name")[0] as String) == "Not Found") return@with res.apply { status = STATUS.NOT_FOUND }
-                            return@with res
-                        }
-                        else -> skipNameAndValue()
-                    }
-                }
-                res.apply { status = STATUS.OK }
-            }
-        } catch (e: JsonEncodingException){
-            TopCoderUserInfo(STATUS.FAILED, handle)
-        } catch (e: JsonDataException){
-            TopCoderUserInfo(STATUS.FAILED, handle)
+        val res = TopCoderUserInfo(STATUS.FAILED, handle)
+
+        val apiResult = TopCoderAPI.getUser(handle) ?: return res
+        apiResult.error?.let {
+            if(it.name == "Not Found") return res.apply{ status = STATUS.NOT_FOUND }
+            return res
         }
+
+        res.handle = apiResult.handle
+        apiResult.ratingSummary.forEach { ratingSummary ->
+            when (ratingSummary.name) {
+                "Algorithm" -> res.rating_algorithm = ratingSummary.rating
+                "Marathon Match" -> res.rating_marathon = ratingSummary.rating
+            }
+        }
+
+        return res.apply { status = STATUS.OK }
     }
 
     override var cachedInfo: UserInfo?
