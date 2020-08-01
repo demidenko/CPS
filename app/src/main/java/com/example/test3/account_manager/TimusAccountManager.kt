@@ -1,8 +1,8 @@
 package com.example.test3.account_manager
 
 import android.content.Context
+import com.example.test3.utils.TimusAPI
 import com.example.test3.utils.fromHTML
-import com.example.test3.utils.readURLData
 
 class TimusAccountManager(context: Context): AccountManager(context) {
     data class TimusUserInfo(
@@ -42,7 +42,7 @@ class TimusAccountManager(context: Context): AccountManager(context) {
 
     override suspend fun downloadInfo(data: String): TimusUserInfo {
         val res = TimusUserInfo(STATUS.FAILED, data)
-        val s = readURLData("https://timus.online/author.aspx?id=$data&locale=en") ?: return res
+        val s = TimusAPI.getUser(data) ?: return res
         var i = s.indexOf("<H2 CLASS=\"author_name\">")
         if(i==-1) return res.apply { status = STATUS.NOT_FOUND }
         i = s.indexOf("<TITLE>")
@@ -97,7 +97,7 @@ class TimusAccountManager(context: Context): AccountManager(context) {
 
     override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? {
         if(str.toIntOrNull()!=null) return null
-        val s = readURLData("https://timus.online/search.aspx?Str=$str") ?: return null
+        val s = TimusAPI.getUserSearch(str) ?: return null
         var i = s.indexOf("CLASS=\"ranklist\"")
         if(i==-1) return null
         val res = ArrayList<Pair<String,String>>()

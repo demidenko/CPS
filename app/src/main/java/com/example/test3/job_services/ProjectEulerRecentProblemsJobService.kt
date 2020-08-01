@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.test3.*
-import com.example.test3.utils.readURLData
+import com.example.test3.utils.ProjectEulerAPI
 
 class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
 
@@ -14,7 +14,7 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
     }
 
     override suspend fun doJob() {
-        val s = readURLData("https://projecteuler.net/recent") ?: return
+        val s = ProjectEulerAPI.getRecent() ?: return
 
         val prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
         val lastViewedProblemID = prefs.getInt(LAST_RECENT_PROBLEM_ID, 0)

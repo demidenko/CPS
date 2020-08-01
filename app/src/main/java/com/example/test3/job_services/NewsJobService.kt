@@ -5,12 +5,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import com.example.test3.*
+import com.example.test3.utils.ACMPAPI
+import com.example.test3.utils.ProjectEulerAPI
 import com.example.test3.utils.fromHTML
-import com.example.test3.utils.readURLData
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import java.nio.charset.Charset
 
 class NewsJobService : CoroutineJobService() {
 
@@ -34,7 +34,7 @@ class NewsJobService : CoroutineJobService() {
     }
 
     private suspend fun parseACMP() {
-        val s = readURLData("https://acmp.ru", Charset.forName("windows-1251")) ?: return
+        val s = ACMPAPI.getMainPage() ?: return
 
         val prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
 
@@ -94,7 +94,7 @@ class NewsJobService : CoroutineJobService() {
     }
 
     private suspend fun parseProjectEuler() {
-        val s = readURLData("https://projecteuler.net/news") ?: return
+        val s = ProjectEulerAPI.getNews() ?: return
 
         val prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
 

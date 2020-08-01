@@ -1,9 +1,7 @@
 package com.example.test3.account_manager
 
 import android.content.Context
-import com.example.test3.utils.readURLData
-import java.net.URLEncoder
-import java.nio.charset.Charset
+import com.example.test3.utils.ACMPAPI
 
 class ACMPAccountManager(context: Context): AccountManager(context) {
     data class ACMPUserInfo(
@@ -43,7 +41,7 @@ class ACMPAccountManager(context: Context): AccountManager(context) {
 
     override suspend fun downloadInfo(data: String): ACMPUserInfo {
         val res = ACMPUserInfo(STATUS.FAILED, data)
-        val s  = readURLData("https://acmp.ru/index.asp?main=user&id=$data", Charset.forName("windows-1251")) ?: return res
+        val s = ACMPAPI.getUser(data) ?: return res
         if(!s.contains("index.asp?main=status&id_mem=$data")) return res.apply { status = STATUS.NOT_FOUND }
         var i = s.indexOf("<title>")
         if(i!=-1){
@@ -94,7 +92,7 @@ class ACMPAccountManager(context: Context): AccountManager(context) {
 
     override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? {
         if(str.toIntOrNull()!=null) return null
-        val s = readURLData("https://acmp.ru/index.asp?main=rating&str=" + URLEncoder.encode(str, "windows-1251"), Charset.forName("windows-1251")) ?: return null
+        val s = ACMPAPI.getUserSearch(str) ?: return null
         val res = ArrayList<Pair<String,String>>()
         var k = s.indexOf("<table cellspacing=1 cellpadding=2 align=center class=main>")
         while(true){

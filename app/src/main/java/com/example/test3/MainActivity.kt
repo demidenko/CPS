@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity(){
         }
 
         configureNavigation()
-        JobServicesCenter.startJobServices(this)
+        JobServicesCenter.startJobServices(this, scope)
 
     }
 

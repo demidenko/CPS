@@ -8,10 +8,7 @@ import android.content.ComponentName
 import android.content.Context
 import androidx.preference.PreferenceManager
 import com.example.test3.R
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
@@ -49,7 +46,7 @@ object JobServicesCenter {
         scheduler.cancel(jobID)
     }
 
-    fun startJobServices(context: Context){
+    fun startJobServices(context: Context, scope: CoroutineScope){
         val toStart = mutableMapOf<Int, (Context)->Unit >(
             JobServiceIDs.news_parsers to ::startNewsJobService,
             JobServiceIDs.accounts_parsers to ::startAccountsJobService,
@@ -62,7 +59,12 @@ object JobServicesCenter {
             if(toStart.containsKey(it.id)) toStart.remove(it.id)
             else stopJobService(context, it.id)
         }
-        toStart.values.shuffled().forEach { it(context) }
+        scope.launch {
+            toStart.values.shuffled().forEach { start ->
+                delay(500)
+                start(context)
+            }
+        }
     }
 
     private fun startNewsJobService(context: Context){
