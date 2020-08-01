@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
@@ -26,7 +25,7 @@ object NotificationChannels {
     const val acmp_news = "acmp_news"
 
     fun createNotificationChannels(context: Context){
-        val m = (context.getSystemService(AppCompatActivity.NOTIFICATION_SERVICE) as NotificationManager)
+        val m = NotificationManagerCompat.from(context)
 
         //test
         val group_id_test = "test"
@@ -142,25 +141,38 @@ object NotificationChannels {
 }
 
 object NotificationIDs {
-    private var id = 0
-
-    //codeforces
-    val codeforces_contest_watcher = ++id
-    val codeforces_contribution_changes = ++id
-
-    //project euler
-    fun makeProjectEulerRecentProblemNotificationID(problemID: Int): Int = 1_000_000 + problemID
-    fun makeProjectEulerNewsNotificationID(title: String): Int {
-        var res = title.hashCode() % 900_000
-        if(res<0) res += 900_000
-        return 1_100_000 + res
+    object nextID {
+        private var id = 0
+        operator fun invoke() = ++id
     }
 
+    object nextIntervalID {
+        private var start = 1_000_000
+        private val step = 1_000_000
+        operator fun invoke() = IntervalID(start, step).also { start += step }
+    }
+
+    data class IntervalID(val from: Int, val length: Int){
+        init {
+            if(length < 1) throw IllegalArgumentException("illegal interval length: $length")
+        }
+        operator fun invoke(int: Int) = (int % length + length) % length + from
+        operator fun invoke(str: String) = invoke(str.hashCode())
+    }
+
+    //codeforces
+    val codeforces_contest_watcher = nextID()
+    val codeforces_contribution_changes = nextID()
+
+    //project euler
+    val makeProjectEulerRecentProblemNotificationID = nextIntervalID()
+    val makeProjectEulerNewsNotificationID = nextIntervalID()
+
     //acmp
-    fun makeACMPNewsNotificationID(newsID: Int): Int = 2_000_000 + newsID
+    val makeACMPNewsNotificationID = nextIntervalID()
 
     //test
-    val test = ++id
+    val test = nextID()
 }
 
 object NotificationColors {
