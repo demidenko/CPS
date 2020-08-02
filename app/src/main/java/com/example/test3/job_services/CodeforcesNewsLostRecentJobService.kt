@@ -9,6 +9,7 @@ import com.example.test3.utils.CodeforcesUtils
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.launch
 import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.util.*
@@ -61,8 +62,10 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         }
     }
 
+    override suspend fun makeJobs() = arrayListOf(launch { parseRecent() })
+
     private val highRated = arrayListOf("user-orange", "user-red", "user-legendary")
-    override suspend fun doJob(){
+    private suspend fun parseRecent(){
         val enabled = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.news_codeforces_lost_enabled), false)
         if(!enabled) return
 

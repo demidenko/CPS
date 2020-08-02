@@ -5,6 +5,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.test3.*
 import com.example.test3.utils.ProjectEulerAPI
+import kotlinx.coroutines.launch
 
 class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
 
@@ -13,8 +14,10 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
         private const val LAST_RECENT_PROBLEM_ID = "last_recent_problem_id"
     }
 
-    override suspend fun doJob() {
-        val s = ProjectEulerAPI.getRecent() ?: return
+    override suspend fun makeJobs() = arrayListOf(launch { parseRecentProblems() })
+
+    private suspend fun parseRecentProblems() {
+        val s = ProjectEulerAPI.getRecentProblemsPage() ?: return
 
         val prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
         val lastViewedProblemID = prefs.getInt(LAST_RECENT_PROBLEM_ID, 0)

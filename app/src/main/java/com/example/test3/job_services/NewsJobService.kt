@@ -9,7 +9,6 @@ import com.example.test3.utils.ACMPAPI
 import com.example.test3.utils.ProjectEulerAPI
 import com.example.test3.utils.fromHTML
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 class NewsJobService : CoroutineJobService() {
@@ -24,13 +23,13 @@ class NewsJobService : CoroutineJobService() {
         const val PROJECT_EULER_LAST_NEWS = "project_euler_last_news"
     }
 
-    override suspend fun doJob() {
+    override suspend fun makeJobs(): ArrayList<Job> {
         val jobs = arrayListOf<Job>()
         with(PreferenceManager.getDefaultSharedPreferences(this)){
             if(getBoolean(getString(R.string.news_project_euler_feed),false)) jobs.add(launch { parseProjectEuler() })
             if(getBoolean(getString(R.string.news_acmp_feed),false)) jobs.add(launch { parseACMP() })
         }
-        jobs.joinAll()
+        return jobs
     }
 
     private suspend fun parseACMP() {
@@ -94,7 +93,7 @@ class NewsJobService : CoroutineJobService() {
     }
 
     private suspend fun parseProjectEuler() {
-        val s = ProjectEulerAPI.getNews() ?: return
+        val s = ProjectEulerAPI.getNewsPage() ?: return
 
         val prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
 

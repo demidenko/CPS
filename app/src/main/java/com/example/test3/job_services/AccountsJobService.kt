@@ -9,15 +9,15 @@ import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.makePendingIntentOpenURL
-import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class AccountsJobService : CoroutineJobService() {
 
-    override suspend fun doJob() {
-        arrayListOf(
-            launch { codeforcesContribution() }
-        ).joinAll()
+    override suspend fun makeJobs(): ArrayList<Job> {
+        val jobs = arrayListOf<Job>()
+        jobs.add(launch { codeforcesContribution() })
+        return jobs
     }
 
     private suspend fun codeforcesContribution() {
@@ -48,7 +48,7 @@ class AccountsJobService : CoroutineJobService() {
                 setNotificationSilent()
                 setAutoCancel(true)
                 setShowWhen(false)
-                setContentIntent(makePendingIntentOpenURL("https://codeforces.com/profile/$handle", this@AccountsJobService))
+                setContentIntent(makePendingIntentOpenURL(info.link(), this@AccountsJobService))
                 extras = Bundle().apply {
                     putInt("contribution", oldShowedContribution)
                 }

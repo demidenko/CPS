@@ -109,19 +109,20 @@ object JobServicesCenter {
 
 }
 
-abstract class CoroutineJobService : JobService(), CoroutineScope{
+abstract class CoroutineJobService : JobService(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext = Job() + Dispatchers.Main
 
-    protected abstract suspend fun doJob()
+    protected abstract suspend fun makeJobs(): ArrayList<Job>
 
     override fun onStopJob(params: JobParameters?): Boolean {
+        coroutineContext.cancelChildren()
         return false
     }
 
     override fun onStartJob(params: JobParameters?): Boolean {
         launch {
-            doJob()
+            makeJobs().joinAll()
             jobFinished(params, false)
         }
         return true

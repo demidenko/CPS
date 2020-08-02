@@ -13,10 +13,10 @@ object ProjectEulerAPI {
 
     interface WEB {
         @GET("news")
-        fun getNews(): Call<ResponseBody>
+        fun getNewsPage(): Call<ResponseBody>
 
         @GET("recent")
-        fun getRecent(): Call<ResponseBody>
+        fun getRecentProblemsPage(): Call<ResponseBody>
     }
 
     private val projecteulerWEB = Retrofit.Builder()
@@ -26,20 +26,20 @@ object ProjectEulerAPI {
         .build()
         .create(WEB::class.java)
 
-    suspend fun getNews(): String? {
+    suspend fun getNewsPage(): String? {
         try {
             return withContext(Dispatchers.IO){
-                projecteulerWEB.getNews().execute().body()?.string()
+                projecteulerWEB.getNewsPage().execute().body()?.string()
             }
         }catch (e: IOException){
             return null
         }
     }
 
-    suspend fun getRecent(): String? {
+    suspend fun getRecentProblemsPage(): String? {
         try {
             return withContext(Dispatchers.IO){
-                projecteulerWEB.getRecent().execute().body()?.string()
+                projecteulerWEB.getRecentProblemsPage().execute().body()?.string()
             }
         }catch (e: IOException){
             return null
