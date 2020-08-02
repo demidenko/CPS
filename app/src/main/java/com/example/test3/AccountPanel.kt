@@ -91,13 +91,6 @@ abstract class AccountPanel(
         show(manager.savedInfo)
     }
 
-    private val rotateAnimation = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f).apply {
-        duration = 1000
-        repeatCount = Animation.INFINITE
-        repeatMode = Animation.INFINITE
-        interpolator = LinearInterpolator()
-    }
-
     suspend fun reload(){
         if(isEmpty()) return
 
@@ -144,4 +137,18 @@ abstract class AccountPanel(
         settingsButton.isEnabled = true
         linkButton.isEnabled = true
     }
+}
+
+val rotateAnimation = RotateAnimation(
+    0f,
+    360f,
+    Animation.RELATIVE_TO_SELF,
+    0.5f,
+    Animation.RELATIVE_TO_SELF,
+    0.5f
+).apply {
+    duration = 1000
+    repeatCount = Animation.INFINITE
+    repeatMode = Animation.INFINITE
+    interpolator = LinearInterpolator()
 }

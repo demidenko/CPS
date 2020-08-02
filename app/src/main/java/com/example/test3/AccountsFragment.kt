@@ -11,7 +11,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.*
-import com.google.android.material.bottomappbar.BottomAppBar
+import kotlinx.android.synthetic.main.navigation_accounts.*
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -187,13 +187,19 @@ class AccountsFragment: Fragment() {
     }
 
     val toggleSet = TreeSet<String>()
+    private val reloadButton by lazy { requireActivity().navigation_accounts_reload }
     fun toggleReload(s: String){
-        val activity = requireActivity() as MainActivity
         if(toggleSet.contains(s)){
             toggleSet.remove(s)
-            if(toggleSet.isEmpty()) activity.findViewById<BottomAppBar>(R.id.navigation_accounts).menu.findItem(R.id.navigation_accounts_reload).isEnabled = true
+            if(toggleSet.isEmpty()){
+                //reloadButton.clearAnimation()
+                reloadButton.isEnabled = true
+            }
         }else{
-            if(toggleSet.isEmpty()) activity.findViewById<BottomAppBar>(R.id.navigation_accounts).menu.findItem(R.id.navigation_accounts_reload).isEnabled = false
+            if(toggleSet.isEmpty()){
+                reloadButton.isEnabled = false
+                //reloadButton.startAnimation(rotateAnimation)
+            }
             toggleSet.add(s)
         }
     }

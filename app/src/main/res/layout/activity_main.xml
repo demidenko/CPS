@@ -26,44 +26,41 @@
         android:background="@android:color/black"
         >
 
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:orientation="vertical"
             >
 
-            <com.google.android.material.bottomappbar.BottomAppBar
+            <include
                 android:id="@+id/navigation_accounts"
-                android:visibility="gone"
+                layout="@layout/navigation_accounts"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:backgroundTint="@android:color/black"
-
-                app:menu="@menu/navigation_accounts"
+                android:layout_height="match_parent"
+                android:visibility="gone"
                 />
 
-            <com.google.android.material.bottomappbar.BottomAppBar
+            <include
                 android:id="@+id/navigation_news"
-                android:visibility="gone"
+                layout="@layout/navigation_news"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:backgroundTint="@android:color/black"
-
-                app:menu="@menu/navigation_news"
-
+                android:layout_height="match_parent"
+                android:visibility="gone"
                 />
 
-            <com.google.android.material.bottomappbar.BottomAppBar
-                android:id="@+id/navigation_dev"
-                android:visibility="gone"
+            <include
+                android:id="@+id/navigation_develop"
+                layout="@layout/navigation_empty"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:backgroundTint="@android:color/black"
-
-                app:menu="@menu/navigation_empty"
+                android:layout_height="match_parent"
+                android:visibility="gone"
                 />
 
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        </LinearLayout>
+
+
+
 
 
         <View

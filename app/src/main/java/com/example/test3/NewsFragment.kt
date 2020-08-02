@@ -31,6 +31,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_cf_news_page.view.*
+import kotlinx.android.synthetic.main.navigation_news.*
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import java.util.*
@@ -124,7 +125,7 @@ class NewsFragment : Fragment() {
 
     }
 
-    private val reloadButton by lazy { requireActivity().navigation_news.menu.findItem(R.id.navigation_news_reload) }
+    private val reloadButton by lazy { requireActivity().navigation_news_reload }
     fun reloadTabs() {
         reloadButton.isEnabled = false
         (requireActivity() as MainActivity).scope.launch {

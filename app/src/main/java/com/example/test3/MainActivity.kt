@@ -21,6 +21,8 @@ import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.useRealColors
 import com.example.test3.job_services.JobServicesCenter
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.navigation_accounts.*
+import kotlinx.android.synthetic.main.navigation_news.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -55,18 +57,18 @@ class MainActivity : AppCompatActivity(){
             when(fragment){
                 accountsFragment -> {
                     navigation_news.visibility = View.GONE
-                    navigation_dev.visibility = View.GONE
+                    navigation_develop.visibility = View.GONE
                     navigation_accounts.visibility = View.VISIBLE
                 }
                 newsFragment -> {
                     navigation_accounts.visibility = View.GONE
-                    navigation_dev.visibility = View.GONE
+                    navigation_develop.visibility = View.GONE
                     navigation_news.visibility = View.VISIBLE
                 }
                 testFragment -> {
                     navigation_accounts.visibility = View.GONE
                     navigation_news.visibility = View.GONE
-                    navigation_dev.visibility = View.VISIBLE
+                    navigation_develop.visibility = View.VISIBLE
                 }
             }
             setActionBarSubTitle(getFragmentSubTitle(fragment))
@@ -116,29 +118,19 @@ class MainActivity : AppCompatActivity(){
 
     fun configureNavigation(){
 
-        navigation_accounts.setOnMenuItemClickListener {
-            when(it.itemId){
-                R.id.navigation_accounts_reload -> accountsFragment.reloadAccounts()
-                R.id.navigation_accounts_add -> accountsFragment.addAccount()
-            }
-            true
-        }
+        navigation_accounts_reload.setOnClickListener { accountsFragment.reloadAccounts() }
+        navigation_accounts_add.setOnClickListener { accountsFragment.addAccount() }
 
-        navigation_news.setOnMenuItemClickListener {
-            when(it.itemId){
-                R.id.navigation_news_reload -> newsFragment.reloadTabs()
-                R.id.navigation_news_settings -> {
-                    supportFragmentManager.beginTransaction()
-                        .hide(newsFragment)
-                        .add(android.R.id.content, SettingsNewsFragment())
-                        .addToBackStack(null)
-                        .commit()
+        navigation_news_reload.setOnClickListener { newsFragment.reloadTabs() }
+        navigation_news_settings.setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                .hide(newsFragment)
+                .add(android.R.id.content, SettingsNewsFragment())
+                .addToBackStack(null)
+                .commit()
 
-                    setActionBarSubTitle("::news.settings")
-                    navigation.visibility = View.GONE
-                }
-            }
-            true
+            setActionBarSubTitle("::news.settings")
+            navigation.visibility = View.GONE
         }
     }
 
