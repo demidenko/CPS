@@ -612,4 +612,9 @@ class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSha
             }
         }
     }
+
+    override fun onDestroy() {
+        PreferenceManager.getDefaultSharedPreferences(requireContext()).unregisterOnSharedPreferenceChangeListener(this)
+        super.onDestroy()
+    }
 }
