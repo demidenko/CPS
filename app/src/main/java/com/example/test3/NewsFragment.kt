@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.color
 import androidx.fragment.app.Fragment
 import androidx.preference.DropDownPreference
@@ -341,14 +342,14 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
     }
 
 
-    class CodeforcesNewsItemViewHolder(val view: RelativeLayout) : RecyclerView.ViewHolder(view){
+    class CodeforcesNewsItemViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
         val title: TextView = view.findViewById(R.id.news_item_title)
         val author: TextView = view.findViewById(R.id.news_item_author)
         val time: TextView = view.findViewById(R.id.news_item_time)
         val rating: TextView = view.findViewById(R.id.news_item_rating)
         val comments: TextView = view.findViewById(R.id.news_item_comments)
         val commentsIcon: ImageView = view.findViewById(R.id.news_item_comment_icon)
-        val newDot: View = view.findViewById(R.id.new_item_dot_new)
+        val newDot: View = view.findViewById(R.id.news_item_dot_new)
     }
 
     protected var rows: Array<Info> = emptyArray()
@@ -357,7 +358,7 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesNewsItemViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_item, parent, false) as RelativeLayout
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_item, parent, false) as ConstraintLayout
         return CodeforcesNewsItemViewHolder(view)
     }
 
