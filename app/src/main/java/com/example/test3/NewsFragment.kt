@@ -27,6 +27,7 @@ import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
 import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.utils.CodeforcesAPI
+import com.example.test3.utils.CodeforcesAPIStatus
 import com.example.test3.utils.fromHTML
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -52,12 +53,12 @@ class NewsFragment : Fragment() {
     private val codeforcesNewsAdapter: CodeforcesNewsAdapter by lazy {
         val activity = requireActivity() as MainActivity
         val fragments = mutableListOf(
-            CodeforcesNewsFragment("CF MAIN", "/", true, CodeforcesNewsItemsClassicAdapter(activity)),
-            CodeforcesNewsFragment("CF TOP", "/top", false, CodeforcesNewsItemsClassicAdapter(activity)),
-            CodeforcesNewsFragment("CF RECENT", "/recent-actions", false, CodeforcesNewsItemsRecentAdapter(activity))
+            CodeforcesNewsFragment("MAIN", "/", true, CodeforcesNewsItemsClassicAdapter(activity)),
+            CodeforcesNewsFragment("TOP", "/top", false, CodeforcesNewsItemsClassicAdapter(activity)),
+            CodeforcesNewsFragment("RECENT", "/recent-actions", false, CodeforcesNewsItemsRecentAdapter(activity))
         )
         if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.news_codeforces_lost_enabled), false)){
-            fragments.add(CodeforcesNewsFragment("CF LOST", "", true, CodeforcesNewsItemsLostRecentAdapter(activity)))
+            fragments.add(CodeforcesNewsFragment("LOST", "", true, CodeforcesNewsItemsLostRecentAdapter(activity)))
         }
         CodeforcesNewsAdapter(this, fragments)
     }
@@ -84,7 +85,7 @@ class NewsFragment : Fragment() {
         tabLayout = view.findViewById(R.id.cf_news_tab_layout)
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
             val fragment = codeforcesNewsAdapter.fragments[position]
-            tab.text = fragment.title
+            tab.text = "CF ${fragment.title}"
             if(fragment.isManagesNewEntries){
                 tab.orCreateBadge.apply {
                     backgroundColor = resources.getColor(android.R.color.holo_green_light, null)
@@ -105,6 +106,10 @@ class NewsFragment : Fragment() {
                             clearNumber()
                         }
                     }
+
+                    if(fragment.title == "LOST"){
+                        updateLostInfoButton.visibility = View.GONE
+                    }
                 }
             }
 
@@ -117,7 +122,11 @@ class NewsFragment : Fragment() {
                         }
                     }
 
-                    val subtitle = "::news.${fragment.title.toLowerCase().replace("cf ", "codeforces.")}"
+                    if(fragment.title == "LOST"){
+                        updateLostInfoButton.visibility = View.VISIBLE
+                    }
+
+                    val subtitle = "::news.codeforces.${fragment.title.toLowerCase()}"
                     setFragmentSubTitle(this@NewsFragment, subtitle)
                     (requireActivity() as MainActivity).setActionBarSubTitle(subtitle)
                 }
@@ -125,6 +134,7 @@ class NewsFragment : Fragment() {
         })
 
     }
+
 
     private val reloadButton by lazy { requireActivity().navigation_news_reload }
     fun reloadTabs() {
@@ -138,7 +148,7 @@ class NewsFragment : Fragment() {
                     if(tab.isSelected || currentTime - fragment.lastReloadTime > TimeUnit.MINUTES.toMillis(1)) {
                         tab.text = "..."
                         if(fragment.reload(lang)) {
-                            tab.text = fragment.title
+                            tab.text = "CF ${fragment.title}"
                             if (fragment.isManagesNewEntries) {
                                 if (fragment.newBlogs.isEmpty()) {
                                     tab.badge?.apply {
@@ -168,18 +178,72 @@ class NewsFragment : Fragment() {
     }
 
 
+    private val updateLostInfoButton by lazy { requireActivity().navigation_news_lost_update_info }
+    fun updateLostInfo() {
+        val activity = requireActivity() as MainActivity
+
+        val index = codeforcesNewsAdapter.fragments.indexOfFirst{ it.title == "LOST" }
+        if(index == -1) return
+        val tab = tabLayout.getTabAt(index) ?: return
+        val fragment = codeforcesNewsAdapter.fragments[index]
+
+        updateLostInfoButton.isEnabled = false
+        tab.text = "..."
+
+        activity.scope.launch {
+            val blogEntries = CodeforcesNewsLostRecentJobService.getSavedBlogs(activity, CodeforcesNewsLostRecentJobService.CF_LOST)
+                .toTypedArray()
+
+            CodeforcesAPI.getUsers(blogEntries.map { it.authorHandle })?.result?.let { users ->
+                for(i in blogEntries.indices) {
+                    val blogEntry = blogEntries[i]
+                    users.find { it.handle == blogEntry.authorHandle }?.let { user ->
+                        blogEntries[i] = blogEntry.copy(
+                            authorColorTag = activity.accountsFragment.codeforcesAccountManager.getTagByRating(user.rating)
+                        )
+                    }
+                }
+            }
+
+            val blogIDsToRemove = mutableSetOf<Int>()
+            blogEntries.forEachIndexed { index, blogEntry ->
+                CodeforcesAPI.getBlogEntry(blogEntry.id)?.let { response ->
+                    if(response.status == CodeforcesAPIStatus.FAILED && response.comment == "blogEntryId: Blog entry with id ${blogEntry.id} not found"){
+                        blogIDsToRemove.add(blogEntry.id)
+                    } else {
+                        if(response.status == CodeforcesAPIStatus.OK) response.result?.let { freshBlogEntry ->
+                            blogEntries[index] = blogEntry.copy(title = freshBlogEntry.title)
+                        } else {
+                            //god bless kotlin
+                        }
+                    }
+                }
+            }
+
+            CodeforcesNewsLostRecentJobService.saveBlogs(
+                activity,
+                CodeforcesNewsLostRecentJobService.CF_LOST,
+                blogEntries.filterNot { blogIDsToRemove.contains(it.id) }
+            )
+            fragment.reload("")
+
+            tab.text = "CF LOST"
+            updateLostInfoButton.isEnabled = true
+        }
+
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
         val defaultTab =
             PreferenceManager.getDefaultSharedPreferences(context).getString(getString(R.string.news_codeforces_default_tab),null)
                 ?: CodeforcesNewsAdapter.titles[1]
-        for(index in 0 until tabLayout.tabCount){
-            if(tabLayout.getTabAt(index)?.text == defaultTab){
-                tabLayout.selectTab(tabLayout.getTabAt(index))
-                codeforcesNewsViewPager.setCurrentItem(index, false)
-            }
-        }
+
+        var index = codeforcesNewsAdapter.fragments.indexOfFirst { it.title == defaultTab }
+        if(index == -1) index = 1
+        tabLayout.selectTab(tabLayout.getTabAt(index))
+        codeforcesNewsViewPager.setCurrentItem(index, false)
 
         reloadTabs()
     }
@@ -206,10 +270,10 @@ class CodeforcesNewsAdapter(
 
     companion object{
         val titles = arrayOf(
-            "CF MAIN",
-            "CF TOP",
-            "CF RECENT",
-            "CF LOST"
+            "MAIN",
+            "TOP",
+            "RECENT",
+            "LOST"
         )
     }
 }
@@ -539,39 +603,38 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
 
 class CodeforcesNewsItemsLostRecentAdapter(activity: MainActivity) : CodeforcesNewsItemsClassicAdapter(activity) {
     override fun parseData(s: String): Boolean {
-        val blogs = CodeforcesNewsLostRecentJobService.getBlogs(activity, CodeforcesNewsLostRecentJobService.CF_LOST)
+        val blogs = CodeforcesNewsLostRecentJobService.getSavedBlogs(activity, CodeforcesNewsLostRecentJobService.CF_LOST)
 
         if(blogs.isNotEmpty()){
-            val currentTime = System.currentTimeMillis()
+            val currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
             rows = blogs
-                .sortedByDescending { it.creationTime }
+                .sortedByDescending { it.creationTimeSeconds }
                 .map {
                 Info(
                     blogID = it.id.toString(),
                     title = it.title,
-                    author = it.author,
+                    author = it.authorHandle,
                     authorColorTag = it.authorColorTag,
-                    time = timeDifference(it.creationTime, currentTime),
+                    time = timeDifference(it.creationTimeSeconds, currentTimeSeconds),
                     comments = "",
                     rating = ""
                 )
             }.toTypedArray()
 
             notifyDataSetChanged()
-            return true
         }
 
-        return false
+        return true
     }
 }
 
-fun timeDifference(fromTime: Long, toTime: Long): String {
-    val t = toTime - fromTime
+fun timeDifference(fromTimeSeconds: Long, toTimeSeconds: Long): String {
+    val t = toTimeSeconds - fromTimeSeconds
     return when {
-        t <= TimeUnit.MINUTES.toMillis(2) -> "${TimeUnit.MILLISECONDS.toSeconds(t)} seconds"
-        t <= TimeUnit.HOURS.toMillis(2) -> "${TimeUnit.MILLISECONDS.toMinutes(t)} minutes"
-        t <= TimeUnit.HOURS.toMillis(24 * 2) -> "${TimeUnit.MILLISECONDS.toHours(t)} hours"
-        else -> "${TimeUnit.MILLISECONDS.toDays(t)} days"
+        t <= TimeUnit.MINUTES.toSeconds(2) -> "$t seconds"
+        t <= TimeUnit.HOURS.toSeconds(2) -> "${TimeUnit.SECONDS.toMinutes(t)} minutes"
+        t <= TimeUnit.HOURS.toSeconds(24 * 2) -> "${TimeUnit.SECONDS.toHours(t)} hours"
+        else -> "${TimeUnit.SECONDS.toDays(t)} days"
     } + " ago"
 }
 

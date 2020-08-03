@@ -21,10 +21,8 @@ import java.net.SocketTimeoutException
 
 object CodeforcesUtils {
 
-    suspend fun getBlogCreationTimeMillis(blogID: String): Long {
-        val response = CodeforcesAPI.getBlogEntry(blogID.toInt()) ?: return 0L
-        val blogInfo = response.result ?: return 0L
-        return blogInfo.creationTimeSeconds * 1000
+    suspend fun getBlogCreationTimeSeconds(blogID: String): Long {
+        return CodeforcesAPI.getBlogEntry(blogID.toInt())?.result?.creationTimeSeconds ?: return 0L
     }
 
 }
@@ -127,9 +125,14 @@ data class CodeforcesBlogEntry(
     val id: Int,
     val title: String,
     val authorHandle: String,
-    val rating: Int,
-    val creationTimeSeconds: Long
-)
+    val creationTimeSeconds: Long,
+    val rating: Int = 0,
+    val authorColorTag: String = ""
+){
+    companion object {
+        val jsonAdapter = CodeforcesBlogEntryJsonAdapter(Moshi.Builder().build())
+    }
+}
 
 
 object CodeforcesAPI {

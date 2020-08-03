@@ -138,6 +138,19 @@ class CodeforcesAccountManager(context: Context): AccountManager(context), Color
         }?.getARGB(this)
     }
 
+    fun getTagByRating(rating: Int): String {
+        return when {
+            rating < 1200 -> "user-gray"
+            rating < 1400 -> "user-green"
+            rating < 1600 -> "user-cyan"
+            rating < 1900 -> "user-blue"
+            rating < 2100 -> "user-violet"
+            rating < 2400 -> "user-orange"
+            rating < 3000 -> "user-red"
+            else -> "user-legendary"
+        }
+    }
+
     fun makeSpan(handle: String, tag: String) = SpannableString(handle).apply {
         val def = (context as MainActivity).defaultTextColor
         set(0, handle.length, ForegroundColorSpan(getHandleColorByTag(tag)?:def))

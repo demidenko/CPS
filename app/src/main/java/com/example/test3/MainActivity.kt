@@ -132,6 +132,7 @@ class MainActivity : AppCompatActivity(){
             setActionBarSubTitle("::news.settings")
             navigation.visibility = View.GONE
         }
+        navigation_news_lost_update_info.setOnClickListener { newsFragment.updateLostInfo() }
     }
 
     fun setActionBarSubTitle(text: String) {
