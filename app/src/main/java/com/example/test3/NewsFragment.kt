@@ -212,7 +212,7 @@ class NewsFragment : Fragment() {
                         blogIDsToRemove.add(blogEntry.id)
                     } else {
                         if(response.status == CodeforcesAPIStatus.OK) response.result?.let { freshBlogEntry ->
-                            blogEntries[index] = blogEntry.copy(title = freshBlogEntry.title)
+                            blogEntries[index] = blogEntry.copy(title = fromHTML(freshBlogEntry.title))
                         } else {
                             //god bless kotlin
                         }
