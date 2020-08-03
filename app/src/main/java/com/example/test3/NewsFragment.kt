@@ -234,6 +234,7 @@ class CodeforcesNewsFragment(
             layoutManager = LinearLayoutManager(context)
             adapter = viewAdapter
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            setHasFixedSize(true)
         }
     }
 
@@ -368,6 +369,10 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
 
             view.setOnClickListener {
                 activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${info.blogID}")))
+                if(info.isNew){
+                    info.isNew = false
+                    notifyItemChanged(position)
+                }
             }
 
             title.text = info.title
