@@ -55,6 +55,7 @@
             android:layout_height="wrap_content"
             android:hint="handle"
             android:inputType="textPersonName"
+            android:selectAllOnFocus="true"
             />
 
         <com.google.android.material.button.MaterialButton

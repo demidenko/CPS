@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.example.test3.account_manager.useRealColors
 import com.example.test3.job_services.JobServicesCenter
 import kotlinx.android.synthetic.main.activity_main.*
@@ -107,6 +108,7 @@ class MainActivity : AppCompatActivity(){
         }
 
 
+        PreferenceManager.setDefaultValues(this, R.xml.news_preferences, false)
         with(getPreferences(Context.MODE_PRIVATE)){
             useRealColors = getBoolean(use_real_colors, false)
         }

@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.color
@@ -557,10 +556,11 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
         return false
     }
 
-    class CodeforcesNewsItemViewHolder(val view: RelativeLayout) : RecyclerView.ViewHolder(view){
+    class CodeforcesNewsItemViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
         val title: TextView = view.findViewById(R.id.news_item_title)
         val author: TextView = view.findViewById(R.id.news_item_author)
         val comments: TextView = view.findViewById(R.id.news_item_comments)
+        val commentsIcon: ImageView = view.findViewById(R.id.news_item_comment_icon)
     }
 
     private var rows: Array<Info> = emptyArray()
@@ -569,7 +569,7 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesNewsItemViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_item, parent, false) as RelativeLayout
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_item, parent, false) as ConstraintLayout
         return CodeforcesNewsItemViewHolder(view)
     }
 
@@ -589,14 +589,10 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
 
             author.text = codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
 
-            comments.text = SpannableStringBuilder().apply {
-                var flag = false
-                info.comments.forEach {(handle, colorTag) ->
-                    if(flag) append(", ")
-                    append(codeforcesAccountManager.makeSpan(handle,colorTag))
-                    flag = true
-                }
-            }
+            comments.text = info.comments.joinTo(SpannableStringBuilder()) { (handle, colorTag) -> codeforcesAccountManager.makeSpan(handle, colorTag) }
+
+            commentsIcon.visibility = if(info.comments.isEmpty()) View.INVISIBLE else View.VISIBLE
+
         }
     }
 
