@@ -36,20 +36,16 @@
         android:title="News feeds"
         >
 
-        <SwitchPreference
+        <CheckBoxPreference
             android:key="@string/news_acmp_feed"
             android:defaultValue="false"
-            android:title="projecteuler.org"
-            android:summaryOn="subscribed"
-
+            android:title="projecteuler.net"
             />
 
-        <SwitchPreference
+        <CheckBoxPreference
             android:key="@string/news_project_euler_feed"
             android:defaultValue="false"
             android:title="acmp.ru"
-            android:summaryOn="subscribed"
-
             />
     </PreferenceCategory>
 
