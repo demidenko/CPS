@@ -6,7 +6,6 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import androidx.core.text.set
-import com.example.test3.MainActivity
 import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesAPIStatus
 import kotlinx.coroutines.Dispatchers
@@ -152,16 +151,15 @@ class CodeforcesAccountManager(context: Context): AccountManager(context), Color
     }
 
     fun makeSpan(handle: String, tag: String) = SpannableString(handle).apply {
-        val def = (context as MainActivity).defaultTextColor
-        set(0, handle.length, ForegroundColorSpan(getHandleColorByTag(tag)?:def))
+        getHandleColorByTag(tag)?.let {
+            set(
+                if(tag=="user-legendary") 1 else 0,
+                handle.length,
+                ForegroundColorSpan(it)
+            )
+        }
         if(tag!="user-black") set(0, handle.length, StyleSpan(Typeface.BOLD))
-        if(tag=="user-legendary") set(0, 1, ForegroundColorSpan(def))
     }
 
-    fun makeSpan(info: CodeforcesUserInfo) = SpannableString(info.handle).apply {
-        val def = (context as MainActivity).defaultTextColor
-        set(0, info.handle.length, ForegroundColorSpan(getColor(info)?:def))
-        if(info.rating!= NOT_RATED) set(0, info.handle.length, StyleSpan(Typeface.BOLD))
-        if(info.rating>=3000) set(0, 1, ForegroundColorSpan(def))
-    }
+    fun makeSpan(info: CodeforcesUserInfo) = makeSpan(info.handle, getTagByRating(info.rating))
 }

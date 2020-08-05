@@ -84,7 +84,7 @@ class NewsFragment : Fragment() {
         tabLayout = view.findViewById(R.id.cf_news_tab_layout)
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
             val fragment = codeforcesNewsAdapter.fragments[position]
-            tab.text = "CF ${fragment.title}"
+            tab.text = fragment.title
             if(fragment.isManagesNewEntries){
                 tab.orCreateBadge.apply {
                     backgroundColor = resources.getColor(android.R.color.holo_green_light, null)
@@ -147,7 +147,7 @@ class NewsFragment : Fragment() {
                     if(tab.isSelected || currentTime - fragment.lastReloadTime > TimeUnit.MINUTES.toMillis(1)) {
                         tab.text = "..."
                         if(fragment.reload(lang)) {
-                            tab.text = "CF ${fragment.title}"
+                            tab.text = fragment.title
                             if (fragment.isManagesNewEntries) {
                                 if (fragment.newBlogs.isEmpty()) {
                                     tab.badge?.apply {
@@ -229,7 +229,7 @@ class NewsFragment : Fragment() {
             )
             fragment.reload("")
 
-            tab.text = "CF LOST"
+            tab.text = fragment.title
             updateLostInfoButton.isEnabled = true
         }
 
