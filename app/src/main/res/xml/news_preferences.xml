@@ -14,7 +14,7 @@
         <SwitchPreference
             android:defaultValue="false"
             android:key="@string/news_codeforces_lost_enabled"
-            android:title="CF LOST"
+            android:title="Lost recent blogs"
             android:summaryOn="enabled"
             android:summaryOff="disabled"
             />

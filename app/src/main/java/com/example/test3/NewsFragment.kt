@@ -52,12 +52,12 @@ class NewsFragment : Fragment() {
     private val codeforcesNewsAdapter: CodeforcesNewsAdapter by lazy {
         val activity = requireActivity() as MainActivity
         val fragments = mutableListOf(
-            CodeforcesNewsFragment("MAIN", "/", true, CodeforcesNewsItemsClassicAdapter(activity)),
-            CodeforcesNewsFragment("TOP", "/top", false, CodeforcesNewsItemsClassicAdapter(activity)),
-            CodeforcesNewsFragment("RECENT", "/recent-actions", false, CodeforcesNewsItemsRecentAdapter(activity))
+            CodeforcesNewsFragment(CodeforcesTitle.MAIN, "/", true, CodeforcesNewsItemsClassicAdapter(activity)),
+            CodeforcesNewsFragment(CodeforcesTitle.TOP, "/top", false, CodeforcesNewsItemsClassicAdapter(activity)),
+            CodeforcesNewsFragment(CodeforcesTitle.RECENT, "/recent-actions", false, CodeforcesNewsItemsRecentAdapter(activity))
         )
         if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.news_codeforces_lost_enabled), false)){
-            fragments.add(CodeforcesNewsFragment("LOST", "", true, CodeforcesNewsItemsLostRecentAdapter(activity)))
+            fragments.add(CodeforcesNewsFragment(CodeforcesTitle.LOST, "", true, CodeforcesNewsItemsLostRecentAdapter(activity)))
         }
         CodeforcesNewsAdapter(this, fragments)
     }
@@ -84,7 +84,7 @@ class NewsFragment : Fragment() {
         tabLayout = view.findViewById(R.id.cf_news_tab_layout)
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
             val fragment = codeforcesNewsAdapter.fragments[position]
-            tab.text = fragment.title
+            tab.text = fragment.title.name
             if(fragment.isManagesNewEntries){
                 tab.orCreateBadge.apply {
                     backgroundColor = resources.getColor(android.R.color.holo_green_light, null)
@@ -106,7 +106,7 @@ class NewsFragment : Fragment() {
                         }
                     }
 
-                    if(fragment.title == "LOST"){
+                    if(fragment.title == CodeforcesTitle.LOST){
                         updateLostInfoButton.visibility = View.GONE
                     }
                 }
@@ -117,15 +117,15 @@ class NewsFragment : Fragment() {
                     val fragment = codeforcesNewsAdapter.fragments[position]
                     if(fragment.isManagesNewEntries) badge?.run{
                         if(hasNumber()){
-                            fragment.save()
+                            fragment.saveEntries()
                         }
                     }
 
-                    if(fragment.title == "LOST"){
+                    if(fragment.title == CodeforcesTitle.LOST){
                         updateLostInfoButton.visibility = View.VISIBLE
                     }
 
-                    val subtitle = "::news.codeforces.${fragment.title.toLowerCase()}"
+                    val subtitle = "::news.codeforces.${fragment.title.name.toLowerCase()}"
                     setFragmentSubTitle(this@NewsFragment, subtitle)
                     (requireActivity() as MainActivity).setActionBarSubTitle(subtitle)
                 }
@@ -140,39 +140,39 @@ class NewsFragment : Fragment() {
         reloadButton.isEnabled = false
         (requireActivity() as MainActivity).scope.launch {
             val lang = if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.news_codeforces_ru), true)) "ru" else "en"
-            val currentTime = System.currentTimeMillis()
             codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
                 val tab = tabLayout.getTabAt(index)!!
-                launch {
-                    if(tab.isSelected || currentTime - fragment.lastReloadTime > TimeUnit.MINUTES.toMillis(1)) {
-                        tab.text = "..."
-                        if(fragment.reload(lang)) {
-                            tab.text = fragment.title
-                            if (fragment.isManagesNewEntries) {
-                                if (fragment.newBlogs.isEmpty()) {
-                                    tab.badge?.apply {
-                                        isVisible = false
-                                        clearNumber()
-                                    }
-                                } else {
-                                    tab.badge?.apply {
-                                        number = fragment.newBlogs.size
-                                        isVisible = true
-                                    }
-                                    if (tab.isSelected) fragment.save()
-                                }
-                            }
-                        }else{
-                            tab.text = SpannableStringBuilder().apply {
-                                color(resources.getColor(R.color.reload_fail,null)) {
-                                    append(fragment.title)
-                                }
-                            }
-                        }
-                    }
-                }
+                launch { reloadFragment(fragment, tab, lang) }
             }.joinAll()
             reloadButton.isEnabled = true
+        }
+    }
+
+    suspend fun reloadFragment(fragment: CodeforcesNewsFragment, tab: TabLayout.Tab, lang: String) {
+        if(!tab.isSelected && TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - fragment.lastReloadTimeMillis)<1) return
+        tab.text = "..."
+        if(fragment.reload(lang)) {
+            tab.text = fragment.title.name
+            if (fragment.isManagesNewEntries) {
+                if (fragment.newBlogs.isEmpty()) {
+                    tab.badge?.apply {
+                        isVisible = false
+                        clearNumber()
+                    }
+                } else {
+                    tab.badge?.apply {
+                        number = fragment.newBlogs.size
+                        isVisible = true
+                    }
+                    if (tab.isSelected) fragment.saveEntries()
+                }
+            }
+        }else{
+            tab.text = SpannableStringBuilder().apply {
+                color(resources.getColor(R.color.reload_fail,null)) {
+                    append(fragment.title.name)
+                }
+            }
         }
     }
 
@@ -181,7 +181,7 @@ class NewsFragment : Fragment() {
     fun updateLostInfo() {
         val activity = requireActivity() as MainActivity
 
-        val index = codeforcesNewsAdapter.fragments.indexOfFirst{ it.title == "LOST" }
+        val index = codeforcesNewsAdapter.fragments.indexOfFirst{ it.title == CodeforcesTitle.LOST }
         if(index == -1) return
         val tab = tabLayout.getTabAt(index) ?: return
         val fragment = codeforcesNewsAdapter.fragments[index]
@@ -229,7 +229,7 @@ class NewsFragment : Fragment() {
             )
             fragment.reload("")
 
-            tab.text = fragment.title
+            tab.text = fragment.title.name
             updateLostInfoButton.isEnabled = true
         }
 
@@ -240,9 +240,9 @@ class NewsFragment : Fragment() {
 
         val defaultTab =
             PreferenceManager.getDefaultSharedPreferences(context).getString(getString(R.string.news_codeforces_default_tab),null)
-                ?: CodeforcesNewsAdapter.titles[1]
+                ?: CodeforcesTitle.TOP.name
 
-        var index = codeforcesNewsAdapter.fragments.indexOfFirst { it.title == defaultTab }
+        var index = codeforcesNewsAdapter.fragments.indexOfFirst { it.title.name == defaultTab }
         if(index == -1) index = 1
         tabLayout.selectTab(tabLayout.getTabAt(index))
         codeforcesNewsViewPager.setCurrentItem(index, false)
@@ -260,7 +260,9 @@ class NewsFragment : Fragment() {
     }
 }
 
-
+enum class CodeforcesTitle {
+    MAIN, TOP, RECENT, LOST
+}
 
 class CodeforcesNewsAdapter(
     parentFragment: Fragment,
@@ -269,19 +271,10 @@ class CodeforcesNewsAdapter(
 
     override fun createFragment(position: Int) = fragments[position]
     override fun getItemCount() = fragments.size
-
-    companion object{
-        val titles = arrayOf(
-            "MAIN",
-            "TOP",
-            "RECENT",
-            "LOST"
-        )
-    }
 }
 
 class CodeforcesNewsFragment(
-    val title: String,
+    val title: CodeforcesTitle,
     val pageName: String,
     val isManagesNewEntries: Boolean,
     val viewAdapter: CodeforcesNewsItemsAdapter
@@ -304,7 +297,7 @@ class CodeforcesNewsFragment(
         }
     }
 
-    var lastReloadTime = 0L
+    var lastReloadTimeMillis = 0L
     var newBlogs = hashSetOf<String>()
 
     suspend fun reload(lang: String): Boolean {
@@ -312,7 +305,7 @@ class CodeforcesNewsFragment(
             if(pageName.startsWith('/')) CodeforcesAPI.getPageSource(pageName.substring(1), lang) ?: return false
             else ""
         if(!viewAdapter.parseData(source)) return false
-        lastReloadTime = System.currentTimeMillis()
+        lastReloadTimeMillis = System.currentTimeMillis()
 
         if(isManagesNewEntries){
             val savedBlogs = prefs.getStringSet(prefs_key, null) ?: emptySet()
@@ -322,7 +315,7 @@ class CodeforcesNewsFragment(
         return true
     }
 
-    fun save() {
+    fun saveEntries() {
         if(!isManagesNewEntries) return
         with(prefs.edit()) {
             val toSave = viewAdapter.getBlogIDs().toSet()
@@ -663,9 +656,10 @@ class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSha
         addPreferencesFromResource(R.xml.news_preferences)
 
         findPreference<DropDownPreference>(getString(R.string.news_codeforces_default_tab))?.run {
-            entries = CodeforcesNewsAdapter.titles
-            entryValues = CodeforcesNewsAdapter.titles
-            setDefaultValue(CodeforcesNewsAdapter.titles[1])
+            val titles = CodeforcesTitle.values().map { it.name }.toTypedArray()
+            entries = titles
+            entryValues = titles
+            setDefaultValue(CodeforcesTitle.TOP.name)
         }
 
         PreferenceManager.getDefaultSharedPreferences(requireContext()).registerOnSharedPreferenceChangeListener(this)
