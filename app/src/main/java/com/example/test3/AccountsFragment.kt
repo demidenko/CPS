@@ -53,17 +53,16 @@ class AccountsFragment: Fragment() {
         codeforcesAccountManager = CodeforcesAccountManager(activity)
         codeforcesPanel = object : AccountPanel(activity, codeforcesAccountManager){
             override fun show(info: UserInfo) { info as CodeforcesAccountManager.CodeforcesUserInfo
+                val color = manager.getColor(info)
                 textMain.text = codeforcesAccountManager.makeSpan(info)
                 textAdditional.text = ""
-                val color = manager.getColor(info)
+                textAdditional.setTextColor(color ?: activity.defaultTextColor)
                 if(info.status == STATUS.OK){
                     textMain.typeface = Typeface.DEFAULT_BOLD
                     textAdditional.text = if(info.rating == NOT_RATED) "[not rated]" else "${info.rating}"
                 }else{
                     textMain.typeface = Typeface.DEFAULT
                 }
-                textMain.setTextColor(color ?: activity.defaultTextColor)
-                textAdditional.setTextColor(color ?: activity.defaultTextColor)
                 activity.window.statusBarColor = color ?: Color.TRANSPARENT
             }
         }
@@ -71,34 +70,34 @@ class AccountsFragment: Fragment() {
         atcoderAccountManager = AtCoderAccountManager(activity)
         atcoderPanel = object : AccountPanel(activity, atcoderAccountManager){
             override fun show(info: UserInfo) { info as AtCoderAccountManager.AtCoderUserInfo
-                textMain.text = info.handle
-                textAdditional.text = ""
                 val color = manager.getColor(info)
+                textMain.text = info.handle
+                textMain.setTextColor(color ?: activity.defaultTextColor)
+                textAdditional.text = ""
+                textAdditional.setTextColor(color ?: activity.defaultTextColor)
                 if(info.status == STATUS.OK){
                     textMain.typeface = Typeface.DEFAULT_BOLD
                     textAdditional.text = if(info.rating == NOT_RATED) "[not rated]" else "${info.rating}"
                 }else{
                     textMain.typeface = Typeface.DEFAULT
                 }
-                textMain.setTextColor(color ?: activity.defaultTextColor)
-                textAdditional.setTextColor(color ?: activity.defaultTextColor)
             }
         }
 
         topcoderAccountManager = TopCoderAccountManager(activity)
         topcoderPanel = object : AccountPanel(activity, topcoderAccountManager){
             override fun show(info: UserInfo) { info as TopCoderAccountManager.TopCoderUserInfo
-                textMain.text = info.handle
-                textAdditional.text = ""
                 val color = manager.getColor(info)
+                textMain.text = info.handle
+                textMain.setTextColor(color ?: activity.defaultTextColor)
+                textAdditional.text = ""
+                textAdditional.setTextColor(color ?: activity.defaultTextColor)
                 if(info.status == STATUS.OK){
                     textMain.typeface = Typeface.DEFAULT_BOLD
                     textAdditional.text = if(info.rating_algorithm == NOT_RATED) "[not rated]" else "${info.rating_algorithm}"
                 }else{
                     textMain.typeface = Typeface.DEFAULT
                 }
-                textMain.setTextColor(color ?: activity.defaultTextColor)
-                textAdditional.setTextColor(color ?: activity.defaultTextColor)
             }
         }
 
