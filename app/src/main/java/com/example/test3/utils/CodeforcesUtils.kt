@@ -306,14 +306,8 @@ object CodeforcesAPI {
 
         @GET("{page}")
         fun getPage(
-            @Path("page") page: String,
+            @Path("page", encoded = true) page: String,
             @Query("locale") lang: String,
-            @Header("Cookie") cookie: String = "RCPC=$RCPC"
-        ): Call<ResponseBody>
-
-        @GET("contest/{contestID}")
-        fun getContestPage(
-            @Path("contestID") contestID: Int,
             @Header("Cookie") cookie: String = "RCPC=$RCPC"
         ): Call<ResponseBody>
     }
@@ -326,16 +320,20 @@ object CodeforcesAPI {
         .create(WEB::class.java)
 
 
-    private var RCPC = ""
-    private var last_c = ""
-    private fun recalcRCPC(source: String) = runBlocking {
-        val i = source.indexOf("c=toNumbers(")
-        val c = source.substring(source.indexOf("(\"",i)+2, source.indexOf("\")",i))
-        //println("c = $c")
-        if(c == last_c) return@runBlocking
-        RCPC = decodeAES(c)
-        last_c = c
-        //println("new RCPC = $RCPC")
+    private val RCPC = object {
+
+        private var rcpc_value: String = ""
+
+        override fun toString(): String = rcpc_value
+
+        private var last_c = ""
+        fun recalc(source: String) = runBlocking {
+            val i = source.indexOf("c=toNumbers(")
+            val c = source.substring(source.indexOf("(\"",i)+2, source.indexOf("\")",i))
+            if(c == last_c) return@runBlocking
+            rcpc_value = decodeAES(c)
+            last_c = c
+        }
     }
 
     class CallStringInvoker(val block: ()->Call<ResponseBody> ){
@@ -353,7 +351,7 @@ object CodeforcesAPI {
     private suspend fun makeWEBCall(invoker: CallStringInvoker):String? = withContext(Dispatchers.IO) {
         var s = invoker() ?: return@withContext null
         if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
-            recalcRCPC(s)
+            RCPC.recalc(s)
             delay(300)
             s = invoker() ?: return@withContext null
         }
@@ -364,7 +362,6 @@ object CodeforcesAPI {
 
     suspend fun getPageSource(page: String, lang: String) = makeWEBCall(CallStringInvoker { web.getPage(page,lang) })
 
-    suspend fun getContestPageSource(contestID: Int) = makeWEBCall(CallStringInvoker { web.getContestPage(contestID) })
 }
 
 
