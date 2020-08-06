@@ -1,5 +1,13 @@
 package com.example.test3.utils
 
+import android.graphics.Typeface
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
+import androidx.core.text.set
+import com.example.test3.account_manager.CodeforcesAccountManager
+import com.example.test3.account_manager.ColoredHandles
+import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.NOT_RATED
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.JsonClass
@@ -19,12 +27,78 @@ import retrofit2.http.Query
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-object CodeforcesUtils {
+object CodeforcesUtils : ColoredHandles {
 
     suspend fun getBlogCreationTimeSeconds(blogID: String): Long {
         return CodeforcesAPI.getBlogEntry(blogID.toInt())?.result?.creationTimeSeconds ?: return 0L
     }
 
+
+
+
+    override fun getHandleColor(rating: Int): HandleColor {
+        return when {
+            rating < 1200 -> HandleColor.GRAY
+            rating < 1400 -> HandleColor.GREEN
+            rating < 1600 -> HandleColor.CYAN
+            rating < 1900 -> HandleColor.BLUE
+            rating < 2100 -> HandleColor.VIOLET
+            rating < 2400 -> HandleColor.ORANGE
+            else -> HandleColor.RED
+        }
+    }
+
+    override fun getColor(tag: HandleColor): Int {
+        return when (tag){
+            HandleColor.GRAY -> 0x808080
+            HandleColor.GREEN -> 0x008000
+            HandleColor.CYAN -> 0x03A89E
+            HandleColor.BLUE -> 0x0000FF
+            HandleColor.VIOLET -> 0xAA00AA
+            HandleColor.ORANGE -> 0xFF8C00
+            HandleColor.RED -> 0xFF0000
+            else -> throw HandleColor.UnknownHandleColorException(tag)
+        }
+    }
+
+    fun getTagByRating(rating: Int): String {
+        return when {
+            rating < 1200 -> "user-gray"
+            rating < 1400 -> "user-green"
+            rating < 1600 -> "user-cyan"
+            rating < 1900 -> "user-blue"
+            rating < 2100 -> "user-violet"
+            rating < 2400 -> "user-orange"
+            rating < 3000 -> "user-red"
+            else -> "user-legendary"
+        }
+    }
+
+    fun getHandleColorByTag(tag: String): Int? {
+        return when (tag) {
+            "user-gray" -> HandleColor.GRAY
+            "user-green" -> HandleColor.GREEN
+            "user-cyan" -> HandleColor.CYAN
+            "user-blue" -> HandleColor.BLUE
+            "user-violet" -> HandleColor.VIOLET
+            "user-orange" -> HandleColor.ORANGE
+            "user-red", "user-legendary" -> HandleColor.RED
+            else -> null
+        }?.getARGB(this)
+    }
+
+    fun makeSpan(handle: String, tag: String) = SpannableString(handle).apply {
+        getHandleColorByTag(tag)?.let {
+            set(
+                if(tag=="user-legendary") 1 else 0,
+                handle.length,
+                ForegroundColorSpan(it)
+            )
+        }
+        if(tag!="user-black") set(0, handle.length, StyleSpan(Typeface.BOLD))
+    }
+
+    fun makeSpan(info: CodeforcesAccountManager.CodeforcesUserInfo) = makeSpan(info.handle, getTagByRating(info.rating))
 }
 
 enum class CodeforcesAPIStatus{

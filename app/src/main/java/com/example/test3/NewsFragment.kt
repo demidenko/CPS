@@ -27,6 +27,7 @@ import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesAPIStatus
+import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.fromHTML
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -50,14 +51,14 @@ class NewsFragment : Fragment() {
     }
 
     private val codeforcesNewsAdapter: CodeforcesNewsAdapter by lazy {
-        val activity = requireActivity() as MainActivity
+        val context = requireContext()
         val fragments = mutableListOf(
-            CodeforcesNewsFragment(CodeforcesTitle.MAIN, "/", true, CodeforcesNewsItemsClassicAdapter(activity)),
-            CodeforcesNewsFragment(CodeforcesTitle.TOP, "/top", false, CodeforcesNewsItemsClassicAdapter(activity)),
-            CodeforcesNewsFragment(CodeforcesTitle.RECENT, "/recent-actions", false, CodeforcesNewsItemsRecentAdapter(activity))
+            CodeforcesNewsFragment(CodeforcesTitle.MAIN, "/", true, CodeforcesNewsItemsClassicAdapter(context)),
+            CodeforcesNewsFragment(CodeforcesTitle.TOP, "/top", false, CodeforcesNewsItemsClassicAdapter(context)),
+            CodeforcesNewsFragment(CodeforcesTitle.RECENT, "/recent-actions", false, CodeforcesNewsItemsRecentAdapter(context))
         )
         if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.news_codeforces_lost_enabled), false)){
-            fragments.add(CodeforcesNewsFragment(CodeforcesTitle.LOST, "", true, CodeforcesNewsItemsLostRecentAdapter(activity)))
+            fragments.add(CodeforcesNewsFragment(CodeforcesTitle.LOST, "", true, CodeforcesNewsItemsLostRecentAdapter(context)))
         }
         CodeforcesNewsAdapter(this, fragments)
     }
@@ -198,7 +199,7 @@ class NewsFragment : Fragment() {
                     val blogEntry = blogEntries[i]
                     users.find { it.handle == blogEntry.authorHandle }?.let { user ->
                         blogEntries[i] = blogEntry.copy(
-                            authorColorTag = activity.accountsFragment.codeforcesAccountManager.getTagByRating(user.rating)
+                            authorColorTag = CodeforcesUtils.getTagByRating(user.rating)
                         )
                     }
                 }
@@ -223,7 +224,7 @@ class NewsFragment : Fragment() {
             }
 
             CodeforcesNewsLostRecentJobService.saveBlogs(
-                activity,
+                requireContext(),
                 CodeforcesNewsLostRecentJobService.CF_LOST,
                 blogEntries.filterNot { blogIDsToRemove.contains(it.id) }
             )
@@ -340,12 +341,12 @@ class CodeforcesNewsFragment(
 
 ///---------------data adapters--------------------
 
-abstract class CodeforcesNewsItemsAdapter(val activity: MainActivity): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+abstract class CodeforcesNewsItemsAdapter(val context: Context): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     abstract fun parseData(s: String): Boolean
     abstract fun getBlogIDs(): List<String>
 }
 
-open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): CodeforcesNewsItemsAdapter(activity){
+open class CodeforcesNewsItemsClassicAdapter(context: Context): CodeforcesNewsItemsAdapter(context){
 
     data class Info(
         val blogID: String,
@@ -409,7 +410,7 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
         val rating: TextView = view.findViewById(R.id.news_item_rating)
         val comments: TextView = view.findViewById(R.id.news_item_comments)
         val commentsIcon: ImageView = view.findViewById(R.id.news_item_comment_icon)
-        val newDot: View = view.findViewById(R.id.news_item_dot_new)
+        val newEntryIndicator: View = view.findViewById(R.id.news_item_dot_new)
     }
 
     protected var rows: Array<Info> = emptyArray()
@@ -427,7 +428,7 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
             val info = rows[position]
 
             view.setOnClickListener {
-                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${info.blogID}")))
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${info.blogID}")))
                 if(info.isNew){
                     info.isNew = false
                     notifyItemChanged(position)
@@ -436,18 +437,18 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
 
             title.text = info.title
 
-            author.text = activity.accountsFragment.codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
+            author.text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag)
 
             time.text = timeRUtoEN(info.time)
 
-            newDot.visibility = if(info.isNew) View.VISIBLE else View.GONE
+            newEntryIndicator.visibility = if(info.isNew) View.VISIBLE else View.GONE
 
             comments.text = info.comments
             commentsIcon.visibility = if(info.comments.isEmpty()) View.INVISIBLE else View.VISIBLE
 
             rating.apply{
                 text = info.rating
-                setTextColor(activity.resources.getColor(
+                setTextColor(context.resources.getColor(
                     if(info.rating.startsWith('+')) R.color.blog_rating_positive
                     else R.color.blog_rating_negative, null)
                 )
@@ -469,7 +470,7 @@ open class CodeforcesNewsItemsClassicAdapter(activity: MainActivity): Codeforces
 }
 
 
-class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsItemsAdapter(activity){
+class CodeforcesNewsItemsRecentAdapter(context: Context): CodeforcesNewsItemsAdapter(context){
 
     companion object {
         fun parsePage(s: String): ArrayList<Info> {
@@ -573,16 +574,14 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
             view.setOnClickListener {
                 var suf = info.blogID
                 if(info.lastCommentId.isNotBlank()) suf+="#comment-${info.lastCommentId}"
-                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/$suf")))
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/$suf")))
             }
 
             title.text =  info.title
 
-            val codeforcesAccountManager = activity.accountsFragment.codeforcesAccountManager
+            author.text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag)
 
-            author.text = codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
-
-            comments.text = info.comments.joinTo(SpannableStringBuilder()) { (handle, colorTag) -> codeforcesAccountManager.makeSpan(handle, colorTag) }
+            comments.text = info.comments.joinTo(SpannableStringBuilder()) { (handle, colorTag) -> CodeforcesUtils.makeSpan(handle, colorTag) }
 
             commentsIcon.visibility = if(info.comments.isEmpty()) View.INVISIBLE else View.VISIBLE
 
@@ -593,9 +592,9 @@ class CodeforcesNewsItemsRecentAdapter(activity: MainActivity): CodeforcesNewsIt
 
 }
 
-class CodeforcesNewsItemsLostRecentAdapter(activity: MainActivity) : CodeforcesNewsItemsClassicAdapter(activity) {
+class CodeforcesNewsItemsLostRecentAdapter(context: Context) : CodeforcesNewsItemsClassicAdapter(context) {
     override fun parseData(s: String): Boolean {
-        val blogs = CodeforcesNewsLostRecentJobService.getSavedBlogs(activity, CodeforcesNewsLostRecentJobService.CF_LOST)
+        val blogs = CodeforcesNewsLostRecentJobService.getSavedBlogs(context, CodeforcesNewsLostRecentJobService.CF_LOST)
 
         if(blogs.isNotEmpty()){
             val currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())

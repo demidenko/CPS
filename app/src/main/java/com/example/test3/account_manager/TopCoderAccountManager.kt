@@ -3,7 +3,7 @@ package com.example.test3.account_manager
 import android.content.Context
 import com.example.test3.utils.TopCoderAPI
 
-class TopCoderAccountManager(context: Context): AccountManager(context), ColoredHandles {
+class TopCoderAccountManager(context: Context): AccountManager(context) {
 
     data class TopCoderUserInfo(
         override var status: STATUS,
@@ -24,13 +24,35 @@ class TopCoderAccountManager(context: Context): AccountManager(context), Colored
     override val PREFERENCES_FILE_NAME: String
         get() = preferences_file_name
 
-    companion object{
+    companion object : ColoredHandles {
         const val preferences_file_name = "topcoder"
         const val preferences_handle = "handle"
         const val preferences_rating_algorithm = "rating_algorithm"
         const val preferences_rating_marathon = "rating_marathon"
 
         var __cachedInfo: TopCoderUserInfo? = null
+
+
+        override fun getHandleColor(rating: Int): HandleColor {
+            return when{
+                rating < 900 -> HandleColor.GRAY
+                rating < 1200 -> HandleColor.GREEN
+                rating < 1500 -> HandleColor.BLUE
+                rating < 2200 -> HandleColor.YELLOW
+                else -> HandleColor.RED
+            }
+        }
+
+        override fun getColor(tag: HandleColor): Int {
+            return when(tag){
+                HandleColor.GRAY -> 0x999999
+                HandleColor.GREEN -> 0x00A900
+                HandleColor.BLUE -> 0x6666FE
+                HandleColor.YELLOW -> 0xDDCC00
+                HandleColor.RED -> 0xEE0000
+                else -> throw HandleColor.UnknownHandleColorException(tag)
+            }
+        }
     }
 
 
@@ -80,28 +102,9 @@ class TopCoderAccountManager(context: Context): AccountManager(context), Colored
 
     override fun getColor(info: UserInfo): Int? = with(info as TopCoderUserInfo){
         if(status != STATUS.OK || rating_algorithm == NOT_RATED) return null
-        return getHandleColor(info.rating_algorithm).getARGB(this@TopCoderAccountManager)
+        return getHandleColor(info.rating_algorithm).getARGB(Companion)
     }
 
-    override fun getHandleColor(rating: Int): HandleColor {
-        return when{
-            rating < 900 -> HandleColor.GRAY
-            rating < 1200 -> HandleColor.GREEN
-            rating < 1500 -> HandleColor.BLUE
-            rating < 2200 -> HandleColor.YELLOW
-            else -> HandleColor.RED
-        }
-    }
 
-    override fun getColor(tag: HandleColor): Int {
-        return when(tag){
-            HandleColor.GRAY -> 0x999999
-            HandleColor.GREEN -> 0x00A900
-            HandleColor.BLUE -> 0x6666FE
-            HandleColor.YELLOW -> 0xDDCC00
-            HandleColor.RED -> 0xEE0000
-            else -> throw HandleColor.UnknownHandleColorException(tag)
-        }
-    }
 
 }

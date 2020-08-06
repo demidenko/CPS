@@ -5,7 +5,7 @@ import com.example.test3.utils.AtCoderAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class AtCoderAccountManager(context: Context): AccountManager(context), ColoredHandles{
+class AtCoderAccountManager(context: Context): AccountManager(context) {
 
     data class AtCoderUserInfo(
         override var status: STATUS,
@@ -25,12 +25,41 @@ class AtCoderAccountManager(context: Context): AccountManager(context), ColoredH
     override val PREFERENCES_FILE_NAME: String
         get() = preferences_file_name
 
-    companion object{
+    companion object : ColoredHandles {
         const val preferences_file_name = "atcoder"
         const val preferences_handle = "handle"
         const val preferences_rating = "rating"
 
         var __cachedInfo: AtCoderUserInfo? = null
+
+
+
+        override fun getHandleColor(rating: Int): HandleColor {
+            return when{
+                rating < 400 -> HandleColor.GRAY
+                rating < 800 -> HandleColor.BROWN
+                rating < 1200 -> HandleColor.GREEN
+                rating < 1600 -> HandleColor.CYAN
+                rating < 2000 -> HandleColor.BLUE
+                rating < 2400 -> HandleColor.YELLOW
+                rating < 2800 -> HandleColor.ORANGE
+                else -> HandleColor.RED
+            }
+        }
+
+        override fun getColor(tag: HandleColor): Int {
+            return when(tag){
+                HandleColor.GRAY -> 0x808080
+                HandleColor.BROWN -> 0x804000
+                HandleColor.GREEN -> 0x008000
+                HandleColor.CYAN -> 0x00C0C0
+                HandleColor.BLUE -> 0x0000FF
+                HandleColor.YELLOW -> 0xC0C000
+                HandleColor.ORANGE -> 0xFF8000
+                HandleColor.RED -> 0xFF0000
+                else -> throw HandleColor.UnknownHandleColorException(tag)
+            }
+        }
     }
 
 
@@ -77,7 +106,7 @@ class AtCoderAccountManager(context: Context): AccountManager(context), ColoredH
 
     override fun getColor(info: UserInfo): Int?  = with(info as AtCoderUserInfo){
         if(status != STATUS.OK || rating == NOT_RATED) return null
-        return getHandleColor(info.rating).getARGB(this@AtCoderAccountManager)
+        return getHandleColor(info.rating).getARGB(Companion)
     }
 
     override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? = withContext(Dispatchers.IO) {
@@ -96,32 +125,5 @@ class AtCoderAccountManager(context: Context): AccountManager(context), ColoredH
             res += Pair("$handle $rating", handle)
         }
         return@withContext res
-    }
-
-    override fun getHandleColor(rating: Int): HandleColor {
-        return when{
-            rating < 400 -> HandleColor.GRAY
-            rating < 800 -> HandleColor.BROWN
-            rating < 1200 -> HandleColor.GREEN
-            rating < 1600 -> HandleColor.CYAN
-            rating < 2000 -> HandleColor.BLUE
-            rating < 2400 -> HandleColor.YELLOW
-            rating < 2800 -> HandleColor.ORANGE
-            else -> HandleColor.RED
-        }
-    }
-
-    override fun getColor(tag: HandleColor): Int {
-        return when(tag){
-            HandleColor.GRAY -> 0x808080
-            HandleColor.BROWN -> 0x804000
-            HandleColor.GREEN -> 0x008000
-            HandleColor.CYAN -> 0x00C0C0
-            HandleColor.BLUE -> 0x0000FF
-            HandleColor.YELLOW -> 0xC0C000
-            HandleColor.ORANGE -> 0xFF8000
-            HandleColor.RED -> 0xFF0000
-            else -> throw HandleColor.UnknownHandleColorException(tag)
-        }
     }
 }

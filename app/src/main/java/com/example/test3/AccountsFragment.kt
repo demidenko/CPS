@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.*
+import com.example.test3.utils.CodeforcesUtils
 import kotlinx.android.synthetic.main.navigation_accounts.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -54,7 +55,7 @@ class AccountsFragment: Fragment() {
         codeforcesPanel = object : AccountPanel(activity, codeforcesAccountManager){
             override fun show(info: UserInfo) { info as CodeforcesAccountManager.CodeforcesUserInfo
                 val color = manager.getColor(info)
-                textMain.text = codeforcesAccountManager.makeSpan(info)
+                textMain.text = CodeforcesUtils.makeSpan(info)
                 textAdditional.text = ""
                 textAdditional.setTextColor(color ?: activity.defaultTextColor)
                 if(info.status == STATUS.OK){
