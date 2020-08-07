@@ -20,7 +20,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         private val CF_LOST_SUSPECTS = "cf_lost_suspects.txt"
         val CF_LOST = "cf_lost.txt"
 
-        fun getSavedBlogs(context: Context, file_name: String): List<CodeforcesBlogEntry> {
+        private fun getSavedBlogs(context: Context, file_name: String): List<CodeforcesBlogEntry> {
             try {
                 val res = mutableListOf<CodeforcesBlogEntry>()
                 val sc = Scanner(context.openFileInput(file_name))
@@ -33,6 +33,9 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                 return emptyList()
             }
         }
+
+        fun getSavedLostBlogs(context: Context) = getSavedBlogs(context, CF_LOST)
+        fun getSavedSuspectBlogs(context: Context) = getSavedBlogs(context, CF_LOST_SUSPECTS)
 
         fun saveBlogs(context: Context, file_name: String, blogs: Collection<CodeforcesBlogEntry>){
             println("save $file_name: $blogs")
@@ -61,7 +64,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
 
         val currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
 
-        val suspects = getSavedBlogs(this, CF_LOST_SUSPECTS)
+        val suspects = getSavedSuspectBlogs(this)
             .filter {
                 TimeUnit.SECONDS.toDays(currentTimeSeconds - it.creationTimeSeconds) <= 1
             }.toHashSet()
@@ -87,7 +90,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         println("suspects = $suspects")
 
         val recentBlogIDs = recentBlogs.mapTo(HashSet()){ it.blogID.toInt() }
-        val lost = getSavedBlogs(this, CF_LOST)
+        val lost = getSavedLostBlogs(this)
             .filter { blog ->
                 TimeUnit.SECONDS.toDays(currentTimeSeconds - blog.creationTimeSeconds) <= 7
                     &&

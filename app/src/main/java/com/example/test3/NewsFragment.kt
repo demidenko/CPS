@@ -53,12 +53,12 @@ class NewsFragment : Fragment() {
     private val codeforcesNewsAdapter: CodeforcesNewsAdapter by lazy {
         val context = requireContext()
         val fragments = mutableListOf(
-            CodeforcesNewsFragment(CodeforcesTitle.MAIN, "/", true, CodeforcesNewsItemsClassicAdapter(context)),
-            CodeforcesNewsFragment(CodeforcesTitle.TOP, "/top", false, CodeforcesNewsItemsClassicAdapter(context)),
-            CodeforcesNewsFragment(CodeforcesTitle.RECENT, "/recent-actions", false, CodeforcesNewsItemsRecentAdapter(context))
+            CodeforcesNewsFragment(CodeforcesTitle.MAIN, "/", true, CodeforcesNewsItemsClassicAdapter()),
+            CodeforcesNewsFragment(CodeforcesTitle.TOP, "/top", false, CodeforcesNewsItemsClassicAdapter()),
+            CodeforcesNewsFragment(CodeforcesTitle.RECENT, "/recent-actions", false, CodeforcesNewsItemsRecentAdapter())
         )
         if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.news_codeforces_lost_enabled), false)){
-            fragments.add(CodeforcesNewsFragment(CodeforcesTitle.LOST, "", true, CodeforcesNewsItemsLostRecentAdapter(context)))
+            fragments.add(CodeforcesNewsFragment(CodeforcesTitle.LOST, "", true, CodeforcesNewsItemsLostRecentAdapter()))
         }
         CodeforcesNewsAdapter(this, fragments)
     }
@@ -191,7 +191,7 @@ class NewsFragment : Fragment() {
         tab.text = "..."
 
         activity.scope.launch {
-            val blogEntries = CodeforcesNewsLostRecentJobService.getSavedBlogs(activity, CodeforcesNewsLostRecentJobService.CF_LOST)
+            val blogEntries = CodeforcesNewsLostRecentJobService.getSavedLostBlogs(activity)
                 .toTypedArray()
 
             CodeforcesAPI.getUsers(blogEntries.map { it.authorHandle })?.result?.let { users ->
@@ -341,12 +341,17 @@ class CodeforcesNewsFragment(
 
 ///---------------data adapters--------------------
 
-abstract class CodeforcesNewsItemsAdapter(val context: Context): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+abstract class CodeforcesNewsItemsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     abstract fun parseData(s: String): Boolean
     abstract fun getBlogIDs(): List<String>
+
+    protected lateinit var activity: MainActivity
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        activity = recyclerView.context as MainActivity
+    }
 }
 
-open class CodeforcesNewsItemsClassicAdapter(context: Context): CodeforcesNewsItemsAdapter(context){
+open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
     data class Info(
         val blogID: String,
@@ -428,7 +433,7 @@ open class CodeforcesNewsItemsClassicAdapter(context: Context): CodeforcesNewsIt
             val info = rows[position]
 
             view.setOnClickListener {
-                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${info.blogID}")))
+                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${info.blogID}")))
                 if(info.isNew){
                     info.isNew = false
                     notifyItemChanged(position)
@@ -470,7 +475,7 @@ open class CodeforcesNewsItemsClassicAdapter(context: Context): CodeforcesNewsIt
 }
 
 
-class CodeforcesNewsItemsRecentAdapter(context: Context): CodeforcesNewsItemsAdapter(context){
+class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
     companion object {
         fun parsePage(s: String): ArrayList<Info> {
@@ -574,7 +579,7 @@ class CodeforcesNewsItemsRecentAdapter(context: Context): CodeforcesNewsItemsAda
             view.setOnClickListener {
                 var suf = info.blogID
                 if(info.lastCommentId.isNotBlank()) suf+="#comment-${info.lastCommentId}"
-                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/$suf")))
+                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/$suf")))
             }
 
             title.text =  info.title
@@ -592,9 +597,9 @@ class CodeforcesNewsItemsRecentAdapter(context: Context): CodeforcesNewsItemsAda
 
 }
 
-class CodeforcesNewsItemsLostRecentAdapter(context: Context) : CodeforcesNewsItemsClassicAdapter(context) {
+class CodeforcesNewsItemsLostRecentAdapter : CodeforcesNewsItemsClassicAdapter() {
     override fun parseData(s: String): Boolean {
-        val blogs = CodeforcesNewsLostRecentJobService.getSavedBlogs(context, CodeforcesNewsLostRecentJobService.CF_LOST)
+        val blogs = CodeforcesNewsLostRecentJobService.getSavedLostBlogs(activity)
 
         if(blogs.isNotEmpty()){
             val currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
