@@ -4,9 +4,7 @@ import android.content.Context
 import androidx.preference.PreferenceManager
 import com.example.test3.CodeforcesNewsItemsRecentAdapter
 import com.example.test3.R
-import com.example.test3.utils.CodeforcesAPI
-import com.example.test3.utils.CodeforcesBlogEntry
-import com.example.test3.utils.CodeforcesUtils
+import com.example.test3.utils.*
 import kotlinx.coroutines.launch
 import java.io.FileNotFoundException
 import java.io.PrintWriter
@@ -46,6 +44,46 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
             }
             out.flush()
             out.close()
+        }
+
+        suspend fun updateInfo(context: Context) {
+            val blogEntries = getSavedLostBlogs(context)
+                .toTypedArray()
+
+            CodeforcesAPI.getUsers(blogEntries.map { it.authorHandle })?.result?.let { users ->
+                for(i in blogEntries.indices) {
+                    val blogEntry = blogEntries[i]
+                    users.find { it.handle == blogEntry.authorHandle }?.let { user ->
+                        blogEntries[i] = blogEntry.copy(
+                            authorColorTag = CodeforcesUtils.getTagByRating(user.rating)
+                        )
+                    }
+                }
+            }
+
+            val blogIDsToRemove = mutableSetOf<Int>()
+            blogEntries.forEachIndexed { index, blogEntry ->
+                CodeforcesAPI.getBlogEntry(blogEntry.id)?.let { response ->
+                    if(response.status == CodeforcesAPIStatus.FAILED && response.comment == "blogEntryId: Blog entry with id ${blogEntry.id} not found"){
+                        blogIDsToRemove.add(blogEntry.id)
+                    } else {
+                        if(response.status == CodeforcesAPIStatus.OK) response.result?.let { freshBlogEntry ->
+                            val title = freshBlogEntry.title
+                                .removePrefix("<p>")
+                                .removeSuffix("</p>")
+                            blogEntries[index] = blogEntry.copy(title = fromHTML(title))
+                        } else {
+                            //god bless kotlin
+                        }
+                    }
+                }
+            }
+
+            saveBlogs(
+                context,
+                CF_LOST,
+                blogEntries.filterNot { blogIDsToRemove.contains(it.id) }
+            )
         }
     }
 

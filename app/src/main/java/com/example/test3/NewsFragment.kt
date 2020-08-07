@@ -20,14 +20,15 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
 import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.utils.CodeforcesAPI
-import com.example.test3.utils.CodeforcesAPIStatus
 import com.example.test3.utils.CodeforcesUtils
+import com.example.test3.utils.SharedReloadButton
 import com.example.test3.utils.fromHTML
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -135,23 +136,32 @@ class NewsFragment : Fragment() {
 
     }
 
+    private fun getContentLanguage() = with(PreferenceManager.getDefaultSharedPreferences(context)){
+        if(getBoolean(getString(R.string.news_codeforces_ru), true)) "ru" else "en"
+    }
 
-    private val reloadButton by lazy { requireActivity().navigation_news_reload }
+    val sharedReloadButton by lazy { SharedReloadButton(requireActivity().navigation_news_reload) }
     fun reloadTabs() {
-        reloadButton.isEnabled = false
         (requireActivity() as MainActivity).scope.launch {
-            val lang = if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.news_codeforces_ru), true)) "ru" else "en"
+            val lang = getContentLanguage()
             codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
                 val tab = tabLayout.getTabAt(index)!!
                 launch { reloadFragment(fragment, tab, lang) }
             }.joinAll()
-            reloadButton.isEnabled = true
         }
     }
 
-    suspend fun reloadFragment(fragment: CodeforcesNewsFragment, tab: TabLayout.Tab, lang: String) {
-        if(!tab.isSelected && TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - fragment.lastReloadTimeMillis)<1) return
+    suspend fun reloadFragment(
+        fragment: CodeforcesNewsFragment,
+        tab: TabLayout.Tab,
+        lang: String,
+        block: suspend () -> Unit = {}
+    ) {
+        //if(!tab.isSelected && TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - fragment.lastReloadTimeMillis)<1) return
+        sharedReloadButton.toggle(fragment.title.name)
         tab.text = "..."
+        fragment.swipeRefreshLayout.isRefreshing = true
+        block()
         if(fragment.reload(lang)) {
             tab.text = fragment.title.name
             if (fragment.isManagesNewEntries) {
@@ -175,6 +185,14 @@ class NewsFragment : Fragment() {
                 }
             }
         }
+        fragment.swipeRefreshLayout.isRefreshing = false
+        sharedReloadButton.toggle(fragment.title.name)
+    }
+
+    suspend fun reloadFragment(fragment: CodeforcesNewsFragment) {
+        val index = codeforcesNewsAdapter.fragments.indexOf(fragment)
+        val tab = tabLayout.getTabAt(index) ?: return
+        reloadFragment(fragment, tab, getContentLanguage())
     }
 
 
@@ -187,51 +205,12 @@ class NewsFragment : Fragment() {
         val tab = tabLayout.getTabAt(index) ?: return
         val fragment = codeforcesNewsAdapter.fragments[index]
 
-        updateLostInfoButton.isEnabled = false
-        tab.text = "..."
-
         activity.scope.launch {
-            val blogEntries = CodeforcesNewsLostRecentJobService.getSavedLostBlogs(activity)
-                .toTypedArray()
-
-            CodeforcesAPI.getUsers(blogEntries.map { it.authorHandle })?.result?.let { users ->
-                for(i in blogEntries.indices) {
-                    val blogEntry = blogEntries[i]
-                    users.find { it.handle == blogEntry.authorHandle }?.let { user ->
-                        blogEntries[i] = blogEntry.copy(
-                            authorColorTag = CodeforcesUtils.getTagByRating(user.rating)
-                        )
-                    }
-                }
+            reloadFragment(fragment, tab, ""){
+                updateLostInfoButton.isEnabled = false
+                CodeforcesNewsLostRecentJobService.updateInfo(activity)
+                updateLostInfoButton.isEnabled = true
             }
-
-            val blogIDsToRemove = mutableSetOf<Int>()
-            blogEntries.forEachIndexed { index, blogEntry ->
-                CodeforcesAPI.getBlogEntry(blogEntry.id)?.let { response ->
-                    if(response.status == CodeforcesAPIStatus.FAILED && response.comment == "blogEntryId: Blog entry with id ${blogEntry.id} not found"){
-                        blogIDsToRemove.add(blogEntry.id)
-                    } else {
-                        if(response.status == CodeforcesAPIStatus.OK) response.result?.let { freshBlogEntry ->
-                            val title = freshBlogEntry.title
-                                .removePrefix("<p>")
-                                .removeSuffix("</p>")
-                            blogEntries[index] = blogEntry.copy(title = fromHTML(title))
-                        } else {
-                            //god bless kotlin
-                        }
-                    }
-                }
-            }
-
-            CodeforcesNewsLostRecentJobService.saveBlogs(
-                requireContext(),
-                CodeforcesNewsLostRecentJobService.CF_LOST,
-                blogEntries.filterNot { blogIDsToRemove.contains(it.id) }
-            )
-            fragment.reload("")
-
-            tab.text = fragment.title.name
-            updateLostInfoButton.isEnabled = true
         }
 
     }
@@ -289,6 +268,7 @@ class CodeforcesNewsFragment(
         return inflater.inflate(R.layout.fragment_cf_news_page, container, false)
     }
 
+    val swipeRefreshLayout: SwipeRefreshLayout by lazy { requireView().cf_news_page_swipe_refresh_layout }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         view.cf_news_page_recyclerview.apply {
             layoutManager = LinearLayoutManager(context)
@@ -296,6 +276,15 @@ class CodeforcesNewsFragment(
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             setHasFixedSize(true)
         }
+
+        val activity = requireActivity() as MainActivity
+        swipeRefreshLayout.setOnRefreshListener {
+            activity.scope.launch {
+                activity.newsFragment.reloadFragment(this@CodeforcesNewsFragment)
+            }
+        }
+        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.textColor)
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent)
     }
 
     var lastReloadTimeMillis = 0L

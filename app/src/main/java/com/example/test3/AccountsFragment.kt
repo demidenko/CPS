@@ -12,9 +12,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.*
 import com.example.test3.utils.CodeforcesUtils
+import com.example.test3.utils.SharedReloadButton
 import kotlinx.android.synthetic.main.navigation_accounts.*
 import kotlinx.coroutines.launch
-import java.util.*
 
 class AccountsFragment: Fragment() {
 
@@ -178,7 +178,6 @@ class AccountsFragment: Fragment() {
     }
 
     fun reloadAccounts() {
-        if(toggleSet.isNotEmpty()) throw java.lang.Exception("...")
         (requireActivity() as MainActivity).scope.launch {
             panels.forEach {
                 launch { it.reload() }
@@ -186,23 +185,7 @@ class AccountsFragment: Fragment() {
         }
     }
 
-    val toggleSet = TreeSet<String>()
-    private val reloadButton by lazy { requireActivity().navigation_accounts_reload }
-    fun toggleReload(s: String){
-        if(toggleSet.contains(s)){
-            toggleSet.remove(s)
-            if(toggleSet.isEmpty()){
-                //reloadButton.clearAnimation()
-                reloadButton.isEnabled = true
-            }
-        }else{
-            if(toggleSet.isEmpty()){
-                reloadButton.isEnabled = false
-                //reloadButton.startAnimation(rotateAnimation)
-            }
-            toggleSet.add(s)
-        }
-    }
+    val sharedReloadButton by lazy { SharedReloadButton(requireActivity().navigation_accounts_reload) }
 
     override fun onResume() {
         super.onResume()

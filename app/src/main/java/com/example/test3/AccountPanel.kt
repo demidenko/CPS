@@ -97,7 +97,7 @@ abstract class AccountPanel(
         settingsButton.isEnabled = false
         linkButton.isEnabled = false
         reloadButton.isEnabled = false
-        activity.accountsFragment.toggleReload(manager.PREFERENCES_FILE_NAME)
+        activity.accountsFragment.sharedReloadButton.toggle(manager.PREFERENCES_FILE_NAME)
 
 
         settingsButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
@@ -132,7 +132,7 @@ abstract class AccountPanel(
         }
 
 
-        activity.accountsFragment.toggleReload(manager.PREFERENCES_FILE_NAME)
+        activity.accountsFragment.sharedReloadButton.toggle(manager.PREFERENCES_FILE_NAME)
         reloadButton.isEnabled = true
         settingsButton.isEnabled = true
         linkButton.isEnabled = true
