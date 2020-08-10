@@ -162,6 +162,7 @@ object NotificationIDs {
 
     //codeforces
     val codeforces_contest_watcher = nextID()
+    val codeforces_rating_changes = nextID()
     val codeforces_contribution_changes = nextID()
 
     //project euler

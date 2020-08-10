@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope: CoroutineScope): CodeforcesContestWatchListener(){
 
@@ -24,6 +25,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
             val sysTestPercentage = ChangingValue(-1)
             var problemsResults: List<ChangingValue<CodeforcesProblemResult>> = emptyList()
             val testedSubmissions = mutableSetOf<Long>()
+            var ratingChangeWaitingStartTimeMillis = 0L
 
             while (true) {
                 var timeSecondsFromStart: Long? = null
@@ -137,8 +139,30 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                     CodeforcesContestPhase.SYSTEM_TEST -> delay(5_000)
                     CodeforcesContestPhase.PENDING_SYSTEM_TEST -> delay(15_000)
                     CodeforcesContestPhase.FINISHED -> {
-                        //TODO("watch rating changes")
-                        return@launch
+                        if(participationType.value != CodeforcesParticipationType.CONTESTANT) return@launch
+
+                        val currentTimeMillis = System.currentTimeMillis()
+                        if(ratingChangeWaitingStartTimeMillis == 0L) ratingChangeWaitingStartTimeMillis = currentTimeMillis
+
+                        CodeforcesAPI.getContestRatingChanges(contestID)?.let { response ->
+                            if(response.status == CodeforcesAPIStatus.FAILED){
+                                if(response.comment == "contestId: Rating changes are unavailable for this contest") return@launch
+                                return@let
+                            }
+                            with(response.result ?: return@let) {
+                                val change = findLast { it.handle == handle } ?: return@let
+                                onRatingChange(change)
+                                return@launch
+                            }
+                        }
+
+                        val hoursWaiting = TimeUnit.MILLISECONDS.toHours(currentTimeMillis - ratingChangeWaitingStartTimeMillis)
+                        when {
+                            hoursWaiting<=1 -> delay(10_000)
+                            hoursWaiting<=2 -> delay(30_000)
+                            hoursWaiting<=4 -> delay(60_000)
+                            else -> return@launch
+                        }
                     }
                     else -> delay(30_000)
                 }
@@ -197,6 +221,10 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         listeners.forEach { l -> l.onSetParticipationType(type) }
     }
 
+    override fun onRatingChange(ratingChange: CodeforcesRatingChange) {
+        listeners.forEach { l -> l.onRatingChange(ratingChange) }
+    }
+
     override fun commit() {
         listeners.forEach { l -> l.commit() }
     }
@@ -214,6 +242,7 @@ abstract class CodeforcesContestWatchListener{
     abstract fun onSetProblemResult(problemName: String, result: CodeforcesProblemResult)
     abstract fun onSetProblemSystestResult(submission: CodeforcesSubmission)
     abstract fun onSetParticipationType(type: CodeforcesParticipationType)
+    abstract fun onRatingChange(ratingChange: CodeforcesRatingChange)
     abstract fun commit()
 }
 

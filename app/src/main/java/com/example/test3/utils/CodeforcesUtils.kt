@@ -29,8 +29,8 @@ import java.net.SocketTimeoutException
 
 object CodeforcesUtils : ColoredHandles {
 
-    suspend fun getBlogCreationTimeSeconds(blogID: String): Long {
-        return CodeforcesAPI.getBlogEntry(blogID.toInt())?.result?.creationTimeSeconds ?: return 0L
+    suspend fun getBlogCreationTimeSeconds(blogId: String): Long {
+        return CodeforcesAPI.getBlogEntry(blogId.toInt())?.result?.creationTimeSeconds ?: return 0L
     }
 
 
@@ -208,6 +208,15 @@ data class CodeforcesBlogEntry(
     }
 }
 
+@JsonClass(generateAdapter = true)
+data class CodeforcesRatingChange(
+    val contestId: Int,
+    val handle: String,
+    val rank: Int,
+    val oldRating: Int,
+    val newRating: Int
+)
+
 
 object CodeforcesAPI {
 
@@ -225,7 +234,7 @@ object CodeforcesAPI {
 
         @GET("blogEntry.view")
         fun getBlogEntry(
-            @Query("blogEntryId") blogID: Int,
+            @Query("blogEntryId") blogId: Int,
             @Query("locale") lang: String = "ru"
         ): Call<CodeforcesAPIResponse<CodeforcesBlogEntry>>
 
@@ -250,6 +259,11 @@ object CodeforcesAPI {
             @Query("handle") handle: String,
             @Query("count") count: Int = 1000000000
         ): Call<CodeforcesAPIResponse<List<CodeforcesSubmission>>>
+
+        @GET("contest.ratingChanges")
+        fun getContestRatingChanges(
+            @Query("contestId") contestId: Int
+        ): Call<CodeforcesAPIResponse<List<CodeforcesRatingChange>>>
     }
 
     private val api = Retrofit.Builder()
@@ -286,15 +300,16 @@ object CodeforcesAPI {
     suspend fun getUsers(handles: Collection<String>) = makeAPICall(api.getUser(handles.joinToString(separator = ";")))
     suspend fun getUser(handle: String) = getUsers(listOf(handle))?.let { CodeforcesAPIResponse(it.status, it.result?.get(0), it.comment) }
 
-    suspend fun getBlogEntry(blogID: Int) = makeAPICall(api.getBlogEntry(blogID))
+    suspend fun getBlogEntry(blogId: Int) = makeAPICall(api.getBlogEntry(blogId))
 
-    suspend fun getContestStandings(contestID: Int, handles: Collection<String>, showUnofficial: Boolean) = makeAPICall(api.getContestStandings(contestID, handles.joinToString(separator = ";"), showUnofficial))
-    suspend fun getContestStandings(contestID: Int, handle: String, showUnofficial: Boolean) = getContestStandings(contestID, listOf(handle), showUnofficial)
+    suspend fun getContestStandings(contestId: Int, handles: Collection<String>, showUnofficial: Boolean) = makeAPICall(api.getContestStandings(contestId, handles.joinToString(separator = ";"), showUnofficial))
+    suspend fun getContestStandings(contestId: Int, handle: String, showUnofficial: Boolean) = getContestStandings(contestId, listOf(handle), showUnofficial)
 
-    suspend fun getContestSubmissions(contestID: Int, handle: String) = makeAPICall(api.getContestStatus(contestID, handle))
+    suspend fun getContestSubmissions(contestId: Int, handle: String) = makeAPICall(api.getContestStatus(contestId, handle))
 
     suspend fun getUserBlogEntries(handle: String) = makeAPICall(api.getUserBlogs(handle))
 
+    suspend fun getContestRatingChanges(contestId: Int) = makeAPICall(api.getContestRatingChanges(contestId))
 
 
     interface WEB {

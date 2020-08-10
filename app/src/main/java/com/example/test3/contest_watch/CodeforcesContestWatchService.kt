@@ -12,10 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.text.bold
 import androidx.core.text.color
 import androidx.core.text.italic
-import com.example.test3.NotificationChannels
-import com.example.test3.NotificationIDs
-import com.example.test3.R
-import com.example.test3.makeSimpleNotification
+import com.example.test3.*
 import com.example.test3.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -201,6 +198,20 @@ class CodeforcesContestWatchService: Service() {
                         if(submission.verdict == CodeforcesProblemVerdict.OK) "OK"
                         else "${submission.verdict.name} #${submission.passedTestCount+1}"
                     makeSimpleNotification(this@CodeforcesContestWatchService, submission.id.toInt(), "problem $problemName", result, false)
+                }
+
+                override fun onRatingChange(ratingChange: CodeforcesRatingChange) {
+                    val n = NotificationCompat.Builder(this@CodeforcesContestWatchService, NotificationChannels.codeforces_rating_changes).apply {
+                        val decreased = ratingChange.newRating < ratingChange.oldRating
+                        setSmallIcon(if(decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
+                        setContentTitle("$handle new rating: ${ratingChange.newRating}")
+                        val difference = (if(decreased) "" else "+") + (ratingChange.newRating - ratingChange.oldRating)
+                        setContentText("$difference, rank: ${ratingChange.rank}")
+                        setSubText("Codeforces rating changes")
+                        color = CodeforcesUtils.getHandleColor(ratingChange.newRating).getARGB(CodeforcesUtils)
+                        setContentIntent(makePendingIntentOpenURL("https://codeforces.com/contests/with/$handle", this@CodeforcesContestWatchService))
+                    }
+                    notificationManager.notify(NotificationIDs.codeforces_rating_changes, n.build())
                 }
 
                 override fun commit() {
