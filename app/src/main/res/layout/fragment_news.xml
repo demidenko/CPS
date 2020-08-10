@@ -33,7 +33,6 @@
         android:layout_alignBottom="@id/cf_news_tab_layout"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:tint="@color/textColor"
 
         />
 

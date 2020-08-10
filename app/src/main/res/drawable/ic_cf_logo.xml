@@ -2,7 +2,9 @@
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="100"
-    android:viewportHeight="100">
+    android:viewportHeight="100"
+    android:tint="@color/textColor"
+    >
   <path
       android:pathData="M9,38L20,38A7,7 0,0 1,27 45L27,86A7,7 0,0 1,20 93L9,93A7,7 0,0 1,2 86L2,45A7,7 0,0 1,9 38z"
       android:strokeWidth="0.22394566"

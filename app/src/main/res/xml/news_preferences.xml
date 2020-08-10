@@ -40,6 +40,7 @@
             android:key="@string/news_acmp_feed"
             android:defaultValue="false"
             android:title="projecteuler.net"
+            android:icon="@drawable/ic_projecteuler_logo"
             />
 
         <CheckBoxPreference
