@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/cf_news_recent_item_menu_open_last_comment"
+        android:title="Open last comment"
+        android:icon="@drawable/ic_open_in_browser"
+        />
+
+    <item
+        android:id="@+id/cf_news_recent_item_menu_open_blog"
+        android:title="Open blog"
+        android:icon="@drawable/ic_open_in_browser"
+        />
+
+</menu>

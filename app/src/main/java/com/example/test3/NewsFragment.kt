@@ -5,11 +5,14 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.color
@@ -468,7 +471,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
     companion object {
         fun parsePage(s: String): ArrayList<Info> {
-            val commentators = mutableMapOf<String,MutableList<String>>()
+            val blogCommentators = mutableMapOf<String,MutableList<String>>()
             val commentatorsColors = mutableMapOf<String,String>()
 
             var i = 0
@@ -487,7 +490,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
                 val blogID = s.substring(s.lastIndexOf('/',i)+1, i)
 
-                commentators.getOrPut(blogID) { mutableListOf(commentID) }.add(handle)
+                blogCommentators.getOrPut(blogID) { mutableListOf(commentID) }.add(handle)
                 commentatorsColors[handle] = handleColor
             }
 
@@ -510,15 +513,15 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
                 val title = fromHTML(s.substring(s.indexOf(">", i) + 1, s.indexOf("</a", i)))
 
-                val comments = mutableListOf<Pair<String,String>>()
+                val comments = mutableListOf<Spannable>()
                 var lastCommentId = ""
 
-                commentators[id]?.distinct()?.mapIndexed{ index, handle ->
+                blogCommentators[id]?.distinct()?.mapIndexed{ index, handle ->
                     if(index==0) lastCommentId = handle
-                    else comments.add(Pair(handle,commentatorsColors[handle]!!))
+                    else comments.add(CodeforcesUtils.makeSpan(handle,commentatorsColors[handle]!!))
                 }
 
-                res.add(Info(id,title,author,authorColor,lastCommentId,comments.toTypedArray()))
+                res.add(Info(id,title,author,authorColor,lastCommentId,comments))
             }
 
             return res
@@ -531,7 +534,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         val author: String,
         val authorColorTag: String,
         val lastCommentId: String,
-        val comments: Array<Pair<String,String>>
+        val commentators: List<Spannable>
     )
 
     override fun parseData(s: String): Boolean {
@@ -566,18 +569,49 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
             val info = rows[position]
 
             view.setOnClickListener {
-                var suf = info.blogID
-                if(info.lastCommentId.isNotBlank()) suf+="#comment-${info.lastCommentId}"
-                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/$suf")))
+                val blogLink = "https://codeforces.com/blog/entry/${info.blogID}"
+
+                if(info.commentators.isEmpty()){
+                    activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(blogLink)))
+                    return@setOnClickListener
+                }
+
+                PopupMenu(activity, holder.title, Gravity.CENTER_HORIZONTAL).apply {
+                    inflate(R.menu.cf_recent_item_open_variants)
+
+                    setForceShowIcon(true)
+                    menu.findItem(R.id.cf_news_recent_item_menu_open_last_comment).let { item ->
+                        item.title = SpannableStringBuilder(item.title)
+                            .append(" [")
+                            .append(info.commentators.first())
+                            .append("]")
+                    }
+
+                    setOnMenuItemClickListener {
+                        when(it.itemId){
+                            R.id.cf_news_recent_item_menu_open_blog -> {
+                                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(blogLink)))
+                                true
+                            }
+                            R.id.cf_news_recent_item_menu_open_last_comment -> {
+                                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("$blogLink#comment-${info.lastCommentId}")))
+                                true
+                            }
+                            else -> false
+                        }
+                    }
+
+                    show()
+                }
             }
 
             title.text =  info.title
 
             author.text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag)
 
-            comments.text = info.comments.joinTo(SpannableStringBuilder()) { (handle, colorTag) -> CodeforcesUtils.makeSpan(handle, colorTag) }
+            comments.text = info.commentators.joinTo(SpannableStringBuilder())
 
-            commentsIcon.visibility = if(info.comments.isEmpty()) View.INVISIBLE else View.VISIBLE
+            commentsIcon.visibility = if(info.commentators.isEmpty()) View.INVISIBLE else View.VISIBLE
 
         }
     }
