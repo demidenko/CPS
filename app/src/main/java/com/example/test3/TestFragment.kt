@@ -74,10 +74,7 @@ class TestFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.button_watcher_stop).setOnClickListener { button -> button as Button
-            activity.startService(
-                Intent(activity, CodeforcesContestWatchService::class.java)
-                    .setAction(CodeforcesContestWatchService.ACTION_STOP)
-            )
+            activity.startService(CodeforcesContestWatchService.makeStopIntent(activity))
         }
 
         view.findViewById<Button>(R.id.dev_choose_contest).setOnClickListener { button -> button as Button

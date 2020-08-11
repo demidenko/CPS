@@ -1,6 +1,7 @@
 package com.example.test3.contest_watch
 
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -25,6 +26,8 @@ class CodeforcesContestWatchService: Service() {
     companion object {
         const val ACTION_START = "start"
         const val ACTION_STOP = "stop"
+
+        fun makeStopIntent(context: Context) = Intent(context, CodeforcesContestWatchService::class.java).setAction(ACTION_STOP)
     }
 
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
@@ -37,20 +40,21 @@ class CodeforcesContestWatchService: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val action = intent!!.action
-
-        when(action){
+        when(intent!!.action){
             ACTION_START -> {
                 val handle = intent.getStringExtra("handle")!!
                 val contestID = intent.getIntExtra("contestID", -1)
                 stop()
-                start(handle, contestID, NotificationCompat.Builder(this, NotificationChannels.codeforces_contest_watcher).apply {
+                val notification = NotificationCompat.Builder(this, NotificationChannels.codeforces_contest_watcher).apply {
                     setSmallIcon(R.drawable.ic_contest)
                     setSubText(handle)
                     setShowWhen(false)
                     setNotificationSilent()
                     setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                })
+                }
+                notification.addAction(NotificationCompat.Action(null, "Close", PendingIntent.getService(this, 0, makeStopIntent(this), 0)))
+                notification.addAction(NotificationCompat.Action(null, "Browse", makePendingIntentOpenURL("https://codeforces.com/contest/$contestID",this)))
+                start(handle, contestID, notification)
             }
             ACTION_STOP -> {
                 stop()

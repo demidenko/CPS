@@ -11,169 +11,180 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
 
     private var job: Job? = null
 
-    fun start(){
-        job = scope.launch {
-            val contestName = ChangingValue("")
-            val contestType = ChangingValue(CodeforcesContestType.UNDEFINED)
-            val phaseCodeforces = ChangingValue(CodeforcesContestPhase.UNDEFINED)
-            val rank = ChangingValue(-1)
-            val pointsTotal = ChangingValue(0.0)
-            val durationSeconds = ChangingValue(-1L)
-            val startTimeSeconds = ChangingValue(-1L)
-            var problemNames: ArrayList<String>? = null
-            val participationType = ChangingValue(CodeforcesParticipationType.NOT_PARTICIPATED)
-            val sysTestPercentage = ChangingValue(-1)
-            var problemsResults: List<ChangingValue<CodeforcesProblemResult>> = emptyList()
-            val testedSubmissions = mutableSetOf<Long>()
-            var ratingChangeWaitingStartTimeMillis = 0L
+    private suspend fun watchContest(){
+        val contestName = ChangingValue("")
+        val contestType = ChangingValue(CodeforcesContestType.UNDEFINED)
+        val phaseCodeforces = ChangingValue(CodeforcesContestPhase.UNDEFINED)
+        val rank = ChangingValue(-1)
+        val pointsTotal = ChangingValue(0.0)
+        val durationSeconds = ChangingValue(-1L)
+        val startTimeSeconds = ChangingValue(-1L)
+        var problemNames: ArrayList<String>? = null
+        val participationType = ChangingValue(CodeforcesParticipationType.NOT_PARTICIPATED)
+        val sysTestPercentage = ChangingValue(-1)
+        var problemsResults: List<ChangingValue<CodeforcesProblemResult>> = emptyList()
+        val testedSubmissions = mutableSetOf<Long>()
+        var ratingChangeWaitingStartTimeMillis = 0L
 
-            while (true) {
-                var timeSecondsFromStart: Long? = null
-                CodeforcesAPI.getContestStandings(contestID, handle, participationType.value!=CodeforcesParticipationType.CONTESTANT)?.run {
-                    if(status == CodeforcesAPIStatus.FAILED){
-                        if(comment == "contestId: Contest with id $contestID has not started")
-                            phaseCodeforces.value = CodeforcesContestPhase.BEFORE
-                        return@run
+        while (true) {
+            var timeSecondsFromStart: Long? = null
+            CodeforcesAPI.getContestStandings(contestID, handle, participationType.value!=CodeforcesParticipationType.CONTESTANT)?.run {
+                if(status == CodeforcesAPIStatus.FAILED){
+                    if(comment == "contestId: Contest with id $contestID has not started")
+                        phaseCodeforces.value = CodeforcesContestPhase.BEFORE
+                    return@run
+                }
+                with(result ?: return@run){
+                    if(problemNames == null){
+                        val tmp = problems.mapTo(ArrayList()) { it.index }
+                        problemNames = tmp
+                        onSetProblemNames(tmp.toTypedArray())
                     }
-                    with(result ?: return@run){
-                        if(problemNames == null){
-                            val tmp = problems.mapTo(ArrayList()) { it.index }
-                            problemNames = tmp
-                            onSetProblemNames(tmp.toTypedArray())
-                        }
 
-                        phaseCodeforces.value = contest.phase
-                        timeSecondsFromStart = contest.relativeTimeSeconds
-                        durationSeconds.value = contest.durationSeconds
-                        startTimeSeconds.value = contest.startTimeSeconds
-                        contestName.value = contest.name
-                        contestType.value = contest.type
+                    phaseCodeforces.value = contest.phase
+                    timeSecondsFromStart = contest.relativeTimeSeconds
+                    durationSeconds.value = contest.durationSeconds
+                    startTimeSeconds.value = contest.startTimeSeconds
+                    contestName.value = contest.name
+                    contestType.value = contest.type
 
-                        rows.find { row ->
-                            row.party.participantType.participatedInContest()
-                        }?.let { row ->
-                            participationType.value = row.party.participantType
-                            rank.value = row.rank
-                            pointsTotal.value = row.points
-                            with(row.problemResults){
-                                if (this.size != problemsResults.size) problemsResults = this.map { ChangingValue(it, true) }
-                                else this.forEachIndexed { index, result -> problemsResults[index].value = result }
-                            }
+                    rows.find { row ->
+                        row.party.participantType.participatedInContest()
+                    }?.let { row ->
+                        participationType.value = row.party.participantType
+                        rank.value = row.rank
+                        pointsTotal.value = row.points
+                        with(row.problemResults){
+                            if (this.size != problemsResults.size) problemsResults = this.map { ChangingValue(it, true) }
+                            else this.forEachIndexed { index, result -> problemsResults[index].value = result }
                         }
                     }
-                }
-
-
-                if(contestName.isChanged() || contestType.isChanged()) onSetContestNameAndType(contestName.value, contestType.value)
-                if(phaseCodeforces.isChanged()) onSetContestPhase(phaseCodeforces.value)
-
-                if(phaseCodeforces.value == CodeforcesContestPhase.CODING && (durationSeconds.isChanged() || startTimeSeconds.isChanged())) timeSecondsFromStart?.let{
-                    val remainingTime = durationSeconds.value - it
-                    onSetRemainingTime(remainingTime)
-                }
-
-                if(phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST){
-                    //get progress of testing (0% ... 100%)
-                    CodeforcesAPI.getPageSource("contest/$contestID", "en")?.let { page ->
-                        var i = page.indexOf("<span class=\"contest-state-regular\">")
-                        if (i != -1) {
-                            i = page.indexOf(">", i + 1)
-                            val progress = page.substring(i + 1, page.indexOf("</", i + 1))
-                            if (progress.endsWith('%')) {
-                                sysTestPercentage.value = progress.substring(0, progress.length - 1).toInt()
-                                if(sysTestPercentage.isChanged()) onSetSysTestProgress(sysTestPercentage.value)
-                            }
-                        }
-                    }
-                }
-
-
-                if(participationType.isChanged()){
-                    onSetParticipationType(participationType.value)
-                    if(participationType.value == CodeforcesParticipationType.CONTESTANT){
-                        pointsTotal.value = 0.0
-                        rank.value = -1
-                        problemsResults = emptyList()
-                        continue
-                    }
-                }
-
-                if(rank.value != -1){
-                    if(rank.isChanged()) onSetContestantRank(rank.value)
-                    if(pointsTotal.isChanged()) onSetContestantPoints(pointsTotal.value)
-
-                    problemsResults.forEachIndexed { index, changingValue ->
-                        if(changingValue.isChanged()){
-                            val result = changingValue.value
-                            val problemName = problemNames!![index]
-                            onSetProblemResult(problemName, result)
-                        }
-
-                    }
-                }
-
-                if(phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST
-                    && participationType.value.participatedInContest()
-                    && contestType.value == CodeforcesContestType.CF
-                    && problemsResults.count { it.value.type == CodeforcesProblemStatus.PRELIMINARY } > 0
-                ){
-                    CodeforcesAPI.getContestSubmissions(contestID, handle)?.result
-                        ?.filterNot { submission -> testedSubmissions.contains(submission.id) }
-                        ?.asSequence()
-                        ?.filter { submission -> submission.author.participantType.participatedInContest() }
-                        ?.filter { submission -> submission.testset == "TESTS" }
-                        ?.filter { submission -> submission.verdict != CodeforcesProblemVerdict.WAITING }
-                        ?.filter { submission -> submission.verdict != CodeforcesProblemVerdict.TESTING }
-                        ?.filter { submission -> submission.verdict != CodeforcesProblemVerdict.SKIPPED }
-                        ?.forEach { submission ->
-                            testedSubmissions.add(submission.id)
-                            onSetProblemSystestResult(submission)
-                        }
-                }
-
-
-                //------------------------
-                commit()
-                when(phaseCodeforces.value){
-                    CodeforcesContestPhase.CODING -> delay(3_000)
-                    CodeforcesContestPhase.SYSTEM_TEST -> delay(5_000)
-                    CodeforcesContestPhase.PENDING_SYSTEM_TEST -> delay(15_000)
-                    CodeforcesContestPhase.FINISHED -> {
-                        if(participationType.value != CodeforcesParticipationType.CONTESTANT) return@launch
-
-                        val currentTimeMillis = System.currentTimeMillis()
-                        if(ratingChangeWaitingStartTimeMillis == 0L) ratingChangeWaitingStartTimeMillis = currentTimeMillis
-
-                        CodeforcesAPI.getContestRatingChanges(contestID)?.let { response ->
-                            if(response.status == CodeforcesAPIStatus.FAILED){
-                                if(response.comment == "contestId: Rating changes are unavailable for this contest") return@launch
-                                return@let
-                            }
-                            with(response.result ?: return@let) {
-                                val change = findLast { it.handle == handle } ?: return@let
-                                onRatingChange(change)
-                                return@launch
-                            }
-                        }
-
-                        val hoursWaiting = TimeUnit.MILLISECONDS.toHours(currentTimeMillis - ratingChangeWaitingStartTimeMillis)
-                        when {
-                            hoursWaiting<=1 -> delay(10_000)
-                            hoursWaiting<=2 -> delay(30_000)
-                            hoursWaiting<=4 -> delay(60_000)
-                            else -> return@launch
-                        }
-                    }
-                    else -> delay(30_000)
                 }
             }
+
+
+            if(contestName.isChanged() || contestType.isChanged()) onSetContestNameAndType(contestName.value, contestType.value)
+            if(phaseCodeforces.isChanged()) onSetContestPhase(phaseCodeforces.value)
+
+            if(phaseCodeforces.value == CodeforcesContestPhase.CODING && (durationSeconds.isChanged() || startTimeSeconds.isChanged())) timeSecondsFromStart?.let{
+                val remainingTime = durationSeconds.value - it
+                onSetRemainingTime(remainingTime)
+            }
+
+            if(phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST){
+                //get progress of testing (0% ... 100%)
+                CodeforcesAPI.getPageSource("contest/$contestID", "en")?.let { page ->
+                    var i = page.indexOf("<span class=\"contest-state-regular\">")
+                    if (i != -1) {
+                        i = page.indexOf(">", i + 1)
+                        val progress = page.substring(i + 1, page.indexOf("</", i + 1))
+                        if (progress.endsWith('%')) {
+                            sysTestPercentage.value = progress.substring(0, progress.length - 1).toInt()
+                            if(sysTestPercentage.isChanged()) onSetSysTestProgress(sysTestPercentage.value)
+                        }
+                    }
+                }
+            }
+
+
+            if(participationType.isChanged()){
+                onSetParticipationType(participationType.value)
+                if(participationType.value == CodeforcesParticipationType.CONTESTANT){
+                    pointsTotal.value = 0.0
+                    rank.value = -1
+                    problemsResults = emptyList()
+                    continue
+                }
+            }
+
+            if(rank.value != -1){
+                if(rank.isChanged()) onSetContestantRank(rank.value)
+                if(pointsTotal.isChanged()) onSetContestantPoints(pointsTotal.value)
+
+                problemsResults.forEachIndexed { index, changingValue ->
+                    if(changingValue.isChanged()){
+                        val result = changingValue.value
+                        val problemName = problemNames!![index]
+                        onSetProblemResult(problemName, result)
+                    }
+
+                }
+            }
+
+            if(phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST
+                && participationType.value.participatedInContest()
+                && contestType.value == CodeforcesContestType.CF
+                && problemsResults.count { it.value.type == CodeforcesProblemStatus.PRELIMINARY } > 0
+            ){
+                CodeforcesAPI.getContestSubmissions(contestID, handle)?.result
+                    ?.filterNot { submission -> testedSubmissions.contains(submission.id) }
+                    ?.asSequence()
+                    ?.filter { submission -> submission.author.participantType.participatedInContest() }
+                    ?.filter { submission -> submission.testset == "TESTS" }
+                    ?.filter { submission -> submission.verdict != CodeforcesProblemVerdict.WAITING }
+                    ?.filter { submission -> submission.verdict != CodeforcesProblemVerdict.TESTING }
+                    ?.filter { submission -> submission.verdict != CodeforcesProblemVerdict.SKIPPED }
+                    ?.forEach { submission ->
+                        testedSubmissions.add(submission.id)
+                        onSetProblemSystestResult(submission)
+                    }
+            }
+
+
+            //------------------------
+            commit()
+            when(phaseCodeforces.value){
+                CodeforcesContestPhase.CODING -> delay(3_000)
+                CodeforcesContestPhase.SYSTEM_TEST -> delay(5_000)
+                CodeforcesContestPhase.PENDING_SYSTEM_TEST -> delay(15_000)
+                CodeforcesContestPhase.FINISHED -> {
+                    if(checkRatingChanges(participationType.value)) return
+
+                    val currentTimeMillis = System.currentTimeMillis()
+                    if(ratingChangeWaitingStartTimeMillis == 0L) ratingChangeWaitingStartTimeMillis = currentTimeMillis
+
+                    val hoursWaiting = TimeUnit.MILLISECONDS.toHours(currentTimeMillis - ratingChangeWaitingStartTimeMillis)
+                    when {
+                        hoursWaiting<=1 -> delay(10_000)
+                        hoursWaiting<=2 -> delay(30_000)
+                        hoursWaiting<=4 -> delay(60_000)
+                        else -> return
+                    }
+                }
+                else -> delay(30_000)
+            }
+        }
+    }
+
+    private suspend fun checkRatingChanges(
+        participationType: CodeforcesParticipationType
+    ): Boolean {
+        if(participationType != CodeforcesParticipationType.CONTESTANT) return true
+
+        CodeforcesAPI.getContestRatingChanges(contestID)?.let { response ->
+            if(response.status == CodeforcesAPIStatus.FAILED){
+                if(response.comment == "contestId: Rating changes are unavailable for this contest") return true
+                return@let
+            }
+            with(response.result ?: return@let) {
+                val change = findLast { it.handle == handle } ?: return@let
+                onRatingChange(change)
+                return true
+            }
+        }
+
+        return false
+    }
+
+    fun start() {
+        job = scope.launch {
+            watchContest()
         }
     }
 
     fun stop(){
         job?.cancel()
     }
-
 
 
 
