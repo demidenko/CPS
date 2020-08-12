@@ -1,9 +1,7 @@
 package com.example.test3
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -425,7 +423,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
             val info = rows[position]
 
             view.setOnClickListener {
-                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://codeforces.com/blog/entry/${info.blogID}")))
+                activity.startActivity(makeIntentOpenUrl("https://codeforces.com/blog/entry/${info.blogID}"))
                 if(info.isNew){
                     info.isNew = false
                     notifyItemChanged(position)
@@ -572,7 +570,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
                 val blogLink = "https://codeforces.com/blog/entry/${info.blogID}"
 
                 if(info.commentators.isEmpty()){
-                    activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(blogLink)))
+                    activity.startActivity(makeIntentOpenUrl(blogLink))
                     return@setOnClickListener
                 }
 
@@ -590,11 +588,11 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
                     setOnMenuItemClickListener {
                         when(it.itemId){
                             R.id.cf_news_recent_item_menu_open_blog -> {
-                                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(blogLink)))
+                                activity.startActivity(makeIntentOpenUrl(blogLink))
                                 true
                             }
                             R.id.cf_news_recent_item_menu_open_last_comment -> {
-                                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("$blogLink#comment-${info.lastCommentId}")))
+                                activity.startActivity(makeIntentOpenUrl("$blogLink#comment-${info.lastCommentId}"))
                                 true
                             }
                             else -> false

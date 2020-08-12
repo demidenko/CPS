@@ -1,7 +1,6 @@
 package com.example.test3
 
 import android.content.Intent
-import android.net.Uri
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -26,7 +25,7 @@ abstract class AccountPanel(
         setOnClickListener {
             val info = manager.savedInfo
             if(info.status == STATUS.OK){
-                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(info.link())))
+                activity.startActivity(makeIntentOpenUrl(info.link()))
             }
         }
     }

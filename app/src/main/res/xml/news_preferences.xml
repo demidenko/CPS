@@ -12,14 +12,6 @@
             />
 
         <SwitchPreference
-            android:defaultValue="false"
-            android:key="@string/news_codeforces_lost_enabled"
-            android:title="Lost recent blogs"
-            android:summaryOn="enabled"
-            android:summaryOff="disabled"
-            />
-
-        <SwitchPreference
             android:defaultValue="true"
             android:key="@string/news_codeforces_ru"
             android:title="Russian content"
@@ -27,6 +19,13 @@
             android:summaryOff="en blogs only"
             />
 
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/news_codeforces_lost_enabled"
+            android:title="Lost recent blogs"
+            android:summaryOn="enabled"
+            android:summaryOff="disabled"
+            />
 
     </PreferenceCategory>
 

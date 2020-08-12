@@ -195,6 +195,8 @@ fun makeSimpleNotification(context: Context, id: Int, title: String, content: St
     NotificationManagerCompat.from(context).notify(id, n.build())
 }
 
+fun makeIntentOpenUrl(url: String) = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+
 fun makePendingIntentOpenURL(url: String, context: Context): PendingIntent {
     return PendingIntent.getActivity(context, 0, Intent(Intent.ACTION_VIEW, Uri.parse(url)), 0)
 }
