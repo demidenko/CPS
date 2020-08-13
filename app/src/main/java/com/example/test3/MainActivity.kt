@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity(){
 
     val accountsFragment: AccountsFragment by lazy { supportFragmentManager.fragments.find { it is AccountsFragment } as? AccountsFragment ?: AccountsFragment() }
     val newsFragment: NewsFragment by lazy { supportFragmentManager.fragments.find { it is NewsFragment } as? NewsFragment ?: NewsFragment() }
-    val testFragment: TestFragment by lazy { supportFragmentManager.fragments.find { it is TestFragment } as? TestFragment ?: TestFragment() }
+    val devFragment: TestFragment by lazy { supportFragmentManager.fragments.find { it is TestFragment } as? TestFragment ?: TestFragment() }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,14 +55,14 @@ class MainActivity : AppCompatActivity(){
         fun navigationSelectUpdateUI(fragment: Fragment){
             navigation_accounts.visibility = if(fragment == accountsFragment) View.VISIBLE else View.GONE
             navigation_news.visibility = if(fragment == newsFragment) View.VISIBLE else View.GONE
-            navigation_develop.visibility = if(fragment == testFragment) View.VISIBLE else View.GONE
+            navigation_develop.visibility = if(fragment == devFragment) View.VISIBLE else View.GONE
 
             setActionBarSubTitle(getFragmentSubTitle(fragment))
         }
 
         setFragmentSubTitle(accountsFragment, "::accounts")
         setFragmentSubTitle(newsFragment, "::news")
-        setFragmentSubTitle(testFragment, "::develop")
+        setFragmentSubTitle(devFragment, "::develop")
 
         var activeFragment = supportFragmentManager.fragments.find { it.isVisible } ?: accountsFragment
         if(!activeFragment.isAdded) supportFragmentManager.beginTransaction().add(R.id.container_fragment, activeFragment).commit()
@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity(){
                 when(id){
                     R.id.navigation_accounts -> accountsFragment
                     R.id.navigation_news -> newsFragment
-                    R.id.navigation_develop -> testFragment
+                    R.id.navigation_develop -> devFragment
                     else -> throw Exception("unknown selected navigation bar item: $id")
                 }
 

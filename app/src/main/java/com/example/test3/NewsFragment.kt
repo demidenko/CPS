@@ -128,7 +128,7 @@ class NewsFragment : Fragment() {
                         updateLostInfoButton.visibility = View.VISIBLE
                     }
 
-                    val subtitle = "::news.codeforces.${fragment.title.name.toLowerCase()}"
+                    val subtitle = "::news.codeforces.${fragment.title.name.toLowerCase(Locale.ENGLISH)}"
                     setFragmentSubTitle(this@NewsFragment, subtitle)
                     (requireActivity() as MainActivity).setActionBarSubTitle(subtitle)
                 }
@@ -152,8 +152,7 @@ class NewsFragment : Fragment() {
         if(getBoolean(getString(R.string.news_codeforces_ru), true)) "ru" else "en"
     }
 
-    val sharedReloadButton by lazy { SharedReloadButton(requireActivity().navigation_news_reload) }
-    fun reloadTabs() {
+    private fun reloadTabs() {
         (requireActivity() as MainActivity).scope.launch {
             val lang = getContentLanguage()
             codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
@@ -163,13 +162,14 @@ class NewsFragment : Fragment() {
         }
     }
 
-    suspend fun reloadFragment(
+    private val sharedReloadButton by lazy { SharedReloadButton(requireActivity().navigation_news_reload) }
+    private val failColor by lazy { resources.getColor(R.color.reload_fail, null) }
+    private suspend fun reloadFragment(
         fragment: CodeforcesNewsFragment,
         tab: TabLayout.Tab,
         lang: String,
         block: suspend () -> Unit = {}
     ) {
-        //if(!tab.isSelected && TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - fragment.lastReloadTimeMillis)<1) return
         sharedReloadButton.toggle(fragment.title.name)
         tab.text = "..."
         fragment.swipeRefreshLayout.isRefreshing = true
@@ -191,11 +191,7 @@ class NewsFragment : Fragment() {
                 }
             }
         }else{
-            tab.text = SpannableStringBuilder().apply {
-                color(resources.getColor(R.color.reload_fail,null)) {
-                    append(fragment.title.name)
-                }
-            }
+            tab.text = SpannableStringBuilder().color(failColor) { append(fragment.title.name) }
         }
         fragment.swipeRefreshLayout.isRefreshing = false
         sharedReloadButton.toggle(fragment.title.name)
@@ -209,7 +205,7 @@ class NewsFragment : Fragment() {
 
 
     private val updateLostInfoButton by lazy { requireActivity().navigation_news_lost_update_info }
-    fun updateLostInfo() {
+    private fun updateLostInfo() {
         val activity = requireActivity() as MainActivity
 
         val index = codeforcesNewsAdapter.fragments.indexOfFirst{ it.title == CodeforcesTitle.LOST }
@@ -234,8 +230,7 @@ class NewsFragment : Fragment() {
             PreferenceManager.getDefaultSharedPreferences(context).getString(getString(R.string.news_codeforces_default_tab),null)
                 ?: CodeforcesTitle.TOP.name
 
-        var index = codeforcesNewsAdapter.fragments.indexOfFirst { it.title.name == defaultTab }
-        if(index == -1) index = 1
+        val index = codeforcesNewsAdapter.fragments.indexOfFirst { it.title.name == defaultTab }.takeIf { it!=-1 } ?: 1
         tabLayout.selectTab(tabLayout.getTabAt(index))
         codeforcesNewsViewPager.setCurrentItem(index, false)
 
@@ -299,7 +294,6 @@ class CodeforcesNewsFragment(
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent)
     }
 
-    var lastReloadTimeMillis = 0L
     var newBlogs = hashSetOf<String>()
 
     suspend fun reload(lang: String): Boolean {
@@ -307,7 +301,6 @@ class CodeforcesNewsFragment(
             if(pageName.startsWith('/')) CodeforcesAPI.getPageSource(pageName.substring(1), lang) ?: return false
             else ""
         if(!viewAdapter.parseData(source)) return false
-        lastReloadTimeMillis = System.currentTimeMillis()
 
         if(isManagesNewEntries){
             val savedBlogs = prefs.getStringSet(prefs_key, null) ?: emptySet()
