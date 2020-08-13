@@ -22,8 +22,6 @@ import androidx.preference.PreferenceManager
 import com.example.test3.account_manager.useRealColors
 import com.example.test3.job_services.JobServicesCenter
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.navigation_accounts.*
-import kotlinx.android.synthetic.main.navigation_news.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -55,23 +53,10 @@ class MainActivity : AppCompatActivity(){
 
 
         fun navigationSelectUpdateUI(fragment: Fragment){
-            when(fragment){
-                accountsFragment -> {
-                    navigation_news.visibility = View.GONE
-                    navigation_develop.visibility = View.GONE
-                    navigation_accounts.visibility = View.VISIBLE
-                }
-                newsFragment -> {
-                    navigation_accounts.visibility = View.GONE
-                    navigation_develop.visibility = View.GONE
-                    navigation_news.visibility = View.VISIBLE
-                }
-                testFragment -> {
-                    navigation_accounts.visibility = View.GONE
-                    navigation_news.visibility = View.GONE
-                    navigation_develop.visibility = View.VISIBLE
-                }
-            }
+            navigation_accounts.visibility = if(fragment == accountsFragment) View.VISIBLE else View.GONE
+            navigation_news.visibility = if(fragment == newsFragment) View.VISIBLE else View.GONE
+            navigation_develop.visibility = if(fragment == testFragment) View.VISIBLE else View.GONE
+
             setActionBarSubTitle(getFragmentSubTitle(fragment))
         }
 
@@ -113,28 +98,8 @@ class MainActivity : AppCompatActivity(){
             useRealColors = getBoolean(use_real_colors, false)
         }
 
-        configureNavigation()
         JobServicesCenter.startJobServices(this, scope)
 
-    }
-
-    fun configureNavigation(){
-
-        navigation_accounts_reload.setOnClickListener { accountsFragment.reloadAccounts() }
-        navigation_accounts_add.setOnClickListener { accountsFragment.addAccount() }
-
-        navigation_news_reload.setOnClickListener { newsFragment.reloadTabs() }
-        navigation_news_settings.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .hide(newsFragment)
-                .add(android.R.id.content, SettingsNewsFragment())
-                .addToBackStack(null)
-                .commit()
-
-            setActionBarSubTitle("::news.settings")
-            navigation.visibility = View.GONE
-        }
-        navigation_news_lost_update_info.setOnClickListener { newsFragment.updateLostInfo() }
     }
 
     fun setActionBarSubTitle(text: String) {

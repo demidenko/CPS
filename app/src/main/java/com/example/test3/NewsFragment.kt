@@ -135,6 +135,17 @@ class NewsFragment : Fragment() {
             }
         })
 
+        with(requireActivity() as MainActivity){
+            navigation_news_reload.setOnClickListener { reloadTabs() }
+            navigation_news_settings.setOnClickListener {
+                supportFragmentManager.beginTransaction()
+                    .hide(newsFragment)
+                    .add(android.R.id.content, SettingsNewsFragment())
+                    .addToBackStack(null)
+                    .commit()
+            }
+            navigation_news_lost_update_info.setOnClickListener { updateLostInfo() }
+        }
     }
 
     private fun getContentLanguage() = with(PreferenceManager.getDefaultSharedPreferences(context)){
@@ -676,6 +687,14 @@ fun timeRUtoEN(time: String): String{
 
 ///--------------SETTINGS------------
 class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        with(requireActivity() as MainActivity){
+            setActionBarSubTitle("::news.settings")
+            navigation.visibility = View.GONE
+        }
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.news_preferences)

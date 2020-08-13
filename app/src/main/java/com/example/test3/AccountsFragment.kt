@@ -157,6 +157,10 @@ class AccountsFragment: Fragment() {
 
         panels.forEach { it.show() }
 
+        with(requireActivity() as MainActivity){
+            navigation_accounts_reload.setOnClickListener { reloadAccounts() }
+            navigation_accounts_add.setOnClickListener { addAccount() }
+        }
     }
 
     fun addAccount() {
