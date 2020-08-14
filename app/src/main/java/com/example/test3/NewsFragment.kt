@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.color
@@ -27,10 +28,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
 import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
-import com.example.test3.utils.CodeforcesAPI
-import com.example.test3.utils.CodeforcesUtils
-import com.example.test3.utils.SharedReloadButton
-import com.example.test3.utils.fromHTML
+import com.example.test3.utils.*
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.activity_main.*
@@ -216,7 +214,20 @@ class NewsFragment : Fragment() {
         activity.scope.launch {
             reloadFragment(fragment, tab, ""){
                 updateLostInfoButton.isEnabled = false
-                CodeforcesNewsLostRecentJobService.updateInfo(activity, fragment.requireView().findViewById(R.id.cf_news_page_progressbar))
+                CodeforcesNewsLostRecentJobService.updateInfo(activity, object : ProgressListener{
+                    val progressBar: ProgressBar = fragment.requireView().findViewById(R.id.cf_news_page_progressbar)
+                    override fun onStart(max: Int) {
+                        progressBar.max = max
+                        progressBar.progress = 0
+                        progressBar.visibility = View.VISIBLE
+                    }
+                    override fun onIncrement() {
+                        progressBar.incrementProgressBy(1)
+                    }
+                    override fun onFinish() {
+                        progressBar.visibility = View.GONE
+                    }
+                })
                 updateLostInfoButton.isEnabled = true
             }
         }
