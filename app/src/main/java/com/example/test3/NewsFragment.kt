@@ -216,7 +216,7 @@ class NewsFragment : Fragment() {
         activity.scope.launch {
             reloadFragment(fragment, tab, ""){
                 updateLostInfoButton.isEnabled = false
-                CodeforcesNewsLostRecentJobService.updateInfo(activity)
+                CodeforcesNewsLostRecentJobService.updateInfo(activity, fragment.requireView().findViewById(R.id.cf_news_page_progressbar))
                 updateLostInfoButton.isEnabled = true
             }
         }

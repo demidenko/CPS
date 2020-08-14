@@ -1,6 +1,8 @@
 package com.example.test3.job_services
 
 import android.content.Context
+import android.view.View
+import android.widget.ProgressBar
 import androidx.preference.PreferenceManager
 import com.example.test3.CodeforcesNewsItemsRecentAdapter
 import com.example.test3.R
@@ -46,9 +48,15 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
             out.close()
         }
 
-        suspend fun updateInfo(context: Context) {
+        suspend fun updateInfo(context: Context, progressBar: ProgressBar?) {
             val blogEntries = getSavedLostBlogs(context)
                 .toTypedArray()
+
+            progressBar?.run {
+                max = blogEntries.size
+                progress = 0
+                visibility = View.VISIBLE
+            }
 
             CodeforcesAPI.getUsers(blogEntries.map { it.authorHandle })?.result?.let { users ->
                 for(i in blogEntries.indices) {
@@ -72,10 +80,9 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                                 .removePrefix("<p>")
                                 .removeSuffix("</p>")
                             blogEntries[index] = blogEntry.copy(title = fromHTML(title))
-                        } else {
-                            //god bless kotlin
                         }
                     }
+                    progressBar?.incrementProgressBy(1)
                 }
             }
 
@@ -84,6 +91,10 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                 CF_LOST,
                 blogEntries.filterNot { blogIDsToRemove.contains(it.id) }
             )
+
+            progressBar?.run {
+                visibility = View.GONE
+            }
         }
     }
 

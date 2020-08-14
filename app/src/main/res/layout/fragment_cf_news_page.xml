@@ -1,17 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/cf_news_page_swipe_refresh_layout"
+     android:layout_height="fill_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-
     >
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/cf_news_page_recyclerview"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+
+        android:id="@+id/cf_news_page_swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
+        >
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/cf_news_page_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <ProgressBar
+        android:id="@+id/cf_news_page_progressbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:visibility="gone"
         />
 
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</RelativeLayout>

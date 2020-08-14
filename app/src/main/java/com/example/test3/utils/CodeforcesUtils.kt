@@ -220,6 +220,8 @@ data class CodeforcesRatingChange(
 
 object CodeforcesAPI {
 
+    private const val callLimitExceededWaitTimeMillis: Long = 300
+
     interface API {
         @GET("contest.list")
         fun getContests(
@@ -283,7 +285,7 @@ object CodeforcesAPI {
                 val s = r.errorBody()?.string() ?: return@withContext null
                 val er: CodeforcesAPIErrorResponse = CodeforcesAPIErrorResponse.jsonAdapter.fromJson(s) ?: return@withContext null
                 if(er.comment == "Call limit exceeded"){
-                    delay(500)
+                    delay(callLimitExceededWaitTimeMillis)
                     c = c.clone()
                     continue
                 }
