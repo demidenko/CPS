@@ -53,7 +53,7 @@ class CodeforcesContestWatchService: Service() {
                     setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 }
                 notification.addAction(NotificationCompat.Action(null, "Close", PendingIntent.getService(this, 0, makeStopIntent(this), 0)))
-                notification.addAction(NotificationCompat.Action(null, "Browse", makePendingIntentOpenURL("https://codeforces.com/contest/$contestID",this)))
+                notification.addAction(NotificationCompat.Action(null, "Browse", makePendingIntentOpenURL(CodeforcesLinkFactory.contest(contestID),this)))
                 start(handle, contestID, notification)
             }
             ACTION_STOP -> {
@@ -213,7 +213,7 @@ class CodeforcesContestWatchService: Service() {
                         setContentText("$difference, rank: ${ratingChange.rank}")
                         setSubText("Codeforces rating changes")
                         color = CodeforcesUtils.getHandleColor(ratingChange.newRating).getARGB(CodeforcesUtils)
-                        setContentIntent(makePendingIntentOpenURL("https://codeforces.com/contests/with/$handle", this@CodeforcesContestWatchService))
+                        setContentIntent(makePendingIntentOpenURL(CodeforcesLinkFactory.contestsWith(handle), this@CodeforcesContestWatchService))
                     }
                     notificationManager.notify(NotificationIDs.codeforces_rating_changes, n.build())
                 }
