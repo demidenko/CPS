@@ -190,8 +190,13 @@ data class CodeforcesSubmission(
     val verdict: CodeforcesProblemVerdict = CodeforcesProblemVerdict.WAITING,
     val passedTestCount: Int,
     val id: Long,
-    val testset: String
-)
+    val testset: CodeforcesTestset
+){
+    enum class CodeforcesTestset {
+        SAMPLES, PRETESTS, TESTS, CHALLENGES,
+        TESTS1, TESTS2, TESTS3, TESTS4, TESTS5, TESTS6, TESTS7, TESTS8, TESTS9, TESTS10
+    }
+}
 
 
 @JsonClass(generateAdapter = true)
