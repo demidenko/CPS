@@ -434,4 +434,6 @@ object CodeforcesLinkFactory {
     fun contest(contestId: Int) = "$main/contest/$contestId"
 
     fun contestsWith(handle: String) = "$main/contests/with/$handle"
+
+    fun submission(submission: CodeforcesSubmission) = "https://codeforces.com/contest/${submission.contestId}/submission/${submission.id}"
 }

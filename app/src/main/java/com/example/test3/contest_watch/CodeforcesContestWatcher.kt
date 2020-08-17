@@ -115,7 +115,9 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
             if((phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST || phaseCodeforces.value == CodeforcesContestPhase.FINISHED)
                 && participationType.value.participatedInContest()
                 && contestType.value == CodeforcesContestType.CF
-                && problemsResults.count { it.value.type == CodeforcesProblemStatus.PRELIMINARY } > 0
+                && problemsResults.count {
+                    it.value.type == CodeforcesProblemStatus.PRELIMINARY || it.isChanged() && it.value.type == CodeforcesProblemStatus.FINAL
+                } > 0
             ){
                 delay(1000)
                 CodeforcesAPI.getContestSubmissions(contestID, handle)?.result

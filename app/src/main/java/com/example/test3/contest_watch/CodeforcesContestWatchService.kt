@@ -13,7 +13,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.text.bold
 import androidx.core.text.color
 import androidx.core.text.italic
-import com.example.test3.*
+import com.example.test3.NotificationChannels
+import com.example.test3.NotificationIDs
+import com.example.test3.R
+import com.example.test3.makePendingIntentOpenURL
 import com.example.test3.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -197,15 +200,36 @@ class CodeforcesContestWatchService: Service() {
                 }
 
                 override fun onSetProblemSystestResult(submission: CodeforcesSubmission) {
-                    val problemName = submission.problem.index
+                    val problemName = "${submission.contestId}${submission.problem.index}"
                     val result =
                         if(submission.verdict == CodeforcesProblemVerdict.OK) "OK"
                         else "${submission.verdict.name} #${submission.passedTestCount+1}"
-                    makeSimpleNotification(this@CodeforcesContestWatchService, submission.id.toInt(), "problem $problemName", result, false)
+
+                    val n = NotificationCompat.Builder(
+                        this@CodeforcesContestWatchService,
+                        NotificationChannels.codeforces_contest_watcher
+                    ).apply {
+                        if(submission.verdict == CodeforcesProblemVerdict.OK){
+                            setSmallIcon(R.drawable.ic_problem_ok)
+                            color = successColor
+                        }else{
+                            setSmallIcon(R.drawable.ic_problem_fail)
+                            color = failColor
+                        }
+                        setContentTitle("Problem $problemName: $result")
+                        setSubText("Codeforces system testing result")
+                        setShowWhen(false)
+                        setAutoCancel(true)
+                        setContentIntent(makePendingIntentOpenURL(CodeforcesLinkFactory.submission(submission), this@CodeforcesContestWatchService))
+                    }
+                    notificationManager.notify(NotificationIDs.makeCodeforcesSystestSubmissionID(submission.id), n.build())
                 }
 
                 override fun onRatingChange(ratingChange: CodeforcesRatingChange) {
-                    val n = NotificationCompat.Builder(this@CodeforcesContestWatchService, NotificationChannels.codeforces_rating_changes).apply {
+                    val n = NotificationCompat.Builder(
+                        this@CodeforcesContestWatchService,
+                        NotificationChannels.codeforces_rating_changes
+                    ).apply {
                         val decreased = ratingChange.newRating < ratingChange.oldRating
                         setSmallIcon(if(decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
                         setContentTitle("$handle new rating: ${ratingChange.newRating}")

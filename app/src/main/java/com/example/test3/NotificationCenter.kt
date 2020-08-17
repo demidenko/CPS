@@ -157,6 +157,7 @@ object NotificationIDs {
             if(length < 1) throw IllegalArgumentException("illegal interval length: $length")
         }
         operator fun invoke(int: Int) = (int % length + length) % length + from
+        operator fun invoke(long: Long) = ((long % length).toInt() + length) % length + from
         operator fun invoke(str: String) = invoke(str.hashCode())
     }
 
@@ -164,6 +165,7 @@ object NotificationIDs {
     val codeforces_contest_watcher = nextID()
     val codeforces_rating_changes = nextID()
     val codeforces_contribution_changes = nextID()
+    val makeCodeforcesSystestSubmissionID = nextIntervalID()
 
     //project euler
     val makeProjectEulerRecentProblemNotificationID = nextIntervalID()
