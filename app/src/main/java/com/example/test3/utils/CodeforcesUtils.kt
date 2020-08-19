@@ -29,8 +29,8 @@ import java.net.SocketTimeoutException
 
 object CodeforcesUtils : ColoredHandles {
 
-    suspend fun getBlogCreationTimeSeconds(blogId: String): Long {
-        return CodeforcesAPI.getBlogEntry(blogId.toInt())?.result?.creationTimeSeconds ?: return 0L
+    suspend fun getBlogCreationTimeSeconds(blogId: Int): Long {
+        return CodeforcesAPI.getBlogEntry(blogId)?.result?.creationTimeSeconds ?: return 0L
     }
 
 
@@ -192,12 +192,7 @@ data class CodeforcesSubmission(
     val passedTestCount: Int,
     val id: Long,
     val testset: CodeforcesTestset
-){
-    enum class CodeforcesTestset {
-        SAMPLES, PRETESTS, TESTS, CHALLENGES,
-        TESTS1, TESTS2, TESTS3, TESTS4, TESTS5, TESTS6, TESTS7, TESTS8, TESTS9, TESTS10
-    }
-}
+)
 
 
 @JsonClass(generateAdapter = true)
@@ -221,6 +216,23 @@ data class CodeforcesRatingChange(
     val rank: Int,
     val oldRating: Int,
     val newRating: Int
+)
+
+@JsonClass(generateAdapter = true)
+data class CodeforcesComment(
+    val id: Long,
+    val creationTimeSeconds: Long,
+    val commentatorHandle: String,
+    val text: String,
+    val rating: Int,
+    val commentatorHandleColorTag: String = ""
+)
+
+@JsonClass(generateAdapter = true)
+data class CodeforcesRecentAction(
+    val timeSeconds: Long,
+    val blogEntry: CodeforcesBlogEntry? = null,
+    val comment: CodeforcesComment? = null
 )
 
 
@@ -424,13 +436,18 @@ enum class CodeforcesProblemVerdict {
     FAILED, OK, PARTIAL, COMPILATION_ERROR, RUNTIME_ERROR, WRONG_ANSWER, PRESENTATION_ERROR, TIME_LIMIT_EXCEEDED, MEMORY_LIMIT_EXCEEDED, IDLENESS_LIMIT_EXCEEDED, SECURITY_VIOLATED, CRASHED, INPUT_PREPARATION_CRASHED, CHALLENGED, SKIPPED, TESTING, REJECTED
 }
 
+enum class CodeforcesTestset {
+    SAMPLES, PRETESTS, TESTS, CHALLENGES,
+    TESTS1, TESTS2, TESTS3, TESTS4, TESTS5, TESTS6, TESTS7, TESTS8, TESTS9, TESTS10
+}
+
 object CodeforcesURLFactory {
 
     private const val main = "https://codeforces.com"
 
     fun user(handle: String) = "$main/profile/$handle"
 
-    fun blog(blogId: String) = "$main/blog/entry/$blogId"
+    fun blog(blogId: Int) = "$main/blog/entry/$blogId"
 
     fun contest(contestId: Int) = "$main/contest/$contestId"
 

@@ -126,7 +126,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
                             &&
                             submission.author.participantType.participatedInContest()
                             &&
-                            submission.testset == CodeforcesSubmission.CodeforcesTestset.TESTS
+                            submission.testset == CodeforcesTestset.TESTS
                             &&
                             submission.verdict != CodeforcesProblemVerdict.WAITING
                             &&
