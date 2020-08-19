@@ -28,7 +28,7 @@ abstract class AccountManager(val context: Context) {
             if(info == cachedInfo) return
             writeInfo(info)
             cachedInfo = info
-            println("${PREFERENCES_FILE_NAME} rewrited to ${info.makeInfoString()}")
+            println("account $PREFERENCES_FILE_NAME rewrited to ${info.makeInfoString()}")
         }
 
     open fun getColor(info: UserInfo): Int? = null

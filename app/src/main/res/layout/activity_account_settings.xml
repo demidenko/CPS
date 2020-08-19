@@ -9,7 +9,7 @@
     >
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/account_create_handle_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -19,7 +19,7 @@
         />
 
     <Button
-        android:id="@+id/buttonSave"
+        android:id="@+id/account_create_save_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -27,7 +27,7 @@
         />
 
     <TextView
-        android:id="@+id/textViewUserInfo"
+        android:id="@+id/account_create_user_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -36,7 +36,7 @@
         />
 
     <TextView
-        android:id="@+id/textViewSuggestions"
+        android:id="@+id/account_create_suggestions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

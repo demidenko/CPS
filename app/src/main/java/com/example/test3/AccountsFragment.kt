@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.*
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.SharedReloadButton
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.navigation_accounts.*
 import kotlinx.coroutines.launch
 
@@ -190,6 +191,15 @@ class AccountsFragment: Fragment() {
     }
 
     val sharedReloadButton by lazy { SharedReloadButton(requireActivity().navigation_accounts_reload) }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        if(!hidden){
+            with(requireActivity() as MainActivity){
+                navigation.visibility = View.VISIBLE
+            }
+        }
+        super.onHiddenChanged(hidden)
+    }
 
     override fun onResume() {
         super.onResume()

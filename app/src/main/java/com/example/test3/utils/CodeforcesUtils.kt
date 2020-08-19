@@ -63,6 +63,7 @@ object CodeforcesUtils : ColoredHandles {
 
     fun getTagByRating(rating: Int): String {
         return when {
+            rating == NOT_RATED -> "user-black"
             rating < 1200 -> "user-gray"
             rating < 1400 -> "user-green"
             rating < 1600 -> "user-cyan"

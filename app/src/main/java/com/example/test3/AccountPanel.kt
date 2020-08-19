@@ -1,6 +1,6 @@
 package com.example.test3
 
-import android.content.Intent
+import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -31,8 +31,13 @@ abstract class AccountPanel(
     }
     val settingsButton: ImageButton = layout.findViewById<ImageButton>(R.id.account_panel_settings_button).apply {
         setOnClickListener {
-            val intent = Intent(activity, AccountSettings::class.java).putExtra("manager", manager.PREFERENCES_FILE_NAME)
-            activity.startActivityForResult(intent, MainActivity.CALL_ACCOUNT_SETTINGS)
+            activity.supportFragmentManager.beginTransaction()
+                .hide(activity.accountsFragment)
+                .add(android.R.id.content, AccountCreatingFragment().apply {
+                    arguments = Bundle().apply { putString("manager", manager.PREFERENCES_FILE_NAME) }
+                })
+                .addToBackStack(null)
+                .commit()
         }
     }
     val reloadButton = layout.findViewById<ImageButton>(R.id.account_panel_reload_button).apply {
