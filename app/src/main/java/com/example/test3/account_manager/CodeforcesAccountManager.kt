@@ -3,7 +3,7 @@ package com.example.test3.account_manager
 import android.content.Context
 import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesAPIStatus
-import com.example.test3.utils.CodeforcesLinkFactory
+import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.CodeforcesUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -23,7 +23,7 @@ class CodeforcesAccountManager(context: Context): AccountManager(context) {
             return if(rating == NOT_RATED) "$handle [not rated]" else "$handle $rating"
         }
 
-        override fun link(): String = CodeforcesLinkFactory.user(handle)
+        override fun link(): String = CodeforcesURLFactory.user(handle)
     }
 
     override val PREFERENCES_FILE_NAME: String

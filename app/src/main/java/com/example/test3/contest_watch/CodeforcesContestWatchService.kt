@@ -56,7 +56,7 @@ class CodeforcesContestWatchService: Service() {
                     setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 }
                 notification.addAction(NotificationCompat.Action(null, "Close", PendingIntent.getService(this, 0, makeStopIntent(this), 0)))
-                notification.addAction(NotificationCompat.Action(null, "Browse", makePendingIntentOpenURL(CodeforcesLinkFactory.contest(contestID),this)))
+                notification.addAction(NotificationCompat.Action(null, "Browse", makePendingIntentOpenURL(CodeforcesURLFactory.contest(contestID),this)))
                 start(handle, contestID, notification)
             }
             ACTION_STOP -> {
@@ -220,7 +220,7 @@ class CodeforcesContestWatchService: Service() {
                         setSubText("Codeforces system testing result")
                         setShowWhen(false)
                         setAutoCancel(true)
-                        setContentIntent(makePendingIntentOpenURL(CodeforcesLinkFactory.submission(submission), this@CodeforcesContestWatchService))
+                        setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.submission(submission), this@CodeforcesContestWatchService))
                     }
                     notificationManager.notify(NotificationIDs.makeCodeforcesSystestSubmissionID(submission.id), n.build())
                 }
@@ -237,7 +237,7 @@ class CodeforcesContestWatchService: Service() {
                         setContentText("$difference, rank: ${ratingChange.rank}")
                         setSubText("Codeforces rating changes")
                         color = CodeforcesUtils.getHandleColor(ratingChange.newRating).getARGB(CodeforcesUtils)
-                        setContentIntent(makePendingIntentOpenURL(CodeforcesLinkFactory.contestsWith(handle), this@CodeforcesContestWatchService))
+                        setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.contestsWith(handle), this@CodeforcesContestWatchService))
                     }
                     notificationManager.notify(NotificationIDs.codeforces_rating_changes, n.build())
                 }

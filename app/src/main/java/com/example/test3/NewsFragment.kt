@@ -438,7 +438,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
             val info = rows[position]
 
             view.setOnClickListener {
-                activity.startActivity(makeIntentOpenUrl(CodeforcesLinkFactory.blog(info.blogID)))
+                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogID)))
                 if(info.isNew){
                     info.isNew = false
                     notifyItemChanged(position)
@@ -582,7 +582,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
             val info = rows[position]
 
             view.setOnClickListener {
-                val blogLink = CodeforcesLinkFactory.blog(info.blogID)
+                val blogLink = CodeforcesURLFactory.blog(info.blogID)
 
                 if(info.commentators.isEmpty()){
                     activity.startActivity(makeIntentOpenUrl(blogLink))
