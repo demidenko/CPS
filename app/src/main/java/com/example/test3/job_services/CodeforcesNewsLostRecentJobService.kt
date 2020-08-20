@@ -2,7 +2,6 @@ package com.example.test3.job_services
 
 import android.content.Context
 import androidx.preference.PreferenceManager
-import com.example.test3.CodeforcesNewsItemsRecentAdapter
 import com.example.test3.R
 import com.example.test3.utils.*
 import kotlinx.coroutines.launch
@@ -98,9 +97,9 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         if(!enabled) return
 
 
-        val recentBlogs = CodeforcesNewsItemsRecentAdapter.parsePage(
+        val recentBlogs = CodeforcesUtils.parseRecentActionsPage(
             CodeforcesAPI.getPageSource("recent-actions", "ru") ?: return
-        )
+        ).first
         if(recentBlogs.isEmpty()) return
 
         val currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
@@ -112,17 +111,10 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
 
         val newSuspects = mutableListOf<CodeforcesBlogEntry>()
         recentBlogs.forEach { blog ->
-            val blogID = blog.blogID.toInt()
-            if(blog.authorColorTag in highRated && suspects.find { it.id == blogID } == null){
-                val creationTimeSeconds = CodeforcesUtils.getBlogCreationTimeSeconds(blog.blogID)
+            if(blog.authorColorTag in highRated && suspects.find { it.id == blog.id } == null){
+                val creationTimeSeconds = CodeforcesUtils.getBlogCreationTimeSeconds(blog.id)
                 if(TimeUnit.SECONDS.toDays(currentTimeSeconds - creationTimeSeconds) <= 1){
-                    newSuspects.add(CodeforcesBlogEntry(
-                        id = blogID,
-                        creationTimeSeconds = creationTimeSeconds,
-                        title = blog.title,
-                        authorHandle = blog.author,
-                        authorColorTag = blog.authorColorTag
-                    ))
+                    newSuspects.add(blog.copy(creationTimeSeconds = creationTimeSeconds))
                 }
             }
         }
@@ -130,7 +122,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         suspects.addAll(newSuspects)
         println("suspects = $suspects")
 
-        val recentBlogIDs = recentBlogs.mapTo(HashSet()){ it.blogID.toInt() }
+        val recentBlogIDs = recentBlogs.mapTo(HashSet()){ it.id }
         val lost = getSavedLostBlogs(this)
             .filter { blog ->
                 TimeUnit.SECONDS.toDays(currentTimeSeconds - blog.creationTimeSeconds) <= 7

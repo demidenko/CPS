@@ -33,7 +33,81 @@ object CodeforcesUtils : ColoredHandles {
         return CodeforcesAPI.getBlogEntry(blogId)?.result?.creationTimeSeconds ?: return 0L
     }
 
+    fun parseRecentActionsPage(s: String): Pair<List<CodeforcesBlogEntry>,List<CodeforcesComment>> {
 
+        val comments = mutableListOf<CodeforcesComment>()
+
+        var i = 0
+        while(true){
+            i = s.indexOf("<table class=\"comment-table\">", i+1)
+            if(i==-1) break
+
+            i = s.indexOf("class=\"rated-user", i)
+            val handleColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
+
+            i = s.lastIndexOf("/profile/",i)
+            val handle = s.substring(s.indexOf('/',i+1)+1, s.indexOf('"',i))
+
+            i = s.indexOf("#comment-", i)
+            val commentId = s.substring(s.indexOf('-',i)+1, s.indexOf('"',i)).toLong()
+
+            val blogId = s.substring(s.lastIndexOf('/',i)+1, i).toInt()
+
+            i = s.indexOf("<span class=\"format-humantime\"", i)
+            i = s.indexOf('>', i)
+            val commentTime = s.substring(s.lastIndexOf('"',i-2)+1, i-1)
+
+            i = s.indexOf("<div class=\"ttypography\">", i)
+            val commentText = s.substring(s.indexOf("<p>",i)+3, s.indexOf("</p></div>",i))
+
+            i = s.lastIndexOf("<span commentid=\"$commentId\">")
+            i = s.indexOf("</span>", i)
+            val commentRating = s.substring(s.lastIndexOf('>',i)+1, i).toInt()
+
+            comments.add(
+                CodeforcesComment(
+                    id = commentId,
+                    blogId = blogId,
+                    commentatorHandle = handle,
+                    commentatorHandleColorTag = handleColor,
+                    text = commentText,
+                    rating = commentRating,
+                    creationTimeSeconds = 0 //TODO parse $commentTime
+                )
+            )
+        }
+
+        val blogs = mutableListOf<CodeforcesBlogEntry>()
+
+        i = s.indexOf("<div class=\"recent-actions\">")
+        while(true){
+            i = s.indexOf("<div style=\"font-size:0.9em;padding:0.5em 0;\">", i+1)
+            if(i==-1) break
+
+            i = s.indexOf("/profile/", i)
+            val author = s.substring(i+9,s.indexOf('"',i))
+
+            i = s.indexOf("rated-user user-",i)
+            val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
+
+            i = s.indexOf("entry/", i)
+            val id = s.substring(i+6, s.indexOf('"',i)).toInt()
+
+            val title = fromHTML(s.substring(s.indexOf(">", i) + 1, s.indexOf("</a", i)))
+
+            blogs.add(
+                CodeforcesBlogEntry(
+                    id = id,
+                    title = title,
+                    authorHandle = author,
+                    authorColorTag = authorColor,
+                    creationTimeSeconds = 0L
+                )
+            )
+        }
+
+        return Pair(blogs, comments)
+    }
 
 
     override fun getHandleColor(rating: Int): HandleColor {
@@ -225,7 +299,8 @@ data class CodeforcesComment(
     val commentatorHandle: String,
     val text: String,
     val rating: Int,
-    val commentatorHandleColorTag: String = ""
+    val commentatorHandleColorTag: String = "",
+    val blogId: Int = 0
 )
 
 @JsonClass(generateAdapter = true)

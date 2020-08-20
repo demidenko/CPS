@@ -359,7 +359,7 @@ abstract class CodeforcesNewsItemsAdapter: RecyclerView.Adapter<RecyclerView.Vie
 open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
     data class Info(
-        val blogID: Int,
+        val blogId: Int,
         val title: String,
         val author: String,
         val authorColorTag: String,
@@ -438,7 +438,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
             val info = rows[position]
 
             view.setOnClickListener {
-                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogID)))
+                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogId)))
                 if(info.isNew){
                     info.isNew = false
                     notifyItemChanged(position)
@@ -466,11 +466,11 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
         }
     }
 
-    override fun getBlogIDs(): List<String> = rows.map { it.blogID.toString() }
+    override fun getBlogIDs(): List<String> = rows.map { it.blogId.toString() }
 
     fun markNewEntries(newBlogs: HashSet<String>){
         rows.forEachIndexed { index, info ->
-            val isNew = info.blogID.toString() in newBlogs
+            val isNew = info.blogId.toString() in newBlogs
             if(rows[index].isNew != isNew){
                 rows[index].isNew = isNew
                 notifyItemChanged(index)
@@ -482,85 +482,8 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
 class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
-    companion object {
-        fun parsePage(s: String): ArrayList<Info> {
-            val blogComments = mutableMapOf<Int,MutableList<CodeforcesComment>>()
-
-            var i = 0
-            while(true){
-                i = s.indexOf("<table class=\"comment-table\">", i+1)
-                if(i==-1) break
-
-                i = s.indexOf("class=\"rated-user", i)
-                val handleColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
-
-                i = s.lastIndexOf("/profile/",i)
-                val handle = s.substring(s.indexOf('/',i+1)+1, s.indexOf('"',i))
-
-                i = s.indexOf("#comment-", i)
-                val commentID = s.substring(s.indexOf('-',i)+1, s.indexOf('"',i)).toLong()
-
-                val blogID = s.substring(s.lastIndexOf('/',i)+1, i).toInt()
-
-                i = s.indexOf("<span class=\"format-humantime\"", i)
-                i = s.indexOf('>', i)
-                val commentTime = s.substring(s.lastIndexOf('"',i-2)+1, i-1)
-
-                i = s.indexOf("<div class=\"ttypography\">", i)
-                val commentText = s.substring(s.indexOf("<p>",i)+3, s.indexOf("</p></div>",i))
-
-                i = s.lastIndexOf("<span commentid=\"$commentID\">")
-                i = s.indexOf("</span>", i)
-                val commentRating = s.substring(s.lastIndexOf('>',i)+1, i).toInt()
-
-                blogComments.getOrPut(blogID) { mutableListOf() }.add(
-                    CodeforcesComment(
-                        id = commentID,
-                        commentatorHandle = handle,
-                        commentatorHandleColorTag = handleColor,
-                        text = commentText,
-                        rating = commentRating,
-                        creationTimeSeconds = 0
-                    )
-                )
-            }
-
-            val res = arrayListOf<Info>()
-            i = s.indexOf("<div class=\"recent-actions\">")
-            if(i==-1) return res
-
-            while(true){
-                i = s.indexOf("<div style=\"font-size:0.9em;padding:0.5em 0;\">", i+1)
-                if(i==-1) break
-
-                i = s.indexOf("/profile/", i)
-                val author = s.substring(i+9,s.indexOf('"',i))
-
-                i = s.indexOf("rated-user user-",i)
-                val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
-
-                i = s.indexOf("entry/", i)
-                val id = s.substring(i+6, s.indexOf('"',i)).toInt()
-
-                val title = fromHTML(s.substring(s.indexOf(">", i) + 1, s.indexOf("</a", i)))
-
-                val lastCommentId = blogComments[id]?.first()?.id ?: -1
-
-                val commentators = blogComments[id]
-                    ?.distinctBy { it.commentatorHandle }
-                    ?.map { comment ->
-                        CodeforcesUtils.makeSpan(comment.commentatorHandle,comment.commentatorHandleColorTag)
-                    } ?: emptyList()
-
-                res.add(Info(id,title,author,authorColor,lastCommentId,commentators))
-            }
-
-            return res
-        }
-    }
-
     data class Info(
-        val blogID: Int,
+        val blogId: Int,
         val title: String,
         val author: String,
         val authorColorTag: String,
@@ -568,8 +491,26 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         val commentators: List<Spannable>
     )
 
+    private val blogComments = mutableMapOf<Int, MutableList<CodeforcesComment>>()
+
     override fun parseData(s: String): Boolean {
-        val res = parsePage(s)
+        val (blogs, comments) = CodeforcesUtils.parseRecentActionsPage(s)
+
+        blogComments.clear()
+        comments.forEach { comment ->
+            blogComments.getOrPut(comment.blogId){ mutableListOf() }.add(comment)
+        }
+
+        val res = blogs.map { blog ->
+            val commentators = blogComments[blog.id]
+                ?.distinctBy { it.commentatorHandle }
+                ?.map { comment ->
+                    CodeforcesUtils.makeSpan(comment.commentatorHandle,comment.commentatorHandleColorTag)
+                } ?: emptyList()
+            val lastCommentId = blogComments[blog.id]?.first()?.id ?: -1
+            Info(blog.id,blog.title,blog.authorHandle,blog.authorColorTag,lastCommentId,commentators)
+        }
+
         if(res.isNotEmpty()){
             rows = res.toTypedArray()
             notifyDataSetChanged()
@@ -600,7 +541,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
             val info = rows[position]
 
             view.setOnClickListener {
-                val blogLink = CodeforcesURLFactory.blog(info.blogID)
+                val blogLink = CodeforcesURLFactory.blog(info.blogId)
 
                 if(info.commentators.isEmpty()){
                     activity.startActivity(makeIntentOpenUrl(blogLink))
@@ -647,7 +588,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         }
     }
 
-    override fun getBlogIDs(): List<String> = rows.map { it.blogID.toString() }
+    override fun getBlogIDs(): List<String> = rows.map { it.blogId.toString() }
 
 }
 
@@ -661,7 +602,7 @@ class CodeforcesNewsItemsLostRecentAdapter : CodeforcesNewsItemsClassicAdapter()
                 .sortedByDescending { it.creationTimeSeconds }
                 .map {
                 Info(
-                    blogID = it.id,
+                    blogId = it.id,
                     title = it.title,
                     author = it.authorHandle,
                     authorColorTag = it.authorColorTag,
