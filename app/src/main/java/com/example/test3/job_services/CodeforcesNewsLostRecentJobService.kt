@@ -72,7 +72,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                             val title = freshBlogEntry.title
                                 .removePrefix("<p>")
                                 .removeSuffix("</p>")
-                            blogEntries[index] = blogEntry.copy(title = fromHTML(title))
+                            blogEntries[index] = blogEntry.copy(title = fromHTML(title).toString())
                         }
                     }
                     progressListener?.onIncrement()

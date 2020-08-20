@@ -110,6 +110,10 @@ class NewsFragment : Fragment() {
                     if(fragment.title == CodeforcesTitle.LOST){
                         updateLostInfoButton.visibility = View.GONE
                     }
+
+                    if(fragment.title == CodeforcesTitle.RECENT){
+                        swapRecentButton.visibility = View.GONE
+                    }
                 }
             }
 
@@ -124,6 +128,10 @@ class NewsFragment : Fragment() {
 
                     if(fragment.title == CodeforcesTitle.LOST){
                         updateLostInfoButton.visibility = View.VISIBLE
+                    }
+
+                    if(fragment.title == CodeforcesTitle.RECENT){
+                        swapRecentButton.visibility = View.VISIBLE
                     }
 
                     val subtitle = "::news.codeforces.${fragment.title.name.toLowerCase(Locale.ENGLISH)}"
@@ -143,6 +151,13 @@ class NewsFragment : Fragment() {
                     .commit()
             }
             navigation_news_lost_update_info.setOnClickListener { updateLostInfo() }
+            navigation_news_recent_swap.setOnClickListener {
+                val fragment = codeforcesNewsAdapter.fragments.find { it.title == CodeforcesTitle.RECENT } ?: return@setOnClickListener
+                with(fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter){
+                    groupComments = !groupComments
+                    notifyDataSetChanged()
+                }
+            }
         }
     }
 
@@ -202,6 +217,7 @@ class NewsFragment : Fragment() {
     }
 
 
+    private val swapRecentButton by lazy { requireActivity().navigation_news_recent_swap }
     private val updateLostInfoButton by lazy { requireActivity().navigation_news_lost_update_info }
     private fun updateLostInfo() {
         val activity = requireActivity() as MainActivity
@@ -376,7 +392,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
             i = s.indexOf("<div class=\"topic\"", i + 1)
             if (i == -1) break
 
-            val title = fromHTML(s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i)))
+            val title = fromHTML(s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i))).toString()
 
             i = s.indexOf("entry/", i)
             val id = s.substring(i+6, s.indexOf('"',i)).toInt()
@@ -482,7 +498,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
 class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
-    data class Info(
+    data class BlogInfo(
         val blogId: Int,
         val title: String,
         val author: String,
@@ -491,6 +507,8 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         val commentators: List<Spannable>
     )
 
+    private var rows: Array<BlogInfo> = emptyArray()
+    private var rowsComments: Array<CodeforcesComment> = emptyArray()
     private val blogComments = mutableMapOf<Int, MutableList<CodeforcesComment>>()
 
     override fun parseData(s: String): Boolean {
@@ -508,39 +526,57 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
                     CodeforcesUtils.makeSpan(comment.commentatorHandle,comment.commentatorHandleColorTag)
                 } ?: emptyList()
             val lastCommentId = blogComments[blog.id]?.first()?.id ?: -1
-            Info(blog.id,blog.title,blog.authorHandle,blog.authorColorTag,lastCommentId,commentators)
+            BlogInfo(blog.id,blog.title,blog.authorHandle,blog.authorColorTag,lastCommentId,commentators)
         }
 
         if(res.isNotEmpty()){
             rows = res.toTypedArray()
+            rowsComments = comments.toTypedArray()
             notifyDataSetChanged()
             return true
         }
         return false
     }
 
-    class CodeforcesNewsItemViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
+    class CodeforcesNewsBlogItemViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
         val title: TextView = view.findViewById(R.id.news_item_title)
         val author: TextView = view.findViewById(R.id.news_item_author)
         val comments: TextView = view.findViewById(R.id.news_item_comments)
         val commentsIcon: ImageView = view.findViewById(R.id.news_item_comment_icon)
     }
 
-    private var rows: Array<Info> = emptyArray()
+    class CodeforcesNewsCommentItemViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
+        val title: TextView = view.findViewById(R.id.news_item_title)
+        val author: TextView = view.findViewById(R.id.news_item_author)
+        val time: TextView = view.findViewById(R.id.news_item_time)
+        val rating: TextView = view.findViewById(R.id.news_item_rating)
+        val comment: TextView = view.findViewById(R.id.news_item_comment_content)
+    }
 
-    override fun getItemCount() = rows.size
+    override fun getItemCount() = if(groupComments) rows.size else rowsComments.size
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesNewsItemViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_item, parent, false) as ConstraintLayout
-        return CodeforcesNewsItemViewHolder(view)
+    var groupComments = true
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        if(groupComments){
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_item, parent, false) as ConstraintLayout
+            return CodeforcesNewsBlogItemViewHolder(view)
+        }else{
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_comment, parent, false) as ConstraintLayout
+            return CodeforcesNewsCommentItemViewHolder(view)
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if(groupComments) 0 else 1
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        with(holder as CodeforcesNewsItemViewHolder){
+        if(holder is CodeforcesNewsBlogItemViewHolder){
             val info = rows[position]
 
-            view.setOnClickListener {
+            holder.view.setOnClickListener {
                 val blogLink = CodeforcesURLFactory.blog(info.blogId)
 
                 if(info.commentators.isEmpty()){
@@ -577,14 +613,36 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
                 }
             }
 
-            title.text =  info.title
+            holder.title.text =  info.title
 
-            author.text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag)
+            holder.author.text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag)
 
-            comments.text = info.commentators.joinTo(SpannableStringBuilder())
+            holder.comments.text = info.commentators.joinTo(SpannableStringBuilder())
 
-            commentsIcon.visibility = if(info.commentators.isEmpty()) View.INVISIBLE else View.VISIBLE
+            holder.commentsIcon.visibility = if(info.commentators.isEmpty()) View.INVISIBLE else View.VISIBLE
+        }else
+        if(holder is CodeforcesNewsCommentItemViewHolder){
+            val comment = rowsComments[position]
 
+            holder.title.text = rows.find { it.blogId == comment.blogId }?.title
+
+            holder.author.text = CodeforcesUtils.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
+
+            holder.rating.apply{
+                text = comment.rating.run {
+                    (if(this > 0) "+" else "") + this.toString()
+                }
+                setTextColor(context.resources.getColor(
+                    if(comment.rating > 0) R.color.blog_rating_positive
+                    else R.color.blog_rating_negative, null)
+                )
+            }
+
+            holder.comment.text = CodeforcesUtils.fromCodeforcesHTML(comment.text)
+
+            holder.view.setOnClickListener {
+                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(comment.blogId) + "#comment-${comment.id}"))
+            }
         }
     }
 

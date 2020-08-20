@@ -1,6 +1,7 @@
 package com.example.test3.utils
 
 import android.text.Html
+import android.text.Spanned
 import android.widget.ImageButton
 import androidx.core.text.HtmlCompat
 import okhttp3.OkHttpClient
@@ -15,7 +16,7 @@ val httpClient = OkHttpClient
     .build()
 
 
-fun fromHTML(s: String): String = Html.fromHtml(s, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
+fun fromHTML(s: String): Spanned = Html.fromHtml(s, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
 
 class SharedReloadButton(private val button: ImageButton) {

@@ -47,7 +47,7 @@ class NewsJobService : CoroutineJobService() {
             val currentID = s.substring(s.indexOf("_",i)+1, s.indexOf(">",i)).toInt()
             if(lastNewsID!=-1 && currentID<=lastNewsID) break
 
-            val title = fromHTML(s.substring(i, s.indexOf("<br><br>", i)))
+            val title = fromHTML(s.substring(i, s.indexOf("<br><br>", i))).toString()
 
             news.add(Pair(currentID,title))
         }

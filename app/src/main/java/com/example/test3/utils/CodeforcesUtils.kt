@@ -2,6 +2,7 @@ package com.example.test3.utils
 
 import android.graphics.Typeface
 import android.text.SpannableString
+import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import androidx.core.text.set
@@ -58,7 +59,11 @@ object CodeforcesUtils : ColoredHandles {
             val commentTime = s.substring(s.lastIndexOf('"',i-2)+1, i-1)
 
             i = s.indexOf("<div class=\"ttypography\">", i)
-            val commentText = s.substring(s.indexOf("<p>",i)+3, s.indexOf("</p></div>",i))
+            val commentText = try{
+                s.substring(s.indexOf(">",i)+1, s.indexOf("</div>",i))
+            }catch (e: Exception){
+                e.toString()
+            }
 
             i = s.lastIndexOf("<span commentid=\"$commentId\">")
             i = s.indexOf("</span>", i)
@@ -93,7 +98,7 @@ object CodeforcesUtils : ColoredHandles {
             i = s.indexOf("entry/", i)
             val id = s.substring(i+6, s.indexOf('"',i)).toInt()
 
-            val title = fromHTML(s.substring(s.indexOf(">", i) + 1, s.indexOf("</a", i)))
+            val title = fromHTML(s.substring(s.indexOf(">", i) + 1, s.indexOf("</a", i))).toString()
 
             blogs.add(
                 CodeforcesBlogEntry(
@@ -107,6 +112,13 @@ object CodeforcesUtils : ColoredHandles {
         }
 
         return Pair(blogs, comments)
+    }
+
+    fun fromCodeforcesHTML(str: String): Spanned {
+        var s = str
+        s = s.replace("<code>", "<font face=monospace>").replace("</code>", "</font>")
+        val res = fromHTML(s)
+        return res.trimEnd() as Spanned
     }
 
 
