@@ -508,15 +508,15 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
     )
 
     private var rows: Array<BlogInfo> = emptyArray()
-    private var rowsComments: Array<CodeforcesComment> = emptyArray()
+    private var rowsComments: Array<CodeforcesRecentAction> = emptyArray()
     private val blogComments = mutableMapOf<Int, MutableList<CodeforcesComment>>()
 
     override fun parseData(s: String): Boolean {
         val (blogs, comments) = CodeforcesUtils.parseRecentActionsPage(s)
 
         blogComments.clear()
-        comments.forEach { comment ->
-            blogComments.getOrPut(comment.blogId){ mutableListOf() }.add(comment)
+        comments.forEach { recentAction ->
+            blogComments.getOrPut(recentAction.blogEntry!!.id){ mutableListOf() }.add(recentAction.comment!!)
         }
 
         val res = blogs.map { blog ->
@@ -577,10 +577,8 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
             val info = rows[position]
 
             holder.view.setOnClickListener {
-                val blogLink = CodeforcesURLFactory.blog(info.blogId)
-
                 if(info.commentators.isEmpty()){
-                    activity.startActivity(makeIntentOpenUrl(blogLink))
+                    activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogId)))
                     return@setOnClickListener
                 }
 
@@ -598,11 +596,11 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
                     setOnMenuItemClickListener {
                         when(it.itemId){
                             R.id.cf_news_recent_item_menu_open_blog -> {
-                                activity.startActivity(makeIntentOpenUrl(blogLink))
+                                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogId)))
                                 true
                             }
                             R.id.cf_news_recent_item_menu_open_last_comment -> {
-                                activity.startActivity(makeIntentOpenUrl("$blogLink#comment-${info.lastCommentId}"))
+                                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(info.blogId,info.lastCommentId)))
                                 true
                             }
                             else -> false
@@ -622,9 +620,11 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
             holder.commentsIcon.visibility = if(info.commentators.isEmpty()) View.INVISIBLE else View.VISIBLE
         }else
         if(holder is CodeforcesNewsCommentItemViewHolder){
-            val comment = rowsComments[position]
+            val recentAction = rowsComments[position]
+            val blogEntry = recentAction.blogEntry!!
+            val comment = recentAction.comment!!
 
-            holder.title.text = rows.find { it.blogId == comment.blogId }?.title
+            holder.title.text = blogEntry.title
 
             holder.author.text = CodeforcesUtils.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
 
@@ -640,8 +640,10 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
             holder.comment.text = CodeforcesUtils.fromCodeforcesHTML(comment.text)
 
+            holder.time.text = timeDifference(comment.creationTimeSeconds, TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()))
+
             holder.view.setOnClickListener {
-                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(comment.blogId) + "#comment-${comment.id}"))
+                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(blogEntry.id,comment.id)))
             }
         }
     }
@@ -680,7 +682,7 @@ class CodeforcesNewsItemsLostRecentAdapter : CodeforcesNewsItemsClassicAdapter()
 fun timeDifference(fromTimeSeconds: Long, toTimeSeconds: Long): String {
     val t = toTimeSeconds - fromTimeSeconds
     return when {
-        t <= TimeUnit.MINUTES.toSeconds(2) -> "$t seconds"
+        t < TimeUnit.MINUTES.toSeconds(2) -> "minute"
         t <= TimeUnit.HOURS.toSeconds(2) -> "${TimeUnit.SECONDS.toMinutes(t)} minutes"
         t <= TimeUnit.HOURS.toSeconds(24 * 2) -> "${TimeUnit.SECONDS.toHours(t)} hours"
         else -> "${TimeUnit.SECONDS.toDays(t)} days"

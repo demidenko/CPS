@@ -27,6 +27,9 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import java.io.IOException
 import java.net.SocketTimeoutException
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 object CodeforcesUtils : ColoredHandles {
 
@@ -34,9 +37,10 @@ object CodeforcesUtils : ColoredHandles {
         return CodeforcesAPI.getBlogEntry(blogId)?.result?.creationTimeSeconds ?: return 0L
     }
 
-    fun parseRecentActionsPage(s: String): Pair<List<CodeforcesBlogEntry>,List<CodeforcesComment>> {
+    private val dateFormat = SimpleDateFormat("dd.MM.yyyy hh:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
+    fun parseRecentActionsPage(s: String): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>> {
 
-        val comments = mutableListOf<CodeforcesComment>()
+        val comments = mutableListOf<CodeforcesRecentAction>()
 
         var i = 0
         while(true){
@@ -44,19 +48,28 @@ object CodeforcesUtils : ColoredHandles {
             if(i==-1) break
 
             i = s.indexOf("class=\"rated-user", i)
-            val handleColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
+            val commentatorHandleColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
 
             i = s.lastIndexOf("/profile/",i)
-            val handle = s.substring(s.indexOf('/',i+1)+1, s.indexOf('"',i))
+            val commentatorHandle = s.substring(s.indexOf('/',i+1)+1, s.indexOf('"',i))
 
             i = s.indexOf("#comment-", i)
             val commentId = s.substring(s.indexOf('-',i)+1, s.indexOf('"',i)).toLong()
 
             val blogId = s.substring(s.lastIndexOf('/',i)+1, i).toInt()
 
+            val blogTitle = fromHTML(s.substring(s.indexOf('>',i)+1, s.indexOf("</a>",i))).toString()
+
+            i = s.lastIndexOf("class=\"rated-user", i)
+            val blogAuthorHandleColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
+
+            i = s.lastIndexOf("/profile/",i)
+            val blogAuthorHandle = s.substring(s.indexOf('/',i+1)+1, s.indexOf('"',i))
+
             i = s.indexOf("<span class=\"format-humantime\"", i)
             i = s.indexOf('>', i)
             val commentTime = s.substring(s.lastIndexOf('"',i-2)+1, i-1)
+            val commentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(dateFormat.parse(commentTime).time)
 
             i = s.indexOf("<div class=\"ttypography\">", i)
             val commentText = try{
@@ -70,14 +83,23 @@ object CodeforcesUtils : ColoredHandles {
             val commentRating = s.substring(s.lastIndexOf('>',i)+1, i).toInt()
 
             comments.add(
-                CodeforcesComment(
-                    id = commentId,
-                    blogId = blogId,
-                    commentatorHandle = handle,
-                    commentatorHandleColorTag = handleColor,
-                    text = commentText,
-                    rating = commentRating,
-                    creationTimeSeconds = 0 //TODO parse $commentTime
+                CodeforcesRecentAction(
+                    timeSeconds = commentTimeSeconds, //TODO parse $commentTime
+                    comment = CodeforcesComment(
+                        id = commentId,
+                        commentatorHandle = commentatorHandle,
+                        commentatorHandleColorTag = commentatorHandleColor,
+                        text = commentText,
+                        rating = commentRating,
+                        creationTimeSeconds = commentTimeSeconds //TODO parse $commentTime
+                    ),
+                    blogEntry = CodeforcesBlogEntry(
+                        id = blogId,
+                        title = blogTitle,
+                        authorHandle = blogAuthorHandle,
+                        authorColorTag = blogAuthorHandleColor,
+                        creationTimeSeconds = 0
+                    )
                 )
             )
         }
@@ -117,6 +139,7 @@ object CodeforcesUtils : ColoredHandles {
     fun fromCodeforcesHTML(str: String): Spanned {
         var s = str
         s = s.replace("<code>", "<font face=monospace>").replace("</code>", "</font>")
+        s = s.replace("\n", "<br/>")
         val res = fromHTML(s)
         return res.trimEnd() as Spanned
     }
@@ -311,8 +334,7 @@ data class CodeforcesComment(
     val commentatorHandle: String,
     val text: String,
     val rating: Int,
-    val commentatorHandleColorTag: String = "",
-    val blogId: Int = 0
+    val commentatorHandleColorTag: String = ""
 )
 
 @JsonClass(generateAdapter = true)
@@ -535,6 +557,8 @@ object CodeforcesURLFactory {
     fun user(handle: String) = "$main/profile/$handle"
 
     fun blog(blogId: Int) = "$main/blog/entry/$blogId"
+
+    fun comment(blogId: Int, commentId: Long) = blog(blogId) + "#comment-$commentId"
 
     fun contest(contestId: Int) = "$main/contest/$contestId"
 

@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="3dp"
     android:layout_marginEnd="3dp"
-    android:layout_marginBottom="2dp"
+    android:layout_marginBottom="3dp"
     >
 
     <TextView
@@ -34,15 +34,17 @@
         android:singleLine="true"
         />
 
-    <TextView
+    <ImageView
         android:id="@+id/recent_by"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="by "
-        android:textColor="@color/blog_time"
-        android:textSize="13sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/news_item_author"
+        android:layout_width="11sp"
+        android:layout_height="11sp"
+        android:layout_marginBottom="1.5dp"
+        android:src="@drawable/ic_comment_solo"
+        android:layout_marginStart="2dp"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/news_item_author"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@id/news_item_author"
         />
 
     <TextView
@@ -51,6 +53,7 @@
         android:layout_height="wrap_content"
         android:text="AUTHOR"
         android:textSize="13sp"
+        android:layout_marginStart="2dp"
         app:layout_constraintStart_toEndOf="@id/recent_by"
         app:layout_constraintTop_toBottomOf="@id/news_item_title"
         />
@@ -83,10 +86,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="COMMENT"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="3dp"
         app:layout_constraintTop_toBottomOf="@id/news_item_author"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constrainedWidth="true"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
