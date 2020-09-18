@@ -9,8 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
@@ -28,7 +32,7 @@ class AccountEditFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.activity_account_settings, container, false)
+        return inflater.inflate(R.layout.fragment_account_edit, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -47,16 +51,16 @@ class AccountEditFragment(
         activity.navigation.visibility = View.GONE
 
 
-        val handleEditor: EditText = view.findViewById(R.id.account_create_handle_edit)
+        val handleEditor: EditText = view.findViewById(R.id.account_edit_handle_edit)
 
         handleEditor.addTextChangedListener(
             UserIDChangeWatcher(
                 this,
                 manager,
                 handleEditor,
-                view.findViewById(R.id.account_create_save_button),
-                view.findViewById(R.id.account_create_user_info),
-                view.findViewById(R.id.account_create_suggestions)
+                view.findViewById(R.id.account_edit_save_button),
+                view.findViewById(R.id.account_edit_user_info),
+                view.findViewById(R.id.account_edit_suggestions)
             )
         )
 
@@ -68,7 +72,7 @@ class AccountEditFragment(
         val handleEditor: EditText,
         val saveButton: Button,
         val preview: TextView,
-        val suggestionsView: TextView
+        val suggestionsView: RecyclerView
     ) : TextWatcher {
 
         val activity = fragment.requireActivity() as MainActivity
@@ -79,10 +83,20 @@ class AccountEditFragment(
         var savedInfo = manager.savedInfo
         var lastLoadedInfo: UserInfo? = null
 
+        val suggestionsAdapter: SuggestionsItemsAdapter
+
         init {
             handleEditor.setText(savedInfo.userID)
             preview.text = ""
-            suggestionsView.text = ""
+
+            suggestionsAdapter = SuggestionsItemsAdapter(handleEditor)
+
+            suggestionsView.apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = suggestionsAdapter
+                addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                setHasFixedSize(true)
+            }
 
             saveButton.setOnClickListener {
                 if(saveButton.text == "Save"){
@@ -138,21 +152,63 @@ class AccountEditFragment(
                 }
             }
 
-            if(usedId.length < 3) suggestionsView.text = ""
+            if(usedId.length < 3) suggestionsAdapter.clear()
             else{
-                suggestionsView.text = "..."
+                suggestionsAdapter.loading()
                 jobSuggestions?.cancel()
                 jobSuggestions = activity.scope.launch {
                     delay(300)
                     val suggestions = manager.loadSuggestions(usedId)
                     if(usedId == editable.toString()){
-                        val str = buildString {
-                            suggestions?.forEach { pair -> appendLine(pair.first) }
-                        }
-                        suggestionsView.text = str
+                        suggestionsAdapter.new(suggestions)
                     }
                 }
             }
+        }
+
+        class SuggestionsItemsAdapter(val handleEditor: EditText) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+
+            class Holder(val view: LinearLayout) : RecyclerView.ViewHolder(view){
+                val text:TextView = view.findViewById(R.id.suggestions_item_text)
+            }
+
+            override fun onCreateViewHolder(
+                parent: ViewGroup,
+                viewType: Int
+            ): RecyclerView.ViewHolder {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.account_suggestions_item, parent, false) as LinearLayout
+                return Holder(view)
+            }
+
+            override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+                with(holder as Holder){
+                    val (title, userId) = data[position]
+                    text.text = title
+                    view.setOnClickListener {
+                        handleEditor.setText(userId)
+                        handleEditor.setSelection(userId.length)
+                    }
+                }
+            }
+
+            override fun getItemCount(): Int = data.size
+
+            private var data : List<Pair<String,String>> = emptyList()
+
+            fun new(suggestions: List<Pair<String,String>>?){
+                data = suggestions ?: emptyList()
+                notifyDataSetChanged()
+            }
+
+            fun clear(){
+                data = emptyList()
+                notifyDataSetChanged()
+            }
+
+            fun loading(){
+                clear()
+            }
+
         }
 
     }

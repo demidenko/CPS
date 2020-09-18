@@ -7,7 +7,7 @@
     >
 
     <EditText
-        android:id="@+id/account_create_handle_edit"
+        android:id="@+id/account_edit_handle_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -17,7 +17,7 @@
         />
 
     <Button
-        android:id="@+id/account_create_save_button"
+        android:id="@+id/account_edit_save_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -25,7 +25,7 @@
         />
 
     <TextView
-        android:id="@+id/account_create_user_info"
+        android:id="@+id/account_edit_user_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -33,12 +33,11 @@
         android:textSize="18sp"
         />
 
-    <TextView
-        android:id="@+id/account_create_suggestions"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/account_edit_suggestions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:scrollbars="vertical"
-        android:textIsSelectable="true"
-         />
+        />
+
 </LinearLayout>
