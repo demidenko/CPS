@@ -1,5 +1,6 @@
 package com.example.test3
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Job
@@ -77,6 +79,10 @@ class AccountCreatingFragment(
                     preview.text = info.makeInfoString()
                     lastLoadedInfo = info
                     saveButton.isEnabled = true
+                    handleEditor.backgroundTintList = ColorStateList.valueOf(
+                        if(info.status==STATUS.OK) resources.getColor(R.color.success, null)
+                        else resources.getColor(R.color.fail, null)
+                    )
                 }
             }
 

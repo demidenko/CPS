@@ -105,8 +105,8 @@ class CodeforcesContestWatchService: Service() {
 
                 private fun doubleToString(x: Double) = x.toString().removeSuffix(".0")
 
-                private val successColor = resources.getColor(R.color.blog_rating_positive, null)
-                private val failColor = resources.getColor(R.color.reload_fail, null)
+                private val successColor = resources.getColor(R.color.success, null)
+                private val failColor = resources.getColor(R.color.fail, null)
                 private fun spanForProblemResult(result: CodeforcesProblemResult): SpannableStringBuilder =
                     SpannableStringBuilder().apply {
                         val pts = doubleToString(result.points)
