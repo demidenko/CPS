@@ -183,7 +183,7 @@ class NewsFragment : Fragment() {
         lang: String,
         block: suspend () -> Unit = {}
     ) {
-        sharedReloadButton.toggle(fragment.title.name)
+        sharedReloadButton.startReload(fragment.title.name)
         tab.text = "..."
         fragment.swipeRefreshLayout.isRefreshing = true
         block()
@@ -207,7 +207,7 @@ class NewsFragment : Fragment() {
             tab.text = SpannableStringBuilder().color(failColor) { append(fragment.title.name) }
         }
         fragment.swipeRefreshLayout.isRefreshing = false
-        sharedReloadButton.toggle(fragment.title.name)
+        sharedReloadButton.stopReload(fragment.title.name)
     }
 
     suspend fun reloadFragment(fragment: CodeforcesNewsFragment) {

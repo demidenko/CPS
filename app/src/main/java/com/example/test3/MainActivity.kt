@@ -1,10 +1,8 @@
 package com.example.test3
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Spannable
@@ -138,7 +136,7 @@ class MainActivity : AppCompatActivity(){
             R.id.app_info -> {
                 AlertDialog.Builder(this)
                     .setTitle("CPS")
-                    .setMessage("version ${BuildConfig.VERSION_NAME}")
+                    .setMessage("version = ${BuildConfig.VERSION_NAME}")
                     .create()
                     .show()
             }
@@ -170,17 +168,6 @@ class MainActivity : AppCompatActivity(){
 
     companion object {
         const val use_real_colors = "use_real_colors"
-
-        const val CALL_ACCOUNT_SETTINGS = 1
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        println("on result $resultCode")
-        if(requestCode == CALL_ACCOUNT_SETTINGS && resultCode == Activity.RESULT_OK){
-            val who: String = data!!.getStringExtra("manager")!!
-            accountsFragment.panels.first { it.manager.PREFERENCES_FILE_NAME==who }.show()
-        }
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onBackPressed() {

@@ -84,14 +84,14 @@ object CodeforcesUtils : ColoredHandles {
 
             comments.add(
                 CodeforcesRecentAction(
-                    timeSeconds = commentTimeSeconds, //TODO parse $commentTime
+                    timeSeconds = commentTimeSeconds,
                     comment = CodeforcesComment(
                         id = commentId,
                         commentatorHandle = commentatorHandle,
                         commentatorHandleColorTag = commentatorHandleColor,
                         text = commentText,
                         rating = commentRating,
-                        creationTimeSeconds = commentTimeSeconds //TODO parse $commentTime
+                        creationTimeSeconds = commentTimeSeconds
                     ),
                     blogEntry = CodeforcesBlogEntry(
                         id = blogId,

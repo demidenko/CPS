@@ -22,18 +22,16 @@ fun fromHTML(s: String): Spanned = Html.fromHtml(s, HtmlCompat.FROM_HTML_MODE_LE
 class SharedReloadButton(private val button: ImageButton) {
     private val current = TreeSet<String>()
 
-    fun toggle(str: String) {
-        if(current.contains(str)){
-            current.remove(str)
-            if(current.isEmpty()){
-                button.isEnabled = true
-            }
-        }else{
-            if(current.isEmpty()){
-                button.isEnabled = false
-            }
-            current.add(str)
-        }
+    fun startReload(tag: String) {
+        if(current.contains(tag)) throw Exception("$tag already started")
+        if(current.isEmpty()) button.isEnabled = false
+        current.add(tag);
+    }
+
+    fun stopReload(tag: String) {
+        if(!current.contains(tag)) throw Exception("$tag not started to be stopped")
+        current.remove(tag)
+        if(current.isEmpty()) button.isEnabled = true
     }
 }
 
