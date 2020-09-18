@@ -33,7 +33,7 @@ abstract class AccountPanel(
         setOnClickListener {
             activity.supportFragmentManager.beginTransaction()
                 .hide(activity.accountsFragment)
-                .add(android.R.id.content, AccountCreatingFragment().apply {
+                .add(android.R.id.content, AccountEditFragment().apply {
                     arguments = Bundle().apply { putString("manager", manager.PREFERENCES_FILE_NAME) }
                 })
                 .addToBackStack(null)
