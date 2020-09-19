@@ -9,8 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -89,7 +89,7 @@ class AccountEditFragment(
             handleEditor.setText(savedInfo.userID)
             preview.text = ""
 
-            suggestionsAdapter = SuggestionsItemsAdapter(handleEditor)
+            suggestionsAdapter = SuggestionsItemsAdapter(this)
 
             suggestionsView.apply {
                 layoutManager = LinearLayoutManager(context)
@@ -126,6 +126,7 @@ class AccountEditFragment(
 
         }
 
+        var changedByChoose = false
         override fun afterTextChanged(editable: Editable?) {
             val usedId = editable?.toString() ?: return
 
@@ -152,50 +153,57 @@ class AccountEditFragment(
                 }
             }
 
-            if(usedId.length < 3) suggestionsAdapter.clear()
-            else{
-                suggestionsAdapter.loading()
-                jobSuggestions?.cancel()
-                jobSuggestions = activity.scope.launch {
-                    delay(300)
-                    val suggestions = manager.loadSuggestions(usedId)
-                    if(usedId == editable.toString()){
-                        suggestionsAdapter.new(suggestions)
+
+            if(changedByChoose) changedByChoose = false
+            else {
+                if (usedId.length < 3) suggestionsAdapter.clear()
+                else {
+                    suggestionsAdapter.loading()
+                    jobSuggestions?.cancel()
+                    jobSuggestions = activity.scope.launch {
+                        delay(300)
+                        val suggestions = manager.loadSuggestions(usedId)
+                        if (usedId == editable.toString()) {
+                            suggestionsAdapter.new(suggestions)
+                        }
                     }
                 }
             }
         }
 
-        class SuggestionsItemsAdapter(val handleEditor: EditText) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+        class SuggestionsItemsAdapter(val watcher: UserIDChangeWatcher) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
-            class Holder(val view: LinearLayout) : RecyclerView.ViewHolder(view){
-                val text:TextView = view.findViewById(R.id.suggestions_item_text)
+            class Holder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
+                val title:TextView = view.findViewById(R.id.suggestions_item_title)
+                val info:TextView = view.findViewById(R.id.suggestions_item_info)
             }
 
             override fun onCreateViewHolder(
                 parent: ViewGroup,
                 viewType: Int
             ): RecyclerView.ViewHolder {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.account_suggestions_item, parent, false) as LinearLayout
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.account_suggestions_item, parent, false) as ConstraintLayout
                 return Holder(view)
             }
 
             override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
                 with(holder as Holder){
-                    val (title, userId) = data[position]
-                    text.text = title
+                    val (title, info, userId) = data[position]
+                    this.title.text = title
+                    this.info.text = info
                     view.setOnClickListener {
-                        handleEditor.setText(userId)
-                        handleEditor.setSelection(userId.length)
+                        watcher.changedByChoose = true
+                        watcher.handleEditor.setText(userId)
+                        watcher.handleEditor.setSelection(userId.length)
                     }
                 }
             }
 
             override fun getItemCount(): Int = data.size
 
-            private var data : List<Pair<String,String>> = emptyList()
+            private var data : List<Triple<String,String,String>> = emptyList()
 
-            fun new(suggestions: List<Pair<String,String>>?){
+            fun new(suggestions: List<Triple<String,String,String>>?){
                 data = suggestions ?: emptyList()
                 notifyDataSetChanged()
             }

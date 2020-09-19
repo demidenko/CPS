@@ -90,10 +90,10 @@ class ACMPAccountManager(context: Context): AccountManager(context) {
         commit()
     }
 
-    override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? {
+    override suspend fun loadSuggestions(str: String): List<Triple<String, String, String>>? {
         if(str.toIntOrNull()!=null) return null
         val s = ACMPAPI.getUserSearch(str) ?: return null
-        val res = ArrayList<Pair<String,String>>()
+        val res = ArrayList<Triple<String,String,String>>()
         var k = s.indexOf("<table cellspacing=1 cellpadding=2 align=center class=main>")
         while(true){
             k = s.indexOf("<tr class=white>", k+1)
@@ -102,7 +102,10 @@ class ACMPAccountManager(context: Context): AccountManager(context) {
             i = s.indexOf('>',i+4)
             val userid = s.substring(s.lastIndexOf("id=",i)+3, i)
             val username = s.substring(i+1, s.indexOf("</a",i))
-            res += Pair("$username $userid", userid)
+            i = s.indexOf("<td align=right>", i)
+            i = s.indexOf("</a></td>", i)
+            val tasks = s.substring(s.lastIndexOf('>',i)+1, i)
+            res += Triple(username, tasks, userid)
         }
         return res
     }

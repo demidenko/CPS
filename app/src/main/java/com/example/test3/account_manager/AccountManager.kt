@@ -16,7 +16,7 @@ abstract class AccountManager(val context: Context) {
         }
     }
 
-    open suspend fun loadSuggestions(str: String): List<Pair<String,String>>? = null
+    open suspend fun loadSuggestions(str: String): List<Triple<String,String,String>>? = null
 
     protected abstract var cachedInfo: UserInfo?
     protected abstract fun readInfo(): UserInfo

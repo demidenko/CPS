@@ -95,19 +95,22 @@ class TimusAccountManager(context: Context): AccountManager(context) {
         commit()
     }
 
-    override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? {
+    override suspend fun loadSuggestions(str: String): List<Triple<String, String, String>>? {
         if(str.toIntOrNull()!=null) return null
         val s = TimusAPI.getUserSearch(str) ?: return null
         var i = s.indexOf("CLASS=\"ranklist\"")
         if(i==-1) return null
-        val res = ArrayList<Pair<String,String>>()
+        val res = ArrayList<Triple<String,String,String>>()
         while(true){
             i = s.indexOf("<TD CLASS=\"name\">", i)
             if(i==-1) break
             i = s.indexOf("?id=", i+1)
             val userid = s.substring(i+4, s.indexOf('"',i))
-            val username = fromHTML(s.substring(s.indexOf('>', i) + 1, s.indexOf("</A", i)))
-            res += Pair("$username $userid", userid)
+            val username = fromHTML(s.substring(s.indexOf('>', i) + 1, s.indexOf("</A", i))).toString()
+            i = s.indexOf("<TD>", i+1)
+            i = s.indexOf("<TD>", i+1)
+            val tasks = s.substring(i+4, s.indexOf("</TD",i))
+            res += Triple(username, tasks, userid)
         }
         return res
     }

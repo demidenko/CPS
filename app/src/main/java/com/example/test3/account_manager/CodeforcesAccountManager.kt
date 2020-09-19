@@ -83,14 +83,14 @@ class CodeforcesAccountManager(context: Context): AccountManager(context) {
         return CodeforcesUtils.getHandleColor(info.rating).getARGB(CodeforcesUtils)
     }
 
-    override suspend fun loadSuggestions(str: String): List<Pair<String, String>>? = withContext(Dispatchers.IO){
+    override suspend fun loadSuggestions(str: String): List<Triple<String, String, String>>? = withContext(Dispatchers.IO){
         val s = CodeforcesAPI.getHandleSuggestions(str) ?: return@withContext null
-        val res = ArrayList<Pair<String, String>>()
+        val res = ArrayList<Triple<String,String, String>>()
         s.split('\n').filter { !it.contains('=') }.forEach {
             val i = it.indexOf('|')
             if (i != -1) {
                 val handle = it.substring(i + 1)
-                res += Pair(handle, handle)
+                res += Triple(handle, "", handle)
             }
         }
         return@withContext res
