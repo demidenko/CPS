@@ -4,8 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="5dp"
-    android:layout_marginBottom="5dp"
+    android:layout_margin="5dp"
     >
 
     <TextView
@@ -20,6 +19,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constrainedWidth="true"
         android:singleLine="true"
+        android:layout_marginEnd="5dp"
         />
 
     <TextView
@@ -28,10 +28,9 @@
         android:layout_height="wrap_content"
         android:text="rating"
         android:textSize="18sp"
+        android:gravity="right"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
