@@ -27,6 +27,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import java.io.IOException
 import java.net.SocketTimeoutException
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -37,8 +38,10 @@ object CodeforcesUtils : ColoredHandles {
         return CodeforcesAPI.getBlogEntry(blogId)?.result?.creationTimeSeconds ?: return 0L
     }
 
-    private val dateFormat = SimpleDateFormat("dd.MM.yyyy hh:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
+    private val dateFormatRU = SimpleDateFormat("dd.MM.yyyy hh:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
+    private val dateFormatEN = SimpleDateFormat("MMM/dd/yyyy hh:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
     fun parseRecentActionsPage(s: String): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>> {
+        var dateFormat = dateFormatRU
 
         val comments = mutableListOf<CodeforcesRecentAction>()
 
@@ -69,7 +72,14 @@ object CodeforcesUtils : ColoredHandles {
             i = s.indexOf("<span class=\"format-humantime\"", i)
             i = s.indexOf('>', i)
             val commentTime = s.substring(s.lastIndexOf('"',i-2)+1, i-1)
-            val commentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(dateFormat.parse(commentTime).time)
+            val commentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(
+                try{
+                    dateFormat.parse(commentTime).time
+                }catch (e : ParseException){
+                    dateFormat = if(dateFormat == dateFormatRU) dateFormatEN else dateFormatRU
+                    dateFormat.parse(commentTime).time
+                }
+            )
 
             i = s.indexOf("<div class=\"ttypography\">", i)
             val commentText = try{
