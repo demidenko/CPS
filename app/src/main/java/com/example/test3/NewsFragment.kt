@@ -585,7 +585,9 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
                 PopupMenu(activity, holder.title, Gravity.CENTER_HORIZONTAL).apply {
                     inflate(R.menu.cf_recent_item_open_variants)
 
-                    setForceShowIcon(true)
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                        setForceShowIcon(true)
+                    }
                     menu.findItem(R.id.cf_news_recent_item_menu_open_last_comment).let { item ->
                         item.title = SpannableStringBuilder(item.title)
                             .append(" [")

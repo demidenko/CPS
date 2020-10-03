@@ -102,14 +102,18 @@ class MainActivity : AppCompatActivity(){
 
     fun setActionBarSubTitle(text: String) {
         supportActionBar?.subtitle = SpannableString(text).apply {
-            setSpan(TypefaceSpan(Typeface.MONOSPACE), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P){
+                setSpan(TypefaceSpan(Typeface.MONOSPACE), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+            }
             setSpan(AbsoluteSizeSpan(44), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         }
     }
 
     fun setActionBarTitle(text: String) {
         supportActionBar?.title = SpannableString(text).apply {
-            setSpan(TypefaceSpan(Typeface.MONOSPACE), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P){
+                setSpan(TypefaceSpan(Typeface.MONOSPACE), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+            }
             setSpan(AbsoluteSizeSpan(44), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         }
     }
