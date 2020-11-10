@@ -67,7 +67,7 @@ object JobServicesCenter {
         }
     }
 
-    private fun startNewsJobService(context: Context){
+    fun startNewsJobService(context: Context){
         makeSchedule(
             context,
             JobServiceIDs.news_parsers,

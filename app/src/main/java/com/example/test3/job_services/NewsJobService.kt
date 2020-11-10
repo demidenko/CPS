@@ -35,6 +35,9 @@ class NewsJobService : CoroutineJobService() {
             if(getBoolean(getString(R.string.news_acmp_feed), false)) jobs.add(launch { parseACMP() })
             if(getBoolean(getString(R.string.news_zaoch_feed), false)) jobs.add(launch { parseZaoch() })
         }
+        if(jobs.isEmpty()){
+            JobServicesCenter.stopJobService(this, JobServiceIDs.news_parsers)
+        }
         return jobs
     }
 

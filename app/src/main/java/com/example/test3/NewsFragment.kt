@@ -735,11 +735,18 @@ class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSha
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
-        if(key == getString(R.string.news_codeforces_lost_enabled)){
-            //spam possible
-            when(sharedPreferences.getBoolean(key, false)){
-                true -> JobServicesCenter.startCodeforcesNewsLostRecentJobService(requireContext())
-                false -> JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_lost_recent_news)
+        when (key) {
+            getString(R.string.news_codeforces_lost_enabled) -> {
+                //spam possible
+                when(sharedPreferences.getBoolean(key, false)){
+                    true -> JobServicesCenter.startCodeforcesNewsLostRecentJobService(requireContext())
+                    false -> JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_lost_recent_news)
+                }
+            }
+            getString(R.string.news_project_euler_feed),
+            getString(R.string.news_acmp_feed),
+            getString(R.string.news_zaoch_feed) -> {
+                if(sharedPreferences.getBoolean(key, false)) JobServicesCenter.startNewsJobService(requireContext())
             }
         }
     }
