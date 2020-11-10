@@ -24,6 +24,9 @@ object NotificationChannels {
     //acmp
     const val acmp_news = "acmp_news"
 
+    //zaoch
+    const val olympiads_zaoch_news = "olympiads_zaoch_news"
+
     fun createNotificationChannels(context: Context){
         val m = NotificationManagerCompat.from(context)
 
@@ -137,6 +140,23 @@ object NotificationChannels {
         ).apply {
             group = group_id_acmp
         })
+
+        //zaoch channels
+        val group_id_zaoch = "zaoch"
+        m.createNotificationChannelGroup(
+            NotificationChannelGroup(
+                group_id_zaoch,
+                "olympiads.ru/zaoch"
+            )
+        )
+        m.createNotificationChannel(
+            NotificationChannel(
+            olympiads_zaoch_news,
+            "News",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            group = group_id_zaoch
+        })
     }
 }
 
@@ -173,6 +193,9 @@ object NotificationIDs {
 
     //acmp
     val makeACMPNewsNotificationID = nextIntervalID()
+
+    //zaoch
+    val makeZaochNewsNotificationID = nextIntervalID()
 
     //test
     val test = nextID()

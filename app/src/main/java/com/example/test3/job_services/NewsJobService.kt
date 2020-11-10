@@ -1,11 +1,13 @@
 package com.example.test3.job_services
 
 import android.content.Context
+import android.graphics.Color
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import com.example.test3.*
 import com.example.test3.utils.ACMPAPI
+import com.example.test3.utils.OlympiadsZaochAPI
 import com.example.test3.utils.ProjectEulerAPI
 import com.example.test3.utils.fromHTML
 import kotlinx.coroutines.Job
@@ -21,13 +23,17 @@ class NewsJobService : CoroutineJobService() {
 
         //project euler
         const val PROJECT_EULER_LAST_NEWS = "project_euler_last_news"
+
+        //olympiads.ru/zaoch
+        const val OLYMPIADS_ZAOCH_LAST_NEWS = "olympiads_zaoch_last_news"
     }
 
     override suspend fun makeJobs(): ArrayList<Job> {
         val jobs = arrayListOf<Job>()
         with(PreferenceManager.getDefaultSharedPreferences(this)){
-            if(getBoolean(getString(R.string.news_project_euler_feed),false)) jobs.add(launch { parseProjectEuler() })
-            if(getBoolean(getString(R.string.news_acmp_feed),false)) jobs.add(launch { parseACMP() })
+            if(getBoolean(getString(R.string.news_project_euler_feed), false)) jobs.add(launch { parseProjectEuler() })
+            if(getBoolean(getString(R.string.news_acmp_feed), false)) jobs.add(launch { parseACMP() })
+            if(getBoolean(getString(R.string.news_zaoch_feed), false)) jobs.add(launch { parseZaoch() })
         }
         return jobs
     }
@@ -38,18 +44,18 @@ class NewsJobService : CoroutineJobService() {
         val prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
 
         val lastNewsID = prefs.getInt(ACMP_LAST_NEWS, 0)
-        val news = mutableListOf<Pair<Int,String>>()
+        val news = mutableListOf<Pair<Int, String>>()
         var i = 0
         while (true) {
-            i = s.indexOf("<a name=news_", i+1)
+            i = s.indexOf("<a name=news_", i + 1)
             if(i==-1) break
 
-            val currentID = s.substring(s.indexOf("_",i)+1, s.indexOf(">",i)).toInt()
+            val currentID = s.substring(s.indexOf("_", i) + 1, s.indexOf(">", i)).toInt()
             if(lastNewsID!=-1 && currentID<=lastNewsID) break
 
             val title = fromHTML(s.substring(i, s.indexOf("<br><br>", i))).toString()
 
-            news.add(Pair(currentID,title))
+            news.add(Pair(currentID, title))
         }
 
         if(news.isEmpty()) return
@@ -102,15 +108,15 @@ class NewsJobService : CoroutineJobService() {
         val news = mutableListOf<Pair<String, String>>()
         var i = 0
         while (true) {
-            i = s.indexOf("<div class=\"news\">", i+1)
+            i = s.indexOf("<div class=\"news\">", i + 1)
             if(i == -1) break
 
-            val currentID = s.substring(s.indexOf("<h4>",i)+4, s.indexOf("</h4>",i))
+            val currentID = s.substring(s.indexOf("<h4>", i) + 4, s.indexOf("</h4>", i))
             if(currentID == lastNewsID) break
 
-            val content = s.substring(s.indexOf("<div>",i)+5, s.indexOf("</div>",i))
+            val content = s.substring(s.indexOf("<div>", i) + 5, s.indexOf("</div>", i))
 
-            news.add(Pair(currentID,content))
+            news.add(Pair(currentID, content))
         }
 
         if(news.isEmpty()) return
@@ -136,6 +142,61 @@ class NewsJobService : CoroutineJobService() {
         if(firstID != lastNewsID) {
             with(prefs.edit()) {
                 putString(PROJECT_EULER_LAST_NEWS, firstID)
+                apply()
+            }
+        }
+    }
+
+    private suspend fun parseZaoch() {
+        val s = OlympiadsZaochAPI.getMainPage() ?: return
+
+        val prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
+
+        val lastNewsID = prefs.getString(OLYMPIADS_ZAOCH_LAST_NEWS, null) ?: ""
+
+        val news = mutableListOf<Pair<String, String>>()
+        var i = 0
+        val tit = "<font color=\"#B00000\">"
+        while(true){
+            i = s.indexOf(tit, i+1)
+            if(i==-1) break
+
+            val currentID = s.substring(i+tit.length, s.indexOf("</font",i))
+            if(currentID == lastNewsID) break
+
+            var j = s.indexOf("<p>", i)
+            if(j==-1) j = s.indexOf("</td", i)
+            var content = s.substring(s.indexOf(".",i)+1,j).trim()
+            while(true){
+                val pos = content.indexOf("<")
+                if (pos == -1) break
+                content = content.substring(0,pos) + content.substring(content.indexOf(">",pos)+1)
+            }
+
+            news.add(Pair(currentID, content))
+        }
+
+        if(news.isEmpty()) return
+
+        news.forEach { (title, content) ->
+            val n = NotificationCompat.Builder(this, NotificationChannels.olympiads_zaoch_news).apply {
+                setSubText("zaoch news")
+                setContentTitle(title)
+                setContentText(fromHTML(content))
+                setStyle(NotificationCompat.BigTextStyle())
+                setSmallIcon(R.drawable.ic_news)
+                setColor(Color.BLUE)
+                setShowWhen(true)
+                //setAutoCancel(true)
+                setContentIntent(makePendingIntentOpenURL("https://olympiads.ru/zaoch/", this@NewsJobService))
+            }
+            NotificationManagerCompat.from(this).notify(NotificationIDs.makeZaochNewsNotificationID(title), n.build())
+        }
+
+        val firstID = news.first().first
+        if(firstID != lastNewsID) {
+            with(prefs.edit()) {
+                putString(OLYMPIADS_ZAOCH_LAST_NEWS, firstID)
                 apply()
             }
         }

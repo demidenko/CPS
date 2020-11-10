@@ -47,6 +47,12 @@
             android:defaultValue="false"
             android:title="acmp.ru"
             />
+
+        <CheckBoxPreference
+            android:key="@string/news_zaoch_feed"
+            android:defaultValue="false"
+            android:title="olympiads.ru/zaoch"
+            />
     </PreferenceCategory>
 
 </PreferenceScreen>

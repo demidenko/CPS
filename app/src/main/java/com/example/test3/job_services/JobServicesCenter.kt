@@ -72,7 +72,7 @@ object JobServicesCenter {
             context,
             JobServiceIDs.news_parsers,
             NewsJobService::class.java,
-            TimeUnit.HOURS.toMillis(16),
+            TimeUnit.HOURS.toMillis(6),
             JobInfo.NETWORK_TYPE_ANY
         )
     }
@@ -102,7 +102,7 @@ object JobServicesCenter {
             context,
             JobServiceIDs.accounts_parsers,
             AccountsJobService::class.java,
-            TimeUnit.MINUTES.toMillis(15),
+            TimeUnit.HOURS.toMillis(1),
             JobInfo.NETWORK_TYPE_ANY
         )
     }

@@ -30,7 +30,7 @@ object ACMPAPI {
         ): Call<ResponseBody>
     }
 
-    private val acmpwWEB = Retrofit.Builder()
+    private val acmpWEB = Retrofit.Builder()
         .baseUrl("https://acmp.ru/")
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
         .client(httpClient)
@@ -45,7 +45,7 @@ object ACMPAPI {
     suspend fun getMainPage(): String? {
         try {
             return withContext(Dispatchers.IO) {
-                decode(acmpwWEB.getMainPage().execute())
+                decode(acmpWEB.getMainPage().execute())
             }
         }catch (e: IOException){
             return null
@@ -54,7 +54,7 @@ object ACMPAPI {
 
     suspend fun getUser(id: String): String? {
         try {
-            return decode(acmpwWEB.getUser(id).execute())
+            return decode(acmpWEB.getUser(id).execute())
         }catch (e: IOException){
             return null
         }
@@ -63,7 +63,7 @@ object ACMPAPI {
     suspend fun getUserSearch(str: String): String? {
         try {
             return withContext(Dispatchers.IO){
-                decode(acmpwWEB.getUserSearch(URLEncoder.encode(str, "windows-1251")).execute())
+                decode(acmpWEB.getUserSearch(URLEncoder.encode(str, "windows-1251")).execute())
             }
         }catch (e: IOException){
             return null
