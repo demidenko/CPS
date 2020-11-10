@@ -4,7 +4,7 @@
         <item name="colorPrimaryDark">@android:color/black</item>
         <item name="colorPrimary">#FF808080</item> <!--- @android:color/tertiary_text_dark -->
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:background">#121212</item> <!-- design_dark_default_color_background -->
+        <item name="background">@color/background</item> <!-- design_dark_default_color_background -->
         <item name="android:textColor">@color/textColor</item>
         <item name="android:editTextColor">@color/textColor</item>
         <item name="android:popupMenuStyle">@style/PopupMenu</item>
