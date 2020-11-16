@@ -56,9 +56,9 @@ class NewsJobService : CoroutineJobService() {
             val currentID = s.substring(s.indexOf("_", i) + 1, s.indexOf(">", i)).toInt()
             if(lastNewsID!=-1 && currentID<=lastNewsID) break
 
-            val title = fromHTML(s.substring(i, s.indexOf("<br><br>", i))).toString()
+            val content = fromHTML(s.substring(i, s.indexOf("<br><br>", i))).toString()
 
-            news.add(Pair(currentID, title))
+            news.add(Pair(currentID, content))
         }
 
         if(news.isEmpty()) return
@@ -66,10 +66,10 @@ class NewsJobService : CoroutineJobService() {
         if(lastNewsID != 0){
             val group = "acmp_news_group"
 
-            news.forEach { (id, title) ->
+            news.forEach { (id, content) ->
                 val n = NotificationCompat.Builder(this, NotificationChannels.acmp_news).apply {
                     setSubText("acmp news")
-                    setContentText(title)
+                    setContentText(content)
                     setStyle(NotificationCompat.BigTextStyle())
                     setSmallIcon(R.drawable.ic_news)
                     setColor(NotificationColors.acmp_main)
@@ -169,12 +169,7 @@ class NewsJobService : CoroutineJobService() {
 
             var j = s.indexOf("<p>", i)
             if(j==-1) j = s.indexOf("</td", i)
-            var content = s.substring(s.indexOf(".",i)+1,j).trim()
-            while(true){
-                val pos = content.indexOf("<")
-                if (pos == -1) break
-                content = content.substring(0,pos) + content.substring(content.indexOf(">",pos)+1)
-            }
+            val content = fromHTML(s.substring(s.indexOf(".",i)+1,j).trim()).toString()
 
             news.add(Pair(currentID, content))
         }
@@ -188,7 +183,7 @@ class NewsJobService : CoroutineJobService() {
                 setContentText(fromHTML(content))
                 setStyle(NotificationCompat.BigTextStyle())
                 setSmallIcon(R.drawable.ic_news)
-                setColor(Color.BLUE)
+                setColor(Color.parseColor("#4040A0"))
                 setShowWhen(true)
                 //setAutoCancel(true)
                 setContentIntent(makePendingIntentOpenURL("https://olympiads.ru/zaoch/", this@NewsJobService))
