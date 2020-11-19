@@ -9,13 +9,12 @@ import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.HashSet
 
 
 class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
     companion object {
-        private val CF_LOST_SUSPECTS = "cf_lost_suspects.txt"
-        val CF_LOST = "cf_lost.txt"
+        private const val CF_LOST_SUSPECTS = "cf_lost_suspects.txt"
+        private const val CF_LOST = "cf_lost.txt"
 
         private fun getSavedBlogs(context: Context, file_name: String): List<CodeforcesBlogEntry> {
             try {
@@ -35,7 +34,6 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         fun getSavedSuspectBlogs(context: Context) = getSavedBlogs(context, CF_LOST_SUSPECTS)
 
         fun saveBlogs(context: Context, file_name: String, blogs: Collection<CodeforcesBlogEntry>){
-            println("save $file_name: $blogs")
             val out = PrintWriter(context.openFileOutput(file_name, Context.MODE_PRIVATE))
             blogs.forEach {
                 val str = CodeforcesBlogEntry.jsonAdapter.toJson(it)
@@ -105,35 +103,34 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         val currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
 
         val suspects = getSavedSuspectBlogs(this)
-            .filter {
-                TimeUnit.SECONDS.toDays(currentTimeSeconds - it.creationTimeSeconds) <= 1
-            }.toHashSet()
+            .filter { blog ->
+                TimeUnit.SECONDS.toHours(currentTimeSeconds - blog.creationTimeSeconds) < 24
+            }.toMutableList()
 
         val newSuspects = mutableListOf<CodeforcesBlogEntry>()
         recentBlogs.forEach { blog ->
             if(blog.authorColorTag in highRated && suspects.find { it.id == blog.id } == null){
                 val creationTimeSeconds = CodeforcesUtils.getBlogCreationTimeSeconds(blog.id)
-                if(TimeUnit.SECONDS.toDays(currentTimeSeconds - creationTimeSeconds) <= 1){
+                if(TimeUnit.SECONDS.toHours(currentTimeSeconds - creationTimeSeconds) < 24){
                     newSuspects.add(blog.copy(creationTimeSeconds = creationTimeSeconds))
                 }
             }
         }
 
         suspects.addAll(newSuspects)
-        println("suspects = $suspects")
 
-        val recentBlogIDs = recentBlogs.mapTo(HashSet()){ it.id }
+        val recentBlogIDs = recentBlogs.map { it.id }
         val lost = getSavedLostBlogs(this)
             .filter { blog ->
                 TimeUnit.SECONDS.toDays(currentTimeSeconds - blog.creationTimeSeconds) <= 7
                     &&
                 blog.id !in recentBlogIDs
-            }.toHashSet()
+            }.toMutableList()
 
         saveBlogs(this, CF_LOST_SUSPECTS,
-            suspects.filter {
-                if (it.id !in recentBlogIDs) {
-                    lost.add(it)
+            suspects.filter { blog ->
+                if (blog.id !in recentBlogIDs) {
+                    lost.add(blog)
                     false
                 } else {
                     true
