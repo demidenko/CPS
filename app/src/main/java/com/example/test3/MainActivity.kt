@@ -3,15 +3,12 @@ package com.example.test3
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.AbsoluteSizeSpan
-import android.text.style.TypefaceSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.ContextCompat
@@ -47,6 +44,7 @@ class MainActivity : AppCompatActivity(){
 
         setContentView(R.layout.activity_main)
 
+        setupActionBar()
         setActionBarTitle("Competitive Programming && Solving") //"Compete, Program, Solve"
 
 
@@ -100,21 +98,24 @@ class MainActivity : AppCompatActivity(){
 
     }
 
+    private fun setupActionBar(){
+        supportActionBar?.run {
+            setDisplayShowCustomEnabled(true)
+            setDisplayShowTitleEnabled(false)
+            setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM)
+            setCustomView(R.layout.action_bar)
+        }
+    }
+
     fun setActionBarSubTitle(text: String) {
-        supportActionBar?.subtitle = SpannableString(text).apply {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P){
-                setSpan(TypefaceSpan(Typeface.MONOSPACE), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
-            }
-            setSpan(AbsoluteSizeSpan(44), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+        supportActionBar?.customView?.let{
+            it.findViewById<TextView>(R.id.action_bar_subtitle).text = text
         }
     }
 
     fun setActionBarTitle(text: String) {
-        supportActionBar?.title = SpannableString(text).apply {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P){
-                setSpan(TypefaceSpan(Typeface.MONOSPACE), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
-            }
-            setSpan(AbsoluteSizeSpan(44), 0, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+        supportActionBar?.customView?.let{
+            it.findViewById<TextView>(R.id.action_bar_title).text = text
         }
     }
 

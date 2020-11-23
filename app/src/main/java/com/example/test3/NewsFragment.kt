@@ -5,10 +5,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.ProgressBar
@@ -719,6 +716,13 @@ class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSha
             setActionBarSubTitle("::news.settings")
             navigation.visibility = View.GONE
         }
+
+        setHasOptionsMenu(true)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        menu.clear()
+        super.onPrepareOptionsMenu(menu)
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
