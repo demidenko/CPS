@@ -50,19 +50,26 @@ class AccountEditFragment(
         activity.setActionBarSubTitle("::accounts.${manager.PREFERENCES_FILE_NAME}.edit")
         activity.navigation.visibility = View.GONE
 
+        val currentUserID = manager.savedInfo.userID
 
-        val handleEditor: EditText = view.findViewById(R.id.account_edit_handle_edit)
+        val textView: TextView = view.findViewById(R.id.account_edit_userid)
 
-        handleEditor.addTextChangedListener(
-            UserIDChangeWatcher(
-                this,
-                manager,
-                handleEditor,
-                view.findViewById(R.id.account_edit_save_button),
-                view.findViewById(R.id.account_edit_user_info),
-                view.findViewById(R.id.account_edit_suggestions)
-            )
-        )
+        textView.setOnClickListener {
+            activity.scope.launch {
+                val res = activity.chooseUserID(manager) ?: return@launch
+                with(manager.loadInfo(res)){
+                    manager.savedInfo = this
+                    textView.text = userID
+                    activity.accountsFragment.panels.find { panel ->
+                        panel.manager.PREFERENCES_FILE_NAME == manager.PREFERENCES_FILE_NAME
+                    }?.show()
+                }
+
+            }
+        }
+
+        textView.text = currentUserID
+        if(currentUserID.isEmpty()) textView.callOnClick()
 
     }
 
@@ -80,13 +87,11 @@ class AccountEditFragment(
         var jobInfo: Job? = null
         var jobSuggestions: Job? = null
 
-        var savedInfo = manager.savedInfo
         var lastLoadedInfo: UserInfo? = null
 
         val suggestionsAdapter: SuggestionsItemsAdapter
 
         init {
-            handleEditor.setText(savedInfo.userID)
             preview.text = ""
 
             suggestionsAdapter = SuggestionsItemsAdapter(this)
@@ -96,22 +101,6 @@ class AccountEditFragment(
                 adapter = suggestionsAdapter
                 addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
                 setHasFixedSize(true)
-            }
-
-            saveButton.setOnClickListener {
-                if(saveButton.text == "Save"){
-                    with(lastLoadedInfo ?: return@setOnClickListener){
-                        val currentUserId = userID
-                        manager.savedInfo = this
-                        savedInfo = this
-                        saveButton.text = "Saved"
-                        handleEditor.setText(currentUserId)
-                        handleEditor.setSelection(currentUserId.length)
-                        activity.accountsFragment.panels.find { panel ->
-                            panel.manager.PREFERENCES_FILE_NAME == manager.PREFERENCES_FILE_NAME
-                        }?.show()
-                    }
-                }
             }
         }
 
@@ -129,8 +118,6 @@ class AccountEditFragment(
         var changedByChoose = false
         override fun afterTextChanged(editable: Editable?) {
             val usedId = editable?.toString() ?: return
-
-            saveButton.text = if(usedId.equals(savedInfo.userID,true)) "Saved" else "Save"
 
             if(usedId == lastLoadedInfo?.userID) return
 

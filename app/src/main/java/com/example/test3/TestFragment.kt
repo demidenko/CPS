@@ -100,7 +100,18 @@ class TestFragment : Fragment() {
             }
         }
 
-        //show running jobs
+        view.findViewById<Button>(R.id.dev_choose_handle).setOnClickListener { button -> button as Button
+            button.isEnabled = false
+
+            activity.scope.launch {
+                activity.chooseUserID(handleEditText.text.toString(), activity.accountsFragment.codeforcesAccountManager)?.let {
+                    handleEditText.setText(it)
+                }
+                button.isEnabled = true
+            }
+        }
+
+            //show running jobs
         view.findViewById<Button>(R.id.button_running_jobs).setOnClickListener {
             stuff.text = JobServicesCenter.getRunningJobServices(activity).joinToString(separator = "\n"){ info ->
                 "Job " + info.id + ": " + info.service.shortClassName.removeSuffix("JobService").removePrefix(".job_services.")
