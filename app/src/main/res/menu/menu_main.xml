@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
-        android:id="@+id/color_switcher"
-        android:title="Colors"
-        android:icon="@drawable/ic_colors"
-        />
+    <group
+        android:id="@+id/menu_group_main"
+        >
+        <item
+            android:id="@+id/color_switcher"
+            android:title="Colors"
+            android:icon="@drawable/ic_colors"
+            />
 
-    <item
-        android:id="@+id/app_info"
-        android:title="About"
-        android:icon="@drawable/ic_info"
-        />
+        <item
+            android:id="@+id/app_info"
+            android:title="About"
+            android:icon="@drawable/ic_info"
+            />
+    </group>
 
 
 </menu>

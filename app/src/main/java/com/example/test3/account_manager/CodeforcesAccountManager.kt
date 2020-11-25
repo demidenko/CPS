@@ -39,6 +39,10 @@ class CodeforcesAccountManager(context: Context): AccountManager(context) {
 
     }
 
+    override fun emptyInfo(): UserInfo {
+        return CodeforcesUserInfo(STATUS.NOT_FOUND, "")
+    }
+
     override suspend fun downloadInfo(data: String): CodeforcesUserInfo {
         val handle = data
         val res = CodeforcesUserInfo(STATUS.FAILED, handle)

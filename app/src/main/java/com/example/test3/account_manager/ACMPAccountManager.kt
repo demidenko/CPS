@@ -39,6 +39,10 @@ class ACMPAccountManager(context: Context): AccountManager(context) {
         var __cachedInfo: ACMPUserInfo? = null
     }
 
+    override fun emptyInfo(): UserInfo {
+        return ACMPUserInfo(STATUS.NOT_FOUND, "")
+    }
+
     override suspend fun downloadInfo(data: String): ACMPUserInfo {
         val res = ACMPUserInfo(STATUS.FAILED, data)
         val s = ACMPAPI.getUser(data) ?: return res

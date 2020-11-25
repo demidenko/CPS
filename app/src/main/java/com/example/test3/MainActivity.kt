@@ -2,10 +2,7 @@ package com.example.test3
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
-import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -15,18 +12,14 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.example.test3.account_manager.AccountManager
+import com.example.test3.account_manager.UserInfo
 import com.example.test3.account_manager.useRealColors
 import com.example.test3.job_services.JobServicesCenter
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.dialog_choose_userid.*
-import kotlinx.android.synthetic.main.dialog_choose_userid.view.*
 import kotlinx.coroutines.*
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
@@ -137,7 +130,7 @@ class MainActivity : AppCompatActivity(){
         when(item.itemId){
             R.id.color_switcher -> {
                 useRealColors = !useRealColors
-                accountsFragment.panels.forEach { it.show() }
+                accountsFragment.showAccounts()
                 if(newsFragment.isAdded) newsFragment.refresh()
 
                 with(getPreferences(Context.MODE_PRIVATE).edit()){
@@ -156,62 +149,17 @@ class MainActivity : AppCompatActivity(){
         return super.onOptionsItemSelected(item)
     }
 
-    class DialogAccountChooser(
-        val defaultText: String,
-        val manager: AccountManager,
-        val cont: Continuation<String?>
-    ): DialogFragment() {
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            return requireActivity().let {
-                val inflater = it.layoutInflater;
-                val view = inflater.inflate(R.layout.dialog_choose_userid, null)
-                val input = view.account_choose_input.apply {
-                    setText(defaultText)
-                }
+    suspend fun chooseUserID(manager: AccountManager) = chooseUserID(manager.savedInfo.userID, manager)
 
-                val builder = AlertDialog.Builder(it)
-                    .setTitle("getUserID(${manager.PREFERENCES_FILE_NAME})")
-                    .setView(view)
-                    .setPositiveButton("Save"){ dialod, id ->
-                        cont.resume(input.text.toString())
-                    }
-
-                builder.create()
+    suspend fun chooseUserID(initialText: String, manager: AccountManager): UserInfo? {
+        return withContext(scope.coroutineContext) {
+            suspendCoroutine { cont ->
+                val dialog = DialogAccountChooser(initialText, manager, cont)
+                dialog.show(supportFragmentManager, "account_choose")
             }
-        }
-
-        override fun onStart() {
-            super.onStart()
-            val dialog = getDialog()!! as AlertDialog
-            dialog.findViewById<TextView>(resources.getIdentifier("alertTitle", "id", "android")).typeface = Typeface.MONOSPACE
-            val input = dialog.account_choose_input
-            input.addTextChangedListener(
-                AccountEditFragment.UserIDChangeWatcher(
-                    this,
-                    manager,
-                    input,
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE),
-                    dialog.account_choose_info,
-                    dialog.account_choose_suggestions
-                )
-            )
-        }
-
-        override fun onCancel(dialog: DialogInterface) {
-            cont.resume(null)
         }
     }
 
-    suspend fun chooseUserID(defaultText: String, manager: AccountManager): String? {
-        return scope.async {
-            return@async suspendCoroutine<String?> { cont ->
-                val dialog = DialogAccountChooser(defaultText, manager, cont)
-                dialog.show(supportFragmentManager, "choose")
-            }
-        }.await()
-    }
-
-    suspend fun chooseUserID(manager: AccountManager): String? = chooseUserID(manager.savedInfo.userID, manager)
 
     override fun onSaveInstanceState(outState: Bundle) {
         println("main on save bundle")

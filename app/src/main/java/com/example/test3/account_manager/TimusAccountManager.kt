@@ -40,6 +40,10 @@ class TimusAccountManager(context: Context): AccountManager(context) {
         var __cachedInfo: TimusUserInfo? = null
     }
 
+    override fun emptyInfo(): UserInfo {
+        return TimusUserInfo(STATUS.NOT_FOUND, "")
+    }
+
     override suspend fun downloadInfo(data: String): TimusUserInfo {
         val res = TimusUserInfo(STATUS.FAILED, data)
         val s = TimusAPI.getUser(data) ?: return res

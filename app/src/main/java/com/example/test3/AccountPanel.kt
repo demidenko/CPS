@@ -21,15 +21,7 @@ abstract class AccountPanel(
     val layout = LayoutInflater.from(activity).inflate(R.layout.account_panel, null, false) as RelativeLayout
     val textMain: TextView = layout.findViewById(R.id.account_panel_textMain)
     val textAdditional: TextView = layout.findViewById(R.id.account_panel_textAdditional)
-    val linkButton: ImageButton = layout.findViewById<ImageButton>(R.id.account_panel_link_button).apply {
-        setOnClickListener {
-            val info = manager.savedInfo
-            if(info.status == STATUS.OK){
-                activity.startActivity(makeIntentOpenUrl(info.link()))
-            }
-        }
-    }
-    val settingsButton: ImageButton = layout.findViewById<ImageButton>(R.id.account_panel_settings_button).apply {
+    val expandButton: ImageButton = layout.findViewById<ImageButton>(R.id.account_panel_expand_button).apply {
         setOnClickListener {
             activity.supportFragmentManager.beginTransaction()
                 .hide(activity.accountsFragment)
@@ -63,7 +55,7 @@ abstract class AccountPanel(
             println("info = " + manager.savedInfo)
             val startDelay = 3000L
             val duration = 2000L
-            listOf(reloadButton, settingsButton, linkButton).forEach { button ->
+            listOf(reloadButton, expandButton).forEach { button ->
                 if(button.isEnabled) {
                     button.clearAnimation()
                     button.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
@@ -98,17 +90,13 @@ abstract class AccountPanel(
     suspend fun reload(){
         if(isEmpty()) return
 
-        settingsButton.isEnabled = false
-        linkButton.isEnabled = false
+        expandButton.isEnabled = false
         reloadButton.isEnabled = false
         activity.accountsFragment.sharedReloadButton.startReload(manager.PREFERENCES_FILE_NAME)
 
 
-        settingsButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
-            settingsButton.visibility = View.GONE
-        }.start()
-        linkButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
-            linkButton.visibility = View.GONE
+        expandButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
+            expandButton.visibility = View.GONE
         }.start()
 
         reloadButton.animate().setStartDelay(0).alpha(1f).setDuration(0).withStartAction {
@@ -138,8 +126,7 @@ abstract class AccountPanel(
 
         activity.accountsFragment.sharedReloadButton.stopReload(manager.PREFERENCES_FILE_NAME)
         reloadButton.isEnabled = true
-        settingsButton.isEnabled = true
-        linkButton.isEnabled = true
+        expandButton.isEnabled = true
     }
 }
 

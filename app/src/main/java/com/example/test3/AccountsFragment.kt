@@ -30,7 +30,7 @@ class AccountsFragment: Fragment() {
     lateinit var topcoderPanel: AccountPanel
     lateinit var acmpPanel: AccountPanel
     lateinit var timusPanel: AccountPanel
-    val panels: List<AccountPanel> by lazy {
+    private val panels: List<AccountPanel> by lazy {
         listOf(
             codeforcesPanel,
             atcoderPanel,
@@ -177,9 +177,13 @@ class AccountsFragment: Fragment() {
             AlertDialog.Builder(activity)
                 .setTitle("Add account")
                 .setAdapter(adapter) { _, index ->
-                    emptyPanels[index].settingsButton.callOnClick()
+                    emptyPanels[index].expandButton.callOnClick()
                 }.create().show()
         }
+    }
+
+    fun showAccounts() {
+        panels.forEach { it.show() }
     }
 
     fun reloadAccounts() {
@@ -188,6 +192,12 @@ class AccountsFragment: Fragment() {
                 launch { it.reload() }
             }
         }
+    }
+
+    fun getPanel(managerType: String): AccountPanel {
+        return panels.find { panel ->
+            panel.manager.PREFERENCES_FILE_NAME == managerType
+        } ?: throw Exception("Unknown type of manager: $managerType")
     }
 
     val sharedReloadButton by lazy { SharedReloadButton(requireActivity().navigation_accounts_reload) }

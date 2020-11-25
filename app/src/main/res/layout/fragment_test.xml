@@ -47,6 +47,8 @@
             android:layout_height="wrap_content"
             android:hint="contestID"
             android:inputType="numberDecimal"
+            android:selectAllOnFocus="true"
+            android:imeOptions="actionDone"
             />
 
         <com.google.android.material.button.MaterialButton
@@ -63,6 +65,7 @@
             android:hint="handle"
             android:inputType="textPersonName"
             android:selectAllOnFocus="true"
+            android:imeOptions="actionDone"
             />
 
         <com.google.android.material.button.MaterialButton

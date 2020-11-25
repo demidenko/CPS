@@ -1,14 +1,14 @@
 package com.example.test3
 
+import android.app.AlertDialog
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -35,42 +35,85 @@ class AccountEditFragment(
         return inflater.inflate(R.layout.fragment_account_edit, container, false)
     }
 
+    val panel: AccountPanel by lazy {
+        val managerType = arguments?.getString("manager") ?: throw Exception("Unset type of manager")
+        (requireActivity() as MainActivity).accountsFragment.getPanel(managerType)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val activity = requireActivity() as MainActivity
 
-        val managerType = arguments?.getString("manager") ?: throw Exception("Unset type of manager")
-
-        val manager = activity.accountsFragment.panels
-            .find { it.manager.PREFERENCES_FILE_NAME == managerType }
-            ?.manager
-            ?: throw Exception("Unknown type of manager")
+        val manager = panel.manager
+        val currentUserID = manager.savedInfo.userID
 
         activity.setActionBarSubTitle("::accounts.${manager.PREFERENCES_FILE_NAME}.edit")
         activity.navigation.visibility = View.GONE
-
-        val currentUserID = manager.savedInfo.userID
 
         val textView: TextView = view.findViewById(R.id.account_edit_userid)
 
         textView.setOnClickListener {
             activity.scope.launch {
-                val res = activity.chooseUserID(manager) ?: return@launch
-                with(manager.loadInfo(res)){
-                    manager.savedInfo = this
-                    textView.text = userID
-                    activity.accountsFragment.panels.find { panel ->
-                        panel.manager.PREFERENCES_FILE_NAME == manager.PREFERENCES_FILE_NAME
-                    }?.show()
+                val userInfo = activity.chooseUserID(manager)
+                if(userInfo==null){
+                    if(currentUserID.isEmpty()) close()
+                }else{
+                    manager.savedInfo = userInfo
+                    textView.text = userInfo.userID
+                    panel.show()
                 }
-
             }
         }
+
+        val linkButton: ImageButton = view.findViewById<ImageButton>(R.id.account_panel_link_button).apply {
+            setOnClickListener {
+                val info = manager.savedInfo
+                if(info.status == STATUS.OK){
+                    activity.startActivity(makeIntentOpenUrl(info.link()))
+                }
+            }
+        }
+
+        setHasOptionsMenu(true)
 
         textView.text = currentUserID
         if(currentUserID.isEmpty()) textView.callOnClick()
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            menu.setGroupDividerEnabled(true)
+        }
+        inflater.inflate(R.menu.menu_account_view, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.account_delete_button -> {
+                AlertDialog.Builder(requireActivity())
+                    .setMessage("Delete ${panel.manager.PREFERENCES_FILE_NAME} account?")
+                    .setPositiveButton("YES"){ _, _ ->
+                        panel.manager.savedInfo = panel.manager.emptyInfo()
+                        panel.show()
+                        close()
+                    }
+                    .setNegativeButton("NO"){ _, _ ->
+
+                    }
+                    .create()
+                    .show()
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun close(){
+        with(requireActivity() as MainActivity){
+            onBackPressed()
+        }
     }
 
     class UserIDChangeWatcher(
@@ -117,24 +160,30 @@ class AccountEditFragment(
 
         var changedByChoose = false
         override fun afterTextChanged(editable: Editable?) {
-            val usedId = editable?.toString() ?: return
+            val userId = editable?.toString() ?: return
 
-            if(usedId == lastLoadedInfo?.userID) return
+            if(userId == lastLoadedInfo?.userID) return
 
             saveButton.isEnabled = false
             lastLoadedInfo = null
 
-            preview.text = "..."
             jobInfo?.cancel()
+            jobSuggestions?.cancel()
+            if(userId.isBlank()){
+                preview.text = ""
+                return
+            }
+
+            preview.text = "..."
             jobInfo = activity.scope.launch {
                 delay(300)
-                val info = manager.loadInfo(usedId)
-                if(usedId == editable.toString()){
+                val info = manager.loadInfo(userId)
+                if (userId == editable.toString()) {
                     preview.text = info.makeInfoString()
                     lastLoadedInfo = info
                     saveButton.isEnabled = true
                     handleEditor.backgroundTintList = ColorStateList.valueOf(
-                        if(info.status==STATUS.OK) successColor
+                        if (info.status == STATUS.OK) successColor
                         else failColor
                     )
                 }
@@ -143,15 +192,14 @@ class AccountEditFragment(
 
             if(changedByChoose) changedByChoose = false
             else {
-                if (usedId.length < 3) suggestionsAdapter.clear()
+                if (userId.length < 3) suggestionsAdapter.clear()
                 else {
                     suggestionsAdapter.loading()
-                    jobSuggestions?.cancel()
                     jobSuggestions = activity.scope.launch {
                         delay(300)
-                        val suggestions = manager.loadSuggestions(usedId)
-                        if (usedId == editable.toString()) {
-                            suggestionsAdapter.new(suggestions)
+                        val suggestions = manager.loadSuggestions(userId)
+                        if (userId == editable.toString()) {
+                            suggestionsAdapter.setData(suggestions)
                         }
                     }
                 }
@@ -190,7 +238,7 @@ class AccountEditFragment(
 
             private var data : List<Triple<String,String,String>> = emptyList()
 
-            fun new(suggestions: List<Triple<String,String,String>>?){
+            fun setData(suggestions: List<Triple<String,String,String>>?){
                 data = suggestions ?: emptyList()
                 notifyDataSetChanged()
             }

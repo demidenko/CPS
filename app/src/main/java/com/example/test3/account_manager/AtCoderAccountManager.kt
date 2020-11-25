@@ -62,6 +62,9 @@ class AtCoderAccountManager(context: Context): AccountManager(context) {
         }
     }
 
+    override fun emptyInfo(): UserInfo {
+        return AtCoderUserInfo(STATUS.NOT_FOUND, "")
+    }
 
     override suspend fun downloadInfo(data: String): UserInfo {
         val handle = data
