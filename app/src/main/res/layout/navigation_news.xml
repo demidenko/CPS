@@ -19,20 +19,6 @@
         />
 
     <ImageButton
-        android:id="@+id/navigation_news_settings"
-        android:tooltipText="settings"
-        android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        app:layout_constraintWidth_percent="0.25"
-        android:src="@drawable/ic_settings"
-        android:backgroundTint="@android:color/transparent"
-        android:foreground="?android:attr/actionBarItemBackground"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        />
-
-    <ImageButton
         android:id="@+id/navigation_news_lost_update_info"
         android:tooltipText="update info"
         android:layout_height="wrap_content"

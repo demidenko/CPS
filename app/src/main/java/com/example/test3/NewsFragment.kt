@@ -138,15 +138,10 @@ class NewsFragment : Fragment() {
             }
         })
 
+        setHasOptionsMenu(true)
+
         with(requireActivity() as MainActivity){
             navigation_news_reload.setOnClickListener { reloadTabs() }
-            navigation_news_settings.setOnClickListener {
-                supportFragmentManager.beginTransaction()
-                    .hide(newsFragment)
-                    .add(android.R.id.content, SettingsNewsFragment())
-                    .addToBackStack(null)
-                    .commit()
-            }
             navigation_news_lost_update_info.setOnClickListener { updateLostInfo() }
             navigation_news_recent_swap.setOnClickListener {
                 val fragment = codeforcesNewsAdapter.fragments.find { it.title == CodeforcesTitle.RECENT } ?: return@setOnClickListener
@@ -156,6 +151,29 @@ class NewsFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            menu.setGroupDividerEnabled(true)
+        }
+        inflater.inflate(R.menu.menu_news, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.menu_news_settings_button -> {
+                with(requireActivity() as MainActivity) {
+                    supportFragmentManager.beginTransaction()
+                        .hide(newsFragment)
+                        .add(android.R.id.content, SettingsNewsFragment())
+                        .addToBackStack(null)
+                        .commit()
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun getContentLanguage() = with(PreferenceManager.getDefaultSharedPreferences(context)){
@@ -711,11 +729,11 @@ fun timeRUtoEN(time: String): String{
 class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         with(requireActivity() as MainActivity){
             setActionBarSubTitle("::news.settings")
             navigation.visibility = View.GONE
         }
+        super.onViewCreated(view, savedInstanceState)
 
         setHasOptionsMenu(true)
     }
