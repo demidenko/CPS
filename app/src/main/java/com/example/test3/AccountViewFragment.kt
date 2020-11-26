@@ -8,23 +8,28 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.STATUS
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.launch
 
-class AccountEditFragment(
+class AccountViewFragment(): Fragment() {
 
-): Fragment() {
+    companion object {
+        const val tag = "account_view"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_account_edit, container, false)
+        return inflater.inflate(R.layout.fragment_account_view, container, false)
     }
 
-    val panel: AccountPanel by lazy {
+    private val panel: AccountPanel by lazy {
         val managerType = arguments?.getString("manager") ?: throw Exception("Unset type of manager")
         (requireActivity() as MainActivity).accountsFragment.getPanel(managerType)
+    }
+
+    private val userInfoTextView by lazy {
+        requireView().findViewById<TextView>(R.id.account_user_info)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -33,25 +38,11 @@ class AccountEditFragment(
         val activity = requireActivity() as MainActivity
 
         val manager = panel.manager
-        val currentUserID = manager.savedInfo.userID
 
-        activity.setActionBarSubTitle("::accounts.${manager.PREFERENCES_FILE_NAME}.edit")
+        val subtitle = "::accounts.${manager.PREFERENCES_FILE_NAME}"
+        setFragmentSubTitle(this, subtitle)
+        activity.setActionBarSubTitle(subtitle)
         activity.navigation.visibility = View.GONE
-
-        val textView: TextView = view.findViewById(R.id.account_edit_userid)
-
-        textView.setOnClickListener {
-            activity.scope.launch {
-                val userInfo = activity.chooseUserID(manager)
-                if(userInfo==null){
-                    if(currentUserID.isEmpty()) close()
-                }else{
-                    manager.savedInfo = userInfo
-                    textView.text = userInfo.userID
-                    panel.show()
-                }
-            }
-        }
 
         val linkButton: ImageButton = view.findViewById<ImageButton>(R.id.account_panel_link_button).apply {
             setOnClickListener {
@@ -64,8 +55,10 @@ class AccountEditFragment(
 
         setHasOptionsMenu(true)
 
-        textView.text = currentUserID
-        if(currentUserID.isEmpty()) textView.callOnClick()
+        with(manager.savedInfo){
+            userInfoTextView.text = toString()
+            if(userID.isEmpty()) openSettings()
+        }
 
     }
 
@@ -79,28 +72,39 @@ class AccountEditFragment(
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.account_delete_button -> {
-                AlertDialog.Builder(requireActivity())
-                    .setMessage("Delete ${panel.manager.PREFERENCES_FILE_NAME} account?")
-                    .setPositiveButton("YES"){ _, _ ->
-                        panel.manager.savedInfo = panel.manager.emptyInfo()
-                        panel.show()
-                        close()
-                    }
-                    .setNegativeButton("NO"){ _, _ ->
-
-                    }
-                    .create()
-                    .show()
-            }
+            R.id.menu_account_delete_button -> deleteAccount()
+            R.id.menu_account_settings_button -> openSettings()
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun close(){
-        with(requireActivity() as MainActivity){
-            onBackPressed()
-        }
+    fun show(){
+        userInfoTextView.text = panel.manager.savedInfo.toString()
+    }
+
+    private fun deleteAccount(){
+        AlertDialog.Builder(requireActivity())
+            .setMessage("Delete ${panel.manager.PREFERENCES_FILE_NAME} account?")
+            .setPositiveButton("YES"){ _, _ ->
+                panel.manager.savedInfo = panel.manager.emptyInfo()
+                panel.show()
+                requireActivity().onBackPressed()
+            }
+            .setNegativeButton("NO"){ _, _ -> }
+            .create()
+            .show()
+    }
+
+    private fun openSettings(){
+        val activity = requireActivity() as MainActivity
+        val managerType = panel.manager.PREFERENCES_FILE_NAME
+        activity.supportFragmentManager.beginTransaction()
+            .hide(this)
+            .add(android.R.id.content, AccountSettingsFragment().apply {
+                arguments = Bundle().apply { putString("manager", managerType) }
+            })
+            .addToBackStack(null)
+            .commit()
     }
 
 }

@@ -28,6 +28,7 @@
         android:tint="@color/textColor"
         android:visibility="gone"
         android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
         />
 
     <ImageButton
@@ -41,6 +42,7 @@
         android:tint="@color/textColor"
         android:visibility="gone"
         android:layout_toStartOf="@id/account_panel_reload_button"
+        android:layout_centerVertical="true"
         />
 
 </RelativeLayout>

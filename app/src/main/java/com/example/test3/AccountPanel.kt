@@ -12,6 +12,7 @@ import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 
 abstract class AccountPanel(
@@ -25,9 +26,9 @@ abstract class AccountPanel(
         setOnClickListener {
             activity.supportFragmentManager.beginTransaction()
                 .hide(activity.accountsFragment)
-                .add(android.R.id.content, AccountEditFragment().apply {
+                .add(android.R.id.content, AccountViewFragment().apply {
                     arguments = Bundle().apply { putString("manager", manager.PREFERENCES_FILE_NAME) }
-                })
+                }, AccountViewFragment.tag)
                 .addToBackStack(null)
                 .commit()
         }
@@ -52,9 +53,8 @@ abstract class AccountPanel(
         additionalBuild()
 
         layout.setOnClickListener {
-            println("info = " + manager.savedInfo)
-            val startDelay = 3000L
-            val duration = 2000L
+            val startDelay = TimeUnit.SECONDS.toMillis(3)
+            val duration = TimeUnit.SECONDS.toMillis(2)
             listOf(reloadButton, expandButton).forEach { button ->
                 if(button.isEnabled) {
                     button.clearAnimation()
