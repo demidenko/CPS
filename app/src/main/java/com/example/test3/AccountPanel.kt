@@ -87,13 +87,22 @@ abstract class AccountPanel(
         show(manager.savedInfo)
     }
 
-    suspend fun reload(){
-        if(isEmpty()) return
-
+    fun block(){
         expandButton.isEnabled = false
         reloadButton.isEnabled = false
         activity.accountsFragment.sharedReloadButton.startReload(manager.PREFERENCES_FILE_NAME)
+    }
 
+    fun unblock(){
+        activity.accountsFragment.sharedReloadButton.stopReload(manager.PREFERENCES_FILE_NAME)
+        reloadButton.isEnabled = true
+        expandButton.isEnabled = true
+    }
+
+    suspend fun reload(){
+        if(isEmpty()) return
+
+        block()
 
         expandButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
             expandButton.visibility = View.GONE
@@ -123,10 +132,7 @@ abstract class AccountPanel(
             reloadButton.setColorFilter(activity.resources.getColor(R.color.reload_fail, null))
         }
 
-
-        activity.accountsFragment.sharedReloadButton.stopReload(manager.PREFERENCES_FILE_NAME)
-        reloadButton.isEnabled = true
-        expandButton.isEnabled = true
+        unblock()
     }
 }
 

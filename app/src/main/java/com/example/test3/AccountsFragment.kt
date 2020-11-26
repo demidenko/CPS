@@ -11,10 +11,13 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.*
+import com.example.test3.utils.CListUtils
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.SharedReloadButton
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.navigation_accounts.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 
 class AccountsFragment: Fragment() {
@@ -167,18 +170,44 @@ class AccountsFragment: Fragment() {
     fun addAccount() {
         val emptyPanels = panels.filter { it.isEmpty() }
 
-        if(emptyPanels.isEmpty()) Toast.makeText(requireActivity(), "Nothing to add", Toast.LENGTH_SHORT).show()
-        else{
-            val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item)
-            emptyPanels.forEach {
-                adapter.add(it.manager.PREFERENCES_FILE_NAME)
-            }
+        val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item)
+        emptyPanels.forEach {
+            adapter.add(it.manager.PREFERENCES_FILE_NAME)
+        }
 
-            AlertDialog.Builder(activity)
-                .setTitle("Add account")
-                .setAdapter(adapter) { _, index ->
-                    emptyPanels[index].expandButton.callOnClick()
-                }.create().show()
+        adapter.add("Import from clist.by")
+
+        AlertDialog.Builder(activity)
+            .setTitle("Add account")
+            .setAdapter(adapter) { _, index ->
+                if(index == emptyPanels.size) clistImport()
+                else emptyPanels[index].expandButton.callOnClick()
+            }.create().show()
+    }
+
+    private fun clistImport() {
+        val activity = requireActivity() as MainActivity
+        activity.scope.launch {
+            val clistUserInfo = activity.chooseUserID("", CListAccountManager(activity)) ?: return@launch
+
+            activity.navigation_accounts_add.isEnabled = false
+
+            clistUserInfo as CListAccountManager.CListUserInfo
+            clistUserInfo.accounts.mapNotNull { (resource, userData) ->
+                val (manager, userID) = CListUtils.getManager(resource, userData.first, userData.second, activity) ?: return@mapNotNull null
+                val panel = getPanel(manager.PREFERENCES_FILE_NAME)
+                panel.block()
+                async {
+                    val userInfo = manager.loadInfo(userID)
+                    manager.savedInfo = userInfo
+                    panel.show()
+                    panel.unblock()
+                }
+            }.awaitAll()
+
+            activity.navigation_accounts_add.isEnabled = true
+
+            Toast.makeText(activity,"Import finished", Toast.LENGTH_LONG).show()
         }
     }
 
