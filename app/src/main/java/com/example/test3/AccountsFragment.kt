@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.*
@@ -28,19 +29,22 @@ class AccountsFragment: Fragment() {
     lateinit var acmpAccountManager: ACMPAccountManager
     lateinit var timusAccountManager: TimusAccountManager
 
-    lateinit var codeforcesPanel: AccountPanel
-    lateinit var atcoderPanel: AccountPanel
-    lateinit var topcoderPanel: AccountPanel
-    lateinit var acmpPanel: AccountPanel
-    lateinit var timusPanel: AccountPanel
-    private val panels: List<AccountPanel> by lazy {
+    private lateinit var codeforcesPanel: AccountPanel
+    private lateinit var atcoderPanel: AccountPanel
+    private lateinit var topcoderPanel: AccountPanel
+    private lateinit var acmpPanel: AccountPanel
+    private lateinit var timusPanel: AccountPanel
+    private val panels by lazy {
         listOf(
             codeforcesPanel,
             atcoderPanel,
             topcoderPanel,
             acmpPanel,
             timusPanel
-        )
+        ).apply {
+            if(this.map { it.manager.PREFERENCES_FILE_NAME }.distinct().size != this.size)
+                throw Exception("not different file names in panels managers")
+        }
     }
 
 
@@ -51,9 +55,13 @@ class AccountsFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         println("fragment accounts onCreateView $savedInstanceState")
-        val view = inflater.inflate(R.layout.fragment_accounts, container, false)
-        val activity = requireActivity() as MainActivity
+        return inflater.inflate(R.layout.fragment_accounts, container, false)
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        println("fragment accounts onViewCreated "+savedInstanceState)
+
+        val activity = requireActivity() as MainActivity
 
         codeforcesAccountManager = CodeforcesAccountManager(activity)
         codeforcesPanel = object : AccountPanel(activity, codeforcesAccountManager){
@@ -68,7 +76,6 @@ class AccountsFragment: Fragment() {
                 }else{
                     textMain.typeface = Typeface.DEFAULT
                 }
-                activity.window.statusBarColor = color ?: Color.TRANSPARENT
             }
         }
 
@@ -140,28 +147,15 @@ class AccountsFragment: Fragment() {
             }
         }
 
-
-        if(panels.map { it.manager.PREFERENCES_FILE_NAME }.distinct().size != panels.size) throw Exception("not different file names in panels managers")
-
         codeforcesPanel.buildAndAdd(30F, 25F, view)
         atcoderPanel.buildAndAdd(30F, 25F, view)
         topcoderPanel.buildAndAdd(30F, 25F, view)
         acmpPanel.buildAndAdd(17F, 14F, view)
         timusPanel.buildAndAdd(17F, 14F, view)
 
+        showPanels()
 
-
-
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        println("fragment accounts onViewCreated "+savedInstanceState)
-        super.onViewCreated(view, savedInstanceState)
-
-        panels.forEach { it.show() }
-
-        with(requireActivity() as MainActivity){
+        with(activity){
             navigation_accounts_reload.setOnClickListener { reloadAccounts() }
             navigation_accounts_add.setOnClickListener { addAccount() }
         }
@@ -181,7 +175,7 @@ class AccountsFragment: Fragment() {
             .setTitle("Add account")
             .setAdapter(adapter) { _, index ->
                 if(index == emptyPanels.size) clistImport()
-                else emptyPanels[index].expandButton.callOnClick()
+                else emptyPanels[index].callExpand()
             }.create().show()
     }
 
@@ -211,7 +205,27 @@ class AccountsFragment: Fragment() {
         }
     }
 
-    fun showAccounts() {
+    fun updateUI(){
+        var allEmpty = true
+        var statusBarColor: Int = Color.TRANSPARENT
+        panels.forEach { panel ->
+            if(!panel.isEmpty()){
+                allEmpty = false
+                with(panel.manager){
+                    getColor(savedInfo)?.let {
+                        if(statusBarColor == Color.TRANSPARENT){
+                            statusBarColor = it
+                        }
+                    }
+                }
+            }
+        }
+        //println("update UI: $allEmpty $statusBarColor")
+        requireView().findViewById<TextView>(R.id.accounts_welcome_text).visibility = if(allEmpty) View.VISIBLE else View.GONE
+        requireActivity().window.statusBarColor = statusBarColor
+    }
+
+    fun showPanels() {
         panels.forEach { it.show() }
     }
 
@@ -240,14 +254,5 @@ class AccountsFragment: Fragment() {
         super.onHiddenChanged(hidden)
     }
 
-    override fun onResume() {
-        super.onResume()
-        println("AccountsFragment onResume")
-    }
-
-    override fun onDestroyView() {
-        println("fragment accounts onDestroyView")
-        super.onDestroyView()
-    }
 
 }

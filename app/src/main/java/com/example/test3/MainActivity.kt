@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity(){
         when(item.itemId){
             R.id.color_switcher -> {
                 useRealColors = !useRealColors
-                accountsFragment.showAccounts()
+                accountsFragment.showPanels()
                 if(newsFragment.isAdded) newsFragment.refresh()
 
                 with(getPreferences(Context.MODE_PRIVATE).edit()){

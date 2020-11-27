@@ -22,18 +22,10 @@ abstract class AccountPanel(
     val layout = LayoutInflater.from(activity).inflate(R.layout.account_panel, null, false) as RelativeLayout
     val textMain: TextView = layout.findViewById(R.id.account_panel_textMain)
     val textAdditional: TextView = layout.findViewById(R.id.account_panel_textAdditional)
-    val expandButton: ImageButton = layout.findViewById<ImageButton>(R.id.account_panel_expand_button).apply {
-        setOnClickListener {
-            activity.supportFragmentManager.beginTransaction()
-                .hide(activity.accountsFragment)
-                .add(android.R.id.content, AccountViewFragment().apply {
-                    arguments = Bundle().apply { putString("manager", manager.PREFERENCES_FILE_NAME) }
-                }, AccountViewFragment.tag)
-                .addToBackStack(null)
-                .commit()
-        }
+    private val expandButton: ImageButton = layout.findViewById<ImageButton>(R.id.account_panel_expand_button).apply {
+        setOnClickListener { callExpand() }
     }
-    val reloadButton = layout.findViewById<ImageButton>(R.id.account_panel_reload_button).apply {
+    private val reloadButton = layout.findViewById<ImageButton>(R.id.account_panel_reload_button).apply {
         setOnClickListener {
             activity.scope.launch { reload() }
         }
@@ -45,10 +37,8 @@ abstract class AccountPanel(
         textMain.setTextSize(TypedValue.COMPLEX_UNIT_SP, textMainSize)
         textAdditional.setTextSize(TypedValue.COMPLEX_UNIT_SP, textAdditionalSize)
 
-        view.findViewById<LinearLayout>(R.id.panels_layout).addView(layout, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
-            val pix = 30
-            setMargins(pix, pix, pix, 0)
-        })
+        view.findViewById<LinearLayout>(R.id.panels_layout)
+            .addView(layout, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
 
         additionalBuild()
 
@@ -81,10 +71,11 @@ abstract class AccountPanel(
     fun show(){
         if(isEmpty()){
             layout.visibility = View.GONE
-            return
+        }else {
+            layout.visibility = View.VISIBLE
+            show(manager.savedInfo)
         }
-        layout.visibility = View.VISIBLE
-        show(manager.savedInfo)
+        activity.accountsFragment.updateUI()
     }
 
     fun block(){
@@ -114,25 +105,35 @@ abstract class AccountPanel(
         }.start()
         reloadButton.startAnimation(rotateAnimation)
 
-        //textAdditional.text = "..."
+
         val savedInfo = manager.savedInfo
         val info = manager.loadInfo(savedInfo.userID)
 
         if(info.status != STATUS.FAILED){
             manager.savedInfo = info
-            show(info)
+            show()
             reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {
                 reloadButton.clearAnimation()
                 reloadButton.visibility = View.GONE
             }.start()
         }else{
-            show(savedInfo)
+            show()
             Toast.makeText(activity, "${manager.PREFERENCES_FILE_NAME} load error", Toast.LENGTH_LONG).show()
             reloadButton.clearAnimation()
             reloadButton.setColorFilter(activity.resources.getColor(R.color.reload_fail, null))
         }
 
         unblock()
+    }
+
+    fun callExpand(){
+        activity.supportFragmentManager.beginTransaction()
+            .hide(activity.accountsFragment)
+            .add(android.R.id.content, AccountViewFragment().apply {
+                arguments = Bundle().apply { putString("manager", manager.PREFERENCES_FILE_NAME) }
+            }, AccountViewFragment.tag)
+            .addToBackStack(null)
+            .commit()
     }
 }
 
