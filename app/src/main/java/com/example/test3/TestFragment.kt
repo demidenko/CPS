@@ -19,7 +19,10 @@ import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesAPIStatus
 import com.example.test3.utils.CodeforcesContest
 import com.example.test3.utils.CodeforcesUtils
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 class TestFragment : Fragment() {
@@ -171,6 +174,21 @@ class TestFragment : Fragment() {
             }
 
             useRealColors = backup
+        }
+
+        val rnd = Random()
+        var iter = 0
+        view.findViewById<Button>(R.id.button_test_add_bar).setOnClickListener { button -> button as Button
+            val t = (rnd.nextInt(10) + 1) * 1000L
+
+            val v = activity.layoutInflater.inflate(R.layout.progress_bottom_info, null)
+            v.findViewById<TextView>(R.id.progress_bottom_info_title).text = t.toString()
+
+            activity.progress_bar_holder.addView(v)
+            activity.scope.launch {
+                delay(t)
+                activity.progress_bar_holder.removeView(v)
+            }
         }
     }
 }

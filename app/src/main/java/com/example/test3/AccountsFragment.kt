@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.*
 import com.example.test3.utils.CListUtils
@@ -182,13 +181,17 @@ class AccountsFragment: Fragment() {
     private fun clistImport() {
         val activity = requireActivity() as MainActivity
         activity.scope.launch {
-            val clistUserInfo = activity.chooseUserID("", CListAccountManager(activity)) ?: return@launch
+            val clistUserInfo = activity.chooseUserID("", CListAccountManager(activity)) as? CListAccountManager.CListUserInfo ?: return@launch
 
             activity.navigation_accounts_add.isEnabled = false
 
-            clistUserInfo as CListAccountManager.CListUserInfo
-            clistUserInfo.accounts.mapNotNull { (resource, userData) ->
-                val (manager, userID) = CListUtils.getManager(resource, userData.first, userData.second, activity) ?: return@mapNotNull null
+            val supported = clistUserInfo.accounts.mapNotNull { (resource, userData) ->
+                CListUtils.getManager(resource, userData.first, userData.second, activity)
+            }
+
+            val progressInfo = BottomProgressInfo(supported.size, "clist import", activity)
+
+            supported.map { (manager, userID) ->
                 val panel = getPanel(manager.PREFERENCES_FILE_NAME)
                 panel.block()
                 async {
@@ -196,12 +199,12 @@ class AccountsFragment: Fragment() {
                     manager.savedInfo = userInfo
                     panel.show()
                     panel.unblock()
+                    progressInfo.increment()
                 }
             }.awaitAll()
 
+            progressInfo.finish()
             activity.navigation_accounts_add.isEnabled = true
-
-            Toast.makeText(activity,"Import finished", Toast.LENGTH_LONG).show()
         }
     }
 

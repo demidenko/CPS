@@ -2,6 +2,8 @@ package com.example.test3.job_services
 
 import android.content.Context
 import androidx.preference.PreferenceManager
+import com.example.test3.BottomProgressInfo
+import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.utils.*
 import kotlinx.coroutines.launch
@@ -43,11 +45,11 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
             out.close()
         }
 
-        suspend fun updateInfo(context: Context, progressListener: ProgressListener?) {
+        suspend fun updateInfo(context: Context) {
             val blogEntries = getSavedLostBlogs(context)
                 .toTypedArray()
 
-            progressListener?.onStart(blogEntries.size)
+            val progressInfo = BottomProgressInfo(blogEntries.size, "update lost info", context as MainActivity)
 
             CodeforcesAPI.getUsers(blogEntries.map { it.authorHandle })?.result?.let { users ->
                 for(i in blogEntries.indices) {
@@ -73,7 +75,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                             blogEntries[index] = blogEntry.copy(title = fromHTML(title).toString())
                         }
                     }
-                    progressListener?.onIncrement()
+                    progressInfo.increment()
                 }
             }
 
@@ -83,7 +85,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                 blogEntries.filterNot { blogIDsToRemove.contains(it.id) }
             )
 
-            progressListener?.onFinish()
+            progressInfo.finish()
         }
     }
 

@@ -8,7 +8,6 @@ import android.text.SpannableStringBuilder
 import android.view.*
 import android.widget.ImageView
 import android.widget.PopupMenu
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.color
@@ -245,20 +244,7 @@ class NewsFragment : Fragment() {
         activity.scope.launch {
             reloadFragment(fragment, tab, ""){
                 updateLostInfoButton.isEnabled = false
-                CodeforcesNewsLostRecentJobService.updateInfo(activity, object : ProgressListener{
-                    val progressBar: ProgressBar = fragment.requireView().findViewById(R.id.cf_news_page_progressbar)
-                    override fun onStart(max: Int) {
-                        progressBar.max = max
-                        progressBar.progress = 0
-                        progressBar.visibility = View.VISIBLE
-                    }
-                    override fun onIncrement() {
-                        progressBar.incrementProgressBy(1)
-                    }
-                    override fun onFinish() {
-                        progressBar.visibility = View.GONE
-                    }
-                })
+                CodeforcesNewsLostRecentJobService.updateInfo(activity)
                 updateLostInfoButton.isEnabled = true
             }
         }

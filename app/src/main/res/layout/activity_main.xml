@@ -20,6 +20,16 @@
 
 
     <LinearLayout
+        android:clickable="true"
+        android:id="@+id/progress_bar_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/navigation"
+        android:orientation="vertical"
+        >
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -110,6 +110,12 @@
             android:layout_height="wrap_content"
             android:text="colors"
             />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_test_add_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+bar"
+            />
     </LinearLayout>
 
 
