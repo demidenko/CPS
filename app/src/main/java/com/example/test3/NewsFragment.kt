@@ -363,7 +363,7 @@ class CodeforcesNewsFragment(
     }
 
     fun refresh(){
-        viewAdapter.notifyDataSetChanged()
+        viewAdapter.refresh()
     }
 
     companion object {
@@ -384,6 +384,10 @@ abstract class CodeforcesNewsItemsAdapter: RecyclerView.Adapter<RecyclerView.Vie
     protected lateinit var activity: MainActivity
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         activity = recyclerView.context as MainActivity
+    }
+
+    open fun refresh(){
+        notifyDataSetChanged()
     }
 }
 
@@ -519,12 +523,27 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         val author: String,
         val authorColorTag: String,
         val lastCommentId: Long,
-        val commentators: List<Spannable>
+        var commentators: List<Spannable>
     )
 
     private var rows: Array<BlogInfo> = emptyArray()
     private var rowsComments: Array<CodeforcesRecentAction> = emptyArray()
     private val blogComments = mutableMapOf<Int, MutableList<CodeforcesComment>>()
+
+    private fun calculateCommentatorsSpans(blogID: Int): List<Spannable> {
+        return blogComments[blogID]
+            ?.distinctBy { it.commentatorHandle }
+            ?.map { comment ->
+                CodeforcesUtils.makeSpan(comment.commentatorHandle,comment.commentatorHandleColorTag)
+            } ?: emptyList()
+    }
+
+    override fun refresh() {
+        rows.forEachIndexed { index, blogInfo ->
+            rows[index].commentators = calculateCommentatorsSpans(blogInfo.blogId)
+        }
+        super.refresh()
+    }
 
     override fun parseData(s: String): Boolean {
         val (blogs, comments) = CodeforcesUtils.parseRecentActionsPage(s)
@@ -535,11 +554,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         }
 
         val res = blogs.map { blog ->
-            val commentators = blogComments[blog.id]
-                ?.distinctBy { it.commentatorHandle }
-                ?.map { comment ->
-                    CodeforcesUtils.makeSpan(comment.commentatorHandle,comment.commentatorHandleColorTag)
-                } ?: emptyList()
+            val commentators = calculateCommentatorsSpans(blog.id)
             val lastCommentId = blogComments[blog.id]?.first()?.id ?: -1
             BlogInfo(blog.id,blog.title,blog.authorHandle,blog.authorColorTag,lastCommentId,commentators)
         }

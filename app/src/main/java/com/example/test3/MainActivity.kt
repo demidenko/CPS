@@ -123,6 +123,7 @@ class MainActivity : AppCompatActivity(){
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         (menu as? MenuBuilder)?.setOptionalIconsVisible(true)
         menuInflater.inflate(R.menu.menu_main, menu)
+        menu?.getItem(0)?.isChecked = useRealColors
         return true
     }
 
@@ -130,6 +131,7 @@ class MainActivity : AppCompatActivity(){
         when(item.itemId){
             R.id.color_switcher -> {
                 useRealColors = !useRealColors
+                item.isChecked = useRealColors
                 accountsFragment.showPanels()
                 if(newsFragment.isAdded) newsFragment.refresh()
 
