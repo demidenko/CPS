@@ -120,7 +120,14 @@ class DialogAccountChooser(
 
         }
 
-        var changedByChoose = false
+        private var changedByChoose = false
+
+        fun selectSuggestion(userID: String) {
+            changedByChoose = true
+            handleEditor.setText(userID)
+            handleEditor.setSelection(userID.length)
+        }
+
         override fun afterTextChanged(editable: Editable?) {
             val userId = editable?.toString() ?: return
 
@@ -136,9 +143,11 @@ class DialogAccountChooser(
                 return
             }
 
+            val isSelectedSuggestion = changedByChoose
+
             preview.text = "..."
             jobInfo = activity.scope.launch {
-                delay(300)
+                if(!isSelectedSuggestion) delay(300)
                 val info = manager.loadInfo(userId)
                 if (userId == editable.toString()) {
                     preview.text = info.makeInfoString()
@@ -152,7 +161,7 @@ class DialogAccountChooser(
             }
 
 
-            if(changedByChoose) changedByChoose = false
+            if(isSelectedSuggestion) changedByChoose = false
             else {
                 if (userId.length < 3) suggestionsAdapter.clear()
                 else {
@@ -168,53 +177,52 @@ class DialogAccountChooser(
             }
         }
 
-        class SuggestionsItemsAdapter(val watcher: UserIDChangeWatcher) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+    }
 
-            class Holder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
-                val title: TextView = view.findViewById(R.id.suggestions_item_title)
-                val info: TextView = view.findViewById(R.id.suggestions_item_info)
-            }
 
-            override fun onCreateViewHolder(
-                parent: ViewGroup,
-                viewType: Int
-            ): RecyclerView.ViewHolder {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.account_suggestions_item, parent, false) as ConstraintLayout
-                return Holder(view)
-            }
+    class SuggestionsItemsAdapter(val watcher: UserIDChangeWatcher) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
-            override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-                with(holder as Holder){
-                    val (title, info, userId) = data[position]
-                    this.title.text = title
-                    this.info.text = info
-                    view.setOnClickListener {
-                        watcher.changedByChoose = true
-                        watcher.handleEditor.setText(userId)
-                        watcher.handleEditor.setSelection(userId.length)
-                    }
+        class Holder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
+            val title: TextView = view.findViewById(R.id.suggestions_item_title)
+            val info: TextView = view.findViewById(R.id.suggestions_item_info)
+        }
+
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): RecyclerView.ViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.account_suggestions_item, parent, false) as ConstraintLayout
+            return Holder(view)
+        }
+
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            with(holder as Holder){
+                val (title, info, userId) = data[position]
+                this.title.text = title
+                this.info.text = info
+                view.setOnClickListener {
+                    watcher.selectSuggestion(userId)
                 }
             }
+        }
 
-            override fun getItemCount(): Int = data.size
+        override fun getItemCount(): Int = data.size
 
-            private var data : List<Triple<String,String,String>> = emptyList()
+        private var data : List<Triple<String,String,String>> = emptyList()
 
-            fun setData(suggestions: List<Triple<String,String,String>>?){
-                data = suggestions ?: emptyList()
-                notifyDataSetChanged()
-            }
+        fun setData(suggestions: List<Triple<String,String,String>>?){
+            data = suggestions ?: emptyList()
+            notifyDataSetChanged()
+        }
 
-            fun clear(){
-                data = emptyList()
-                notifyDataSetChanged()
-            }
+        fun clear(){
+            data = emptyList()
+            notifyDataSetChanged()
+        }
 
-            fun loading(){
-                clear()
-            }
-
+        fun loading(){
+            clear()
         }
 
     }
