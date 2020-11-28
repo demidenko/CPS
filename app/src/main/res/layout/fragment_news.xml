@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/cf_news_tab_layout"
-        android:layout_width="fill_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/cf_news_logo"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@id/cf_news_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:tabInlineLabel="true"
         app:tabTextColor="@color/textColorAdditional"
         app:tabSelectedTextColor="@color/textColor"
@@ -21,9 +24,10 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/cf_news_pager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/cf_news_tab_layout"
-        android:layout_alignParentBottom="true"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/cf_news_tab_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_weight="1"
         />
 
     <ImageView
@@ -31,11 +35,11 @@
         android:layout_width="20sp"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_cf_logo"
-        android:layout_alignTop="@id/cf_news_tab_layout"
-        android:layout_alignBottom="@id/cf_news_tab_layout"
+        app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="6dp"
-
+        app:layout_constraintTop_toTopOf="@id/cf_news_tab_layout"
+        app:layout_constraintBottom_toBottomOf="@id/cf_news_tab_layout"
         />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
