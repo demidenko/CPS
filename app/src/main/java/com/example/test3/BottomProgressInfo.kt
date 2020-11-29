@@ -14,15 +14,19 @@ class BottomProgressInfo(val size: Int, val title: String, private val activity:
     private val progressBar = view.findViewById<ProgressBar>(R.id.progress_bottom_info_bar)
 
     init {
-        progressBar.max = size
-        progressBar.progress = 0
-        activity.progress_bar_holder.addView(view)
+        if(size>0) {
+            progressBar.max = size
+            progressBar.progress = 0
+            activity.progress_bar_holder.addView(view)
+        }
     }
 
     fun finish(){
-        activity.scope.launch {
-            delay(1000)
-            activity.progress_bar_holder.removeView(view)
+        if(size>0){
+            activity.scope.launch {
+                delay(1000)
+                activity.progress_bar_holder.removeView(view)
+            }
         }
     }
 

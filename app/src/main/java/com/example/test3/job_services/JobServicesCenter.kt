@@ -7,6 +7,8 @@ import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
 import androidx.preference.PreferenceManager
+import com.example.test3.BottomProgressInfo
+import com.example.test3.MainActivity
 import com.example.test3.R
 import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
@@ -46,24 +48,27 @@ object JobServicesCenter {
         scheduler.cancel(jobID)
     }
 
-    fun startJobServices(context: Context, scope: CoroutineScope){
+    fun startJobServices(activity: MainActivity){
         val toStart = mutableMapOf<Int, (Context)->Unit >(
             JobServiceIDs.news_parsers to ::startNewsJobService,
             JobServiceIDs.accounts_parsers to ::startAccountsJobService,
             JobServiceIDs.project_euler_recent_problems to ::startProjectEulerRecentProblemsJobService
         )
-        with(PreferenceManager.getDefaultSharedPreferences(context)){
-            if(getBoolean(context.getString(R.string.news_codeforces_lost_enabled), false)) toStart[JobServiceIDs.codeforces_lost_recent_news] = ::startCodeforcesNewsLostRecentJobService
+        with(PreferenceManager.getDefaultSharedPreferences(activity)){
+            if(getBoolean(activity.getString(R.string.news_codeforces_lost_enabled), false)) toStart[JobServiceIDs.codeforces_lost_recent_news] = ::startCodeforcesNewsLostRecentJobService
         }
-        getRunningJobServices(context).forEach {
+        getRunningJobServices(activity).forEach {
             if(toStart.containsKey(it.id)) toStart.remove(it.id)
-            else stopJobService(context, it.id)
+            else stopJobService(activity, it.id)
         }
-        scope.launch {
+        activity.scope.launch {
+            val progressInfo = BottomProgressInfo(toStart.size, "start jobs", activity)
             toStart.values.shuffled().forEach { start ->
                 delay(500)
-                start(context)
+                start(activity)
+                progressInfo.increment()
             }
+            progressInfo.finish()
         }
     }
 

@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity(){
             useRealColors = getBoolean(use_real_colors, false)
         }
 
-        JobServicesCenter.startJobServices(this, scope)
+        JobServicesCenter.startJobServices(this)
 
     }
 
