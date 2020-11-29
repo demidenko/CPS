@@ -194,9 +194,9 @@ class AccountsFragment: Fragment() {
 
             supported.map { (manager, userID) ->
                 val panel = getPanel(manager.PREFERENCES_FILE_NAME)
-                while(panel.isBlocked()) delay(300)
-                panel.block()
                 async {
+                    while(panel.isBlocked()) delay(300)
+                    panel.block()
                     val userInfo = manager.loadInfo(userID)
                     manager.savedInfo = userInfo
                     panel.show()
