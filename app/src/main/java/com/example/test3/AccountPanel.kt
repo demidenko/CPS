@@ -78,6 +78,8 @@ abstract class AccountPanel(
         activity.accountsFragment.updateUI()
     }
 
+    fun isBlocked(): Boolean = !reloadButton.isEnabled
+
     fun block(){
         expandButton.isEnabled = false
         reloadButton.isEnabled = false

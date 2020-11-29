@@ -34,9 +34,3 @@ class SharedReloadButton(private val button: ImageButton) {
         if(current.isEmpty()) button.isEnabled = true
     }
 }
-
-interface ProgressListener {
-    fun onStart(max: Int)
-    fun onIncrement()
-    fun onFinish()
-}

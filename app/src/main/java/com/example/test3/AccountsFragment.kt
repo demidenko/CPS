@@ -18,6 +18,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.navigation_accounts.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class AccountsFragment: Fragment() {
@@ -193,6 +194,7 @@ class AccountsFragment: Fragment() {
 
             supported.map { (manager, userID) ->
                 val panel = getPanel(manager.PREFERENCES_FILE_NAME)
+                while(panel.isBlocked()) delay(300)
                 panel.block()
                 async {
                     val userInfo = manager.loadInfo(userID)
