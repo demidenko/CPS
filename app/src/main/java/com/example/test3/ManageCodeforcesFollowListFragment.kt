@@ -1,10 +1,7 @@
 package com.example.test3
 
 import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -80,6 +77,12 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
             buttonAdd.visibility = View.VISIBLE
         }
 
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
 
