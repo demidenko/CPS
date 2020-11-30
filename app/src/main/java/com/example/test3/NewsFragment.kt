@@ -36,6 +36,10 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 
+enum class CodeforcesTitle {
+    MAIN, TOP, RECENT, LOST, FOLLOW
+}
+
 class NewsFragment : Fragment() {
 
     override fun onCreateView(
@@ -56,9 +60,56 @@ class NewsFragment : Fragment() {
         if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.news_codeforces_lost_enabled), false)){
             fragments.add(CodeforcesNewsFragment(CodeforcesTitle.LOST, "", true, CodeforcesNewsItemsLostRecentAdapter()))
         }
+        fragments.add(0, CodeforcesNewsFragment(CodeforcesTitle.FOLLOW, "", true, CodeforcesNewsItemsFollowAdapter()))
         CodeforcesNewsAdapter(this, fragments)
     }
     private lateinit var tabLayout: TabLayout
+    private val tabSelectionListener = object : TabLayout.OnTabSelectedListener{
+
+        fun changeVisibility(fragment: CodeforcesNewsFragment, type: Int){
+            when(fragment.title){
+                CodeforcesTitle.LOST -> updateLostInfoButton.visibility = type
+                CodeforcesTitle.RECENT -> swapRecentButton.visibility = type
+                CodeforcesTitle.FOLLOW -> {
+                    listFollowButton.visibility = type
+                }
+            }
+        }
+
+        override fun onTabReselected(tab: TabLayout.Tab?) {}
+
+        override fun onTabUnselected(tab: TabLayout.Tab?) {
+            tab?.run{
+                val fragment = codeforcesNewsAdapter.fragments[position]
+                if(fragment.isManagesNewEntries) badge?.run{
+                    if(hasNumber()){
+                        isVisible = false
+                        clearNumber()
+                    }
+                }
+
+                changeVisibility(fragment, View.GONE)
+            }
+        }
+
+        override fun onTabSelected(tab: TabLayout.Tab?) {
+            tab?.run{
+                val fragment = codeforcesNewsAdapter.fragments[position]
+                if(fragment.isManagesNewEntries) badge?.run{
+                    if(hasNumber()){
+                        fragment.saveEntries()
+                    }
+                }
+
+                changeVisibility(fragment, View.VISIBLE)
+
+                val subtitle = "::news.codeforces.${fragment.title.name.toLowerCase(Locale.ENGLISH)}"
+                setFragmentSubTitle(this@NewsFragment, subtitle)
+                (requireActivity() as MainActivity).setActionBarSubTitle(subtitle)
+            }
+        }
+    }
+
     private lateinit var codeforcesNewsViewPager: ViewPager2
 
     fun refresh(){
@@ -90,52 +141,7 @@ class NewsFragment : Fragment() {
             }
         }.attach()
 
-        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                tab?.run{
-                    val fragment = codeforcesNewsAdapter.fragments[position]
-                    if(fragment.isManagesNewEntries) badge?.run{
-                        if(hasNumber()){
-                            isVisible = false
-                            clearNumber()
-                        }
-                    }
-
-                    if(fragment.title == CodeforcesTitle.LOST){
-                        updateLostInfoButton.visibility = View.GONE
-                    }
-
-                    if(fragment.title == CodeforcesTitle.RECENT){
-                        swapRecentButton.visibility = View.GONE
-                    }
-                }
-            }
-
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                tab?.run{
-                    val fragment = codeforcesNewsAdapter.fragments[position]
-                    if(fragment.isManagesNewEntries) badge?.run{
-                        if(hasNumber()){
-                            fragment.saveEntries()
-                        }
-                    }
-
-                    if(fragment.title == CodeforcesTitle.LOST){
-                        updateLostInfoButton.visibility = View.VISIBLE
-                    }
-
-                    if(fragment.title == CodeforcesTitle.RECENT){
-                        swapRecentButton.visibility = View.VISIBLE
-                    }
-
-                    val subtitle = "::news.codeforces.${fragment.title.name.toLowerCase(Locale.ENGLISH)}"
-                    setFragmentSubTitle(this@NewsFragment, subtitle)
-                    (requireActivity() as MainActivity).setActionBarSubTitle(subtitle)
-                }
-            }
-        })
+        tabLayout.addOnTabSelectedListener(tabSelectionListener)
 
         setHasOptionsMenu(true)
 
@@ -149,6 +155,7 @@ class NewsFragment : Fragment() {
                     notifyDataSetChanged()
                 }
             }
+            navigation_news_follow_list.setOnClickListener { manageCodeforcesFollowList() }
         }
     }
 
@@ -233,6 +240,8 @@ class NewsFragment : Fragment() {
 
     private val swapRecentButton by lazy { requireActivity().navigation_news_recent_swap }
     private val updateLostInfoButton by lazy { requireActivity().navigation_news_lost_update_info }
+    private val listFollowButton by lazy { requireActivity().navigation_news_follow_list }
+
     private fun updateLostInfo() {
         val activity = requireActivity() as MainActivity
 
@@ -251,15 +260,35 @@ class NewsFragment : Fragment() {
 
     }
 
+    private fun manageCodeforcesFollowList(){
+        requireActivity().supportFragmentManager.beginTransaction()
+            .hide(this)
+            .add(android.R.id.content, ManageCodeforcesFollowListFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        val defaultTab =
-            PreferenceManager.getDefaultSharedPreferences(context).getString(getString(R.string.news_codeforces_default_tab),null)
-                ?: CodeforcesTitle.TOP.name
+        val index =
+            with(codeforcesNewsAdapter.fragments){
+                val defaultTab =
+                    PreferenceManager.getDefaultSharedPreferences(context).getString(getString(R.string.news_codeforces_default_tab),null)
+                        ?: CodeforcesTitle.TOP.name
 
-        val index = codeforcesNewsAdapter.fragments.indexOfFirst { it.title.name == defaultTab }.takeIf { it!=-1 } ?: 1
-        tabLayout.selectTab(tabLayout.getTabAt(index))
+                var pos = indexOfFirst { it.title.name == defaultTab }
+                if(pos == -1)
+                    pos = indexOfFirst { it.title == CodeforcesTitle.TOP }
+
+                return@with pos
+            }
+
+        tabLayout.getTabAt(index)?.let{
+            if(it.isSelected) tabSelectionListener.onTabSelected(it)
+            else tabLayout.selectTab(tabLayout.getTabAt(index))
+        }
+
         codeforcesNewsViewPager.setCurrentItem(index, false)
 
         reloadTabs()
@@ -275,9 +304,6 @@ class NewsFragment : Fragment() {
     }
 }
 
-enum class CodeforcesTitle {
-    MAIN, TOP, RECENT, LOST
-}
 
 class CodeforcesNewsAdapter(
     parentFragment: Fragment,
@@ -689,6 +715,33 @@ class CodeforcesNewsItemsLostRecentAdapter : CodeforcesNewsItemsClassicAdapter()
                     rating = ""
                 )
             }.toTypedArray()
+
+            notifyDataSetChanged()
+        }
+
+        return true
+    }
+}
+
+class CodeforcesNewsItemsFollowAdapter : CodeforcesNewsItemsClassicAdapter() {
+    override fun parseData(s: String): Boolean {
+        val blogs = emptyList<CodeforcesBlogEntry>()
+
+        if(blogs.isNotEmpty()){
+            val currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+            rows = blogs
+                .sortedByDescending { it.creationTimeSeconds }
+                .map {
+                    Info(
+                        blogId = it.id,
+                        title = it.title,
+                        author = it.authorHandle,
+                        authorColorTag = it.authorColorTag,
+                        time = timeDifference(it.creationTimeSeconds, currentTimeSeconds),
+                        comments = "",
+                        rating = ""
+                    )
+                }.toTypedArray()
 
             notifyDataSetChanged()
         }
