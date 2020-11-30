@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
@@ -117,6 +118,10 @@ class MainActivity : AppCompatActivity(){
         supportActionBar?.customView?.let{
             it.findViewById<TextView>(R.id.action_bar_title).text = text
         }
+    }
+
+    fun showToast(title: String){
+        Toast.makeText(this, title, Toast.LENGTH_LONG).show()
     }
 
     @SuppressLint("RestrictedApi")
