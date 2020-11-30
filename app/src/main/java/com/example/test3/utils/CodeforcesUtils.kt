@@ -6,10 +6,7 @@ import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import androidx.core.text.set
-import com.example.test3.account_manager.CodeforcesAccountManager
-import com.example.test3.account_manager.ColoredHandles
-import com.example.test3.account_manager.HandleColor
-import com.example.test3.account_manager.NOT_RATED
+import com.example.test3.account_manager.*
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
@@ -219,6 +216,35 @@ object CodeforcesUtils : ColoredHandles {
     }
 
     fun makeSpan(info: CodeforcesAccountManager.CodeforcesUserInfo) = makeSpan(info.handle, getTagByRating(info.rating))
+
+    suspend fun getUsersInfo(handlesList: List<String>): List<CodeforcesAccountManager.CodeforcesUserInfo> {
+        val handles = handlesList.toMutableList()
+        while(true){
+            val response = CodeforcesAPI.getUsers(handles) ?: break
+            if(response.status == CodeforcesAPIStatus.FAILED){
+                val comment = response.comment
+                val badHandle = comment.removeSurrounding("handles: User with handle ", " not found")
+                if(badHandle != comment){
+                    handles.remove(badHandle)
+                    continue
+                }
+                break
+            }
+            return response.result?.map { codeforcesUser ->
+                CodeforcesAccountManager.CodeforcesUserInfo(
+                    status = STATUS.OK,
+                    handle = codeforcesUser.handle,
+                    rating = codeforcesUser.rating
+                )
+            } ?: emptyList()
+        }
+        return handles.map { handle ->
+            CodeforcesAccountManager.CodeforcesUserInfo(
+                status = STATUS.FAILED,
+                handle = handle
+            )
+        }
+    }
 }
 
 enum class CodeforcesAPIStatus{
@@ -567,6 +593,8 @@ object CodeforcesURLFactory {
     fun user(handle: String) = "$main/profile/$handle"
 
     fun blog(blogId: Int) = "$main/blog/entry/$blogId"
+
+    fun userBlogs(handle: String) = "$main/blog/$handle"
 
     fun comment(blogId: Int, commentId: Long) = blog(blogId) + "#comment-$commentId"
 
