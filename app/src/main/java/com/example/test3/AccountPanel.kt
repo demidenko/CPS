@@ -7,7 +7,10 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import android.widget.TextView
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
@@ -120,7 +123,7 @@ abstract class AccountPanel(
             }.start()
         }else{
             show()
-            Toast.makeText(activity, "${manager.PREFERENCES_FILE_NAME} load error", Toast.LENGTH_LONG).show()
+            activity.showToast("${manager.PREFERENCES_FILE_NAME} load error")
             reloadButton.clearAnimation()
             reloadButton.setColorFilter(activity.resources.getColor(R.color.reload_fail, null))
         }

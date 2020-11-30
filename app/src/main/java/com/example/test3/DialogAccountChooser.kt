@@ -37,18 +37,24 @@ class DialogAccountChooser(
     private lateinit var userIDChangeWatcher: UserIDChangeWatcher
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return requireActivity().let { activity ->
-            val view = activity.layoutInflater.inflate(R.layout.dialog_choose_userid, null)
+        val activity = requireActivity() as MainActivity
+        val view = activity.layoutInflater.inflate(R.layout.dialog_choose_userid, null)
 
-            val builder = AlertDialog.Builder(activity)
-                .setTitle("getUserID(${manager.PREFERENCES_FILE_NAME})")
-                .setView(view)
-                .setPositiveButton("return"){ _, _ ->
-                    cont.resume(userIDChangeWatcher.lastLoadedInfo)
+        val builder = AlertDialog.Builder(activity)
+            .setTitle("getUserID(${manager.PREFERENCES_FILE_NAME})")
+            .setView(view)
+            .setPositiveButton("return"){ _, _ ->
+                with(userIDChangeWatcher.lastLoadedInfo!!){
+                    if(status == STATUS.NOT_FOUND){
+                        activity.showToast("User not found")
+                        cont.resume(null)
+                    }else{
+                        cont.resume(this)
+                    }
                 }
+            }
 
-            builder.create()
-        }
+        return builder.create()
     }
 
     override fun onStart() {
@@ -180,9 +186,9 @@ class DialogAccountChooser(
     }
 
 
-    class SuggestionsItemsAdapter(val watcher: UserIDChangeWatcher) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+    class SuggestionsItemsAdapter(val watcher: UserIDChangeWatcher) : RecyclerView.Adapter<SuggestionsItemsAdapter.ItemHolder>(){
 
-        class Holder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
+        class ItemHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
             val title: TextView = view.findViewById(R.id.suggestions_item_title)
             val info: TextView = view.findViewById(R.id.suggestions_item_info)
         }
@@ -190,14 +196,14 @@ class DialogAccountChooser(
         override fun onCreateViewHolder(
             parent: ViewGroup,
             viewType: Int
-        ): RecyclerView.ViewHolder {
+        ): ItemHolder {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.account_suggestions_item, parent, false) as ConstraintLayout
-            return Holder(view)
+            return ItemHolder(view)
         }
 
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            with(holder as Holder){
+        override fun onBindViewHolder(holder: ItemHolder, position: Int) {
+            with(holder){
                 val (title, info, userId) = data[position]
                 this.title.text = title
                 this.info.text = info
