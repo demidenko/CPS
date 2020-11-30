@@ -3,24 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@android:color/black"
+    android:background="@color/navigation_background"
     >
 
     <TextView
         android:id="@+id/progress_bottom_info_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
         app:layout_constraintHorizontal_weight="3"
+        android:textSize="15sp"
+        android:textColor="@color/textColorAdditional"
+        android:typeface="monospace"
+        android:gravity="center_horizontal"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/progress_bottom_info_bar"
         android:text="title"
-        android:textColor="@color/textColorAdditional"
-        android:typeface="monospace"
         android:layout_margin="5dp"
-        android:gravity="center_horizontal"
         />
 
     <ProgressBar

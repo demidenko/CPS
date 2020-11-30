@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         android:orientation="horizontal"
-        android:background="@android:color/black"
+        android:background="@color/navigation_background"
         >
 
         <LinearLayout
@@ -92,7 +92,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
 
-            android:background="@android:color/black"
+            android:background="@color/navigation_background"
             app:itemIconTint="@color/bottom_view_color"
             app:labelVisibilityMode="unlabeled"
 
