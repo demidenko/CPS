@@ -8,6 +8,10 @@
             android:title="Settings"
             android:icon="@drawable/ic_settings"
             />
-
+        <item
+            android:id="@+id/menu_news_follow_list"
+            android:title="Follow list"
+            android:icon="@drawable/ic_people"
+            />
     </group>
 </menu>

@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit
 
 
 enum class CodeforcesTitle {
-    MAIN, TOP, RECENT, LOST, FOLLOW
+    MAIN, TOP, RECENT, LOST
 }
 
 class NewsFragment : Fragment() {
@@ -60,7 +60,6 @@ class NewsFragment : Fragment() {
         if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.news_codeforces_lost_enabled), false)){
             fragments.add(CodeforcesNewsFragment(CodeforcesTitle.LOST, "", true, CodeforcesNewsItemsLostRecentAdapter()))
         }
-        fragments.add(0, CodeforcesNewsFragment(CodeforcesTitle.FOLLOW, "", true, CodeforcesNewsItemsFollowAdapter()))
         CodeforcesNewsAdapter(this, fragments)
     }
     private lateinit var tabLayout: TabLayout
@@ -70,9 +69,6 @@ class NewsFragment : Fragment() {
             when(fragment.title){
                 CodeforcesTitle.LOST -> updateLostInfoButton.visibility = type
                 CodeforcesTitle.RECENT -> swapRecentButton.visibility = type
-                CodeforcesTitle.FOLLOW -> {
-                    listFollowButton.visibility = type
-                }
             }
         }
 
@@ -155,7 +151,6 @@ class NewsFragment : Fragment() {
                     notifyDataSetChanged()
                 }
             }
-            navigation_news_follow_list.setOnClickListener { manageCodeforcesFollowList() }
         }
     }
 
@@ -178,6 +173,7 @@ class NewsFragment : Fragment() {
                         .commit()
                 }
             }
+            R.id.menu_news_follow_list -> manageCodeforcesFollowList()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -240,7 +236,6 @@ class NewsFragment : Fragment() {
 
     private val swapRecentButton by lazy { requireActivity().navigation_news_recent_swap }
     private val updateLostInfoButton by lazy { requireActivity().navigation_news_lost_update_info }
-    private val listFollowButton by lazy { requireActivity().navigation_news_follow_list }
 
     private fun updateLostInfo() {
         val activity = requireActivity() as MainActivity
@@ -723,32 +718,6 @@ class CodeforcesNewsItemsLostRecentAdapter : CodeforcesNewsItemsClassicAdapter()
     }
 }
 
-class CodeforcesNewsItemsFollowAdapter : CodeforcesNewsItemsClassicAdapter() {
-    override fun parseData(s: String): Boolean {
-        val blogs = emptyList<CodeforcesBlogEntry>()
-
-        if(blogs.isNotEmpty()){
-            val currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
-            rows = blogs
-                .sortedByDescending { it.creationTimeSeconds }
-                .map {
-                    Info(
-                        blogId = it.id,
-                        title = it.title,
-                        author = it.authorHandle,
-                        authorColorTag = it.authorColorTag,
-                        time = timeDifference(it.creationTimeSeconds, currentTimeSeconds),
-                        comments = "",
-                        rating = ""
-                    )
-                }.toTypedArray()
-
-            notifyDataSetChanged()
-        }
-
-        return true
-    }
-}
 
 fun timeDifference(fromTimeSeconds: Long, toTimeSeconds: Long): String {
     val t = toTimeSeconds - fromTimeSeconds
