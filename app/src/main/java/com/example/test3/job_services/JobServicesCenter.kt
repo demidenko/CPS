@@ -62,7 +62,7 @@ object JobServicesCenter {
             else stopJobService(activity, it.id)
         }
         activity.scope.launch {
-            val progressInfo = BottomProgressInfo(toStart.size, "start jobs", activity)
+            val progressInfo = BottomProgressInfo(toStart.size, "start services", activity)
             toStart.values.shuffled().forEach { start ->
                 delay(500)
                 start(activity)

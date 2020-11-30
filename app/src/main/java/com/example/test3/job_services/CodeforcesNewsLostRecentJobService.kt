@@ -49,7 +49,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
             val blogEntries = getSavedLostBlogs(context)
                 .toTypedArray()
 
-            val progressInfo = BottomProgressInfo(blogEntries.size, "update lost info", context as MainActivity)
+            val progressInfo = BottomProgressInfo(blogEntries.size, "update info of lost", context as MainActivity)
 
             CodeforcesAPI.getUsers(blogEntries.map { it.authorHandle })?.result?.let { users ->
                 for(i in blogEntries.indices) {
