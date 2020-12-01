@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.job_services.CodeforcesNewsFollowJobService
+import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.CodeforcesUtils
 import kotlinx.android.synthetic.main.activity_main.*
@@ -57,22 +58,32 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
         buttonAdd.setOnClickListener { button -> button as Button
             with(activity){
                 scope.launch {
+                    button.isEnabled = false
+
                     val userInfo = chooseUserID("", accountsFragment.codeforcesAccountManager) ?: return@launch
                     userInfo as CodeforcesAccountManager.CodeforcesUserInfo
-                    followListAdapter.add(userInfo)
+
+                    val userBlogs = CodeforcesAPI.getUserBlogEntries(userInfo.handle)?.result?.map { it.id.toString() }
+
+                    try{
+                        requireView()
+                    }catch (e: IllegalStateException){
+                        return@launch
+                    }
+
+                    followListAdapter.add(userInfo, userBlogs)
+                    button.isEnabled = true
                     followListView.scrollToPosition(0)
                 }
             }
         }
 
         val followList = CodeforcesNewsFollowJobService.getSavedHandles(activity)
+        val followMap = CodeforcesNewsFollowJobService.getSavedBlogIDs(activity)
 
         activity.scope.launch {
             followListView.isEnabled = false
-
-            val usersInfo = CodeforcesUtils.getUsersInfo(followList)
-            followListAdapter.initialize(usersInfo)
-
+            followListAdapter.initialize(followList, followMap)
             followListView.isEnabled = true
             buttonAdd.visibility = View.VISIBLE
         }
@@ -89,29 +100,41 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
     class FollowListItemsAdapter() : RecyclerView.Adapter<FollowListItemsAdapter.ItemHolder>() {
 
         private val list = mutableListOf<CodeforcesAccountManager.CodeforcesUserInfo>()
+        private val blogsMap = mutableMapOf<String,List<String>?>()
 
         fun handlesList() = list.map { it.handle }
 
-        fun initialize(usersInfo: List<CodeforcesAccountManager.CodeforcesUserInfo>){
-            list.clear()
+        suspend fun initialize(followList: List<String>, followMap: Map<String,List<String>?>){
+            val usersInfo = CodeforcesUtils.getUsersInfo(followList)
             list.addAll(usersInfo)
+            blogsMap.putAll(followMap)
             notifyItemRangeInserted(0, list.size)
         }
 
-        fun add(userInfo: CodeforcesAccountManager.CodeforcesUserInfo){
+        fun add(userInfo: CodeforcesAccountManager.CodeforcesUserInfo, userBlogs: List<String>?){
             if(list.any { it.handle == userInfo.handle }){
                 activity.showToast("User already in list")
                 return
             }
+
             list.add(0, userInfo)
+            blogsMap[userInfo.handle] = userBlogs
+
             CodeforcesNewsFollowJobService.saveHandles(activity, handlesList())
+            CodeforcesNewsFollowJobService.saveBlogIDs(activity, blogsMap)
+
             notifyItemInserted(0)
         }
 
         fun remove(userInfo: CodeforcesAccountManager.CodeforcesUserInfo){
-            val index = list.indexOf(userInfo)
+            val index = list.indexOf(userInfo).takeIf { it!=-1 } ?: return
+
             list.removeAt(index)
+            blogsMap.remove(userInfo.handle)
+
             CodeforcesNewsFollowJobService.saveHandles(activity, handlesList())
+            CodeforcesNewsFollowJobService.saveBlogIDs(activity, blogsMap)
+
             notifyItemRemoved(index)
         }
 

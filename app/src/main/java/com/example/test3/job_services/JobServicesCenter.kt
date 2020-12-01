@@ -18,7 +18,8 @@ object JobServiceIDs {
     private var id = 0
     val news_parsers = ++id
     val accounts_parsers = ++id
-    val codeforces_lost_recent_news = ++id
+    val codeforces_news_lost_recent = ++id
+    val codeforces_news_follow = ++id
     val project_euler_recent_problems = ++id
 }
 
@@ -55,8 +56,9 @@ object JobServicesCenter {
             JobServiceIDs.project_euler_recent_problems to ::startProjectEulerRecentProblemsJobService
         )
         with(PreferenceManager.getDefaultSharedPreferences(activity)){
-            if(getBoolean(activity.getString(R.string.news_codeforces_lost_enabled), false)) toStart[JobServiceIDs.codeforces_lost_recent_news] = ::startCodeforcesNewsLostRecentJobService
+            if(getBoolean(activity.getString(R.string.news_codeforces_lost_enabled), false)) toStart[JobServiceIDs.codeforces_news_lost_recent] = ::startCodeforcesNewsLostRecentJobService
         }
+        toStart[JobServiceIDs.codeforces_news_follow] = ::startCodeforcesNewsFollowJobService //TODO check prefs
         getRunningJobServices(activity).forEach {
             if(toStart.containsKey(it.id)) toStart.remove(it.id)
             else stopJobService(activity, it.id)
@@ -85,8 +87,18 @@ object JobServicesCenter {
     fun startCodeforcesNewsLostRecentJobService(context: Context){
         makeSchedule(
             context,
-            JobServiceIDs.codeforces_lost_recent_news,
+            JobServiceIDs.codeforces_news_lost_recent,
             CodeforcesNewsLostRecentJobService::class.java,
+            TimeUnit.HOURS.toMillis(1),
+            JobInfo.NETWORK_TYPE_ANY
+        )
+    }
+
+    fun startCodeforcesNewsFollowJobService(context: Context){
+        makeSchedule(
+            context,
+            JobServiceIDs.codeforces_news_follow,
+            CodeforcesNewsFollowJobService::class.java,
             TimeUnit.HOURS.toMillis(1),
             JobInfo.NETWORK_TYPE_ANY
         )

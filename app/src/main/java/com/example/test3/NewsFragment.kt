@@ -785,7 +785,7 @@ class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSha
                 //spam possible
                 when(sharedPreferences.getBoolean(key, false)){
                     true -> JobServicesCenter.startCodeforcesNewsLostRecentJobService(requireContext())
-                    false -> JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_lost_recent_news)
+                    false -> JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_news_lost_recent)
                 }
             }
             getString(R.string.news_project_euler_feed),
