@@ -1,10 +1,14 @@
 package com.example.test3.job_services
 
 import android.content.Context
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
-import com.example.test3.makeSimpleNotification
-import com.example.test3.utils.CodeforcesAPI
-import com.example.test3.utils.CodeforcesAPIStatus
+import com.example.test3.NotificationChannels
+import com.example.test3.NotificationIDs
+import com.example.test3.R
+import com.example.test3.makePendingIntentOpenURL
+import com.example.test3.utils.*
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import kotlinx.coroutines.Job
@@ -73,7 +77,7 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
                 return@forEach
             }
 
-            val res = response.result ?: return@forEach
+            val result = response.result ?: return@forEach
 
             var hasNewBlog = false
             val saved = savedBlogs.getOrDefault(handle, null)?.toSet()
@@ -81,16 +85,15 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             if(saved == null){
                 hasNewBlog = true
             }else{
-                res.forEach { blogEntry ->
+                result.forEach { blogEntry ->
                     if(!saved.contains(blogEntry.id.toString())){
                         hasNewBlog = true
-                        //TODO notify
-                        makeSimpleNotification(this, blogEntry.id, "new blog by $handle", blogEntry.title, false)
+                        notifyNewBlog(blogEntry)
                     }
                 }
             }
             if(hasNewBlog){
-                toSave[handle] = res.map { it.id.toString() }
+                toSave[handle] = result.map { it.id.toString() }
                 isBlogsNeedToSave = true
             }
         }
@@ -100,5 +103,19 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             saveBlogIDs(this, toSave)
         }
         if(handles.size < savedHandles.size) saveHandles(this, handles)
+    }
+
+    private fun notifyNewBlog(blogEntry: CodeforcesBlogEntry){
+        val title = fromHTML(blogEntry.title.removeSurrounding("<p>", "</p>")).toString()
+        val n = NotificationCompat.Builder(this, NotificationChannels.codeforces_follow_new_blog).apply {
+            setSubText("New codeforces blog")
+            setContentTitle(blogEntry.authorHandle)
+            setContentText(title)
+            setStyle(NotificationCompat.BigTextStyle())
+            setSmallIcon(R.drawable.ic_new_post)
+            setAutoCancel(true)
+            setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.blog(blogEntry.id), applicationContext))
+        }
+        NotificationManagerCompat.from(this).notify(NotificationIDs.makeCodeforcesFollowBlogID(blogEntry.id), n.build())
     }
 }

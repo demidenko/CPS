@@ -16,6 +16,7 @@ object NotificationChannels {
     const val codeforces_contest_watcher = "cf_contest_watcher"
     const val codeforces_rating_changes = "cf_rating_changes"
     const val codeforces_contribution_changes = "cf_contribution_changes"
+    const val codeforces_follow_new_blog = "cf_follow_new_blog"
 
     //project euler
     const val project_euler_news = "pe_news"
@@ -102,6 +103,11 @@ object NotificationChannels {
         ).apply {
             group = group_id_codeforces
         })
+        m.createNotificationChannel(NotificationChannel(
+            codeforces_follow_new_blog,
+            "Followed blogs",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ))
 
         //project euler channels
         val group_id_project_euler = "project_euler"
@@ -186,6 +192,7 @@ object NotificationIDs {
     val codeforces_rating_changes = nextID()
     val codeforces_contribution_changes = nextID()
     val makeCodeforcesSystestSubmissionID = nextIntervalID()
+    val makeCodeforcesFollowBlogID = nextIntervalID()
 
     //project euler
     val makeProjectEulerRecentProblemNotificationID = nextIntervalID()

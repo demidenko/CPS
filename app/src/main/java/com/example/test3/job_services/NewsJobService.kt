@@ -76,7 +76,7 @@ class NewsJobService : CoroutineJobService() {
                     setShowWhen(true)
                     setAutoCancel(true)
                     setGroup(group)
-                    setContentIntent(makePendingIntentOpenURL("https://acmp.ru", this@NewsJobService))
+                    setContentIntent(makePendingIntentOpenURL("https://acmp.ru", applicationContext))
                 }
                 NotificationManagerCompat.from(this).notify( NotificationIDs.makeACMPNewsNotificationID(id), n.build())
             }
@@ -135,7 +135,7 @@ class NewsJobService : CoroutineJobService() {
                     setColor(NotificationColors.project_euler_main)
                     setShowWhen(true)
                     setAutoCancel(true)
-                    setContentIntent(makePendingIntentOpenURL("https://projecteuler.net/news", this@NewsJobService))
+                    setContentIntent(makePendingIntentOpenURL("https://projecteuler.net/news", applicationContext))
                 }
                 NotificationManagerCompat.from(this).notify( NotificationIDs.makeProjectEulerNewsNotificationID(title), n.build())
             }
@@ -186,7 +186,7 @@ class NewsJobService : CoroutineJobService() {
                 setColor(Color.parseColor("#4040A0"))
                 setShowWhen(true)
                 //setAutoCancel(true)
-                setContentIntent(makePendingIntentOpenURL("https://olympiads.ru/zaoch/", this@NewsJobService))
+                setContentIntent(makePendingIntentOpenURL("https://olympiads.ru/zaoch/", applicationContext))
             }
             NotificationManagerCompat.from(this).notify(NotificationIDs.makeZaochNewsNotificationID(title), n.build())
         }
