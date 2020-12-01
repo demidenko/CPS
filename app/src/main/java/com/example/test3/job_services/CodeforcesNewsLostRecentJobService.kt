@@ -70,7 +70,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                         blogIDsToRemove.add(blogEntry.id)
                     } else {
                         if(response.status == CodeforcesAPIStatus.OK) response.result?.let { freshBlogEntry ->
-                            val title = freshBlogEntry.title.removeSurrounding("<p>, </p>")
+                            val title = freshBlogEntry.title.removeSurrounding("<p>", "</p>")
                             blogEntries[index] = blogEntry.copy(title = fromHTML(title).toString())
                         }
                     }
