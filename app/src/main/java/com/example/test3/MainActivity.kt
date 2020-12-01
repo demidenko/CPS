@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(){
         setFragmentSubTitle(newsFragment, "::news")
         setFragmentSubTitle(devFragment, "::develop")
 
-        var activeFragment = supportFragmentManager.fragments.find { it.isVisible } ?: accountsFragment
+        var activeFragment = supportFragmentManager.fragments.find { !it.isHidden } ?: accountsFragment
         if(!activeFragment.isAdded) supportFragmentManager.beginTransaction().add(R.id.container_fragment, activeFragment).commit()
         navigationSelectUpdateUI(activeFragment)
 
