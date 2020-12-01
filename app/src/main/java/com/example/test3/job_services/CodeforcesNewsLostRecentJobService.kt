@@ -6,6 +6,7 @@ import com.example.test3.BottomProgressInfo
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.utils.*
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.io.FileNotFoundException
 import java.io.PrintWriter
@@ -85,14 +86,22 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
 
             progressInfo.finish()
         }
+
+        fun isEnabled(context: Context): Boolean {
+            return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.news_codeforces_lost_enabled), false)
+        }
     }
 
-    override suspend fun makeJobs() = arrayListOf(launch { parseRecent() })
+    override suspend fun makeJobs(): ArrayList<Job> {
+        if (isEnabled(this)) return arrayListOf( launch { parseRecent() })
+        else{
+            JobServicesCenter.stopJobService(this, JobServiceIDs.codeforces_news_lost_recent)
+            return arrayListOf()
+        }
+    }
 
     private val highRated = arrayListOf("user-orange", "user-red", "user-legendary")
     private suspend fun parseRecent(){
-        val enabled = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.news_codeforces_lost_enabled), false)
-        if(!enabled) return
 
 
         val recentBlogs = CodeforcesUtils.parseRecentActionsPage(

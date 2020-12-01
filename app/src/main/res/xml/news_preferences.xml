@@ -3,7 +3,7 @@
 
     <PreferenceCategory
         android:icon="@drawable/ic_cf_logo"
-        android:title="Codeforces tabs"
+        android:title="Codeforces"
         >
         <DropDownPreference
             android:key="@string/news_codeforces_default_tab"
@@ -23,6 +23,14 @@
             android:defaultValue="false"
             android:key="@string/news_codeforces_lost_enabled"
             android:title="Lost recent blogs"
+            android:summaryOn="enabled"
+            android:summaryOff="disabled"
+            />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/news_codeforces_follow_enabled"
+            android:title="Follow"
             android:summaryOn="enabled"
             android:summaryOff="disabled"
             />

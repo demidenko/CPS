@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.example.test3.job_services.CodeforcesNewsFollowJobService
 import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
 import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
@@ -159,6 +160,7 @@ class NewsFragment : Fragment() {
             menu.setGroupDividerEnabled(true)
         }
         inflater.inflate(R.menu.menu_news, menu)
+        menu.findItem(R.id.menu_news_follow_list).isVisible = CodeforcesNewsFollowJobService.isEnabled(requireContext())
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -787,6 +789,14 @@ class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSha
                     true -> JobServicesCenter.startCodeforcesNewsLostRecentJobService(requireContext())
                     false -> JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_news_lost_recent)
                 }
+            }
+            getString(R.string.news_codeforces_follow_enabled) -> {
+                //spam possible
+                when(sharedPreferences.getBoolean(key, false)){
+                    true -> JobServicesCenter.startCodeforcesNewsFollowJobService(requireContext())
+                    false -> JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_news_follow)
+                }
+                requireActivity().invalidateOptionsMenu()
             }
             getString(R.string.news_project_euler_feed),
             getString(R.string.news_acmp_feed),

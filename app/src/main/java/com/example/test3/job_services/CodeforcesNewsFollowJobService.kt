@@ -48,12 +48,18 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             val str = PreferenceManager.getDefaultSharedPreferences(context).getString(CF_FOLLOW_BLOGS, null) ?: return emptyMap()
             return adapterMap.fromJson(str) ?: emptyMap()
         }
+
+        fun isEnabled(context: Context): Boolean {
+            return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.news_codeforces_follow_enabled), false)
+        }
     }
 
     override suspend fun makeJobs(): ArrayList<Job> {
-        return arrayListOf(
-            launch { parseBlogs() }
-        )
+        if (isEnabled(this)) return arrayListOf( launch { parseBlogs() })
+        else{
+            JobServicesCenter.stopJobService(this, JobServiceIDs.codeforces_news_follow)
+            return arrayListOf()
+        }
     }
 
     private suspend fun parseBlogs(){
@@ -114,7 +120,7 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             setStyle(NotificationCompat.BigTextStyle())
             setSmallIcon(R.drawable.ic_new_post)
             setAutoCancel(true)
-            setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.blog(blogEntry.id), applicationContext))
+            setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.blog(blogEntry.id), this@CodeforcesNewsFollowJobService))
         }
         NotificationManagerCompat.from(this).notify(NotificationIDs.makeCodeforcesFollowBlogID(blogEntry.id), n.build())
     }

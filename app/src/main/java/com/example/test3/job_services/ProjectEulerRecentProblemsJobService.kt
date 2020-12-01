@@ -51,7 +51,7 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
                     setColor(NotificationColors.project_euler_main)
                     setShowWhen(true)
                     setAutoCancel(true)
-                    setContentIntent(makePendingIntentOpenURL("https://projecteuler.net/problem=$id", applicationContext))
+                    setContentIntent(makePendingIntentOpenURL("https://projecteuler.net/problem=$id", this@ProjectEulerRecentProblemsJobService))
                 }
                 NotificationManagerCompat.from(this).notify(NotificationIDs.makeProjectEulerRecentProblemNotificationID(id), n.build())
             }

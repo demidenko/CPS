@@ -57,8 +57,8 @@ object JobServicesCenter {
         )
         with(PreferenceManager.getDefaultSharedPreferences(activity)){
             if(getBoolean(activity.getString(R.string.news_codeforces_lost_enabled), false)) toStart[JobServiceIDs.codeforces_news_lost_recent] = ::startCodeforcesNewsLostRecentJobService
+            if(getBoolean(activity.getString(R.string.news_codeforces_follow_enabled), false)) toStart[JobServiceIDs.codeforces_news_follow] = ::startCodeforcesNewsFollowJobService
         }
-        toStart[JobServiceIDs.codeforces_news_follow] = ::startCodeforcesNewsFollowJobService //TODO check prefs
         getRunningJobServices(activity).forEach {
             if(toStart.containsKey(it.id)) toStart.remove(it.id)
             else stopJobService(activity, it.id)
