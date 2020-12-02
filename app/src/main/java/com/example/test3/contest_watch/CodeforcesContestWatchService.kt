@@ -10,6 +10,7 @@ import android.os.SystemClock
 import android.text.SpannableStringBuilder
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.IconCompat
 import androidx.core.text.bold
 import androidx.core.text.color
 import androidx.core.text.italic
@@ -52,8 +53,16 @@ class CodeforcesContestWatchService: Service() {
                     setNotificationSilent()
                     setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 }
-                notification.addAction(NotificationCompat.Action(null, "Close", PendingIntent.getService(this, 0, makeStopIntent(this), 0)))
-                notification.addAction(NotificationCompat.Action(null, "Browse", makePendingIntentOpenURL(CodeforcesURLFactory.contest(contestID),this)))
+
+                val closeIcon = if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O){
+                    IconCompat.createWithResource(this, R.drawable.ic_delete_item)
+                } else null
+                val browseIcon = if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O){
+                    IconCompat.createWithResource(this, R.drawable.ic_open_in_browser)
+                } else null
+
+                notification.addAction(NotificationCompat.Action(closeIcon, "Close", PendingIntent.getService(this, 0, makeStopIntent(this), 0)))
+                notification.addAction(NotificationCompat.Action(browseIcon, "Browse", makePendingIntentOpenURL(CodeforcesURLFactory.contest(contestID),this)))
                 start(handle, contestID, notification)
             }
             ACTION_STOP -> {
