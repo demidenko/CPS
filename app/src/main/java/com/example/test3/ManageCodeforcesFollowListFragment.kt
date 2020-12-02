@@ -58,12 +58,11 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
         buttonAdd.setOnClickListener { button -> button as Button
             with(activity){
                 scope.launch {
-                    button.isEnabled = false
 
                     val userInfo = chooseUserID("", accountsFragment.codeforcesAccountManager) ?: return@launch
                     userInfo as CodeforcesAccountManager.CodeforcesUserInfo
 
-                    val userBlogs = CodeforcesAPI.getUserBlogEntries(userInfo.handle)?.result?.map { it.id.toString() }
+                    button.isEnabled = false
 
                     try{
                         requireView()
@@ -71,7 +70,7 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
                         return@launch
                     }
 
-                    followListAdapter.add(userInfo, userBlogs)
+                    followListAdapter.add(userInfo)
                     button.isEnabled = true
                     followListView.scrollToPosition(0)
                 }
@@ -111,11 +110,13 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
             notifyItemRangeInserted(0, list.size)
         }
 
-        fun add(userInfo: CodeforcesAccountManager.CodeforcesUserInfo, userBlogs: List<String>?){
+        suspend fun add(userInfo: CodeforcesAccountManager.CodeforcesUserInfo){
             if(list.any { it.handle == userInfo.handle }){
                 activity.showToast("User already in list")
                 return
             }
+
+            val userBlogs = CodeforcesAPI.getUserBlogEntries(userInfo.handle)?.result?.map { it.id.toString() }
 
             list.add(0, userInfo)
             blogsMap[userInfo.handle] = userBlogs
