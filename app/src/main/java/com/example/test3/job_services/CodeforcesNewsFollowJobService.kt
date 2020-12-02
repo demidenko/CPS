@@ -62,8 +62,18 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
         private val blogsMap = getSavedBlogIDs(context).toMutableMap()
         fun getBlogsMap() = blogsMap.toMap()
 
-        fun add(handle: String){
+        suspend fun add(handle: String): Boolean {
+            if(handles.contains(handle)) return false
 
+            val userBlogs = CodeforcesAPI.getUserBlogEntries(handle)?.result?.map { it.id.toString() }
+
+            handles.add(0, handle)
+            blogsMap[handle] = userBlogs
+
+            handlesChanged = true
+            dataChanged = true
+
+            return true
         }
 
         fun remove(handle: String){

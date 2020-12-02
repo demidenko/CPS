@@ -22,6 +22,7 @@
         app:layout_constraintTop_toBottomOf="@id/manage_cf_follow_users_list"
         app:layout_constraintStart_toStartOf="@id/manage_cf_follow_users_list"
         app:layout_constraintEnd_toEndOf="@id/manage_cf_follow_users_list"
+        android:visibility="gone"
         />
 
 
