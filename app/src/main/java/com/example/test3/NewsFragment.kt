@@ -489,6 +489,25 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
                 }
             }
 
+            view.isLongClickable = true
+            view.setOnLongClickListener{
+                CodeforcesNewsFollowJobService.isEnabled(activity).apply {
+                    if(this){
+                        val handle = info.author
+                        activity.scope.launch {
+                            val connector = CodeforcesNewsFollowJobService.FollowDataConnector(activity)
+                            when(connector.add(handle)){
+                                true -> {
+                                    connector.save()
+                                    activity.showToast("$handle added to follow list")
+                                }
+                                false -> activity.showToast("$handle already in follow list")
+                            }
+                        }
+                    }
+                }
+            }
+
             title.text = info.title
 
             author.text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag)
