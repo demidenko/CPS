@@ -54,6 +54,44 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
         }
     }
 
+    class FollowDataConnector(private val context: Context) {
+
+        private val handles = getSavedHandles(context).toMutableList()
+        fun getHandles() = handles.toList()
+
+        private val blogsMap = getSavedBlogIDs(context).toMutableMap()
+        fun getBlogsMap() = blogsMap.toMap()
+
+        fun add(handle: String){
+
+        }
+
+        fun remove(handle: String){
+            handles.remove(handle)
+            blogsMap.remove(handle)
+            dataChanged = true
+            handlesChanged = true
+        }
+
+        fun setBlogs(handle: String, blogs: List<String>?){
+            blogsMap[handle] = blogs
+            dataChanged = true
+        }
+
+        private var dataChanged = false
+        private var handlesChanged = false
+        fun save(){
+            if(!dataChanged) return
+            if(handlesChanged){
+                saveHandles(context, handles)
+                handlesChanged = false
+            }
+            for(handle in handles) if(!blogsMap.containsKey(handle)) blogsMap.remove(handle)
+            saveBlogIDs(context, blogsMap)
+            dataChanged = false
+        }
+    }
+
     override suspend fun makeJobs(): ArrayList<Job> {
         if (isEnabled(this)) return arrayListOf( launch { parseBlogs() })
         else{
@@ -64,21 +102,15 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
 
     private suspend fun parseBlogs(){
 
-        val savedHandles = getSavedHandles(this)
-        val handles = savedHandles.toMutableList()
+        val connector = FollowDataConnector(this)
+        val savedHandles = connector.getHandles()
+        val savedBlogs = connector.getBlogsMap()
 
-        val savedBlogs = getSavedBlogIDs(this)
-
-        val toSave = savedBlogs.toMutableMap()
-
-        var isBlogsNeedToSave = false
         savedHandles.forEach { handle ->
             val response = CodeforcesAPI.getUserBlogEntries(handle) ?: return@forEach
             if(response.status == CodeforcesAPIStatus.FAILED){
                 if(response.comment == "handle: User with handle $handle not found"){
-                    handles.remove(handle)
-                    toSave.remove(handle)
-                    isBlogsNeedToSave = true
+                    connector.remove(handle)
                 }
                 return@forEach
             }
@@ -99,16 +131,11 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
                 }
             }
             if(hasNewBlog){
-                toSave[handle] = result.map { it.id.toString() }
-                isBlogsNeedToSave = true
+                connector.setBlogs(handle, result.map { it.id.toString() })
             }
         }
 
-        if(isBlogsNeedToSave){
-            for(handle in handles) if(!toSave.containsKey(handle)) toSave.remove(handle)
-            saveBlogIDs(this, toSave)
-        }
-        if(handles.size < savedHandles.size) saveHandles(this, handles)
+        connector.save()
     }
 
     private fun notifyNewBlog(blogEntry: CodeforcesBlogEntry){
