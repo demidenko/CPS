@@ -35,15 +35,19 @@ class AccountsJobService : CoroutineJobService() {
             accountManager.savedInfo = info.copy(contribution = contribution)
 
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            val oldShowedContribution: Int = notificationManager.activeNotifications.find {
-                it.id == NotificationIDs.codeforces_contribution_changes
-            }?.notification?.extras?.getInt("contribution", info.contribution) ?: info.contribution
+
+            val oldShowedContribution: Int = if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) info.contribution
+            else {
+                notificationManager.activeNotifications.find {
+                    it.id == NotificationIDs.codeforces_contribution_changes
+                }?.notification?.extras?.getInt("contribution", info.contribution) ?: info.contribution
+            }
 
             fun signed(x: Int): String = if(x>0) "+$x" else "$x"
 
             val n = NotificationCompat.Builder(this, NotificationChannels.codeforces_contribution_changes).apply {
                 setSubText(handle)
-                setContentTitle("Contribution change:  ${signed(oldShowedContribution)} → ${signed(contribution)}")
+                setContentTitle("Contribution change: ${signed(oldShowedContribution)} → ${signed(contribution)}")
                 setSmallIcon(R.drawable.ic_person)
                 setNotificationSilent()
                 setAutoCancel(true)
