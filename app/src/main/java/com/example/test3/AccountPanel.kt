@@ -125,7 +125,7 @@ abstract class AccountPanel(
             show()
             activity.showToast("${manager.PREFERENCES_FILE_NAME} load error")
             reloadButton.clearAnimation()
-            reloadButton.setColorFilter(activity.resources.getColor(R.color.reload_fail, null))
+            reloadButton.setColorFilter(getColorFromResource(activity, R.color.reload_fail))
         }
 
         unblock()

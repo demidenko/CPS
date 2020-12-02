@@ -41,7 +41,9 @@ class MainActivity : AppCompatActivity(){
         println(savedInstanceState)
         super.onCreate(savedInstanceState)
 
-        NotificationChannels.createNotificationChannels(this)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannels.createNotificationChannels(this)
+        }
 
         setContentView(R.layout.activity_main)
 
@@ -209,4 +211,12 @@ fun getFragmentSubTitle(fragment: Fragment): String = fragment.arguments?.getStr
 fun setFragmentSubTitle(fragment: Fragment, title: String){
     if(fragment.arguments == null) fragment.arguments = Bundle()
     fragment.arguments?.putString("subtitle",title)
+}
+
+fun getColorFromResource(context: Context, resourceId: Int): Int {
+    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        context.resources.getColor(resourceId, null)
+    } else {
+        context.resources.getColor(resourceId)
+    }
 }

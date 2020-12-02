@@ -115,8 +115,8 @@ class DialogAccountChooser(
             }
         }
 
-        private val successColor = fragment.resources.getColor(R.color.success, null)
-        private val failColor = fragment.resources.getColor(R.color.fail, null)
+        private val successColor = getColorFromResource(activity, R.color.success)
+        private val failColor = getColorFromResource(activity, R.color.fail)
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 

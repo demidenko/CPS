@@ -8,6 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
@@ -28,6 +30,7 @@ object NotificationChannels {
     //zaoch
     const val olympiads_zaoch_news = "olympiads_zaoch_news"
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun createNotificationChannels(context: Context){
         val m = NotificationManagerCompat.from(context)
 

@@ -16,7 +16,13 @@ val httpClient = OkHttpClient
     .build()
 
 
-fun fromHTML(s: String): Spanned = Html.fromHtml(s, HtmlCompat.FROM_HTML_MODE_LEGACY)
+fun fromHTML(s: String): Spanned {
+    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+        Html.fromHtml(s, HtmlCompat.FROM_HTML_MODE_LEGACY)
+    } else {
+        Html.fromHtml(s)
+    }
+}
 
 
 class SharedReloadButton(private val button: ImageButton) {

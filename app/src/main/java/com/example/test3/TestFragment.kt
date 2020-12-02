@@ -55,12 +55,15 @@ class TestFragment : Fragment() {
             activity.scope.launch {
                 CodeforcesAPI.getUser(handle)?.let { userInfo ->
                     if(userInfo.status == CodeforcesAPIStatus.OK){
-                        activity.startForegroundService(
-                            Intent(activity, CodeforcesContestWatchService::class.java)
-                                .setAction(CodeforcesContestWatchService.ACTION_START)
-                                .putExtra("handle", userInfo.result!!.handle)
-                                .putExtra("contestID", contestID)
-                        )
+                        val intent = Intent(activity, CodeforcesContestWatchService::class.java)
+                            .setAction(CodeforcesContestWatchService.ACTION_START)
+                            .putExtra("handle", userInfo.result!!.handle)
+                            .putExtra("contestID", contestID)
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            activity.startForegroundService(intent)
+                        } else {
+                            activity.startService(intent)
+                        }
                     }else{
                         Toast.makeText(activity, userInfo.comment, Toast.LENGTH_LONG).show()
                     }

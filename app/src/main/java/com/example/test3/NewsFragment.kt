@@ -126,13 +126,15 @@ class NewsFragment : Fragment() {
             offscreenPageLimit = codeforcesNewsAdapter.fragments.size
         }
 
+        val badgeColor = getColorFromResource(requireContext(), android.R.color.holo_green_light)
+
         tabLayout = view.findViewById(R.id.cf_news_tab_layout)
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
             val fragment = codeforcesNewsAdapter.fragments[position]
             tab.text = fragment.title.name
             if(fragment.isManagesNewEntries){
                 tab.orCreateBadge.apply {
-                    backgroundColor = resources.getColor(android.R.color.holo_green_light, null)
+                    backgroundColor = badgeColor
                     isVisible = false
                 }
             }
@@ -195,7 +197,7 @@ class NewsFragment : Fragment() {
     }
 
     private val sharedReloadButton by lazy { SharedReloadButton(requireActivity().navigation_news_reload) }
-    private val failColor by lazy { resources.getColor(R.color.reload_fail, null) }
+    private val failColor by lazy { getColorFromResource(requireContext(), R.color.reload_fail) }
     private suspend fun reloadFragment(
         fragment: CodeforcesNewsFragment,
         tab: TabLayout.Tab,
@@ -521,10 +523,10 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
             rating.apply{
                 text = info.rating
-                setTextColor(context.resources.getColor(
+                setTextColor(getColorFromResource(activity,
                     if(info.rating.startsWith('+')) R.color.blog_rating_positive
-                    else R.color.blog_rating_negative, null)
-                )
+                    else R.color.blog_rating_negative
+                ))
             }
         }
     }
@@ -692,10 +694,10 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
                 text = comment.rating.run {
                     (if(this > 0) "+" else "") + this.toString()
                 }
-                setTextColor(context.resources.getColor(
+                setTextColor(getColorFromResource(activity,
                     if(comment.rating > 0) R.color.blog_rating_positive
-                    else R.color.blog_rating_negative, null)
-                )
+                    else R.color.blog_rating_negative
+                ))
             }
 
             holder.comment.text = CodeforcesUtils.fromCodeforcesHTML(comment.text)

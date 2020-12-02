@@ -13,10 +13,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.text.bold
 import androidx.core.text.color
 import androidx.core.text.italic
-import com.example.test3.NotificationChannels
-import com.example.test3.NotificationIDs
-import com.example.test3.R
-import com.example.test3.makePendingIntentOpenURL
+import com.example.test3.*
 import com.example.test3.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -105,8 +102,8 @@ class CodeforcesContestWatchService: Service() {
 
                 private fun doubleToString(x: Double) = x.toString().removeSuffix(".0")
 
-                private val successColor = resources.getColor(R.color.success, null)
-                private val failColor = resources.getColor(R.color.fail, null)
+                private val successColor = getColorFromResource(this@CodeforcesContestWatchService, R.color.success)
+                private val failColor = getColorFromResource(this@CodeforcesContestWatchService, R.color.fail)
                 private fun spanForProblemResult(result: CodeforcesProblemResult): SpannableStringBuilder =
                     SpannableStringBuilder().apply {
                         val pts = doubleToString(result.points)

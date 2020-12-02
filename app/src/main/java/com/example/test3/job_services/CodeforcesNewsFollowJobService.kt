@@ -128,7 +128,8 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             val result = response.result ?: return@forEach
 
             var hasNewBlog = false
-            val saved = savedBlogs.getOrDefault(handle, null)?.toSet()
+            val saved = savedBlogs[handle]?.toSet()
+            savedBlogs.get("")
 
             if(saved == null){
                 hasNewBlog = true
