@@ -56,10 +56,14 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
 
     class FollowDataConnector(private val context: Context) {
 
-        private val handles = getSavedHandles(context).toMutableList()
+        private val handles by lazy { getSavedHandles(context).toMutableList() }
+        private var handlesChanged = false
+        @JvmName("getHandles1")
         fun getHandles() = handles.toList()
 
-        private val blogsMap = getSavedBlogIDs(context).toMutableMap()
+        private val blogsMap by lazy { getSavedBlogIDs(context).toMutableMap() }
+        private var dataChanged = false
+        @JvmName("getBlogsMap1")
         fun getBlogsMap() = blogsMap.toMap()
 
         suspend fun add(handle: String): Boolean {
@@ -88,8 +92,6 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             dataChanged = true
         }
 
-        private var dataChanged = false
-        private var handlesChanged = false
         fun save(){
             if(!dataChanged) return
             if(handlesChanged){

@@ -26,6 +26,7 @@ import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
 import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.utils.*
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.activity_main.*
@@ -259,7 +260,7 @@ class NewsFragment : Fragment() {
 
     }
 
-    private fun manageCodeforcesFollowList(){
+    fun manageCodeforcesFollowList(){
         requireActivity().supportFragmentManager.beginTransaction()
             .hide(this)
             .add(android.R.id.content, ManageCodeforcesFollowListFragment())
@@ -494,19 +495,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
             view.isLongClickable = true
             view.setOnLongClickListener{
                 CodeforcesNewsFollowJobService.isEnabled(activity).apply {
-                    if(this){
-                        val handle = info.author
-                        activity.scope.launch {
-                            val connector = CodeforcesNewsFollowJobService.FollowDataConnector(activity)
-                            when(connector.add(handle)){
-                                true -> {
-                                    connector.save()
-                                    activity.showToast("$handle added to follow list")
-                                }
-                                false -> activity.showToast("$handle already in follow list")
-                            }
-                        }
-                    }
+                    if(this) addToFollowListWithSnackBar(activity, this@with)
                 }
             }
 
@@ -540,6 +529,26 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
                 rows[index].isNew = isNew
                 notifyItemChanged(index)
             }
+        }
+    }
+
+    private fun addToFollowListWithSnackBar(activity: MainActivity, holder: CodeforcesNewsItemViewHolder){
+        activity.scope.launch {
+            val connector = CodeforcesNewsFollowJobService.FollowDataConnector(activity)
+            val handle = holder.author.text
+            when(connector.add(handle.toString())){
+                true -> {
+                    connector.save()
+                    Snackbar.make(holder.view, SpannableStringBuilder("You now followed ").append(handle), Snackbar.LENGTH_LONG).apply {
+                        setAction("Manage"){
+                            activity.newsFragment.manageCodeforcesFollowList()
+                        }
+                    }
+                }
+                false -> {
+                    Snackbar.make(holder.view, SpannableStringBuilder("You already followed ").append(handle), Snackbar.LENGTH_LONG)
+                }
+            }.setAnchorView(activity.navigation_main).show()
         }
     }
 }
