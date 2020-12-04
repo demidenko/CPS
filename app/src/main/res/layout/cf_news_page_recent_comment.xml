@@ -6,6 +6,7 @@
     android:layout_marginStart="3dp"
     android:layout_marginEnd="3dp"
     android:layout_marginBottom="3dp"
+    android:animateLayoutChanges="true"
     >
 
     <TextView
@@ -27,7 +28,7 @@
         android:text="TITLE"
         android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@id/recent_arrow"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/news_item_comment_expand"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constrainedWidth="true"
@@ -86,13 +87,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="COMMENT"
-        android:layout_marginStart="3dp"
+        android:layout_marginStart="5dp"
         app:layout_constraintTop_toBottomOf="@id/news_item_author"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constrainedWidth="true"
         android:maxLines="10"
+        />
+
+    <ImageView
+        android:id="@+id/news_item_comment_expand"
+        android:src="@drawable/ic_expand_more"
+        android:layout_width="30sp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/news_item_title"
+        android:visibility="gone"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -700,13 +700,17 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
             holder.author.text = CodeforcesUtils.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
 
             holder.rating.apply{
-                text = comment.rating.takeIf { it!=0 }?.run {
-                    (if(this > 0) "+" else "") + this.toString()
+                if(comment.rating == 0) visibility = View.GONE
+                else {
+                    visibility = View.VISIBLE
+                    if (comment.rating > 0) {
+                        text = "+" + comment.rating.toString()
+                        setTextColor(getColorFromResource(activity, R.color.blog_rating_positive))
+                    } else {
+                        text = comment.rating.toString()
+                        setTextColor(getColorFromResource(activity, R.color.blog_rating_negative))
+                    }
                 }
-                setTextColor(getColorFromResource(activity,
-                    if(comment.rating > 0) R.color.blog_rating_positive
-                    else R.color.blog_rating_negative
-                ))
             }
 
             holder.comment.text = CodeforcesUtils.fromCodeforcesHTML(comment.text)
