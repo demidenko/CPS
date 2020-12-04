@@ -59,7 +59,7 @@ class NewsFragment : Fragment() {
             CodeforcesNewsFragment(CodeforcesTitle.TOP, "/top", false, CodeforcesNewsItemsClassicAdapter()),
             CodeforcesNewsFragment(CodeforcesTitle.RECENT, "/recent-actions", false, CodeforcesNewsItemsRecentAdapter())
         )
-        if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(getString(R.string.news_codeforces_lost_enabled), false)){
+        if(CodeforcesNewsLostRecentJobService.isEnabled(context)){
             fragments.add(CodeforcesNewsFragment(CodeforcesTitle.LOST, "", true, CodeforcesNewsItemsLostRecentAdapter()))
         }
         CodeforcesNewsAdapter(this, fragments)
@@ -700,7 +700,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
             holder.author.text = CodeforcesUtils.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
 
             holder.rating.apply{
-                text = comment.rating.run {
+                text = comment.rating.takeIf { it!=0 }?.run {
                     (if(this > 0) "+" else "") + this.toString()
                 }
                 setTextColor(getColorFromResource(activity,
