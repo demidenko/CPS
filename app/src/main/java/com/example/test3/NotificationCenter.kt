@@ -34,106 +34,96 @@ object NotificationChannels {
     fun createNotificationChannels(context: Context){
         val m = NotificationManagerCompat.from(context)
 
-        fun addChannelsToGroup(groupID: String, groupName: String, channels: List<NotificationChannel>){
+        fun addChannelsToGroup(groupID: String, groupName: String, vararg channels: NotificationChannel){
             m.createNotificationChannelGroup(NotificationChannelGroup(groupID, groupName))
-            channels.forEach {
-                it.group = groupID
-                m.createNotificationChannel(it)
+            channels.forEach { channel ->
+                channel.group = groupID
+                m.createNotificationChannel(channel)
             }
         }
 
         //test channels
         addChannelsToGroup("test", "Test Group",
-            listOf(
-                NotificationChannel(
-                    "test",
-                    "test channel",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                ),
-                NotificationChannel(
-                    "test2",
-                    "test2 channel",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                ),
-                NotificationChannel(
-                    "test3",
-                    "test3 channel",
-                    NotificationManager.IMPORTANCE_MIN
-                ),
-                NotificationChannel(
-                    "test4",
-                    "test4 channel",
-                    NotificationManager.IMPORTANCE_LOW
-                ),
-                NotificationChannel(
-                    "test5",
-                    "test5 channel",
-                    NotificationManager.IMPORTANCE_HIGH
-                )
+            NotificationChannel(
+                "test",
+                "test channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ),
+            NotificationChannel(
+                "test2",
+                "test2 channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ),
+            NotificationChannel(
+                "test3",
+                "test3 channel",
+                NotificationManager.IMPORTANCE_MIN
+            ),
+            NotificationChannel(
+                "test4",
+                "test4 channel",
+                NotificationManager.IMPORTANCE_LOW
+            ),
+            NotificationChannel(
+                "test5",
+                "test5 channel",
+                NotificationManager.IMPORTANCE_HIGH
             )
         )
 
         //codeforces channels
         addChannelsToGroup("codeforces", "CodeForces",
-            listOf(
-                NotificationChannel(
-                    codeforces_rating_changes,
-                    "Rating changes",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                ),
-                NotificationChannel(
-                    codeforces_contribution_changes,
-                    "Contribution changes",
-                    NotificationManager.IMPORTANCE_MIN
-                ),
-                NotificationChannel(
-                    codeforces_contest_watcher,
-                    "Contest watch",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                ),
-                NotificationChannel(
-                    codeforces_follow_new_blog,
-                    "Followed blogs",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
+            NotificationChannel(
+                codeforces_rating_changes,
+                "Rating changes",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ),
+            NotificationChannel(
+                codeforces_contribution_changes,
+                "Contribution changes",
+                NotificationManager.IMPORTANCE_MIN
+            ),
+            NotificationChannel(
+                codeforces_contest_watcher,
+                "Contest watch",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ),
+            NotificationChannel(
+                codeforces_follow_new_blog,
+                "Followed blogs",
+                NotificationManager.IMPORTANCE_DEFAULT
             )
         )
 
         //project euler channels
         addChannelsToGroup("project_euler", "Project Euler",
-            listOf(
-                NotificationChannel(
-                    project_euler_problems,
-                    "Recent Problems",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                ),
-                NotificationChannel(
-                    project_euler_news,
-                    "News",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
+            NotificationChannel(
+                project_euler_problems,
+                "Recent Problems",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ),
+            NotificationChannel(
+                project_euler_news,
+                "News",
+                NotificationManager.IMPORTANCE_DEFAULT
             )
         )
 
         //acmp channels
         addChannelsToGroup("acmp", "ACMP",
-            listOf(
-                NotificationChannel(
-                    acmp_news,
-                    "News",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
+            NotificationChannel(
+                acmp_news,
+                "News",
+                NotificationManager.IMPORTANCE_DEFAULT
             )
         )
 
         //zaoch channels
         addChannelsToGroup("zaoch", "olympiads.ru/zaoch",
-            listOf(
-                NotificationChannel(
-                    olympiads_zaoch_news,
-                    "News",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
+            NotificationChannel(
+                olympiads_zaoch_news,
+                "News",
+                NotificationManager.IMPORTANCE_DEFAULT
             )
         )
 
