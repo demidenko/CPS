@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.view.*
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -148,10 +149,10 @@ class NewsFragment : Fragment() {
         with(requireActivity() as MainActivity){
             navigation_news_reload.setOnClickListener { reloadTabs() }
             navigation_news_lost_update_info.setOnClickListener { updateLostInfo() }
-            navigation_news_recent_swap.setOnClickListener {
+            navigation_news_recent_swap.setOnClickListener { button -> button as ImageButton
                 val fragment = codeforcesNewsAdapter.fragments.find { it.title == CodeforcesTitle.RECENT } ?: return@setOnClickListener
                 with(fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter){
-                    groupComments = !groupComments
+                    switchMode(button)
                     notifyDataSetChanged()
                 }
             }
@@ -622,13 +623,18 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         val comment: TextView = view.findViewById(R.id.news_item_comment_content)
     }
 
-    override fun getItemCount() = if(groupComments) rows.size else rowsComments.size
+    override fun getItemCount() = if(modeGrouped) rows.size else rowsComments.size
 
 
-    var groupComments = true
+    private var modeGrouped = true
+    fun switchMode(button: ImageButton){
+        modeGrouped = !modeGrouped
+        if(modeGrouped) button.setImageResource(R.drawable.ic_recent_mode_comments)
+        else button.setImageResource(R.drawable.ic_recent_mode_grouped)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        if(groupComments){
+        if(modeGrouped){
             val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_item, parent, false) as ConstraintLayout
             return CodeforcesNewsBlogItemViewHolder(view)
         }else{
@@ -638,88 +644,96 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if(groupComments) 0 else 1
+        return if(modeGrouped) 0 else 1
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if(holder is CodeforcesNewsBlogItemViewHolder){
-            val info = rows[position]
-
-            holder.view.setOnClickListener {
-                if(info.commentators.isEmpty()){
-                    activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogId)))
-                    return@setOnClickListener
-                }
-
-                PopupMenu(activity, holder.title, Gravity.CENTER_HORIZONTAL).apply {
-                    inflate(R.menu.cf_recent_item_open_variants)
-
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                        setForceShowIcon(true)
-                    }
-                    menu.findItem(R.id.cf_news_recent_item_menu_open_last_comment).let { item ->
-                        item.title = SpannableStringBuilder(item.title)
-                            .append(" [")
-                            .append(info.commentators.first())
-                            .append("]")
-                    }
-
-                    setOnMenuItemClickListener {
-                        when(it.itemId){
-                            R.id.cf_news_recent_item_menu_open_blog -> {
-                                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogId)))
-                                true
-                            }
-                            R.id.cf_news_recent_item_menu_open_last_comment -> {
-                                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(info.blogId,info.lastCommentId)))
-                                true
-                            }
-                            else -> false
-                        }
-                    }
-
-                    show()
-                }
-            }
-
-            holder.title.text =  info.title
-
-            holder.author.text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag)
-
-            holder.comments.text = info.commentators.joinTo(SpannableStringBuilder())
-
-            holder.commentsIcon.visibility = if(info.commentators.isEmpty()) View.INVISIBLE else View.VISIBLE
+            onBindViewBlogHolder(holder, position)
         }else
         if(holder is CodeforcesNewsCommentItemViewHolder){
-            val recentAction = rowsComments[position]
-            val blogEntry = recentAction.blogEntry!!
-            val comment = recentAction.comment!!
+            onBindViewCommentHolder(holder, position)
+        }
+    }
 
-            holder.title.text = blogEntry.title
+    private fun onBindViewBlogHolder(holder: CodeforcesNewsBlogItemViewHolder, position: Int){
+        val info = rows[position]
 
-            holder.author.text = CodeforcesUtils.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
+        holder.view.setOnClickListener {
+            if(info.commentators.isEmpty()){
+                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogId)))
+                return@setOnClickListener
+            }
 
-            holder.rating.apply{
-                if(comment.rating == 0) visibility = View.GONE
-                else {
-                    visibility = View.VISIBLE
-                    if (comment.rating > 0) {
-                        text = "+" + comment.rating.toString()
-                        setTextColor(getColorFromResource(activity, R.color.blog_rating_positive))
-                    } else {
-                        text = comment.rating.toString()
-                        setTextColor(getColorFromResource(activity, R.color.blog_rating_negative))
+            PopupMenu(activity, holder.title, Gravity.CENTER_HORIZONTAL).apply {
+                inflate(R.menu.cf_recent_item_open_variants)
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    setForceShowIcon(true)
+                }
+                menu.findItem(R.id.cf_news_recent_item_menu_open_last_comment).let { item ->
+                    item.title = SpannableStringBuilder(item.title)
+                        .append(" [")
+                        .append(info.commentators.first())
+                        .append("]")
+                }
+
+                setOnMenuItemClickListener {
+                    when(it.itemId){
+                        R.id.cf_news_recent_item_menu_open_blog -> {
+                            activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogId)))
+                            true
+                        }
+                        R.id.cf_news_recent_item_menu_open_last_comment -> {
+                            activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(info.blogId,info.lastCommentId)))
+                            true
+                        }
+                        else -> false
                     }
                 }
+
+                show()
             }
+        }
 
-            holder.comment.text = CodeforcesUtils.fromCodeforcesHTML(comment.text)
+        holder.title.text =  info.title
 
-            holder.time.text = timeDifference(comment.creationTimeSeconds, TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()))
+        holder.author.text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag)
 
-            holder.view.setOnClickListener {
-                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(blogEntry.id,comment.id)))
+        holder.comments.text = info.commentators.joinTo(SpannableStringBuilder())
+
+        holder.commentsIcon.visibility = if(info.commentators.isEmpty()) View.INVISIBLE else View.VISIBLE
+    }
+
+    private fun onBindViewCommentHolder(holder: CodeforcesNewsCommentItemViewHolder, position: Int){
+        val recentAction = rowsComments[position]
+        val blogEntry = recentAction.blogEntry!!
+        val comment = recentAction.comment!!
+
+        holder.title.text = blogEntry.title
+
+        holder.author.text = CodeforcesUtils.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
+
+        holder.rating.apply{
+            if(comment.rating == 0) visibility = View.GONE
+            else {
+                visibility = View.VISIBLE
+                if (comment.rating > 0) {
+                    text = "+" + comment.rating.toString()
+                    setTextColor(getColorFromResource(activity, R.color.blog_rating_positive))
+                } else {
+                    text = comment.rating.toString()
+                    setTextColor(getColorFromResource(activity, R.color.blog_rating_negative))
+                }
             }
+        }
+
+        holder.comment.text = CodeforcesUtils.fromCodeforcesHTML(comment.text)
+
+        holder.time.text = timeDifference(comment.creationTimeSeconds, TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()))
+
+        holder.view.setOnClickListener {
+            activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(blogEntry.id,comment.id)))
         }
     }
 
