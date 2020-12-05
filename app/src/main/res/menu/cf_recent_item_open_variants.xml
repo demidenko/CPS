@@ -12,4 +12,10 @@
         android:icon="@drawable/ic_open_in_browser"
         />
 
+    <item
+        android:id="@+id/cf_news_recent_item_menu_show_comments"
+        android:title="Show recent comments"
+        android:icon="@drawable/ic_recent_comments"
+        />
+
 </menu>

@@ -48,4 +48,19 @@
         android:visibility="gone"
         />
 
+    <ImageButton
+        android:id="@+id/navigation_news_recent_show_blog_back"
+        android:tooltipText="back"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        app:layout_constraintWidth_percent="0.25"
+        android:src="@drawable/ic_recent_back_from_blog"
+        android:backgroundTint="@android:color/transparent"
+        android:foreground="@android:color/transparent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/navigation_news_reload"
+        android:visibility="gone"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

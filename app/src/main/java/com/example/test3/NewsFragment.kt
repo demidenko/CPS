@@ -71,7 +71,7 @@ class NewsFragment : Fragment() {
         fun changeVisibility(fragment: CodeforcesNewsFragment, type: Int){
             when(fragment.title){
                 CodeforcesTitle.LOST -> updateLostInfoButton.visibility = type
-                CodeforcesTitle.RECENT -> swapRecentButton.visibility = type
+                CodeforcesTitle.RECENT -> (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).changeVisibility(type)
             }
         }
 
@@ -149,12 +149,13 @@ class NewsFragment : Fragment() {
         with(requireActivity() as MainActivity){
             navigation_news_reload.setOnClickListener { reloadTabs() }
             navigation_news_lost_update_info.setOnClickListener { updateLostInfo() }
-            navigation_news_recent_swap.setOnClickListener { button -> button as ImageButton
+            navigation_news_recent_swap.setOnClickListener {
                 val fragment = codeforcesNewsAdapter.fragments.find { it.title == CodeforcesTitle.RECENT } ?: return@setOnClickListener
-                with(fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter){
-                    switchMode(button)
-                    notifyDataSetChanged()
-                }
+                (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).switchMode()
+            }
+            navigation_news_recent_show_blog_back.setOnClickListener {
+                val fragment = codeforcesNewsAdapter.fragments.find { it.title == CodeforcesTitle.RECENT } ?: return@setOnClickListener
+                (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).closeShowFromBlog()
             }
         }
     }
@@ -240,7 +241,6 @@ class NewsFragment : Fragment() {
     }
 
 
-    private val swapRecentButton by lazy { requireActivity().navigation_news_recent_swap }
     private val updateLostInfoButton by lazy { requireActivity().navigation_news_lost_update_info }
 
     private fun updateLostInfo() {
@@ -579,6 +579,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
     }
 
     override fun refresh() {
+        showHeader()
         rows.forEachIndexed { index, blogInfo ->
             rows[index].commentators = calculateCommentatorsSpans(blogInfo.blogId)
         }
@@ -623,28 +624,81 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         val comment: TextView = view.findViewById(R.id.news_item_comment_content)
     }
 
-    override fun getItemCount() = if(modeGrouped) rows.size else rowsComments.size
+    override fun getItemCount(): Int {
+        return headerBlog?.run {
+            rowsComments.count { recentAction ->
+                recentAction.blogEntry!!.id == blogId
+            }
+        } ?: if (modeGrouped) rows.size else rowsComments.size
+    }
 
+    private var headerBlog: BlogInfo? = null
+    private lateinit var header: View
+    private lateinit var switchButton: ImageButton
+    private lateinit var showBackButton: ImageButton
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        with(recyclerView.parent.parent as ConstraintLayout){
+            header = findViewById(R.id.cf_news_page_header)
+        }
+        switchButton = activity.navigation_news_recent_swap
+        showBackButton = activity.navigation_news_recent_show_blog_back
+    }
+
+    fun changeVisibility(type: Int){
+        if(headerBlog == null){
+            switchButton.visibility = type
+        }else{
+            showBackButton.visibility = type
+        }
+    }
+
+    private fun showHeader(){
+        if(headerBlog!=null) header.apply {
+            val info = headerBlog!!
+            findViewById<TextView>(R.id.news_item_title).text = info.title
+            findViewById<TextView>(R.id.news_item_author).text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag)
+            visibility = View.VISIBLE
+        } else {
+            header.visibility = View.GONE
+        }
+    }
+
+    fun showFromBlog(info: BlogInfo){
+        switchButton.visibility = View.GONE
+        showBackButton.visibility = View.VISIBLE
+        headerBlog = info
+        showHeader()
+        notifyDataSetChanged()
+    }
+    fun closeShowFromBlog(){
+        switchButton.visibility = View.VISIBLE
+        showBackButton.visibility = View.GONE
+        headerBlog = null
+        showHeader()
+        notifyDataSetChanged()
+    }
 
     private var modeGrouped = true
-    fun switchMode(button: ImageButton){
+    fun switchMode(){
         modeGrouped = !modeGrouped
-        if(modeGrouped) button.setImageResource(R.drawable.ic_recent_mode_comments)
-        else button.setImageResource(R.drawable.ic_recent_mode_grouped)
+        if(modeGrouped) switchButton.setImageResource(R.drawable.ic_recent_mode_comments)
+        else switchButton.setImageResource(R.drawable.ic_recent_mode_grouped)
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        if(modeGrouped){
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_item, parent, false) as ConstraintLayout
-            return CodeforcesNewsBlogItemViewHolder(view)
-        }else{
+        if (headerBlog!=null || !modeGrouped) {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_comment, parent, false) as ConstraintLayout
             return CodeforcesNewsCommentItemViewHolder(view)
+        } else {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_item, parent, false) as ConstraintLayout
+            return CodeforcesNewsBlogItemViewHolder(view)
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if(modeGrouped) 0 else 1
+        return if (headerBlog!=null || !modeGrouped) 1 else 0
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -688,6 +742,10 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
                             activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(info.blogId,info.lastCommentId)))
                             true
                         }
+                        R.id.cf_news_recent_item_menu_show_comments -> {
+                            showFromBlog(info)
+                            true
+                        }
                         else -> false
                     }
                 }
@@ -706,7 +764,10 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
     }
 
     private fun onBindViewCommentHolder(holder: CodeforcesNewsCommentItemViewHolder, position: Int){
-        val recentAction = rowsComments[position]
+        val recentAction =
+            headerBlog?.run { rowsComments.filter { it.blogEntry!!.id == blogId }[position] }
+                ?: rowsComments[position]
+
         val blogEntry = recentAction.blogEntry!!
         val comment = recentAction.comment!!
 
@@ -734,6 +795,14 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
         holder.view.setOnClickListener {
             activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(blogEntry.id,comment.id)))
+        }
+
+        if(headerBlog!=null){
+            holder.title.visibility = View.GONE
+            holder.view.findViewById<TextView>(R.id.recent_arrow).visibility = View.GONE
+        }else{
+            holder.title.visibility = View.VISIBLE
+            holder.view.findViewById<TextView>(R.id.recent_arrow).visibility = View.VISIBLE
         }
     }
 

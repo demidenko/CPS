@@ -2,23 +2,36 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
+
+    <include
+        android:id="@+id/cf_news_page_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/cf_news_page_swipe_refresh_layout"
+        layout="@layout/cf_news_page_header"
+        android:layout_marginStart="3dp"
+        android:layout_marginEnd="3dp"
+        android:visibility="gone"
+        />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
         android:id="@+id/cf_news_page_swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintVertical_weight="1"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/cf_news_page_header"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constrainedHeight="true"
         >
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/cf_news_page_recyclerview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
