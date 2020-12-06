@@ -395,8 +395,10 @@ abstract class CodeforcesNewsItemsAdapter: RecyclerView.Adapter<RecyclerView.Vie
     abstract fun getBlogIDs(): List<String>
 
     protected lateinit var activity: MainActivity
+    protected lateinit var recyclerView: RecyclerView
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         activity = recyclerView.context as MainActivity
+        this.recyclerView = recyclerView
     }
 
     open fun refresh(){
@@ -670,10 +672,11 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         headerBlog = info
         showHeader()
         notifyDataSetChanged()
+        recyclerView.scrollToPosition(0)
     }
     fun closeShowFromBlog(){
-        switchButton.visibility = View.VISIBLE
         showBackButton.visibility = View.GONE
+        switchButton.visibility = View.VISIBLE
         headerBlog = null
         showHeader()
         notifyDataSetChanged()
