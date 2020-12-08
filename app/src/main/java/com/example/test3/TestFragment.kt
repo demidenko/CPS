@@ -35,13 +35,13 @@ class TestFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?){
         super.onViewCreated(view, savedInstanceState)
-        val activity = requireActivity() as MainActivity
+        val mainActivity = requireActivity() as MainActivity
 
 
         val stuff = view.findViewById<TextView>(R.id.stuff_textview)
         val handleEditText = view.findViewById<EditText>(R.id.dev_text_editor_handle)
         val contestIDEditText = view.findViewById<EditText>(R.id.dev_text_editor_contest_id)
-        val prefs = activity.getSharedPreferences("test", Context.MODE_PRIVATE)
+        val prefs = mainActivity.getSharedPreferences("test", Context.MODE_PRIVATE)
         contestIDEditText.setText(prefs.getInt("contest_id", 0).toString())
         handleEditText.setText(prefs.getString("handle", ""))
 
@@ -52,20 +52,20 @@ class TestFragment : Fragment() {
             val handle = handleEditText.text.toString()
             val contestID = contestIDEditText.text.toString().toInt()
 
-            activity.scope.launch {
+            mainActivity.scope.launch {
                 CodeforcesAPI.getUser(handle)?.let { userInfo ->
                     if(userInfo.status == CodeforcesAPIStatus.OK){
-                        val intent = Intent(activity, CodeforcesContestWatchService::class.java)
+                        val intent = Intent(mainActivity, CodeforcesContestWatchService::class.java)
                             .setAction(CodeforcesContestWatchService.ACTION_START)
                             .putExtra("handle", userInfo.result!!.handle)
                             .putExtra("contestID", contestID)
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                            activity.startForegroundService(intent)
+                            mainActivity.startForegroundService(intent)
                         } else {
-                            activity.startService(intent)
+                            mainActivity.startService(intent)
                         }
                     }else{
-                        Toast.makeText(activity, userInfo.comment, Toast.LENGTH_LONG).show()
+                        Toast.makeText(mainActivity, userInfo.comment, Toast.LENGTH_LONG).show()
                     }
                 }
             }
@@ -79,13 +79,13 @@ class TestFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.button_watcher_stop).setOnClickListener { button -> button as Button
-            activity.startService(CodeforcesContestWatchService.makeStopIntent(activity))
+            mainActivity.startService(CodeforcesContestWatchService.makeStopIntent(mainActivity))
         }
 
         view.findViewById<Button>(R.id.dev_choose_contest).setOnClickListener { button -> button as Button
             button.isEnabled = false
 
-            activity.scope.launch {
+            mainActivity.scope.launch {
                 val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item)
                 val contests = arrayListOf<CodeforcesContest>()
                 CodeforcesAPI.getContests()?.result?.forEach {
@@ -95,7 +95,7 @@ class TestFragment : Fragment() {
                     }
                 }
 
-                AlertDialog.Builder(activity)
+                AlertDialog.Builder(mainActivity)
                     .setTitle("Running or Future Contests")
                     .setAdapter(adapter) { _, index ->
                         contestIDEditText.setText(contests[index].id.toString())
@@ -108,17 +108,19 @@ class TestFragment : Fragment() {
         view.findViewById<Button>(R.id.dev_choose_handle).setOnClickListener { button -> button as Button
             button.isEnabled = false
 
-            activity.scope.launch {
-                activity.chooseUserID(handleEditText.text.toString(), activity.accountsFragment.codeforcesAccountManager)?.let {
-                    handleEditText.setText(it.userID)
+            with(mainActivity){
+                scope.launch {
+                    chooseUserID(accountsFragment.codeforcesAccountManager)?.let {
+                        handleEditText.setText(it.userID)
+                    }
+                    button.isEnabled = true
                 }
-                button.isEnabled = true
             }
         }
 
         //show running jobs
         view.findViewById<Button>(R.id.button_running_jobs).setOnClickListener {
-            stuff.text = JobServicesCenter.getRunningJobServices(activity).joinToString(separator = "\n"){ info ->
+            stuff.text = JobServicesCenter.getRunningJobServices(mainActivity).joinToString(separator = "\n"){ info ->
                 "Job " + info.id + ": " + info.service.shortClassName.removeSuffix("JobService").removePrefix(".job_services.")
             }
         }
@@ -181,9 +183,9 @@ class TestFragment : Fragment() {
         val rnd = Random()
         view.findViewById<Button>(R.id.button_test_add_bar).setOnClickListener { button -> button as Button
             val t = (rnd.nextInt(10) + 1)
-            val bar = BottomProgressInfo(t, t.toString(), activity)
+            val bar = BottomProgressInfo(t, t.toString(), mainActivity)
 
-            activity.scope.launch {
+            mainActivity.scope.launch {
                 for (i in 1..t){
                     delay(1000)
                     bar.increment()

@@ -23,11 +23,13 @@ import kotlinx.coroutines.launch
 
 class AccountsFragment: Fragment() {
 
-    lateinit var codeforcesAccountManager: CodeforcesAccountManager
-    lateinit var atcoderAccountManager: AtCoderAccountManager
-    lateinit var topcoderAccountManager: TopCoderAccountManager
-    lateinit var acmpAccountManager: ACMPAccountManager
-    lateinit var timusAccountManager: TimusAccountManager
+    private val mainActivity by lazy { requireActivity() as MainActivity }
+
+    val codeforcesAccountManager by lazy { CodeforcesAccountManager(mainActivity) }
+    val atcoderAccountManager by lazy { AtCoderAccountManager(mainActivity) }
+    val topcoderAccountManager by lazy { TopCoderAccountManager(mainActivity) }
+    val acmpAccountManager by lazy { ACMPAccountManager(mainActivity) }
+    val timusAccountManager by lazy { TimusAccountManager(mainActivity) }
 
     private lateinit var codeforcesPanel: AccountPanel
     private lateinit var atcoderPanel: AccountPanel
@@ -61,10 +63,7 @@ class AccountsFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         println("fragment accounts onViewCreated "+savedInstanceState)
 
-        val activity = requireActivity() as MainActivity
-
-        codeforcesAccountManager = CodeforcesAccountManager(activity)
-        codeforcesPanel = object : AccountPanel(activity, codeforcesAccountManager){
+        codeforcesPanel = object : AccountPanel(mainActivity, codeforcesAccountManager){
             override fun show(info: UserInfo) { info as CodeforcesAccountManager.CodeforcesUserInfo
                 val color = manager.getColor(info)
                 textMain.text = CodeforcesUtils.makeSpan(info)
@@ -79,8 +78,7 @@ class AccountsFragment: Fragment() {
             }
         }
 
-        atcoderAccountManager = AtCoderAccountManager(activity)
-        atcoderPanel = object : AccountPanel(activity, atcoderAccountManager){
+        atcoderPanel = object : AccountPanel(mainActivity, atcoderAccountManager){
             override fun show(info: UserInfo) { info as AtCoderAccountManager.AtCoderUserInfo
                 val color = manager.getColor(info)
                 textMain.text = info.handle
@@ -96,8 +94,7 @@ class AccountsFragment: Fragment() {
             }
         }
 
-        topcoderAccountManager = TopCoderAccountManager(activity)
-        topcoderPanel = object : AccountPanel(activity, topcoderAccountManager){
+        topcoderPanel = object : AccountPanel(mainActivity, topcoderAccountManager){
             override fun show(info: UserInfo) { info as TopCoderAccountManager.TopCoderUserInfo
                 val color = manager.getColor(info)
                 textMain.text = info.handle
@@ -113,8 +110,7 @@ class AccountsFragment: Fragment() {
             }
         }
 
-        acmpAccountManager = ACMPAccountManager(activity)
-        acmpPanel = object : AccountPanel(activity, acmpAccountManager){
+        acmpPanel = object : AccountPanel(mainActivity, acmpAccountManager){
             override fun show(info: UserInfo) { info as ACMPAccountManager.ACMPUserInfo
                 with(info){
                     if (status == STATUS.OK) {
@@ -130,8 +126,7 @@ class AccountsFragment: Fragment() {
             }
         }
 
-        timusAccountManager = TimusAccountManager(activity)
-        timusPanel = object : AccountPanel(activity, timusAccountManager){
+        timusPanel = object : AccountPanel(mainActivity, timusAccountManager){
             override fun show(info: UserInfo) { info as TimusAccountManager.TimusUserInfo
                 with(info){
                     if (status == STATUS.OK) {
@@ -155,7 +150,7 @@ class AccountsFragment: Fragment() {
 
         showPanels()
 
-        with(activity){
+        with(mainActivity){
             navigation_accounts_reload.setOnClickListener { reloadAccounts() }
             navigation_accounts_add.setOnClickListener { addAccount() }
         }
@@ -180,17 +175,16 @@ class AccountsFragment: Fragment() {
     }
 
     private fun clistImport() {
-        val activity = requireActivity() as MainActivity
-        activity.scope.launch {
-            val clistUserInfo = activity.chooseUserID("", CListAccountManager(activity)) as? CListAccountManager.CListUserInfo ?: return@launch
+        mainActivity.scope.launch {
+            val clistUserInfo = mainActivity.chooseUserID(CListAccountManager(mainActivity)) as? CListAccountManager.CListUserInfo ?: return@launch
 
-            activity.navigation_accounts_add.isEnabled = false
+            mainActivity.navigation_accounts_add.isEnabled = false
 
             val supported = clistUserInfo.accounts.mapNotNull { (resource, userData) ->
-                CListUtils.getManager(resource, userData.first, userData.second, activity)
+                CListUtils.getManager(resource, userData.first, userData.second, mainActivity)
             }
 
-            val progressInfo = BottomProgressInfo(supported.size, "clist import", activity)
+            val progressInfo = BottomProgressInfo(supported.size, "clist import", mainActivity)
 
             supported.map { (manager, userID) ->
                 val panel = getPanel(manager.PREFERENCES_FILE_NAME)
@@ -206,7 +200,7 @@ class AccountsFragment: Fragment() {
             }.awaitAll()
 
             progressInfo.finish()
-            activity.navigation_accounts_add.isEnabled = true
+            mainActivity.navigation_accounts_add.isEnabled = true
         }
     }
 
@@ -227,7 +221,7 @@ class AccountsFragment: Fragment() {
         }
         //println("update UI: $allEmpty $statusBarColor")
         requireView().findViewById<TextView>(R.id.accounts_welcome_text).visibility = if(allEmpty) View.VISIBLE else View.GONE
-        requireActivity().window.statusBarColor = statusBarColor
+        mainActivity.window.statusBarColor = statusBarColor
     }
 
     fun showPanels() {
@@ -235,7 +229,7 @@ class AccountsFragment: Fragment() {
     }
 
     fun reloadAccounts() {
-        (requireActivity() as MainActivity).scope.launch {
+        mainActivity.scope.launch {
             panels.forEach {
                 launch { it.reload() }
             }
@@ -248,11 +242,11 @@ class AccountsFragment: Fragment() {
         } ?: throw Exception("Unknown type of manager: $managerType")
     }
 
-    val sharedReloadButton by lazy { SharedReloadButton(requireActivity().navigation_accounts_reload) }
+    val sharedReloadButton by lazy { SharedReloadButton(mainActivity.navigation_accounts_reload) }
 
     override fun onHiddenChanged(hidden: Boolean) {
         if(!hidden){
-            with(requireActivity() as MainActivity){
+            with(mainActivity){
                 navigation.visibility = View.VISIBLE
             }
         }

@@ -53,8 +53,10 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
             with(activity){
                 scope.launch {
 
-                    val userInfo = chooseUserID("", accountsFragment.codeforcesAccountManager) ?: return@launch
-                    userInfo as CodeforcesAccountManager.CodeforcesUserInfo
+                    val userInfo = chooseUserID(
+                        accountsFragment.codeforcesAccountManager.emptyInfo(),
+                        accountsFragment.codeforcesAccountManager
+                    ) as? CodeforcesAccountManager.CodeforcesUserInfo ?: return@launch
 
                     button.isEnabled = false
 

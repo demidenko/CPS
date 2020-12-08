@@ -30,7 +30,7 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
 class DialogAccountChooser(
-    private val initialText: String,
+    private val initialUserInfo: UserInfo,
     private val manager: AccountManager,
     private val cont: Continuation<UserInfo?>
 ): DialogFragment() {
@@ -45,7 +45,7 @@ class DialogAccountChooser(
             .setTitle("getUserID(${manager.PREFERENCES_FILE_NAME})")
             .setView(view)
             .setPositiveButton("return"){ _, _ ->
-                with(userIDChangeWatcher.lastLoadedInfo!!){
+                with(userIDChangeWatcher.lastLoadedInfo){
                     if(status == STATUS.NOT_FOUND){
                         activity.showToast("User not found")
                         cont.resume(null)
@@ -64,14 +64,17 @@ class DialogAccountChooser(
         dialog.findViewById<TextView>(resources.getIdentifier("alertTitle", "id", "android")).typeface = Typeface.MONOSPACE
 
         val input = dialog.findViewById<EditText>(R.id.account_choose_input).apply {
-            setText(initialText)
+            setText(initialUserInfo.userID)
         }
 
-        val saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        val saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE).apply {
+            isEnabled = false
+        }
 
         userIDChangeWatcher = UserIDChangeWatcher(
             this,
             manager,
+            initialUserInfo,
             input,
             saveButton,
             dialog.findViewById(R.id.account_choose_info),
@@ -88,6 +91,7 @@ class DialogAccountChooser(
     class UserIDChangeWatcher(
         val fragment: Fragment,
         val manager: AccountManager,
+        var lastLoadedInfo: UserInfo,
         val handleEditor: EditText,
         val saveButton: Button,
         val preview: TextView,
@@ -98,8 +102,6 @@ class DialogAccountChooser(
 
         var jobInfo: Job? = null
         var jobSuggestions: Job? = null
-
-        var lastLoadedInfo: UserInfo? = null
 
         val suggestionsAdapter: SuggestionsItemsAdapter
 
@@ -139,10 +141,10 @@ class DialogAccountChooser(
             //TODO: check symbols
             val userId = editable?.toString() ?: return
 
-            if(userId == lastLoadedInfo?.userID) return
+            if(userId == lastLoadedInfo.userID) return
 
             saveButton.isEnabled = false
-            lastLoadedInfo = null
+            lastLoadedInfo = manager.emptyInfo()
 
             jobInfo?.cancel()
             jobSuggestions?.cancel()

@@ -158,12 +158,12 @@ class MainActivity : AppCompatActivity(){
         return super.onOptionsItemSelected(item)
     }
 
-    suspend fun chooseUserID(manager: AccountManager) = chooseUserID(manager.savedInfo.userID, manager)
+    suspend fun chooseUserID(manager: AccountManager) = chooseUserID(manager.savedInfo, manager)
 
-    suspend fun chooseUserID(initialText: String, manager: AccountManager): UserInfo? {
+    suspend fun chooseUserID(initialUserInfo: UserInfo, manager: AccountManager): UserInfo? {
         return withContext(scope.coroutineContext) {
             suspendCoroutine { cont ->
-                val dialog = DialogAccountChooser(initialText, manager, cont)
+                val dialog = DialogAccountChooser(initialUserInfo, manager, cont)
                 dialog.show(supportFragmentManager, "account_choose")
             }
         }
