@@ -8,6 +8,9 @@ import com.example.test3.R
 import com.example.test3.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.util.*
@@ -25,7 +28,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                 val sc = Scanner(context.openFileInput(file_name))
                 while(sc.hasNextLine()){
                     val str = sc.nextLine()
-                    res.add(CodeforcesBlogEntry.jsonAdapter.fromJson(str)!!)
+                    res.add(Json.decodeFromString(str))
                 }
                 return res
             }catch (e: FileNotFoundException){
@@ -39,7 +42,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         fun saveBlogs(context: Context, file_name: String, blogs: Collection<CodeforcesBlogEntry>){
             val out = PrintWriter(context.openFileOutput(file_name, Context.MODE_PRIVATE))
             blogs.forEach {
-                val str = CodeforcesBlogEntry.jsonAdapter.toJson(it)
+                val str = Json.encodeToString(it)
                 out.println(str)
             }
             out.flush()

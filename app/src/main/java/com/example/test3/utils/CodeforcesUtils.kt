@@ -8,16 +8,16 @@ import android.text.style.StyleSpan
 import androidx.core.text.set
 import com.example.test3.account_manager.*
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import com.squareup.moshi.JsonClass
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
@@ -251,7 +251,7 @@ enum class CodeforcesAPIStatus{
     OK, FAILED
 }
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CodeforcesAPIResponse<T>(
     val status: CodeforcesAPIStatus,
     val result: T? = null,
@@ -263,25 +263,20 @@ data class CodeforcesAPIResponse<T>(
     )
 }
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CodeforcesAPIErrorResponse(
     val status: CodeforcesAPIStatus,
     val comment: String
-){
-    companion object{
-        //val jsonAdapter: JsonAdapter<CodeforcesAPIErrorResponse> = Moshi.Builder().build().adapter(CodeforcesAPIErrorResponse::class.java)
-        val jsonAdapter = CodeforcesAPIErrorResponseJsonAdapter(Moshi.Builder().build())
-    }
-}
+)
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CodeforcesUser(
     val handle: String,
     val rating: Int = NOT_RATED,
     val contribution: Int = 0
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CodeforcesContest(
     val id: Int,
     val name: String,
@@ -292,13 +287,13 @@ data class CodeforcesContest(
     val relativeTimeSeconds: Long
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CodeforcesContestStandings(
     val contest: CodeforcesContest,
     val problems: List<CodeforcesProblem>,
     val rows: List<CodeforcesContestStandingsRow>
 ){
-    @JsonClass(generateAdapter = true)
+    @Serializable
     data class CodeforcesContestStandingsRow(
         val rank: Int,
         val points: Double,
@@ -306,7 +301,7 @@ data class CodeforcesContestStandings(
         val problemResults: List<CodeforcesProblemResult>
     )
 
-    @JsonClass(generateAdapter = true)
+    @Serializable
     data class CodeforcesContestParticipant(
         val contestId: Int,
         val participantType: CodeforcesParticipationType,
@@ -314,21 +309,21 @@ data class CodeforcesContestStandings(
     )
 }
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CodeforcesProblem(
     val name: String,
     val index: String,
-    val points: Int = 0
+    val points: Double = 0.0
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CodeforcesProblemResult(
     val points: Double,
     val type: CodeforcesProblemStatus,
     val rejectedAttemptCount: Int
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CodeforcesSubmission(
     val contestId: Int,
     val problem: CodeforcesProblem,
@@ -340,7 +335,7 @@ data class CodeforcesSubmission(
 )
 
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CodeforcesBlogEntry(
     val id: Int,
     val title: String,
@@ -348,13 +343,9 @@ data class CodeforcesBlogEntry(
     val creationTimeSeconds: Long,
     val rating: Int = 0,
     val authorColorTag: String = ""
-){
-    companion object {
-        val jsonAdapter = CodeforcesBlogEntryJsonAdapter(Moshi.Builder().build())
-    }
-}
+)
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CodeforcesRatingChange(
     val contestId: Int,
     val handle: String,
@@ -363,7 +354,7 @@ data class CodeforcesRatingChange(
     val newRating: Int
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CodeforcesComment(
     val id: Long,
     val creationTimeSeconds: Long,
@@ -373,7 +364,7 @@ data class CodeforcesComment(
     val commentatorHandleColorTag: String = ""
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CodeforcesRecentAction(
     val timeSeconds: Long,
     val blogEntry: CodeforcesBlogEntry? = null,
@@ -433,7 +424,7 @@ object CodeforcesAPI {
 
     private val api = Retrofit.Builder()
         .baseUrl("https://codeforces.com/api/")
-        .addConverterFactory(MoshiConverterFactory.create())
+        .addConverterFactory(jsonConverterFactory)
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
         .client(httpClient)
         .build()
@@ -446,7 +437,7 @@ object CodeforcesAPI {
                 val r = c.execute()
                 if(r.isSuccessful) return@withContext r.body()
                 val s = r.errorBody()?.string() ?: return@withContext null
-                val er: CodeforcesAPIErrorResponse = CodeforcesAPIErrorResponse.jsonAdapter.fromJson(s) ?: return@withContext null
+                val er: CodeforcesAPIErrorResponse = Json.decodeFromString<CodeforcesAPIErrorResponse>(s) ?: return@withContext null
                 if(er.comment == "Call limit exceeded"){
                     delay(callLimitExceededWaitTimeMillis)
                     c = c.clone()
