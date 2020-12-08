@@ -32,21 +32,19 @@ object TimusAPI {
         .build()
         .create(WEB::class.java)
 
-    suspend fun getUser(id: String): String? {
+    suspend fun getUser(id: String): String? = withContext(Dispatchers.IO){
         try {
-            return timusWEB.getUser(id).execute().body()?.string()
+            timusWEB.getUser(id).execute().body()?.string()
         }catch (e: IOException){
-            return null
+            null
         }
     }
 
-    suspend fun getUserSearch(str: String): String? {
+    suspend fun getUserSearch(str: String): String? = withContext(Dispatchers.IO){
         try {
-            return withContext(Dispatchers.IO){
-                timusWEB.getUserSearch(str).execute().body()?.string()
-            }
+            timusWEB.getUserSearch(str).execute().body()?.string()
         }catch (e: IOException){
-            return null
+            null
         }
     }
 }

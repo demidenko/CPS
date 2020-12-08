@@ -1,6 +1,8 @@
 package com.example.test3.utils
 
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
@@ -31,19 +33,19 @@ object AtCoderAPI {
         .build()
         .create(WEB::class.java)
 
-    suspend fun getUser(handle: String): Response<ResponseBody>? {
+    suspend fun getUser(handle: String): Response<ResponseBody>? = withContext(Dispatchers.IO){
         try {
-            return atcoderWEB.getUser(handle).execute()
+            atcoderWEB.getUser(handle).execute()
         }catch (e: IOException){
-            return null
+            null
         }
     }
 
-    suspend fun getRankingSearch(str: String): Response<ResponseBody>? {
+    suspend fun getRankingSearch(str: String): Response<ResponseBody>? = withContext(Dispatchers.IO){
         try {
-            return atcoderWEB.getRankingSearch(str).execute()
+            atcoderWEB.getRankingSearch(str).execute()
         }catch (e: IOException){
-            return null
+            null
         }
     }
 }

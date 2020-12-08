@@ -54,7 +54,9 @@ object ACMPAPI {
 
     suspend fun getUser(id: String): String? {
         try {
-            return decode(acmpWEB.getUser(id).execute())
+            return withContext(Dispatchers.IO){
+                decode(acmpWEB.getUser(id).execute())
+            }
         }catch (e: IOException){
             return null
         }

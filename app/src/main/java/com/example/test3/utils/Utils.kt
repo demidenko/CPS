@@ -4,6 +4,9 @@ import android.text.Html
 import android.text.Spanned
 import android.widget.ImageButton
 import androidx.core.text.HtmlCompat
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -15,6 +18,7 @@ val httpClient = OkHttpClient
     .readTimeout(30, TimeUnit.SECONDS)
     .build()
 
+val jsonConverterFactory = Json{ ignoreUnknownKeys = true }.asConverterFactory(MediaType.get("application/json"))
 
 fun fromHTML(s: String): Spanned {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {

@@ -3,6 +3,8 @@ package com.example.test3.utils
 import com.example.test3.MainActivity
 import com.example.test3.account_manager.AccountManager
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
@@ -49,19 +51,19 @@ object CListAPI {
         .build()
         .create(WEB::class.java)
 
-    suspend fun getUser(login: String): Response<ResponseBody>? {
+    suspend fun getUser(login: String): Response<ResponseBody>? = withContext(Dispatchers.IO){
         try {
-            return clistWEB.getUser(login).execute()
+            clistWEB.getUser(login).execute()
         }catch (e: IOException){
-            return null
+            null
         }
     }
 
-    suspend fun getUsersSearch(str: String): Response<ResponseBody>? {
+    suspend fun getUsersSearch(str: String): Response<ResponseBody>?  = withContext(Dispatchers.IO){
         try {
-            return clistWEB.getUsersSearch(str).execute()
+            clistWEB.getUsersSearch(str).execute()
         }catch (e: IOException){
-            return null
+            null
         }
     }
 }
