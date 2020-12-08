@@ -68,7 +68,7 @@ class DialogAccountChooser(
         }
 
         val saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE).apply {
-            isEnabled = false
+            isEnabled = initialUserInfo.status == STATUS.OK
         }
 
         userIDChangeWatcher = UserIDChangeWatcher(
@@ -106,7 +106,8 @@ class DialogAccountChooser(
         val suggestionsAdapter: SuggestionsItemsAdapter
 
         init {
-            preview.text = ""
+            preview.text = if(lastLoadedInfo.userID.isEmpty()) ""
+            else lastLoadedInfo.makeInfoString()
 
             suggestionsAdapter = SuggestionsItemsAdapter(this)
 
