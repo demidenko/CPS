@@ -36,9 +36,7 @@ class CListAccountManager(context: Context) : AccountManager(context) {
 
     override fun writeInfo(info: UserInfo): Boolean = false
 
-    override fun emptyInfo(): UserInfo {
-        return CListUserInfo(STATUS.NOT_FOUND, "")
-    }
+    override fun emptyInfo() = CListUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String): UserInfo {
         val login = data

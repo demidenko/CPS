@@ -4,9 +4,14 @@ import android.content.Context
 import com.example.test3.utils.AtCoderAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class AtCoderAccountManager(context: Context): AccountManager(context) {
 
+    @Serializable
     data class AtCoderUserInfo(
         override var status: STATUS,
         var handle: String,
@@ -27,8 +32,6 @@ class AtCoderAccountManager(context: Context): AccountManager(context) {
 
     companion object : ColoredHandles {
         const val preferences_file_name = "atcoder"
-        const val preferences_handle = "handle"
-        const val preferences_rating = "rating"
 
         var __cachedInfo: AtCoderUserInfo? = null
 
@@ -62,9 +65,7 @@ class AtCoderAccountManager(context: Context): AccountManager(context) {
         }
     }
 
-    override fun emptyInfo(): UserInfo {
-        return AtCoderUserInfo(STATUS.NOT_FOUND, "")
-    }
+    override fun emptyInfo() = AtCoderUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String): UserInfo {
         val handle = data
@@ -92,18 +93,13 @@ class AtCoderAccountManager(context: Context): AccountManager(context) {
         set(value) { __cachedInfo = value as AtCoderUserInfo }
 
     override fun readInfo(): AtCoderUserInfo = with(prefs){
-        AtCoderUserInfo(
-            STATUS.valueOf(getString(preferences_status, null) ?: STATUS.FAILED.name),
-            handle = getString(preferences_handle, null) ?: "",
-            rating = getInt(preferences_rating, NOT_RATED)
-        )
+        val str = getString(preferences_key_user_info, null) ?: return@with emptyInfo().apply { status = STATUS.FAILED }
+        Json.decodeFromString(str)
     }
 
     override fun writeInfo(info: UserInfo) = with(prefs.edit()){
-        putString(preferences_status, info.status.name)
         info as AtCoderUserInfo
-        putString(preferences_handle, info.handle)
-        putInt(preferences_rating, info.rating)
+        putString(preferences_key_user_info, Json.encodeToString(info))
         commit()
     }
 

@@ -2,9 +2,14 @@ package com.example.test3.account_manager
 
 import android.content.Context
 import com.example.test3.utils.TopCoderAPI
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class TopCoderAccountManager(context: Context): AccountManager(context) {
 
+    @Serializable
     data class TopCoderUserInfo(
         override var status: STATUS,
         var handle: String,
@@ -26,9 +31,6 @@ class TopCoderAccountManager(context: Context): AccountManager(context) {
 
     companion object : ColoredHandles {
         const val preferences_file_name = "topcoder"
-        const val preferences_handle = "handle"
-        const val preferences_rating_algorithm = "rating_algorithm"
-        const val preferences_rating_marathon = "rating_marathon"
 
         var __cachedInfo: TopCoderUserInfo? = null
 
@@ -55,9 +57,7 @@ class TopCoderAccountManager(context: Context): AccountManager(context) {
         }
     }
 
-    override fun emptyInfo(): UserInfo {
-        return TopCoderUserInfo(STATUS.NOT_FOUND, "")
-    }
+    override fun emptyInfo() = TopCoderUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String): UserInfo {
         val handle = data
@@ -85,20 +85,13 @@ class TopCoderAccountManager(context: Context): AccountManager(context) {
         set(value) { __cachedInfo = value as TopCoderUserInfo }
 
     override fun readInfo(): TopCoderUserInfo = with(prefs){
-        TopCoderUserInfo(
-            STATUS.valueOf(getString(preferences_status, null) ?: STATUS.FAILED.name),
-            handle = getString(preferences_handle, null) ?: "",
-            rating_algorithm = getInt(preferences_rating_algorithm, NOT_RATED),
-            rating_marathon = getInt(preferences_rating_marathon, NOT_RATED)
-        )
+        val str = getString(preferences_key_user_info, null) ?: return@with emptyInfo().apply { status = STATUS.FAILED }
+        Json.decodeFromString(str)
     }
 
     override fun writeInfo(info: UserInfo) = with(prefs.edit()){
-        putString(preferences_status, info.status.name)
         info as TopCoderUserInfo
-        putString(preferences_handle, info.handle)
-        putInt(preferences_rating_algorithm, info.rating_algorithm)
-        putInt(preferences_rating_marathon, info.rating_marathon)
+        putString(preferences_key_user_info, Json.encodeToString(info))
         commit()
     }
 

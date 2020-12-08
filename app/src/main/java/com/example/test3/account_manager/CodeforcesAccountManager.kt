@@ -7,9 +7,14 @@ import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.CodeforcesUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class CodeforcesAccountManager(context: Context): AccountManager(context) {
 
+    @Serializable
     data class CodeforcesUserInfo(
         override var status: STATUS,
         var handle: String,
@@ -31,17 +36,12 @@ class CodeforcesAccountManager(context: Context): AccountManager(context) {
 
     companion object{
         const val preferences_file_name = "codeforces"
-        const val preferences_handle = "handle"
-        const val preferences_rating = "rating"
-        const val preferences_contribution = "contribution"
 
         var __cachedInfo: CodeforcesUserInfo? = null
 
     }
 
-    override fun emptyInfo(): UserInfo {
-        return CodeforcesUserInfo(STATUS.NOT_FOUND, "")
-    }
+    override fun emptyInfo() = CodeforcesUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String): CodeforcesUserInfo {
         val handle = data
@@ -65,20 +65,13 @@ class CodeforcesAccountManager(context: Context): AccountManager(context) {
         set(value) { __cachedInfo = value as CodeforcesUserInfo }
 
     override fun readInfo(): CodeforcesUserInfo = with(prefs){
-        CodeforcesUserInfo(
-            STATUS.valueOf(getString(preferences_status, null) ?: STATUS.FAILED.name),
-            handle = getString(preferences_handle, null) ?: "",
-            rating = getInt(preferences_rating, NOT_RATED),
-            contribution = getInt(preferences_contribution, 0)
-        )
+        val str = getString(preferences_key_user_info, null) ?: return@with emptyInfo().apply { status = STATUS.FAILED }
+        Json.decodeFromString(str)
     }
 
     override fun writeInfo(info: UserInfo) = with(prefs.edit()){
-        putString(preferences_status, info.status.name)
         info as CodeforcesUserInfo
-        putString(preferences_handle, info.handle)
-        putInt(preferences_rating, info.rating)
-        putInt(preferences_contribution, info.contribution)
+        putString(preferences_key_user_info, Json.encodeToString(info))
         commit()
     }
 

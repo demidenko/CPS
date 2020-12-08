@@ -2,8 +2,14 @@ package com.example.test3.account_manager
 
 import android.content.Context
 import com.example.test3.utils.ACMPAPI
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class ACMPAccountManager(context: Context): AccountManager(context) {
+
+    @Serializable
     data class ACMPUserInfo(
         override var status: STATUS,
         var id: String,
@@ -29,19 +35,12 @@ class ACMPAccountManager(context: Context): AccountManager(context) {
 
     companion object{
         const val preferences_file_name = "acmp"
-        const val preferences_userid = "userid"
-        const val preferences_username = "username"
-        const val preferences_rating = "rating"
-        const val preferences_count_of_solved_tasks = "count_of_solved_tasks"
-        const val preferences_place = "place"
 
 
         var __cachedInfo: ACMPUserInfo? = null
     }
 
-    override fun emptyInfo(): UserInfo {
-        return ACMPUserInfo(STATUS.NOT_FOUND, "")
-    }
+    override fun emptyInfo() = ACMPUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String): ACMPUserInfo {
         val res = ACMPUserInfo(STATUS.FAILED, data)
@@ -73,24 +72,13 @@ class ACMPAccountManager(context: Context): AccountManager(context) {
         set(value) { __cachedInfo = value as ACMPUserInfo }
 
     override fun readInfo(): ACMPUserInfo = with(prefs){
-        ACMPUserInfo(
-            STATUS.valueOf(getString(preferences_status, null) ?: STATUS.FAILED.name),
-            id = getString(preferences_userid, null) ?: "",
-            userName = getString(preferences_username, null) ?: "",
-            rating = getInt(preferences_rating, 0),
-            solvedTasks = getInt(preferences_count_of_solved_tasks, 0),
-            place = getInt(preferences_place, 0)
-        )
+        val str = getString(preferences_key_user_info, null) ?: return@with emptyInfo().apply { status = STATUS.FAILED }
+        Json.decodeFromString(str)
     }
 
     override fun writeInfo(info: UserInfo) = with(prefs.edit()){
-        putString(preferences_status, info.status.name)
         info as ACMPUserInfo
-        putString(preferences_userid, info.id)
-        putString(preferences_username, info.userName)
-        putInt(preferences_rating, info.rating)
-        putInt(preferences_count_of_solved_tasks, info.solvedTasks)
-        putInt(preferences_place, info.place)
+        putString(preferences_key_user_info, Json.encodeToString(info))
         commit()
     }
 

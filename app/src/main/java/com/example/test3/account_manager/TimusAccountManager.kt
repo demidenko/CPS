@@ -3,8 +3,14 @@ package com.example.test3.account_manager
 import android.content.Context
 import com.example.test3.utils.TimusAPI
 import com.example.test3.utils.fromHTML
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class TimusAccountManager(context: Context): AccountManager(context) {
+
+    @Serializable
     data class TimusUserInfo(
         override var status: STATUS,
         var id: String,
@@ -29,20 +35,11 @@ class TimusAccountManager(context: Context): AccountManager(context) {
 
     companion object{
         const val preferences_file_name = "timus"
-        const val preferences_userid = "userid"
-        const val preferences_username = "username"
-        const val preferences_rating = "rating"
-        const val preferences_count_of_solved_tasks = "count_of_solved_tasks"
-        const val preferences_place_by_tasks = "place_tasks"
-        const val preferences_place_by_rating = "place_rating"
-
 
         var __cachedInfo: TimusUserInfo? = null
     }
 
-    override fun emptyInfo(): UserInfo {
-        return TimusUserInfo(STATUS.NOT_FOUND, "")
-    }
+    override fun emptyInfo() = TimusUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String): TimusUserInfo {
         val res = TimusUserInfo(STATUS.FAILED, data)
@@ -76,26 +73,13 @@ class TimusAccountManager(context: Context): AccountManager(context) {
         set(value) { __cachedInfo = value as TimusUserInfo }
 
     override fun readInfo(): TimusUserInfo = with(prefs) {
-        TimusUserInfo(
-            STATUS.valueOf(getString(preferences_status, null) ?: STATUS.FAILED.name),
-            id = getString(preferences_userid, null) ?: "",
-            userName = getString(preferences_username, null) ?: "",
-            rating = getInt(preferences_rating, 0),
-            solvedTasks = getInt(preferences_count_of_solved_tasks, 0),
-            placeTasks = getInt(preferences_place_by_tasks, 0),
-            placeRating = getInt(preferences_place_by_rating, 0)
-        )
+        val str = getString(preferences_key_user_info, null) ?: return@with emptyInfo().apply { status = STATUS.FAILED }
+        Json.decodeFromString(str)
     }
 
     override fun writeInfo(info: UserInfo) = with(prefs.edit()){
-        putString(preferences_status, info.status.name)
         info as TimusUserInfo
-        putString(preferences_userid, info.id)
-        putString(preferences_username, info.userName)
-        putInt(preferences_rating, info.rating)
-        putInt(preferences_count_of_solved_tasks, info.solvedTasks)
-        putInt(preferences_place_by_tasks, info.placeTasks)
-        putInt(preferences_place_by_rating, info.placeRating)
+        putString(preferences_key_user_info, Json.encodeToString(info))
         commit()
     }
 

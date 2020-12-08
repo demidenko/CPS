@@ -6,8 +6,13 @@ import kotlinx.coroutines.withContext
 
 
 abstract class AccountManager(val context: Context) {
+
+    companion object {
+        const val preferences_key_user_info = "user_info"
+    }
+
     abstract val PREFERENCES_FILE_NAME: String
-    val prefs = context.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
+    val prefs by lazy { context.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE) }
 
     abstract fun emptyInfo(): UserInfo
 
@@ -43,7 +48,6 @@ enum class STATUS{
     FAILED
 }
 const val NOT_RATED = Int.MIN_VALUE
-const val preferences_status = "preferences_status"
 
 abstract class UserInfo{
     abstract val userID: String
