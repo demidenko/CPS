@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.account_manager.AccountManager
+import com.example.test3.account_manager.AccountSuggestion
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
 import kotlinx.coroutines.Job
@@ -216,9 +217,9 @@ class DialogAccountChooser(
 
         override fun getItemCount(): Int = data.size
 
-        private var data : List<Triple<String,String,String>> = emptyList()
+        private var data : List<AccountSuggestion> = emptyList()
 
-        fun setData(suggestions: List<Triple<String,String,String>>?){
+        fun setData(suggestions: List<AccountSuggestion>?){
             data = suggestions ?: emptyList()
             notifyDataSetChanged()
         }

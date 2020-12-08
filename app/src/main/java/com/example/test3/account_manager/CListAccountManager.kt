@@ -66,10 +66,10 @@ class CListAccountManager(context: Context) : AccountManager(context) {
         return res
     }
 
-    override suspend fun loadSuggestions(str: String): List<Triple<String, String, String>>?  = withContext(Dispatchers.IO) {
+    override suspend fun loadSuggestions(str: String): List<AccountSuggestion>?  = withContext(Dispatchers.IO) {
         val response = CListAPI.getUsersSearch(str) ?: return@withContext null
         val s = response.body()?.string() ?: return@withContext null
-        val res = ArrayList<Triple<String,String, String>>()
+        val res = ArrayList<AccountSuggestion>()
         var i = 0
         while (true) {
             i = s.indexOf("<td class=\"username\">", i+1)
@@ -77,7 +77,7 @@ class CListAccountManager(context: Context) : AccountManager(context) {
             var j = s.indexOf("<span", i)
             j = s.indexOf("<a href=", j)
             val login = s.substring(s.indexOf("\">",j)+2, s.indexOf("</a",j))
-            res.add(Triple(login,"",login))
+            res.add(AccountSuggestion(login,"",login))
         }
         return@withContext res
     }

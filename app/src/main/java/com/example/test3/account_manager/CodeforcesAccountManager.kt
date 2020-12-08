@@ -80,14 +80,14 @@ class CodeforcesAccountManager(context: Context): AccountManager(context) {
         return CodeforcesUtils.getHandleColor(info.rating).getARGB(CodeforcesUtils)
     }
 
-    override suspend fun loadSuggestions(str: String): List<Triple<String, String, String>>? = withContext(Dispatchers.IO){
+    override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = withContext(Dispatchers.IO){
         val s = CodeforcesAPI.getHandleSuggestions(str) ?: return@withContext null
-        val res = ArrayList<Triple<String,String, String>>()
+        val res = ArrayList<AccountSuggestion>()
         s.split('\n').filter { !it.contains('=') }.forEach {
             val i = it.indexOf('|')
             if (i != -1) {
                 val handle = it.substring(i + 1)
-                res += Triple(handle, "", handle)
+                res += AccountSuggestion(handle, "", handle)
             }
         }
         return@withContext res

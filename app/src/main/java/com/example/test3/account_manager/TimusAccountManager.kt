@@ -83,12 +83,12 @@ class TimusAccountManager(context: Context): AccountManager(context) {
         commit()
     }
 
-    override suspend fun loadSuggestions(str: String): List<Triple<String, String, String>>? {
+    override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         if(str.toIntOrNull()!=null) return null
         val s = TimusAPI.getUserSearch(str) ?: return null
         var i = s.indexOf("CLASS=\"ranklist\"")
         if(i==-1) return null
-        val res = ArrayList<Triple<String,String,String>>()
+        val res = ArrayList<AccountSuggestion>()
         while(true){
             i = s.indexOf("<TD CLASS=\"name\">", i)
             if(i==-1) break
@@ -98,7 +98,7 @@ class TimusAccountManager(context: Context): AccountManager(context) {
             i = s.indexOf("<TD>", i+1)
             i = s.indexOf("<TD>", i+1)
             val tasks = s.substring(i+4, s.indexOf("</TD",i))
-            res += Triple(username, tasks, userid)
+            res += AccountSuggestion(username, tasks, userid)
         }
         return res
     }

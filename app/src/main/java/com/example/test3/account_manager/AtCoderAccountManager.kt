@@ -108,10 +108,10 @@ class AtCoderAccountManager(context: Context): AccountManager(context) {
         return getHandleColor(info.rating).getARGB(Companion)
     }
 
-    override suspend fun loadSuggestions(str: String): List<Triple<String, String, String>>? = withContext(Dispatchers.IO) {
+    override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = withContext(Dispatchers.IO) {
         val response = AtCoderAPI.getRankingSearch("*$str*") ?: return@withContext null
         val s = response.body()?.string() ?: return@withContext null
-        val res = ArrayList<Triple<String,String, String>>()
+        val res = ArrayList<AccountSuggestion>()
         var i = s.indexOf("<div class=\"table-responsive\">")
         while(true){
             i = s.indexOf("<td class=\"no-break\">", i+1)
@@ -121,7 +121,7 @@ class AtCoderAccountManager(context: Context): AccountManager(context) {
             j = s.indexOf("<td", j+1)
             j = s.indexOf("<td", j+1)
             val rating = s.substring(s.indexOf("<b>",j)+3, s.indexOf("</b>",j))
-            res += Triple(handle, rating, handle)
+            res += AccountSuggestion(handle, rating, handle)
         }
         return@withContext res
     }

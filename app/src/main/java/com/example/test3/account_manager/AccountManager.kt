@@ -24,7 +24,7 @@ abstract class AccountManager(val context: Context) {
         }
     }
 
-    open suspend fun loadSuggestions(str: String): List<Triple<String,String,String>>? = null
+    open suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = null
 
     protected abstract var cachedInfo: UserInfo?
     protected abstract fun readInfo(): UserInfo
@@ -89,3 +89,8 @@ interface ColoredHandles {
     fun getColor(tag: HandleColor): Int
 }
 
+data class AccountSuggestion(
+    val title: String,
+    val info: String,
+    val userId: String
+)
