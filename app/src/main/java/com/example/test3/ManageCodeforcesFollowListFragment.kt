@@ -7,6 +7,7 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,14 +34,14 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
 
         setHasOptionsMenu(true)
 
-        val activity = requireActivity() as MainActivity
+        val mainActivity = requireActivity() as MainActivity
 
         val subtitle = "::news.codeforces.follow.list"
         setFragmentSubTitle(this, subtitle)
-        activity.setActionBarSubTitle(subtitle)
-        activity.navigation.visibility = View.GONE
+        mainActivity.setActionBarSubTitle(subtitle)
+        mainActivity.navigation.visibility = View.GONE
 
-        val followListAdapter = FollowListItemsAdapter(activity)
+        val followListAdapter = FollowListItemsAdapter(mainActivity)
         val followListView = view.manage_cf_follow_users_list.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = followListAdapter
@@ -50,30 +51,22 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
 
         val buttonAdd = view.manage_cf_follow_add
         buttonAdd.setOnClickListener { button -> button as Button
-            with(activity){
-                scope.launch {
+            lifecycleScope.launch {
 
-                    val userInfo = chooseUserID(
-                        accountsFragment.codeforcesAccountManager.emptyInfo(),
-                        accountsFragment.codeforcesAccountManager
-                    ) as? CodeforcesAccountManager.CodeforcesUserInfo ?: return@launch
+                val userInfo = mainActivity.chooseUserID(
+                    mainActivity.accountsFragment.codeforcesAccountManager.emptyInfo(),
+                    mainActivity.accountsFragment.codeforcesAccountManager
+                ) as? CodeforcesAccountManager.CodeforcesUserInfo ?: return@launch
 
-                    button.isEnabled = false
-
-                    try{
-                        requireView()
-                    }catch (e: IllegalStateException){
-                        return@launch
-                    }
-
-                    followListAdapter.add(userInfo)
-                    button.isEnabled = true
-                    followListView.scrollToPosition(0)
-                }
+                button.isEnabled = false
+                followListAdapter.add(userInfo)
+                button.isEnabled = true
+                followListView.scrollToPosition(0)
             }
+
         }
 
-        activity.scope.launch {
+        lifecycleScope.launch {
             followListView.isEnabled = false
             followListAdapter.initialize()
             followListView.isEnabled = true
