@@ -1,6 +1,5 @@
 package com.example.test3.account_view
 
-import android.graphics.Typeface
 import com.example.test3.MainActivity
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.NOT_RATED
@@ -17,12 +16,9 @@ class CodeforcesAccountPanel(
         val color = manager.getColor(info)
         textMain.text = CodeforcesUtils.makeSpan(info)
         textAdditional.text = ""
-        textAdditional.setTextColor(color ?: activity.defaultTextColor)
+        textAdditional.setTextColor(color ?: mainActivity.defaultTextColor)
         if(info.status == STATUS.OK){
-            textMain.typeface = Typeface.DEFAULT_BOLD
             textAdditional.text = if(info.rating == NOT_RATED) "[not rated]" else "${info.rating}"
-        }else{
-            textMain.typeface = Typeface.DEFAULT
         }
     }
 

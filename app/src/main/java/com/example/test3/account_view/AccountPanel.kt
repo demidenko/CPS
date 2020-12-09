@@ -2,13 +2,11 @@ package com.example.test3.account_view
 
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
@@ -23,31 +21,29 @@ import java.util.concurrent.TimeUnit
 
 
 abstract class AccountPanel(
-    val activity: MainActivity,
+    val mainActivity: MainActivity,
     val manager: AccountManager
 ){
-    val layout = LayoutInflater.from(activity).inflate(R.layout.account_panel, null, false) as RelativeLayout
-    val textMain: TextView = layout.findViewById(R.id.account_panel_textMain)
-    val textAdditional: TextView = layout.findViewById(R.id.account_panel_textAdditional)
-    private val expandButton: ImageButton = layout.findViewById<ImageButton>(R.id.account_panel_expand_button).apply {
+    private val layout = mainActivity.layoutInflater.inflate(R.layout.account_panel, null, false) as RelativeLayout
+
+    protected val textMain: TextView = layout.findViewById(R.id.account_panel_textMain)
+    protected val textAdditional: TextView = layout.findViewById(R.id.account_panel_textAdditional)
+
+    private val expandButton = layout.findViewById<ImageButton>(R.id.account_panel_expand_button).apply {
         setOnClickListener { callExpand() }
     }
+
     private val reloadButton = layout.findViewById<ImageButton>(R.id.account_panel_reload_button).apply {
         setOnClickListener {
-            activity.accountsFragment.lifecycleScope.launch { reload() }
+            mainActivity.accountsFragment.lifecycleScope.launch { reload() }
         }
     }
 
 
-    fun buildAndAdd(textMainSize: Float, textAdditionalSize: Float, view: View){
+    fun createSmallView(textMainSize: Float, textAdditionalSize: Float): View {
 
         textMain.setTextSize(TypedValue.COMPLEX_UNIT_SP, textMainSize)
         textAdditional.setTextSize(TypedValue.COMPLEX_UNIT_SP, textAdditionalSize)
-
-        view.findViewById<LinearLayout>(R.id.panels_layout)
-            .addView(layout, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
-
-        additionalBuild()
 
         layout.setOnClickListener {
             val startDelay = TimeUnit.SECONDS.toMillis(3)
@@ -66,10 +62,8 @@ abstract class AccountPanel(
             }
         }
 
-
+        return layout
     }
-
-    open fun additionalBuild(){ }
 
     fun isEmpty() = manager.savedInfo.userID.isBlank()
 
@@ -82,7 +76,7 @@ abstract class AccountPanel(
             layout.visibility = View.VISIBLE
             show(manager.savedInfo)
         }
-        activity.accountsFragment.updateUI()
+        mainActivity.accountsFragment.updateUI()
     }
 
     fun isBlocked(): Boolean = !reloadButton.isEnabled
@@ -90,11 +84,11 @@ abstract class AccountPanel(
     fun block(){
         expandButton.isEnabled = false
         reloadButton.isEnabled = false
-        activity.accountsFragment.sharedReloadButton.startReload(manager.PREFERENCES_FILE_NAME)
+        mainActivity.accountsFragment.sharedReloadButton.startReload(manager.PREFERENCES_FILE_NAME)
     }
 
     fun unblock(){
-        activity.accountsFragment.sharedReloadButton.stopReload(manager.PREFERENCES_FILE_NAME)
+        mainActivity.accountsFragment.sharedReloadButton.stopReload(manager.PREFERENCES_FILE_NAME)
         reloadButton.isEnabled = true
         expandButton.isEnabled = true
     }
@@ -109,7 +103,7 @@ abstract class AccountPanel(
         }.start()
 
         reloadButton.animate().setStartDelay(0).alpha(1f).setDuration(0).withStartAction {
-            reloadButton.setColorFilter(activity.defaultTextColor)
+            reloadButton.setColorFilter(mainActivity.defaultTextColor)
             reloadButton.visibility = View.VISIBLE
         }.start()
         reloadButton.startAnimation(rotateAnimation)
@@ -127,17 +121,17 @@ abstract class AccountPanel(
             }.start()
         }else{
             show()
-            activity.showToast("${manager.PREFERENCES_FILE_NAME} load error")
+            mainActivity.showToast("${manager.PREFERENCES_FILE_NAME} load error")
             reloadButton.clearAnimation()
-            reloadButton.setColorFilter(getColorFromResource(activity, R.color.reload_fail))
+            reloadButton.setColorFilter(getColorFromResource(mainActivity, R.color.reload_fail))
         }
 
         unblock()
     }
 
     fun callExpand(){
-        activity.supportFragmentManager.beginTransaction()
-            .hide(activity.accountsFragment)
+        mainActivity.supportFragmentManager.beginTransaction()
+            .hide(mainActivity.accountsFragment)
             .add(android.R.id.content, AccountViewFragment().apply {
                 arguments = Bundle().apply { putString("manager", manager.PREFERENCES_FILE_NAME) }
             }, AccountViewFragment.tag)

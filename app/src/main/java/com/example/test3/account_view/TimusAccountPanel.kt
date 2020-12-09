@@ -20,8 +20,8 @@ class TimusAccountPanel(
                 textAdditional.text = ""
             }
         }
-        textMain.setTextColor(activity.defaultTextColor)
-        textAdditional.setTextColor(activity.defaultTextColor)
+        textMain.setTextColor(mainActivity.defaultTextColor)
+        textAdditional.setTextColor(mainActivity.defaultTextColor)
     }
 
 }

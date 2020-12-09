@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -56,18 +57,19 @@ class AccountsFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        println("fragment accounts onCreateView $savedInstanceState")
         return inflater.inflate(R.layout.fragment_accounts, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        println("fragment accounts onViewCreated "+savedInstanceState)
 
-        codeforcesPanel.buildAndAdd(30F, 25F, view)
-        atcoderPanel.buildAndAdd(30F, 25F, view)
-        topcoderPanel.buildAndAdd(30F, 25F, view)
-        acmpPanel.buildAndAdd(17F, 14F, view)
-        timusPanel.buildAndAdd(17F, 14F, view)
+        view.findViewById<LinearLayout>(R.id.panels_layout).apply {
+            val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            addView(codeforcesPanel.createSmallView(30F, 25F), params)
+            addView(atcoderPanel.createSmallView(30F, 25F), params)
+            addView(topcoderPanel.createSmallView(30F, 25F), params)
+            addView(acmpPanel.createSmallView(17F, 14F), params)
+            addView(timusPanel.createSmallView(17F, 14F), params)
+        }
 
         showPanels()
 
