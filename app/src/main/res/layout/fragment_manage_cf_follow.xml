@@ -11,6 +11,7 @@
         app:layout_constraintVertical_weight="1"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/manage_cf_follow_add"
+        android:overScrollMode="never"
         />
 
     <Button
