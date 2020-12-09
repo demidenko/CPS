@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.*
 import com.example.test3.utils.CListUtils
 import com.example.test3.utils.CodeforcesUtils
@@ -175,7 +176,7 @@ class AccountsFragment: Fragment() {
     }
 
     private fun clistImport() {
-        mainActivity.scope.launch {
+        lifecycleScope.launch {
             val clistUserInfo = mainActivity.chooseUserID(CListAccountManager(mainActivity)) as? CListAccountManager.CListUserInfo ?: return@launch
 
             mainActivity.navigation_accounts_add.isEnabled = false
@@ -229,7 +230,7 @@ class AccountsFragment: Fragment() {
     }
 
     fun reloadAccounts() {
-        mainActivity.scope.launch {
+        lifecycleScope.launch {
             panels.forEach {
                 launch { it.reload() }
             }

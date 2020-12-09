@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.color
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.DropDownPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
@@ -158,6 +159,8 @@ class NewsFragment : Fragment() {
                 (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).closeShowFromBlog()
             }
         }
+
+        reloadTabs()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -190,7 +193,7 @@ class NewsFragment : Fragment() {
     }
 
     private fun reloadTabs() {
-        (requireActivity() as MainActivity).scope.launch {
+        (requireActivity() as MainActivity).scope.launch { //TODO lifecycleScope crahes
             val lang = getContentLanguage()
             codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
                 val tab = tabLayout.getTabAt(index)!!
@@ -251,7 +254,7 @@ class NewsFragment : Fragment() {
         val tab = tabLayout.getTabAt(index) ?: return
         val fragment = codeforcesNewsAdapter.fragments[index]
 
-        activity.scope.launch {
+        lifecycleScope.launch {
             reloadFragment(fragment, tab, ""){
                 updateLostInfoButton.isEnabled = false
                 CodeforcesNewsLostRecentJobService.updateInfo(activity)
@@ -291,8 +294,6 @@ class NewsFragment : Fragment() {
         }
 
         codeforcesNewsViewPager.setCurrentItem(index, false)
-
-        reloadTabs()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -341,7 +342,7 @@ class CodeforcesNewsFragment(
 
         val activity = requireActivity() as MainActivity
         swipeRefreshLayout.setOnRefreshListener {
-            activity.scope.launch {
+            lifecycleScope.launch {
                 activity.newsFragment.reloadFragment(this@CodeforcesNewsFragment)
             }
         }
@@ -535,23 +536,23 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
         }
     }
 
-    private fun addToFollowListWithSnackBar(activity: MainActivity, holder: CodeforcesNewsItemViewHolder){
-        activity.scope.launch {
-            val connector = CodeforcesNewsFollowJobService.FollowDataConnector(activity)
+    private fun addToFollowListWithSnackBar(mainActivity: MainActivity, holder: CodeforcesNewsItemViewHolder){
+        mainActivity.newsFragment.lifecycleScope.launch {
+            val connector = CodeforcesNewsFollowJobService.FollowDataConnector(mainActivity)
             val handle = holder.author.text
             when(connector.add(handle.toString())){
                 true -> {
                     connector.save()
                     Snackbar.make(holder.view, SpannableStringBuilder("You now followed ").append(handle), Snackbar.LENGTH_LONG).apply {
                         setAction("Manage"){
-                            activity.newsFragment.manageCodeforcesFollowList()
+                            mainActivity.newsFragment.manageCodeforcesFollowList()
                         }
                     }
                 }
                 false -> {
                     Snackbar.make(holder.view, SpannableStringBuilder("You already followed ").append(handle), Snackbar.LENGTH_LONG)
                 }
-            }.setAnchorView(activity.navigation_main).show()
+            }.setAnchorView(mainActivity.navigation_main).show()
         }
     }
 }

@@ -2,6 +2,7 @@ package com.example.test3
 
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -23,7 +24,7 @@ class BottomProgressInfo(val size: Int, val title: String, private val activity:
 
     fun finish(){
         if(size>0){
-            activity.scope.launch {
+            activity.lifecycleScope.launch {
                 delay(1000)
                 activity.progress_bar_holder.removeView(view)
             }

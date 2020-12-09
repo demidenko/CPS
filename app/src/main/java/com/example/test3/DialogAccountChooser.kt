@@ -16,6 +16,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -157,7 +158,7 @@ class DialogAccountChooser(
             val isSelectedSuggestion = changedByChoose
 
             preview.text = "..."
-            jobInfo = activity.scope.launch {
+            jobInfo = fragment.lifecycleScope.launch {
                 if(!isSelectedSuggestion) delay(300)
                 val info = manager.loadInfo(userId)
                 if (userId == editable.toString()) {
@@ -177,7 +178,7 @@ class DialogAccountChooser(
                 if (userId.length < 3) suggestionsAdapter.clear()
                 else {
                     suggestionsAdapter.loading()
-                    jobSuggestions = activity.scope.launch {
+                    jobSuggestions = fragment.lifecycleScope.launch {
                         delay(300)
                         val suggestions = manager.loadSuggestions(userId)
                         if (userId == editable.toString()) {

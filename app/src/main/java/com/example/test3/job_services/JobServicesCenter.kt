@@ -6,6 +6,7 @@ import android.app.job.JobScheduler
 import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.example.test3.BottomProgressInfo
 import com.example.test3.MainActivity
@@ -63,7 +64,7 @@ object JobServicesCenter {
             if(toStart.containsKey(it.id)) toStart.remove(it.id)
             else stopJobService(activity, it.id)
         }
-        activity.scope.launch {
+        activity.lifecycleScope.launchWhenStarted {
             val progressInfo = BottomProgressInfo(toStart.size, "start services", activity)
             toStart.values.shuffled().forEach { start ->
                 delay(500)

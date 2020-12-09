@@ -11,6 +11,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
@@ -30,7 +31,7 @@ abstract class AccountPanel(
     }
     private val reloadButton = layout.findViewById<ImageButton>(R.id.account_panel_reload_button).apply {
         setOnClickListener {
-            activity.scope.launch { reload() }
+            activity.accountsFragment.lifecycleScope.launch { reload() }
         }
     }
 

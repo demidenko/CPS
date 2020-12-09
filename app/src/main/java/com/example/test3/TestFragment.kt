@@ -12,6 +12,7 @@ import android.widget.*
 import androidx.core.text.bold
 import androidx.core.text.color
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.*
 import com.example.test3.contest_watch.CodeforcesContestWatchService
 import com.example.test3.job_services.JobServicesCenter
@@ -52,7 +53,7 @@ class TestFragment : Fragment() {
             val handle = handleEditText.text.toString()
             val contestID = contestIDEditText.text.toString().toInt()
 
-            mainActivity.scope.launch {
+            lifecycleScope.launch {
                 CodeforcesAPI.getUser(handle)?.let { userInfo ->
                     if(userInfo.status == CodeforcesAPIStatus.OK){
                         val intent = Intent(mainActivity, CodeforcesContestWatchService::class.java)
@@ -85,7 +86,7 @@ class TestFragment : Fragment() {
         view.findViewById<Button>(R.id.dev_choose_contest).setOnClickListener { button -> button as Button
             button.isEnabled = false
 
-            mainActivity.scope.launch {
+            lifecycleScope.launch {
                 val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item)
                 val contests = arrayListOf<CodeforcesContest>()
                 CodeforcesAPI.getContests()?.result?.forEach {
@@ -108,13 +109,11 @@ class TestFragment : Fragment() {
         view.findViewById<Button>(R.id.dev_choose_handle).setOnClickListener { button -> button as Button
             button.isEnabled = false
 
-            with(mainActivity){
-                scope.launch {
-                    chooseUserID(accountsFragment.codeforcesAccountManager)?.let {
-                        handleEditText.setText(it.userID)
-                    }
-                    button.isEnabled = true
+            lifecycleScope.launch {
+                mainActivity.chooseUserID(mainActivity.accountsFragment.codeforcesAccountManager)?.let {
+                    handleEditText.setText(it.userID)
                 }
+                button.isEnabled = true
             }
         }
 
@@ -185,7 +184,7 @@ class TestFragment : Fragment() {
             val t = (rnd.nextInt(10) + 1)
             val bar = BottomProgressInfo(t, t.toString(), mainActivity)
 
-            mainActivity.scope.launch {
+            lifecycleScope.launch {
                 for (i in 1..t){
                     delay(1000)
                     bar.increment()
