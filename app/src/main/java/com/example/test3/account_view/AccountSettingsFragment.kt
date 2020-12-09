@@ -1,10 +1,13 @@
-package com.example.test3
+package com.example.test3.account_view
 
 import android.os.Bundle
 import android.view.*
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.example.test3.MainActivity
+import com.example.test3.R
+import com.example.test3.setFragmentSubTitle
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 

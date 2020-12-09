@@ -1,4 +1,4 @@
-package com.example.test3
+package com.example.test3.account_view
 
 import android.os.Bundle
 import android.util.TypedValue
@@ -12,9 +12,12 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
+import com.example.test3.MainActivity
+import com.example.test3.R
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
+import com.example.test3.getColorFromResource
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 

@@ -2,7 +2,6 @@ package com.example.test3
 
 import android.app.AlertDialog
 import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +11,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.*
+import com.example.test3.account_view.*
 import com.example.test3.utils.CListUtils
-import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.SharedReloadButton
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.navigation_accounts.*
@@ -32,11 +31,11 @@ class AccountsFragment: Fragment() {
     val acmpAccountManager by lazy { ACMPAccountManager(mainActivity) }
     val timusAccountManager by lazy { TimusAccountManager(mainActivity) }
 
-    private lateinit var codeforcesPanel: AccountPanel
-    private lateinit var atcoderPanel: AccountPanel
-    private lateinit var topcoderPanel: AccountPanel
-    private lateinit var acmpPanel: AccountPanel
-    private lateinit var timusPanel: AccountPanel
+    private val codeforcesPanel by lazy { CodeforcesAccountPanel(mainActivity, codeforcesAccountManager) }
+    private val atcoderPanel by lazy { AtCoderAccountPanel(mainActivity, atcoderAccountManager) }
+    private val topcoderPanel by lazy { TopCoderAccountPanel(mainActivity, topcoderAccountManager) }
+    private val acmpPanel by lazy { ACMPAccountPanel(mainActivity, acmpAccountManager) }
+    private val timusPanel by lazy { TimusAccountPanel(mainActivity, timusAccountManager) }
     private val panels by lazy {
         listOf(
             codeforcesPanel,
@@ -63,85 +62,6 @@ class AccountsFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         println("fragment accounts onViewCreated "+savedInstanceState)
-
-        codeforcesPanel = object : AccountPanel(mainActivity, codeforcesAccountManager){
-            override fun show(info: UserInfo) { info as CodeforcesAccountManager.CodeforcesUserInfo
-                val color = manager.getColor(info)
-                textMain.text = CodeforcesUtils.makeSpan(info)
-                textAdditional.text = ""
-                textAdditional.setTextColor(color ?: activity.defaultTextColor)
-                if(info.status == STATUS.OK){
-                    textMain.typeface = Typeface.DEFAULT_BOLD
-                    textAdditional.text = if(info.rating == NOT_RATED) "[not rated]" else "${info.rating}"
-                }else{
-                    textMain.typeface = Typeface.DEFAULT
-                }
-            }
-        }
-
-        atcoderPanel = object : AccountPanel(mainActivity, atcoderAccountManager){
-            override fun show(info: UserInfo) { info as AtCoderAccountManager.AtCoderUserInfo
-                val color = manager.getColor(info)
-                textMain.text = info.handle
-                textMain.setTextColor(color ?: activity.defaultTextColor)
-                textAdditional.text = ""
-                textAdditional.setTextColor(color ?: activity.defaultTextColor)
-                if(info.status == STATUS.OK){
-                    textMain.typeface = Typeface.DEFAULT_BOLD
-                    textAdditional.text = if(info.rating == NOT_RATED) "[not rated]" else "${info.rating}"
-                }else{
-                    textMain.typeface = Typeface.DEFAULT
-                }
-            }
-        }
-
-        topcoderPanel = object : AccountPanel(mainActivity, topcoderAccountManager){
-            override fun show(info: UserInfo) { info as TopCoderAccountManager.TopCoderUserInfo
-                val color = manager.getColor(info)
-                textMain.text = info.handle
-                textMain.setTextColor(color ?: activity.defaultTextColor)
-                textAdditional.text = ""
-                textAdditional.setTextColor(color ?: activity.defaultTextColor)
-                if(info.status == STATUS.OK){
-                    textMain.typeface = Typeface.DEFAULT_BOLD
-                    textAdditional.text = if(info.rating_algorithm == NOT_RATED) "[not rated]" else "${info.rating_algorithm}"
-                }else{
-                    textMain.typeface = Typeface.DEFAULT
-                }
-            }
-        }
-
-        acmpPanel = object : AccountPanel(mainActivity, acmpAccountManager){
-            override fun show(info: UserInfo) { info as ACMPAccountManager.ACMPUserInfo
-                with(info){
-                    if (status == STATUS.OK) {
-                        textMain.text = userName
-                        textAdditional.text = "Solved: $solvedTasks  Rank: $place  Rating: $rating"
-                    }else{
-                        textMain.text = id
-                        textAdditional.text = ""
-                    }
-                }
-                textMain.setTextColor(activity.defaultTextColor)
-                textAdditional.setTextColor(activity.defaultTextColor)
-            }
-        }
-
-        timusPanel = object : AccountPanel(mainActivity, timusAccountManager){
-            override fun show(info: UserInfo) { info as TimusAccountManager.TimusUserInfo
-                with(info){
-                    if (status == STATUS.OK) {
-                        textMain.text = userName
-                        textAdditional.text = "Solved: $solvedTasks  Rank: $placeTasks"
-                    }else{
-                        textMain.text = id
-                        textAdditional.text = ""
-                    }
-                }
-                textMain.setTextColor(activity.defaultTextColor)
-                textAdditional.setTextColor(activity.defaultTextColor)
-            }
-        }
 
         codeforcesPanel.buildAndAdd(30F, 25F, view)
         atcoderPanel.buildAndAdd(30F, 25F, view)
