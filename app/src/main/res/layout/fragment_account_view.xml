@@ -15,15 +15,4 @@
         android:layout_gravity="center"
         />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/account_panel_link_button"
-        android:src="@drawable/ic_origin"
-        android:background="@android:color/transparent"
-        android:tint="@color/textColor"
-        android:layout_gravity="center"
-
-        />
-
 </LinearLayout>

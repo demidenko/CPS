@@ -15,7 +15,6 @@ import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.getColorFromResource
-import com.example.test3.makeIntentOpenUrl
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -139,15 +138,6 @@ abstract class AccountPanel(
 
     open fun showBigView(fragment: AccountViewFragment) {
         val view = fragment.requireView()
-
-        view.findViewById<ImageButton>(R.id.account_panel_link_button).apply {
-            setOnClickListener {
-                val info = manager.savedInfo
-                if(info.status == STATUS.OK){
-                    mainActivity.startActivity(makeIntentOpenUrl(info.link()))
-                }
-            }
-        }
 
         val userInfoTextView = view.findViewById<TextView>(R.id.account_user_info)
         userInfoTextView.text = manager.savedInfo.toString()
