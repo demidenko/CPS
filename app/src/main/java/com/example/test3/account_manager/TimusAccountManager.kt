@@ -3,10 +3,10 @@ package com.example.test3.account_manager
 import android.content.Context
 import com.example.test3.utils.TimusAPI
 import com.example.test3.utils.fromHTML
+import com.example.test3.utils.jsonCPS
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 class TimusAccountManager(context: Context): AccountManager(context) {
 
@@ -17,8 +17,8 @@ class TimusAccountManager(context: Context): AccountManager(context) {
         var userName: String = "",
         var rating: Int = 0,
         var solvedTasks: Int = 0,
-        var placeTasks: Int = 0,
-        var placeRating: Int = 0
+        var rankTasks: Int = 0,
+        var rankRating: Int = 0
     ): UserInfo() {
         override val userID: String
             get() = id
@@ -52,13 +52,13 @@ class TimusAccountManager(context: Context): AccountManager(context) {
         i = s.indexOf("<TD CLASS=\"author_stats_value\"", i+1)
         if(i!=-1) {
             i = s.indexOf('>', i)
-            res.placeTasks = s.substring(i + 1, s.indexOf(' ', i)).toInt()
+            res.rankTasks = s.substring(i + 1, s.indexOf(' ', i)).toInt()
 
             i = s.indexOf('>', s.indexOf("<TD CLASS=\"author_stats_value\"", i + 1))
             res.solvedTasks = s.substring(i + 1, s.indexOf(' ', i)).toInt()
 
             i = s.indexOf('>', s.indexOf("<TD CLASS=\"author_stats_value\"", i + 1))
-            res.placeRating = s.substring(i + 1, s.indexOf(' ', i)).toInt()
+            res.rankRating = s.substring(i + 1, s.indexOf(' ', i)).toInt()
 
             i = s.indexOf('>', s.indexOf("<TD CLASS=\"author_stats_value\"", i + 1))
             res.rating = s.substring(i + 1, s.indexOf(' ', i)).toInt()
@@ -74,12 +74,12 @@ class TimusAccountManager(context: Context): AccountManager(context) {
 
     override fun readInfo(): TimusUserInfo = with(prefs) {
         val str = getString(preferences_key_user_info, null) ?: return@with emptyInfo().apply { status = STATUS.FAILED }
-        Json.decodeFromString(str)
+        jsonCPS.decodeFromString(str)
     }
 
     override fun writeInfo(info: UserInfo) = with(prefs.edit()){
         info as TimusUserInfo
-        putString(preferences_key_user_info, Json.encodeToString(info))
+        putString(preferences_key_user_info, jsonCPS.encodeToString(info))
         commit()
     }
 

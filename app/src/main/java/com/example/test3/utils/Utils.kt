@@ -18,7 +18,8 @@ val httpClient = OkHttpClient
     .readTimeout(30, TimeUnit.SECONDS)
     .build()
 
-val jsonConverterFactory = Json{ ignoreUnknownKeys = true }.asConverterFactory(MediaType.get("application/json"))
+val jsonCPS = Json{ ignoreUnknownKeys = true }
+val jsonConverterFactory = jsonCPS.asConverterFactory(MediaType.get("application/json"))
 
 fun fromHTML(s: String): Spanned {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {

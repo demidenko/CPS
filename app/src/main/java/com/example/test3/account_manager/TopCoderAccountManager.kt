@@ -2,10 +2,10 @@ package com.example.test3.account_manager
 
 import android.content.Context
 import com.example.test3.utils.TopCoderAPI
+import com.example.test3.utils.jsonCPS
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 class TopCoderAccountManager(context: Context): AccountManager(context) {
 
@@ -86,12 +86,12 @@ class TopCoderAccountManager(context: Context): AccountManager(context) {
 
     override fun readInfo(): TopCoderUserInfo = with(prefs){
         val str = getString(preferences_key_user_info, null) ?: return@with emptyInfo().apply { status = STATUS.FAILED }
-        Json.decodeFromString(str)
+        jsonCPS.decodeFromString(str)
     }
 
     override fun writeInfo(info: UserInfo) = with(prefs.edit()){
         info as TopCoderUserInfo
-        putString(preferences_key_user_info, Json.encodeToString(info))
+        putString(preferences_key_user_info, jsonCPS.encodeToString(info))
         commit()
     }
 

@@ -2,6 +2,7 @@ package com.example.test3.account_view
 
 import android.text.SpannableStringBuilder
 import android.util.TypedValue
+import android.widget.TextView
 import androidx.core.text.color
 import com.example.test3.MainActivity
 import com.example.test3.R
@@ -27,7 +28,7 @@ class TimusAccountPanel(
                     color(additionalColor){ append("solved: ") }
                     append("$solvedTasks")
                     color(additionalColor){ append("  rank: ") }
-                    append("$placeTasks")
+                    append("$rankTasks")
                 }
             }else{
                 textMain.text = id
@@ -36,6 +37,26 @@ class TimusAccountPanel(
         }
         textMain.setTextColor(mainActivity.defaultTextColor)
         textAdditional.setTextColor(mainActivity.defaultTextColor)
+    }
+
+    override val bigViewResource = R.layout.fragment_account_view_timus
+
+    override fun showBigView(fragment: AccountViewFragment) {
+        val view = fragment.requireView()
+
+        val info = manager.savedInfo as TimusAccountManager.TimusUserInfo
+
+        view.findViewById<TextView>(R.id.account_view_name).apply {
+            text = info.userName
+        }
+
+        view.findViewById<TextView>(R.id.account_view_timus_solved).apply {
+            text = info.solvedTasks.toString()
+        }
+
+        view.findViewById<TextView>(R.id.account_view_timus_rank).apply {
+            text = info.rankTasks.toString()
+        }
     }
 
 }

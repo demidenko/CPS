@@ -2,10 +2,10 @@ package com.example.test3.account_manager
 
 import android.content.Context
 import com.example.test3.utils.ACMPAPI
+import com.example.test3.utils.jsonCPS
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 class ACMPAccountManager(context: Context): AccountManager(context) {
 
@@ -16,7 +16,7 @@ class ACMPAccountManager(context: Context): AccountManager(context) {
         var userName: String = "",
         var rating: Int = 0,
         var solvedTasks: Int = 0,
-        var place: Int = 0
+        var rank: Int = 0
     ): UserInfo() {
         override val userID: String
             get() = id
@@ -61,7 +61,7 @@ class ACMPAccountManager(context: Context): AccountManager(context) {
             res.rating = s.substring(i+2, s.indexOf('/', i)-1).toInt()
             i = s.lastIndexOf("<b class=btext>Место:", i)
             i = s.indexOf(':', i)
-            res.place = s.substring(i+2, s.indexOf('/', i)-1).toInt()
+            res.rank = s.substring(i+2, s.indexOf('/', i)-1).toInt()
         }
         res.status = STATUS.OK
         return res
@@ -73,12 +73,12 @@ class ACMPAccountManager(context: Context): AccountManager(context) {
 
     override fun readInfo(): ACMPUserInfo = with(prefs){
         val str = getString(preferences_key_user_info, null) ?: return@with emptyInfo().apply { status = STATUS.FAILED }
-        Json.decodeFromString(str)
+        jsonCPS.decodeFromString(str)
     }
 
     override fun writeInfo(info: UserInfo) = with(prefs.edit()){
         info as ACMPUserInfo
-        putString(preferences_key_user_info, Json.encodeToString(info))
+        putString(preferences_key_user_info, jsonCPS.encodeToString(info))
         commit()
     }
 

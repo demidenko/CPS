@@ -2,6 +2,7 @@ package com.example.test3.account_view
 
 import android.text.SpannableStringBuilder
 import android.util.TypedValue
+import android.widget.TextView
 import androidx.core.text.color
 import com.example.test3.MainActivity
 import com.example.test3.R
@@ -26,10 +27,10 @@ class ACMPAccountPanel(
                 textAdditional.text = SpannableStringBuilder().apply {
                     color(additionalColor){ append("solved: ") }
                     append("$solvedTasks")
-                    color(additionalColor){ append("  rank: ") }
-                    append("$place")
                     color(additionalColor){ append("  rating: ") }
                     append("$rating")
+                    color(additionalColor){ append("  rank: ") }
+                    append("$rank")
                 }
             }else{
                 textMain.text = id
@@ -40,4 +41,27 @@ class ACMPAccountPanel(
         textAdditional.setTextColor(mainActivity.defaultTextColor)
     }
 
+    override val bigViewResource = R.layout.fragment_account_view_acmp
+
+    override fun showBigView(fragment: AccountViewFragment) {
+        val view = fragment.requireView()
+
+        val info = manager.savedInfo as ACMPAccountManager.ACMPUserInfo
+
+        view.findViewById<TextView>(R.id.account_view_name).apply {
+            text = info.userName
+        }
+
+        view.findViewById<TextView>(R.id.account_view_acmp_solved).apply {
+            text = info.solvedTasks.toString()
+        }
+
+        view.findViewById<TextView>(R.id.account_view_acmp_rating).apply {
+            text = info.rating.toString()
+        }
+
+        view.findViewById<TextView>(R.id.account_view_acmp_rank).apply {
+            text = info.rank.toString()
+        }
+    }
 }
