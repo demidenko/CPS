@@ -9,7 +9,6 @@ import com.example.test3.account_manager.NOT_RATED
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.getColorFromResource
-import com.example.test3.makeIntentOpenUrl
 import com.example.test3.utils.CodeforcesUtils
 
 class CodeforcesAccountPanel(
@@ -41,9 +40,6 @@ class CodeforcesAccountPanel(
 
         handleView.apply {
             text = CodeforcesUtils.makeSpan(info)
-            setOnClickListener {
-                mainActivity.startActivity(makeIntentOpenUrl(info.link()))
-            }
         }
 
         ratingView.apply {

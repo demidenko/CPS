@@ -14,5 +14,11 @@
             android:title="Settings"
             android:icon="@drawable/ic_settings"
             />
+
+        <item
+            android:id="@+id/menu_account_open_button"
+            android:title="Origin"
+            android:icon="@drawable/ic_origin"
+            />
     </group>
 </menu>

@@ -6,6 +6,7 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import com.example.test3.MainActivity
 import com.example.test3.R
+import com.example.test3.makeIntentOpenUrl
 import com.example.test3.setFragmentSubTitle
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -65,6 +66,7 @@ class AccountViewFragment(): Fragment() {
         when(item.itemId){
             R.id.menu_account_delete_button -> deleteAccount()
             R.id.menu_account_settings_button -> openSettings()
+            R.id.menu_account_open_button -> requireActivity().startActivity(makeIntentOpenUrl(panel.manager.savedInfo.link()))
         }
         return super.onOptionsItemSelected(item)
     }
