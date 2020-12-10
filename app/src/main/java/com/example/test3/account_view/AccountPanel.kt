@@ -7,8 +7,8 @@ import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.widget.ImageButton
-import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
@@ -16,6 +16,7 @@ import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.getColorFromResource
+import com.example.test3.makeIntentOpenUrl
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -24,7 +25,7 @@ abstract class AccountPanel(
     val mainActivity: MainActivity,
     val manager: AccountManager
 ){
-    private val layout = mainActivity.layoutInflater.inflate(R.layout.account_panel, null, false) as RelativeLayout
+    private val layout = mainActivity.layoutInflater.inflate(R.layout.account_panel, null, false) as ConstraintLayout
 
     protected val textMain: TextView = layout.findViewById(R.id.account_panel_textMain)
     protected val textAdditional: TextView = layout.findViewById(R.id.account_panel_textAdditional)
@@ -42,7 +43,7 @@ abstract class AccountPanel(
 
     fun createSmallView(textMainSize: Float, textAdditionalSize: Float): View {
 
-        textMain.setTextSize(TypedValue.COMPLEX_UNIT_SP, textMainSize)
+        textMain.setTextSize(TypedValue.COMPLEX_UNIT_SP, textMainSize) //TODO: bad spacing
         textAdditional.setTextSize(TypedValue.COMPLEX_UNIT_SP, textAdditionalSize)
 
         layout.setOnClickListener {
@@ -137,6 +138,24 @@ abstract class AccountPanel(
             }, AccountViewFragment.tag)
             .addToBackStack(null)
             .commit()
+    }
+
+    open val bigViewResource: Int = R.layout.fragment_account_view
+
+    open fun showBigView(fragment: AccountViewFragment) {
+        val view = fragment.requireView()
+
+        view.findViewById<ImageButton>(R.id.account_panel_link_button).apply {
+            setOnClickListener {
+                val info = manager.savedInfo
+                if(info.status == STATUS.OK){
+                    mainActivity.startActivity(makeIntentOpenUrl(info.link()))
+                }
+            }
+        }
+
+        val userInfoTextView = view.findViewById<TextView>(R.id.account_user_info)
+        userInfoTextView.text = manager.savedInfo.toString()
     }
 }
 

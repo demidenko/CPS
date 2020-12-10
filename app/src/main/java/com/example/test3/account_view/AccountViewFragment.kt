@@ -3,13 +3,9 @@ package com.example.test3.account_view
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.test3.MainActivity
 import com.example.test3.R
-import com.example.test3.account_manager.STATUS
-import com.example.test3.makeIntentOpenUrl
 import com.example.test3.setFragmentSubTitle
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -19,25 +15,26 @@ class AccountViewFragment(): Fragment() {
         const val tag = "account_view"
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_account_view, container, false)
-    }
-
     private val panel: AccountPanel by lazy {
         val managerType = arguments?.getString("manager") ?: throw Exception("Unset type of manager")
         (requireActivity() as MainActivity).accountsFragment.getPanel(managerType)
     }
 
-    private val userInfoTextView by lazy {
-        requireView().findViewById<TextView>(R.id.account_user_info)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(panel.bigViewResource, container, false)
     }
+
+
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setHasOptionsMenu(true)
 
         val activity = requireActivity() as MainActivity
 
@@ -48,19 +45,9 @@ class AccountViewFragment(): Fragment() {
         activity.setActionBarSubTitle(subtitle)
         activity.navigation.visibility = View.GONE
 
-        val linkButton: ImageButton = view.findViewById<ImageButton>(R.id.account_panel_link_button).apply {
-            setOnClickListener {
-                val info = manager.savedInfo
-                if(info.status == STATUS.OK){
-                    activity.startActivity(makeIntentOpenUrl(info.link()))
-                }
-            }
-        }
-
-        setHasOptionsMenu(true)
+        panel.showBigView(this)
 
         with(manager.savedInfo){
-            userInfoTextView.text = toString()
             if(userID.isEmpty()) openSettings()
         }
 
@@ -80,10 +67,6 @@ class AccountViewFragment(): Fragment() {
             R.id.menu_account_settings_button -> openSettings()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    fun show(){
-        userInfoTextView.text = panel.manager.savedInfo.toString()
     }
 
     private fun deleteAccount(){
