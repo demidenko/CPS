@@ -26,8 +26,7 @@ class CodeforcesAccountPanel(
         }
     }
 
-    override val bigViewResource: Int
-        get() = R.layout.fragment_account_view_codeforces
+    override val bigViewResource = R.layout.fragment_account_view_codeforces
 
     override fun showBigView(fragment: AccountViewFragment) {
         val view = fragment.requireView()
@@ -42,8 +41,12 @@ class CodeforcesAccountPanel(
         handleView.text = CodeforcesUtils.makeSpan(info)
 
         ratingView.apply {
-            text = info.rating.toString()
             setTextColor(color)
+            if(info.status == STATUS.OK){
+                text = if(info.rating == NOT_RATED) "[not rated]" else "${info.rating}"
+            } else {
+                text = ""
+            }
         }
 
         contributionView.apply {
