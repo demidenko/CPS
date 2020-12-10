@@ -1,7 +1,6 @@
 package com.example.test3.account_view
 
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
@@ -25,7 +24,7 @@ abstract class AccountPanel(
     val mainActivity: MainActivity,
     val manager: AccountManager
 ){
-    private val layout = mainActivity.layoutInflater.inflate(R.layout.account_panel, null, false) as ConstraintLayout
+    private val layout = mainActivity.layoutInflater.inflate(R.layout.account_panel, null) as ConstraintLayout
 
     protected val textMain: TextView = layout.findViewById(R.id.account_panel_textMain)
     protected val textAdditional: TextView = layout.findViewById(R.id.account_panel_textAdditional)
@@ -41,11 +40,7 @@ abstract class AccountPanel(
     }
 
 
-    fun createSmallView(textMainSize: Float, textAdditionalSize: Float): View {
-
-        textMain.setTextSize(TypedValue.COMPLEX_UNIT_SP, textMainSize) //TODO: bad spacing
-        textAdditional.setTextSize(TypedValue.COMPLEX_UNIT_SP, textAdditionalSize)
-
+    fun createSmallView(): View {
         layout.setOnClickListener {
             val startDelay = TimeUnit.SECONDS.toMillis(3)
             val duration = TimeUnit.SECONDS.toMillis(2)

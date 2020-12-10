@@ -12,6 +12,8 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
         />
 
     <TextView
@@ -20,6 +22,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/account_panel_textMain"
         app:layout_constraintStart_toStartOf="@id/account_panel_textMain"
+        android:textColor="@color/textColor"
+        android:textSize="25sp"
         />
 
     <ImageButton

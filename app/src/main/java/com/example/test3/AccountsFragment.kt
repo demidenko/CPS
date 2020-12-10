@@ -64,11 +64,11 @@ class AccountsFragment: Fragment() {
 
         view.findViewById<LinearLayout>(R.id.panels_layout).apply {
             val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            addView(codeforcesPanel.createSmallView(30F, 25F), params)
-            addView(atcoderPanel.createSmallView(30F, 25F), params)
-            addView(topcoderPanel.createSmallView(30F, 25F), params)
-            addView(acmpPanel.createSmallView(17F, 14F), params)
-            addView(timusPanel.createSmallView(17F, 14F), params)
+            addView(codeforcesPanel.createSmallView(), params)
+            addView(atcoderPanel.createSmallView(), params)
+            addView(topcoderPanel.createSmallView(), params)
+            addView(acmpPanel.createSmallView(), params)
+            addView(timusPanel.createSmallView(), params)
         }
 
         showPanels()
