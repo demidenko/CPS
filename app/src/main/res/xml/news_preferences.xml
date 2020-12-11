@@ -44,14 +44,14 @@
         >
 
         <CheckBoxPreference
-            android:key="@string/news_acmp_feed"
+            android:key="@string/news_project_euler_feed"
             android:defaultValue="false"
             android:title="projecteuler.net"
             android:icon="@drawable/ic_projecteuler_logo"
             />
 
         <CheckBoxPreference
-            android:key="@string/news_project_euler_feed"
+            android:key="@string/news_acmp_feed"
             android:defaultValue="false"
             android:title="acmp.ru"
             />
