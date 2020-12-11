@@ -203,12 +203,6 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
-    fun onBackPressed(count: Int) {
-        if(count<1) return
-        for (i in 1 until count) super.onBackPressed()
-        onBackPressed()
-    }
-
 
 }
 

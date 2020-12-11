@@ -51,9 +51,6 @@ class AccountViewFragment(): Fragment() {
 
         lifecycleScope.launch {
             panel.showBigView(this@AccountViewFragment)
-            with(manager.getSavedInfo()){
-                if(userID.isEmpty()) openSettings()
-            }
         }
 
     }

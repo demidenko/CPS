@@ -44,27 +44,17 @@ class AccountSettingsFragment(): Fragment() {
 
         textView.setOnClickListener {
             lifecycleScope.launch {
-                val currentUserID = manager.getSavedInfo().userID
-                val userInfo = mainActivity.chooseUserID(manager)
-                if(userInfo==null){
-                    if(currentUserID.isEmpty()){
-                        mainActivity.onBackPressed(2)
-                    }
-                }else{
-                    manager.setSavedInfo(userInfo)
-                    textView.text = userInfo.userID
-                    panel.show()
-                    val accountViewFragment = (mainActivity.supportFragmentManager.findFragmentByTag(AccountViewFragment.tag) as AccountViewFragment)
-                    panel.showBigView(accountViewFragment)
-                }
+                val userInfo = mainActivity.chooseUserID(manager) ?: return@launch
+                manager.setSavedInfo(userInfo)
+                textView.text = userInfo.userID
+                panel.show()
+                val accountViewFragment = (mainActivity.supportFragmentManager.findFragmentByTag(AccountViewFragment.tag) as AccountViewFragment)
+                panel.showBigView(accountViewFragment)
             }
         }
 
         lifecycleScope.launch {
-            with(manager.getSavedInfo().userID){
-                textView.text = this
-                if(isEmpty()) textView.callOnClick()
-            }
+            textView.text = manager.getSavedInfo().userID
         }
 
     }

@@ -94,7 +94,15 @@ class AccountsFragment: Fragment() {
                 .setTitle("Add account")
                 .setAdapter(adapter) { _, index ->
                     if(index == emptyPanels.size) clistImport()
-                    else emptyPanels[index].callExpand()
+                    else{
+                        val panel = emptyPanels[index]
+                        lifecycleScope.launch {
+                            mainActivity.chooseUserID(panel.manager)?.let { userInfo ->
+                                panel.manager.setSavedInfo(userInfo)
+                                panel.show()
+                            }
+                        }
+                    }
                 }.create().show()
         }
     }
