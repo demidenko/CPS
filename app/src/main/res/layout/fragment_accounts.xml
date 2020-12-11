@@ -27,6 +27,7 @@
         android:typeface="monospace"
         android:layout_marginEnd="10dp"
         android:textColor="@color/textColorAdditional"
+        android:visibility="gone"
         />
 
 

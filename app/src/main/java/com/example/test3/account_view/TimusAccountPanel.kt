@@ -41,10 +41,10 @@ class TimusAccountPanel(
 
     override val bigViewResource = R.layout.fragment_account_view_timus
 
-    override fun showBigView(fragment: AccountViewFragment) {
+    override suspend fun showBigView(fragment: AccountViewFragment) {
         val view = fragment.requireView()
 
-        val info = manager.savedInfo as TimusAccountManager.TimusUserInfo
+        val info = manager.getSavedInfo() as TimusAccountManager.TimusUserInfo
 
         view.findViewById<TextView>(R.id.account_view_name).apply {
             text = info.userName

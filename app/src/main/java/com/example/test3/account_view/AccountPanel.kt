@@ -60,16 +60,16 @@ abstract class AccountPanel(
         return layout
     }
 
-    fun isEmpty() = manager.savedInfo.userID.isBlank()
+    suspend fun isEmpty() = manager.getSavedInfo().userID.isBlank()
 
     protected abstract fun show(info: UserInfo)
 
-    fun show(){
+    suspend fun show(){
         if(isEmpty()){
             layout.visibility = View.GONE
         }else {
             layout.visibility = View.VISIBLE
-            show(manager.savedInfo)
+            show(manager.getSavedInfo())
         }
         mainActivity.accountsFragment.updateUI()
     }
@@ -104,11 +104,11 @@ abstract class AccountPanel(
         reloadButton.startAnimation(rotateAnimation)
 
 
-        val savedInfo = manager.savedInfo
+        val savedInfo = manager.getSavedInfo()
         val info = manager.loadInfo(savedInfo.userID)
 
         if(info.status != STATUS.FAILED){
-            manager.savedInfo = info
+            if(info!=savedInfo) manager.setSavedInfo(info)
             show()
             reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {
                 reloadButton.clearAnimation()
@@ -136,11 +136,11 @@ abstract class AccountPanel(
 
     open val bigViewResource: Int = R.layout.fragment_account_view
 
-    open fun showBigView(fragment: AccountViewFragment) {
+    open suspend fun showBigView(fragment: AccountViewFragment) {
         val view = fragment.requireView()
 
         val userInfoTextView = view.findViewById<TextView>(R.id.account_user_info)
-        userInfoTextView.text = manager.savedInfo.toString()
+        userInfoTextView.text = manager.getSavedInfo().toString()
     }
 }
 

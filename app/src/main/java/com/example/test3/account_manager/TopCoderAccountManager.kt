@@ -32,8 +32,6 @@ class TopCoderAccountManager(context: Context): AccountManager(context) {
     companion object : ColoredHandles {
         const val preferences_file_name = "topcoder"
 
-        var __cachedInfo: TopCoderUserInfo? = null
-
         override val ratingsUpperBounds = arrayOf(
             900 to HandleColor.GRAY,
             1200 to HandleColor.GREEN,
@@ -76,20 +74,9 @@ class TopCoderAccountManager(context: Context): AccountManager(context) {
         return res.apply { status = STATUS.OK }
     }
 
-    override var cachedInfo: UserInfo?
-        get() = __cachedInfo
-        set(value) { __cachedInfo = value as TopCoderUserInfo }
+    override fun decodeFromString(str: String) = jsonCPS.decodeFromString<TopCoderUserInfo>(str)
 
-    override fun readInfo(): TopCoderUserInfo = with(prefs){
-        val str = getString(preferences_key_user_info, null) ?: return@with emptyInfo().apply { status = STATUS.FAILED }
-        jsonCPS.decodeFromString(str)
-    }
-
-    override fun writeInfo(info: UserInfo) = with(prefs.edit()){
-        info as TopCoderUserInfo
-        putString(preferences_key_user_info, jsonCPS.encodeToString(info))
-        commit()
-    }
+    override fun encodeToString(info: UserInfo) = jsonCPS.encodeToString(info as TopCoderUserInfo)
 
     override fun getColor(info: UserInfo): Int? = with(info as TopCoderUserInfo){
         if(status != STATUS.OK || rating_algorithm == NOT_RATED) return null

@@ -22,7 +22,7 @@ class AccountsJobService : CoroutineJobService() {
 
     private suspend fun codeforcesContribution() {
         val accountManager = CodeforcesAccountManager(this)
-        val info = accountManager.savedInfo as CodeforcesAccountManager.CodeforcesUserInfo
+        val info = accountManager.getSavedInfo() as CodeforcesAccountManager.CodeforcesUserInfo
         if(info.status != STATUS.OK) return
 
         val handle = info.handle
@@ -32,7 +32,7 @@ class AccountsJobService : CoroutineJobService() {
         }
 
         if(info.contribution != contribution){
-            accountManager.savedInfo = info.copy(contribution = contribution)
+            accountManager.setSavedInfo(info.copy(contribution = contribution))
 
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 

@@ -158,7 +158,7 @@ class MainActivity : AppCompatActivity(){
         return super.onOptionsItemSelected(item)
     }
 
-    suspend fun chooseUserID(manager: AccountManager) = chooseUserID(manager.savedInfo, manager)
+    suspend fun chooseUserID(manager: AccountManager) = chooseUserID(manager.getSavedInfo(), manager)
 
     suspend fun chooseUserID(initialUserInfo: UserInfo, manager: AccountManager): UserInfo? {
         return withContext(scope.coroutineContext) {

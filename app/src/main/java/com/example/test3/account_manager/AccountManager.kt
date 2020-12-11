@@ -1,7 +1,11 @@
 package com.example.test3.account_manager
 
 import android.content.Context
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.preferencesKey
+import androidx.datastore.preferences.createDataStore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 
@@ -9,10 +13,11 @@ abstract class AccountManager(val context: Context) {
 
     companion object {
         const val preferences_key_user_info = "user_info"
+        val KEY_USER_INFO = preferencesKey<String>(preferences_key_user_info)
     }
 
     abstract val PREFERENCES_FILE_NAME: String
-    val prefs by lazy { context.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE) }
+    protected val dataStore = context.createDataStore(name = PREFERENCES_FILE_NAME)
 
     abstract fun emptyInfo(): UserInfo
 
@@ -26,18 +31,18 @@ abstract class AccountManager(val context: Context) {
 
     open suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = null
 
-    protected abstract var cachedInfo: UserInfo?
-    protected abstract fun readInfo(): UserInfo
-    protected abstract fun writeInfo(info: UserInfo): Boolean
+    protected abstract fun decodeFromString(str: String): UserInfo
+    protected abstract fun encodeToString(info: UserInfo): String
 
-    var savedInfo: UserInfo
-        get() = cachedInfo ?: readInfo().also { cachedInfo = it }
-        set(info) {
-            if(info == cachedInfo) return
-            writeInfo(info)
-            cachedInfo = info
-            println("account $PREFERENCES_FILE_NAME rewrited to ${info.makeInfoString()}")
+    suspend fun getSavedInfo(): UserInfo {
+        val str = dataStore.data.first()[KEY_USER_INFO] ?: return emptyInfo().apply { status = STATUS.FAILED }
+        return decodeFromString(str)
+    }
+    suspend fun setSavedInfo(info: UserInfo) {
+        dataStore.edit {
+            it[KEY_USER_INFO] = encodeToString(info)
         }
+    }
 
     open fun getColor(info: UserInfo): Int? = null
 }
@@ -51,7 +56,7 @@ const val NOT_RATED = Int.MIN_VALUE
 
 abstract class UserInfo{
     abstract val userID: String
-    abstract val status: STATUS
+    abstract var status: STATUS
 
     protected abstract fun makeInfoOKString(): String
     fun makeInfoString(): String {

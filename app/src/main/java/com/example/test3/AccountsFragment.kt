@@ -71,30 +71,32 @@ class AccountsFragment: Fragment() {
             addView(timusPanel.createSmallView(), params)
         }
 
-        showPanels()
-
         with(mainActivity){
             navigation_accounts_reload.setOnClickListener { reloadAccounts() }
             navigation_accounts_add.setOnClickListener { addAccount() }
         }
+
+        showPanels()
     }
 
     fun addAccount() {
-        val emptyPanels = panels.filter { it.isEmpty() }
+        lifecycleScope.launch {
+            val emptyPanels = panels.filter { it.isEmpty() }
 
-        val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item)
-        emptyPanels.forEach {
-            adapter.add(it.manager.PREFERENCES_FILE_NAME)
+            val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item)
+            emptyPanels.forEach {
+                adapter.add(it.manager.PREFERENCES_FILE_NAME)
+            }
+
+            adapter.add("Import from clist.by")
+
+            AlertDialog.Builder(activity)
+                .setTitle("Add account")
+                .setAdapter(adapter) { _, index ->
+                    if(index == emptyPanels.size) clistImport()
+                    else emptyPanels[index].callExpand()
+                }.create().show()
         }
-
-        adapter.add("Import from clist.by")
-
-        AlertDialog.Builder(activity)
-            .setTitle("Add account")
-            .setAdapter(adapter) { _, index ->
-                if(index == emptyPanels.size) clistImport()
-                else emptyPanels[index].callExpand()
-            }.create().show()
     }
 
     private fun clistImport() {
@@ -115,7 +117,7 @@ class AccountsFragment: Fragment() {
                     while(panel.isBlocked()) delay(300)
                     panel.block()
                     val userInfo = manager.loadInfo(userID)
-                    manager.savedInfo = userInfo
+                    manager.setSavedInfo(userInfo)
                     panel.show()
                     panel.unblock()
                     progressInfo.increment()
@@ -127,14 +129,14 @@ class AccountsFragment: Fragment() {
         }
     }
 
-    fun updateUI(){
+    suspend fun updateUI(){
         var allEmpty = true
         var statusBarColor: Int = Color.TRANSPARENT
         panels.forEach { panel ->
             if(!panel.isEmpty()){
                 allEmpty = false
                 with(panel.manager){
-                    getColor(savedInfo)?.let {
+                    getColor(getSavedInfo())?.let {
                         if(statusBarColor == Color.TRANSPARENT){
                             statusBarColor = it
                         }
@@ -148,7 +150,9 @@ class AccountsFragment: Fragment() {
     }
 
     fun showPanels() {
-        panels.forEach { it.show() }
+        lifecycleScope.launch {
+            panels.forEach { it.show() }
+        }
     }
 
     fun reloadAccounts() {

@@ -33,8 +33,6 @@ class AtCoderAccountManager(context: Context): AccountManager(context) {
     companion object : ColoredHandles {
         const val preferences_file_name = "atcoder"
 
-        var __cachedInfo: AtCoderUserInfo? = null
-
         override val ratingsUpperBounds = arrayOf(
             400 to HandleColor.GRAY,
             800 to HandleColor.BROWN,
@@ -83,20 +81,9 @@ class AtCoderAccountManager(context: Context): AccountManager(context) {
         return res
     }
 
-    override var cachedInfo: UserInfo?
-        get() = __cachedInfo
-        set(value) { __cachedInfo = value as AtCoderUserInfo }
+    override fun decodeFromString(str: String) = jsonCPS.decodeFromString<AtCoderUserInfo>(str)
 
-    override fun readInfo(): AtCoderUserInfo = with(prefs){
-        val str = getString(preferences_key_user_info, null) ?: return@with emptyInfo().apply { status = STATUS.FAILED }
-        jsonCPS.decodeFromString(str)
-    }
-
-    override fun writeInfo(info: UserInfo) = with(prefs.edit()){
-        info as AtCoderUserInfo
-        putString(preferences_key_user_info, jsonCPS.encodeToString(info))
-        commit()
-    }
+    override fun encodeToString(info: UserInfo) = jsonCPS.encodeToString(info as AtCoderUserInfo)
 
     override fun getColor(info: UserInfo): Int?  = with(info as AtCoderUserInfo){
         if(status != STATUS.OK || rating == NOT_RATED) return null

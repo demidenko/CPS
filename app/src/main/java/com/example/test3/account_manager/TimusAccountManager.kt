@@ -33,10 +33,8 @@ class TimusAccountManager(context: Context): AccountManager(context) {
     override val PREFERENCES_FILE_NAME: String
         get() = preferences_file_name
 
-    companion object{
+    companion object {
         const val preferences_file_name = "timus"
-
-        var __cachedInfo: TimusUserInfo? = null
     }
 
     override fun emptyInfo() = TimusUserInfo(STATUS.NOT_FOUND, "")
@@ -68,20 +66,9 @@ class TimusAccountManager(context: Context): AccountManager(context) {
         return res
     }
 
-    override var cachedInfo: UserInfo?
-        get() = __cachedInfo
-        set(value) { __cachedInfo = value as TimusUserInfo }
+    override fun decodeFromString(str: String) = jsonCPS.decodeFromString<TimusUserInfo>(str)
 
-    override fun readInfo(): TimusUserInfo = with(prefs) {
-        val str = getString(preferences_key_user_info, null) ?: return@with emptyInfo().apply { status = STATUS.FAILED }
-        jsonCPS.decodeFromString(str)
-    }
-
-    override fun writeInfo(info: UserInfo) = with(prefs.edit()){
-        info as TimusUserInfo
-        putString(preferences_key_user_info, jsonCPS.encodeToString(info))
-        commit()
-    }
+    override fun encodeToString(info: UserInfo) = jsonCPS.encodeToString(info as TimusUserInfo)
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         if(str.toIntOrNull()!=null) return null

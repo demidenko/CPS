@@ -4,11 +4,13 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.makeIntentOpenUrl
 import com.example.test3.setFragmentSubTitle
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.launch
 
 class AccountViewFragment(): Fragment() {
 
@@ -46,10 +48,12 @@ class AccountViewFragment(): Fragment() {
         activity.setActionBarSubTitle(subtitle)
         activity.navigation.visibility = View.GONE
 
-        panel.showBigView(this)
 
-        with(manager.savedInfo){
-            if(userID.isEmpty()) openSettings()
+        lifecycleScope.launch {
+            panel.showBigView(this@AccountViewFragment)
+            with(manager.getSavedInfo()){
+                if(userID.isEmpty()) openSettings()
+            }
         }
 
     }
@@ -66,18 +70,20 @@ class AccountViewFragment(): Fragment() {
         when(item.itemId){
             R.id.menu_account_delete_button -> deleteAccount()
             R.id.menu_account_settings_button -> openSettings()
-            R.id.menu_account_open_button -> requireActivity().startActivity(makeIntentOpenUrl(panel.manager.savedInfo.link()))
+            R.id.menu_account_open_button -> lifecycleScope.launch { startActivity(makeIntentOpenUrl(panel.manager.getSavedInfo().link())) }
         }
         return super.onOptionsItemSelected(item)
     }
 
     private fun deleteAccount(){
-        AlertDialog.Builder(requireActivity())
+        AlertDialog.Builder(requireContext())
             .setMessage("Delete ${panel.manager.PREFERENCES_FILE_NAME} account?")
             .setPositiveButton("YES"){ _, _ ->
-                panel.manager.savedInfo = panel.manager.emptyInfo()
-                panel.show()
-                requireActivity().onBackPressed()
+                lifecycleScope.launch {
+                    panel.manager.setSavedInfo(panel.manager.emptyInfo())
+                    panel.show()
+                    requireActivity().onBackPressed()
+                }
             }
             .setNegativeButton("NO"){ _, _ -> }
             .create()

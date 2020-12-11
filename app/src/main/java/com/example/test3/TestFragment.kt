@@ -20,7 +20,6 @@ import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesAPIStatus
 import com.example.test3.utils.CodeforcesContest
 import com.example.test3.utils.CodeforcesUtils
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -179,18 +178,5 @@ class TestFragment : Fragment() {
             useRealColors = backup
         }
 
-        val rnd = Random()
-        view.findViewById<Button>(R.id.button_test_add_bar).setOnClickListener { button -> button as Button
-            val t = (rnd.nextInt(10) + 1)
-            val bar = BottomProgressInfo(t, t.toString(), mainActivity)
-
-            lifecycleScope.launch {
-                for (i in 1..t){
-                    delay(1000)
-                    bar.increment()
-                }
-                bar.finish()
-            }
-        }
     }
 }

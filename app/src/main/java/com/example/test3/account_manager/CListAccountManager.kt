@@ -28,13 +28,9 @@ class CListAccountManager(context: Context) : AccountManager(context) {
     override val PREFERENCES_FILE_NAME: String
         get() = preferences_file_name
 
-    override var cachedInfo: UserInfo?
-        get() = null
-        set(value) {}
+    override fun decodeFromString(str: String) = emptyInfo()
 
-    override fun readInfo(): UserInfo = emptyInfo()
-
-    override fun writeInfo(info: UserInfo): Boolean = false
+    override fun encodeToString(info: UserInfo) = ""
 
     override fun emptyInfo() = CListUserInfo(STATUS.NOT_FOUND, "")
 

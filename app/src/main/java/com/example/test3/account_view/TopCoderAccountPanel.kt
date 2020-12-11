@@ -32,10 +32,10 @@ class TopCoderAccountPanel(
 
     override val bigViewResource = R.layout.fragment_account_view_topcoder
 
-    override fun showBigView(fragment: AccountViewFragment) {
+    override suspend fun showBigView(fragment: AccountViewFragment) {
         val view = fragment.requireView()
 
-        val info = manager.savedInfo as TopCoderAccountManager.TopCoderUserInfo
+        val info = manager.getSavedInfo() as TopCoderAccountManager.TopCoderUserInfo
 
         val handleView = view.findViewById<TextView>(R.id.account_view_handle)
         val ratingView = view.findViewById<TextView>(R.id.account_view_rating)

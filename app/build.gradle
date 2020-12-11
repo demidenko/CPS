@@ -22,8 +22,8 @@ android {
         applicationId "com.example.test3"
         minSdkVersion 22
         targetSdkVersion 30
-        versionCode = 91
-        versionName '0.25.5'
+        versionCode = 92
+        versionName '0.25.6'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -50,8 +50,10 @@ dependencies {
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
     implementation "androidx.preference:preference-ktx:1.1.1"
+    implementation "androidx.datastore:datastore-preferences:1.0.0-alpha05"
 
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
 
     implementation 'com.squareup.moshi:moshi-kotlin:1.11.0'
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.11.0'

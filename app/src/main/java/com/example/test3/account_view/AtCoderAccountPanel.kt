@@ -34,10 +34,10 @@ class AtCoderAccountPanel(
 
     override val bigViewResource = R.layout.fragment_account_view_atcoder
 
-    override fun showBigView(fragment: AccountViewFragment) {
+    override suspend fun showBigView(fragment: AccountViewFragment) {
         val view = fragment.requireView()
 
-        val info = manager.savedInfo as AtCoderAccountManager.AtCoderUserInfo
+        val info = manager.getSavedInfo() as AtCoderAccountManager.AtCoderUserInfo
 
         val handleView = view.findViewById<TextView>(R.id.account_view_handle)
         val ratingView = view.findViewById<TextView>(R.id.account_view_rating)

@@ -28,10 +28,10 @@ class CodeforcesAccountPanel(
 
     override val bigViewResource = R.layout.fragment_account_view_codeforces
 
-    override fun showBigView(fragment: AccountViewFragment) {
+    override suspend fun showBigView(fragment: AccountViewFragment) {
         val view = fragment.requireView()
 
-        val info = manager.savedInfo as CodeforcesAccountManager.CodeforcesUserInfo
+        val info = manager.getSavedInfo() as CodeforcesAccountManager.CodeforcesUserInfo
         val color = manager.getColor(info) ?: mainActivity.defaultTextColor
 
         val handleView = view.findViewById<TextView>(R.id.account_view_handle)

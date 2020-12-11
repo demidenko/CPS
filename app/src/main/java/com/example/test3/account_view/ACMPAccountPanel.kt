@@ -43,10 +43,10 @@ class ACMPAccountPanel(
 
     override val bigViewResource = R.layout.fragment_account_view_acmp
 
-    override fun showBigView(fragment: AccountViewFragment) {
+    override suspend fun showBigView(fragment: AccountViewFragment) {
         val view = fragment.requireView()
 
-        val info = manager.savedInfo as ACMPAccountManager.ACMPUserInfo
+        val info = manager.getSavedInfo() as ACMPAccountManager.ACMPUserInfo
 
         view.findViewById<TextView>(R.id.account_view_name).apply {
             text = info.userName
