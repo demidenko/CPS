@@ -151,18 +151,14 @@ object CodeforcesUtils : ColoredHandles {
         return res.trimEnd() as Spanned
     }
 
-
-    override fun getHandleColor(rating: Int): HandleColor {
-        return when {
-            rating < 1200 -> HandleColor.GRAY
-            rating < 1400 -> HandleColor.GREEN
-            rating < 1600 -> HandleColor.CYAN
-            rating < 1900 -> HandleColor.BLUE
-            rating < 2100 -> HandleColor.VIOLET
-            rating < 2400 -> HandleColor.ORANGE
-            else -> HandleColor.RED
-        }
-    }
+    override val ratingsUpperBounds = arrayOf(
+        1200 to HandleColor.GRAY,
+        1400 to HandleColor.GREEN,
+        1600 to HandleColor.CYAN,
+        1900 to HandleColor.BLUE,
+        2100 to HandleColor.VIOLET,
+        2400 to HandleColor.ORANGE
+    )
 
     override fun getColor(tag: HandleColor): Int {
         return when (tag){

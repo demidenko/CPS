@@ -34,16 +34,12 @@ class TopCoderAccountManager(context: Context): AccountManager(context) {
 
         var __cachedInfo: TopCoderUserInfo? = null
 
-
-        override fun getHandleColor(rating: Int): HandleColor {
-            return when{
-                rating < 900 -> HandleColor.GRAY
-                rating < 1200 -> HandleColor.GREEN
-                rating < 1500 -> HandleColor.BLUE
-                rating < 2200 -> HandleColor.YELLOW
-                else -> HandleColor.RED
-            }
-        }
+        override val ratingsUpperBounds = arrayOf(
+            900 to HandleColor.GRAY,
+            1200 to HandleColor.GREEN,
+            1500 to HandleColor.BLUE,
+            2200 to HandleColor.YELLOW
+        )
 
         override fun getColor(tag: HandleColor): Int {
             return when(tag){
@@ -97,7 +93,7 @@ class TopCoderAccountManager(context: Context): AccountManager(context) {
 
     override fun getColor(info: UserInfo): Int? = with(info as TopCoderUserInfo){
         if(status != STATUS.OK || rating_algorithm == NOT_RATED) return null
-        return getHandleColor(info.rating_algorithm).getARGB(Companion)
+        return getHandleColorARGB(info.rating_algorithm)
     }
 
 

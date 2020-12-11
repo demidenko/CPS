@@ -73,7 +73,7 @@ class CodeforcesAccountManager(context: Context): AccountManager(context) {
 
     override fun getColor(info: UserInfo): Int? = with(info as CodeforcesUserInfo){
         if(status != STATUS.OK || rating == NOT_RATED) return null
-        return CodeforcesUtils.getHandleColor(info.rating).getARGB(CodeforcesUtils)
+        return CodeforcesUtils.getHandleColorARGB(info.rating)
     }
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = withContext(Dispatchers.IO){

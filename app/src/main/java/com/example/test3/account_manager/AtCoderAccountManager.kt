@@ -35,20 +35,15 @@ class AtCoderAccountManager(context: Context): AccountManager(context) {
 
         var __cachedInfo: AtCoderUserInfo? = null
 
-
-
-        override fun getHandleColor(rating: Int): HandleColor {
-            return when{
-                rating < 400 -> HandleColor.GRAY
-                rating < 800 -> HandleColor.BROWN
-                rating < 1200 -> HandleColor.GREEN
-                rating < 1600 -> HandleColor.CYAN
-                rating < 2000 -> HandleColor.BLUE
-                rating < 2400 -> HandleColor.YELLOW
-                rating < 2800 -> HandleColor.ORANGE
-                else -> HandleColor.RED
-            }
-        }
+        override val ratingsUpperBounds = arrayOf(
+            400 to HandleColor.GRAY,
+            800 to HandleColor.BROWN,
+            1200 to HandleColor.GREEN,
+            1600 to HandleColor.CYAN,
+            2000 to HandleColor.BLUE,
+            2400 to HandleColor.YELLOW,
+            2800 to HandleColor.ORANGE
+        )
 
         override fun getColor(tag: HandleColor): Int {
             return when(tag){
@@ -105,7 +100,7 @@ class AtCoderAccountManager(context: Context): AccountManager(context) {
 
     override fun getColor(info: UserInfo): Int?  = with(info as AtCoderUserInfo){
         if(status != STATUS.OK || rating == NOT_RATED) return null
-        return getHandleColor(info.rating).getARGB(Companion)
+        return getHandleColorARGB(info.rating)
     }
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = withContext(Dispatchers.IO) {

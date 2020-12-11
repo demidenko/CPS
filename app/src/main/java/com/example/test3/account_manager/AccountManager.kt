@@ -85,8 +85,18 @@ enum class HandleColor(private val rgb: Int) {
 }
 
 interface ColoredHandles {
-    fun getHandleColor(rating: Int): HandleColor
     fun getColor(tag: HandleColor): Int
+    val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
+}
+
+fun ColoredHandles.getHandleColor(rating: Int): HandleColor {
+    return ratingsUpperBounds.find { (bound, color) ->
+        rating < bound
+    }?.second ?: HandleColor.RED
+}
+
+fun ColoredHandles.getHandleColorARGB(rating: Int): Int {
+    return getHandleColor(rating).getARGB(this)
 }
 
 data class AccountSuggestion(

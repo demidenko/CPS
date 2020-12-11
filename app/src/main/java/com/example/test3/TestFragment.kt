@@ -148,14 +148,14 @@ class TestFragment : Fragment() {
             ))
 
             val backup = useRealColors
-            for(color in HandleColor.values()){
+            for(handleColor in HandleColor.values()){
                 val row = arrayListOf<CharSequence>()
 
                 useRealColors = false
 
                 row.add(
                     SpannableStringBuilder().bold {
-                        color(color.getARGB(CodeforcesUtils)) { append(color.name) }
+                        color(handleColor.getARGB(CodeforcesUtils)) { append(handleColor.name) }
                     }
                 )
                 useRealColors = true
@@ -166,7 +166,7 @@ class TestFragment : Fragment() {
                 ).forEach {
                     val s = SpannableStringBuilder().bold {
                         try {
-                            color(color.getARGB(it)) { append(color.name) }
+                            color(handleColor.getARGB(it)) { append(handleColor.name) }
                         } catch (e: HandleColor.UnknownHandleColorException) {
                             append("")
                         }

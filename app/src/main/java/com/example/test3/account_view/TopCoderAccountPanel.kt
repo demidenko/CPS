@@ -5,10 +5,7 @@ import android.view.View
 import android.widget.TextView
 import com.example.test3.MainActivity
 import com.example.test3.R
-import com.example.test3.account_manager.NOT_RATED
-import com.example.test3.account_manager.STATUS
-import com.example.test3.account_manager.TopCoderAccountManager
-import com.example.test3.account_manager.UserInfo
+import com.example.test3.account_manager.*
 
 class TopCoderAccountPanel(
     mainActivity: MainActivity,
@@ -55,7 +52,7 @@ class TopCoderAccountPanel(
                 visibility = View.VISIBLE
                 marathonRatingViewTitle.visibility = View.VISIBLE
 
-                val marathonColor = TopCoderAccountManager.getHandleColor(info.rating_marathon).getARGB(TopCoderAccountManager.Companion)
+                val marathonColor = TopCoderAccountManager.getHandleColorARGB(info.rating_marathon)
                 setTextColor(marathonColor)
                 text = "${info.rating_marathon}"
             }
