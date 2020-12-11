@@ -919,6 +919,12 @@ class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSha
                 }
                 requireActivity().invalidateOptionsMenu()
             }
+            getString(R.string.news_project_euler_problems) -> {
+                when(sharedPreferences.getBoolean(key, false)){
+                    true -> JobServicesCenter.startProjectEulerRecentProblemsJobService(requireContext())
+                    false -> JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.project_euler_recent_problems)
+                }
+            }
             getString(R.string.news_project_euler_feed),
             getString(R.string.news_acmp_feed),
             getString(R.string.news_zaoch_feed) -> {

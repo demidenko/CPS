@@ -53,12 +53,12 @@ object JobServicesCenter {
     fun startJobServices(activity: MainActivity){
         val toStart = mutableMapOf<Int, (Context)->Unit >(
             JobServiceIDs.news_parsers to ::startNewsJobService,
-            JobServiceIDs.accounts_parsers to ::startAccountsJobService,
-            JobServiceIDs.project_euler_recent_problems to ::startProjectEulerRecentProblemsJobService
+            JobServiceIDs.accounts_parsers to ::startAccountsJobService
         )
         with(PreferenceManager.getDefaultSharedPreferences(activity)){
             if(getBoolean(activity.getString(R.string.news_codeforces_lost_enabled), false)) toStart[JobServiceIDs.codeforces_news_lost_recent] = ::startCodeforcesNewsLostRecentJobService
             if(getBoolean(activity.getString(R.string.news_codeforces_follow_enabled), false)) toStart[JobServiceIDs.codeforces_news_follow] = ::startCodeforcesNewsFollowJobService
+            if(getBoolean(activity.getString(R.string.news_project_euler_problems), false)) toStart[JobServiceIDs.project_euler_recent_problems] = ::startProjectEulerRecentProblemsJobService
         }
         getRunningJobServices(activity).forEach {
             if(toStart.containsKey(it.id)) toStart.remove(it.id)
@@ -105,7 +105,7 @@ object JobServicesCenter {
         )
     }
 
-    private fun startProjectEulerRecentProblemsJobService(context: Context){
+    fun startProjectEulerRecentProblemsJobService(context: Context){
         makeSchedule(
             context,
             JobServiceIDs.project_euler_recent_problems,

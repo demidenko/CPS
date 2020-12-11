@@ -3,18 +3,31 @@ package com.example.test3.job_services
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.preference.PreferenceManager
 import com.example.test3.*
 import com.example.test3.utils.ProjectEulerAPI
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.util.*
 
 class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
 
     companion object {
         private const val PREFERENCES_FILE_NAME = "project_euler"
         private const val LAST_RECENT_PROBLEM_ID = "last_recent_problem_id"
+
+        fun isEnabled(context: Context): Boolean {
+            return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.news_project_euler_problems), false)
+        }
     }
 
-    override suspend fun makeJobs() = arrayListOf(launch { parseRecentProblems() })
+    override suspend fun makeJobs(): ArrayList<Job> {
+        if (isEnabled(this)) return arrayListOf( launch { parseRecentProblems() } )
+        else{
+            JobServicesCenter.stopJobService(this, JobServiceIDs.project_euler_recent_problems)
+            return arrayListOf()
+        }
+    }
 
     private suspend fun parseRecentProblems() {
         val s = ProjectEulerAPI.getRecentProblemsPage() ?: return

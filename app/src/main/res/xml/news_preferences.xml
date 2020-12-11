@@ -51,6 +51,14 @@
             />
 
         <CheckBoxPreference
+            android:key="@string/news_project_euler_problems"
+            android:defaultValue="false"
+            android:title="projecteuler.net/recent"
+            android:icon="@drawable/ic_projecteuler_logo"
+            android:summary="new problems"
+            />
+
+        <CheckBoxPreference
             android:key="@string/news_acmp_feed"
             android:defaultValue="false"
             android:title="acmp.ru"
