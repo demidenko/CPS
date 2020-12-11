@@ -15,32 +15,8 @@ class TopCoderAccountPanel(
     manager: TopCoderAccountManager
 ): AccountPanel(mainActivity, manager)  {
 
-    override fun show(info: UserInfo) { info as TopCoderAccountManager.TopCoderUserInfo
-        val color = manager.getColor(info)
-        textMain.text = info.handle
-        textMain.setTextColor(color ?: mainActivity.defaultTextColor)
-        textAdditional.text = ""
-        textAdditional.setTextColor(color ?: mainActivity.defaultTextColor)
-        if(info.status == STATUS.OK){
-            textMain.typeface = Typeface.DEFAULT_BOLD
-            textAdditional.text = if(info.rating_algorithm == NOT_RATED) "[not rated]" else "${info.rating_algorithm}"
-        }else{
-            textMain.typeface = Typeface.DEFAULT
-        }
-    }
-
-    override val bigViewResource = R.layout.fragment_account_view_topcoder
-
-    override fun showBigView(fragment: AccountViewFragment) {
-        val view = fragment.requireView()
-
-        val info = manager.savedInfo as TopCoderAccountManager.TopCoderUserInfo
+    private fun showMain(handleView: TextView, ratingView: TextView, info: TopCoderAccountManager.TopCoderUserInfo) {
         val color = manager.getColor(info) ?: mainActivity.defaultTextColor
-
-        val handleView = view.findViewById<TextView>(R.id.account_view_handle)
-        val ratingView = view.findViewById<TextView>(R.id.account_view_rating)
-        val marathonRatingView = view.findViewById<TextView>(R.id.account_view_tc_marathon)
-
         handleView.setTextColor(color)
         ratingView.setTextColor(color)
         handleView.text = info.handle
@@ -49,7 +25,26 @@ class TopCoderAccountPanel(
             ratingView.text = if(info.rating_algorithm == NOT_RATED) "[not rated]" else "${info.rating_algorithm}"
         }else{
             handleView.typeface = Typeface.DEFAULT
+            ratingView.text = ""
         }
+    }
+
+    override fun show(info: UserInfo) {
+        showMain(textMain, textAdditional, info as TopCoderAccountManager.TopCoderUserInfo)
+    }
+
+    override val bigViewResource = R.layout.fragment_account_view_topcoder
+
+    override fun showBigView(fragment: AccountViewFragment) {
+        val view = fragment.requireView()
+
+        val info = manager.savedInfo as TopCoderAccountManager.TopCoderUserInfo
+
+        val handleView = view.findViewById<TextView>(R.id.account_view_handle)
+        val ratingView = view.findViewById<TextView>(R.id.account_view_rating)
+        val marathonRatingView = view.findViewById<TextView>(R.id.account_view_tc_marathon)
+
+        showMain(handleView, ratingView, info)
 
         marathonRatingView.apply {
             val marathonRatingViewTitle = view.findViewById<TextView>(R.id.account_view_tc_marathon_title)

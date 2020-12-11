@@ -14,31 +14,8 @@ class AtCoderAccountPanel(
     manager: AtCoderAccountManager
 ): AccountPanel(mainActivity, manager)  {
 
-    override fun show(info: UserInfo) { info as AtCoderAccountManager.AtCoderUserInfo
+    private fun showMain(handleView: TextView, ratingView: TextView, info: AtCoderAccountManager.AtCoderUserInfo) {
         val color = manager.getColor(info) ?: mainActivity.defaultTextColor
-        textMain.text = info.handle
-        textMain.setTextColor(color)
-        textAdditional.text = ""
-        textAdditional.setTextColor(color)
-        if(info.status == STATUS.OK){
-            textMain.typeface = Typeface.DEFAULT_BOLD
-            textAdditional.text = if(info.rating == NOT_RATED) "[not rated]" else "${info.rating}"
-        }else{
-            textMain.typeface = Typeface.DEFAULT
-        }
-    }
-
-    override val bigViewResource = R.layout.fragment_account_view_atcoder
-
-    override fun showBigView(fragment: AccountViewFragment) {
-        val view = fragment.requireView()
-
-        val info = manager.savedInfo as AtCoderAccountManager.AtCoderUserInfo
-        val color = manager.getColor(info) ?: mainActivity.defaultTextColor
-
-        val handleView = view.findViewById<TextView>(R.id.account_view_handle)
-        val ratingView = view.findViewById<TextView>(R.id.account_view_rating)
-
         handleView.setTextColor(color)
         ratingView.setTextColor(color)
         handleView.text = info.handle
@@ -47,7 +24,25 @@ class AtCoderAccountPanel(
             ratingView.text = if(info.rating == NOT_RATED) "[not rated]" else "${info.rating}"
         }else{
             handleView.typeface = Typeface.DEFAULT
+            ratingView.text = ""
         }
+    }
+
+    override fun show(info: UserInfo) {
+        showMain(textMain, textAdditional, info as AtCoderAccountManager.AtCoderUserInfo)
+    }
+
+    override val bigViewResource = R.layout.fragment_account_view_atcoder
+
+    override fun showBigView(fragment: AccountViewFragment) {
+        val view = fragment.requireView()
+
+        val info = manager.savedInfo as AtCoderAccountManager.AtCoderUserInfo
+
+        val handleView = view.findViewById<TextView>(R.id.account_view_handle)
+        val ratingView = view.findViewById<TextView>(R.id.account_view_rating)
+
+        showMain(handleView, ratingView, info)
 
     }
 
