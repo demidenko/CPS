@@ -17,10 +17,7 @@ import com.example.test3.utils.CListUtils
 import com.example.test3.utils.SharedReloadButton
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.navigation_accounts.*
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class AccountsFragment: Fragment() {
 
@@ -158,7 +155,7 @@ class AccountsFragment: Fragment() {
     }
 
     fun showPanels() {
-        lifecycleScope.launch {
+        runBlocking {
             panels.forEach { it.show() }
         }
     }
