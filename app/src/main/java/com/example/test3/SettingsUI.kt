@@ -29,25 +29,19 @@ class SettingsUI(context: Context) {
 
 
 
-var Context.useRealColors by UseRealColorsDelegate()
+val Context.settingsUI by SettingsUIDelegate()
 
-class UseRealColorsDelegate {
+fun Context.getUseRealColors() = runBlocking { settingsUI.getUseRealColors() }
+
+fun Context.setUseRealColors(use: Boolean) = runBlocking { settingsUI.setUseRealColors(use) }
+
+class SettingsUIDelegate {
 
     private var _dataStore: SettingsUI? = null
 
-    private fun getOrCreateDataStore(thisRef: Context): SettingsUI {
+    operator fun getValue(thisRef: Context, property: KProperty<*>): SettingsUI {
         return _dataStore ?: SettingsUI(thisRef).also {
             _dataStore = it
-        }
-    }
-
-    operator fun getValue(thisRef: Context, property: KProperty<*>): Boolean {
-        return runBlocking { getOrCreateDataStore(thisRef).getUseRealColors() }
-    }
-
-    operator fun setValue(thisRef: Context, property: KProperty<*>, value: Boolean) {
-        runBlocking {
-            getOrCreateDataStore(thisRef).setUseRealColors(value)
         }
     }
 }

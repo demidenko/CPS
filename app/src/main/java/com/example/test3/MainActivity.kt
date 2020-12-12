@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity(){
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         (menu as? MenuBuilder)?.setOptionalIconsVisible(true)
         menuInflater.inflate(R.menu.menu_main, menu)
-        menu?.getItem(0)?.isChecked = useRealColors
+        menu?.getItem(0)?.isChecked = getUseRealColors()
         return true
     }
 
@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity(){
             R.id.color_switcher -> {
                 val use = !item.isChecked
                 item.isChecked = use
-                useRealColors = use
+                setUseRealColors(use)
                 accountsFragment.showPanels()
                 if(newsFragment.isAdded) newsFragment.refresh()
             }
@@ -183,10 +183,6 @@ class MainActivity : AppCompatActivity(){
         super.onDestroy()
     }
 
-
-    companion object {
-        const val use_real_colors = "use_real_colors"
-    }
 
     override fun onBackPressed() {
         super.onBackPressed()

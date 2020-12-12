@@ -146,18 +146,15 @@ class TestFragment : Fragment() {
                 "Topcoder"
             ))
 
-            val backup = mainActivity.useRealColors
             for(handleColor in HandleColor.values()){
                 val row = arrayListOf<CharSequence>()
 
-                mainActivity.useRealColors = false
-
                 row.add(
                     SpannableStringBuilder().bold {
-                        color(handleColor.getARGB(mainActivity.accountsFragment.codeforcesAccountManager)) { append(handleColor.name) }
+                        color(handleColor.getARGB(mainActivity.accountsFragment.codeforcesAccountManager, false)) { append(handleColor.name) }
                     }
                 )
-                mainActivity.useRealColors = true
+
                 arrayOf<RatedAccountManager>(
                     mainActivity.accountsFragment.codeforcesAccountManager,
                     mainActivity.accountsFragment.atcoderAccountManager,
@@ -165,7 +162,7 @@ class TestFragment : Fragment() {
                 ).forEach { manager ->
                     val s = SpannableStringBuilder().bold {
                         try {
-                            color(handleColor.getARGB(manager)) { append(handleColor.name) }
+                            color(handleColor.getARGB(manager, true)) { append(handleColor.name) }
                         } catch (e: HandleColor.UnknownHandleColorException) {
                             append("")
                         }
@@ -174,8 +171,6 @@ class TestFragment : Fragment() {
                 }
                 addRow(row)
             }
-
-            mainActivity.useRealColors = backup
         }
 
     }
