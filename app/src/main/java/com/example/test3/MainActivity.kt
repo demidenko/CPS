@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
@@ -135,9 +136,9 @@ class MainActivity : AppCompatActivity(){
             R.id.color_switcher -> {
                 val use = !item.isChecked
                 item.isChecked = use
-                setUseRealColors(use)
-                accountsFragment.showPanels()
-                if(newsFragment.isAdded) newsFragment.refresh()
+                lifecycleScope.launch {
+                    setUseRealColors(use)
+                }
             }
             R.id.app_info -> {
                 AlertDialog.Builder(this)

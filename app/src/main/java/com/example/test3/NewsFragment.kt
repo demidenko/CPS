@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.view.*
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -67,7 +66,7 @@ class NewsFragment : Fragment() {
         }
         CodeforcesNewsAdapter(this, fragments)
     }
-    private lateinit var tabLayout: TabLayout
+    private val tabLayout by lazy { requireView().findViewById<TabLayout>(R.id.cf_news_tab_layout) }
     private val tabSelectionListener = object : TabLayout.OnTabSelectedListener{
 
         fun changeVisibility(fragment: CodeforcesNewsFragment, type: Int){
@@ -111,13 +110,10 @@ class NewsFragment : Fragment() {
         }
     }
 
-    private lateinit var codeforcesNewsViewPager: ViewPager2
-
-    fun refresh(){
-        try {
-            codeforcesNewsAdapter.fragments.forEach { it.refresh() }
-        }catch (e: UninitializedPropertyAccessException){
-
+    private val codeforcesNewsViewPager by lazy {
+        requireView().findViewById<ViewPager2>(R.id.cf_news_pager).apply {
+            adapter = codeforcesNewsAdapter
+            offscreenPageLimit = codeforcesNewsAdapter.fragments.size
         }
     }
 
@@ -125,14 +121,8 @@ class NewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        codeforcesNewsViewPager = view.findViewById<ViewPager2>(R.id.cf_news_pager).apply {
-            adapter = codeforcesNewsAdapter
-            offscreenPageLimit = codeforcesNewsAdapter.fragments.size
-        }
-
         val badgeColor = getColorFromResource(requireContext(), android.R.color.holo_green_light)
 
-        tabLayout = view.findViewById(R.id.cf_news_tab_layout)
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
             val fragment = codeforcesNewsAdapter.fragments[position]
             tab.text = fragment.title.name
@@ -158,6 +148,10 @@ class NewsFragment : Fragment() {
             navigation_news_recent_show_blog_back.setOnClickListener {
                 val fragment = codeforcesNewsAdapter.fragments.find { it.title == CodeforcesTitle.RECENT } ?: return@setOnClickListener
                 (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).closeShowFromBlog()
+            }
+
+            settingsUI.userRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
+                codeforcesNewsAdapter.fragments.forEach { it.refresh() }
             }
         }
 
@@ -644,15 +638,13 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
     private var headerBlog: BlogInfo? = null
     private lateinit var header: View
-    private lateinit var switchButton: ImageButton
-    private lateinit var showBackButton: ImageButton
+    private val switchButton by lazy { activity.navigation_news_recent_swap }
+    private val showBackButton by lazy { activity.navigation_news_recent_show_blog_back }
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         with(recyclerView.parent.parent as ConstraintLayout){
             header = findViewById(R.id.cf_news_page_header)
         }
-        switchButton = activity.navigation_news_recent_swap
-        showBackButton = activity.navigation_news_recent_show_blog_back
     }
 
     fun changeVisibility(type: Int){

@@ -5,10 +5,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.example.test3.MainActivity
-import com.example.test3.R
-import com.example.test3.makeIntentOpenUrl
-import com.example.test3.setFragmentSubTitle
+import com.example.test3.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 
@@ -39,18 +36,20 @@ class AccountViewFragment(): Fragment() {
 
         setHasOptionsMenu(true)
 
-        val activity = requireActivity() as MainActivity
+        val mainActivity = requireActivity() as MainActivity
 
         val manager = panel.manager
 
         val subtitle = "::accounts.${manager.PREFERENCES_FILE_NAME}"
         setFragmentSubTitle(this, subtitle)
-        activity.setActionBarSubTitle(subtitle)
-        activity.navigation.visibility = View.GONE
+        mainActivity.setActionBarSubTitle(subtitle)
+        mainActivity.navigation.visibility = View.GONE
 
 
-        lifecycleScope.launch {
-            panel.showBigView(this@AccountViewFragment)
+        mainActivity.settingsUI.userRealColorsLiveData.observe(viewLifecycleOwner){ use ->
+            lifecycleScope.launch {
+                panel.showBigView(this@AccountViewFragment)
+            }
         }
 
     }

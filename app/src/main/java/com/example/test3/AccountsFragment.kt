@@ -75,6 +75,9 @@ class AccountsFragment: Fragment() {
             navigation_accounts_add.setOnClickListener { addAccount() }
         }
 
+        mainActivity.settingsUI.userRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
+            showPanels()
+        }
     }
 
     fun addAccount() {
@@ -124,7 +127,6 @@ class AccountsFragment: Fragment() {
                     panel.block()
                     val userInfo = manager.loadInfo(userID)
                     manager.setSavedInfo(userInfo)
-                    //panel.show()
                     panel.unblock()
                     progressInfo.increment()
                 }
@@ -156,7 +158,7 @@ class AccountsFragment: Fragment() {
     }
 
     fun showPanels() {
-        runBlocking {
+        lifecycleScope.launch {
             panels.forEach { it.show() }
         }
     }
