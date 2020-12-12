@@ -61,11 +61,13 @@ class AccountsFragment: Fragment() {
 
         view.findViewById<LinearLayout>(R.id.panels_layout).apply {
             val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            addView(codeforcesPanel.createSmallView(), params)
-            addView(atcoderPanel.createSmallView(), params)
-            addView(topcoderPanel.createSmallView(), params)
-            addView(acmpPanel.createSmallView(), params)
-            addView(timusPanel.createSmallView(), params)
+
+            panels.forEach { panel ->
+                addView(panel.createSmallView(), params)
+                panel.manager.dataStoreLive.observe(viewLifecycleOwner){
+                    lifecycleScope.launch { panel.show() }
+                }
+            }
         }
 
         with(mainActivity){
@@ -73,7 +75,6 @@ class AccountsFragment: Fragment() {
             navigation_accounts_add.setOnClickListener { addAccount() }
         }
 
-        showPanels()
     }
 
     fun addAccount() {
@@ -96,7 +97,7 @@ class AccountsFragment: Fragment() {
                         lifecycleScope.launch {
                             mainActivity.chooseUserID(panel.manager)?.let { userInfo ->
                                 panel.manager.setSavedInfo(userInfo)
-                                panel.show()
+                                //panel.show()
                             }
                         }
                     }
@@ -123,7 +124,7 @@ class AccountsFragment: Fragment() {
                     panel.block()
                     val userInfo = manager.loadInfo(userID)
                     manager.setSavedInfo(userInfo)
-                    panel.show()
+                    //panel.show()
                     panel.unblock()
                     progressInfo.increment()
                 }

@@ -109,14 +109,11 @@ abstract class AccountPanel(
 
         if(info.status != STATUS.FAILED){
             if(info!=savedInfo) manager.setSavedInfo(info)
-            show()
             reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {
                 reloadButton.clearAnimation()
                 reloadButton.visibility = View.GONE
             }.start()
         }else{
-            show()
-            mainActivity.showToast("${manager.PREFERENCES_FILE_NAME} load error")
             reloadButton.clearAnimation()
             reloadButton.setColorFilter(getColorFromResource(mainActivity, R.color.reload_fail))
         }

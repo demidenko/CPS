@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
 import androidx.datastore.preferences.createDataStore
+import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -18,6 +19,7 @@ abstract class AccountManager(val context: Context) {
 
     abstract val PREFERENCES_FILE_NAME: String
     protected val dataStore = context.createDataStore(name = PREFERENCES_FILE_NAME)
+    val dataStoreLive = dataStore.data.asLiveData()
 
     abstract fun emptyInfo(): UserInfo
 

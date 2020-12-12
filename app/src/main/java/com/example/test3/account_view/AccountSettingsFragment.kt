@@ -47,7 +47,6 @@ class AccountSettingsFragment(): Fragment() {
                 val userInfo = mainActivity.chooseUserID(manager) ?: return@launch
                 manager.setSavedInfo(userInfo)
                 textView.text = userInfo.userID
-                panel.show()
                 val accountViewFragment = (mainActivity.supportFragmentManager.findFragmentByTag(AccountViewFragment.tag) as AccountViewFragment)
                 panel.showBigView(accountViewFragment)
             }

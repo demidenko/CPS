@@ -78,7 +78,6 @@ class AccountViewFragment(): Fragment() {
             .setPositiveButton("YES"){ _, _ ->
                 lifecycleScope.launch {
                     panel.manager.setSavedInfo(panel.manager.emptyInfo())
-                    panel.show()
                     requireActivity().onBackPressed()
                 }
             }
