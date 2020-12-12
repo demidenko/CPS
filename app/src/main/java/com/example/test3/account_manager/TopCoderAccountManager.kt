@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class TopCoderAccountManager(context: Context): AccountManager(context) {
+class TopCoderAccountManager(context: Context): RatedAccountManager(context) {
 
     @Serializable
     data class TopCoderUserInfo(
@@ -29,26 +29,8 @@ class TopCoderAccountManager(context: Context): AccountManager(context) {
     override val PREFERENCES_FILE_NAME: String
         get() = preferences_file_name
 
-    companion object : ColoredHandles {
+    companion object {
         const val preferences_file_name = "topcoder"
-
-        override val ratingsUpperBounds = arrayOf(
-            900 to HandleColor.GRAY,
-            1200 to HandleColor.GREEN,
-            1500 to HandleColor.BLUE,
-            2200 to HandleColor.YELLOW
-        )
-
-        override fun getColor(tag: HandleColor): Int {
-            return when(tag){
-                HandleColor.GRAY -> 0x999999
-                HandleColor.GREEN -> 0x00A900
-                HandleColor.BLUE -> 0x6666FE
-                HandleColor.YELLOW -> 0xDDCC00
-                HandleColor.RED -> 0xEE0000
-                else -> throw HandleColor.UnknownHandleColorException(tag)
-            }
-        }
     }
 
     override fun emptyInfo() = TopCoderUserInfo(STATUS.NOT_FOUND, "")
@@ -83,6 +65,24 @@ class TopCoderAccountManager(context: Context): AccountManager(context) {
         return getHandleColorARGB(info.rating_algorithm)
     }
 
+
+    override val ratingsUpperBounds = arrayOf(
+        900 to HandleColor.GRAY,
+        1200 to HandleColor.GREEN,
+        1500 to HandleColor.BLUE,
+        2200 to HandleColor.YELLOW
+    )
+
+    override fun getColor(tag: HandleColor): Int {
+        return when(tag){
+            HandleColor.GRAY -> 0x999999
+            HandleColor.GREEN -> 0x00A900
+            HandleColor.BLUE -> 0x6666FE
+            HandleColor.YELLOW -> 0xDDCC00
+            HandleColor.RED -> 0xEE0000
+            else -> throw HandleColor.UnknownHandleColorException(tag)
+        }
+    }
 
 
 }

@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class AtCoderAccountManager(context: Context): AccountManager(context) {
+class AtCoderAccountManager(context: Context): RatedAccountManager(context) {
 
     @Serializable
     data class AtCoderUserInfo(
@@ -30,32 +30,8 @@ class AtCoderAccountManager(context: Context): AccountManager(context) {
     override val PREFERENCES_FILE_NAME: String
         get() = preferences_file_name
 
-    companion object : ColoredHandles {
+    companion object {
         const val preferences_file_name = "atcoder"
-
-        override val ratingsUpperBounds = arrayOf(
-            400 to HandleColor.GRAY,
-            800 to HandleColor.BROWN,
-            1200 to HandleColor.GREEN,
-            1600 to HandleColor.CYAN,
-            2000 to HandleColor.BLUE,
-            2400 to HandleColor.YELLOW,
-            2800 to HandleColor.ORANGE
-        )
-
-        override fun getColor(tag: HandleColor): Int {
-            return when(tag){
-                HandleColor.GRAY -> 0x808080
-                HandleColor.BROWN -> 0x804000
-                HandleColor.GREEN -> 0x008000
-                HandleColor.CYAN -> 0x00C0C0
-                HandleColor.BLUE -> 0x0000FF
-                HandleColor.YELLOW -> 0xC0C000
-                HandleColor.ORANGE -> 0xFF8000
-                HandleColor.RED -> 0xFF0000
-                else -> throw HandleColor.UnknownHandleColorException(tag)
-            }
-        }
     }
 
     override fun emptyInfo() = AtCoderUserInfo(STATUS.NOT_FOUND, "")
@@ -106,5 +82,29 @@ class AtCoderAccountManager(context: Context): AccountManager(context) {
             res += AccountSuggestion(handle, rating, handle)
         }
         return@withContext res
+    }
+
+    override val ratingsUpperBounds = arrayOf(
+        400 to HandleColor.GRAY,
+        800 to HandleColor.BROWN,
+        1200 to HandleColor.GREEN,
+        1600 to HandleColor.CYAN,
+        2000 to HandleColor.BLUE,
+        2400 to HandleColor.YELLOW,
+        2800 to HandleColor.ORANGE
+    )
+
+    override fun getColor(tag: HandleColor): Int {
+        return when(tag){
+            HandleColor.GRAY -> 0x808080
+            HandleColor.BROWN -> 0x804000
+            HandleColor.GREEN -> 0x008000
+            HandleColor.CYAN -> 0x00C0C0
+            HandleColor.BLUE -> 0x0000FF
+            HandleColor.YELLOW -> 0xC0C000
+            HandleColor.ORANGE -> 0xFF8000
+            HandleColor.RED -> 0xFF0000
+            else -> throw HandleColor.UnknownHandleColorException(tag)
+        }
     }
 }

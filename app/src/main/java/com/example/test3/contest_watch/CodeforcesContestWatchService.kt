@@ -15,7 +15,7 @@ import androidx.core.text.bold
 import androidx.core.text.color
 import androidx.core.text.italic
 import com.example.test3.*
-import com.example.test3.account_manager.getHandleColorARGB
+import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -232,6 +232,7 @@ class CodeforcesContestWatchService: Service() {
                     notificationManager.notify(NotificationIDs.makeCodeforcesSystestSubmissionID(submission.id), n.build())
                 }
 
+                private val codeforcesAccountManager by lazy { CodeforcesAccountManager(this@CodeforcesContestWatchService) }
                 override fun onRatingChange(ratingChange: CodeforcesRatingChange) {
                     val n = NotificationCompat.Builder(
                         this@CodeforcesContestWatchService,
@@ -243,7 +244,7 @@ class CodeforcesContestWatchService: Service() {
                         val difference = (if(decreased) "" else "+") + (ratingChange.newRating - ratingChange.oldRating)
                         setContentText("$difference, rank: ${ratingChange.rank}")
                         setSubText("Codeforces rating changes")
-                        color = CodeforcesUtils.getHandleColorARGB(ratingChange.newRating)
+                        color = codeforcesAccountManager.getHandleColorARGB(ratingChange.newRating)
                         setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.contestsWith(handle), this@CodeforcesContestWatchService))
                     }
                     notificationManager.notify(NotificationIDs.codeforces_rating_changes, n.build())

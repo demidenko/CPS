@@ -29,7 +29,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-object CodeforcesUtils : ColoredHandles {
+object CodeforcesUtils {
 
     suspend fun getBlogCreationTimeSeconds(blogId: Int): Long {
         return CodeforcesAPI.getBlogEntry(blogId)?.result?.creationTimeSeconds ?: return 0L
@@ -151,28 +151,6 @@ object CodeforcesUtils : ColoredHandles {
         return res.trimEnd() as Spanned
     }
 
-    override val ratingsUpperBounds = arrayOf(
-        1200 to HandleColor.GRAY,
-        1400 to HandleColor.GREEN,
-        1600 to HandleColor.CYAN,
-        1900 to HandleColor.BLUE,
-        2100 to HandleColor.VIOLET,
-        2400 to HandleColor.ORANGE
-    )
-
-    override fun getColor(tag: HandleColor): Int {
-        return when (tag){
-            HandleColor.GRAY -> 0x808080
-            HandleColor.GREEN -> 0x008000
-            HandleColor.CYAN -> 0x03A89E
-            HandleColor.BLUE -> 0x0000FF
-            HandleColor.VIOLET -> 0xAA00AA
-            HandleColor.ORANGE -> 0xFF8C00
-            HandleColor.RED -> 0xFF0000
-            else -> throw HandleColor.UnknownHandleColorException(tag)
-        }
-    }
-
     fun getTagByRating(rating: Int): String {
         return when {
             rating == NOT_RATED -> "user-black"
@@ -187,7 +165,7 @@ object CodeforcesUtils : ColoredHandles {
         }
     }
 
-    fun getHandleColorByTag(tag: String): Int? {
+    fun getHandleColorByTag(tag: String, manager: CodeforcesAccountManager): Int? {
         return when (tag) {
             "user-gray" -> HandleColor.GRAY
             "user-green" -> HandleColor.GREEN
@@ -197,11 +175,11 @@ object CodeforcesUtils : ColoredHandles {
             "user-orange" -> HandleColor.ORANGE
             "user-red", "user-legendary" -> HandleColor.RED
             else -> null
-        }?.getARGB(this)
+        }?.getARGB(manager)
     }
 
-    fun makeSpan(handle: String, tag: String) = SpannableString(handle).apply {
-        getHandleColorByTag(tag)?.let {
+    fun makeSpan(handle: String, tag: String, manager: CodeforcesAccountManager) = SpannableString(handle).apply {
+        getHandleColorByTag(tag, manager)?.let {
             set(
                 if(tag=="user-legendary") 1 else 0,
                 handle.length,
@@ -211,7 +189,7 @@ object CodeforcesUtils : ColoredHandles {
         if(tag!="user-black") set(0, handle.length, StyleSpan(Typeface.BOLD))
     }
 
-    fun makeSpan(info: CodeforcesAccountManager.CodeforcesUserInfo) = makeSpan(info.handle, getTagByRating(info.rating))
+    fun makeSpan(info: CodeforcesAccountManager.CodeforcesUserInfo, manager: CodeforcesAccountManager) = makeSpan(info.handle, getTagByRating(info.rating), manager)
 
     suspend fun getUsersInfo(handlesList: List<String>): List<CodeforcesAccountManager.CodeforcesUserInfo> {
         val handles = handlesList.toMutableList()

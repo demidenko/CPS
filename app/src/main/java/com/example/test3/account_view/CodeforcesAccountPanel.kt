@@ -18,7 +18,7 @@ class CodeforcesAccountPanel(
 
     override fun show(info: UserInfo) { info as CodeforcesAccountManager.CodeforcesUserInfo
         val color = manager.getColor(info) ?: mainActivity.defaultTextColor
-        textMain.text = CodeforcesUtils.makeSpan(info)
+        textMain.text = CodeforcesUtils.makeSpan(info, manager as CodeforcesAccountManager)
         textAdditional.text = ""
         textAdditional.setTextColor(color)
         if(info.status == STATUS.OK){
@@ -39,7 +39,7 @@ class CodeforcesAccountPanel(
         val contributionView = view.findViewById<TextView>(R.id.account_view_cf_contribution)
 
         handleView.apply {
-            text = CodeforcesUtils.makeSpan(info)
+            text = CodeforcesUtils.makeSpan(info, manager as CodeforcesAccountManager)
         }
 
         ratingView.apply {

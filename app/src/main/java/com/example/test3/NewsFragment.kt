@@ -505,7 +505,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
             title.text = info.title
 
-            author.text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag)
+            author.text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag, activity.accountsFragment.codeforcesAccountManager)
 
             time.text = timeRUtoEN(info.time)
 
@@ -577,7 +577,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         return blogComments[blogID]
             ?.distinctBy { it.commentatorHandle }
             ?.map { comment ->
-                CodeforcesUtils.makeSpan(comment.commentatorHandle,comment.commentatorHandleColorTag)
+                CodeforcesUtils.makeSpan(comment.commentatorHandle,comment.commentatorHandleColorTag,activity.accountsFragment.codeforcesAccountManager)
             } ?: emptyList()
     }
 
@@ -660,7 +660,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         if(headerBlog!=null) header.apply {
             val info = headerBlog!!
             findViewById<TextView>(R.id.news_item_title).text = info.title
-            findViewById<TextView>(R.id.news_item_author).text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag)
+            findViewById<TextView>(R.id.news_item_author).text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag, activity.accountsFragment.codeforcesAccountManager)
             visibility = View.VISIBLE
         } else {
             header.visibility = View.GONE
@@ -760,7 +760,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
         holder.title.text =  info.title
 
-        holder.author.text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag)
+        holder.author.text = CodeforcesUtils.makeSpan(info.author, info.authorColorTag, activity.accountsFragment.codeforcesAccountManager)
 
         holder.comments.text = info.commentators.joinTo(SpannableStringBuilder())
 
@@ -777,7 +777,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
         holder.title.text = blogEntry.title
 
-        holder.author.text = CodeforcesUtils.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
+        holder.author.text = CodeforcesUtils.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag, activity.accountsFragment.codeforcesAccountManager)
 
         holder.rating.apply{
             if(comment.rating == 0) visibility = View.GONE

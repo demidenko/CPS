@@ -13,13 +13,14 @@ import androidx.core.text.bold
 import androidx.core.text.color
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.example.test3.account_manager.*
+import com.example.test3.account_manager.HandleColor
+import com.example.test3.account_manager.RatedAccountManager
+import com.example.test3.account_manager.useRealColors
 import com.example.test3.contest_watch.CodeforcesContestWatchService
 import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesAPIStatus
 import com.example.test3.utils.CodeforcesContest
-import com.example.test3.utils.CodeforcesUtils
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -154,14 +155,14 @@ class TestFragment : Fragment() {
 
                 row.add(
                     SpannableStringBuilder().bold {
-                        color(handleColor.getARGB(CodeforcesUtils)) { append(handleColor.name) }
+                        color(handleColor.getARGB(mainActivity.accountsFragment.codeforcesAccountManager)) { append(handleColor.name) }
                     }
                 )
                 useRealColors = true
-                arrayOf<ColoredHandles>(
-                    CodeforcesUtils,
-                    AtCoderAccountManager.Companion,
-                    TopCoderAccountManager.Companion
+                arrayOf<RatedAccountManager>(
+                    mainActivity.accountsFragment.codeforcesAccountManager,
+                    mainActivity.accountsFragment.atcoderAccountManager,
+                    mainActivity.accountsFragment.topcoderAccountManager,
                 ).forEach {
                     val s = SpannableStringBuilder().bold {
                         try {

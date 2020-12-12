@@ -49,6 +49,22 @@ abstract class AccountManager(val context: Context) {
     open fun getColor(info: UserInfo): Int? = null
 }
 
+
+abstract class RatedAccountManager(context: Context) : AccountManager(context){
+    abstract fun getColor(tag: HandleColor): Int
+    abstract val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
+
+    fun getHandleColor(rating: Int): HandleColor {
+        return ratingsUpperBounds.find { (bound, color) ->
+            rating < bound
+        }?.second ?: HandleColor.RED
+    }
+
+    fun getHandleColorARGB(rating: Int): Int {
+        return getHandleColor(rating).getARGB(this)
+    }
+}
+
 enum class STATUS{
     OK,
     NOT_FOUND,
@@ -84,26 +100,11 @@ enum class HandleColor(private val rgb: Int) {
     ORANGE(0xFB8000),
     RED(0xED301D);
 
-    fun getARGB(manager: ColoredHandles): Int {
+    fun getARGB(manager: RatedAccountManager): Int {
         return ((if(useRealColors) manager.getColor(this) else rgb) + 0xFF000000).toInt()
     }
 
     class UnknownHandleColorException(color: HandleColor): Exception("${color.name} is invalid color for manager ")
-}
-
-interface ColoredHandles {
-    fun getColor(tag: HandleColor): Int
-    val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
-}
-
-fun ColoredHandles.getHandleColor(rating: Int): HandleColor {
-    return ratingsUpperBounds.find { (bound, color) ->
-        rating < bound
-    }?.second ?: HandleColor.RED
-}
-
-fun ColoredHandles.getHandleColorARGB(rating: Int): Int {
-    return getHandleColor(rating).getARGB(this)
 }
 
 data class AccountSuggestion(

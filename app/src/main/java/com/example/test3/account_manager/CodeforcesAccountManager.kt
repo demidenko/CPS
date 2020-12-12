@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class CodeforcesAccountManager(context: Context): AccountManager(context) {
+class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
 
     @Serializable
     data class CodeforcesUserInfo(
@@ -59,7 +59,7 @@ class CodeforcesAccountManager(context: Context): AccountManager(context) {
 
     override fun getColor(info: UserInfo): Int? = with(info as CodeforcesUserInfo){
         if(status != STATUS.OK || rating == NOT_RATED) return null
-        return CodeforcesUtils.getHandleColorARGB(info.rating)
+        return getHandleColorARGB(info.rating)
     }
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = withContext(Dispatchers.IO){
@@ -73,5 +73,27 @@ class CodeforcesAccountManager(context: Context): AccountManager(context) {
             }
         }
         return@withContext res
+    }
+
+    override val ratingsUpperBounds = arrayOf(
+        1200 to HandleColor.GRAY,
+        1400 to HandleColor.GREEN,
+        1600 to HandleColor.CYAN,
+        1900 to HandleColor.BLUE,
+        2100 to HandleColor.VIOLET,
+        2400 to HandleColor.ORANGE
+    )
+
+    override fun getColor(tag: HandleColor): Int {
+        return when (tag){
+            HandleColor.GRAY -> 0x808080
+            HandleColor.GREEN -> 0x008000
+            HandleColor.CYAN -> 0x03A89E
+            HandleColor.BLUE -> 0x0000FF
+            HandleColor.VIOLET -> 0xAA00AA
+            HandleColor.ORANGE -> 0xFF8C00
+            HandleColor.RED -> 0xFF0000
+            else -> throw HandleColor.UnknownHandleColorException(tag)
+        }
     }
 }
