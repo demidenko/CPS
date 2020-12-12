@@ -36,6 +36,7 @@ import kotlinx.android.synthetic.main.fragment_cf_news_page.view.*
 import kotlinx.android.synthetic.main.navigation_news.*
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -574,11 +575,17 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
     private val blogComments = mutableMapOf<Int, MutableList<CodeforcesComment>>()
 
     private fun calculateCommentatorsSpans(blogID: Int): List<Spannable> {
-        return blogComments[blogID]
-            ?.distinctBy { it.commentatorHandle }
-            ?.map { comment ->
-                CodeforcesUtils.makeSpan(comment.commentatorHandle,comment.commentatorHandleColorTag,activity.accountsFragment.codeforcesAccountManager)
-            } ?: emptyList()
+        return runBlocking {
+            blogComments[blogID]
+                ?.distinctBy { it.commentatorHandle }
+                ?.map { comment ->
+                    CodeforcesUtils.makeSpan(
+                        comment.commentatorHandle,
+                        comment.commentatorHandleColorTag,
+                        activity.accountsFragment.codeforcesAccountManager
+                    )
+                } ?: emptyList()
+        }
     }
 
     override fun refresh() {

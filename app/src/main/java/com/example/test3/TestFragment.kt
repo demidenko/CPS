@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.RatedAccountManager
-import com.example.test3.account_manager.useRealColors
 import com.example.test3.contest_watch.CodeforcesContestWatchService
 import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.utils.CodeforcesAPI
@@ -147,26 +146,26 @@ class TestFragment : Fragment() {
                 "Topcoder"
             ))
 
-            val backup = useRealColors
+            val backup = mainActivity.useRealColors
             for(handleColor in HandleColor.values()){
                 val row = arrayListOf<CharSequence>()
 
-                useRealColors = false
+                mainActivity.useRealColors = false
 
                 row.add(
                     SpannableStringBuilder().bold {
                         color(handleColor.getARGB(mainActivity.accountsFragment.codeforcesAccountManager)) { append(handleColor.name) }
                     }
                 )
-                useRealColors = true
+                mainActivity.useRealColors = true
                 arrayOf<RatedAccountManager>(
                     mainActivity.accountsFragment.codeforcesAccountManager,
                     mainActivity.accountsFragment.atcoderAccountManager,
                     mainActivity.accountsFragment.topcoderAccountManager,
-                ).forEach {
+                ).forEach { manager ->
                     val s = SpannableStringBuilder().bold {
                         try {
-                            color(handleColor.getARGB(it)) { append(handleColor.name) }
+                            color(handleColor.getARGB(manager)) { append(handleColor.name) }
                         } catch (e: HandleColor.UnknownHandleColorException) {
                             append("")
                         }
@@ -176,7 +175,7 @@ class TestFragment : Fragment() {
                 addRow(row)
             }
 
-            useRealColors = backup
+            mainActivity.useRealColors = backup
         }
 
     }

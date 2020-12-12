@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
 import androidx.datastore.preferences.createDataStore
 import androidx.lifecycle.asLiveData
+import com.example.test3.useRealColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -88,7 +89,7 @@ abstract class UserInfo{
     abstract fun link(): String
 }
 
-var useRealColors: Boolean = false
+
 enum class HandleColor(private val rgb: Int) {
     GRAY(0x888888),
     BROWN(0x80461B),
@@ -101,7 +102,7 @@ enum class HandleColor(private val rgb: Int) {
     RED(0xED301D);
 
     fun getARGB(manager: RatedAccountManager): Int {
-        return ((if(useRealColors) manager.getColor(this) else rgb) + 0xFF000000).toInt()
+        return ((if(manager.context.useRealColors) manager.getColor(this) else rgb) + 0xFF000000).toInt()
     }
 
     class UnknownHandleColorException(color: HandleColor): Exception("${color.name} is invalid color for manager ")

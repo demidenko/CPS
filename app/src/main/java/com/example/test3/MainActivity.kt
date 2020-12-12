@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
-import com.example.test3.account_manager.useRealColors
 import com.example.test3.job_services.JobServicesCenter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
@@ -93,9 +92,6 @@ class MainActivity : AppCompatActivity(){
 
 
         PreferenceManager.setDefaultValues(this, R.xml.news_preferences, false)
-        with(getPreferences(Context.MODE_PRIVATE)){
-            useRealColors = getBoolean(use_real_colors, false)
-        }
 
         JobServicesCenter.startJobServices(this)
 
@@ -137,15 +133,11 @@ class MainActivity : AppCompatActivity(){
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.color_switcher -> {
-                useRealColors = !useRealColors
-                item.isChecked = useRealColors
+                val use = !item.isChecked
+                item.isChecked = use
+                useRealColors = use
                 accountsFragment.showPanels()
                 if(newsFragment.isAdded) newsFragment.refresh()
-
-                with(getPreferences(Context.MODE_PRIVATE).edit()){
-                    putBoolean(use_real_colors, useRealColors)
-                    apply()
-                }
             }
             R.id.app_info -> {
                 AlertDialog.Builder(this)
