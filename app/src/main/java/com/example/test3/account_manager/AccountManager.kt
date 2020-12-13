@@ -15,12 +15,11 @@ import kotlinx.coroutines.withContext
 abstract class AccountManager(val context: Context) {
 
     companion object {
-        const val preferences_key_user_info = "user_info"
-        val KEY_USER_INFO = preferencesKey<String>(preferences_key_user_info)
+        val KEY_USER_INFO = preferencesKey<String>("user_info")
     }
 
     abstract val PREFERENCES_FILE_NAME: String
-    protected val dataStore = context.createDataStore(name = PREFERENCES_FILE_NAME)
+    private val dataStore = context.createDataStore(name = PREFERENCES_FILE_NAME)
     val dataStoreLive = dataStore.data.asLiveData()
 
     abstract fun emptyInfo(): UserInfo
