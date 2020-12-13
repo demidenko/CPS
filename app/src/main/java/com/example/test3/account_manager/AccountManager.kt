@@ -18,6 +18,8 @@ abstract class AccountManager(val context: Context) {
         val KEY_USER_INFO = preferencesKey<String>("user_info")
     }
 
+    abstract val userIDName: String
+
     abstract val PREFERENCES_FILE_NAME: String
     private val dataStore = context.createDataStore(name = PREFERENCES_FILE_NAME)
     val dataStoreLive = dataStore.data.asLiveData()
@@ -66,6 +68,8 @@ abstract class RatedAccountManager(context: Context) : AccountManager(context){
     }
 
     abstract fun makeSpan(info: UserInfo): SpannableString
+
+    override val userIDName = "handle"
 }
 
 enum class STATUS{

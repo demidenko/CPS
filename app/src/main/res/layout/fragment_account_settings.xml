@@ -5,23 +5,39 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
-    <TextView
-        android:id="@+id/account_settings_userid_header"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/account_settings_userid"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="userID:"
-        android:textColor="@color/textColorAdditional"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        />
+        android:layout_margin="10dp"
+        android:padding="10dp"
+        android:background="@color/backgroundAdditional"
+        >
 
-    <TextView
-        android:id="@+id/account_settings_userid"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/account_settings_userid_header"
-        android:textSize="20sp"
-        />
+        <TextView
+            android:id="@+id/account_settings_userid_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColorAdditional"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="userID:"
+            android:textSize="18sp"
+            />
+
+        <TextView
+            android:id="@+id/account_settings_userid_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/account_settings_userid_title"
+            app:layout_constraintTop_toBottomOf="@id/account_settings_userid_title"
+            android:text="Handle"
+            android:textSize="24sp"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

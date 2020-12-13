@@ -28,7 +28,7 @@ class ACMPAccountManager(context: Context): AccountManager(context) {
         override fun link(): String = "https://acmp.ru/index.asp?main=user&id=$id"
     }
 
-
+    override val userIDName = "id"
 
     override val PREFERENCES_FILE_NAME: String
         get() = preferences_file_name

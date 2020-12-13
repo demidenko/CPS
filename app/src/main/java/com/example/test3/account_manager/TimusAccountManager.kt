@@ -30,6 +30,8 @@ class TimusAccountManager(context: Context): AccountManager(context) {
         override fun link(): String = "https://timus.online/author.aspx?id=$id"
     }
 
+    override val userIDName = "id"
+
     override val PREFERENCES_FILE_NAME: String
         get() = preferences_file_name
 

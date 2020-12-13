@@ -3,6 +3,7 @@
     <color name="textColor">#D6D6D6</color>
     <color name="textColorAdditional">#939393</color>
     <color name="background">#121212</color>
+    <color name="backgroundAdditional">#222222</color>
     <color name="navigation_background">@android:color/black</color>
     <color name="success">#3C963C</color>
     <color name="fail">#C84040</color>

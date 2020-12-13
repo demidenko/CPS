@@ -11,6 +11,6 @@
     </style>
 
     <style name="PopupMenu" parent="@android:style/Widget.PopupMenu">
-        <item name="android:popupBackground">#222222</item>
+        <item name="android:popupBackground">@color/backgroundAdditional</item>
     </style>
 </resources>

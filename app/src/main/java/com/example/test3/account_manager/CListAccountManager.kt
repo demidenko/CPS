@@ -25,6 +25,8 @@ class CListAccountManager(context: Context) : AccountManager(context) {
         const val preferences_file_name = "clist"
     }
 
+    override val userIDName = "login"
+
     override val PREFERENCES_FILE_NAME: String
         get() = preferences_file_name
 

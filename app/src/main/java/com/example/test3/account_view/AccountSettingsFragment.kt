@@ -40,20 +40,25 @@ class AccountSettingsFragment(): Fragment() {
 
         setHasOptionsMenu(true)
 
-        val textView: TextView = view.findViewById(R.id.account_settings_userid)
+        val userIDView: View = view.findViewById(R.id.account_settings_userid)
+        val userId: TextView = userIDView.findViewById(R.id.account_settings_userid_value)
 
-        textView.setOnClickListener {
-            lifecycleScope.launch {
-                val userInfo = mainActivity.chooseUserID(manager) ?: return@launch
-                manager.setSavedInfo(userInfo)
-                textView.text = userInfo.userID
-                val accountViewFragment = (mainActivity.supportFragmentManager.findFragmentByTag(AccountViewFragment.tag) as AccountViewFragment)
-                panel.showBigView(accountViewFragment)
+        userIDView.apply {
+            findViewById<TextView>(R.id.account_settings_userid_title).text = "${manager.userIDName}:"
+
+            setOnClickListener {
+                lifecycleScope.launch {
+                    val userInfo = mainActivity.chooseUserID(manager) ?: return@launch
+                    manager.setSavedInfo(userInfo)
+                    userId.text = userInfo.userID
+                    val accountViewFragment = (mainActivity.supportFragmentManager.findFragmentByTag(AccountViewFragment.tag) as AccountViewFragment)
+                    panel.showBigView(accountViewFragment)
+                }
             }
         }
 
         lifecycleScope.launch {
-            textView.text = manager.getSavedInfo().userID
+            userId.text = manager.getSavedInfo().userID
         }
 
     }
