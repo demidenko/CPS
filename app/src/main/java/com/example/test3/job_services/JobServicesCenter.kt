@@ -114,7 +114,7 @@ object JobServicesCenter {
         )
     }
 
-    private fun startAccountsJobService(context: Context){
+    fun startAccountsJobService(context: Context){
         makeSchedule(
             context,
             JobServiceIDs.accounts_parsers,

@@ -8,6 +8,7 @@ import com.example.test3.NotificationIDs
 import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
+import com.example.test3.account_view.CodeforcesAccountPanel
 import com.example.test3.makePendingIntentOpenURL
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -16,7 +17,10 @@ class AccountsJobService : CoroutineJobService() {
 
     override suspend fun makeJobs(): ArrayList<Job> {
         val jobs = arrayListOf<Job>()
-        jobs.add(launch { codeforcesContribution() })
+        if(CodeforcesAccountPanel.getDataStore(this).getObserveContribution()){
+            jobs.add(launch { codeforcesContribution() })
+        }
+        if(jobs.isEmpty()) JobServicesCenter.stopJobService(this, JobServiceIDs.accounts_parsers)
         return jobs
     }
 
