@@ -28,11 +28,11 @@ object JobServicesCenter {
     private fun makeSchedule(
         context: Context,
         id: Int,
-        c: Class<*>?,
+        c: Class<*>,
         millis: Long,
         flex: Long = millis
     ) {
-        val builder = JobInfo.Builder(id, ComponentName(context, c!!)).apply {
+        val builder = JobInfo.Builder(id, ComponentName(context, c)).apply {
             setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
                 setPeriodic(millis, flex)
