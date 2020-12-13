@@ -1,6 +1,11 @@
 package com.example.test3.account_manager
 
 import android.content.Context
+import android.graphics.Typeface
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
+import androidx.core.text.set
 import com.example.test3.utils.AtCoderAPI
 import com.example.test3.utils.jsonCPS
 import kotlinx.coroutines.Dispatchers
@@ -94,8 +99,8 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context) {
         2800 to HandleColor.ORANGE
     )
 
-    override fun getColor(tag: HandleColor): Int {
-        return when(tag){
+    override fun getColor(handleColor: HandleColor): Int {
+        return when(handleColor){
             HandleColor.GRAY -> 0x808080
             HandleColor.BROWN -> 0x804000
             HandleColor.GREEN -> 0x008000
@@ -104,7 +109,17 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context) {
             HandleColor.YELLOW -> 0xC0C000
             HandleColor.ORANGE -> 0xFF8000
             HandleColor.RED -> 0xFF0000
-            else -> throw HandleColor.UnknownHandleColorException(tag)
+            else -> throw HandleColor.UnknownHandleColorException(handleColor)
+        }
+    }
+
+    override fun makeSpan(info: UserInfo): SpannableString {
+        info as AtCoderUserInfo
+        return SpannableString(info.handle).apply {
+            getColor(info)?.let {
+                set(0, length, ForegroundColorSpan(it))
+            }
+            if(info.rating != NOT_RATED) set(0, length, StyleSpan(Typeface.BOLD))
         }
     }
 }

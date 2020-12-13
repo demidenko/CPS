@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 
 abstract class AccountPanel(
     protected val mainActivity: MainActivity,
-    val manager: AccountManager
+    open val manager: AccountManager
 ){
     private val layout = mainActivity.layoutInflater.inflate(R.layout.account_panel, null) as ConstraintLayout
 

@@ -122,7 +122,7 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
 
         override fun onBindViewHolder(holder: ItemHolder, position: Int) {
             val userInfo = list[position]
-            holder.title.text = CodeforcesUtils.makeSpan(userInfo, activity.accountsFragment.codeforcesAccountManager)
+            holder.title.text = activity.accountsFragment.codeforcesAccountManager.makeSpan(userInfo)
 
             holder.view.setOnClickListener {
                 PopupMenu(activity, holder.title, Gravity.CENTER_HORIZONTAL).apply {

@@ -1,6 +1,5 @@
 package com.example.test3.account_view
 
-import android.graphics.Typeface
 import android.view.View
 import android.widget.TextView
 import com.example.test3.MainActivity
@@ -12,19 +11,16 @@ import com.example.test3.account_manager.UserInfo
 
 class TopCoderAccountPanel(
     mainActivity: MainActivity,
-    manager: TopCoderAccountManager
+    override val manager: TopCoderAccountManager
 ): AccountPanel(mainActivity, manager)  {
 
     private fun showMain(handleView: TextView, ratingView: TextView, info: TopCoderAccountManager.TopCoderUserInfo) {
         val color = manager.getColor(info) ?: mainActivity.defaultTextColor
-        handleView.setTextColor(color)
         ratingView.setTextColor(color)
-        handleView.text = info.handle
+        handleView.text = manager.makeSpan(info)
         if(info.status == STATUS.OK){
-            handleView.typeface = Typeface.DEFAULT_BOLD
             ratingView.text = if(info.rating_algorithm == NOT_RATED) "[not rated]" else "${info.rating_algorithm}"
         }else{
-            handleView.typeface = Typeface.DEFAULT
             ratingView.text = ""
         }
     }
@@ -55,7 +51,7 @@ class TopCoderAccountPanel(
                 visibility = View.VISIBLE
                 marathonRatingViewTitle.visibility = View.VISIBLE
 
-                val marathonColor = (manager as TopCoderAccountManager).getHandleColorARGB(info.rating_marathon)
+                val marathonColor = manager.getHandleColorARGB(info.rating_marathon)
                 setTextColor(marathonColor)
                 text = "${info.rating_marathon}"
             }

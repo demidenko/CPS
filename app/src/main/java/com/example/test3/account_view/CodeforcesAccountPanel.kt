@@ -9,16 +9,15 @@ import com.example.test3.account_manager.NOT_RATED
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.getColorFromResource
-import com.example.test3.utils.CodeforcesUtils
 
 class CodeforcesAccountPanel(
     mainActivity: MainActivity,
-    manager: CodeforcesAccountManager
+    override val manager: CodeforcesAccountManager
 ): AccountPanel(mainActivity, manager) {
 
     override fun show(info: UserInfo) { info as CodeforcesAccountManager.CodeforcesUserInfo
         val color = manager.getColor(info) ?: mainActivity.defaultTextColor
-        textMain.text = CodeforcesUtils.makeSpan(info, manager as CodeforcesAccountManager)
+        textMain.text = manager.makeSpan(info)
         textAdditional.text = ""
         textAdditional.setTextColor(color)
         if(info.status == STATUS.OK){
@@ -39,7 +38,7 @@ class CodeforcesAccountPanel(
         val contributionView = view.findViewById<TextView>(R.id.account_view_cf_contribution)
 
         handleView.apply {
-            text = CodeforcesUtils.makeSpan(info, manager as CodeforcesAccountManager)
+            text = manager.makeSpan(info)
         }
 
         ratingView.apply {

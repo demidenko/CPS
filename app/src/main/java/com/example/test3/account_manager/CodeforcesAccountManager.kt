@@ -1,6 +1,7 @@
 package com.example.test3.account_manager
 
 import android.content.Context
+import android.text.SpannableString
 import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -84,8 +85,8 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
         2400 to HandleColor.ORANGE
     )
 
-    override fun getColor(tag: HandleColor): Int {
-        return when (tag){
+    override fun getColor(handleColor: HandleColor): Int {
+        return when (handleColor){
             HandleColor.GRAY -> 0x808080
             HandleColor.GREEN -> 0x008000
             HandleColor.CYAN -> 0x03A89E
@@ -93,7 +94,12 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
             HandleColor.VIOLET -> 0xAA00AA
             HandleColor.ORANGE -> 0xFF8C00
             HandleColor.RED -> 0xFF0000
-            else -> throw HandleColor.UnknownHandleColorException(tag)
+            else -> throw HandleColor.UnknownHandleColorException(handleColor)
         }
+    }
+
+    override fun makeSpan(info: UserInfo): SpannableString {
+        info as CodeforcesUserInfo
+        return CodeforcesUtils.makeSpan(info.handle, CodeforcesUtils.getTagByRating(info.rating), this)
     }
 }

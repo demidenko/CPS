@@ -189,8 +189,6 @@ object CodeforcesUtils {
         if(tag!="user-black") set(0, handle.length, StyleSpan(Typeface.BOLD))
     }
 
-    fun makeSpan(info: CodeforcesAccountManager.CodeforcesUserInfo, manager: CodeforcesAccountManager) = makeSpan(info.handle, getTagByRating(info.rating), manager)
-
     suspend fun getUsersInfo(handlesList: List<String>): List<CodeforcesAccountManager.CodeforcesUserInfo> {
         val handles = handlesList.toMutableList()
         while(true){

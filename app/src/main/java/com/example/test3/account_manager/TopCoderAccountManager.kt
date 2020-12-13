@@ -1,6 +1,11 @@
 package com.example.test3.account_manager
 
 import android.content.Context
+import android.graphics.Typeface
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
+import androidx.core.text.set
 import com.example.test3.utils.TopCoderAPI
 import com.example.test3.utils.jsonCPS
 import kotlinx.serialization.Serializable
@@ -73,16 +78,25 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context) {
         2200 to HandleColor.YELLOW
     )
 
-    override fun getColor(tag: HandleColor): Int {
-        return when(tag){
+    override fun getColor(handleColor: HandleColor): Int {
+        return when(handleColor){
             HandleColor.GRAY -> 0x999999
             HandleColor.GREEN -> 0x00A900
             HandleColor.BLUE -> 0x6666FE
             HandleColor.YELLOW -> 0xDDCC00
             HandleColor.RED -> 0xEE0000
-            else -> throw HandleColor.UnknownHandleColorException(tag)
+            else -> throw HandleColor.UnknownHandleColorException(handleColor)
         }
     }
 
+    override fun makeSpan(info: UserInfo): SpannableString {
+        info as TopCoderUserInfo
+        return SpannableString(info.handle).apply {
+            getColor(info)?.let {
+                set(0, length, ForegroundColorSpan(it))
+            }
+            if(info.rating_marathon != NOT_RATED) set(0, length, StyleSpan(Typeface.BOLD))
+        }
+    }
 
 }

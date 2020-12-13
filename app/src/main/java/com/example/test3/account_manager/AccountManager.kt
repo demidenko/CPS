@@ -1,6 +1,7 @@
 package com.example.test3.account_manager
 
 import android.content.Context
+import android.text.SpannableString
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
 import androidx.datastore.preferences.createDataStore
@@ -52,7 +53,7 @@ abstract class AccountManager(val context: Context) {
 
 
 abstract class RatedAccountManager(context: Context) : AccountManager(context){
-    abstract fun getColor(tag: HandleColor): Int
+    abstract fun getColor(handleColor: HandleColor): Int
     abstract val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
 
     fun getHandleColor(rating: Int): HandleColor {
@@ -64,6 +65,8 @@ abstract class RatedAccountManager(context: Context) : AccountManager(context){
     fun getHandleColorARGB(rating: Int): Int {
         return getHandleColor(rating).getARGB(this)
     }
+
+    abstract fun makeSpan(info: UserInfo): SpannableString
 }
 
 enum class STATUS{
