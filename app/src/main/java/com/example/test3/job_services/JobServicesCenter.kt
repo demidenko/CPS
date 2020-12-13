@@ -30,11 +30,13 @@ object JobServicesCenter {
         id: Int,
         c: Class<*>?,
         millis: Long,
-        network_type: Int
+        flex: Long = millis
     ) {
         val builder = JobInfo.Builder(id, ComponentName(context, c!!)).apply {
-            setPeriodic(millis)
-            setRequiredNetworkType(network_type)
+            setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+                setPeriodic(millis, flex)
+            else setPeriodic(millis)
         }
         val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
         jobScheduler.schedule(builder.build())
@@ -80,8 +82,7 @@ object JobServicesCenter {
             context,
             JobServiceIDs.news_parsers,
             NewsJobService::class.java,
-            TimeUnit.HOURS.toMillis(6),
-            JobInfo.NETWORK_TYPE_ANY
+            TimeUnit.HOURS.toMillis(6)
         )
     }
 
@@ -90,8 +91,7 @@ object JobServicesCenter {
             context,
             JobServiceIDs.codeforces_news_lost_recent,
             CodeforcesNewsLostRecentJobService::class.java,
-            TimeUnit.HOURS.toMillis(1),
-            JobInfo.NETWORK_TYPE_ANY
+            TimeUnit.HOURS.toMillis(1)
         )
     }
 
@@ -101,7 +101,7 @@ object JobServicesCenter {
             JobServiceIDs.codeforces_news_follow,
             CodeforcesNewsFollowJobService::class.java,
             TimeUnit.HOURS.toMillis(1),
-            JobInfo.NETWORK_TYPE_ANY
+            TimeUnit.MINUTES.toMillis(30)
         )
     }
 
@@ -110,8 +110,7 @@ object JobServicesCenter {
             context,
             JobServiceIDs.project_euler_recent_problems,
             ProjectEulerRecentProblemsJobService::class.java,
-            TimeUnit.HOURS.toMillis(1),
-            JobInfo.NETWORK_TYPE_ANY
+            TimeUnit.HOURS.toMillis(1)
         )
     }
 
@@ -120,8 +119,7 @@ object JobServicesCenter {
             context,
             JobServiceIDs.accounts_parsers,
             AccountsJobService::class.java,
-            TimeUnit.HOURS.toMillis(1),
-            JobInfo.NETWORK_TYPE_ANY
+            TimeUnit.HOURS.toMillis(1)
         )
     }
 
