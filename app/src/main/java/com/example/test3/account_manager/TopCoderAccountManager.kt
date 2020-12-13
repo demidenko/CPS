@@ -95,7 +95,7 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context) {
             getColor(info)?.let {
                 set(0, length, ForegroundColorSpan(it))
             }
-            if(info.rating_marathon != NOT_RATED) set(0, length, StyleSpan(Typeface.BOLD))
+            if(info.rating_algorithm != NOT_RATED) set(0, length, StyleSpan(Typeface.BOLD))
         }
     }
 
