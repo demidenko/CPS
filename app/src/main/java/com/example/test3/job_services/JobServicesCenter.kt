@@ -100,8 +100,8 @@ object JobServicesCenter {
             context,
             JobServiceIDs.codeforces_news_follow,
             CodeforcesNewsFollowJobService::class.java,
-            TimeUnit.HOURS.toMillis(1),
-            TimeUnit.MINUTES.toMillis(30)
+            TimeUnit.HOURS.toMillis(6),
+            TimeUnit.HOURS.toMillis(3)
         )
     }
 
