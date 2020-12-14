@@ -234,20 +234,7 @@ class CodeforcesContestWatchService: Service() {
 
                 private val codeforcesAccountManager by lazy { CodeforcesAccountManager(this@CodeforcesContestWatchService) }
                 override fun onRatingChange(ratingChange: CodeforcesRatingChange) {
-                    val n = NotificationCompat.Builder(
-                        this@CodeforcesContestWatchService,
-                        NotificationChannels.codeforces_rating_changes
-                    ).apply {
-                        val decreased = ratingChange.newRating < ratingChange.oldRating
-                        setSmallIcon(if(decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
-                        setContentTitle("$handle new rating: ${ratingChange.newRating}")
-                        val difference = (if(decreased) "" else "+") + (ratingChange.newRating - ratingChange.oldRating)
-                        setContentText("$difference, rank: ${ratingChange.rank}")
-                        setSubText("Codeforces rating changes")
-                        color = codeforcesAccountManager.getHandleColorARGB(ratingChange.newRating)
-                        setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.contestsWith(handle), this@CodeforcesContestWatchService))
-                    }
-                    notificationManager.notify(NotificationIDs.codeforces_rating_changes, n.build())
+                    CodeforcesUtils.notifyRatingChange(ratingChange, this@CodeforcesContestWatchService, notificationManager, codeforcesAccountManager)
                 }
 
                 override fun commit() {

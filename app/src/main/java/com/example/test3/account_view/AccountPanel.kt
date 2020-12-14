@@ -140,9 +140,9 @@ abstract class AccountPanel(
         userInfoTextView.text = manager.getSavedInfo().toString()
     }
 
-    open suspend fun createSettingsView(fragment: AccountSettingsFragment){
+    open suspend fun createSettingsView(fragment: AccountSettingsFragment){}
 
-    }
+    open suspend fun resetRelatedData(){}
 }
 
 val rotateAnimation = RotateAnimation(

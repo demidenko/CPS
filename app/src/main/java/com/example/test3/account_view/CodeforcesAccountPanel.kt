@@ -14,7 +14,6 @@ import com.example.test3.account_manager.NOT_RATED
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.getColorFromResource
-import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -84,34 +83,65 @@ class CodeforcesAccountPanel(
 
     override suspend fun createSettingsView(fragment: AccountSettingsFragment) {
 
-        val dataStore = getDataStore(mainActivity)
-
-        val observeContributionView = fragment.createAndAddSwitch(
-            "Observe contribution changes",
-            dataStore.getObserveContribution()
-        ){ buttonView, isChecked ->
-            fragment.lifecycleScope.launch {
-                buttonView.isEnabled = false
-                dataStore.setObserveContribution(isChecked)
-                when (isChecked) {
-                    true -> JobServicesCenter.startAccountsJobService(mainActivity)
-                    false -> JobServicesCenter.stopJobService(mainActivity, JobServiceIDs.accounts_parsers)
+        getDataStore(mainActivity).apply {
+            fragment.createAndAddSwitch(
+                "Observe rating changes",
+                getObserveRating()
+            ){ buttonView, isChecked ->
+                fragment.lifecycleScope.launch {
+                    buttonView.isEnabled = false
+                    getDataStore(mainActivity).setObserveRating(isChecked)
+                    if (isChecked) {
+                        JobServicesCenter.startAccountsJobService(mainActivity)
+                    }
+                    buttonView.isEnabled = true
                 }
-                buttonView.isEnabled = true
+            }
+
+            fragment.createAndAddSwitch(
+                "Observe contribution changes",
+                getObserveContribution()
+            ){ buttonView, isChecked ->
+                fragment.lifecycleScope.launch {
+                    buttonView.isEnabled = false
+                    getDataStore(mainActivity).setObserveContribution(isChecked)
+                    if (isChecked) {
+                        JobServicesCenter.startAccountsJobService(mainActivity)
+                    }
+                    buttonView.isEnabled = true
+                }
             }
         }
 
     }
 
+    override suspend fun resetRelatedData() {
+        with(getDataStore(mainActivity)){
+            setLastRatedContestID(-1)
+        }
+    }
+
     class CodeforcesSettingsDataStore(context: Context) {
         private val dataStore = context.createDataStore(name = "settings_account_codeforces")
-        private val KEY_OBS_CONTRIBUTION = preferencesKey<Boolean>("settings_account_codeforces_contribution")
+        companion object {
+            private val KEY_OBS_RATING = preferencesKey<Boolean>("settings_account_codeforces_rating")
+            private val KEY_LAST_RATED_CONTEST = preferencesKey<Int>("settings_account_codeforces_last_rated_contest")
+            private val KEY_OBS_CONTRIBUTION = preferencesKey<Boolean>("settings_account_codeforces_contribution")
+        }
+
+        suspend fun getObserveRating() = dataStore.data.first()[KEY_OBS_RATING] ?: false
+        suspend fun setObserveRating(flag: Boolean){
+            dataStore.edit { it[KEY_OBS_RATING] = flag }
+        }
+
+        suspend fun getLastRatedContestID() = dataStore.data.first()[KEY_LAST_RATED_CONTEST] ?: -1
+        suspend fun setLastRatedContestID(contestID: Int){
+            dataStore.edit { it[KEY_LAST_RATED_CONTEST] = contestID }
+        }
 
         suspend fun getObserveContribution() = dataStore.data.first()[KEY_OBS_CONTRIBUTION] ?: false
         suspend fun setObserveContribution(flag: Boolean){
-            dataStore.edit {
-                it[KEY_OBS_CONTRIBUTION] = flag
-            }
+            dataStore.edit { it[KEY_OBS_CONTRIBUTION] = flag }
         }
     }
 

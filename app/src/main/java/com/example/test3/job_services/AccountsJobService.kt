@@ -10,18 +10,46 @@ import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_view.CodeforcesAccountPanel
 import com.example.test3.makePendingIntentOpenURL
+import com.example.test3.utils.CodeforcesAPI
+import com.example.test3.utils.CodeforcesAPIStatus
+import com.example.test3.utils.CodeforcesUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class AccountsJobService : CoroutineJobService() {
 
+    private val notificationManager by lazy { getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
+
+    private val codeforcesSettingsDataStore by lazy { CodeforcesAccountPanel.getDataStore(this) }
+
     override suspend fun makeJobs(): ArrayList<Job> {
         val jobs = arrayListOf<Job>()
-        if(CodeforcesAccountPanel.getDataStore(this).getObserveContribution()){
-            jobs.add(launch { codeforcesContribution() })
+        with(codeforcesSettingsDataStore){
+            if(getObserveRating()) jobs.add(launch { codeforcesRating() })
+            if(getObserveContribution()) jobs.add(launch { codeforcesContribution() })
         }
         if(jobs.isEmpty()) JobServicesCenter.stopJobService(this, JobServiceIDs.accounts_parsers)
         return jobs
+    }
+
+    private suspend fun codeforcesRating() {
+        val accountManager = CodeforcesAccountManager(this)
+        val info = accountManager.getSavedInfo() as CodeforcesAccountManager.CodeforcesUserInfo
+        if(info.status != STATUS.OK) return
+
+        val response = CodeforcesAPI.getUserRatingChanges(info.handle) ?: return
+        if(response.status != CodeforcesAPIStatus.OK) return
+
+        val lastRatingChange = response.result?.last() ?: return
+        val prevRatingChangeContestID = codeforcesSettingsDataStore.getLastRatedContestID()
+
+        if(prevRatingChangeContestID == lastRatingChange.contestId) return
+
+        if(prevRatingChangeContestID!=-1){
+            CodeforcesUtils.notifyRatingChange(lastRatingChange, this, notificationManager, accountManager)
+        }
+
+        codeforcesSettingsDataStore.setLastRatedContestID(lastRatingChange.contestId)
     }
 
     private suspend fun codeforcesContribution() {
@@ -37,8 +65,6 @@ class AccountsJobService : CoroutineJobService() {
 
         if(info.contribution != contribution){
             accountManager.setSavedInfo(info.copy(contribution = contribution))
-
-            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
             val oldShowedContribution: Int = if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) info.contribution
             else {

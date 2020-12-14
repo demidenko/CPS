@@ -1,12 +1,19 @@
 package com.example.test3.utils
 
+import android.app.NotificationManager
+import android.content.Context
 import android.graphics.Typeface
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import androidx.core.app.NotificationCompat
 import androidx.core.text.set
+import com.example.test3.NotificationChannels
+import com.example.test3.NotificationIDs
+import com.example.test3.R
 import com.example.test3.account_manager.*
+import com.example.test3.makePendingIntentOpenURL
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -217,6 +224,28 @@ object CodeforcesUtils {
             )
         }
     }
+
+    fun notifyRatingChange(
+        ratingChange: CodeforcesRatingChange,
+        context: Context,
+        notificationManager: NotificationManager,
+        codeforcesAccountManager: CodeforcesAccountManager
+    ){
+        val n = NotificationCompat.Builder(
+            context,
+            NotificationChannels.codeforces_rating_changes
+        ).apply {
+            val decreased = ratingChange.newRating < ratingChange.oldRating
+            setSmallIcon(if(decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
+            setContentTitle("${ratingChange.handle} new rating: ${ratingChange.newRating}")
+            val difference = (if(decreased) "" else "+") + (ratingChange.newRating - ratingChange.oldRating)
+            setContentText("$difference, rank: ${ratingChange.rank}")
+            setSubText("Codeforces rating changes")
+            color = codeforcesAccountManager.getHandleColorARGB(ratingChange.newRating)
+            setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.contestsWith(ratingChange.handle), context))
+        }
+        notificationManager.notify(NotificationIDs.codeforces_rating_changes, n.build())
+    }
 }
 
 enum class CodeforcesAPIStatus{
@@ -392,6 +421,11 @@ object CodeforcesAPI {
         fun getContestRatingChanges(
             @Query("contestId") contestId: Int
         ): Call<CodeforcesAPIResponse<List<CodeforcesRatingChange>>>
+
+        @GET("user.rating")
+        fun getUserRatingChanges(
+            @Query("handle") handle: String
+        ): Call<CodeforcesAPIResponse<List<CodeforcesRatingChange>>>
     }
 
     private val api = Retrofit.Builder()
@@ -438,6 +472,8 @@ object CodeforcesAPI {
     suspend fun getUserBlogEntries(handle: String) = makeAPICall(api.getUserBlogs(handle))
 
     suspend fun getContestRatingChanges(contestId: Int) = makeAPICall(api.getContestRatingChanges(contestId))
+
+    suspend fun getUserRatingChanges(handle: String) = makeAPICall(api.getUserRatingChanges(handle))
 
 
     interface WEB {

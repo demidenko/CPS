@@ -53,8 +53,11 @@ class AccountSettingsFragment(): Fragment() {
             setOnClickListener {
                 lifecycleScope.launch {
                     val userInfo = mainActivity.chooseUserID(manager) ?: return@launch
+                    view.isEnabled = false
                     manager.setSavedInfo(userInfo)
+                    panel.resetRelatedData()
                     userId.text = userInfo.userID
+                    view.isEnabled = true
                 }
             }
         }
