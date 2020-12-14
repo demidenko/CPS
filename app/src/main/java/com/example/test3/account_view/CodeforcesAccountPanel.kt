@@ -71,7 +71,7 @@ class CodeforcesAccountPanel(
                     setTextColor(getColorFromResource(mainActivity, R.color.blog_rating_positive))
                 } else {
                     text = "${info.contribution}"
-                    setTextColor(getColorFromResource(mainActivity, R.color.blog_rating_positive))
+                    setTextColor(getColorFromResource(mainActivity, R.color.blog_rating_negative))
                 }
             }
         }
