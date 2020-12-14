@@ -34,6 +34,7 @@ object JobServicesCenter {
     ) {
         val builder = JobInfo.Builder(id, ComponentName(context, c)).apply {
             setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+            setPersisted(true)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
                 setPeriodic(millis, flex)
             else setPeriodic(millis)
