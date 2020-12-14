@@ -100,7 +100,6 @@ class AccountsFragment: Fragment() {
                         lifecycleScope.launch {
                             mainActivity.chooseUserID(panel.manager)?.let { userInfo ->
                                 panel.manager.setSavedInfo(userInfo)
-                                //panel.show()
                             }
                         }
                     }

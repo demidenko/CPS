@@ -131,7 +131,6 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
 
             var hasNewBlog = false
             val saved = savedBlogs[handle]?.toSet()
-            savedBlogs.get("")
 
             if(saved == null){
                 hasNewBlog = true
