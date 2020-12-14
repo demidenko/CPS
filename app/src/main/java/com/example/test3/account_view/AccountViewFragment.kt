@@ -15,7 +15,7 @@ class AccountViewFragment(): Fragment() {
         const val tag = "account_view"
     }
 
-    private val panel: AccountPanel by lazy {
+    val panel: AccountPanel by lazy {
         val managerType = arguments?.getString("manager") ?: throw Exception("Unset type of manager")
         (requireActivity() as MainActivity).accountsFragment.getPanel(managerType)
     }
@@ -55,6 +55,9 @@ class AccountViewFragment(): Fragment() {
             showBigView()
         }
 
+        lifecycleScope.launch {
+            mainActivity.accountsFragment.updateUI()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -98,6 +101,15 @@ class AccountViewFragment(): Fragment() {
             })
             .addToBackStack(null)
             .commit()
+    }
+
+    override fun onDestroy() {
+        with(requireActivity() as MainActivity){
+            lifecycleScope.launch {
+                accountsFragment.updateUI()
+            }
+        }
+        super.onDestroy()
     }
 
 }

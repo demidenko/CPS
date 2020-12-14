@@ -139,7 +139,8 @@ class AccountsFragment: Fragment() {
     suspend fun updateUI(){
         var allEmpty = true
         var statusBarColor: Int = Color.TRANSPARENT
-        panels.forEach { panel ->
+
+        suspend fun updateWithPanel(panel: AccountPanel){
             if(!panel.isEmpty()){
                 allEmpty = false
                 with(panel.manager){
@@ -151,6 +152,11 @@ class AccountsFragment: Fragment() {
                 }
             }
         }
+
+        mainActivity.supportFragmentManager.findFragmentByTag(AccountViewFragment.tag)?.let {
+            updateWithPanel((it as AccountViewFragment).panel)
+        } ?: panels.forEach { panel -> updateWithPanel(panel) }
+
         //println("update UI: $allEmpty $statusBarColor")
         requireView().findViewById<TextView>(R.id.accounts_welcome_text).visibility = if(allEmpty) View.VISIBLE else View.GONE
         mainActivity.window.statusBarColor = statusBarColor
