@@ -25,7 +25,9 @@ fun<T> LiveData<T>.observeUpdates(owner: LifecycleOwner, _onChanged: (T)->Unit){
 }
 
 
-class SettingsUI(context: Context) {
+abstract class SettingsByContext
+
+class SettingsUI(context: Context): SettingsByContext() {
     private val dataStore = context.createDataStore(name = "settings_ui")
 
     private val KEY_USE_REAL_COLORS = preferencesKey<Boolean>("use_real_colors")
@@ -45,20 +47,18 @@ class SettingsUI(context: Context) {
     }
 }
 
-
-
-val Context.settingsUI by SettingsUIDelegate()
-
+val Context.settingsUI by SettingsDelegate{ SettingsUI(it) }
 fun Context.getUseRealColors() = runBlocking { settingsUI.getUseRealColors() }
-
 suspend fun Context.setUseRealColors(use: Boolean) = settingsUI.setUseRealColors(use)
 
-class SettingsUIDelegate {
 
-    private var _dataStore: SettingsUI? = null
+class SettingsDelegate<T: SettingsByContext>(
+    val create: (Context)->T
+) {
+    private var _dataStore: T? = null
 
-    operator fun getValue(thisRef: Context, property: KProperty<*>): SettingsUI {
-        return _dataStore ?: SettingsUI(thisRef).also {
+    operator fun getValue(thisRef: Context, property: KProperty<*>): T {
+        return _dataStore ?: create(thisRef).also {
             _dataStore = it
         }
     }

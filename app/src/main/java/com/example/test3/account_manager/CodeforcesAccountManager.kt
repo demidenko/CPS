@@ -2,6 +2,7 @@ package com.example.test3.account_manager
 
 import android.content.Context
 import android.text.SpannableString
+import com.example.test3.SettingsDelegate
 import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -106,4 +107,8 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
         info as CodeforcesUserInfo
         return CodeforcesUtils.makeSpan(info.handle, CodeforcesUtils.getTagByRating(info.rating), this)
     }
+
+    override val dataStore by lazy { context.accountDataStoreCodeforces }
 }
+
+val Context.accountDataStoreCodeforces by SettingsDelegate { AccountDataStore(it, CodeforcesAccountManager.preferences_file_name) }

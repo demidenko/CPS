@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
 import androidx.datastore.preferences.createDataStore
 import androidx.lifecycle.asLiveData
+import com.example.test3.SettingsByContext
 import com.example.test3.getUseRealColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -21,8 +22,8 @@ abstract class AccountManager(val context: Context) {
     abstract val userIDName: String
 
     abstract val PREFERENCES_FILE_NAME: String
-    private val dataStore = context.createDataStore(name = PREFERENCES_FILE_NAME)
-    val dataStoreLive = dataStore.data.asLiveData()
+    protected open val dataStore = AccountDataStore(context, PREFERENCES_FILE_NAME)
+    val dataStoreLive by lazy{ dataStore.getLiveData() }
 
     abstract fun emptyInfo(): UserInfo
 
@@ -40,13 +41,11 @@ abstract class AccountManager(val context: Context) {
     protected abstract fun encodeToString(info: UserInfo): String
 
     suspend fun getSavedInfo(): UserInfo {
-        val str = dataStore.data.first()[KEY_USER_INFO] ?: return emptyInfo().apply { status = STATUS.FAILED }
+        val str = dataStore.getString() ?: return emptyInfo().apply { status = STATUS.FAILED }
         return decodeFromString(str)
     }
     suspend fun setSavedInfo(info: UserInfo) {
-        dataStore.edit {
-            it[KEY_USER_INFO] = encodeToString(info)
-        }
+        dataStore.putString(encodeToString(info))
     }
 
     open fun getColor(info: UserInfo): Int? = null
@@ -85,6 +84,25 @@ abstract class RatedAccountManager(context: Context) : AccountManager(context){
             val upper = ratingsUpperBounds[pos].first
             val blockLength = (upper - lower).toDouble() / (j-i+1)
             return i + (rating - lower) / blockLength
+        }
+    }
+}
+
+
+class AccountDataStore(context: Context, name: String): SettingsByContext() {
+    companion object {
+        val KEY_USER_INFO = preferencesKey<String>("user_info")
+    }
+
+    private val dataStore = context.createDataStore(name = name)
+
+    fun getLiveData() = dataStore.data.asLiveData()
+
+    suspend fun getString(): String? = dataStore.data.first()[AccountManager.KEY_USER_INFO]
+
+    suspend fun putString(str: String){
+        dataStore.edit {
+            it[KEY_USER_INFO] = str
         }
     }
 }

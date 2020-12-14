@@ -120,7 +120,7 @@ object JobServicesCenter {
             context,
             JobServiceIDs.accounts_parsers,
             AccountsJobService::class.java,
-            TimeUnit.HOURS.toMillis(1)
+            TimeUnit.MINUTES.toMillis(15)
         )
     }
 
