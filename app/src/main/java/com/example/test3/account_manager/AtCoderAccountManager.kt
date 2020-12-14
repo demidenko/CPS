@@ -99,6 +99,8 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context) {
         2800 to HandleColor.ORANGE
     )
 
+    override val rankedHandleColorsList = HandleColor.rankedAtCoder
+
     override fun getColor(handleColor: HandleColor): Int {
         return when(handleColor){
             HandleColor.GRAY -> 0x808080

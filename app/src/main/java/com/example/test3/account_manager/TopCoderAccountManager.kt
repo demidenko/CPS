@@ -78,6 +78,8 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context) {
         2200 to HandleColor.YELLOW
     )
 
+    override val rankedHandleColorsList = HandleColor.rankedTopCoder
+
     override fun getColor(handleColor: HandleColor): Int {
         return when(handleColor){
             HandleColor.GRAY -> 0x999999

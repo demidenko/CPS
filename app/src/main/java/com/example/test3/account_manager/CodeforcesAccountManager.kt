@@ -85,6 +85,8 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
         2400 to HandleColor.ORANGE
     )
 
+    override val rankedHandleColorsList = HandleColor.rankedCodeforces
+
     override fun getColor(handleColor: HandleColor): Int {
         return when (handleColor){
             HandleColor.GRAY -> 0x808080

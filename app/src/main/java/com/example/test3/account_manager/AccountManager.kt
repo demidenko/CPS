@@ -56,6 +56,7 @@ abstract class AccountManager(val context: Context) {
 abstract class RatedAccountManager(context: Context) : AccountManager(context){
     abstract fun getColor(handleColor: HandleColor): Int
     abstract val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
+    abstract val rankedHandleColorsList: Array<HandleColor>
 
     fun getHandleColor(rating: Int): HandleColor {
         return ratingsUpperBounds.find { (bound, color) ->
@@ -106,6 +107,12 @@ enum class HandleColor(private val rgb: Int) {
     YELLOW(0xCCCC00),
     ORANGE(0xFB8000),
     RED(0xED301D);
+
+    companion object {
+        val rankedCodeforces    = arrayOf(GRAY, GRAY, GREEN, CYAN, BLUE, VIOLET, VIOLET, ORANGE, ORANGE, RED)
+        val rankedAtCoder       = arrayOf(GRAY, BROWN, GREEN, CYAN, BLUE, YELLOW, YELLOW, ORANGE, ORANGE, RED)
+        val rankedTopCoder      = arrayOf(GRAY, GRAY, GREEN, GREEN, BLUE, YELLOW, YELLOW, YELLOW, YELLOW, RED)
+    }
 
     fun getARGB(manager: RatedAccountManager, realColor: Boolean): Int {
         return ((if(realColor) manager.getColor(this) else rgb) + 0xFF000000).toInt()

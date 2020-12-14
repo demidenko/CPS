@@ -42,8 +42,26 @@ class AccountsFragment: Fragment() {
             acmpPanel,
             timusPanel
         ).apply {
+            //check data file names
             if(this.map { it.manager.PREFERENCES_FILE_NAME }.distinct().size != this.size)
                 throw Exception("not different file names in panels managers")
+
+            //check ranks of colors
+            mapNotNull { it.manager as? RatedAccountManager }.apply {
+                map { ratedManager ->
+                    val colors = ratedManager.rankedHandleColorsList
+                    colors.forEachIndexed { index, handleColor ->
+                        ratedManager.getColor(handleColor)
+
+                        if(index>0 && handleColor < colors[index-1])
+                            throw Exception("${ratedManager.PREFERENCES_FILE_NAME}: color list is not sorted")
+                    }
+                    colors.size
+                }.apply {
+                    if(distinct().size != 1)
+                        throw Exception("different sizes for color lists")
+                }
+            }
         }
     }
 
