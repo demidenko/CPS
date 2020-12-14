@@ -136,7 +136,7 @@ class AccountsFragment: Fragment() {
         }
     }
 
-    suspend fun updateUI(){
+    suspend fun updateStatusBarColor(){
         var allEmpty = true
         var statusBarColor: Int = Color.TRANSPARENT
 

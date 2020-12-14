@@ -56,7 +56,7 @@ class AccountViewFragment(): Fragment() {
         }
 
         lifecycleScope.launch {
-            mainActivity.accountsFragment.updateUI()
+            mainActivity.accountsFragment.updateStatusBarColor()
         }
     }
 
@@ -106,7 +106,7 @@ class AccountViewFragment(): Fragment() {
     override fun onDestroy() {
         with(requireActivity() as MainActivity){
             lifecycleScope.launch {
-                accountsFragment.updateUI()
+                accountsFragment.updateStatusBarColor()
             }
         }
         super.onDestroy()
