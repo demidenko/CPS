@@ -45,11 +45,14 @@ class AccountViewFragment(): Fragment() {
         mainActivity.setActionBarSubTitle(subtitle)
         mainActivity.navigation.visibility = View.GONE
 
+        fun showBigView() = lifecycleScope.launch { panel.showBigView(this@AccountViewFragment) }
 
-        mainActivity.settingsUI.userRealColorsLiveData.observe(viewLifecycleOwner){ use ->
-            lifecycleScope.launch {
-                panel.showBigView(this@AccountViewFragment)
-            }
+        manager.dataStoreLive.observe(viewLifecycleOwner){
+            showBigView()
+        }
+
+        mainActivity.settingsUI.userRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
+            showBigView()
         }
 
     }
