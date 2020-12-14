@@ -56,7 +56,6 @@ abstract class AccountManager(val context: Context) {
 abstract class RatedAccountManager(context: Context) : AccountManager(context){
     abstract fun getColor(handleColor: HandleColor): Int
     abstract val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
-    abstract val rankedHandleColorsList: Array<HandleColor>
 
     fun getHandleColor(rating: Int): HandleColor {
         return ratingsUpperBounds.find { (bound, color) ->
@@ -71,6 +70,23 @@ abstract class RatedAccountManager(context: Context) : AccountManager(context){
     abstract fun makeSpan(info: UserInfo): SpannableString
 
     override val userIDName = "handle"
+
+    abstract val rankedHandleColorsList: Array<HandleColor>
+    abstract fun getRating(info: UserInfo): Int
+    fun getOrder(info: UserInfo): Double {
+        val rating = getRating(info)
+        if(rating == NOT_RATED) return -1.0
+        val handleColor = getHandleColor(rating)
+        if(handleColor == HandleColor.RED) return 1e9
+        val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
+        val j = rankedHandleColorsList.indexOfLast { handleColor == it }
+        ratingsUpperBounds.indexOfFirst { it.second == handleColor }.let { pos ->
+            val lower = if(pos>0) ratingsUpperBounds[pos-1].first else 0
+            val upper = ratingsUpperBounds[pos].first
+            val blockLength = (upper - lower).toDouble() / (j-i+1)
+            return i + (rating - lower) / blockLength
+        }
+    }
 }
 
 enum class STATUS{

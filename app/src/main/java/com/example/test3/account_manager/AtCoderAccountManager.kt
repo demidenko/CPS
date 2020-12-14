@@ -89,6 +89,8 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context) {
         return@withContext res
     }
 
+    override fun getRating(info: UserInfo) = (info as AtCoderUserInfo).rating
+
     override val ratingsUpperBounds = arrayOf(
         400 to HandleColor.GRAY,
         800 to HandleColor.BROWN,

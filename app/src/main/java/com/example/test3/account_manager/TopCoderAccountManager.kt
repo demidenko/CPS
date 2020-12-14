@@ -70,6 +70,7 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context) {
         return getHandleColorARGB(info.rating_algorithm)
     }
 
+    override fun getRating(info: UserInfo) = (info as TopCoderUserInfo).rating_algorithm
 
     override val ratingsUpperBounds = arrayOf(
         900 to HandleColor.GRAY,

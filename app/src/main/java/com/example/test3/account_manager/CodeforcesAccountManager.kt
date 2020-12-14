@@ -76,6 +76,8 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
         return@withContext res
     }
 
+    override fun getRating(info: UserInfo) = (info as CodeforcesUserInfo).rating
+
     override val ratingsUpperBounds = arrayOf(
         1200 to HandleColor.GRAY,
         1400 to HandleColor.GREEN,

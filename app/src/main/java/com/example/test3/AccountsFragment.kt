@@ -156,14 +156,19 @@ class AccountsFragment: Fragment() {
 
     suspend fun updateStatusBarColor(){
         var allEmpty = true
+
         var statusBarColor: Int = Color.TRANSPARENT
+        var bestOrder: Double = -1e9
 
         suspend fun updateWithPanel(panel: AccountPanel){
             if(!panel.isEmpty()){
                 allEmpty = false
-                with(panel.manager){
-                    getColor(getSavedInfo())?.let {
-                        if(statusBarColor == Color.TRANSPARENT){
+                (panel.manager as? RatedAccountManager)?.let { manager ->
+                    val info = manager.getSavedInfo()
+                    manager.getColor(info)?.let {
+                        val order = manager.getOrder(info)
+                        if(order > bestOrder){
+                            bestOrder = order
                             statusBarColor = it
                         }
                     }
