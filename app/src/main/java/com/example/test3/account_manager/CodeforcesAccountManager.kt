@@ -2,9 +2,12 @@ package com.example.test3.account_manager
 
 import android.content.Context
 import android.text.SpannableString
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.preferencesKey
 import com.example.test3.SettingsDelegate
 import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -109,6 +112,35 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
     }
 
     override val dataStore by lazy { context.accountDataStoreCodeforces }
+    override fun getSettings() = CodeforcesAccountSettingsDataStore(context, PREFERENCES_FILE_NAME)
 }
 
 val Context.accountDataStoreCodeforces by SettingsDelegate { AccountDataStore(it, CodeforcesAccountManager.preferences_file_name) }
+
+class CodeforcesAccountSettingsDataStore(context: Context, name: String): AccountSettingsDataStore(context, name){
+
+    companion object {
+        private val KEY_OBS_RATING = preferencesKey<Boolean>("observe_rating")
+        private val KEY_LAST_RATED_CONTEST = preferencesKey<Int>("last_rated_contest")
+        private val KEY_OBS_CONTRIBUTION = preferencesKey<Boolean>("observe_contribution")
+    }
+
+    override suspend fun resetRelatedData() {
+        setLastRatedContestID(-1)
+    }
+
+    suspend fun getObserveRating() = dataStore.data.first()[KEY_OBS_RATING] ?: false
+    suspend fun setObserveRating(flag: Boolean){
+        dataStore.edit { it[KEY_OBS_RATING] = flag }
+    }
+
+    suspend fun getLastRatedContestID() = dataStore.data.first()[KEY_LAST_RATED_CONTEST] ?: -1
+    suspend fun setLastRatedContestID(contestID: Int){
+        dataStore.edit { it[KEY_LAST_RATED_CONTEST] = contestID }
+    }
+
+    suspend fun getObserveContribution() = dataStore.data.first()[KEY_OBS_CONTRIBUTION] ?: false
+    suspend fun setObserveContribution(flag: Boolean){
+        dataStore.edit { it[KEY_OBS_CONTRIBUTION] = flag }
+    }
+}

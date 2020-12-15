@@ -5,7 +5,6 @@ import android.os.Bundle
 import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
-import com.example.test3.account_view.CodeforcesAccountPanel
 import com.example.test3.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -14,11 +13,11 @@ class AccountsJobService : CoroutineJobService() {
 
     private val notificationManager by lazy { getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
 
-    private val codeforcesSettingsDataStore by lazy { CodeforcesAccountPanel.getDataStore(this) }
+    private val codeforcesAccountManager by lazy { CodeforcesAccountManager(this) }
 
     override suspend fun makeJobs(): ArrayList<Job> {
         val jobs = arrayListOf<Job>()
-        with(codeforcesSettingsDataStore){
+        with(codeforcesAccountManager.getSettings()){
             if(getObserveRating()) jobs.add(launch { codeforcesRating() })
             if(getObserveContribution()) jobs.add(launch { codeforcesContribution() })
         }
@@ -27,44 +26,42 @@ class AccountsJobService : CoroutineJobService() {
     }
 
     private suspend fun codeforcesRating() {
-        val accountManager = CodeforcesAccountManager(this)
-        val info = accountManager.getSavedInfo() as CodeforcesAccountManager.CodeforcesUserInfo
+        val info = codeforcesAccountManager.getSavedInfo() as CodeforcesAccountManager.CodeforcesUserInfo
         if(info.status != STATUS.OK) return
 
         val response = CodeforcesAPI.getUserRatingChanges(info.handle) ?: return
         if(response.status != CodeforcesAPIStatus.OK) return
 
         val lastRatingChange = response.result?.last() ?: return
-        val prevRatingChangeContestID = codeforcesSettingsDataStore.getLastRatedContestID()
+        val prevRatingChangeContestID = codeforcesAccountManager.getSettings().getLastRatedContestID()
 
         if(prevRatingChangeContestID == lastRatingChange.contestId && info.rating == lastRatingChange.newRating) return
 
-        codeforcesSettingsDataStore.setLastRatedContestID(lastRatingChange.contestId)
+        codeforcesAccountManager.getSettings().setLastRatedContestID(lastRatingChange.contestId)
 
         if(prevRatingChangeContestID!=-1){
-            CodeforcesUtils.notifyRatingChange(lastRatingChange, this, notificationManager, accountManager)
-            val newInfo = accountManager.loadInfo(info.handle)
+            CodeforcesUtils.notifyRatingChange(lastRatingChange, this, notificationManager, codeforcesAccountManager)
+            val newInfo = codeforcesAccountManager.loadInfo(info.handle)
             if(newInfo.status!=STATUS.FAILED){
-                accountManager.setSavedInfo(newInfo)
+                codeforcesAccountManager.setSavedInfo(newInfo)
             }else{
-                accountManager.setSavedInfo(info.copy(rating = lastRatingChange.newRating))
+                codeforcesAccountManager.setSavedInfo(info.copy(rating = lastRatingChange.newRating))
             }
         }
     }
 
     private suspend fun codeforcesContribution() {
-        val accountManager = CodeforcesAccountManager(this)
-        val info = accountManager.getSavedInfo() as CodeforcesAccountManager.CodeforcesUserInfo
+        val info = codeforcesAccountManager.getSavedInfo() as CodeforcesAccountManager.CodeforcesUserInfo
         if(info.status != STATUS.OK) return
 
         val handle = info.handle
-        val contribution = (accountManager.loadInfo(handle) as CodeforcesAccountManager.CodeforcesUserInfo).let {
+        val contribution = (codeforcesAccountManager.loadInfo(handle) as CodeforcesAccountManager.CodeforcesUserInfo).let {
             if(it.status != STATUS.OK) return
             it.contribution
         }
 
         if(info.contribution != contribution){
-            accountManager.setSavedInfo(info.copy(contribution = contribution))
+            codeforcesAccountManager.setSavedInfo(info.copy(contribution = contribution))
 
             val oldShowedContribution: Int = if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) info.contribution
             else {

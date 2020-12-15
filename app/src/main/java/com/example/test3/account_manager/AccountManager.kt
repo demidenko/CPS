@@ -25,6 +25,8 @@ abstract class AccountManager(val context: Context) {
     protected open val dataStore = AccountDataStore(context, PREFERENCES_FILE_NAME)
     val dataStoreLive by lazy{ dataStore.getLiveData() }
 
+    open fun getSettings() = AccountSettingsDataStore(context, PREFERENCES_FILE_NAME)
+
     abstract fun emptyInfo(): UserInfo
 
     protected abstract suspend fun downloadInfo(data: String): UserInfo
@@ -45,7 +47,9 @@ abstract class AccountManager(val context: Context) {
         return decodeFromString(str)
     }
     suspend fun setSavedInfo(info: UserInfo) {
+        val old = getSavedInfo()
         dataStore.putString(encodeToString(info))
+        if(info.userID != old.userID) getSettings().resetRelatedData()
     }
 
     open fun getColor(info: UserInfo): Int? = null
@@ -105,6 +109,11 @@ class AccountDataStore(context: Context, name: String): SettingsByContext() {
             it[KEY_USER_INFO] = str
         }
     }
+}
+
+open class AccountSettingsDataStore(context: Context, name: String) {
+    protected val dataStore by lazy { context.createDataStore(name = "${name}_account_settings") }
+    open suspend fun resetRelatedData(){}
 }
 
 enum class STATUS{
