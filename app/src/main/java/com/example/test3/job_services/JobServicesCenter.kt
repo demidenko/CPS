@@ -25,6 +25,9 @@ object JobServiceIDs {
 }
 
 object JobServicesCenter {
+
+    private fun getJobScheduler(context: Context) = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+
     private fun makeSchedule(
         context: Context,
         id: Int,
@@ -39,39 +42,32 @@ object JobServicesCenter {
                 setPeriodic(millis, flex)
             else setPeriodic(millis)
         }
-        val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        jobScheduler.schedule(builder.build())
+        getJobScheduler(context).schedule(builder.build())
     }
 
-    fun getRunningJobServices(context: Context): List<JobInfo> {
-        val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        return scheduler.allPendingJobs
-    }
+    fun getRunningJobServices(context: Context): List<JobInfo> = getJobScheduler(context).allPendingJobs
 
-    fun stopJobService(context: Context, jobID: Int) {
-        val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        scheduler.cancel(jobID)
-    }
+    fun stopJobService(context: Context, jobID: Int) = getJobScheduler(context).cancel(jobID)
 
-    fun startJobServices(activity: MainActivity){
+    fun startJobServices(mainActivity: MainActivity){
         val toStart = mutableMapOf<Int, (Context)->Unit >(
             JobServiceIDs.news_parsers to ::startNewsJobService,
             JobServiceIDs.accounts_parsers to ::startAccountsJobService
         )
-        with(PreferenceManager.getDefaultSharedPreferences(activity)){
-            if(getBoolean(activity.getString(R.string.news_codeforces_lost_enabled), false)) toStart[JobServiceIDs.codeforces_news_lost_recent] = ::startCodeforcesNewsLostRecentJobService
-            if(getBoolean(activity.getString(R.string.news_codeforces_follow_enabled), false)) toStart[JobServiceIDs.codeforces_news_follow] = ::startCodeforcesNewsFollowJobService
-            if(getBoolean(activity.getString(R.string.news_project_euler_problems), false)) toStart[JobServiceIDs.project_euler_recent_problems] = ::startProjectEulerRecentProblemsJobService
+        with(PreferenceManager.getDefaultSharedPreferences(mainActivity)){
+            if(getBoolean(mainActivity.getString(R.string.news_codeforces_lost_enabled), false)) toStart[JobServiceIDs.codeforces_news_lost_recent] = ::startCodeforcesNewsLostRecentJobService
+            if(getBoolean(mainActivity.getString(R.string.news_codeforces_follow_enabled), false)) toStart[JobServiceIDs.codeforces_news_follow] = ::startCodeforcesNewsFollowJobService
+            if(getBoolean(mainActivity.getString(R.string.news_project_euler_problems), false)) toStart[JobServiceIDs.project_euler_recent_problems] = ::startProjectEulerRecentProblemsJobService
         }
-        getRunningJobServices(activity).forEach {
+        getRunningJobServices(mainActivity).forEach {
             if(toStart.containsKey(it.id)) toStart.remove(it.id)
-            else stopJobService(activity, it.id)
+            else stopJobService(mainActivity, it.id)
         }
-        activity.lifecycleScope.launchWhenStarted {
-            val progressInfo = BottomProgressInfo(toStart.size, "start services", activity)
+        mainActivity.lifecycleScope.launchWhenStarted {
+            val progressInfo = BottomProgressInfo(toStart.size, "start services", mainActivity)
             toStart.values.shuffled().forEach { start ->
                 delay(500)
-                start(activity)
+                start(mainActivity)
                 progressInfo.increment()
             }
             progressInfo.finish()
