@@ -77,11 +77,9 @@ class AccountsJobService : CoroutineJobService() {
                 }?.notification?.extras?.getInt("contribution", info.contribution) ?: info.contribution
             }
 
-            fun signed(x: Int): String = if(x>0) "+$x" else "$x"
-
             val n = NotificationCompat.Builder(this, NotificationChannels.codeforces_contribution_changes).apply {
                 setSubText(handle)
-                setContentTitle("Contribution change: ${signed(oldShowedContribution)} → ${signed(contribution)}")
+                setContentTitle("Contribution change: ${signedToString(oldShowedContribution)} → ${signedToString(contribution)}")
                 setSmallIcon(R.drawable.ic_person)
                 setNotificationSilent()
                 setAutoCancel(true)

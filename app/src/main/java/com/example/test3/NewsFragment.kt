@@ -782,11 +782,10 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
             if(comment.rating == 0) visibility = View.GONE
             else {
                 visibility = View.VISIBLE
+                text = signedToString(comment.rating)
                 if (comment.rating > 0) {
-                    text = "+" + comment.rating.toString()
                     setTextColor(getColorFromResource(activity, R.color.blog_rating_positive))
                 } else {
-                    text = comment.rating.toString()
                     setTextColor(getColorFromResource(activity, R.color.blog_rating_negative))
                 }
             }

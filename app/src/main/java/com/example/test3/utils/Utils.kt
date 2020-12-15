@@ -29,6 +29,8 @@ fun fromHTML(s: String): Spanned {
     }
 }
 
+fun signedToString(x: Int): String = if(x>0) "+$x" else "$x"
+
 
 class SharedReloadButton(private val button: ImageButton) {
     private val current = TreeSet<String>()

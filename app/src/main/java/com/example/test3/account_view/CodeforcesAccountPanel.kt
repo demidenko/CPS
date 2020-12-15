@@ -15,6 +15,7 @@ import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.getColorFromResource
 import com.example.test3.job_services.JobServicesCenter
+import com.example.test3.utils.signedToString
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -66,11 +67,10 @@ class CodeforcesAccountPanel(
             }else {
                 visibility = View.VISIBLE
                 contributionViewTitle.visibility = View.VISIBLE
+                text = signedToString(info.contribution)
                 if (info.contribution > 0) {
-                    text = "+${info.contribution}"
                     setTextColor(getColorFromResource(mainActivity, R.color.blog_rating_positive))
                 } else {
-                    text = "${info.contribution}"
                     setTextColor(getColorFromResource(mainActivity, R.color.blog_rating_negative))
                 }
             }
