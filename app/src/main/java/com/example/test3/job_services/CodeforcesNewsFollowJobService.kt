@@ -4,10 +4,7 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
-import com.example.test3.NotificationChannels
-import com.example.test3.NotificationIDs
-import com.example.test3.R
-import com.example.test3.makePendingIntentOpenURL
+import com.example.test3.*
 import com.example.test3.utils.*
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -152,7 +149,7 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
 
     private fun notifyNewBlog(blogEntry: CodeforcesBlogEntry){
         val title = fromHTML(blogEntry.title.removeSurrounding("<p>", "</p>")).toString()
-        val n = NotificationCompat.Builder(this, NotificationChannels.codeforces_follow_new_blog).apply {
+        val n = notificationBuilder(this, NotificationChannels.codeforces_follow_new_blog).apply {
             setSubText("New codeforces blog")
             setContentTitle(blogEntry.authorHandle)
             setContentText(title)

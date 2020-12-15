@@ -2,14 +2,10 @@ package com.example.test3.job_services
 
 import android.app.NotificationManager
 import android.os.Bundle
-import androidx.core.app.NotificationCompat
-import com.example.test3.NotificationChannels
-import com.example.test3.NotificationIDs
-import com.example.test3.R
+import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_view.CodeforcesAccountPanel
-import com.example.test3.makePendingIntentOpenURL
 import com.example.test3.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -77,7 +73,7 @@ class AccountsJobService : CoroutineJobService() {
                 }?.notification?.extras?.getInt("contribution", info.contribution) ?: info.contribution
             }
 
-            val n = NotificationCompat.Builder(this, NotificationChannels.codeforces_contribution_changes).apply {
+            val n = notificationBuilder(this, NotificationChannels.codeforces_contribution_changes).apply {
                 setSubText(handle)
                 setContentTitle("Contribution change: ${signedToString(oldShowedContribution)} → ${signedToString(contribution)}")
                 setSmallIcon(R.drawable.ic_person)

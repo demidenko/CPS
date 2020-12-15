@@ -55,7 +55,7 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
 
         if(lastViewedProblemID != 0){
             newProblems.forEach { (id, name) ->
-                val n = NotificationCompat.Builder(this, NotificationChannels.project_euler_problems).apply {
+                val n = notificationBuilder(this, NotificationChannels.project_euler_problems).apply {
                     setSubText("Project Euler • New problem published!")
                     setContentTitle("Problem $id")
                     setContentText(name)

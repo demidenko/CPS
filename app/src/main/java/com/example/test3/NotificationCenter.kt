@@ -13,120 +13,81 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
+
+fun notificationBuilder(context: Context, channel: NotificationChannelLazy): NotificationCompat.Builder {
+    return NotificationCompat.Builder(context, channel.getID(context))
+}
+
 object NotificationChannels {
+    const val IMPORTANCE_MIN = 1
+    const val IMPORTANCE_DEFAULT = 3
+
     //codeforces
-    const val codeforces_contest_watcher = "cf_contest_watcher"
-    const val codeforces_rating_changes = "cf_rating_changes"
-    const val codeforces_contribution_changes = "cf_contribution_changes"
-    const val codeforces_follow_new_blog = "cf_follow_new_blog"
+    private val group_codeforces by lazy { NotificationChannelGroupLazy("codeforces", "CodeForces") }
+    val codeforces_contest_watcher by lazy { NotificationChannelLazy("cf_contest_watcher", "Contest watch", IMPORTANCE_DEFAULT, group_codeforces) }
+    val codeforces_rating_changes by lazy { NotificationChannelLazy("cf_rating_changes", "Rating changes", IMPORTANCE_DEFAULT, group_codeforces) }
+    val codeforces_contribution_changes by lazy { NotificationChannelLazy("cf_contribution_changes", "Contribution changes", IMPORTANCE_MIN, group_codeforces) }
+    val codeforces_follow_new_blog by lazy { NotificationChannelLazy("cf_follow_new_blog", "Followed blogs", IMPORTANCE_DEFAULT, group_codeforces) }
 
     //project euler
-    const val project_euler_news = "pe_news"
-    const val project_euler_problems = "pe_problems"
+    private val group_project_euler by lazy { NotificationChannelGroupLazy("project_euler", "Project Euler") }
+    val project_euler_news by lazy { NotificationChannelLazy("pe_news", "Recent Problems", IMPORTANCE_DEFAULT, group_project_euler) }
+    val project_euler_problems by lazy { NotificationChannelLazy("pe_problems", "News", IMPORTANCE_DEFAULT, group_project_euler) }
 
     //acmp
-    const val acmp_news = "acmp_news"
+    private val group_acmp by lazy { NotificationChannelGroupLazy("acmp", "ACMP") }
+    val acmp_news by lazy { NotificationChannelLazy("acmp_news", "News", IMPORTANCE_DEFAULT, group_acmp) }
 
     //zaoch
-    const val olympiads_zaoch_news = "olympiads_zaoch_news"
+    private val group_zaoch by lazy { NotificationChannelGroupLazy("zaoch", "olympiads.ru/zaoch") }
+    val olympiads_zaoch_news by lazy { NotificationChannelLazy("olympiads_zaoch_news", "News", IMPORTANCE_DEFAULT, group_zaoch) }
 
+    //test
+    private val group_test by lazy { NotificationChannelGroupLazy("test", "Test group") }
+    val test by lazy { NotificationChannelLazy("test", "test channel", IMPORTANCE_DEFAULT, group_test) }
+
+}
+
+class NotificationChannelGroupLazy(private val id: String, val name: String){
+    private var created = false
     @RequiresApi(Build.VERSION_CODES.O)
-    fun createNotificationChannels(context: Context){
-        val m = NotificationManagerCompat.from(context)
+    fun getID(m: NotificationManagerCompat): String {
+        if(!created){
+            m.createNotificationChannelGroup(NotificationChannelGroup(id, name))
+            created = true
+        }
+        return id
+    }
+}
 
-        fun addChannelsToGroup(groupID: String, groupName: String, vararg channels: NotificationChannel){
-            m.createNotificationChannelGroup(NotificationChannelGroup(groupID, groupName))
-            channels.forEach { channel ->
-                channel.group = groupID
+class NotificationChannelLazy(
+    private val id: String,
+    val name: String,
+    val importance: Int,
+    val groupCreator: NotificationChannelGroupLazy
+){
+    private var created = false
+    fun getID(context: Context): String {
+        if(!created){
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+                val m = NotificationManagerCompat.from(context)
+                val channel = NotificationChannel(id, name, convertImportance()).apply {
+                    group = groupCreator.getID(m)
+                }
                 m.createNotificationChannel(channel)
             }
+            created = true
         }
+        return id
+    }
 
-        //test channels
-        addChannelsToGroup("test", "Test Group",
-            NotificationChannel(
-                "test",
-                "test channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ),
-            NotificationChannel(
-                "test2",
-                "test2 channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ),
-            NotificationChannel(
-                "test3",
-                "test3 channel",
-                NotificationManager.IMPORTANCE_MIN
-            ),
-            NotificationChannel(
-                "test4",
-                "test4 channel",
-                NotificationManager.IMPORTANCE_LOW
-            ),
-            NotificationChannel(
-                "test5",
-                "test5 channel",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-        )
-
-        //codeforces channels
-        addChannelsToGroup("codeforces", "CodeForces",
-            NotificationChannel(
-                codeforces_rating_changes,
-                "Rating changes",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ),
-            NotificationChannel(
-                codeforces_contribution_changes,
-                "Contribution changes",
-                NotificationManager.IMPORTANCE_MIN
-            ),
-            NotificationChannel(
-                codeforces_contest_watcher,
-                "Contest watch",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ),
-            NotificationChannel(
-                codeforces_follow_new_blog,
-                "Followed blogs",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-        )
-
-        //project euler channels
-        addChannelsToGroup("project_euler", "Project Euler",
-            NotificationChannel(
-                project_euler_problems,
-                "Recent Problems",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ),
-            NotificationChannel(
-                project_euler_news,
-                "News",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-        )
-
-        //acmp channels
-        addChannelsToGroup("acmp", "ACMP",
-            NotificationChannel(
-                acmp_news,
-                "News",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-        )
-
-        //zaoch channels
-        addChannelsToGroup("zaoch", "olympiads.ru/zaoch",
-            NotificationChannel(
-                olympiads_zaoch_news,
-                "News",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-        )
-
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun convertImportance(): Int {
+        return when (importance){
+            NotificationChannels.IMPORTANCE_DEFAULT -> NotificationManager.IMPORTANCE_DEFAULT
+            NotificationChannels.IMPORTANCE_MIN -> NotificationManager.IMPORTANCE_MIN
+            else -> NotificationManager.IMPORTANCE_UNSPECIFIED
+        }
     }
 }
 
@@ -181,7 +142,7 @@ object NotificationColors {
 }
 
 fun makeSimpleNotification(context: Context, id: Int, title: String, content: String, silent: Boolean = true){
-    val n = NotificationCompat.Builder(context, "test").apply {
+    val n = notificationBuilder(context, NotificationChannels.test).apply {
         setSmallIcon(R.drawable.ic_news)
         setShowWhen(true)
         setContentTitle(title)

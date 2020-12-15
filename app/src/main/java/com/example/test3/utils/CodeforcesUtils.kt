@@ -7,13 +7,9 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import androidx.core.app.NotificationCompat
 import androidx.core.text.set
-import com.example.test3.NotificationChannels
-import com.example.test3.NotificationIDs
-import com.example.test3.R
+import com.example.test3.*
 import com.example.test3.account_manager.*
-import com.example.test3.makePendingIntentOpenURL
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -231,10 +227,7 @@ object CodeforcesUtils {
         notificationManager: NotificationManager,
         codeforcesAccountManager: CodeforcesAccountManager
     ){
-        val n = NotificationCompat.Builder(
-            context,
-            NotificationChannels.codeforces_rating_changes
-        ).apply {
+        val n = notificationBuilder(context, NotificationChannels.codeforces_rating_changes).apply {
             val decreased = ratingChange.newRating < ratingChange.oldRating
             setSmallIcon(if(decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
             setContentTitle("${ratingChange.handle} new rating: ${ratingChange.newRating}")

@@ -41,10 +41,6 @@ class MainActivity : AppCompatActivity(){
         println(savedInstanceState)
         super.onCreate(savedInstanceState)
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannels.createNotificationChannels(this)
-        }
-
         setContentView(R.layout.activity_main)
 
         setupActionBar()

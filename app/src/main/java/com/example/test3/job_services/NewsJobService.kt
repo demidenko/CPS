@@ -67,7 +67,7 @@ class NewsJobService : CoroutineJobService() {
             val group = "acmp_news_group"
 
             news.forEach { (id, content) ->
-                val n = NotificationCompat.Builder(this, NotificationChannels.acmp_news).apply {
+                val n = notificationBuilder(this, NotificationChannels.acmp_news).apply {
                     setSubText("acmp news")
                     setContentText(content)
                     setStyle(NotificationCompat.BigTextStyle())
@@ -81,7 +81,7 @@ class NewsJobService : CoroutineJobService() {
                 NotificationManagerCompat.from(this).notify( NotificationIDs.makeACMPNewsNotificationID(id), n.build())
             }
 
-            val n = NotificationCompat.Builder(this, NotificationChannels.acmp_news).apply {
+            val n = notificationBuilder(this, NotificationChannels.acmp_news).apply {
                 setStyle(NotificationCompat.InboxStyle().setSummaryText("acmp news"))
                 setSmallIcon(R.drawable.ic_news)
                 setColor(NotificationColors.acmp_main)
@@ -126,7 +126,7 @@ class NewsJobService : CoroutineJobService() {
 
         if(lastNewsID!=""){
             news.forEach { (title, content) ->
-                val n = NotificationCompat.Builder(this, NotificationChannels.project_euler_news).apply {
+                val n = notificationBuilder(this, NotificationChannels.project_euler_news).apply {
                     setSubText("Project Euler news")
                     setContentTitle(title)
                     setContentText(fromHTML(content))
@@ -177,7 +177,7 @@ class NewsJobService : CoroutineJobService() {
         if(news.isEmpty()) return
 
         news.forEach { (title, content) ->
-            val n = NotificationCompat.Builder(this, NotificationChannels.olympiads_zaoch_news).apply {
+            val n = notificationBuilder(this, NotificationChannels.olympiads_zaoch_news).apply {
                 setSubText("zaoch news")
                 setContentTitle(title)
                 setContentText(fromHTML(content))

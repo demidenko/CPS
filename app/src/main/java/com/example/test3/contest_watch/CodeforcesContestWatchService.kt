@@ -47,7 +47,7 @@ class CodeforcesContestWatchService: Service() {
                 val handle = intent.getStringExtra("handle")!!
                 val contestID = intent.getIntExtra("contestID", -1)
                 stop()
-                val notification = NotificationCompat.Builder(this, NotificationChannels.codeforces_contest_watcher).apply {
+                val notification = notificationBuilder(this, NotificationChannels.codeforces_contest_watcher).apply {
                     setSmallIcon(R.drawable.ic_contest)
                     setSubText(handle)
                     setShowWhen(false)
@@ -212,7 +212,7 @@ class CodeforcesContestWatchService: Service() {
                         if(submission.verdict == CodeforcesProblemVerdict.OK) "OK"
                         else "${submission.verdict.name} #${submission.passedTestCount+1}"
 
-                    val n = NotificationCompat.Builder(
+                    val n = notificationBuilder(
                         this@CodeforcesContestWatchService,
                         NotificationChannels.codeforces_contest_watcher
                     ).apply {
