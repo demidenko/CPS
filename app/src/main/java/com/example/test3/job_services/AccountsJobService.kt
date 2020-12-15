@@ -10,9 +10,7 @@ import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_view.CodeforcesAccountPanel
 import com.example.test3.makePendingIntentOpenURL
-import com.example.test3.utils.CodeforcesAPI
-import com.example.test3.utils.CodeforcesAPIStatus
-import com.example.test3.utils.CodeforcesUtils
+import com.example.test3.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -43,13 +41,19 @@ class AccountsJobService : CoroutineJobService() {
         val lastRatingChange = response.result?.last() ?: return
         val prevRatingChangeContestID = codeforcesSettingsDataStore.getLastRatedContestID()
 
-        if(prevRatingChangeContestID == lastRatingChange.contestId) return
+        if(prevRatingChangeContestID == lastRatingChange.contestId && info.rating == lastRatingChange.newRating) return
+
+        codeforcesSettingsDataStore.setLastRatedContestID(lastRatingChange.contestId)
 
         if(prevRatingChangeContestID!=-1){
             CodeforcesUtils.notifyRatingChange(lastRatingChange, this, notificationManager, accountManager)
+            val newInfo = accountManager.loadInfo(info.handle)
+            if(newInfo.status!=STATUS.FAILED){
+                accountManager.setSavedInfo(newInfo)
+            }else{
+                accountManager.setSavedInfo(info.copy(rating = lastRatingChange.newRating))
+            }
         }
-
-        codeforcesSettingsDataStore.setLastRatedContestID(lastRatingChange.contestId)
     }
 
     private suspend fun codeforcesContribution() {

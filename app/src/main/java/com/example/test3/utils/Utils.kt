@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit
 
 val httpClient = OkHttpClient
     .Builder()
-    .connectTimeout(30, TimeUnit.SECONDS)
-    .readTimeout(30, TimeUnit.SECONDS)
+    .connectTimeout(15, TimeUnit.SECONDS)
+    .readTimeout(15, TimeUnit.SECONDS)
     .build()
 
 val jsonCPS = Json{ ignoreUnknownKeys = true }

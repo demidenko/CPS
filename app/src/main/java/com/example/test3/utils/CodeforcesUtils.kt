@@ -239,10 +239,12 @@ object CodeforcesUtils {
             setSmallIcon(if(decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
             setContentTitle("${ratingChange.handle} new rating: ${ratingChange.newRating}")
             val difference = (if(decreased) "" else "+") + (ratingChange.newRating - ratingChange.oldRating)
-            setContentText("$difference, rank: ${ratingChange.rank}")
+            setContentText("$difference (rank: ${ratingChange.rank})")
             setSubText("Codeforces rating changes")
             color = codeforcesAccountManager.getHandleColorARGB(ratingChange.newRating)
             setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.contestsWith(ratingChange.handle), context))
+            setShowWhen(true)
+            setWhen(TimeUnit.SECONDS.toMillis(ratingChange.ratingUpdateTimeSeconds))
         }
         notificationManager.notify(NotificationIDs.codeforces_rating_changes, n.build())
     }
@@ -352,7 +354,8 @@ data class CodeforcesRatingChange(
     val handle: String,
     val rank: Int,
     val oldRating: Int,
-    val newRating: Int
+    val newRating: Int,
+    val ratingUpdateTimeSeconds: Long
 )
 
 @Serializable
