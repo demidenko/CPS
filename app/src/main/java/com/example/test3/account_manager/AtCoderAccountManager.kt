@@ -89,6 +89,10 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context) {
         return@withContext res
     }
 
+    override suspend fun getRatingHistory(info: UserInfo): List<RatingChange>? {
+        return AtCoderAPI.getRatingChanges(info.userID)?.map { RatingChange(it) }
+    }
+
     override fun getRating(info: UserInfo) = (info as AtCoderUserInfo).rating
 
     override val ratingsUpperBounds = arrayOf(

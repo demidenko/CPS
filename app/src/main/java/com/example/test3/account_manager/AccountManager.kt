@@ -8,6 +8,8 @@ import androidx.datastore.preferences.createDataStore
 import androidx.lifecycle.asLiveData
 import com.example.test3.SettingsByContext
 import com.example.test3.getUseRealColors
+import com.example.test3.utils.AtCoderRatingChange
+import com.example.test3.utils.CodeforcesRatingChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -90,8 +92,24 @@ abstract class RatedAccountManager(context: Context) : AccountManager(context){
             return i + (rating - lower) / blockLength
         }
     }
+
+    open suspend fun getRatingHistory(info: UserInfo): List<RatingChange>? = null
 }
 
+data class RatingChange(
+    val rating: Int,
+    val timeSeconds: Long
+){
+    constructor(ratingChange: CodeforcesRatingChange): this(
+        ratingChange.newRating,
+        ratingChange.ratingUpdateTimeSeconds
+    )
+
+    constructor(ratingChange: AtCoderRatingChange): this(
+        ratingChange.NewRating,
+        ratingChange.EndTime
+    )
+}
 
 class AccountDataStore(context: Context, name: String): SettingsByContext() {
     companion object {
