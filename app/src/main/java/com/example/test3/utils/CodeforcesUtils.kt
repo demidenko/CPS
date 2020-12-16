@@ -583,5 +583,5 @@ object CodeforcesURLFactory {
 
     fun contestsWith(handle: String) = "$main/contests/with/$handle"
 
-    fun submission(submission: CodeforcesSubmission) = "https://codeforces.com/contest/${submission.contestId}/submission/${submission.id}"
+    fun submission(submission: CodeforcesSubmission) = "$main/contest/${submission.contestId}/submission/${submission.id}"
 }
