@@ -16,8 +16,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -439,7 +439,7 @@ object CodeforcesAPI {
                 val r = c.execute()
                 if(r.isSuccessful) return@withContext r.body()
                 val s = r.errorBody()?.string() ?: return@withContext null
-                val er: CodeforcesAPIErrorResponse = Json.decodeFromString<CodeforcesAPIErrorResponse>(s) ?: return@withContext null
+                val er = jsonCPS.decodeFromString<CodeforcesAPIErrorResponse>(s)
                 if(er.comment == "Call limit exceeded"){
                     delay(callLimitExceededWaitTimeMillis)
                     c = c.clone()
@@ -447,6 +447,8 @@ object CodeforcesAPI {
                 }
                 return@withContext CodeforcesAPIResponse<T>(er)
             }catch (e : IOException){
+                return@withContext null
+            }catch (e: SerializationException){
                 return@withContext null
             }
         }
