@@ -11,9 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
-import com.example.test3.account_manager.AccountManager
-import com.example.test3.account_manager.STATUS
-import com.example.test3.account_manager.UserInfo
+import com.example.test3.account_manager.*
 import com.example.test3.getColorFromResource
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -129,6 +127,18 @@ abstract class AccountPanel(
             }, AccountViewFragment.tag)
             .addToBackStack(null)
             .commit()
+    }
+
+    fun showMainRated(handleView: TextView, ratingView: TextView, ratedAccountManager: RatedAccountManager, info: UserInfo) {
+        val color = ratedAccountManager.getColor(info) ?: mainActivity.defaultTextColor
+        handleView.text = ratedAccountManager.makeSpan(info)
+        ratingView.setTextColor(color)
+        if(info.status == STATUS.OK){
+            val rating = ratedAccountManager.getRating(info)
+            ratingView.text = if(rating == NOT_RATED) "[not rated]" else "$rating"
+        }else{
+            ratingView.text = ""
+        }
     }
 
     open val bigViewResource: Int = R.layout.fragment_account_view

@@ -5,7 +5,6 @@ import android.widget.TextView
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.NOT_RATED
-import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.TopCoderAccountManager
 import com.example.test3.account_manager.UserInfo
 
@@ -14,19 +13,8 @@ class TopCoderAccountPanel(
     override val manager: TopCoderAccountManager
 ): AccountPanel(mainActivity, manager)  {
 
-    private fun showMain(handleView: TextView, ratingView: TextView, info: TopCoderAccountManager.TopCoderUserInfo) {
-        val color = manager.getColor(info) ?: mainActivity.defaultTextColor
-        ratingView.setTextColor(color)
-        handleView.text = manager.makeSpan(info)
-        if(info.status == STATUS.OK){
-            ratingView.text = if(info.rating_algorithm == NOT_RATED) "[not rated]" else "${info.rating_algorithm}"
-        }else{
-            ratingView.text = ""
-        }
-    }
-
     override fun show(info: UserInfo) {
-        showMain(textMain, textAdditional, info as TopCoderAccountManager.TopCoderUserInfo)
+        showMainRated(textMain, textAdditional, manager, info)
     }
 
     override val bigViewResource = R.layout.fragment_account_view_topcoder
@@ -40,7 +28,7 @@ class TopCoderAccountPanel(
         val ratingView = view.findViewById<TextView>(R.id.account_view_rating)
         val marathonRatingView = view.findViewById<TextView>(R.id.account_view_tc_marathon)
 
-        showMain(handleView, ratingView, info)
+        showMainRated(handleView, ratingView, manager, info)
 
         marathonRatingView.apply {
             val marathonRatingViewTitle = view.findViewById<TextView>(R.id.account_view_tc_marathon_title)

@@ -4,8 +4,6 @@ import android.widget.TextView
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.AtCoderAccountManager
-import com.example.test3.account_manager.NOT_RATED
-import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
 
 class AtCoderAccountPanel(
@@ -13,19 +11,8 @@ class AtCoderAccountPanel(
     override val manager: AtCoderAccountManager
 ): AccountPanel(mainActivity, manager)  {
 
-    private fun showMain(handleView: TextView, ratingView: TextView, info: AtCoderAccountManager.AtCoderUserInfo) {
-        val color = manager.getColor(info) ?: mainActivity.defaultTextColor
-        ratingView.setTextColor(color)
-        handleView.text = manager.makeSpan(info)
-        if(info.status == STATUS.OK){
-            ratingView.text = if(info.rating == NOT_RATED) "[not rated]" else "${info.rating}"
-        }else{
-            ratingView.text = ""
-        }
-    }
-
     override fun show(info: UserInfo) {
-        showMain(textMain, textAdditional, info as AtCoderAccountManager.AtCoderUserInfo)
+        showMainRated(textMain, textAdditional, manager, info)
     }
 
     override val bigViewResource = R.layout.fragment_account_view_atcoder
@@ -38,7 +25,7 @@ class AtCoderAccountPanel(
         val handleView = view.findViewById<TextView>(R.id.account_view_handle)
         val ratingView = view.findViewById<TextView>(R.id.account_view_rating)
 
-        showMain(handleView, ratingView, info)
+        showMainRated(handleView, ratingView, manager, info)
 
     }
 
