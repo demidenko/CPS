@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             style="@style/TextAppearance.Compat.Notification.Line2"
             android:textStyle="bold"
-
+            android:layout_gravity="center_horizontal"
             />
 
     </LinearLayout>
@@ -83,7 +83,7 @@
             android:layout_height="wrap_content"
             style="@style/TextAppearance.Compat.Notification.Line2"
             android:textStyle="bold"
-
+            android:layout_gravity="center_horizontal"
             />
 
     </LinearLayout>

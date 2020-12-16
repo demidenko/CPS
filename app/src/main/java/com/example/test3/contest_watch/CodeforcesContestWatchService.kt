@@ -208,9 +208,7 @@ class CodeforcesContestWatchService: Service() {
 
                 override fun onSetProblemSystestResult(submission: CodeforcesSubmission) {
                     val problemName = "${submission.contestId}${submission.problem.index}"
-                    val result =
-                        if(submission.verdict == CodeforcesProblemVerdict.OK) "OK"
-                        else "${submission.verdict.name} #${submission.passedTestCount+1}"
+                    val result = submission.makeVerdict()
 
                     val n = notificationBuilder(
                         this@CodeforcesContestWatchService,
@@ -232,9 +230,8 @@ class CodeforcesContestWatchService: Service() {
                     notificationManager.notify(NotificationIDs.makeCodeforcesSystestSubmissionID(submission.id), n.build())
                 }
 
-                private val codeforcesAccountManager by lazy { CodeforcesAccountManager(this@CodeforcesContestWatchService) }
                 override fun onRatingChange(ratingChange: CodeforcesRatingChange) {
-                    CodeforcesUtils.notifyRatingChange(ratingChange, this@CodeforcesContestWatchService, notificationManager, codeforcesAccountManager)
+                    CodeforcesUtils.notifyRatingChange(ratingChange, this@CodeforcesContestWatchService, notificationManager, CodeforcesAccountManager(this@CodeforcesContestWatchService))
                 }
 
                 override fun commit() {
