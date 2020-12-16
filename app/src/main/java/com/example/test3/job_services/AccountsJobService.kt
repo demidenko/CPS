@@ -3,6 +3,7 @@ package com.example.test3.job_services
 import android.app.NotificationManager
 import android.os.Bundle
 import com.example.test3.*
+import com.example.test3.account_manager.AtCoderAccountManager
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.utils.*
@@ -14,12 +15,16 @@ class AccountsJobService : CoroutineJobService() {
     private val notificationManager by lazy { getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
 
     private val codeforcesAccountManager by lazy { CodeforcesAccountManager(this) }
+    private val atcoderAccountManager by lazy { AtCoderAccountManager(this) }
 
     override suspend fun makeJobs(): ArrayList<Job> {
         val jobs = arrayListOf<Job>()
         with(codeforcesAccountManager.getSettings()){
             if(getObserveRating()) jobs.add(launch { codeforcesRating() })
             if(getObserveContribution()) jobs.add(launch { codeforcesContribution() })
+        }
+        with(atcoderAccountManager.getSettings()){
+            if(getObserveRating()) jobs.add(launch { atcoderRating() })
         }
         if(jobs.isEmpty()) JobServicesCenter.stopJobService(this, JobServiceIDs.accounts_parsers)
         return jobs
@@ -40,12 +45,36 @@ class AccountsJobService : CoroutineJobService() {
         codeforcesAccountManager.getSettings().setLastRatedContestID(lastRatingChange.contestId)
 
         if(prevRatingChangeContestID!=-1){
-            CodeforcesUtils.notifyRatingChange(lastRatingChange, this, notificationManager, codeforcesAccountManager)
+            codeforcesAccountManager.notifyRatingChange(notificationManager, lastRatingChange)
             val newInfo = codeforcesAccountManager.loadInfo(info.handle)
             if(newInfo.status!=STATUS.FAILED){
                 codeforcesAccountManager.setSavedInfo(newInfo)
             }else{
                 codeforcesAccountManager.setSavedInfo(info.copy(rating = lastRatingChange.newRating))
+            }
+        }
+    }
+
+    private suspend fun atcoderRating() {
+        val info = atcoderAccountManager.getSavedInfo() as AtCoderAccountManager.AtCoderUserInfo
+        if(info.status != STATUS.OK) return
+
+        val ratingChanges = AtCoderAPI.getRatingChanges(info.handle) ?: return
+        val lastRatingChange = ratingChanges.last()
+        val lastRatingChangeContestID = lastRatingChange.getContestID()
+        val prevRatingChangeContestID = atcoderAccountManager.getSettings().getLastRatedContestID()
+
+        if(prevRatingChangeContestID == lastRatingChangeContestID && info.rating == lastRatingChange.NewRating) return
+
+        atcoderAccountManager.getSettings().setLastRatedContestID(lastRatingChangeContestID)
+
+        if(prevRatingChangeContestID!=""){
+            atcoderAccountManager.notifyRatingChange(notificationManager, info.handle, lastRatingChange)
+            val newInfo = atcoderAccountManager.loadInfo(info.handle)
+            if(newInfo.status!=STATUS.FAILED){
+                atcoderAccountManager.setSavedInfo(newInfo)
+            }else{
+                atcoderAccountManager.setSavedInfo(info.copy(rating = lastRatingChange.NewRating))
             }
         }
     }

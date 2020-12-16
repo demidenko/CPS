@@ -231,7 +231,7 @@ class CodeforcesContestWatchService: Service() {
                 }
 
                 override fun onRatingChange(ratingChange: CodeforcesRatingChange) {
-                    CodeforcesUtils.notifyRatingChange(ratingChange, this@CodeforcesContestWatchService, notificationManager, CodeforcesAccountManager(this@CodeforcesContestWatchService))
+                    CodeforcesAccountManager(this@CodeforcesContestWatchService).notifyRatingChange(notificationManager, ratingChange)
                 }
 
                 override fun commit() {

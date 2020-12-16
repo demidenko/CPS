@@ -29,6 +29,10 @@ object NotificationChannels {
     val codeforces_contribution_changes by lazy { NotificationChannelLazy("cf_contribution_changes", "Contribution changes", IMPORTANCE_MIN, group_codeforces) }
     val codeforces_follow_new_blog by lazy { NotificationChannelLazy("cf_follow_new_blog", "Followed blogs", IMPORTANCE_DEFAULT, group_codeforces) }
 
+    //atcoder
+    private val group_atcoder by lazy { NotificationChannelGroupLazy("atcoder", "AtCoder") }
+    val atcoder_rating_changes by lazy { NotificationChannelLazy("atcoder_rating_changes", "Rating changes", IMPORTANCE_DEFAULT, group_atcoder) }
+
     //project euler
     private val group_project_euler by lazy { NotificationChannelGroupLazy("project_euler", "Project Euler") }
     val project_euler_news by lazy { NotificationChannelLazy("pe_news", "Recent Problems", IMPORTANCE_DEFAULT, group_project_euler) }
@@ -118,6 +122,9 @@ object NotificationIDs {
     val codeforces_contribution_changes = nextID()
     val makeCodeforcesSystestSubmissionID = nextIntervalID()
     val makeCodeforcesFollowBlogID = nextIntervalID()
+
+    //atcoder
+    val atcoder_rating_changes = nextID()
 
     //project euler
     val makeProjectEulerRecentProblemNotificationID = nextIntervalID()

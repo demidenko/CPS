@@ -1,18 +1,20 @@
 package com.example.test3.account_manager
 
+import android.app.NotificationManager
 import android.content.Context
 import android.text.SpannableString
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
 import androidx.datastore.preferences.createDataStore
 import androidx.lifecycle.asLiveData
-import com.example.test3.SettingsByContext
-import com.example.test3.getUseRealColors
+import com.example.test3.*
 import com.example.test3.utils.AtCoderRatingChange
 import com.example.test3.utils.CodeforcesRatingChange
+import com.example.test3.utils.signedToString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 
 
 abstract class AccountManager(val context: Context) {
@@ -189,3 +191,31 @@ data class AccountSuggestion(
     val info: String,
     val userId: String
 )
+
+
+fun notifyRatingChange(
+    context: Context,
+    notificationManager: NotificationManager,
+    notificationChannel: NotificationChannelLazy,
+    notificationID: Int,
+    accountManager: RatedAccountManager,
+    handle: String, newRating: Int, oldRating: Int, rank: Int, url: String? = null, timeSeconds: Long? = null
+){
+    val n = notificationBuilder(context, notificationChannel).apply {
+        val decreased = newRating < oldRating
+        setSmallIcon(if(decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
+        setContentTitle("$handle new rating: $newRating")
+        val difference = signedToString(newRating - oldRating)
+        setContentText("$difference (rank: $rank)")
+        setSubText("${accountManager.PREFERENCES_FILE_NAME} rating changes")
+        color = accountManager.getHandleColorARGB(newRating)
+        url?.let {
+            setContentIntent(makePendingIntentOpenURL(url, context))
+        }
+        timeSeconds?.let {
+            setShowWhen(true)
+            setWhen(TimeUnit.SECONDS.toMillis(timeSeconds))
+        }
+    }
+    notificationManager.notify(notificationID, n.build())
+}

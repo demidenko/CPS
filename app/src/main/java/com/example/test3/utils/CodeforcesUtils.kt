@@ -1,7 +1,5 @@
 package com.example.test3.utils
 
-import android.app.NotificationManager
-import android.content.Context
 import android.graphics.Typeface
 import android.text.SpannableString
 import android.text.Spanned
@@ -221,26 +219,7 @@ object CodeforcesUtils {
         }
     }
 
-    fun notifyRatingChange(
-        ratingChange: CodeforcesRatingChange,
-        context: Context,
-        notificationManager: NotificationManager,
-        codeforcesAccountManager: CodeforcesAccountManager
-    ){
-        val n = notificationBuilder(context, NotificationChannels.codeforces_rating_changes).apply {
-            val decreased = ratingChange.newRating < ratingChange.oldRating
-            setSmallIcon(if(decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
-            setContentTitle("${ratingChange.handle} new rating: ${ratingChange.newRating}")
-            val difference = (if(decreased) "" else "+") + (ratingChange.newRating - ratingChange.oldRating)
-            setContentText("$difference (rank: ${ratingChange.rank})")
-            setSubText("Codeforces rating changes")
-            color = codeforcesAccountManager.getHandleColorARGB(ratingChange.newRating)
-            setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.contestsWith(ratingChange.handle), context))
-            setShowWhen(true)
-            setWhen(TimeUnit.SECONDS.toMillis(ratingChange.ratingUpdateTimeSeconds))
-        }
-        notificationManager.notify(NotificationIDs.codeforces_rating_changes, n.build())
-    }
+
 }
 
 enum class CodeforcesAPIStatus{

@@ -21,9 +21,14 @@ data class AtCoderRatingChange(
     val OldRating: Int,
     val Place: Int,
     val EndTime: Long,
-    val ContestName: String
-    //val StandingsUrl: String
-)
+    val ContestName: String,
+    val StandingsUrl: String
+){
+    fun getContestID(): String {
+        val s = StandingsUrl.removePrefix("/contests/")
+        return s.substring(0, s.indexOf('/'))
+    }
+}
 
 object AtCoderAPI {
     interface WEB {

@@ -1,9 +1,12 @@
 package com.example.test3.account_manager
 
+import android.app.NotificationManager
 import android.content.Context
 import android.text.SpannableString
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
+import com.example.test3.NotificationChannels
+import com.example.test3.NotificationIDs
 import com.example.test3.SettingsDelegate
 import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
@@ -120,6 +123,22 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
 
     override val dataStore by lazy { context.accountDataStoreCodeforces }
     override fun getSettings() = CodeforcesAccountSettingsDataStore(context, PREFERENCES_FILE_NAME)
+
+    fun notifyRatingChange(m: NotificationManager, ratingChange: CodeforcesRatingChange){
+        notifyRatingChange(
+            context,
+            m,
+            NotificationChannels.codeforces_rating_changes,
+            NotificationIDs.codeforces_rating_changes,
+            this,
+            ratingChange.handle,
+            ratingChange.newRating,
+            ratingChange.oldRating,
+            ratingChange.rank,
+            CodeforcesURLFactory.contestsWith(ratingChange.handle),
+            ratingChange.ratingUpdateTimeSeconds
+        )
+    }
 }
 
 val Context.accountDataStoreCodeforces by SettingsDelegate { AccountDataStore(it, CodeforcesAccountManager.preferences_file_name) }
