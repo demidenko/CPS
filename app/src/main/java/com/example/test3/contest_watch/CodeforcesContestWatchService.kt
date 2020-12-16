@@ -30,6 +30,18 @@ class CodeforcesContestWatchService: Service() {
         const val ACTION_STOP = "stop"
 
         fun makeStopIntent(context: Context) = Intent(context, CodeforcesContestWatchService::class.java).setAction(ACTION_STOP)
+
+        fun startService(context: Context, handle: String, contestID: Int){
+            val intent = Intent(context, CodeforcesContestWatchService::class.java)
+                .setAction(ACTION_START)
+                .putExtra("handle", handle)
+                .putExtra("contestID", contestID)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
+        }
     }
 
     private val scope = CoroutineScope(Job() + Dispatchers.Main)

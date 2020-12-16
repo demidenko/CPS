@@ -2,7 +2,6 @@ package com.example.test3
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
@@ -55,15 +54,11 @@ class TestFragment : Fragment() {
             lifecycleScope.launch {
                 CodeforcesAPI.getUser(handle)?.let { userInfo ->
                     if(userInfo.status == CodeforcesAPIStatus.OK){
-                        val intent = Intent(mainActivity, CodeforcesContestWatchService::class.java)
-                            .setAction(CodeforcesContestWatchService.ACTION_START)
-                            .putExtra("handle", userInfo.result!!.handle)
-                            .putExtra("contestID", contestID)
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                            mainActivity.startForegroundService(intent)
-                        } else {
-                            mainActivity.startService(intent)
-                        }
+                        CodeforcesContestWatchService.startService(
+                            mainActivity,
+                            userInfo.result!!.handle,
+                            contestID
+                        )
                     }else{
                         Toast.makeText(mainActivity, userInfo.comment, Toast.LENGTH_LONG).show()
                     }
