@@ -14,6 +14,7 @@ import com.example.test3.NotificationIDs
 import com.example.test3.SettingsDelegate
 import com.example.test3.utils.AtCoderAPI
 import com.example.test3.utils.AtCoderRatingChange
+import com.example.test3.utils.AtCoderURLFactory
 import com.example.test3.utils.jsonCPS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -37,7 +38,7 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context) {
             return if(rating == NOT_RATED) "$handle [not rated]" else "$handle $rating"
         }
 
-        override fun link(): String = "https://atcoder.jp/users/$handle"
+        override fun link(): String = AtCoderURLFactory.user(handle)
     }
 
     override val PREFERENCES_FILE_NAME: String
@@ -153,7 +154,7 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context) {
             ratingChange.NewRating,
             ratingChange.OldRating,
             ratingChange.Place,
-            "https://atcoder.jp/users/$handle/history/share/${ratingChange.getContestID()}",
+            AtCoderURLFactory.userContestResult(handle, ratingChange.getContestID()),
             ratingChange.EndTime
         )
     }

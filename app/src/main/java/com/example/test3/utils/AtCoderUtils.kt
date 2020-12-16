@@ -81,3 +81,14 @@ object AtCoderAPI {
         }
     }
 }
+
+
+object AtCoderURLFactory {
+
+    private const val main = "https://atcoder.jp"
+
+    fun user(handle: String) = "$main/users/$handle"
+
+    fun userContestResult(handle: String, contestID: String) = "$main/users/$handle/history/share/$contestID"
+
+}
