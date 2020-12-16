@@ -38,11 +38,13 @@ class AccountsJobService : CoroutineJobService() {
         if(response.status != CodeforcesAPIStatus.OK) return
 
         val lastRatingChange = response.result?.last() ?: return
-        val prevRatingChangeContestID = codeforcesAccountManager.getSettings().getLastRatedContestID()
+
+        val settings = codeforcesAccountManager.getSettings()
+        val prevRatingChangeContestID = settings.getLastRatedContestID()
 
         if(prevRatingChangeContestID == lastRatingChange.contestId && info.rating == lastRatingChange.newRating) return
 
-        codeforcesAccountManager.getSettings().setLastRatedContestID(lastRatingChange.contestId)
+        settings.setLastRatedContestID(lastRatingChange.contestId)
 
         if(prevRatingChangeContestID!=-1){
             codeforcesAccountManager.notifyRatingChange(notificationManager, lastRatingChange)
@@ -62,11 +64,13 @@ class AccountsJobService : CoroutineJobService() {
         val ratingChanges = AtCoderAPI.getRatingChanges(info.handle) ?: return
         val lastRatingChange = ratingChanges.last()
         val lastRatingChangeContestID = lastRatingChange.getContestID()
-        val prevRatingChangeContestID = atcoderAccountManager.getSettings().getLastRatedContestID()
+
+        val settings = atcoderAccountManager.getSettings()
+        val prevRatingChangeContestID = settings.getLastRatedContestID()
 
         if(prevRatingChangeContestID == lastRatingChangeContestID && info.rating == lastRatingChange.NewRating) return
 
-        atcoderAccountManager.getSettings().setLastRatedContestID(lastRatingChangeContestID)
+        settings.setLastRatedContestID(lastRatingChangeContestID)
 
         if(prevRatingChangeContestID!=""){
             atcoderAccountManager.notifyRatingChange(notificationManager, info.handle, lastRatingChange)
