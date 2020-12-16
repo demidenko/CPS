@@ -306,6 +306,7 @@ data class CodeforcesSubmission(
     val verdict: CodeforcesProblemVerdict = CodeforcesProblemVerdict.WAITING,
     val passedTestCount: Int,
     val id: Long,
+    val creationTimeSeconds: Long,
     val testset: CodeforcesTestset
 ){
     fun makeVerdict(): String {
@@ -406,6 +407,13 @@ object CodeforcesAPI {
         fun getUserRatingChanges(
             @Query("handle") handle: String
         ): Call<CodeforcesAPIResponse<List<CodeforcesRatingChange>>>
+
+        @GET("user.status")
+        fun getUserStatus(
+            @Query("handle") handle: String,
+            @Query("count") count: Int = 10,
+            @Query("from") from: Int = 1
+        ): Call<CodeforcesAPIResponse<List<CodeforcesSubmission>>>
     }
 
     private val api = Retrofit.Builder()
@@ -456,6 +464,8 @@ object CodeforcesAPI {
     suspend fun getContestRatingChanges(contestId: Int) = makeAPICall(api.getContestRatingChanges(contestId))
 
     suspend fun getUserRatingChanges(handle: String) = makeAPICall(api.getUserRatingChanges(handle))
+
+    suspend fun getUserSubmissions(handle: String, count: Int = 10, from: Int = 1) = makeAPICall(api.getUserStatus(handle,count,from))
 
 
     interface WEB {
