@@ -96,7 +96,7 @@ class CodeforcesContestWatchService: Service() {
             contestID,
             scope
         ).apply {
-            addCodeforcesContestWatchListener(object : CodeforcesContestWatchListener(){
+            addCodeforcesContestWatchListener(object : CodeforcesContestWatchListener {
                 var contestType = CodeforcesContestType.UNDEFINED
                 var contestPhase = CodeforcesContestPhase.UNDEFINED
                 var changes = false

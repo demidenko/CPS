@@ -7,7 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
-class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope: CoroutineScope): CodeforcesContestWatchListener(){
+class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope: CoroutineScope): CodeforcesContestWatchListener {
 
     private var job: Job? = null
 
@@ -114,7 +114,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
 
             if((phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST || phaseCodeforces.value == CodeforcesContestPhase.FINISHED)
                 && participationType.value.participatedInContest()
-                && contestType.value == CodeforcesContestType.CF
+                //&& contestType.value == CodeforcesContestType.CF
                 && problemsResults.count {
                     it.value.type == CodeforcesProblemStatus.PRELIMINARY || it.isChanged() && it.value.type == CodeforcesProblemStatus.FINAL
                 } > 0
@@ -251,19 +251,19 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
 }
 
 
-abstract class CodeforcesContestWatchListener{
-    abstract fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType)
-    abstract fun onSetProblemNames(problemNames: Array<String>)
-    abstract fun onSetContestPhase(phase: CodeforcesContestPhase)
-    abstract fun onSetRemainingTime(timeSeconds: Long)
-    abstract fun onSetSysTestProgress(percents: Int)
-    abstract fun onSetContestantRank(rank: Int)
-    abstract fun onSetContestantPoints(points: Double)
-    abstract fun onSetProblemResult(problemName: String, result: CodeforcesProblemResult)
-    abstract fun onSetProblemSystestResult(submission: CodeforcesSubmission)
-    abstract fun onSetParticipationType(type: CodeforcesParticipationType)
-    abstract fun onRatingChange(ratingChange: CodeforcesRatingChange)
-    abstract fun commit()
+interface CodeforcesContestWatchListener {
+    fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType)
+    fun onSetProblemNames(problemNames: Array<String>)
+    fun onSetContestPhase(phase: CodeforcesContestPhase)
+    fun onSetRemainingTime(timeSeconds: Long)
+    fun onSetSysTestProgress(percents: Int)
+    fun onSetContestantRank(rank: Int)
+    fun onSetContestantPoints(points: Double)
+    fun onSetProblemResult(problemName: String, result: CodeforcesProblemResult)
+    fun onSetProblemSystestResult(submission: CodeforcesSubmission)
+    fun onSetParticipationType(type: CodeforcesParticipationType)
+    fun onRatingChange(ratingChange: CodeforcesRatingChange)
+    fun commit()
 }
 
 
