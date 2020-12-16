@@ -193,13 +193,13 @@ object CodeforcesUtils {
     suspend fun getUsersInfo(handlesList: List<String>): List<CodeforcesAccountManager.CodeforcesUserInfo> {
         val handles = handlesList.toMutableList()
         while(true){
+            if(handles.isEmpty()) return emptyList()
             val response = CodeforcesAPI.getUsers(handles) ?: break
             if(response.status == CodeforcesAPIStatus.FAILED){
                 val comment = response.comment
                 val badHandle = comment.removeSurrounding("handles: User with handle ", " not found")
                 if(badHandle != comment){
-                    handles.remove(badHandle)
-                    continue
+                    if(handles.remove(badHandle)) continue
                 }
                 break
             }
