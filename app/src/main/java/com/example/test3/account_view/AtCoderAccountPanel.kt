@@ -35,7 +35,7 @@ class AtCoderAccountPanel(
     override suspend fun createSettingsView(fragment: AccountSettingsFragment) {
         manager.apply {
             fragment.createAndAddSwitch(
-                "Observe rating changes",
+                "Rating changes observer",
                 getSettings().getObserveRating()
             ){ buttonView, isChecked ->
                 fragment.lifecycleScope.launch {

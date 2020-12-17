@@ -56,7 +56,7 @@ class CodeforcesAccountPanel(
 
         manager.apply {
             fragment.createAndAddSwitch(
-                "Observe rating changes",
+                "Rating changes observer",
                 getSettings().getObserveRating()
             ){ buttonView, isChecked ->
                 fragment.lifecycleScope.launch {
@@ -70,7 +70,7 @@ class CodeforcesAccountPanel(
             }
 
             fragment.createAndAddSwitch(
-                "Observe contribution changes",
+                "Contribution changes observer",
                 getSettings().getObserveContribution()
             ){ buttonView, isChecked ->
                 fragment.lifecycleScope.launch {
