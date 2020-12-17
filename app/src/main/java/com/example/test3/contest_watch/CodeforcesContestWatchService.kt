@@ -1,5 +1,6 @@
 package com.example.test3.contest_watch
 
+import android.app.ActivityManager
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
@@ -29,9 +30,15 @@ class CodeforcesContestWatchService: Service() {
         const val ACTION_START = "start"
         const val ACTION_STOP = "stop"
 
+        private var startedWithHandle: String? = null
+        private var startedWithContestID: Int? = null
+
         fun makeStopIntent(context: Context) = Intent(context, CodeforcesContestWatchService::class.java).setAction(ACTION_STOP)
 
         fun startService(context: Context, handle: String, contestID: Int){
+            if(isStarted(context)){
+                if(startedWithContestID == contestID && startedWithHandle == handle) return
+            }
             val intent = Intent(context, CodeforcesContestWatchService::class.java)
                 .setAction(ACTION_START)
                 .putExtra("handle", handle)
@@ -42,23 +49,25 @@ class CodeforcesContestWatchService: Service() {
                 context.startService(intent)
             }
         }
+
+        private fun isStarted(context: Context): Boolean {
+            val m = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            return m.getRunningServices(Int.MAX_VALUE).any {
+                it.service.className == CodeforcesContestWatchService::class.java.name
+            }
+        }
     }
 
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
     private val notificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
 
 
-    override fun onCreate() {
-        super.onCreate()
-        println("service onCreate")
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when(intent!!.action){
             ACTION_START -> {
                 val handle = intent.getStringExtra("handle")!!
                 val contestID = intent.getIntExtra("contestID", -1)
-                stop()
+                stopWatcher()
                 val notification = notificationBuilder(this, NotificationChannels.codeforces_contest_watcher).apply {
                     setSmallIcon(R.drawable.ic_contest)
                     setSubText(handle)
@@ -79,8 +88,9 @@ class CodeforcesContestWatchService: Service() {
                 start(handle, contestID, notification)
             }
             ACTION_STOP -> {
-                stop()
+                stopWatcher()
                 stopForeground(true)
+                stopSelf()
             }
         }
 
@@ -90,12 +100,15 @@ class CodeforcesContestWatchService: Service() {
 
     private var watcher: CodeforcesContestWatcher? = null
 
-    private fun stop(){
+    private fun stopWatcher(){
         watcher?.stop()
         watcher = null
     }
 
     private fun start(handle: String, contestID: Int, notification: NotificationCompat.Builder){
+        startedWithContestID = contestID
+        startedWithHandle = handle
+
         startForeground(NotificationIDs.codeforces_contest_watcher, notification.build())
 
         val rview_small = RemoteViews(packageName, R.layout.cf_watcher_notification_small)
