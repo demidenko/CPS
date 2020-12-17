@@ -57,6 +57,9 @@ abstract class AccountManager(val context: Context) {
     }
 
     open fun getColor(info: UserInfo): Int? = null
+
+    open fun isValidForSearch(char: Char): Boolean = true
+    open fun isValidForUserID(char: Char): Boolean = true
 }
 
 

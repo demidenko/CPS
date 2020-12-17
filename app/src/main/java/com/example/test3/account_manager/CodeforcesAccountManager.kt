@@ -42,6 +42,16 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
         const val preferences_file_name = "codeforces"
     }
 
+
+    override fun isValidForSearch(char: Char) = isValidForUserID(char)
+    override fun isValidForUserID(char: Char): Boolean {
+        return when(char){
+            in 'a'..'z', in 'A'..'Z', in '0'..'9', in "._-" -> true
+            else -> false
+        }
+    }
+
+
     override fun emptyInfo() = CodeforcesUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String): CodeforcesUserInfo {

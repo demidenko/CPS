@@ -39,6 +39,10 @@ class TimusAccountManager(context: Context): AccountManager(context) {
         const val preferences_file_name = "timus"
     }
 
+    override fun isValidForUserID(char: Char): Boolean {
+        return char in '0'..'9'
+    }
+
     override fun emptyInfo() = TimusUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String): TimusUserInfo {

@@ -6,8 +6,7 @@ import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
+import android.text.*
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Button
@@ -36,24 +35,15 @@ class DialogAccountChooser(
     private val cont: Continuation<UserInfo?>
 ): DialogFragment() {
 
-    private lateinit var userIDChangeWatcher: UserIDChangeWatcher
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val activity = requireActivity() as MainActivity
-        val view = activity.layoutInflater.inflate(R.layout.dialog_choose_userid, null)
 
-        val builder = AlertDialog.Builder(activity)
-            .setTitle("getUserID(${manager.PREFERENCES_FILE_NAME})")
+        val view = layoutInflater.inflate(R.layout.dialog_choose_userid, null)
+
+        val builder = AlertDialog.Builder(requireContext())
+            .setTitle("getUser(${manager.PREFERENCES_FILE_NAME})")
             .setView(view)
             .setPositiveButton("return"){ _, _ ->
-                with(userIDChangeWatcher.lastLoadedInfo){
-                    if(status == STATUS.NOT_FOUND){
-                        activity.showToast("User not found")
-                        cont.resume(null)
-                    }else{
-                        cont.resume(this)
-                    }
-                }
+
             }
 
         return builder.create()
@@ -61,18 +51,21 @@ class DialogAccountChooser(
 
     override fun onStart() {
         super.onStart()
+
+        val mainActivity = requireActivity() as MainActivity
+
         val dialog = getDialog()!! as AlertDialog
         dialog.findViewById<TextView>(resources.getIdentifier("alertTitle", "id", "android")).typeface = Typeface.MONOSPACE
 
         val input = dialog.findViewById<EditText>(R.id.account_choose_input).apply {
             setText(initialUserInfo.userID)
+            typeface = Typeface.MONOSPACE
+            filters = arrayOf(createSearchInputFilter(manager))
         }
 
-        val saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE).apply {
-            isEnabled = initialUserInfo.status == STATUS.OK
-        }
+        val saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
 
-        userIDChangeWatcher = UserIDChangeWatcher(
+        val userIDChangeWatcher = UserIDChangeWatcher(
             this,
             manager,
             initialUserInfo,
@@ -81,6 +74,24 @@ class DialogAccountChooser(
             dialog.findViewById(R.id.account_choose_info),
             dialog.findViewById(R.id.account_choose_suggestions)
         )
+
+        saveButton.apply {
+            setOnClickListener {
+                with(userIDChangeWatcher.lastLoadedInfo){
+                    if(userID.any { char -> !manager.isValidForUserID(char) }){
+                        mainActivity.showToast("Incorrect characters for userID")
+                        return@with
+                    }
+                    if(status == STATUS.NOT_FOUND){
+                        mainActivity.showToast("User not found")
+                        cont.resume(null)
+                    }else{
+                        cont.resume(this)
+                    }
+                    dismiss()
+                }
+            }
+        }
 
         input.addTextChangedListener(userIDChangeWatcher)
     }
@@ -99,12 +110,10 @@ class DialogAccountChooser(
         val suggestionsView: RecyclerView
     ) : TextWatcher {
 
-        val activity = fragment.requireActivity() as MainActivity
+        private var jobInfo: Job? = null
+        private var jobSuggestions: Job? = null
 
-        var jobInfo: Job? = null
-        var jobSuggestions: Job? = null
-
-        val suggestionsAdapter: SuggestionsItemsAdapter
+        private val suggestionsAdapter: SuggestionsItemsAdapter
 
         init {
             preview.text = if(lastLoadedInfo.userID.isEmpty()) ""
@@ -120,16 +129,11 @@ class DialogAccountChooser(
             }
         }
 
-        private val successColor = getColorFromResource(activity, R.color.success)
-        private val failColor = getColorFromResource(activity, R.color.fail)
+        private val successColor = getColorFromResource(manager.context, R.color.success)
+        private val failColor = getColorFromResource(manager.context, R.color.fail)
 
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-        }
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-        }
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
         private var changedByChoose = false
 
@@ -237,5 +241,25 @@ class DialogAccountChooser(
             clear()
         }
 
+    }
+
+    fun createSearchInputFilter(accountManager: AccountManager): InputFilter {
+        return InputFilter { source, start, end, dest, dstart, dend ->
+            var keepOriginal = true
+            val str = StringBuilder()
+            for(i in start until end) {
+                val c = source[i]
+                if(accountManager.isValidForSearch(c)) str.append(c)
+                else keepOriginal = false
+            }
+            if(keepOriginal) null
+            else {
+                if(source is Spanned){
+                    val span = SpannableString(str)
+                    TextUtils.copySpansFrom(source, start, str.length, null, span, 0)
+                    span
+                }else str
+            }
+        }
     }
 }
