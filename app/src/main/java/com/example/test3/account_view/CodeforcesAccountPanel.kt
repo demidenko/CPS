@@ -82,6 +82,20 @@ class CodeforcesAccountPanel(
                     buttonView.isEnabled = true
                 }
             }
+
+            fragment.createAndAddSwitch(
+                "Contest watcher",
+                getSettings().getContestWatchEnabled()
+            ){ buttonView, isChecked ->
+                fragment.lifecycleScope.launch {
+                    buttonView.isEnabled = false
+                    getSettings().setContestWatchEnabled(isChecked)
+                    if (isChecked) {
+                        JobServicesCenter.startCodeforcesContestWatchStarterJobService(mainActivity)
+                    }
+                    buttonView.isEnabled = true
+                }
+            }
         }
 
     }
