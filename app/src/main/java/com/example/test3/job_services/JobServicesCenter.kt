@@ -6,11 +6,11 @@ import android.app.job.JobScheduler
 import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
-import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.example.test3.BottomProgressInfo
 import com.example.test3.MainActivity
 import com.example.test3.R
+import com.example.test3.account_manager.CodeforcesAccountManager
 import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
@@ -21,6 +21,7 @@ object JobServiceIDs {
     val accounts_parsers = ++id
     val codeforces_news_lost_recent = ++id
     val codeforces_news_follow = ++id
+    val codeforces_contest_watch_starter = ++id
     val project_euler_recent_problems = ++id
 }
 
@@ -49,7 +50,7 @@ object JobServicesCenter {
 
     fun stopJobService(context: Context, jobID: Int) = getJobScheduler(context).cancel(jobID)
 
-    fun startJobServices(mainActivity: MainActivity){
+    suspend fun startJobServices(mainActivity: MainActivity){
         val toStart = mutableMapOf<Int, (Context)->Unit >(
             JobServiceIDs.news_parsers to ::startNewsJobService,
             JobServiceIDs.accounts_parsers to ::startAccountsJobService
@@ -59,19 +60,22 @@ object JobServicesCenter {
             if(getBoolean(mainActivity.getString(R.string.news_codeforces_follow_enabled), false)) toStart[JobServiceIDs.codeforces_news_follow] = ::startCodeforcesNewsFollowJobService
             if(getBoolean(mainActivity.getString(R.string.news_project_euler_problems), false)) toStart[JobServiceIDs.project_euler_recent_problems] = ::startProjectEulerRecentProblemsJobService
         }
+        with(CodeforcesAccountManager(mainActivity).getSettings()){
+            if(getContestWatchEnabled()) toStart[JobServiceIDs.codeforces_contest_watch_starter] = ::startCodeforcesContestWatchStarterJobService
+        }
+
         getRunningJobServices(mainActivity).forEach {
             if(toStart.containsKey(it.id)) toStart.remove(it.id)
             else stopJobService(mainActivity, it.id)
         }
-        mainActivity.lifecycleScope.launchWhenStarted {
-            val progressInfo = BottomProgressInfo(toStart.size, "start services", mainActivity)
-            toStart.values.shuffled().forEach { start ->
-                delay(500)
-                start(mainActivity)
-                progressInfo.increment()
-            }
-            progressInfo.finish()
+
+        val progressInfo = BottomProgressInfo(toStart.size, "start services", mainActivity)
+        toStart.values.shuffled().forEach { start ->
+            delay(500)
+            start(mainActivity)
+            progressInfo.increment()
         }
+        progressInfo.finish()
     }
 
     fun startNewsJobService(context: Context){
@@ -99,6 +103,15 @@ object JobServicesCenter {
             CodeforcesNewsFollowJobService::class.java,
             TimeUnit.HOURS.toMillis(6),
             TimeUnit.HOURS.toMillis(3)
+        )
+    }
+
+    fun startCodeforcesContestWatchStarterJobService(context: Context){
+        makeSchedule(
+            context,
+            JobServiceIDs.codeforces_contest_watch_starter,
+            CodeforcesContestWatchStarterJobService::class.java,
+            TimeUnit.MINUTES.toMillis(45)
         )
     }
 

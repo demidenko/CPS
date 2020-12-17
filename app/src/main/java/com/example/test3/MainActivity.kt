@@ -90,8 +90,9 @@ class MainActivity : AppCompatActivity(){
 
         PreferenceManager.setDefaultValues(this, R.xml.news_preferences, false)
 
-        JobServicesCenter.startJobServices(this)
-
+        lifecycleScope.launchWhenStarted {
+            JobServicesCenter.startJobServices(this@MainActivity)
+        }
     }
 
     private fun setupActionBar(){

@@ -148,11 +148,16 @@ class CodeforcesAccountSettingsDataStore(context: Context, name: String): Accoun
     companion object {
         private val KEY_OBS_RATING = preferencesKey<Boolean>("observe_rating")
         private val KEY_LAST_RATED_CONTEST = preferencesKey<Int>("last_rated_contest")
+
         private val KEY_OBS_CONTRIBUTION = preferencesKey<Boolean>("observe_contribution")
+
+        private val KEY_CONTEST_WATCH = preferencesKey<Boolean>("contest_watch")
+        private val KEY_CONTEST_WATCH_LAST_SUBMISSION = preferencesKey<Long>("contest_watch_last_submission")
     }
 
     override suspend fun resetRelatedData() {
         setLastRatedContestID(-1)
+        setContestWatchLastSubmissionID(-1)
     }
 
     suspend fun getObserveRating() = dataStore.data.first()[KEY_OBS_RATING] ?: false
@@ -168,5 +173,15 @@ class CodeforcesAccountSettingsDataStore(context: Context, name: String): Accoun
     suspend fun getObserveContribution() = dataStore.data.first()[KEY_OBS_CONTRIBUTION] ?: false
     suspend fun setObserveContribution(flag: Boolean){
         dataStore.edit { it[KEY_OBS_CONTRIBUTION] = flag }
+    }
+
+    suspend fun getContestWatchEnabled() = dataStore.data.first()[KEY_CONTEST_WATCH] ?: false
+    suspend fun setContestWatchEnabled(flag: Boolean){
+        dataStore.edit { it[KEY_CONTEST_WATCH] = flag }
+    }
+
+    suspend fun getContestWatchLastSubmissionID() = dataStore.data.first()[KEY_CONTEST_WATCH_LAST_SUBMISSION] ?: -1
+    suspend fun setContestWatchLastSubmissionID(submissionID: Long){
+        dataStore.edit { it[KEY_CONTEST_WATCH_LAST_SUBMISSION] = submissionID }
     }
 }
