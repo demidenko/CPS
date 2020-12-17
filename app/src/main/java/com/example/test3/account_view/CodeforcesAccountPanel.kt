@@ -86,7 +86,7 @@ class CodeforcesAccountPanel(
             fragment.createAndAddSwitch(
                 "Contest watcher",
                 getSettings().getContestWatchEnabled(),
-                "Enables auto started watcher of your contest participation. Allows see contest phase, systest result notifications and catch rating changes early than usual."
+                "Enables auto launched watcher of your contest participation. Allows to see contest phase, systest result notifications and catch rating changes early than usual."
             ){ buttonView, isChecked ->
                 fragment.lifecycleScope.launch {
                     buttonView.isEnabled = false
