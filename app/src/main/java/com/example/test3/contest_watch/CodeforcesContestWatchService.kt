@@ -257,8 +257,8 @@ class CodeforcesContestWatchService: Service() {
                     notificationManager.notify(NotificationIDs.makeCodeforcesSystestSubmissionID(submission.id), n.build())
                 }
 
-                override fun onRatingChange(ratingChange: CodeforcesRatingChange) {
-                    CodeforcesAccountManager(this@CodeforcesContestWatchService).notifyRatingChange(notificationManager, ratingChange)
+                override suspend fun onRatingChange(ratingChange: CodeforcesRatingChange) {
+                    CodeforcesAccountManager(this@CodeforcesContestWatchService).applyRatingChange(ratingChange, notificationManager)
                 }
 
                 override fun commit() {

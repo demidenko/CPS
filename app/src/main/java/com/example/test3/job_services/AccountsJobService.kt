@@ -39,22 +39,7 @@ class AccountsJobService : CoroutineJobService() {
 
         val lastRatingChange = response.result?.last() ?: return
 
-        val settings = codeforcesAccountManager.getSettings()
-        val prevRatingChangeContestID = settings.getLastRatedContestID()
-
-        if(prevRatingChangeContestID == lastRatingChange.contestId && info.rating == lastRatingChange.newRating) return
-
-        settings.setLastRatedContestID(lastRatingChange.contestId)
-
-        if(prevRatingChangeContestID!=-1){
-            codeforcesAccountManager.notifyRatingChange(notificationManager, lastRatingChange)
-            val newInfo = codeforcesAccountManager.loadInfo(info.handle)
-            if(newInfo.status!=STATUS.FAILED){
-                codeforcesAccountManager.setSavedInfo(newInfo)
-            }else{
-                codeforcesAccountManager.setSavedInfo(info.copy(rating = lastRatingChange.newRating))
-            }
-        }
+        codeforcesAccountManager.applyRatingChange(lastRatingChange, notificationManager)
     }
 
     private suspend fun atcoderRating() {

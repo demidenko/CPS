@@ -149,6 +149,27 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
             ratingChange.ratingUpdateTimeSeconds
         )
     }
+
+    suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange, notificationManager: NotificationManager){
+        val info = getSavedInfo() as CodeforcesUserInfo
+
+        val settings = getSettings()
+        val prevRatingChangeContestID = settings.getLastRatedContestID()
+
+        if(prevRatingChangeContestID == ratingChange.contestId && info.rating == ratingChange.newRating) return
+
+        settings.setLastRatedContestID(ratingChange.contestId)
+
+        if(prevRatingChangeContestID!=-1){
+            notifyRatingChange(notificationManager, ratingChange)
+            val newInfo = loadInfo(info.handle)
+            if(newInfo.status!=STATUS.FAILED){
+                setSavedInfo(newInfo)
+            }else{
+                setSavedInfo(info.copy(rating = ratingChange.newRating))
+            }
+        }
+    }
 }
 
 val Context.accountDataStoreCodeforces by SettingsDelegate { AccountDataStore(it, CodeforcesAccountManager.preferences_file_name) }

@@ -177,7 +177,9 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
             }
             with(response.result ?: return@let) {
                 val change = findLast { it.handle == handle } ?: return@let
-                onRatingChange(change)
+                scope.launch {
+                    onRatingChange(change)
+                }
                 return true
             }
         }
@@ -241,7 +243,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
         listeners.forEach { l -> l.onSetParticipationType(type) }
     }
 
-    override fun onRatingChange(ratingChange: CodeforcesRatingChange) {
+    override suspend fun onRatingChange(ratingChange: CodeforcesRatingChange) {
         listeners.forEach { l -> l.onRatingChange(ratingChange) }
     }
 
@@ -262,7 +264,7 @@ interface CodeforcesContestWatchListener {
     fun onSetProblemResult(problemName: String, result: CodeforcesProblemResult)
     fun onSetProblemSystestResult(submission: CodeforcesSubmission)
     fun onSetParticipationType(type: CodeforcesParticipationType)
-    fun onRatingChange(ratingChange: CodeforcesRatingChange)
+    suspend fun onRatingChange(ratingChange: CodeforcesRatingChange)
     fun commit()
 }
 
