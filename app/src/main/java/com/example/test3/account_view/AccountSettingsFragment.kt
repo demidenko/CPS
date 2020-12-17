@@ -70,7 +70,12 @@ class AccountSettingsFragment(): Fragment() {
 
     }
 
-    fun createAndAddSwitch(title: String, checked: Boolean, onChangeCallback: (buttonView: CompoundButton, isChecked: Boolean)->Unit): View {
+    fun createAndAddSwitch(
+        title: String,
+        checked: Boolean,
+        description: String = "",
+        onChangeCallback: (buttonView: CompoundButton, isChecked: Boolean) -> Unit
+    ): View {
         val view = requireView() as LinearLayout
         layoutInflater.inflate(R.layout.account_settings_switcher, view)
         return view[view.childCount-1].apply {
@@ -78,6 +83,12 @@ class AccountSettingsFragment(): Fragment() {
             findViewById<SwitchMaterial>(R.id.account_settings_switcher_button).apply {
                 isChecked = checked
                 this.setOnCheckedChangeListener { buttonView, isChecked -> onChangeCallback(buttonView,isChecked) }
+            }
+            if(description.isNotBlank()){
+                findViewById<TextView>(R.id.account_settings_switcher_description).apply {
+                    text = description
+                    visibility = View.VISIBLE
+                }
             }
         }
     }
