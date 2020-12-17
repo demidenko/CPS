@@ -1,5 +1,6 @@
 package com.example.test3
 
+import android.app.ActivityManager
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
@@ -113,9 +114,13 @@ class TestFragment : Fragment() {
 
         //show running jobs
         view.findViewById<Button>(R.id.button_running_jobs).setOnClickListener {
-            stuff.text = JobServicesCenter.getRunningJobServices(mainActivity).joinToString(separator = "\n"){ info ->
+            val jobservices =  JobServicesCenter.getRunningJobServices(mainActivity).joinToString(separator = "\n"){ info ->
                 "Job " + info.id + ": " + info.service.shortClassName.removeSuffix("JobService").removePrefix(".job_services.")
             }
+            val services = (mainActivity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getRunningServices(Int.MAX_VALUE).joinToString(separator = "\n"){ info ->
+                info.service.className.removePrefix("com.example.test3.")
+            }
+            stuff.text = jobservices + "\n\n" + services
         }
 
         //colors
