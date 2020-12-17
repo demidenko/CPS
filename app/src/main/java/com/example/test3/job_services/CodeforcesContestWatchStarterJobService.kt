@@ -1,5 +1,6 @@
 package com.example.test3.job_services
 
+import android.content.Context
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.contest_watch.CodeforcesContestWatchService
@@ -7,6 +8,7 @@ import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesAPIStatus
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 
 class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
@@ -15,8 +17,10 @@ class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
     override suspend fun makeJobs(): ArrayList<Job> {
         if(accountManager.getSettings().getContestWatchEnabled()){
             return arrayListOf(launch { checkSubmissions() })
+        }else {
+            JobServicesCenter.stopJobService(this, JobServiceIDs.codeforces_contest_watch_starter)
+            return arrayListOf()
         }
-        return arrayListOf()
     }
 
     private suspend fun checkSubmissions() {
@@ -30,6 +34,8 @@ class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
 
         val settings = accountManager.getSettings()
         val lastKnownID: Long = settings.getContestWatchLastSubmissionID()
+        val canceled = settings.getContestWatchCanceled().filter { (id, timeSeconds) -> !isTooLate(timeSeconds) }
+        settings.setContestWatchCanceled(canceled)
 
         var firstID: Long? = null
         var step = 1 //ask 1, than 10 util
@@ -38,7 +44,7 @@ class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
             val response = CodeforcesAPI.getUserSubmissions(info.handle, step, from) ?: return
             if(response.status != CodeforcesAPIStatus.OK) return
 
-            val result = response.result!!.let { submissions ->
+            val contestID = response.result!!.let { submissions ->
                 for(submission in submissions){
                     if(firstID == null) firstID = submission.id
                     if(submission.id <= lastKnownID) return@let -1
@@ -54,7 +60,7 @@ class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
                 -1      -> break
              */
 
-            when(result) {
+            when(contestID) {
                 0 -> {
                     from+=step
                     step = 10
@@ -64,13 +70,24 @@ class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
                     firstID?.let { id ->
                         settings.setContestWatchLastSubmissionID(id)
                     }
-                    if(result != -1){
-                        CodeforcesContestWatchService.startService(this, info.handle, result)
+                    if(contestID != -1){
+                        if(canceled.none { it.first == contestID }) {
+                            CodeforcesContestWatchService.startService(this, info.handle, contestID)
+                        }
                     }
                     return
                 }
             }
 
+        }
+    }
+
+    companion object {
+        fun addToCanceled(context: Context, contestID: Int) = runBlocking {
+            val settings = CodeforcesAccountManager(context).getSettings()
+            val canceled = settings.getContestWatchCanceled().toMutableList()
+            canceled.add(Pair(contestID, System.currentTimeMillis()))
+            settings.setContestWatchCanceled(canceled)
         }
     }
 

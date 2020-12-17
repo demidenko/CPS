@@ -111,7 +111,7 @@ object JobServicesCenter {
             context,
             JobServiceIDs.codeforces_contest_watch_starter,
             CodeforcesContestWatchStarterJobService::class.java,
-            TimeUnit.MINUTES.toMillis(45)
+            TimeUnit.MINUTES.toMillis(15)
         )
     }
 
