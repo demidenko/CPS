@@ -8,4 +8,16 @@
     <string name="news_codeforces_ru">cf_news_allow_ru</string>
     <string name="news_codeforces_lost_enabled">cf_news_lost_enabled</string>
     <string name="news_codeforces_follow_enabled">cf_news_follow_enabled</string>
+
+    <string name="accounts_welcome">
+"/*
+Hello coder!
+
+You can add accounts to show here by pressing [+] button below.
+*/"
+    </string>
+
+    <string name="cf_contest_watcher_description">
+"Enables auto launched watcher of your contest participation. Allows to see contest phase, systest result notifications and catch rating changes early than usual."
+    </string>
 </resources>
