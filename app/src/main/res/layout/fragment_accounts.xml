@@ -4,17 +4,27 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
-        android:id="@+id/panels_layout"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:orientation="vertical"
-        android:animateLayoutChanges="true"
+        android:overScrollMode="never"
         >
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/panels_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:animateLayoutChanges="true"
+            >
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
 
     <TextView
         android:id="@+id/accounts_welcome_text"

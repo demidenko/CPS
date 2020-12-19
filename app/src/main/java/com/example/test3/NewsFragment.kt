@@ -891,7 +891,11 @@ class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSha
         addPreferencesFromResource(R.xml.news_preferences)
 
         findPreference<DropDownPreference>(getString(R.string.news_codeforces_default_tab))?.run {
-            val titles = CodeforcesTitle.values().map { it.name }.toTypedArray()
+            val titles = arrayOf(
+                CodeforcesTitle.MAIN.name,
+                CodeforcesTitle.TOP.name,
+                CodeforcesTitle.RECENT.name
+            )
             entries = titles
             entryValues = titles
             setDefaultValue(CodeforcesTitle.TOP.name)

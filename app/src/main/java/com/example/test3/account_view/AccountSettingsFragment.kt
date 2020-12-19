@@ -76,7 +76,7 @@ class AccountSettingsFragment(): Fragment() {
         description: String = "",
         onChangeCallback: (buttonView: CompoundButton, isChecked: Boolean) -> Unit
     ): View {
-        val view = requireView() as LinearLayout
+        val view = requireView().findViewById<LinearLayout>(R.id.layout)
         layoutInflater.inflate(R.layout.account_settings_switcher, view)
         return view[view.childCount-1].apply {
             findViewById<TextView>(R.id.account_settings_switcher_title).text = title
