@@ -37,7 +37,7 @@ class AccountsJobService : CoroutineJobService() {
         val response = CodeforcesAPI.getUserRatingChanges(info.handle) ?: return
         if(response.status != CodeforcesAPIStatus.OK) return
 
-        val lastRatingChange = response.result?.last() ?: return
+        val lastRatingChange = response.result?.lastOrNull() ?: return
 
         codeforcesAccountManager.applyRatingChange(lastRatingChange, notificationManager)
     }
@@ -47,7 +47,7 @@ class AccountsJobService : CoroutineJobService() {
         if(info.status != STATUS.OK) return
 
         val ratingChanges = AtCoderAPI.getRatingChanges(info.handle) ?: return
-        val lastRatingChange = ratingChanges.last()
+        val lastRatingChange = ratingChanges.lastOrNull() ?: return
         val lastRatingChangeContestID = lastRatingChange.getContestID()
 
         val settings = atcoderAccountManager.getSettings()
