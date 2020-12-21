@@ -44,6 +44,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         val maxY = ratingHistory.maxOf { it.rating } + 100f
 
         val circleRadius = 8f
+        val circleStroke = 3f
 
         val m = Matrix()
         if(ratingHistory.size == 1){
@@ -52,7 +53,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
             m.preScale(width/(bound*2), height/(maxY-minY))
             m.preTranslate(-(x-bound), -minY)
         }else{
-            m.preScale(width/(width+circleRadius*3), 1f, width/2f, height/2f)
+            m.preScale(width/(width+(circleRadius+circleStroke)*3), 1f, width/2f, height/2f)
             val minX = ratingHistory.minOf { it.timeSeconds }.toFloat()
             val maxX = ratingHistory.maxOf { it.timeSeconds }.toFloat()
             m.preScale(width/(maxX-minX), height/(maxY-minY))
@@ -99,6 +100,18 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
             strokeWidth = pathWidth
         })
 
+        ratingHistory.mapIndexed { index, ratingChange ->
+            val arr = floatArrayOf(ratingChange.timeSeconds.toFloat(), ratingChange.rating.toFloat())
+            m.mapPoints(arr)
+            val (x,y) = arr
+
+            //circle shadow
+            extraCanvas.drawCircle(x+shadowX, y+shadowY, circleRadius+circleStroke/2, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.FILL
+                color = shadowColor
+            })
+        }
+
         extraCanvas.drawPath(path, Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.BLACK
             style = Paint.Style.STROKE
@@ -108,7 +121,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         val circlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE
             color = Color.BLACK
-            strokeWidth = 3f
+            strokeWidth = circleStroke
         }
 
         //rating points
@@ -116,12 +129,6 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
             val arr = floatArrayOf(ratingChange.timeSeconds.toFloat(), ratingChange.rating.toFloat())
             m.mapPoints(arr)
             val (x,y) = arr
-
-            //circle shadow
-            extraCanvas.drawCircle(x+shadowX, y+shadowY, circleRadius, Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                style = Paint.Style.FILL
-                color = shadowColor
-            })
 
             //circle inner
             extraCanvas.drawCircle(x, y, circleRadius, Paint(Paint.ANTI_ALIAS_FLAG).apply {
