@@ -38,15 +38,26 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         extraCanvas = Canvas(extraBitmap)
         extraCanvas.scale(1f, -1f, width/2f, height/2f)
 
-        val minX = ratingHistory.minOf { it.timeSeconds } - TimeUnit.DAYS.toSeconds(1).toFloat()
         val minY = ratingHistory.minOf { it.rating } - 100f
-        val maxX = ratingHistory.maxOf { it.timeSeconds } + TimeUnit.DAYS.toSeconds(1).toFloat()
         val maxY = ratingHistory.maxOf { it.rating } + 100f
 
-        val m = Matrix()
-        m.preScale(width/(maxX-minX), height/(maxY-minY))
-        m.preTranslate(-minX, -minY)
+        val circleRadius = 8f
 
+        val m = Matrix()
+        if(ratingHistory.size == 1){
+            val x = ratingHistory[0].timeSeconds
+            val bound = TimeUnit.DAYS.toSeconds(1).toFloat()
+            m.preScale(width/(bound*2), height/(maxY-minY))
+            m.preTranslate(-(x-bound), -minY)
+        }else{
+            m.preScale(width/(width+circleRadius*3), 1f, width/2f, height/2f)
+            val minX = ratingHistory.minOf { it.timeSeconds }.toFloat()
+            val maxX = ratingHistory.maxOf { it.timeSeconds }.toFloat()
+            m.preScale(width/(maxX-minX), height/(maxY-minY))
+            m.preTranslate(-minX, -minY)
+        }
+
+        //rating stripes
         val ratingBounds = accountManager.ratingsUpperBounds.toMutableList()
         ratingBounds.add(Pair(Int.MAX_VALUE, HandleColor.RED))
         ratingBounds.reversed().forEachIndexed { index, (upper, ratingColor) ->
@@ -63,6 +74,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
             })
         }
 
+        //rating path
         val path = Path()
         ratingHistory.mapIndexed { index, ratingChange ->
             val arr = floatArrayOf(ratingChange.timeSeconds.toFloat(), ratingChange.rating.toFloat())
@@ -75,7 +87,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         extraCanvas.drawPath(path, Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.BLACK
             style = Paint.Style.STROKE
-            strokeWidth = 5f
+            strokeWidth = 4f
         })
 
         val circlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -84,18 +96,20 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
             strokeWidth = 3f
         }
 
+        //rating points
         ratingHistory.mapIndexed { index, ratingChange ->
             val arr = floatArrayOf(ratingChange.timeSeconds.toFloat(), ratingChange.rating.toFloat())
             m.mapPoints(arr)
             val (x,y) = arr
 
-            val ratingColor = accountManager.getHandleColor(ratingChange.rating)
-
-            extraCanvas.drawCircle(x, y, 10f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            //circle inner
+            extraCanvas.drawCircle(x, y, circleRadius, Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 style = Paint.Style.FILL
-                color = ratingColor.getARGB(accountManager)
+                color = accountManager.getHandleColorARGB(ratingChange.rating)
             })
-            extraCanvas.drawCircle(x, y, 10f, circlePaint)
+
+            //circle outer
+            extraCanvas.drawCircle(x, y, circleRadius, circlePaint)
         }
     }
 
