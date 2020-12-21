@@ -6,8 +6,6 @@ import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
-import com.example.test3.account_manager.NOT_RATED
-import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.getColorFromResource
 import com.example.test3.job_services.JobServicesCenter
@@ -33,7 +31,6 @@ class CodeforcesAccountPanel(
         val handleView = view.findViewById<TextView>(R.id.account_view_handle)
         val ratingView = view.findViewById<TextView>(R.id.account_view_rating)
         val contributionView = view.findViewById<TextView>(R.id.account_view_cf_contribution)
-        val ratingGraphView = view.findViewById<RatingGraphView>(R.id.account_view_rating_graph)
 
         showMainRated(handleView, ratingView, manager, info)
 
@@ -54,15 +51,8 @@ class CodeforcesAccountPanel(
             }
         }
 
-        fragment.lifecycleScope.launch {
-            ratingGraphView.setManager(manager)
-            if(info.status!=STATUS.OK || info.rating== NOT_RATED) return@launch
-            val history = manager.getRatingHistory(info) ?: return@launch
-            ratingGraphView.apply {
-                setHistory(history)
-                visibility = View.VISIBLE
-            }
-        }
+        RatingGraphView.showInAccountViewFragment(fragment, manager, view.findViewById(R.id.account_view_rating_graph))
+
     }
 
     override suspend fun createSettingsView(fragment: AccountSettingsFragment) {

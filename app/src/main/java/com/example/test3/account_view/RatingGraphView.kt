@@ -4,9 +4,11 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.RatedAccountManager
 import com.example.test3.account_manager.RatingChange
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, attrs) {
@@ -75,6 +77,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         }
 
         //rating path
+        val pathWidth = 4f
         val path = Path()
         ratingHistory.mapIndexed { index, ratingChange ->
             val arr = floatArrayOf(ratingChange.timeSeconds.toFloat(), ratingChange.rating.toFloat())
@@ -84,10 +87,22 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
             else path.lineTo(x, y)
         }
 
+        //path shadow
+        val shadowColor = 0x66000000
+        val shadowX = 4f
+        val shadowY = -4f
+        val pathShadow = Path()
+        pathShadow.addPath(path, shadowX, shadowY)
+        extraCanvas.drawPath(pathShadow, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = shadowColor
+            style = Paint.Style.STROKE
+            strokeWidth = pathWidth
+        })
+
         extraCanvas.drawPath(path, Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.BLACK
             style = Paint.Style.STROKE
-            strokeWidth = 4f
+            strokeWidth = pathWidth
         })
 
         val circlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -101,6 +116,12 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
             val arr = floatArrayOf(ratingChange.timeSeconds.toFloat(), ratingChange.rating.toFloat())
             m.mapPoints(arr)
             val (x,y) = arr
+
+            //circle shadow
+            extraCanvas.drawCircle(x+shadowX, y+shadowY, circleRadius, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.FILL
+                color = shadowColor
+            })
 
             //circle inner
             extraCanvas.drawCircle(x, y, circleRadius, Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -121,5 +142,24 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawBitmap(extraBitmap, 0f, 0f, null)
+    }
+
+
+    companion object {
+        fun showInAccountViewFragment(fragment: AccountViewFragment, manager: RatedAccountManager, ratingGraphView: RatingGraphView){
+            ratingGraphView.setManager(manager)
+            fragment.lifecycleScope.launch {
+                val info = manager.getSavedInfo()
+                val history = manager.getRatingHistory(info)
+                if(history == null || history.isEmpty()){
+                    ratingGraphView.visibility = View.GONE
+                    return@launch
+                }
+                ratingGraphView.apply {
+                    setHistory(history)
+                    visibility = View.VISIBLE
+                }
+            }
+        }
     }
 }
