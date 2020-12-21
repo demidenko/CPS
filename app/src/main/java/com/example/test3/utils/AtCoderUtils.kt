@@ -32,7 +32,7 @@ data class AtCoderRatingChange(
 
 object AtCoderAPI {
     interface WEB {
-        @GET("users/{handle}")
+        @GET("users/{handle}?graph=rating")
         fun getUser(
             @Path("handle") handle: String
         ): Call<ResponseBody>
