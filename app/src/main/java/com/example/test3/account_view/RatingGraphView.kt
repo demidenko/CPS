@@ -222,9 +222,14 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                 text = "Show rating graph"
                 setOnClickListener { title -> title as TextView
                     fragment.lifecycleScope.launch {
+                        title.isEnabled = false
                         title.text = "Loading..."
                         val history = manager.getRatingHistory(info)
-                        if(history == null || history.isEmpty()) return@launch
+                        title.isEnabled = true
+                        if(history == null || history.isEmpty()){
+                            title.text = "Show rating graph"
+                            return@launch
+                        }
                         title.text = ""
                         ratingGraphView.apply {
                             setHistory(history)
