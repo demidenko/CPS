@@ -8,9 +8,8 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.R
-import com.example.test3.account_manager.HandleColor
-import com.example.test3.account_manager.RatedAccountManager
-import com.example.test3.account_manager.RatingChange
+import com.example.test3.account_manager.*
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -27,9 +26,50 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
     }
 
     private var ratingHistory: List<RatingChange> = listOf(RatingChange(0,0L))
+    private var toShow = ratingHistory
+    lateinit var ratingHistoryLast10: List<RatingChange>
+    lateinit var ratingHistoryLastMonth: List<RatingChange>
+    lateinit var ratingHistoryLastYear: List<RatingChange>
 
     fun setHistory(history: List<RatingChange>) {
-        ratingHistory = history.sortedBy { it.timeSeconds }
+        ratingHistory = history
+        toShow = ratingHistory
+
+        ratingHistoryLast10 = history.takeLast(10)
+
+        val currentSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+        ratingHistoryLastMonth = history.filter { ratingChange ->
+            TimeUnit.SECONDS.toDays(currentSeconds - ratingChange.timeSeconds) <= 30
+        }
+
+        ratingHistoryLastYear = history.filter { ratingChange ->
+            TimeUnit.SECONDS.toDays(currentSeconds - ratingChange.timeSeconds) <= 365
+        }
+
+        drawRating()
+        invalidate()
+    }
+
+    fun showAll(){
+        toShow = ratingHistory
+        drawRating()
+        invalidate()
+    }
+
+    fun showLast10(){
+        toShow = ratingHistoryLast10
+        drawRating()
+        invalidate()
+    }
+
+    fun showLastMonth(){
+        toShow = ratingHistoryLastMonth
+        drawRating()
+        invalidate()
+    }
+
+    fun showLastYear(){
+        toShow = ratingHistoryLastYear
         drawRating()
         invalidate()
     }
@@ -43,10 +83,10 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         extraCanvas = Canvas(extraBitmap)
         extraCanvas.scale(1f, -1f, width/2f, height/2f)
 
-        val minY = ratingHistory.minOf { it.rating } - 100f
-        val maxY = ratingHistory.maxOf { it.rating } + 100f
-        val minX = ratingHistory.minOf { it.timeSeconds }.toFloat()
-        val maxX = ratingHistory.maxOf { it.timeSeconds }.toFloat()
+        val minY = toShow.minOf { it.rating } - 100f
+        val maxY = toShow.maxOf { it.rating } + 100f
+        val minX = toShow.minOf { it.timeSeconds }.toFloat()
+        val maxX = toShow.maxOf { it.timeSeconds }.toFloat()
 
         val circleRadius = 8f
         val circleStroke = 3f
@@ -155,20 +195,33 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
 
     companion object {
-        fun showInAccountViewFragment(fragment: AccountViewFragment, manager: RatedAccountManager){
+        suspend fun showInAccountViewFragment(fragment: AccountViewFragment, manager: RatedAccountManager){
 
             val view = fragment.requireView().findViewById<ConstraintLayout>(R.id.account_view_rating_graph_view)
+
+            val info = manager.getSavedInfo()
+            if(info.status != STATUS.OK || manager.getRating(info) == NOT_RATED){
+                view.visibility = View.GONE
+                return
+            }
 
             val ratingGraphView = view.findViewById<RatingGraphView>(R.id.account_view_rating_graph).apply {
                 setManager(manager)
                 visibility = View.GONE
             }
 
+            val buttonAll = view.findViewById<MaterialButton>(R.id.account_view_rating_graph_button_all)
+            val buttonLast10 = view.findViewById<MaterialButton>(R.id.account_view_rating_graph_button_last10)
+            val buttonLastMonth = view.findViewById<MaterialButton>(R.id.account_view_rating_graph_button_last_month)
+            val buttonLastYear = view.findViewById<MaterialButton>(R.id.account_view_rating_graph_button_last_year)
+
+            listOf(buttonAll, buttonLast10, buttonLastMonth, buttonLastYear).forEach { button -> button.visibility = View.GONE }
+
+
             view.findViewById<TextView>(R.id.account_view_rating_graph_title).apply {
                 text = "Show rating graph"
                 setOnClickListener { title -> title as TextView
                     fragment.lifecycleScope.launch {
-                        val info = manager.getSavedInfo()
                         title.text = "Loading..."
                         val history = manager.getRatingHistory(info)
                         if(history == null || history.isEmpty()) return@launch
@@ -176,6 +229,34 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                         ratingGraphView.apply {
                             setHistory(history)
                             visibility = View.VISIBLE
+                        }
+                        var something = false
+                        if(history.size > 10){
+                            something = true
+                            buttonLast10.apply {
+                                visibility = View.VISIBLE
+                                setOnClickListener { ratingGraphView.showLast10() }
+                            }
+                        }
+                        if(ratingGraphView.ratingHistoryLastMonth.isNotEmpty()){
+                           something = true
+                            buttonLastMonth.apply {
+                                visibility = View.VISIBLE
+                                setOnClickListener { ratingGraphView.showLastMonth() }
+                            }
+                        }
+                        if(ratingGraphView.ratingHistoryLastYear.size > ratingGraphView.ratingHistoryLastMonth.size){
+                            something = true
+                            buttonLastYear.apply {
+                                visibility = View.VISIBLE
+                                setOnClickListener { ratingGraphView.showLastYear() }
+                            }
+                        }
+                        if(something){
+                            buttonAll.apply {
+                                visibility = View.VISIBLE
+                                setOnClickListener { ratingGraphView.showAll() }
+                            }
                         }
                     }
                 }

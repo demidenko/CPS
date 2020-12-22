@@ -98,7 +98,8 @@ abstract class RatedAccountManager(context: Context) : AccountManager(context){
         }
     }
 
-    open suspend fun getRatingHistory(info: UserInfo): List<RatingChange>? = null
+    protected open suspend fun loadRatingHistory(info: UserInfo): List<RatingChange>? = null
+    suspend fun getRatingHistory(info: UserInfo): List<RatingChange>? = loadRatingHistory(info)?.sortedBy { it.timeSeconds }
 }
 
 data class RatingChange(

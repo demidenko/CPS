@@ -106,7 +106,7 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context) {
         return@withContext res
     }
 
-    override suspend fun getRatingHistory(info: UserInfo): List<RatingChange>? {
+    override suspend fun loadRatingHistory(info: UserInfo): List<RatingChange>? {
         return AtCoderAPI.getRatingChanges(info.userID)?.map { RatingChange(it) }
     }
 

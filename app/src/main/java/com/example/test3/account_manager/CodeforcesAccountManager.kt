@@ -93,7 +93,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
         return@withContext res
     }
 
-    override suspend fun getRatingHistory(info: UserInfo): List<RatingChange>? {
+    override suspend fun loadRatingHistory(info: UserInfo): List<RatingChange>? {
         info as CodeforcesUserInfo
         val response = CodeforcesAPI.getUserRatingChanges(info.handle) ?: return null
         if(response.status!=CodeforcesAPIStatus.OK) return null
