@@ -4,7 +4,10 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
+import com.example.test3.R
 import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.RatedAccountManager
 import com.example.test3.account_manager.RatingChange
@@ -42,20 +45,19 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
         val minY = ratingHistory.minOf { it.rating } - 100f
         val maxY = ratingHistory.maxOf { it.rating } + 100f
+        val minX = ratingHistory.minOf { it.timeSeconds }.toFloat()
+        val maxX = ratingHistory.maxOf { it.timeSeconds }.toFloat()
 
         val circleRadius = 8f
         val circleStroke = 3f
 
         val m = Matrix()
-        if(ratingHistory.size == 1){
-            val x = ratingHistory[0].timeSeconds
+        if(minX == maxX){
             val bound = TimeUnit.DAYS.toSeconds(1).toFloat()
             m.preScale(width/(bound*2), height/(maxY-minY))
-            m.preTranslate(-(x-bound), -minY)
+            m.preTranslate(-(minX-bound), -minY)
         }else{
             m.preScale(width/(width+(circleRadius+circleStroke)*3), 1f, width/2f, height/2f)
-            val minX = ratingHistory.minOf { it.timeSeconds }.toFloat()
-            val maxX = ratingHistory.maxOf { it.timeSeconds }.toFloat()
             m.preScale(width/(maxX-minX), height/(maxY-minY))
             m.preTranslate(-minX, -minY)
         }
@@ -80,7 +82,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         //rating path
         val pathWidth = 4f
         val path = Path()
-        ratingHistory.mapIndexed { index, ratingChange ->
+        ratingHistory.forEachIndexed { index, ratingChange ->
             val arr = floatArrayOf(ratingChange.timeSeconds.toFloat(), ratingChange.rating.toFloat())
             m.mapPoints(arr)
             val (x,y) = arr
@@ -100,7 +102,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
             strokeWidth = pathWidth
         })
 
-        ratingHistory.mapIndexed { index, ratingChange ->
+        ratingHistory.forEach { ratingChange ->
             val arr = floatArrayOf(ratingChange.timeSeconds.toFloat(), ratingChange.rating.toFloat())
             m.mapPoints(arr)
             val (x,y) = arr
@@ -125,7 +127,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         }
 
         //rating points
-        ratingHistory.mapIndexed { index, ratingChange ->
+        ratingHistory.forEach { ratingChange ->
             val arr = floatArrayOf(ratingChange.timeSeconds.toFloat(), ratingChange.rating.toFloat())
             m.mapPoints(arr)
             val (x,y) = arr
@@ -153,20 +155,33 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
 
     companion object {
-        fun showInAccountViewFragment(fragment: AccountViewFragment, manager: RatedAccountManager, ratingGraphView: RatingGraphView){
-            ratingGraphView.setManager(manager)
-            fragment.lifecycleScope.launch {
-                val info = manager.getSavedInfo()
-                val history = manager.getRatingHistory(info)
-                if(history == null || history.isEmpty()){
-                    ratingGraphView.visibility = View.GONE
-                    return@launch
-                }
-                ratingGraphView.apply {
-                    setHistory(history)
-                    visibility = View.VISIBLE
+        fun showInAccountViewFragment(fragment: AccountViewFragment, manager: RatedAccountManager){
+
+            val view = fragment.requireView().findViewById<ConstraintLayout>(R.id.account_view_rating_graph_view)
+
+            val ratingGraphView = view.findViewById<RatingGraphView>(R.id.account_view_rating_graph).apply {
+                setManager(manager)
+                visibility = View.GONE
+            }
+
+            view.findViewById<TextView>(R.id.account_view_rating_graph_title).apply {
+                text = "Show rating graph"
+                setOnClickListener { title -> title as TextView
+                    fragment.lifecycleScope.launch {
+                        val info = manager.getSavedInfo()
+                        title.text = "Loading..."
+                        val history = manager.getRatingHistory(info)
+                        if(history == null || history.isEmpty()) return@launch
+                        title.text = ""
+                        ratingGraphView.apply {
+                            setHistory(history)
+                            visibility = View.VISIBLE
+                        }
+                    }
                 }
             }
+
+
         }
     }
 }

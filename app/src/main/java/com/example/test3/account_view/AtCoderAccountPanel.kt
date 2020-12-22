@@ -30,7 +30,7 @@ class AtCoderAccountPanel(
 
         showMainRated(handleView, ratingView, manager, info)
 
-        RatingGraphView.showInAccountViewFragment(fragment, manager, view.findViewById(R.id.account_view_rating_graph))
+        RatingGraphView.showInAccountViewFragment(fragment, manager)
     }
 
     override suspend fun createSettingsView(fragment: AccountSettingsFragment) {

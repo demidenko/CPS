@@ -51,7 +51,7 @@ class CodeforcesAccountPanel(
             }
         }
 
-        RatingGraphView.showInAccountViewFragment(fragment, manager, view.findViewById(R.id.account_view_rating_graph))
+        RatingGraphView.showInAccountViewFragment(fragment, manager)
 
     }
 
