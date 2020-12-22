@@ -198,6 +198,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         suspend fun showInAccountViewFragment(fragment: AccountViewFragment, manager: RatedAccountManager){
 
             val view = fragment.requireView().findViewById<ConstraintLayout>(R.id.account_view_rating_graph_view)
+            view.visibility = View.VISIBLE
 
             val info = manager.getSavedInfo()
             if(info.status != STATUS.OK || manager.getRating(info) == NOT_RATED){
