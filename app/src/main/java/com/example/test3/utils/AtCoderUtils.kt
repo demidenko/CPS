@@ -71,7 +71,7 @@ object AtCoderAPI {
             val response = atcoderWEB.getUser(handle).execute() ?: return@withContext null
             if(!response.isSuccessful) return@withContext null
             val s = response.body()?.string() ?: return@withContext null
-            val i = s.lastIndexOf("<script>rating_history=[{")
+            val i = s.lastIndexOf("<script>var rating_history=[{")
             if(i==-1) return@withContext null
             val j = s.indexOf("}];</script>", i)
             val str = s.substring(s.indexOf('=',i)+1, j+2)
