@@ -11,6 +11,9 @@ import com.example.test3.utils.jsonCPS
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class TopCoderAccountManager(context: Context): RatedAccountManager(context) {
 
@@ -36,6 +39,8 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context) {
 
     companion object {
         const val preferences_file_name = "topcoder"
+
+        private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
     }
 
     override fun isValidForSearch(char: Char) = isValidForUserID(char)
@@ -76,6 +81,18 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context) {
     override fun getColor(info: UserInfo): Int? = with(info as TopCoderUserInfo){
         if(status != STATUS.OK || rating_algorithm == NOT_RATED) return null
         return getHandleColorARGB(info.rating_algorithm)
+    }
+
+    override suspend fun loadRatingHistory(info: UserInfo): List<RatingChange>? {
+        info as TopCoderUserInfo
+        val response = TopCoderAPI.getStatsHistory(info.handle) ?: return null
+        if(!response.success || response.status!=200) return null
+        return response.content[0].DATA_SCIENCE.SRM.history.map { topCoderRatingChange ->
+            RatingChange(
+                rating = topCoderRatingChange.rating.toInt(),
+                timeSeconds = TimeUnit.MILLISECONDS.toSeconds(dateFormat.parse(topCoderRatingChange.date.removeSuffix("T00:00:00.000Z")).time)
+            )
+        }
     }
 
     override fun getRating(info: UserInfo) = (info as TopCoderUserInfo).rating_algorithm

@@ -44,6 +44,8 @@ class TopCoderAccountPanel(
                 text = "${info.rating_marathon}"
             }
         }
+
+        RatingGraphView.showInAccountViewFragment(fragment, manager)
     }
 
 }
