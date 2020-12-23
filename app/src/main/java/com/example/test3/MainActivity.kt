@@ -26,8 +26,6 @@ import kotlin.coroutines.suspendCoroutine
 
 class MainActivity : AppCompatActivity(){
 
-    val scope = CoroutineScope(Job() + Dispatchers.Main)
-
     val defaultTextColor by lazy { ContextCompat.getColor(this, R.color.textColor) }
 
 
@@ -151,7 +149,7 @@ class MainActivity : AppCompatActivity(){
     suspend fun chooseUserID(manager: AccountManager) = chooseUserID(manager.getSavedInfo(), manager)
 
     suspend fun chooseUserID(initialUserInfo: UserInfo, manager: AccountManager): UserInfo? {
-        return withContext(scope.coroutineContext) {
+        return withContext(lifecycleScope.coroutineContext) {
             suspendCoroutine { cont ->
                 val dialog = DialogAccountChooser(initialUserInfo, manager, cont)
                 dialog.show(supportFragmentManager, "account_choose")
@@ -177,7 +175,6 @@ class MainActivity : AppCompatActivity(){
 
     override fun onDestroy() {
         println("main destroy")
-        scope.cancel()
         super.onDestroy()
     }
 
