@@ -144,7 +144,6 @@ class DialogAccountChooser(
         }
 
         override fun afterTextChanged(editable: Editable?) {
-            //TODO: check symbols
             val userId = editable?.toString() ?: return
 
             if(userId == lastLoadedInfo.userID) return
