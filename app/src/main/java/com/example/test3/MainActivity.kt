@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
@@ -26,7 +25,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class MainActivity : AppCompatActivity(){
 
-    val defaultTextColor by lazy { ContextCompat.getColor(this, R.color.textColor) }
+    val defaultTextColor by lazy { getColorFromResource(this, R.color.textColor) }
 
 
     val accountsFragment: AccountsFragment by lazy { supportFragmentManager.fragments.find { it is AccountsFragment } as? AccountsFragment ?: AccountsFragment() }
