@@ -9,6 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.R
 import com.example.test3.account_manager.*
+import com.example.test3.getColorFromResource
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -27,9 +28,9 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
     private var ratingHistory: List<RatingChange> = listOf(RatingChange(0,0L))
     private var toShow = ratingHistory
-    lateinit var ratingHistoryLast10: List<RatingChange>
-    lateinit var ratingHistoryLastMonth: List<RatingChange>
-    lateinit var ratingHistoryLastYear: List<RatingChange>
+    private lateinit var ratingHistoryLast10: List<RatingChange>
+    private lateinit var ratingHistoryLastMonth: List<RatingChange>
+    private lateinit var ratingHistoryLastYear: List<RatingChange>
 
     fun setHistory(history: List<RatingChange>) {
         ratingHistory = history
@@ -73,6 +74,10 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         drawRating()
         invalidate()
     }
+
+    fun senseToShowLast10() = ratingHistory.size > 10
+    fun senseToShowLastMonth() = ratingHistoryLastMonth.size in 1 until ratingHistory.size
+    fun senseToShowLastYear() = ratingHistoryLastYear.size in ratingHistoryLastMonth.size+1 until ratingHistory.size
 
     private fun drawRating(){
 
@@ -216,7 +221,23 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
             val buttonLastMonth = view.findViewById<MaterialButton>(R.id.account_view_rating_graph_button_last_month)
             val buttonLastYear = view.findViewById<MaterialButton>(R.id.account_view_rating_graph_button_last_year)
 
-            listOf(buttonAll, buttonLast10, buttonLastMonth, buttonLastYear).forEach { button -> button.visibility = View.GONE }
+            val buttons = listOf(buttonAll, buttonLast10, buttonLastMonth, buttonLastYear)
+            val activeTextColor = getColorFromResource(manager.context, R.color.textColor)
+            val inactiveTextColor = getColorFromResource(manager.context, R.color.textColorAdditional)
+            buttons.forEach { button ->
+                button.visibility = View.GONE
+                button.setTextColor(inactiveTextColor)
+            }
+            buttonAll.setTextColor(activeTextColor)
+
+            fun buttonClick(button: MaterialButton){
+                buttons.forEach {
+                    it.setTextColor(
+                        if(it == button) activeTextColor
+                        else inactiveTextColor
+                    )
+                }
+            }
 
 
             view.findViewById<TextView>(R.id.account_view_rating_graph_title).apply {
@@ -228,7 +249,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                         val history = manager.getRatingHistory(info)
                         title.isEnabled = true
                         if(history == null || history.isEmpty()){
-                            title.text = "Show rating graph"
+                            title.text = "Failed. Try again."
                             return@launch
                         }
                         title.text = ""
@@ -236,32 +257,48 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                             setHistory(history)
                             visibility = View.VISIBLE
                         }
-                        var something = false
-                        if(history.size > 10){
-                            something = true
+
+                        var showed = 0
+                        if(ratingGraphView.senseToShowLast10()){
+                            showed++
                             buttonLast10.apply {
                                 visibility = View.VISIBLE
-                                setOnClickListener { ratingGraphView.showLast10() }
+                                setOnClickListener {
+                                    ratingGraphView.showLast10()
+                                    buttonClick(this)
+                                }
                             }
                         }
-                        if(ratingGraphView.ratingHistoryLastMonth.isNotEmpty()){
-                           something = true
+
+                        if(ratingGraphView.senseToShowLastMonth()){
+                            showed++
                             buttonLastMonth.apply {
                                 visibility = View.VISIBLE
-                                setOnClickListener { ratingGraphView.showLastMonth() }
+                                setOnClickListener {
+                                    ratingGraphView.showLastMonth()
+                                    buttonClick(this)
+                                }
                             }
                         }
-                        if(ratingGraphView.ratingHistoryLastYear.size > ratingGraphView.ratingHistoryLastMonth.size){
-                            something = true
+
+                        if(ratingGraphView.senseToShowLastYear()){
+                            showed++
                             buttonLastYear.apply {
                                 visibility = View.VISIBLE
-                                setOnClickListener { ratingGraphView.showLastYear() }
+                                setOnClickListener {
+                                    ratingGraphView.showLastYear()
+                                    buttonClick(this)
+                                }
                             }
                         }
-                        if(something){
+
+                        if(showed>0){
                             buttonAll.apply {
                                 visibility = View.VISIBLE
-                                setOnClickListener { ratingGraphView.showAll() }
+                                setOnClickListener {
+                                    ratingGraphView.showAll()
+                                    buttonClick(this)
+                                }
                             }
                         }
                     }
