@@ -31,13 +31,8 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/account_view_rating_graph_button_all"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="50dp"
+        style="@style/RatingGraphButton"
         android:text="all"
-        android:textColor="@color/textColor"
-        android:background="@android:color/transparent"
-        android:textAllCaps="false"
         app:layout_constraintBottom_toTopOf="@id/account_view_rating_graph"
         app:layout_constraintStart_toEndOf="@id/account_view_rating_show_button"
         android:visibility="gone"
@@ -45,13 +40,8 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/account_view_rating_graph_button_last10"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="50dp"
+        style="@style/RatingGraphButton"
         android:text="last 10"
-        android:textColor="@color/textColor"
-        android:background="@android:color/transparent"
-        android:textAllCaps="false"
         app:layout_constraintBottom_toTopOf="@id/account_view_rating_graph"
         app:layout_constraintStart_toEndOf="@id/account_view_rating_graph_button_all"
         android:visibility="gone"
@@ -59,13 +49,8 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/account_view_rating_graph_button_last_month"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="50dp"
+        style="@style/RatingGraphButton"
         android:text="last month"
-        android:textColor="@color/textColor"
-        android:background="@android:color/transparent"
-        android:textAllCaps="false"
         app:layout_constraintBottom_toTopOf="@id/account_view_rating_graph"
         app:layout_constraintStart_toEndOf="@id/account_view_rating_graph_button_last10"
         android:visibility="gone"
@@ -73,13 +58,8 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/account_view_rating_graph_button_last_year"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="50dp"
+        style="@style/RatingGraphButton"
         android:text="last year"
-        android:textColor="@color/textColor"
-        android:background="@android:color/transparent"
-        android:textAllCaps="false"
         app:layout_constraintBottom_toTopOf="@id/account_view_rating_graph"
         app:layout_constraintStart_toEndOf="@id/account_view_rating_graph_button_last_month"
         android:visibility="gone"
