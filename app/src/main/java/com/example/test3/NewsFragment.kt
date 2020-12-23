@@ -154,8 +154,6 @@ class NewsFragment : Fragment() {
                 codeforcesNewsAdapter.fragments.forEach { it.refresh() }
             }
         }
-
-        reloadTabs()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -188,7 +186,7 @@ class NewsFragment : Fragment() {
     }
 
     private fun reloadTabs() {
-        (requireActivity() as MainActivity).scope.launch { //TODO lifecycleScope crahes
+        lifecycleScope.launch {
             val lang = getContentLanguage()
             codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
                 val tab = tabLayout.getTabAt(index)!!
@@ -327,6 +325,10 @@ class CodeforcesNewsFragment(
     }
 
     val swipeRefreshLayout: SwipeRefreshLayout by lazy { requireView().cf_news_page_swipe_refresh_layout }
+
+    private val newsFragment by lazy { (requireActivity() as MainActivity).newsFragment }
+    private suspend fun callReload() = newsFragment.reloadFragment(this)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         view.cf_news_page_recyclerview.apply {
             layoutManager = LinearLayoutManager(context)
@@ -335,14 +337,15 @@ class CodeforcesNewsFragment(
             setHasFixedSize(true)
         }
 
-        val activity = requireActivity() as MainActivity
-        swipeRefreshLayout.setOnRefreshListener {
-            lifecycleScope.launch {
-                activity.newsFragment.reloadFragment(this@CodeforcesNewsFragment)
+        swipeRefreshLayout.apply {
+            setOnRefreshListener {
+                lifecycleScope.launch { callReload() }
             }
+            setProgressBackgroundColorSchemeResource(R.color.textColor)
+            setColorSchemeResources(R.color.colorAccent)
         }
-        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.textColor)
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent)
+
+        lifecycleScope.launchWhenCreated { callReload() }
     }
 
     var newBlogs = hashSetOf<String>()
