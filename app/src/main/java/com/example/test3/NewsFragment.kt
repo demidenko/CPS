@@ -356,6 +356,8 @@ class CodeforcesNewsFragment(
             else ""
         if(!viewAdapter.parseData(source)) return false
 
+        viewAdapter.notifyDataSetChanged()
+
         if(isManagesNewEntries){
             val savedBlogs = prefs.getStringSet(prefs_key, null) ?: emptySet()
             newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.toHashSet()
@@ -390,7 +392,7 @@ class CodeforcesNewsFragment(
 ///---------------data adapters--------------------
 
 abstract class CodeforcesNewsItemsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>(){
-    abstract fun parseData(s: String): Boolean
+    abstract suspend fun parseData(s: String): Boolean
     abstract fun getBlogIDs(): List<String>
 
     protected lateinit var activity: MainActivity
@@ -418,7 +420,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
         var isNew: Boolean = false
     )
 
-    override fun parseData(s: String): Boolean {
+    override suspend fun parseData(s: String): Boolean {
         val res = arrayListOf<Info>()
         var i = 0
         while (true) {
@@ -454,7 +456,6 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
         if(res.isNotEmpty()){
             rows = res.toTypedArray()
-            notifyDataSetChanged()
             return true
         }
 
@@ -558,7 +559,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
 class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
-    data class BlogInfo(
+    class BlogInfo(
         val blogId: Int,
         val title: String,
         val author: String,
@@ -593,7 +594,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         super.refresh()
     }
 
-    override fun parseData(s: String): Boolean {
+    override suspend fun parseData(s: String): Boolean {
         val (blogs, comments) = CodeforcesUtils.parseRecentActionsPage(s)
 
         blogComments.clear()
@@ -602,15 +603,15 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         }
 
         val res = blogs.map { blog ->
-            val commentators = calculateCommentatorsSpans(blog.id)
-            val lastCommentId = blogComments[blog.id]?.first()?.id ?: -1
-            BlogInfo(blog.id,blog.title,blog.authorHandle,blog.authorColorTag,lastCommentId,commentators)
+            BlogInfo(blog.id, blog.title, blog.authorHandle, blog.authorColorTag,
+                lastCommentId = blogComments[blog.id]?.first()?.id ?: -1,
+                commentators = calculateCommentatorsSpans(blog.id)
+            )
         }
 
         if(res.isNotEmpty()){
             rows = res.toTypedArray()
             rowsComments = comments.toTypedArray()
-            notifyDataSetChanged()
             return true
         }
         return false
@@ -816,7 +817,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 }
 
 class CodeforcesNewsItemsLostRecentAdapter : CodeforcesNewsItemsClassicAdapter() {
-    override fun parseData(s: String): Boolean {
+    override suspend fun parseData(s: String): Boolean {
         val blogs = CodeforcesNewsLostRecentJobService.getSavedLostBlogs(activity)
 
         if(blogs.isNotEmpty()){
@@ -834,8 +835,6 @@ class CodeforcesNewsItemsLostRecentAdapter : CodeforcesNewsItemsClassicAdapter()
                     rating = ""
                 )
             }.toTypedArray()
-
-            notifyDataSetChanged()
         }
 
         return true
