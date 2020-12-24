@@ -54,6 +54,10 @@ class NewsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_news, container, false)
     }
 
+    private fun createLostFragment(): CodeforcesNewsFragment {
+        return CodeforcesNewsFragment(CodeforcesTitle.LOST, "", true, CodeforcesNewsItemsLostRecentAdapter())
+    }
+
     private val codeforcesNewsAdapter: CodeforcesNewsAdapter by lazy {
         val context = requireContext()
         val fragments = mutableListOf(
@@ -62,7 +66,7 @@ class NewsFragment : Fragment() {
             CodeforcesNewsFragment(CodeforcesTitle.RECENT, "/recent-actions", false, CodeforcesNewsItemsRecentAdapter())
         )
         if(CodeforcesNewsLostRecentJobService.isEnabled(context)){
-            fragments.add(CodeforcesNewsFragment(CodeforcesTitle.LOST, "", true, CodeforcesNewsItemsLostRecentAdapter()))
+            fragments.add(createLostFragment())
         }
         CodeforcesNewsAdapter(this, fragments)
     }
@@ -105,7 +109,7 @@ class NewsFragment : Fragment() {
 
                 val subtitle = "::news.codeforces.${fragment.title.name.toLowerCase(Locale.ENGLISH)}"
                 setFragmentSubTitle(this@NewsFragment, subtitle)
-                (requireActivity() as MainActivity).setActionBarSubTitle(subtitle)
+                if(this@NewsFragment.isVisible) (requireActivity() as MainActivity).setActionBarSubTitle(subtitle)
             }
         }
     }
@@ -142,11 +146,11 @@ class NewsFragment : Fragment() {
             navigation_news_reload.setOnClickListener { reloadTabs() }
             navigation_news_lost_update_info.setOnClickListener { updateLostInfo() }
             navigation_news_recent_swap.setOnClickListener {
-                val fragment = codeforcesNewsAdapter.fragments.find { it.title == CodeforcesTitle.RECENT } ?: return@setOnClickListener
+                val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
                 (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).switchMode()
             }
             navigation_news_recent_show_blog_back.setOnClickListener {
-                val fragment = codeforcesNewsAdapter.fragments.find { it.title == CodeforcesTitle.RECENT } ?: return@setOnClickListener
+                val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
                 (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).closeShowFromBlog()
             }
 
@@ -240,9 +244,9 @@ class NewsFragment : Fragment() {
     private val updateLostInfoButton by lazy { requireActivity().navigation_news_lost_update_info }
 
     private fun updateLostInfo() {
-        val activity = requireActivity() as MainActivity
+        //TODO: behaviour on disable/enable LOST in settings
 
-        val index = codeforcesNewsAdapter.fragments.indexOfFirst{ it.title == CodeforcesTitle.LOST }
+        val index = codeforcesNewsAdapter.indexOf(CodeforcesTitle.LOST)
         if(index == -1) return
         val tab = tabLayout.getTabAt(index) ?: return
         val fragment = codeforcesNewsAdapter.fragments[index]
@@ -250,7 +254,7 @@ class NewsFragment : Fragment() {
         lifecycleScope.launch {
             reloadFragment(fragment, tab, ""){
                 updateLostInfoButton.isEnabled = false
-                CodeforcesNewsLostRecentJobService.updateInfo(activity)
+                CodeforcesNewsLostRecentJobService.updateInfo(requireContext())
                 updateLostInfoButton.isEnabled = true
             }
         }
@@ -269,14 +273,14 @@ class NewsFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         val index =
-            with(codeforcesNewsAdapter.fragments){
+            with(codeforcesNewsAdapter){
                 val defaultTab =
                     PreferenceManager.getDefaultSharedPreferences(context).getString(getString(R.string.news_codeforces_default_tab),null)
-                        ?: CodeforcesTitle.TOP.name
+                        ?.let { CodeforcesTitle.valueOf(it) }
+                        ?: CodeforcesTitle.TOP
 
-                var pos = indexOfFirst { it.title.name == defaultTab }
-                if(pos == -1)
-                    pos = indexOfFirst { it.title == CodeforcesTitle.TOP }
+                var pos = indexOf(defaultTab)
+                if(pos == -1) pos = indexOf(CodeforcesTitle.TOP)
 
                 return@with pos
             }
@@ -297,16 +301,51 @@ class NewsFragment : Fragment() {
         }
         super.onHiddenChanged(hidden)
     }
+
+    fun addLostTab(){
+        with(codeforcesNewsAdapter){
+            if(indexOf(CodeforcesTitle.LOST) != -1) return
+            val index = indexOf(CodeforcesTitle.RECENT)
+            add(index+1, createLostFragment())
+        }
+    }
+
+    fun removeLostTab(){
+        val index = codeforcesNewsAdapter.indexOf(CodeforcesTitle.LOST)
+        if(index == -1) return
+        tabLayout.getTabAt(index)?.let { tabLost ->
+            if(tabLost.isSelected){
+                tabSelectionListener.onTabUnselected(tabLost)
+                tabLayout.selectTab(tabLayout.getTabAt(codeforcesNewsAdapter.indexOf(CodeforcesTitle.RECENT)))
+            }
+        }
+        codeforcesNewsAdapter.remove(index)
+    }
 }
 
 
 class CodeforcesNewsAdapter(
     parentFragment: Fragment,
-    val fragments: List<CodeforcesNewsFragment>
+    val fragments: MutableList<CodeforcesNewsFragment>
 ) : FragmentStateAdapter(parentFragment) {
 
     override fun createFragment(position: Int) = fragments[position]
     override fun getItemCount() = fragments.size
+
+    fun indexOf(title: CodeforcesTitle) = fragments.indexOfFirst { it.title == title }
+    fun getFragment(title: CodeforcesTitle) = fragments.find { it.title == title }
+
+    fun remove(index: Int){
+        fragments.removeAt(index)
+        notifyItemRemoved(index)
+    }
+
+    fun add(index: Int, fragment: CodeforcesNewsFragment){
+        fragments.add(index, fragment)
+        notifyItemInserted(index)
+    }
+
+    override fun getItemId(position: Int) = fragments[position].title.ordinal.toLong()
 }
 
 class CodeforcesNewsFragment(
@@ -873,6 +912,8 @@ fun timeRUtoEN(time: String): String{
 ///--------------SETTINGS------------
 class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private val newsFragment by lazy { (requireActivity() as MainActivity).newsFragment }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(requireActivity() as MainActivity){
             setActionBarSubTitle("::news.settings")
@@ -910,8 +951,14 @@ class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSha
             getString(R.string.news_codeforces_lost_enabled) -> {
                 //spam possible
                 when(sharedPreferences.getBoolean(key, false)){
-                    true -> JobServicesCenter.startCodeforcesNewsLostRecentJobService(requireContext())
-                    false -> JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_news_lost_recent)
+                    true -> {
+                        JobServicesCenter.startCodeforcesNewsLostRecentJobService(requireContext())
+                        newsFragment.addLostTab()
+                    }
+                    false -> {
+                        newsFragment.removeLostTab()
+                        JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_news_lost_recent)
+                    }
                 }
             }
             getString(R.string.news_codeforces_follow_enabled) -> {
