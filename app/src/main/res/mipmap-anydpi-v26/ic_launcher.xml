@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@drawable/ic_launcher_background" />
-    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <background android:drawable="@color/background" />
+    <foreground>
+        <inset
+            android:drawable="@drawable/ic_cps_logo"
+            android:insetLeft="10%"
+            android:insetRight="7%"
+            android:insetTop="7%"
+            android:insetBottom="10%"
+            />
+    </foreground>
 </adaptive-icon>
