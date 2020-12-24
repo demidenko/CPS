@@ -2,7 +2,11 @@ package com.example.test3.account_manager
 
 import android.app.NotificationManager
 import android.content.Context
+import android.graphics.Typeface
 import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
+import androidx.core.text.set
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
 import com.example.test3.NotificationChannels
@@ -113,6 +117,30 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
 
     override val rankedHandleColorsList = HandleColor.rankedCodeforces
 
+    fun getHandleColorByTag(tag: String): Int? {
+        return when (tag) {
+            "user-gray" -> HandleColor.GRAY
+            "user-green" -> HandleColor.GREEN
+            "user-cyan" -> HandleColor.CYAN
+            "user-blue" -> HandleColor.BLUE
+            "user-violet" -> HandleColor.VIOLET
+            "user-orange" -> HandleColor.ORANGE
+            "user-red", "user-legendary" -> HandleColor.RED
+            else -> null
+        }?.getARGB(this)
+    }
+
+    fun makeSpan(handle: String, tag: String) = SpannableString(handle).apply {
+        getHandleColorByTag(tag)?.let {
+            set(
+                if(tag=="user-legendary") 1 else 0,
+                handle.length,
+                ForegroundColorSpan(it)
+            )
+        }
+        if(tag!="user-black") set(0, handle.length, StyleSpan(Typeface.BOLD))
+    }
+
     override fun getColor(handleColor: HandleColor): Int {
         return when (handleColor){
             HandleColor.GRAY -> 0x808080
@@ -128,7 +156,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
 
     override fun makeSpan(info: UserInfo): SpannableString {
         info as CodeforcesUserInfo
-        return CodeforcesUtils.makeSpan(info.handle, CodeforcesUtils.getTagByRating(info.rating), this)
+        return makeSpan(info.handle, CodeforcesUtils.getTagByRating(info.rating))
     }
 
     override val dataStore by lazy { context.accountDataStoreCodeforces }

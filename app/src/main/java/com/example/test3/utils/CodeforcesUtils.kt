@@ -1,11 +1,6 @@
 package com.example.test3.utils
 
-import android.graphics.Typeface
-import android.text.SpannableString
 import android.text.Spanned
-import android.text.style.ForegroundColorSpan
-import android.text.style.StyleSpan
-import androidx.core.text.set
 import com.example.test3.*
 import com.example.test3.account_manager.*
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
@@ -164,30 +159,6 @@ object CodeforcesUtils {
             rating < 3000 -> "user-red"
             else -> "user-legendary"
         }
-    }
-
-    fun getHandleColorByTag(tag: String, manager: CodeforcesAccountManager): Int? {
-        return when (tag) {
-            "user-gray" -> HandleColor.GRAY
-            "user-green" -> HandleColor.GREEN
-            "user-cyan" -> HandleColor.CYAN
-            "user-blue" -> HandleColor.BLUE
-            "user-violet" -> HandleColor.VIOLET
-            "user-orange" -> HandleColor.ORANGE
-            "user-red", "user-legendary" -> HandleColor.RED
-            else -> null
-        }?.getARGB(manager)
-    }
-
-    fun makeSpan(handle: String, tag: String, manager: CodeforcesAccountManager) = SpannableString(handle).apply {
-        getHandleColorByTag(tag, manager)?.let {
-            set(
-                if(tag=="user-legendary") 1 else 0,
-                handle.length,
-                ForegroundColorSpan(it)
-            )
-        }
-        if(tag!="user-black") set(0, handle.length, StyleSpan(Typeface.BOLD))
     }
 
     suspend fun getUsersInfo(handlesList: List<String>): List<CodeforcesAccountManager.CodeforcesUserInfo> {
