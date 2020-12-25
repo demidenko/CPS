@@ -1,7 +1,6 @@
 package com.example.test3.job_services
 
 import android.content.Context
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import com.example.test3.*
@@ -58,8 +57,7 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
                 val n = notificationBuilder(this, NotificationChannels.project_euler_problems).apply {
                     setSubText("Project Euler • New problem published!")
                     setContentTitle("Problem $id")
-                    setContentText(name)
-                    setStyle(NotificationCompat.BigTextStyle())
+                    setBigContent(name)
                     setSmallIcon(R.drawable.ic_new_post)
                     setColor(NotificationColors.project_euler_main)
                     setShowWhen(true)

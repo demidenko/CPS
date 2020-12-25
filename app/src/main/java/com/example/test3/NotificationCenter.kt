@@ -18,6 +18,8 @@ fun notificationBuilder(context: Context, channel: NotificationChannelLazy): Not
     return NotificationCompat.Builder(context, channel.getID(context))
 }
 
+fun NotificationCompat.Builder.setBigContent(str: CharSequence) = setContentText(str).setStyle(NotificationCompat.BigTextStyle().bigText(str))
+
 object NotificationChannels {
     const val IMPORTANCE_MIN = 1
     const val IMPORTANCE_DEFAULT = 3

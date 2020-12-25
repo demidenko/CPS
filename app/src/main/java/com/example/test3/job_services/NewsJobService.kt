@@ -69,8 +69,7 @@ class NewsJobService : CoroutineJobService() {
             news.forEach { (id, content) ->
                 val n = notificationBuilder(this, NotificationChannels.acmp_news).apply {
                     setSubText("acmp news")
-                    setContentText(content)
-                    setStyle(NotificationCompat.BigTextStyle())
+                    setBigContent(content)
                     setSmallIcon(R.drawable.ic_news)
                     setColor(NotificationColors.acmp_main)
                     setShowWhen(true)
@@ -129,8 +128,7 @@ class NewsJobService : CoroutineJobService() {
                 val n = notificationBuilder(this, NotificationChannels.project_euler_news).apply {
                     setSubText("Project Euler news")
                     setContentTitle(title)
-                    setContentText(fromHTML(content))
-                    setStyle(NotificationCompat.BigTextStyle())
+                    setBigContent(fromHTML(content))
                     setSmallIcon(R.drawable.ic_news)
                     setColor(NotificationColors.project_euler_main)
                     setShowWhen(true)
@@ -180,8 +178,7 @@ class NewsJobService : CoroutineJobService() {
             val n = notificationBuilder(this, NotificationChannels.olympiads_zaoch_news).apply {
                 setSubText("zaoch news")
                 setContentTitle(title)
-                setContentText(fromHTML(content))
-                setStyle(NotificationCompat.BigTextStyle())
+                setBigContent(fromHTML(content))
                 setSmallIcon(R.drawable.ic_news)
                 setColor(Color.parseColor("#4040A0"))
                 setShowWhen(true)

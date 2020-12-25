@@ -1,7 +1,6 @@
 package com.example.test3.job_services
 
 import android.content.Context
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import com.example.test3.*
@@ -152,8 +151,7 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
         val n = notificationBuilder(this, NotificationChannels.codeforces_follow_new_blog).apply {
             setSubText("New codeforces blog")
             setContentTitle(blogEntry.authorHandle)
-            setContentText(title)
-            setStyle(NotificationCompat.BigTextStyle())
+            setBigContent(title)
             setSmallIcon(R.drawable.ic_new_post)
             setAutoCancel(true)
             setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.blog(blogEntry.id), this@CodeforcesNewsFollowJobService))
