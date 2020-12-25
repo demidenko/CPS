@@ -148,6 +148,9 @@ object NotificationColors {
 
     //acmp
     val acmp_main = Color.parseColor("#006600")
+
+    //zaoch
+    val zaoch_main = Color.parseColor("#4040A0")
 }
 
 fun makeSimpleNotification(context: Context, id: Int, title: String, content: String, silent: Boolean = true){

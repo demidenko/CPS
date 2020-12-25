@@ -1,7 +1,6 @@
 package com.example.test3.job_services
 
 import android.content.Context
-import android.graphics.Color
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
@@ -155,32 +154,35 @@ class NewsJobService : CoroutineJobService() {
 
         val lastNewsID = prefs.getString(OLYMPIADS_ZAOCH_LAST_NEWS, null) ?: ""
 
-        val news = mutableListOf<Pair<String, String>>()
+        val news = mutableListOf<Triple<String, String, String>>()
         var i = 0
         val tit = "<font color=\"#B00000\">"
         while(true){
             i = s.indexOf(tit, i+1)
             if(i==-1) break
 
-            val currentID = s.substring(i+tit.length, s.indexOf("</font",i))
-            if(currentID == lastNewsID) break
+            val date = s.substring(i+tit.length, s.indexOf("</font",i))
 
             var j = s.indexOf("<p>", i)
             if(j==-1) j = s.indexOf("</td", i)
             val content = fromHTML(s.substring(s.indexOf(".",i)+1,j).trim()).toString()
 
-            news.add(Pair(currentID, content))
+            val currentID = "$date@${content.hashCode()}"
+
+            if(currentID == lastNewsID) break
+
+            news.add(Triple(currentID, date, content))
         }
 
         if(news.isEmpty()) return
 
-        news.forEach { (title, content) ->
+        news.forEach { (_, title, content) ->
             val n = notificationBuilder(this, NotificationChannels.olympiads_zaoch_news).apply {
                 setSubText("zaoch news")
                 setContentTitle(title)
                 setBigContent(fromHTML(content))
                 setSmallIcon(R.drawable.ic_news)
-                setColor(Color.parseColor("#4040A0"))
+                setColor(NotificationColors.zaoch_main)
                 setShowWhen(true)
                 //setAutoCancel(true)
                 setContentIntent(makePendingIntentOpenURL("https://olympiads.ru/zaoch/", this@NewsJobService))
