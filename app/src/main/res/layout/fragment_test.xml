@@ -25,69 +25,6 @@
 
     </LinearLayout>
 
-    <GridLayout
-        android:id="@+id/dev_watcher"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:columnCount="2"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        >
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/dev_choose_contest"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="choose"
-            />
-
-        <EditText
-            android:id="@+id/dev_text_editor_contest_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="contestID"
-            android:inputType="numberDecimal"
-            android:selectAllOnFocus="true"
-            android:imeOptions="actionDone"
-            />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/dev_choose_handle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="choose"
-            />
-
-        <EditText
-            android:id="@+id/dev_text_editor_handle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="handle"
-            android:inputType="textPersonName"
-            android:selectAllOnFocus="true"
-            android:imeOptions="actionDone"
-            />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_watcher_stop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="stop"
-            />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_watcher"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="run"
-            />
-
-
-    </GridLayout>
-
-
-
-
 
 
     <LinearLayout
@@ -95,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_above="@id/dev_watcher"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         >
         <com.google.android.material.button.MaterialButton
