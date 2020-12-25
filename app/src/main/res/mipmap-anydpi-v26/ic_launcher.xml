@@ -3,11 +3,11 @@
     <background android:drawable="@color/background" />
     <foreground>
         <inset
-            android:drawable="@drawable/ic_cps_logo"
-            android:insetLeft="10%"
-            android:insetRight="7%"
-            android:insetTop="7%"
-            android:insetBottom="10%"
+            android:drawable="@drawable/ic_cps_logo_2"
+            android:insetLeft="14%"
+            android:insetRight="1%"
+            android:insetTop="32%"
+            android:insetBottom="-17%"
             />
     </foreground>
 </adaptive-icon>
