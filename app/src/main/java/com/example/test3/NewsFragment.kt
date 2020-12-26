@@ -46,6 +46,13 @@ enum class CodeforcesTitle {
 
 class NewsFragment : Fragment() {
 
+    companion object {
+
+        fun getCodeforcesContentLanguage(context: Context) = with(PreferenceManager.getDefaultSharedPreferences(context)){
+            if(getBoolean(context.getString(R.string.news_codeforces_ru), true)) "ru" else "en"
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -185,13 +192,9 @@ class NewsFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun getContentLanguage() = with(PreferenceManager.getDefaultSharedPreferences(context)){
-        if(getBoolean(getString(R.string.news_codeforces_ru), true)) "ru" else "en"
-    }
-
     private fun reloadTabs() {
         lifecycleScope.launch {
-            val lang = getContentLanguage()
+            val lang = getCodeforcesContentLanguage(requireContext())
             codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
                 val tab = tabLayout.getTabAt(index)!!
                 launch { reloadFragment(fragment, tab, lang) }
@@ -237,7 +240,7 @@ class NewsFragment : Fragment() {
     suspend fun reloadFragment(fragment: CodeforcesNewsFragment) {
         val index = codeforcesNewsAdapter.fragments.indexOf(fragment)
         val tab = tabLayout.getTabAt(index) ?: return
-        reloadFragment(fragment, tab, getContentLanguage())
+        reloadFragment(fragment, tab, getCodeforcesContentLanguage(requireContext()))
     }
 
 

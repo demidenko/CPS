@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.preference.PreferenceManager
 import com.example.test3.BottomProgressInfo
 import com.example.test3.MainActivity
+import com.example.test3.NewsFragment
 import com.example.test3.R
 import com.example.test3.utils.*
 import kotlinx.coroutines.Job
@@ -107,7 +108,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
 
 
         val recentBlogs = CodeforcesUtils.parseRecentActionsPage(
-            CodeforcesAPI.getPageSource("recent-actions", "ru") ?: return
+            CodeforcesAPI.getPageSource("recent-actions", NewsFragment.getCodeforcesContentLanguage(this)) ?: return
         ).first
         if(recentBlogs.isEmpty()) return
 
