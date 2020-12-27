@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.text.*
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -46,7 +47,9 @@ class DialogAccountChooser(
 
             }
 
-        return builder.create()
+        return builder.create().apply {
+            window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+        }
     }
 
     override fun onStart() {
@@ -61,6 +64,7 @@ class DialogAccountChooser(
             setText(initialUserInfo.userID)
             typeface = Typeface.MONOSPACE
             filters = arrayOf(createSearchInputFilter(manager))
+            requestFocus()
         }
 
         val saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
