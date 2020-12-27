@@ -14,6 +14,8 @@ class AtCoderAccountPanel(
     override val manager: AtCoderAccountManager
 ): AccountPanel(mainActivity, manager)  {
 
+    override val homeURL = "https://atcoder.jp"
+
     override fun show(info: UserInfo) {
         showMainRated(textMain, textAdditional, manager, info)
     }

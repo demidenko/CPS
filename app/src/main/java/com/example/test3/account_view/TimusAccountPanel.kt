@@ -16,6 +16,8 @@ class TimusAccountPanel(
     manager: TimusAccountManager
 ): AccountPanel(mainActivity, manager)  {
 
+    override val homeURL = "https://timus.online"
+
     private val additionalColor = getColorFromResource(mainActivity, R.color.textColorAdditional)
 
     override fun show(info: UserInfo) { info as TimusAccountManager.TimusUserInfo

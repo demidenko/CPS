@@ -36,6 +36,8 @@ abstract class AccountPanel(
         }
     }
 
+    abstract val homeURL: String
+
 
     fun createSmallView(): View {
         layout.setOnClickListener {

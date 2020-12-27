@@ -1,20 +1,21 @@
 package com.example.test3
 
-import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.*
 import com.example.test3.account_view.*
 import com.example.test3.utils.CListUtils
 import com.example.test3.utils.SharedReloadButton
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.navigation_accounts.*
 import kotlinx.coroutines.*
@@ -100,28 +101,48 @@ class AccountsFragment: Fragment() {
 
     fun addAccount() {
         lifecycleScope.launch {
-            val emptyPanels = panels.filter { it.isEmpty() }
+            BottomSheetDialog(requireContext()).apply {
+                val view = layoutInflater.inflate(R.layout.dialog_add_account, null).apply {
 
-            val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item)
-            emptyPanels.forEach {
-                adapter.add(it.manager.PREFERENCES_FILE_NAME)
-            }
+                    findViewById<TextView>(R.id.dialog_add_account_cancel).setOnClickListener { dismiss() }
 
-            adapter.add("Import from clist.by")
+                    findViewById<ConstraintLayout>(R.id.dialog_add_account_clist).apply {
+                        findViewById<TextView>(R.id.dialog_add_account_item_title).text = "import from clist.by"
 
-            AlertDialog.Builder(activity)
-                .setTitle("Add account")
-                .setAdapter(adapter) { _, index ->
-                    if(index == emptyPanels.size) clistImport()
-                    else{
-                        val panel = emptyPanels[index]
-                        lifecycleScope.launch {
-                            mainActivity.chooseUserID(panel.manager)?.let { userInfo ->
-                                panel.manager.setSavedInfo(userInfo)
-                            }
+                        setOnClickListener {
+                            dismiss()
+                            clistImport()
+                        }
+
+                        findViewById<ImageButton>(R.id.dialog_add_account_item_help).setOnClickListener {
+                            startActivity(makeIntentOpenUrl("https://clist.by"))
                         }
                     }
-                }.create().show()
+
+                    val listView = findViewById<LinearLayout>(R.id.dialog_add_account_list)
+                    panels.filter { it.isEmpty() }.forEach { panel ->
+                        val itemView = layoutInflater.inflate(R.layout.dialog_add_account_item, null).apply {
+                            findViewById<TextView>(R.id.dialog_add_account_item_title).text = panel.manager.PREFERENCES_FILE_NAME
+
+                            setOnClickListener {
+                                dismiss()
+                                lifecycleScope.launch {
+                                    mainActivity.chooseUserID(panel.manager)?.let { userInfo ->
+                                        panel.manager.setSavedInfo(userInfo)
+                                    }
+                                }
+                            }
+
+                            findViewById<ImageButton>(R.id.dialog_add_account_item_help).setOnClickListener {
+                                startActivity(makeIntentOpenUrl(panel.homeURL))
+                            }
+                        }
+                        listView.addView(itemView)
+                    }
+                }
+                setContentView(view)
+
+            }.show()
         }
     }
 
