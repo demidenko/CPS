@@ -74,6 +74,8 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context) {
         return res.apply { status = STATUS.OK }
     }
 
+    override val isProvidesSuggestions = false
+
     override fun decodeFromString(str: String) = jsonCPS.decodeFromString<TopCoderUserInfo>(str)
 
     override fun encodeToString(info: UserInfo) = jsonCPS.encodeToString(info as TopCoderUserInfo)

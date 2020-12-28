@@ -8,6 +8,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.text.*
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Button
@@ -88,10 +89,9 @@ class DialogAccountChooser(
                     }
                     if(status == STATUS.NOT_FOUND){
                         mainActivity.showToast("User not found")
-                        cont.resume(null)
-                    }else{
-                        cont.resume(this)
+                        return@with
                     }
+                    cont.resume(this)
                     dismiss()
                 }
             }
@@ -130,11 +130,13 @@ class DialogAccountChooser(
                 adapter = suggestionsAdapter
                 addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
                 setHasFixedSize(true)
+                visibility = View.GONE
             }
         }
 
-        private val successColor = getColorFromResource(manager.context, R.color.success)
-        private val failColor = getColorFromResource(manager.context, R.color.fail)
+        private val successLine = ColorStateList.valueOf(getColorFromResource(manager.context, R.color.success))
+        private val neutralColor = ColorStateList.valueOf(getColorFromResource(manager.context, R.color.colorAccent))
+        private val failLine = ColorStateList.valueOf(getColorFromResource(manager.context, R.color.fail))
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -150,11 +152,12 @@ class DialogAccountChooser(
         override fun afterTextChanged(editable: Editable?) {
             val userId = editable?.toString() ?: return
 
-            if(userId == lastLoadedInfo.userID) return
+            if(userId.isNotBlank() && userId == lastLoadedInfo.userID) return
 
             saveButton.isEnabled = false
             lastLoadedInfo = manager.emptyInfo()
 
+            handleEditor.backgroundTintList = neutralColor
             jobInfo?.cancel()
             jobSuggestions?.cancel()
             if(userId.isBlank()){
@@ -172,24 +175,21 @@ class DialogAccountChooser(
                     preview.text = info.makeInfoString()
                     lastLoadedInfo = info
                     saveButton.isEnabled = true
-                    handleEditor.backgroundTintList = ColorStateList.valueOf(
-                        if (info.status == STATUS.OK) successColor
-                        else failColor
-                    )
+                    handleEditor.backgroundTintList =
+                        if (info.status == STATUS.OK) successLine
+                        else failLine
                 }
             }
 
-
             if(isSelectedSuggestion) changedByChoose = false
             else {
-                if (userId.length < 3) suggestionsAdapter.clear()
-                else {
-                    suggestionsAdapter.loading()
+                if(manager.isProvidesSuggestions && userId.length >= 3){
+                    suggestionsAdapter.loading(suggestionsView)
                     jobSuggestions = fragment.lifecycleScope.launch {
                         delay(300)
                         val suggestions = manager.loadSuggestions(userId)
                         if (userId == editable.toString()) {
-                            suggestionsAdapter.setData(suggestions)
+                            suggestionsAdapter.setData(suggestions, suggestionsView)
                         }
                     }
                 }
@@ -230,18 +230,21 @@ class DialogAccountChooser(
 
         private var data : List<AccountSuggestion> = emptyList()
 
-        fun setData(suggestions: List<AccountSuggestion>?){
+        fun setData(suggestions: List<AccountSuggestion>?, view: RecyclerView){
+            if(suggestions == null || suggestions.isEmpty()) view.visibility = View.GONE
             data = suggestions ?: emptyList()
             notifyDataSetChanged()
         }
 
-        fun clear(){
+        fun clear(view: RecyclerView){
+            view.visibility = View.GONE
             data = emptyList()
             notifyDataSetChanged()
         }
 
-        fun loading(){
-            clear()
+        fun loading(view: RecyclerView){
+            clear(view)
+            view.visibility = View.VISIBLE
         }
 
     }

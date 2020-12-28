@@ -42,12 +42,13 @@ abstract class AccountManager(val context: Context) {
     }
 
     open suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = null
+    open val isProvidesSuggestions = true
 
     protected abstract fun decodeFromString(str: String): UserInfo
     protected abstract fun encodeToString(info: UserInfo): String
 
     suspend fun getSavedInfo(): UserInfo {
-        val str = dataStore.getString() ?: return emptyInfo().apply { status = STATUS.FAILED }
+        val str = dataStore.getString() ?: return emptyInfo()
         return decodeFromString(str)
     }
     suspend fun setSavedInfo(info: UserInfo) {
