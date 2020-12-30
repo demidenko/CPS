@@ -87,14 +87,14 @@ class CodeforcesContestWatchService: Service() {
                 start(handle, contestID, notification)
             }
             ACTION_STOP -> {
-                CodeforcesContestWatchStarterJobService.addToCanceled(this, startedWithContestID!!)
+                CodeforcesContestWatchStarterJobService.stopWatcher(this, startedWithContestID!!)
                 stopWatcher()
                 stopForeground(true)
                 stopSelf()
             }
         }
 
-        return super.onStartCommand(intent, flags, startId)
+        return START_REDELIVER_INTENT
     }
 
 

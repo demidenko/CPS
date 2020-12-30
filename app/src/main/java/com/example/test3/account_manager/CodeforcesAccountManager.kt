@@ -212,12 +212,14 @@ class CodeforcesAccountSettingsDataStore(context: Context, name: String): Accoun
 
         private val KEY_CONTEST_WATCH = preferencesKey<Boolean>("contest_watch")
         private val KEY_CONTEST_WATCH_LAST_SUBMISSION = preferencesKey<Long>("contest_watch_last_submission")
+        private val KEY_CONTEST_WATCH_STARTED = preferencesKey<Int>("contest_watch_started_contest")
         private val KEY_CONTEST_WATCH_CANCELED = preferencesKey<String>("contest_watch_canceled")
     }
 
     override suspend fun resetRelatedData() {
         setLastRatedContestID(-1)
         setContestWatchLastSubmissionID(-1)
+        setContestWatchStartedContestID(-1)
         setContestWatchCanceled(emptyList())
     }
 
@@ -244,6 +246,11 @@ class CodeforcesAccountSettingsDataStore(context: Context, name: String): Accoun
     suspend fun getContestWatchLastSubmissionID() = dataStore.data.first()[KEY_CONTEST_WATCH_LAST_SUBMISSION] ?: -1
     suspend fun setContestWatchLastSubmissionID(submissionID: Long){
         dataStore.edit { it[KEY_CONTEST_WATCH_LAST_SUBMISSION] = submissionID }
+    }
+
+    suspend fun getContestWatchStartedContestID() = dataStore.data.first()[KEY_CONTEST_WATCH_STARTED] ?: -1
+    suspend fun setContestWatchStartedContestID(contestID: Int){
+        dataStore.edit { it[KEY_CONTEST_WATCH_STARTED] = contestID }
     }
 
     suspend fun getContestWatchCanceled(): List<Pair<Int,Long>> {

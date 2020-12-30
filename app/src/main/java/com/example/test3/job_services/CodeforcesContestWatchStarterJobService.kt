@@ -44,7 +44,7 @@ class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
             val response = CodeforcesAPI.getUserSubmissions(info.handle, step, from) ?: return
             if(response.status != CodeforcesAPIStatus.OK) return
 
-            val contestID = response.result!!.let { submissions ->
+            val result = response.result!!.let { submissions ->
                 for(submission in submissions){
                     if(firstID == null) firstID = submission.id
                     if(submission.id <= lastKnownID) return@let -1
@@ -60,7 +60,7 @@ class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
                 -1      -> break
              */
 
-            when(contestID) {
+            when(result) {
                 0 -> {
                     from+=step
                     step = 10
@@ -70,8 +70,12 @@ class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
                     firstID?.let { id ->
                         settings.setContestWatchLastSubmissionID(id)
                     }
+                    val contestID =
+                        if(result != -1) result
+                        else settings.getContestWatchStartedContestID()
                     if(contestID != -1){
                         if(canceled.none { it.first == contestID }) {
+                            settings.setContestWatchStartedContestID(contestID)
                             CodeforcesContestWatchService.startService(this, info.handle, contestID)
                         }
                     }
@@ -83,11 +87,12 @@ class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
     }
 
     companion object {
-        fun addToCanceled(context: Context, contestID: Int) = runBlocking {
+        fun stopWatcher(context: Context, contestID: Int) = runBlocking {
             val settings = CodeforcesAccountManager(context).getSettings()
             val canceled = settings.getContestWatchCanceled().toMutableList()
             canceled.add(Pair(contestID, System.currentTimeMillis()))
             settings.setContestWatchCanceled(canceled)
+            settings.setContestWatchStartedContestID(-1)
         }
     }
 
