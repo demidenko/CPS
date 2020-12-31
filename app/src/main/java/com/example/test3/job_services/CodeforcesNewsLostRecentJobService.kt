@@ -55,7 +55,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
 
             val progressInfo = BottomProgressInfo(blogEntries.size, "update info of lost", context as MainActivity)
 
-            CodeforcesAPI.getUsers(blogEntries.map { it.authorHandle })?.result?.let { users ->
+            CodeforcesUtils.getUsersInfo(blogEntries.map { it.authorHandle }).let { users ->
                 for(i in blogEntries.indices) {
                     val blogEntry = blogEntries[i]
                     users.find { it.handle == blogEntry.authorHandle }?.let { user ->
@@ -74,7 +74,10 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                     } else {
                         if(response.status == CodeforcesAPIStatus.OK) response.result?.let { freshBlogEntry ->
                             val title = freshBlogEntry.title.removeSurrounding("<p>", "</p>")
-                            blogEntries[index] = blogEntry.copy(title = fromHTML(title).toString())
+                            blogEntries[index] = blogEntry.copy(
+                                authorHandle = freshBlogEntry.authorHandle,
+                                title = fromHTML(title).toString()
+                            )
                         }
                     }
                     progressInfo.increment()
@@ -109,7 +112,15 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
 
         val recentBlogs = CodeforcesUtils.parseRecentActionsPage(
             CodeforcesAPI.getPageSource("recent-actions", NewsFragment.getCodeforcesContentLanguage(this)) ?: return
-        ).first
+        ).first.let { list ->
+            val authors = CodeforcesUtils.getUsersInfo(list.map { blog -> blog.authorHandle })
+            list.map { blog ->
+                authors.find { it.handle == blog.authorHandle }?.let {
+                    blog.copy(authorColorTag = CodeforcesUtils.getTagByRating(it.rating))
+                } ?: blog
+            }
+        }
+
         if(recentBlogs.isEmpty()) return
 
         val currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
