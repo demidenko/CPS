@@ -62,10 +62,11 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
         @JvmName("getBlogsMap1")
         fun getBlogsMap() = blogsMap.toMap()
 
+        private val locale by lazy { NewsFragment.getCodeforcesContentLanguage(context) }
         suspend fun add(handle: String): Boolean {
             if(handles.contains(handle)) return false
 
-            val userBlogs = CodeforcesAPI.getUserBlogEntries(handle)?.result?.map { it.id.toString() }
+            val userBlogs = CodeforcesAPI.getUserBlogEntries(handle,locale)?.result?.map { it.id.toString() }
 
             handles.add(0, handle)
             blogsMap[handle] = userBlogs
@@ -113,10 +114,12 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
         val connector = FollowDataConnector(this)
         val savedHandles = connector.getHandles()
         val savedBlogs = connector.getBlogsMap()
+        val locale = NewsFragment.getCodeforcesContentLanguage(this)
 
         savedHandles.forEach { handle ->
-            val response = CodeforcesAPI.getUserBlogEntries(handle) ?: return@forEach
+            val response = CodeforcesAPI.getUserBlogEntries(handle, locale) ?: return@forEach
             if(response.status == CodeforcesAPIStatus.FAILED){
+                //"handle: You are not allowed to read that blog" -> no activity
                 if(response.comment == "handle: User with handle $handle not found"){
                     connector.remove(handle)
                 }

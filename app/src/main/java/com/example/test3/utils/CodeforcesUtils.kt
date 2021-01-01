@@ -355,7 +355,7 @@ object CodeforcesAPI {
         @GET("user.blogEntries")
         fun getUserBlogs(
             @Query("handle") handle: String,
-            @Query("locale") lang: String = "ru"
+            @Query("locale") lang: String
         ): Call<CodeforcesAPIResponse<List<CodeforcesBlogEntry>>>
 
         @GET("contest.standings")
@@ -435,7 +435,7 @@ object CodeforcesAPI {
 
     suspend fun getContestSubmissions(contestId: Int, handle: String) = makeAPICall(api.getContestStatus(contestId, handle))
 
-    suspend fun getUserBlogEntries(handle: String) = makeAPICall(api.getUserBlogs(handle))
+    suspend fun getUserBlogEntries(handle: String, locale: String) = makeAPICall(api.getUserBlogs(handle,locale))
 
     suspend fun getContestRatingChanges(contestId: Int) = makeAPICall(api.getContestRatingChanges(contestId))
 
