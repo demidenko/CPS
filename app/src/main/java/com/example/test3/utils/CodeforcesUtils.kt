@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
 object CodeforcesUtils {
 
     suspend fun getBlogCreationTimeSeconds(blogId: Int): Long {
-        return CodeforcesAPI.getBlogEntry(blogId)?.result?.creationTimeSeconds ?: return 0L
+        return CodeforcesAPI.getBlogEntry(blogId,"ru")?.result?.creationTimeSeconds ?: return 0L
     }
 
     private val dateFormatRU = SimpleDateFormat("dd.MM.yyyy hh:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
@@ -212,6 +212,12 @@ data class CodeforcesAPIResponse<T>(
         status = error.status,
         comment = error.comment
     )
+
+    fun isBlogNotFound(blogId: Int): Boolean {
+        if(comment == "blogEntryId: Blog entry with id $blogId not found") return true
+        if(comment == "Blog entry with id $blogId not found") return true
+        return false
+    }
 }
 
 @Serializable
@@ -349,7 +355,7 @@ object CodeforcesAPI {
         @GET("blogEntry.view")
         fun getBlogEntry(
             @Query("blogEntryId") blogId: Int,
-            @Query("locale") lang: String = "ru"
+            @Query("locale") lang: String
         ): Call<CodeforcesAPIResponse<CodeforcesBlogEntry>>
 
         @GET("user.blogEntries")
@@ -428,7 +434,7 @@ object CodeforcesAPI {
     suspend fun getUsers(handles: Collection<String>) = makeAPICall(api.getUser(handles.joinToString(separator = ";")))
     suspend fun getUser(handle: String) = getUsers(listOf(handle))?.let { CodeforcesAPIResponse(it.status, it.result?.get(0), it.comment) }
 
-    suspend fun getBlogEntry(blogId: Int) = makeAPICall(api.getBlogEntry(blogId))
+    suspend fun getBlogEntry(blogId: Int, locale: String) = makeAPICall(api.getBlogEntry(blogId,locale))
 
     suspend fun getContestStandings(contestId: Int, handles: Collection<String>, showUnofficial: Boolean) = makeAPICall(api.getContestStandings(contestId, handles.joinToString(separator = ";"), showUnofficial))
     suspend fun getContestStandings(contestId: Int, handle: String, showUnofficial: Boolean) = getContestStandings(contestId, listOf(handle), showUnofficial)

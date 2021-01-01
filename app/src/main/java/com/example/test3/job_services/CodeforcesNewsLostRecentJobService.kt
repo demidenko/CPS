@@ -68,10 +68,12 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                 }
             }
 
+            val locale = NewsFragment.getCodeforcesContentLanguage(context)
+
             val blogIDsToRemove = mutableSetOf<Int>()
             blogEntries.forEachIndexed { index, blogEntry ->
-                CodeforcesAPI.getBlogEntry(blogEntry.id)?.let { response ->
-                    if(response.status == CodeforcesAPIStatus.FAILED && response.comment == "blogEntryId: Blog entry with id ${blogEntry.id} not found"){
+                CodeforcesAPI.getBlogEntry(blogEntry.id,locale)?.let { response ->
+                    if(response.status == CodeforcesAPIStatus.FAILED && response.isBlogNotFound(blogEntry.id)){
                         blogIDsToRemove.add(blogEntry.id)
                     } else {
                         if(response.status == CodeforcesAPIStatus.OK) response.result?.let { freshBlogEntry ->
