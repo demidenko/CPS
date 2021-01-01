@@ -161,33 +161,38 @@ object CodeforcesUtils {
         }
     }
 
-    suspend fun getUsersInfo(handlesList: List<String>): List<CodeforcesAccountManager.CodeforcesUserInfo> {
+    suspend fun getUsersInfo(handlesList: List<String>): Map<String, CodeforcesAccountManager.CodeforcesUserInfo> {
+        val res = handlesList.associateWith { handle ->
+            CodeforcesAccountManager.CodeforcesUserInfo(STATUS.FAILED, handle)
+        }.toMutableMap()
+
         val handles = handlesList.toMutableList()
-        while(true){
-            if(handles.isEmpty()) return emptyList()
+        while(handles.isNotEmpty()){
             val response = CodeforcesAPI.getUsers(handles) ?: break
             if(response.status == CodeforcesAPIStatus.FAILED){
                 val comment = response.comment
                 val badHandle = comment.removeSurrounding("handles: User with handle ", " not found")
                 if(badHandle != comment){
-                    if(handles.remove(badHandle)) continue
+                    if(handles.remove(badHandle)){
+                        //TODO: handle redirect
+                        res[badHandle]?.status = STATUS.NOT_FOUND
+                        continue
+                    }
                 }
                 break
             }
-            return response.result?.map { codeforcesUser ->
-                CodeforcesAccountManager.CodeforcesUserInfo(
+            response.result?.forEach { codeforcesUser ->
+                val handle = handles.find { it.equals(codeforcesUser.handle, true) } ?: return@forEach
+                res[handle] = CodeforcesAccountManager.CodeforcesUserInfo(
                     status = STATUS.OK,
                     handle = codeforcesUser.handle,
                     rating = codeforcesUser.rating
                 )
-            } ?: emptyList()
+            }
+            break
         }
-        return handles.map { handle ->
-            CodeforcesAccountManager.CodeforcesUserInfo(
-                status = STATUS.FAILED,
-                handle = handle
-            )
-        }
+
+        return res
     }
 
 

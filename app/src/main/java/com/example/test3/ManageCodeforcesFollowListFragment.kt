@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.account_manager.CodeforcesAccountManager
+import com.example.test3.account_manager.STATUS
 import com.example.test3.job_services.CodeforcesNewsFollowJobService
 import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.CodeforcesUtils
@@ -86,8 +87,11 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
         private val dataConnector = CodeforcesNewsFollowJobService.FollowDataConnector(activity)
 
         suspend fun initialize(){
-            val usersInfo = CodeforcesUtils.getUsersInfo(dataConnector.getHandles())
-            list.addAll(usersInfo)
+            val handles = dataConnector.getHandles()
+            val usersInfo = CodeforcesUtils.getUsersInfo(handles)
+            list.addAll(handles.mapNotNull { handle ->
+                usersInfo[handle]?.takeIf { it.status!=STATUS.NOT_FOUND }
+            })
             notifyItemRangeInserted(0, list.size)
         }
 

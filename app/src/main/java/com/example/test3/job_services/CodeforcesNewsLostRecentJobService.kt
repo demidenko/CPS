@@ -6,6 +6,7 @@ import com.example.test3.BottomProgressInfo
 import com.example.test3.MainActivity
 import com.example.test3.NewsFragment
 import com.example.test3.R
+import com.example.test3.account_manager.STATUS
 import com.example.test3.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -55,10 +56,11 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
 
             val progressInfo = BottomProgressInfo(blogEntries.size, "update info of lost", context as MainActivity)
 
+            //updates author's handle color
             CodeforcesUtils.getUsersInfo(blogEntries.map { it.authorHandle }).let { users ->
                 for(i in blogEntries.indices) {
                     val blogEntry = blogEntries[i]
-                    users.find { it.handle == blogEntry.authorHandle }?.let { user ->
+                    users[blogEntry.authorHandle]?.takeIf { it.status==STATUS.OK }?.let { user ->
                         blogEntries[i] = blogEntry.copy(
                             authorColorTag = CodeforcesUtils.getTagByRating(user.rating)
                         )
@@ -115,7 +117,8 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         ).first.let { list ->
             val authors = CodeforcesUtils.getUsersInfo(list.map { blog -> blog.authorHandle })
             list.map { blog ->
-                authors.find { it.handle == blog.authorHandle }?.let {
+                authors[blog.authorHandle]?.takeIf { it.status==STATUS.OK }
+                ?.let {
                     blog.copy(authorColorTag = CodeforcesUtils.getTagByRating(it.rating))
                 } ?: blog
             }
