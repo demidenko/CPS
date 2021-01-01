@@ -63,7 +63,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
         val res = CodeforcesUserInfo(STATUS.FAILED, handle)
         val response = CodeforcesAPI.getUser(handle) ?: return res
         if(response.status == CodeforcesAPIStatus.FAILED){
-            if(response.comment == "handles: User with handle $handle not found") return res.copy( status = STATUS.NOT_FOUND )
+            if(response.isHandleNotFound() == handle) return res.copy( status = STATUS.NOT_FOUND )
             return res
         }
         val info = response.result!!

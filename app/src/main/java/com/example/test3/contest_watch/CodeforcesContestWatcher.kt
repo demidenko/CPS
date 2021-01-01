@@ -30,8 +30,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
             var timeSecondsFromStart: Long? = null
             CodeforcesAPI.getContestStandings(contestID, handle, participationType.value!=CodeforcesParticipationType.CONTESTANT)?.run {
                 if(status == CodeforcesAPIStatus.FAILED){
-                    if(comment == "contestId: Contest with id $contestID has not started")
-                        phaseCodeforces.value = CodeforcesContestPhase.BEFORE
+                    if(isContestNotStarted(contestID)) phaseCodeforces.value = CodeforcesContestPhase.BEFORE
                     return@run
                 }
                 with(result ?: return@run){
@@ -172,7 +171,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
 
         CodeforcesAPI.getContestRatingChanges(contestID)?.let { response ->
             if(response.status == CodeforcesAPIStatus.FAILED){
-                if(response.comment == "contestId: Rating changes are unavailable for this contest") return true
+                if(response.isContestRatingUnavailable()) return true
                 return@let
             }
             with(response.result ?: return@let) {

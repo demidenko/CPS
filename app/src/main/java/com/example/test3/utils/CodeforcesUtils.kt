@@ -170,9 +170,8 @@ object CodeforcesUtils {
         while(handles.isNotEmpty()){
             val response = CodeforcesAPI.getUsers(handles) ?: break
             if(response.status == CodeforcesAPIStatus.FAILED){
-                val comment = response.comment
-                val badHandle = comment.removeSurrounding("handles: User with handle ", " not found")
-                if(badHandle != comment){
+                val badHandle = response.isHandleNotFound()
+                if(badHandle != null){
                     if(handles.remove(badHandle)){
                         //TODO: handle redirect
                         res[badHandle]?.status = STATUS.NOT_FOUND
@@ -213,9 +212,32 @@ data class CodeforcesAPIResponse<T>(
         comment = error.comment
     )
 
+    fun isHandleNotFound(): String? {
+        val cut = comment.removeSurrounding("handles: User with handle ", " not found")
+        if(cut == comment) return null
+        return cut
+    }
+
     fun isBlogNotFound(blogId: Int): Boolean {
         if(comment == "blogEntryId: Blog entry with id $blogId not found") return true
         if(comment == "Blog entry with id $blogId not found") return true
+        return false
+    }
+
+    fun isBlogHandleNotFound(handle: String): Boolean {
+        if(comment == "handle: User with handle $handle not found") return true
+        if(comment == "handle: Field should contain between 3 and 24 characters, inclusive") return true
+        if(comment == "handle: Поле должно содержать от 3 до 24 символов, включительно") return true
+        return false
+    }
+
+    fun isContestRatingUnavailable(): Boolean {
+        if(comment == "contestId: Rating changes are unavailable for this contest") return true
+        return false
+    }
+
+    fun isContestNotStarted(contestId: Int): Boolean {
+        if(comment == "contestId: Contest with id $contestId has not started") return true
         return false
     }
 }

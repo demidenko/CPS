@@ -120,7 +120,7 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             val response = CodeforcesAPI.getUserBlogEntries(handle, locale) ?: return@forEach
             if(response.status == CodeforcesAPIStatus.FAILED){
                 //"handle: You are not allowed to read that blog" -> no activity
-                if(response.comment == "handle: User with handle $handle not found"){
+                if(response.isBlogHandleNotFound(handle)){
                     connector.remove(handle)
                 }
                 return@forEach
