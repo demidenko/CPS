@@ -81,23 +81,38 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
     }
 
 
-    class FollowListItemsAdapter(val activity: MainActivity) : RecyclerView.Adapter<FollowListItemsAdapter.ItemHolder>() {
+    class FollowListItemsAdapter(val mainActivity: MainActivity) : RecyclerView.Adapter<FollowListItemsAdapter.ItemHolder>() {
+
+        private val codeforcesAccountManager by lazy { mainActivity.accountsFragment.codeforcesAccountManager }
 
         private val list = mutableListOf<CodeforcesAccountManager.CodeforcesUserInfo>()
-        private val dataConnector = CodeforcesNewsFollowJobService.FollowDataConnector(activity)
+        private val dataConnector = CodeforcesNewsFollowJobService.FollowDataConnector(mainActivity)
 
         suspend fun initialize(){
             val handles = dataConnector.getHandles()
             val usersInfo = CodeforcesUtils.getUsersInfo(handles)
-            list.addAll(handles.mapNotNull { handle ->
-                usersInfo[handle]?.takeIf { it.status!=STATUS.NOT_FOUND }
-            })
+            handles.mapNotNull { handle ->
+                usersInfo[handle]
+                    ?.let { info ->
+                        if(info.status == STATUS.NOT_FOUND){
+                            (codeforcesAccountManager.loadInfo(info.handle, 1) as CodeforcesAccountManager.CodeforcesUserInfo)
+                                .apply { dataConnector.changeHandle(handle, this.handle) }
+                        } else info
+                    }
+                    ?.apply {
+                        if(status == STATUS.NOT_FOUND) dataConnector.remove(handle)
+                    }
+                    ?.takeIf { it.status != STATUS.NOT_FOUND }
+            }.let { infos ->
+                list.addAll(infos.distinctBy { it.handle })
+            }
+            dataConnector.save()
             notifyItemRangeInserted(0, list.size)
         }
 
         suspend fun add(userInfo: CodeforcesAccountManager.CodeforcesUserInfo){
             if(!dataConnector.add(userInfo.handle)){
-                activity.showToast("User already in list")
+                mainActivity.showToast("User already in list")
                 return
             }
             dataConnector.save()
@@ -126,10 +141,10 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
 
         override fun onBindViewHolder(holder: ItemHolder, position: Int) {
             val userInfo = list[position]
-            holder.title.text = activity.accountsFragment.codeforcesAccountManager.makeSpan(userInfo)
+            holder.title.text = codeforcesAccountManager.makeSpan(userInfo)
 
             holder.view.setOnClickListener {
-                PopupMenu(activity, holder.title, Gravity.CENTER_HORIZONTAL).apply {
+                PopupMenu(mainActivity, holder.title, Gravity.CENTER_HORIZONTAL).apply {
                     inflate(R.menu.popup_cf_follow_list_item)
 
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
@@ -139,7 +154,7 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
                     setOnMenuItemClickListener {
                         when(it.itemId){
                             R.id.cf_follow_list_item_open_blogs -> {
-                                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.userBlogs(userInfo.handle)))
+                                mainActivity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.userBlogs(userInfo.handle)))
                                 true
                             }
                             R.id.cf_follow_list_item_delete -> {

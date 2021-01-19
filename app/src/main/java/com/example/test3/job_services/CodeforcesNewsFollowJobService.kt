@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import com.example.test3.*
+import com.example.test3.account_manager.CodeforcesAccountManager
+import com.example.test3.account_manager.STATUS
 import com.example.test3.utils.*
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -62,9 +64,11 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
         @JvmName("getBlogsMap1")
         fun getBlogsMap() = blogsMap.toMap()
 
+        private fun handleIndex(handle: String) = handles.indexOfFirst { handle.equals(it,true) }
+
         private val locale by lazy { NewsFragment.getCodeforcesContentLanguage(context) }
         suspend fun add(handle: String): Boolean {
-            if(handles.contains(handle)) return false
+            if(handleIndex(handle) != -1) return false
 
             val userBlogs = CodeforcesAPI.getUserBlogEntries(handle,locale)?.result?.map { it.id.toString() }
 
@@ -82,6 +86,22 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             blogsMap.remove(handle)
             dataChanged = true
             handlesChanged = true
+        }
+
+        fun changeHandle(fromHandle: String, toHandle: String){
+            val fromIndex = handleIndex(fromHandle)
+            val toIndex = handleIndex(toHandle)
+            if(fromIndex == -1 || fromIndex == toIndex) return
+
+            if(toIndex != -1){
+                handles.removeAt(fromIndex)
+            }else{
+                blogsMap[toHandle] = blogsMap[fromHandle]
+            }
+            blogsMap.remove(fromHandle)
+
+            handlesChanged = true
+            dataChanged = true
         }
 
         fun setBlogs(handle: String, blogs: List<String>?){
@@ -115,18 +135,31 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
         val savedHandles = connector.getHandles()
         val savedBlogs = connector.getBlogsMap()
         val locale = NewsFragment.getCodeforcesContentLanguage(this)
+        val codeforcesAccountManager by lazy { CodeforcesAccountManager(this) }
 
-        savedHandles.forEach { handle ->
-            val response = CodeforcesAPI.getUserBlogEntries(handle, locale) ?: return@forEach
+        val proceeded = mutableSetOf<String>()
+        suspend fun proceedUser(handle: String){
+            if(!proceeded.add(handle.toLowerCase())) return
+
+            val response = CodeforcesAPI.getUserBlogEntries(handle, locale) ?: return
             if(response.status == CodeforcesAPIStatus.FAILED){
                 //"handle: You are not allowed to read that blog" -> no activity
                 if(response.isBlogHandleNotFound(handle)){
-                    connector.remove(handle)
+                    val info = codeforcesAccountManager.loadInfo(handle, 1) as CodeforcesAccountManager.CodeforcesUserInfo
+                    when(info.status){
+                        STATUS.OK -> {
+                            connector.changeHandle(handle, info.handle)
+                            proceedUser(info.handle)
+                            return
+                        }
+                        STATUS.NOT_FOUND -> connector.remove(handle)
+                        STATUS.FAILED -> return
+                    }
                 }
-                return@forEach
+                return
             }
 
-            val result = response.result ?: return@forEach
+            val result = response.result ?: return
 
             var hasNewBlog = false
             val saved = savedBlogs[handle]?.toSet()
@@ -145,6 +178,8 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
                 connector.setBlogs(handle, result.map { it.id.toString() })
             }
         }
+
+        savedHandles.forEach { handle -> proceedUser(handle) }
 
         connector.save()
     }
