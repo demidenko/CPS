@@ -105,7 +105,7 @@ abstract class AccountPanel(
 
 
         val savedInfo = manager.getSavedInfo()
-        val info = manager.loadInfo(savedInfo.userID)
+        val info = manager.loadInfo(savedInfo.userID, 1)
 
         if(info.status != STATUS.FAILED){
             if(info!=savedInfo) manager.setSavedInfo(info)
