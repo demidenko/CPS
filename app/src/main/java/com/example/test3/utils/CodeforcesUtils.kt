@@ -31,8 +31,8 @@ object CodeforcesUtils {
         return CodeforcesAPI.getBlogEntry(blogId,"ru")?.result?.creationTimeSeconds ?: return 0L
     }
 
-    private val dateFormatRU = SimpleDateFormat("dd.MM.yyyy hh:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
-    private val dateFormatEN = SimpleDateFormat("MMM/dd/yyyy hh:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
+    private val dateFormatRU = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
+    private val dateFormatEN = SimpleDateFormat("MMM/dd/yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
     fun parseRecentActionsPage(s: String): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>> {
         var dateFormat = dateFormatRU
 
