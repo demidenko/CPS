@@ -58,7 +58,7 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context) {
 
     override fun emptyInfo() = AtCoderUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String): UserInfo {
+    override suspend fun downloadInfo(data: String, flags: Int): UserInfo {
         val handle = data
         val res = AtCoderUserInfo(STATUS.FAILED, handle)
         val response = AtCoderAPI.getUser(handle) ?: return res

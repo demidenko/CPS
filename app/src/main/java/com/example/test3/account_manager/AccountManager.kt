@@ -33,11 +33,11 @@ abstract class AccountManager(val context: Context) {
 
     abstract fun emptyInfo(): UserInfo
 
-    protected abstract suspend fun downloadInfo(data: String): UserInfo
-    suspend fun loadInfo(data: String): UserInfo {
+    protected abstract suspend fun downloadInfo(data: String, flags: Int): UserInfo
+    suspend fun loadInfo(data: String, flags: Int = 0): UserInfo {
         if(data.isBlank()) return emptyInfo()
         return withContext(Dispatchers.IO){
-            downloadInfo(data)
+            downloadInfo(data, flags)
         }
     }
 

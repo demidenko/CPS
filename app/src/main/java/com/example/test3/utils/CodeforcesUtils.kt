@@ -194,6 +194,13 @@ object CodeforcesUtils {
         return res
     }
 
+    fun extractRealHandle(s: String): String? {
+        var i = s.indexOf(" <div class=\"userbox\">")
+        if(i == -1) return null
+        i = s.indexOf("<div class=\"user-rank\">", i)
+        i = s.indexOf("class=\"rated-user", i)
+        return s.substring(s.indexOf('>', i)+1, s.indexOf("</a", i))
+    }
 
 }
 
@@ -537,33 +544,6 @@ object CodeforcesAPI {
 
     suspend fun getPageSource(page: String, lang: String) = makeWEBCall(CallStringInvoker { web.getPage(page,lang) })
 
-    private fun extractRealHandle(s: String): String? {
-        var i = s.indexOf(" <div class=\"userbox\">")
-        if(i == -1) return null
-        i = s.indexOf("<div class=\"user-rank\">", i)
-        i = s.indexOf("class=\"rated-user", i)
-        return s.substring(s.indexOf('>', i)+1, s.indexOf("</a", i))
-    }
-
-    //get user consume handle changes
-    suspend fun getUser2(handle: String, codeforcesAccountManager: CodeforcesAccountManager) = withContext(Dispatchers.IO){
-
-        val res = CodeforcesAccountManager.CodeforcesUserInfo(
-            status = STATUS.FAILED,
-            handle = handle
-        )
-
-        val response = web.getPage(CodeforcesURLFactory.user(handle), "en").execute()
-        if(!response.isSuccessful){
-            return@withContext res
-        }
-
-        val s = response.body()?.string() ?: return@withContext res
-
-        extractRealHandle(s)?.let {
-            codeforcesAccountManager.loadInfo(it)
-        } ?: res.copy(status = STATUS.NOT_FOUND)
-    }
 }
 
 

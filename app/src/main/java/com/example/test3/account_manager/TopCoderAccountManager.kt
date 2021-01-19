@@ -53,7 +53,7 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context) {
 
     override fun emptyInfo() = TopCoderUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String): UserInfo {
+    override suspend fun downloadInfo(data: String, flags: Int): UserInfo {
         val handle = data
         val res = TopCoderUserInfo(STATUS.FAILED, handle)
 

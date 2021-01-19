@@ -58,12 +58,24 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
 
     override fun emptyInfo() = CodeforcesUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String): CodeforcesUserInfo {
+
+
+    override suspend fun downloadInfo(data: String, flags: Int): UserInfo {
         val handle = data
         val res = CodeforcesUserInfo(STATUS.FAILED, handle)
         val response = CodeforcesAPI.getUser(handle) ?: return res
         if(response.status == CodeforcesAPIStatus.FAILED){
-            if(response.isHandleNotFound() == handle) return res.copy( status = STATUS.NOT_FOUND )
+            if(response.isHandleNotFound() == handle){
+                if((flags and 1) != 0){
+                    val res2 = CodeforcesAPI.getPageSource(CodeforcesURLFactory.user(handle), "en")?.let { page ->
+                        CodeforcesUtils.extractRealHandle(page)?.let { realHandle ->
+                            downloadInfo(realHandle, 0)
+                        }
+                    }
+                    if(res2!=null) return res2
+                }
+                return res.copy( status = STATUS.NOT_FOUND )
+            }
             return res
         }
         val info = response.result!!

@@ -43,7 +43,7 @@ class ACMPAccountManager(context: Context): AccountManager(context) {
 
     override fun emptyInfo() = ACMPUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String): ACMPUserInfo {
+    override suspend fun downloadInfo(data: String, flags: Int): UserInfo {
         val res = ACMPUserInfo(STATUS.FAILED, data)
         val s = ACMPAPI.getUser(data) ?: return res
         if(!s.contains("index.asp?main=status&id_mem=$data")) return res.apply { status = STATUS.NOT_FOUND }

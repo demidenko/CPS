@@ -36,7 +36,7 @@ class CListAccountManager(context: Context) : AccountManager(context) {
 
     override fun emptyInfo() = CListUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String): UserInfo {
+    override suspend fun downloadInfo(data: String, flags: Int): UserInfo {
         val login = data
         val res = CListUserInfo(STATUS.FAILED, login)
         val response = CListAPI.getUser(login) ?: return res

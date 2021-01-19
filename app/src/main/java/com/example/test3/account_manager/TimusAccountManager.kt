@@ -45,7 +45,7 @@ class TimusAccountManager(context: Context): AccountManager(context) {
 
     override fun emptyInfo() = TimusUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String): TimusUserInfo {
+    override suspend fun downloadInfo(data: String, flags: Int): UserInfo {
         val res = TimusUserInfo(STATUS.FAILED, data)
         val s = TimusAPI.getUser(data) ?: return res
         var i = s.indexOf("<H2 CLASS=\"author_name\">")
