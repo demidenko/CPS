@@ -96,6 +96,7 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             if(toIndex != -1){
                 handles.removeAt(fromIndex)
             }else{
+                handles[fromIndex] = toHandle
                 blogsMap[toHandle] = blogsMap[fromHandle]
             }
             blogsMap.remove(fromHandle)
