@@ -290,7 +290,9 @@ data class CodeforcesAPIResponse<T>(
 data class CodeforcesAPIErrorResponse(
     val status: CodeforcesAPIStatus,
     val comment: String
-)
+){
+    fun isCallLimitExceeded() = comment == "Call limit exceeded"
+}
 
 @Serializable
 data class CodeforcesUser(
@@ -474,23 +476,23 @@ object CodeforcesAPI {
 
     private suspend fun <T> makeAPICall(call: Call<CodeforcesAPIResponse<T>>): CodeforcesAPIResponse<T>? = withContext(Dispatchers.IO){
         var c = call
-        while(true){
-            try{
+        try{
+            while(true) {
                 val r = c.execute()
-                if(r.isSuccessful) return@withContext r.body()
+                if (r.isSuccessful) return@withContext r.body()
                 val s = r.errorBody()?.string() ?: return@withContext null
                 val er = jsonCPS.decodeFromString<CodeforcesAPIErrorResponse>(s)
-                if(er.comment == "Call limit exceeded"){
+                if (er.isCallLimitExceeded()) {
                     delay(callLimitExceededWaitTimeMillis)
                     c = c.clone()
                     continue
                 }
                 return@withContext CodeforcesAPIResponse<T>(er)
-            }catch (e : IOException){
-                return@withContext null
-            }catch (e: SerializationException){
-                return@withContext null
             }
+        }catch (e : IOException){
+            return@withContext null
+        }catch (e: SerializationException){
+            return@withContext null
         }
         null
     }
