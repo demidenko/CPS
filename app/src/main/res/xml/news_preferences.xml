@@ -11,14 +11,6 @@
             app:useSimpleSummaryProvider="true"
             />
 
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="@string/news_codeforces_ru"
-            android:title="Russian content"
-            android:summaryOn="en + ru blogs"
-            android:summaryOff="en blogs only"
-            />
-
     </PreferenceCategory>
 
 

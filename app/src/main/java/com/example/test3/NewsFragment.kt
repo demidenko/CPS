@@ -50,9 +50,7 @@ class NewsFragment : Fragment() {
 
     companion object {
 
-        fun getCodeforcesContentLanguage(context: Context) = with(PreferenceManager.getDefaultSharedPreferences(context)){
-            if(getBoolean(context.getString(R.string.news_codeforces_ru), true)) "ru" else "en"
-        }
+        suspend fun getCodeforcesContentLanguage(context: Context) = if(SettingsNewsFragment.getSettings(context).getRussianContentEnabled()) "ru" else "en"
     }
 
     override fun onCreateView(

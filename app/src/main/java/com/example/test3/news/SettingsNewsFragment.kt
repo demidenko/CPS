@@ -47,19 +47,31 @@ class SettingsNewsFragment: Fragment(){
         lifecycleScope.launch {
 
             createAndAddSwitch(
+                "Russian content",
+                getSettings(requireContext()).getRussianContentEnabled()
+            ){ buttonView, isChecked ->
+                lifecycleScope.launch {
+                    buttonView.isEnabled = false
+                    getSettings(requireContext()).setRussianContentEnabled(isChecked)
+                    buttonView.isEnabled = true
+                }
+            }
+
+            createAndAddSwitch(
                 "Lost recent blogs",
                 getSettings(requireContext()).getLostEnabled(),
                 "TODO"
             ){ buttonView, isChecked ->
                 lifecycleScope.launch {
                     buttonView.isEnabled = false
-                    getSettings(requireContext()).setLostEnabled(isChecked)
+                    val context = requireContext()
+                    getSettings(context).setLostEnabled(isChecked)
                     if (isChecked) {
-                        JobServicesCenter.startCodeforcesNewsLostRecentJobService(requireContext())
+                        JobServicesCenter.startCodeforcesNewsLostRecentJobService(context)
                         newsFragment.addLostTab()
                     } else {
                         newsFragment.removeLostTab()
-                        JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_news_lost_recent)
+                        JobServicesCenter.stopJobService(context, JobServiceIDs.codeforces_news_lost_recent)
                     }
                     buttonView.isEnabled = true
                 }
@@ -72,13 +84,14 @@ class SettingsNewsFragment: Fragment(){
             ){ buttonView, isChecked ->
                 lifecycleScope.launch {
                     buttonView.isEnabled = false
-                    getSettings(requireContext()).setFollowEnabled(isChecked)
+                    val activity = requireActivity()
+                    getSettings(activity).setFollowEnabled(isChecked)
                     if (isChecked) {
-                        JobServicesCenter.startCodeforcesNewsFollowJobService(requireContext())
+                        JobServicesCenter.startCodeforcesNewsFollowJobService(activity)
                     } else {
-                        JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_news_follow)
+                        JobServicesCenter.stopJobService(activity, JobServiceIDs.codeforces_news_follow)
                     }
-                    requireActivity().invalidateOptionsMenu()
+                    activity.invalidateOptionsMenu()
                     buttonView.isEnabled = true
                 }
             }
@@ -109,8 +122,14 @@ class SettingsNewsFragment: Fragment(){
         private val dataStore by lazy { context.createDataStore(name = "news_settings") }
 
         companion object {
+            private val KEY_RU = preferencesKey<Boolean>("ru_lang")
             private val KEY_LOST = preferencesKey<Boolean>("lost")
             private val KEY_FOLLOW = preferencesKey<Boolean>("follow")
+        }
+
+        suspend fun getRussianContentEnabled() = dataStore.data.first()[KEY_RU] ?: true
+        suspend fun setRussianContentEnabled(flag: Boolean){
+            dataStore.edit { it[KEY_RU] = flag }
         }
 
         suspend fun getLostEnabled() = dataStore.data.first()[KEY_LOST] ?: false

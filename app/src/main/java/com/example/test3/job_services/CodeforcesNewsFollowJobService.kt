@@ -65,10 +65,10 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
 
         private fun handleIndex(handle: String) = handles.indexOfFirst { handle.equals(it,true) }
 
-        private val locale by lazy { NewsFragment.getCodeforcesContentLanguage(context) }
         suspend fun add(handle: String): Boolean {
             if(handleIndex(handle) != -1) return false
 
+            val locale = NewsFragment.getCodeforcesContentLanguage(context)
             val userBlogs = CodeforcesAPI.getUserBlogEntries(handle,locale)?.result?.map { it.id.toString() }
 
             handles.add(0, handle)
