@@ -44,7 +44,9 @@ object CodeforcesUtils {
             if(i==-1) break
 
             i = s.indexOf("class=\"rated-user", i)
-            val commentatorHandleColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
+            val commentatorHandleColorTag = ColorTag.fromString(
+                s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
+            )
 
             i = s.lastIndexOf("/profile/",i)
             val commentatorHandle = s.substring(s.indexOf('/',i+1)+1, s.indexOf('"',i))
@@ -57,7 +59,9 @@ object CodeforcesUtils {
             val blogTitle = fromHTML(s.substring(s.indexOf('>',i)+1, s.indexOf("</a>",i))).toString()
 
             i = s.lastIndexOf("class=\"rated-user", i)
-            val blogAuthorHandleColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
+            val blogAuthorHandleColorTag = ColorTag.fromString(
+                s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
+            )
 
             i = s.lastIndexOf("/profile/",i)
             val blogAuthorHandle = s.substring(s.indexOf('/',i+1)+1, s.indexOf('"',i))
@@ -91,7 +95,7 @@ object CodeforcesUtils {
                     comment = CodeforcesComment(
                         id = commentId,
                         commentatorHandle = commentatorHandle,
-                        commentatorHandleColorTag = commentatorHandleColor,
+                        commentatorHandleColorTag = commentatorHandleColorTag,
                         text = commentText,
                         rating = commentRating,
                         creationTimeSeconds = commentTimeSeconds
@@ -100,7 +104,7 @@ object CodeforcesUtils {
                         id = blogId,
                         title = blogTitle,
                         authorHandle = blogAuthorHandle,
-                        authorColorTag = blogAuthorHandleColor,
+                        authorColorTag = blogAuthorHandleColorTag,
                         creationTimeSeconds = 0
                     )
                 )
@@ -118,7 +122,9 @@ object CodeforcesUtils {
             val author = s.substring(i+9,s.indexOf('"',i))
 
             i = s.indexOf("rated-user user-",i)
-            val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
+            val authorColorTag = ColorTag.fromString(
+                s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
+            )
 
             i = s.indexOf("entry/", i)
             val id = s.substring(i+6, s.indexOf('"',i)).toInt()
@@ -130,7 +136,7 @@ object CodeforcesUtils {
                     id = id,
                     title = title,
                     authorHandle = author,
-                    authorColorTag = authorColor,
+                    authorColorTag = authorColorTag,
                     creationTimeSeconds = 0L
                 )
             )
@@ -147,17 +153,48 @@ object CodeforcesUtils {
         return res.trimEnd() as Spanned
     }
 
-    fun getTagByRating(rating: Int): String {
+    enum class ColorTag {
+        BLACK,
+        GRAY,
+        GREEN,
+        CYAN,
+        BLUE,
+        VIOLET,
+        ORANGE,
+        RED,
+        LEGENDARY,
+        ADMIN;
+
+        companion object {
+            fun fromString(str: String): ColorTag =
+                valueOf(str.removePrefix("user-").toUpperCase(Locale.ENGLISH))
+        }
+    }
+
+    fun getTagByRating(rating: Int): ColorTag {
         return when {
-            rating == NOT_RATED -> "user-black"
-            rating < 1200 -> "user-gray"
-            rating < 1400 -> "user-green"
-            rating < 1600 -> "user-cyan"
-            rating < 1900 -> "user-blue"
-            rating < 2100 -> "user-violet"
-            rating < 2400 -> "user-orange"
-            rating < 3000 -> "user-red"
-            else -> "user-legendary"
+            rating == NOT_RATED -> ColorTag.BLACK
+            rating < 1200 -> ColorTag.GRAY
+            rating < 1400 -> ColorTag.GREEN
+            rating < 1600 -> ColorTag.CYAN
+            rating < 1900 -> ColorTag.BLUE
+            rating < 2100 -> ColorTag.VIOLET
+            rating < 2400 -> ColorTag.ORANGE
+            rating < 3000 -> ColorTag.RED
+            else -> ColorTag.LEGENDARY
+        }
+    }
+
+    fun getHandleColorByTag(tag: ColorTag): HandleColor? {
+        return when (tag) {
+            ColorTag.GRAY -> HandleColor.GRAY
+            ColorTag.GREEN -> HandleColor.GREEN
+            ColorTag.CYAN -> HandleColor.CYAN
+            ColorTag.BLUE -> HandleColor.BLUE
+            ColorTag.VIOLET -> HandleColor.VIOLET
+            ColorTag.ORANGE -> HandleColor.ORANGE
+            ColorTag.RED, ColorTag.LEGENDARY -> HandleColor.RED
+            else -> null
         }
     }
 
@@ -334,7 +371,7 @@ data class CodeforcesBlogEntry(
     val authorHandle: String,
     val creationTimeSeconds: Long,
     val rating: Int = 0,
-    val authorColorTag: String = ""
+    val authorColorTag: CodeforcesUtils.ColorTag = CodeforcesUtils.ColorTag.BLACK
 )
 
 @Serializable
@@ -354,7 +391,7 @@ data class CodeforcesComment(
     val commentatorHandle: String,
     val text: String,
     val rating: Int,
-    val commentatorHandleColorTag: String = ""
+    val commentatorHandleColorTag: CodeforcesUtils.ColorTag = CodeforcesUtils.ColorTag.BLACK
 )
 
 @Serializable

@@ -129,28 +129,15 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
 
     override val rankedHandleColorsList = HandleColor.rankedCodeforces
 
-    fun getHandleColorByTag(tag: String): Int? {
-        return when (tag) {
-            "user-gray" -> HandleColor.GRAY
-            "user-green" -> HandleColor.GREEN
-            "user-cyan" -> HandleColor.CYAN
-            "user-blue" -> HandleColor.BLUE
-            "user-violet" -> HandleColor.VIOLET
-            "user-orange" -> HandleColor.ORANGE
-            "user-red", "user-legendary" -> HandleColor.RED
-            else -> null
-        }?.getARGB(this)
-    }
-
-    fun makeSpan(handle: String, tag: String) = SpannableString(handle).apply {
-        getHandleColorByTag(tag)?.let {
+    fun makeSpan(handle: String, tag: CodeforcesUtils.ColorTag) = SpannableString(handle).apply {
+        CodeforcesUtils.getHandleColorByTag(tag)?.getARGB(this@CodeforcesAccountManager)?.let { argb ->
             set(
-                if(tag=="user-legendary") 1 else 0,
+                if(tag == CodeforcesUtils.ColorTag.LEGENDARY) 1 else 0,
                 handle.length,
-                ForegroundColorSpan(it)
+                ForegroundColorSpan(argb)
             )
         }
-        if(tag!="user-black") set(0, handle.length, StyleSpan(Typeface.BOLD))
+        if(tag != CodeforcesUtils.ColorTag.BLACK) set(0, handle.length, StyleSpan(Typeface.BOLD))
     }
 
     override fun getColor(handleColor: HandleColor): Int {

@@ -10,6 +10,7 @@ import com.example.test3.account_manager.STATUS
 import com.example.test3.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import java.io.FileNotFoundException
@@ -33,6 +34,8 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                 }
                 return res
             }catch (e: FileNotFoundException){
+                return emptyList()
+            }catch (e: SerializationException){
                 return emptyList()
             }
         }
@@ -110,7 +113,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         }
     }
 
-    private val highRated = arrayListOf("user-orange", "user-red", "user-legendary")
+    private val highRated = CodeforcesUtils.ColorTag.ORANGE
     private suspend fun parseRecent(){
 
 
@@ -137,7 +140,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
 
         val newSuspects = mutableListOf<CodeforcesBlogEntry>()
         recentBlogs.forEach { blog ->
-            if(blog.authorColorTag in highRated && suspects.find { it.id == blog.id } == null){
+            if(blog.authorColorTag>=highRated && suspects.find { it.id == blog.id } == null){
                 val creationTimeSeconds = CodeforcesUtils.getBlogCreationTimeSeconds(blog.id)
                 if(TimeUnit.SECONDS.toHours(currentTimeSeconds - creationTimeSeconds) < 24){
                     newSuspects.add(blog.copy(creationTimeSeconds = creationTimeSeconds))

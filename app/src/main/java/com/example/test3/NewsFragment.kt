@@ -455,7 +455,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
         val blogId: Int,
         val title: String,
         val author: String,
-        val authorColorTag: String,
+        val authorColorTag: CodeforcesUtils.ColorTag,
         val time: String,
         val comments: String,
         val rating: String,
@@ -479,7 +479,9 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
             val author = s.substring(i+9,s.indexOf('"',i))
 
             i = s.indexOf("rated-user user-",i)
-            val authorColor = s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
+            val authorColorTag = CodeforcesUtils.ColorTag.fromString(
+                s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
+            )
 
             i = s.indexOf("<span class=\"format-humantime\"", i)
             val time = s.substring(s.indexOf('>',i)+1, s.indexOf("</span>",i))
@@ -493,7 +495,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
             i = s.lastIndexOf("</a>", i)
             val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim()
 
-            res.add(Info(id,title,author,authorColor,time,comments,rating))
+            res.add(Info(id,title,author,authorColorTag,time,comments,rating))
         }
 
         if(res.isNotEmpty()){
@@ -605,7 +607,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         val blogId: Int,
         val title: String,
         val author: String,
-        val authorColorTag: String,
+        val authorColorTag: CodeforcesUtils.ColorTag,
         val lastCommentId: Long,
         var commentators: List<Spannable>
     )
