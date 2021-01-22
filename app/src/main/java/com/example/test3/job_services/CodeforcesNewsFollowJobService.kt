@@ -12,6 +12,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class CodeforcesNewsFollowJobService: CoroutineJobService() {
     companion object {
@@ -192,6 +193,8 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             setBigContent(title)
             setSmallIcon(R.drawable.ic_new_post)
             setAutoCancel(true)
+            setShowWhen(true)
+            setWhen(TimeUnit.SECONDS.toMillis(blogEntry.creationTimeSeconds))
             setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.blog(blogEntry.id), this@CodeforcesNewsFollowJobService))
         }
         NotificationManagerCompat.from(this).notify(NotificationIDs.makeCodeforcesFollowBlogID(blogEntry.id), n.build())
