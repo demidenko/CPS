@@ -26,6 +26,8 @@ import com.example.test3.job_services.CodeforcesNewsFollowJobService
 import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
 import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
+import com.example.test3.news.ManageCodeforcesFollowListFragment
+import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
@@ -72,8 +74,10 @@ class NewsFragment : Fragment() {
             CodeforcesNewsFragment(CodeforcesTitle.TOP, "/top", false, CodeforcesNewsItemsClassicAdapter()),
             CodeforcesNewsFragment(CodeforcesTitle.RECENT, "/recent-actions", false, CodeforcesNewsItemsRecentAdapter())
         )
-        if(CodeforcesNewsLostRecentJobService.isEnabled(context)){
-            fragments.add(createLostFragment())
+        runBlocking {
+            if(CodeforcesNewsLostRecentJobService.isEnabled(context)){
+                fragments.add(createLostFragment())
+            }
         }
         CodeforcesNewsAdapter(this, fragments)
     }
@@ -178,6 +182,15 @@ class NewsFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
+            R.id.menu_news_settings_old_button -> {
+                with(requireActivity() as MainActivity) {
+                    supportFragmentManager.beginTransaction()
+                        .hide(newsFragment)
+                        .add(android.R.id.content, SettingsNewsFragment_old())
+                        .addToBackStack(null)
+                        .commit()
+                }
+            }
             R.id.menu_news_settings_button -> {
                 with(requireActivity() as MainActivity) {
                     supportFragmentManager.beginTransaction()
@@ -915,7 +928,8 @@ fun timeRUtoEN(time: String): String{
 
 
 ///--------------SETTINGS------------
-class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
+
+class SettingsNewsFragment_old : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val newsFragment by lazy { (requireActivity() as MainActivity).newsFragment }
 
@@ -953,19 +967,6 @@ class SettingsNewsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSha
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         when (key) {
-            getString(R.string.news_codeforces_lost_enabled) -> {
-                //spam possible
-                when(sharedPreferences.getBoolean(key, false)){
-                    true -> {
-                        JobServicesCenter.startCodeforcesNewsLostRecentJobService(requireContext())
-                        newsFragment.addLostTab()
-                    }
-                    false -> {
-                        newsFragment.removeLostTab()
-                        JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_news_lost_recent)
-                    }
-                }
-            }
             getString(R.string.news_codeforces_follow_enabled) -> {
                 //spam possible
                 when(sharedPreferences.getBoolean(key, false)){

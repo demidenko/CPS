@@ -5,13 +5,12 @@ import android.view.*
 import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.setFragmentSubTitle
-import com.google.android.material.switchmaterial.SwitchMaterial
+import com.example.test3.utils.createAndAddSwitch
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 
@@ -77,20 +76,8 @@ class AccountSettingsFragment(): Fragment() {
         onChangeCallback: (buttonView: CompoundButton, isChecked: Boolean) -> Unit
     ): View {
         val view = requireView().findViewById<LinearLayout>(R.id.layout)
-        layoutInflater.inflate(R.layout.account_settings_switcher, view)
-        return view[view.childCount-1].apply {
-            findViewById<TextView>(R.id.account_settings_switcher_title).text = title
-            findViewById<SwitchMaterial>(R.id.account_settings_switcher_button).apply {
-                isChecked = checked
-                this.setOnCheckedChangeListener { buttonView, isChecked -> onChangeCallback(buttonView,isChecked) }
-            }
-            if(description.isNotBlank()){
-                findViewById<TextView>(R.id.account_settings_switcher_description).apply {
-                    text = description
-                    visibility = View.VISIBLE
-                }
-            }
-        }
+        layoutInflater.inflate(R.layout.settings_switcher, view)
+        return createAndAddSwitch(view, title, checked, description, onChangeCallback)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

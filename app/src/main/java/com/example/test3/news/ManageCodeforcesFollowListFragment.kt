@@ -1,4 +1,4 @@
-package com.example.test3
+package com.example.test3.news
 
 import android.os.Bundle
 import android.view.*
@@ -11,9 +11,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.test3.MainActivity
+import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.job_services.CodeforcesNewsFollowJobService
+import com.example.test3.makeIntentOpenUrl
+import com.example.test3.setFragmentSubTitle
 import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.CodeforcesUtils
 import kotlinx.android.synthetic.main.activity_main.*

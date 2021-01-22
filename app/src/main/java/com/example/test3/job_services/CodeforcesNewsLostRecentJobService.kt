@@ -1,12 +1,11 @@
 package com.example.test3.job_services
 
 import android.content.Context
-import androidx.preference.PreferenceManager
 import com.example.test3.BottomProgressInfo
 import com.example.test3.MainActivity
 import com.example.test3.NewsFragment
-import com.example.test3.R
 import com.example.test3.account_manager.STATUS
+import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -100,9 +99,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
             progressInfo.finish()
         }
 
-        fun isEnabled(context: Context): Boolean {
-            return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.news_codeforces_lost_enabled), false)
-        }
+        suspend fun isEnabled(context: Context): Boolean = SettingsNewsFragment.getSettings(context).getLostEnabled()
     }
 
     override suspend fun makeJobs(): ArrayList<Job> {

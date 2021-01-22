@@ -4,6 +4,11 @@
         android:id="@+id/menu_group_news"
         >
         <item
+            android:id="@+id/menu_news_settings_old_button"
+            android:title="Settings old"
+            android:icon="@drawable/ic_settings"
+            />
+        <item
             android:id="@+id/menu_news_settings_button"
             android:title="Settings"
             android:icon="@drawable/ic_settings"
