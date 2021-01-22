@@ -6,6 +6,7 @@ import androidx.preference.PreferenceManager
 import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
+import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.*
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -47,9 +48,7 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             return adapterMap.fromJson(str) ?: emptyMap()
         }
 
-        fun isEnabled(context: Context): Boolean {
-            return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.news_codeforces_follow_enabled), false)
-        }
+        suspend fun isEnabled(context: Context): Boolean = SettingsNewsFragment.getSettings(context).getFollowEnabled()
     }
 
     class FollowDataConnector(private val context: Context) {

@@ -176,7 +176,7 @@ class NewsFragment : Fragment() {
             menu.setGroupDividerEnabled(true)
         }
         inflater.inflate(R.menu.menu_news, menu)
-        menu.findItem(R.id.menu_news_follow_list).isVisible = CodeforcesNewsFollowJobService.isEnabled(requireContext())
+        menu.findItem(R.id.menu_news_follow_list).isVisible = runBlocking { CodeforcesNewsFollowJobService.isEnabled(requireContext()) }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -553,8 +553,8 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
             }
 
             view.isLongClickable = true
-            view.setOnLongClickListener{
-                CodeforcesNewsFollowJobService.isEnabled(activity).apply {
+            view.setOnLongClickListener {
+                runBlocking { CodeforcesNewsFollowJobService.isEnabled(activity) }.apply {
                     if(this) addToFollowListWithSnackBar(activity, this@with)
                 }
             }
@@ -967,14 +967,6 @@ class SettingsNewsFragment_old : PreferenceFragmentCompat(), SharedPreferences.O
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         when (key) {
-            getString(R.string.news_codeforces_follow_enabled) -> {
-                //spam possible
-                when(sharedPreferences.getBoolean(key, false)){
-                    true -> JobServicesCenter.startCodeforcesNewsFollowJobService(requireContext())
-                    false -> JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_news_follow)
-                }
-                requireActivity().invalidateOptionsMenu()
-            }
             getString(R.string.news_project_euler_problems) -> {
                 when(sharedPreferences.getBoolean(key, false)){
                     true -> JobServicesCenter.startProjectEulerRecentProblemsJobService(requireContext())

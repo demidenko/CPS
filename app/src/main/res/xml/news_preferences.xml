@@ -19,14 +19,6 @@
             android:summaryOff="en blogs only"
             />
 
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="@string/news_codeforces_follow_enabled"
-            android:title="Follow"
-            android:summaryOn="enabled"
-            android:summaryOff="disabled"
-            />
-
     </PreferenceCategory>
 
 

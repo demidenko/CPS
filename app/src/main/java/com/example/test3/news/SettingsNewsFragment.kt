@@ -45,6 +45,7 @@ class SettingsNewsFragment: Fragment(){
         setHasOptionsMenu(true)
 
         lifecycleScope.launch {
+
             createAndAddSwitch(
                 "Lost recent blogs",
                 getSettings(requireContext()).getLostEnabled(),
@@ -60,6 +61,24 @@ class SettingsNewsFragment: Fragment(){
                         newsFragment.removeLostTab()
                         JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_news_lost_recent)
                     }
+                    buttonView.isEnabled = true
+                }
+            }
+
+            createAndAddSwitch(
+                "Follow",
+                getSettings(requireContext()).getFollowEnabled(),
+                "TODO"
+            ){ buttonView, isChecked ->
+                lifecycleScope.launch {
+                    buttonView.isEnabled = false
+                    getSettings(requireContext()).setFollowEnabled(isChecked)
+                    if (isChecked) {
+                        JobServicesCenter.startCodeforcesNewsFollowJobService(requireContext())
+                    } else {
+                        JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.codeforces_news_follow)
+                    }
+                    requireActivity().invalidateOptionsMenu()
                     buttonView.isEnabled = true
                 }
             }
@@ -97,6 +116,11 @@ class SettingsNewsFragment: Fragment(){
         suspend fun getLostEnabled() = dataStore.data.first()[KEY_LOST] ?: false
         suspend fun setLostEnabled(flag: Boolean){
             dataStore.edit { it[KEY_LOST] = flag }
+        }
+
+        suspend fun getFollowEnabled() = dataStore.data.first()[KEY_FOLLOW] ?: false
+        suspend fun setFollowEnabled(flag: Boolean){
+            dataStore.edit { it[KEY_FOLLOW] = flag }
         }
     }
 }

@@ -57,11 +57,11 @@ object JobServicesCenter {
             JobServiceIDs.accounts_parsers to ::startAccountsJobService
         )
         with(PreferenceManager.getDefaultSharedPreferences(mainActivity)){
-            if(getBoolean(mainActivity.getString(R.string.news_codeforces_follow_enabled), false)) toStart[JobServiceIDs.codeforces_news_follow] = ::startCodeforcesNewsFollowJobService
             if(getBoolean(mainActivity.getString(R.string.news_project_euler_problems), false)) toStart[JobServiceIDs.project_euler_recent_problems] = ::startProjectEulerRecentProblemsJobService
         }
         with(SettingsNewsFragment.getSettings(mainActivity)){
             if(getLostEnabled()) toStart[JobServiceIDs.codeforces_news_lost_recent] = ::startCodeforcesNewsLostRecentJobService
+            if(getFollowEnabled()) toStart[JobServiceIDs.codeforces_news_follow] = ::startCodeforcesNewsFollowJobService
         }
         with(CodeforcesAccountManager(mainActivity).getSettings()){
             if(getContestWatchEnabled()) toStart[JobServiceIDs.codeforces_contest_watch_starter] = ::startCodeforcesContestWatchStarterJobService
