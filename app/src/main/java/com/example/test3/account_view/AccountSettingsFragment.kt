@@ -13,6 +13,7 @@ import com.example.test3.setFragmentSubTitle
 import com.example.test3.utils.createAndAddSwitch
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class AccountSettingsFragment(): Fragment() {
 
@@ -60,7 +61,7 @@ class AccountSettingsFragment(): Fragment() {
             }
         }
 
-        lifecycleScope.launch {
+        runBlocking {
             userId.text = manager.getSavedInfo().userID
             view.isEnabled = false
             panel.createSettingsView(this@AccountSettingsFragment)

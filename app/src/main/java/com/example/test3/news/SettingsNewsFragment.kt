@@ -21,6 +21,7 @@ import com.example.test3.utils.createAndAddSwitch
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 class SettingsNewsFragment: Fragment(){
@@ -44,7 +45,7 @@ class SettingsNewsFragment: Fragment(){
 
         setHasOptionsMenu(true)
 
-        lifecycleScope.launch {
+        runBlocking {
 
             createAndAddSwitch(
                 "Russian content",
