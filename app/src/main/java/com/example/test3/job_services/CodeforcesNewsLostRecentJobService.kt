@@ -110,7 +110,6 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         }
     }
 
-    private val highRated = CodeforcesUtils.ColorTag.ORANGE
     private suspend fun parseRecent(){
 
 
@@ -135,6 +134,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                 TimeUnit.SECONDS.toHours(currentTimeSeconds - blog.creationTimeSeconds) < 24
             }.toMutableList()
 
+        val highRated = SettingsNewsFragment.getSettings(this).getLostMinRating()
         val newSuspects = mutableListOf<CodeforcesBlogEntry>()
         recentBlogs.forEach { blog ->
             if(blog.authorColorTag>=highRated && suspects.find { it.id == blog.id } == null){

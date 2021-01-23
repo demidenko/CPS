@@ -17,6 +17,7 @@ import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
+import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.setupSelect
 import com.example.test3.utils.setupSwitch
 import kotlinx.android.synthetic.main.activity_main.*
@@ -81,11 +82,15 @@ class SettingsNewsFragment: Fragment(){
                 }
             }
 
+            val isLostEnabled = getSettings(requireContext()).getLostEnabled()
             val switchLost = view.findViewById<ConstraintLayout>(R.id.news_settings_lost)
+            val selectLostRating = view.findViewById<ConstraintLayout>(R.id.news_settings_lost_min_rating).apply {
+                visibility = if(isLostEnabled) View.VISIBLE else View.GONE
+            }
             setupSwitch(
                 switchLost,
                 "Lost recent blogs",
-                getSettings(requireContext()).getLostEnabled(),
+                isLostEnabled,
                 "TODO"
             ){ buttonView, isChecked ->
                 lifecycleScope.launch {
@@ -95,10 +100,26 @@ class SettingsNewsFragment: Fragment(){
                     if (isChecked) {
                         JobServicesCenter.startCodeforcesNewsLostRecentJobService(context)
                         newsFragment.addLostTab()
+                        selectLostRating.visibility = View.VISIBLE
                     } else {
                         newsFragment.removeLostTab()
                         JobServicesCenter.stopJobService(context, JobServiceIDs.codeforces_news_lost_recent)
+                        selectLostRating.visibility = View.GONE
                     }
+                    buttonView.isEnabled = true
+                }
+            }
+
+            val ratingOptions = CodeforcesUtils.ColorTag.values().filter { it!=CodeforcesUtils.ColorTag.ADMIN }
+            setupSelect(
+                selectLostRating,
+                "Rating at least",
+                ratingOptions.map { it.name }.toTypedArray(),
+                ratingOptions.indexOf(getSettings(requireContext()).getLostMinRating())
+            ){ buttonView, optionSelected ->
+                lifecycleScope.launch {
+                    buttonView.isEnabled = false
+                    getSettings(requireContext()).setLostMinRating(ratingOptions[optionSelected])
                     buttonView.isEnabled = true
                 }
             }
@@ -142,6 +163,7 @@ class SettingsNewsFragment: Fragment(){
             private val KEY_TAB = preferencesKey<String>("default_tab")
             private val KEY_RU = preferencesKey<Boolean>("ru_lang")
             private val KEY_LOST = preferencesKey<Boolean>("lost")
+            private val KEY_LOST_RATING = preferencesKey<String>("lost_min_rating")
             private val KEY_FOLLOW = preferencesKey<Boolean>("follow")
         }
 
@@ -162,6 +184,15 @@ class SettingsNewsFragment: Fragment(){
         suspend fun getLostEnabled() = dataStore.data.first()[KEY_LOST] ?: false
         suspend fun setLostEnabled(flag: Boolean){
             dataStore.edit { it[KEY_LOST] = flag }
+        }
+
+        suspend fun getLostMinRating(): CodeforcesUtils.ColorTag {
+            return dataStore.data.first()[KEY_LOST_RATING]?.let {
+                CodeforcesUtils.ColorTag.valueOf(it)
+            } ?: CodeforcesUtils.ColorTag.ORANGE
+        }
+        suspend fun setLostMinRating(tag: CodeforcesUtils.ColorTag) {
+            dataStore.edit { it[KEY_LOST_RATING] = tag.name }
         }
 
         suspend fun getFollowEnabled() = dataStore.data.first()[KEY_FOLLOW] ?: false

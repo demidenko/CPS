@@ -11,6 +11,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:orientation="vertical"
         app:layout_scrollFlags="enterAlways"
+        android:animateLayoutChanges="true"
         >
 
         <include
@@ -26,6 +27,11 @@
         <include
             android:id="@+id/news_settings_lost"
             layout="@layout/settings_switcher"
+            />
+
+        <include
+            android:id="@+id/news_settings_lost_min_rating"
+            layout="@layout/settings_select"
             />
 
         <include
