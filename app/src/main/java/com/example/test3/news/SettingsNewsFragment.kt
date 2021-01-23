@@ -113,14 +113,29 @@ class SettingsNewsFragment: Fragment(){
                 }
             }
 
-            val ratingOptions = CodeforcesUtils.ColorTag.values().filter {
-                it!=CodeforcesUtils.ColorTag.ADMIN && it!=CodeforcesUtils.ColorTag.BLACK
+            val ratingOptions = CodeforcesUtils.ColorTag.values().filter { it != CodeforcesUtils.ColorTag.ADMIN }
+
+            val ratingNames = ratingOptions.map { tag ->
+                when(tag){
+                    CodeforcesUtils.ColorTag.BLACK -> "Exists"
+                    CodeforcesUtils.ColorTag.GRAY -> "Newbie"
+                    CodeforcesUtils.ColorTag.GREEN -> "Pupil"
+                    CodeforcesUtils.ColorTag.CYAN -> "Specialist"
+                    CodeforcesUtils.ColorTag.BLUE -> "Expert"
+                    CodeforcesUtils.ColorTag.VIOLET -> "Candidate Master"
+                    CodeforcesUtils.ColorTag.ORANGE -> "Master"
+                    CodeforcesUtils.ColorTag.RED -> "Grandmaster"
+                    CodeforcesUtils.ColorTag.LEGENDARY -> "LGM"
+                    else -> ""
+                }.let {
+                    mainActivity.accountsFragment.codeforcesAccountManager.makeSpan(it, tag)
+                }
             }
 
             setupSelect(
                 selectLostRating,
                 "Author at least",
-                ratingOptions.map { mainActivity.accountsFragment.codeforcesAccountManager.makeSpan(it.name, it) }.toTypedArray(),
+                ratingNames.toTypedArray(),
                 ratingOptions.indexOf(getSettings(requireContext()).getLostMinRating())
             ){ buttonView, optionSelected ->
                 lifecycleScope.launch {
