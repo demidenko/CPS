@@ -52,7 +52,7 @@ class SettingsNewsFragment: Fragment(){
             val tabOptions = listOf(
                 CodeforcesTitle.MAIN,
                 CodeforcesTitle.TOP,
-                CodeforcesTitle.RECENT
+                //CodeforcesTitle.RECENT TODO: crash on init
             )
             createAndAddSelect(
                 "Default tab",
