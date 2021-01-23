@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
@@ -28,7 +29,8 @@ import kotlinx.coroutines.runBlocking
 
 class SettingsNewsFragment: Fragment(){
 
-    private val newsFragment by lazy { (requireActivity() as MainActivity).newsFragment }
+    private val mainActivity by lazy { requireActivity() as MainActivity }
+    private val newsFragment by lazy { mainActivity.newsFragment }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,6 +88,7 @@ class SettingsNewsFragment: Fragment(){
             val switchLost = view.findViewById<ConstraintLayout>(R.id.news_settings_lost)
             val selectLostRating = view.findViewById<ConstraintLayout>(R.id.news_settings_lost_min_rating).apply {
                 visibility = if(isLostEnabled) View.VISIBLE else View.GONE
+                findViewById<TextView>(R.id.settings_select_button).setTextColor(mainActivity.defaultTextColor)
             }
             setupSwitch(
                 switchLost,
@@ -110,11 +113,14 @@ class SettingsNewsFragment: Fragment(){
                 }
             }
 
-            val ratingOptions = CodeforcesUtils.ColorTag.values().filter { it!=CodeforcesUtils.ColorTag.ADMIN }
+            val ratingOptions = CodeforcesUtils.ColorTag.values().filter {
+                it!=CodeforcesUtils.ColorTag.ADMIN && it!=CodeforcesUtils.ColorTag.BLACK
+            }
+
             setupSelect(
                 selectLostRating,
-                "Rating at least",
-                ratingOptions.map { it.name }.toTypedArray(),
+                "Author at least",
+                ratingOptions.map { mainActivity.accountsFragment.codeforcesAccountManager.makeSpan(it.name, it) }.toTypedArray(),
                 ratingOptions.indexOf(getSettings(requireContext()).getLostMinRating())
             ){ buttonView, optionSelected ->
                 lifecycleScope.launch {
