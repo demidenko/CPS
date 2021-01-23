@@ -94,7 +94,7 @@ class SettingsNewsFragment: Fragment(){
                 switchLost,
                 "Lost recent blogs",
                 isLostEnabled,
-                "TODO"
+                getString(R.string.news_settings_cf_lost_description)
             ){ buttonView, isChecked ->
                 lifecycleScope.launch {
                     buttonView.isEnabled = false
@@ -135,7 +135,7 @@ class SettingsNewsFragment: Fragment(){
                 switchFollow,
                 "Follow",
                 getSettings(requireContext()).getFollowEnabled(),
-                "TODO"
+                getString(R.string.news_settings_cf_follow_description)
             ){ buttonView, isChecked ->
                 lifecycleScope.launch {
                     buttonView.isEnabled = false

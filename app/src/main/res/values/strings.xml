@@ -16,4 +16,13 @@ You can add accounts to show here by pressing [+] button below.
     <string name="cf_contest_watcher_description">
 "Enables auto launched watcher of your contest participation. Allows to see contest phase, systest result notifications and catch rating changes early than usual."
     </string>
+
+    <string name="news_settings_cf_lost_description">
+"Catch new blogs from recent actions which get lost because of low activity."
+    </string>
+
+    <string name="news_settings_cf_follow_description">
+"Subscribe to users for new blogs notifications."
+    </string>
+
 </resources>
