@@ -13,7 +13,25 @@
         app:layout_scrollFlags="enterAlways"
         >
 
+        <include
+            android:id="@+id/news_settings_default_tab"
+            layout="@layout/settings_select"
+            />
 
+        <include
+            android:id="@+id/news_settings_ru_lang"
+            layout="@layout/settings_switcher"
+            />
+
+        <include
+            android:id="@+id/news_settings_lost"
+            layout="@layout/settings_switcher"
+            />
+
+        <include
+            android:id="@+id/news_settings_follow"
+            layout="@layout/settings_switcher"
+            />
 
     </LinearLayout>
 </ScrollView>

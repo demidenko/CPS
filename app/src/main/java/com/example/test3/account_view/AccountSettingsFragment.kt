@@ -75,10 +75,10 @@ class AccountSettingsFragment(): Fragment() {
         checked: Boolean,
         description: String = "",
         onChangeCallback: (buttonView: CompoundButton, isChecked: Boolean) -> Unit
-    ): View {
+    ){
         val view = requireView().findViewById<LinearLayout>(R.id.layout)
         layoutInflater.inflate(R.layout.settings_switcher, view)
-        return createAndAddSwitch(view, title, checked, description, onChangeCallback)
+        createAndAddSwitch(view, title, checked, description, onChangeCallback)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

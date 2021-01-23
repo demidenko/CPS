@@ -6,8 +6,7 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
-import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
 import androidx.datastore.preferences.createDataStore
@@ -18,8 +17,8 @@ import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
-import com.example.test3.utils.createAndAddSelect
-import com.example.test3.utils.createAndAddSwitch
+import com.example.test3.utils.setupSelect
+import com.example.test3.utils.setupSwitch
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -54,7 +53,10 @@ class SettingsNewsFragment: Fragment(){
                 CodeforcesTitle.TOP,
                 //CodeforcesTitle.RECENT TODO: crash on init
             )
-            createAndAddSelect(
+
+            val selectDefaultTab = view.findViewById<ConstraintLayout>(R.id.news_settings_default_tab)
+            setupSelect(
+                selectDefaultTab,
                 "Default tab",
                 tabOptions.map { it.name }.toTypedArray(),
                 tabOptions.indexOf(getSettings(requireContext()).getDefaultTab()),
@@ -66,7 +68,9 @@ class SettingsNewsFragment: Fragment(){
                 }
             }
 
-            createAndAddSwitch(
+            val switchRuLang = view.findViewById<ConstraintLayout>(R.id.news_settings_ru_lang)
+            setupSwitch(
+                switchRuLang,
                 "Russian content",
                 getSettings(requireContext()).getRussianContentEnabled()
             ){ buttonView, isChecked ->
@@ -77,7 +81,9 @@ class SettingsNewsFragment: Fragment(){
                 }
             }
 
-            createAndAddSwitch(
+            val switchLost = view.findViewById<ConstraintLayout>(R.id.news_settings_lost)
+            setupSwitch(
+                switchLost,
                 "Lost recent blogs",
                 getSettings(requireContext()).getLostEnabled(),
                 "TODO"
@@ -97,7 +103,9 @@ class SettingsNewsFragment: Fragment(){
                 }
             }
 
-            createAndAddSwitch(
+            val switchFollow = view.findViewById<ConstraintLayout>(R.id.news_settings_follow)
+            setupSwitch(
+                switchFollow,
                 "Follow",
                 getSettings(requireContext()).getFollowEnabled(),
                 "TODO"
@@ -121,29 +129,6 @@ class SettingsNewsFragment: Fragment(){
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.clear()
         super.onPrepareOptionsMenu(menu)
-    }
-
-    private fun createAndAddSwitch(
-        title: String,
-        checked: Boolean,
-        description: String = "",
-        onChangeCallback: (buttonView: CompoundButton, isChecked: Boolean) -> Unit
-    ): View {
-        val view = requireView().findViewById<LinearLayout>(R.id.layout)
-        layoutInflater.inflate(R.layout.settings_switcher, view)
-        return createAndAddSwitch(view, title, checked, description, onChangeCallback)
-    }
-
-    private fun createAndAddSelect(
-        title: String,
-        options: Array<CharSequence>,
-        selected: Int,
-        description: String = "",
-        onChangeCallback: (buttonView: View, optionSelected: Int) -> Unit
-    ): View {
-        val view = requireView().findViewById<LinearLayout>(R.id.layout)
-        layoutInflater.inflate(R.layout.settings_select, view)
-        return createAndAddSelect(view, title, options, selected, description, onChangeCallback)
     }
 
     companion object {

@@ -8,6 +8,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.HtmlCompat
 import androidx.core.view.get
 import com.example.test3.R
@@ -56,14 +57,14 @@ class SharedReloadButton(private val button: ImageButton) {
     }
 }
 
-fun createAndAddSwitch(
-    view: LinearLayout,
+fun setupSwitch(
+    view: ConstraintLayout,
     title: String,
     checked: Boolean,
     description: String = "",
     onChangeCallback: (buttonView: CompoundButton, isChecked: Boolean) -> Unit
-): View {
-    return view[view.childCount-1].apply {
+){
+    view.apply {
         findViewById<TextView>(R.id.settings_switcher_title).text = title
         findViewById<SwitchMaterial>(R.id.settings_switcher_button).apply {
             isChecked = checked
@@ -78,16 +79,15 @@ fun createAndAddSwitch(
     }
 }
 
-
-fun createAndAddSelect(
-    view: LinearLayout,
+fun setupSelect(
+    view: ConstraintLayout,
     title: String,
     options: Array<CharSequence>,
     initSelected: Int,
     description: String = "",
     onChangeCallback: (buttonView: View, optionSelected: Int) -> Unit
-): View {
-    return view[view.childCount-1].apply {
+){
+    view.apply {
         findViewById<TextView>(R.id.settings_switcher_title).text = title
         val selectedTextView = findViewById<TextView>(R.id.settings_select_button)
         var selected = initSelected
@@ -111,3 +111,14 @@ fun createAndAddSelect(
         }
     }
 }
+
+fun createAndAddSwitch(
+    view: LinearLayout,
+    title: String,
+    checked: Boolean,
+    description: String = "",
+    onChangeCallback: (buttonView: CompoundButton, isChecked: Boolean) -> Unit
+){
+    setupSwitch(view[view.childCount-1] as ConstraintLayout, title, checked, description, onChangeCallback)
+}
+
