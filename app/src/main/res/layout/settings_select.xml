@@ -19,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/settings_switcher_description"
-        app:layout_constraintEnd_toStartOf="@id/settings_switcher_button"
+        app:layout_constraintEnd_toStartOf="@id/settings_select_button"
         app:layout_constrainedWidth="true"
         app:layout_constraintHorizontal_bias="0"
         />
@@ -34,19 +34,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settings_switcher_title"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/settings_switcher_button"
+        app:layout_constraintEnd_toStartOf="@id/settings_select_button"
         app:layout_constrainedWidth="true"
         app:layout_constraintHorizontal_bias="0"
         android:visibility="gone"
         />
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/settings_switcher_button"
+    <TextView
+        android:id="@+id/settings_select_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Option"
+        android:textSize="18sp"
+        android:textColor="@color/colorAccent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="10dp"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

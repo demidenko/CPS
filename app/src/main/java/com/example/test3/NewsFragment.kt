@@ -13,7 +13,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.color
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.DropDownPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -288,10 +287,9 @@ class NewsFragment : Fragment() {
 
         val index =
             with(codeforcesNewsAdapter){
-                val defaultTab =
-                    PreferenceManager.getDefaultSharedPreferences(context).getString(getString(R.string.news_codeforces_default_tab),null)
-                        ?.let { CodeforcesTitle.valueOf(it) }
-                        ?: CodeforcesTitle.TOP
+                val defaultTab = runBlocking {
+                    SettingsNewsFragment.getSettings(requireContext()).getDefaultTab()
+                }
 
                 var pos = indexOf(defaultTab)
                 if(pos == -1) pos = indexOf(CodeforcesTitle.TOP)
@@ -948,17 +946,6 @@ class SettingsNewsFragment_old : PreferenceFragmentCompat(), SharedPreferences.O
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.news_preferences)
-
-        findPreference<DropDownPreference>(getString(R.string.news_codeforces_default_tab))?.run {
-            val titles = arrayOf(
-                CodeforcesTitle.MAIN.name,
-                CodeforcesTitle.TOP.name,
-                CodeforcesTitle.RECENT.name
-            )
-            entries = titles
-            entryValues = titles
-            setDefaultValue(CodeforcesTitle.TOP.name)
-        }
 
         PreferenceManager.getDefaultSharedPreferences(requireContext()).registerOnSharedPreferenceChangeListener(this)
     }

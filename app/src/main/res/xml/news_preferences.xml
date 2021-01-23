@@ -5,11 +5,6 @@
         android:icon="@drawable/ic_cf_logo"
         android:title="Codeforces"
         >
-        <DropDownPreference
-            android:key="@string/news_codeforces_default_tab"
-            android:title="Default tab"
-            app:useSimpleSummaryProvider="true"
-            />
 
     </PreferenceCategory>
 

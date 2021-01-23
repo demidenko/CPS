@@ -3,10 +3,8 @@ package com.example.test3.utils
 import android.text.Html
 import android.text.Spanned
 import android.view.View
-import android.widget.CompoundButton
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.core.view.get
 import com.example.test3.R
@@ -63,13 +61,48 @@ fun createAndAddSwitch(
     onChangeCallback: (buttonView: CompoundButton, isChecked: Boolean) -> Unit
 ): View {
     return view[view.childCount-1].apply {
-        findViewById<TextView>(R.id.account_settings_switcher_title).text = title
-        findViewById<SwitchMaterial>(R.id.account_settings_switcher_button).apply {
+        findViewById<TextView>(R.id.settings_switcher_title).text = title
+        findViewById<SwitchMaterial>(R.id.settings_switcher_button).apply {
             isChecked = checked
             this.setOnCheckedChangeListener { buttonView, isChecked -> onChangeCallback(buttonView,isChecked) }
         }
         if(description.isNotBlank()){
-            findViewById<TextView>(R.id.account_settings_switcher_description).apply {
+            findViewById<TextView>(R.id.settings_switcher_description).apply {
+                text = description
+                visibility = View.VISIBLE
+            }
+        }
+    }
+}
+
+
+fun createAndAddSelect(
+    view: LinearLayout,
+    title: String,
+    options: List<CharSequence>,
+    selected: Int,
+    description: String = "",
+    onChangeCallback: (buttonView: View, optionSelected: Int) -> Unit
+): View {
+    return view[view.childCount-1].apply {
+        findViewById<TextView>(R.id.settings_switcher_title).text = title
+        findViewById<TextView>(R.id.settings_select_button).apply {
+            text = options[selected]
+            this.setOnClickListener {
+                val adapter = ArrayAdapter<CharSequence>(context, android.R.layout.select_dialog_item).apply {
+                    options.forEach { add(it) }
+                }
+                AlertDialog.Builder(context)
+                    .setTitle(title)
+                    .setAdapter(adapter){ _, index ->
+                        text = options[index]
+                        onChangeCallback(it, index)
+                    }
+                    .create().show()
+            }
+        }
+        if(description.isNotBlank()){
+            findViewById<TextView>(R.id.settings_switcher_description).apply {
                 text = description
                 visibility = View.VISIBLE
             }

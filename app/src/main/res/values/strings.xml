@@ -4,7 +4,6 @@
     <string name="news_project_euler_problems">prefs_news_project_euler_problems</string>
     <string name="news_acmp_feed">prefs_news_acmp_news</string>
     <string name="news_zaoch_feed">prefs_news_zaoch_news</string>
-    <string name="news_codeforces_default_tab">cf_news_default_tab</string>
 
     <string name="accounts_welcome">
 "/*

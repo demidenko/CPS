@@ -13,10 +13,12 @@ import androidx.datastore.preferences.core.preferencesKey
 import androidx.datastore.preferences.createDataStore
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.example.test3.CodeforcesTitle
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
+import com.example.test3.utils.createAndAddSelect
 import com.example.test3.utils.createAndAddSwitch
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.first
@@ -46,6 +48,23 @@ class SettingsNewsFragment: Fragment(){
         setHasOptionsMenu(true)
 
         runBlocking {
+
+            val tabOptions = listOf(
+                CodeforcesTitle.MAIN,
+                CodeforcesTitle.TOP,
+                CodeforcesTitle.RECENT
+            )
+            createAndAddSelect(
+                "Default tab",
+                tabOptions.map { it.name },
+                tabOptions.indexOf(getSettings(requireContext()).getDefaultTab()),
+            ){ buttonView, optionSelected ->
+                lifecycleScope.launch {
+                    buttonView.isEnabled = false
+                    getSettings(requireContext()).setDefaultTab(tabOptions[optionSelected])
+                    buttonView.isEnabled = true
+                }
+            }
 
             createAndAddSwitch(
                 "Russian content",
@@ -115,6 +134,18 @@ class SettingsNewsFragment: Fragment(){
         return createAndAddSwitch(view, title, checked, description, onChangeCallback)
     }
 
+    private fun createAndAddSelect(
+        title: String,
+        options: List<CharSequence>,
+        selected: Int,
+        description: String = "",
+        onChangeCallback: (buttonView: View, optionSelected: Int) -> Unit
+    ): View {
+        val view = requireView().findViewById<LinearLayout>(R.id.layout)
+        layoutInflater.inflate(R.layout.settings_select, view)
+        return createAndAddSelect(view, title, options, selected, description, onChangeCallback)
+    }
+
     companion object {
         fun getSettings(context: Context) = NewsSettingsDataStore(context)
     }
@@ -123,9 +154,19 @@ class SettingsNewsFragment: Fragment(){
         private val dataStore by lazy { context.createDataStore(name = "news_settings") }
 
         companion object {
+            private val KEY_TAB = preferencesKey<String>("default_tab")
             private val KEY_RU = preferencesKey<Boolean>("ru_lang")
             private val KEY_LOST = preferencesKey<Boolean>("lost")
             private val KEY_FOLLOW = preferencesKey<Boolean>("follow")
+        }
+
+        suspend fun getDefaultTab(): CodeforcesTitle {
+            return dataStore.data.first()[KEY_TAB]?.let {
+                CodeforcesTitle.valueOf(it)
+            } ?: CodeforcesTitle.TOP
+        }
+        suspend fun setDefaultTab(title: CodeforcesTitle) {
+            dataStore.edit { it[KEY_TAB] = title.name }
         }
 
         suspend fun getRussianContentEnabled() = dataStore.data.first()[KEY_RU] ?: true
