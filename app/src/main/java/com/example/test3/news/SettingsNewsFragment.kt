@@ -56,7 +56,7 @@ class SettingsNewsFragment: Fragment(){
             )
             createAndAddSelect(
                 "Default tab",
-                tabOptions.map { it.name },
+                tabOptions.map { it.name }.toTypedArray(),
                 tabOptions.indexOf(getSettings(requireContext()).getDefaultTab()),
             ){ buttonView, optionSelected ->
                 lifecycleScope.launch {
@@ -136,7 +136,7 @@ class SettingsNewsFragment: Fragment(){
 
     private fun createAndAddSelect(
         title: String,
-        options: List<CharSequence>,
+        options: Array<CharSequence>,
         selected: Int,
         description: String = "",
         onChangeCallback: (buttonView: View, optionSelected: Int) -> Unit

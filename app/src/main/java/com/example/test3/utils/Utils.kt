@@ -3,7 +3,10 @@ package com.example.test3.utils
 import android.text.Html
 import android.text.Spanned
 import android.view.View
-import android.widget.*
+import android.widget.CompoundButton
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.core.view.get
@@ -79,27 +82,26 @@ fun createAndAddSwitch(
 fun createAndAddSelect(
     view: LinearLayout,
     title: String,
-    options: List<CharSequence>,
-    selected: Int,
+    options: Array<CharSequence>,
+    initSelected: Int,
     description: String = "",
     onChangeCallback: (buttonView: View, optionSelected: Int) -> Unit
 ): View {
     return view[view.childCount-1].apply {
         findViewById<TextView>(R.id.settings_switcher_title).text = title
-        findViewById<TextView>(R.id.settings_select_button).apply {
-            text = options[selected]
-            this.setOnClickListener {
-                val adapter = ArrayAdapter<CharSequence>(context, android.R.layout.select_dialog_item).apply {
-                    options.forEach { add(it) }
+        val selectedTextView = findViewById<TextView>(R.id.settings_select_button)
+        var selected = initSelected
+        selectedTextView.text = options[selected]
+        setOnClickListener {
+            AlertDialog.Builder(context)
+                .setTitle(title)
+                .setSingleChoiceItems(options, selected){ d, index ->
+                    selected = index
+                    onChangeCallback(it, index)
+                    selectedTextView.text = options[index]
+                    d.dismiss()
                 }
-                AlertDialog.Builder(context)
-                    .setTitle(title)
-                    .setAdapter(adapter){ _, index ->
-                        text = options[index]
-                        onChangeCallback(it, index)
-                    }
-                    .create().show()
-            }
+                .create().show()
         }
         if(description.isNotBlank()){
             findViewById<TextView>(R.id.settings_switcher_description).apply {
