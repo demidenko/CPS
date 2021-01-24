@@ -3,8 +3,8 @@ package com.example.test3.job_services
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.preference.PreferenceManager
 import com.example.test3.*
+import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.ACMPAPI
 import com.example.test3.utils.OlympiadsZaochAPI
 import com.example.test3.utils.ProjectEulerAPI
@@ -29,10 +29,10 @@ class NewsJobService : CoroutineJobService() {
 
     override suspend fun makeJobs(): ArrayList<Job> {
         val jobs = arrayListOf<Job>()
-        with(PreferenceManager.getDefaultSharedPreferences(this)){
-            if(getBoolean(getString(R.string.news_project_euler_feed), false)) jobs.add(launch { parseProjectEuler() })
-            if(getBoolean(getString(R.string.news_acmp_feed), false)) jobs.add(launch { parseACMP() })
-            if(getBoolean(getString(R.string.news_zaoch_feed), false)) jobs.add(launch { parseZaoch() })
+        with(SettingsNewsFragment.getSettings(this)){
+            if(getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.PROJECT_EULER_NEWS)) jobs.add(launch { parseProjectEuler() })
+            if(getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.ACMP_NEWS)) jobs.add(launch { parseACMP() })
+            if(getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.ZAOCH_NEWS)) jobs.add(launch { parseZaoch() })
         }
         if(jobs.isEmpty()){
             JobServicesCenter.stopJobService(this, JobServiceIDs.news_parsers)

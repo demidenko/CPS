@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.job_services.JobServicesCenter
@@ -84,8 +83,6 @@ class MainActivity : AppCompatActivity(){
             true
         }
 
-
-        PreferenceManager.setDefaultValues(this, R.xml.news_preferences, false)
 
         lifecycleScope.launchWhenStarted {
             JobServicesCenter.startJobServices(this@MainActivity)

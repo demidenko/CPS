@@ -13,8 +13,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.color
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +21,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.test3.job_services.CodeforcesNewsFollowJobService
 import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
-import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.news.ManageCodeforcesFollowListFragment
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.*
@@ -178,15 +175,6 @@ class NewsFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.menu_news_settings_old_button -> {
-                with(requireActivity() as MainActivity) {
-                    supportFragmentManager.beginTransaction()
-                        .hide(newsFragment)
-                        .add(android.R.id.content, SettingsNewsFragment_old())
-                        .addToBackStack(null)
-                        .commit()
-                }
-            }
             R.id.menu_news_settings_button -> {
                 with(requireActivity() as MainActivity) {
                     supportFragmentManager.beginTransaction()
@@ -919,48 +907,4 @@ fun timeRUtoEN(time: String): String{
         } + " ago"
     }
     return time
-}
-
-
-///--------------SETTINGS------------
-
-class SettingsNewsFragment_old : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
-
-    private val newsFragment by lazy { (requireActivity() as MainActivity).newsFragment }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        with(requireActivity() as MainActivity){
-            setActionBarSubTitle("::news.settings")
-            navigation.visibility = View.GONE
-        }
-        super.onViewCreated(view, savedInstanceState)
-
-        setHasOptionsMenu(true)
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        menu.clear()
-        super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(R.xml.news_preferences)
-
-        PreferenceManager.getDefaultSharedPreferences(requireContext()).registerOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
-        when (key) {
-            getString(R.string.news_project_euler_feed),
-            getString(R.string.news_acmp_feed),
-            getString(R.string.news_zaoch_feed) -> {
-                if(sharedPreferences.getBoolean(key, false)) JobServicesCenter.startNewsJobService(requireContext())
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        PreferenceManager.getDefaultSharedPreferences(requireContext()).unregisterOnSharedPreferenceChangeListener(this)
-        super.onDestroy()
-    }
 }

@@ -172,7 +172,9 @@ class SettingsNewsFragment: Fragment(){
             val newsFeedsNames = NewsFeed.values().map { newsFeed ->
                 when(newsFeed){
                     NewsFeed.PROJECT_EULER_RECENT -> "projecteuler.net/recent"
-                    //NewsFeed.PROJECT_EULER_NEWS -> "projecteuler.net"
+                    NewsFeed.PROJECT_EULER_NEWS -> "projecteuler.net"
+                    NewsFeed.ACMP_NEWS -> "acmp.ru"
+                    NewsFeed.ZAOCH_NEWS -> "olympiads.ru/zaoch"
                 }
             }
 
@@ -206,9 +208,11 @@ class SettingsNewsFragment: Fragment(){
                                 if(enabled) JobServicesCenter.startProjectEulerRecentProblemsJobService(requireContext())
                                 else JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.project_euler_recent_problems)
                             }
-                            /*NewsFeed.PROJECT_EULER_NEWS -> {
+                            NewsFeed.PROJECT_EULER_NEWS,
+                            NewsFeed.ACMP_NEWS,
+                            NewsFeed.ZAOCH_NEWS -> {
                                 if(enabled) JobServicesCenter.startNewsJobService(requireContext())
-                            }*/
+                            }
                         }
                     }
                     buttonView.isEnabled = true
@@ -228,9 +232,9 @@ class SettingsNewsFragment: Fragment(){
 
     enum class NewsFeed {
         PROJECT_EULER_RECENT,
-        //PROJECT_EULER_NEWS,
-        //ACMP_NEWS,
-        //ZAOCH_NEWS
+        PROJECT_EULER_NEWS,
+        ACMP_NEWS,
+        ZAOCH_NEWS
     }
 
     class NewsSettingsDataStore(context: Context){
@@ -284,13 +288,17 @@ class SettingsNewsFragment: Fragment(){
 
         suspend fun getNewsFeedEnabled(newsFeed: NewsFeed) = when(newsFeed){
             NewsFeed.PROJECT_EULER_RECENT -> dataStore.data.first()[KEY_FEED_PE_RECENT] ?: false
-            //NewsFeed.PROJECT_EULER_NEWS -> dataStore.data.first()[KEY_FEED_PE] ?: false
+            NewsFeed.PROJECT_EULER_NEWS -> dataStore.data.first()[KEY_FEED_PE] ?: false
+            NewsFeed.ACMP_NEWS -> dataStore.data.first()[KEY_FEED_ACMP] ?: false
+            NewsFeed.ZAOCH_NEWS -> dataStore.data.first()[KEY_FEED_ZAOCH] ?: false
         }
 
         suspend fun setNewsFeedEnabled(newsFeed: NewsFeed, flag: Boolean){
             when(newsFeed){
                 NewsFeed.PROJECT_EULER_RECENT -> dataStore.edit { it[KEY_FEED_PE_RECENT] = flag }
-                //NewsFeed.PROJECT_EULER_NEWS -> dataStore.edit { it[KEY_FEED_PE] = flag }
+                NewsFeed.PROJECT_EULER_NEWS -> dataStore.edit { it[KEY_FEED_PE] = flag }
+                NewsFeed.ACMP_NEWS -> dataStore.edit { it[KEY_FEED_ACMP] = flag }
+                NewsFeed.ZAOCH_NEWS -> dataStore.edit { it[KEY_FEED_ZAOCH] = flag }
             }
         }
 
