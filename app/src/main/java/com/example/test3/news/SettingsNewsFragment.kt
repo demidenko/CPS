@@ -8,9 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
-import androidx.datastore.preferences.createDataStore
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.CodeforcesTitle
@@ -18,10 +18,7 @@ import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
-import com.example.test3.utils.CodeforcesUtils
-import com.example.test3.utils.setupMultiSelect
-import com.example.test3.utils.setupSelect
-import com.example.test3.utils.setupSwitch
+import com.example.test3.utils.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -237,8 +234,7 @@ class SettingsNewsFragment: Fragment(){
         ZAOCH_NEWS
     }
 
-    class NewsSettingsDataStore(context: Context){
-        private val dataStore by lazy { context.createDataStore(name = "news_settings") }
+    class NewsSettingsDataStore(context: Context): SettingsDataStore(context, "news_settings"){
 
         companion object {
             private val KEY_TAB = preferencesKey<String>("default_tab")
@@ -286,20 +282,18 @@ class SettingsNewsFragment: Fragment(){
             dataStore.edit { it[KEY_FOLLOW] = flag }
         }
 
-        suspend fun getNewsFeedEnabled(newsFeed: NewsFeed) = when(newsFeed){
-            NewsFeed.PROJECT_EULER_RECENT -> dataStore.data.first()[KEY_FEED_PE_RECENT] ?: false
-            NewsFeed.PROJECT_EULER_NEWS -> dataStore.data.first()[KEY_FEED_PE] ?: false
-            NewsFeed.ACMP_NEWS -> dataStore.data.first()[KEY_FEED_ACMP] ?: false
-            NewsFeed.ZAOCH_NEWS -> dataStore.data.first()[KEY_FEED_ZAOCH] ?: false
+        private fun getKey(newsFeed: NewsFeed): Preferences.Key<Boolean> {
+            return when(newsFeed){
+                NewsFeed.PROJECT_EULER_RECENT -> KEY_FEED_PE_RECENT
+                NewsFeed.PROJECT_EULER_NEWS -> KEY_FEED_PE
+                NewsFeed.ACMP_NEWS -> KEY_FEED_ACMP
+                NewsFeed.ZAOCH_NEWS -> KEY_FEED_ZAOCH
+            }
         }
 
+        suspend fun getNewsFeedEnabled(newsFeed: NewsFeed) = dataStore.data.first()[getKey(newsFeed)] ?: false
         suspend fun setNewsFeedEnabled(newsFeed: NewsFeed, flag: Boolean){
-            when(newsFeed){
-                NewsFeed.PROJECT_EULER_RECENT -> dataStore.edit { it[KEY_FEED_PE_RECENT] = flag }
-                NewsFeed.PROJECT_EULER_NEWS -> dataStore.edit { it[KEY_FEED_PE] = flag }
-                NewsFeed.ACMP_NEWS -> dataStore.edit { it[KEY_FEED_ACMP] = flag }
-                NewsFeed.ZAOCH_NEWS -> dataStore.edit { it[KEY_FEED_ZAOCH] = flag }
-            }
+            dataStore.edit { it[getKey(newsFeed)] = flag }
         }
 
     }

@@ -10,6 +10,7 @@ import androidx.lifecycle.asLiveData
 import com.example.test3.*
 import com.example.test3.utils.AtCoderRatingChange
 import com.example.test3.utils.CodeforcesRatingChange
+import com.example.test3.utils.SettingsDataStore
 import com.example.test3.utils.signedToString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -136,8 +137,7 @@ class AccountDataStore(context: Context, name: String): SettingsByContext() {
     }
 }
 
-open class AccountSettingsDataStore(context: Context, name: String) {
-    protected val dataStore by lazy { context.createDataStore(name = "${name}_account_settings") }
+open class AccountSettingsDataStore(context: Context, name: String): SettingsDataStore(context, "${name}_account_settings") {
     open suspend fun resetRelatedData(){}
 }
 

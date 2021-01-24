@@ -5,13 +5,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
-import androidx.datastore.preferences.createDataStore
 import com.example.test3.*
 import com.example.test3.news.SettingsNewsFragment
-import com.example.test3.utils.ACMPAPI
-import com.example.test3.utils.OlympiadsZaochAPI
-import com.example.test3.utils.ProjectEulerAPI
-import com.example.test3.utils.fromHTML
+import com.example.test3.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -179,8 +175,7 @@ class NewsJobService : CoroutineJobService() {
         }
     }
 
-    class NewsJobServiceDataStore(context: Context){
-        private val dataStore by lazy { context.createDataStore(name = "jobservice_news") }
+    class NewsJobServiceDataStore(context: Context): SettingsDataStore(context, "jobservice_news"){
 
         companion object {
             private val KEY_ACMP_LAST_NEWS = preferencesKey<Int>("acmp_last_news")

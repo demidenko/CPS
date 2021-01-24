@@ -1,5 +1,6 @@
 package com.example.test3.utils
 
+import android.content.Context
 import android.text.Html
 import android.text.Spanned
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.HtmlCompat
+import androidx.datastore.preferences.createDataStore
 import com.example.test3.R
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -53,6 +55,10 @@ class SharedReloadButton(private val button: ImageButton) {
         current.remove(tag)
         if(current.isEmpty()) button.isEnabled = true
     }
+}
+
+open class SettingsDataStore(context: Context, name: String) {
+    protected val dataStore by lazy { context.createDataStore(name = name) }
 }
 
 

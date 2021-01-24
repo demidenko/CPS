@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
-import androidx.datastore.preferences.createDataStore
 import com.example.test3.*
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.ProjectEulerAPI
+import com.example.test3.utils.SettingsDataStore
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -75,8 +75,7 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
         }
     }
 
-    class ProjectEulerRecentProblemsJobServiceDataStore(context: Context){
-        private val dataStore by lazy { context.createDataStore(name = "jobservice_project_euler_recent") }
+    class ProjectEulerRecentProblemsJobServiceDataStore(context: Context): SettingsDataStore(context, "jobservice_project_euler_recent") {
 
         companion object {
             private val KEY_LAST_RECENT_PROBLEM_ID = preferencesKey<Int>("last_recent_problem_id")
