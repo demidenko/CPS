@@ -5,12 +5,14 @@ import android.view.*
 import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.setFragmentSubTitle
-import com.example.test3.utils.createAndAddSwitch
+import com.example.test3.utils.setupSwitch
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -78,7 +80,7 @@ class AccountSettingsFragment(): Fragment() {
     ){
         val view = requireView().findViewById<LinearLayout>(R.id.layout)
         layoutInflater.inflate(R.layout.settings_switcher, view)
-        createAndAddSwitch(view, title, checked, description, onChangeCallback)
+        setupSwitch(view[view.childCount-1] as ConstraintLayout, title, checked, description, onChangeCallback)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

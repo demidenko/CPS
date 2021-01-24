@@ -5,12 +5,10 @@ import android.text.Spanned
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.HtmlCompat
-import androidx.core.view.get
 import com.example.test3.R
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -57,6 +55,19 @@ class SharedReloadButton(private val button: ImageButton) {
     }
 }
 
+
+private fun setupDescription(
+    view: ConstraintLayout,
+    description: String
+){
+    if(description.isNotBlank()){
+        view.findViewById<TextView>(R.id.settings_item_description).apply {
+            text = description
+            visibility = View.VISIBLE
+        }
+    }
+}
+
 fun setupSwitch(
     view: ConstraintLayout,
     title: String,
@@ -65,17 +76,12 @@ fun setupSwitch(
     onChangeCallback: (buttonView: CompoundButton, isChecked: Boolean) -> Unit
 ){
     view.apply {
-        findViewById<TextView>(R.id.settings_switcher_title).text = title
+        findViewById<TextView>(R.id.settings_item_title).text = title
         findViewById<SwitchMaterial>(R.id.settings_switcher_button).apply {
             isChecked = checked
             this.setOnCheckedChangeListener { buttonView, isChecked -> onChangeCallback(buttonView,isChecked) }
         }
-        if(description.isNotBlank()){
-            findViewById<TextView>(R.id.settings_switcher_description).apply {
-                text = description
-                visibility = View.VISIBLE
-            }
-        }
+        setupDescription(this, description)
     }
 }
 
@@ -88,11 +94,11 @@ fun setupSelect(
     onChangeCallback: (buttonView: View, optionSelected: Int) -> Unit
 ){
     view.apply {
-        findViewById<TextView>(R.id.settings_switcher_title).text = title
+        findViewById<TextView>(R.id.settings_item_title).text = title
         val selectedTextView = findViewById<TextView>(R.id.settings_select_button)
-        var selected = initSelected
-        selectedTextView.text = options[selected]
+        selectedTextView.text = options[initSelected]
         setOnClickListener {
+            var selected = initSelected
             AlertDialog.Builder(context)
                 .setTitle(title)
                 .setSingleChoiceItems(options, selected){ d, index ->
@@ -103,22 +109,36 @@ fun setupSelect(
                 }
                 .create().show()
         }
-        if(description.isNotBlank()){
-            findViewById<TextView>(R.id.settings_switcher_description).apply {
-                text = description
-                visibility = View.VISIBLE
-            }
-        }
+        setupDescription(this, description)
     }
 }
 
-fun createAndAddSwitch(
-    view: LinearLayout,
+fun setupMultiSelect(
+    view: ConstraintLayout,
     title: String,
-    checked: Boolean,
+    options: Array<CharSequence>,
+    initSelected: BooleanArray,
     description: String = "",
-    onChangeCallback: (buttonView: CompoundButton, isChecked: Boolean) -> Unit
+    onChangeCallback: (buttonView: View, optionsSelected: BooleanArray) -> Unit
 ){
-    setupSwitch(view[view.childCount-1] as ConstraintLayout, title, checked, description, onChangeCallback)
+    view.apply {
+        findViewById<TextView>(R.id.settings_item_title).text = title
+        val selectedTextView = findViewById<TextView>(R.id.settings_multiselect_button)
+        selectedTextView.text = initSelected.count { it }.toString()
+        setOnClickListener {
+            val selected = initSelected.clone()
+            AlertDialog.Builder(context)
+                .setTitle(title)
+                .setMultiChoiceItems(options, selected){ _, i, isChecked ->
+                    selected[i] = isChecked
+                }
+                .setPositiveButton("Save"){ d, _ ->
+                    onChangeCallback(it, selected.clone())
+                    selectedTextView.text = selected.count { it }.toString()
+                    d.dismiss()
+                }
+                .create().show()
+        }
+        setupDescription(this, description)
+    }
 }
-

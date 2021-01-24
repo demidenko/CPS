@@ -2,14 +2,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
-        android:icon="@drawable/ic_cf_logo"
-        android:title="Codeforces"
-        >
-
-    </PreferenceCategory>
-
-
-    <PreferenceCategory
         android:icon="@drawable/ic_rss_feed"
         android:title="News feeds"
         >
@@ -19,14 +11,6 @@
             android:defaultValue="false"
             android:title="projecteuler.net"
             android:icon="@drawable/ic_projecteuler_logo"
-            />
-
-        <CheckBoxPreference
-            android:key="@string/news_project_euler_problems"
-            android:defaultValue="false"
-            android:title="projecteuler.net/recent"
-            android:icon="@drawable/ic_projecteuler_logo"
-            android:summary="new problems"
             />
 
         <CheckBoxPreference

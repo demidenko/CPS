@@ -19,6 +19,7 @@ import com.example.test3.R
 import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.utils.CodeforcesUtils
+import com.example.test3.utils.setupMultiSelect
 import com.example.test3.utils.setupSelect
 import com.example.test3.utils.setupSwitch
 import kotlinx.android.synthetic.main.activity_main.*
@@ -165,6 +166,54 @@ class SettingsNewsFragment: Fragment(){
                     buttonView.isEnabled = true
                 }
             }
+
+            val multiSelectNewsFeeds = view.findViewById<ConstraintLayout>(R.id.news_settings_news_feeds)
+
+            val newsFeedsNames = NewsFeed.values().map { newsFeed ->
+                when(newsFeed){
+                    NewsFeed.PROJECT_EULER_RECENT -> "projecteuler.net/recent"
+                    //NewsFeed.PROJECT_EULER_NEWS -> "projecteuler.net"
+                }
+            }
+
+            val newsFeedsEnabled = with(getSettings(requireContext())){
+                NewsFeed.values().map { newsFeed -> getNewsFeedEnabled(newsFeed) }
+                    .toBooleanArray()
+            }
+
+            setupMultiSelect(
+                multiSelectNewsFeeds,
+                "Subscribes",
+                newsFeedsNames.toTypedArray(),
+                newsFeedsEnabled
+            ){ buttonView, optionsSelected ->
+                lifecycleScope.launch {
+                    buttonView.isEnabled = false
+                    val changed = mutableListOf<Pair<NewsFeed,Boolean>>()
+                    with(getSettings(requireContext())){
+                        NewsFeed.values().mapIndexed { index, newsFeed ->
+                            val current = optionsSelected[index]
+                            if(newsFeedsEnabled[index] != current){
+                                setNewsFeedEnabled(newsFeed, current)
+                                newsFeedsEnabled[index] = current
+                                changed.add(Pair(newsFeed,current))
+                            }
+                        }
+                    }
+                    changed.forEach { (newsFeed, enabled) ->
+                        when(newsFeed){
+                            NewsFeed.PROJECT_EULER_RECENT -> {
+                                if(enabled) JobServicesCenter.startProjectEulerRecentProblemsJobService(requireContext())
+                                else JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.project_euler_recent_problems)
+                            }
+                            /*NewsFeed.PROJECT_EULER_NEWS -> {
+                                if(enabled) JobServicesCenter.startNewsJobService(requireContext())
+                            }*/
+                        }
+                    }
+                    buttonView.isEnabled = true
+                }
+            }
         }
     }
 
@@ -177,6 +226,13 @@ class SettingsNewsFragment: Fragment(){
         fun getSettings(context: Context) = NewsSettingsDataStore(context)
     }
 
+    enum class NewsFeed {
+        PROJECT_EULER_RECENT,
+        //PROJECT_EULER_NEWS,
+        //ACMP_NEWS,
+        //ZAOCH_NEWS
+    }
+
     class NewsSettingsDataStore(context: Context){
         private val dataStore by lazy { context.createDataStore(name = "news_settings") }
 
@@ -186,6 +242,11 @@ class SettingsNewsFragment: Fragment(){
             private val KEY_LOST = preferencesKey<Boolean>("lost")
             private val KEY_LOST_RATING = preferencesKey<String>("lost_min_rating")
             private val KEY_FOLLOW = preferencesKey<Boolean>("follow")
+
+            private val KEY_FEED_PE = preferencesKey<Boolean>("news_feeds_project_euler_news")
+            private val KEY_FEED_PE_RECENT = preferencesKey<Boolean>("news_feeds_project_euler_recent")
+            private val KEY_FEED_ACMP = preferencesKey<Boolean>("news_feeds_acmp_news")
+            private val KEY_FEED_ZAOCH = preferencesKey<Boolean>("news_feeds_zaoch_news")
         }
 
         suspend fun getDefaultTab(): CodeforcesTitle {
@@ -220,5 +281,18 @@ class SettingsNewsFragment: Fragment(){
         suspend fun setFollowEnabled(flag: Boolean){
             dataStore.edit { it[KEY_FOLLOW] = flag }
         }
+
+        suspend fun getNewsFeedEnabled(newsFeed: NewsFeed) = when(newsFeed){
+            NewsFeed.PROJECT_EULER_RECENT -> dataStore.data.first()[KEY_FEED_PE_RECENT] ?: false
+            //NewsFeed.PROJECT_EULER_NEWS -> dataStore.data.first()[KEY_FEED_PE] ?: false
+        }
+
+        suspend fun setNewsFeedEnabled(newsFeed: NewsFeed, flag: Boolean){
+            when(newsFeed){
+                NewsFeed.PROJECT_EULER_RECENT -> dataStore.edit { it[KEY_FEED_PE_RECENT] = flag }
+                //NewsFeed.PROJECT_EULER_NEWS -> dataStore.edit { it[KEY_FEED_PE] = flag }
+            }
+        }
+
     }
 }

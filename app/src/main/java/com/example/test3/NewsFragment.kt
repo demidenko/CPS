@@ -23,7 +23,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.test3.job_services.CodeforcesNewsFollowJobService
 import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
-import com.example.test3.job_services.JobServiceIDs
 import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.news.ManageCodeforcesFollowListFragment
 import com.example.test3.news.SettingsNewsFragment
@@ -952,12 +951,6 @@ class SettingsNewsFragment_old : PreferenceFragmentCompat(), SharedPreferences.O
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         when (key) {
-            getString(R.string.news_project_euler_problems) -> {
-                when(sharedPreferences.getBoolean(key, false)){
-                    true -> JobServicesCenter.startProjectEulerRecentProblemsJobService(requireContext())
-                    false -> JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.project_euler_recent_problems)
-                }
-            }
             getString(R.string.news_project_euler_feed),
             getString(R.string.news_acmp_feed),
             getString(R.string.news_zaoch_feed) -> {

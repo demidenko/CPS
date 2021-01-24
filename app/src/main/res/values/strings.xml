@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">CPS</string>
     <string name="news_project_euler_feed">prefs_news_project_euler_news</string>
-    <string name="news_project_euler_problems">prefs_news_project_euler_problems</string>
     <string name="news_acmp_feed">prefs_news_acmp_news</string>
     <string name="news_zaoch_feed">prefs_news_zaoch_news</string>
 

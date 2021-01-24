@@ -6,10 +6,8 @@ import android.app.job.JobScheduler
 import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
-import androidx.preference.PreferenceManager
 import com.example.test3.BottomProgressInfo
 import com.example.test3.MainActivity
-import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.news.SettingsNewsFragment
 import kotlinx.coroutines.*
@@ -56,12 +54,10 @@ object JobServicesCenter {
             JobServiceIDs.news_parsers to ::startNewsJobService,
             JobServiceIDs.accounts_parsers to ::startAccountsJobService
         )
-        with(PreferenceManager.getDefaultSharedPreferences(mainActivity)){
-            if(getBoolean(mainActivity.getString(R.string.news_project_euler_problems), false)) toStart[JobServiceIDs.project_euler_recent_problems] = ::startProjectEulerRecentProblemsJobService
-        }
         with(SettingsNewsFragment.getSettings(mainActivity)){
             if(getLostEnabled()) toStart[JobServiceIDs.codeforces_news_lost_recent] = ::startCodeforcesNewsLostRecentJobService
             if(getFollowEnabled()) toStart[JobServiceIDs.codeforces_news_follow] = ::startCodeforcesNewsFollowJobService
+            if(getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.PROJECT_EULER_RECENT)) toStart[JobServiceIDs.project_euler_recent_problems] = ::startProjectEulerRecentProblemsJobService
         }
         with(CodeforcesAccountManager(mainActivity).getSettings()){
             if(getContestWatchEnabled()) toStart[JobServiceIDs.codeforces_contest_watch_starter] = ::startCodeforcesContestWatchStarterJobService

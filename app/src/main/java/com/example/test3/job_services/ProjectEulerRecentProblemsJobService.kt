@@ -2,8 +2,8 @@ package com.example.test3.job_services
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import androidx.preference.PreferenceManager
 import com.example.test3.*
+import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.ProjectEulerAPI
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -15,9 +15,8 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
         private const val PREFERENCES_FILE_NAME = "project_euler"
         private const val LAST_RECENT_PROBLEM_ID = "last_recent_problem_id"
 
-        fun isEnabled(context: Context): Boolean {
-            return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.news_project_euler_problems), false)
-        }
+        suspend fun isEnabled(context: Context): Boolean =
+            SettingsNewsFragment.getSettings(context).getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.PROJECT_EULER_RECENT)
     }
 
     override suspend fun makeJobs(): ArrayList<Job> {
