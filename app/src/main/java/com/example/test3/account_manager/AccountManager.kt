@@ -4,7 +4,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.text.SpannableString
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.preferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.createDataStore
 import androidx.lifecycle.asLiveData
 import com.example.test3.*
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 abstract class AccountManager(val context: Context) {
 
     companion object {
-        val KEY_USER_INFO = preferencesKey<String>("user_info")
+        val KEY_USER_INFO = stringPreferencesKey("user_info")
     }
 
     abstract val userIDName: String
@@ -121,7 +121,7 @@ data class RatingChange(
 
 class AccountDataStore(context: Context, name: String): SettingsByContext() {
     companion object {
-        val KEY_USER_INFO = preferencesKey<String>("user_info")
+        val KEY_USER_INFO = stringPreferencesKey("user_info")
     }
 
     private val dataStore = context.createDataStore(name = name)

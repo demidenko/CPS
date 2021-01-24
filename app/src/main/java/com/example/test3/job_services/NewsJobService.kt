@@ -4,7 +4,8 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.preferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.test3.*
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.*
@@ -178,9 +179,9 @@ class NewsJobService : CoroutineJobService() {
     class NewsJobServiceDataStore(context: Context): SettingsDataStore(context, "jobservice_news"){
 
         companion object {
-            private val KEY_ACMP_LAST_NEWS = preferencesKey<Int>("acmp_last_news")
-            private val KEY_PROJECT_EULER_LAST_NEWS = preferencesKey<String>("project_euler_last_news")
-            private val KEY_OLYMPIADS_ZAOCH_LAST_NEWS = preferencesKey<String>("olympiads_zaoch_last_news")
+            private val KEY_ACMP_LAST_NEWS = intPreferencesKey("acmp_last_news")
+            private val KEY_PROJECT_EULER_LAST_NEWS = stringPreferencesKey("project_euler_last_news")
+            private val KEY_OLYMPIADS_ZAOCH_LAST_NEWS = stringPreferencesKey("olympiads_zaoch_last_news")
         }
 
         suspend fun getACMPLastNewsID() = dataStore.data.first()[KEY_ACMP_LAST_NEWS] ?: 0

@@ -7,8 +7,7 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import androidx.core.text.set
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.preferencesKey
+import androidx.datastore.preferences.core.*
 import com.example.test3.NotificationChannels
 import com.example.test3.NotificationIDs
 import com.example.test3.SettingsDelegate
@@ -204,15 +203,15 @@ val Context.accountDataStoreCodeforces by SettingsDelegate { AccountDataStore(it
 class CodeforcesAccountSettingsDataStore(context: Context, name: String): AccountSettingsDataStore(context, name){
 
     companion object {
-        private val KEY_OBS_RATING = preferencesKey<Boolean>("observe_rating")
-        private val KEY_LAST_RATED_CONTEST = preferencesKey<Int>("last_rated_contest")
+        private val KEY_OBS_RATING = booleanPreferencesKey("observe_rating")
+        private val KEY_LAST_RATED_CONTEST = intPreferencesKey("last_rated_contest")
 
-        private val KEY_OBS_CONTRIBUTION = preferencesKey<Boolean>("observe_contribution")
+        private val KEY_OBS_CONTRIBUTION = booleanPreferencesKey("observe_contribution")
 
-        private val KEY_CONTEST_WATCH = preferencesKey<Boolean>("contest_watch")
-        private val KEY_CONTEST_WATCH_LAST_SUBMISSION = preferencesKey<Long>("contest_watch_last_submission")
-        private val KEY_CONTEST_WATCH_STARTED = preferencesKey<Int>("contest_watch_started_contest")
-        private val KEY_CONTEST_WATCH_CANCELED = preferencesKey<String>("contest_watch_canceled")
+        private val KEY_CONTEST_WATCH = booleanPreferencesKey("contest_watch")
+        private val KEY_CONTEST_WATCH_LAST_SUBMISSION = longPreferencesKey("contest_watch_last_submission")
+        private val KEY_CONTEST_WATCH_STARTED = intPreferencesKey("contest_watch_started_contest")
+        private val KEY_CONTEST_WATCH_CANCELED = stringPreferencesKey("contest_watch_canceled")
     }
 
     override suspend fun resetRelatedData() {

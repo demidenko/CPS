@@ -1,8 +1,8 @@
 package com.example.test3
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.preferencesKey
 import androidx.datastore.preferences.createDataStore
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -30,7 +30,7 @@ abstract class SettingsByContext
 class SettingsUI(context: Context): SettingsByContext() {
     private val dataStore = context.createDataStore(name = "settings_ui")
 
-    private val KEY_USE_REAL_COLORS = preferencesKey<Boolean>("use_real_colors")
+    private val KEY_USE_REAL_COLORS = booleanPreferencesKey("use_real_colors")
 
     private val flowForUseRealColors = dataStore.data.map {
         it[KEY_USE_REAL_COLORS] ?: false

@@ -7,8 +7,9 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import androidx.core.text.set
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.preferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.test3.NotificationChannels
 import com.example.test3.NotificationIDs
 import com.example.test3.SettingsDelegate
@@ -173,8 +174,8 @@ val Context.accountDataStoreAtCoder by SettingsDelegate { AccountDataStore(it, A
 class AtCoderAccountSettingsDataStore(context: Context, name: String): AccountSettingsDataStore(context, name){
 
     companion object {
-        private val KEY_OBS_RATING = preferencesKey<Boolean>("observe_rating")
-        private val KEY_LAST_RATED_CONTEST = preferencesKey<String>("last_rated_contest")
+        private val KEY_OBS_RATING = booleanPreferencesKey("observe_rating")
+        private val KEY_LAST_RATED_CONTEST = stringPreferencesKey("last_rated_contest")
     }
 
     override suspend fun resetRelatedData() {

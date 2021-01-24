@@ -9,8 +9,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.preferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.CodeforcesTitle
@@ -237,16 +238,16 @@ class SettingsNewsFragment: Fragment(){
     class NewsSettingsDataStore(context: Context): SettingsDataStore(context, "news_settings"){
 
         companion object {
-            private val KEY_TAB = preferencesKey<String>("default_tab")
-            private val KEY_RU = preferencesKey<Boolean>("ru_lang")
-            private val KEY_LOST = preferencesKey<Boolean>("lost")
-            private val KEY_LOST_RATING = preferencesKey<String>("lost_min_rating")
-            private val KEY_FOLLOW = preferencesKey<Boolean>("follow")
+            private val KEY_TAB = stringPreferencesKey("default_tab")
+            private val KEY_RU = booleanPreferencesKey("ru_lang")
+            private val KEY_LOST = booleanPreferencesKey("lost")
+            private val KEY_LOST_RATING = stringPreferencesKey("lost_min_rating")
+            private val KEY_FOLLOW = booleanPreferencesKey("follow")
 
-            private val KEY_FEED_PE = preferencesKey<Boolean>("news_feeds_project_euler_news")
-            private val KEY_FEED_PE_RECENT = preferencesKey<Boolean>("news_feeds_project_euler_recent")
-            private val KEY_FEED_ACMP = preferencesKey<Boolean>("news_feeds_acmp_news")
-            private val KEY_FEED_ZAOCH = preferencesKey<Boolean>("news_feeds_zaoch_news")
+            private val KEY_FEED_PE = booleanPreferencesKey("news_feeds_project_euler_news")
+            private val KEY_FEED_PE_RECENT = booleanPreferencesKey("news_feeds_project_euler_recent")
+            private val KEY_FEED_ACMP = booleanPreferencesKey("news_feeds_acmp_news")
+            private val KEY_FEED_ZAOCH = booleanPreferencesKey("news_feeds_zaoch_news")
         }
 
         suspend fun getDefaultTab(): CodeforcesTitle {

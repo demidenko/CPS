@@ -3,7 +3,7 @@ package com.example.test3.job_services
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.preferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import com.example.test3.*
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.ProjectEulerAPI
@@ -78,7 +78,7 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
     class ProjectEulerRecentProblemsJobServiceDataStore(context: Context): SettingsDataStore(context, "jobservice_project_euler_recent") {
 
         companion object {
-            private val KEY_LAST_RECENT_PROBLEM_ID = preferencesKey<Int>("last_recent_problem_id")
+            private val KEY_LAST_RECENT_PROBLEM_ID = intPreferencesKey("last_recent_problem_id")
         }
 
         suspend fun getLastRecentProblemID() = dataStore.data.first()[KEY_LAST_RECENT_PROBLEM_ID] ?: 0
