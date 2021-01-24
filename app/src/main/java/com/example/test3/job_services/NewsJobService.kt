@@ -3,6 +3,9 @@ package com.example.test3.job_services
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.preferencesKey
+import androidx.datastore.preferences.createDataStore
 import com.example.test3.*
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.ACMPAPI
@@ -10,22 +13,10 @@ import com.example.test3.utils.OlympiadsZaochAPI
 import com.example.test3.utils.ProjectEulerAPI
 import com.example.test3.utils.fromHTML
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class NewsJobService : CoroutineJobService() {
-
-    companion object{
-        const val PREFERENCES_FILE_NAME = "news_parsers"
-
-        //acmp
-        const val ACMP_LAST_NEWS = "acmp_last_news"
-
-        //project euler
-        const val PROJECT_EULER_LAST_NEWS = "project_euler_last_news"
-
-        //olympiads.ru/zaoch
-        const val OLYMPIADS_ZAOCH_LAST_NEWS = "olympiads_zaoch_last_news"
-    }
 
     override suspend fun makeJobs(): List<Job> {
         val jobs = mutableListOf<Job>()
@@ -40,12 +31,12 @@ class NewsJobService : CoroutineJobService() {
         return jobs
     }
 
+    private val dataStore by lazy { NewsJobServiceDataStore(this) }
+
     private suspend fun parseACMP() {
         val s = ACMPAPI.getMainPage() ?: return
 
-        val prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
-
-        val lastNewsID = prefs.getInt(ACMP_LAST_NEWS, 0)
+        val lastNewsID = dataStore.getACMPLastNewsID()
         val news = mutableListOf<Pair<Int, String>>()
         var i = 0
         while (true) {
@@ -92,19 +83,14 @@ class NewsJobService : CoroutineJobService() {
 
         val firstID = news.first().first
         if(firstID != lastNewsID) {
-            with(prefs.edit()) {
-                putInt(ACMP_LAST_NEWS, firstID)
-                apply()
-            }
+            dataStore.setACMPLastNewsID(firstID)
         }
     }
 
     private suspend fun parseProjectEuler() {
         val s = ProjectEulerAPI.getNewsPage() ?: return
 
-        val prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
-
-        val lastNewsID = prefs.getString(PROJECT_EULER_LAST_NEWS, null) ?: ""
+        val lastNewsID = dataStore.getProjectEulerLastNewsID()
 
         val news = mutableListOf<Pair<String, String>>()
         var i = 0
@@ -140,19 +126,14 @@ class NewsJobService : CoroutineJobService() {
 
         val firstID = news.first().first
         if(firstID != lastNewsID) {
-            with(prefs.edit()) {
-                putString(PROJECT_EULER_LAST_NEWS, firstID)
-                apply()
-            }
+            dataStore.setProjectEulerLastNewsID(firstID)
         }
     }
 
     private suspend fun parseZaoch() {
         val s = OlympiadsZaochAPI.getMainPage() ?: return
 
-        val prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
-
-        val lastNewsID = prefs.getString(OLYMPIADS_ZAOCH_LAST_NEWS, null) ?: ""
+        val lastNewsID = dataStore.getOlympiadsZaochLastNewsID()
 
         val news = mutableListOf<Triple<String, String, String>>()
         var i = 0
@@ -176,26 +157,50 @@ class NewsJobService : CoroutineJobService() {
 
         if(news.isEmpty()) return
 
-        news.forEach { (_, title, content) ->
-            val n = notificationBuilder(this, NotificationChannels.olympiads_zaoch_news).apply {
-                setSubText("zaoch news")
-                setContentTitle(title)
-                setBigContent(fromHTML(content))
-                setSmallIcon(R.drawable.ic_news)
-                setColor(NotificationColors.zaoch_main)
-                setShowWhen(true)
-                //setAutoCancel(true)
-                setContentIntent(makePendingIntentOpenURL("https://olympiads.ru/zaoch/", this@NewsJobService))
+        if(lastNewsID!=""){
+            news.forEach { (_, title, content) ->
+                val n = notificationBuilder(this, NotificationChannels.olympiads_zaoch_news).apply {
+                    setSubText("zaoch news")
+                    setContentTitle(title)
+                    setBigContent(fromHTML(content))
+                    setSmallIcon(R.drawable.ic_news)
+                    setColor(NotificationColors.zaoch_main)
+                    setShowWhen(true)
+                    //setAutoCancel(true)
+                    setContentIntent(makePendingIntentOpenURL("https://olympiads.ru/zaoch/", this@NewsJobService))
+                }
+                NotificationManagerCompat.from(this).notify(NotificationIDs.makeZaochNewsNotificationID(title), n.build())
             }
-            NotificationManagerCompat.from(this).notify(NotificationIDs.makeZaochNewsNotificationID(title), n.build())
         }
 
         val firstID = news.first().first
         if(firstID != lastNewsID) {
-            with(prefs.edit()) {
-                putString(OLYMPIADS_ZAOCH_LAST_NEWS, firstID)
-                apply()
-            }
+            dataStore.setOlympiadsZaochLastNewsID(firstID)
+        }
+    }
+
+    class NewsJobServiceDataStore(context: Context){
+        private val dataStore by lazy { context.createDataStore(name = "jobservice_news") }
+
+        companion object {
+            private val KEY_ACMP_LAST_NEWS = preferencesKey<Int>("acmp_last_news")
+            private val KEY_PROJECT_EULER_LAST_NEWS = preferencesKey<String>("project_euler_last_news")
+            private val KEY_OLYMPIADS_ZAOCH_LAST_NEWS = preferencesKey<String>("olympiads_zaoch_last_news")
+        }
+
+        suspend fun getACMPLastNewsID() = dataStore.data.first()[KEY_ACMP_LAST_NEWS] ?: 0
+        suspend fun setACMPLastNewsID(newsID: Int) {
+            dataStore.edit { it[KEY_ACMP_LAST_NEWS] = newsID }
+        }
+
+        suspend fun getProjectEulerLastNewsID() = dataStore.data.first()[KEY_PROJECT_EULER_LAST_NEWS] ?: ""
+        suspend fun setProjectEulerLastNewsID(newsID: String) {
+            dataStore.edit { it[KEY_PROJECT_EULER_LAST_NEWS] = newsID }
+        }
+
+        suspend fun getOlympiadsZaochLastNewsID() = dataStore.data.first()[KEY_OLYMPIADS_ZAOCH_LAST_NEWS] ?: ""
+        suspend fun setOlympiadsZaochLastNewsID(newsID: String) {
+            dataStore.edit { it[KEY_OLYMPIADS_ZAOCH_LAST_NEWS] = newsID }
         }
     }
 

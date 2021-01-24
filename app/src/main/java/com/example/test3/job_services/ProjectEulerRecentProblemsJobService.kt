@@ -2,19 +2,20 @@ package com.example.test3.job_services
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.preferencesKey
+import androidx.datastore.preferences.createDataStore
 import com.example.test3.*
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.ProjectEulerAPI
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.*
 
 class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
 
     companion object {
-        private const val PREFERENCES_FILE_NAME = "project_euler"
-        private const val LAST_RECENT_PROBLEM_ID = "last_recent_problem_id"
-
         suspend fun isEnabled(context: Context): Boolean =
             SettingsNewsFragment.getSettings(context).getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.PROJECT_EULER_RECENT)
     }
@@ -27,11 +28,12 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
         }
     }
 
+    private val dataStore by lazy { ProjectEulerRecentProblemsJobServiceDataStore(this) }
+
     private suspend fun parseRecentProblems() {
         val s = ProjectEulerAPI.getRecentProblemsPage() ?: return
 
-        val prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
-        val lastViewedProblemID = prefs.getInt(LAST_RECENT_PROBLEM_ID, 0)
+        val lastViewedProblemID = dataStore.getLastRecentProblemID()
 
         val newProblems = mutableListOf<Pair<Int,String>>()
 
@@ -69,10 +71,20 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
 
         val firstID = newProblems.first().first
         if(firstID != lastViewedProblemID) {
-            with(prefs.edit()) {
-                putInt(LAST_RECENT_PROBLEM_ID, firstID)
-                apply()
-            }
+            dataStore.setLastRecentProblemID(firstID)
+        }
+    }
+
+    class ProjectEulerRecentProblemsJobServiceDataStore(context: Context){
+        private val dataStore by lazy { context.createDataStore(name = "jobservice_project_euler_recent") }
+
+        companion object {
+            private val KEY_LAST_RECENT_PROBLEM_ID = preferencesKey<Int>("last_recent_problem_id")
+        }
+
+        suspend fun getLastRecentProblemID() = dataStore.data.first()[KEY_LAST_RECENT_PROBLEM_ID] ?: 0
+        suspend fun setLastRecentProblemID(problemID: Int) {
+            dataStore.edit { it[KEY_LAST_RECENT_PROBLEM_ID] = problemID }
         }
     }
 
