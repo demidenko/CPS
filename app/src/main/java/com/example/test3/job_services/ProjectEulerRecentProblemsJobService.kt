@@ -19,11 +19,11 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
             SettingsNewsFragment.getSettings(context).getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.PROJECT_EULER_RECENT)
     }
 
-    override suspend fun makeJobs(): ArrayList<Job> {
-        if (isEnabled(this)) return arrayListOf( launch { parseRecentProblems() } )
+    override suspend fun makeJobs(): List<Job> {
+        if (isEnabled(this)) return listOf( launch { parseRecentProblems() } )
         else{
             JobServicesCenter.stopJobService(this, JobServiceIDs.project_euler_recent_problems)
-            return arrayListOf()
+            return emptyList()
         }
     }
 
@@ -57,7 +57,7 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
                     setSubText("Project Euler • New problem published!")
                     setContentTitle("Problem $id")
                     setBigContent(name)
-                    setSmallIcon(R.drawable.ic_new_post)
+                    setSmallIcon(R.drawable.ic_projecteuler_logo)
                     setColor(NotificationColors.project_euler_main)
                     setShowWhen(true)
                     setAutoCancel(true)

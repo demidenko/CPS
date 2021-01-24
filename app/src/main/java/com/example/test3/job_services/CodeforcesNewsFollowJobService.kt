@@ -122,11 +122,11 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
         }
     }
 
-    override suspend fun makeJobs(): ArrayList<Job> {
-        if (isEnabled(this)) return arrayListOf( launch { parseBlogs() })
+    override suspend fun makeJobs(): List<Job> {
+        if (isEnabled(this)) return listOf( launch { parseBlogs() })
         else{
             JobServicesCenter.stopJobService(this, JobServiceIDs.codeforces_news_follow)
-            return arrayListOf()
+            return emptyList()
         }
     }
 

@@ -27,8 +27,8 @@ class NewsJobService : CoroutineJobService() {
         const val OLYMPIADS_ZAOCH_LAST_NEWS = "olympiads_zaoch_last_news"
     }
 
-    override suspend fun makeJobs(): ArrayList<Job> {
-        val jobs = arrayListOf<Job>()
+    override suspend fun makeJobs(): List<Job> {
+        val jobs = mutableListOf<Job>()
         with(SettingsNewsFragment.getSettings(this)){
             if(getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.PROJECT_EULER_NEWS)) jobs.add(launch { parseProjectEuler() })
             if(getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.ACMP_NEWS)) jobs.add(launch { parseACMP() })

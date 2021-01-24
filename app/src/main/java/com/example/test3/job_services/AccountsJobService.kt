@@ -17,8 +17,8 @@ class AccountsJobService : CoroutineJobService() {
     private val codeforcesAccountManager by lazy { CodeforcesAccountManager(this) }
     private val atcoderAccountManager by lazy { AtCoderAccountManager(this) }
 
-    override suspend fun makeJobs(): ArrayList<Job> {
-        val jobs = arrayListOf<Job>()
+    override suspend fun makeJobs(): List<Job> {
+        val jobs = mutableListOf<Job>()
         with(codeforcesAccountManager.getSettings()){
             if(getObserveRating()) jobs.add(launch { codeforcesRating() })
             if(getObserveContribution()) jobs.add(launch { codeforcesContribution() })

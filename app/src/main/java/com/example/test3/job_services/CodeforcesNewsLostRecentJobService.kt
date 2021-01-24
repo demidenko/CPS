@@ -102,11 +102,11 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         suspend fun isEnabled(context: Context): Boolean = SettingsNewsFragment.getSettings(context).getLostEnabled()
     }
 
-    override suspend fun makeJobs(): ArrayList<Job> {
-        if (isEnabled(this)) return arrayListOf( launch { parseRecent() })
+    override suspend fun makeJobs(): List<Job> {
+        if (isEnabled(this)) return listOf( launch { parseRecent() })
         else{
             JobServicesCenter.stopJobService(this, JobServiceIDs.codeforces_news_lost_recent)
-            return arrayListOf()
+            return emptyList()
         }
     }
 

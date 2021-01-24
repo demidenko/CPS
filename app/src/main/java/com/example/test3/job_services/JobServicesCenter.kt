@@ -138,7 +138,7 @@ abstract class CoroutineJobService : JobService(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext = Job() + Dispatchers.Main
 
-    protected abstract suspend fun makeJobs(): ArrayList<Job>
+    protected abstract suspend fun makeJobs(): List<Job>
 
     override fun onStopJob(params: JobParameters?): Boolean {
         coroutineContext.cancelChildren()

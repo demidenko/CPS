@@ -14,12 +14,12 @@ import java.util.concurrent.TimeUnit
 class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
 
     private val accountManager by lazy { CodeforcesAccountManager(this) }
-    override suspend fun makeJobs(): ArrayList<Job> {
+    override suspend fun makeJobs(): List<Job> {
         if(accountManager.getSettings().getContestWatchEnabled()){
-            return arrayListOf(launch { checkSubmissions() })
+            return listOf(launch { checkSubmissions() })
         }else {
             JobServicesCenter.stopJobService(this, JobServiceIDs.codeforces_contest_watch_starter)
-            return arrayListOf()
+            return emptyList()
         }
     }
 
