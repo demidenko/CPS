@@ -74,7 +74,7 @@ class NewsFragment : Fragment() {
             }
         }
         CodeforcesNewsAdapter(this, fragments).apply {
-            setButtons(CodeforcesTitle.RECENT, Pair(switchButton,View.VISIBLE), Pair(showBackButton,View.GONE))
+            setButtons(CodeforcesTitle.RECENT, Pair(recentSwitchButton,View.VISIBLE), Pair(recentShowBackButton,View.GONE))
             setButtons(CodeforcesTitle.LOST, Pair(updateLostInfoButton,View.VISIBLE))
         }
     }
@@ -145,12 +145,12 @@ class NewsFragment : Fragment() {
 
         with(requireActivity() as MainActivity){
             navigation_news_reload.setOnClickListener { reloadTabs() }
-            navigation_news_lost_update_info.setOnClickListener { updateLostInfo() }
-            navigation_news_recent_swap.setOnClickListener {
+            updateLostInfoButton.setOnClickListener { updateLostInfo() }
+            recentSwitchButton.setOnClickListener {
                 val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
                 (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).switchMode()
             }
-            navigation_news_recent_show_blog_back.setOnClickListener {
+            recentShowBackButton.setOnClickListener {
                 val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
                 (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).closeShowFromBlog()
             }
@@ -181,7 +181,7 @@ class NewsFragment : Fragment() {
                         .commit()
                 }
             }
-            R.id.menu_news_follow_list -> manageCodeforcesFollowList()
+            R.id.menu_news_follow_list -> showCodeforcesFollowListManager()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -240,8 +240,8 @@ class NewsFragment : Fragment() {
 
     private val updateLostInfoButton by lazy { requireActivity().navigation_news_lost_update_info }
 
-    private val switchButton by lazy { requireActivity().navigation_news_recent_swap }
-    private val showBackButton by lazy { requireActivity().navigation_news_recent_show_blog_back }
+    private val recentSwitchButton by lazy { requireActivity().navigation_news_recent_swap }
+    private val recentShowBackButton by lazy { requireActivity().navigation_news_recent_show_blog_back }
 
     private fun updateLostInfo() {
         //TODO: behaviour on disable/enable LOST in settings
@@ -261,7 +261,7 @@ class NewsFragment : Fragment() {
 
     }
 
-    fun manageCodeforcesFollowList(){
+    fun showCodeforcesFollowListManager(){
         requireActivity().supportFragmentManager.beginTransaction()
             .hide(this)
             .add(android.R.id.content, ManageCodeforcesFollowListFragment())
@@ -606,7 +606,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
                     connector.save()
                     Snackbar.make(holder.view, SpannableStringBuilder("You now followed ").append(handle), Snackbar.LENGTH_LONG).apply {
                         setAction("Manage"){
-                            mainActivity.newsFragment.manageCodeforcesFollowList()
+                            mainActivity.newsFragment.showCodeforcesFollowListManager()
                         }
                     }
                 }
