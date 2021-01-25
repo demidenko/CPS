@@ -53,7 +53,7 @@ class SettingsNewsFragment: Fragment(){
             val tabOptions = listOf(
                 CodeforcesTitle.MAIN,
                 CodeforcesTitle.TOP,
-                //CodeforcesTitle.RECENT TODO: crash on init
+                CodeforcesTitle.RECENT
             )
 
             val selectDefaultTab = view.findViewById<ConstraintLayout>(R.id.news_settings_default_tab)

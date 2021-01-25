@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.view.*
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -72,17 +73,13 @@ class NewsFragment : Fragment() {
                 fragments.add(createLostFragment())
             }
         }
-        CodeforcesNewsAdapter(this, fragments)
+        CodeforcesNewsAdapter(this, fragments).apply {
+            setButtons(CodeforcesTitle.RECENT, Pair(switchButton,View.VISIBLE), Pair(showBackButton,View.GONE))
+            setButtons(CodeforcesTitle.LOST, Pair(updateLostInfoButton,View.VISIBLE))
+        }
     }
     private val tabLayout by lazy { requireView().findViewById<TabLayout>(R.id.cf_news_tab_layout) }
     private val tabSelectionListener = object : TabLayout.OnTabSelectedListener{
-
-        fun changeVisibility(fragment: CodeforcesNewsFragment, type: Int){
-            when(fragment.title){
-                CodeforcesTitle.LOST -> updateLostInfoButton.visibility = type
-                CodeforcesTitle.RECENT -> (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).changeVisibility(type)
-            }
-        }
 
         override fun onTabReselected(tab: TabLayout.Tab?) {}
 
@@ -96,7 +93,7 @@ class NewsFragment : Fragment() {
                     }
                 }
 
-                changeVisibility(fragment, View.GONE)
+                codeforcesNewsAdapter.makeGONE(fragment.title)
             }
         }
 
@@ -109,7 +106,7 @@ class NewsFragment : Fragment() {
                     }
                 }
 
-                changeVisibility(fragment, View.VISIBLE)
+                codeforcesNewsAdapter.makeVISIBLE(fragment.title)
 
                 val subtitle = "::news.codeforces.${fragment.title.name.toLowerCase(Locale.ENGLISH)}"
                 setFragmentSubTitle(this@NewsFragment, subtitle)
@@ -243,6 +240,9 @@ class NewsFragment : Fragment() {
 
     private val updateLostInfoButton by lazy { requireActivity().navigation_news_lost_update_info }
 
+    private val switchButton by lazy { requireActivity().navigation_news_recent_swap }
+    private val showBackButton by lazy { requireActivity().navigation_news_recent_show_blog_back }
+
     private fun updateLostInfo() {
         //TODO: behaviour on disable/enable LOST in settings
 
@@ -314,7 +314,6 @@ class NewsFragment : Fragment() {
         if(index == -1) return
         tabLayout.getTabAt(index)?.let { tabLost ->
             if(tabLost.isSelected){
-                tabSelectionListener.onTabUnselected(tabLost)
                 tabLayout.selectTab(tabLayout.getTabAt(codeforcesNewsAdapter.indexOf(CodeforcesTitle.RECENT)))
             }
         }
@@ -345,6 +344,29 @@ class CodeforcesNewsAdapter(
     }
 
     override fun getItemId(position: Int) = fragments[position].title.ordinal.toLong()
+
+
+    private val tabButtons = mutableMapOf<CodeforcesTitle, List<ImageButton>>()
+    private val buttonVisibility = mutableMapOf<Int, Int>()
+    fun setButtons(title: CodeforcesTitle, vararg buttons: Pair<ImageButton,Int>){
+        tabButtons[title] = buttons.unzip().first
+        buttons.forEach { (button, visibility) ->
+            buttonVisibility[button.id] = visibility
+        }
+    }
+
+    fun makeGONE(title: CodeforcesTitle) {
+        tabButtons[title]?.forEach { button ->
+            buttonVisibility[button.id] = button.visibility
+            button.visibility = View.GONE
+        }
+    }
+
+    fun makeVISIBLE(title: CodeforcesTitle) {
+        tabButtons[title]?.forEach { button ->
+            button.visibility = buttonVisibility[button.id]!!
+        }
+    }
 }
 
 class CodeforcesNewsFragment(
@@ -687,14 +709,6 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         super.onAttachedToRecyclerView(recyclerView)
         with(recyclerView.parent.parent as ConstraintLayout){
             header = findViewById(R.id.cf_news_page_header)
-        }
-    }
-
-    fun changeVisibility(type: Int){
-        if(headerBlog == null){
-            switchButton.visibility = type
-        }else{
-            showBackButton.visibility = type
         }
     }
 
