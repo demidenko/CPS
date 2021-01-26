@@ -1,7 +1,6 @@
 package com.example.test3
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -12,6 +11,8 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.color
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -31,9 +32,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_cf_news_page.view.*
 import kotlinx.android.synthetic.main.navigation_news.*
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -102,7 +102,9 @@ class NewsFragment : Fragment() {
                 val fragment = codeforcesNewsAdapter.fragments[position]
                 if(fragment.isManagesNewEntries) badge?.run{
                     if(hasNumber()){
-                        fragment.saveEntries()
+                        lifecycleScope.launch {
+                            fragment.saveEntries()
+                        }
                     }
                 }
 
@@ -211,14 +213,14 @@ class NewsFragment : Fragment() {
         if(fragment.reload(lang)) {
             tab.text = fragment.title.name
             if (fragment.isManagesNewEntries) {
-                if (fragment.newBlogs.isEmpty()) {
+                if (fragment.newBlogsSize == 0) {
                     tab.badge?.apply {
                         isVisible = false
                         clearNumber()
                     }
                 } else {
                     tab.badge?.apply {
-                        number = fragment.newBlogs.size
+                        number = fragment.newBlogsSize
                         isVisible = true
                     }
                     if (tab.isSelected) fragment.saveEntries()
@@ -408,7 +410,11 @@ class CodeforcesNewsFragment(
         lifecycleScope.launchWhenCreated { callReload() }
     }
 
-    var newBlogs = hashSetOf<String>()
+    private var newBlogs = hashSetOf<String>()
+    val newBlogsSize: Int
+        get() = newBlogs.size
+
+    private val dataStore by lazy { CodeforcesNewsFragmentDataStore(this) }
 
     suspend fun reload(lang: String): Boolean {
         val source =
@@ -419,20 +425,17 @@ class CodeforcesNewsFragment(
         viewAdapter.notifyDataSetChanged()
 
         if(isManagesNewEntries){
-            val savedBlogs = prefs.getStringSet(prefs_key, null) ?: emptySet()
+            val savedBlogs = dataStore.getBlogsViewed()
             newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.toHashSet()
         }
 
         return true
     }
 
-    fun saveEntries() {
+    suspend fun saveEntries() {
         if(!isManagesNewEntries) return
-        with(prefs.edit()) {
-            val toSave = viewAdapter.getBlogIDs().toSet()
-            putStringSet(prefs_key, toSave)
-            apply()
-        }
+        val toSave = viewAdapter.getBlogIDs().toSet()
+        dataStore.setBlogsViewed(toSave)
         (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.markNewEntries(newBlogs)
     }
 
@@ -440,12 +443,18 @@ class CodeforcesNewsFragment(
         viewAdapter.refresh()
     }
 
-    companion object {
-        const val CODEFORCES_NEWS_VIEWED = "codeforces_news_viewed"
-    }
 
-    private val prefs: SharedPreferences by lazy { requireActivity().getSharedPreferences(CODEFORCES_NEWS_VIEWED, Context.MODE_PRIVATE) }
-    private val prefs_key: String = this::class.java.simpleName + " " + title
+    class CodeforcesNewsFragmentDataStore(fragment: CodeforcesNewsFragment)
+    : SettingsDataStore(fragment.requireContext(), "data_cf_news_fragment_${fragment.title}"){
+        companion object {
+            private val KEY_BLOGS_VIEWED = stringSetPreferencesKey("blogs_viewed")
+        }
+
+        suspend fun getBlogsViewed() = dataStore.data.first()[KEY_BLOGS_VIEWED] ?: emptySet()
+        suspend fun setBlogsViewed(blogIDs: Set<String>) = withContext(Dispatchers.IO){
+            dataStore.edit { it[KEY_BLOGS_VIEWED] = blogIDs }
+        }
+    }
 }
 
 

@@ -49,7 +49,7 @@
             />
 
         <include
-            android:id="@+id/news_settings_ru_lang"
+            android:id="@+id/news_settings_follow"
             layout="@layout/settings_switcher"
             />
 
@@ -68,7 +68,7 @@
             />
 
         <include
-            android:id="@+id/news_settings_follow"
+            android:id="@+id/news_settings_ru_lang"
             layout="@layout/settings_switcher"
             />
 
