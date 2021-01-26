@@ -127,7 +127,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
 
         if(recentBlogs.isEmpty()) return
 
-        val currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+        val currentTimeSeconds = getCurrentTimeSeconds()
 
         val suspects = getSavedSuspectBlogs(this)
             .filter { blog ->

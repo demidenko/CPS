@@ -6,6 +6,7 @@ import com.example.test3.account_manager.STATUS
 import com.example.test3.contest_watch.CodeforcesContestWatchService
 import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesAPIStatus
+import com.example.test3.utils.getCurrentTimeSeconds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -27,7 +28,7 @@ class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
         val info = accountManager.getSavedInfo() as CodeforcesAccountManager.CodeforcesUserInfo
         if(info.status != STATUS.OK) return
 
-        val currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+        val currentTimeSeconds = getCurrentTimeSeconds()
         fun isTooLate(timeSeconds: Long): Boolean {
             return TimeUnit.SECONDS.toHours(currentTimeSeconds - timeSeconds) >= 24
         }
@@ -90,7 +91,7 @@ class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
         fun stopWatcher(context: Context, contestID: Int) = runBlocking {
             val settings = CodeforcesAccountManager(context).getSettings()
             val canceled = settings.getContestWatchCanceled().toMutableList()
-            canceled.add(Pair(contestID, System.currentTimeMillis()))
+            canceled.add(Pair(contestID, getCurrentTimeSeconds()))
             settings.setContestWatchCanceled(canceled)
             settings.setContestWatchStartedContestID(-1)
         }

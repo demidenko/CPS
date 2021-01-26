@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.test3.R
 import com.example.test3.account_manager.*
 import com.example.test3.getColorFromResource
+import com.example.test3.utils.getCurrentTimeSeconds
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -38,7 +39,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
         ratingHistoryLast10 = history.takeLast(10)
 
-        val currentSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+        val currentSeconds = getCurrentTimeSeconds()
         ratingHistoryLastMonth = history.filter { ratingChange ->
             TimeUnit.SECONDS.toDays(currentSeconds - ratingChange.timeSeconds) <= 30
         }
@@ -91,7 +92,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         val minY = toShow.minOf { it.rating } - 100f
         val maxY = toShow.maxOf { it.rating } + 100f
 
-        val currentSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+        val currentSeconds = getCurrentTimeSeconds()
         val (minX, maxX) = when(toShow){
             ratingHistoryLastMonth -> Pair(currentSeconds - TimeUnit.DAYS.toSeconds(30), currentSeconds)
             ratingHistoryLastYear -> Pair(currentSeconds - TimeUnit.DAYS.toSeconds(365), currentSeconds)

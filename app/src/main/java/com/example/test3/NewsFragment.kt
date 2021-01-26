@@ -859,7 +859,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
         holder.comment.text = CodeforcesUtils.fromCodeforcesHTML(comment.text)
 
-        holder.time.text = timeDifference(comment.creationTimeSeconds, TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()))
+        holder.time.text = timeDifference(comment.creationTimeSeconds, getCurrentTimeSeconds())
 
         holder.view.setOnClickListener {
             activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(blogEntry.id,comment.id)))
@@ -883,7 +883,7 @@ class CodeforcesNewsItemsLostRecentAdapter : CodeforcesNewsItemsClassicAdapter()
         val blogs = CodeforcesNewsLostRecentJobService.getSavedLostBlogs(activity)
 
         if(blogs.isNotEmpty()){
-            val currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+            val currentTimeSeconds = getCurrentTimeSeconds()
             rows = blogs
                 .sortedByDescending { it.creationTimeSeconds }
                 .map {

@@ -20,6 +20,7 @@ import okhttp3.OkHttpClient
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+fun getCurrentTimeSeconds() = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
 
 val httpClient = OkHttpClient
     .Builder()
