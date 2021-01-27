@@ -38,24 +38,36 @@ abstract class AccountPanel(
 
     abstract val homeURL: String
 
+    companion object {
+        private val startDelayMillis = TimeUnit.SECONDS.toMillis(3)
+        private val durationMillis = TimeUnit.SECONDS.toMillis(2)
+        private fun animateDelayedHide(button: ImageButton){
+            button.clearAnimation()
+            button.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
+                button.visibility = View.VISIBLE
+                button.animate().setStartDelay(startDelayMillis).setDuration(durationMillis).alpha(0f)
+                    .withEndAction {
+                        button.visibility = View.GONE
+                    }.start()
+            }.start()
+        }
+    }
 
     fun createSmallView(): View {
-        layout.setOnClickListener {
-            val startDelay = TimeUnit.SECONDS.toMillis(3)
-            val duration = TimeUnit.SECONDS.toMillis(2)
-            listOf(reloadButton, expandButton).forEach { button ->
-                if(button.isEnabled) {
-                    button.clearAnimation()
-                    button.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
-                        button.visibility = View.VISIBLE
-                        button.animate().setStartDelay(startDelay).setDuration(duration).alpha(0f)
-                            .withEndAction {
-                                button.visibility = View.GONE
-                            }.start()
-                    }.start()
+        layout.setOnClickListener(object : View.OnClickListener{
+            val buttons = listOf(reloadButton, expandButton)
+            var lastClickMillis: Long = 0
+            override fun onClick(v: View) {
+                buttons.forEach { button ->
+                    if(button.isEnabled) animateDelayedHide(button)
                 }
+                val currentTimeMillis = System.currentTimeMillis()
+                if(currentTimeMillis - lastClickMillis < 333){
+                    callExpand()
+                }
+                lastClickMillis = currentTimeMillis
             }
-        }
+        })
 
         return layout
     }
