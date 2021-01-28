@@ -198,27 +198,43 @@ object CodeforcesUtils {
         }
     }
 
-    suspend fun getUsersInfo(handlesList: List<String>): Map<String, CodeforcesAccountManager.CodeforcesUserInfo> {
+    suspend fun getUsersInfo(handlesList: List<String>, doRedirect: Boolean = false): Map<String, CodeforcesAccountManager.CodeforcesUserInfo> {
         val res = handlesList.associateWith { handle ->
             CodeforcesAccountManager.CodeforcesUserInfo(STATUS.FAILED, handle)
         }.toMutableMap()
 
         val handles = handlesList.toMutableList()
+        val redirectMap = mutableMapOf<String,String>()
         while(handles.isNotEmpty()){
             val response = CodeforcesAPI.getUsers(handles) ?: break
             if(response.status == CodeforcesAPIStatus.FAILED){
                 val badHandle = response.isHandleNotFound()
                 if(badHandle != null){
-                    if(handles.remove(badHandle)){
-                        //TODO: handle redirect
-                        res[badHandle]?.status = STATUS.NOT_FOUND
-                        continue
+                    if(doRedirect){
+                        val (realHandle, status) = getRealHandle(badHandle)
+                        when(status){
+                            STATUS.OK -> {
+                                redirectMap[realHandle] = badHandle
+                                handles[handles.indexOf(badHandle)] = realHandle
+                            }
+                            else -> {
+                                handles.remove(badHandle)
+                                res[badHandle]!!.status = status
+                            }
+                        }
+                    }else{
+                        handles.remove(badHandle)
+                        res[badHandle]!!.status = STATUS.NOT_FOUND
                     }
+                    continue
                 }
                 break
             }
             response.result?.forEach { codeforcesUser ->
-                val handle = handles.find { it.equals(codeforcesUser.handle, true) } ?: return@forEach
+                val handle =
+                    redirectMap[codeforcesUser.handle]
+                        ?: handles.find { it.equals(codeforcesUser.handle, true) }
+                        ?: return@forEach
                 res[handle] = CodeforcesAccountManager.CodeforcesUserInfo(
                     status = STATUS.OK,
                     handle = codeforcesUser.handle,
@@ -231,7 +247,13 @@ object CodeforcesUtils {
         return res
     }
 
-    fun extractRealHandle(s: String): String? {
+    suspend fun getRealHandle(handle: String): Pair<String, STATUS> {
+        val page = CodeforcesAPI.getPageSource(CodeforcesURLFactory.user(handle), "en") ?: return handle to STATUS.FAILED
+        val realHandle = extractRealHandle(page) ?: return handle to STATUS.NOT_FOUND
+        return realHandle to STATUS.OK
+    }
+
+    private fun extractRealHandle(s: String): String? {
         var i = s.indexOf(" <div class=\"userbox\">")
         if(i == -1) return null
         i = s.indexOf("<div class=\"user-rank\">", i)

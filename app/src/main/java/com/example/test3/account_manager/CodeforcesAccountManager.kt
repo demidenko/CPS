@@ -66,12 +66,12 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context) {
         if(response.status == CodeforcesAPIStatus.FAILED){
             if(response.isHandleNotFound() == handle){
                 if((flags and 1) != 0){
-                    val res2 = CodeforcesAPI.getPageSource(CodeforcesURLFactory.user(handle), "en")?.let { page ->
-                        CodeforcesUtils.extractRealHandle(page)?.let { realHandle ->
-                            downloadInfo(realHandle, 0)
-                        }
+                    val (realHandle, status) = CodeforcesUtils.getRealHandle(handle)
+                    return when(status){
+                        STATUS.OK -> downloadInfo(realHandle, 0)
+                        STATUS.NOT_FOUND -> res.copy( status = STATUS.NOT_FOUND )
+                        STATUS.FAILED -> res
                     }
-                    if(res2!=null) return res2
                 }
                 return res.copy( status = STATUS.NOT_FOUND )
             }

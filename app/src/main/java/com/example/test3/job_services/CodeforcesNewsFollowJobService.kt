@@ -90,8 +90,13 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
 
         fun changeHandle(fromHandle: String, toHandle: String){
             val fromIndex = handleIndex(fromHandle)
-            val toIndex = handleIndex(toHandle)
-            if(fromIndex == -1 || fromIndex == toIndex) return
+            if(fromIndex == -1) return
+            val toIndex = handleIndex(toHandle).let {
+                if(fromIndex == it){
+                    if(fromHandle == toHandle) return
+                    -1
+                } else it
+            }
 
             if(toIndex != -1){
                 handles.removeAt(fromIndex)
