@@ -886,18 +886,18 @@ class CodeforcesNewsItemsLostRecentAdapter : CodeforcesNewsItemsClassicAdapter()
         if(blogs.isNotEmpty()){
             val currentTimeSeconds = getCurrentTimeSeconds()
             rows = blogs
-                .sortedByDescending { it.creationTimeSeconds }
+                .sortedByDescending { it.timeStamp }
                 .map {
-                Info(
-                    blogId = it.id,
-                    title = it.title,
-                    author = it.authorHandle,
-                    authorColorTag = it.authorColorTag,
-                    time = timeDifference(it.creationTimeSeconds, currentTimeSeconds),
-                    comments = "",
-                    rating = ""
-                )
-            }.toTypedArray()
+                    Info(
+                        blogId = it.id,
+                        title = it.title,
+                        author = it.authorHandle,
+                        authorColorTag = it.authorColorTag,
+                        time = timeDifference(it.creationTimeSeconds, currentTimeSeconds),
+                        comments = "",
+                        rating = ""
+                    )
+                }.toTypedArray()
         }
 
         return true
