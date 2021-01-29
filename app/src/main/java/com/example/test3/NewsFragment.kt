@@ -25,6 +25,7 @@ import com.example.test3.job_services.CodeforcesNewsFollowJobService
 import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
 import com.example.test3.news.ManageCodeforcesFollowListFragment
 import com.example.test3.news.SettingsNewsFragment
+import com.example.test3.room.getLostBlogsDao
 import com.example.test3.utils.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
@@ -880,7 +881,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
 class CodeforcesNewsItemsLostRecentAdapter : CodeforcesNewsItemsClassicAdapter() {
     override suspend fun parseData(s: String): Boolean {
-        val blogs = CodeforcesNewsLostRecentJobService.getSavedLostBlogs(activity)
+        val blogs = getLostBlogsDao(activity).getLost()
 
         if(blogs.isNotEmpty()){
             val currentTimeSeconds = getCurrentTimeSeconds()

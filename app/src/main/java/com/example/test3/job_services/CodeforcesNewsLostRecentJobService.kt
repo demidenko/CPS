@@ -6,54 +6,21 @@ import com.example.test3.MainActivity
 import com.example.test3.NewsFragment
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.SettingsNewsFragment
+import com.example.test3.room.LostBlogEntry
+import com.example.test3.room.getLostBlogsDao
 import com.example.test3.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import java.io.FileNotFoundException
-import java.io.PrintWriter
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 
 class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
     companion object {
-        private const val CF_LOST_SUSPECTS = "cf_lost_suspects.txt"
-        private const val CF_LOST = "cf_lost.txt"
-
-        private fun getSavedBlogs(context: Context, file_name: String): List<CodeforcesBlogEntry> {
-            try {
-                val res = mutableListOf<CodeforcesBlogEntry>()
-                val sc = Scanner(context.openFileInput(file_name))
-                while(sc.hasNextLine()){
-                    val str = sc.nextLine()
-                    res.add(jsonCPS.decodeFromString(str))
-                }
-                return res
-            }catch (e: FileNotFoundException){
-                return emptyList()
-            }catch (e: SerializationException){
-                return emptyList()
-            }
-        }
-
-        fun getSavedLostBlogs(context: Context) = getSavedBlogs(context, CF_LOST)
-        fun getSavedSuspectBlogs(context: Context) = getSavedBlogs(context, CF_LOST_SUSPECTS)
-
-        fun saveBlogs(context: Context, file_name: String, blogs: Collection<CodeforcesBlogEntry>){
-            val out = PrintWriter(context.openFileOutput(file_name, Context.MODE_PRIVATE))
-            blogs.forEach {
-                val str = jsonCPS.encodeToString(it)
-                out.println(str)
-            }
-            out.flush()
-            out.close()
-        }
 
         suspend fun updateInfo(context: Context) {
-            val blogEntries = getSavedLostBlogs(context)
+            val blogsDao = getLostBlogsDao(context)
+
+            val blogEntries = blogsDao.getLost()
                 .toTypedArray()
 
             val progressInfo = BottomProgressInfo(blogEntries.size, "update info of lost", context as MainActivity)
@@ -90,9 +57,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                 }
             }
 
-            saveBlogs(
-                context,
-                CF_LOST,
+            blogsDao.insert(
                 blogEntries.filterNot { blogIDsToRemove.contains(it.id) }
             )
 
@@ -128,19 +93,28 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         if(recentBlogs.isEmpty()) return
 
         val currentTimeSeconds = getCurrentTimeSeconds()
+        val blogsDao = getLostBlogsDao(this)
 
-        val suspects = getSavedSuspectBlogs(this)
+        val suspects = blogsDao.getSuspects()
             .filter { blog ->
                 TimeUnit.SECONDS.toHours(currentTimeSeconds - blog.creationTimeSeconds) < 24
             }.toMutableList()
 
         val highRated = SettingsNewsFragment.getSettings(this).getLostMinRating()
-        val newSuspects = mutableListOf<CodeforcesBlogEntry>()
+        val newSuspects = mutableListOf<LostBlogEntry>()
         recentBlogs.forEach { blog ->
-            if(blog.authorColorTag>=highRated && suspects.find { it.id == blog.id } == null){
+            if(blog.authorColorTag>=highRated && suspects.none { it.id == blog.id }){
                 val creationTimeSeconds = CodeforcesUtils.getBlogCreationTimeSeconds(blog.id)
                 if(TimeUnit.SECONDS.toHours(currentTimeSeconds - creationTimeSeconds) < 24){
-                    newSuspects.add(blog.copy(creationTimeSeconds = creationTimeSeconds))
+                    newSuspects.add(LostBlogEntry(
+                        id = blog.id,
+                        title = blog.title,
+                        authorHandle = blog.authorHandle,
+                        authorColorTag = blog.authorColorTag,
+                        creationTimeSeconds = creationTimeSeconds,
+                        isSuspect = true,
+                        timeStamp = 0
+                    ))
                 }
             }
         }
@@ -148,17 +122,20 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         suspects.addAll(newSuspects)
 
         val recentBlogIDs = recentBlogs.map { it.id }
-        val lost = getSavedLostBlogs(this)
+        val lost = blogsDao.getLost()
             .filter { blog ->
                 TimeUnit.SECONDS.toDays(currentTimeSeconds - blog.creationTimeSeconds) <= 7
                     &&
                 blog.id !in recentBlogIDs
             }.toMutableList()
 
-        saveBlogs(this, CF_LOST_SUSPECTS,
+        blogsDao.insert(
             suspects.filter { blog ->
                 if (blog.id !in recentBlogIDs) {
-                    lost.add(blog)
+                    lost.add(blog.copy(
+                        isSuspect = false,
+                        timeStamp = currentTimeSeconds
+                    ))
                     false
                 } else {
                     true
@@ -166,7 +143,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
             }
         )
 
-        saveBlogs(this, CF_LOST, lost)
+        blogsDao.insert(lost)
     }
 
 }
