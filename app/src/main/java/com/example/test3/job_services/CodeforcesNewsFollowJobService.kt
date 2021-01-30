@@ -23,7 +23,7 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
         private val adapterList = Moshi.Builder().build().adapter<List<String>>(Types.newParameterizedType(List::class.java, String::class.java))
         private val adapterMap = Moshi.Builder().build().adapter<Map<String,List<String>?>>(Types.newParameterizedType(Map::class.java, String::class.java, List::class.java))
 
-        fun saveHandles(context: Context, handles: List<String>) {
+        private fun saveHandles(context: Context, handles: List<String>) {
             with(PreferenceManager.getDefaultSharedPreferences(context).edit()){
                 val str = adapterList.toJson(handles)
                 putString(CF_FOLLOW_HANDLES, str)
@@ -31,12 +31,12 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             }
         }
 
-        fun getSavedHandles(context: Context): List<String> {
+        private fun getSavedHandles(context: Context): List<String> {
             val str = PreferenceManager.getDefaultSharedPreferences(context).getString(CF_FOLLOW_HANDLES, null) ?: return emptyList()
             return adapterList.fromJson(str) ?: emptyList()
         }
 
-        fun saveBlogIDs(context: Context, blogs: Map<String,List<String>?>) {
+        private fun saveBlogIDs(context: Context, blogs: Map<String,List<String>?>) {
             with(PreferenceManager.getDefaultSharedPreferences(context).edit()){
                 val str = adapterMap.toJson(blogs)
                 putString(CF_FOLLOW_BLOGS, str)
@@ -44,7 +44,7 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             }
         }
 
-        fun getSavedBlogIDs(context: Context): Map<String,List<String>?>{
+        private fun getSavedBlogIDs(context: Context): Map<String,List<String>?>{
             val str = PreferenceManager.getDefaultSharedPreferences(context).getString(CF_FOLLOW_BLOGS, null) ?: return emptyMap()
             return adapterMap.fromJson(str) ?: emptyMap()
         }
@@ -82,20 +82,21 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
         }
 
         fun remove(handle: String){
-            handles.remove(handle)
-            blogsMap.remove(handle)
+            val index = handleIndex(handle)
+            if(index == -1) throw Exception("$handle not found to remove")
+            blogsMap.remove(handles[index])
+            handles.removeAt(index)
             dataChanged = true
             handlesChanged = true
         }
 
         fun changeHandle(fromHandle: String, toHandle: String){
+            if(fromHandle == toHandle) return
             val fromIndex = handleIndex(fromHandle)
             if(fromIndex == -1) return
-            val toIndex = handleIndex(toHandle).let {
-                if(fromIndex == it){
-                    if(fromHandle == toHandle) return
-                    -1
-                } else it
+            val toIndex = when(val i = handleIndex(toHandle)){
+                fromIndex -> -1
+                else -> i
             }
 
             if(toIndex != -1){
