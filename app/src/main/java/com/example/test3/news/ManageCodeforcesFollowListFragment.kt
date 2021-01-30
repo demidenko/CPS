@@ -94,15 +94,19 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
 
         suspend fun initialize(){
             val usersInfo = CodeforcesUtils.getUsersInfo(dataConnector.getHandles(), true)
-            usersInfo.forEach {
-                val (handle, info) = it
-                if(info.status == STATUS.NOT_FOUND) dataConnector.remove(handle)
-                else {
-                    if(info.status == STATUS.OK && info.handle != handle){
-                        dataConnector.changeHandle(handle, info.handle)
+                .mapNotNull { (handle, info) ->
+                    if(info.status == STATUS.NOT_FOUND){
+                        dataConnector.remove(handle)
+                        null
+                    } else {
+                        if(info.status == STATUS.OK && info.handle != handle){
+                            dataConnector.changeHandle(handle, info.handle)
+                            info.handle to info
+                        } else {
+                            handle to info
+                        }
                     }
-                }
-            }
+                }.toMap()
 
             dataConnector.getHandles().mapNotNull { handle ->
                 usersInfo[handle]?.takeIf { it.status != STATUS.NOT_FOUND }
