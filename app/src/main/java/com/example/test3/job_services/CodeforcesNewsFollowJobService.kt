@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import com.example.test3.*
-import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.*
@@ -61,8 +60,8 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
 
         private val blogsMap by lazy { getSavedBlogIDs(context).toMutableMap() }
         private var dataChanged = false
-        @JvmName("getBlogsMap1")
-        fun getBlogsMap() = blogsMap.toMap()
+
+        fun getBlogs(handle: String) = blogsMap[handle]
 
         private fun handleIndex(handle: String) = handles.indexOfFirst { handle.equals(it,true) }
 
@@ -140,9 +139,7 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
 
         val connector = FollowDataConnector(this)
         val savedHandles = connector.getHandles()
-        val savedBlogs = connector.getBlogsMap()
         val locale = NewsFragment.getCodeforcesContentLanguage(this)
-        val codeforcesAccountManager by lazy { CodeforcesAccountManager(this) }
 
         val proceeded = mutableSetOf<String>()
         suspend fun proceedUser(handle: String){
@@ -152,11 +149,11 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             if(response.status == CodeforcesAPIStatus.FAILED){
                 //"handle: You are not allowed to read that blog" -> no activity
                 if(response.isBlogHandleNotFound(handle)){
-                    val info = codeforcesAccountManager.loadInfo(handle, 1) as CodeforcesAccountManager.CodeforcesUserInfo
-                    when(info.status){
+                    val (realHandle, status) = CodeforcesUtils.getRealHandle(handle)
+                    when(status){
                         STATUS.OK -> {
-                            connector.changeHandle(handle, info.handle)
-                            proceedUser(info.handle)
+                            connector.changeHandle(handle, realHandle)
+                            proceedUser(realHandle)
                             return
                         }
                         STATUS.NOT_FOUND -> connector.remove(handle)
@@ -169,7 +166,7 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             val result = response.result ?: return
 
             var hasNewBlog = false
-            val saved = savedBlogs[handle]?.toSet()
+            val saved = connector.getBlogs(handle)?.toSet()
 
             if(saved == null){
                 hasNewBlog = true
