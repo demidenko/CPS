@@ -93,22 +93,23 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
         private val dataConnector = CodeforcesNewsFollowJobService.FollowDataConnector(mainActivity)
 
         suspend fun initialize(){
-            val handles = dataConnector.getHandles()
-            val usersInfo = CodeforcesUtils.getUsersInfo(handles, true)
-            handles.mapNotNull { handle ->
-                usersInfo[handle]
-                    ?.apply {
-                        if(status == STATUS.NOT_FOUND) dataConnector.remove(handle)
-                        else {
-                            if(status == STATUS.OK && this.handle != handle){
-                                dataConnector.changeHandle(handle, this.handle)
-                            }
-                        }
+            val usersInfo = CodeforcesUtils.getUsersInfo(dataConnector.getHandles(), true)
+            usersInfo.forEach {
+                val (handle, info) = it
+                if(info.status == STATUS.NOT_FOUND) dataConnector.remove(handle)
+                else {
+                    if(info.status == STATUS.OK && info.handle != handle){
+                        dataConnector.changeHandle(handle, info.handle)
                     }
-                    ?.takeIf { it.status != STATUS.NOT_FOUND }
-            }.let { infos ->
-                list.addAll(infos.distinctBy { it.handle })
+                }
             }
+
+            dataConnector.getHandles().mapNotNull { handle ->
+                usersInfo[handle]?.takeIf { it.status != STATUS.NOT_FOUND }
+            }.let { infos ->
+                list.addAll(infos)
+            }
+
             dataConnector.save()
             notifyItemRangeInserted(0, list.size)
         }
