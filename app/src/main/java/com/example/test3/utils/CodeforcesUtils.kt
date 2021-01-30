@@ -231,15 +231,16 @@ object CodeforcesUtils {
                 break
             }
             response.result?.forEach { codeforcesUser ->
-                val handle =
+                listOfNotNull(
+                    handles.find { it.equals(codeforcesUser.handle, true) },
                     redirectMap[codeforcesUser.handle]
-                        ?: handles.find { it.equals(codeforcesUser.handle, true) }
-                        ?: return@forEach
-                res[handle] = CodeforcesAccountManager.CodeforcesUserInfo(
-                    status = STATUS.OK,
-                    handle = codeforcesUser.handle,
-                    rating = codeforcesUser.rating
-                )
+                ).forEach { handle ->
+                    res[handle] = CodeforcesAccountManager.CodeforcesUserInfo(
+                        status = STATUS.OK,
+                        handle = codeforcesUser.handle,
+                        rating = codeforcesUser.rating
+                    )
+                }
             }
             break
         }
