@@ -204,7 +204,7 @@ object CodeforcesUtils {
         }.toMutableMap()
 
         val handles = handlesList.toMutableList()
-        val redirectMap = mutableMapOf<String,String>()
+        val realHandles = mutableMapOf<String,String>()
         while(handles.isNotEmpty()){
             val response = CodeforcesAPI.getUsers(handles) ?: break
             if(response.status == CodeforcesAPIStatus.FAILED){
@@ -214,7 +214,7 @@ object CodeforcesUtils {
                         val (realHandle, status) = getRealHandle(badHandle)
                         when(status){
                             STATUS.OK -> {
-                                redirectMap[realHandle] = badHandle
+                                realHandles[badHandle] = realHandle
                                 handles[handles.indexOf(badHandle)] = realHandle
                             }
                             else -> {
@@ -230,18 +230,21 @@ object CodeforcesUtils {
                 }
                 break
             }
-            response.result?.forEach { codeforcesUser ->
-                listOfNotNull(
-                    handles.find { it.equals(codeforcesUser.handle, true) },
-                    redirectMap[codeforcesUser.handle]
-                ).forEach { handle ->
-                    res[handle] = CodeforcesAccountManager.CodeforcesUserInfo(
-                        status = STATUS.OK,
-                        handle = codeforcesUser.handle,
-                        rating = codeforcesUser.rating
-                    )
+
+            response.result?.let { resultList ->
+                res.keys.forEach { handle ->
+                    (realHandles[handle] ?: handle).let { realHandle ->
+                        resultList.find { it.handle.equals(realHandle, true) }
+                    }?.let { codeforcesUser ->
+                        res[handle] = CodeforcesAccountManager.CodeforcesUserInfo(
+                            status = STATUS.OK,
+                            handle = codeforcesUser.handle,
+                            rating = codeforcesUser.rating
+                        )
+                    }
                 }
             }
+
             break
         }
 
