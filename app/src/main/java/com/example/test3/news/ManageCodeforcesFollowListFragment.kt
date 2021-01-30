@@ -23,6 +23,7 @@ import com.example.test3.utils.CodeforcesUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_manage_cf_follow.view.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class ManageCodeforcesFollowListFragment(): Fragment() {
 
@@ -114,7 +115,6 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
                 list.addAll(infos)
             }
 
-            dataConnector.save()
             notifyItemRangeInserted(0, list.size)
         }
 
@@ -123,7 +123,6 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
                 mainActivity.showToast("User already in list")
                 return
             }
-            dataConnector.save()
             list.add(0, userInfo)
             notifyItemInserted(0)
         }
@@ -131,8 +130,9 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
         fun remove(userInfo: CodeforcesAccountManager.CodeforcesUserInfo){
             val index = list.indexOf(userInfo).takeIf { it!=-1 } ?: return
 
-            dataConnector.remove(userInfo.handle)
-            dataConnector.save()
+            runBlocking {
+                dataConnector.remove(userInfo.handle)
+            }
             list.removeAt(index)
             notifyItemRemoved(index)
         }

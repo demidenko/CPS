@@ -2,128 +2,63 @@ package com.example.test3.job_services
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import androidx.preference.PreferenceManager
 import com.example.test3.*
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.SettingsNewsFragment
+import com.example.test3.room.UserBlogs
+import com.example.test3.room.getFollowDao
 import com.example.test3.utils.*
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class CodeforcesNewsFollowJobService: CoroutineJobService() {
     companion object {
-
-        private const val CF_FOLLOW_HANDLES = "cf_follow_handles"
-        private const val CF_FOLLOW_BLOGS = "cf_follow_blogs"
-
-        private val adapterList = Moshi.Builder().build().adapter<List<String>>(Types.newParameterizedType(List::class.java, String::class.java))
-        private val adapterMap = Moshi.Builder().build().adapter<Map<String,List<String>?>>(Types.newParameterizedType(Map::class.java, String::class.java, List::class.java))
-
-        private fun saveHandles(context: Context, handles: List<String>) {
-            with(PreferenceManager.getDefaultSharedPreferences(context).edit()){
-                val str = adapterList.toJson(handles)
-                putString(CF_FOLLOW_HANDLES, str)
-                commit()
-            }
-        }
-
-        private fun getSavedHandles(context: Context): List<String> {
-            val str = PreferenceManager.getDefaultSharedPreferences(context).getString(CF_FOLLOW_HANDLES, null) ?: return emptyList()
-            return adapterList.fromJson(str) ?: emptyList()
-        }
-
-        private fun saveBlogIDs(context: Context, blogs: Map<String,List<String>?>) {
-            with(PreferenceManager.getDefaultSharedPreferences(context).edit()){
-                val str = adapterMap.toJson(blogs)
-                putString(CF_FOLLOW_BLOGS, str)
-                commit()
-            }
-        }
-
-        private fun getSavedBlogIDs(context: Context): Map<String,List<String>?>{
-            val str = PreferenceManager.getDefaultSharedPreferences(context).getString(CF_FOLLOW_BLOGS, null) ?: return emptyMap()
-            return adapterMap.fromJson(str) ?: emptyMap()
-        }
-
         suspend fun isEnabled(context: Context): Boolean = SettingsNewsFragment.getSettings(context).getFollowEnabled()
     }
 
     class FollowDataConnector(private val context: Context) {
 
-        private val handles by lazy { getSavedHandles(context).toMutableList() }
-        private var handlesChanged = false
-        @JvmName("getHandles1")
-        fun getHandles() = handles.toList()
+        private val dao by lazy { getFollowDao(context) }
 
-        private val blogsMap by lazy { getSavedBlogIDs(context).toMutableMap() }
-        private var dataChanged = false
-
-        fun getBlogs(handle: String) = blogsMap[handle]
-
-        private fun handleIndex(handle: String) = handles.indexOfFirst { handle.equals(it,true) }
+        suspend fun getHandles(): List<String> = dao.getAll().sortedByDescending { it.id }.map { it.handle }
+        suspend fun getBlogs(handle: String) = dao.getUserBlogs(handle)?.blogs
 
         suspend fun add(handle: String): Boolean {
-            if(handleIndex(handle) != -1) return false
+            if(dao.getUserBlogs(handle)!=null) return false
 
             val locale = NewsFragment.getCodeforcesContentLanguage(context)
-            val userBlogs = CodeforcesAPI.getUserBlogEntries(handle,locale)?.result?.map { it.id.toString() }
+            val userBlogs = CodeforcesAPI.getUserBlogEntries(handle,locale)?.result?.map { it.id }
 
-            handles.add(0, handle)
-            blogsMap[handle] = userBlogs
-
-            handlesChanged = true
-            dataChanged = true
+            dao.insert(
+                UserBlogs(
+                    handle = handle,
+                    blogs = userBlogs
+                )
+            )
 
             return true
         }
 
-        fun remove(handle: String){
-            val index = handleIndex(handle)
-            if(index == -1) throw Exception("$handle not found to remove")
-            blogsMap.remove(handles[index])
-            handles.removeAt(index)
-            dataChanged = true
-            handlesChanged = true
+        suspend fun remove(handle: String){
+            dao.remove(handle)
         }
 
-        fun changeHandle(fromHandle: String, toHandle: String){
+        suspend fun changeHandle(fromHandle: String, toHandle: String){
             if(fromHandle == toHandle) return
-            val fromIndex = handleIndex(fromHandle)
-            if(fromIndex == -1) return
-            val toIndex = when(val i = handleIndex(toHandle)){
-                fromIndex -> -1
-                else -> i
+            val fromUserBlogs = dao.getUserBlogs(fromHandle) ?: return
+            dao.getUserBlogs(toHandle)?.let { toUserBlogs ->
+                if(toUserBlogs.id != fromUserBlogs.id){
+                    dao.remove(fromHandle)
+                    return
+                }
             }
-
-            if(toIndex != -1){
-                handles.removeAt(fromIndex)
-            }else{
-                handles[fromIndex] = toHandle
-                blogsMap[toHandle] = blogsMap[fromHandle]
-            }
-            blogsMap.remove(fromHandle)
-
-            handlesChanged = true
-            dataChanged = true
+            dao.update(fromUserBlogs.copy(handle = toHandle))
         }
 
-        fun setBlogs(handle: String, blogs: List<String>?){
-            blogsMap[handle] = blogs
-            dataChanged = true
-        }
-
-        fun save(){
-            if(!dataChanged) return
-            if(handlesChanged){
-                saveHandles(context, handles)
-                handlesChanged = false
-            }
-            for(handle in handles) if(!blogsMap.containsKey(handle)) blogsMap.remove(handle)
-            saveBlogIDs(context, blogsMap)
-            dataChanged = false
+        suspend fun setBlogs(handle: String, blogs: List<Int>?){
+            val userBlogs = dao.getUserBlogs(handle) ?: return
+            dao.update(userBlogs.copy(blogs = blogs))
         }
     }
 
@@ -172,20 +107,19 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
                 hasNewBlog = true
             }else{
                 result.forEach { blogEntry ->
-                    if(!saved.contains(blogEntry.id.toString())){
+                    if(!saved.contains(blogEntry.id)){
                         hasNewBlog = true
                         notifyNewBlog(blogEntry)
                     }
                 }
             }
             if(hasNewBlog){
-                connector.setBlogs(handle, result.map { it.id.toString() })
+                connector.setBlogs(handle, result.map { it.id })
             }
         }
 
         savedHandles.forEach { handle -> proceedUser(handle) }
 
-        connector.save()
     }
 
     private fun notifyNewBlog(blogEntry: CodeforcesBlogEntry){

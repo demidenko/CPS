@@ -613,7 +613,6 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
             val handle = holder.author.text
             when(connector.add(handle.toString())){
                 true -> {
-                    connector.save()
                     Snackbar.make(holder.view, SpannableStringBuilder("You now followed ").append(handle), Snackbar.LENGTH_LONG).apply {
                         setAction("Manage"){
                             mainActivity.newsFragment.showCodeforcesFollowListManager()
