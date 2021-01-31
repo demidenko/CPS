@@ -62,7 +62,7 @@ abstract class AccountPanel(
                     if(button.isEnabled) animateDelayedHide(button)
                 }
                 val currentTimeMillis = System.currentTimeMillis()
-                if(currentTimeMillis - lastClickMillis < 333){
+                if(currentTimeMillis - lastClickMillis < 333 && expandButton.isEnabled){
                     callExpand()
                 }
                 lastClickMillis = currentTimeMillis
