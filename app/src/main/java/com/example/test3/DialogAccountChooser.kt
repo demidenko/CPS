@@ -39,9 +39,10 @@ class DialogAccountChooser(
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val view = layoutInflater.inflate(R.layout.dialog_choose_userid, null)
+        val context = requireContext()
+        val view = LayoutInflater.from(context).inflate(R.layout.dialog_choose_userid, null)
 
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = AlertDialog.Builder(context)
             .setTitle("getUser(${manager.PREFERENCES_FILE_NAME})")
             .setView(view)
             .setPositiveButton("return"){ _, _ ->
