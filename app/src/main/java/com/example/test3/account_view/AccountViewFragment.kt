@@ -55,9 +55,7 @@ class AccountViewFragment(): Fragment() {
             showBigView()
         }
 
-        lifecycleScope.launch {
-            mainActivity.accountsFragment.updateStatusBarColor()
-        }
+        mainActivity.accountsFragment.statusBarColorManager.setCurrent(panel)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -105,9 +103,7 @@ class AccountViewFragment(): Fragment() {
 
     override fun onDestroy() {
         with(requireActivity() as MainActivity){
-            lifecycleScope.launch {
-                accountsFragment.updateStatusBarColor()
-            }
+            accountsFragment.statusBarColorManager.setCurrent(null)
         }
         super.onDestroy()
     }

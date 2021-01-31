@@ -175,35 +175,59 @@ class AccountsFragment: Fragment() {
         }
     }
 
-    suspend fun updateStatusBarColor(){
-        var allEmpty = true
 
-        var statusBarColor: Int = Color.TRANSPARENT
-        var bestOrder: Double = -1e9
+    val statusBarColorManager by lazy { StatusBarColorManager(this) }
 
-        suspend fun updateWithPanel(panel: AccountPanel){
-            if(!panel.isEmpty()){
-                allEmpty = false
-                (panel.manager as? RatedAccountManager)?.let { manager ->
-                    val info = manager.getSavedInfo()
-                    manager.getColor(info)?.let {
-                        val order = manager.getOrder(info)
-                        if(order > bestOrder){
-                            bestOrder = order
-                            statusBarColor = it
-                        }
-                    }
-                }
+    class StatusBarColorManager(
+        private val accountsFragment: AccountsFragment
+    ) {
+
+        data class ColorInfo(
+            val color: Int = Color.TRANSPARENT,
+            val order: Double = -1e9
+        )
+
+        private val infoByPanel = mutableMapOf<String,ColorInfo>()
+        private var current: String? = null
+
+        private fun getListOfColors(): List<ColorInfo> {
+            if(current != null) return listOfNotNull(infoByPanel[current])
+            return infoByPanel.values.toList()
+        }
+
+        private fun updateStatusBar() {
+
+            val (best, allEmpty) =
+                getListOfColors().maxByOrNull { it.order }
+                    ?.let { it to false }
+                    ?: ColorInfo() to true
+
+            with(accountsFragment){
+                requireView().findViewById<TextView>(R.id.accounts_welcome_text).visibility = if(allEmpty) View.VISIBLE else View.GONE
+                mainActivity.window.statusBarColor = best.color
             }
         }
 
-        mainActivity.supportFragmentManager.findFragmentByTag(AccountViewFragment.tag)?.let {
-            updateWithPanel((it as AccountViewFragment).panel)
-        } ?: panels.forEach { panel -> updateWithPanel(panel) }
+        fun setCurrent(panel: AccountPanel?) {
+            current = panel?.manager?.PREFERENCES_FILE_NAME
+            updateStatusBar()
+        }
 
-        //println("update UI: $allEmpty $statusBarColor")
-        requireView().findViewById<TextView>(R.id.accounts_welcome_text).visibility = if(allEmpty) View.VISIBLE else View.GONE
-        mainActivity.window.statusBarColor = statusBarColor
+        suspend fun updatePanel(panel: AccountPanel) {
+            val name = panel.manager.PREFERENCES_FILE_NAME
+            if(!panel.isEmpty()) {
+                infoByPanel[name] = ColorInfo()
+                (panel.manager as? RatedAccountManager)?.let { manager ->
+                    val info = manager.getSavedInfo()
+                    manager.getColor(info)?.let {
+                        infoByPanel[name] = ColorInfo(it, manager.getOrder(info))
+                    }
+                }
+            } else {
+                infoByPanel.remove(name)
+            }
+            updateStatusBar()
+        }
     }
 
     fun showPanels() {
