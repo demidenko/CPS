@@ -39,15 +39,15 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
 
             val locale = NewsFragment.getCodeforcesContentLanguage(context)
 
-            val blogIDsToRemove = mutableSetOf<Int>()
-            blogEntries.forEachIndexed { index, blogEntry ->
+            for(i in blogEntries.indices) {
+                val blogEntry = blogEntries[i]
                 CodeforcesAPI.getBlogEntry(blogEntry.id,locale)?.let { response ->
                     if(response.status == CodeforcesAPIStatus.FAILED && response.isBlogNotFound(blogEntry.id)){
-                        blogIDsToRemove.add(blogEntry.id)
+                        blogsDao.remove(blogEntry)
                     } else {
                         if(response.status == CodeforcesAPIStatus.OK) response.result?.let { freshBlogEntry ->
                             val title = freshBlogEntry.title.removeSurrounding("<p>", "</p>")
-                            blogEntries[index] = blogEntry.copy(
+                            blogEntries[i] = blogEntry.copy(
                                 authorHandle = freshBlogEntry.authorHandle,
                                 title = fromHTML(title).toString()
                             )
@@ -57,9 +57,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                 }
             }
 
-            blogsDao.insert(
-                blogEntries.filterNot { blogIDsToRemove.contains(it.id) }
-            )
+            blogsDao.update(blogEntries)
 
             progressInfo.finish()
         }
@@ -77,7 +75,6 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
 
     private suspend fun parseRecent(){
 
-
         val recentBlogs = CodeforcesUtils.parseRecentActionsPage(
             CodeforcesAPI.getPageSource("recent-actions", NewsFragment.getCodeforcesContentLanguage(this)) ?: return
         ).first.let { list ->
@@ -93,20 +90,33 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         if(recentBlogs.isEmpty()) return
 
         val currentTimeSeconds = getCurrentTimeSeconds()
+
+        fun isNew(blogCreationTimeSeconds: Long): Boolean =
+            TimeUnit.SECONDS.toHours(currentTimeSeconds - blogCreationTimeSeconds) < 24
+
+        fun isOldLost(blogCreationTimeSeconds: Long): Boolean =
+            TimeUnit.SECONDS.toDays(currentTimeSeconds - blogCreationTimeSeconds) > 7
+
         val blogsDao = getLostBlogsDao(this)
 
-        val suspects = blogsDao.getSuspects()
-            .filter { blog ->
-                TimeUnit.SECONDS.toHours(currentTimeSeconds - blog.creationTimeSeconds) < 24
-            }.toMutableList()
+        //get current suspects with removing old ones
+        val suspects = blogsDao.getSuspects().let { list ->
+            val res = mutableListOf<LostBlogEntry>()
+            list.forEach { blog ->
+                if (isNew(blog.creationTimeSeconds)) res.add(blog)
+                else blogsDao.remove(blog)
+            }
+            res.toList()
+        }
 
         val highRated = SettingsNewsFragment.getSettings(this).getLostMinRating()
-        val newSuspects = mutableListOf<LostBlogEntry>()
+
+        //catch new suspects from recent actions
         recentBlogs.forEach { blog ->
             if(blog.authorColorTag>=highRated && suspects.none { it.id == blog.id }){
                 val creationTimeSeconds = CodeforcesUtils.getBlogCreationTimeSeconds(blog.id)
-                if(TimeUnit.SECONDS.toHours(currentTimeSeconds - creationTimeSeconds) < 24){
-                    newSuspects.add(LostBlogEntry(
+                if(isNew(creationTimeSeconds)){
+                    val newSuspect = LostBlogEntry(
                         id = blog.id,
                         title = blog.title,
                         authorHandle = blog.authorHandle,
@@ -114,36 +124,31 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                         creationTimeSeconds = creationTimeSeconds,
                         isSuspect = true,
                         timeStamp = 0
-                    ))
+                    )
+                    blogsDao.insert(newSuspect)
                 }
             }
         }
 
-        suspects.addAll(newSuspects)
-
         val recentBlogIDs = recentBlogs.map { it.id }
-        val lost = blogsDao.getLost()
-            .filter { blog ->
-                TimeUnit.SECONDS.toDays(currentTimeSeconds - blog.creationTimeSeconds) <= 7
-                    &&
-                blog.id !in recentBlogIDs
-            }.toMutableList()
 
-        blogsDao.insert(
-            suspects.filter { blog ->
-                if (blog.id !in recentBlogIDs) {
-                    lost.add(blog.copy(
-                        isSuspect = false,
-                        timeStamp = currentTimeSeconds
-                    ))
-                    false
-                } else {
-                    true
-                }
+        //remove from lost
+        blogsDao.getLost().forEach { blog ->
+            if(isOldLost(blog.creationTimeSeconds) || blog.id in recentBlogIDs){
+                blogsDao.remove(blog)
             }
-        )
+        }
 
-        blogsDao.insert(lost)
+        //suspect become lost
+        suspects.forEach { blog ->
+            if(blog.id !in recentBlogIDs){
+                blogsDao.update(blog.copy(
+                    isSuspect = false,
+                    timeStamp = currentTimeSeconds
+                ))
+            }
+        }
+
     }
 
 }

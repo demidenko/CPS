@@ -13,6 +13,18 @@ interface LostBlogsDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(blogs: List<LostBlogEntry>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(blogEntry: LostBlogEntry)
+
+    @Update
+    suspend fun update(blogs: Array<LostBlogEntry>)
+
+    @Update
+    suspend fun update(blogEntry: LostBlogEntry)
+
+    @Delete
+    suspend fun remove(blogEntry: LostBlogEntry)
+
     @Query("SELECT * FROM $lostBlogsTableName where isSuspect = 0")
     suspend fun getLost(): List<LostBlogEntry>
 
