@@ -11,10 +11,6 @@ import kotlinx.coroutines.launch
 
 class AccountViewFragment(): Fragment() {
 
-    companion object {
-        const val tag = "account_view"
-    }
-
     val panel: AccountPanel by lazy {
         val managerType = arguments?.getString("manager") ?: throw Exception("Unset type of manager")
         (requireActivity() as MainActivity).accountsFragment.getPanel(managerType)

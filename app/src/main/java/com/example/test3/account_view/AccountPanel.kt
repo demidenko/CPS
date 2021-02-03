@@ -138,7 +138,7 @@ abstract class AccountPanel(
             .hide(mainActivity.accountsFragment)
             .add(android.R.id.content, AccountViewFragment().apply {
                 arguments = Bundle().apply { putString("manager", manager.PREFERENCES_FILE_NAME) }
-            }, AccountViewFragment.tag)
+            })
             .addToBackStack(null)
             .commit()
     }

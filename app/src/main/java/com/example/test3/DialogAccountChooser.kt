@@ -81,20 +81,18 @@ class DialogAccountChooser(
             dialog.findViewById(R.id.account_choose_suggestions)
         )
 
-        saveButton.apply {
-            setOnClickListener {
-                with(userIDChangeWatcher.lastLoadedInfo){
-                    if(userID.any { char -> !manager.isValidForUserID(char) }){
-                        mainActivity.showToast("Incorrect characters for userID")
-                        return@with
-                    }
-                    if(status == STATUS.NOT_FOUND){
-                        mainActivity.showToast("User not found")
-                        return@with
-                    }
-                    cont.resume(this)
-                    dismiss()
+        saveButton.setOnClickListener {
+            with(userIDChangeWatcher.lastLoadedInfo){
+                if(userID.any { char -> !manager.isValidForUserID(char) }){
+                    mainActivity.showToast("Incorrect characters for ${manager.userIDName}")
+                    return@with
                 }
+                if(status == STATUS.NOT_FOUND){
+                    mainActivity.showToast("User not found")
+                    return@with
+                }
+                cont.resume(this)
+                dismiss()
             }
         }
 
