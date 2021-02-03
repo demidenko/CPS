@@ -98,22 +98,21 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
             TimeUnit.SECONDS.toDays(currentTimeSeconds - blogCreationTimeSeconds) > 7
 
         val blogsDao = getLostBlogsDao(this)
+        val minRating = SettingsNewsFragment.getSettings(this).getLostMinRating()
 
         //get current suspects with removing old ones
         val suspects = blogsDao.getSuspects().let { list ->
             val res = mutableListOf<LostBlogEntry>()
             list.forEach { blog ->
-                if (isNew(blog.creationTimeSeconds)) res.add(blog)
+                if (isNew(blog.creationTimeSeconds) && blog.authorColorTag>=minRating) res.add(blog)
                 else blogsDao.remove(blog)
             }
             res.toList()
         }
 
-        val highRated = SettingsNewsFragment.getSettings(this).getLostMinRating()
-
         //catch new suspects from recent actions
         recentBlogs.forEach { blog ->
-            if(blog.authorColorTag>=highRated && suspects.none { it.id == blog.id }){
+            if(blog.authorColorTag>=minRating && suspects.none { it.id == blog.id }){
                 val creationTimeSeconds = CodeforcesUtils.getBlogCreationTimeSeconds(blog.id)
                 if(isNew(creationTimeSeconds)){
                     val newSuspect = LostBlogEntry(
