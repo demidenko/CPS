@@ -156,7 +156,7 @@ class AccountsFragment: Fragment() {
                 CListUtils.getManager(resource, userData.first, userData.second, mainActivity)
             }
 
-            val progressInfo = BottomProgressInfo(supported.size, "clist import", mainActivity)
+            val progressInfo = BottomProgressInfo("clist import", mainActivity).start(supported.size)
 
             supported.map { (manager, userID) ->
                 val panel = getPanel(manager.PREFERENCES_FILE_NAME)

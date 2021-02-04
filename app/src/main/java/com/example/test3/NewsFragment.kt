@@ -257,7 +257,7 @@ class NewsFragment : Fragment() {
         lifecycleScope.launch {
             reloadFragment(fragment, tab, ""){
                 updateLostInfoButton.isEnabled = false
-                CodeforcesNewsLostRecentJobService.updateInfo(requireContext())
+                CodeforcesNewsLostRecentJobService.updateInfo(requireContext(), BottomProgressInfo("update info of lost", requireActivity() as MainActivity))
                 updateLostInfoButton.isEnabled = true
             }
         }

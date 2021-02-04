@@ -2,7 +2,6 @@ package com.example.test3.job_services
 
 import android.content.Context
 import com.example.test3.BottomProgressInfo
-import com.example.test3.MainActivity
 import com.example.test3.NewsFragment
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.SettingsNewsFragment
@@ -17,13 +16,13 @@ import java.util.concurrent.TimeUnit
 class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
     companion object {
 
-        suspend fun updateInfo(context: Context) {
+        suspend fun updateInfo(context: Context, progressInfo: BottomProgressInfo?) {
             val blogsDao = getLostBlogsDao(context)
 
             val blogEntries = blogsDao.getLost()
                 .toTypedArray()
 
-            val progressInfo = BottomProgressInfo(blogEntries.size, "update info of lost", context as MainActivity)
+            progressInfo?.start(blogEntries.size)
 
             //updates author's handle color
             CodeforcesUtils.getUsersInfo(blogEntries.map { it.authorHandle }).let { users ->
@@ -53,13 +52,13 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
                             )
                         }
                     }
-                    progressInfo.increment()
+                    progressInfo?.increment()
                 }
             }
 
             blogsDao.update(blogEntries)
 
-            progressInfo.finish()
+            progressInfo?.finish()
         }
 
         suspend fun isEnabled(context: Context): Boolean = SettingsNewsFragment.getSettings(context).getLostEnabled()

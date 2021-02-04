@@ -69,9 +69,7 @@ object JobServicesCenter {
             else stopJobService(mainActivity, it.id)
         }
 
-        val progressInfo =
-            if(SettingsDev(mainActivity).getDevEnabled()) BottomProgressInfo(toStart.size, "start services", mainActivity)
-            else null
+        val progressInfo = BottomProgressInfo("start services", mainActivity).takeIf { SettingsDev(mainActivity).getDevEnabled() } ?.start(toStart.size)
         toStart.values.shuffled().forEach { start ->
             delay(500)
             start(mainActivity)
