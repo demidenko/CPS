@@ -12,10 +12,15 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.text.bold
 import androidx.core.text.color
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.RatedAccountManager
 import com.example.test3.job_services.JobServicesCenter
+import com.example.test3.utils.SettingsDataStore
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import java.util.*
 
 
@@ -102,5 +107,15 @@ class TestFragment : Fragment() {
             }
         }
 
+    }
+}
+
+
+class SettingsDev(context: Context) : SettingsDataStore(context, "settings_develop") {
+    private val KEY_DEV = booleanPreferencesKey("develop_enabled")
+
+    fun getDevEnabled() = runBlocking { dataStore.data.first()[KEY_DEV] ?: false }
+    suspend fun setDevEnabled(flag: Boolean) {
+        dataStore.edit { it[KEY_DEV] = flag }
     }
 }

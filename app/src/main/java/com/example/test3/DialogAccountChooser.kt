@@ -59,7 +59,6 @@ class DialogAccountChooser(
         val mainActivity = requireActivity() as MainActivity
 
         val dialog = getDialog()!! as AlertDialog
-        dialog.findViewById<TextView>(resources.getIdentifier("alertTitle", "id", "android")).typeface = Typeface.MONOSPACE
 
         dialog.findViewById<TextView>(R.id.account_choose_title).apply {
             text = "getUser(${manager.PREFERENCES_FILE_NAME}):"
