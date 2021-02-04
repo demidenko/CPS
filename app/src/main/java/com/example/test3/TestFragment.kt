@@ -115,7 +115,7 @@ class SettingsDev(context: Context) : SettingsDataStore(context, "settings_devel
     private val KEY_DEV = booleanPreferencesKey("develop_enabled")
 
     fun getDevEnabled() = runBlocking { dataStore.data.first()[KEY_DEV] ?: false }
-    suspend fun setDevEnabled(flag: Boolean) {
-        dataStore.edit { it[KEY_DEV] = flag }
+    fun setDevEnabled(flag: Boolean) {
+        runBlocking { dataStore.edit { it[KEY_DEV] = flag } }
     }
 }

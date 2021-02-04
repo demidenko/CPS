@@ -8,6 +8,7 @@ import android.content.ComponentName
 import android.content.Context
 import com.example.test3.BottomProgressInfo
 import com.example.test3.MainActivity
+import com.example.test3.SettingsDev
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.news.SettingsNewsFragment
 import kotlinx.coroutines.*
@@ -68,13 +69,15 @@ object JobServicesCenter {
             else stopJobService(mainActivity, it.id)
         }
 
-        val progressInfo = BottomProgressInfo(toStart.size, "start services", mainActivity)
+        val progressInfo =
+            if(SettingsDev(mainActivity).getDevEnabled()) BottomProgressInfo(toStart.size, "start services", mainActivity)
+            else null
         toStart.values.shuffled().forEach { start ->
             delay(500)
             start(mainActivity)
-            progressInfo.increment()
+            progressInfo?.increment()
         }
-        progressInfo.finish()
+        progressInfo?.finish()
     }
 
     fun startNewsJobService(context: Context){
