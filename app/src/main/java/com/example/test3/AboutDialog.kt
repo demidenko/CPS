@@ -2,8 +2,8 @@ package com.example.test3
 
 import android.app.Dialog
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AboutDialog: DialogFragment() {
 
@@ -15,13 +15,14 @@ class AboutDialog: DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext())
             .setTitle("CPS")
             .setMessage("version = ${BuildConfig.VERSION_NAME}")
 
-        return builder.create()
-    }
+        val dialog = builder.create()
 
+        return dialog
+    }
 
 
 }

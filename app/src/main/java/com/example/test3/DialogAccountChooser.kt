@@ -43,7 +43,6 @@ class DialogAccountChooser(
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_choose_userid, null)
 
         val builder = AlertDialog.Builder(context)
-            .setTitle("getUser(${manager.PREFERENCES_FILE_NAME})")
             .setView(view)
             .setPositiveButton("return"){ _, _ ->
 
@@ -61,6 +60,10 @@ class DialogAccountChooser(
 
         val dialog = getDialog()!! as AlertDialog
         dialog.findViewById<TextView>(resources.getIdentifier("alertTitle", "id", "android")).typeface = Typeface.MONOSPACE
+
+        dialog.findViewById<TextView>(R.id.account_choose_title).apply {
+            text = "getUser(${manager.PREFERENCES_FILE_NAME}):"
+        }
 
         val input = dialog.findViewById<EditText>(R.id.account_choose_input).apply {
             setText(initialUserInfo.userID)
