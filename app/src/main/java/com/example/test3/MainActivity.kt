@@ -1,7 +1,6 @@
 package com.example.test3
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.Menu
@@ -131,13 +130,7 @@ class MainActivity : AppCompatActivity(){
                     setUseRealColors(use)
                 }
             }
-            R.id.app_info -> {
-                AlertDialog.Builder(this)
-                    .setTitle("CPS")
-                    .setMessage("version = ${BuildConfig.VERSION_NAME}")
-                    .create()
-                    .show()
-            }
+            R.id.app_info -> AboutDialog.showDialog(this)
         }
         return super.onOptionsItemSelected(item)
     }
