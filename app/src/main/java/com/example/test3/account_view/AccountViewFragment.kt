@@ -1,11 +1,11 @@
 package com.example.test3.account_view
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 
@@ -72,8 +72,8 @@ class AccountViewFragment(): Fragment() {
     }
 
     private fun deleteAccount(){
-        AlertDialog.Builder(requireContext())
-            .setMessage("Delete ${panel.manager.PREFERENCES_FILE_NAME} account?")
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Delete ${panel.manager.PREFERENCES_FILE_NAME} account?")
             .setPositiveButton("YES"){ _, _ ->
                 lifecycleScope.launch {
                     panel.manager.setSavedInfo(panel.manager.emptyInfo())

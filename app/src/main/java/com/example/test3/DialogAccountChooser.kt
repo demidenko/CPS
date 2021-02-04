@@ -1,9 +1,9 @@
 package com.example.test3
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.*
@@ -14,6 +14,7 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -25,6 +26,7 @@ import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.AccountSuggestion
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,8 +44,12 @@ class DialogAccountChooser(
         val context = requireContext()
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_choose_userid, null)
 
-        val builder = AlertDialog.Builder(context)
+        val insetTopBotPx = (24 * Resources.getSystem().displayMetrics.density).toInt()
+
+        val builder = MaterialAlertDialogBuilder(context)
             .setView(view)
+            .setBackgroundInsetTop(insetTopBotPx)
+            .setBackgroundInsetBottom(insetTopBotPx)
             .setPositiveButton("return"){ _, _ ->
 
             }
@@ -58,13 +64,13 @@ class DialogAccountChooser(
 
         val mainActivity = requireActivity() as MainActivity
 
-        val dialog = getDialog()!! as AlertDialog
+        val dialog = requireDialog() as AlertDialog
 
-        dialog.findViewById<TextView>(R.id.account_choose_title).apply {
+        dialog.findViewById<TextView>(R.id.account_choose_title)!!.apply {
             text = "getUser(${manager.PREFERENCES_FILE_NAME}):"
         }
 
-        val input = dialog.findViewById<EditText>(R.id.account_choose_input).apply {
+        val input = dialog.findViewById<EditText>(R.id.account_choose_input)!!.apply {
             setText(initialUserInfo.userID)
             typeface = Typeface.MONOSPACE
             filters = arrayOf(createSearchInputFilter(manager))
@@ -79,8 +85,8 @@ class DialogAccountChooser(
             initialUserInfo,
             input,
             saveButton,
-            dialog.findViewById(R.id.account_choose_info),
-            dialog.findViewById(R.id.account_choose_suggestions)
+            dialog.findViewById(R.id.account_choose_info)!!,
+            dialog.findViewById(R.id.account_choose_suggestions)!!
         )
 
         saveButton.setOnClickListener {
