@@ -33,8 +33,7 @@ class MainActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         println("main create")
-        println(savedInstanceState)
-        super.onCreate(savedInstanceState)
+        super.onCreate(null)
 
         setContentView(R.layout.activity_main)
 
@@ -162,7 +161,7 @@ class MainActivity : AppCompatActivity(){
 
     override fun onSaveInstanceState(outState: Bundle) {
         println("main on save bundle")
-        super.onSaveInstanceState(outState)
+        //super.onSaveInstanceState(outState)
     }
 
     override fun onResume() {

@@ -203,7 +203,7 @@ class AccountsFragment: Fragment() {
                     ?: ColorInfo() to true
 
             with(accountsFragment){
-                requireView().findViewById<TextView>(R.id.accounts_welcome_text).visibility = if(allEmpty) View.VISIBLE else View.GONE
+                view?.findViewById<TextView>(R.id.accounts_welcome_text)?.visibility = if(allEmpty) View.VISIBLE else View.GONE
                 mainActivity.window.statusBarColor = best.color
             }
         }
