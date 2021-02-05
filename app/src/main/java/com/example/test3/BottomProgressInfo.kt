@@ -12,7 +12,9 @@ class BottomProgressInfo(val title: String, private val activity: MainActivity) 
 
     private lateinit var view: View
     private val progressBar by lazy { view.findViewById<ProgressBar>(R.id.progress_bottom_info_bar) }
-    private fun createView(size: Int) {
+    private var size = 0
+    private fun createView() {
+        if(size<1) return
         view = activity.layoutInflater.inflate(R.layout.progress_bottom_info, null).apply {
             findViewById<TextView>(R.id.progress_bottom_info_title).text = title
         }
@@ -24,12 +26,13 @@ class BottomProgressInfo(val title: String, private val activity: MainActivity) 
     }
 
     fun start(size: Int): BottomProgressInfo {
-        createView(size)
+        this.size = size
+        createView()
         return this
     }
 
     fun finish(){
-        if(progressBar.max>0){
+        if(size>0){
             activity.lifecycleScope.launch {
                 delay(1000)
                 activity.progress_bar_holder.removeView(view)
