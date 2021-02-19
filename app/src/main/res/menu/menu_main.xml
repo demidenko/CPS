@@ -6,7 +6,7 @@
         >
         <item
             android:id="@+id/color_switcher"
-            android:title="Real handle colors"
+            android:title="Original colors"
             android:icon="@drawable/ic_colors"
             android:checkable="true"
             />
