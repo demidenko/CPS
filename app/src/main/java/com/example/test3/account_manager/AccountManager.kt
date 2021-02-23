@@ -19,10 +19,6 @@ import java.util.concurrent.TimeUnit
 
 abstract class AccountManager(val context: Context) {
 
-    companion object {
-        val KEY_USER_INFO = stringPreferencesKey("user_info")
-    }
-
     abstract val userIDName: String
 
     abstract val PREFERENCES_FILE_NAME: String
@@ -125,7 +121,7 @@ class AccountDataStore(context: Context, name: String): SettingsDataStore(contex
 
     fun getLiveData() = dataStore.data.asLiveData()
 
-    suspend fun getString(): String? = dataStore.data.first()[AccountManager.KEY_USER_INFO]
+    suspend fun getString(): String? = dataStore.data.first()[KEY_USER_INFO]
 
     suspend fun putString(str: String){
         dataStore.edit {
