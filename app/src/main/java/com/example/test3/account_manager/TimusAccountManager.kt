@@ -8,7 +8,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class TimusAccountManager(context: Context): AccountManager(context) {
+class TimusAccountManager(context: Context): AccountManager(context, preferences_file_name) {
+
+    companion object {
+        const val preferences_file_name = "timus"
+    }
 
     @Serializable
     data class TimusUserInfo(
@@ -31,13 +35,6 @@ class TimusAccountManager(context: Context): AccountManager(context) {
     }
 
     override val userIDName = "id"
-
-    override val PREFERENCES_FILE_NAME: String
-        get() = preferences_file_name
-
-    companion object {
-        const val preferences_file_name = "timus"
-    }
 
     override fun isValidForUserID(char: Char): Boolean {
         return char in '0'..'9'

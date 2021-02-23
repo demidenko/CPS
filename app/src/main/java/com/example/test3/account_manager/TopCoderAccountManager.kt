@@ -15,7 +15,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class TopCoderAccountManager(context: Context): RatedAccountManager(context) {
+class TopCoderAccountManager(context: Context): RatedAccountManager(context, preferences_file_name) {
+
+    companion object {
+        const val preferences_file_name = "topcoder"
+
+        private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+    }
 
     @Serializable
     data class TopCoderUserInfo(
@@ -32,15 +38,6 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context) {
         }
 
         override fun link(): String = "https://www.topcoder.com/members/$handle"
-    }
-
-    override val PREFERENCES_FILE_NAME: String
-        get() = preferences_file_name
-
-    companion object {
-        const val preferences_file_name = "topcoder"
-
-        private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
     }
 
     override fun isValidForSearch(char: Char) = isValidForUserID(char)

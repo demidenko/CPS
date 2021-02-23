@@ -5,7 +5,11 @@ import com.example.test3.utils.CListAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class CListAccountManager(context: Context) : AccountManager(context) {
+class CListAccountManager(context: Context) : AccountManager(context, preferences_file_name) {
+
+    companion object {
+        const val preferences_file_name = "clist"
+    }
 
     data class CListUserInfo(
         override var status: STATUS,
@@ -21,14 +25,7 @@ class CListAccountManager(context: Context) : AccountManager(context) {
 
     }
 
-    companion object {
-        const val preferences_file_name = "clist"
-    }
-
     override val userIDName = "login"
-
-    override val PREFERENCES_FILE_NAME: String
-        get() = preferences_file_name
 
     override fun decodeFromString(str: String) = emptyInfo()
 

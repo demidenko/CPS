@@ -24,7 +24,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class AtCoderAccountManager(context: Context): RatedAccountManager(context) {
+class AtCoderAccountManager(context: Context): RatedAccountManager(context, preferences_file_name) {
+
+    companion object {
+        const val preferences_file_name = "atcoder"
+    }
 
     @Serializable
     data class AtCoderUserInfo(
@@ -40,13 +44,6 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context) {
         }
 
         override fun link(): String = AtCoderURLFactory.user(handle)
-    }
-
-    override val PREFERENCES_FILE_NAME: String
-        get() = preferences_file_name
-
-    companion object {
-        const val preferences_file_name = "atcoder"
     }
 
     override fun isValidForSearch(char: Char) = isValidForUserID(char)

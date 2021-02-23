@@ -17,11 +17,10 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 
-abstract class AccountManager(val context: Context) {
+abstract class AccountManager(val context: Context, val PREFERENCES_FILE_NAME: String) {
 
     abstract val userIDName: String
 
-    abstract val PREFERENCES_FILE_NAME: String
     protected open val dataStore = AccountDataStore(context, PREFERENCES_FILE_NAME)
     val dataStoreLive by lazy{ dataStore.getLiveData() }
 
@@ -60,7 +59,7 @@ abstract class AccountManager(val context: Context) {
 }
 
 
-abstract class RatedAccountManager(context: Context) : AccountManager(context){
+abstract class RatedAccountManager(context: Context, PREFERENCES_FILE_NAME: String) : AccountManager(context, PREFERENCES_FILE_NAME){
     abstract fun getColor(handleColor: HandleColor): Int
     abstract val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
 
