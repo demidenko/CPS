@@ -5,7 +5,6 @@ import android.content.Context
 import android.text.SpannableString
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.createDataStore
 import androidx.lifecycle.asLiveData
 import com.example.test3.*
 import com.example.test3.utils.AtCoderRatingChange
@@ -119,12 +118,10 @@ data class RatingChange(
     )
 }
 
-class AccountDataStore(context: Context, name: String): SettingsByContext() {
+class AccountDataStore(context: Context, name: String): SettingsDataStore(context, name) {
     companion object {
         val KEY_USER_INFO = stringPreferencesKey("user_info")
     }
-
-    private val dataStore = context.createDataStore(name = name)
 
     fun getLiveData() = dataStore.data.asLiveData()
 

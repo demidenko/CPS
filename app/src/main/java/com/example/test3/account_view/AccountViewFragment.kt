@@ -47,7 +47,7 @@ class AccountViewFragment(): Fragment() {
             showBigView()
         }
 
-        mainActivity.settingsUI.userRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
+        mainActivity.settingsUI.useRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
             showBigView()
         }
 

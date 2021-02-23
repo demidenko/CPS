@@ -158,7 +158,7 @@ class NewsFragment : Fragment() {
                 (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).closeShowFromBlog()
             }
 
-            settingsUI.userRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
+            settingsUI.useRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
                 codeforcesNewsAdapter.fragments.forEach { it.refresh() }
             }
         }

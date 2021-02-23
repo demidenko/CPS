@@ -3,11 +3,11 @@ package com.example.test3
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.createDataStore
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
+import com.example.test3.utils.SettingsDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
@@ -25,10 +25,7 @@ fun<T> LiveData<T>.observeUpdates(owner: LifecycleOwner, _onChanged: (T)->Unit){
 }
 
 
-abstract class SettingsByContext
-
-class SettingsUI(context: Context): SettingsByContext() {
-    private val dataStore = context.createDataStore(name = "settings_ui")
+class SettingsUI(context: Context): SettingsDataStore(context, "settings_ui") {
 
     private val KEY_USE_REAL_COLORS = booleanPreferencesKey("use_real_colors")
 
@@ -36,7 +33,7 @@ class SettingsUI(context: Context): SettingsByContext() {
         it[KEY_USE_REAL_COLORS] ?: false
     }
 
-    val userRealColorsLiveData = flowForUseRealColors.asLiveData()
+    val useRealColorsLiveData = flowForUseRealColors.asLiveData()
 
     suspend fun getUseRealColors() = flowForUseRealColors.first()
 
@@ -52,7 +49,7 @@ fun Context.getUseRealColors() = runBlocking { settingsUI.getUseRealColors() }
 suspend fun Context.setUseRealColors(use: Boolean) = settingsUI.setUseRealColors(use)
 
 
-class SettingsDelegate<T: SettingsByContext>(
+class SettingsDelegate<T: SettingsDataStore>(
     val create: (Context)->T
 ) {
     private var _dataStore: T? = null

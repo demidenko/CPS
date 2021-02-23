@@ -94,7 +94,7 @@ class AccountsFragment: Fragment() {
             navigation_accounts_add.setOnClickListener { addAccount() }
         }
 
-        mainActivity.settingsUI.userRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
+        mainActivity.settingsUI.useRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
             showPanels()
         }
     }
