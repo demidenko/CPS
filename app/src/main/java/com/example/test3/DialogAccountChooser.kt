@@ -67,7 +67,7 @@ class DialogAccountChooser(
         val dialog = requireDialog() as AlertDialog
 
         dialog.findViewById<TextView>(R.id.account_choose_title)!!.apply {
-            text = "getUser(${manager.PREFERENCES_FILE_NAME}):"
+            text = "getUser(${manager.managerName}):"
         }
 
         val input = dialog.findViewById<EditText>(R.id.account_choose_input)!!.apply {

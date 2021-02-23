@@ -91,11 +91,11 @@ abstract class AccountPanel(
     fun block(){
         expandButton.isEnabled = false
         reloadButton.isEnabled = false
-        mainActivity.accountsFragment.sharedReloadButton.startReload(manager.PREFERENCES_FILE_NAME)
+        mainActivity.accountsFragment.sharedReloadButton.startReload(manager.managerName)
     }
 
     fun unblock(){
-        mainActivity.accountsFragment.sharedReloadButton.stopReload(manager.PREFERENCES_FILE_NAME)
+        mainActivity.accountsFragment.sharedReloadButton.stopReload(manager.managerName)
         reloadButton.isEnabled = true
         expandButton.isEnabled = true
     }
@@ -137,7 +137,7 @@ abstract class AccountPanel(
         mainActivity.supportFragmentManager.beginTransaction()
             .hide(mainActivity.accountsFragment)
             .add(android.R.id.content, AccountViewFragment().apply {
-                arguments = Bundle().apply { putString("manager", manager.PREFERENCES_FILE_NAME) }
+                arguments = Bundle().apply { putString("manager", manager.managerName) }
             })
             .addToBackStack(null)
             .commit()

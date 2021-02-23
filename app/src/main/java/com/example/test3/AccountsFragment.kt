@@ -44,7 +44,7 @@ class AccountsFragment: Fragment() {
             timusPanel
         ).apply {
             //check data file names
-            if(this.map { it.manager.PREFERENCES_FILE_NAME }.distinct().size != this.size)
+            if(this.map { it.manager.managerName }.distinct().size != this.size)
                 throw Exception("not different file names in panels managers")
 
             //check ranks of colors
@@ -55,7 +55,7 @@ class AccountsFragment: Fragment() {
                         ratedManager.getColor(handleColor)
 
                         if(index>0 && handleColor < colors[index-1])
-                            throw Exception("${ratedManager.PREFERENCES_FILE_NAME}: color list is not sorted")
+                            throw Exception("${ratedManager.managerName}: color list is not sorted")
                     }
                     colors.size
                 }.apply {
@@ -122,7 +122,7 @@ class AccountsFragment: Fragment() {
                     val listView = findViewById<LinearLayout>(R.id.dialog_add_account_list)
                     panels.filter { it.isEmpty() }.forEach { panel ->
                         val itemView = layoutInflater.inflate(R.layout.dialog_add_account_item, null).apply {
-                            findViewById<TextView>(R.id.dialog_add_account_item_title).text = panel.manager.PREFERENCES_FILE_NAME
+                            findViewById<TextView>(R.id.dialog_add_account_item_title).text = panel.manager.managerName
 
                             setOnClickListener {
                                 dismiss()
@@ -159,7 +159,7 @@ class AccountsFragment: Fragment() {
             val progressInfo = BottomProgressInfo("clist import", mainActivity).start(supported.size)
 
             supported.map { (manager, userID) ->
-                val panel = getPanel(manager.PREFERENCES_FILE_NAME)
+                val panel = getPanel(manager.managerName)
                 async {
                     while(panel.isBlocked()) delay(300)
                     panel.block()
@@ -209,12 +209,12 @@ class AccountsFragment: Fragment() {
         }
 
         fun setCurrent(panel: AccountPanel?) {
-            current = panel?.manager?.PREFERENCES_FILE_NAME
+            current = panel?.manager?.managerName
             updateStatusBar()
         }
 
         suspend fun updatePanel(panel: AccountPanel) {
-            val name = panel.manager.PREFERENCES_FILE_NAME
+            val name = panel.manager.managerName
             if(!panel.isEmpty()) {
                 infoByPanel[name] = ColorInfo()
                 (panel.manager as? RatedAccountManager)?.let { manager ->
@@ -246,7 +246,7 @@ class AccountsFragment: Fragment() {
 
     fun getPanel(managerType: String): AccountPanel {
         return panels.find { panel ->
-            panel.manager.PREFERENCES_FILE_NAME == managerType
+            panel.manager.managerName == managerType
         } ?: throw Exception("Unknown type of manager: $managerType")
     }
 

@@ -36,7 +36,7 @@ class AccountViewFragment(): Fragment() {
 
         val manager = panel.manager
 
-        val subtitle = "::accounts.${manager.PREFERENCES_FILE_NAME}"
+        val subtitle = "::accounts.${manager.managerName}"
         setFragmentSubTitle(this, subtitle)
         mainActivity.setActionBarSubTitle(subtitle)
         mainActivity.navigation.visibility = View.GONE
@@ -73,7 +73,7 @@ class AccountViewFragment(): Fragment() {
 
     private fun deleteAccount(){
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Delete ${panel.manager.PREFERENCES_FILE_NAME} account?")
+            .setTitle("Delete ${panel.manager.managerName} account?")
             .setPositiveButton("YES"){ _, _ ->
                 lifecycleScope.launch {
                     panel.manager.setSavedInfo(panel.manager.emptyInfo())
@@ -87,7 +87,7 @@ class AccountViewFragment(): Fragment() {
 
     private fun openSettings(){
         val activity = requireActivity() as MainActivity
-        val managerType = panel.manager.PREFERENCES_FILE_NAME
+        val managerType = panel.manager.managerName
         activity.supportFragmentManager.beginTransaction()
             .hide(this)
             .add(android.R.id.content, AccountSettingsFragment().apply {

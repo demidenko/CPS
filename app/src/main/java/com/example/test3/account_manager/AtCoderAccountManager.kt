@@ -147,7 +147,7 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context, pref
     }
 
     override val dataStore by lazy { context.accountDataStoreAtCoder }
-    override fun getSettings() = AtCoderAccountSettingsDataStore(context, PREFERENCES_FILE_NAME)
+    override fun getSettings() = AtCoderAccountSettingsDataStore(this)
 
     fun notifyRatingChange(m: NotificationManager, handle: String, ratingChange: AtCoderRatingChange){
         notifyRatingChange(
@@ -168,7 +168,7 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context, pref
 
 val Context.accountDataStoreAtCoder by SettingsDelegate { AccountDataStore(it, AtCoderAccountManager.preferences_file_name) }
 
-class AtCoderAccountSettingsDataStore(context: Context, name: String): AccountSettingsDataStore(context, name){
+class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager): AccountSettingsDataStore(manager.context, manager.managerName){
 
     companion object {
         private val KEY_OBS_RATING = booleanPreferencesKey("observe_rating")

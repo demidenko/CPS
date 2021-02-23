@@ -155,7 +155,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, p
     }
 
     override val dataStore by lazy { context.accountDataStoreCodeforces }
-    override fun getSettings() = CodeforcesAccountSettingsDataStore(context, PREFERENCES_FILE_NAME)
+    override fun getSettings() = CodeforcesAccountSettingsDataStore(this)
 
     fun notifyRatingChange(m: NotificationManager, ratingChange: CodeforcesRatingChange){
         notifyRatingChange(
@@ -197,7 +197,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, p
 
 val Context.accountDataStoreCodeforces by SettingsDelegate { AccountDataStore(it, CodeforcesAccountManager.preferences_file_name) }
 
-class CodeforcesAccountSettingsDataStore(context: Context, name: String): AccountSettingsDataStore(context, name){
+class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager): AccountSettingsDataStore(manager.context, manager.managerName){
 
     companion object {
         private val KEY_OBS_RATING = booleanPreferencesKey("observe_rating")

@@ -39,7 +39,7 @@ class AccountSettingsFragment(): Fragment() {
 
         val manager = panel.manager
 
-        val subtitle = "::accounts.${manager.PREFERENCES_FILE_NAME}.settings"
+        val subtitle = "::accounts.${manager.managerName}.settings"
         setFragmentSubTitle(this, subtitle)
         mainActivity.setActionBarSubTitle(subtitle)
         mainActivity.navigation.visibility = View.GONE

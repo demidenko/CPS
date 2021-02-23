@@ -17,14 +17,14 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 
-abstract class AccountManager(val context: Context, val PREFERENCES_FILE_NAME: String) {
+abstract class AccountManager(val context: Context, val managerName: String) {
 
     abstract val userIDName: String
 
-    protected open val dataStore = AccountDataStore(context, PREFERENCES_FILE_NAME)
+    protected open val dataStore = AccountDataStore(context, managerName)
     val dataStoreLive by lazy{ dataStore.getLiveData() }
 
-    open fun getSettings() = AccountSettingsDataStore(context, PREFERENCES_FILE_NAME)
+    open fun getSettings() = AccountSettingsDataStore(context, managerName)
 
     abstract fun emptyInfo(): UserInfo
 
@@ -59,7 +59,7 @@ abstract class AccountManager(val context: Context, val PREFERENCES_FILE_NAME: S
 }
 
 
-abstract class RatedAccountManager(context: Context, PREFERENCES_FILE_NAME: String) : AccountManager(context, PREFERENCES_FILE_NAME){
+abstract class RatedAccountManager(context: Context, managerName: String) : AccountManager(context, managerName){
     abstract fun getColor(handleColor: HandleColor): Int
     abstract val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
 
@@ -204,7 +204,7 @@ fun notifyRatingChange(
         setContentTitle("$handle new rating: $newRating")
         val difference = signedToString(newRating - oldRating)
         setContentText("$difference (rank: $rank)")
-        setSubText("${accountManager.PREFERENCES_FILE_NAME} rating changes")
+        setSubText("${accountManager.managerName} rating changes")
         color = accountManager.getHandleColorARGB(newRating)
         url?.let {
             setContentIntent(makePendingIntentOpenURL(url, context))
