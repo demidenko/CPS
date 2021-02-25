@@ -204,13 +204,11 @@ class NewsFragment : Fragment() {
     private suspend fun reloadFragment(
         fragment: CodeforcesNewsFragment,
         tab: TabLayout.Tab,
-        lang: String,
-        block: suspend () -> Unit = {}
+        lang: String
     ) {
         sharedReloadButton.startReload(fragment.title.name)
         tab.text = "..."
         fragment.swipeRefreshLayout.isRefreshing = true
-        block()
         if(fragment.reload(lang)) {
             tab.text = fragment.title.name
             if (fragment.isManagesNewEntries) {
@@ -247,19 +245,18 @@ class NewsFragment : Fragment() {
     private val recentShowBackButton by lazy { requireActivity().navigation_news_recent_show_blog_back }
 
     private fun updateLostInfo() {
-        //TODO: behaviour on disable/enable LOST in settings
-
-        val index = codeforcesNewsAdapter.indexOf(CodeforcesTitle.LOST)
-        if(index == -1) return
-        val tab = tabLayout.getTabAt(index) ?: return
-        val fragment = codeforcesNewsAdapter.fragments[index]
-
         lifecycleScope.launch {
-            reloadFragment(fragment, tab, ""){
-                updateLostInfoButton.isEnabled = false
-                CodeforcesNewsLostRecentJobService.updateInfo(requireContext(), BottomProgressInfo("update info of lost", requireActivity() as MainActivity))
-                updateLostInfoButton.isEnabled = true
-            }
+            updateLostInfoButton.isEnabled = false
+            val mainActivity = requireActivity() as MainActivity
+            CodeforcesNewsLostRecentJobService.updateInfo(mainActivity, BottomProgressInfo("update info of lost", mainActivity))
+            updateLostInfoButton.isEnabled = true
+
+            codeforcesNewsAdapter.indexOf(CodeforcesTitle.LOST).takeIf { it!=-1 }
+                ?.let { index ->
+                    val tab = tabLayout.getTabAt(index) ?: return@let
+                    val fragment = codeforcesNewsAdapter.fragments[index]
+                    reloadFragment(fragment, tab, "")
+                }
         }
 
     }
