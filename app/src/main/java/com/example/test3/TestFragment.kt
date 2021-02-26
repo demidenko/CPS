@@ -7,7 +7,7 @@ import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.text.bold
@@ -21,6 +21,7 @@ import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.job_services.settingsJobServices
 import com.example.test3.utils.SettingsDataStore
 import com.example.test3.utils.getCurrentTimeSeconds
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.util.*
@@ -44,7 +45,7 @@ class TestFragment : Fragment() {
         val stuff = view.findViewById<TextView>(R.id.stuff_textview)
 
         //show running jobs
-        view.findViewById<Button>(R.id.button_running_jobs).setOnClickListener {
+        mainActivity.navigation_develop.findViewById<ImageButton>(R.id.navigation_dev_jobs).setOnClickListener {
             val currentTimeSeconds = getCurrentTimeSeconds()
             val jobservices =  JobServicesCenter.getRunningJobServices(mainActivity).joinToString(separator = "\n"){ info ->
                 buildString {
@@ -68,7 +69,7 @@ class TestFragment : Fragment() {
         }
 
         //colors
-        view.findViewById<Button>(R.id.button_test_handle_colors).setOnClickListener{ button -> button as Button
+        mainActivity.navigation_develop.findViewById<ImageButton>(R.id.navigation_dev_colors).setOnClickListener{
             val table = view.findViewById<LinearLayout>(R.id.table_handle_colors)
             table.removeAllViews()
 

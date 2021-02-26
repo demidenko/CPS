@@ -64,7 +64,7 @@
 
             <include
                 android:id="@+id/navigation_develop"
-                layout="@layout/navigation_empty"
+                layout="@layout/navigation_dev"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"
