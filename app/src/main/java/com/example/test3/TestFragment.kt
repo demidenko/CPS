@@ -18,10 +18,13 @@ import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.RatedAccountManager
 import com.example.test3.job_services.JobServicesCenter
+import com.example.test3.job_services.settingsJobServices
 import com.example.test3.utils.SettingsDataStore
+import com.example.test3.utils.getCurrentTimeSeconds
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class TestFragment : Fragment() {
@@ -39,12 +42,19 @@ class TestFragment : Fragment() {
 
 
         val stuff = view.findViewById<TextView>(R.id.stuff_textview)
-        //val prefs = mainActivity.getSharedPreferences("test", Context.MODE_PRIVATE)
 
         //show running jobs
         view.findViewById<Button>(R.id.button_running_jobs).setOnClickListener {
+            val currentTimeSeconds = getCurrentTimeSeconds()
             val jobservices =  JobServicesCenter.getRunningJobServices(mainActivity).joinToString(separator = "\n"){ info ->
-                "Job " + info.id + ": " + info.service.shortClassName.removeSuffix("JobService").removePrefix(".job_services.")
+                buildString {
+                    append("Job ${info.id}: ")
+                    appendLine(info.service.shortClassName.removeSuffix("JobService").removePrefix(".job_services."))
+                    val startTimeSeconds = runBlocking {
+                        TimeUnit.MILLISECONDS.toSeconds(mainActivity.settingsJobServices.getStartTimeMillis(info.id))
+                    }
+                    append(timeDifference(startTimeSeconds, currentTimeSeconds))
+                }
             }
             val services = (mainActivity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getRunningServices(Int.MAX_VALUE)
                 .mapNotNull {

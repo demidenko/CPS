@@ -6,12 +6,17 @@ import android.app.job.JobScheduler
 import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import com.example.test3.BottomProgressInfo
 import com.example.test3.MainActivity
+import com.example.test3.SettingsDelegate
 import com.example.test3.SettingsDev
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.news.SettingsNewsFragment
+import com.example.test3.utils.SettingsDataStore
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
@@ -135,7 +140,7 @@ object JobServicesCenter {
 
 }
 
-abstract class CoroutineJobService : JobService(), CoroutineScope {
+abstract class CoroutineJobService() : JobService(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext = Job() + Dispatchers.Main
 
@@ -148,9 +153,23 @@ abstract class CoroutineJobService : JobService(), CoroutineScope {
 
     override fun onStartJob(params: JobParameters?): Boolean {
         launch {
+            settingsJobServices.setStartTimeMillis(params!!.jobId, System.currentTimeMillis())
             makeJobs().joinAll()
             jobFinished(params, false)
         }
         return true
     }
+}
+
+val Context.settingsJobServices by SettingsDelegate { SettingsJobServices(it) }
+
+class SettingsJobServices(context: Context): SettingsDataStore(context, "data_job_services") {
+
+    private fun makeStartTimeKey(jobId: Int) = longPreferencesKey("start_time_$jobId")
+
+    suspend fun setStartTimeMillis(jobId: Int, timeMillis: Long){
+        dataStore.edit { it[makeStartTimeKey(jobId)] = timeMillis }
+    }
+
+    suspend fun getStartTimeMillis(jobId: Int) = dataStore.data.first()[makeStartTimeKey(jobId)] ?: 0L
 }
