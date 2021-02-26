@@ -47,16 +47,16 @@ class TestFragment : Fragment() {
         //show running jobs
         mainActivity.navigation_develop.findViewById<ImageButton>(R.id.navigation_dev_jobs).setOnClickListener {
             val currentTimeSeconds = getCurrentTimeSeconds()
-            val jobservices =  JobServicesCenter.getRunningJobServices(mainActivity).joinToString(separator = "\n"){ info ->
-                buildString {
-                    append("Job ${info.id}: ")
-                    appendLine(info.service.shortClassName.removeSuffix("JobService").removePrefix(".job_services."))
-                    val startTimeSeconds = runBlocking {
-                        TimeUnit.MILLISECONDS.toSeconds(mainActivity.settingsJobServices.getStartTimeMillis(info.id))
+            val jobservices = JobServicesCenter.getRunningJobServices(mainActivity)
+                .map { info -> info to runBlocking { TimeUnit.MILLISECONDS.toSeconds(mainActivity.settingsJobServices.getStartTimeMillis(info.id)) } }
+                .sortedByDescending { it.second }
+                .joinToString(separator = "\n"){ (info, startTimeSeconds) ->
+                    buildString {
+                        append("Job ${info.id}: ")
+                        appendLine(info.service.shortClassName.removeSuffix("JobService").removePrefix(".job_services."))
+                        append(timeDifference(startTimeSeconds, currentTimeSeconds))
                     }
-                    append(timeDifference(startTimeSeconds, currentTimeSeconds))
                 }
-            }
             val services = (mainActivity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getRunningServices(Int.MAX_VALUE)
                 .mapNotNull {
                     val s = it.service.className
