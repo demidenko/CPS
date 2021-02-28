@@ -5,9 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.test3.BottomProgressInfo
 import com.example.test3.NewsFragment
-import com.example.test3.NotificationIDs
 import com.example.test3.account_manager.STATUS
-import com.example.test3.makeSimpleNotification
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
@@ -67,8 +65,6 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
     }
 
     override suspend fun doWork(): Result {
-
-        makeSimpleNotification(context, NotificationIDs.test, "Lost started", "", false)
 
         if(!isEnabled(context)){
             WorkersCenter.stopWorker(context, WorkersNames.codeforces_news_lost_recent)
