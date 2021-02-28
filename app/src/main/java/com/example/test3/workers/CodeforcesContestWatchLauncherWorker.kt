@@ -1,32 +1,30 @@
-package com.example.test3.job_services
+package com.example.test3.workers
 
 import android.content.Context
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.contest_watch.CodeforcesContestWatchService
 import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesAPIStatus
 import com.example.test3.utils.getCurrentTimeSeconds
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 
-class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
+class CodeforcesContestWatchLauncherWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
-    private val codeforcesAccountManager by lazy { CodeforcesAccountManager(this) }
-    override suspend fun makeJobs(): List<Job> {
-        if(codeforcesAccountManager.getSettings().getContestWatchEnabled()){
-            return listOf(launch { checkSubmissions() })
-        }else {
-            JobServicesCenter.stopJobService(this, JobServiceIDs.codeforces_contest_watch_starter)
-            return emptyList()
+    private val codeforcesAccountManager by lazy { CodeforcesAccountManager(context) }
+
+    override suspend fun doWork(): Result {
+
+        if(!codeforcesAccountManager.getSettings().getContestWatchEnabled()){
+            WorkersCenter.stopWorker(context, WorkersNames.codeforces_contest_watch_launcher)
+            return Result.success()
         }
-    }
 
-    private suspend fun checkSubmissions() {
         val info = codeforcesAccountManager.getSavedInfo() as CodeforcesAccountManager.CodeforcesUserInfo
-        if(info.status != STATUS.OK) return
+        if(info.status != STATUS.OK) return Result.success()
 
         val currentTimeSeconds = getCurrentTimeSeconds()
         fun isTooLate(timeSeconds: Long): Boolean {
@@ -45,8 +43,8 @@ class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
         var step = 1 //ask 1, than 10 util
         var from = 1
         while (true) {
-            val response = CodeforcesAPI.getUserSubmissions(info.handle, step, from) ?: return
-            if(response.status != CodeforcesAPIStatus.OK) return
+            val response = CodeforcesAPI.getUserSubmissions(info.handle, step, from) ?: return Result.retry()
+            if(response.status != CodeforcesAPIStatus.OK) return Result.retry()
 
             val result = response.result!!.let { submissions ->
                 for(submission in submissions){
@@ -81,10 +79,10 @@ class CodeforcesContestWatchStarterJobService: CoroutineJobService() {
                     if(contestID != -1){
                         if(canceled.none { it.first == contestID }) {
                             settings.setContestWatchStartedContestID(contestID)
-                            CodeforcesContestWatchService.startService(this, info.handle, contestID)
+                            CodeforcesContestWatchService.startService(context, info.handle, contestID)
                         }
                     }
-                    return
+                    return Result.success()
                 }
             }
 

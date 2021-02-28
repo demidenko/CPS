@@ -22,8 +22,8 @@ android {
         applicationId "com.example.test3"
         minSdkVersion 22
         targetSdkVersion 30
-        versionCode = 144
-        versionName '0.34.2'
+        versionCode = 145
+        versionName '0.34.3'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -56,6 +56,8 @@ dependencies {
 
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.3.0"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.3.0"
+
+    implementation "androidx.work:work-runtime-ktx:2.5.0"
 
     implementation 'com.squareup.moshi:moshi-kotlin:1.11.0'
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.11.0'

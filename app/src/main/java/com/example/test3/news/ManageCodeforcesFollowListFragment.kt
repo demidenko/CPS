@@ -15,7 +15,7 @@ import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
-import com.example.test3.job_services.CodeforcesNewsFollowJobService
+import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.example.test3.makeIntentOpenUrl
 import com.example.test3.setFragmentSubTitle
 import com.example.test3.utils.CodeforcesURLFactory
@@ -91,7 +91,7 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
         private val codeforcesAccountManager by lazy { mainActivity.accountsFragment.codeforcesAccountManager }
 
         private val list = mutableListOf<CodeforcesAccountManager.CodeforcesUserInfo>()
-        private val dataConnector = CodeforcesNewsFollowJobService.FollowDataConnector(mainActivity)
+        private val dataConnector = CodeforcesNewsFollowWorker.FollowDataConnector(mainActivity)
 
         suspend fun initialize(){
             val usersInfo = CodeforcesUtils.getUsersInfo(dataConnector.getHandles(), true)

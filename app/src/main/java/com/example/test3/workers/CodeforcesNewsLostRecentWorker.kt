@@ -1,19 +1,21 @@
-package com.example.test3.job_services
+package com.example.test3.workers
 
 import android.content.Context
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
 import com.example.test3.BottomProgressInfo
 import com.example.test3.NewsFragment
+import com.example.test3.NotificationIDs
 import com.example.test3.account_manager.STATUS
+import com.example.test3.makeSimpleNotification
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
 import com.example.test3.utils.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 
-class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
+class CodeforcesNewsLostRecentWorker(private val context: Context, params: WorkerParameters): CoroutineWorker(context, params){
     companion object {
 
         suspend fun updateInfo(context: Context, progressInfo: BottomProgressInfo?) {
@@ -64,18 +66,17 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         suspend fun isEnabled(context: Context): Boolean = SettingsNewsFragment.getSettings(context).getLostEnabled()
     }
 
-    override suspend fun makeJobs(): List<Job> {
-        if (isEnabled(this)) return listOf( launch { parseRecent() })
-        else{
-            JobServicesCenter.stopJobService(this, JobServiceIDs.codeforces_news_lost_recent)
-            return emptyList()
-        }
-    }
+    override suspend fun doWork(): Result {
 
-    private suspend fun parseRecent(){
+        makeSimpleNotification(context, NotificationIDs.test, "Lost started", "", false)
+
+        if(!isEnabled(context)){
+            WorkersCenter.stopWorker(context, WorkersNames.codeforces_news_lost_recent)
+            return Result.success()
+        }
 
         val recentBlogs = CodeforcesUtils.parseRecentActionsPage(
-            CodeforcesAPI.getPageSource("recent-actions", NewsFragment.getCodeforcesContentLanguage(this)) ?: return
+            CodeforcesAPI.getPageSource("recent-actions", NewsFragment.getCodeforcesContentLanguage(context)) ?: return Result.failure()
         ).first.let { list ->
             val authors = CodeforcesUtils.getUsersInfo(list.map { blog -> blog.authorHandle })
             list.map { blog ->
@@ -86,7 +87,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
             }
         }
 
-        if(recentBlogs.isEmpty()) return
+        if(recentBlogs.isEmpty()) return Result.failure()
 
         val currentTimeSeconds = getCurrentTimeSeconds()
 
@@ -96,8 +97,8 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
         fun isOldLost(blogCreationTimeSeconds: Long): Boolean =
             TimeUnit.SECONDS.toDays(currentTimeSeconds - blogCreationTimeSeconds) > 7
 
-        val blogsDao = getLostBlogsDao(this)
-        val minRating = SettingsNewsFragment.getSettings(this).getLostMinRating()
+        val blogsDao = getLostBlogsDao(context)
+        val minRating = SettingsNewsFragment.getSettings(context).getLostMinRating()
 
         //get current suspects with removing old ones
         val suspects = blogsDao.getSuspects().let { list ->
@@ -147,6 +148,7 @@ class CodeforcesNewsLostRecentJobService : CoroutineJobService(){
             }
         }
 
+        return Result.success()
     }
 
 }

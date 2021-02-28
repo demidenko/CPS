@@ -1,4 +1,4 @@
-package com.example.test3.job_services
+package com.example.test3.workers
 
 import android.content.Context
 import androidx.core.app.NotificationCompat
@@ -6,29 +6,29 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
 import com.example.test3.*
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.*
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
-class NewsJobService : CoroutineJobService() {
+class NewsWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
-    override suspend fun makeJobs(): List<Job> {
+    override suspend fun doWork(): Result  = withContext(Dispatchers.IO){
         val jobs = mutableListOf<Job>()
-        with(SettingsNewsFragment.getSettings(this)){
+        with(SettingsNewsFragment.getSettings(context)){
             if(getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.PROJECT_EULER_NEWS)) jobs.add(launch { parseProjectEuler() })
             if(getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.ACMP_NEWS)) jobs.add(launch { parseACMP() })
             if(getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.ZAOCH_NEWS)) jobs.add(launch { parseZaoch() })
         }
-        if(jobs.isEmpty()){
-            JobServicesCenter.stopJobService(this, JobServiceIDs.news_parsers)
-        }
-        return jobs
+        if(jobs.isEmpty()) WorkersCenter.stopWorker(context, WorkersNames.news_parsers)
+        jobs.joinAll()
+        return@withContext Result.success()
     }
 
-    private val dataStore by lazy { NewsJobServiceDataStore(this) }
+    private val dataStore by lazy { NewsJobServiceDataStore(context) }
 
     private suspend fun parseACMP() {
         val s = ACMPAPI.getMainPage() ?: return
@@ -54,7 +54,7 @@ class NewsJobService : CoroutineJobService() {
             val group = "acmp_news_group"
 
             news.forEach { (id, content) ->
-                val n = notificationBuilder(this, NotificationChannels.acmp_news).apply {
+                val n = notificationBuilder(context, NotificationChannels.acmp_news).apply {
                     setSubText("acmp news")
                     setBigContent(content)
                     setSmallIcon(R.drawable.ic_news)
@@ -62,12 +62,12 @@ class NewsJobService : CoroutineJobService() {
                     setShowWhen(true)
                     setAutoCancel(true)
                     setGroup(group)
-                    setContentIntent(makePendingIntentOpenURL("https://acmp.ru", this@NewsJobService))
+                    setContentIntent(makePendingIntentOpenURL("https://acmp.ru", context))
                 }
-                NotificationManagerCompat.from(this).notify( NotificationIDs.makeACMPNewsNotificationID(id), n.build())
+                NotificationManagerCompat.from(context).notify( NotificationIDs.makeACMPNewsNotificationID(id), n.build())
             }
 
-            val n = notificationBuilder(this, NotificationChannels.acmp_news).apply {
+            val n = notificationBuilder(context, NotificationChannels.acmp_news).apply {
                 setStyle(NotificationCompat.InboxStyle().setSummaryText("acmp news"))
                 setSmallIcon(R.drawable.ic_news)
                 setColor(NotificationColors.acmp_main)
@@ -75,7 +75,7 @@ class NewsJobService : CoroutineJobService() {
                 setGroup(group)
                 setGroupSummary(true)
             }
-            NotificationManagerCompat.from(this).notify( NotificationIDs.makeACMPNewsNotificationID(0), n.build())
+            NotificationManagerCompat.from(context).notify( NotificationIDs.makeACMPNewsNotificationID(0), n.build())
         }
 
         val firstID = news.first().first
@@ -107,7 +107,7 @@ class NewsJobService : CoroutineJobService() {
 
         if(lastNewsID!=""){
             news.forEach { (title, content) ->
-                val n = notificationBuilder(this, NotificationChannels.project_euler_news).apply {
+                val n = notificationBuilder(context, NotificationChannels.project_euler_news).apply {
                     setSubText("Project Euler news")
                     setContentTitle(title)
                     setBigContent(fromHTML(content))
@@ -115,9 +115,9 @@ class NewsJobService : CoroutineJobService() {
                     setColor(NotificationColors.project_euler_main)
                     setShowWhen(true)
                     setAutoCancel(true)
-                    setContentIntent(makePendingIntentOpenURL("https://projecteuler.net/news", this@NewsJobService))
+                    setContentIntent(makePendingIntentOpenURL("https://projecteuler.net/news", context))
                 }
-                NotificationManagerCompat.from(this).notify( NotificationIDs.makeProjectEulerNewsNotificationID(title), n.build())
+                NotificationManagerCompat.from(context).notify( NotificationIDs.makeProjectEulerNewsNotificationID(title), n.build())
             }
         }
 
@@ -156,7 +156,7 @@ class NewsJobService : CoroutineJobService() {
 
         if(lastNewsID!=""){
             news.forEach { (_, title, content) ->
-                val n = notificationBuilder(this, NotificationChannels.olympiads_zaoch_news).apply {
+                val n = notificationBuilder(context, NotificationChannels.olympiads_zaoch_news).apply {
                     setSubText("zaoch news")
                     setContentTitle(title)
                     setBigContent(fromHTML(content))
@@ -164,9 +164,9 @@ class NewsJobService : CoroutineJobService() {
                     setColor(NotificationColors.zaoch_main)
                     setShowWhen(true)
                     //setAutoCancel(true)
-                    setContentIntent(makePendingIntentOpenURL("https://olympiads.ru/zaoch/", this@NewsJobService))
+                    setContentIntent(makePendingIntentOpenURL("https://olympiads.ru/zaoch/", context))
                 }
-                NotificationManagerCompat.from(this).notify(NotificationIDs.makeZaochNewsNotificationID(title), n.build())
+                NotificationManagerCompat.from(context).notify(NotificationIDs.makeZaochNewsNotificationID(title), n.build())
             }
         }
 

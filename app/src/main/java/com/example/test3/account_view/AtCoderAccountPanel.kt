@@ -6,7 +6,7 @@ import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.AtCoderAccountManager
 import com.example.test3.account_manager.UserInfo
-import com.example.test3.job_services.JobServicesCenter
+import com.example.test3.workers.WorkersCenter
 import kotlinx.coroutines.launch
 
 class AtCoderAccountPanel(
@@ -45,7 +45,7 @@ class AtCoderAccountPanel(
                     buttonView.isEnabled = false
                     getSettings().setObserveRating(isChecked)
                     if (isChecked) {
-                        JobServicesCenter.startAccountsJobService(mainActivity)
+                        WorkersCenter.startAccountsWorker(mainActivity)
                     }
                     buttonView.isEnabled = true
                 }

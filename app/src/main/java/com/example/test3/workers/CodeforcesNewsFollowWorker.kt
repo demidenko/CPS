@@ -1,18 +1,18 @@
-package com.example.test3.job_services
+package com.example.test3.workers
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
 import com.example.test3.*
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.room.UserBlogs
 import com.example.test3.room.getFollowDao
 import com.example.test3.utils.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
-class CodeforcesNewsFollowJobService: CoroutineJobService() {
+class CodeforcesNewsFollowWorker(private val context: Context, val params: WorkerParameters): CoroutineWorker(context, params) {
     companion object {
         suspend fun isEnabled(context: Context): Boolean = SettingsNewsFragment.getSettings(context).getFollowEnabled()
     }
@@ -62,19 +62,18 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
         }
     }
 
-    override suspend fun makeJobs(): List<Job> {
-        if (isEnabled(this)) return listOf( launch { parseBlogs() })
-        else{
-            JobServicesCenter.stopJobService(this, JobServiceIDs.codeforces_news_follow)
-            return emptyList()
+    override suspend fun doWork(): Result {
+
+        params.id.toString()
+
+        if(!isEnabled(context)){
+            WorkersCenter.stopWorker(context, WorkersNames.codeforces_news_follow)
+            return Result.success()
         }
-    }
 
-    private suspend fun parseBlogs(){
-
-        val connector = FollowDataConnector(this)
+        val connector = FollowDataConnector(context)
         val savedHandles = connector.getHandles()
-        val locale = NewsFragment.getCodeforcesContentLanguage(this)
+        val locale = NewsFragment.getCodeforcesContentLanguage(context)
 
         val proceeded = mutableSetOf<String>()
         suspend fun proceedUser(handle: String){
@@ -120,11 +119,12 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
 
         savedHandles.forEach { handle -> proceedUser(handle) }
 
+        return Result.success()
     }
 
     private fun notifyNewBlog(blogEntry: CodeforcesBlogEntry){
         val title = fromHTML(blogEntry.title.removeSurrounding("<p>", "</p>")).toString()
-        val n = notificationBuilder(this, NotificationChannels.codeforces_follow_new_blog).apply {
+        val n = notificationBuilder(context, NotificationChannels.codeforces_follow_new_blog).apply {
             setSubText("New codeforces blog")
             setContentTitle(blogEntry.authorHandle)
             setBigContent(title)
@@ -132,8 +132,8 @@ class CodeforcesNewsFollowJobService: CoroutineJobService() {
             setAutoCancel(true)
             setShowWhen(true)
             setWhen(TimeUnit.SECONDS.toMillis(blogEntry.creationTimeSeconds))
-            setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.blog(blogEntry.id), this@CodeforcesNewsFollowJobService))
+            setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.blog(blogEntry.id), context))
         }
-        NotificationManagerCompat.from(this).notify(NotificationIDs.makeCodeforcesFollowBlogID(blogEntry.id), n.build())
+        NotificationManagerCompat.from(context).notify(NotificationIDs.makeCodeforcesFollowBlogID(blogEntry.id), n.build())
     }
 }

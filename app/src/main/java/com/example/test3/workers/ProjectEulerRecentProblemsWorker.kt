@@ -1,37 +1,34 @@
-package com.example.test3.job_services
+package com.example.test3.workers
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
 import com.example.test3.*
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.utils.ProjectEulerAPI
 import com.example.test3.utils.SettingsDataStore
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import java.util.*
 
-class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
+class ProjectEulerRecentProblemsWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     companion object {
         suspend fun isEnabled(context: Context): Boolean =
             SettingsNewsFragment.getSettings(context).getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.PROJECT_EULER_RECENT)
     }
 
-    override suspend fun makeJobs(): List<Job> {
-        if (isEnabled(this)) return listOf( launch { parseRecentProblems() } )
-        else{
-            JobServicesCenter.stopJobService(this, JobServiceIDs.project_euler_recent_problems)
-            return emptyList()
+    private val dataStore by lazy { ProjectEulerRecentProblemsJobServiceDataStore(context) }
+
+    override suspend fun doWork(): Result {
+
+        if(!isEnabled(context)){
+            WorkersCenter.stopWorker(context, WorkersNames.project_euler_recent_problems)
+            return Result.success()
         }
-    }
 
-    private val dataStore by lazy { ProjectEulerRecentProblemsJobServiceDataStore(this) }
-
-    private suspend fun parseRecentProblems() {
-        val s = ProjectEulerAPI.getRecentProblemsPage() ?: return
+        val s = ProjectEulerAPI.getRecentProblemsPage() ?: return Result.retry()
 
         val lastViewedProblemID = dataStore.getLastRecentProblemID()
 
@@ -51,11 +48,11 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
             newProblems.add(Pair(problemID, problemName))
         }
 
-        if(newProblems.isEmpty()) return
+        if(newProblems.isEmpty()) return Result.success()
 
         if(lastViewedProblemID != 0){
             newProblems.forEach { (id, name) ->
-                val n = notificationBuilder(this, NotificationChannels.project_euler_problems).apply {
+                val n = notificationBuilder(context, NotificationChannels.project_euler_problems).apply {
                     setSubText("Project Euler • New problem published!")
                     setContentTitle("Problem $id")
                     setBigContent(name)
@@ -63,9 +60,9 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
                     setColor(NotificationColors.project_euler_main)
                     setShowWhen(true)
                     setAutoCancel(true)
-                    setContentIntent(makePendingIntentOpenURL("https://projecteuler.net/problem=$id", this@ProjectEulerRecentProblemsJobService))
+                    setContentIntent(makePendingIntentOpenURL("https://projecteuler.net/problem=$id", context))
                 }
-                NotificationManagerCompat.from(this).notify(NotificationIDs.makeProjectEulerRecentProblemNotificationID(id), n.build())
+                NotificationManagerCompat.from(context).notify(NotificationIDs.makeProjectEulerRecentProblemNotificationID(id), n.build())
             }
         }
 
@@ -73,6 +70,8 @@ class ProjectEulerRecentProblemsJobService: CoroutineJobService() {
         if(firstID != lastViewedProblemID) {
             dataStore.setLastRecentProblemID(firstID)
         }
+
+        return Result.success()
     }
 
     class ProjectEulerRecentProblemsJobServiceDataStore(context: Context): SettingsDataStore(context, "jobservice_project_euler_recent") {

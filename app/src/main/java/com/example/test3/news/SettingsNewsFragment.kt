@@ -17,9 +17,9 @@ import androidx.lifecycle.lifecycleScope
 import com.example.test3.CodeforcesTitle
 import com.example.test3.MainActivity
 import com.example.test3.R
-import com.example.test3.job_services.JobServiceIDs
-import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.utils.*
+import com.example.test3.workers.WorkersCenter
+import com.example.test3.workers.WorkersNames
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -100,12 +100,12 @@ class SettingsNewsFragment: Fragment(){
                     val context = requireContext()
                     getSettings(context).setLostEnabled(isChecked)
                     if (isChecked) {
-                        JobServicesCenter.startCodeforcesNewsLostRecentJobService(context)
+                        WorkersCenter.startCodeforcesNewsLostRecentWorker(context)
                         newsFragment.addLostTab()
                         selectLostRating.visibility = View.VISIBLE
                     } else {
                         newsFragment.removeLostTab()
-                        JobServicesCenter.stopJobService(context, JobServiceIDs.codeforces_news_lost_recent)
+                        WorkersCenter.stopWorker(context, WorkersNames.codeforces_news_lost_recent)
                         selectLostRating.visibility = View.GONE
                     }
                     buttonView.isEnabled = true
@@ -156,9 +156,9 @@ class SettingsNewsFragment: Fragment(){
                     val activity = requireActivity()
                     getSettings(activity).setFollowEnabled(isChecked)
                     if (isChecked) {
-                        JobServicesCenter.startCodeforcesNewsFollowJobService(activity)
+                        WorkersCenter.startCodeforcesNewsFollowWorker(activity)
                     } else {
-                        JobServicesCenter.stopJobService(activity, JobServiceIDs.codeforces_news_follow)
+                        WorkersCenter.stopWorker(activity, WorkersNames.codeforces_news_follow)
                     }
                     activity.invalidateOptionsMenu()
                     buttonView.isEnabled = true
@@ -203,13 +203,13 @@ class SettingsNewsFragment: Fragment(){
                     changed.forEach { (newsFeed, enabled) ->
                         when(newsFeed){
                             NewsFeed.PROJECT_EULER_RECENT -> {
-                                if(enabled) JobServicesCenter.startProjectEulerRecentProblemsJobService(requireContext())
-                                else JobServicesCenter.stopJobService(requireContext(), JobServiceIDs.project_euler_recent_problems)
+                                if(enabled) WorkersCenter.startProjectEulerRecentProblemsWorker(requireContext())
+                                else WorkersCenter.stopWorker(requireContext(), WorkersNames.project_euler_recent_problems)
                             }
                             NewsFeed.PROJECT_EULER_NEWS,
                             NewsFeed.ACMP_NEWS,
                             NewsFeed.ZAOCH_NEWS -> {
-                                if(enabled) JobServicesCenter.startNewsJobService(requireContext())
+                                if(enabled) WorkersCenter.startNewsWorker(requireContext())
                             }
                         }
                     }

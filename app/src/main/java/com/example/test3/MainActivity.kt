@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
-import com.example.test3.job_services.JobServicesCenter
+import com.example.test3.workers.WorkersCenter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.suspendCoroutine
@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity(){
 
 
         lifecycleScope.launchWhenStarted {
-            JobServicesCenter.startJobServices(this@MainActivity)
+            WorkersCenter.startWorkers(this@MainActivity)
         }
     }
 
@@ -156,12 +156,6 @@ class MainActivity : AppCompatActivity(){
                 dialog.show(supportFragmentManager, "account_choose")
             }
         }
-    }
-
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        println("main on save bundle")
-        //super.onSaveInstanceState(outState)
     }
 
     override fun onResume() {

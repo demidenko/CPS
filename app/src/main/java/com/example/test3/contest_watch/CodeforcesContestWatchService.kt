@@ -17,7 +17,7 @@ import androidx.core.text.color
 import androidx.core.text.italic
 import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
-import com.example.test3.job_services.CodeforcesContestWatchStarterJobService
+import com.example.test3.workers.CodeforcesContestWatchLauncherWorker
 import com.example.test3.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -87,7 +87,7 @@ class CodeforcesContestWatchService: Service() {
                 start(handle, contestID, notification)
             }
             ACTION_STOP -> {
-                CodeforcesContestWatchStarterJobService.stopWatcher(this, startedWithContestID!!)
+                CodeforcesContestWatchLauncherWorker.stopWatcher(this, startedWithContestID!!)
                 stopWatcher()
                 stopForeground(true)
                 stopSelf()

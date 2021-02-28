@@ -21,12 +21,12 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.example.test3.job_services.CodeforcesNewsFollowJobService
-import com.example.test3.job_services.CodeforcesNewsLostRecentJobService
+import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.example.test3.news.ManageCodeforcesFollowListFragment
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.room.getLostBlogsDao
 import com.example.test3.utils.*
+import com.example.test3.workers.CodeforcesNewsLostRecentWorker
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -70,7 +70,7 @@ class NewsFragment : Fragment() {
             CodeforcesNewsFragment(CodeforcesTitle.RECENT, "/recent-actions", false, CodeforcesNewsItemsRecentAdapter())
         )
         runBlocking {
-            if(CodeforcesNewsLostRecentJobService.isEnabled(context)){
+            if(CodeforcesNewsLostRecentWorker.isEnabled(context)){
                 fragments.add(createLostFragment())
             }
         }
@@ -169,7 +169,7 @@ class NewsFragment : Fragment() {
             menu.setGroupDividerEnabled(true)
         }
         inflater.inflate(R.menu.menu_news, menu)
-        menu.findItem(R.id.menu_news_follow_list).isVisible = runBlocking { CodeforcesNewsFollowJobService.isEnabled(requireContext()) }
+        menu.findItem(R.id.menu_news_follow_list).isVisible = runBlocking { CodeforcesNewsFollowWorker.isEnabled(requireContext()) }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -248,7 +248,7 @@ class NewsFragment : Fragment() {
         lifecycleScope.launch {
             updateLostInfoButton.isEnabled = false
             val mainActivity = requireActivity() as MainActivity
-            CodeforcesNewsLostRecentJobService.updateInfo(mainActivity, BottomProgressInfo("update info of lost", mainActivity))
+            CodeforcesNewsLostRecentWorker.updateInfo(mainActivity, BottomProgressInfo("update info of lost", mainActivity))
             updateLostInfoButton.isEnabled = true
 
             codeforcesNewsAdapter.indexOf(CodeforcesTitle.LOST).takeIf { it!=-1 }
@@ -566,7 +566,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
             view.isLongClickable = true
             view.setOnLongClickListener {
-                runBlocking { CodeforcesNewsFollowJobService.isEnabled(activity) }.apply {
+                runBlocking { CodeforcesNewsFollowWorker.isEnabled(activity) }.apply {
                     if(this) addToFollowListWithSnackBar(activity, this@with)
                 }
             }
@@ -606,7 +606,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
     private fun addToFollowListWithSnackBar(mainActivity: MainActivity, holder: CodeforcesNewsItemViewHolder){
         mainActivity.newsFragment.lifecycleScope.launch {
-            val connector = CodeforcesNewsFollowJobService.FollowDataConnector(mainActivity)
+            val connector = CodeforcesNewsFollowWorker.FollowDataConnector(mainActivity)
             val handle = holder.author.text
             when(connector.add(handle.toString())){
                 true -> {

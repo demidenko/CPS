@@ -1,23 +1,26 @@
-package com.example.test3.job_services
+package com.example.test3.workers
 
 import android.app.NotificationManager
+import android.content.Context
+import android.content.Context.NOTIFICATION_SERVICE
 import android.os.Bundle
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
 import com.example.test3.*
 import com.example.test3.account_manager.AtCoderAccountManager
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.utils.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
-class AccountsJobService : CoroutineJobService() {
+class AccountsWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
-    private val notificationManager by lazy { getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
+    private val notificationManager by lazy { context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
 
-    private val codeforcesAccountManager by lazy { CodeforcesAccountManager(this) }
-    private val atcoderAccountManager by lazy { AtCoderAccountManager(this) }
+    private val codeforcesAccountManager by lazy { CodeforcesAccountManager(context) }
+    private val atcoderAccountManager by lazy { AtCoderAccountManager(context) }
 
-    override suspend fun makeJobs(): List<Job> {
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO){
         val jobs = mutableListOf<Job>()
         with(codeforcesAccountManager.getSettings()){
             if(getObserveRating()) jobs.add(launch { codeforcesRating() })
@@ -26,8 +29,9 @@ class AccountsJobService : CoroutineJobService() {
         with(atcoderAccountManager.getSettings()){
             if(getObserveRating()) jobs.add(launch { atcoderRating() })
         }
-        if(jobs.isEmpty()) JobServicesCenter.stopJobService(this, JobServiceIDs.accounts_parsers)
-        return jobs
+        if(jobs.isEmpty()) WorkersCenter.stopWorker(context, WorkersNames.accounts_parsers)
+        jobs.joinAll()
+        return@withContext Result.success()
     }
 
     private suspend fun codeforcesRating() {
@@ -88,14 +92,14 @@ class AccountsJobService : CoroutineJobService() {
                 }?.notification?.extras?.getInt("contribution", info.contribution) ?: info.contribution
             }
 
-            val n = notificationBuilder(this, NotificationChannels.codeforces_contribution_changes).apply {
+            val n = notificationBuilder(context, NotificationChannels.codeforces_contribution_changes).apply {
                 setSubText(handle)
                 setContentTitle("Contribution change: ${signedToString(oldShowedContribution)} → ${signedToString(contribution)}")
                 setSmallIcon(R.drawable.ic_person)
                 setNotificationSilent()
                 setAutoCancel(true)
                 setShowWhen(false)
-                setContentIntent(makePendingIntentOpenURL(info.link(), this@AccountsJobService))
+                setContentIntent(makePendingIntentOpenURL(info.link(), context))
                 extras = Bundle().apply {
                     putInt("contribution", oldShowedContribution)
                 }

@@ -27,24 +27,6 @@
 
         <service android:name=".contest_watch.CodeforcesContestWatchService" />
 
-        <service android:name=".job_services.NewsJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
-
-        <service android:name=".job_services.AccountsJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
-
-        <service android:name=".job_services.CodeforcesNewsLostRecentJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
-
-        <service android:name=".job_services.CodeforcesNewsFollowJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
-
-        <service android:name=".job_services.CodeforcesContestWatchStarterJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
-
-        <service android:name=".job_services.ProjectEulerRecentProblemsJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
-
     </application>
 
 </manifest>

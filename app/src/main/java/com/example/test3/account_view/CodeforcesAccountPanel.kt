@@ -8,8 +8,8 @@ import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.getColorFromResource
-import com.example.test3.job_services.JobServicesCenter
 import com.example.test3.utils.signedToString
+import com.example.test3.workers.WorkersCenter
 import kotlinx.coroutines.launch
 
 class CodeforcesAccountPanel(
@@ -68,7 +68,7 @@ class CodeforcesAccountPanel(
                     buttonView.isEnabled = false
                     getSettings().setObserveRating(isChecked)
                     if (isChecked) {
-                        JobServicesCenter.startAccountsJobService(mainActivity)
+                        WorkersCenter.startAccountsWorker(mainActivity)
                     }
                     buttonView.isEnabled = true
                 }
@@ -82,7 +82,7 @@ class CodeforcesAccountPanel(
                     buttonView.isEnabled = false
                     getSettings().setObserveContribution(isChecked)
                     if (isChecked) {
-                        JobServicesCenter.startAccountsJobService(mainActivity)
+                        WorkersCenter.startAccountsWorker(mainActivity)
                     }
                     buttonView.isEnabled = true
                 }
@@ -97,7 +97,7 @@ class CodeforcesAccountPanel(
                     buttonView.isEnabled = false
                     getSettings().setContestWatchEnabled(isChecked)
                     if (isChecked) {
-                        JobServicesCenter.startCodeforcesContestWatchStarterJobService(mainActivity)
+                        WorkersCenter.startCodeforcesContestWatchLauncherWorker(mainActivity)
                     }
                     buttonView.isEnabled = true
                 }

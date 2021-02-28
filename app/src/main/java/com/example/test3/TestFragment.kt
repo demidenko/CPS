@@ -17,15 +17,12 @@ import androidx.datastore.preferences.core.edit
 import androidx.fragment.app.Fragment
 import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.RatedAccountManager
-import com.example.test3.job_services.JobServicesCenter
-import com.example.test3.job_services.settingsJobServices
 import com.example.test3.utils.SettingsDataStore
-import com.example.test3.utils.getCurrentTimeSeconds
+import com.example.test3.workers.WorkersCenter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 class TestFragment : Fragment() {
@@ -42,21 +39,23 @@ class TestFragment : Fragment() {
         val mainActivity = requireActivity() as MainActivity
 
 
-        val stuff = view.findViewById<TextView>(R.id.stuff_textview)
 
         //show running jobs
-        mainActivity.navigation_develop.findViewById<ImageButton>(R.id.navigation_dev_jobs).setOnClickListener {
-            val currentTimeSeconds = getCurrentTimeSeconds()
-            val jobservices = JobServicesCenter.getRunningJobServices(mainActivity)
-                .map { info -> info to runBlocking { TimeUnit.MILLISECONDS.toSeconds(mainActivity.settingsJobServices.getStartTimeMillis(info.id)) } }
-                .sortedByDescending { it.second }
-                .joinToString(separator = "\n"){ (info, startTimeSeconds) ->
-                    buildString {
-                        append("Job ${info.id}: ")
-                        appendLine(info.service.shortClassName.removeSuffix("JobService").removePrefix(".job_services."))
-                        append(timeDifference(startTimeSeconds, currentTimeSeconds))
-                    }
+
+        val workersTextView = view.findViewById<TextView>(R.id.workers)
+        WorkersCenter.getWorksLiveData(mainActivity).observe(mainActivity){ infos ->
+            workersTextView.text = infos.joinToString(separator = "\n"){ info ->
+                buildString {
+                    val str = info.tags.find { it!=WorkersCenter.commonTag }
+                        ?.removePrefix("com.example.test3.workers.")
+                        ?.removeSuffix("Worker")
+                    append("$str ${info.state.name}")
                 }
+            }
+        }
+
+        val stuff = view.findViewById<TextView>(R.id.stuff_textview)
+        mainActivity.navigation_develop.findViewById<ImageButton>(R.id.navigation_dev_jobs).setOnClickListener {
             val services = (mainActivity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getRunningServices(Int.MAX_VALUE)
                 .mapNotNull {
                     val s = it.service.className
@@ -65,7 +64,7 @@ class TestFragment : Fragment() {
                     else s2
                 }
                 .joinToString(separator = "\n") { it }
-            stuff.text = jobservices + "\n\n" + services
+            stuff.text = services
         }
 
         //colors
