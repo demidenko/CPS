@@ -23,20 +23,30 @@ class AboutDialog: DialogFragment() {
         val context = requireContext()
 
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_about, null).apply {
-            findViewById<TextView>(R.id.about_text_view)?.text = """
+            findViewById<TextView>(R.id.about_title)?.text = """
                    Competitive
                    Programming
                 && Solving
-                
-                version = ${BuildConfig.VERSION_NAME}
             """.trimIndent()
 
-            val devCheckBox = findViewById<CheckBox>(R.id.dev_checkbox).apply {
-                val devEnabled = context.settingsDev.getDevEnabled()
-                visibility = if(devEnabled) View.VISIBLE else View.GONE
-                isChecked = devEnabled
+            val versionTextView = findViewById<TextView>(R.id.about_version).apply {
+                text = "   version = ${BuildConfig.VERSION_NAME}"
+            }
+
+            fun makeDevModeText(enabled: Boolean) = "   dev_mode = $enabled"
+
+            val devTextView = findViewById<TextView>(R.id.about_dev_mode)
+
+            val devCheckBox = findViewById<CheckBox>(R.id.about_dev_checkbox).apply {
+                context.settingsDev.getDevEnabled().let { devEnabled ->
+                    visibility = if(devEnabled) View.VISIBLE else View.GONE
+                    devTextView.visibility = if(devEnabled) View.VISIBLE else View.GONE
+                    devTextView.text = makeDevModeText(devEnabled)
+                    isChecked = devEnabled
+                }
                 setOnCheckedChangeListener { buttonView, isChecked ->
                     context.settingsDev.setDevEnabled(isChecked)
+                    devTextView.text = makeDevModeText(isChecked)
                 }
             }
 
@@ -53,6 +63,7 @@ class AboutDialog: DialogFragment() {
                         timeClicks[(clicks-1-i)%6] - timeClicks[(clicks-2-i)%6]
                     }
                     if(minOf(t[1],t[3]) > maxOf(t[0],t[2],t[4])){
+                        devTextView.visibility = View.VISIBLE
                         devCheckBox.visibility = View.VISIBLE
                         devCheckBox.isChecked = true
                         clicks = 0

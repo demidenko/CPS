@@ -1,35 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingHorizontal="24dp"
-    android:paddingVertical="24dp"
+    android:paddingStart="18dp"
+    android:paddingEnd="10dp"
+    android:paddingVertical="18dp"
     android:animateLayoutChanges="true"
+    android:orientation="vertical"
     >
 
     <TextView
-        android:id="@+id/about_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/about_title"
+        android:text="CPS"
+        style="@style/TextAbout"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:textSize="18sp"
-        android:typeface="monospace"
-        android:textColor="@color/textColor"
         />
 
-    <CheckBox
-        android:id="@+id/dev_checkbox"
-        android:layout_width="wrap_content"
+    <TextView
+        android:text="{"
+        style="@style/TextAbout"
+        />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/about_text_view"
-        app:layout_constraintStart_toStartOf="parent"
-        android:textSize="18sp"
-        android:typeface="monospace"
-        android:textColor="@color/textColor"
-        android:text="Dev mode"
-        android:layout_marginTop="10dp"
+        android:animateLayoutChanges="true"
+        >
+        <TextView
+            android:id="@+id/about_version"
+            android:text="   version = 1.0"
+            style="@style/TextAbout"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/about_dev_mode"
+            android:text="   dev_mode = true"
+            style="@style/TextAbout"
+            app:layout_constraintTop_toBottomOf="@id/about_version"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <CheckBox
+            android:id="@+id/about_dev_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/about_dev_mode"
+            app:layout_constraintBottom_toBottomOf="@id/about_dev_mode"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:text="}"
+        style="@style/TextAbout"
         />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
