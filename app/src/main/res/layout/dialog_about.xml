@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingHorizontal="24dp"
     android:paddingVertical="24dp"
+    android:animateLayoutChanges="true"
     >
 
     <TextView
@@ -24,7 +25,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/about_text_view"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:textSize="18sp"
         android:typeface="monospace"
         android:textColor="@color/textColor"
