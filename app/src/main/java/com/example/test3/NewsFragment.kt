@@ -66,7 +66,7 @@ class NewsFragment : Fragment() {
         val context = requireContext()
         val fragments = mutableListOf(
             CodeforcesNewsFragment(CodeforcesTitle.MAIN, "/", true, CodeforcesNewsItemsClassicAdapter()),
-            CodeforcesNewsFragment(CodeforcesTitle.TOP, "/top", false, CodeforcesNewsItemsClassicAdapter()),
+            CodeforcesNewsFragment(CodeforcesTitle.TOP, "/top", true, CodeforcesNewsItemsClassicAdapter()),
             CodeforcesNewsFragment(CodeforcesTitle.RECENT, "/recent-actions", false, CodeforcesNewsItemsRecentAdapter())
         )
         runBlocking {
@@ -302,6 +302,19 @@ class NewsFragment : Fragment() {
         }
         codeforcesNewsAdapter.remove(index)
     }
+
+    val viewedDataStore by lazy { CodeforcesNewsViewedBlogsDataStore(requireContext()) }
+
+    class CodeforcesNewsViewedBlogsDataStore(context: Context)
+        : SettingsDataStore(context, "data_news_fragment_cf_viewed"){
+
+        private fun makeKey(title: CodeforcesTitle) = stringSetPreferencesKey("blogs_viewed_${title.name}")
+
+        suspend fun getBlogsViewed(title: CodeforcesTitle) = dataStore.data.first()[makeKey(title)] ?: emptySet()
+        suspend fun setBlogsViewed(title: CodeforcesTitle, blogIDs: Set<String>) {
+            dataStore.edit { it[makeKey(title)] = blogIDs }
+        }
+    }
 }
 
 
@@ -413,12 +426,11 @@ class CodeforcesNewsFragment(
     }
 
     private var newBlogs = hashSetOf<String>()
-    private val dataStore by lazy { CodeforcesNewsFragmentDataStore(this) }
 
     suspend fun afterReload(tab: TabLayout.Tab){
         if(!isManagesNewEntries) return
 
-        val savedBlogs = dataStore.getBlogsViewed()
+        val savedBlogs = newsFragment.viewedDataStore.getBlogsViewed(title)
         newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.toHashSet()
 
         if (newBlogs.size == 0) {
@@ -438,7 +450,7 @@ class CodeforcesNewsFragment(
     suspend fun saveEntries() {
         if(!isManagesNewEntries) return
         val toSave = viewAdapter.getBlogIDs().toSet()
-        dataStore.setBlogsViewed(toSave)
+        newsFragment.viewedDataStore.setBlogsViewed(title, toSave)
         (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.markNewEntries(newBlogs)
     }
 
@@ -446,18 +458,6 @@ class CodeforcesNewsFragment(
         viewAdapter.refresh()
     }
 
-
-    class CodeforcesNewsFragmentDataStore(fragment: CodeforcesNewsFragment)
-    : SettingsDataStore(fragment.requireContext(), "data_cf_news_fragment_${fragment.title}"){
-        companion object {
-            private val KEY_BLOGS_VIEWED = stringSetPreferencesKey("blogs_viewed")
-        }
-
-        suspend fun getBlogsViewed() = dataStore.data.first()[KEY_BLOGS_VIEWED] ?: emptySet()
-        suspend fun setBlogsViewed(blogIDs: Set<String>) = withContext(Dispatchers.IO){
-            dataStore.edit { it[KEY_BLOGS_VIEWED] = blogIDs }
-        }
-    }
 }
 
 
