@@ -21,11 +21,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.example.test3.news.ManageCodeforcesFollowListFragment
 import com.example.test3.news.SettingsNewsFragment
 import com.example.test3.room.getLostBlogsDao
 import com.example.test3.utils.*
+import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.example.test3.workers.CodeforcesNewsLostRecentWorker
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
@@ -208,27 +208,14 @@ class NewsFragment : Fragment() {
     ) {
         sharedReloadButton.startReload(fragment.title.name)
         tab.text = "..."
-        fragment.swipeRefreshLayout.isRefreshing = true
+        fragment.startReload()
         if(fragment.reload(lang)) {
             tab.text = fragment.title.name
-            if (fragment.isManagesNewEntries) {
-                if (fragment.newBlogsSize == 0) {
-                    tab.badge?.apply {
-                        isVisible = false
-                        clearNumber()
-                    }
-                } else {
-                    tab.badge?.apply {
-                        number = fragment.newBlogsSize
-                        isVisible = true
-                    }
-                    if (tab.isSelected) fragment.saveEntries()
-                }
-            }
+            fragment.afterReload(tab)
         }else{
             tab.text = SpannableStringBuilder().color(failColor) { append(fragment.title.name) }
         }
-        fragment.swipeRefreshLayout.isRefreshing = false
+        fragment.stopReload()
         sharedReloadButton.stopReload(fragment.title.name)
     }
 
@@ -384,7 +371,15 @@ class CodeforcesNewsFragment(
         return inflater.inflate(R.layout.fragment_cf_news_page, container, false)
     }
 
-    val swipeRefreshLayout: SwipeRefreshLayout by lazy { requireView().cf_news_page_swipe_refresh_layout }
+    private val swipeRefreshLayout: SwipeRefreshLayout by lazy { requireView().cf_news_page_swipe_refresh_layout }
+
+    fun startReload() {
+        swipeRefreshLayout.isRefreshing = true
+    }
+
+    fun stopReload() {
+        swipeRefreshLayout.isRefreshing = false
+    }
 
     private val newsFragment by lazy { (requireActivity() as MainActivity).newsFragment }
     private suspend fun callReload() = newsFragment.reloadFragment(this)
@@ -409,8 +404,6 @@ class CodeforcesNewsFragment(
     }
 
     private var newBlogs = hashSetOf<String>()
-    val newBlogsSize: Int
-        get() = newBlogs.size
 
     private val dataStore by lazy { CodeforcesNewsFragmentDataStore(this) }
 
@@ -428,6 +421,22 @@ class CodeforcesNewsFragment(
         }
 
         return true
+    }
+
+    suspend fun afterReload(tab: TabLayout.Tab){
+        if(!isManagesNewEntries) return
+        if (newBlogs.size == 0) {
+            tab.badge?.apply {
+                isVisible = false
+                clearNumber()
+            }
+        } else {
+            tab.badge?.apply {
+                number = newBlogs.size
+                isVisible = true
+            }
+            if (tab.isSelected) saveEntries()
+        }
     }
 
     suspend fun saveEntries() {
