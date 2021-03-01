@@ -15,13 +15,6 @@
             android:title="About"
             android:icon="@drawable/ic_info"
             />
-
-        <item
-            android:id="@+id/dev_enabled"
-            android:title="Dev mode"
-            android:icon="@drawable/ic_develop"
-            android:checkable="true"
-            />
     </group>
 
 

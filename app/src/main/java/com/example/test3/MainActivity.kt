@@ -40,9 +40,9 @@ class MainActivity : AppCompatActivity(){
         setupActionBar()
         setActionBarTitle("Competitive Programming && Solving") //"Compete, Program, Solve"
 
-        with(SettingsDev(this)){
-            val devEnabled = getDevEnabled()
-            navigation_main.menu.findItem(R.id.navigation_develop).setVisible(devEnabled)
+        settingsDev.getDevEnabledLiveData().observe(this){ isChecked ->
+            val item = navigation_main.menu.findItem(R.id.navigation_develop)
+            item.isVisible = isChecked
         }
 
         fun navigationSelectUpdateUI(fragment: Fragment){
@@ -121,10 +121,6 @@ class MainActivity : AppCompatActivity(){
         (menu as? MenuBuilder)?.setOptionalIconsVisible(true)
         menuInflater.inflate(R.menu.menu_main, menu)
         menu?.findItem(R.id.color_switcher)?.isChecked = getUseRealColors()
-        menu?.findItem(R.id.dev_enabled)?.let {
-            if(SettingsDev(this).getDevEnabled()) it.isChecked = true
-            else it.setVisible(false)
-        }
         return true
     }
 
@@ -138,11 +134,6 @@ class MainActivity : AppCompatActivity(){
                 }
             }
             R.id.app_info -> AboutDialog.showDialog(this)
-            R.id.dev_enabled -> {
-                val enabled = !item.isChecked
-                item.isChecked = enabled
-                SettingsDev(this).setDevEnabled(enabled)
-            }
         }
         return super.onOptionsItemSelected(item)
     }

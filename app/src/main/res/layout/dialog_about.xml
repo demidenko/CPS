@@ -18,4 +18,18 @@
         android:textColor="@color/textColor"
         />
 
+    <CheckBox
+        android:id="@+id/dev_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/about_text_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="18sp"
+        android:typeface="monospace"
+        android:textColor="@color/textColor"
+        android:text="Dev mode"
+        android:layout_marginTop="10dp"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

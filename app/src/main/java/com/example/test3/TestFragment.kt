@@ -15,12 +15,14 @@ import androidx.core.text.color
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asLiveData
 import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.RatedAccountManager
 import com.example.test3.utils.SettingsDataStore
 import com.example.test3.workers.WorkersCenter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
@@ -120,11 +122,14 @@ class TestFragment : Fragment() {
     }
 }
 
+val Context.settingsDev by SettingsDelegate { SettingsDev(it) }
 
 class SettingsDev(context: Context) : SettingsDataStore(context, "settings_develop") {
     private val KEY_DEV = booleanPreferencesKey("develop_enabled")
 
-    fun getDevEnabled() = runBlocking { dataStore.data.first()[KEY_DEV] ?: false }
+    private val flowDevEnabled = dataStore.data.map { it[KEY_DEV] ?: false }
+    fun getDevEnabled() = runBlocking { flowDevEnabled.first() }
+    fun getDevEnabledLiveData() = flowDevEnabled.asLiveData()
     fun setDevEnabled(flag: Boolean) {
         runBlocking { dataStore.edit { it[KEY_DEV] = flag } }
     }
