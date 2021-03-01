@@ -75,8 +75,8 @@ class NewsFragment : Fragment() {
             }
         }
         CodeforcesNewsAdapter(this, fragments).apply {
-            setButtons(CodeforcesTitle.RECENT, Pair(recentSwitchButton,View.VISIBLE), Pair(recentShowBackButton,View.GONE))
-            setButtons(CodeforcesTitle.LOST, Pair(updateLostInfoButton,View.VISIBLE))
+            setButtons(CodeforcesTitle.RECENT, recentSwitchButton to View.VISIBLE, recentShowBackButton to View.GONE)
+            setButtons(CodeforcesTitle.LOST, updateLostInfoButton to View.VISIBLE)
         }
     }
     private val tabLayout by lazy { requireView().findViewById<TabLayout>(R.id.cf_news_tab_layout) }
@@ -264,11 +264,7 @@ class NewsFragment : Fragment() {
                 val defaultTab = runBlocking {
                     SettingsNewsFragment.getSettings(requireContext()).getDefaultTab()
                 }
-
-                var pos = indexOf(defaultTab)
-                if(pos == -1) pos = indexOf(CodeforcesTitle.TOP)
-
-                return@with pos
+                indexOf(defaultTab).takeIf { it!=-1 } ?: indexOf(CodeforcesTitle.TOP)
             }
 
         tabLayout.getTabAt(index)?.let{
@@ -403,9 +399,7 @@ class CodeforcesNewsFragment(
         lifecycleScope.launchWhenCreated { callReload() }
     }
 
-    private var newBlogs = hashSetOf<String>()
-
-    private val dataStore by lazy { CodeforcesNewsFragmentDataStore(this) }
+    private fun showItems() = viewAdapter.notifyDataSetChanged()
 
     suspend fun reload(lang: String): Boolean {
         val source =
@@ -413,18 +407,20 @@ class CodeforcesNewsFragment(
             else ""
         if(!viewAdapter.parseData(source)) return false
 
-        viewAdapter.notifyDataSetChanged()
-
-        if(isManagesNewEntries){
-            val savedBlogs = dataStore.getBlogsViewed()
-            newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.toHashSet()
-        }
+        showItems()
 
         return true
     }
 
+    private var newBlogs = hashSetOf<String>()
+    private val dataStore by lazy { CodeforcesNewsFragmentDataStore(this) }
+
     suspend fun afterReload(tab: TabLayout.Tab){
         if(!isManagesNewEntries) return
+
+        val savedBlogs = dataStore.getBlogsViewed()
+        newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.toHashSet()
+
         if (newBlogs.size == 0) {
             tab.badge?.apply {
                 isVisible = false
