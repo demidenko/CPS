@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity(){
     val newsFragment: NewsFragment by lazy { supportFragmentManager.fragments.find { it is NewsFragment } as? NewsFragment ?: NewsFragment() }
     val devFragment: TestFragment by lazy { supportFragmentManager.fragments.find { it is TestFragment } as? TestFragment ?: TestFragment() }
 
+    val cpsFragmentManager by lazy { CPSFragmentManager(this, R.id.container_fragment) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         println("main create")
@@ -56,28 +57,25 @@ class MainActivity : AppCompatActivity(){
             setBottomPanelId(R.id.support_navigation_develop)
         }
 
-        var activeFragment = supportFragmentManager.fragments.find { !it.isHidden } as? CPSFragment ?: accountsFragment
-        if(!activeFragment.isAdded) supportFragmentManager.beginTransaction().add(R.id.container_fragment, activeFragment).commit()
+        val accountsStackId = cpsFragmentManager.createStack(accountsFragment)
+        val newsStackId = cpsFragmentManager.createStack(newsFragment)
+        val devStackId = cpsFragmentManager.createStack(devFragment)
+
+        //TODO on restore
+        cpsFragmentManager.switchToStack(accountsStackId)
 
         navigation_main.setOnNavigationItemSelectedListener { item ->
             val id = item.itemId
 
-            val selectedFragment =
+            val selectedStackId =
                 when(id){
-                    R.id.navigation_accounts -> accountsFragment
-                    R.id.navigation_news -> newsFragment
-                    R.id.navigation_develop -> devFragment
+                    R.id.navigation_accounts -> accountsStackId
+                    R.id.navigation_news -> newsStackId
+                    R.id.navigation_develop -> devStackId
                     else -> throw Exception("unknown selected navigation bar item: $id")
                 }
 
-            if(selectedFragment!=activeFragment) {
-                println("$id selected")
-                supportFragmentManager.beginTransaction().hide(activeFragment).run {
-                    if(selectedFragment.isAdded) show(selectedFragment)
-                    else add(R.id.container_fragment, selectedFragment)
-                }.commit()
-                activeFragment = selectedFragment
-            }
+            cpsFragmentManager.switchToStack(selectedStackId)
 
             true
         }
@@ -163,7 +161,8 @@ class MainActivity : AppCompatActivity(){
 
 
     override fun onBackPressed() {
-        super.onBackPressed()
+        if(cpsFragmentManager.currentIsRoot()) super.onBackPressed()
+        else cpsFragmentManager.backPressed()
     }
 
 

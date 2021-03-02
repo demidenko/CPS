@@ -175,15 +175,7 @@ class NewsFragment : CPSFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.menu_news_settings_button -> {
-                with(requireActivity() as MainActivity) {
-                    supportFragmentManager.beginTransaction()
-                        .hide(newsFragment)
-                        .add(android.R.id.content, SettingsNewsFragment())
-                        .addToBackStack(null)
-                        .commit()
-                }
-            }
+            R.id.menu_news_settings_button -> showSettingsNews()
             R.id.menu_news_follow_list -> showCodeforcesFollowListManager()
         }
         return super.onOptionsItemSelected(item)
@@ -248,12 +240,16 @@ class NewsFragment : CPSFragment() {
 
     }
 
+    fun showSettingsNews(){
+        with(requireActivity() as MainActivity) {
+            cpsFragmentManager.pushBack(SettingsNewsFragment())
+        }
+    }
+
     fun showCodeforcesFollowListManager(){
-        requireActivity().supportFragmentManager.beginTransaction()
-            .hide(this)
-            .add(android.R.id.content, ManageCodeforcesFollowListFragment())
-            .addToBackStack(null)
-            .commit()
+        with(requireActivity() as MainActivity) {
+            cpsFragmentManager.pushBack(ManageCodeforcesFollowListFragment())
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

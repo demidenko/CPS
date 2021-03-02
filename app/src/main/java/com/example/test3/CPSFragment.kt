@@ -66,3 +66,69 @@ open class CPSFragment : Fragment() {
     }
 
 }
+
+
+class CPSFragmentManager(activity: MainActivity, private val containerId: Int) {
+
+    class CPSException(str: String): Exception("CPS Fragments: $str")
+
+    private val stacks = mutableMapOf<Int, MutableList<CPSFragment>>()
+    private var stacksCount = 0
+    private var currentStackId = -1
+
+
+
+    private val fragmentManager = activity.supportFragmentManager.apply {
+        //TODO init stacks on restore
+        fragments.filterIsInstance<CPSFragment>().forEach {
+        }
+    }
+
+    fun switchToStack(stackId: Int) {
+        if(stackId == currentStackId) return
+        val targetLine = stacks[stackId] ?: throw CPSException("stack $stackId is not exist")
+        val transaction = fragmentManager.beginTransaction()
+        if(currentStackId!=-1){
+            val currentLine = stacks[currentStackId]!!
+            transaction.hide(currentLine.last())
+        }
+        with(targetLine.last()){
+            if(isAdded) transaction.show(this)
+            else transaction.add(containerId, this)
+        }
+        transaction.commit()
+        currentStackId = stackId
+    }
+
+    fun createStack(rootFragment: CPSFragment): Int {
+        val stackId = stacksCount
+        stacksCount+=1
+        stacks[stackId] = mutableListOf(rootFragment)
+        return stackId
+    }
+
+    fun createStackAndSwitch(rootFragment: CPSFragment): Int {
+        val stackId = createStack(rootFragment)
+        switchToStack(stackId)
+        return stackId
+    }
+
+    fun currentIsRoot(): Boolean {
+        return stacks[currentStackId]!!.size == 1
+    }
+
+    fun pushBack(fragment: CPSFragment) {
+        val currentLine = stacks[currentStackId]!!
+        val transaction = fragmentManager.beginTransaction().hide(currentLine.last()).add(containerId, fragment)
+        currentLine.add(fragment)
+        transaction.commit()
+    }
+
+    fun backPressed() {
+        val currentLine = stacks[currentStackId] ?: return
+        val transaction = fragmentManager.beginTransaction().remove(currentLine.removeLast())
+        if(currentLine.isNotEmpty()) transaction.show(currentLine.last())
+        transaction.commit()
+    }
+
+}

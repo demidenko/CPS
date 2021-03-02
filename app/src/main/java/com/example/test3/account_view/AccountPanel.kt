@@ -1,6 +1,5 @@
 package com.example.test3.account_view
 
-import android.os.Bundle
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
@@ -134,13 +133,11 @@ abstract class AccountPanel(
     }
 
     fun callExpand(){
-        mainActivity.supportFragmentManager.beginTransaction()
-            .hide(mainActivity.accountsFragment)
-            .add(android.R.id.content, AccountViewFragment().apply {
-                arguments = Bundle().apply { putString("manager", manager.managerName) }
-            })
-            .addToBackStack(null)
-            .commit()
+        mainActivity.cpsFragmentManager.pushBack(
+            AccountViewFragment().apply {
+                requireArguments().putString("manager", manager.managerName)
+            }
+        )
     }
 
     fun showMainRated(handleView: TextView, ratingView: TextView, ratedAccountManager: RatedAccountManager, info: UserInfo) {

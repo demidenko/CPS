@@ -82,15 +82,13 @@ class AccountViewFragment: CPSFragment() {
     }
 
     private fun openSettings(){
-        val activity = requireActivity() as MainActivity
+        val mainActivity = requireActivity() as MainActivity
         val managerType = panel.manager.managerName
-        activity.supportFragmentManager.beginTransaction()
-            .hide(this)
-            .add(android.R.id.content, AccountSettingsFragment().apply {
-                arguments = Bundle().apply { putString("manager", managerType) }
-            })
-            .addToBackStack(null)
-            .commit()
+        mainActivity.cpsFragmentManager.pushBack(
+            AccountSettingsFragment().apply {
+                requireArguments().putString("manager", managerType)
+            }
+        )
     }
 
     override fun onDestroy() {
