@@ -21,6 +21,11 @@ import kotlinx.coroutines.*
 
 class AccountsFragment: CPSFragment() {
 
+    init {
+        setCPSTitle("::accounts")
+        setBottomPanelId(R.id.support_navigation_accounts)
+    }
+
     private val mainActivity by lazy { requireActivity() as MainActivity }
 
     val codeforcesAccountManager by lazy { CodeforcesAccountManager(mainActivity) }
@@ -76,6 +81,7 @@ class AccountsFragment: CPSFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         view.findViewById<LinearLayout>(R.id.panels_layout).apply {
             val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)

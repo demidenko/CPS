@@ -45,6 +45,11 @@ enum class CodeforcesTitle {
 
 class NewsFragment : CPSFragment() {
 
+    init {
+        setCPSTitle("::news")
+        setBottomPanelId(R.id.support_navigation_news)
+    }
+
     companion object {
 
         suspend fun getCodeforcesContentLanguage(context: Context) = if(SettingsNewsFragment.getSettings(context).getRussianContentEnabled()) "ru" else "en"

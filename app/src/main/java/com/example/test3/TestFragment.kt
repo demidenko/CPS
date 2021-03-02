@@ -27,6 +27,12 @@ import java.util.*
 
 
 class TestFragment : CPSFragment() {
+
+    init {
+        setCPSTitle("::develop")
+        setBottomPanelId(R.id.support_navigation_develop)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

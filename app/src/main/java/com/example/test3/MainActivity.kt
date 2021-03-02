@@ -32,43 +32,28 @@ class MainActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         println("main create")
-        super.onCreate(null)
+        super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
 
         setupActionBar()
-        setActionBarTitle("Competitive Programming && Solving") //"Compete, Program, Solve"
+        setActionBarTitle("Competitive Programming && Solving")
 
         settingsDev.getDevEnabledLiveData().observe(this){ isChecked ->
             val item = navigation_main.menu.findItem(R.id.navigation_develop)
             item.isVisible = isChecked
         }
 
-        accountsFragment.apply {
-            setCPSTitle("::accounts")
-            setBottomPanelId(R.id.support_navigation_accounts)
-        }
-        newsFragment.apply {
-            setCPSTitle("::news")
-            setBottomPanelId(R.id.support_navigation_news)
-        }
-        devFragment.apply {
-            setCPSTitle("::develop")
-            setBottomPanelId(R.id.support_navigation_develop)
-        }
+        val accountsStackId = cpsFragmentManager.getOrCreateStack(accountsFragment)
+        val newsStackId = cpsFragmentManager.getOrCreateStack(newsFragment)
+        val devStackId = cpsFragmentManager.getOrCreateStack(devFragment)
 
-        val accountsStackId = cpsFragmentManager.createStack(accountsFragment)
-        val newsStackId = cpsFragmentManager.createStack(newsFragment)
-        val devStackId = cpsFragmentManager.createStack(devFragment)
-
-        //TODO on restore
-        cpsFragmentManager.switchToStack(accountsStackId)
+        if(cpsFragmentManager.getCurrentStackId() == -1) cpsFragmentManager.switchToStack(accountsStackId)
 
         navigation_main.setOnNavigationItemSelectedListener { item ->
-            val id = item.itemId
 
             val selectedStackId =
-                when(id){
+                when(val id = item.itemId){
                     R.id.navigation_accounts -> accountsStackId
                     R.id.navigation_news -> newsStackId
                     R.id.navigation_develop -> devStackId
