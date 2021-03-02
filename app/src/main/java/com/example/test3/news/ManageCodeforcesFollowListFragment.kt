@@ -2,7 +2,7 @@ package com.example.test3.news
 
 import android.os.Bundle
 import android.view.*
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -39,6 +39,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         val mainActivity = requireActivity() as MainActivity
 
         setCPSTitle("::news.codeforces.follow.list")
+        setBottomPanelId(R.id.support_navigation_cf_follow)
 
         val followListAdapter = FollowListItemsAdapter(mainActivity)
         val followListView = view.manage_cf_follow_users_list.apply {
@@ -48,8 +49,10 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             setHasFixedSize(true)
         }
 
-        val buttonAdd = view.manage_cf_follow_add
-        buttonAdd.setOnClickListener { button -> button as Button
+        val buttonAdd = mainActivity.support_navigation_cf_follow.findViewById<ImageButton>(R.id.navigation_cf_follow_add).apply {
+            visibility = View.GONE
+        }
+        buttonAdd.setOnClickListener { button -> button as ImageButton
             lifecycleScope.launch {
 
                 val userInfo = mainActivity.chooseUserID(

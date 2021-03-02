@@ -71,6 +71,14 @@
                 android:visibility="gone"
                 />
 
+            <include
+                android:id="@+id/support_navigation_cf_follow"
+                layout="@layout/navigation_cf_follow"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                />
+
         </LinearLayout>
 
 
