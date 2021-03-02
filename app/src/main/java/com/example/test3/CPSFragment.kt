@@ -28,9 +28,9 @@ open class CPSFragment : Fragment() {
         //TODO()
     }
 
-    override fun onStart() {
-        super.onStart()
-        showStuff()
+    override fun onResume() {
+        if(!isHidden) showStuff()
+        super.onResume()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
