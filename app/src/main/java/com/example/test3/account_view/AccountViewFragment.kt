@@ -36,7 +36,6 @@ class AccountViewFragment: CPSFragment() {
         val manager = panel.manager
 
         setCPSTitle("::accounts.${manager.managerName}")
-        mainActivity.navigation.visibility = View.GONE
 
         fun showBigView() = lifecycleScope.launch { panel.showBigView(this@AccountViewFragment) }
 

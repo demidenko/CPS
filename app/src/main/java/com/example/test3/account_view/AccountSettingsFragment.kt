@@ -39,7 +39,6 @@ class AccountSettingsFragment: CPSFragment() {
         val manager = panel.manager
 
         setCPSTitle("::accounts.${manager.managerName}.settings")
-        mainActivity.navigation.visibility = View.GONE
 
         setHasOptionsMenu(true)
 

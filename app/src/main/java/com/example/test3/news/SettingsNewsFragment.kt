@@ -20,7 +20,6 @@ import com.example.test3.R
 import com.example.test3.utils.*
 import com.example.test3.workers.WorkersCenter
 import com.example.test3.workers.WorkersNames
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -43,9 +42,6 @@ class SettingsNewsFragment: CPSFragment(){
         super.onViewCreated(view, savedInstanceState)
 
         setCPSTitle("::news.settings")
-        with(requireActivity() as MainActivity){
-            navigation.visibility = View.GONE
-        }
 
         setHasOptionsMenu(true)
 

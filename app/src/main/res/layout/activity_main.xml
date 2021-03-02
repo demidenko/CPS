@@ -40,6 +40,7 @@
         >
 
         <LinearLayout
+            android:id="@+id/support_navigation"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -47,7 +48,7 @@
             >
 
             <include
-                android:id="@+id/navigation_accounts"
+                android:id="@+id/support_navigation_accounts"
                 layout="@layout/navigation_accounts"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -55,7 +56,7 @@
                 />
 
             <include
-                android:id="@+id/navigation_news"
+                android:id="@+id/support_navigation_news"
                 layout="@layout/navigation_news"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -63,7 +64,7 @@
                 />
 
             <include
-                android:id="@+id/navigation_develop"
+                android:id="@+id/support_navigation_develop"
                 layout="@layout/navigation_dev"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

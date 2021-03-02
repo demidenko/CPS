@@ -39,7 +39,6 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         val mainActivity = requireActivity() as MainActivity
 
         setCPSTitle("::news.codeforces.follow.list")
-        mainActivity.navigation.visibility = View.GONE
 
         val followListAdapter = FollowListItemsAdapter(mainActivity)
         val followListView = view.manage_cf_follow_users_list.apply {

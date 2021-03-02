@@ -251,14 +251,5 @@ class AccountsFragment: CPSFragment() {
 
     val sharedReloadButton by lazy { SharedReloadButton(mainActivity.navigation_accounts_reload) }
 
-    override fun onHiddenChanged(hidden: Boolean) {
-        if(!hidden){
-            with(mainActivity){
-                navigation.visibility = View.VISIBLE
-            }
-        }
-        super.onHiddenChanged(hidden)
-    }
-
 
 }

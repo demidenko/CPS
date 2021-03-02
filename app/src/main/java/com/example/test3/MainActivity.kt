@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
@@ -44,19 +43,21 @@ class MainActivity : AppCompatActivity(){
             item.isVisible = isChecked
         }
 
-        fun navigationSelectUpdateUI(fragment: CPSFragment){
-            navigation_accounts.visibility = if(fragment == accountsFragment) View.VISIBLE else View.GONE
-            navigation_news.visibility = if(fragment == newsFragment) View.VISIBLE else View.GONE
-            navigation_develop.visibility = if(fragment == devFragment) View.VISIBLE else View.GONE
+        accountsFragment.apply {
+            setCPSTitle("::accounts")
+            setBottomPanelId(R.id.support_navigation_accounts)
         }
-
-        accountsFragment.setCPSTitle("::accounts")
-        newsFragment.setCPSTitle("::news")
-        devFragment.setCPSTitle("::develop")
+        newsFragment.apply {
+            setCPSTitle("::news")
+            setBottomPanelId(R.id.support_navigation_news)
+        }
+        devFragment.apply {
+            setCPSTitle("::develop")
+            setBottomPanelId(R.id.support_navigation_develop)
+        }
 
         var activeFragment = supportFragmentManager.fragments.find { !it.isHidden } as? CPSFragment ?: accountsFragment
         if(!activeFragment.isAdded) supportFragmentManager.beginTransaction().add(R.id.container_fragment, activeFragment).commit()
-        navigationSelectUpdateUI(activeFragment)
 
         navigation_main.setOnNavigationItemSelectedListener { item ->
             val id = item.itemId
@@ -76,7 +77,6 @@ class MainActivity : AppCompatActivity(){
                     else add(R.id.container_fragment, selectedFragment)
                 }.commit()
                 activeFragment = selectedFragment
-                navigationSelectUpdateUI(selectedFragment)
             }
 
             true

@@ -275,15 +275,6 @@ class NewsFragment : CPSFragment() {
         codeforcesNewsViewPager.setCurrentItem(index, false)
     }
 
-    override fun onHiddenChanged(hidden: Boolean) {
-        if(!hidden){
-            with(requireActivity() as MainActivity){
-                navigation.visibility = View.VISIBLE
-            }
-        }
-        super.onHiddenChanged(hidden)
-    }
-
     fun addLostTab(){
         with(codeforcesNewsAdapter){
             if(indexOf(CodeforcesTitle.LOST) != -1) return

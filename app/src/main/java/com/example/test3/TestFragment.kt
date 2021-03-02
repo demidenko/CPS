@@ -56,7 +56,7 @@ class TestFragment : CPSFragment() {
         }
 
         val stuff = view.findViewById<TextView>(R.id.stuff_textview)
-        mainActivity.navigation_develop.findViewById<ImageButton>(R.id.navigation_dev_jobs).setOnClickListener {
+        mainActivity.support_navigation_develop.findViewById<ImageButton>(R.id.navigation_dev_jobs).setOnClickListener {
             val services = (mainActivity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getRunningServices(Int.MAX_VALUE)
                 .mapNotNull {
                     val s = it.service.className
@@ -69,7 +69,7 @@ class TestFragment : CPSFragment() {
         }
 
         //colors
-        mainActivity.navigation_develop.findViewById<ImageButton>(R.id.navigation_dev_colors).setOnClickListener{
+        mainActivity.support_navigation_develop.findViewById<ImageButton>(R.id.navigation_dev_colors).setOnClickListener{
             val table = view.findViewById<LinearLayout>(R.id.table_handle_colors)
             table.removeAllViews()
 
