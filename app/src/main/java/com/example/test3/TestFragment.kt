@@ -14,7 +14,6 @@ import androidx.core.text.bold
 import androidx.core.text.color
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.RatedAccountManager
@@ -27,7 +26,7 @@ import kotlinx.coroutines.runBlocking
 import java.util.*
 
 
-class TestFragment : Fragment() {
+class TestFragment : CPSFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

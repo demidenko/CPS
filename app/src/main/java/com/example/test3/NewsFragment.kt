@@ -43,7 +43,7 @@ enum class CodeforcesTitle {
     MAIN, TOP, RECENT, LOST
 }
 
-class NewsFragment : Fragment() {
+class NewsFragment : CPSFragment() {
 
     companion object {
 
@@ -112,7 +112,7 @@ class NewsFragment : Fragment() {
                 codeforcesNewsAdapter.makeVISIBLE(fragment.title)
 
                 val subtitle = "::news.codeforces.${fragment.title.name.toLowerCase(Locale.ENGLISH)}"
-                setFragmentSubTitle(this@NewsFragment, subtitle)
+                setCPSTitle(subtitle)
                 if(this@NewsFragment.isVisible) (requireActivity() as MainActivity).setActionBarSubTitle(subtitle)
             }
         }

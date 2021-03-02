@@ -12,8 +12,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.example.test3.CPSFragment
 import com.example.test3.CodeforcesTitle
 import com.example.test3.MainActivity
 import com.example.test3.R
@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
-class SettingsNewsFragment: Fragment(){
+class SettingsNewsFragment: CPSFragment(){
 
     private val mainActivity by lazy { requireActivity() as MainActivity }
     private val newsFragment by lazy { mainActivity.newsFragment }
@@ -40,11 +40,12 @@ class SettingsNewsFragment: Fragment(){
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setCPSTitle("::news.settings")
         with(requireActivity() as MainActivity){
-            setActionBarSubTitle("::news.settings")
             navigation.visibility = View.GONE
         }
-        super.onViewCreated(view, savedInstanceState)
 
         setHasOptionsMenu(true)
 

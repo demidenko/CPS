@@ -6,26 +6,22 @@ import android.widget.Button
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.test3.MainActivity
-import com.example.test3.R
+import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
-import com.example.test3.workers.CodeforcesNewsFollowWorker
-import com.example.test3.makeIntentOpenUrl
-import com.example.test3.setFragmentSubTitle
 import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.CodeforcesUtils
+import com.example.test3.workers.CodeforcesNewsFollowWorker
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_manage_cf_follow.view.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class ManageCodeforcesFollowListFragment(): Fragment() {
+class ManageCodeforcesFollowListFragment: CPSFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,9 +38,7 @@ class ManageCodeforcesFollowListFragment(): Fragment() {
 
         val mainActivity = requireActivity() as MainActivity
 
-        val subtitle = "::news.codeforces.follow.list"
-        setFragmentSubTitle(this, subtitle)
-        mainActivity.setActionBarSubTitle(subtitle)
+        setCPSTitle("::news.codeforces.follow.list")
         mainActivity.navigation.visibility = View.GONE
 
         val followListAdapter = FollowListItemsAdapter(mainActivity)

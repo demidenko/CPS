@@ -9,7 +9,6 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.*
 import com.example.test3.account_view.*
@@ -20,7 +19,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.navigation_accounts.*
 import kotlinx.coroutines.*
 
-class AccountsFragment: Fragment() {
+class AccountsFragment: CPSFragment() {
 
     private val mainActivity by lazy { requireActivity() as MainActivity }
 

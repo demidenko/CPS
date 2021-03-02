@@ -7,17 +7,16 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.example.test3.CPSFragment
 import com.example.test3.MainActivity
 import com.example.test3.R
-import com.example.test3.setFragmentSubTitle
 import com.example.test3.utils.setupSwitch
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class AccountSettingsFragment(): Fragment() {
+class AccountSettingsFragment: CPSFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,9 +38,7 @@ class AccountSettingsFragment(): Fragment() {
 
         val manager = panel.manager
 
-        val subtitle = "::accounts.${manager.managerName}.settings"
-        setFragmentSubTitle(this, subtitle)
-        mainActivity.setActionBarSubTitle(subtitle)
+        setCPSTitle("::accounts.${manager.managerName}.settings")
         mainActivity.navigation.visibility = View.GONE
 
         setHasOptionsMenu(true)

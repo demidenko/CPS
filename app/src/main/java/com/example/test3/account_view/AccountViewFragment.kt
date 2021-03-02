@@ -2,14 +2,13 @@ package com.example.test3.account_view
 
 import android.os.Bundle
 import android.view.*
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 
-class AccountViewFragment(): Fragment() {
+class AccountViewFragment: CPSFragment() {
 
     val panel: AccountPanel by lazy {
         val managerType = arguments?.getString("manager") ?: throw Exception("Unset type of manager")
@@ -36,9 +35,7 @@ class AccountViewFragment(): Fragment() {
 
         val manager = panel.manager
 
-        val subtitle = "::accounts.${manager.managerName}"
-        setFragmentSubTitle(this, subtitle)
-        mainActivity.setActionBarSubTitle(subtitle)
+        setCPSTitle("::accounts.${manager.managerName}")
         mainActivity.navigation.visibility = View.GONE
 
         fun showBigView() = lifecycleScope.launch { panel.showBigView(this@AccountViewFragment) }

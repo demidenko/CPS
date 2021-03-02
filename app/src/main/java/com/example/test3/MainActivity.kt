@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
@@ -45,19 +44,17 @@ class MainActivity : AppCompatActivity(){
             item.isVisible = isChecked
         }
 
-        fun navigationSelectUpdateUI(fragment: Fragment){
+        fun navigationSelectUpdateUI(fragment: CPSFragment){
             navigation_accounts.visibility = if(fragment == accountsFragment) View.VISIBLE else View.GONE
             navigation_news.visibility = if(fragment == newsFragment) View.VISIBLE else View.GONE
             navigation_develop.visibility = if(fragment == devFragment) View.VISIBLE else View.GONE
-
-            setActionBarSubTitle(getFragmentSubTitle(fragment))
         }
 
-        setFragmentSubTitle(accountsFragment, "::accounts")
-        setFragmentSubTitle(newsFragment, "::news")
-        setFragmentSubTitle(devFragment, "::develop")
+        accountsFragment.setCPSTitle("::accounts")
+        newsFragment.setCPSTitle("::news")
+        devFragment.setCPSTitle("::develop")
 
-        var activeFragment = supportFragmentManager.fragments.find { !it.isHidden } ?: accountsFragment
+        var activeFragment = supportFragmentManager.fragments.find { !it.isHidden } as? CPSFragment ?: accountsFragment
         if(!activeFragment.isAdded) supportFragmentManager.beginTransaction().add(R.id.container_fragment, activeFragment).commit()
         navigationSelectUpdateUI(activeFragment)
 
@@ -167,20 +164,11 @@ class MainActivity : AppCompatActivity(){
 
     override fun onBackPressed() {
         super.onBackPressed()
-        supportFragmentManager.fragments.forEach {
-            if(it.isVisible) setActionBarSubTitle(getFragmentSubTitle(it))
-        }
     }
 
 
 }
 
-fun getFragmentSubTitle(fragment: Fragment): String = fragment.arguments?.getString("subtitle",null)?:""
-
-fun setFragmentSubTitle(fragment: Fragment, title: String){
-    if(fragment.arguments == null) fragment.arguments = Bundle()
-    fragment.arguments?.putString("subtitle",title)
-}
 
 fun getColorFromResource(context: Context, resourceId: Int): Int {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
