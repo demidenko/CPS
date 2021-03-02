@@ -5,6 +5,8 @@ import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
@@ -77,6 +79,12 @@ class MainActivity : AppCompatActivity(){
             setDisplayShowTitleEnabled(false)
             setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM)
             setCustomView(R.layout.action_bar)
+            customView?.findViewById<ImageButton>(R.id.button_recreate_app)?.apply {
+                setOnClickListener { recreate() }
+                settingsDev.getDevEnabledLiveData().observe(this@MainActivity){
+                    visibility = if(it) View.VISIBLE else View.GONE
+                }
+            }
         }
     }
 

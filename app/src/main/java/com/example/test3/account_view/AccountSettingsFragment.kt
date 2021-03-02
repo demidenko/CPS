@@ -32,6 +32,7 @@ class AccountSettingsFragment: CPSFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        //TODO bad restore
         super.onViewCreated(view, savedInstanceState)
 
         val mainActivity = requireActivity() as MainActivity
