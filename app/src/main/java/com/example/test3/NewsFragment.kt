@@ -64,15 +64,21 @@ class NewsFragment : CPSFragment() {
     }
 
     private fun createLostFragment(): CodeforcesNewsFragment {
-        return CodeforcesNewsFragment(CodeforcesTitle.LOST, "", true, CodeforcesNewsItemsLostRecentAdapter())
+        return findOrCreateCodeforcesNewsFragment(CodeforcesTitle.LOST)
+    }
+
+    private fun findOrCreateCodeforcesNewsFragment(title: CodeforcesTitle): CodeforcesNewsFragment {
+        return childFragmentManager.fragments.filterIsInstance<CodeforcesNewsFragment>()
+            .find { it.title == title }
+            ?: CodeforcesNewsFragment.createInstance(title)
     }
 
     private val codeforcesNewsAdapter: CodeforcesNewsAdapter by lazy {
         val context = requireContext()
         val fragments = mutableListOf(
-            CodeforcesNewsFragment(CodeforcesTitle.MAIN, "/", true, CodeforcesNewsItemsClassicAdapter()),
-            CodeforcesNewsFragment(CodeforcesTitle.TOP, "/top", true, CodeforcesNewsItemsClassicAdapter()),
-            CodeforcesNewsFragment(CodeforcesTitle.RECENT, "/recent-actions", false, CodeforcesNewsItemsRecentAdapter())
+            findOrCreateCodeforcesNewsFragment(CodeforcesTitle.MAIN),
+            findOrCreateCodeforcesNewsFragment(CodeforcesTitle.TOP),
+            findOrCreateCodeforcesNewsFragment(CodeforcesTitle.RECENT)
         )
         runBlocking {
             if(CodeforcesNewsLostRecentWorker.isEnabled(context)){
@@ -357,12 +363,36 @@ class CodeforcesNewsAdapter(
     }
 }
 
-class CodeforcesNewsFragment(
-    val title: CodeforcesTitle,
-    val pageName: String,
-    val isManagesNewEntries: Boolean,
-    val viewAdapter: CodeforcesNewsItemsAdapter
-): Fragment() {
+class CodeforcesNewsFragment: Fragment() {
+
+    val title: CodeforcesTitle by lazy { CodeforcesTitle.valueOf(requireArguments().getString(keyTitle)!!) }
+    val pageName: String by lazy { requireArguments().getString(keyPageName)!! }
+    val isManagesNewEntries: Boolean by lazy { requireArguments().getBoolean(keyEntries) }
+    val viewAdapter: CodeforcesNewsItemsAdapter by lazy { CodeforcesNewsItemsAdapter.getFromType(requireArguments().getInt(keyAdapter)) }
+
+    companion object {
+        private const val keyTitle = "cf_news_title"
+        private const val keyPageName = "cf_news_page_name"
+        private const val keyEntries = "cf_news_entries"
+        private const val keyAdapter = "cf_news_adapter"
+        fun createInstance(title: CodeforcesTitle): CodeforcesNewsFragment {
+            val (pageName, isManagesNewEntries, viewAdapterType) =
+            when (title) {
+                CodeforcesTitle.MAIN -> Triple("/", true, CodeforcesNewsItemsAdapter.typeClassic)
+                CodeforcesTitle.TOP -> Triple("/top", true, CodeforcesNewsItemsAdapter.typeClassic)
+                CodeforcesTitle.RECENT -> Triple("/recent-actions", false, CodeforcesNewsItemsAdapter.typeRecent)
+                CodeforcesTitle.LOST -> Triple("", true, CodeforcesNewsItemsAdapter.typeLost)
+            }
+            return CodeforcesNewsFragment().apply {
+                arguments = Bundle().apply {
+                    putString(keyTitle, title.name)
+                    putString(keyPageName, pageName)
+                    putBoolean(keyEntries, isManagesNewEntries)
+                    putInt(keyAdapter, viewAdapterType)
+                }
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -468,6 +498,20 @@ abstract class CodeforcesNewsItemsAdapter: RecyclerView.Adapter<RecyclerView.Vie
 
     open fun refresh(){
         notifyDataSetChanged()
+    }
+
+    companion object {
+        const val typeClassic = 0
+        const val typeRecent = 1
+        const val typeLost = 2
+        fun getFromType(type: Int): CodeforcesNewsItemsAdapter {
+            return when(type) {
+                typeClassic -> CodeforcesNewsItemsClassicAdapter()
+                typeRecent -> CodeforcesNewsItemsRecentAdapter()
+                typeLost -> CodeforcesNewsItemsLostRecentAdapter()
+                else -> throw Exception("Unknown type of CodeforcesNewsItemsAdapter: $type")
+            }
+        }
     }
 }
 
