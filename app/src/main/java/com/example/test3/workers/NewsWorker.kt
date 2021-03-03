@@ -9,7 +9,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.test3.*
-import com.example.test3.news.SettingsNewsFragment
+import com.example.test3.news.NewsFeed
+import com.example.test3.news.settingsNews
 import com.example.test3.utils.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
@@ -18,10 +19,10 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
 
     override suspend fun doWork(): Result  = withContext(Dispatchers.IO){
         val jobs = mutableListOf<Job>()
-        with(SettingsNewsFragment.getSettings(context)){
-            if(getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.PROJECT_EULER_NEWS)) jobs.add(launch { parseProjectEuler() })
-            if(getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.ACMP_NEWS)) jobs.add(launch { parseACMP() })
-            if(getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.ZAOCH_NEWS)) jobs.add(launch { parseZaoch() })
+        with(context.settingsNews){
+            if(getNewsFeedEnabled(NewsFeed.PROJECT_EULER_NEWS)) jobs.add(launch { parseProjectEuler() })
+            if(getNewsFeedEnabled(NewsFeed.ACMP_NEWS)) jobs.add(launch { parseACMP() })
+            if(getNewsFeedEnabled(NewsFeed.ZAOCH_NEWS)) jobs.add(launch { parseZaoch() })
         }
         if(jobs.isEmpty()) WorkersCenter.stopWorker(context, WorkersNames.news_parsers)
         jobs.joinAll()

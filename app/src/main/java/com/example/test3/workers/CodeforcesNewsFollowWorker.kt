@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.test3.*
 import com.example.test3.account_manager.STATUS
-import com.example.test3.news.SettingsNewsFragment
+import com.example.test3.news.settingsNews
 import com.example.test3.room.UserBlogs
 import com.example.test3.room.getFollowDao
 import com.example.test3.utils.*
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 
 class CodeforcesNewsFollowWorker(private val context: Context, val params: WorkerParameters): CoroutineWorker(context, params) {
     companion object {
-        suspend fun isEnabled(context: Context): Boolean = SettingsNewsFragment.getSettings(context).getFollowEnabled()
+        suspend fun isEnabled(context: Context): Boolean = context.settingsNews.getFollowEnabled()
     }
 
     class FollowDataConnector(private val context: Context) {

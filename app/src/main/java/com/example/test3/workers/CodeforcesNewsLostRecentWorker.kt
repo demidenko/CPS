@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.example.test3.BottomProgressInfo
 import com.example.test3.NewsFragment
 import com.example.test3.account_manager.STATUS
-import com.example.test3.news.SettingsNewsFragment
+import com.example.test3.news.settingsNews
 import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
 import com.example.test3.utils.*
@@ -61,7 +61,7 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
             progressInfo?.finish()
         }
 
-        suspend fun isEnabled(context: Context): Boolean = SettingsNewsFragment.getSettings(context).getLostEnabled()
+        suspend fun isEnabled(context: Context): Boolean = context.settingsNews.getLostEnabled()
     }
 
     override suspend fun doWork(): Result {
@@ -94,7 +94,7 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
             TimeUnit.SECONDS.toDays(currentTimeSeconds - blogCreationTimeSeconds) > 7
 
         val blogsDao = getLostBlogsDao(context)
-        val minRating = SettingsNewsFragment.getSettings(context).getLostMinRating()
+        val minRating = context.settingsNews.getLostMinRating()
 
         //get current suspects with removing old ones
         val suspects = blogsDao.getSuspects().let { list ->

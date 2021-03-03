@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.*
 import com.example.test3.MainActivity
 import com.example.test3.account_manager.CodeforcesAccountManager
-import com.example.test3.news.SettingsNewsFragment
 import java.util.concurrent.TimeUnit
 
 object WorkersNames {
@@ -48,11 +47,11 @@ object WorkersCenter {
 
     suspend fun startWorkers(mainActivity: MainActivity) {
         startAccountsWorker(mainActivity, false)
-        with(SettingsNewsFragment.getSettings(mainActivity)){
-            if(getLostEnabled()) startCodeforcesNewsLostRecentWorker(mainActivity, false)
-            if(getFollowEnabled()) startCodeforcesNewsFollowWorker(mainActivity, false)
-            if(getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.PROJECT_EULER_RECENT)) startProjectEulerRecentProblemsWorker(mainActivity, false)
-        }
+
+        if(CodeforcesNewsLostRecentWorker.isEnabled(mainActivity)) startCodeforcesNewsLostRecentWorker(mainActivity, false)
+        if(CodeforcesNewsFollowWorker.isEnabled(mainActivity)) startCodeforcesNewsFollowWorker(mainActivity, false)
+        if(ProjectEulerRecentProblemsWorker.isEnabled(mainActivity)) startProjectEulerRecentProblemsWorker(mainActivity, false)
+
         with(CodeforcesAccountManager(mainActivity).getSettings()){
             if(getContestWatchEnabled()) startCodeforcesContestWatchLauncherWorker(mainActivity, false)
         }

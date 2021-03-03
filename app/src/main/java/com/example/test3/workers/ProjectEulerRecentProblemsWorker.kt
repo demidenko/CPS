@@ -7,7 +7,8 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.test3.*
-import com.example.test3.news.SettingsNewsFragment
+import com.example.test3.news.NewsFeed
+import com.example.test3.news.settingsNews
 import com.example.test3.utils.ProjectEulerAPI
 import com.example.test3.utils.SettingsDataStore
 import kotlinx.coroutines.flow.first
@@ -15,8 +16,7 @@ import kotlinx.coroutines.flow.first
 class ProjectEulerRecentProblemsWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     companion object {
-        suspend fun isEnabled(context: Context): Boolean =
-            SettingsNewsFragment.getSettings(context).getNewsFeedEnabled(SettingsNewsFragment.NewsFeed.PROJECT_EULER_RECENT)
+        suspend fun isEnabled(context: Context): Boolean = context.settingsNews.getNewsFeedEnabled(NewsFeed.PROJECT_EULER_RECENT)
     }
 
     private val dataStore by lazy { ProjectEulerRecentProblemsJobServiceDataStore(context) }

@@ -23,6 +23,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.test3.news.ManageCodeforcesFollowListFragment
 import com.example.test3.news.SettingsNewsFragment
+import com.example.test3.news.settingsNews
 import com.example.test3.room.getLostBlogsDao
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsFollowWorker
@@ -48,7 +49,7 @@ class NewsFragment : CPSFragment() {
     companion object {
         private const val keySelectedTab = "selected_tab"
 
-        suspend fun getCodeforcesContentLanguage(context: Context) = if(SettingsNewsFragment.getSettings(context).getRussianContentEnabled()) "ru" else "en"
+        suspend fun getCodeforcesContentLanguage(context: Context) = if(context.settingsNews.getRussianContentEnabled()) "ru" else "en"
     }
 
     override fun onCreateView(
@@ -269,7 +270,7 @@ class NewsFragment : CPSFragment() {
         val index = savedInstanceState?.getInt(keySelectedTab)
             ?: with(codeforcesNewsAdapter){
                 val defaultTab = runBlocking {
-                    SettingsNewsFragment.getSettings(requireContext()).getDefaultTab()
+                    mainActivity.settingsNews.getDefaultTab()
                 }
                 indexOf(defaultTab).takeIf { it!=-1 } ?: indexOf(CodeforcesTitle.TOP)
             }
