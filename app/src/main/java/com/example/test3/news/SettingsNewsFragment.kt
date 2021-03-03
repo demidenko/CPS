@@ -94,15 +94,14 @@ class SettingsNewsFragment: CPSFragment(){
             ){ buttonView, isChecked ->
                 lifecycleScope.launch {
                     buttonView.isEnabled = false
-                    val context = requireContext()
                     mainActivity.settingsNews.setLostEnabled(isChecked)
                     if (isChecked) {
-                        WorkersCenter.startCodeforcesNewsLostRecentWorker(context)
+                        WorkersCenter.startCodeforcesNewsLostRecentWorker(mainActivity)
                         newsFragment.addLostTab()
                         selectLostRating.visibility = View.VISIBLE
                     } else {
                         newsFragment.removeLostTab()
-                        WorkersCenter.stopWorker(context, WorkersNames.codeforces_news_lost_recent)
+                        WorkersCenter.stopWorker(mainActivity, WorkersNames.codeforces_news_lost_recent)
                         selectLostRating.visibility = View.GONE
                     }
                     buttonView.isEnabled = true
@@ -199,13 +198,13 @@ class SettingsNewsFragment: CPSFragment(){
                     changed.forEach { (newsFeed, enabled) ->
                         when(newsFeed){
                             NewsFeed.PROJECT_EULER_RECENT -> {
-                                if(enabled) WorkersCenter.startProjectEulerRecentProblemsWorker(requireContext())
-                                else WorkersCenter.stopWorker(requireContext(), WorkersNames.project_euler_recent_problems)
+                                if(enabled) WorkersCenter.startProjectEulerRecentProblemsWorker(mainActivity)
+                                else WorkersCenter.stopWorker(mainActivity, WorkersNames.project_euler_recent_problems)
                             }
                             NewsFeed.PROJECT_EULER_NEWS,
                             NewsFeed.ACMP_NEWS,
                             NewsFeed.ZAOCH_NEWS -> {
-                                if(enabled) WorkersCenter.startNewsWorker(requireContext())
+                                if(enabled) WorkersCenter.startNewsWorker(mainActivity)
                             }
                         }
                     }

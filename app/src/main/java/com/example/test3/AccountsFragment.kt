@@ -101,7 +101,7 @@ class AccountsFragment: CPSFragment() {
 
     fun addAccount() {
         lifecycleScope.launch {
-            BottomSheetDialog(requireContext()).apply {
+            BottomSheetDialog(mainActivity).apply {
                 val view = layoutInflater.inflate(R.layout.dialog_add_account, null).apply {
 
                     findViewById<TextView>(R.id.dialog_add_account_cancel).setOnClickListener { dismiss() }

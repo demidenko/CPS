@@ -71,14 +71,13 @@ class NewsFragment : CPSFragment() {
     }
 
     private val codeforcesNewsAdapter: CodeforcesNewsAdapter by lazy {
-        val context = requireContext()
         val fragments = mutableListOf(
             findOrCreateCodeforcesNewsFragment(CodeforcesTitle.MAIN),
             findOrCreateCodeforcesNewsFragment(CodeforcesTitle.TOP),
             findOrCreateCodeforcesNewsFragment(CodeforcesTitle.RECENT)
         )
         runBlocking {
-            if(CodeforcesNewsLostRecentWorker.isEnabled(context)){
+            if(CodeforcesNewsLostRecentWorker.isEnabled(mainActivity)){
                 fragments.add(createLostFragment())
             }
         }
@@ -140,7 +139,7 @@ class NewsFragment : CPSFragment() {
         cpsTitle = "::news"
         setBottomPanelId(R.id.support_navigation_news)
 
-        val badgeColor = getColorFromResource(requireContext(), android.R.color.holo_green_light)
+        val badgeColor = getColorFromResource(mainActivity, android.R.color.holo_green_light)
 
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
             val fragment = codeforcesNewsAdapter.fragments[position]
@@ -180,7 +179,7 @@ class NewsFragment : CPSFragment() {
             menu.setGroupDividerEnabled(true)
         }
         inflater.inflate(R.menu.menu_news, menu)
-        menu.findItem(R.id.menu_news_follow_list).isVisible = runBlocking { CodeforcesNewsFollowWorker.isEnabled(requireContext()) }
+        menu.findItem(R.id.menu_news_follow_list).isVisible = runBlocking { CodeforcesNewsFollowWorker.isEnabled(mainActivity) }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -194,7 +193,7 @@ class NewsFragment : CPSFragment() {
 
     private fun reloadTabs() {
         lifecycleScope.launch {
-            val lang = getCodeforcesContentLanguage(requireContext())
+            val lang = getCodeforcesContentLanguage(mainActivity)
             codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
                 val tab = tabLayout.getTabAt(index)!!
                 launch { reloadFragment(fragment, tab, lang) }
@@ -204,7 +203,7 @@ class NewsFragment : CPSFragment() {
 
     private val reloadButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_news_reload) }
     private val sharedReloadButton by lazy { SharedReloadButton(reloadButton) }
-    private val failColor by lazy { getColorFromResource(requireContext(), R.color.reload_fail) }
+    private val failColor by lazy { getColorFromResource(mainActivity, R.color.reload_fail) }
     private suspend fun reloadFragment(
         fragment: CodeforcesNewsFragment,
         tab: TabLayout.Tab,
@@ -226,7 +225,7 @@ class NewsFragment : CPSFragment() {
     suspend fun reloadFragment(fragment: CodeforcesNewsFragment) {
         val index = codeforcesNewsAdapter.fragments.indexOf(fragment)
         val tab = tabLayout.getTabAt(index) ?: return
-        reloadFragment(fragment, tab, getCodeforcesContentLanguage(requireContext()))
+        reloadFragment(fragment, tab, getCodeforcesContentLanguage(mainActivity))
     }
 
 
@@ -302,7 +301,7 @@ class NewsFragment : CPSFragment() {
         codeforcesNewsAdapter.remove(index)
     }
 
-    val viewedDataStore by lazy { CodeforcesNewsViewedBlogsDataStore(requireContext()) }
+    val viewedDataStore by lazy { CodeforcesNewsViewedBlogsDataStore(mainActivity) }
 
     class CodeforcesNewsViewedBlogsDataStore(context: Context)
         : SettingsDataStore(context, "data_news_fragment_cf_viewed"){

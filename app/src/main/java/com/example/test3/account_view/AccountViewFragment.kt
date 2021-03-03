@@ -60,7 +60,7 @@ class AccountViewFragment: CPSFragment() {
     }
 
     private fun deleteAccount(){
-        MaterialAlertDialogBuilder(requireContext())
+        MaterialAlertDialogBuilder(mainActivity)
             .setTitle("Delete ${panel.manager.managerName} account?")
             .setPositiveButton("YES"){ _, _ ->
                 lifecycleScope.launch {
