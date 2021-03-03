@@ -50,7 +50,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         val buttonAdd = mainActivity.support_navigation_cf_follow.findViewById<ImageButton>(R.id.navigation_cf_follow_add).apply {
             visibility = View.GONE
         }
-        buttonAdd.setOnClickListener { button -> button as ImageButton
+        buttonAdd.setOnClickListener {
             lifecycleScope.launch {
 
                 val userInfo = mainActivity.chooseUserID(
@@ -58,9 +58,9 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
                     mainActivity.accountsFragment.codeforcesAccountManager
                 ) as? CodeforcesAccountManager.CodeforcesUserInfo ?: return@launch
 
-                button.isEnabled = false
+                buttonAdd.isEnabled = false
                 followListAdapter.add(userInfo)
-                button.isEnabled = true
+                buttonAdd.isEnabled = true
                 followListView.scrollToPosition(0)
             }
 
@@ -72,11 +72,10 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             followListView.isEnabled = true
             buttonAdd.visibility = View.VISIBLE
         }
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        menu.clear()
-        super.onCreateOptionsMenu(menu, inflater)
+        mainActivity.settingsUI.useRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
+            followListAdapter.notifyDataSetChanged()
+        }
     }
 
 
