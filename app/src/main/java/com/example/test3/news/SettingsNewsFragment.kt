@@ -15,7 +15,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.CPSFragment
 import com.example.test3.CodeforcesTitle
-import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.utils.*
 import com.example.test3.workers.WorkersCenter
@@ -27,7 +26,6 @@ import kotlinx.coroutines.runBlocking
 
 class SettingsNewsFragment: CPSFragment(){
 
-    private val mainActivity by lazy { requireActivity() as MainActivity }
     private val newsFragment by lazy { mainActivity.newsFragment }
 
     override fun onCreateView(
@@ -42,7 +40,7 @@ class SettingsNewsFragment: CPSFragment(){
         //TODO bad restore
         super.onViewCreated(view, savedInstanceState)
 
-        setCPSTitle("::news.settings")
+        cpsTitle = "::news.settings"
 
         setHasOptionsMenu(true)
 
@@ -151,14 +149,13 @@ class SettingsNewsFragment: CPSFragment(){
             ){ buttonView, isChecked ->
                 lifecycleScope.launch {
                     buttonView.isEnabled = false
-                    val activity = requireActivity()
-                    getSettings(activity).setFollowEnabled(isChecked)
+                    getSettings(mainActivity).setFollowEnabled(isChecked)
                     if (isChecked) {
-                        WorkersCenter.startCodeforcesNewsFollowWorker(activity)
+                        WorkersCenter.startCodeforcesNewsFollowWorker(mainActivity)
                     } else {
-                        WorkersCenter.stopWorker(activity, WorkersNames.codeforces_news_follow)
+                        WorkersCenter.stopWorker(mainActivity, WorkersNames.codeforces_news_follow)
                     }
-                    activity.invalidateOptionsMenu()
+                    mainActivity.invalidateOptionsMenu()
                     buttonView.isEnabled = true
                 }
             }

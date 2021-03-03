@@ -9,7 +9,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.CPSFragment
-import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.utils.setupSwitch
 import kotlinx.android.synthetic.main.activity_main.*
@@ -27,19 +26,17 @@ class AccountSettingsFragment: CPSFragment() {
     }
 
     private val panel: AccountPanel by lazy {
-        val managerType = arguments?.getString("manager") ?: throw Exception("Unset type of manager")
-        (requireActivity() as MainActivity).accountsFragment.getPanel(managerType)
+        val managerType = requireArguments().getString("manager") ?: throw Exception("Unset type of manager")
+        mainActivity.accountsFragment.getPanel(managerType)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         //TODO bad restore
         super.onViewCreated(view, savedInstanceState)
 
-        val mainActivity = requireActivity() as MainActivity
-
         val manager = panel.manager
 
-        setCPSTitle("::accounts.${manager.managerName}.settings")
+        cpsTitle = "::accounts.${manager.managerName}.settings"
 
         setHasOptionsMenu(true)
 

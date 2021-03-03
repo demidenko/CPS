@@ -45,11 +45,6 @@ enum class CodeforcesTitle {
 
 class NewsFragment : CPSFragment() {
 
-    init {
-        setCPSTitle("::news")
-        setBottomPanelId(R.id.support_navigation_news)
-    }
-
     companion object {
         private const val keySelectedTab = "selected_tab"
 
@@ -124,8 +119,8 @@ class NewsFragment : CPSFragment() {
                 codeforcesNewsAdapter.makeVISIBLE(fragment.title)
 
                 val subtitle = "::news.codeforces.${fragment.title.name.toLowerCase(Locale.ENGLISH)}"
-                setCPSTitle(subtitle)
-                if(this@NewsFragment.isVisible) (requireActivity() as MainActivity).setActionBarSubTitle(subtitle)
+                cpsTitle = subtitle
+                if(this@NewsFragment.isVisible) mainActivity.setActionBarSubTitle(subtitle)
             }
         }
     }
@@ -140,6 +135,9 @@ class NewsFragment : CPSFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        cpsTitle = "::news"
+        setBottomPanelId(R.id.support_navigation_news)
 
         val badgeColor = getColorFromResource(requireContext(), android.R.color.holo_green_light)
 
@@ -158,7 +156,7 @@ class NewsFragment : CPSFragment() {
 
         setHasOptionsMenu(true)
 
-        with(requireActivity() as MainActivity){
+        with(mainActivity){
             navigation_news_reload.setOnClickListener { reloadTabs() }
             updateLostInfoButton.setOnClickListener { updateLostInfo() }
             recentSwitchButton.setOnClickListener {
@@ -203,7 +201,7 @@ class NewsFragment : CPSFragment() {
         }
     }
 
-    private val sharedReloadButton by lazy { SharedReloadButton(requireActivity().navigation_news_reload) }
+    private val sharedReloadButton by lazy { SharedReloadButton(mainActivity.navigation_news_reload) }
     private val failColor by lazy { getColorFromResource(requireContext(), R.color.reload_fail) }
     private suspend fun reloadFragment(
         fragment: CodeforcesNewsFragment,
@@ -230,15 +228,14 @@ class NewsFragment : CPSFragment() {
     }
 
 
-    private val updateLostInfoButton by lazy { requireActivity().navigation_news_lost_update_info }
+    private val updateLostInfoButton by lazy { mainActivity.navigation_news_lost_update_info }
 
-    private val recentSwitchButton by lazy { requireActivity().navigation_news_recent_swap }
-    private val recentShowBackButton by lazy { requireActivity().navigation_news_recent_show_blog_back }
+    private val recentSwitchButton by lazy { mainActivity.navigation_news_recent_swap }
+    private val recentShowBackButton by lazy { mainActivity.navigation_news_recent_show_blog_back }
 
     private fun updateLostInfo() {
         lifecycleScope.launch {
             updateLostInfoButton.isEnabled = false
-            val mainActivity = requireActivity() as MainActivity
             CodeforcesNewsLostRecentWorker.updateInfo(mainActivity, BottomProgressInfo("update info of lost", mainActivity))
             updateLostInfoButton.isEnabled = true
 
@@ -253,15 +250,11 @@ class NewsFragment : CPSFragment() {
     }
 
     fun showSettingsNews(){
-        with(requireActivity() as MainActivity) {
-            cpsFragmentManager.pushBack(SettingsNewsFragment())
-        }
+        mainActivity.cpsFragmentManager.pushBack(SettingsNewsFragment())
     }
 
     fun showCodeforcesFollowListManager(){
-        with(requireActivity() as MainActivity) {
-            cpsFragmentManager.pushBack(ManageCodeforcesFollowListFragment())
-        }
+        mainActivity.cpsFragmentManager.pushBack(ManageCodeforcesFollowListFragment())
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

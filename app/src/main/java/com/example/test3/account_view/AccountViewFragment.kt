@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 class AccountViewFragment: CPSFragment() {
 
     val panel: AccountPanel by lazy {
-        val managerType = arguments?.getString("manager") ?: throw Exception("Unset type of manager")
-        (requireActivity() as MainActivity).accountsFragment.getPanel(managerType)
+        val managerType = requireArguments().getString("manager") ?: throw Exception("Unset type of manager")
+        mainActivity.accountsFragment.getPanel(managerType)
     }
 
     override fun onCreateView(
@@ -31,11 +31,9 @@ class AccountViewFragment: CPSFragment() {
 
         setHasOptionsMenu(true)
 
-        val mainActivity = requireActivity() as MainActivity
-
         val manager = panel.manager
 
-        setCPSTitle("::accounts.${manager.managerName}")
+        cpsTitle = "::accounts.${manager.managerName}"
 
         fun showBigView() = lifecycleScope.launch { panel.showBigView(this@AccountViewFragment) }
 
@@ -73,7 +71,7 @@ class AccountViewFragment: CPSFragment() {
             .setPositiveButton("YES"){ _, _ ->
                 lifecycleScope.launch {
                     panel.manager.setSavedInfo(panel.manager.emptyInfo())
-                    requireActivity().onBackPressed()
+                    mainActivity.onBackPressed()
                 }
             }
             .setNegativeButton("NO"){ _, _ -> }
@@ -82,7 +80,6 @@ class AccountViewFragment: CPSFragment() {
     }
 
     private fun openSettings(){
-        val mainActivity = requireActivity() as MainActivity
         val managerType = panel.manager.managerName
         mainActivity.cpsFragmentManager.pushBack(
             AccountSettingsFragment().apply {
@@ -92,9 +89,7 @@ class AccountViewFragment: CPSFragment() {
     }
 
     override fun onDestroy() {
-        with(requireActivity() as MainActivity){
-            accountsFragment.statusBarColorManager.setCurrent(null)
-        }
+        mainActivity.accountsFragment.statusBarColorManager.setCurrent(null)
         super.onDestroy()
     }
 

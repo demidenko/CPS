@@ -34,12 +34,10 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setHasOptionsMenu(true)
-
-        val mainActivity = requireActivity() as MainActivity
-
-        setCPSTitle("::news.codeforces.follow.list")
+        cpsTitle = "::news.codeforces.follow.list"
         setBottomPanelId(R.id.support_navigation_cf_follow)
+
+        setHasOptionsMenu(true)
 
         val followListAdapter = FollowListItemsAdapter(mainActivity)
         val followListView = view.manage_cf_follow_users_list.apply {

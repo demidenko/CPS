@@ -12,6 +12,8 @@ open class CPSFragment : Fragment() {
         if(arguments==null) arguments = Bundle()
     }
 
+    protected val mainActivity by lazy { requireActivity() as MainActivity }
+
     companion object {
         private const val keyTitle = "cps_title"
         private const val keyId = "cps_id"
@@ -19,11 +21,11 @@ open class CPSFragment : Fragment() {
         private const val keyBottomPanelId = "cps_bottom_panel_id"
     }
 
-    private fun getCPSTitle(): String = requireArguments().getString(keyTitle, "")
-
-    fun setCPSTitle(title: String) {
-        requireArguments().putString(keyTitle, title)
-    }
+    var cpsTitle: String
+        get() = requireArguments().getString(keyTitle, "")
+        set(title) {
+            requireArguments().putString(keyTitle, title)
+        }
 
     var cpsId: Int
         get() = requireArguments().getInt(keyId)
@@ -41,7 +43,7 @@ open class CPSFragment : Fragment() {
         with(requireArguments()){
             if(!containsKey(keyBottomPanelId)) null
             else getInt(keyBottomPanelId).let {
-                (requireActivity() as MainActivity).support_navigation.findViewById<ConstraintLayout>(it)
+                mainActivity.support_navigation.findViewById<ConstraintLayout>(it)
             }
         }
     }
@@ -51,8 +53,7 @@ open class CPSFragment : Fragment() {
     }
 
     private fun showStuff() {
-        val mainActivity = (requireActivity() as MainActivity)
-        mainActivity.setActionBarSubTitle(getCPSTitle())
+        mainActivity.setActionBarSubTitle(cpsTitle)
         mainActivity.navigation.visibility = bottomPanel?.let {
                 it.visibility = View.VISIBLE
                 View.VISIBLE

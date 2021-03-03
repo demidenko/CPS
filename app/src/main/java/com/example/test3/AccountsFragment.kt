@@ -21,13 +21,6 @@ import kotlinx.coroutines.*
 
 class AccountsFragment: CPSFragment() {
 
-    init {
-        setCPSTitle("::accounts")
-        setBottomPanelId(R.id.support_navigation_accounts)
-    }
-
-    private val mainActivity by lazy { requireActivity() as MainActivity }
-
     val codeforcesAccountManager by lazy { CodeforcesAccountManager(mainActivity) }
     val atcoderAccountManager by lazy { AtCoderAccountManager(mainActivity) }
     val topcoderAccountManager by lazy { TopCoderAccountManager(mainActivity) }
@@ -82,6 +75,9 @@ class AccountsFragment: CPSFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        cpsTitle = "::accounts"
+        setBottomPanelId(R.id.support_navigation_accounts)
 
         view.findViewById<LinearLayout>(R.id.panels_layout).apply {
             val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)

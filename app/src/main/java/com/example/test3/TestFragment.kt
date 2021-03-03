@@ -28,11 +28,6 @@ import java.util.*
 
 class TestFragment : CPSFragment() {
 
-    init {
-        setCPSTitle("::develop")
-        setBottomPanelId(R.id.support_navigation_develop)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -43,12 +38,11 @@ class TestFragment : CPSFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?){
         super.onViewCreated(view, savedInstanceState)
-        val mainActivity = requireActivity() as MainActivity
 
-
+        cpsTitle = "::develop"
+        setBottomPanelId(R.id.support_navigation_develop)
 
         //show running jobs
-
         val workersTextView = view.findViewById<TextView>(R.id.workers)
         WorkersCenter.getWorksLiveData(mainActivity).observe(mainActivity){ infos ->
             workersTextView.text = infos.joinToString(separator = "\n"){ info ->
