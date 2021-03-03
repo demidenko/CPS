@@ -385,7 +385,7 @@ class CodeforcesNewsFragment: Fragment() {
             val (pageName, isManagesNewEntries, viewAdapterType) =
             when (title) {
                 CodeforcesTitle.MAIN -> Triple("/", true, CodeforcesNewsItemsAdapter.typeClassic)
-                CodeforcesTitle.TOP -> Triple("/top", true, CodeforcesNewsItemsAdapter.typeClassic)
+                CodeforcesTitle.TOP -> Triple("/top", false, CodeforcesNewsItemsAdapter.typeClassic)
                 CodeforcesTitle.RECENT -> Triple("/recent-actions", false, CodeforcesNewsItemsAdapter.typeRecent)
                 CodeforcesTitle.LOST -> Triple("", true, CodeforcesNewsItemsAdapter.typeLost)
             }
