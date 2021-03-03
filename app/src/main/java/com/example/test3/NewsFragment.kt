@@ -51,6 +51,7 @@ class NewsFragment : CPSFragment() {
     }
 
     companion object {
+        private const val keySelectedTab = "selected_tab"
 
         suspend fun getCodeforcesContentLanguage(context: Context) = if(SettingsNewsFragment.getSettings(context).getRussianContentEnabled()) "ru" else "en"
     }
@@ -263,11 +264,16 @@ class NewsFragment : CPSFragment() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(keySelectedTab, tabLayout.selectedTabPosition)
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        val index =
-            with(codeforcesNewsAdapter){
+        val index = savedInstanceState?.getInt(keySelectedTab)
+            ?: with(codeforcesNewsAdapter){
                 val defaultTab = runBlocking {
                     SettingsNewsFragment.getSettings(requireContext()).getDefaultTab()
                 }
