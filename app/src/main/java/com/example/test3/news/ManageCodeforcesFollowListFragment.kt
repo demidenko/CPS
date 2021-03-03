@@ -16,8 +16,6 @@ import com.example.test3.account_manager.STATUS
 import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.workers.CodeforcesNewsFollowWorker
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_manage_cf_follow.view.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -40,14 +38,14 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         setHasOptionsMenu(true)
 
         val followListAdapter = FollowListItemsAdapter(mainActivity)
-        val followListView = view.manage_cf_follow_users_list.apply {
+        val followListView = view.findViewById<RecyclerView>(R.id.manage_cf_follow_users_list).apply {
             layoutManager = LinearLayoutManager(context)
             adapter = followListAdapter
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             setHasFixedSize(true)
         }
 
-        val buttonAdd = mainActivity.support_navigation_cf_follow.findViewById<ImageButton>(R.id.navigation_cf_follow_add).apply {
+        val buttonAdd = requireBottomPanel().findViewById<ImageButton>(R.id.navigation_cf_follow_add).apply {
             visibility = View.GONE
         }
         buttonAdd.setOnClickListener {

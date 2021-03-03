@@ -19,7 +19,6 @@ import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.RatedAccountManager
 import com.example.test3.utils.SettingsDataStore
 import com.example.test3.workers.WorkersCenter
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
@@ -56,7 +55,7 @@ class TestFragment : CPSFragment() {
         }
 
         val stuff = view.findViewById<TextView>(R.id.stuff_textview)
-        mainActivity.support_navigation_develop.findViewById<ImageButton>(R.id.navigation_dev_jobs).setOnClickListener {
+        requireBottomPanel().findViewById<ImageButton>(R.id.navigation_dev_jobs).setOnClickListener {
             val services = (mainActivity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getRunningServices(Int.MAX_VALUE)
                 .mapNotNull {
                     val s = it.service.className
@@ -69,7 +68,7 @@ class TestFragment : CPSFragment() {
         }
 
         //colors
-        mainActivity.support_navigation_develop.findViewById<ImageButton>(R.id.navigation_dev_colors).setOnClickListener{
+        requireBottomPanel().findViewById<ImageButton>(R.id.navigation_dev_colors).setOnClickListener{
             val table = view.findViewById<LinearLayout>(R.id.table_handle_colors)
             table.removeAllViews()
 

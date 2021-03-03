@@ -157,7 +157,7 @@ class NewsFragment : CPSFragment() {
         setHasOptionsMenu(true)
 
         with(mainActivity){
-            navigation_news_reload.setOnClickListener { reloadTabs() }
+            reloadButton.setOnClickListener { reloadTabs() }
             updateLostInfoButton.setOnClickListener { updateLostInfo() }
             recentSwitchButton.setOnClickListener {
                 val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
@@ -201,7 +201,8 @@ class NewsFragment : CPSFragment() {
         }
     }
 
-    private val sharedReloadButton by lazy { SharedReloadButton(mainActivity.navigation_news_reload) }
+    private val reloadButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_news_reload) }
+    private val sharedReloadButton by lazy { SharedReloadButton(reloadButton) }
     private val failColor by lazy { getColorFromResource(requireContext(), R.color.reload_fail) }
     private suspend fun reloadFragment(
         fragment: CodeforcesNewsFragment,
@@ -228,10 +229,10 @@ class NewsFragment : CPSFragment() {
     }
 
 
-    private val updateLostInfoButton by lazy { mainActivity.navigation_news_lost_update_info }
+    private val updateLostInfoButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_news_lost_update_info) }
 
-    private val recentSwitchButton by lazy { mainActivity.navigation_news_recent_swap }
-    private val recentShowBackButton by lazy { mainActivity.navigation_news_recent_show_blog_back }
+    private val recentSwitchButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_news_recent_swap) }
+    private val recentShowBackButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_news_recent_show_blog_back) }
 
     private fun updateLostInfo() {
         lifecycleScope.launch {

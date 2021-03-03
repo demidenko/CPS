@@ -48,6 +48,10 @@ open class CPSFragment : Fragment() {
         }
     }
 
+    fun requireBottomPanel(): ConstraintLayout {
+        return bottomPanel ?: throw CPSFragmentException("bottom panel is not defined")
+    }
+
     fun setBottomPanelId(id: Int) {
         requireArguments().putInt(keyBottomPanelId, id)
     }
@@ -84,8 +88,6 @@ open class CPSFragment : Fragment() {
 
 
 class CPSFragmentManager(activity: MainActivity, private val containerId: Int) {
-
-    class CPSException(str: String): Exception("CPS Fragments: $str")
 
     private val stacks = mutableMapOf<Int, MutableList<CPSFragment>>()
     private var lastStackId = -1
@@ -125,7 +127,7 @@ class CPSFragmentManager(activity: MainActivity, private val containerId: Int) {
 
     fun switchToStack(stackId: Int) {
         if(stackId == currentStackId) return
-        val targetLine = stacks[stackId] ?: throw CPSException("stack $stackId is not exist")
+        val targetLine = stacks[stackId] ?: throw CPSFragmentException("stack $stackId is not exist")
         val transaction = fragmentManager.beginTransaction()
         if(currentStackId!=-1){
             val currentLine = stacks[currentStackId]!!
@@ -180,3 +182,5 @@ class CPSFragmentManager(activity: MainActivity, private val containerId: Int) {
     }
 
 }
+
+class CPSFragmentException(str: String): Exception("CPS Fragments: $str")

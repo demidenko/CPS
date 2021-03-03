@@ -15,8 +15,6 @@ import com.example.test3.account_view.*
 import com.example.test3.utils.CListUtils
 import com.example.test3.utils.SharedReloadButton
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.navigation_accounts.*
 import kotlinx.coroutines.*
 
 class AccountsFragment: CPSFragment() {
@@ -90,15 +88,16 @@ class AccountsFragment: CPSFragment() {
             }
         }
 
-        with(mainActivity){
-            navigation_accounts_reload.setOnClickListener { reloadAccounts() }
-            navigation_accounts_add.setOnClickListener { addAccount() }
-        }
+        reloadButton.setOnClickListener { reloadAccounts() }
+        addAccountButton.setOnClickListener { addAccount() }
 
         mainActivity.settingsUI.useRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
             showPanels()
         }
     }
+
+    private val reloadButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_accounts_reload) }
+    private val addAccountButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_accounts_add) }
 
     fun addAccount() {
         lifecycleScope.launch {
@@ -151,7 +150,7 @@ class AccountsFragment: CPSFragment() {
         lifecycleScope.launch {
             val clistUserInfo = mainActivity.chooseUserID(CListAccountManager(mainActivity)) as? CListAccountManager.CListUserInfo ?: return@launch
 
-            mainActivity.navigation_accounts_add.isEnabled = false
+            addAccountButton.isEnabled = false
 
             val supported = clistUserInfo.accounts.mapNotNull { (resource, userData) ->
                 CListUtils.getManager(resource, userData.first, userData.second, mainActivity)
@@ -172,7 +171,7 @@ class AccountsFragment: CPSFragment() {
             }.awaitAll()
 
             progressInfo.finish()
-            mainActivity.navigation_accounts_add.isEnabled = true
+            addAccountButton.isEnabled = true
         }
     }
 
@@ -251,7 +250,7 @@ class AccountsFragment: CPSFragment() {
         } ?: throw Exception("Unknown type of manager: $managerType")
     }
 
-    val sharedReloadButton by lazy { SharedReloadButton(mainActivity.navigation_accounts_reload) }
+    val sharedReloadButton by lazy { SharedReloadButton(reloadButton) }
 
 
 }
