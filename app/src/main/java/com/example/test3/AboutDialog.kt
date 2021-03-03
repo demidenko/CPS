@@ -51,25 +51,12 @@ class AboutDialog: DialogFragment() {
             }
 
             //apply dev mode
-            val timeClicks = LongArray(6)
-            var clicks = 0
-            setOnClickListener {
-                val cur = System.currentTimeMillis()
-                if(clicks>0 && cur - timeClicks[(clicks-1)%6] > 1000) clicks = 0
-                timeClicks[clicks%6] = cur
-                ++clicks
-                if(clicks >= 6 && !devCheckBox.isVisible){
-                    val t = (0..4).map { i ->
-                        timeClicks[(clicks-1-i)%6] - timeClicks[(clicks-2-i)%6]
-                    }
-                    if(minOf(t[1],t[3]) > maxOf(t[0],t[2],t[4])){
-                        devTextView.visibility = View.VISIBLE
-                        devCheckBox.visibility = View.VISIBLE
-                        devCheckBox.isChecked = true
-                        clicks = 0
-                    }
-                }
-            }
+            setOnClickListener(PatternClickListener("._.._..."){
+                if(devCheckBox.isVisible) return@PatternClickListener
+                devTextView.visibility = View.VISIBLE
+                devCheckBox.visibility = View.VISIBLE
+                devCheckBox.isChecked = true
+            })
         }
 
         val builder = MaterialAlertDialogBuilder(context)
@@ -80,6 +67,66 @@ class AboutDialog: DialogFragment() {
         return dialog
     }
 
+    class PatternClickListener(
+        pattern: String,
+        private val callback: () -> Unit
+    ): View.OnClickListener {
 
+        private val n: Int
+        private val shortIndices: IntArray
+        private val longIndices: IntArray
+
+        init {
+            fun badPattern() { throw Exception("Bad pattern: [$pattern]") }
+
+            if(pattern[0]!='.') badPattern()
+
+            var pushes = 1
+            val shorts = mutableListOf<Int>()
+            val longs = mutableListOf<Int>()
+            for(i in 1 until pattern.length){
+                when(pattern[i]){
+                    '.' -> {
+                        pushes++
+                        if(pattern[i-1] == '.') shorts.add(pushes-2)
+                        else longs.add(pushes-2)
+                    }
+                    '_' -> if(pattern[i-1] != '.') badPattern()
+                    else -> badPattern()
+                }
+            }
+
+            println(shorts)
+            println(longs)
+
+            n = pushes
+            shortIndices = shorts.toIntArray()
+            longIndices = longs.toIntArray()
+        }
+
+        private val timeClicks = LongArray(n)
+        private var clicks = 0
+
+        override fun onClick(v: View?) {
+            val cur = System.currentTimeMillis()
+            if(clicks>0 && cur - timeClicks[(clicks-1)%n] > 1000) clicks = 0
+            timeClicks[clicks%n] = cur
+            ++clicks
+            if(clicks >= n){
+                val t = (n-2 downTo 0).map { i ->
+                    timeClicks[(clicks-1-i)%n] - timeClicks[(clicks-2-i)%n]
+                }
+
+                val x = longIndices.map { t[it] }.minOrNull() ?: Long.MAX_VALUE
+                val y = shortIndices.map { t[it] }.maxOrNull() ?: Long.MIN_VALUE
+
+                if(x > y){
+                    clicks = 0
+                    callback()
+                }
+            }
+        }
+
+    }
 
 }
