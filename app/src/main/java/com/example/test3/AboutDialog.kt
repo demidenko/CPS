@@ -96,9 +96,6 @@ class AboutDialog: DialogFragment() {
                 }
             }
 
-            println(shorts)
-            println(longs)
-
             n = pushes
             shortIndices = shorts.toIntArray()
             longIndices = longs.toIntArray()
