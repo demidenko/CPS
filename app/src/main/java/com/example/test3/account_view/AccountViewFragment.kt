@@ -10,10 +10,7 @@ import kotlinx.coroutines.launch
 
 class AccountViewFragment: CPSFragment() {
 
-    val panel: AccountPanel by lazy {
-        val managerType = requireArguments().getString("manager") ?: throw Exception("Unset type of manager")
-        mainActivity.accountsFragment.getPanel(managerType)
-    }
+    private val panel: AccountPanel by lazy { mainActivity.accountsFragment.getPanel(this) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -22,9 +19,6 @@ class AccountViewFragment: CPSFragment() {
     ): View? {
         return inflater.inflate(panel.bigViewResource, container, false)
     }
-
-
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

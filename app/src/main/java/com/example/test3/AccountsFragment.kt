@@ -250,6 +250,11 @@ class AccountsFragment: CPSFragment() {
         } ?: throw Exception("Unknown type of manager: $managerType")
     }
 
+    fun getPanel(fragment: CPSFragment): AccountPanel {
+        val managerType = fragment.requireArguments().getString("manager") ?: throw Exception("Unset type of manager")
+        return getPanel(managerType)
+    }
+
     val sharedReloadButton by lazy { SharedReloadButton(reloadButton) }
 
 

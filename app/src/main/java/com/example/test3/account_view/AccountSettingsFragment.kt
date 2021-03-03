@@ -17,17 +17,14 @@ import kotlinx.coroutines.runBlocking
 
 class AccountSettingsFragment: CPSFragment() {
 
+    private val panel: AccountPanel by lazy { mainActivity.accountsFragment.getPanel(this) }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_account_settings, container, false)
-    }
-
-    private val panel: AccountPanel by lazy {
-        val managerType = requireArguments().getString("manager") ?: throw Exception("Unset type of manager")
-        mainActivity.accountsFragment.getPanel(managerType)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
