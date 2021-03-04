@@ -39,9 +39,6 @@ class SettingsNewsFragment: CPSFragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if(savedInstanceState != null) {
-            TODO("bad restore")
-        }
 
         cpsTitle = "::news.settings"
 

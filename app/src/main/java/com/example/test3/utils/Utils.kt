@@ -85,6 +85,7 @@ fun setupSwitch(
     view.apply {
         findViewById<TextView>(R.id.settings_item_title).text = title
         findViewById<SwitchMaterial>(R.id.settings_switcher_button).apply {
+            isSaveEnabled = false
             isChecked = checked
             this.setOnCheckedChangeListener { buttonView, isChecked -> onChangeCallback(buttonView,isChecked) }
         }

@@ -28,9 +28,6 @@ class AccountSettingsFragment: CPSFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if(savedInstanceState != null) {
-            TODO("bad restore")
-        }
 
         val manager = panel.manager
 
