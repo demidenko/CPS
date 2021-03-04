@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.activity_main.*
 
 open class CPSFragment : Fragment() {
 
@@ -43,7 +42,7 @@ open class CPSFragment : Fragment() {
         with(requireArguments()){
             if(!containsKey(keyBottomPanelId)) null
             else getInt(keyBottomPanelId).let {
-                mainActivity.support_navigation.findViewById<ConstraintLayout>(it)
+                mainActivity.navigation.findViewById<ConstraintLayout>(it)
             }
         }
     }

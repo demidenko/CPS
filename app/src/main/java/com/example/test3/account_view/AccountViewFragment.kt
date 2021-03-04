@@ -5,7 +5,6 @@ import android.view.*
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 
 class AccountViewFragment: CPSFragment() {

@@ -31,7 +31,6 @@ import com.example.test3.workers.CodeforcesNewsLostRecentWorker
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.navigation_news.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import java.util.*
@@ -606,7 +605,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
             view.isLongClickable = true
             view.setOnLongClickListener {
                 runBlocking { CodeforcesNewsFollowWorker.isEnabled(activity) }.apply {
-                    if(this) addToFollowListWithSnackBar(activity, this@with)
+                    if(this) addToFollowListWithSnackBar(this@with)
                 }
             }
 
@@ -643,22 +642,22 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
         }
     }
 
-    private fun addToFollowListWithSnackBar(mainActivity: MainActivity, holder: CodeforcesNewsItemViewHolder){
-        mainActivity.newsFragment.lifecycleScope.launch {
-            val connector = CodeforcesNewsFollowWorker.FollowDataConnector(mainActivity)
+    private fun addToFollowListWithSnackBar(holder: CodeforcesNewsItemViewHolder){
+        activity.newsFragment.lifecycleScope.launch {
+            val connector = CodeforcesNewsFollowWorker.FollowDataConnector(activity)
             val handle = holder.author.text
             when(connector.add(handle.toString())){
                 true -> {
                     Snackbar.make(holder.view, SpannableStringBuilder("You now followed ").append(handle), Snackbar.LENGTH_LONG).apply {
                         setAction("Manage"){
-                            mainActivity.newsFragment.showCodeforcesFollowListManager()
+                            activity.newsFragment.showCodeforcesFollowListManager()
                         }
                     }
                 }
                 false -> {
                     Snackbar.make(holder.view, SpannableStringBuilder("You already followed ").append(handle), Snackbar.LENGTH_LONG)
                 }
-            }.setAnchorView(mainActivity.navigation).show()
+            }.setAnchorView(activity.navigation).show()
         }
     }
 }
@@ -748,8 +747,8 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
     private var headerBlog: BlogInfo? = null
     private lateinit var header: View
-    private val switchButton by lazy { activity.navigation_news_recent_swap }
-    private val showBackButton by lazy { activity.navigation_news_recent_show_blog_back }
+    private val switchButton: ImageButton by lazy { activity.navigation.findViewById(R.id.navigation_news_recent_swap) }
+    private val showBackButton: ImageButton by lazy { activity.navigation.findViewById(R.id.navigation_news_recent_show_blog_back) }
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         with(recyclerView.parent.parent as ConstraintLayout){
