@@ -104,8 +104,8 @@ fun setupSelect(
         findViewById<TextView>(R.id.settings_item_title).text = title
         val selectedTextView = findViewById<TextView>(R.id.settings_select_button)
         selectedTextView.text = options[initSelected]
+        var selected = initSelected
         setOnClickListener {
-            var selected = initSelected
             AlertDialog.Builder(context)
                 .setTitle(title)
                 .setSingleChoiceItems(options, selected){ d, index ->
@@ -132,14 +132,14 @@ fun setupMultiSelect(
         findViewById<TextView>(R.id.settings_item_title).text = title
         val selectedTextView = findViewById<TextView>(R.id.settings_multiselect_button)
         selectedTextView.text = initSelected.count { it }.toString()
+        var selected = initSelected.clone()
         setOnClickListener {
-            val selected = initSelected.clone()
+            val currentSelected = selected.clone()
             AlertDialog.Builder(context)
                 .setTitle(title)
-                .setMultiChoiceItems(options, selected){ _, i, isChecked ->
-                    selected[i] = isChecked
-                }
+                .setMultiChoiceItems(options, currentSelected){ _, _, _ -> }
                 .setPositiveButton("Save"){ d, _ ->
+                    selected = currentSelected
                     onChangeCallback(it, selected.clone())
                     selectedTextView.text = selected.count { it }.toString()
                     d.dismiss()

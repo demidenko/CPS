@@ -188,7 +188,7 @@ class SettingsNewsFragment: CPSFragment(){
                     buttonView.isEnabled = false
                     val changed = mutableListOf<Pair<NewsFeed,Boolean>>()
                     with(mainActivity.settingsNews){
-                        NewsFeed.values().mapIndexed { index, newsFeed ->
+                        NewsFeed.values().forEachIndexed { index, newsFeed ->
                             val current = optionsSelected[index]
                             if(newsFeedsEnabled[index] != current){
                                 setNewsFeedEnabled(newsFeed, current)
@@ -197,19 +197,18 @@ class SettingsNewsFragment: CPSFragment(){
                             }
                         }
                     }
-                    changed.forEach { (newsFeed, enabled) ->
-                        when(newsFeed){
-                            NewsFeed.PROJECT_EULER_RECENT -> {
-                                if(enabled) WorkersCenter.startProjectEulerRecentProblemsWorker(mainActivity)
-                                else WorkersCenter.stopWorker(mainActivity, WorkersNames.project_euler_recent_problems)
-                            }
-                            NewsFeed.PROJECT_EULER_NEWS,
-                            NewsFeed.ACMP_NEWS,
-                            NewsFeed.ZAOCH_NEWS -> {
-                                if(enabled) WorkersCenter.startNewsWorker(mainActivity)
-                            }
+
+                    changed.find { it.first == NewsFeed.PROJECT_EULER_RECENT }
+                        ?.let { (_, enabled) ->
+                            if(enabled) WorkersCenter.startProjectEulerRecentProblemsWorker(mainActivity)
+                            else WorkersCenter.stopWorker(mainActivity, WorkersNames.project_euler_recent_problems)
                         }
-                    }
+
+                    changed.find { (newsFeed, enabled) ->
+                        enabled &&
+                        newsFeed in listOf(NewsFeed.PROJECT_EULER_NEWS, NewsFeed.ACMP_NEWS, NewsFeed.ZAOCH_NEWS)
+                    } ?.run { WorkersCenter.startNewsWorker(mainActivity) }
+
                     buttonView.isEnabled = true
                 }
             }
