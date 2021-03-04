@@ -31,8 +31,6 @@ import com.example.test3.workers.CodeforcesNewsLostRecentWorker
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_cf_news_page.view.*
 import kotlinx.android.synthetic.main.navigation_news.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
@@ -128,7 +126,7 @@ class NewsFragment : CPSFragment() {
     private val codeforcesNewsViewPager by lazy {
         requireView().findViewById<ViewPager2>(R.id.cf_news_pager).apply {
             adapter = codeforcesNewsAdapter
-            offscreenPageLimit = codeforcesNewsAdapter.fragments.size
+            offscreenPageLimit = CodeforcesTitle.values().size
         }
     }
 
@@ -402,7 +400,7 @@ class CodeforcesNewsFragment: Fragment() {
         return inflater.inflate(R.layout.fragment_cf_news_page, container, false)
     }
 
-    private val swipeRefreshLayout: SwipeRefreshLayout by lazy { requireView().cf_news_page_swipe_refresh_layout }
+    private val swipeRefreshLayout: SwipeRefreshLayout by lazy { requireView().findViewById(R.id.cf_news_page_swipe_refresh_layout) }
 
     fun startReload() {
         swipeRefreshLayout.isRefreshing = true
@@ -412,11 +410,13 @@ class CodeforcesNewsFragment: Fragment() {
         swipeRefreshLayout.isRefreshing = false
     }
 
-    private val newsFragment by lazy { (requireActivity() as MainActivity).newsFragment }
-    private suspend fun callReload() = newsFragment.reloadFragment(this)
+    private val newsFragment by lazy { requireParentFragment() as NewsFragment }
+    private fun callReload() {
+        lifecycleScope.launch { newsFragment.reloadFragment(this@CodeforcesNewsFragment) }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        view.cf_news_page_recyclerview.apply {
+        swipeRefreshLayout.findViewById<RecyclerView>(R.id.cf_news_page_recyclerview).apply {
             layoutManager = LinearLayoutManager(context)
             adapter = viewAdapter
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
@@ -424,14 +424,12 @@ class CodeforcesNewsFragment: Fragment() {
         }
 
         swipeRefreshLayout.apply {
-            setOnRefreshListener {
-                lifecycleScope.launch { callReload() }
-            }
+            setOnRefreshListener { callReload() }
             setProgressBackgroundColorSchemeResource(R.color.textColor)
             setColorSchemeResources(R.color.colorAccent)
         }
 
-        lifecycleScope.launchWhenCreated { callReload() }
+        callReload()
     }
 
     private fun showItems() = viewAdapter.notifyDataSetChanged()
@@ -660,7 +658,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
                 false -> {
                     Snackbar.make(holder.view, SpannableStringBuilder("You already followed ").append(handle), Snackbar.LENGTH_LONG)
                 }
-            }.setAnchorView(mainActivity.navigation_main).show()
+            }.setAnchorView(mainActivity.navigation).show()
         }
     }
 }

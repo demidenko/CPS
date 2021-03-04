@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
@@ -16,7 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.workers.WorkersCenter
-import kotlinx.android.synthetic.main.activity_main.*
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
 import kotlin.coroutines.suspendCoroutine
 
@@ -32,6 +33,9 @@ class MainActivity : AppCompatActivity(){
 
     val cpsFragmentManager by lazy { CPSFragmentManager(this, R.id.container_fragment) }
 
+    val navigation: LinearLayout by lazy { findViewById(R.id.navigation) }
+    val navigationMain: BottomNavigationView by lazy { navigation.findViewById(R.id.navigation_main) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         println("main create")
         super.onCreate(savedInstanceState)
@@ -42,7 +46,7 @@ class MainActivity : AppCompatActivity(){
         setActionBarTitle("Competitive Programming && Solving")
 
         settingsDev.getDevEnabledLiveData().observe(this){ isChecked ->
-            val item = navigation_main.menu.findItem(R.id.navigation_develop)
+            val item = navigationMain.menu.findItem(R.id.navigation_develop)
             item.isVisible = isChecked
         }
 
@@ -52,7 +56,7 @@ class MainActivity : AppCompatActivity(){
 
         if(cpsFragmentManager.getCurrentStackId() == -1) cpsFragmentManager.switchToStack(accountsStackId)
 
-        navigation_main.setOnNavigationItemSelectedListener { item ->
+        navigationMain.setOnNavigationItemSelectedListener { item ->
 
             val selectedStackId =
                 when(val id = item.itemId){
