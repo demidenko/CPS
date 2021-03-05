@@ -36,54 +36,14 @@
             />
     </LinearLayout>
 
-    <LinearLayout
+    <include
         android:id="@+id/action_bar_ui_panel"
-        android:layout_width="wrap_content"
+        layout="@layout/settings_ui_panel"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        >
-
-        <ImageButton
-            android:id="@+id/button_ui_close"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_close"
-            android:tooltipText="close"
-            style="@style/CPSImageButton"
-            />
-
-        <ImageButton
-            android:id="@+id/button_recreate_app"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_recreate"
-            style="@style/CPSImageButton"
-            android:visibility="gone"
-            />
-
-        <ImageButton
-            android:id="@+id/button_origin_colors"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_colors"
-            android:tooltipText="original colors"
-            style="@style/CPSImageButton"
-            />
-
-        <ImageButton
-            android:id="@+id/button_colored_status_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_status_bar"
-            android:tooltipText="colored status bar"
-            style="@style/CPSImageButton"
-            />
-
-    </LinearLayout>
+        android:visibility="gone"
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

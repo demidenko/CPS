@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
@@ -86,7 +87,7 @@ class MainActivity : AppCompatActivity(){
 
             supportActionBar?.run {
                 val titles: LinearLayout = findViewById(R.id.action_bar_titles)
-                val panelUI: LinearLayout = findViewById(R.id.action_bar_ui_panel)
+                val panelUI: ConstraintLayout = findViewById(R.id.action_bar_ui_panel)
                 when(value){
                     true -> {
                         titles.visibility = View.GONE
