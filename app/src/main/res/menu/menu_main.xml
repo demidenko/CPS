@@ -5,10 +5,9 @@
         android:id="@+id/menu_group_main"
         >
         <item
-            android:id="@+id/color_switcher"
-            android:title="Original colors"
-            android:icon="@drawable/ic_colors"
-            android:checkable="true"
+            android:id="@+id/settings_ui"
+            android:title="UI"
+            android:icon="@drawable/ic_settings_ui"
             />
         <item
             android:id="@+id/app_info"

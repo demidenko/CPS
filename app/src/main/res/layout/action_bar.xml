@@ -3,44 +3,76 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     >
 
-    <TextView
-        android:id="@+id/action_bar_title"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/action_bar_titles"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TITLE"
-        android:typeface="monospace"
-        android:singleLine="true"
-        android:textSize="16dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="6dp"
-        />
+    >
+        <TextView
+            android:id="@+id/action_bar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TITLE"
+            android:typeface="monospace"
+            android:singleLine="true"
+            android:textSize="16dp"
+            android:layout_marginTop="6dp"
+            />
 
-    <TextView
-        android:id="@+id/action_bar_subtitle"
+        <TextView
+            android:id="@+id/action_bar_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="subtitle"
+            android:typeface="monospace"
+            android:singleLine="true"
+            android:textSize="16dp"
+            android:textColor="@color/textColorAdditional"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/action_bar_ui_panel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="subtitle"
-        android:typeface="monospace"
-        android:singleLine="true"
-        android:textSize="16dp"
-        android:textColor="@color/textColorAdditional"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/action_bar_title"
-        />
-
-    <ImageButton
-        android:id="@+id/button_recreate_app"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/ic_recreate"
-        android:backgroundTint="@android:color/transparent"
+        android:orientation="horizontal"
         android:visibility="gone"
-        />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+
+        <ImageButton
+            android:id="@+id/button_ui_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_close"
+            android:backgroundTint="@android:color/transparent"
+            />
+
+        <ImageButton
+            android:id="@+id/button_origin_colors"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_colors"
+            android:backgroundTint="@android:color/transparent"
+            />
+
+        <ImageButton
+            android:id="@+id/button_recreate_app"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_recreate"
+            android:backgroundTint="@android:color/transparent"
+            android:visibility="gone"
+            />
+
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

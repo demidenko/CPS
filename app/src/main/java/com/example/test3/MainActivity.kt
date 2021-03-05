@@ -44,6 +44,9 @@ class MainActivity : AppCompatActivity(){
 
         setupActionBar()
         setActionBarTitle("Competitive Programming && Solving")
+        savedInstanceState?.let {
+            showUISettingsPanel = it.getBoolean(keyShowUIPanel)
+        }
 
         settingsDev.getDevEnabledLiveData().observe(this){ isChecked ->
             val item = navigationMain.menu.findItem(R.id.navigation_develop)
@@ -77,18 +80,66 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
+    private var showUISettingsPanel: Boolean = false
+        set(value) {
+            field = value
+
+            supportActionBar?.run {
+                val titles: LinearLayout = findViewById(R.id.action_bar_titles)
+                val panelUI: LinearLayout = findViewById(R.id.action_bar_ui_panel)
+                when(value){
+                    true -> {
+                        titles.visibility = View.GONE
+                        panelUI.visibility = View.VISIBLE
+                    }
+                    false -> {
+                        panelUI.visibility = View.GONE
+                        titles.visibility = View.VISIBLE
+                    }
+                }
+            }
+        }
+
+    companion object {
+        private const val keyShowUIPanel = "show_ui_panel"
+    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(keyShowUIPanel, showUISettingsPanel)
+    }
+
+
     private fun setupActionBar(){
         supportActionBar?.run {
             setDisplayShowCustomEnabled(true)
             setDisplayShowTitleEnabled(false)
             setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM)
             setCustomView(R.layout.action_bar)
-            customView?.findViewById<ImageButton>(R.id.button_recreate_app)?.apply {
-                setOnClickListener { recreate() }
-                settingsDev.getDevEnabledLiveData().observe(this@MainActivity){
-                    visibility = if(it) View.VISIBLE else View.GONE
+            customView?.apply {
+
+                findViewById<ImageButton>(R.id.button_ui_close)?.apply {
+                    setOnClickListener {
+                        showUISettingsPanel = false
+                    }
+                }
+
+                findViewById<ImageButton>(R.id.button_origin_colors)?.apply {
+                    setOnClickListener {
+                        lifecycleScope.launch {
+                            val current = getUseRealColors()
+                            setUseRealColors(!current)
+                        }
+                    }
+                }
+
+                findViewById<ImageButton>(R.id.button_recreate_app)?.apply {
+                    setOnClickListener { recreate() }
+                    settingsDev.getDevEnabledLiveData().observe(this@MainActivity){
+                        visibility = if(it) View.VISIBLE else View.GONE
+                    }
                 }
             }
+
         }
     }
 
@@ -112,18 +163,13 @@ class MainActivity : AppCompatActivity(){
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         (menu as? MenuBuilder)?.setOptionalIconsVisible(true)
         menuInflater.inflate(R.menu.menu_main, menu)
-        menu?.findItem(R.id.color_switcher)?.isChecked = getUseRealColors()
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.color_switcher -> {
-                val use = !item.isChecked
-                item.isChecked = use
-                lifecycleScope.launch {
-                    setUseRealColors(use)
-                }
+            R.id.settings_ui -> {
+                showUISettingsPanel = true
             }
             R.id.app_info -> AboutDialog.showDialog(this)
         }

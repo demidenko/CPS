@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import com.example.test3.utils.SettingsDataStore
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
@@ -29,18 +30,15 @@ class SettingsUI(context: Context): SettingsDataStore(context, "settings_ui") {
 
     private val KEY_USE_REAL_COLORS = booleanPreferencesKey("use_real_colors")
 
-    private val flowForUseRealColors = dataStore.data.map {
+    private val useRealColorsFlow = dataStore.data.map {
         it[KEY_USE_REAL_COLORS] ?: false
     }
 
-    val useRealColorsLiveData = flowForUseRealColors.asLiveData()
+    val useRealColorsLiveData = useRealColorsFlow.distinctUntilChanged().asLiveData()
 
-    suspend fun getUseRealColors() = flowForUseRealColors.first()
-
+    suspend fun getUseRealColors() = useRealColorsFlow.first()
     suspend fun setUseRealColors(use: Boolean) {
-        dataStore.edit {
-            it[KEY_USE_REAL_COLORS] = use
-        }
+        dataStore.edit { it[KEY_USE_REAL_COLORS] = use }
     }
 }
 
@@ -59,4 +57,8 @@ class SettingsDelegate<T: SettingsDataStore>(
             _dataStore = it
         }
     }
+}
+
+class PanelSettingsUI(val mainActivity: MainActivity){
+
 }
