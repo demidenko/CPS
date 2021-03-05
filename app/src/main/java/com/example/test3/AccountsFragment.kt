@@ -195,6 +195,16 @@ class AccountsFragment: CPSFragment() {
             return infoByPanel.values.toList()
         }
 
+        private var enabled: Boolean = true
+        init {
+            with(accountsFragment.mainActivity){
+                settingsUI.useStatusBarLiveData.observe(this){ use ->
+                    enabled = use
+                    updateStatusBar()
+                }
+            }
+        }
+
         private fun updateStatusBar() {
 
             val (best, allEmpty) =
@@ -204,7 +214,7 @@ class AccountsFragment: CPSFragment() {
 
             with(accountsFragment){
                 view?.findViewById<TextView>(R.id.accounts_welcome_text)?.visibility = if(allEmpty) View.VISIBLE else View.GONE
-                mainActivity.window.statusBarColor = best.color
+                mainActivity.window.statusBarColor = (if(enabled) best else ColorInfo()).color
             }
         }
 

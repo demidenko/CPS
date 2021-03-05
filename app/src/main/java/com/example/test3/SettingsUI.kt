@@ -29,16 +29,20 @@ fun<T> LiveData<T>.observeUpdates(owner: LifecycleOwner, _onChanged: (T)->Unit){
 class SettingsUI(context: Context): SettingsDataStore(context, "settings_ui") {
 
     private val KEY_USE_REAL_COLORS = booleanPreferencesKey("use_real_colors")
+    private val KEY_USE_STATUS_BAR = booleanPreferencesKey("use_status_bar")
 
-    private val useRealColorsFlow = dataStore.data.map {
-        it[KEY_USE_REAL_COLORS] ?: false
-    }
-
+    private val useRealColorsFlow = dataStore.data.map { it[KEY_USE_REAL_COLORS] ?: false }
     val useRealColorsLiveData = useRealColorsFlow.distinctUntilChanged().asLiveData()
-
     suspend fun getUseRealColors() = useRealColorsFlow.first()
     suspend fun setUseRealColors(use: Boolean) {
         dataStore.edit { it[KEY_USE_REAL_COLORS] = use }
+    }
+
+    private val useStatusBar = dataStore.data.map { it[KEY_USE_STATUS_BAR] ?: true }
+    val useStatusBarLiveData = useStatusBar.distinctUntilChanged().asLiveData()
+    suspend fun getUseStatusBar() = useStatusBar.first()
+    suspend fun setUseStatusBar(use: Boolean) {
+        dataStore.edit { it[KEY_USE_STATUS_BAR] = use }
     }
 }
 

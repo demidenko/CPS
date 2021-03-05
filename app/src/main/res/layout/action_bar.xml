@@ -52,14 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_close"
-            style="@style/CPSImageButton"
-            />
-
-        <ImageButton
-            android:id="@+id/button_origin_colors"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_colors"
+            android:tooltipText="close"
             style="@style/CPSImageButton"
             />
 
@@ -70,6 +63,24 @@
             android:src="@drawable/ic_recreate"
             style="@style/CPSImageButton"
             android:visibility="gone"
+            />
+
+        <ImageButton
+            android:id="@+id/button_origin_colors"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_colors"
+            android:tooltipText="original colors"
+            style="@style/CPSImageButton"
+            />
+
+        <ImageButton
+            android:id="@+id/button_colored_status_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_status_bar"
+            android:tooltipText="colored status bar"
+            style="@style/CPSImageButton"
             />
 
     </LinearLayout>

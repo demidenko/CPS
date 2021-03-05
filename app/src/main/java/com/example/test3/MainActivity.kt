@@ -132,10 +132,19 @@ class MainActivity : AppCompatActivity(){
                     }
                 }
 
+                findViewById<ImageButton>(R.id.button_colored_status_bar)?.apply {
+                    setOnClickListener {
+                        lifecycleScope.launchWhenStarted {
+                            val current = settingsUI.getUseStatusBar()
+                            settingsUI.setUseStatusBar(!current)
+                        }
+                    }
+                }
+
                 findViewById<ImageButton>(R.id.button_recreate_app)?.apply {
                     setOnClickListener { recreate() }
-                    settingsDev.getDevEnabledLiveData().observe(this@MainActivity){
-                        visibility = if(it) View.VISIBLE else View.GONE
+                    settingsDev.getDevEnabledLiveData().observe(this@MainActivity){ enabled ->
+                        visibility = if(enabled) View.VISIBLE else View.GONE
                     }
                 }
             }
