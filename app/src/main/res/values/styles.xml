@@ -38,4 +38,9 @@
         <item name="android:typeface">monospace</item>
         <item name="android:textColor">@color/textColor</item>
     </style>
+
+    <style name="CPSImageButton">
+        <item name="android:backgroundTint">@android:color/transparent</item>
+        <item name="android:foreground">?android:attr/actionBarItemBackground</item>
+    </style>
 </resources>

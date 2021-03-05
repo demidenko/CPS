@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_close"
-            android:backgroundTint="@android:color/transparent"
+            style="@style/CPSImageButton"
             />
 
         <ImageButton
@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_colors"
-            android:backgroundTint="@android:color/transparent"
+            style="@style/CPSImageButton"
             />
 
         <ImageButton
@@ -68,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_recreate"
-            android:backgroundTint="@android:color/transparent"
+            style="@style/CPSImageButton"
             android:visibility="gone"
             />
 
