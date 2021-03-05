@@ -130,6 +130,9 @@ class MainActivity : AppCompatActivity(){
                             setUseRealColors(!current)
                         }
                     }
+                    settingsUI.useRealColorsLiveData.observe(this@MainActivity){ use ->
+                        alpha = if(use) 1f else 0.5f
+                    }
                 }
 
                 findViewById<ImageButton>(R.id.button_colored_status_bar)?.apply {
@@ -138,6 +141,9 @@ class MainActivity : AppCompatActivity(){
                             val current = settingsUI.getUseStatusBar()
                             settingsUI.setUseStatusBar(!current)
                         }
+                    }
+                    settingsUI.useStatusBarLiveData.observe(this@MainActivity){ use ->
+                        alpha = if(use) 1f else 0.5f
                     }
                 }
 
