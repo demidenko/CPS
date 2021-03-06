@@ -13,7 +13,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.lifecycleScope
-import com.example.test3.CPSFragment
+import com.example.test3.ui.CPSFragment
 import com.example.test3.CodeforcesTitle
 import com.example.test3.R
 import com.example.test3.SettingsDelegate

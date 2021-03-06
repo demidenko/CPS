@@ -17,6 +17,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
+import com.example.test3.ui.CPSFragmentManager
 import com.example.test3.utils.off
 import com.example.test3.utils.on
 import com.example.test3.workers.WorkersCenter
@@ -38,6 +39,8 @@ class MainActivity : AppCompatActivity(){
 
     val navigation: LinearLayout by lazy { findViewById(R.id.navigation) }
     val navigationMain: BottomNavigationView by lazy { navigation.findViewById(R.id.navigation_main) }
+
+    val progressBarHolder: LinearLayout by lazy { findViewById(R.id.progress_bar_holder) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         println("main create")

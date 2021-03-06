@@ -8,8 +8,8 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import androidx.lifecycle.lifecycleScope
-import com.example.test3.CPSFragment
 import com.example.test3.R
+import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.setupSwitch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

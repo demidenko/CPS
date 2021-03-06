@@ -3,7 +3,7 @@ package com.example.test3.workers
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.example.test3.BottomProgressInfo
+import com.example.test3.ui.BottomProgressInfo
 import com.example.test3.NewsFragment
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.settingsNews

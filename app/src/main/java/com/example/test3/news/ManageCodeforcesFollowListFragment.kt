@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
+import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.disable

@@ -1,9 +1,10 @@
-package com.example.test3
+package com.example.test3.ui
 
 import android.os.Bundle
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import com.example.test3.MainActivity
 
 open class CPSFragment : Fragment() {
 
