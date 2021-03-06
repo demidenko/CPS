@@ -17,7 +17,6 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 fun getCurrentTimeSeconds() = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
@@ -42,8 +41,23 @@ fun fromHTML(s: String): Spanned {
 fun signedToString(x: Int): String = if(x>0) "+$x" else "$x"
 
 
+fun ImageButton.on() {
+    animate().alpha(1f).setDuration(500).start()
+}
+fun ImageButton.off() {
+    animate().alpha(.5f).setDuration(500).start()
+}
+fun ImageButton.enable() {
+    on()
+    isEnabled = true
+}
+fun ImageButton.disable() {
+    isEnabled = false
+    off()
+}
+
 class SharedReloadButton(private val button: ImageButton) {
-    private val current = TreeSet<String>()
+    private val current = mutableSetOf<String>()
 
     fun startReload(tag: String) {
         if(current.contains(tag)) throw Exception("$tag already started")
@@ -60,18 +74,6 @@ class SharedReloadButton(private val button: ImageButton) {
 
 open class SettingsDataStore(context: Context, name: String) {
     protected val dataStore by lazy { context.createDataStore(name = name) }
-}
-
-
-fun ImageButton.on() { alpha = 1f }
-fun ImageButton.off() { alpha = 0.5f }
-fun ImageButton.enable() {
-    on()
-    isEnabled = true
-}
-fun ImageButton.disable() {
-    isEnabled = false
-    off()
 }
 
 
