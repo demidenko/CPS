@@ -47,19 +47,31 @@ class SharedReloadButton(private val button: ImageButton) {
 
     fun startReload(tag: String) {
         if(current.contains(tag)) throw Exception("$tag already started")
-        if(current.isEmpty()) button.isEnabled = false
+        if(current.isEmpty()) button.disable()
         current.add(tag);
     }
 
     fun stopReload(tag: String) {
         if(!current.contains(tag)) throw Exception("$tag not started to be stopped")
         current.remove(tag)
-        if(current.isEmpty()) button.isEnabled = true
+        if(current.isEmpty()) button.enable()
     }
 }
 
 open class SettingsDataStore(context: Context, name: String) {
     protected val dataStore by lazy { context.createDataStore(name = name) }
+}
+
+
+fun ImageButton.on() { alpha = 1f }
+fun ImageButton.off() { alpha = 0.5f }
+fun ImageButton.enable() {
+    on()
+    isEnabled = true
+}
+fun ImageButton.disable() {
+    isEnabled = false
+    off()
 }
 
 

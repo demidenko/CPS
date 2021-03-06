@@ -17,6 +17,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
+import com.example.test3.utils.off
+import com.example.test3.utils.on
 import com.example.test3.workers.WorkersCenter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
@@ -132,7 +134,7 @@ class MainActivity : AppCompatActivity(){
                         }
                     }
                     settingsUI.useRealColorsLiveData.observe(this@MainActivity){ use ->
-                        alpha = if(use) 1f else 0.5f
+                        if(use) on() else off()
                     }
                 }
 
@@ -144,7 +146,7 @@ class MainActivity : AppCompatActivity(){
                         }
                     }
                     settingsUI.useStatusBarLiveData.observe(this@MainActivity){ use ->
-                        alpha = if(use) 1f else 0.5f
+                        if(use) on() else off()
                     }
                 }
 

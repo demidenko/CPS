@@ -233,9 +233,9 @@ class NewsFragment : CPSFragment() {
 
     private fun updateLostInfo() {
         lifecycleScope.launch {
-            updateLostInfoButton.isEnabled = false
+            updateLostInfoButton.disable()
             CodeforcesNewsLostRecentWorker.updateInfo(mainActivity, BottomProgressInfo("update info of lost", mainActivity))
-            updateLostInfoButton.isEnabled = true
+            updateLostInfoButton.enable()
 
             codeforcesNewsAdapter.indexOf(CodeforcesTitle.LOST).takeIf { it!=-1 }
                 ?.let { index ->

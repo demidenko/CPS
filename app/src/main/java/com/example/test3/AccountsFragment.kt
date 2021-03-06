@@ -14,6 +14,8 @@ import com.example.test3.account_manager.*
 import com.example.test3.account_view.*
 import com.example.test3.utils.CListUtils
 import com.example.test3.utils.SharedReloadButton
+import com.example.test3.utils.disable
+import com.example.test3.utils.enable
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.*
 
@@ -150,7 +152,7 @@ class AccountsFragment: CPSFragment() {
         lifecycleScope.launch {
             val clistUserInfo = mainActivity.chooseUserID(CListAccountManager(mainActivity)) as? CListAccountManager.CListUserInfo ?: return@launch
 
-            addAccountButton.isEnabled = false
+            addAccountButton.disable()
 
             val supported = clistUserInfo.accounts.mapNotNull { (resource, userData) ->
                 CListUtils.getManager(resource, userData.first, userData.second, mainActivity)
@@ -171,7 +173,7 @@ class AccountsFragment: CPSFragment() {
             }.awaitAll()
 
             progressInfo.finish()
-            addAccountButton.isEnabled = true
+            addAccountButton.enable()
         }
     }
 

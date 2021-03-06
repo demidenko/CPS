@@ -15,6 +15,8 @@ import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.CodeforcesUtils
+import com.example.test3.utils.disable
+import com.example.test3.utils.enable
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -56,9 +58,9 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
                     mainActivity.accountsFragment.codeforcesAccountManager
                 ) as? CodeforcesAccountManager.CodeforcesUserInfo ?: return@launch
 
-                buttonAdd.isEnabled = false
+                buttonAdd.disable()
                 followListAdapter.add(userInfo)
-                buttonAdd.isEnabled = true
+                buttonAdd.enable()
                 followListView.scrollToPosition(0)
             }
 
