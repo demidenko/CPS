@@ -1,6 +1,7 @@
 package com.example.test3.room
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.test3.utils.CodeforcesUtils
 
@@ -27,6 +28,9 @@ interface LostBlogsDao{
 
     @Query("SELECT * FROM $lostBlogsTableName where isSuspect = 0")
     suspend fun getLost(): List<LostBlogEntry>
+
+    @Query("SELECT * FROM $lostBlogsTableName where isSuspect = 0")
+    fun getLostLiveData(): LiveData<List<LostBlogEntry>>
 
     @Query("SELECT * FROM $lostBlogsTableName where isSuspect = 1")
     suspend fun getSuspects(): List<LostBlogEntry>

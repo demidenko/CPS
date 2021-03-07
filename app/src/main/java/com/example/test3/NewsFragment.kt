@@ -207,6 +207,7 @@ class NewsFragment : CPSFragment() {
         tab: TabLayout.Tab,
         lang: String
     ) {
+        if(fragment.isAutoUpdatable) return
         sharedReloadButton.startReload(fragment.title.name)
         tab.text = "..."
         fragment.startReload()
@@ -241,15 +242,7 @@ class NewsFragment : CPSFragment() {
             updateLostInfoButton.disable()
             CodeforcesNewsLostRecentWorker.updateInfo(mainActivity, BottomProgressInfo("update info of lost", mainActivity))
             updateLostInfoButton.enable()
-
-            codeforcesNewsAdapter.indexOf(CodeforcesTitle.LOST).takeIf { it!=-1 }
-                ?.let { index ->
-                    val tab = tabLayout.getTabAt(index) ?: return@let
-                    val fragment = codeforcesNewsAdapter.fragments[index]
-                    reloadFragment(fragment, tab, "")
-                }
         }
-
     }
 
     fun showSettingsNews(){
@@ -417,10 +410,12 @@ class CodeforcesNewsFragment: Fragment() {
     private val swipeRefreshLayout: SwipeRefreshLayout by lazy { requireView().findViewById(R.id.cf_news_page_swipe_refresh_layout) }
 
     fun startReload() {
+        if(isAutoUpdatable) return
         swipeRefreshLayout.isRefreshing = true
     }
 
     fun stopReload() {
+        if(isAutoUpdatable) return
         swipeRefreshLayout.isRefreshing = false
     }
 
@@ -437,10 +432,20 @@ class CodeforcesNewsFragment: Fragment() {
             setHasFixedSize(true)
         }
 
-        swipeRefreshLayout.apply {
-            setOnRefreshListener { callReload() }
-            setProgressBackgroundColorSchemeResource(R.color.textColor)
-            setColorSchemeResources(R.color.colorAccent)
+        if(isAutoUpdatable){
+            swipeRefreshLayout.isEnabled = false
+            (viewAdapter as? CodeforcesNewsItemsLostRecentAdapter)?.subscribeLiveData(this){
+                lifecycleScope.launch {
+                    manageNewEntries()
+                    showItems()
+                }
+            }
+        } else {
+            swipeRefreshLayout.apply {
+                setOnRefreshListener { callReload() }
+                setProgressBackgroundColorSchemeResource(R.color.textColor)
+                setColorSchemeResources(R.color.colorAccent)
+            }
         }
 
         subscribeNewEntries()
@@ -951,10 +956,13 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 }
 
 class CodeforcesNewsItemsLostRecentAdapter : CodeforcesNewsItemsClassicAdapter() {
-    override suspend fun parseData(s: String): Boolean {
-        val blogs = getLostBlogsDao(activity).getLost()
+    override suspend fun parseData(s: String) = true
 
-        if(blogs.isNotEmpty()){
+    fun subscribeLiveData(
+        fragment: CodeforcesNewsFragment,
+        dataReadyCallback: () -> Unit
+    ) {
+        getLostBlogsDao(fragment.requireContext()).getLostLiveData().observe(fragment.viewLifecycleOwner){ blogs ->
             val currentTimeSeconds = getCurrentTimeSeconds()
             rows = blogs
                 .sortedByDescending { it.timeStamp }
@@ -969,9 +977,9 @@ class CodeforcesNewsItemsLostRecentAdapter : CodeforcesNewsItemsClassicAdapter()
                         rating = ""
                     )
                 }.toTypedArray()
-        }
 
-        return true
+            dataReadyCallback()
+        }
     }
 }
 
