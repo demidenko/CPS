@@ -10,6 +10,7 @@
 
     <color name="colorAccent">@android:color/holo_blue_dark</color>
     <color name="reload_fail">@color/fail</color>
+    <color name="badgeColor">@android:color/holo_green_light</color>
     <color name="blog_rating_positive">@color/success</color>
     <color name="blog_rating_negative">#969696</color>
     <color name="blog_time">@color/textColorAdditional</color>

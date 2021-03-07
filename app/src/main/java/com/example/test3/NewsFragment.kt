@@ -137,7 +137,7 @@ class NewsFragment : CPSFragment() {
         cpsTitle = "::news"
         setBottomPanelId(R.id.support_navigation_news)
 
-        val badgeColor = getColorFromResource(mainActivity, android.R.color.holo_green_light)
+        val badgeColor = getColorFromResource(mainActivity, R.color.badgeColor)
 
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
             val fragment = codeforcesNewsAdapter.fragments[position]
@@ -443,23 +443,7 @@ class CodeforcesNewsFragment: Fragment() {
             setColorSchemeResources(R.color.colorAccent)
         }
 
-        if(isManagesNewEntries){
-            (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.getNewEntriesCountLiveData()?.observe(viewLifecycleOwner){ count ->
-                val tab = newsFragment.getTab(title) ?: return@observe
-                if (count == 0) {
-                    tab.badge?.apply {
-                        isVisible = false
-                        clearNumber()
-                    }
-                } else {
-                    tab.badge?.apply {
-                        number = count
-                        isVisible = true
-                    }
-                    if (tab.isSelected) lifecycleScope.launch { saveEntries() }
-                }
-            }
-        }
+        subscribeNewEntries()
 
         callReload()
     }
@@ -470,6 +454,7 @@ class CodeforcesNewsFragment: Fragment() {
         val source =
             if(pageName.startsWith('/')) CodeforcesAPI.getPageSource(pageName.substring(1), lang) ?: return false
             else ""
+
         if(!viewAdapter.parseData(source)) return false
 
         (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.clearNewEntries()
@@ -481,7 +466,6 @@ class CodeforcesNewsFragment: Fragment() {
 
     private suspend fun manageNewEntries() {
         if(!isManagesNewEntries) return
-
         val savedBlogs = newsFragment.viewedDataStore.getBlogsViewed(title)
         val newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.map { it.toInt() }
         (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.addNewEntries(newBlogs)
@@ -493,9 +477,26 @@ class CodeforcesNewsFragment: Fragment() {
         newsFragment.viewedDataStore.setBlogsViewed(title, toSave)
     }
 
-    fun refresh(){
-        viewAdapter.refresh()
+    private fun subscribeNewEntries() {
+        if(!isManagesNewEntries) return
+        (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.getNewEntriesCountLiveData()?.observe(viewLifecycleOwner){ count ->
+            val tab = newsFragment.getTab(title) ?: return@observe
+            if (count == 0) {
+                tab.badge?.apply {
+                    isVisible = false
+                    clearNumber()
+                }
+            } else {
+                tab.badge?.apply {
+                    number = count
+                    isVisible = true
+                }
+                if (tab.isSelected) lifecycleScope.launch { saveEntries() }
+            }
+        }
     }
+
+    fun refresh() = viewAdapter.refresh()
 
 }
 
