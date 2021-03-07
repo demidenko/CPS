@@ -370,26 +370,36 @@ class CodeforcesNewsFragment: Fragment() {
     val title: CodeforcesTitle by lazy { CodeforcesTitle.valueOf(requireArguments().getString(keyTitle)!!) }
     val pageName: String by lazy { requireArguments().getString(keyPageName)!! }
     val isManagesNewEntries: Boolean by lazy { requireArguments().getBoolean(keyEntries) }
+    val isAutoUpdatable: Boolean by lazy { requireArguments().getBoolean(keyAutoUpdate) }
     val viewAdapter: CodeforcesNewsItemsAdapter by lazy { CodeforcesNewsItemsAdapter.getFromType(requireArguments().getInt(keyAdapter)) }
 
     companion object {
         private const val keyTitle = "cf_news_title"
         private const val keyPageName = "cf_news_page_name"
         private const val keyEntries = "cf_news_entries"
+        private const val keyAutoUpdate = "cf_news_auto_update"
         private const val keyAdapter = "cf_news_adapter"
         fun createInstance(title: CodeforcesTitle): CodeforcesNewsFragment {
-            val (pageName, isManagesNewEntries, viewAdapterType) =
-            when (title) {
-                CodeforcesTitle.MAIN -> Triple("/", true, CodeforcesNewsItemsAdapter.typeClassic)
-                CodeforcesTitle.TOP -> Triple("/top", false, CodeforcesNewsItemsAdapter.typeClassic)
-                CodeforcesTitle.RECENT -> Triple("/recent-actions", false, CodeforcesNewsItemsAdapter.typeRecent)
-                CodeforcesTitle.LOST -> Triple("", true, CodeforcesNewsItemsAdapter.typeLost)
+            return when (title) {
+                CodeforcesTitle.MAIN -> createInstance(title, "/", CodeforcesNewsItemsAdapter.typeClassic, isManagesNewEntries = true, isAutoUpdatable = false)
+                CodeforcesTitle.TOP -> createInstance(title, "/top", CodeforcesNewsItemsAdapter.typeClassic, isManagesNewEntries = false, isAutoUpdatable = false)
+                CodeforcesTitle.RECENT -> createInstance(title, "/recent-actions", CodeforcesNewsItemsAdapter.typeRecent, isManagesNewEntries = false, isAutoUpdatable = false)
+                CodeforcesTitle.LOST -> createInstance(title, "", CodeforcesNewsItemsAdapter.typeLost, isManagesNewEntries = true, isAutoUpdatable = true)
             }
+        }
+        private fun createInstance(
+            title: CodeforcesTitle,
+            pageName: String,
+            viewAdapterType: Int,
+            isManagesNewEntries: Boolean,
+            isAutoUpdatable: Boolean
+        ): CodeforcesNewsFragment {
             return CodeforcesNewsFragment().apply {
                 arguments = Bundle().apply {
                     putString(keyTitle, title.name)
                     putString(keyPageName, pageName)
                     putBoolean(keyEntries, isManagesNewEntries)
+                    putBoolean(keyAutoUpdate, isAutoUpdatable)
                     putInt(keyAdapter, viewAdapterType)
                 }
             }
