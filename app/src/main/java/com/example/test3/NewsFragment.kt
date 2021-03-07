@@ -14,6 +14,7 @@ import androidx.core.text.color
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -91,13 +92,10 @@ class NewsFragment : CPSFragment() {
         override fun onTabReselected(tab: TabLayout.Tab?) {}
 
         override fun onTabUnselected(tab: TabLayout.Tab?) {
-            tab?.run{
+            tab?.run {
                 val fragment = codeforcesNewsAdapter.fragments[position]
-                if(fragment.isManagesNewEntries) badge?.run{
-                    if(hasNumber()){
-                        isVisible = false
-                        clearNumber()
-                    }
+                if(fragment.isManagesNewEntries) badge?.run {
+                    if(hasNumber()) isVisible = false
                 }
 
                 codeforcesNewsAdapter.makeGONE(fragment.title)
@@ -105,10 +103,11 @@ class NewsFragment : CPSFragment() {
         }
 
         override fun onTabSelected(tab: TabLayout.Tab?) {
-            tab?.run{
+            tab?.run {
                 val fragment = codeforcesNewsAdapter.fragments[position]
-                if(fragment.isManagesNewEntries) badge?.run{
+                if(fragment.isManagesNewEntries) badge?.run {
                     if(hasNumber()){
+                        isVisible = true
                         lifecycleScope.launch {
                             fragment.saveEntries()
                         }
@@ -213,7 +212,6 @@ class NewsFragment : CPSFragment() {
         fragment.startReload()
         if(fragment.reload(lang)) {
             tab.text = fragment.title.name
-            fragment.showNewEntries(tab)
         }else{
             tab.text = SpannableStringBuilder().color(failColor) { append(fragment.title.name) }
         }
@@ -225,6 +223,11 @@ class NewsFragment : CPSFragment() {
         val index = codeforcesNewsAdapter.fragments.indexOf(fragment)
         val tab = tabLayout.getTabAt(index) ?: return
         reloadFragment(fragment, tab, getCodeforcesContentLanguage(mainActivity))
+    }
+
+    fun getTab(title: CodeforcesTitle): TabLayout.Tab? {
+        val index = codeforcesNewsAdapter.indexOf(title)
+        return tabLayout.getTabAt(index)
     }
 
 
@@ -430,6 +433,24 @@ class CodeforcesNewsFragment: Fragment() {
             setColorSchemeResources(R.color.colorAccent)
         }
 
+        if(isManagesNewEntries){
+            (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.getNewEntriesCountLiveData()?.observe(viewLifecycleOwner){ count ->
+                val tab = newsFragment.getTab(title) ?: return@observe
+                if (count == 0) {
+                    tab.badge?.apply {
+                        isVisible = false
+                        clearNumber()
+                    }
+                } else {
+                    tab.badge?.apply {
+                        number = count
+                        isVisible = true
+                    }
+                    if (tab.isSelected) lifecycleScope.launch { saveEntries() }
+                }
+            }
+        }
+
         callReload()
     }
 
@@ -441,30 +462,19 @@ class CodeforcesNewsFragment: Fragment() {
             else ""
         if(!viewAdapter.parseData(source)) return false
 
+        (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.clearNewEntries()
+        manageNewEntries()
         showItems()
 
         return true
     }
 
-    suspend fun showNewEntries(tab: TabLayout.Tab){
+    private suspend fun manageNewEntries() {
         if(!isManagesNewEntries) return
 
         val savedBlogs = newsFragment.viewedDataStore.getBlogsViewed(title)
         val newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.map { it.toInt() }
-        (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.markNewEntries(newBlogs)
-
-        if (newBlogs.isEmpty()) {
-            tab.badge?.apply {
-                isVisible = false
-                clearNumber()
-            }
-        } else {
-            tab.badge?.apply {
-                number = newBlogs.size
-                isVisible = true
-            }
-            if (tab.isSelected) saveEntries()
-        }
+        (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.addNewEntries(newBlogs)
     }
 
     suspend fun saveEntries() {
@@ -521,8 +531,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
         val authorColorTag: CodeforcesUtils.ColorTag,
         val time: String,
         val comments: String,
-        val rating: String,
-        var isNew: Boolean = false
+        val rating: String
     )
 
     override suspend fun parseData(s: String): Boolean {
@@ -585,6 +594,11 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
     override fun getItemCount() = rows.size
 
 
+    private val newEntries = MutableSetLiveSize<Int>()
+    fun getNewEntriesCountLiveData() = newEntries.size
+    fun addNewEntries(entries: Collection<Int>) = newEntries.addAll(entries)
+    fun clearNewEntries() = newEntries.clear()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesNewsItemViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_item, parent, false) as ConstraintLayout
         return CodeforcesNewsItemViewHolder(view)
@@ -594,10 +608,11 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
         with(holder as CodeforcesNewsItemViewHolder){
             val info = rows[position]
 
+            val blogId = info.blogId
             view.setOnClickListener {
-                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogId)))
-                if(info.isNew){
-                    info.isNew = false
+                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(blogId)))
+                if(newEntries.contains(blogId)){
+                    newEntries.remove(blogId)
                     notifyItemChanged(position)
                 }
             }
@@ -615,7 +630,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
             time.text = timeRUtoEN(info.time)
 
-            newEntryIndicator.visibility = if(info.isNew) View.VISIBLE else View.GONE
+            newEntryIndicator.visibility = if(newEntries.contains(blogId)) View.VISIBLE else View.GONE
 
             comments.text = info.comments
             commentsIcon.visibility = if(info.comments.isEmpty()) View.INVISIBLE else View.VISIBLE
@@ -632,15 +647,6 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
     override fun getBlogIDs(): List<String> = rows.map { it.blogId.toString() }
 
-    fun markNewEntries(newBlogs: Collection<Int>){
-        rows.forEachIndexed { index, info ->
-            val isNew = info.blogId in newBlogs
-            if(rows[index].isNew != isNew){
-                rows[index].isNew = isNew
-                notifyItemChanged(index)
-            }
-        }
-    }
 
     private fun addToFollowListWithSnackBar(holder: CodeforcesNewsItemViewHolder){
         activity.newsFragment.lifecycleScope.launch {
@@ -659,6 +665,24 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
                 }
             }.setAnchorView(activity.navigation).show()
         }
+    }
+}
+
+class MutableSetLiveSize<T>() {
+    private val s = mutableSetOf<T>()
+    val size by lazy { MutableLiveData<Int>(0) }
+    fun contains(element: T) = s.contains(element)
+    fun addAll(elements: Collection<T>) {
+        s.addAll(elements)
+        size.value = s.size
+    }
+    fun remove(element: T) {
+        s.remove(element)
+        size.value = s.size
+    }
+    fun clear() {
+        s.clear()
+        size.value = 0
     }
 }
 
