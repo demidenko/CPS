@@ -213,7 +213,7 @@ class NewsFragment : CPSFragment() {
         fragment.startReload()
         if(fragment.reload(lang)) {
             tab.text = fragment.title.name
-            fragment.afterReload(tab)
+            fragment.showNewEntries(tab)
         }else{
             tab.text = SpannableStringBuilder().color(failColor) { append(fragment.title.name) }
         }
@@ -446,15 +446,14 @@ class CodeforcesNewsFragment: Fragment() {
         return true
     }
 
-    private var newBlogs = hashSetOf<String>()
-
-    suspend fun afterReload(tab: TabLayout.Tab){
+    suspend fun showNewEntries(tab: TabLayout.Tab){
         if(!isManagesNewEntries) return
 
         val savedBlogs = newsFragment.viewedDataStore.getBlogsViewed(title)
-        newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.toHashSet()
+        val newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.map { it.toInt() }
+        (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.markNewEntries(newBlogs)
 
-        if (newBlogs.size == 0) {
+        if (newBlogs.isEmpty()) {
             tab.badge?.apply {
                 isVisible = false
                 clearNumber()
@@ -472,7 +471,6 @@ class CodeforcesNewsFragment: Fragment() {
         if(!isManagesNewEntries) return
         val toSave = viewAdapter.getBlogIDs().toSet()
         newsFragment.viewedDataStore.setBlogsViewed(title, toSave)
-        (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.markNewEntries(newBlogs)
     }
 
     fun refresh(){
@@ -634,9 +632,9 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
     override fun getBlogIDs(): List<String> = rows.map { it.blogId.toString() }
 
-    fun markNewEntries(newBlogs: HashSet<String>){
+    fun markNewEntries(newBlogs: Collection<Int>){
         rows.forEachIndexed { index, info ->
-            val isNew = info.blogId.toString() in newBlogs
+            val isNew = info.blogId in newBlogs
             if(rows[index].isNew != isNew){
                 rows[index].isNew = isNew
                 notifyItemChanged(index)
