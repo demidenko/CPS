@@ -98,7 +98,7 @@ class NewsFragment : CPSFragment() {
                     if(hasNumber()) isVisible = false
                 }
 
-                codeforcesNewsAdapter.makeGONE(fragment.title)
+                codeforcesNewsAdapter.hideSupportButtons(fragment.title)
             }
         }
 
@@ -114,7 +114,7 @@ class NewsFragment : CPSFragment() {
                     }
                 }
 
-                codeforcesNewsAdapter.makeVISIBLE(fragment.title)
+                codeforcesNewsAdapter.showSupportButtons(fragment.title)
 
                 val subtitle = "::news.codeforces.${fragment.title.name.toLowerCase(Locale.ENGLISH)}"
                 cpsTitle = subtitle
@@ -351,14 +351,14 @@ class CodeforcesNewsAdapter(
         }
     }
 
-    fun makeGONE(title: CodeforcesTitle) {
+    fun hideSupportButtons(title: CodeforcesTitle) {
         tabButtons[title]?.forEach { button ->
             buttonVisibility[button.id] = button.visibility
             button.visibility = View.GONE
         }
     }
 
-    fun makeVISIBLE(title: CodeforcesTitle) {
+    fun showSupportButtons(title: CodeforcesTitle) {
         tabButtons[title]?.forEach { button ->
             button.visibility = buttonVisibility[button.id]!!
         }
@@ -503,9 +503,12 @@ abstract class CodeforcesNewsItemsAdapter: RecyclerView.Adapter<RecyclerView.Vie
         this.recyclerView = recyclerView
     }
 
-    open fun refresh(){
+
+    fun refresh(){
+        beforeRefresh()
         notifyDataSetChanged()
     }
+    open fun beforeRefresh() { }
 
     companion object {
         const val typeClassic = 0
@@ -715,12 +718,11 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         }
     }
 
-    override fun refresh() {
+    override fun beforeRefresh() {
         showHeader()
         rows.forEachIndexed { index, blogInfo ->
             rows[index].commentators = calculateCommentatorsSpans(blogInfo.blogId)
         }
-        super.refresh()
     }
 
     override suspend fun parseData(s: String): Boolean {
