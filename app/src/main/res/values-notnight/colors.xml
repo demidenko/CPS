@@ -3,9 +3,13 @@
     <color name="textColor">#131313</color>
     <color name="textColorAdditional">#565656</color>
 
-    <color name="background">#F0F0F0</color>
+    <color name="background">#F8F8F8</color>
     <color name="backgroundAdditional">#E0E0E0</color>
     <color name="navigation_background">#FFFFFF</color>
     <color name="navigation_divider_color">#555555</color>
 
+    <color name="success">#008000</color>
+
+    <color name="blog_rating_positive">@color/success</color>
+    <color name="blog_rating_negative">#808080</color>
 </resources>

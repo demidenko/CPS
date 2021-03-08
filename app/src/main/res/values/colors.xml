@@ -8,6 +8,7 @@
     <color name="background">#121212</color>
     <color name="backgroundAdditional">#222222</color>
     <color name="navigation_background">#000000</color>
+    <color name="navigation_divider_color">#555555</color>
 
     <color name="success">#3C963C</color>
     <color name="fail">#C84040</color>
@@ -17,5 +18,4 @@
     <color name="blog_rating_positive">@color/success</color>
     <color name="blog_rating_negative">#969696</color>
     <color name="blog_time">@color/textColorAdditional</color>
-    <color name="navigation_divider_color">#555555</color>
 </resources>
