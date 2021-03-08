@@ -2,8 +2,8 @@
 <resources>
     <color name="colorAccent">#1565C0</color>
 
-    <color name="textColor">#080808</color>
-    <color name="textColorAdditional">#565656</color>
+    <color name="textColor">#272727</color>
+    <color name="textColorAdditional">#858585</color>
 
     <color name="background">#F8F8F8</color>
     <color name="backgroundAdditional">#E6E6E6</color>
