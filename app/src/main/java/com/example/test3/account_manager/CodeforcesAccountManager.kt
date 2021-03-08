@@ -10,7 +10,7 @@ import androidx.core.text.set
 import androidx.datastore.preferences.core.*
 import com.example.test3.NotificationChannels
 import com.example.test3.NotificationIDs
-import com.example.test3.SettingsDelegate
+import com.example.test3.ui.SettingsDelegate
 import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first

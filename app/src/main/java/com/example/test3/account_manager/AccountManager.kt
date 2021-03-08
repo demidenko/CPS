@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.asLiveData
 import com.example.test3.*
+import com.example.test3.ui.getUseRealColors
 import com.example.test3.utils.AtCoderRatingChange
 import com.example.test3.utils.CodeforcesRatingChange
 import com.example.test3.utils.SettingsDataStore

@@ -5,6 +5,8 @@ import android.view.*
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.*
 import com.example.test3.ui.CPSFragment
+import com.example.test3.ui.observeUpdates
+import com.example.test3.ui.settingsUI
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 

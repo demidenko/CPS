@@ -2,7 +2,6 @@ package com.example.test3
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -14,12 +13,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
-import com.example.test3.ui.CPSFragmentManager
+import com.example.test3.ui.*
 import com.example.test3.utils.off
 import com.example.test3.utils.on
 import com.example.test3.workers.WorkersCenter
@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity(){
 
         setContentView(R.layout.activity_main)
 
+        setupDarkLight()
         setupActionBar()
         setActionBarTitle("Competitive Programming && Solving")
         savedInstanceState?.let {
@@ -118,11 +119,6 @@ class MainActivity : AppCompatActivity(){
 
 
     private fun setupActionBar(){
-        when(resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK)) {
-            Configuration.UI_MODE_NIGHT_NO -> setLightBars()
-            Configuration.UI_MODE_NIGHT_YES -> setDarkBars()
-        }
-
         supportActionBar?.run {
             setDisplayShowCustomEnabled(true)
             setDisplayShowTitleEnabled(false)
@@ -160,6 +156,23 @@ class MainActivity : AppCompatActivity(){
                     }
                 }
 
+                findViewById<ImageButton>(R.id.button_dark_light)?.apply {
+                    setOnClickListener {
+                        runBlocking {
+                            when(settingsUI.getDarkLightMode()){
+                                SettingsUI.DarkLightMode.DARK -> {
+                                    settingsUI.setDarkLightMode(SettingsUI.DarkLightMode.LIGHT)
+                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                                }
+                                SettingsUI.DarkLightMode.LIGHT -> {
+                                    settingsUI.setDarkLightMode(SettingsUI.DarkLightMode.DARK)
+                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                                }
+                            }
+                        }
+                    }
+                }
+
                 findViewById<ImageButton>(R.id.button_recreate_app)?.apply {
                     setOnClickListener { recreate() }
                     settingsDev.getDevEnabledLiveData().observe(this@MainActivity){ enabled ->
@@ -171,7 +184,21 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
-    private fun setLightBars() {
+    private fun setupDarkLight() {
+        /*when(resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK)) {
+            Configuration.UI_MODE_NIGHT_NO -> setLightBars()
+            Configuration.UI_MODE_NIGHT_YES -> setDarkBars()
+        }*/
+        val current = runBlocking {
+            settingsUI.getDarkLightMode()
+        }
+        when(current){
+            SettingsUI.DarkLightMode.DARK -> setDarkModeBars()
+            SettingsUI.DarkLightMode.LIGHT -> setLightModeBars()
+        }
+    }
+
+    private fun setDarkModeBars() {
         window.navigationBarColor = getColorFromResource(this, R.color.navigation_background)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             window.insetsController?.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
@@ -188,7 +215,7 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
-    private fun setDarkBars() {
+    private fun setLightModeBars() {
         window.navigationBarColor = getColorFromResource(this, R.color.navigation_background)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             window.insetsController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)

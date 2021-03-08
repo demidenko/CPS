@@ -1,12 +1,14 @@
-package com.example.test3
+package com.example.test3.ui
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
+import com.example.test3.MainActivity
 import com.example.test3.utils.SettingsDataStore
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -30,6 +32,7 @@ class SettingsUI(context: Context): SettingsDataStore(context, "settings_ui") {
 
     private val KEY_USE_REAL_COLORS = booleanPreferencesKey("use_real_colors")
     private val KEY_USE_STATUS_BAR = booleanPreferencesKey("use_status_bar")
+    private val KEY_DARK_LIGHT_MODE = stringPreferencesKey("dark_light_mode")
 
     private val useRealColorsFlow = dataStore.data.map { it[KEY_USE_REAL_COLORS] ?: false }
     val useRealColorsLiveData = useRealColorsFlow.distinctUntilChanged().asLiveData()
@@ -43,6 +46,14 @@ class SettingsUI(context: Context): SettingsDataStore(context, "settings_ui") {
     suspend fun getUseStatusBar() = useStatusBar.first()
     suspend fun setUseStatusBar(use: Boolean) {
         dataStore.edit { it[KEY_USE_STATUS_BAR] = use }
+    }
+
+    enum class DarkLightMode { DARK, LIGHT, /*AUTO*/ }
+    private val darkLightMode = dataStore.data.map { it[KEY_DARK_LIGHT_MODE]?.let { DarkLightMode.valueOf(it) } ?: DarkLightMode.DARK }
+    val darkLightModeLiveData = darkLightMode.distinctUntilChanged().asLiveData()
+    suspend fun getDarkLightMode() = darkLightMode.first()
+    suspend fun setDarkLightMode(mode: DarkLightMode) {
+        dataStore.edit { it[KEY_DARK_LIGHT_MODE] = mode.name }
     }
 }
 

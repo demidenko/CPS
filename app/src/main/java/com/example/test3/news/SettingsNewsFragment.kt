@@ -16,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.test3.ui.CPSFragment
 import com.example.test3.CodeforcesTitle
 import com.example.test3.R
-import com.example.test3.SettingsDelegate
+import com.example.test3.ui.SettingsDelegate
 import com.example.test3.utils.*
 import com.example.test3.workers.WorkersCenter
 import com.example.test3.workers.WorkersNames

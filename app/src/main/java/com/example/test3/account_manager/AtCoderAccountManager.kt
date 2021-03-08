@@ -12,7 +12,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.test3.NotificationChannels
 import com.example.test3.NotificationIDs
-import com.example.test3.SettingsDelegate
+import com.example.test3.ui.SettingsDelegate
 import com.example.test3.utils.AtCoderAPI
 import com.example.test3.utils.AtCoderRatingChange
 import com.example.test3.utils.AtCoderURLFactory

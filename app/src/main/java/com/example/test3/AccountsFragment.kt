@@ -14,6 +14,8 @@ import com.example.test3.account_manager.*
 import com.example.test3.account_view.*
 import com.example.test3.ui.BottomProgressInfo
 import com.example.test3.ui.CPSFragment
+import com.example.test3.ui.observeUpdates
+import com.example.test3.ui.settingsUI
 import com.example.test3.utils.CListUtils
 import com.example.test3.utils.SharedReloadButton
 import com.example.test3.utils.disable

@@ -28,6 +28,8 @@ import com.example.test3.news.settingsNews
 import com.example.test3.room.getLostBlogsDao
 import com.example.test3.ui.BottomProgressInfo
 import com.example.test3.ui.CPSFragment
+import com.example.test3.ui.observeUpdates
+import com.example.test3.ui.settingsUI
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.example.test3.workers.CodeforcesNewsLostRecentWorker
