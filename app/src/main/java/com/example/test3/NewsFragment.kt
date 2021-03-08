@@ -137,7 +137,7 @@ class NewsFragment : CPSFragment() {
         cpsTitle = "::news"
         setBottomPanelId(R.id.support_navigation_news)
 
-        val badgeColor = getColorFromResource(mainActivity, R.color.badgeColor)
+        val badgeColor = getColorFromResource(mainActivity, R.color.newEntryColor)
 
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
             val fragment = codeforcesNewsAdapter.fragments[position]
