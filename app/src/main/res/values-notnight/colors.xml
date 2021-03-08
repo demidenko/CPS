@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="textColor">#131313</color>
+    <color name="textColorAdditional">#565656</color>
+
+    <color name="background">#EEEEEE</color>
+    <color name="navigation_background">#FFFFFF</color>
 
 </resources>
