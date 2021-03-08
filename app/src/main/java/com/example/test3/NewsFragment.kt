@@ -201,7 +201,7 @@ class NewsFragment : CPSFragment() {
 
     private val reloadButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_news_reload) }
     private val sharedReloadButton by lazy { SharedReloadButton(reloadButton) }
-    private val failColor by lazy { getColorFromResource(mainActivity, R.color.reload_fail) }
+    private val failColor by lazy { getColorFromResource(mainActivity, R.color.fail) }
     private suspend fun reloadFragment(
         fragment: CodeforcesNewsFragment,
         tab: TabLayout.Tab,

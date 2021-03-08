@@ -126,7 +126,7 @@ abstract class AccountPanel(
             }.start()
         }else{
             reloadButton.clearAnimation()
-            reloadButton.setColorFilter(getColorFromResource(mainActivity, R.color.reload_fail))
+            reloadButton.setColorFilter(getColorFromResource(mainActivity, R.color.fail))
         }
 
         unblock()

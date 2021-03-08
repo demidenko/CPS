@@ -13,7 +13,6 @@
     <color name="success">#008000</color>
     <color name="fail">#DD2222</color>
 
-    <color name="reload_fail">@color/fail</color>
     <color name="newEntryColor">@android:color/holo_green_dark</color>
     <color name="blog_rating_positive">@color/success</color>
     <color name="blog_rating_negative">#808080</color>
