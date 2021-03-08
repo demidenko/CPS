@@ -3,7 +3,9 @@
     <color name="textColor">#131313</color>
     <color name="textColorAdditional">#565656</color>
 
-    <color name="background">#EEEEEE</color>
+    <color name="background">#F0F0F0</color>
+    <color name="backgroundAdditional">#E0E0E0</color>
     <color name="navigation_background">#FFFFFF</color>
+    <color name="navigation_divider_color">#555555</color>
 
 </resources>

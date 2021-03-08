@@ -88,7 +88,7 @@
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="#555555"
+            android:background="@color/navigation_divider_color"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             />
@@ -104,6 +104,7 @@
             android:background="@color/navigation_background"
             app:itemIconTint="@color/bottom_view_color"
             app:labelVisibilityMode="unlabeled"
+            app:elevation="0dp"
 
             app:menu="@menu/navigation_bar"
             />
