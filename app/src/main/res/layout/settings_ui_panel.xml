@@ -49,7 +49,7 @@
             style="@style/CPSImageButton" />
 
         <ImageButton
-            android:id="@+id/button_dark_light"
+            android:id="@+id/button_ui_mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_day_night"

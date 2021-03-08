@@ -1,6 +1,10 @@
 package com.example.test3.ui
 
 import android.content.Context
+import android.content.res.Configuration
+import android.view.View
+import android.view.WindowInsetsController
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -9,6 +13,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import com.example.test3.MainActivity
+import com.example.test3.R
+import com.example.test3.getColorFromResource
 import com.example.test3.utils.SettingsDataStore
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -28,11 +34,11 @@ fun<T> LiveData<T>.observeUpdates(owner: LifecycleOwner, _onChanged: (T)->Unit){
 }
 
 
-class SettingsUI(context: Context): SettingsDataStore(context, "settings_ui") {
+class SettingsUI(private val context: Context): SettingsDataStore(context, "settings_ui") {
 
     private val KEY_USE_REAL_COLORS = booleanPreferencesKey("use_real_colors")
     private val KEY_USE_STATUS_BAR = booleanPreferencesKey("use_status_bar")
-    private val KEY_DARK_LIGHT_MODE = stringPreferencesKey("dark_light_mode")
+    private val KEY_UI_MODE = stringPreferencesKey("ui_mode")
 
     private val useRealColorsFlow = dataStore.data.map { it[KEY_USE_REAL_COLORS] ?: false }
     val useRealColorsLiveData = useRealColorsFlow.distinctUntilChanged().asLiveData()
@@ -48,12 +54,11 @@ class SettingsUI(context: Context): SettingsDataStore(context, "settings_ui") {
         dataStore.edit { it[KEY_USE_STATUS_BAR] = use }
     }
 
-    enum class DarkLightMode { DARK, LIGHT, /*AUTO*/ }
-    private val darkLightMode = dataStore.data.map { it[KEY_DARK_LIGHT_MODE]?.let { DarkLightMode.valueOf(it) } ?: DarkLightMode.DARK }
-    val darkLightModeLiveData = darkLightMode.distinctUntilChanged().asLiveData()
-    suspend fun getDarkLightMode() = darkLightMode.first()
-    suspend fun setDarkLightMode(mode: DarkLightMode) {
-        dataStore.edit { it[KEY_DARK_LIGHT_MODE] = mode.name }
+
+    private val uiModeFlow = dataStore.data.map { it[KEY_UI_MODE]?.let { UIMode.valueOf(it) } ?: getSystemUIMode(context) }
+    suspend fun getUIMode() = uiModeFlow.first()
+    suspend fun setUIMode(mode: UIMode) {
+        dataStore.edit { it[KEY_UI_MODE] = mode.name }
     }
 }
 
@@ -74,6 +79,67 @@ class SettingsDelegate<T: SettingsDataStore>(
     }
 }
 
-class PanelSettingsUI(val mainActivity: MainActivity){
+enum class UIMode { DARK, LIGHT, /*SYSTEM*/ }
+fun MainActivity.setupUIMode() {
+    when(getUIMode()){
+        UIMode.DARK -> {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            setDarkModeBars()
+        }
+        UIMode.LIGHT -> {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            setLightModeBars()
+        }
+    }
+}
 
+fun MainActivity.getUIMode(): UIMode = runBlocking{ settingsUI.getUIMode() }
+
+fun MainActivity.setUIMode(mode: UIMode) {
+    runBlocking { settingsUI.setUIMode(mode) }
+    when(mode){
+        UIMode.DARK -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        UIMode.LIGHT -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+    }
+}
+
+private fun getSystemUIMode(context: Context): UIMode {
+    return when(context.resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK)) {
+        Configuration.UI_MODE_NIGHT_NO -> UIMode.LIGHT
+        else -> UIMode.DARK
+    }
+}
+
+private fun MainActivity.setLightModeBars() {
+    window.navigationBarColor = getColorFromResource(this, R.color.navigation_background)
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+        window.insetsController?.setSystemBarsAppearance(0.inv(), WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+        window.insetsController?.setSystemBarsAppearance(0.inv(), WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS)
+    } else {
+        var flags = window.decorView.systemUiVisibility
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            flags = flags or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                flags = flags or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            }
+        }
+        window.decorView.systemUiVisibility = flags
+    }
+}
+
+private fun MainActivity.setDarkModeBars() {
+    window.navigationBarColor = getColorFromResource(this, R.color.navigation_background)
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+        window.insetsController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+        window.insetsController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS)
+    } else {
+        var flags = window.decorView.systemUiVisibility
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                flags = flags and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+            }
+        }
+        window.decorView.systemUiVisibility = flags
+    }
 }

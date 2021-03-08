@@ -6,14 +6,12 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.WindowInsetsController
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
@@ -50,7 +48,7 @@ class MainActivity : AppCompatActivity(){
 
         setContentView(R.layout.activity_main)
 
-        setupDarkLight()
+        setupUIMode()
         setupActionBar()
         setActionBarTitle("Competitive Programming && Solving")
         savedInstanceState?.let {
@@ -156,19 +154,11 @@ class MainActivity : AppCompatActivity(){
                     }
                 }
 
-                findViewById<ImageButton>(R.id.button_dark_light)?.apply {
+                findViewById<ImageButton>(R.id.button_ui_mode)?.apply {
                     setOnClickListener {
-                        runBlocking {
-                            when(settingsUI.getDarkLightMode()){
-                                SettingsUI.DarkLightMode.DARK -> {
-                                    settingsUI.setDarkLightMode(SettingsUI.DarkLightMode.LIGHT)
-                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                                }
-                                SettingsUI.DarkLightMode.LIGHT -> {
-                                    settingsUI.setDarkLightMode(SettingsUI.DarkLightMode.DARK)
-                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                                }
-                            }
+                        when(getUIMode()){
+                            UIMode.DARK -> setUIMode(UIMode.LIGHT)
+                            UIMode.LIGHT -> setUIMode(UIMode.DARK)
                         }
                     }
                 }
@@ -184,53 +174,7 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
-    private fun setupDarkLight() {
-        /*when(resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK)) {
-            Configuration.UI_MODE_NIGHT_NO -> setLightBars()
-            Configuration.UI_MODE_NIGHT_YES -> setDarkBars()
-        }*/
-        val current = runBlocking {
-            settingsUI.getDarkLightMode()
-        }
-        when(current){
-            SettingsUI.DarkLightMode.DARK -> setDarkModeBars()
-            SettingsUI.DarkLightMode.LIGHT -> setLightModeBars()
-        }
-    }
 
-    private fun setDarkModeBars() {
-        window.navigationBarColor = getColorFromResource(this, R.color.navigation_background)
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            window.insetsController?.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
-            window.insetsController?.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS, WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS)
-        } else {
-            var flags = window.decorView.systemUiVisibility
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                flags = flags or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    flags = flags or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-                }
-            }
-            window.decorView.systemUiVisibility = flags
-        }
-    }
-
-    private fun setLightModeBars() {
-        window.navigationBarColor = getColorFromResource(this, R.color.navigation_background)
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            window.insetsController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
-            window.insetsController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS)
-        } else {
-            var flags = window.decorView.systemUiVisibility
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    flags = flags and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
-                }
-            }
-            window.decorView.systemUiVisibility = flags
-        }
-    }
 
     fun setActionBarSubTitle(text: String) {
         supportActionBar?.customView?.let{
