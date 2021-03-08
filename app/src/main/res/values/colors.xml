@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorAccent">@android:color/holo_blue_dark</color>
+
     <color name="textColor">#D6D6D6</color>
     <color name="textColorAdditional">#939393</color>
+
     <color name="background">#121212</color>
     <color name="backgroundAdditional">#222222</color>
-    <color name="navigation_background">@android:color/black</color>
+    <color name="navigation_background">#000000</color>
+
     <color name="success">#3C963C</color>
     <color name="fail">#C84040</color>
 
-    <color name="colorAccent">@android:color/holo_blue_dark</color>
     <color name="reload_fail">@color/fail</color>
     <color name="badgeColor">@android:color/holo_green_light</color>
     <color name="blog_rating_positive">@color/success</color>

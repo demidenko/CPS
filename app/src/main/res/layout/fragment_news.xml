@@ -17,6 +17,7 @@
         app:tabTextColor="@color/textColorAdditional"
         app:tabSelectedTextColor="@color/textColor"
         app:tabIndicatorColor="?attr/colorAccent"
+        app:tabBackground="@color/background"
         app:tabMode="fixed"
         app:tabPaddingStart="-1dp"
         app:tabPaddingEnd="-1dp"

@@ -1,13 +1,23 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
         <item name="colorPrimaryDark">@android:color/black</item>
-        <item name="colorPrimary">#FF808080</item> <!--- @android:color/tertiary_text_dark -->
+        <item name="colorPrimary">#FF808080</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/background</item> <!-- design_dark_default_color_background -->
+        <item name="android:windowBackground">@color/background</item>
         <item name="android:textColor">@color/textColor</item>
         <item name="android:editTextColor">@color/textColor</item>
+        <item name="actionBarStyle">@style/ActionBar</item>
         <item name="android:popupMenuStyle">@style/PopupMenu</item>
+        <!-- action bar menu button color -->
+        <!-- main menu background -->
+        <!-- dialog background -->
+        <!-- recyclerview list divider color -->
+        <!-- switch button back color -->
+    </style>
+
+    <style name="ActionBar" parent="ThemeOverlay.MaterialComponents.ActionBar">
+        <item name="background">@color/background</item>
     </style>
 
     <style name="PopupMenu" parent="@android:style/Widget.PopupMenu">
