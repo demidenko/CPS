@@ -2,10 +2,12 @@ package com.example.test3
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowInsetsController
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -116,6 +118,11 @@ class MainActivity : AppCompatActivity(){
 
 
     private fun setupActionBar(){
+        when(resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK)) {
+            Configuration.UI_MODE_NIGHT_NO -> setLightBars()
+            Configuration.UI_MODE_NIGHT_YES -> setDarkBars()
+        }
+
         supportActionBar?.run {
             setDisplayShowCustomEnabled(true)
             setDisplayShowTitleEnabled(false)
@@ -161,6 +168,40 @@ class MainActivity : AppCompatActivity(){
                 }
             }
 
+        }
+    }
+
+    private fun setLightBars() {
+        window.navigationBarColor = getColorFromResource(this, R.color.navigation_background)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            window.insetsController?.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+            window.insetsController?.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS, WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS)
+        } else {
+            var flags = window.decorView.systemUiVisibility
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                flags = flags or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    flags = flags or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                }
+            }
+            window.decorView.systemUiVisibility = flags
+        }
+    }
+
+    private fun setDarkBars() {
+        window.navigationBarColor = getColorFromResource(this, R.color.navigation_background)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            window.insetsController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+            window.insetsController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS)
+        } else {
+            var flags = window.decorView.systemUiVisibility
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    flags = flags and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+                }
+            }
+            window.decorView.systemUiVisibility = flags
         }
     }
 
