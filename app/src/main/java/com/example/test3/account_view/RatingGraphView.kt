@@ -82,7 +82,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
     private fun drawRating(){
 
-        if(width == 0|| height == 0) return
+        if(width == 0 || height == 0) return
 
         if (::extraBitmap.isInitialized) extraBitmap.recycle()
         extraBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
@@ -93,9 +93,9 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         val maxY = toShow.maxOf { it.rating } + 100f
 
         val currentSeconds = getCurrentTimeSeconds()
-        val (minX, maxX) = when(toShow){
-            ratingHistoryLastMonth -> Pair(currentSeconds - TimeUnit.DAYS.toSeconds(30), currentSeconds)
-            ratingHistoryLastYear -> Pair(currentSeconds - TimeUnit.DAYS.toSeconds(365), currentSeconds)
+        val (minX, maxX) = when {
+            toShow === ratingHistoryLastMonth -> Pair(currentSeconds - TimeUnit.DAYS.toSeconds(30), currentSeconds)
+            toShow === ratingHistoryLastYear -> Pair(currentSeconds - TimeUnit.DAYS.toSeconds(365), currentSeconds)
             else -> Pair(toShow.first().timeSeconds, toShow.last().timeSeconds)
         }.let { Pair(it.first.toFloat(), it.second.toFloat()) }
 
