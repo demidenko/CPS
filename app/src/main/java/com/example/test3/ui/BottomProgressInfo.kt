@@ -1,19 +1,19 @@
 package com.example.test3.ui
 
 import android.view.View
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class BottomProgressInfo(title: String, private val mainActivity: MainActivity): ConstraintLayout(mainActivity) {
 
-    private val progressBar: ProgressBar by lazy { findViewById(R.id.progress_bottom_info_bar) }
+    private val progressBar: LinearProgressIndicator by lazy { findViewById(R.id.progress_bottom_info_bar) }
 
     init {
         inflate(mainActivity, R.layout.progress_bottom_info, this)
