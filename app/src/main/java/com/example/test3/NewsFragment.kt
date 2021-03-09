@@ -445,7 +445,7 @@ class CodeforcesNewsFragment: Fragment() {
         } else {
             swipeRefreshLayout.apply {
                 setOnRefreshListener { callReload() }
-                setProgressBackgroundColorSchemeResource(R.color.textColor)
+                setProgressBackgroundColorSchemeResource(R.color.backgroundAdditional)
                 setColorSchemeResources(R.color.colorAccent)
             }
         }
