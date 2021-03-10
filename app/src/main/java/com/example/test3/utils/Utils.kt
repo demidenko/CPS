@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.HtmlCompat
 import androidx.datastore.preferences.createDataStore
+import androidx.lifecycle.MutableLiveData
 import com.example.test3.R
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -69,6 +70,25 @@ class SharedReloadButton(private val button: ImageButton) {
         if(!current.contains(tag)) throw Exception("$tag not started to be stopped")
         current.remove(tag)
         if(current.isEmpty()) button.enable()
+    }
+}
+
+
+class MutableSetLiveSize<T>() {
+    private val s = mutableSetOf<T>()
+    val size by lazy { MutableLiveData<Int>(0) }
+    fun contains(element: T) = s.contains(element)
+    fun addAll(elements: Collection<T>) {
+        s.addAll(elements)
+        size.value = s.size
+    }
+    fun remove(element: T) {
+        s.remove(element)
+        size.value = s.size
+    }
+    fun clear() {
+        s.clear()
+        size.value = 0
     }
 }
 
