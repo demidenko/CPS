@@ -20,7 +20,13 @@ class CodeforcesNewsFragment: Fragment() {
     val pageName: String by lazy { requireArguments().getString(keyPageName)!! }
     val isManagesNewEntries: Boolean by lazy { requireArguments().getBoolean(keyEntries) }
     val isAutoUpdatable: Boolean by lazy { requireArguments().getBoolean(keyAutoUpdate) }
-    val viewAdapter: CodeforcesNewsItemsAdapter by lazy { CodeforcesNewsItemsAdapter.getFromType(requireArguments().getInt(keyAdapter)) }
+    val viewAdapter: CodeforcesNewsItemsAdapter get() {
+        val adapter = recyclerView.adapter
+            ?: CodeforcesNewsItemsAdapter.getFromType(requireArguments().getInt(keyAdapter)).also {
+                recyclerView.adapter = it
+            }
+        return adapter as CodeforcesNewsItemsAdapter
+    }
 
     companion object {
         private const val keyTitle = "cf_news_title"
@@ -63,7 +69,8 @@ class CodeforcesNewsFragment: Fragment() {
         return inflater.inflate(R.layout.fragment_cf_news_page, container, false)
     }
 
-    private val swipeRefreshLayout: SwipeRefreshLayout by lazy { requireView().findViewById(R.id.cf_news_page_swipe_refresh_layout) }
+    private val swipeRefreshLayout: SwipeRefreshLayout get() = requireView().findViewById(R.id.cf_news_page_swipe_refresh_layout)
+    private val recyclerView: RecyclerView get() = swipeRefreshLayout.findViewById(R.id.cf_news_page_recyclerview)
 
     fun startReload() {
         if(isAutoUpdatable) return
@@ -81,16 +88,15 @@ class CodeforcesNewsFragment: Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        swipeRefreshLayout.findViewById<RecyclerView>(R.id.cf_news_page_recyclerview).apply {
+        recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = viewAdapter
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             setHasFixedSize(true)
         }
 
         if(isAutoUpdatable){
             swipeRefreshLayout.isEnabled = false
-            (viewAdapter as? CodeforcesNewsItemsLostRecentAdapter)?.subscribeLiveData(this){
+            (viewAdapter as CodeforcesNewsItemsAdapterAutoUpdatable).subscribeLiveData(this){
                 lifecycleScope.launch { showItems() }
             }
         } else {
@@ -113,7 +119,7 @@ class CodeforcesNewsFragment: Fragment() {
 
         if(!viewAdapter.parseData(source)) return false
 
-        (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.clearNewEntries()
+        (viewAdapter as? CodeforcesNewsItemsAdapterManagesNewEntries)?.clearNewEntries()
 
         showItems()
 
@@ -128,19 +134,21 @@ class CodeforcesNewsFragment: Fragment() {
     private suspend fun manageNewEntries() {
         if(!isManagesNewEntries) return
         val savedBlogs = newsFragment.viewedDataStore.getBlogsViewed(title)
-        val newBlogs = viewAdapter.getBlogIDs().filter { !savedBlogs.contains(it) }.map { it.toInt() }
-        (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.addNewEntries(newBlogs)
+        with(viewAdapter as CodeforcesNewsItemsAdapterManagesNewEntries){
+            val newBlogs = getBlogIDs().filter { !savedBlogs.contains(it) }.map { it.toInt() }
+            addNewEntries(newBlogs)
+        }
     }
 
     suspend fun saveEntries() {
         if(!isManagesNewEntries) return
-        val toSave = viewAdapter.getBlogIDs().toSet()
+        val toSave = (viewAdapter as CodeforcesNewsItemsAdapterManagesNewEntries).getBlogIDs().toSet()
         newsFragment.viewedDataStore.setBlogsViewed(title, toSave)
     }
 
     private fun subscribeNewEntries() {
         if(!isManagesNewEntries) return
-        (viewAdapter as? CodeforcesNewsItemsClassicAdapter)?.getNewEntriesCountLiveData()?.observe(viewLifecycleOwner){ count ->
+        (viewAdapter as CodeforcesNewsItemsAdapterManagesNewEntries).getNewEntriesCountLiveData().observe(viewLifecycleOwner){ count ->
             val tab = newsFragment.getTab(title) ?: return@observe
             if (count == 0) {
                 tab.badge?.apply {

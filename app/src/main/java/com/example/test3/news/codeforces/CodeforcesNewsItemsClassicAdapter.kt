@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
-open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
+open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(), CodeforcesNewsItemsAdapterManagesNewEntries {
 
     data class Info(
         val blogId: Int,
@@ -94,11 +94,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(){
 
     override fun getItemCount() = rows.size
 
-
-    private val newEntries = MutableSetLiveSize<Int>()
-    fun getNewEntriesCountLiveData() = newEntries.size
-    fun addNewEntries(entries: Collection<Int>) = newEntries.addAll(entries)
-    fun clearNewEntries() = newEntries.clear()
+    override val newEntries = MutableSetLiveSize<Int>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesNewsItemViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_item, parent, false) as ConstraintLayout

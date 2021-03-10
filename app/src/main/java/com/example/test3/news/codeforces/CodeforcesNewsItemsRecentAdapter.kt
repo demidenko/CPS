@@ -264,6 +264,4 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         }
     }
 
-    override fun getBlogIDs(): List<String> = rows.map { it.blogId.toString() }
-
 }

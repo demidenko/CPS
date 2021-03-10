@@ -2,10 +2,10 @@ package com.example.test3.news.codeforces
 
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.MainActivity
+import com.example.test3.utils.MutableSetLiveSize
 
 abstract class CodeforcesNewsItemsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     abstract suspend fun parseData(s: String): Boolean
-    abstract fun getBlogIDs(): List<String>
 
     protected lateinit var activity: MainActivity
     protected lateinit var recyclerView: RecyclerView
@@ -34,4 +34,20 @@ abstract class CodeforcesNewsItemsAdapter: RecyclerView.Adapter<RecyclerView.Vie
             }
         }
     }
+}
+
+interface CodeforcesNewsItemsAdapterManagesNewEntries {
+    fun getBlogIDs(): List<String>
+
+    val newEntries: MutableSetLiveSize<Int>
+    fun getNewEntriesCountLiveData() = newEntries.size
+    fun addNewEntries(entries: Collection<Int>) = newEntries.addAll(entries)
+    fun clearNewEntries() = newEntries.clear()
+}
+
+interface CodeforcesNewsItemsAdapterAutoUpdatable {
+    fun subscribeLiveData(
+        fragment: CodeforcesNewsFragment,
+        dataReadyCallback: () -> Unit
+    )
 }
