@@ -17,7 +17,6 @@ import com.example.test3.getColorFromResource
 import com.example.test3.makeIntentOpenUrl
 import com.example.test3.timeDifference
 import com.example.test3.utils.*
-import kotlinx.coroutines.runBlocking
 
 class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
@@ -35,16 +34,14 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
     private val blogComments = mutableMapOf<Int, MutableList<CodeforcesComment>>()
 
     private fun calculateCommentatorsSpans(blogID: Int): List<Spannable> {
-        return runBlocking {
-            blogComments[blogID]
-                ?.distinctBy { it.commentatorHandle }
-                ?.map { comment ->
-                    activity.accountsFragment.codeforcesAccountManager.makeSpan(
-                        comment.commentatorHandle,
-                        comment.commentatorHandleColorTag
-                    )
-                } ?: emptyList()
-        }
+        return blogComments[blogID]
+            ?.distinctBy { it.commentatorHandle }
+            ?.map { comment ->
+                activity.accountsFragment.codeforcesAccountManager.makeSpan(
+                    comment.commentatorHandle,
+                    comment.commentatorHandleColorTag
+                )
+            } ?: emptyList()
     }
 
     override fun beforeRefresh() {
