@@ -1,6 +1,5 @@
 package com.example.test3.account_manager
 
-import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Typeface
 import android.text.SpannableString
@@ -28,6 +27,7 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context, pref
 
     companion object {
         const val preferences_file_name = "atcoder"
+        private val Context.accountDataStoreAtCoder by SettingsDelegate { AccountDataStore(it, preferences_file_name) }
     }
 
     @Serializable
@@ -149,10 +149,9 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context, pref
     override val dataStore by lazy { context.accountDataStoreAtCoder }
     override fun getSettings() = AtCoderAccountSettingsDataStore(this)
 
-    fun notifyRatingChange(m: NotificationManager, handle: String, ratingChange: AtCoderRatingChange){
+    fun notifyRatingChange(handle: String, ratingChange: AtCoderRatingChange){
         notifyRatingChange(
             context,
-            m,
             NotificationChannels.atcoder_rating_changes,
             NotificationIDs.atcoder_rating_changes,
             this,
@@ -165,8 +164,6 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context, pref
         )
     }
 }
-
-val Context.accountDataStoreAtCoder by SettingsDelegate { AccountDataStore(it, AtCoderAccountManager.preferences_file_name) }
 
 class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager): AccountSettingsDataStore(manager.context, manager.managerName){
 

@@ -43,7 +43,7 @@ class AccountsWorker(private val context: Context, params: WorkerParameters) : C
 
         val lastRatingChange = response.result?.lastOrNull() ?: return
 
-        codeforcesAccountManager.applyRatingChange(lastRatingChange, notificationManager)
+        codeforcesAccountManager.applyRatingChange(lastRatingChange)
     }
 
     private suspend fun atcoderRating() {
@@ -62,7 +62,7 @@ class AccountsWorker(private val context: Context, params: WorkerParameters) : C
         settings.setLastRatedContestID(lastRatingChangeContestID)
 
         if(prevRatingChangeContestID!=""){
-            atcoderAccountManager.notifyRatingChange(notificationManager, info.handle, lastRatingChange)
+            atcoderAccountManager.notifyRatingChange(info.handle, lastRatingChange)
             val newInfo = atcoderAccountManager.loadInfo(info.handle)
             if(newInfo.status!=STATUS.FAILED){
                 atcoderAccountManager.setSavedInfo(newInfo)

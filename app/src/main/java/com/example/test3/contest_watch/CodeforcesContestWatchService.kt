@@ -1,7 +1,6 @@
 package com.example.test3.contest_watch
 
 import android.app.ActivityManager
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
@@ -11,14 +10,15 @@ import android.os.SystemClock
 import android.text.SpannableStringBuilder
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.text.bold
 import androidx.core.text.color
 import androidx.core.text.italic
 import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
-import com.example.test3.workers.CodeforcesContestWatchLauncherWorker
 import com.example.test3.utils.*
+import com.example.test3.workers.CodeforcesContestWatchLauncherWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -132,7 +132,7 @@ class CodeforcesContestWatchService: Service() {
         val handle: String,
         val notificationTable: NotificationCompat.Builder
     ): CodeforcesContestWatchListener {
-        val notificationManager by lazy { context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
+        val notificationManager by lazy { NotificationManagerCompat.from(context) }
 
         var contestType = CodeforcesContestType.UNDEFINED
         var contestPhase = CodeforcesContestPhase.UNDEFINED
@@ -269,7 +269,7 @@ class CodeforcesContestWatchService: Service() {
         }
 
         override suspend fun onRatingChange(ratingChange: CodeforcesRatingChange) {
-            CodeforcesAccountManager(context).applyRatingChange(ratingChange, notificationManager)
+            CodeforcesAccountManager(context).applyRatingChange(ratingChange)
         }
 
         override fun commit() {

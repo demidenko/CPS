@@ -1,6 +1,5 @@
 package com.example.test3.account_manager
 
-import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Typeface
 import android.text.SpannableString
@@ -23,6 +22,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, p
 
     companion object {
         const val preferences_file_name = "codeforces"
+        private val Context.accountDataStoreCodeforces by SettingsDelegate { AccountDataStore(it, preferences_file_name) }
     }
 
     @Serializable
@@ -157,10 +157,9 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, p
     override val dataStore by lazy { context.accountDataStoreCodeforces }
     override fun getSettings() = CodeforcesAccountSettingsDataStore(this)
 
-    fun notifyRatingChange(m: NotificationManager, ratingChange: CodeforcesRatingChange){
+    fun notifyRatingChange(ratingChange: CodeforcesRatingChange){
         notifyRatingChange(
             context,
-            m,
             NotificationChannels.codeforces_rating_changes,
             NotificationIDs.codeforces_rating_changes,
             this,
@@ -173,7 +172,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, p
         )
     }
 
-    suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange, notificationManager: NotificationManager){
+    suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange){
         val info = getSavedInfo() as CodeforcesUserInfo
 
         val settings = getSettings()
@@ -184,7 +183,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, p
         settings.setLastRatedContestID(ratingChange.contestId)
 
         if(prevRatingChangeContestID!=-1){
-            notifyRatingChange(notificationManager, ratingChange)
+            notifyRatingChange(ratingChange)
             val newInfo = loadInfo(info.handle)
             if(newInfo.status!=STATUS.FAILED){
                 setSavedInfo(newInfo)
@@ -194,8 +193,6 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, p
         }
     }
 }
-
-val Context.accountDataStoreCodeforces by SettingsDelegate { AccountDataStore(it, CodeforcesAccountManager.preferences_file_name) }
 
 class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager): AccountSettingsDataStore(manager.context, manager.managerName){
 

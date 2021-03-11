@@ -1,12 +1,15 @@
 package com.example.test3.account_manager
 
-import android.app.NotificationManager
 import android.content.Context
 import android.text.SpannableString
+import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.asLiveData
-import com.example.test3.*
+import com.example.test3.NotificationChannelLazy
+import com.example.test3.R
+import com.example.test3.makePendingIntentOpenURL
+import com.example.test3.notificationBuilder
 import com.example.test3.ui.getUseRealColors
 import com.example.test3.utils.AtCoderRatingChange
 import com.example.test3.utils.CodeforcesRatingChange
@@ -193,7 +196,6 @@ data class AccountSuggestion(
 
 fun notifyRatingChange(
     context: Context,
-    notificationManager: NotificationManager,
     notificationChannel: NotificationChannelLazy,
     notificationID: Int,
     accountManager: RatedAccountManager,
@@ -215,5 +217,5 @@ fun notifyRatingChange(
             setWhen(TimeUnit.SECONDS.toMillis(timeSeconds))
         }
     }
-    notificationManager.notify(notificationID, n.build())
+    NotificationManagerCompat.from(context).notify(notificationID, n.build())
 }
