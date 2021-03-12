@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -50,13 +51,13 @@ class CodeforcesNewsFragment: Fragment() {
             isAutoUpdatable: Boolean
         ): CodeforcesNewsFragment {
             return CodeforcesNewsFragment().apply {
-                arguments = Bundle().apply {
-                    putString(keyTitle, title.name)
-                    putString(keyPageName, pageName)
-                    putBoolean(keyEntries, isManagesNewEntries)
-                    putBoolean(keyAutoUpdate, isAutoUpdatable)
-                    putInt(keyAdapter, viewAdapterType)
-                }
+                arguments = bundleOf(
+                    keyTitle to title.name,
+                    keyPageName to pageName,
+                    keyEntries to isManagesNewEntries,
+                    keyAutoUpdate to isAutoUpdatable,
+                    keyAdapter to viewAdapterType
+                )
             }
         }
     }

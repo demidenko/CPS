@@ -3,7 +3,7 @@ package com.example.test3.workers
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
-import android.os.Bundle
+import androidx.core.os.bundleOf
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.test3.*
@@ -89,7 +89,7 @@ class AccountsWorker(private val context: Context, params: WorkerParameters) : C
             else {
                 notificationManager.activeNotifications.find {
                     it.id == NotificationIDs.codeforces_contribution_changes
-                }?.notification?.extras?.getInt("contribution", info.contribution) ?: info.contribution
+                }?.notification?.extras?.getInt(keyContribution, info.contribution) ?: info.contribution
             }
 
             val n = notificationBuilder(context, NotificationChannels.codeforces_contribution_changes).apply {
@@ -100,12 +100,14 @@ class AccountsWorker(private val context: Context, params: WorkerParameters) : C
                 setAutoCancel(true)
                 setShowWhen(false)
                 setContentIntent(makePendingIntentOpenURL(info.link(), context))
-                extras = Bundle().apply {
-                    putInt("contribution", oldShowedContribution)
-                }
+                extras = bundleOf(keyContribution to oldShowedContribution)
             }
             notificationManager.notify( NotificationIDs.codeforces_contribution_changes, n.build())
         }
+    }
+
+    companion object {
+        private const val keyContribution = "contribution"
     }
 
 }
