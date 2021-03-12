@@ -1,8 +1,8 @@
 package com.example.test3.ui
 
 import android.os.Bundle
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.example.test3.MainActivity
 
@@ -58,16 +58,14 @@ open class CPSFragment : Fragment() {
 
     private fun showStuff() {
         mainActivity.setActionBarSubTitle(cpsTitle)
-        mainActivity.navigation.visibility = bottomPanel?.let {
-                it.visibility = View.VISIBLE
-                View.VISIBLE
-            } ?: View.GONE
+        mainActivity.navigation.isVisible = bottomPanel?.let {
+                it.isVisible = true
+                true
+            } ?: false
     }
 
     private fun hideStuff() {
-        bottomPanel?.let {
-            it.visibility = View.GONE
-        }
+        bottomPanel?.isVisible = false
     }
 
     override fun onResume() {

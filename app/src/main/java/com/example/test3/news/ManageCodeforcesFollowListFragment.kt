@@ -6,6 +6,7 @@ import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -51,7 +52,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         }
 
         val buttonAdd = requireBottomPanel().findViewById<ImageButton>(R.id.navigation_cf_follow_add).apply {
-            visibility = View.GONE
+            isVisible = false
         }
         buttonAdd.setOnClickListener {
             lifecycleScope.launch {
@@ -73,7 +74,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             followListView.isEnabled = false
             followListAdapter.initialize()
             followListView.isEnabled = true
-            buttonAdd.visibility = View.VISIBLE
+            buttonAdd.isVisible = true
         }
 
         mainActivity.settingsUI.useRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->

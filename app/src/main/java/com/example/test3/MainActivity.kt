@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -14,6 +13,7 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
@@ -94,16 +94,8 @@ class MainActivity : AppCompatActivity(){
             supportActionBar?.run {
                 val titles: LinearLayout = findViewById(R.id.action_bar_titles)
                 val panelUI: ConstraintLayout = findViewById(R.id.action_bar_ui_panel)
-                when(value){
-                    true -> {
-                        titles.visibility = View.GONE
-                        panelUI.visibility = View.VISIBLE
-                    }
-                    false -> {
-                        panelUI.visibility = View.GONE
-                        titles.visibility = View.VISIBLE
-                    }
-                }
+                titles.isVisible = !value
+                panelUI.isVisible = value
             }
         }
 
@@ -166,7 +158,7 @@ class MainActivity : AppCompatActivity(){
                 findViewById<ImageButton>(R.id.button_recreate_app)?.apply {
                     setOnClickListener { recreate() }
                     settingsDev.getDevEnabledLiveData().observe(this@MainActivity){ enabled ->
-                        visibility = if(enabled) View.VISIBLE else View.GONE
+                        isVisible = enabled
                     }
                 }
             }

@@ -11,6 +11,8 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.getColorFromResource
@@ -113,23 +115,23 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
             val info = headerBlog!!
             findViewById<TextView>(R.id.news_item_title).text = info.title
             findViewById<TextView>(R.id.news_item_author).text = activity.accountsFragment.codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
-            visibility = View.VISIBLE
+            isVisible = true
         } else {
-            header.visibility = View.GONE
+            header.isGone = true
         }
     }
 
     fun showFromBlog(info: BlogInfo){
-        switchButton.visibility = View.GONE
-        showBackButton.visibility = View.VISIBLE
+        switchButton.isGone = true
+        showBackButton.isVisible = true
         headerBlog = info
         showHeader()
         notifyDataSetChanged()
         recyclerView.scrollToPosition(0)
     }
     fun closeShowFromBlog(){
-        showBackButton.visibility = View.GONE
-        switchButton.visibility = View.VISIBLE
+        showBackButton.isGone = true
+        switchButton.isVisible = true
         headerBlog = null
         showHeader()
         notifyDataSetChanged()
@@ -216,7 +218,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
         holder.comments.text = info.commentators.joinTo(SpannableStringBuilder())
 
-        holder.commentsIcon.visibility = if(info.commentators.isEmpty()) View.INVISIBLE else View.VISIBLE
+        holder.commentsIcon.isGone = info.commentators.isEmpty()
     }
 
     private fun onBindViewCommentHolder(holder: CodeforcesNewsCommentItemViewHolder, position: Int){
@@ -232,9 +234,9 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         holder.author.text = activity.accountsFragment.codeforcesAccountManager.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
 
         holder.rating.apply{
-            if(comment.rating == 0) visibility = View.GONE
+            if(comment.rating == 0) isGone = true
             else {
-                visibility = View.VISIBLE
+                isVisible = true
                 text = signedToString(comment.rating)
                 if (comment.rating > 0) {
                     setTextColor(getColorFromResource(activity, R.color.blog_rating_positive))
@@ -252,13 +254,9 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
             activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(blogEntry.id,comment.id)))
         }
 
-        if(headerBlog!=null){
-            holder.title.visibility = View.GONE
-            holder.view.findViewById<TextView>(R.id.recent_arrow).visibility = View.GONE
-        }else{
-            holder.title.visibility = View.VISIBLE
-            holder.view.findViewById<TextView>(R.id.recent_arrow).visibility = View.VISIBLE
-        }
+        val hasHeader = headerBlog!=null
+        holder.title.isGone = hasHeader
+        holder.view.findViewById<TextView>(R.id.recent_arrow).isGone = hasHeader
     }
 
 }

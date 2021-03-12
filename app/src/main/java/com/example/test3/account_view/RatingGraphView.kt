@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.R
 import com.example.test3.account_manager.*
@@ -209,17 +210,17 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         suspend fun showInAccountViewFragment(fragment: AccountViewFragment, manager: RatedAccountManager){
 
             val view = fragment.requireView().findViewById<ConstraintLayout>(R.id.account_view_rating_graph_view)
-            view.visibility = View.VISIBLE
+            view.isVisible = true
 
             val info = manager.getSavedInfo()
             if(info.status != STATUS.OK || manager.getRating(info) == NOT_RATED){
-                view.visibility = View.GONE
+                view.isVisible = false
                 return
             }
 
             val ratingGraphView = view.findViewById<RatingGraphView>(R.id.account_view_rating_graph).apply {
                 setManager(manager)
-                visibility = View.GONE
+                isVisible = false
             }
 
             val buttonAll = view.findViewById<MaterialButton>(R.id.account_view_rating_graph_button_all)
@@ -231,7 +232,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
             val activeTextColor = getColorFromResource(manager.context, R.color.textColor)
             val inactiveTextColor = getColorFromResource(manager.context, R.color.textColorAdditional)
             buttons.forEach { button ->
-                button.visibility = View.GONE
+                button.isVisible = false
                 button.setTextColor(inactiveTextColor)
             }
             buttonAll.setTextColor(activeTextColor)
@@ -261,14 +262,14 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                         title.text = ""
                         ratingGraphView.apply {
                             setHistory(history)
-                            visibility = View.VISIBLE
+                            isVisible = true
                         }
 
                         var showed = 0
                         if(ratingGraphView.senseToShowLast10()){
                             showed++
                             buttonLast10.apply {
-                                visibility = View.VISIBLE
+                                isVisible = true
                                 setOnClickListener {
                                     ratingGraphView.showLast10()
                                     buttonClick(this)
@@ -279,7 +280,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                         if(ratingGraphView.senseToShowLastMonth()){
                             showed++
                             buttonLastMonth.apply {
-                                visibility = View.VISIBLE
+                                isVisible = true
                                 setOnClickListener {
                                     ratingGraphView.showLastMonth()
                                     buttonClick(this)
@@ -290,7 +291,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                         if(ratingGraphView.senseToShowLastYear()){
                             showed++
                             buttonLastYear.apply {
-                                visibility = View.VISIBLE
+                                isVisible = true
                                 setOnClickListener {
                                     ratingGraphView.showLastYear()
                                     buttonClick(this)
@@ -300,7 +301,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
                         if(showed>0){
                             buttonAll.apply {
-                                visibility = View.VISIBLE
+                                isVisible = true
                                 setOnClickListener {
                                     ratingGraphView.showAll()
                                     buttonClick(this)

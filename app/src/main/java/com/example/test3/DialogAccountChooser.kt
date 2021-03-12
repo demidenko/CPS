@@ -8,7 +8,6 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.text.*
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Button
@@ -16,6 +15,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -137,7 +137,7 @@ class DialogAccountChooser(
                 adapter = suggestionsAdapter
                 addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
                 setHasFixedSize(true)
-                visibility = View.GONE
+                isVisible = false
             }
         }
 
@@ -238,20 +238,20 @@ class DialogAccountChooser(
         private var data : List<AccountSuggestion> = emptyList()
 
         fun setData(suggestions: List<AccountSuggestion>?, view: RecyclerView){
-            if(suggestions == null || suggestions.isEmpty()) view.visibility = View.GONE
+            if(suggestions == null || suggestions.isEmpty()) view.isVisible = false
             data = suggestions ?: emptyList()
             notifyDataSetChanged()
         }
 
         fun clear(view: RecyclerView){
-            view.visibility = View.GONE
+            view.isVisible = false
             data = emptyList()
             notifyDataSetChanged()
         }
 
         fun loading(view: RecyclerView){
             clear(view)
-            view.visibility = View.VISIBLE
+            view.isVisible = true
         }
 
     }

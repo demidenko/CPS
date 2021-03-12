@@ -1,7 +1,7 @@
 package com.example.test3.account_view
 
-import android.view.View
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
@@ -39,11 +39,11 @@ class CodeforcesAccountPanel(
         contributionView.apply {
             val contributionViewTitle = view.findViewById<TextView>(R.id.account_view_cf_contribution_title)
             if(info.contribution == 0){
-                visibility = View.GONE
-                contributionViewTitle.visibility = View.GONE
+                isVisible = false
+                contributionViewTitle.isVisible = false
             }else {
-                visibility = View.VISIBLE
-                contributionViewTitle.visibility = View.VISIBLE
+                isVisible = true
+                contributionViewTitle.isVisible = true
                 text = signedToString(info.contribution)
                 if (info.contribution > 0) {
                     setTextColor(getColorFromResource(mainActivity, R.color.blog_rating_positive))

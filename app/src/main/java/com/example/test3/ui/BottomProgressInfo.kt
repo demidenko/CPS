@@ -1,8 +1,8 @@
 package com.example.test3.ui
 
-import android.view.View
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
@@ -18,7 +18,7 @@ class BottomProgressInfo(title: String, private val mainActivity: MainActivity):
     init {
         inflate(mainActivity, R.layout.progress_bottom_info, this)
         findViewById<TextView>(R.id.progress_bottom_info_title).text = title
-        visibility = View.GONE
+        isGone = true
         mainActivity.progressBarHolder.addView(this)
     }
 
@@ -28,7 +28,7 @@ class BottomProgressInfo(title: String, private val mainActivity: MainActivity):
                 max = size
                 progress = 0
             }
-            visibility = View.VISIBLE
+            isVisible = true
         }
         return this
     }

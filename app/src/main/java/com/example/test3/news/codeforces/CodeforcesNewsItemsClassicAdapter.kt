@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
@@ -127,10 +129,10 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(), Code
 
             time.text = timeRUtoEN(info.time)
 
-            newEntryIndicator.visibility = if(newEntries.contains(blogId)) View.VISIBLE else View.GONE
+            newEntryIndicator.isVisible = newEntries.contains(blogId)
 
             comments.text = info.comments
-            commentsIcon.visibility = if(info.comments.isEmpty()) View.INVISIBLE else View.VISIBLE
+            commentsIcon.isGone = info.comments.isEmpty()
 
             rating.apply{
                 text = info.rating

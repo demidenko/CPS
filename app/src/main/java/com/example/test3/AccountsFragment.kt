@@ -9,6 +9,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.*
 import com.example.test3.account_view.*
@@ -219,7 +220,7 @@ class AccountsFragment: CPSFragment() {
                     ?: ColorInfo() to true
 
             with(accountsFragment){
-                view?.findViewById<TextView>(R.id.accounts_welcome_text)?.visibility = if(allEmpty) View.VISIBLE else View.GONE
+                view?.findViewById<TextView>(R.id.accounts_welcome_text)?.isVisible = allEmpty
                 mainActivity.window.statusBarColor = (if(enabled) best else ColorInfo()).color
             }
         }

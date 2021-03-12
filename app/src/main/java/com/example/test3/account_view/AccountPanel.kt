@@ -7,6 +7,8 @@ import android.view.animation.RotateAnimation
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
@@ -43,10 +45,10 @@ abstract class AccountPanel(
         private fun animateDelayedHide(button: ImageButton){
             button.clearAnimation()
             button.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
-                button.visibility = View.VISIBLE
+                button.isVisible = true
                 button.animate().setStartDelay(startDelayMillis).setDuration(durationMillis).alpha(0f)
                     .withEndAction {
-                        button.visibility = View.GONE
+                        button.isGone = true
                     }.start()
             }.start()
         }
@@ -77,9 +79,9 @@ abstract class AccountPanel(
 
     suspend fun show(){
         if(isEmpty()){
-            layout.visibility = View.GONE
+            layout.isVisible = false
         }else {
-            layout.visibility = View.VISIBLE
+            layout.isVisible = true
             show(manager.getSavedInfo())
         }
         mainActivity.accountsFragment.statusBarColorManager.updatePanel(this)
@@ -105,12 +107,12 @@ abstract class AccountPanel(
         block()
 
         expandButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
-            expandButton.visibility = View.GONE
+            expandButton.isGone = true
         }.start()
 
         reloadButton.animate().setStartDelay(0).alpha(1f).setDuration(0).withStartAction {
             reloadButton.setColorFilter(mainActivity.defaultTextColor)
-            reloadButton.visibility = View.VISIBLE
+            reloadButton.isVisible = true
         }.start()
         reloadButton.startAnimation(rotateAnimation)
 
@@ -122,7 +124,7 @@ abstract class AccountPanel(
             if(info!=savedInfo) manager.setSavedInfo(info)
             reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {
                 reloadButton.clearAnimation()
-                reloadButton.visibility = View.GONE
+                reloadButton.isGone = true
             }.start()
         }else{
             reloadButton.clearAnimation()

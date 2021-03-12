@@ -1,7 +1,7 @@
 package com.example.test3.account_view
 
-import android.view.View
 import android.widget.TextView
+import androidx.core.view.isVisible
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.NOT_RATED
@@ -35,11 +35,11 @@ class TopCoderAccountPanel(
         marathonRatingView.apply {
             val marathonRatingViewTitle = view.findViewById<TextView>(R.id.account_view_tc_marathon_title)
             if(info.rating_marathon == NOT_RATED){
-                visibility = View.GONE
-                marathonRatingViewTitle.visibility = View.GONE
+                isVisible = false
+                marathonRatingViewTitle.isVisible = false
             }else {
-                visibility = View.VISIBLE
-                marathonRatingViewTitle.visibility = View.VISIBLE
+                isVisible = true
+                marathonRatingViewTitle.isVisible = true
 
                 val marathonColor = manager.getHandleColorARGB(info.rating_marathon)
                 setTextColor(marathonColor)

@@ -39,8 +39,8 @@ class AboutDialog: DialogFragment() {
 
             val devCheckBox = findViewById<CheckBox>(R.id.about_dev_checkbox).apply {
                 context.settingsDev.getDevEnabled().let { devEnabled ->
-                    visibility = if(devEnabled) View.VISIBLE else View.GONE
-                    devTextView.visibility = if(devEnabled) View.VISIBLE else View.GONE
+                    isVisible = devEnabled
+                    devTextView.isVisible = devEnabled
                     devTextView.text = makeDevModeText(devEnabled)
                     isChecked = devEnabled
                 }
@@ -53,8 +53,8 @@ class AboutDialog: DialogFragment() {
             //apply dev mode
             setOnClickListener(PatternClickListener("._.._..."){
                 if(devCheckBox.isVisible) return@PatternClickListener
-                devTextView.visibility = View.VISIBLE
-                devCheckBox.visibility = View.VISIBLE
+                devTextView.isVisible = true
+                devCheckBox.isVisible = true
                 devCheckBox.isChecked = true
             })
         }

@@ -8,14 +8,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.lifecycleScope
-import com.example.test3.ui.CPSFragment
 import com.example.test3.CodeforcesTitle
 import com.example.test3.R
+import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.SettingsDelegate
 import com.example.test3.utils.*
 import com.example.test3.workers.WorkersCenter
@@ -82,7 +83,7 @@ class SettingsNewsFragment: CPSFragment(){
             val isLostEnabled = mainActivity.settingsNews.getLostEnabled()
             val switchLost = view.findViewById<ConstraintLayout>(R.id.news_settings_lost)
             val selectLostRating = view.findViewById<ConstraintLayout>(R.id.news_settings_lost_min_rating).apply {
-                visibility = if(isLostEnabled) View.VISIBLE else View.GONE
+                isVisible = isLostEnabled
                 findViewById<TextView>(R.id.settings_select_button).setTextColor(mainActivity.defaultTextColor)
             }
             setupSwitch(
@@ -97,11 +98,11 @@ class SettingsNewsFragment: CPSFragment(){
                     if (isChecked) {
                         WorkersCenter.startCodeforcesNewsLostRecentWorker(mainActivity)
                         newsFragment.addLostTab()
-                        selectLostRating.visibility = View.VISIBLE
+                        selectLostRating.isVisible = true
                     } else {
                         newsFragment.removeLostTab()
                         WorkersCenter.stopWorker(mainActivity, WorkersNames.codeforces_news_lost_recent)
-                        selectLostRating.visibility = View.GONE
+                        selectLostRating.isVisible = false
                     }
                     buttonView.isEnabled = true
                 }
