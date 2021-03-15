@@ -77,6 +77,7 @@ class SharedReloadButton(private val button: ImageButton) {
 class MutableSetLiveSize<T>() {
     private val s = mutableSetOf<T>()
     val size by lazy { MutableLiveData<Int>(0) }
+    fun values() = s.toSet()
     fun contains(element: T) = s.contains(element)
     fun addAll(elements: Collection<T>) {
         s.addAll(elements)

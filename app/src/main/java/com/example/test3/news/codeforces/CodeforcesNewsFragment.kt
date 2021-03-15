@@ -136,7 +136,9 @@ class CodeforcesNewsFragment: Fragment() {
         if(!isManagesNewEntries) return
         val savedBlogs = newsFragment.viewedDataStore.getBlogsViewed(title)
         with(viewAdapter as CodeforcesNewsItemsAdapterManagesNewEntries){
-            val newBlogs = getBlogIDs().filter { !savedBlogs.contains(it) }.map { it.toInt() }
+            val currentBlogs = getBlogIDs()
+            for(id in newEntries.values()) if(id.toString() !in currentBlogs) newEntries.remove(id)
+            val newBlogs = currentBlogs.filter { !savedBlogs.contains(it) }.map { it.toInt() }
             addNewEntries(newBlogs)
         }
     }
@@ -161,7 +163,7 @@ class CodeforcesNewsFragment: Fragment() {
                     number = count
                     isVisible = true
                 }
-                if (tab.isSelected) lifecycleScope.launch { saveEntries() }
+                if (tab.isSelected && isVisible) lifecycleScope.launch { saveEntries() }
             }
         }
     }
