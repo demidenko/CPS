@@ -137,15 +137,15 @@ class CodeforcesNewsFragment: Fragment() {
         val savedBlogs = newsFragment.viewedDataStore.getBlogsViewed(title)
         with(viewAdapter as CodeforcesNewsItemsAdapterManagesNewEntries){
             val currentBlogs = getBlogIDs()
-            for(id in newEntries.values()) if(id.toString() !in currentBlogs) newEntries.remove(id)
-            val newBlogs = currentBlogs.filter { !savedBlogs.contains(it) }.map { it.toInt() }
+            for(id in newEntries.values()) if(id !in currentBlogs) newEntries.remove(id)
+            val newBlogs = currentBlogs.filter { !savedBlogs.contains(it) }
             addNewEntries(newBlogs)
         }
     }
 
     suspend fun saveEntries() {
         if(!isManagesNewEntries) return
-        val toSave = (viewAdapter as CodeforcesNewsItemsAdapterManagesNewEntries).getBlogIDs().toSet()
+        val toSave = (viewAdapter as CodeforcesNewsItemsAdapterManagesNewEntries).getBlogIDs()
         newsFragment.viewedDataStore.setBlogsViewed(title, toSave)
     }
 

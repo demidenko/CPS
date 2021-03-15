@@ -37,7 +37,7 @@ abstract class CodeforcesNewsItemsAdapter: RecyclerView.Adapter<RecyclerView.Vie
 }
 
 interface CodeforcesNewsItemsAdapterManagesNewEntries {
-    fun getBlogIDs(): List<String>
+    fun getBlogIDs(): List<Int>
 
     val newEntries: MutableSetLiveSize<Int>
     fun getNewEntriesCountLiveData() = newEntries.size

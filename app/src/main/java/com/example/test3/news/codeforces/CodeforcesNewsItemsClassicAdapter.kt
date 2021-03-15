@@ -144,7 +144,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(), Code
         }
     }
 
-    override fun getBlogIDs(): List<String> = rows.map { it.blogId.toString() }
+    override fun getBlogIDs() = rows.map { it.blogId }
 
 
     private fun addToFollowListWithSnackBar(holder: CodeforcesNewsItemViewHolder){

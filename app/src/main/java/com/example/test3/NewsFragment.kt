@@ -294,9 +294,9 @@ class NewsFragment : CPSFragment() {
 
         private fun makeKey(title: CodeforcesTitle) = stringSetPreferencesKey("blogs_viewed_${title.name}")
 
-        suspend fun getBlogsViewed(title: CodeforcesTitle) = dataStore.data.first()[makeKey(title)] ?: emptySet()
-        suspend fun setBlogsViewed(title: CodeforcesTitle, blogIDs: Set<String>) {
-            dataStore.edit { it[makeKey(title)] = blogIDs }
+        suspend fun getBlogsViewed(title: CodeforcesTitle): Set<Int> = dataStore.data.first()[makeKey(title)]?.mapTo(mutableSetOf()){ it.toInt() } ?: emptySet()
+        suspend fun setBlogsViewed(title: CodeforcesTitle, blogIDs: Collection<Int>) {
+            dataStore.edit { it[makeKey(title)] = blogIDs.mapTo(mutableSetOf()){ id -> id.toString() } }
         }
     }
 }
