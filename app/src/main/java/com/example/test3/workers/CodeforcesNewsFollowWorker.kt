@@ -1,8 +1,10 @@
 package com.example.test3.workers
 
 import android.content.Context
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
+import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.example.test3.*
 import com.example.test3.account_manager.STATUS
@@ -64,12 +66,16 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
 
     override suspend fun doWork(): Result {
 
-        params.id.toString()
-
         if(!isEnabled(context)){
             WorkersCenter.stopWorker(context, WorkersNames.codeforces_news_follow)
             return Result.success()
         }
+
+
+        setForeground(ForegroundInfo(
+            NotificationIDs.codeforces_follow_progress,
+            createProgressNotification().setProgress(100,0,true).build()
+        ))
 
         val connector = FollowDataConnector(context)
         val savedHandles = connector.getHandles()
@@ -117,9 +123,24 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
             }
         }
 
-        savedHandles.forEach { handle -> proceedUser(handle) }
+        val notificationManagerCompat = NotificationManagerCompat.from(context)
+        savedHandles.forEachIndexed { index, handle ->
+            proceedUser(handle)
+            notificationManagerCompat.notify(
+                NotificationIDs.codeforces_follow_progress,
+                createProgressNotification().setProgress(savedHandles.size, index+1, false).build()
+            )
+        }
 
         return Result.success()
+    }
+
+    private fun createProgressNotification(): NotificationCompat.Builder {
+        return notificationBuilder(context, NotificationChannels.test)
+            .setContentTitle("Codeforces Follow Update...")
+            .setSmallIcon(R.drawable.ic_cf_logo)
+            .setNotificationSilent()
+            .setShowWhen(false)
     }
 
     private fun notifyNewBlog(blogEntry: CodeforcesBlogEntry){
