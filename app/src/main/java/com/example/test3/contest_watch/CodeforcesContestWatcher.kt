@@ -169,21 +169,19 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
     ): Boolean {
         if(participationType != CodeforcesParticipationType.CONTESTANT) return true
 
-        CodeforcesAPI.getContestRatingChanges(contestID)?.let { response ->
-            if(response.status == CodeforcesAPIStatus.FAILED){
-                if(response.isContestRatingUnavailable()) return true
-                return@let
-            }
-            with(response.result ?: return@let) {
-                val change = findLast { it.handle == handle } ?: return@let
-                scope.launch {
-                    onRatingChange(change)
-                }
-                return true
-            }
+        val response = CodeforcesAPI.getContestRatingChanges(contestID) ?: return false
+        if(response.status == CodeforcesAPIStatus.FAILED){
+            if(response.isContestRatingUnavailable()) return true
+            return false
         }
 
-        return false
+        val change = response.result?.findLast { it.handle == handle } ?: return false
+
+        scope.launch {
+            onRatingChange(change)
+        }
+
+        return true
     }
 
     fun start() {
