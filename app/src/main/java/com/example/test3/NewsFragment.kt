@@ -51,7 +51,6 @@ class NewsFragment : CPSFragment() {
     }
 
     private fun createLostFragment(): CodeforcesNewsFragment {
-        requireView()
         return findOrCreateCodeforcesNewsFragment(CodeforcesTitle.LOST)
     }
 
