@@ -27,13 +27,19 @@ object WorkersCenter {
         name: String,
         restart: Boolean,
         repeatInterval: Pair<TimeUnit, Long>,
-        flex: Pair<TimeUnit, Long> = repeatInterval
+        flex: Pair<TimeUnit, Long> = repeatInterval,
+        batteryNotLow: Boolean = false
     ){
         val request = PeriodicWorkRequestBuilder<T>(
             repeatInterval.second, repeatInterval.first,
             flex.second, flex.first
         ).addTag(commonTag)
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .setRequiresBatteryNotLow(batteryNotLow)
+                    .build()
+            )
             .build()
 
         getWorkManager(context).enqueueUniquePeriodicWork(
@@ -73,6 +79,7 @@ object WorkersCenter {
             restart,
             TimeUnit.HOURS to 6,
             TimeUnit.HOURS to 3,
+            batteryNotLow = true
         )
     }
 
@@ -99,7 +106,8 @@ object WorkersCenter {
             context,
             WorkersNames.news_parsers,
             restart,
-            TimeUnit.HOURS to 6
+            TimeUnit.HOURS to 6,
+            batteryNotLow = true
         )
     }
 
