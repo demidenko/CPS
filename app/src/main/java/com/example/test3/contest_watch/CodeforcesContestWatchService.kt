@@ -14,6 +14,7 @@ import com.example.test3.workers.CodeforcesContestWatchLauncherWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class CodeforcesContestWatchService: Service() {
     override fun onBind(intent: Intent?): IBinder? = null
@@ -25,7 +26,7 @@ class CodeforcesContestWatchService: Service() {
         private var startedWithHandle: String? = null
         private var startedWithContestID: Int? = null
 
-        fun makeStopIntent(context: Context) = Intent(context, CodeforcesContestWatchService::class.java).setAction(ACTION_STOP)
+        private fun makeStopIntent(context: Context) = Intent(context, CodeforcesContestWatchService::class.java).setAction(ACTION_STOP)
 
         fun startService(context: Context, handle: String, contestID: Int){
             if(isStarted(context)){
@@ -102,18 +103,20 @@ class CodeforcesContestWatchService: Service() {
 
         startForeground(NotificationIDs.codeforces_contest_watcher, notification.build())
 
-        watcherJob = CodeforcesContestWatcher(
-            handle,
-            contestID
-        ).apply {
-            addCodeforcesContestWatchListener(
-                CodeforcesContestWatcherTableNotification(
-                    this@CodeforcesContestWatchService,
-                    handle,
-                    notification
+        watcherJob = scope.launch {
+            CodeforcesContestWatcher(
+                handle,
+                contestID
+            ).apply {
+                addCodeforcesContestWatchListener(
+                    CodeforcesContestWatcherTableNotification(
+                        this@CodeforcesContestWatchService,
+                        handle,
+                        notification
+                    )
                 )
-            )
-        }.start(scope)
+            }.start()
+        }
     }
 
 }

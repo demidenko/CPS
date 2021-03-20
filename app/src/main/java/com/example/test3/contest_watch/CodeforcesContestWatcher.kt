@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 
 class CodeforcesContestWatcher(val handle: String, val contestID: Int): CodeforcesContestWatchListener {
 
-    private suspend fun watchContest(){
+    suspend fun start(){
         val contestName = ChangingValue("")
         val contestType = ChangingValue(CodeforcesContestType.UNDEFINED)
         val phaseCodeforces = ChangingValue(CodeforcesContestPhase.UNDEFINED)
@@ -175,12 +175,6 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
         onRatingChange(change)
 
         return true
-    }
-
-    fun start(scope: CoroutineScope): Job {
-        return scope.launch {
-            watchContest()
-        }
     }
 
     private val listeners = mutableListOf<CodeforcesContestWatchListener>()
