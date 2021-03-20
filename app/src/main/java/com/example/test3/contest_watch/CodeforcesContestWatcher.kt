@@ -156,9 +156,9 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
 
                 val hoursWaiting = TimeUnit.MILLISECONDS.toHours(currentTimeMillis - ratingChangeWaitingStartTimeMillis)
                 return when {
-                    hoursWaiting<=1 -> 10_000
-                    hoursWaiting<=2 -> 30_000
-                    hoursWaiting<=4 -> 60_000
+                    hoursWaiting<=0 -> 10_000
+                    hoursWaiting<=1 -> 30_000
+                    hoursWaiting<=3 -> 60_000
                     else -> 0
                 }
             }
