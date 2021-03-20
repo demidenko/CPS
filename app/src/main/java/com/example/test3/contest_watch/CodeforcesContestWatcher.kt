@@ -19,7 +19,6 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
         val sysTestPercentage = ChangingValue(-1)
         var problemsResults: List<ChangingValue<CodeforcesProblemResult>> = emptyList()
         val testedSubmissions = mutableSetOf<Long>()
-        var ratingChangeWaitingStartTimeMillis = 0L
 
         while (true) {
             var timeSecondsFromStart: Long? = null
@@ -130,28 +129,40 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
             }
 
 
-            //------------------------
+
             commit()
-            when(phaseCodeforces.value){
-                CodeforcesContestPhase.CODING -> delay(3_000)
-                CodeforcesContestPhase.SYSTEM_TEST -> delay(3_000)
-                CodeforcesContestPhase.PENDING_SYSTEM_TEST -> delay(15_000)
-                CodeforcesContestPhase.FINISHED -> {
-                    if(checkRatingChanges(participationType.value)) return
 
-                    val currentTimeMillis = System.currentTimeMillis()
-                    if(ratingChangeWaitingStartTimeMillis == 0L) ratingChangeWaitingStartTimeMillis = currentTimeMillis
-
-                    val hoursWaiting = TimeUnit.MILLISECONDS.toHours(currentTimeMillis - ratingChangeWaitingStartTimeMillis)
-                    when {
-                        hoursWaiting<=1 -> delay(10_000)
-                        hoursWaiting<=2 -> delay(30_000)
-                        hoursWaiting<=4 -> delay(60_000)
-                        else -> return
-                    }
+            when(val delayMillis = getDelayMillis(phaseCodeforces.value, participationType.value)){
+                0L -> {
+                    return
+                    //delay(60_000)
                 }
-                else -> delay(30_000)
+                else -> delay(delayMillis)
             }
+        }
+    }
+
+    private var ratingChangeWaitingStartTimeMillis = 0L
+    private suspend fun getDelayMillis(contestPhase: CodeforcesContestPhase, participationType: CodeforcesParticipationType): Long {
+        when(contestPhase){
+            CodeforcesContestPhase.CODING -> return 3_000
+            CodeforcesContestPhase.SYSTEM_TEST -> return 3_000
+            CodeforcesContestPhase.PENDING_SYSTEM_TEST -> return 15_000
+            CodeforcesContestPhase.FINISHED -> {
+                if(checkRatingChanges(participationType)) return 0
+
+                val currentTimeMillis = System.currentTimeMillis()
+                if(ratingChangeWaitingStartTimeMillis == 0L) ratingChangeWaitingStartTimeMillis = currentTimeMillis
+
+                val hoursWaiting = TimeUnit.MILLISECONDS.toHours(currentTimeMillis - ratingChangeWaitingStartTimeMillis)
+                return when {
+                    hoursWaiting<=1 -> 10_000
+                    hoursWaiting<=2 -> 30_000
+                    hoursWaiting<=4 -> 60_000
+                    else -> 0
+                }
+            }
+            else -> return 30_000
         }
     }
 
