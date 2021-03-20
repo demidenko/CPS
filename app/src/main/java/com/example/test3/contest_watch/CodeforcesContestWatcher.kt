@@ -14,7 +14,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
         val pointsTotal = ChangingValue(0.0)
         val durationSeconds = ChangingValue(-1L)
         val startTimeSeconds = ChangingValue(-1L)
-        var problemNames: ArrayList<String>? = null
+        var problemNames: List<String>? = null
         val participationType = ChangingValue(CodeforcesParticipationType.NOT_PARTICIPATED)
         val sysTestPercentage = ChangingValue(-1)
         var problemsResults: List<ChangingValue<CodeforcesProblemResult>> = emptyList()
@@ -23,16 +23,18 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
 
         while (true) {
             var timeSecondsFromStart: Long? = null
-            CodeforcesAPI.getContestStandings(contestID, handle, participationType.value!=CodeforcesParticipationType.CONTESTANT)?.run {
+            CodeforcesAPI.getContestStandings(
+                contestID,
+                handle,
+                participationType.value!=CodeforcesParticipationType.CONTESTANT
+            )?.run {
                 if(status == CodeforcesAPIStatus.FAILED){
                     if(isContestNotStarted(contestID)) phaseCodeforces.value = CodeforcesContestPhase.BEFORE
                     return@run
                 }
-                with(result ?: return@run){
-                    if(problemNames == null){
-                        val tmp = problems.mapTo(ArrayList()) { it.index }
-                        problemNames = tmp
-                        onSetProblemNames(tmp.toTypedArray())
+                result?.run {
+                    if(problemNames == null) problemNames = problems.map { it.index }.also {
+                        onSetProblemNames(it.toTypedArray())
                     }
 
                     phaseCodeforces.value = contest.phase
@@ -69,14 +71,9 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
                 //get progress of testing (0% ... 100%)
                 delay(1000)
                 CodeforcesAPI.getPageSource("contest/$contestID", "en")?.let { page ->
-                    var i = page.indexOf("<span class=\"contest-state-regular\">")
-                    if (i != -1) {
-                        i = page.indexOf(">", i + 1)
-                        val progress = page.substring(i + 1, page.indexOf("</", i + 1))
-                        if (progress.endsWith('%')) {
-                            sysTestPercentage.value = progress.substring(0, progress.length - 1).toInt()
-                            if(sysTestPercentage.isChanged()) onSetSysTestProgress(sysTestPercentage.value)
-                        }
+                    CodeforcesUtils.parseTestPercentage(page)?.let { percentage ->
+                        sysTestPercentage.value = percentage
+                        if(sysTestPercentage.isChanged()) onSetSysTestProgress(sysTestPercentage.value)
                     }
                 }
             }
@@ -102,21 +99,20 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
                         val problemName = problemNames!![index]
                         onSetProblemResult(problemName, result)
                     }
-
                 }
             }
 
             if((phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST || phaseCodeforces.value == CodeforcesContestPhase.FINISHED)
                 && participationType.value.participatedInContest()
                 //&& contestType.value == CodeforcesContestType.CF
-                && problemsResults.count {
+                && problemsResults.any {
                     it.value.type == CodeforcesProblemStatus.PRELIMINARY || it.isChanged() && it.value.type == CodeforcesProblemStatus.FINAL
-                } > 0
+                }
             ){
                 delay(1000)
                 CodeforcesAPI.getContestSubmissions(contestID, handle)?.result
                     ?.filter { submission ->
-                            !testedSubmissions.contains(submission.id)
+                            submission.id !in testedSubmissions
                             &&
                             submission.author.participantType.participatedInContest()
                             &&

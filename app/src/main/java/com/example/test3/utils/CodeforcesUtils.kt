@@ -145,6 +145,16 @@ object CodeforcesUtils {
         return Pair(blogs, comments)
     }
 
+    fun parseTestPercentage(s: String): Int? {
+        var i = s.indexOf("<span class=\"contest-state-regular\">")
+        if (i != -1) {
+            i = s.indexOf(">", i + 1)
+            val progress = s.substring(i + 1, s.indexOf("</", i + 1))
+            return progress.removeSuffix("%").toIntOrNull()
+        }
+        return null
+    }
+
     fun fromCodeforcesHTML(str: String): Spanned {
         var s = str
         s = s.replace("<code>", "<font face=monospace>").replace("</code>", "</font>")
