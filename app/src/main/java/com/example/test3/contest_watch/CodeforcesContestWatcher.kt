@@ -1,15 +1,10 @@
 package com.example.test3.contest_watch
 
 import com.example.test3.utils.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
 
-class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope: CoroutineScope): CodeforcesContestWatchListener {
-
-    private var job: Job? = null
+class CodeforcesContestWatcher(val handle: String, val contestID: Int): CodeforcesContestWatchListener {
 
     private suspend fun watchContest(){
         val contestName = ChangingValue("")
@@ -177,24 +172,16 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int, val scope
 
         val change = response.result?.findLast { it.handle == handle } ?: return false
 
-        scope.launch {
-            onRatingChange(change)
-        }
+        onRatingChange(change)
 
         return true
     }
 
-    fun start() {
-        job = scope.launch {
+    fun start(scope: CoroutineScope): Job {
+        return scope.launch {
             watchContest()
         }
     }
-
-    fun stop(){
-        job?.cancel()
-    }
-
-
 
     private val listeners = mutableListOf<CodeforcesContestWatchListener>()
 

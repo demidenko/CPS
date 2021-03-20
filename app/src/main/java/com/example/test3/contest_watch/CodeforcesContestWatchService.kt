@@ -89,11 +89,11 @@ class CodeforcesContestWatchService: Service() {
     }
 
 
-    private var watcher: CodeforcesContestWatcher? = null
+    private var watcherJob: Job? = null
 
     private fun stopWatcher(){
-        watcher?.stop()
-        watcher = null
+        watcherJob?.cancel()
+        watcherJob = null
     }
 
     private fun start(handle: String, contestID: Int, notification: NotificationCompat.Builder){
@@ -102,10 +102,9 @@ class CodeforcesContestWatchService: Service() {
 
         startForeground(NotificationIDs.codeforces_contest_watcher, notification.build())
 
-        watcher = CodeforcesContestWatcher(
+        watcherJob = CodeforcesContestWatcher(
             handle,
-            contestID,
-            scope
+            contestID
         ).apply {
             addCodeforcesContestWatchListener(
                 CodeforcesContestWatcherTableNotification(
@@ -114,8 +113,7 @@ class CodeforcesContestWatchService: Service() {
                     notification
                 )
             )
-            start()
-        }
+        }.start(scope)
     }
 
 }
