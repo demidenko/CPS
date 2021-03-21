@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.*
+import com.example.test3.account_manager.RatedAccountManager
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.observeUpdates
 import com.example.test3.ui.settingsUI
@@ -30,6 +31,11 @@ class AccountViewFragment: CPSFragment() {
         val manager = panel.manager
 
         cpsTitle = "::accounts.${manager.managerName}"
+        if(manager is RatedAccountManager){
+            setBottomPanelId(R.id.support_navigation_rated_account, R.layout.navigation_rated_account)
+        } else {
+            setBottomPanelId(R.id.support_navigation_empty, R.layout.navigation_empty)
+        }
 
         fun showBigView() = lifecycleScope.launch { panel.showBigView(this@AccountViewFragment) }
 

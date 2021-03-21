@@ -14,7 +14,7 @@ open class CPSFragment : Fragment() {
         if(arguments==null) arguments = Bundle()
     }
 
-    protected val mainActivity by lazy { requireActivity() as MainActivity }
+    val mainActivity by lazy { requireActivity() as MainActivity }
 
     companion object {
         private const val keyTitle = "cps_title"

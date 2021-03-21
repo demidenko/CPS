@@ -4,13 +4,15 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
-import android.widget.TextView
+import android.widget.ImageButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.R
 import com.example.test3.account_manager.*
 import com.example.test3.getColorFromResource
+import com.example.test3.utils.disable
+import com.example.test3.utils.enable
 import com.example.test3.utils.getCurrentTimeSeconds
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
@@ -210,7 +212,6 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         suspend fun showInAccountViewFragment(fragment: AccountViewFragment, manager: RatedAccountManager){
 
             val view = fragment.requireView().findViewById<ConstraintLayout>(R.id.account_view_rating_graph_view)
-            view.isVisible = true
 
             val info = manager.getSavedInfo()
             if(info.status != STATUS.OK || manager.getRating(info) == NOT_RATED){
@@ -246,20 +247,17 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                 }
             }
 
-
-            view.findViewById<TextView>(R.id.account_view_rating_graph_title).apply {
-                text = "Show rating graph"
-                setOnClickListener { title -> title as TextView
+            fragment.requireBottomPanel().findViewById<ImageButton>(R.id.navigation_rated_account_rating_graph)
+                .setOnClickListener { button -> button as ImageButton
                     fragment.lifecycleScope.launch {
-                        title.isEnabled = false
-                        title.text = "Loading..."
+                        button.disable()
                         val history = manager.getRatingHistory(info)
-                        title.isEnabled = true
                         if(history == null || history.isEmpty()){
-                            title.text = "Failed. Try again."
+                            fragment.mainActivity.showToast("Load failed. Try again.")
+                            button.enable()
                             return@launch
                         }
-                        title.text = ""
+
                         ratingGraphView.apply {
                             setHistory(history)
                             isVisible = true
@@ -308,11 +306,10 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                                 }
                             }
                         }
+
+                        view.isVisible = true
                     }
                 }
-            }
-
-
         }
     }
 }
