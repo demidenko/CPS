@@ -125,7 +125,7 @@ class NewsFragment : CPSFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         cpsTitle = "::news"
-        setBottomPanelId(R.id.support_navigation_news)
+        setBottomPanelId(R.id.support_navigation_news, R.layout.navigation_news)
 
         val badgeColor = getColorFromResource(mainActivity, R.color.newEntryColor)
 

@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity(){
 
     val navigation: LinearLayout by lazy { findViewById(R.id.navigation) }
     val navigationMain: BottomNavigationView by lazy { navigation.findViewById(R.id.navigation_main) }
+    val navigationSupport: LinearLayout by lazy { navigation.findViewById(R.id.support_navigation) }
 
     val progressBarHolder: LinearLayout by lazy { findViewById(R.id.progress_bar_holder) }
 

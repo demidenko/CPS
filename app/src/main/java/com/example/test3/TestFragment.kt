@@ -41,7 +41,7 @@ class TestFragment : CPSFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         cpsTitle = "::develop"
-        setBottomPanelId(R.id.support_navigation_develop)
+        setBottomPanelId(R.id.support_navigation_develop, R.layout.navigation_dev)
 
         //show running jobs
         val workersTextView = view.findViewById<TextView>(R.id.workers)
@@ -49,7 +49,8 @@ class TestFragment : CPSFragment() {
             workersTextView.text = infos.joinToString(separator = "\n"){ info ->
                 buildString {
                     val str = info.tags.find { it!=WorkersCenter.commonTag }
-                        ?.removePrefix("com.example.test3.workers.")
+                        ?.split(".")
+                        ?.last()
                         ?.removeSuffix("Worker")
                     append("$str ${info.state.name}")
                 }

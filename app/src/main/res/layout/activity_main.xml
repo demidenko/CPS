@@ -45,44 +45,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            >
-
-            <include
-                android:id="@+id/support_navigation_accounts"
-                layout="@layout/navigation_accounts"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                />
-
-            <include
-                android:id="@+id/support_navigation_news"
-                layout="@layout/navigation_news"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                />
-
-            <include
-                android:id="@+id/support_navigation_develop"
-                layout="@layout/navigation_dev"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                />
-
-            <include
-                android:id="@+id/support_navigation_cf_follow"
-                layout="@layout/navigation_cf_follow"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                />
-
-        </LinearLayout>
-
-
-
+            />
 
 
         <View

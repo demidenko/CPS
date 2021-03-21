@@ -82,7 +82,7 @@ class AccountsFragment: CPSFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         cpsTitle = "::accounts"
-        setBottomPanelId(R.id.support_navigation_accounts)
+        setBottomPanelId(R.id.support_navigation_accounts, R.layout.navigation_accounts)
 
         view.findViewById<LinearLayout>(R.id.panels_layout).apply {
             val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)

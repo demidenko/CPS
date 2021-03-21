@@ -1,6 +1,7 @@
 package com.example.test3.ui
 
 import android.os.Bundle
+import androidx.annotation.LayoutRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -19,6 +20,7 @@ open class CPSFragment : Fragment() {
         private const val keyId = "cps_id"
         private const val keyParentId = "cps_parent_id"
         private const val keyBottomPanelId = "cps_bottom_panel_id"
+        private const val keyBottomPanelLayoutId = "cps_bottom_panel_layout_id"
     }
 
     var cpsTitle: String
@@ -42,8 +44,14 @@ open class CPSFragment : Fragment() {
     private val bottomPanel: ConstraintLayout? by lazy {
         with(requireArguments()){
             if(!containsKey(keyBottomPanelId)) null
-            else getInt(keyBottomPanelId).let {
-                mainActivity.navigation.findViewById<ConstraintLayout>(it)
+            else{
+                val id = getInt(keyBottomPanelId)
+                with(mainActivity.navigationSupport){
+                    if(findViewById<ConstraintLayout>(id) == null){
+                        layoutInflater.inflate(getInt(keyBottomPanelLayoutId), this)
+                    }
+                    findViewById<ConstraintLayout>(id)
+                }
             }
         }
     }
@@ -52,8 +60,11 @@ open class CPSFragment : Fragment() {
         return bottomPanel ?: throw CPSFragmentException("bottom panel is not defined")
     }
 
-    fun setBottomPanelId(id: Int) {
-        requireArguments().putInt(keyBottomPanelId, id)
+    fun setBottomPanelId(id: Int, @LayoutRes layoutId: Int) {
+        requireArguments().apply {
+            putInt(keyBottomPanelId, id)
+            putInt(keyBottomPanelLayoutId, layoutId)
+        }
     }
 
     private fun showStuff() {

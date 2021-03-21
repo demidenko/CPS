@@ -39,7 +39,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         cpsTitle = "::news.codeforces.follow.list"
-        setBottomPanelId(R.id.support_navigation_cf_follow)
+        setBottomPanelId(R.id.support_navigation_cf_follow, R.layout.navigation_cf_follow)
 
         setHasOptionsMenu(true)
 
