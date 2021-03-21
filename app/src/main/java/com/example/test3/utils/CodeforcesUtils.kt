@@ -160,7 +160,7 @@ object CodeforcesUtils {
         s = s.replace("<code>", "<font face=monospace>").replace("</code>", "</font>")
         s = s.replace("\n", "<br/>")
         val res = fromHTML(s)
-        return res.trimEnd() as Spanned
+        return res.trimEnd() as? Spanned ?: res
     }
 
     enum class ColorTag {
