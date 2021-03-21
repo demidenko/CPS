@@ -3,6 +3,7 @@ package com.example.test3.ui
 import android.os.Bundle
 import androidx.annotation.LayoutRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.example.test3.MainActivity
@@ -46,12 +47,9 @@ open class CPSFragment : Fragment() {
             if(!containsKey(keyBottomPanelId)) null
             else{
                 val id = getInt(keyBottomPanelId)
-                with(mainActivity.navigationSupport){
-                    if(findViewById<ConstraintLayout>(id) == null){
-                        layoutInflater.inflate(getInt(keyBottomPanelLayoutId), this)
-                    }
-                    findViewById<ConstraintLayout>(id)
-                }
+                mainActivity.navigationSupport.findViewById<ConstraintLayout>(id)
+                    ?: mainActivity.layoutInflater.inflate(getInt(keyBottomPanelLayoutId), mainActivity.navigationSupport)
+                        .findViewById<ConstraintLayout>(id).apply { isGone = true }
             }
         }
     }
@@ -91,6 +89,13 @@ open class CPSFragment : Fragment() {
         } else {
             showStuff()
         }
+    }
+
+    override fun onDetach() {
+        bottomPanel?.let {
+            mainActivity.navigationSupport.removeView(it)
+        }
+        super.onDetach()
     }
 
 }
