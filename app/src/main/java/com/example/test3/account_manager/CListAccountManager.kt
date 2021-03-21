@@ -46,14 +46,16 @@ class CListAccountManager(context: Context) : AccountManager(context, preference
         while (true) {
             i = s.indexOf("<span class=\"account btn-group", i+1)
             if(i == -1) break
-            var j = s.indexOf("<span class=", i+1)
-            j = s.indexOf(">", j+1)
-            val userName = s.substring(j+1, s.indexOf("</span",j+1))
-            val r = s.indexOf("href=\"/resource/", j)
-            val resource = s.substring(s.indexOf(">",r)+1, s.indexOf("</a",r))
-            val l = s.lastIndexOf("fa-external-link-alt", r)
-            val link = if (l!=-1 && l<r){
-                s.substring(s.lastIndexOf("href=", l)+6, s.lastIndexOf("\" target=\"_blank\"", l))
+            var j = s.indexOf("href=\"/resource/", i)
+            val l = s.indexOf("\"", s.indexOf("title=\"", j))
+            val resource = s.substring(l+1, s.indexOf("\"",l+1)).removeSuffix("/")
+            j = s.indexOf("<span class=", j+1)
+            var r = s.indexOf("</span>", j)
+            val userName = s.substring(s.indexOf(">", j)+1, r)
+            j = s.indexOf("fa-external-link-alt", j)
+            r = s.indexOf("</span>", r+1)
+            val link = if (j!=-1 && j<r){
+                s.substring(s.lastIndexOf("href=", j)+6, s.lastIndexOf("\" target=\"_blank\"", j))
             }else ""
             res.accounts[resource] = Pair(userName, link)
         }
