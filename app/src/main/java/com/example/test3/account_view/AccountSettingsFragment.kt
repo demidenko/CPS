@@ -42,9 +42,9 @@ class AccountSettingsFragment: CPSFragment() {
             findViewById<TextView>(R.id.account_settings_userid_title).text = "${manager.userIDName}:"
 
             setOnClickListener {
+                view.isEnabled = false
                 lifecycleScope.launch {
                     val userInfo = mainActivity.chooseUserID(manager) ?: return@launch
-                    view.isEnabled = false
                     manager.setSavedInfo(userInfo)
                     userId.text = userInfo.userID
                     view.isEnabled = true

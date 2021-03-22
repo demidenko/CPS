@@ -247,8 +247,9 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                 }
             }
 
-            fragment.requireBottomPanel().findViewById<ImageButton>(R.id.navigation_rated_account_rating_graph)
-                .setOnClickListener { button -> button as ImageButton
+            fragment.requireBottomPanel().findViewById<ImageButton>(R.id.navigation_rated_account_rating_graph).apply {
+                enable()
+                setOnClickListener { button -> button as ImageButton
                     fragment.lifecycleScope.launch {
                         button.disable()
                         val history = manager.getRatingHistory(info)
@@ -310,6 +311,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                         view.isVisible = true
                     }
                 }
+            }
         }
     }
 }
