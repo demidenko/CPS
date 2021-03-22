@@ -5,7 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
-import com.example.test3.contest_watch.CodeforcesContestWatchService
+import com.example.test3.contest_watch.CodeforcesContestWatchWorker
 import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesAPIStatus
 import com.example.test3.utils.getCurrentTimeSeconds
@@ -79,7 +79,7 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
                     if(contestID != -1){
                         if(canceled.none { it.first == contestID }) {
                             settings.setContestWatchStartedContestID(contestID)
-                            CodeforcesContestWatchService.startService(context, info.handle, contestID)
+                            CodeforcesContestWatchWorker.startWorker(context, info.handle, contestID)
                         }
                     }
                     return Result.success()
@@ -91,11 +91,12 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
 
     companion object {
         fun stopWatcher(context: Context, contestID: Int) = runBlocking {
-            val settings = CodeforcesAccountManager(context).getSettings()
-            val canceled = settings.getContestWatchCanceled().toMutableList()
-            canceled.add(Pair(contestID, getCurrentTimeSeconds()))
-            settings.setContestWatchCanceled(canceled)
-            settings.setContestWatchStartedContestID(-1)
+            with(CodeforcesAccountManager(context).getSettings()){
+                setContestWatchStartedContestID(-1)
+                val canceled = getContestWatchCanceled().toMutableList()
+                canceled.add(contestID to getCurrentTimeSeconds())
+                setContestWatchCanceled(canceled)
+            }
         }
     }
 

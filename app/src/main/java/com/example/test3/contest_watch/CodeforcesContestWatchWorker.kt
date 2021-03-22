@@ -1,17 +1,17 @@
 package com.example.test3.contest_watch
 
 import android.content.Context
-import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
-import androidx.core.graphics.drawable.IconCompat
 import androidx.work.*
 import com.example.test3.*
 import com.example.test3.R
 import com.example.test3.utils.CodeforcesURLFactory
+import com.example.test3.workers.CodeforcesContestWatchLauncherWorker
 import com.example.test3.workers.WorkersCenter
 import com.example.test3.workers.WorkersNames
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
+import java.util.concurrent.CancellationException
+import java.util.concurrent.TimeUnit
 
 class CodeforcesContestWatchWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -49,11 +49,8 @@ class CodeforcesContestWatchWorker(val context: Context, params: WorkerParameter
 
         setForeground(ForegroundInfo(NotificationIDs.codeforces_contest_watcher, notification.build()))
 
-        withContext(Dispatchers.Default){
-            CodeforcesContestWatcher(
-                handle,
-                contestID,
-            ).apply {
+        try {
+            CodeforcesContestWatcher(handle, contestID,).apply {
                 addCodeforcesContestWatchListener(
                     CodeforcesContestWatcherTableNotification(
                         context,
@@ -62,6 +59,12 @@ class CodeforcesContestWatchWorker(val context: Context, params: WorkerParameter
                     )
                 )
             }.start()
+
+            while (true) {
+                delay(TimeUnit.MINUTES.toMillis(5))
+            }
+        }catch (e: CancellationException){
+            CodeforcesContestWatchLauncherWorker.stopWatcher(context, contestID)
         }
 
         return Result.success()
@@ -79,25 +82,18 @@ class CodeforcesContestWatchWorker(val context: Context, params: WorkerParameter
             setStyle(NotificationCompat.DecoratedCustomViewStyle())
         }
 
-        //TODO call CodeforcesContestWatchLauncherWorker.stopWatcher
-        notification.addAction(NotificationCompat.Action(
-            createIcon(R.drawable.ic_delete_item),
+        notification.addAction(
+            R.drawable.ic_delete_item,
             "Close",
             WorkManager.getInstance(context).createCancelPendingIntent(id)
-        ))
+        )
 
-        notification.addAction(NotificationCompat.Action(
-            createIcon(R.drawable.ic_open_in_browser),
+        notification.addAction(
+            R.drawable.ic_open_in_browser,
             "Browse",
             makePendingIntentOpenURL(CodeforcesURLFactory.contest(contestID),context)
-        ))
+        )
 
         return notification
-    }
-
-    private fun createIcon(@DrawableRes resid: Int): IconCompat? {
-        return if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O){
-            IconCompat.createWithResource(context, resid)
-        } else null
     }
 }
