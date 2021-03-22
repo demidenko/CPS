@@ -57,7 +57,7 @@ class ProjectEulerRecentProblemsWorker(private val context: Context, params: Wor
                     setContentTitle("Problem $id")
                     setBigContent(name)
                     setSmallIcon(R.drawable.ic_projecteuler_logo)
-                    setColor(NotificationColors.project_euler_main)
+                    setColor(getColorFromResource(context, R.color.project_euler_main))
                     setShowWhen(true)
                     setAutoCancel(true)
                     setContentIntent(makePendingIntentOpenURL("https://projecteuler.net/problem=$id", context))
