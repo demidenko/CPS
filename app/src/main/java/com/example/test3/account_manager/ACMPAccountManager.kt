@@ -1,16 +1,18 @@
 package com.example.test3.account_manager
 
 import android.content.Context
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.test3.utils.ACMPAPI
 import com.example.test3.utils.jsonCPS
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class ACMPAccountManager(context: Context): AccountManager(context, preferences_file_name) {
+class ACMPAccountManager(context: Context): AccountManager(context, manager_name) {
 
     companion object {
-        const val preferences_file_name = "acmp"
+        const val manager_name = "acmp"
+        private val Context.account_acmp_dataStore by preferencesDataStore(manager_name)
     }
 
     @Serializable
@@ -88,4 +90,7 @@ class ACMPAccountManager(context: Context): AccountManager(context, preferences_
         }
         return res
     }
+
+    override fun getDataStore() = AccountDataStore(context.account_acmp_dataStore)
+
 }

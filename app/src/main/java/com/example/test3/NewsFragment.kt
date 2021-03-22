@@ -8,6 +8,7 @@ import android.widget.ImageButton
 import androidx.core.text.color
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -288,8 +289,11 @@ class NewsFragment : CPSFragment() {
 
     val viewedDataStore by lazy { CodeforcesNewsViewedBlogsDataStore(mainActivity) }
 
-    class CodeforcesNewsViewedBlogsDataStore(context: Context)
-        : SettingsDataStore(context, "data_news_fragment_cf_viewed"){
+    class CodeforcesNewsViewedBlogsDataStore(context: Context): CPSDataStore(context.cf_blogs_viewed_dataStore){
+
+        companion object {
+            private val Context.cf_blogs_viewed_dataStore by preferencesDataStore("data_news_fragment_cf_viewed")
+        }
 
         private fun makeKey(title: CodeforcesTitle) = stringSetPreferencesKey("blogs_viewed_${title.name}")
 

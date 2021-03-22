@@ -89,7 +89,7 @@ class AccountsFragment: CPSFragment() {
 
             panels.forEach { panel ->
                 addView(panel.createSmallView(), params)
-                panel.manager.dataStoreLive.observe(viewLifecycleOwner){
+                panel.manager.getDataStoreLive().observe(viewLifecycleOwner){
                     lifecycleScope.launch { panel.show() }
                 }
             }
@@ -155,7 +155,9 @@ class AccountsFragment: CPSFragment() {
 
     private fun clistImport() {
         lifecycleScope.launch {
-            val clistUserInfo = mainActivity.chooseUserID(CListAccountManager(mainActivity)) as? CListAccountManager.CListUserInfo ?: return@launch
+            val clistUserInfo = with(CListAccountManager(mainActivity)){
+                mainActivity.chooseUserID(emptyInfo(), this) as? CListAccountManager.CListUserInfo
+            } ?: return@launch
 
             addAccountButton.disable()
 

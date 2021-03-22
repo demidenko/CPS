@@ -1,6 +1,7 @@
 package com.example.test3.account_manager
 
 import android.content.Context
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.test3.utils.TimusAPI
 import com.example.test3.utils.fromHTML
 import com.example.test3.utils.jsonCPS
@@ -8,10 +9,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class TimusAccountManager(context: Context): AccountManager(context, preferences_file_name) {
+class TimusAccountManager(context: Context): AccountManager(context, manager_name) {
 
     companion object {
-        const val preferences_file_name = "timus"
+        const val manager_name = "timus"
+        private val Context.account_timus_dataStore by preferencesDataStore(manager_name)
     }
 
     @Serializable
@@ -92,4 +94,6 @@ class TimusAccountManager(context: Context): AccountManager(context, preferences
         }
         return res
     }
+
+    override fun getDataStore() = AccountDataStore(context.account_timus_dataStore)
 }

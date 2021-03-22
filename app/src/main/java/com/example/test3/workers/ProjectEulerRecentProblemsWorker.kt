@@ -4,13 +4,14 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.test3.*
 import com.example.test3.news.NewsFeed
 import com.example.test3.news.settingsNews
+import com.example.test3.utils.CPSDataStore
 import com.example.test3.utils.ProjectEulerAPI
-import com.example.test3.utils.SettingsDataStore
 import kotlinx.coroutines.flow.first
 
 class ProjectEulerRecentProblemsWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
@@ -19,7 +20,7 @@ class ProjectEulerRecentProblemsWorker(private val context: Context, params: Wor
         suspend fun isEnabled(context: Context): Boolean = context.settingsNews.getNewsFeedEnabled(NewsFeed.PROJECT_EULER_RECENT)
     }
 
-    private val dataStore by lazy { ProjectEulerRecentProblemsJobServiceDataStore(context) }
+    private val dataStore by lazy { ProjectEulerRecentProblemsWorkerDataStore(context) }
 
     override suspend fun doWork(): Result {
 
@@ -74,9 +75,11 @@ class ProjectEulerRecentProblemsWorker(private val context: Context, params: Wor
         return Result.success()
     }
 
-    class ProjectEulerRecentProblemsJobServiceDataStore(context: Context): SettingsDataStore(context, "jobservice_project_euler_recent") {
+    class ProjectEulerRecentProblemsWorkerDataStore(context: Context): CPSDataStore(context.pe_recent_worker_dataStore) {
 
         companion object {
+            private val Context.pe_recent_worker_dataStore by preferencesDataStore("worker_project_euler_recent")
+
             private val KEY_LAST_RECENT_PROBLEM_ID = intPreferencesKey("last_recent_problem_id")
         }
 

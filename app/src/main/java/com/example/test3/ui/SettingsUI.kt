@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -15,7 +16,7 @@ import androidx.lifecycle.asLiveData
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.getColorFromResource
-import com.example.test3.utils.SettingsDataStore
+import com.example.test3.utils.CPSDataStore
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -34,11 +35,14 @@ fun<T> LiveData<T>.observeUpdates(owner: LifecycleOwner, _onChanged: (T)->Unit){
 }
 
 
-class SettingsUI(private val context: Context): SettingsDataStore(context, "settings_ui") {
+class SettingsUI(private val context: Context): CPSDataStore(context.settingsUI_dataStore) {
+    companion object {
+        private val Context.settingsUI_dataStore by preferencesDataStore("settings_ui")
 
-    private val KEY_USE_REAL_COLORS = booleanPreferencesKey("use_real_colors")
-    private val KEY_USE_STATUS_BAR = booleanPreferencesKey("use_status_bar")
-    private val KEY_UI_MODE = stringPreferencesKey("ui_mode")
+        private val KEY_USE_REAL_COLORS = booleanPreferencesKey("use_real_colors")
+        private val KEY_USE_STATUS_BAR = booleanPreferencesKey("use_status_bar")
+        private val KEY_UI_MODE = stringPreferencesKey("ui_mode")
+    }
 
     private val useRealColorsFlow = dataStore.data.map { it[KEY_USE_REAL_COLORS] ?: false }
     val useRealColorsLiveData = useRealColorsFlow.distinctUntilChanged().asLiveData()
@@ -62,12 +66,12 @@ class SettingsUI(private val context: Context): SettingsDataStore(context, "sett
     }
 }
 
-val Context.settingsUI by SettingsDelegate{ SettingsUI(it) }
+val Context.settingsUI by CPSDataStoreDelegate{ SettingsUI(it) }
 fun Context.getUseRealColors() = runBlocking { settingsUI.getUseRealColors() }
 suspend fun Context.setUseRealColors(use: Boolean) = settingsUI.setUseRealColors(use)
 
 
-class SettingsDelegate<T: SettingsDataStore>(
+class CPSDataStoreDelegate<T: CPSDataStore>(
     val create: (Context)->T
 ) {
     private var _dataStore: T? = null

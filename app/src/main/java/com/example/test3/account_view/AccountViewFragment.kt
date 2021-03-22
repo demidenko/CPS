@@ -39,7 +39,7 @@ class AccountViewFragment: CPSFragment() {
 
         fun showBigView() = lifecycleScope.launch { panel.showBigView(this@AccountViewFragment) }
 
-        manager.dataStoreLive.observe(viewLifecycleOwner){
+        manager.getDataStoreLive().observe(viewLifecycleOwner){
             showBigView()
         }
 

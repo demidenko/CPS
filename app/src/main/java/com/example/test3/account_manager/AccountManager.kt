@@ -4,14 +4,16 @@ import android.content.Context
 import android.text.SpannableString
 import androidx.annotation.ColorRes
 import androidx.core.app.NotificationManagerCompat
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.asLiveData
 import com.example.test3.*
 import com.example.test3.ui.getUseRealColors
 import com.example.test3.utils.AtCoderRatingChange
+import com.example.test3.utils.CPSDataStore
 import com.example.test3.utils.CodeforcesRatingChange
-import com.example.test3.utils.SettingsDataStore
 import com.example.test3.utils.signedToString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -23,10 +25,8 @@ abstract class AccountManager(val context: Context, val managerName: String) {
 
     abstract val userIDName: String
 
-    protected open val dataStore = AccountDataStore(context, managerName)
-    val dataStoreLive by lazy{ dataStore.getLiveData() }
-
-    open fun getSettings() = AccountSettingsDataStore(context, managerName)
+    protected abstract fun getDataStore(): AccountDataStore
+    fun getDataStoreLive() = getDataStore().getLiveData()
 
     abstract fun emptyInfo(): UserInfo
 
@@ -45,13 +45,13 @@ abstract class AccountManager(val context: Context, val managerName: String) {
     protected abstract fun encodeToString(info: UserInfo): String
 
     suspend fun getSavedInfo(): UserInfo {
-        val str = dataStore.getString() ?: return emptyInfo()
+        val str = getDataStore().getString() ?: return emptyInfo()
         return decodeFromString(str)
     }
     suspend fun setSavedInfo(info: UserInfo) {
         val old = getSavedInfo()
-        dataStore.putString(encodeToString(info))
-        if(info.userID != old.userID) getSettings().resetRelatedData()
+        getDataStore().putString(encodeToString(info))
+        if(info.userID != old.userID && this is AccountSettingsProvider) getSettings().resetRelatedData()
     }
 
     open fun getColor(info: UserInfo): Int? = null
@@ -60,6 +60,9 @@ abstract class AccountManager(val context: Context, val managerName: String) {
     open fun isValidForUserID(char: Char): Boolean = true
 }
 
+interface AccountSettingsProvider {
+    fun getSettings(): AccountSettingsDataStore
+}
 
 abstract class RatedAccountManager(context: Context, managerName: String) : AccountManager(context, managerName){
     abstract fun getColor(handleColor: HandleColor): Int
@@ -115,9 +118,9 @@ data class RatingChange(
     )
 }
 
-class AccountDataStore(context: Context, name: String): SettingsDataStore(context, name) {
+class AccountDataStore(dataStore: DataStore<Preferences>) : CPSDataStore(dataStore) {
     companion object {
-        val KEY_USER_INFO = stringPreferencesKey("user_info")
+        private val KEY_USER_INFO = stringPreferencesKey("user_info")
     }
 
     fun getLiveData() = dataStore.data.asLiveData()
@@ -131,7 +134,7 @@ class AccountDataStore(context: Context, name: String): SettingsDataStore(contex
     }
 }
 
-open class AccountSettingsDataStore(context: Context, name: String): SettingsDataStore(context, "${name}_account_settings") {
+open class AccountSettingsDataStore(dataStore: DataStore<Preferences>) : CPSDataStore(dataStore) {
     open suspend fun resetRelatedData(){}
 }
 

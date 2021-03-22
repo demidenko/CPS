@@ -79,4 +79,8 @@ class CListAccountManager(context: Context) : AccountManager(context, preference
         return@withContext res
     }
 
+    override fun getDataStore(): AccountDataStore {
+        throw IllegalAccessException("CList account manager can not provide data store")
+    }
+
 }

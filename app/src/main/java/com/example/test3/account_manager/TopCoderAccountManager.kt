@@ -6,6 +6,7 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import androidx.core.text.set
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.test3.utils.TopCoderAPI
 import com.example.test3.utils.jsonCPS
 import kotlinx.serialization.Serializable
@@ -15,10 +16,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class TopCoderAccountManager(context: Context): RatedAccountManager(context, preferences_file_name) {
+class TopCoderAccountManager(context: Context): RatedAccountManager(context, manager_name) {
 
     companion object {
-        const val preferences_file_name = "topcoder"
+        const val manager_name = "topcoder"
+        private val Context.account_topcoder_dataStore by preferencesDataStore(manager_name)
 
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
     }
@@ -126,4 +128,5 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context, pre
         }
     }
 
+    override fun getDataStore() = AccountDataStore(context.account_topcoder_dataStore)
 }

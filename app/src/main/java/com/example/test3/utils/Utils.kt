@@ -1,6 +1,5 @@
 package com.example.test3.utils
 
-import android.content.Context
 import android.text.Html
 import android.text.Spanned
 import android.view.View
@@ -10,7 +9,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.HtmlCompat
-import androidx.datastore.preferences.createDataStore
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.MutableLiveData
 import com.example.test3.R
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -93,10 +93,7 @@ class MutableSetLiveSize<T>() {
     }
 }
 
-open class SettingsDataStore(context: Context, name: String) {
-    protected val dataStore by lazy { context.createDataStore(name = name) }
-}
-
+open class CPSDataStore(protected val dataStore: DataStore<Preferences>)
 
 private fun setupDescription(
     view: ConstraintLayout,

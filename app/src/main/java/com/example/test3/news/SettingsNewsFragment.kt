@@ -13,11 +13,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.CodeforcesTitle
 import com.example.test3.R
+import com.example.test3.ui.CPSDataStoreDelegate
 import com.example.test3.ui.CPSFragment
-import com.example.test3.ui.SettingsDelegate
 import com.example.test3.utils.*
 import com.example.test3.workers.WorkersCenter
 import com.example.test3.workers.WorkersNames
@@ -220,11 +221,13 @@ class SettingsNewsFragment: CPSFragment(){
 
 }
 
-val Context.settingsNews by SettingsDelegate { NewsSettingsDataStore(it) }
+val Context.settingsNews by CPSDataStoreDelegate { NewsSettingsDataStore(it) }
 
-class NewsSettingsDataStore(context: Context): SettingsDataStore(context, "news_settings"){
+class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_settings_dataStore){
 
     companion object {
+        private val Context.news_settings_dataStore by preferencesDataStore("news_settings")
+
         private val KEY_TAB = stringPreferencesKey("default_tab")
         private val KEY_RU = booleanPreferencesKey("ru_lang")
         private val KEY_LOST = booleanPreferencesKey("lost")

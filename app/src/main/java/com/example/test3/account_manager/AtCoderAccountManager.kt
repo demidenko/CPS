@@ -9,9 +9,9 @@ import androidx.core.text.set
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.test3.NotificationChannels
 import com.example.test3.NotificationIDs
-import com.example.test3.ui.SettingsDelegate
 import com.example.test3.utils.AtCoderAPI
 import com.example.test3.utils.AtCoderRatingChange
 import com.example.test3.utils.AtCoderURLFactory
@@ -23,11 +23,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class AtCoderAccountManager(context: Context): RatedAccountManager(context, preferences_file_name) {
+class AtCoderAccountManager(context: Context): RatedAccountManager(context, manager_name), AccountSettingsProvider {
 
     companion object {
-        const val preferences_file_name = "atcoder"
-        private val Context.accountDataStoreAtCoder by SettingsDelegate { AccountDataStore(it, preferences_file_name) }
+        const val manager_name = "atcoder"
+        private val Context.account_atcoder_dataStore by preferencesDataStore(manager_name)
     }
 
     @Serializable
@@ -146,7 +146,7 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context, pref
         }
     }
 
-    override val dataStore by lazy { context.accountDataStoreAtCoder }
+    override fun getDataStore() = AccountDataStore(context.account_atcoder_dataStore)
     override fun getSettings() = AtCoderAccountSettingsDataStore(this)
 
     fun notifyRatingChange(handle: String, ratingChange: AtCoderRatingChange){
@@ -165,9 +165,12 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context, pref
     }
 }
 
-class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager): AccountSettingsDataStore(manager.context, manager.managerName){
+class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager)
+    : AccountSettingsDataStore(manager.context.account_settings_atcoder_dataStore){
 
     companion object {
+        private val Context.account_settings_atcoder_dataStore by preferencesDataStore(AtCoderAccountManager.manager_name + "_account_settings")
+
         private val KEY_OBS_RATING = booleanPreferencesKey("observe_rating")
         private val KEY_LAST_RATED_CONTEST = stringPreferencesKey("last_rated_contest")
     }

@@ -14,12 +14,13 @@ import androidx.core.text.bold
 import androidx.core.text.color
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.asLiveData
 import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.RatedAccountManager
+import com.example.test3.ui.CPSDataStoreDelegate
 import com.example.test3.ui.CPSFragment
-import com.example.test3.ui.SettingsDelegate
-import com.example.test3.utils.SettingsDataStore
+import com.example.test3.utils.CPSDataStore
 import com.example.test3.workers.WorkersCenter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -123,10 +124,14 @@ class TestFragment : CPSFragment() {
     }
 }
 
-val Context.settingsDev by SettingsDelegate { SettingsDev(it) }
+val Context.settingsDev by CPSDataStoreDelegate { SettingsDev(it) }
 
-class SettingsDev(context: Context) : SettingsDataStore(context, "settings_develop") {
-    private val KEY_DEV = booleanPreferencesKey("develop_enabled")
+class SettingsDev(context: Context) : CPSDataStore(context.settings_dev_dataStore) {
+    companion object {
+        private val Context.settings_dev_dataStore by preferencesDataStore("settings_develop")
+
+        private val KEY_DEV = booleanPreferencesKey("develop_enabled")
+    }
 
     private val flowDevEnabled = dataStore.data.map { it[KEY_DEV] ?: false }
     fun getDevEnabled() = runBlocking { flowDevEnabled.first() }

@@ -6,6 +6,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.test3.*
@@ -29,7 +30,7 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
         return@withContext Result.success()
     }
 
-    private val dataStore by lazy { NewsJobServiceDataStore(context) }
+    private val dataStore by lazy { NewsWorkerDataStore(context) }
 
     private suspend fun parseACMP() {
         val s = ACMPAPI.getMainPage() ?: return
@@ -177,9 +178,11 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
         }
     }
 
-    class NewsJobServiceDataStore(context: Context): SettingsDataStore(context, "jobservice_news"){
+    class NewsWorkerDataStore(context: Context): CPSDataStore(context.news_worker_dataStore){
 
         companion object {
+            private val Context.news_worker_dataStore by preferencesDataStore("worker_news")
+
             private val KEY_ACMP_LAST_NEWS = intPreferencesKey("acmp_last_news")
             private val KEY_PROJECT_EULER_LAST_NEWS = stringPreferencesKey("project_euler_last_news")
             private val KEY_OLYMPIADS_ZAOCH_LAST_NEWS = stringPreferencesKey("olympiads_zaoch_last_news")

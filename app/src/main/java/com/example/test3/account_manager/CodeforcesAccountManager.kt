@@ -7,9 +7,9 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import androidx.core.text.set
 import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.test3.NotificationChannels
 import com.example.test3.NotificationIDs
-import com.example.test3.ui.SettingsDelegate
 import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -18,11 +18,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class CodeforcesAccountManager(context: Context): RatedAccountManager(context, preferences_file_name) {
+class CodeforcesAccountManager(context: Context): RatedAccountManager(context, manager_name), AccountSettingsProvider {
 
     companion object {
-        const val preferences_file_name = "codeforces"
-        private val Context.accountDataStoreCodeforces by SettingsDelegate { AccountDataStore(it, preferences_file_name) }
+        const val manager_name = "codeforces"
+        private val Context.account_codeforces_dataStore by preferencesDataStore(manager_name)
     }
 
     @Serializable
@@ -154,7 +154,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, p
         return makeSpan(info.handle, CodeforcesUtils.getTagByRating(info.rating))
     }
 
-    override val dataStore by lazy { context.accountDataStoreCodeforces }
+    override fun getDataStore() = AccountDataStore(context.account_codeforces_dataStore)
     override fun getSettings() = CodeforcesAccountSettingsDataStore(this)
 
     fun notifyRatingChange(ratingChange: CodeforcesRatingChange){
@@ -194,9 +194,12 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, p
     }
 }
 
-class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager): AccountSettingsDataStore(manager.context, manager.managerName){
+class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager)
+    : AccountSettingsDataStore(manager.context.account_settings_codeforces_dataStore){
 
     companion object {
+        private val Context.account_settings_codeforces_dataStore by preferencesDataStore(CodeforcesAccountManager.manager_name + "_account_settings")
+
         private val KEY_OBS_RATING = booleanPreferencesKey("observe_rating")
         private val KEY_LAST_RATED_CONTEST = intPreferencesKey("last_rated_contest")
 

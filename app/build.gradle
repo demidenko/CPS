@@ -20,8 +20,8 @@ android {
         applicationId "com.example.test3"
         minSdkVersion 22
         targetSdkVersion 30
-        versionCode = 169
-        versionName '0.39.3'
+        versionCode = 170
+        versionName '0.39.4'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -47,7 +47,7 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.1.0"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
-    implementation "androidx.datastore:datastore-preferences:1.0.0-alpha06"
+    implementation "androidx.datastore:datastore-preferences:1.0.0-alpha08"
 
     implementation "androidx.room:room-ktx:2.2.6"
     kapt "androidx.room:room-compiler:2.2.6"
