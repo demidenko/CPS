@@ -2,14 +2,12 @@ package com.example.test3.account_manager
 
 import android.content.Context
 import android.text.SpannableString
+import androidx.annotation.ColorRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.asLiveData
-import com.example.test3.NotificationChannelLazy
-import com.example.test3.R
-import com.example.test3.makePendingIntentOpenURL
-import com.example.test3.notificationBuilder
+import com.example.test3.*
 import com.example.test3.ui.getUseRealColors
 import com.example.test3.utils.AtCoderRatingChange
 import com.example.test3.utils.CodeforcesRatingChange
@@ -161,16 +159,16 @@ abstract class UserInfo{
 }
 
 
-enum class HandleColor(private val rgb: Int) {
-    GRAY(0x888888),
-    BROWN(0x80461B),
-    GREEN(0x009000),
-    CYAN(0x00A89E),
-    BLUE(0x3F68F0),
-    VIOLET(0xB04ECC),
-    YELLOW(0xCCCC00),
-    ORANGE(0xFB8000),
-    RED(0xED301D);
+enum class HandleColor(@ColorRes private val resid: Int) {
+    GRAY(R.color.GRAY),
+    BROWN(R.color.BROWN),
+    GREEN(R.color.GREEN),
+    CYAN(R.color.CYAN),
+    BLUE(R.color.BLUE),
+    VIOLET(R.color.VIOLET),
+    YELLOW(R.color.YELLOW),
+    ORANGE(R.color.ORANGE),
+    RED(R.color.RED);
 
     companion object {
         val rankedCodeforces    = arrayOf(GRAY, GRAY, GREEN, CYAN, BLUE, VIOLET, VIOLET, ORANGE, ORANGE, RED)
@@ -179,7 +177,8 @@ enum class HandleColor(private val rgb: Int) {
     }
 
     fun getARGB(manager: RatedAccountManager, realColor: Boolean): Int {
-        return ((if(realColor) manager.getColor(this) else rgb) + 0xFF000000).toInt()
+        return if(realColor) (manager.getColor(this) + 0xFF000000).toInt()
+            else getColorFromResource(manager.context,resid)
     }
 
     fun getARGB(manager: RatedAccountManager) = getARGB(manager, manager.context.getUseRealColors())
