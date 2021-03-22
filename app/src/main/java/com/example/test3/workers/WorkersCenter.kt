@@ -11,6 +11,7 @@ object WorkersNames {
     const val news_parsers = "news_feeds"
     const val codeforces_news_lost_recent = "cf_lost"
     const val codeforces_news_follow = "cf_follow"
+    const val codeforces_contest_watcher = "cf_contest_watcher"
     const val codeforces_contest_watch_launcher = "cf_contest_watch_launcher"
     const val project_euler_recent_problems = "pe_recent"
 }
@@ -21,6 +22,7 @@ object WorkersCenter {
 
     const val commonTag = "cps"
     fun getWorksLiveData(context: Context) = getWorkManager(context).getWorkInfosByTagLiveData(commonTag)
+    fun getWorkInfo(context: Context, name: String) = getWorkManager(context).getWorkInfosForUniqueWork(name)
 
     private inline fun<reified T: CoroutineWorker> makeAndEnqueueWork(
         context: Context,
@@ -40,6 +42,11 @@ object WorkersCenter {
                     .setRequiresBatteryNotLow(batteryNotLow)
                     .build()
             )
+            .setBackoffCriteria(
+                BackoffPolicy.LINEAR,
+                PeriodicWorkRequest.MIN_BACKOFF_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
             .build()
 
         getWorkManager(context).enqueueUniquePeriodicWork(
@@ -53,6 +60,7 @@ object WorkersCenter {
 
     suspend fun startWorkers(mainActivity: MainActivity) {
         startAccountsWorker(mainActivity, false)
+        startNewsWorker(mainActivity, false)
 
         if(CodeforcesNewsLostRecentWorker.isEnabled(mainActivity)) startCodeforcesNewsLostRecentWorker(mainActivity, false)
         if(CodeforcesNewsFollowWorker.isEnabled(mainActivity)) startCodeforcesNewsFollowWorker(mainActivity, false)
@@ -117,6 +125,14 @@ object WorkersCenter {
             WorkersNames.project_euler_recent_problems,
             restart,
             TimeUnit.HOURS to 1
+        )
+    }
+
+    fun startCodeforcesContestWatcher(context: Context, request: OneTimeWorkRequest.Builder) {
+        getWorkManager(context).enqueueUniqueWork(
+            WorkersNames.codeforces_contest_watcher,
+            ExistingWorkPolicy.REPLACE,
+            request.addTag(commonTag).build()
         )
     }
 
