@@ -136,7 +136,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
     }
 
     private fun createProgressNotification(): NotificationCompat.Builder {
-        return notificationBuilder(context, NotificationChannels.test)
+        return notificationBuilder(context, NotificationChannels.codeforces_follow_progress)
             .setContentTitle("Codeforces Follow Update...")
             .setSmallIcon(R.drawable.ic_cf_logo)
             .setNotificationSilent()

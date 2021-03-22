@@ -24,14 +24,14 @@ object NotificationChannels {
     //codeforces
     private val group_codeforces by lazy { NotificationChannelGroupLazy("codeforces", "CodeForces") }
     val codeforces_contest_watcher by lazy { NotificationChannelLazy("cf_contest_watcher", "Contest watch", Importance.DEFAULT, group_codeforces) }
-    val codeforces_rating_changes by lazy { NotificationChannelLazy("cf_rating_changes", "Rating changes", Importance.DEFAULT, group_codeforces) }
+    val codeforces_rating_changes by lazy { NotificationChannelLazy("cf_rating_changes", "Rating changes", Importance.HIGH, group_codeforces) }
     val codeforces_contribution_changes by lazy { NotificationChannelLazy("cf_contribution_changes", "Contribution changes", Importance.MIN, group_codeforces) }
     val codeforces_follow_new_blog by lazy { NotificationChannelLazy("cf_follow_new_blog", "Followed blogs", Importance.DEFAULT, group_codeforces) }
     val codeforces_follow_progress by lazy { NotificationChannelLazy("cf_follow_progress", "Follow update progress", Importance.MIN, group_codeforces) }
 
     //atcoder
     private val group_atcoder by lazy { NotificationChannelGroupLazy("atcoder", "AtCoder") }
-    val atcoder_rating_changes by lazy { NotificationChannelLazy("atcoder_rating_changes", "Rating changes", Importance.DEFAULT, group_atcoder) }
+    val atcoder_rating_changes by lazy { NotificationChannelLazy("atcoder_rating_changes", "Rating changes", Importance.HIGH, group_atcoder) }
 
     //project euler
     private val group_project_euler by lazy { NotificationChannelGroupLazy("project_euler", "Project Euler") }
@@ -53,13 +53,15 @@ object NotificationChannels {
 
     enum class Importance {
         MIN,
-        DEFAULT;
+        DEFAULT,
+        HIGH;
 
         @RequiresApi(Build.VERSION_CODES.N)
         fun convert(): Int =
             when(this){
                 DEFAULT -> NotificationManager.IMPORTANCE_DEFAULT
                 MIN -> NotificationManager.IMPORTANCE_MIN
+                HIGH -> NotificationManager.IMPORTANCE_HIGH
             }
     }
 }
