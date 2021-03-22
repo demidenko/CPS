@@ -35,8 +35,11 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
         val canceled: List<Pair<Int,Long>>
         with(codeforcesAccountManager.getSettings()){
             lastKnownID = getContestWatchLastSubmissionID()
-            canceled = getContestWatchCanceled().filter { (id, timeSeconds) -> !isTooLate(timeSeconds) }
-            setContestWatchCanceled(canceled)
+            canceled = getContestWatchCanceled().toMutableList().apply {
+                if(removeAll { (id, timeSeconds) -> isTooLate(timeSeconds) }){
+                    setContestWatchCanceled(this)
+                }
+            }
         }
 
         var firstID: Long? = null
