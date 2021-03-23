@@ -53,6 +53,7 @@ abstract class AccountManager(val context: Context, val managerName: String) {
         getDataStore().putString(encodeToString(info))
         if(info.userID != old.userID && this is AccountSettingsProvider) getSettings().resetRelatedData()
     }
+    suspend fun isEmpty() = getSavedInfo().userID.isBlank()
 
     open fun getColor(info: UserInfo): Int? = null
 

@@ -73,7 +73,7 @@ abstract class AccountPanel(
         return layout
     }
 
-    suspend fun isEmpty() = manager.getSavedInfo().userID.isBlank()
+    suspend fun isEmpty() = manager.isEmpty()
 
     protected abstract fun show(info: UserInfo)
 
@@ -84,7 +84,7 @@ abstract class AccountPanel(
             layout.isVisible = true
             show(manager.getSavedInfo())
         }
-        mainActivity.accountsFragment.statusBarColorManager.updatePanel(this)
+        mainActivity.accountsFragment.statusBarColorManager.updateBy(manager)
     }
 
     fun isBlocked(): Boolean = !reloadButton.isEnabled

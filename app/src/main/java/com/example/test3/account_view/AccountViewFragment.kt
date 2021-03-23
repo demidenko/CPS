@@ -47,7 +47,7 @@ class AccountViewFragment: CPSFragment() {
             showBigView()
         }
 
-        mainActivity.accountsFragment.statusBarColorManager.setCurrent(panel)
+        mainActivity.accountsFragment.statusBarColorManager.setCurrent(manager)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

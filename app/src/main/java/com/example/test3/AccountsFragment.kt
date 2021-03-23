@@ -1,6 +1,5 @@
 package com.example.test3
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,14 +8,10 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.*
 import com.example.test3.account_view.*
-import com.example.test3.ui.BottomProgressInfo
-import com.example.test3.ui.CPSFragment
-import com.example.test3.ui.observeUpdates
-import com.example.test3.ui.settingsUI
+import com.example.test3.ui.*
 import com.example.test3.utils.CListUtils
 import com.example.test3.utils.SharedReloadButton
 import com.example.test3.utils.disable
@@ -186,68 +181,6 @@ class AccountsFragment: CPSFragment() {
 
 
     val statusBarColorManager by lazy { StatusBarColorManager(this) }
-
-    class StatusBarColorManager(
-        private val accountsFragment: AccountsFragment
-    ) {
-
-        data class ColorInfo(
-            val color: Int = Color.TRANSPARENT,
-            val order: Double = -1e9
-        )
-
-        private val infoByPanel = mutableMapOf<String,ColorInfo>()
-        private var current: String? = null
-
-        private fun getListOfColors(): List<ColorInfo> {
-            if(current != null) return listOfNotNull(infoByPanel[current])
-            return infoByPanel.values.toList()
-        }
-
-        private var enabled: Boolean = true
-        init {
-            with(accountsFragment.mainActivity){
-                settingsUI.useStatusBarLiveData.observe(this){ use ->
-                    enabled = use
-                    updateStatusBar()
-                }
-            }
-        }
-
-        private fun updateStatusBar() {
-
-            val (best, allEmpty) =
-                getListOfColors().maxByOrNull { it.order }
-                    ?.let { it to false }
-                    ?: ColorInfo() to true
-
-            with(accountsFragment){
-                view?.findViewById<TextView>(R.id.accounts_welcome_text)?.isVisible = allEmpty
-                mainActivity.window.statusBarColor = (if(enabled) best else ColorInfo()).color
-            }
-        }
-
-        fun setCurrent(panel: AccountPanel?) {
-            current = panel?.manager?.managerName
-            updateStatusBar()
-        }
-
-        suspend fun updatePanel(panel: AccountPanel) {
-            val name = panel.manager.managerName
-            if(!panel.isEmpty()) {
-                infoByPanel[name] = ColorInfo()
-                (panel.manager as? RatedAccountManager)?.let { manager ->
-                    val info = manager.getSavedInfo()
-                    manager.getColor(info)?.let {
-                        infoByPanel[name] = ColorInfo(it, manager.getOrder(info))
-                    }
-                }
-            } else {
-                infoByPanel.remove(name)
-            }
-            updateStatusBar()
-        }
-    }
 
     fun showPanels() {
         lifecycleScope.launch {
