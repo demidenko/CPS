@@ -79,7 +79,6 @@ class AccountsFragment: CPSFragment() {
         cpsTitle = "::accounts"
         setBottomPanelId(R.id.support_navigation_accounts, R.layout.navigation_accounts)
 
-        statusBarColorManager //touch to init
         view.findViewById<LinearLayout>(R.id.panels_layout).apply {
             val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
 
@@ -96,6 +95,10 @@ class AccountsFragment: CPSFragment() {
 
         mainActivity.settingsUI.useRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
             showPanels()
+        }
+
+        statusBarColorManager.getStatusBarColorLiveData().observe(mainActivity){ color ->
+            mainActivity.window.statusBarColor = color
         }
 
         //TODO show wellcome text

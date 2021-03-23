@@ -1,18 +1,22 @@
 package com.example.test3.ui
 
 import android.graphics.Color
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.test3.MainActivity
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.RatedAccountManager
 import kotlinx.coroutines.runBlocking
 
+private const val NO_COLOR = Color.TRANSPARENT
+
 class StatusBarColorManager(
-    val mainActivity: MainActivity,
+    mainActivity: MainActivity,
     managers: List<AccountManager>
 ) {
 
-    class ColorInfo(
-        val color: Int = Color.TRANSPARENT,
+    private class ColorInfo(
+        val color: Int = NO_COLOR,
         val order: Double = -1e9
     )
 
@@ -44,11 +48,14 @@ class StatusBarColorManager(
         }
     }
 
+    private val statusBarColor = MutableLiveData<Int>()
+    fun getStatusBarColorLiveData(): LiveData<Int> = statusBarColor
+
     private fun recalculateStatusBarColor() {
-        val colorInfo = if(enabled){
-            getListOfColors().maxByOrNull { it.order } ?: ColorInfo()
-        } else ColorInfo()
-        mainActivity.window.statusBarColor = colorInfo.color
+        val color = if(enabled){
+            getListOfColors().maxByOrNull { it.order }?.color ?: NO_COLOR
+        } else NO_COLOR
+        statusBarColor.value = color
     }
 
     fun setCurrent(manager: AccountManager?) {
