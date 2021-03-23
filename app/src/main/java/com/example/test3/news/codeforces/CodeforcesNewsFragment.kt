@@ -6,12 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.*
+import com.example.test3.ui.settingsUI
 import com.example.test3.utils.CodeforcesAPI
 import kotlinx.coroutines.launch
 
@@ -109,6 +111,7 @@ class CodeforcesNewsFragment: Fragment() {
         }
 
         subscribeNewEntries()
+        subscribeRefreshOnRealColor()
 
         callReload()
     }
@@ -168,6 +171,12 @@ class CodeforcesNewsFragment: Fragment() {
         }
     }
 
-    fun refresh() = viewAdapter.refresh()
-
+    private fun subscribeRefreshOnRealColor() {
+        newsFragment.mainActivity.settingsUI
+            .useRealColorsLiveData
+            .distinctUntilChanged()
+            .observe(viewLifecycleOwner){ use ->
+                viewAdapter.refresh()
+            }
+    }
 }

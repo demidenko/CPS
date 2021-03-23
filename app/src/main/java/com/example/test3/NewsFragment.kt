@@ -18,8 +18,6 @@ import com.example.test3.news.codeforces.CodeforcesNewsFragment
 import com.example.test3.news.codeforces.CodeforcesNewsItemsRecentAdapter
 import com.example.test3.ui.BottomProgressInfo
 import com.example.test3.ui.CPSFragment
-import com.example.test3.ui.observeUpdates
-import com.example.test3.ui.settingsUI
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.example.test3.workers.CodeforcesNewsLostRecentWorker
@@ -145,21 +143,15 @@ class NewsFragment : CPSFragment() {
 
         setHasOptionsMenu(true)
 
-        with(mainActivity){
-            reloadButton.setOnClickListener { reloadTabs() }
-            updateLostInfoButton.setOnClickListener { updateLostInfo() }
-            recentSwitchButton.setOnClickListener {
-                val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
-                (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).switchMode()
-            }
-            recentShowBackButton.setOnClickListener {
-                val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
-                (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).closeShowFromBlog()
-            }
-
-            settingsUI.useRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
-                codeforcesNewsAdapter.fragments.forEach { it.refresh() }
-            }
+        reloadButton.setOnClickListener { reloadTabs() }
+        updateLostInfoButton.setOnClickListener { updateLostInfo() }
+        recentSwitchButton.setOnClickListener {
+            val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
+            (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).switchMode()
+        }
+        recentShowBackButton.setOnClickListener {
+            val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
+            (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).closeShowFromBlog()
         }
     }
 
