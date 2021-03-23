@@ -84,7 +84,6 @@ abstract class AccountPanel(
             layout.isVisible = true
             show(manager.getSavedInfo())
         }
-        mainActivity.accountsFragment.statusBarColorManager.updateBy(manager)
     }
 
     fun isBlocked(): Boolean = !reloadButton.isEnabled

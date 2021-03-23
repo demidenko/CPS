@@ -1,15 +1,14 @@
 package com.example.test3.ui
 
 import android.graphics.Color
-import android.widget.TextView
-import androidx.core.view.isVisible
-import com.example.test3.AccountsFragment
-import com.example.test3.R
+import com.example.test3.MainActivity
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.RatedAccountManager
+import kotlinx.coroutines.runBlocking
 
 class StatusBarColorManager(
-    private val accountsFragment: AccountsFragment
+    val mainActivity: MainActivity,
+    managers: List<AccountManager>
 ) {
 
     data class ColorInfo(
@@ -27,33 +26,38 @@ class StatusBarColorManager(
 
     private var enabled: Boolean = true
     init {
-        with(accountsFragment.mainActivity){
+        with(mainActivity){
+            managers.forEach { manager ->
+                runBlocking { updateBy(manager) }
+                manager.getDataStoreLive().observe(this){
+                    runBlocking { updateBy(manager) }
+                }
+            }
             settingsUI.useStatusBarLiveData.observe(this){ use ->
                 enabled = use
-                updateStatusBar()
+                recalculateStatusBarColor()
+            }
+            settingsUI.useRealColorsLiveData.observeUpdates(this){ use ->
+                runBlocking {
+                    managers.forEach { updateBy(it) }
+                }
             }
         }
     }
 
-    private fun updateStatusBar() {
-
-        val (best, allEmpty) =
-            getListOfColors().maxByOrNull { it.order }
-                ?.let { it to false }
-                ?: ColorInfo() to true
-
-        with(accountsFragment){
-            view?.findViewById<TextView>(R.id.accounts_welcome_text)?.isVisible = allEmpty
-            mainActivity.window.statusBarColor = (if(enabled) best else ColorInfo()).color
-        }
+    private fun recalculateStatusBarColor() {
+        val colorInfo = if(enabled){
+            getListOfColors().maxByOrNull { it.order } ?: ColorInfo()
+        } else ColorInfo()
+        mainActivity.window.statusBarColor = colorInfo.color
     }
 
     fun setCurrent(manager: AccountManager?) {
         current = manager?.managerName
-        updateStatusBar()
+        recalculateStatusBarColor()
     }
 
-    suspend fun updateBy(manager: AccountManager) {
+    private suspend fun updateBy(manager: AccountManager) {
         val name = manager.managerName
         if(!manager.isEmpty()) {
             colors[name] = ColorInfo()
@@ -66,6 +70,6 @@ class StatusBarColorManager(
         } else {
             colors.remove(name)
         }
-        updateStatusBar()
+        recalculateStatusBarColor()
     }
 }

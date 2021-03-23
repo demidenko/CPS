@@ -79,6 +79,7 @@ class AccountsFragment: CPSFragment() {
         cpsTitle = "::accounts"
         setBottomPanelId(R.id.support_navigation_accounts, R.layout.navigation_accounts)
 
+        statusBarColorManager //touch to init
         view.findViewById<LinearLayout>(R.id.panels_layout).apply {
             val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
 
@@ -96,6 +97,8 @@ class AccountsFragment: CPSFragment() {
         mainActivity.settingsUI.useRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
             showPanels()
         }
+
+        //TODO show wellcome text
     }
 
     private val reloadButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_accounts_reload) }
@@ -180,7 +183,7 @@ class AccountsFragment: CPSFragment() {
     }
 
 
-    val statusBarColorManager by lazy { StatusBarColorManager(this) }
+    val statusBarColorManager by lazy { StatusBarColorManager(mainActivity, panels.map { it.manager }) }
 
     fun showPanels() {
         lifecycleScope.launch {
