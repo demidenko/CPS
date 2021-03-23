@@ -40,9 +40,6 @@ interface CodeforcesNewsItemsAdapterManagesNewEntries {
     fun getBlogIDs(): List<Int>
 
     val newEntries: MutableSetLiveSize<Int>
-    fun getNewEntriesCountLiveData() = newEntries.size
-    fun addNewEntries(entries: Collection<Int>) = newEntries.addAll(entries)
-    fun clearNewEntries() = newEntries.clear()
 }
 
 interface CodeforcesNewsItemsAdapterAutoUpdatable {

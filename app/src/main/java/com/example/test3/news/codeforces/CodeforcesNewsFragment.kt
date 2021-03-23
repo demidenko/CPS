@@ -121,9 +121,10 @@ class CodeforcesNewsFragment: Fragment() {
             if(pageName.startsWith('/')) CodeforcesAPI.getPageSource(pageName.substring(1), lang) ?: return false
             else ""
 
-        if(!viewAdapter.parseData(source)) return false
-
-        (viewAdapter as? CodeforcesNewsItemsAdapterManagesNewEntries)?.clearNewEntries()
+        with(viewAdapter){
+            if(!parseData(source)) return false
+            if(this is CodeforcesNewsItemsAdapterManagesNewEntries) newEntries.clear()
+        }
 
         showItems()
 
@@ -142,7 +143,7 @@ class CodeforcesNewsFragment: Fragment() {
             val currentBlogs = getBlogIDs()
             for(id in newEntries.values()) if(id !in currentBlogs) newEntries.remove(id)
             val newBlogs = currentBlogs.filter { !savedBlogs.contains(it) }
-            addNewEntries(newBlogs)
+            newEntries.addAll(newBlogs)
         }
     }
 
@@ -154,7 +155,7 @@ class CodeforcesNewsFragment: Fragment() {
 
     private fun subscribeNewEntries() {
         if(!isManagesNewEntries) return
-        (viewAdapter as CodeforcesNewsItemsAdapterManagesNewEntries).getNewEntriesCountLiveData().observe(viewLifecycleOwner){ count ->
+        (viewAdapter as CodeforcesNewsItemsAdapterManagesNewEntries).newEntries.sizeLiveData.observe(viewLifecycleOwner){ count ->
             val tab = newsFragment.getTab(title) ?: return@observe
             if (count == 0) {
                 tab.badge?.apply {

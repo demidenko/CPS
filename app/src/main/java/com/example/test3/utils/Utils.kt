@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.HtmlCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.test3.R
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -76,7 +77,9 @@ class SharedReloadButton(private val button: ImageButton) {
 
 class MutableSetLiveSize<T>() {
     private val s = mutableSetOf<T>()
-    val size by lazy { MutableLiveData<Int>(0) }
+    private val size = MutableLiveData<Int>(0)
+    val sizeLiveData: LiveData<Int> get() = size
+
     fun values() = s.toSet()
     fun contains(element: T) = s.contains(element)
     fun addAll(elements: Collection<T>) {
