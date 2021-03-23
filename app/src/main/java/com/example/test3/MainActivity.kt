@@ -30,10 +30,13 @@ class MainActivity : AppCompatActivity(){
 
     val defaultTextColor by lazy { getColorFromResource(this, R.color.textColor) }
 
+    private inline fun<reified T: CPSFragment> findOrCreateFragment(): T {
+        return supportFragmentManager.fragments.find { it is T } as? T ?: T::class.java.newInstance()
+    }
 
-    val accountsFragment: AccountsFragment by lazy { supportFragmentManager.fragments.find { it is AccountsFragment } as? AccountsFragment ?: AccountsFragment() }
-    val newsFragment: NewsFragment by lazy { supportFragmentManager.fragments.find { it is NewsFragment } as? NewsFragment ?: NewsFragment() }
-    val devFragment: TestFragment by lazy { supportFragmentManager.fragments.find { it is TestFragment } as? TestFragment ?: TestFragment() }
+    val accountsFragment by lazy { findOrCreateFragment<AccountsFragment>() }
+    val newsFragment by lazy { findOrCreateFragment<NewsFragment>() }
+    val devFragment by lazy { findOrCreateFragment<TestFragment>() }
 
     val cpsFragmentManager by lazy { CPSFragmentManager(this, R.id.container_fragment) }
 
