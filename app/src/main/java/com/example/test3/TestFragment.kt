@@ -1,6 +1,5 @@
 package com.example.test3
 
-import android.app.ActivityManager
 import android.content.Context
 import android.os.Bundle
 import android.text.SpannableStringBuilder
@@ -46,30 +45,20 @@ class TestFragment : CPSFragment() {
 
         //show running jobs
         val workersTextView = view.findViewById<TextView>(R.id.workers)
+        fun concat(a: String, b: String) = a + ".".repeat(42 - a.length - b.length) + b
         WorkersCenter.getWorksLiveData(mainActivity).observe(mainActivity){ infos ->
-            workersTextView.text = infos.joinToString(separator = "\n"){ info ->
-                buildString {
-                    val str = info.tags.find { it!=WorkersCenter.commonTag }
-                        ?.split(".")
-                        ?.last()
-                        ?.removeSuffix("Worker")
-                    append("$str ${info.state.name}")
-                }
+            val rows = infos.map { info ->
+                val str = info.tags.find { it!=WorkersCenter.commonTag }!!
+                    .split(".")
+                    .last()
+                    .removeSuffix("Worker")
+                str to info.state
             }
+            workersTextView.text =
+                rows.sortedBy { it.first }.joinToString(separator = "\n"){ (str, state) -> concat(str, state.name) }
         }
 
         val stuff = view.findViewById<TextView>(R.id.stuff_textview)
-        requireBottomPanel().findViewById<ImageButton>(R.id.navigation_dev_jobs).setOnClickListener {
-            val services = (mainActivity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getRunningServices(Int.MAX_VALUE)
-                .mapNotNull {
-                    val s = it.service.className
-                    val s2 = s.removePrefix("com.example.test3.")
-                    if(s == s2) null
-                    else s2
-                }
-                .joinToString(separator = "\n") { it }
-            stuff.text = services
-        }
 
         //colors
         requireBottomPanel().findViewById<ImageButton>(R.id.navigation_dev_colors).setOnClickListener{
