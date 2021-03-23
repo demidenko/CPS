@@ -64,7 +64,7 @@ class CodeforcesContestWatchWorker(val context: Context, params: WorkerParameter
                 delay(TimeUnit.MINUTES.toMillis(5))
             }
         }catch (e: CancellationException){
-            CodeforcesContestWatchLauncherWorker.stopWatcher(context, contestID)
+            CodeforcesContestWatchLauncherWorker.onStopWatcher(context, contestID)
         }
 
         return Result.success()

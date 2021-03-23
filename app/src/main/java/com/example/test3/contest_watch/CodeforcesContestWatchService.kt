@@ -79,7 +79,7 @@ class CodeforcesContestWatchService: Service() {
                 start(handle, contestID, notification)
             }
             ACTION_STOP -> {
-                CodeforcesContestWatchLauncherWorker.stopWatcher(this, startedWithContestID!!)
+                CodeforcesContestWatchLauncherWorker.onStopWatcher(this, startedWithContestID!!)
                 stopWatcher()
                 stopForeground(true)
                 stopSelf()

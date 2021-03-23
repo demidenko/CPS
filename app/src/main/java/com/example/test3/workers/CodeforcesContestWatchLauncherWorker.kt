@@ -14,9 +14,9 @@ import java.util.concurrent.TimeUnit
 
 class CodeforcesContestWatchLauncherWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
-    private val codeforcesAccountManager by lazy { CodeforcesAccountManager(context) }
-
     override suspend fun doWork(): Result {
+
+        val codeforcesAccountManager = CodeforcesAccountManager(context)
 
         if(!codeforcesAccountManager.getSettings().getContestWatchEnabled()){
             WorkersCenter.stopWorker(context, WorkersNames.codeforces_contest_watch_launcher)
@@ -49,58 +49,48 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
             val response = CodeforcesAPI.getUserSubmissions(info.handle, step, from) ?: return Result.retry()
             if(response.status != CodeforcesAPIStatus.OK) return Result.retry()
 
-            val result = response.result!!.let { submissions ->
+            val resultId = response.result!!.let { submissions ->
                 for(submission in submissions){
                     if(firstID == null) firstID = submission.id
-                    if(submission.id <= lastKnownID) return@let -1
-                    if(isTooLate(submission.creationTimeSeconds)) return@let -1
+                    if(submission.id <= lastKnownID) return@let NOTHING
+                    if(isTooLate(submission.creationTimeSeconds)) return@let NOTHING
                     if(submission.author.participantType.participatedInContest()) return@let submission.contestId
                 }
-                0
+                CONTINUE
             }
 
-            /*
-                id>0    -> run service
-                0       -> continue
-                -1      -> break
-             */
-
-            when(result) {
-                0 -> {
-                    from+=step
-                    step = 10
-                    continue
-                }
-                else -> {
-                    val settings = codeforcesAccountManager.getSettings()
-                    firstID?.let { id ->
-                        settings.setContestWatchLastSubmissionID(id)
-                    }
-                    val contestID =
-                        if(result != -1) result
-                        else settings.getContestWatchStartedContestID()
-                    if(contestID != -1){
-                        if(canceled.none { it.first == contestID }) {
-                            settings.setContestWatchStartedContestID(contestID)
-                            CodeforcesContestWatchWorker.startWorker(context, info.handle, contestID)
-                        }
-                    }
-                    return Result.success()
-                }
+            if(resultId == CONTINUE) {
+                from+=step
+                step = 10
+                continue
             }
 
+            val settings = codeforcesAccountManager.getSettings().apply {
+                setContestWatchLastSubmissionID(firstID!!)
+            }
+            val contestID = resultId.takeIf { it!=NOTHING } ?: settings.getContestWatchStartedContestID()
+            if(contestID != NOTHING){
+                if(canceled.none { it.first == contestID }) {
+                    settings.setContestWatchStartedContestID(contestID)
+                    CodeforcesContestWatchWorker.startWorker(context, info.handle, contestID)
+                }
+            }
+            return Result.success()
         }
     }
 
     companion object {
-        fun stopWatcher(context: Context, contestID: Int) = runBlocking {
+        fun onStopWatcher(context: Context, contestID: Int) = runBlocking {
             with(CodeforcesAccountManager(context).getSettings()){
-                setContestWatchStartedContestID(-1)
+                setContestWatchStartedContestID(NOTHING)
                 val canceled = getContestWatchCanceled().toMutableList()
                 canceled.add(contestID to getCurrentTimeSeconds())
                 setContestWatchCanceled(canceled)
             }
         }
+
+        private const val CONTINUE = 0
+        private const val NOTHING = -1
     }
 
 }
