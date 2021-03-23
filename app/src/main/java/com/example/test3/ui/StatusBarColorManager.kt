@@ -11,7 +11,7 @@ class StatusBarColorManager(
     managers: List<AccountManager>
 ) {
 
-    data class ColorInfo(
+    class ColorInfo(
         val color: Int = Color.TRANSPARENT,
         val order: Double = -1e9
     )
@@ -28,7 +28,6 @@ class StatusBarColorManager(
     init {
         with(mainActivity){
             managers.forEach { manager ->
-                runBlocking { updateBy(manager) }
                 manager.getDataStoreLive().observe(this){
                     runBlocking { updateBy(manager) }
                 }
