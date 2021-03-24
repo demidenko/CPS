@@ -6,7 +6,6 @@ import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -23,8 +22,6 @@ abstract class AccountPanel(
     open val manager: AccountManager
 ){
 
-    private val viewModel: AccountViewModel by mainActivity.viewModels()
-
     private val layout = mainActivity.layoutInflater.inflate(R.layout.account_panel, null) as ConstraintLayout
 
     protected val textMain: TextView = layout.findViewById(R.id.account_panel_textMain)
@@ -35,7 +32,7 @@ abstract class AccountPanel(
     }
 
     private val reloadButton = layout.findViewById<ImageButton>(R.id.account_panel_reload_button).apply {
-        setOnClickListener { viewModel.reload(manager) }
+        setOnClickListener { mainActivity.accountsFragment.accountViewModel.reload(manager) }
     }
 
     abstract val homeURL: String
@@ -71,37 +68,35 @@ abstract class AccountPanel(
             }
         })
 
-        viewModel.getAccountLoadingStateLiveData(manager.managerName).distinctUntilChanged().observe(mainActivity.accountsFragment){ loadingState ->
-            loadingState ?: return@observe
-            if(loadingState == LoadingState.LOADING){
-                block()
-            } else {
-                unblock()
-            }
-            when(loadingState) {
-                LoadingState.PENDING -> {
-                    reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {
+        val failColor = getColorFromResource(mainActivity, R.color.fail)
+        mainActivity.accountsFragment.accountViewModel
+            .getAccountLoadingStateLiveData(manager.managerName).distinctUntilChanged()
+            .observe(mainActivity.accountsFragment){ loadingState ->
+                loadingState ?: return@observe
+                if(loadingState == LoadingState.LOADING) block() else unblock()
+                when(loadingState) {
+                    LoadingState.PENDING -> {
+                        reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {
+                            reloadButton.clearAnimation()
+                            reloadButton.isGone = true
+                        }.start()
+                    }
+                    LoadingState.LOADING -> {
+                        expandButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
+                            expandButton.isGone = true
+                        }.start()
+                        reloadButton.animate().setStartDelay(0).alpha(1f).setDuration(0).withStartAction {
+                            reloadButton.clearColorFilter()
+                            reloadButton.isVisible = true
+                        }.start()
+                        reloadButton.startAnimation(rotateAnimation)
+                    }
+                    LoadingState.FAILED -> {
                         reloadButton.clearAnimation()
-                        reloadButton.isGone = true
-                    }.start()
-                }
-                LoadingState.LOADING -> {
-                    expandButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
-                        expandButton.isGone = true
-                    }.start()
-
-                    reloadButton.animate().setStartDelay(0).alpha(1f).setDuration(0).withStartAction {
-                        reloadButton.setColorFilter(mainActivity.defaultTextColor)
-                        reloadButton.isVisible = true
-                    }.start()
-                    reloadButton.startAnimation(rotateAnimation)
-                }
-                LoadingState.FAILED -> {
-                    reloadButton.clearAnimation()
-                    reloadButton.setColorFilter(getColorFromResource(mainActivity, R.color.fail))
+                        reloadButton.setColorFilter(failColor)
+                    }
                 }
             }
-        }
 
         return layout
     }

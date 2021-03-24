@@ -8,6 +8,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.*
 import com.example.test3.account_view.*
@@ -21,24 +22,21 @@ import kotlinx.coroutines.*
 
 class AccountsFragment: CPSFragment() {
 
+    val accountViewModel: AccountViewModel by viewModels()
+
     val codeforcesAccountManager by lazy { CodeforcesAccountManager(mainActivity) }
     val atcoderAccountManager by lazy { AtCoderAccountManager(mainActivity) }
     val topcoderAccountManager by lazy { TopCoderAccountManager(mainActivity) }
     val acmpAccountManager by lazy { ACMPAccountManager(mainActivity) }
     val timusAccountManager by lazy { TimusAccountManager(mainActivity) }
 
-    private val codeforcesPanel by lazy { CodeforcesAccountPanel(mainActivity, codeforcesAccountManager) }
-    private val atcoderPanel by lazy { AtCoderAccountPanel(mainActivity, atcoderAccountManager) }
-    private val topcoderPanel by lazy { TopCoderAccountPanel(mainActivity, topcoderAccountManager) }
-    private val acmpPanel by lazy { ACMPAccountPanel(mainActivity, acmpAccountManager) }
-    private val timusPanel by lazy { TimusAccountPanel(mainActivity, timusAccountManager) }
     private val panels by lazy {
         listOf(
-            codeforcesPanel,
-            atcoderPanel,
-            topcoderPanel,
-            acmpPanel,
-            timusPanel
+            CodeforcesAccountPanel(mainActivity, codeforcesAccountManager),
+            AtCoderAccountPanel(mainActivity, atcoderAccountManager),
+            TopCoderAccountPanel(mainActivity, topcoderAccountManager),
+            ACMPAccountPanel(mainActivity, acmpAccountManager),
+            TimusAccountPanel(mainActivity, timusAccountManager)
         ).apply {
             //check data file names
             if(this.map { it.manager.managerName }.distinct().size != this.size)
