@@ -6,15 +6,15 @@ import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.distinctUntilChanged
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.*
 import com.example.test3.getColorFromResource
-import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 
@@ -22,6 +22,9 @@ abstract class AccountPanel(
     protected val mainActivity: MainActivity,
     open val manager: AccountManager
 ){
+
+    private val viewModel: AccountViewModel by mainActivity.viewModels()
+
     private val layout = mainActivity.layoutInflater.inflate(R.layout.account_panel, null) as ConstraintLayout
 
     protected val textMain: TextView = layout.findViewById(R.id.account_panel_textMain)
@@ -32,9 +35,7 @@ abstract class AccountPanel(
     }
 
     private val reloadButton = layout.findViewById<ImageButton>(R.id.account_panel_reload_button).apply {
-        setOnClickListener {
-            mainActivity.accountsFragment.lifecycleScope.launch { reload() }
-        }
+        setOnClickListener { viewModel.reload(manager) }
     }
 
     abstract val homeURL: String
@@ -70,6 +71,38 @@ abstract class AccountPanel(
             }
         })
 
+        viewModel.getAccountLoadingStateLiveData(manager.managerName).distinctUntilChanged().observe(mainActivity.accountsFragment){ loadingState ->
+            loadingState ?: return@observe
+            if(loadingState == LoadingState.LOADING){
+                block()
+            } else {
+                unblock()
+            }
+            when(loadingState) {
+                LoadingState.PENDING -> {
+                    reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {
+                        reloadButton.clearAnimation()
+                        reloadButton.isGone = true
+                    }.start()
+                }
+                LoadingState.LOADING -> {
+                    expandButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
+                        expandButton.isGone = true
+                    }.start()
+
+                    reloadButton.animate().setStartDelay(0).alpha(1f).setDuration(0).withStartAction {
+                        reloadButton.setColorFilter(mainActivity.defaultTextColor)
+                        reloadButton.isVisible = true
+                    }.start()
+                    reloadButton.startAnimation(rotateAnimation)
+                }
+                LoadingState.FAILED -> {
+                    reloadButton.clearAnimation()
+                    reloadButton.setColorFilter(getColorFromResource(mainActivity, R.color.fail))
+                }
+            }
+        }
+
         return layout
     }
 
@@ -100,38 +133,7 @@ abstract class AccountPanel(
         expandButton.isEnabled = true
     }
 
-    suspend fun reload(){
-        if(isEmpty()) return
-
-        block()
-
-        expandButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
-            expandButton.isGone = true
-        }.start()
-
-        reloadButton.animate().setStartDelay(0).alpha(1f).setDuration(0).withStartAction {
-            reloadButton.setColorFilter(mainActivity.defaultTextColor)
-            reloadButton.isVisible = true
-        }.start()
-        reloadButton.startAnimation(rotateAnimation)
-
-
-        val savedInfo = manager.getSavedInfo()
-        val info = manager.loadInfo(savedInfo.userID, 1)
-
-        if(info.status != STATUS.FAILED){
-            if(info!=savedInfo) manager.setSavedInfo(info)
-            reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {
-                reloadButton.clearAnimation()
-                reloadButton.isGone = true
-            }.start()
-        }else{
-            reloadButton.clearAnimation()
-            reloadButton.setColorFilter(getColorFromResource(mainActivity, R.color.fail))
-        }
-
-        unblock()
-    }
+    fun reload() = reloadButton.callOnClick()
 
     fun callExpand(){
         mainActivity.cpsFragmentManager.pushBack(
@@ -166,7 +168,7 @@ abstract class AccountPanel(
 
 }
 
-val rotateAnimation = RotateAnimation(
+private val rotateAnimation = RotateAnimation(
     0f,
     360f,
     Animation.RELATIVE_TO_SELF,

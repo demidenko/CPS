@@ -194,13 +194,7 @@ class AccountsFragment: CPSFragment() {
         }
     }
 
-    fun reloadAccounts() {
-        lifecycleScope.launch {
-            panels.forEach {
-                launch { it.reload() }
-            }
-        }
-    }
+    private fun reloadAccounts() = panels.forEach { it.reload() }
 
     fun getPanel(managerType: String): AccountPanel {
         return panels.find { panel ->

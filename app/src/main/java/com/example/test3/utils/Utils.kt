@@ -68,7 +68,7 @@ class SharedReloadButton(private val button: ImageButton) {
     }
 
     fun stopReload(tag: String) {
-        if(!current.contains(tag)) throw Exception("$tag not started to be stopped")
+        //if(!current.contains(tag)) throw Exception("$tag not started to be stopped")
         current.remove(tag)
         if(current.isEmpty()) button.enable()
     }
