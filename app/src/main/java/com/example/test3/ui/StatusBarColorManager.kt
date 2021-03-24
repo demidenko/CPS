@@ -65,10 +65,10 @@ class StatusBarColorManager(
 
     private suspend fun updateBy(manager: AccountManager) {
         val name = manager.managerName
-        if(!manager.isEmpty()) {
+        val info = manager.getSavedInfo()
+        if(!info.isEmpty()) {
             colors[name] = ColorInfo()
             if(manager is RatedAccountManager){
-                val info = manager.getSavedInfo()
                 manager.getColor(info)?.let {
                     colors[name] = ColorInfo(it, manager.getOrder(info))
                 }

@@ -73,7 +73,7 @@ abstract class AccountPanel(
         return layout
     }
 
-    suspend fun isEmpty() = manager.isEmpty()
+    suspend fun isEmpty() = manager.getSavedInfo().isEmpty()
 
     protected abstract fun show(info: UserInfo)
 
