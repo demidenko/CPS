@@ -17,6 +17,7 @@ import com.example.test3.utils.CodeforcesRatingChange
 import com.example.test3.utils.signedToString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
@@ -26,7 +27,7 @@ abstract class AccountManager(val context: Context, val managerName: String) {
     abstract val userIDName: String
 
     protected abstract fun getDataStore(): AccountDataStore
-    fun getDataStoreLive() = getDataStore().getLiveData()
+    fun getInfoLiveData() = getDataStore().getDataFlow().map { str -> this to strToInfo(str) }.asLiveData()
 
     abstract fun emptyInfo(): UserInfo
 
@@ -44,10 +45,9 @@ abstract class AccountManager(val context: Context, val managerName: String) {
     protected abstract fun decodeFromString(str: String): UserInfo
     protected abstract fun encodeToString(info: UserInfo): String
 
-    suspend fun getSavedInfo(): UserInfo {
-        val str = getDataStore().getString() ?: return emptyInfo()
-        return decodeFromString(str)
-    }
+    private fun strToInfo(str: String?): UserInfo = str?.let { decodeFromString(it) } ?: emptyInfo()
+    suspend fun getSavedInfo(): UserInfo = strToInfo(getDataStore().getString())
+
     suspend fun setSavedInfo(info: UserInfo) {
         val old = getSavedInfo()
         getDataStore().putString(encodeToString(info))
@@ -123,7 +123,7 @@ class AccountDataStore(dataStore: DataStore<Preferences>) : CPSDataStore(dataSto
         private val KEY_USER_INFO = stringPreferencesKey("user_info")
     }
 
-    fun getLiveData() = dataStore.data.asLiveData()
+    internal fun getDataFlow() = dataStore.data.map { it[KEY_USER_INFO] }
 
     suspend fun getString(): String? = dataStore.data.first()[KEY_USER_INFO]
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.test3.MainActivity
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.RatedAccountManager
+import com.example.test3.account_manager.UserInfo
 import kotlinx.coroutines.runBlocking
 
 private const val NO_COLOR = Color.TRANSPARENT
@@ -32,9 +33,9 @@ class StatusBarColorManager(
     init {
         checkManagers(managers)
         with(mainActivity){
-            managers.forEach { manager ->
-                manager.getDataStoreLive().observe(this){
-                    runBlocking { updateBy(manager) }
+            managers.forEach {
+                it.getInfoLiveData().observe(this){ (manager, info) ->
+                    updateBy(manager, info)
                 }
             }
             settingsUI.useStatusBarLiveData.observe(this){ use ->
@@ -64,9 +65,9 @@ class StatusBarColorManager(
         recalculateStatusBarColor()
     }
 
-    private suspend fun updateBy(manager: AccountManager) {
+    private suspend fun updateBy(manager: AccountManager) = updateBy(manager, manager.getSavedInfo())
+    private fun updateBy(manager: AccountManager, info: UserInfo) {
         val name = manager.managerName
-        val info = manager.getSavedInfo()
         if(!info.isEmpty()) {
             colors[name] = ColorInfo()
             if(manager is RatedAccountManager){

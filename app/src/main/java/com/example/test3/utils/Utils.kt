@@ -82,6 +82,10 @@ class MutableSetLiveSize<T>() {
 
     fun values() = s.toSet()
     fun contains(element: T) = s.contains(element)
+    fun add(element: T) {
+        s.add(element)
+        size.value = s.size
+    }
     fun addAll(elements: Collection<T>) {
         s.addAll(elements)
         size.value = s.size

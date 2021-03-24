@@ -8,15 +8,13 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.*
 import com.example.test3.account_view.*
 import com.example.test3.ui.*
-import com.example.test3.utils.CListUtils
-import com.example.test3.utils.SharedReloadButton
-import com.example.test3.utils.disable
-import com.example.test3.utils.enable
+import com.example.test3.utils.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.*
 
@@ -54,14 +52,24 @@ class AccountsFragment: CPSFragment() {
         cpsTitle = "::accounts"
         setBottomPanelId(R.id.support_navigation_accounts, R.layout.navigation_accounts)
 
+        val notEmptyPanels = MutableSetLiveSize<String>()
         view.findViewById<LinearLayout>(R.id.panels_layout).apply {
             val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
 
             panels.forEach { panel ->
                 addView(panel.createSmallView(), params)
-                panel.manager.getDataStoreLive().observe(viewLifecycleOwner){
+                val liveData = panel.manager.getInfoLiveData()
+                liveData.observe(viewLifecycleOwner){ (manager, info) ->
                     lifecycleScope.launch { panel.show() }
+                    if(info.isEmpty()) notEmptyPanels.remove(manager.managerName)
+                    else notEmptyPanels.add(manager.managerName)
                 }
+            }
+        }
+
+        view.findViewById<TextView>(R.id.accounts_welcome_text).apply {
+            notEmptyPanels.sizeLiveData.observe(viewLifecycleOwner){ count ->
+                isVisible = count==0
             }
         }
 
@@ -76,7 +84,6 @@ class AccountsFragment: CPSFragment() {
             mainActivity.window.statusBarColor = color
         }
 
-        //TODO show wellcome text
     }
 
     private val reloadButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_accounts_reload) }
