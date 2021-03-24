@@ -37,31 +37,8 @@ class AccountsFragment: CPSFragment() {
             TopCoderAccountPanel(mainActivity, topcoderAccountManager),
             ACMPAccountPanel(mainActivity, acmpAccountManager),
             TimusAccountPanel(mainActivity, timusAccountManager)
-        ).apply {
-            //check data file names
-            if(this.map { it.manager.managerName }.distinct().size != this.size)
-                throw Exception("not different file names in panels managers")
-
-            //check ranks of colors
-            mapNotNull { it.manager as? RatedAccountManager }.apply {
-                map { ratedManager ->
-                    val colors = ratedManager.rankedHandleColorsList
-                    colors.forEachIndexed { index, handleColor ->
-                        ratedManager.getColor(handleColor)
-
-                        if(index>0 && handleColor < colors[index-1])
-                            throw Exception("${ratedManager.managerName}: color list is not sorted")
-                    }
-                    colors.size
-                }.apply {
-                    if(distinct().size != 1)
-                        throw Exception("different sizes for color lists")
-                }
-            }
-        }
+        )
     }
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -30,6 +30,7 @@ class StatusBarColorManager(
 
     private var enabled: Boolean = true
     init {
+        checkManagers(managers)
         with(mainActivity){
             managers.forEach { manager ->
                 manager.getDataStoreLive().observe(this){
@@ -77,5 +78,26 @@ class StatusBarColorManager(
             colors.remove(name)
         }
         recalculateStatusBarColor()
+    }
+
+    private fun checkManagers(managers: List<AccountManager>) {
+        //check data file names
+        if(managers.map { it.managerName }.distinct().size != managers.size)
+            throw Exception("Not different managers names")
+
+        //check ranks of colors
+        managers.filterIsInstance<RatedAccountManager>().apply {
+            distinctBy { ratedManager ->
+                val colors = ratedManager.rankedHandleColorsList
+                colors.forEachIndexed { index, handleColor ->
+                    ratedManager.getColor(handleColor)
+                    if(index > 0 && handleColor < colors[index-1])
+                        throw Exception("${ratedManager.managerName}: color list is not sorted")
+                }
+                colors.size
+            }.apply {
+                if(size != 1) throw Exception("different sizes for color lists")
+            }
+        }
     }
 }
