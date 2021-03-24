@@ -9,12 +9,10 @@ class AccountViewModel() : ViewModel() {
 
     fun reload(manager: AccountManager){
         viewModelScope.launch {
-
-            val loadingState = accountLoadingState(manager.managerName)
-
             val savedInfo = manager.getSavedInfo()
             if(savedInfo.isEmpty()) return@launch
 
+            val loadingState = accountLoadingState(manager.managerName)
             loadingState.value = LoadingState.LOADING
 
             val info = manager.loadInfo(savedInfo.userID, 1)
@@ -30,11 +28,7 @@ class AccountViewModel() : ViewModel() {
 
     private val states = mutableMapOf<String,MutableLiveData<LoadingState>>()
 
-    private fun accountLoadingState(managerName: String): MutableLiveData<LoadingState> {
-        return states.getOrPut(managerName){
-            MutableLiveData(LoadingState.PENDING)
-        }
-    }
+    private fun accountLoadingState(managerName: String) = states.getOrPut(managerName) { MutableLiveData(LoadingState.PENDING) }
 
     fun getAccountLoadingStateLiveData(managerName: String): LiveData<LoadingState> = accountLoadingState(managerName)
 }
