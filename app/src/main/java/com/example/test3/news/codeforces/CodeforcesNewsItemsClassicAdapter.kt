@@ -11,10 +11,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.example.test3.R
-import com.example.test3.getColorFromResource
-import com.example.test3.makeIntentOpenUrl
-import com.example.test3.timeRUtoEN
+import com.example.test3.*
 import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.MutableSetLiveSize
@@ -109,7 +106,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(), Code
 
             val blogId = info.blogId
             view.setOnClickListener {
-                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(blogId)))
+                it.context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(blogId)))
                 if(newEntries.contains(blogId)){
                     newEntries.remove(blogId)
                     notifyItemChanged(position)
@@ -118,14 +115,15 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(), Code
 
             view.isLongClickable = true
             view.setOnLongClickListener {
-                runBlocking { CodeforcesNewsFollowWorker.isEnabled(activity) }.apply {
-                    if(this) addToFollowListWithSnackBar(this@with)
+                val mainActivity = it.context!! as MainActivity
+                runBlocking { CodeforcesNewsFollowWorker.isEnabled(mainActivity) }.apply {
+                    if(this) addToFollowListWithSnackBar(this@with, mainActivity)
                 }
             }
 
             title.text = info.title
 
-            author.text = activity.accountsFragment.codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
+            author.text = codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
 
             time.text = timeRUtoEN(info.time)
 
@@ -136,7 +134,7 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(), Code
 
             rating.apply{
                 text = info.rating
-                setTextColor(getColorFromResource(activity,
+                setTextColor(getColorFromResource(context,
                     if(info.rating.startsWith('+')) R.color.blog_rating_positive
                     else R.color.blog_rating_negative
                 ))
@@ -147,22 +145,22 @@ open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(), Code
     override fun getBlogIDs() = rows.map { it.blogId }
 
 
-    private fun addToFollowListWithSnackBar(holder: CodeforcesNewsItemViewHolder){
-        activity.newsFragment.lifecycleScope.launch {
-            val connector = CodeforcesNewsFollowWorker.FollowDataConnector(activity)
+    private fun addToFollowListWithSnackBar(holder: CodeforcesNewsItemViewHolder, mainActivity: MainActivity){
+        mainActivity.newsFragment.lifecycleScope.launch {
+            val connector = CodeforcesNewsFollowWorker.FollowDataConnector(mainActivity)
             val handle = holder.author.text
             when(connector.add(handle.toString())){
                 true -> {
                     Snackbar.make(holder.view, SpannableStringBuilder("You now followed ").append(handle), Snackbar.LENGTH_LONG).apply {
                         setAction("Manage"){
-                            activity.newsFragment.showCodeforcesFollowListManager()
+                            mainActivity.newsFragment.showCodeforcesFollowListManager()
                         }
                     }
                 }
                 false -> {
                     Snackbar.make(holder.view, SpannableStringBuilder("You already followed ").append(handle), Snackbar.LENGTH_LONG)
                 }
-            }.setAnchorView(activity.navigation).show()
+            }.setAnchorView(mainActivity.navigation).show()
         }
     }
 }

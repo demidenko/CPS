@@ -1,17 +1,17 @@
 package com.example.test3.news.codeforces
 
 import androidx.recyclerview.widget.RecyclerView
-import com.example.test3.MainActivity
+import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.utils.MutableSetLiveSize
 
 abstract class CodeforcesNewsItemsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     abstract suspend fun parseData(s: String): Boolean
 
-    protected lateinit var activity: MainActivity
     protected lateinit var recyclerView: RecyclerView
+    protected lateinit var codeforcesAccountManager: CodeforcesAccountManager
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        activity = recyclerView.context as MainActivity
         this.recyclerView = recyclerView
+        codeforcesAccountManager = CodeforcesAccountManager(recyclerView.context)
     }
 
 

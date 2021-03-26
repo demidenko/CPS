@@ -14,10 +14,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.example.test3.R
-import com.example.test3.getColorFromResource
-import com.example.test3.makeIntentOpenUrl
-import com.example.test3.timeDifference
+import com.example.test3.*
 import com.example.test3.utils.*
 
 class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
@@ -39,7 +36,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         return blogComments[blogID]
             ?.distinctBy { it.commentatorHandle }
             ?.map { comment ->
-                activity.accountsFragment.codeforcesAccountManager.makeSpan(
+                codeforcesAccountManager.makeSpan(
                     comment.commentatorHandle,
                     comment.commentatorHandleColorTag
                 )
@@ -101,12 +98,16 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
     private var headerBlog: BlogInfo? = null
     private lateinit var header: View
-    private val switchButton: ImageButton by lazy { activity.navigation.findViewById(R.id.navigation_news_recent_swap) }
-    private val showBackButton: ImageButton by lazy { activity.navigation.findViewById(R.id.navigation_news_recent_show_blog_back) }
+    private lateinit var switchButton: ImageButton
+    private lateinit var showBackButton: ImageButton
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         with(recyclerView.parent.parent as ConstraintLayout){
             header = findViewById(R.id.cf_news_page_header)
+        }
+        with(recyclerView.context as MainActivity){
+            switchButton = navigation.findViewById(R.id.navigation_news_recent_swap)
+            showBackButton = navigation.findViewById(R.id.navigation_news_recent_show_blog_back)
         }
     }
 
@@ -114,7 +115,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         if(headerBlog!=null) header.apply {
             val info = headerBlog!!
             findViewById<TextView>(R.id.news_item_title).text = info.title
-            findViewById<TextView>(R.id.news_item_author).text = activity.accountsFragment.codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
+            findViewById<TextView>(R.id.news_item_author).text = codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
             isVisible = true
         } else {
             header.isGone = true
@@ -172,12 +173,13 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         val info = rows[position]
 
         holder.view.setOnClickListener {
+            val context = it.context
             if(info.commentators.isEmpty()){
-                activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogId)))
+                context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogId)))
                 return@setOnClickListener
             }
 
-            PopupMenu(activity, holder.title, Gravity.CENTER_HORIZONTAL).apply {
+            PopupMenu(context, holder.title, Gravity.CENTER_HORIZONTAL).apply {
                 inflate(R.menu.cf_recent_item_open_variants)
 
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
@@ -193,11 +195,11 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
                 setOnMenuItemClickListener {
                     when(it.itemId){
                         R.id.cf_news_recent_item_menu_open_blog -> {
-                            activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogId)))
+                            context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(info.blogId)))
                             true
                         }
                         R.id.cf_news_recent_item_menu_open_last_comment -> {
-                            activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(info.blogId,info.lastCommentId)))
+                            context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(info.blogId,info.lastCommentId)))
                             true
                         }
                         R.id.cf_news_recent_item_menu_show_comments -> {
@@ -214,7 +216,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
         holder.title.text =  info.title
 
-        holder.author.text = activity.accountsFragment.codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
+        holder.author.text = codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
 
         holder.comments.text = info.commentators.joinTo(SpannableStringBuilder())
 
@@ -231,7 +233,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
 
         holder.title.text = blogEntry.title
 
-        holder.author.text = activity.accountsFragment.codeforcesAccountManager.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
+        holder.author.text = codeforcesAccountManager.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
 
         holder.rating.apply{
             if(comment.rating == 0) isGone = true
@@ -239,9 +241,9 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
                 isVisible = true
                 text = signedToString(comment.rating)
                 if (comment.rating > 0) {
-                    setTextColor(getColorFromResource(activity, R.color.blog_rating_positive))
+                    setTextColor(getColorFromResource(context, R.color.blog_rating_positive))
                 } else {
-                    setTextColor(getColorFromResource(activity, R.color.blog_rating_negative))
+                    setTextColor(getColorFromResource(context, R.color.blog_rating_negative))
                 }
             }
         }
@@ -251,7 +253,7 @@ class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
         holder.time.text = timeDifference(comment.creationTimeSeconds, getCurrentTimeSeconds())
 
         holder.view.setOnClickListener {
-            activity.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(blogEntry.id,comment.id)))
+            it.context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(blogEntry.id,comment.id)))
         }
 
         val hasHeader = headerBlog!=null
