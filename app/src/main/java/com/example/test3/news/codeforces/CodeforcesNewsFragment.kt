@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
@@ -14,52 +13,22 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.*
 import com.example.test3.ui.settingsUI
-import com.example.test3.utils.CodeforcesAPI
 import kotlinx.coroutines.launch
 
-class CodeforcesNewsFragment: Fragment() {
+abstract class CodeforcesNewsFragment: Fragment() {
 
-    val title: CodeforcesTitle by lazy { CodeforcesTitle.valueOf(requireArguments().getString(keyTitle)!!) }
-    val pageName: String by lazy { requireArguments().getString(keyPageName)!! }
-    val isManagesNewEntries: Boolean by lazy { requireArguments().getBoolean(keyEntries) }
-    val isAutoUpdatable: Boolean by lazy { requireArguments().getBoolean(keyAutoUpdate) }
-    val viewAdapter: CodeforcesNewsItemsAdapter get() {
-        val adapter = recyclerView.adapter
-            ?: CodeforcesNewsItemsAdapter.getFromType(requireArguments().getInt(keyAdapter)).also {
-                recyclerView.adapter = it
-            }
-        return adapter as CodeforcesNewsItemsAdapter
-    }
+    abstract val title: CodeforcesTitle
+    abstract val isManagesNewEntries: Boolean
+    abstract val isAutoUpdatable: Boolean
+    abstract val viewAdapter: CodeforcesNewsItemsAdapter
 
     companion object {
-        private const val keyTitle = "cf_news_title"
-        private const val keyPageName = "cf_news_page_name"
-        private const val keyEntries = "cf_news_entries"
-        private const val keyAutoUpdate = "cf_news_auto_update"
-        private const val keyAdapter = "cf_news_adapter"
         fun createInstance(title: CodeforcesTitle): CodeforcesNewsFragment {
             return when (title) {
-                CodeforcesTitle.MAIN -> createInstance(title, "/", CodeforcesNewsItemsAdapter.typeClassic, isManagesNewEntries = true, isAutoUpdatable = false)
-                CodeforcesTitle.TOP -> createInstance(title, "/top", CodeforcesNewsItemsAdapter.typeClassic, isManagesNewEntries = false, isAutoUpdatable = false)
-                CodeforcesTitle.RECENT -> createInstance(title, "/recent-actions", CodeforcesNewsItemsAdapter.typeRecent, isManagesNewEntries = false, isAutoUpdatable = false)
-                CodeforcesTitle.LOST -> createInstance(title, "", CodeforcesNewsItemsAdapter.typeLost, isManagesNewEntries = true, isAutoUpdatable = true)
-            }
-        }
-        private fun createInstance(
-            title: CodeforcesTitle,
-            pageName: String,
-            viewAdapterType: Int,
-            isManagesNewEntries: Boolean,
-            isAutoUpdatable: Boolean
-        ): CodeforcesNewsFragment {
-            return CodeforcesNewsFragment().apply {
-                arguments = bundleOf(
-                    keyTitle to title.name,
-                    keyPageName to pageName,
-                    keyEntries to isManagesNewEntries,
-                    keyAutoUpdate to isAutoUpdatable,
-                    keyAdapter to viewAdapterType
-                )
+                CodeforcesTitle.MAIN -> CodeforcesNewsMainFragment()
+                CodeforcesTitle.TOP -> CodeforcesNewsTopFragment()
+                CodeforcesTitle.RECENT -> CodeforcesNewsRecentFragment()
+                CodeforcesTitle.LOST -> CodeforcesNewsLostFragment()
             }
         }
     }
@@ -92,6 +61,7 @@ class CodeforcesNewsFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerView.apply {
+            adapter = viewAdapter
             layoutManager = LinearLayoutManager(context)
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             setHasFixedSize(true)
@@ -116,13 +86,11 @@ class CodeforcesNewsFragment: Fragment() {
         callReload()
     }
 
+    abstract suspend fun parseData(lang: String): Boolean
     suspend fun reload(lang: String): Boolean {
-        val source =
-            if(pageName.startsWith('/')) CodeforcesAPI.getPageSource(pageName.substring(1), lang) ?: return false
-            else ""
+        if(!parseData(lang)) return false
 
         with(viewAdapter){
-            if(!parseData(source)) return false
             if(this is CodeforcesNewsItemsAdapterManagesNewEntries) newEntries.clear()
         }
 
