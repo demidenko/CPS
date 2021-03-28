@@ -1,8 +1,12 @@
 package com.example.test3.news.codeforces
 
+import androidx.lifecycle.lifecycleScope
 import com.example.test3.room.getLostBlogsDao
 import com.example.test3.timeDifference
 import com.example.test3.utils.getCurrentTimeSeconds
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 
 class CodeforcesLostRecentAdapter : CodeforcesBlogEntriesAdapter(), CodeforcesNewsItemsAdapterAutoUpdatable {
@@ -12,23 +16,27 @@ class CodeforcesLostRecentAdapter : CodeforcesBlogEntriesAdapter(), CodeforcesNe
         fragment: CodeforcesNewsFragment,
         dataReadyCallback: () -> Unit
     ) {
-        getLostBlogsDao(fragment.requireContext()).getLostLiveData().observe(fragment.viewLifecycleOwner){ blogs ->
-            val currentTimeSeconds = getCurrentTimeSeconds()
-            rows = blogs
-                .sortedByDescending { it.timeStamp }
-                .map {
-                    BlogEntryInfo(
-                        blogId = it.id,
-                        title = it.title,
-                        author = it.authorHandle,
-                        authorColorTag = it.authorColorTag,
-                        time = timeDifference(it.creationTimeSeconds, currentTimeSeconds),
-                        comments = "",
-                        rating = ""
-                    )
-                }.toTypedArray()
-
-            dataReadyCallback()
+        fragment.lifecycleScope.launchWhenStarted {
+            getLostBlogsDao(fragment.requireContext()).getLostFlow()
+                .distinctUntilChanged()
+                .map { blogEntries ->
+                    val currentTimeSeconds = getCurrentTimeSeconds()
+                    blogEntries.sortedByDescending { it.timeStamp }
+                        .map {
+                            BlogEntryInfo(
+                                blogId = it.id,
+                                title = it.title,
+                                author = it.authorHandle,
+                                authorColorTag = it.authorColorTag,
+                                time = timeDifference(it.creationTimeSeconds, currentTimeSeconds),
+                                comments = "",
+                                rating = ""
+                            )
+                        }
+                }.collect { blogEntries ->
+                    rows = blogEntries.toTypedArray()
+                    dataReadyCallback()
+                }
         }
     }
 }

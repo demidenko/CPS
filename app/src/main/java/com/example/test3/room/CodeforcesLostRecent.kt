@@ -1,9 +1,9 @@
 package com.example.test3.room
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.test3.utils.CodeforcesUtils
+import kotlinx.coroutines.flow.Flow
 
 fun getLostBlogsDao(context: Context) = RoomSingleton.getInstance(context).lostBlogsDao()
 
@@ -30,7 +30,7 @@ interface LostBlogsDao{
     suspend fun getLost(): List<LostBlogEntry>
 
     @Query("SELECT * FROM $lostBlogsTableName where isSuspect = 0")
-    fun getLostLiveData(): LiveData<List<LostBlogEntry>>
+    fun getLostFlow(): Flow<List<LostBlogEntry>>
 
     @Query("SELECT * FROM $lostBlogsTableName where isSuspect = 1")
     suspend fun getSuspects(): List<LostBlogEntry>
