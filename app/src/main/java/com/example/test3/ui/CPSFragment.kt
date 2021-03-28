@@ -28,6 +28,7 @@ open class CPSFragment : Fragment() {
         get() = requireArguments().getString(keyTitle, "")
         set(title) {
             requireArguments().putString(keyTitle, title)
+            if(isVisible) showSubTitle()
         }
 
     var cpsId: Int
@@ -65,8 +66,12 @@ open class CPSFragment : Fragment() {
         }
     }
 
-    private fun showStuff() {
+    private fun showSubTitle() {
         mainActivity.setActionBarSubTitle(cpsTitle)
+    }
+
+    private fun showStuff() {
+        showSubTitle()
         mainActivity.navigation.isVisible = bottomPanel?.let {
                 it.isVisible = true
                 true
@@ -84,11 +89,8 @@ open class CPSFragment : Fragment() {
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        if(hidden){
-            hideStuff()
-        } else {
-            showStuff()
-        }
+        if(hidden) hideStuff()
+        else showStuff()
     }
 
     override fun onDetach() {

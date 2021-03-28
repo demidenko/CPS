@@ -78,36 +78,24 @@ class NewsFragment : CPSFragment() {
     private val tabLayout by lazy { requireView().findViewById<TabLayout>(R.id.cf_news_tab_layout) }
     private val tabSelectionListener = object : TabLayout.OnTabSelectedListener{
 
-        override fun onTabReselected(tab: TabLayout.Tab?) {}
+        override fun onTabReselected(tab: TabLayout.Tab) {}
 
-        override fun onTabUnselected(tab: TabLayout.Tab?) {
-            tab?.run {
-                val fragment = codeforcesNewsAdapter.fragments[position]
-                if(fragment.isManagesNewEntries) badge?.run {
-                    if(hasNumber()) isVisible = false
-                }
-
-                codeforcesNewsAdapter.hideSupportButtons(fragment.title)
+        override fun onTabUnselected(tab: TabLayout.Tab) {
+            with(codeforcesNewsAdapter){
+                val fragment = fragments[tab.position]
+                fragment.onPageUnselected(tab)
+                hideSupportButtons(fragment.title)
             }
         }
 
-        override fun onTabSelected(tab: TabLayout.Tab?) {
-            tab?.run {
-                val fragment = codeforcesNewsAdapter.fragments[position]
-                if(fragment.isManagesNewEntries) badge?.run {
-                    if(hasNumber()){
-                        isVisible = true
-                        lifecycleScope.launch {
-                            fragment.saveEntries()
-                        }
-                    }
-                }
-
-                codeforcesNewsAdapter.showSupportButtons(fragment.title)
+        override fun onTabSelected(tab: TabLayout.Tab) {
+            with(codeforcesNewsAdapter){
+                val fragment = fragments[tab.position]
+                fragment.onPageSelected(tab)
+                showSupportButtons(fragment.title)
 
                 val subtitle = "::news.codeforces.${fragment.title.name.toLowerCase(Locale.ENGLISH)}"
                 cpsTitle = subtitle
-                if(this@NewsFragment.isVisible) mainActivity.setActionBarSubTitle(subtitle)
             }
         }
     }

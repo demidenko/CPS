@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.*
 import com.example.test3.ui.settingsUI
+import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.launch
 
 abstract class CodeforcesNewsFragment: Fragment() {
@@ -99,6 +100,20 @@ abstract class CodeforcesNewsFragment: Fragment() {
         return true
     }
 
+    fun onPageSelected(tab: TabLayout.Tab) {
+        if(isManagesNewEntries) tab.badge?.run {
+            if(hasNumber()){
+                isVisible = true
+                lifecycleScope.launch { saveEntries() }
+            }
+        }
+    }
+    fun onPageUnselected(tab: TabLayout.Tab) {
+        if(isManagesNewEntries) tab.badge?.run {
+            if(hasNumber()) isVisible = false
+        }
+    }
+
     private suspend fun showItems() {
         manageNewEntries()
         viewAdapter.notifyDataSetChanged()
@@ -115,7 +130,7 @@ abstract class CodeforcesNewsFragment: Fragment() {
         }
     }
 
-    suspend fun saveEntries() {
+    private suspend fun saveEntries() {
         if(!isManagesNewEntries) return
         val toSave = (viewAdapter as CodeforcesNewsItemsAdapterManagesNewEntries).getBlogIDs()
         newsFragment.viewedDataStore.setBlogsViewed(title, toSave)
