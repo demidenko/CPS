@@ -22,9 +22,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
-open class CodeforcesBlogEntriesAdapter: CodeforcesNewsItemsAdapter(), CodeforcesNewsItemsAdapterManagesNewEntries {
+open class CodeforcesBlogEntriesAdapter:
+    CodeforcesNewsItemsAdapter<CodeforcesBlogEntriesAdapter.CodeforcesBlogEntryViewHolder>(),
+    CodeforcesNewsItemsAdapterManagesNewEntries {
 
-    data class Info(
+    data class BlogEntryInfo(
         val blogId: Int,
         val title: String,
         val author: String,
@@ -35,7 +37,7 @@ open class CodeforcesBlogEntriesAdapter: CodeforcesNewsItemsAdapter(), Codeforce
     )
 
     override suspend fun parseData(s: String): Boolean {
-        val res = arrayListOf<Info>()
+        val res = arrayListOf<BlogEntryInfo>()
         var i = 0
         while (true) {
             i = s.indexOf("<div class=\"topic\"", i + 1)
@@ -67,7 +69,7 @@ open class CodeforcesBlogEntriesAdapter: CodeforcesNewsItemsAdapter(), Codeforce
             i = s.lastIndexOf("</a>", i)
             val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim()
 
-            res.add(Info(id,title,author,authorColorTag,time,comments,rating))
+            res.add(BlogEntryInfo(id,title,author,authorColorTag,time,comments,rating))
         }
 
         if(res.isNotEmpty()){
@@ -79,7 +81,7 @@ open class CodeforcesBlogEntriesAdapter: CodeforcesNewsItemsAdapter(), Codeforce
     }
 
 
-    class CodeforcesNewsItemViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
+    class CodeforcesBlogEntryViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
         val title: TextView = view.findViewById(R.id.news_item_title)
         val author: TextView = view.findViewById(R.id.news_item_author)
         val time: TextView = view.findViewById(R.id.news_item_time)
@@ -89,19 +91,19 @@ open class CodeforcesBlogEntriesAdapter: CodeforcesNewsItemsAdapter(), Codeforce
         val newEntryIndicator: View = view.findViewById(R.id.news_item_dot_new)
     }
 
-    protected var rows: Array<Info> = emptyArray()
+    protected var rows: Array<BlogEntryInfo> = emptyArray()
 
     override fun getItemCount() = rows.size
 
     override val newEntries = MutableSetLiveSize<Int>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesNewsItemViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesBlogEntryViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_item, parent, false) as ConstraintLayout
-        return CodeforcesNewsItemViewHolder(view)
+        return CodeforcesBlogEntryViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        with(holder as CodeforcesNewsItemViewHolder){
+    override fun onBindViewHolder(holder: CodeforcesBlogEntryViewHolder, position: Int) {
+        with(holder){
             val info = rows[position]
 
             val blogId = info.blogId
@@ -145,7 +147,7 @@ open class CodeforcesBlogEntriesAdapter: CodeforcesNewsItemsAdapter(), Codeforce
     override fun getBlogIDs() = rows.map { it.blogId }
 
 
-    private fun addToFollowListWithSnackBar(holder: CodeforcesNewsItemViewHolder, mainActivity: MainActivity){
+    private fun addToFollowListWithSnackBar(holder: CodeforcesBlogEntryViewHolder, mainActivity: MainActivity){
         mainActivity.newsFragment.lifecycleScope.launch {
             val connector = CodeforcesNewsFollowWorker.FollowDataConnector(mainActivity)
             val handle = holder.author.text

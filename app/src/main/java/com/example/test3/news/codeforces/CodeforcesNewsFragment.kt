@@ -21,7 +21,7 @@ abstract class CodeforcesNewsFragment: Fragment() {
     abstract val title: CodeforcesTitle
     abstract val isManagesNewEntries: Boolean
     abstract val isAutoUpdatable: Boolean
-    abstract val viewAdapter: CodeforcesNewsItemsAdapter
+    abstract val viewAdapter: CodeforcesNewsItemsAdapter<out RecyclerView.ViewHolder>
 
     companion object {
         fun createInstance(title: CodeforcesTitle): CodeforcesNewsFragment {

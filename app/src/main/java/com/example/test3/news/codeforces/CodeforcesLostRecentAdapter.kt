@@ -17,7 +17,7 @@ class CodeforcesLostRecentAdapter : CodeforcesBlogEntriesAdapter(), CodeforcesNe
             rows = blogs
                 .sortedByDescending { it.timeStamp }
                 .map {
-                    Info(
+                    BlogEntryInfo(
                         blogId = it.id,
                         title = it.title,
                         author = it.authorHandle,

@@ -17,9 +17,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
 import com.example.test3.utils.*
 
-class CodeforcesRecentActionsAdapter: CodeforcesNewsItemsAdapter(){
+class CodeforcesRecentActionsAdapter:
+    CodeforcesNewsItemsAdapter<CodeforcesRecentActionsAdapter.CodeforcesRecentActionItemViewHolder>(){
 
-    class BlogInfo(
+    class BlogEntryInfo(
         val blogId: Int,
         val title: String,
         val author: String,
@@ -28,7 +29,7 @@ class CodeforcesRecentActionsAdapter: CodeforcesNewsItemsAdapter(){
         var commentators: List<Spannable>
     )
 
-    private var rows: Array<BlogInfo> = emptyArray()
+    private var rows: Array<BlogEntryInfo> = emptyArray()
     private var rowsComments: Array<CodeforcesRecentAction> = emptyArray()
     private val blogComments = mutableMapOf<Int, MutableList<CodeforcesComment>>()
 
@@ -59,7 +60,7 @@ class CodeforcesRecentActionsAdapter: CodeforcesNewsItemsAdapter(){
         }
 
         val res = blogs.map { blog ->
-            BlogInfo(blog.id, blog.title, blog.authorHandle, blog.authorColorTag,
+            BlogEntryInfo(blog.id, blog.title, blog.authorHandle, blog.authorColorTag,
                 lastCommentId = blogComments[blog.id]?.first()?.id ?: -1,
                 commentators = calculateCommentatorsSpans(blog.id)
             )
@@ -73,16 +74,17 @@ class CodeforcesRecentActionsAdapter: CodeforcesNewsItemsAdapter(){
         return false
     }
 
-    class CodeforcesNewsBlogItemViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
+    abstract class CodeforcesRecentActionItemViewHolder(val view: ConstraintLayout): RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.news_item_title)
         val author: TextView = view.findViewById(R.id.news_item_author)
+    }
+
+    class CodeforcesRecentActionBlogEntryViewHolder(view: ConstraintLayout): CodeforcesRecentActionItemViewHolder(view){
         val comments: TextView = view.findViewById(R.id.news_item_comments)
         val commentsIcon: ImageView = view.findViewById(R.id.news_item_comment_icon)
     }
 
-    class CodeforcesNewsCommentItemViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
-        val title: TextView = view.findViewById(R.id.news_item_title)
-        val author: TextView = view.findViewById(R.id.news_item_author)
+    class CodeforcesRecentActionCommentViewHolder(view: ConstraintLayout): CodeforcesRecentActionItemViewHolder(view){
         val time: TextView = view.findViewById(R.id.news_item_time)
         val rating: TextView = view.findViewById(R.id.news_item_rating)
         val comment: TextView = view.findViewById(R.id.news_item_comment_content)
@@ -96,7 +98,7 @@ class CodeforcesRecentActionsAdapter: CodeforcesNewsItemsAdapter(){
         } ?: if (modeGrouped) rows.size else rowsComments.size
     }
 
-    private var headerBlog: BlogInfo? = null
+    private var headerBlog: BlogEntryInfo? = null
     private lateinit var header: View
     private lateinit var switchButton: ImageButton
     private lateinit var showBackButton: ImageButton
@@ -122,7 +124,7 @@ class CodeforcesRecentActionsAdapter: CodeforcesNewsItemsAdapter(){
         }
     }
 
-    fun showFromBlog(info: BlogInfo){
+    fun showFromBlog(info: BlogEntryInfo){
         switchButton.isGone = true
         showBackButton.isVisible = true
         headerBlog = info
@@ -146,13 +148,13 @@ class CodeforcesRecentActionsAdapter: CodeforcesNewsItemsAdapter(){
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesRecentActionItemViewHolder {
         if (headerBlog!=null || !modeGrouped) {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_comment, parent, false) as ConstraintLayout
-            return CodeforcesNewsCommentItemViewHolder(view)
+            return CodeforcesRecentActionCommentViewHolder(view)
         } else {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_item, parent, false) as ConstraintLayout
-            return CodeforcesNewsBlogItemViewHolder(view)
+            return CodeforcesRecentActionBlogEntryViewHolder(view)
         }
     }
 
@@ -160,16 +162,16 @@ class CodeforcesRecentActionsAdapter: CodeforcesNewsItemsAdapter(){
         return if (headerBlog!=null || !modeGrouped) 1 else 0
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if(holder is CodeforcesNewsBlogItemViewHolder){
-            onBindViewBlogHolder(holder, position)
+    override fun onBindViewHolder(holder: CodeforcesRecentActionItemViewHolder, position: Int) {
+        if(holder is CodeforcesRecentActionBlogEntryViewHolder){
+            onBindBlogEntryViewHolder(holder, position)
         }else
-            if(holder is CodeforcesNewsCommentItemViewHolder){
-                onBindViewCommentHolder(holder, position)
-            }
+        if(holder is CodeforcesRecentActionCommentViewHolder){
+            onBindCommentViewHolder(holder, position)
+        }
     }
 
-    private fun onBindViewBlogHolder(holder: CodeforcesNewsBlogItemViewHolder, position: Int){
+    private fun onBindBlogEntryViewHolder(holder: CodeforcesRecentActionBlogEntryViewHolder, position: Int){
         val info = rows[position]
 
         holder.view.setOnClickListener {
@@ -223,7 +225,7 @@ class CodeforcesRecentActionsAdapter: CodeforcesNewsItemsAdapter(){
         holder.commentsIcon.isGone = info.commentators.isEmpty()
     }
 
-    private fun onBindViewCommentHolder(holder: CodeforcesNewsCommentItemViewHolder, position: Int){
+    private fun onBindCommentViewHolder(holder: CodeforcesRecentActionCommentViewHolder, position: Int){
         val recentAction =
             headerBlog?.run { rowsComments.filter { it.blogEntry!!.id == blogId }[position] }
                 ?: rowsComments[position]

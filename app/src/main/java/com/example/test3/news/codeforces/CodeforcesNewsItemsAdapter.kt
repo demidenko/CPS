@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.utils.MutableSetLiveSize
 
-abstract class CodeforcesNewsItemsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+abstract class CodeforcesNewsItemsAdapter<H: RecyclerView.ViewHolder>: RecyclerView.Adapter<H>(){
     abstract suspend fun parseData(s: String): Boolean
 
     protected lateinit var recyclerView: RecyclerView
