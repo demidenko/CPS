@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
 import com.example.test3.utils.*
 
-class CodeforcesNewsItemsRecentAdapter: CodeforcesNewsItemsAdapter(){
+class CodeforcesRecentActionsAdapter: CodeforcesNewsItemsAdapter(){
 
     class BlogInfo(
         val blogId: Int,

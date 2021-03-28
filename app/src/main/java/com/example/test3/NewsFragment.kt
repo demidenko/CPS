@@ -15,7 +15,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.test3.news.*
 import com.example.test3.news.codeforces.CodeforcesNewsFragment
-import com.example.test3.news.codeforces.CodeforcesNewsItemsRecentAdapter
+import com.example.test3.news.codeforces.CodeforcesRecentActionsAdapter
 import com.example.test3.ui.BottomProgressInfo
 import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.*
@@ -135,11 +135,11 @@ class NewsFragment : CPSFragment() {
         updateLostInfoButton.setOnClickListener { updateLostInfo() }
         recentSwitchButton.setOnClickListener {
             val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
-            (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).switchMode()
+            (fragment.viewAdapter as CodeforcesRecentActionsAdapter).switchMode()
         }
         recentShowBackButton.setOnClickListener {
             val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
-            (fragment.viewAdapter as CodeforcesNewsItemsRecentAdapter).closeShowFromBlog()
+            (fragment.viewAdapter as CodeforcesRecentActionsAdapter).closeShowFromBlog()
         }
     }
 

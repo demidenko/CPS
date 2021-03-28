@@ -5,7 +5,7 @@ import com.example.test3.timeDifference
 import com.example.test3.utils.getCurrentTimeSeconds
 
 
-class CodeforcesNewsItemsLostRecentAdapter : CodeforcesNewsItemsClassicAdapter(), CodeforcesNewsItemsAdapterAutoUpdatable {
+class CodeforcesLostRecentAdapter : CodeforcesBlogEntriesAdapter(), CodeforcesNewsItemsAdapterAutoUpdatable {
     override suspend fun parseData(s: String) = true
 
     override fun subscribeLiveData(

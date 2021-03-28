@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
-open class CodeforcesNewsItemsClassicAdapter: CodeforcesNewsItemsAdapter(), CodeforcesNewsItemsAdapterManagesNewEntries {
+open class CodeforcesBlogEntriesAdapter: CodeforcesNewsItemsAdapter(), CodeforcesNewsItemsAdapterManagesNewEntries {
 
     data class Info(
         val blogId: Int,
