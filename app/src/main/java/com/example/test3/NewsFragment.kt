@@ -141,6 +141,8 @@ class NewsFragment : CPSFragment() {
         subscribeReloading(CodeforcesTitle.TOP)
         subscribeReloading(CodeforcesTitle.RECENT)
 
+        selectPage(savedInstanceState)
+
     }
 
     private fun subscribeReloading(title: CodeforcesTitle) {
@@ -231,8 +233,7 @@ class NewsFragment : CPSFragment() {
         outState.putInt(keySelectedTab, tabLayout.selectedTabPosition)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    private fun selectPage(savedInstanceState: Bundle?) {
 
         val index = savedInstanceState?.getInt(keySelectedTab)
             ?: with(codeforcesNewsAdapter){
