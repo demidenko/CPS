@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.map
 class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
 
     override val title = CodeforcesTitle.LOST
-    override val isAutoUpdatable = true
     private val itemsAdapter by lazy {
         CodeforcesBlogEntriesAdapter(
             lifecycleScope,

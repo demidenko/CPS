@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 abstract class CodeforcesNewsFragment: Fragment() {
 
     abstract val title: CodeforcesTitle
-    abstract val isAutoUpdatable: Boolean
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -173,13 +173,12 @@ class NewsFragment : CPSFragment() {
     private val reloadButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_news_reload) }
     private val sharedReloadButton by lazy { SharedReloadButton(reloadButton) }
     private val failColor by lazy { getColorFromResource(mainActivity, R.color.fail) }
+
     private fun reloadFragment(fragment: CodeforcesNewsFragment, lang: String) {
-        if(fragment.isAutoUpdatable) return
         newsViewModel.reload(fragment.title, lang)
     }
 
     suspend fun reloadFragment(fragment: CodeforcesNewsFragment) {
-        if(fragment.isAutoUpdatable) return
         reloadFragment(fragment, getCodeforcesContentLanguage(mainActivity))
     }
 

@@ -12,7 +12,6 @@ import com.example.test3.utils.LoadingState
 class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
 
     override val title = CodeforcesTitle.RECENT
-    override val isAutoUpdatable = false
     private val itemsAdapter by lazy {
         CodeforcesRecentActionsAdapter(
             lifecycleScope,

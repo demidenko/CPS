@@ -13,7 +13,6 @@ import com.google.android.material.tabs.TabLayout
 class CodeforcesNewsMainFragment(): CodeforcesNewsFragment() {
 
     override val title = CodeforcesTitle.MAIN
-    override val isAutoUpdatable = false
     private val itemsAdapter by lazy {
         CodeforcesBlogEntriesAdapter(
             lifecycleScope,
