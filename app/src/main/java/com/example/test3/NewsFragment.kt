@@ -17,7 +17,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.test3.news.*
 import com.example.test3.news.codeforces.CodeforcesNewsFragment
 import com.example.test3.news.codeforces.CodeforcesNewsViewModel
-import com.example.test3.news.codeforces.CodeforcesRecentActionsAdapter
 import com.example.test3.ui.BottomProgressInfo
 import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.*
@@ -125,11 +124,9 @@ class NewsFragment : CPSFragment() {
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
             val fragment = codeforcesNewsAdapter.fragments[position]
             tab.text = fragment.title.name
-            if(fragment.isManagesNewEntries){
-                tab.orCreateBadge.apply {
-                    backgroundColor = badgeColor
-                    isVisible = false
-                }
+            tab.orCreateBadge.apply {
+                backgroundColor = badgeColor
+                isVisible = false
             }
         }.attach()
 
@@ -139,14 +136,6 @@ class NewsFragment : CPSFragment() {
 
         reloadButton.setOnClickListener { reloadTabs() }
         updateLostInfoButton.setOnClickListener { updateLostInfo() }
-        recentSwitchButton.setOnClickListener {
-            val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
-            (fragment.viewAdapter as CodeforcesRecentActionsAdapter).switchMode()
-        }
-        recentShowBackButton.setOnClickListener {
-            val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
-            (fragment.viewAdapter as CodeforcesRecentActionsAdapter).closeShowFromBlog()
-        }
 
         subscribeReloading(CodeforcesTitle.MAIN)
         subscribeReloading(CodeforcesTitle.TOP)
@@ -216,10 +205,10 @@ class NewsFragment : CPSFragment() {
     }
 
 
-    private val updateLostInfoButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_news_lost_update_info) }
+    private val updateLostInfoButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_lost_update_info) }
 
-    private val recentSwitchButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_news_recent_swap) }
-    private val recentShowBackButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_news_recent_show_blog_back) }
+    val recentSwitchButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_recent_swap) }
+    val recentShowBackButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_recent_show_blog_back) }
 
     private fun updateLostInfo() {
         lifecycleScope.launch {

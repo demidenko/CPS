@@ -27,6 +27,7 @@ class CodeforcesNewsViewModel: ViewModel() {
     fun getRecentActionsData() = recentActions.asStateFlow()
 
     fun reload(title: CodeforcesTitle, lang: String) {
+        if(title == CodeforcesTitle.LOST) return
         viewModelScope.launch {
             val loadingState = pageLoadingState(title)
             loadingState.value = LoadingState.LOADING
@@ -57,8 +58,6 @@ class CodeforcesNewsViewModel: ViewModel() {
                     }
                 }
             }
-
-
         }
     }
 
