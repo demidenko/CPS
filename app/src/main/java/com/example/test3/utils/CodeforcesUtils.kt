@@ -3,7 +3,7 @@ package com.example.test3.utils
 import android.text.Spanned
 import com.example.test3.*
 import com.example.test3.account_manager.*
-import com.example.test3.news.codeforces.CodeforcesBlogEntriesAdapter
+import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

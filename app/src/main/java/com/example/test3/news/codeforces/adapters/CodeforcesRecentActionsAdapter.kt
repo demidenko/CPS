@@ -1,4 +1,4 @@
-package com.example.test3.news.codeforces
+package com.example.test3.news.codeforces.adapters
 
 import android.text.Spannable
 import android.text.SpannableStringBuilder

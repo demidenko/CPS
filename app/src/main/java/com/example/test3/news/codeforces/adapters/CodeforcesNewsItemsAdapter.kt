@@ -1,4 +1,4 @@
-package com.example.test3.news.codeforces
+package com.example.test3.news.codeforces.adapters
 
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.account_manager.CodeforcesAccountManager

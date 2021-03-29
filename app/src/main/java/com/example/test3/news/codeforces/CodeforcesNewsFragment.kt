@@ -10,6 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.*
+import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
+import com.example.test3.news.codeforces.adapters.CodeforcesNewsItemsAdapter
 import com.example.test3.ui.settingsUI
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.launch

@@ -1,4 +1,4 @@
-package com.example.test3.news.codeforces
+package com.example.test3.news.codeforces.adapters
 
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
@@ -31,9 +31,7 @@ open class CodeforcesBlogEntriesAdapter(
     private val viewedBlogEntriesIdsFlow: Flow<Set<Int>>,
     val isManagesNewEntries: Boolean,
     val clearNewEntriesOnDataChange: Boolean
-    ):
-    CodeforcesNewsItemsAdapter<CodeforcesBlogEntriesAdapter.CodeforcesBlogEntryViewHolder>()
-{
+): CodeforcesNewsItemsAdapter<CodeforcesBlogEntriesAdapter.CodeforcesBlogEntryViewHolder>() {
 
     data class BlogEntryInfo(
         val blogId: Int,
