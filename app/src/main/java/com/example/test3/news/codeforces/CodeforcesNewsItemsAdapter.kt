@@ -2,10 +2,8 @@ package com.example.test3.news.codeforces
 
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.account_manager.CodeforcesAccountManager
-import com.example.test3.utils.MutableSetLiveSize
 
 abstract class CodeforcesNewsItemsAdapter<H: RecyclerView.ViewHolder>: RecyclerView.Adapter<H>(){
-    abstract suspend fun parseData(s: String): Boolean
 
     protected lateinit var recyclerView: RecyclerView
     protected lateinit var codeforcesAccountManager: CodeforcesAccountManager
@@ -21,17 +19,4 @@ abstract class CodeforcesNewsItemsAdapter<H: RecyclerView.ViewHolder>: RecyclerV
     }
     open fun beforeRefresh() { }
 
-}
-
-interface CodeforcesNewsItemsAdapterManagesNewEntries {
-    fun getBlogIDs(): List<Int>
-
-    val newEntries: MutableSetLiveSize<Int>
-}
-
-interface CodeforcesNewsItemsAdapterAutoUpdatable {
-    fun subscribeLiveData(
-        fragment: CodeforcesNewsFragment,
-        dataReadyCallback: () -> Unit
-    )
 }

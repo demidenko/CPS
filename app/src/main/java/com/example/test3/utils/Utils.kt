@@ -189,3 +189,7 @@ fun setupMultiSelect(
         setupDescription(this, description)
     }
 }
+
+enum class LoadingState {
+    PENDING, LOADING, FAILED
+}

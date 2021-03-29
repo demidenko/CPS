@@ -13,12 +13,17 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
 import com.example.test3.utils.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 
-class CodeforcesRecentActionsAdapter:
-    CodeforcesNewsItemsAdapter<CodeforcesRecentActionsAdapter.CodeforcesRecentActionItemViewHolder>(){
+class CodeforcesRecentActionsAdapter(
+    lifecycleCoroutineScope: LifecycleCoroutineScope,
+    dataFlow: Flow<Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>>,
+    ): CodeforcesNewsItemsAdapter<CodeforcesRecentActionsAdapter.CodeforcesRecentActionItemViewHolder>(){
 
     class BlogEntryInfo(
         val blogId: Int,
@@ -51,28 +56,29 @@ class CodeforcesRecentActionsAdapter:
         }
     }
 
-    override suspend fun parseData(s: String): Boolean {
-        val (blogs, comments) = CodeforcesUtils.parseRecentActionsPage(s)
+    init {
+        lifecycleCoroutineScope.launchWhenStarted {
+            dataFlow.collect { (blogs, comments) ->
+                blogComments.clear()
+                comments.forEach { recentAction ->
+                    blogComments.getOrPut(recentAction.blogEntry!!.id){ mutableListOf() }.add(recentAction.comment!!)
+                }
 
-        blogComments.clear()
-        comments.forEach { recentAction ->
-            blogComments.getOrPut(recentAction.blogEntry!!.id){ mutableListOf() }.add(recentAction.comment!!)
-        }
+                val res = blogs.map { blog ->
+                    BlogEntryInfo(blog.id, blog.title, blog.authorHandle, blog.authorColorTag,
+                        lastCommentId = blogComments[blog.id]?.first()?.id ?: -1,
+                        commentators = calculateCommentatorsSpans(blog.id)
+                    )
+                }
 
-        val res = blogs.map { blog ->
-            BlogEntryInfo(blog.id, blog.title, blog.authorHandle, blog.authorColorTag,
-                lastCommentId = blogComments[blog.id]?.first()?.id ?: -1,
-                commentators = calculateCommentatorsSpans(blog.id)
-            )
-        }
+                rows = res.toTypedArray()
+                rowsComments = comments.toTypedArray()
 
-        if(res.isNotEmpty()){
-            rows = res.toTypedArray()
-            rowsComments = comments.toTypedArray()
-            return true
+                notifyDataSetChanged()
+            }
         }
-        return false
     }
+
 
     abstract class CodeforcesRecentActionItemViewHolder(val view: ConstraintLayout): RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.news_item_title)

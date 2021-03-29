@@ -10,11 +10,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.test3.news.*
 import com.example.test3.news.codeforces.CodeforcesNewsFragment
+import com.example.test3.news.codeforces.CodeforcesNewsViewModel
 import com.example.test3.news.codeforces.CodeforcesRecentActionsAdapter
 import com.example.test3.ui.BottomProgressInfo
 import com.example.test3.ui.CPSFragment
@@ -24,7 +26,9 @@ import com.example.test3.workers.CodeforcesNewsLostRecentWorker
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -40,6 +44,8 @@ class NewsFragment : CPSFragment() {
 
         suspend fun getCodeforcesContentLanguage(context: Context) = if(context.settingsNews.getRussianContentEnabled()) "ru" else "en"
     }
+
+    val newsViewModel: CodeforcesNewsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -141,6 +147,28 @@ class NewsFragment : CPSFragment() {
             val fragment = codeforcesNewsAdapter.getFragment(CodeforcesTitle.RECENT) ?: return@setOnClickListener
             (fragment.viewAdapter as CodeforcesRecentActionsAdapter).closeShowFromBlog()
         }
+
+        subscribeReloading(CodeforcesTitle.MAIN)
+        subscribeReloading(CodeforcesTitle.TOP)
+        subscribeReloading(CodeforcesTitle.RECENT)
+
+    }
+
+    private fun subscribeReloading(title: CodeforcesTitle) {
+        newsViewModel.getPageLoadingStateLiveData(title).observe(viewLifecycleOwner){ loadingState ->
+            loadingState ?: return@observe
+            val tab = tabLayout.getTabAt(codeforcesNewsAdapter.indexOf(title)) ?: return@observe
+            tab.text = when(loadingState){
+                LoadingState.PENDING -> title.name
+                LoadingState.LOADING -> "..."
+                LoadingState.FAILED -> SpannableStringBuilder().color(failColor) { append(title.name) }
+            }
+            if(loadingState == LoadingState.LOADING){
+                sharedReloadButton.startReload(title.name)
+            }else{
+                sharedReloadButton.stopReload(title.name)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -163,38 +191,23 @@ class NewsFragment : CPSFragment() {
     private fun reloadTabs() {
         lifecycleScope.launch {
             val lang = getCodeforcesContentLanguage(mainActivity)
-            codeforcesNewsAdapter.fragments.mapIndexed { index, fragment ->
-                val tab = tabLayout.getTabAt(index)!!
-                launch { reloadFragment(fragment, tab, lang) }
-            }.joinAll()
+            codeforcesNewsAdapter.fragments.forEach { fragment ->
+                reloadFragment(fragment, lang)
+            }
         }
     }
 
     private val reloadButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_news_reload) }
     private val sharedReloadButton by lazy { SharedReloadButton(reloadButton) }
     private val failColor by lazy { getColorFromResource(mainActivity, R.color.fail) }
-    private suspend fun reloadFragment(
-        fragment: CodeforcesNewsFragment,
-        tab: TabLayout.Tab,
-        lang: String
-    ) {
+    private fun reloadFragment(fragment: CodeforcesNewsFragment, lang: String) {
         if(fragment.isAutoUpdatable) return
-        sharedReloadButton.startReload(fragment.title.name)
-        tab.text = "..."
-        fragment.startReload()
-        if(fragment.reload(lang)) {
-            tab.text = fragment.title.name
-        }else{
-            tab.text = SpannableStringBuilder().color(failColor) { append(fragment.title.name) }
-        }
-        fragment.stopReload()
-        sharedReloadButton.stopReload(fragment.title.name)
+        newsViewModel.reload(fragment.title, lang)
     }
 
     suspend fun reloadFragment(fragment: CodeforcesNewsFragment) {
-        val index = codeforcesNewsAdapter.fragments.indexOf(fragment)
-        val tab = tabLayout.getTabAt(index) ?: return
-        reloadFragment(fragment, tab, getCodeforcesContentLanguage(mainActivity))
+        if(fragment.isAutoUpdatable) return
+        reloadFragment(fragment, getCodeforcesContentLanguage(mainActivity))
     }
 
     fun getTab(title: CodeforcesTitle): TabLayout.Tab? {
@@ -277,7 +290,9 @@ class NewsFragment : CPSFragment() {
 
         private fun makeKey(title: CodeforcesTitle) = stringSetPreferencesKey("blogs_viewed_${title.name}")
 
-        suspend fun getBlogsViewed(title: CodeforcesTitle): Set<Int> = dataStore.data.first()[makeKey(title)]?.mapTo(mutableSetOf()){ it.toInt() } ?: emptySet()
+        fun blogsViewedFlow(title: CodeforcesTitle): Flow<Set<Int>> = dataStore.data.map { it[makeKey(title)]?.map{ it.toInt() }?.toSet() ?: emptySet() }
+
+        suspend fun getBlogsViewed(title: CodeforcesTitle): Set<Int> = blogsViewedFlow(title).first()
         suspend fun setBlogsViewed(title: CodeforcesTitle, blogIDs: Collection<Int>) {
             dataStore.edit { it[makeKey(title)] = blogIDs.mapTo(mutableSetOf()){ id -> id.toString() } }
         }

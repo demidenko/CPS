@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.*
 import com.example.test3.ui.settingsUI
+import com.example.test3.utils.LoadingState
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.launch
 
@@ -45,17 +46,8 @@ abstract class CodeforcesNewsFragment: Fragment() {
     private val swipeRefreshLayout: SwipeRefreshLayout get() = requireView().findViewById(R.id.cf_news_page_swipe_refresh_layout)
     private val recyclerView: RecyclerView get() = swipeRefreshLayout.findViewById(R.id.cf_news_page_recyclerview)
 
-    fun startReload() {
-        if(isAutoUpdatable) return
-        swipeRefreshLayout.isRefreshing = true
-    }
 
-    fun stopReload() {
-        if(isAutoUpdatable) return
-        swipeRefreshLayout.isRefreshing = false
-    }
-
-    private val newsFragment by lazy { requireParentFragment() as NewsFragment }
+    protected val newsFragment by lazy { requireParentFragment() as NewsFragment }
     private fun callReload() {
         lifecycleScope.launch { newsFragment.reloadFragment(this@CodeforcesNewsFragment) }
     }
@@ -70,75 +62,38 @@ abstract class CodeforcesNewsFragment: Fragment() {
 
         if(isAutoUpdatable){
             swipeRefreshLayout.isEnabled = false
-            (viewAdapter as CodeforcesNewsItemsAdapterAutoUpdatable).subscribeLiveData(this){
-                lifecycleScope.launch { showItems() }
-            }
         } else {
             swipeRefreshLayout.apply {
                 setOnRefreshListener { callReload() }
                 setProgressBackgroundColorSchemeResource(R.color.backgroundAdditional)
                 setColorSchemeResources(R.color.colorAccent)
             }
+            newsFragment.newsViewModel.getPageLoadingStateLiveData(title).observe(viewLifecycleOwner){ loadingState ->
+                swipeRefreshLayout.isRefreshing = loadingState == LoadingState.LOADING
+            }
         }
 
         subscribeNewEntries()
         subscribeRefreshOnRealColor()
 
-        callReload()
+        if(savedInstanceState == null) callReload()
     }
 
-    abstract suspend fun parseData(lang: String): Boolean
-    suspend fun reload(lang: String): Boolean {
-        if(!parseData(lang)) return false
+    open fun onPageSelected(tab: TabLayout.Tab) { }
+    open fun onPageUnselected(tab: TabLayout.Tab) { }
 
-        with(viewAdapter){
-            if(this is CodeforcesNewsItemsAdapterManagesNewEntries) newEntries.clear()
-        }
 
-        showItems()
-
-        return true
-    }
-
-    fun onPageSelected(tab: TabLayout.Tab) {
-        if(isManagesNewEntries) tab.badge?.run {
-            if(hasNumber()){
-                isVisible = true
-                lifecycleScope.launch { saveEntries() }
-            }
-        }
-    }
-    fun onPageUnselected(tab: TabLayout.Tab) {
-        if(isManagesNewEntries) tab.badge?.run {
-            if(hasNumber()) isVisible = false
-        }
-    }
-
-    private suspend fun showItems() {
-        manageNewEntries()
-        viewAdapter.notifyDataSetChanged()
-    }
-
-    private suspend fun manageNewEntries() {
+    protected fun saveEntries() {
         if(!isManagesNewEntries) return
-        val savedBlogs = newsFragment.viewedDataStore.getBlogsViewed(title)
-        with(viewAdapter as CodeforcesNewsItemsAdapterManagesNewEntries){
-            val currentBlogs = getBlogIDs()
-            for(id in newEntries.values()) if(id !in currentBlogs) newEntries.remove(id)
-            val newBlogs = currentBlogs.filter { !savedBlogs.contains(it) }
-            newEntries.addAll(newBlogs)
+        val toSave = (viewAdapter as CodeforcesBlogEntriesAdapter).getBlogIDs()
+        lifecycleScope.launch {
+            newsFragment.viewedDataStore.setBlogsViewed(title, toSave)
         }
-    }
-
-    private suspend fun saveEntries() {
-        if(!isManagesNewEntries) return
-        val toSave = (viewAdapter as CodeforcesNewsItemsAdapterManagesNewEntries).getBlogIDs()
-        newsFragment.viewedDataStore.setBlogsViewed(title, toSave)
     }
 
     private fun subscribeNewEntries() {
         if(!isManagesNewEntries) return
-        (viewAdapter as CodeforcesNewsItemsAdapterManagesNewEntries).newEntries.sizeLiveData.observe(viewLifecycleOwner){ count ->
+        (viewAdapter as CodeforcesBlogEntriesAdapter).getNewEntriesSize().observe(viewLifecycleOwner){ count ->
             val tab = newsFragment.getTab(title) ?: return@observe
             if (count == 0) {
                 tab.badge?.apply {
@@ -150,7 +105,7 @@ abstract class CodeforcesNewsFragment: Fragment() {
                     number = count
                     isVisible = true
                 }
-                if (tab.isSelected && isVisible) lifecycleScope.launch { saveEntries() }
+                if (tab.isSelected && isVisible) saveEntries()
             }
         }
     }

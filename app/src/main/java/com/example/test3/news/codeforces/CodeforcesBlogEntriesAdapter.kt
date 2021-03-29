@@ -9,22 +9,31 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
 import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.MutableSetLiveSize
-import com.example.test3.utils.fromHTML
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
-open class CodeforcesBlogEntriesAdapter:
-    CodeforcesNewsItemsAdapter<CodeforcesBlogEntriesAdapter.CodeforcesBlogEntryViewHolder>(),
-    CodeforcesNewsItemsAdapterManagesNewEntries {
+open class CodeforcesBlogEntriesAdapter(
+    lifecycleCoroutineScope: LifecycleCoroutineScope,
+    dataFlow: Flow<List<BlogEntryInfo>>,
+    private val viewedBlogEntriesIdsFlow: Flow<Set<Int>>,
+    val isManagesNewEntries: Boolean,
+    val clearNewEntriesOnDataChange: Boolean
+    ):
+    CodeforcesNewsItemsAdapter<CodeforcesBlogEntriesAdapter.CodeforcesBlogEntryViewHolder>()
+{
 
     data class BlogEntryInfo(
         val blogId: Int,
@@ -36,49 +45,28 @@ open class CodeforcesBlogEntriesAdapter:
         val rating: String
     )
 
-    override suspend fun parseData(s: String): Boolean {
-        val res = arrayListOf<BlogEntryInfo>()
-        var i = 0
-        while (true) {
-            i = s.indexOf("<div class=\"topic\"", i + 1)
-            if (i == -1) break
-
-            val title = fromHTML(s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i))).toString()
-
-            i = s.indexOf("entry/", i)
-            val id = s.substring(i+6, s.indexOf('"',i)).toInt()
-
-            i = s.indexOf("<div class=\"info\"", i)
-            i = s.indexOf("/profile/", i)
-            val author = s.substring(i+9,s.indexOf('"',i))
-
-            i = s.indexOf("rated-user user-",i)
-            val authorColorTag = CodeforcesUtils.ColorTag.fromString(
-                s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
-            )
-
-            i = s.indexOf("<span class=\"format-humantime\"", i)
-            val time = s.substring(s.indexOf('>',i)+1, s.indexOf("</span>",i))
-
-            i = s.indexOf("<div class=\"roundbox meta\"", i)
-            i = s.indexOf("</span>", i)
-            val rating = s.substring(s.lastIndexOf('>',i-1)+1,i)
-
-            i = s.indexOf("<div class=\"right-meta\">", i)
-            i = s.indexOf("</ul>", i)
-            i = s.lastIndexOf("</a>", i)
-            val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim()
-
-            res.add(BlogEntryInfo(id,title,author,authorColorTag,time,comments,rating))
+    init {
+        lifecycleCoroutineScope.launchWhenStarted {
+            dataFlow.collect { blogEntries ->
+                rows = blogEntries.toTypedArray()
+                manageNewEntries()
+                notifyDataSetChanged()
+            }
         }
-
-        if(res.isNotEmpty()){
-            rows = res.toTypedArray()
-            return true
-        }
-
-        return false
     }
+
+    private suspend fun manageNewEntries() {
+        if(!isManagesNewEntries) return
+        val currentBlogs = getBlogIDs()
+        if(clearNewEntriesOnDataChange) newEntries.clear()
+        else {
+            for(id in newEntries.values()) if(id !in currentBlogs) newEntries.remove(id)
+        }
+        val savedBlogs = viewedBlogEntriesIdsFlow.first()
+        val newBlogs = currentBlogs.filter { it !in savedBlogs }
+        newEntries.addAll(newBlogs)
+    }
+
 
 
     class CodeforcesBlogEntryViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
@@ -91,11 +79,12 @@ open class CodeforcesBlogEntriesAdapter:
         val newEntryIndicator: View = view.findViewById(R.id.news_item_dot_new)
     }
 
-    protected var rows: Array<BlogEntryInfo> = emptyArray()
+    private var rows: Array<BlogEntryInfo> = emptyArray()
 
     override fun getItemCount() = rows.size
 
-    override val newEntries = MutableSetLiveSize<Int>()
+    private val newEntries = MutableSetLiveSize<Int>()
+    fun getNewEntriesSize() = newEntries.sizeLiveData
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesBlogEntryViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_item, parent, false) as ConstraintLayout
@@ -144,7 +133,7 @@ open class CodeforcesBlogEntriesAdapter:
         }
     }
 
-    override fun getBlogIDs() = rows.map { it.blogId }
+    fun getBlogIDs() = rows.map { it.blogId }
 
 
     private fun addToFollowListWithSnackBar(holder: CodeforcesBlogEntryViewHolder, mainActivity: MainActivity){

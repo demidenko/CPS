@@ -3,6 +3,7 @@ package com.example.test3.account_view
 import androidx.lifecycle.*
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.STATUS
+import com.example.test3.utils.LoadingState
 import kotlinx.coroutines.launch
 
 class AccountViewModel() : ViewModel() {
@@ -33,6 +34,3 @@ class AccountViewModel() : ViewModel() {
     fun getAccountLoadingStateLiveData(managerName: String): LiveData<LoadingState> = accountLoadingState(managerName)
 }
 
-enum class LoadingState {
-    PENDING, LOADING, FAILED
-}

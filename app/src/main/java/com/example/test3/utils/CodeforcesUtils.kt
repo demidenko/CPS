@@ -3,6 +3,7 @@ package com.example.test3.utils
 import android.text.Spanned
 import com.example.test3.*
 import com.example.test3.account_manager.*
+import com.example.test3.news.codeforces.CodeforcesBlogEntriesAdapter
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -143,6 +144,45 @@ object CodeforcesUtils {
         }
 
         return Pair(blogs, comments)
+    }
+
+    fun parseBlogEntriesPage(s: String): List<CodeforcesBlogEntriesAdapter.BlogEntryInfo> {
+        val res = mutableListOf<CodeforcesBlogEntriesAdapter.BlogEntryInfo>()
+        var i = 0
+        while (true) {
+            i = s.indexOf("<div class=\"topic\"", i + 1)
+            if (i == -1) break
+
+            val title = fromHTML(s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i))).toString()
+
+            i = s.indexOf("entry/", i)
+            val id = s.substring(i+6, s.indexOf('"',i)).toInt()
+
+            i = s.indexOf("<div class=\"info\"", i)
+            i = s.indexOf("/profile/", i)
+            val author = s.substring(i+9,s.indexOf('"',i))
+
+            i = s.indexOf("rated-user user-",i)
+            val authorColorTag = CodeforcesUtils.ColorTag.fromString(
+                s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
+            )
+
+            i = s.indexOf("<span class=\"format-humantime\"", i)
+            val time = s.substring(s.indexOf('>',i)+1, s.indexOf("</span>",i))
+
+            i = s.indexOf("<div class=\"roundbox meta\"", i)
+            i = s.indexOf("</span>", i)
+            val rating = s.substring(s.lastIndexOf('>',i-1)+1,i)
+
+            i = s.indexOf("<div class=\"right-meta\">", i)
+            i = s.indexOf("</ul>", i)
+            i = s.lastIndexOf("</a>", i)
+            val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim()
+
+            res.add(CodeforcesBlogEntriesAdapter.BlogEntryInfo(id,title,author,authorColorTag,time,comments,rating))
+        }
+
+        return res
     }
 
     fun parseTestPercentage(s: String): Int? {
