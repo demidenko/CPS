@@ -6,6 +6,7 @@ import android.text.SpannableStringBuilder
 import android.view.*
 import android.widget.ImageButton
 import androidx.core.text.color
+import androidx.core.view.isVisible
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -26,7 +27,6 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -76,33 +76,15 @@ class NewsFragment : CPSFragment() {
             }
         }
         CodeforcesNewsAdapter(this, fragments).apply {
-            setButtons(CodeforcesTitle.RECENT, recentSwitchButton to View.VISIBLE, recentShowBackButton to View.GONE)
-            setButtons(CodeforcesTitle.LOST, updateLostInfoButton to View.VISIBLE)
+            setButtons(CodeforcesTitle.RECENT, recentSwitchButton to true, recentShowBackButton to false)
+            setButtons(CodeforcesTitle.LOST, updateLostInfoButton to true)
         }
     }
     private val tabLayout by lazy { requireView().findViewById<TabLayout>(R.id.cf_news_tab_layout) }
     private val tabSelectionListener = object : TabLayout.OnTabSelectedListener{
-
         override fun onTabReselected(tab: TabLayout.Tab) {}
-
-        override fun onTabUnselected(tab: TabLayout.Tab) {
-            with(codeforcesNewsAdapter){
-                val fragment = fragments[tab.position]
-                fragment.onPageUnselected(tab)
-                hideSupportButtons(fragment.title)
-            }
-        }
-
-        override fun onTabSelected(tab: TabLayout.Tab) {
-            with(codeforcesNewsAdapter){
-                val fragment = fragments[tab.position]
-                fragment.onPageSelected(tab)
-                showSupportButtons(fragment.title)
-
-                val subtitle = "::news.codeforces.${fragment.title.name.toLowerCase(Locale.ENGLISH)}"
-                cpsTitle = subtitle
-            }
-        }
+        override fun onTabUnselected(tab: TabLayout.Tab) = codeforcesNewsAdapter.onPageUnselected(tab)
+        override fun onTabSelected(tab: TabLayout.Tab) = codeforcesNewsAdapter.onPageSelected(tab, this@NewsFragment)
     }
 
     private val codeforcesNewsViewPager by lazy {
@@ -122,7 +104,7 @@ class NewsFragment : CPSFragment() {
         val badgeColor = getColorFromResource(mainActivity, R.color.newEntryColor)
 
         TabLayoutMediator(tabLayout, codeforcesNewsViewPager) { tab, position ->
-            val fragment = codeforcesNewsAdapter.fragments[position]
+            val fragment = codeforcesNewsAdapter.createFragment(position)
             tab.text = fragment.title.name
             tab.orCreateBadge.apply {
                 backgroundColor = badgeColor
@@ -134,7 +116,7 @@ class NewsFragment : CPSFragment() {
 
         setHasOptionsMenu(true)
 
-        reloadButton.setOnClickListener { reloadTabs() }
+        reloadButton.setOnClickListener { reloadFragments() }
         updateLostInfoButton.setOnClickListener { updateLostInfo() }
 
         subscribeReloading(CodeforcesTitle.MAIN)
@@ -179,10 +161,10 @@ class NewsFragment : CPSFragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun reloadTabs() {
+    private fun reloadFragments() {
         lifecycleScope.launch {
             val lang = getCodeforcesContentLanguage(mainActivity)
-            codeforcesNewsAdapter.fragments.forEach { fragment ->
+            codeforcesNewsAdapter.forEach { fragment ->
                 reloadFragment(fragment, lang)
             }
         }
@@ -280,9 +262,13 @@ class NewsFragment : CPSFragment() {
 
         private fun makeKey(title: CodeforcesTitle) = stringSetPreferencesKey("blogs_viewed_${title.name}")
 
-        fun blogsViewedFlow(title: CodeforcesTitle): Flow<Set<Int>> = dataStore.data.map { it[makeKey(title)]?.map{ it.toInt() }?.toSet() ?: emptySet() }
+        fun blogsViewedFlow(title: CodeforcesTitle): Flow<Set<Int>> = dataStore.data.map {
+            it[makeKey(title)]
+                ?.map { str -> str.toInt() }
+                ?.toSet()
+                ?: emptySet()
+        }
 
-        suspend fun getBlogsViewed(title: CodeforcesTitle): Set<Int> = blogsViewedFlow(title).first()
         suspend fun setBlogsViewed(title: CodeforcesTitle, blogIDs: Collection<Int>) {
             dataStore.edit { it[makeKey(title)] = blogIDs.mapTo(mutableSetOf()){ id -> id.toString() } }
         }
@@ -292,14 +278,15 @@ class NewsFragment : CPSFragment() {
 
 class CodeforcesNewsAdapter(
     parentFragment: Fragment,
-    val fragments: MutableList<CodeforcesNewsFragment>
+    private val fragments: MutableList<CodeforcesNewsFragment>
 ) : FragmentStateAdapter(parentFragment) {
 
     override fun createFragment(position: Int) = fragments[position]
     override fun getItemCount() = fragments.size
+    override fun getItemId(position: Int) = fragments[position].title.ordinal.toLong()
 
     fun indexOf(title: CodeforcesTitle) = fragments.indexOfFirst { it.title == title }
-    fun getFragment(title: CodeforcesTitle) = fragments.find { it.title == title }
+    fun forEach(action: (CodeforcesNewsFragment) -> Unit) = fragments.forEach(action)
 
     fun remove(index: Int){
         fragments.removeAt(index)
@@ -311,28 +298,40 @@ class CodeforcesNewsAdapter(
         notifyItemInserted(index)
     }
 
-    override fun getItemId(position: Int) = fragments[position].title.ordinal.toLong()
+    
+    fun onPageSelected(tab: TabLayout.Tab, newsFragment: NewsFragment) {
+        val fragment = fragments[tab.position]
+        fragment.onPageSelected(tab)
+        showSupportButtons(fragment.title)
 
+        newsFragment.cpsTitle = "::news.codeforces.${fragment.title.name.toLowerCase(Locale.ENGLISH)}"
+    }
+    
+    fun onPageUnselected(tab: TabLayout.Tab) {
+        val fragment = fragments[tab.position]
+        fragment.onPageUnselected(tab)
+        hideSupportButtons(fragment.title)
+    }
 
-    private val tabButtons = mutableMapOf<CodeforcesTitle, List<ImageButton>>()
-    private val buttonVisibility = mutableMapOf<Int, Int>()
-    fun setButtons(title: CodeforcesTitle, vararg buttons: Pair<ImageButton,Int>){
-        tabButtons[title] = buttons.unzip().first
+    private val buttonsByTitle = mutableMapOf<CodeforcesTitle, List<ImageButton>>()
+    private val buttonVisibility = mutableMapOf<Int, Boolean>()
+    fun setButtons(title: CodeforcesTitle, vararg buttons: Pair<ImageButton,Boolean>){
+        buttonsByTitle[title] = buttons.unzip().first
         buttons.forEach { (button, visibility) ->
             buttonVisibility[button.id] = visibility
         }
     }
 
-    fun hideSupportButtons(title: CodeforcesTitle) {
-        tabButtons[title]?.forEach { button ->
-            buttonVisibility[button.id] = button.visibility
-            button.visibility = View.GONE
+    private fun hideSupportButtons(title: CodeforcesTitle) {
+        buttonsByTitle[title]?.forEach { button ->
+            buttonVisibility[button.id] = button.isVisible
+            button.isVisible = false
         }
     }
 
-    fun showSupportButtons(title: CodeforcesTitle) {
-        tabButtons[title]?.forEach { button ->
-            button.visibility = buttonVisibility[button.id]!!
+    private fun showSupportButtons(title: CodeforcesTitle) {
+        buttonsByTitle[title]?.forEach { button ->
+            button.isVisible = buttonVisibility[button.id]!!
         }
     }
 }
