@@ -44,7 +44,7 @@ class CodeforcesNewsViewModel: ViewModel() {
         getData: () -> T?
     ) {
         val loadingState = pageLoadingState(title)
-        loadingState.value = LoadingState.PENDING
+        loadingState.value = LoadingState.LOADING
         val data = getData()
         if(data == null) loadingState.value = LoadingState.FAILED
         else {

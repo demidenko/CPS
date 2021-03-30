@@ -3,12 +3,12 @@ package com.example.test3.workers
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.example.test3.ui.BottomProgressInfo
 import com.example.test3.NewsFragment
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.settingsNews
 import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
+import com.example.test3.ui.BottomProgressInfo
 import com.example.test3.utils.*
 import java.util.concurrent.TimeUnit
 
@@ -71,9 +71,9 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
             return Result.success()
         }
 
-        val recentBlogs = CodeforcesUtils.parseRecentActionsPage(
+        val recentBlogs = CodeforcesUtils.parseRecentBlogEntriesPage(
             CodeforcesAPI.getPageSource("recent-actions", NewsFragment.getCodeforcesContentLanguage(context)) ?: return Result.failure()
-        ).first.let { list ->
+        ).let { list ->
             val authors = CodeforcesUtils.getUsersInfo(list.map { blog -> blog.authorHandle })
             list.map { blog ->
                 authors[blog.authorHandle]?.takeIf { it.status==STATUS.OK }
