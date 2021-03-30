@@ -36,6 +36,7 @@ class CodeforcesCommentsAdapter(
         val time: TextView = view.findViewById(R.id.news_item_time)
         val rating: TextView = view.findViewById(R.id.news_item_rating)
         val commentContent: TextView = view.findViewById(R.id.news_item_comment_content)
+        val arrow: TextView = view.findViewById(R.id.recent_arrow)
     }
 
     private var rows: Array<CodeforcesRecentAction> = emptyArray()
@@ -62,11 +63,10 @@ class CodeforcesCommentsAdapter(
                 else {
                     isVisible = true
                     text = signedToString(comment.rating)
-                    if (comment.rating > 0) {
-                        setTextColor(getColorFromResource(context, R.color.blog_rating_positive))
-                    } else {
-                        setTextColor(getColorFromResource(context, R.color.blog_rating_negative))
-                    }
+                    setTextColor(getColorFromResource(context,
+                        if (comment.rating > 0) R.color.blog_rating_positive
+                        else R.color.blog_rating_negative
+                    ))
                 }
             }
 
@@ -79,7 +79,7 @@ class CodeforcesCommentsAdapter(
             }
 
             title.isVisible = showTitle
-            view.findViewById<TextView>(R.id.recent_arrow).isVisible = showTitle
+            arrow.isVisible = showTitle
         }
     }
 
