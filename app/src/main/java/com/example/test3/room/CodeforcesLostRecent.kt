@@ -12,16 +12,16 @@ const val lostBlogsTableName = "cf_lost_blogs"
 @Dao
 interface LostBlogsDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(blogs: List<LostBlogEntry>)
+    suspend fun insert(blogEntries: List<LostBlogEntry>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(blogEntry: LostBlogEntry)
 
     @Update
-    suspend fun update(blogs: Array<LostBlogEntry>)
-
-    @Update
     suspend fun update(blogEntry: LostBlogEntry)
+
+    @Delete
+    suspend fun remove(blogEntries: List<LostBlogEntry>)
 
     @Delete
     suspend fun remove(blogEntry: LostBlogEntry)

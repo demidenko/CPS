@@ -20,43 +20,43 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
             val blogsDao = getLostBlogsDao(context)
 
             val blogEntries = blogsDao.getLost()
-                .toTypedArray()
 
             progressInfo?.start(blogEntries.size)
 
-            //updates author's handle color
-            CodeforcesUtils.getUsersInfo(blogEntries.map { it.authorHandle }).let { users ->
-                for(i in blogEntries.indices) {
-                    val blogEntry = blogEntries[i]
-                    users[blogEntry.authorHandle]?.takeIf { it.status==STATUS.OK }?.let { user ->
-                        blogEntries[i] = blogEntry.copy(
-                            authorColorTag = CodeforcesUtils.getTagByRating(user.rating)
-                        )
-                    }
-                }
-            }
 
+            val users = CodeforcesUtils.getUsersInfo(blogEntries.map { it.authorHandle })
             val locale = NewsFragment.getCodeforcesContentLanguage(context)
 
-            for(i in blogEntries.indices) {
-                val blogEntry = blogEntries[i]
+            blogEntries.forEach { originalBlogEntry ->
+                var blogEntry = originalBlogEntry.copy()
+
+                //updates author's handle color
+                users[blogEntry.authorHandle]?.takeIf { it.status==STATUS.OK }?.let { user ->
+                    blogEntry = blogEntry.copy(
+                        authorColorTag = CodeforcesUtils.getTagByRating(user.rating)
+                    )
+                }
+
                 CodeforcesAPI.getBlogEntry(blogEntry.id,locale)?.let { response ->
                     if(response.status == CodeforcesAPIStatus.FAILED && response.isBlogNotFound(blogEntry.id)){
+                        //remove deleted
                         blogsDao.remove(blogEntry)
                     } else {
+                        //update title and author's handle
                         if(response.status == CodeforcesAPIStatus.OK) response.result?.let { freshBlogEntry ->
                             val title = freshBlogEntry.title.removeSurrounding("<p>", "</p>")
-                            blogEntries[i] = blogEntry.copy(
+                            blogEntry = blogEntry.copy(
                                 authorHandle = freshBlogEntry.authorHandle,
                                 title = fromHTML(title).toString()
                             )
                         }
                     }
-                    progressInfo?.increment()
                 }
-            }
 
-            blogsDao.update(blogEntries)
+                if(blogEntry != originalBlogEntry) blogsDao.update(blogEntry)
+
+                progressInfo?.increment()
+            }
 
             progressInfo?.finish()
         }
@@ -71,19 +71,19 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
             return Result.success()
         }
 
-        val recentBlogs = CodeforcesUtils.parseRecentBlogEntriesPage(
+        val recentBlogEntries = CodeforcesUtils.parseRecentBlogEntriesPage(
             CodeforcesAPI.getPageSource("recent-actions", NewsFragment.getCodeforcesContentLanguage(context)) ?: return Result.failure()
         ).let { list ->
             val authors = CodeforcesUtils.getUsersInfo(list.map { blog -> blog.authorHandle })
-            list.map { blog ->
-                authors[blog.authorHandle]?.takeIf { it.status==STATUS.OK }
+            list.map { blogEntry ->
+                authors[blogEntry.authorHandle]?.takeIf { it.status==STATUS.OK }
                 ?.let {
-                    blog.copy(authorColorTag = CodeforcesUtils.getTagByRating(it.rating))
-                } ?: blog
+                    blogEntry.copy(authorColorTag = CodeforcesUtils.getTagByRating(it.rating))
+                } ?: blogEntry
             }
         }
 
-        if(recentBlogs.isEmpty()) return Result.failure()
+        if(recentBlogEntries.isEmpty()) return Result.failure()
 
         val currentTimeSeconds = getCurrentTimeSeconds()
 
@@ -94,21 +94,19 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
             TimeUnit.SECONDS.toDays(currentTimeSeconds - blogCreationTimeSeconds) > 7
 
         val blogsDao = getLostBlogsDao(context)
-        val minRating = context.settingsNews.getLostMinRating()
+        val minRatingColorTag = context.settingsNews.getLostMinRating()
 
         //get current suspects with removing old ones
-        val suspects = blogsDao.getSuspects().let { list ->
-            val res = mutableListOf<LostBlogEntry>()
-            list.forEach { blog ->
-                if (isNew(blog.creationTimeSeconds) && blog.authorColorTag>=minRating) res.add(blog)
-                else blogsDao.remove(blog)
-            }
-            res.toList()
-        }
+        val suspects = blogsDao.getSuspects()
+            .partition { blogEntry ->
+                isNew(blogEntry.creationTimeSeconds) && blogEntry.authorColorTag>=minRatingColorTag
+            }.also {
+                blogsDao.remove(it.second)
+            }.first
 
         //catch new suspects from recent actions
-        recentBlogs.forEach { blog ->
-            if(blog.authorColorTag>=minRating && suspects.none { it.id == blog.id }){
+        recentBlogEntries.forEach { blog ->
+            if(blog.authorColorTag>=minRatingColorTag && suspects.none { it.id == blog.id }){
                 val creationTimeSeconds = CodeforcesUtils.getBlogCreationTimeSeconds(blog.id)
                 if(isNew(creationTimeSeconds)){
                     val newSuspect = LostBlogEntry(
@@ -125,19 +123,19 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
             }
         }
 
-        val recentBlogIDs = recentBlogs.map { it.id }
+        val recentBlogIDs = recentBlogEntries.map { it.id }
 
         //remove from lost
-        blogsDao.getLost().forEach { blog ->
-            if(isOldLost(blog.creationTimeSeconds) || blog.id in recentBlogIDs){
-                blogsDao.remove(blog)
+        blogsDao.remove(
+            blogsDao.getLost().filter { blogEntry ->
+                isOldLost(blogEntry.creationTimeSeconds) || blogEntry.id in recentBlogIDs
             }
-        }
+        )
 
         //suspect become lost
-        suspects.forEach { blog ->
-            if(blog.id !in recentBlogIDs){
-                blogsDao.update(blog.copy(
+        suspects.forEach { blogEntry ->
+            if(blogEntry.id !in recentBlogIDs){
+                blogsDao.update(blogEntry.copy(
                     isSuspect = false,
                     timeStamp = currentTimeSeconds
                 ))
