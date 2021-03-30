@@ -34,7 +34,46 @@ object CodeforcesUtils {
 
     private val dateFormatRU = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
     private val dateFormatEN = SimpleDateFormat("MMM/dd/yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
-    fun parseRecentActionsPage(s: String): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>> {
+    fun parseBlogEntriesPage(s: String): List<CodeforcesBlogEntriesAdapter.BlogEntryInfo> {
+        val res = mutableListOf<CodeforcesBlogEntriesAdapter.BlogEntryInfo>()
+        var i = 0
+        while (true) {
+            i = s.indexOf("<div class=\"topic\"", i + 1)
+            if (i == -1) break
+
+            val title = fromHTML(s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i))).toString()
+
+            i = s.indexOf("entry/", i)
+            val id = s.substring(i+6, s.indexOf('"',i)).toInt()
+
+            i = s.indexOf("<div class=\"info\"", i)
+            i = s.indexOf("/profile/", i)
+            val author = s.substring(i+9,s.indexOf('"',i))
+
+            i = s.indexOf("rated-user user-",i)
+            val authorColorTag = CodeforcesUtils.ColorTag.fromString(
+                s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
+            )
+
+            i = s.indexOf("<span class=\"format-humantime\"", i)
+            val time = s.substring(s.indexOf('>',i)+1, s.indexOf("</span>",i))
+
+            i = s.indexOf("<div class=\"roundbox meta\"", i)
+            i = s.indexOf("</span>", i)
+            val rating = s.substring(s.lastIndexOf('>',i-1)+1,i)
+
+            i = s.indexOf("<div class=\"right-meta\">", i)
+            i = s.indexOf("</ul>", i)
+            i = s.lastIndexOf("</a>", i)
+            val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim()
+
+            res.add(CodeforcesBlogEntriesAdapter.BlogEntryInfo(id,title,author,authorColorTag,time,comments,rating))
+        }
+
+        return res
+    }
+
+    fun parseCommentsPage(s: String): List<CodeforcesRecentAction> {
         var dateFormat = dateFormatRU
 
         val comments = mutableListOf<CodeforcesRecentAction>()
@@ -112,9 +151,13 @@ object CodeforcesUtils {
             )
         }
 
-        val blogs = mutableListOf<CodeforcesBlogEntry>()
+        return comments
+    }
 
-        i = s.indexOf("<div class=\"recent-actions\">")
+    fun parseRecentBlogEntriesPage(s: String): List<CodeforcesBlogEntry> {
+        val blogEntries = mutableListOf<CodeforcesBlogEntry>()
+
+        var i = s.indexOf("<div class=\"recent-actions\">")
         while(true){
             i = s.indexOf("<div style=\"font-size:0.9em;padding:0.5em 0;\">", i+1)
             if(i==-1) break
@@ -132,7 +175,7 @@ object CodeforcesUtils {
 
             val title = fromHTML(s.substring(s.indexOf(">", i) + 1, s.indexOf("</a", i))).toString()
 
-            blogs.add(
+            blogEntries.add(
                 CodeforcesBlogEntry(
                     id = id,
                     title = title,
@@ -143,46 +186,7 @@ object CodeforcesUtils {
             )
         }
 
-        return Pair(blogs, comments)
-    }
-
-    fun parseBlogEntriesPage(s: String): List<CodeforcesBlogEntriesAdapter.BlogEntryInfo> {
-        val res = mutableListOf<CodeforcesBlogEntriesAdapter.BlogEntryInfo>()
-        var i = 0
-        while (true) {
-            i = s.indexOf("<div class=\"topic\"", i + 1)
-            if (i == -1) break
-
-            val title = fromHTML(s.substring(s.indexOf("<p>", i) + 3, s.indexOf("</p>", i))).toString()
-
-            i = s.indexOf("entry/", i)
-            val id = s.substring(i+6, s.indexOf('"',i)).toInt()
-
-            i = s.indexOf("<div class=\"info\"", i)
-            i = s.indexOf("/profile/", i)
-            val author = s.substring(i+9,s.indexOf('"',i))
-
-            i = s.indexOf("rated-user user-",i)
-            val authorColorTag = CodeforcesUtils.ColorTag.fromString(
-                s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
-            )
-
-            i = s.indexOf("<span class=\"format-humantime\"", i)
-            val time = s.substring(s.indexOf('>',i)+1, s.indexOf("</span>",i))
-
-            i = s.indexOf("<div class=\"roundbox meta\"", i)
-            i = s.indexOf("</span>", i)
-            val rating = s.substring(s.lastIndexOf('>',i-1)+1,i)
-
-            i = s.indexOf("<div class=\"right-meta\">", i)
-            i = s.indexOf("</ul>", i)
-            i = s.lastIndexOf("</a>", i)
-            val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim()
-
-            res.add(CodeforcesBlogEntriesAdapter.BlogEntryInfo(id,title,author,authorColorTag,time,comments,rating))
-        }
-
-        return res
+        return blogEntries
     }
 
     fun parseTestPercentage(s: String): Int? {

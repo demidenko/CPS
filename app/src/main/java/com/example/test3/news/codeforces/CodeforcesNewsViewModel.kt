@@ -70,6 +70,9 @@ class CodeforcesNewsViewModel: ViewModel() {
 
     private suspend fun loadRecentActionsPage(lang: String): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>? {
         val s = CodeforcesAPI.getPageSource("/recent-actions", lang) ?: return null
-        return CodeforcesUtils.parseRecentActionsPage(s).takeIf { it.first.isNotEmpty() }
+        val blogEntries = CodeforcesUtils.parseRecentBlogEntriesPage(s)
+        val comments = CodeforcesUtils.parseCommentsPage(s)
+        if(blogEntries.isEmpty() || comments.isEmpty()) return null
+        return Pair(blogEntries, comments)
     }
 }
