@@ -28,37 +28,28 @@ class CodeforcesNewsViewModel: ViewModel() {
     fun getRecentActionsData() = recentActions.asStateFlow()
 
     fun reload(title: CodeforcesTitle, lang: String) {
-        if(title == CodeforcesTitle.LOST) return
         viewModelScope.launch {
-            val loadingState = pageLoadingState(title)
-            loadingState.value = LoadingState.LOADING
-
             when(title){
-                CodeforcesTitle.MAIN -> {
-                    val blogEntries = loadBlogEntriesPage("/", lang)
-                    if (blogEntries == null) loadingState.value = LoadingState.FAILED
-                    else {
-                        blogEntriesMain.value = blogEntries
-                        loadingState.value = LoadingState.PENDING
-                    }
-                }
-                CodeforcesTitle.TOP -> {
-                    val blogEntries = loadBlogEntriesPage("/top", lang)
-                    if (blogEntries == null) loadingState.value = LoadingState.FAILED
-                    else {
-                        blogEntriesTop.value = blogEntries
-                        loadingState.value = LoadingState.PENDING
-                    }
-                }
-                CodeforcesTitle.RECENT -> {
-                    val recentActionData = loadRecentActionsPage(lang)
-                    if(recentActionData == null) loadingState.value = LoadingState.FAILED
-                    else {
-                        recentActions.value = recentActionData
-                        loadingState.value = LoadingState.PENDING
-                    }
-                }
+                CodeforcesTitle.MAIN -> proceedLoading(title, blogEntriesMain) { loadBlogEntriesPage("/", lang) }
+                CodeforcesTitle.TOP -> proceedLoading(title, blogEntriesTop) { loadBlogEntriesPage("/top", lang) }
+                CodeforcesTitle.RECENT -> proceedLoading(title, recentActions) { loadRecentActionsPage(lang) }
+                else -> return@launch
             }
+        }
+    }
+
+    private inline fun<reified T> proceedLoading(
+        title: CodeforcesTitle,
+        flowOut: MutableStateFlow<T>,
+        getData: () -> T?
+    ) {
+        val loadingState = pageLoadingState(title)
+        loadingState.value = LoadingState.PENDING
+        val data = getData()
+        if(data == null) loadingState.value = LoadingState.FAILED
+        else {
+            flowOut.value = data
+            loadingState.value = LoadingState.PENDING
         }
     }
 
