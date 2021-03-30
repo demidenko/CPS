@@ -17,9 +17,7 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
         CodeforcesBlogEntriesAdapter(
             lifecycleScope,
             newsFragment.newsViewModel.getBlogEntriesTop(),
-            newsFragment.viewedDataStore.blogsViewedFlow(title),
-            isManagesNewEntries = false,
-            clearNewEntriesOnDataChange = true
+            null
         )
     }
 

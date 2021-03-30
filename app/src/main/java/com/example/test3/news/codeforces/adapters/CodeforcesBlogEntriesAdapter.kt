@@ -28,9 +28,8 @@ import kotlinx.coroutines.runBlocking
 open class CodeforcesBlogEntriesAdapter(
     lifecycleCoroutineScope: LifecycleCoroutineScope,
     dataFlow: Flow<List<BlogEntryInfo>>,
-    private val viewedBlogEntriesIdsFlow: Flow<Set<Int>>,
-    val isManagesNewEntries: Boolean,
-    val clearNewEntriesOnDataChange: Boolean
+    private val viewedBlogEntriesIdsFlow: Flow<Set<Int>>?,
+    val clearNewEntriesOnDataChange: Boolean = true
 ): CodeforcesNewsItemsAdapter<CodeforcesBlogEntriesAdapter.CodeforcesBlogEntryViewHolder>() {
 
     data class BlogEntryInfo(
@@ -54,15 +53,14 @@ open class CodeforcesBlogEntriesAdapter(
     }
 
     private suspend fun manageNewEntries() {
-        if(!isManagesNewEntries) return
-        val currentBlogs = getBlogIDs()
+        val savedBlogEntries = viewedBlogEntriesIdsFlow?.first() ?: return
+        val currentBlogEntries = getBlogIDs()
         if(clearNewEntriesOnDataChange) newEntries.clear()
         else {
-            for(id in newEntries.values()) if(id !in currentBlogs) newEntries.remove(id)
+            for(id in newEntries.values()) if(id !in currentBlogEntries) newEntries.remove(id)
         }
-        val savedBlogs = viewedBlogEntriesIdsFlow.first()
-        val newBlogs = currentBlogs.filter { it !in savedBlogs }
-        newEntries.addAll(newBlogs)
+        val newBlogEntries = currentBlogEntries.filter { it !in savedBlogEntries }
+        newEntries.addAll(newBlogEntries)
     }
 
 

@@ -7,10 +7,12 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.test3.CodeforcesTitle
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
+import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
 import com.example.test3.timeDifference
 import com.example.test3.utils.getCurrentTimeSeconds
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
@@ -20,10 +22,17 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
     private val itemsAdapter by lazy {
         CodeforcesBlogEntriesAdapter(
             lifecycleScope,
-            makeDataFlow(),
+            makeDataFlow(getLostBlogsDao(requireContext()).getLostFlow()),
             newsFragment.viewedDataStore.blogsViewedFlow(title),
-            isManagesNewEntries = true,
             clearNewEntriesOnDataChange = false
+        )
+    }
+
+    private val itemsSuspectsAdapter by lazy {
+        CodeforcesBlogEntriesAdapter(
+            lifecycleScope,
+            makeDataFlow(getLostBlogsDao(requireContext()).getSuspectsFlow()),
+            null
         )
     }
 
@@ -40,7 +49,6 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
         subscribeNewEntries(itemsAdapter)
         subscribeRefreshOnRealColor { itemsAdapter.refresh() }
 
-        if(savedInstanceState == null) callReload()
     }
 
     override fun onPageSelected(tab: TabLayout.Tab) {
@@ -58,8 +66,8 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
         }
     }
 
-    private fun makeDataFlow() = getLostBlogsDao(requireContext()).getLostFlow()
-        .distinctUntilChanged()
+    private fun makeDataFlow(blogEntriesFlow: Flow<List<LostBlogEntry>>) =
+        blogEntriesFlow.distinctUntilChanged()
         .map { blogEntries ->
             val currentTimeSeconds = getCurrentTimeSeconds()
             blogEntries.sortedByDescending { it.timeStamp }
