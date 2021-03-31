@@ -21,10 +21,15 @@ class CodeforcesCommentsAdapter(
     dataFlow: Flow<List<CodeforcesRecentAction>>
 ): CodeforcesNewsItemsAdapter<CodeforcesCommentsAdapter.CodeforcesCommentViewHolder>() {
 
+    private var items: Array<CodeforcesRecentAction> = emptyArray()
+    override fun getItemCount() = items.size
+
+    var showTitle = true //TODO
+
     init {
         lifecycleCoroutineScope.launchWhenStarted {
             dataFlow.collect { recentActions ->
-                rows = recentActions.toTypedArray()
+                items = recentActions.toTypedArray()
                 notifyDataSetChanged()
             }
         }
@@ -39,17 +44,14 @@ class CodeforcesCommentsAdapter(
         val arrow: TextView = view.findViewById(R.id.recent_arrow)
     }
 
-    private var rows: Array<CodeforcesRecentAction> = emptyArray()
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesCommentViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_recent_comment, parent, false) as ConstraintLayout
         return CodeforcesCommentViewHolder(view)
     }
 
-    var showTitle = true
 
     override fun onBindViewHolder(holder: CodeforcesCommentViewHolder, position: Int) {
-        val recentAction = rows[position]
+        val recentAction = items[position]
         val blogEntry = recentAction.blogEntry!!
         val comment = recentAction.comment!!
 
@@ -83,7 +85,6 @@ class CodeforcesCommentsAdapter(
         }
     }
 
-    override fun getItemCount() = rows.size
 
 
 }

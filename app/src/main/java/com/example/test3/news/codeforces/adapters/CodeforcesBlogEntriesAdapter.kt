@@ -42,10 +42,16 @@ open class CodeforcesBlogEntriesAdapter(
         val rating: String
     )
 
+    private var items: Array<BlogEntryInfo> = emptyArray()
+    override fun getItemCount() = items.size
+
+    private val newEntries = MutableSetLiveSize<Int>()
+    fun getNewEntriesSize() = newEntries.sizeLiveData
+
     init {
         lifecycleCoroutineScope.launchWhenStarted {
             dataFlow.collect { blogEntries ->
-                rows = blogEntries.toTypedArray()
+                items = blogEntries.toTypedArray()
                 manageNewEntries()
                 notifyDataSetChanged()
             }
@@ -75,12 +81,7 @@ open class CodeforcesBlogEntriesAdapter(
         val newEntryIndicator: View = view.findViewById(R.id.news_item_dot_new)
     }
 
-    private var rows: Array<BlogEntryInfo> = emptyArray()
 
-    override fun getItemCount() = rows.size
-
-    private val newEntries = MutableSetLiveSize<Int>()
-    fun getNewEntriesSize() = newEntries.sizeLiveData
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesBlogEntryViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_item, parent, false) as ConstraintLayout
@@ -89,7 +90,7 @@ open class CodeforcesBlogEntriesAdapter(
 
     override fun onBindViewHolder(holder: CodeforcesBlogEntryViewHolder, position: Int) {
         with(holder){
-            val info = rows[position]
+            val info = items[position]
 
             val blogId = info.blogId
             view.setOnClickListener {
@@ -129,7 +130,7 @@ open class CodeforcesBlogEntriesAdapter(
         }
     }
 
-    fun getBlogIDs() = rows.map { it.blogId }
+    fun getBlogIDs() = items.map { it.blogId }
 
 
     private fun addToFollowListWithSnackBar(holder: CodeforcesBlogEntryViewHolder, mainActivity: MainActivity){
