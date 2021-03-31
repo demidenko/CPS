@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.*
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.news.codeforces.adapters.CodeforcesNewsItemsAdapter
+import com.example.test3.ui.observeUpdates
 import com.example.test3.ui.settingsUI
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.launch
@@ -70,8 +70,7 @@ abstract class CodeforcesNewsFragment: Fragment() {
     protected fun subscribeRefreshOnRealColor(refresh: (Boolean) -> Unit) {
         newsFragment.mainActivity.settingsUI
             .useRealColorsLiveData
-            .distinctUntilChanged()
-            .observe(viewLifecycleOwner, refresh)
+            .observeUpdates(viewLifecycleOwner, refresh)
     }
 
     companion object {
