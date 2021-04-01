@@ -12,6 +12,8 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -27,6 +29,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -119,27 +122,30 @@ class NewsFragment : CPSFragment() {
         reloadButton.setOnClickListener { reloadFragments() }
         updateLostInfoButton.setOnClickListener { updateLostInfo() }
 
-        subscribeReloading(CodeforcesTitle.MAIN)
-        subscribeReloading(CodeforcesTitle.TOP)
-        subscribeReloading(CodeforcesTitle.RECENT)
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
+            subscribeReloading(CodeforcesTitle.MAIN)
+            subscribeReloading(CodeforcesTitle.TOP)
+            subscribeReloading(CodeforcesTitle.RECENT)
+        }
 
         selectPage(savedInstanceState)
 
     }
 
     private fun subscribeReloading(title: CodeforcesTitle) {
-        newsViewModel.getPageLoadingStateLiveData(title).observe(viewLifecycleOwner){ loadingState ->
-            loadingState ?: return@observe
-            val tab = tabLayout.getTabAt(codeforcesNewsAdapter.indexOf(title)) ?: return@observe
-            tab.text = when(loadingState){
-                LoadingState.PENDING -> title.name
-                LoadingState.LOADING -> "..."
-                LoadingState.FAILED -> SpannableStringBuilder().color(failColor) { append(title.name) }
-            }
-            if(loadingState == LoadingState.LOADING){
-                sharedReloadButton.startReload(title.name)
-            }else{
-                sharedReloadButton.stopReload(title.name)
+        lifecycleScope.launch {
+            newsViewModel.getPageLoadingStateFlow(title).collect { loadingState ->
+                val tab = tabLayout.getTabAt(codeforcesNewsAdapter.indexOf(title)) ?: return@collect
+                tab.text = when(loadingState){
+                    LoadingState.PENDING -> title.name
+                    LoadingState.LOADING -> "..."
+                    LoadingState.FAILED -> SpannableStringBuilder().color(failColor) { append(title.name) }
+                }
+                if(loadingState == LoadingState.LOADING){
+                    sharedReloadButton.startReload(title.name)
+                }else{
+                    sharedReloadButton.stopReload(title.name)
+                }
             }
         }
     }

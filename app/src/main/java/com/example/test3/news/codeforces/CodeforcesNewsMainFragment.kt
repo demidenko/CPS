@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.test3.CodeforcesTitle
 import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
-import com.example.test3.utils.LoadingState
 import com.google.android.material.tabs.TabLayout
 
 class CodeforcesNewsMainFragment(): CodeforcesNewsFragment() {
@@ -35,10 +34,8 @@ class CodeforcesNewsMainFragment(): CodeforcesNewsFragment() {
             setProgressBackgroundColorSchemeResource(R.color.backgroundAdditional)
             setColorSchemeResources(R.color.colorAccent)
         }
-        newsFragment.newsViewModel.getPageLoadingStateLiveData(title).observe(viewLifecycleOwner){ loadingState ->
-            swipeRefreshLayout.isRefreshing = loadingState == LoadingState.LOADING
-        }
 
+        subscribeLoadingState(newsFragment.newsViewModel.getPageLoadingStateFlow(title), swipeRefreshLayout)
         subscribeNewEntries(itemsAdapter)
         subscribeRefreshOnRealColor { itemsAdapter.refresh() }
 

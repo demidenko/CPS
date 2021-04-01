@@ -1,7 +1,5 @@
 package com.example.test3.news.codeforces
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.test3.CodeforcesTitle
@@ -13,9 +11,9 @@ import kotlinx.coroutines.launch
 
 class CodeforcesNewsViewModel: ViewModel() {
 
-    private val states = mutableMapOf<CodeforcesTitle, MutableLiveData<LoadingState>>()
-    private fun pageLoadingState(title: CodeforcesTitle) = states.getOrPut(title) { MutableLiveData(LoadingState.PENDING) }
-    fun getPageLoadingStateLiveData(title: CodeforcesTitle): LiveData<LoadingState> = pageLoadingState(title)
+    private val states = mutableMapOf<CodeforcesTitle, MutableStateFlow<LoadingState>>()
+    private fun pageLoadingState(title: CodeforcesTitle) = states.getOrPut(title) { MutableStateFlow(LoadingState.PENDING) }
+    fun getPageLoadingStateFlow(title: CodeforcesTitle) = pageLoadingState(title).asStateFlow()
 
 
     private val blogEntriesMain = MutableStateFlow<List<CodeforcesBlogEntriesAdapter.BlogEntryInfo>>(emptyList())

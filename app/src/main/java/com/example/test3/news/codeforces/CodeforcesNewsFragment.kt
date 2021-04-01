@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -13,7 +15,10 @@ import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.news.codeforces.adapters.CodeforcesNewsItemsAdapter
 import com.example.test3.ui.observeUpdates
 import com.example.test3.ui.settingsUI
+import com.example.test3.utils.LoadingState
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 abstract class CodeforcesNewsFragment: Fragment() {
@@ -71,6 +76,12 @@ abstract class CodeforcesNewsFragment: Fragment() {
         newsFragment.mainActivity.settingsUI
             .useRealColorsLiveData
             .observeUpdates(viewLifecycleOwner, refresh)
+    }
+
+    protected fun subscribeLoadingState(loadingState: StateFlow<LoadingState>, swipeRefreshLayout: SwipeRefreshLayout) {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
+            loadingState.collect { swipeRefreshLayout.isRefreshing = it == LoadingState.LOADING }
+        }
     }
 
     companion object {
