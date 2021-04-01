@@ -123,29 +123,29 @@ class NewsFragment : CPSFragment() {
         updateLostInfoButton.setOnClickListener { updateLostInfo() }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
-            subscribeReloading(CodeforcesTitle.MAIN)
-            subscribeReloading(CodeforcesTitle.TOP)
-            subscribeReloading(CodeforcesTitle.RECENT)
+            listOf(
+                CodeforcesTitle.MAIN,
+                CodeforcesTitle.TOP,
+                CodeforcesTitle.RECENT
+            ).forEach { launch { subscribeReloading(it) } }
         }
 
         selectPage(savedInstanceState)
 
     }
 
-    private fun subscribeReloading(title: CodeforcesTitle) {
-        lifecycleScope.launch {
-            newsViewModel.getPageLoadingStateFlow(title).collect { loadingState ->
-                val tab = tabLayout.getTabAt(codeforcesNewsAdapter.indexOf(title)) ?: return@collect
-                tab.text = when(loadingState){
-                    LoadingState.PENDING -> title.name
-                    LoadingState.LOADING -> "..."
-                    LoadingState.FAILED -> SpannableStringBuilder().color(failColor) { append(title.name) }
-                }
-                if(loadingState == LoadingState.LOADING){
-                    sharedReloadButton.startReload(title.name)
-                }else{
-                    sharedReloadButton.stopReload(title.name)
-                }
+    private suspend fun subscribeReloading(title: CodeforcesTitle) {
+        newsViewModel.getPageLoadingStateFlow(title).collect { loadingState ->
+            val tab = tabLayout.getTabAt(codeforcesNewsAdapter.indexOf(title)) ?: return@collect
+            tab.text = when(loadingState){
+                LoadingState.PENDING -> title.name
+                LoadingState.LOADING -> "..."
+                LoadingState.FAILED -> SpannableStringBuilder().color(failColor) { append(title.name) }
+            }
+            if(loadingState == LoadingState.LOADING){
+                sharedReloadButton.startReload(title.name)
+            }else{
+                sharedReloadButton.stopReload(title.name)
             }
         }
     }
