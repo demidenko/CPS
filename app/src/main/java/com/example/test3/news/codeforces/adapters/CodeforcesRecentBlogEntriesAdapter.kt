@@ -21,12 +21,13 @@ import com.example.test3.utils.CodeforcesComment
 import com.example.test3.utils.CodeforcesRecentAction
 import com.example.test3.utils.CodeforcesURLFactory
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 
 class CodeforcesRecentBlogEntriesAdapter(
     lifecycleCoroutineScope: LifecycleCoroutineScope,
     dataFlow: Flow<Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>>
-): CodeforcesNewsItemsAdapter<CodeforcesRecentBlogEntriesAdapter.CodeforcesRecentBlogEntryViewHolder>(){
+): CodeforcesNewsItemsAdapter<CodeforcesRecentBlogEntriesAdapter.CodeforcesRecentBlogEntryViewHolder,Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>>(
+    lifecycleCoroutineScope, dataFlow
+){
 
     private var items: Array<CodeforcesBlogEntry> = emptyArray()
     override fun getItemCount() = items.size
@@ -43,16 +44,12 @@ class CodeforcesRecentBlogEntriesAdapter(
             } ?: emptyList()
     }
 
-    init {
-        lifecycleCoroutineScope.launchWhenStarted {
-            dataFlow.collect { (blogEntries, comments) ->
-                commentsByBlogEntry = comments.groupBy({ it.blogEntry!!.id }){ it.comment!! }
-                items = blogEntries.toTypedArray()
-                notifyDataSetChanged()
-            }
-        }
+    override suspend fun applyData(data: Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>) {
+        val (blogEntries, comments) = data
+        commentsByBlogEntry = comments.groupBy({ it.blogEntry!!.id }){ it.comment!! }
+        items = blogEntries.toTypedArray()
+        notifyDataSetChanged()
     }
-
 
     class CodeforcesRecentBlogEntryViewHolder(val view: ConstraintLayout):  RecyclerView.ViewHolder(view){
         val title: TextView = view.findViewById(R.id.news_item_title)

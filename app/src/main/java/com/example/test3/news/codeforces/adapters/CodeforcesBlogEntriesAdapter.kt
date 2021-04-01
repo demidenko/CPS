@@ -19,7 +19,6 @@ import com.example.test3.utils.MutableSetLiveSize
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -30,7 +29,9 @@ open class CodeforcesBlogEntriesAdapter(
     dataFlow: Flow<List<BlogEntryInfo>>,
     private val viewedBlogEntriesIdsFlow: Flow<Set<Int>>?,
     val clearNewEntriesOnDataChange: Boolean = true
-): CodeforcesNewsItemsAdapter<CodeforcesBlogEntriesAdapter.CodeforcesBlogEntryViewHolder>() {
+): CodeforcesNewsItemsAdapter<CodeforcesBlogEntriesAdapter.CodeforcesBlogEntryViewHolder, List<CodeforcesBlogEntriesAdapter.BlogEntryInfo>>(
+    lifecycleCoroutineScope, dataFlow
+) {
 
     data class BlogEntryInfo(
         val blogId: Int,
@@ -48,14 +49,9 @@ open class CodeforcesBlogEntriesAdapter(
     private val newEntries = MutableSetLiveSize<Int>()
     fun getNewEntriesSize() = newEntries.sizeLiveData
 
-    init {
-        lifecycleCoroutineScope.launchWhenStarted {
-            dataFlow.collect { blogEntries ->
-                items = blogEntries.toTypedArray()
-                manageNewEntries()
-                notifyDataSetChanged()
-            }
-        }
+    override suspend fun applyData(data: List<BlogEntryInfo>) {
+        items = data.toTypedArray()
+        manageNewEntries()
     }
 
     private suspend fun manageNewEntries() {

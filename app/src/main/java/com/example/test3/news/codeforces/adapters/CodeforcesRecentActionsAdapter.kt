@@ -18,12 +18,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 
 class CodeforcesRecentActionsAdapter(
     lifecycleCoroutineScope: LifecycleCoroutineScope,
     dataFlow: Flow<Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>>,
-    ): CodeforcesNewsItemsAdapter<CodeforcesRecentActionsAdapter.CodeforcesRecentActionItemViewHolder>(){
+): CodeforcesNewsItemsAdapter<CodeforcesRecentActionsAdapter.CodeforcesRecentActionItemViewHolder,Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>>(
+    lifecycleCoroutineScope, dataFlow
+){
 
     class BlogEntryInfo(
         val blogId: Int,
@@ -56,27 +57,22 @@ class CodeforcesRecentActionsAdapter(
         }
     }
 
-    init {
-        lifecycleCoroutineScope.launchWhenStarted {
-            dataFlow.collect { (blogs, comments) ->
-                blogComments.clear()
-                comments.forEach { recentAction ->
-                    blogComments.getOrPut(recentAction.blogEntry!!.id){ mutableListOf() }.add(recentAction.comment!!)
-                }
-
-                val res = blogs.map { blog ->
-                    BlogEntryInfo(blog.id, blog.title, blog.authorHandle, blog.authorColorTag,
-                        lastCommentId = blogComments[blog.id]?.first()?.id ?: -1,
-                        commentators = calculateCommentatorsSpans(blog.id)
-                    )
-                }
-
-                rows = res.toTypedArray()
-                rowsComments = comments.toTypedArray()
-
-                notifyDataSetChanged()
-            }
+    override suspend fun applyData(data: Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>) {
+        val (blogs, comments) = data
+        blogComments.clear()
+        comments.forEach { recentAction ->
+            blogComments.getOrPut(recentAction.blogEntry!!.id){ mutableListOf() }.add(recentAction.comment!!)
         }
+
+        val res = blogs.map { blog ->
+            BlogEntryInfo(blog.id, blog.title, blog.authorHandle, blog.authorColorTag,
+                lastCommentId = blogComments[blog.id]?.first()?.id ?: -1,
+                commentators = calculateCommentatorsSpans(blog.id)
+            )
+        }
+
+        rows = res.toTypedArray()
+        rowsComments = comments.toTypedArray()
     }
 
 

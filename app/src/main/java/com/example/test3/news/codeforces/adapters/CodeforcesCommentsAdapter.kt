@@ -14,25 +14,21 @@ import com.example.test3.makeIntentOpenUrl
 import com.example.test3.timeDifference
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 
 class CodeforcesCommentsAdapter(
     lifecycleCoroutineScope: LifecycleCoroutineScope,
     dataFlow: Flow<List<CodeforcesRecentAction>>
-): CodeforcesNewsItemsAdapter<CodeforcesCommentsAdapter.CodeforcesCommentViewHolder>() {
+): CodeforcesNewsItemsAdapter<CodeforcesCommentsAdapter.CodeforcesCommentViewHolder,List<CodeforcesRecentAction>>(
+    lifecycleCoroutineScope, dataFlow
+) {
 
     private var items: Array<CodeforcesRecentAction> = emptyArray()
     override fun getItemCount() = items.size
 
     var showTitle = true //TODO
 
-    init {
-        lifecycleCoroutineScope.launchWhenStarted {
-            dataFlow.collect { recentActions ->
-                items = recentActions.toTypedArray()
-                notifyDataSetChanged()
-            }
-        }
+    override suspend fun applyData(data: List<CodeforcesRecentAction>) {
+        items = data.toTypedArray()
     }
 
     class CodeforcesCommentViewHolder(val view: ConstraintLayout): RecyclerView.ViewHolder(view) {
