@@ -9,10 +9,10 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
+import com.example.test3.news.codeforces.CodeforcesNewsFragment
 import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.MutableSetLiveSize
@@ -24,13 +24,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
-open class CodeforcesBlogEntriesAdapter(
-    lifecycleCoroutineScope: LifecycleCoroutineScope,
+class CodeforcesBlogEntriesAdapter(
+    fragment: CodeforcesNewsFragment,
     dataFlow: Flow<List<BlogEntryInfo>>,
     private val viewedBlogEntriesIdsFlow: Flow<Set<Int>>?,
     val clearNewEntriesOnDataChange: Boolean = true
 ): CodeforcesNewsItemsAdapter<CodeforcesBlogEntriesAdapter.CodeforcesBlogEntryViewHolder, List<CodeforcesBlogEntriesAdapter.BlogEntryInfo>>(
-    lifecycleCoroutineScope, dataFlow
+    fragment, dataFlow
 ) {
 
     data class BlogEntryInfo(

@@ -2,7 +2,6 @@ package com.example.test3.news.codeforces
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.test3.CodeforcesTitle
@@ -21,7 +20,7 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
     override val title = CodeforcesTitle.LOST
     private val itemsAdapter by lazy {
         CodeforcesBlogEntriesAdapter(
-            lifecycleScope,
+            this,
             makeDataFlow(getLostBlogsDao(requireContext()).getLostFlow()),
             newsFragment.viewedDataStore.blogsViewedFlow(title),
             clearNewEntriesOnDataChange = false
@@ -30,7 +29,7 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
 
     private val itemsSuspectsAdapter by lazy {
         CodeforcesBlogEntriesAdapter(
-            lifecycleScope,
+            this,
             makeDataFlow(getLostBlogsDao(requireContext()).getSuspectsFlow()),
             null
         )

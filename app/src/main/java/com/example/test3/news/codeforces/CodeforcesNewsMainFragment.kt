@@ -2,7 +2,6 @@ package com.example.test3.news.codeforces
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.test3.CodeforcesTitle
@@ -15,7 +14,7 @@ class CodeforcesNewsMainFragment(): CodeforcesNewsFragment() {
     override val title = CodeforcesTitle.MAIN
     private val itemsAdapter by lazy {
         CodeforcesBlogEntriesAdapter(
-            lifecycleScope,
+            this,
             newsFragment.newsViewModel.getBlogEntriesMain(),
             newsFragment.viewedDataStore.blogsViewedFlow(title)
         )

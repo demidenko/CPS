@@ -12,10 +12,10 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.makeIntentOpenUrl
+import com.example.test3.news.codeforces.CodeforcesNewsFragment
 import com.example.test3.utils.CodeforcesBlogEntry
 import com.example.test3.utils.CodeforcesComment
 import com.example.test3.utils.CodeforcesRecentAction
@@ -23,10 +23,10 @@ import com.example.test3.utils.CodeforcesURLFactory
 import kotlinx.coroutines.flow.Flow
 
 class CodeforcesRecentBlogEntriesAdapter(
-    lifecycleCoroutineScope: LifecycleCoroutineScope,
+    fragment: CodeforcesNewsFragment,
     dataFlow: Flow<Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>>
 ): CodeforcesNewsItemsAdapter<CodeforcesRecentBlogEntriesAdapter.CodeforcesRecentBlogEntryViewHolder,Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>>(
-    lifecycleCoroutineScope, dataFlow
+    fragment, dataFlow
 ){
 
     private var items: Array<CodeforcesBlogEntry> = emptyArray()

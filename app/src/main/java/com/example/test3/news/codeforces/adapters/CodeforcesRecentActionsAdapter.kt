@@ -13,17 +13,17 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
+import com.example.test3.news.codeforces.CodeforcesNewsFragment
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.Flow
 
 class CodeforcesRecentActionsAdapter(
-    lifecycleCoroutineScope: LifecycleCoroutineScope,
+    fragment: CodeforcesNewsFragment,
     dataFlow: Flow<Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>>,
 ): CodeforcesNewsItemsAdapter<CodeforcesRecentActionsAdapter.CodeforcesRecentActionItemViewHolder,Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>>(
-    lifecycleCoroutineScope, dataFlow
+    fragment, dataFlow
 ){
 
     class BlogEntryInfo(
@@ -104,8 +104,9 @@ class CodeforcesRecentActionsAdapter(
     private lateinit var header: View
     private lateinit var switchButton: ImageButton
     private lateinit var showBackButton: ImageButton
+    private lateinit var recyclerView: RecyclerView
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
         with(recyclerView.parent.parent as ConstraintLayout){
             header = findViewById(R.id.cf_news_page_header)
         }
