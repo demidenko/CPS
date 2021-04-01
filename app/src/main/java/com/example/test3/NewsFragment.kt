@@ -30,7 +30,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -132,16 +132,12 @@ class NewsFragment : CPSFragment() {
             titles.forEach { launch { subscribeReloading(it) } }
 
             launch {
-                combine(titles.map { newsViewModel.getPageLoadingStateFlow(it) }){
-                    when {
-                        it.contains(LoadingState.LOADING) -> LoadingState.LOADING
-                        it.contains(LoadingState.FAILED) -> LoadingState.FAILED
-                        else -> LoadingState.PENDING
+                LoadingState.combineLoadingStateFlows(titles.map { newsViewModel.getPageLoadingStateFlow(it) })
+                    .distinctUntilChanged()
+                    .collect { loadingState ->
+                        if(loadingState == LoadingState.LOADING) reloadButton.disable()
+                        else reloadButton.enable()
                     }
-                }.collect { loadingState ->
-                    if(loadingState == LoadingState.LOADING) reloadButton.disable()
-                    else reloadButton.enable()
-                }
             }
         }
 
