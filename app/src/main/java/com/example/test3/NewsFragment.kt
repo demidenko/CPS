@@ -30,6 +30,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -123,11 +124,25 @@ class NewsFragment : CPSFragment() {
         updateLostInfoButton.setOnClickListener { updateLostInfo() }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
-            listOf(
+            val titles = listOf(
                 CodeforcesTitle.MAIN,
                 CodeforcesTitle.TOP,
                 CodeforcesTitle.RECENT
-            ).forEach { launch { subscribeReloading(it) } }
+            )
+            titles.forEach { launch { subscribeReloading(it) } }
+
+            launch {
+                combine(titles.map { newsViewModel.getPageLoadingStateFlow(it) }){
+                    when {
+                        it.contains(LoadingState.LOADING) -> LoadingState.LOADING
+                        it.contains(LoadingState.FAILED) -> LoadingState.FAILED
+                        else -> LoadingState.PENDING
+                    }
+                }.collect { loadingState ->
+                    if(loadingState == LoadingState.LOADING) reloadButton.disable()
+                    else reloadButton.enable()
+                }
+            }
         }
 
         selectPage(savedInstanceState)
@@ -141,11 +156,6 @@ class NewsFragment : CPSFragment() {
                 LoadingState.PENDING -> title.name
                 LoadingState.LOADING -> "..."
                 LoadingState.FAILED -> SpannableStringBuilder().color(failColor) { append(title.name) }
-            }
-            if(loadingState == LoadingState.LOADING){
-                sharedReloadButton.startReload(title.name)
-            }else{
-                sharedReloadButton.stopReload(title.name)
             }
         }
     }
@@ -176,8 +186,7 @@ class NewsFragment : CPSFragment() {
         }
     }
 
-    private val reloadButton by lazy { requireBottomPanel().findViewById<ImageButton>(R.id.navigation_news_reload) }
-    private val sharedReloadButton by lazy { SharedReloadButton(reloadButton) }
+    private val reloadButton: ImageButton get() = requireBottomPanel().findViewById(R.id.navigation_news_reload)
     private val failColor by lazy { getColorFromResource(mainActivity, R.color.fail) }
 
     private fun reloadFragment(fragment: CodeforcesNewsFragment, lang: String) {

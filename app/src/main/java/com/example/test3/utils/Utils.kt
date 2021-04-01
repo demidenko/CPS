@@ -50,10 +50,12 @@ fun ImageButton.off() {
     animate().alpha(.5f).setDuration(500).start()
 }
 fun ImageButton.enable() {
+    if(isEnabled) return
     on()
     isEnabled = true
 }
 fun ImageButton.disable() {
+    if(!isEnabled) return
     isEnabled = false
     off()
 }
