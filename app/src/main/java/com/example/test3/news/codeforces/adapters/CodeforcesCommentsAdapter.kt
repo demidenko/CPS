@@ -17,15 +17,14 @@ import kotlinx.coroutines.flow.Flow
 
 class CodeforcesCommentsAdapter(
     fragment: CodeforcesNewsFragment,
-    dataFlow: Flow<List<CodeforcesRecentAction>>
+    dataFlow: Flow<List<CodeforcesRecentAction>>,
+    private val showTitle: Boolean = true
 ): CodeforcesNewsItemsAdapter<CodeforcesCommentsAdapter.CodeforcesCommentViewHolder,List<CodeforcesRecentAction>>(
     fragment, dataFlow
 ) {
 
     private var items: Array<CodeforcesRecentAction> = emptyArray()
     override fun getItemCount() = items.size
-
-    var showTitle = true //TODO
 
     override suspend fun applyData(data: List<CodeforcesRecentAction>) {
         items = data.toTypedArray()

@@ -32,6 +32,11 @@ class CodeforcesRecentBlogEntriesAdapter(
     private var items: Array<CodeforcesBlogEntry> = emptyArray()
     override fun getItemCount() = items.size
 
+    private var openBlogCommentsCallback: ((CodeforcesBlogEntry) -> Unit)? = null
+    fun setOnBlogSelectListener(callback: (CodeforcesBlogEntry) -> Unit) {
+        openBlogCommentsCallback = callback
+    }
+
     private var commentsByBlogEntry = mapOf<Int, List<CodeforcesComment>>()
     private fun calculateCommentatorsSpans(blogId: Int): List<Spannable> {
         return commentsByBlogEntry[blogId]
@@ -67,7 +72,7 @@ class CodeforcesRecentBlogEntriesAdapter(
         val blogEntry = items[position]
 
         with(holder){
-            view.setOnClickListener(makeItemClickListener(blogEntry.id))
+            view.setOnClickListener(makeItemClickListener(blogEntry))
 
             title.text =  blogEntry.title
             author.text = codeforcesAccountManager.makeSpan(blogEntry.authorHandle, blogEntry.authorColorTag)
@@ -80,20 +85,20 @@ class CodeforcesRecentBlogEntriesAdapter(
     }
 
 
-    private fun makeItemClickListener(blogId: Int): View.OnClickListener {
+    private fun makeItemClickListener(blogEntry: CodeforcesBlogEntry): View.OnClickListener {
         //remember to prevent update data while menu is open
-        val lastComment = commentsByBlogEntry[blogId]?.firstOrNull()
+        val lastComment = commentsByBlogEntry[blogEntry.id]?.firstOrNull()
         return View.OnClickListener { v ->
             val context = v.context
             if(lastComment == null){
-                context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(blogId)))
+                context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(blogEntry.id)))
             } else {
-                buildPopupMenu(lastComment, blogId, v, context).show()
+                buildPopupMenu(lastComment, blogEntry, v, context).show()
             }
         }
     }
 
-    private fun buildPopupMenu(comment: CodeforcesComment, blogId: Int, anchor: View, context: Context): PopupMenu =
+    private fun buildPopupMenu(comment: CodeforcesComment, blogEntry: CodeforcesBlogEntry, anchor: View, context: Context): PopupMenu =
         PopupMenu(context, anchor, Gravity.CENTER_HORIZONTAL).apply {
             inflate(R.menu.cf_recent_item_open_variants)
 
@@ -110,15 +115,15 @@ class CodeforcesRecentBlogEntriesAdapter(
             setOnMenuItemClickListener {
                 when(it.itemId){
                     R.id.cf_news_recent_item_menu_open_blog -> {
-                        context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(blogId)))
+                        context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(blogEntry.id)))
                         true
                     }
                     R.id.cf_news_recent_item_menu_open_last_comment -> {
-                        context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(blogId,comment.id)))
+                        context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(blogEntry.id,comment.id)))
                         true
                     }
                     R.id.cf_news_recent_item_menu_show_comments -> {
-                        //TODO("call open comments from blogEntry")
+                        openBlogCommentsCallback?.invoke(blogEntry)
                         true
                     }
                     else -> false
