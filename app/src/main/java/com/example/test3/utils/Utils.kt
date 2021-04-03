@@ -17,7 +17,6 @@ import com.example.test3.R
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
@@ -199,7 +198,7 @@ enum class LoadingState {
     PENDING, LOADING, FAILED;
 
     companion object {
-        fun combineLoadingStateFlows(states: List<StateFlow<LoadingState>>): Flow<LoadingState> =
+        fun combineLoadingStateFlows(states: List<Flow<LoadingState>>): Flow<LoadingState> =
             combine(states){
                 when {
                     it.contains(LOADING) -> LOADING

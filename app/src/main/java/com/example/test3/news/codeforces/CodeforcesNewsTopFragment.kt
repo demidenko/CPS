@@ -14,7 +14,7 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
     private val itemsAdapter by lazy {
         CodeforcesBlogEntriesAdapter(
             this,
-            newsFragment.newsViewModel.getBlogEntriesTop(),
+            newsFragment.newsViewModel.flowOfTopBlogEntries(),
             null
         )
     }

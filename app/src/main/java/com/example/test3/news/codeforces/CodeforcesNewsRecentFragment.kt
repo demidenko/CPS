@@ -26,21 +26,21 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
     private val blogEntriesAdapter by lazy {
         CodeforcesRecentBlogEntriesAdapter(
             this,
-            newsFragment.newsViewModel.getRecentActionsData()
+            newsFragment.newsViewModel.flowOfRecentActions()
         )
     }
 
     private val commentsAdapter by lazy {
         CodeforcesCommentsAdapter(
             this,
-            newsFragment.newsViewModel.getRecentActionsData().map { it.second }.distinctUntilChanged()
+            newsFragment.newsViewModel.flowOfRecentActions().map { it.second }.distinctUntilChanged()
         )
     }
 
     private fun commentsFilteredAdapter(blogId: Int) =
         CodeforcesCommentsAdapter(
             this,
-            newsFragment.newsViewModel.getRecentActionsData().map { (_, comments) ->
+            newsFragment.newsViewModel.flowOfRecentActions().map { (_, comments) ->
                 comments.filter {
                     it.blogEntry?.id == blogId
                 }

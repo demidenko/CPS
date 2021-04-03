@@ -16,8 +16,9 @@ import com.example.test3.ui.observeUpdates
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.LoadingState
 import com.google.android.material.tabs.TabLayout
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 abstract class CodeforcesNewsFragment: Fragment() {
@@ -77,9 +78,9 @@ abstract class CodeforcesNewsFragment: Fragment() {
             .observeUpdates(viewLifecycleOwner, refresh)
     }
 
-    protected fun subscribeLoadingState(loadingState: StateFlow<LoadingState>, swipeRefreshLayout: SwipeRefreshLayout) {
+    protected fun subscribeLoadingState(loadingState: Flow<LoadingState>, swipeRefreshLayout: SwipeRefreshLayout) {
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
-            loadingState.collect { swipeRefreshLayout.isRefreshing = it == LoadingState.LOADING }
+            loadingState.distinctUntilChanged().collect { swipeRefreshLayout.isRefreshing = it == LoadingState.LOADING }
         }
     }
 
