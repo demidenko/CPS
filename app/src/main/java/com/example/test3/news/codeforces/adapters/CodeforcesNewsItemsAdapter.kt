@@ -32,7 +32,7 @@ abstract class CodeforcesNewsItemsAdapter<H: RecyclerView.ViewHolder, T>(
         beforeRefresh()
         notifyDataSetChanged()
     }
-    open fun beforeRefresh() { }
+    protected open fun beforeRefresh() { }
 
 
     override fun registerAdapterDataObserver(observer: RecyclerView.AdapterDataObserver) {

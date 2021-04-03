@@ -112,6 +112,7 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerViewBlogEntries.apply {
+            isVisible = true
             adapter = blogEntriesAdapter.apply {
                 setOnBlogSelectListener { openCommentsByBlogEntry(it) }
             }

@@ -1,15 +1,20 @@
 package com.example.test3.news.codeforces
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.CodeforcesTitle
 import com.example.test3.NewsFragment
 import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.news.codeforces.adapters.CodeforcesCommentsAdapter
+import com.example.test3.news.codeforces.adapters.CodeforcesNewsItemsAdapter
 import com.example.test3.utils.off
 import com.example.test3.utils.on
 import kotlinx.coroutines.launch
@@ -30,11 +35,31 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
             newsFragment.newsViewModel.flowOfTopComments()
         )
     }
-    private var commentsAdapterCreated = false
+
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return inflater.inflate(R.layout.fragment_cf_news_top, container, false)
+    }
+
+    private val recyclerViewBlogEntries: RecyclerView get() = requireView().findViewById(R.id.cf_news_page_recyclerview_blog_entries)
+    private val recyclerViewComments: RecyclerView get() = requireView().findViewById(R.id.cf_news_page_recyclerview_comments)
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        recyclerView.apply {
+        recyclerViewBlogEntries.apply {
+            isVisible = true
             adapter = blogEntriesAdapter
+            layoutManager = LinearLayoutManager(context)
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            setHasFixedSize(true)
+        }
+
+        recyclerViewComments.apply {
+            isVisible = false
             layoutManager = LinearLayoutManager(context)
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             setHasFixedSize(true)
@@ -49,24 +74,32 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
         newsFragment.topCommentsButton.apply {
             off()
             setOnClickListener {
-                if(recyclerView.adapter == blogEntriesAdapter){
+                if(recyclerViewBlogEntries.isVisible){
                     on()
-                    recyclerView.adapter = commentsAdapter
-                    if(!commentsAdapterCreated){
-                        commentsAdapterCreated = true
-                        lifecycleScope.launch {
-                            newsFragment.newsViewModel.reloadTopComments(NewsFragment.getCodeforcesContentLanguage(requireContext()))
+                    recyclerViewBlogEntries.isVisible = false
+                    with(recyclerViewComments){
+                        isVisible = true
+                        if(adapter == null){
+                            adapter = commentsAdapter
+                            lifecycleScope.launch {
+                                newsFragment.newsViewModel.reloadTopComments(NewsFragment.getCodeforcesContentLanguage(requireContext()))
+                            }
                         }
                     }
                 } else {
                     off()
-                    recyclerView.adapter = blogEntriesAdapter
+                    recyclerViewComments.isVisible = false
+                    recyclerViewBlogEntries.isVisible = true
                 }
             }
         }
 
         subscribeLoadingState(newsFragment.newsViewModel.getPageLoadingStateFlow(title), swipeRefreshLayout)
-        subscribeRefreshOnRealColor { blogEntriesAdapter.refresh() }
+        subscribeRefreshOnRealColor {
+            listOf(recyclerViewBlogEntries, recyclerViewComments).forEach { rv ->
+                rv.adapter?.let { (it as CodeforcesNewsItemsAdapter<*,*>).refresh() }
+            }
+        }
 
         if(savedInstanceState == null) callReload()
     }
