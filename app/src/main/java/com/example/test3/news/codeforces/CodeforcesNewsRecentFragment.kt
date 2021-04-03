@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
@@ -61,9 +62,10 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
     private val recyclerViewCommentsFiltered: RecyclerView get() = requireView().findViewById(R.id.cf_news_page_recyclerview_comments_filtered)
 
     private val switchButton get() = newsFragment.recentSwitchButton
-    private val backButton get() = newsFragment.recentShowBackButton
 
     private val blogEntryHeader: ConstraintLayout get() = requireView().findViewById(R.id.cf_news_page_header)
+    private val headerCloseButton: ImageButton get() = blogEntryHeader.findViewById(R.id.recent_header_close)
+
     private var headerInfo: CodeforcesBlogEntry? = null
     private fun drawBlogEntryHeader() {
         blogEntryHeader.apply {
@@ -85,7 +87,6 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
         headerInfo = blogEntry
         drawBlogEntryHeader()
         switchButton.isVisible = false
-        backButton.isVisible = true
     }
 
     private fun closeCommentsByBlogEntry() {
@@ -94,7 +95,6 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
         recyclerViewBlogEntries.isVisible = true
         headerInfo = null
         drawBlogEntryHeader()
-        backButton.isVisible = false
         switchButton.isVisible = true
     }
 
@@ -149,7 +149,7 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
             }
         }
 
-        backButton.apply {
+        headerCloseButton.apply {
             setOnClickListener {
                 closeCommentsByBlogEntry()
             }
