@@ -60,4 +60,18 @@
         android:visibility="gone"
         />
 
+    <ImageButton
+        android:id="@+id/navigation_news_top_comments"
+        android:tooltipText="top comments"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        app:layout_constraintWidth_percent="0.25"
+        android:src="@drawable/ic_comments_top"
+        style="@style/CPSImageButton"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/navigation_news_reload"
+        />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

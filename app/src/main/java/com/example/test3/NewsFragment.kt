@@ -82,6 +82,7 @@ class NewsFragment : CPSFragment() {
         CodeforcesNewsAdapter(this, fragments).apply {
             setButtons(CodeforcesTitle.RECENT, recentSwitchButton to true, recentShowBackButton to false)
             setButtons(CodeforcesTitle.LOST, updateLostInfoButton to true)
+            setButtons(CodeforcesTitle.TOP, topCommentsButton to true)
         }
     }
     private val tabLayout by lazy { requireView().findViewById<TabLayout>(R.id.cf_news_tab_layout) }
@@ -203,6 +204,8 @@ class NewsFragment : CPSFragment() {
 
     val recentSwitchButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_recent_swap) }
     val recentShowBackButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_recent_show_blog_back) }
+
+    val topCommentsButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_top_comments) }
 
     private fun updateLostInfo() {
         lifecycleScope.launch {

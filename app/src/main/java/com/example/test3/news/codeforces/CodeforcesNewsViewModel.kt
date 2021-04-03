@@ -5,13 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.test3.CodeforcesTitle
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.utils.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class CodeforcesNewsViewModel: ViewModel() {
 
 
-    private class DataLoader<T>(
+    private inner class DataLoader<T>(
         init: T,
         var ignoreLoad: Boolean = false
     ) {
@@ -20,14 +23,16 @@ class CodeforcesNewsViewModel: ViewModel() {
 
         val loadingState: MutableStateFlow<LoadingState> = MutableStateFlow(LoadingState.PENDING)
 
-        suspend fun load(getData: suspend () -> T?) {
+        fun load(getData: suspend () -> T?) {
             if(ignoreLoad) return
             loadingState.value = LoadingState.LOADING
-            val data = getData()
-            if(data == null) loadingState.value = LoadingState.FAILED
-            else {
-                dataFlow.value = data
-                loadingState.value = LoadingState.PENDING
+            viewModelScope.launch {
+                val data = getData()
+                if(data == null) loadingState.value = LoadingState.FAILED
+                else {
+                    dataFlow.value = data
+                    loadingState.value = LoadingState.PENDING
+                }
             }
         }
     }
@@ -53,24 +58,26 @@ class CodeforcesNewsViewModel: ViewModel() {
     private val topBlogEntries = DataLoader<List<CodeforcesBlogEntriesAdapter.BlogEntryInfo>>(emptyList())
     fun flowOfTopBlogEntries() = topBlogEntries.getDataFlow()
 
-    private var topComments = DataLoader<List<CodeforcesRecentAction>>(emptyList(), ignoreLoad = true)
+    private val topComments = DataLoader<List<CodeforcesRecentAction>>(emptyList(), ignoreLoad = true)
     fun flowOfTopComments() = topComments.apply { ignoreLoad = false }.getDataFlow()
 
     private val recentActions = DataLoader<Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>>(Pair(emptyList(), emptyList()))
     fun flowOfRecentActions() = recentActions.getDataFlow()
 
     fun reload(title: CodeforcesTitle, lang: String) {
-        viewModelScope.launch {
-            when(title){
-                CodeforcesTitle.MAIN -> mainBlogEntries.load { loadBlogEntriesPage("/", lang) }
-                CodeforcesTitle.TOP -> {
-                    topBlogEntries.load { loadBlogEntriesPage("/top", lang) }
-                    topComments.load { loadCommentsPage("/topComments?days=2", lang) }
-                }
-                CodeforcesTitle.RECENT -> recentActions.load { loadRecentActionsPage(lang) }
-                else -> return@launch
+        when(title){
+            CodeforcesTitle.MAIN -> mainBlogEntries.load { loadBlogEntriesPage("/", lang) }
+            CodeforcesTitle.TOP -> {
+                topBlogEntries.load { loadBlogEntriesPage("/top", lang) }
+                reloadTopComments(lang)
             }
+            CodeforcesTitle.RECENT -> recentActions.load { loadRecentActionsPage(lang) }
+            else -> return
         }
+    }
+
+    fun reloadTopComments(lang: String) {
+        topComments.load { loadCommentsPage("/topComments?days=2", lang) }
     }
 
 
