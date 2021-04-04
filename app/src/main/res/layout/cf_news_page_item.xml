@@ -67,7 +67,8 @@
         android:text="RATING"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/news_item_title"
+        app:layout_constraintTop_toTopOf="@id/news_item_title"
+        android:layout_marginTop="3dp"
         android:textStyle="bold"
         />
 

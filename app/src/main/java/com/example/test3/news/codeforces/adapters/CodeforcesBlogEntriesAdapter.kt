@@ -16,6 +16,7 @@ import com.example.test3.news.codeforces.CodeforcesNewsFragment
 import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.MutableSetLiveSize
+import com.example.test3.utils.signedToString
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.Flow
@@ -40,7 +41,7 @@ class CodeforcesBlogEntriesAdapter(
         val authorColorTag: CodeforcesUtils.ColorTag,
         val time: String,
         val comments: String,
-        val rating: String
+        val rating: Int
     )
 
     private var items: Array<BlogEntryInfo> = emptyArray()
@@ -117,11 +118,15 @@ class CodeforcesBlogEntriesAdapter(
             commentsIcon.isGone = info.comments.isEmpty()
 
             rating.apply{
-                text = info.rating
-                setTextColor(getColorFromResource(context,
-                    if(info.rating.startsWith('+')) R.color.blog_rating_positive
-                    else R.color.blog_rating_negative
-                ))
+                if(info.rating==0) isVisible = false
+                else {
+                    isVisible = true
+                    text = signedToString(info.rating)
+                    setTextColor(getColorFromResource(context,
+                        if(info.rating>0) R.color.blog_rating_positive
+                        else R.color.blog_rating_negative
+                    ))
+                }
             }
         }
     }

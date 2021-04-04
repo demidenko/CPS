@@ -60,7 +60,7 @@ object CodeforcesUtils {
 
             i = s.indexOf("<div class=\"roundbox meta\"", i)
             i = s.indexOf("</span>", i)
-            val rating = s.substring(s.lastIndexOf('>',i-1)+1,i)
+            val rating = s.substring(s.lastIndexOf('>',i-1)+1,i).toInt()
 
             i = s.indexOf("<div class=\"right-meta\">", i)
             i = s.indexOf("</ul>", i)
