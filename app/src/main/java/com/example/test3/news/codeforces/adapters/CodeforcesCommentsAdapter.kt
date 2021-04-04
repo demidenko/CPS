@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -36,7 +37,7 @@ class CodeforcesCommentsAdapter(
         val time: TextView = view.findViewById(R.id.news_item_time)
         val rating: TextView = view.findViewById(R.id.news_item_rating)
         val commentContent: TextView = view.findViewById(R.id.news_item_comment_content)
-        val arrow: TextView = view.findViewById(R.id.recent_arrow)
+        val titleWithArrow: Group = view.findViewById(R.id.news_item_title_with_arrow)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesCommentViewHolder {
@@ -75,8 +76,7 @@ class CodeforcesCommentsAdapter(
                 it.context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(blogEntry.id,comment.id)))
             }
 
-            title.isVisible = showTitle
-            arrow.isVisible = showTitle
+            titleWithArrow.isVisible = showTitle
         }
     }
 

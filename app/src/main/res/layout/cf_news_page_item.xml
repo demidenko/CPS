@@ -73,7 +73,7 @@
         />
 
     <TextView
-        android:id="@+id/news_item_comments"
+        android:id="@+id/news_item_comments_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="COMMENTS"
@@ -84,14 +84,21 @@
         />
 
     <ImageView
-        android:id="@+id/news_item_comment_icon"
+        android:id="@+id/news_item_comments_icon"
         android:src="@drawable/ic_comments"
         android:layout_width="11.5sp"
         android:layout_height="11.5sp"
-        app:layout_constraintEnd_toStartOf="@id/news_item_comments"
-        app:layout_constraintBottom_toBottomOf="@id/news_item_comments"
+        app:layout_constraintEnd_toStartOf="@id/news_item_comments_count"
+        app:layout_constraintBottom_toBottomOf="@id/news_item_comments_count"
         android:layout_marginEnd="2dp"
         android:layout_marginBottom="2dp"
+        />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/news_item_comments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="news_item_comments_count,news_item_comments_icon"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

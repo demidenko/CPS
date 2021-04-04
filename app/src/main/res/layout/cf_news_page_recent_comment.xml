@@ -35,6 +35,13 @@
         android:singleLine="true"
         />
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/news_item_title_with_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="news_item_title,recent_arrow"
+        />
+
     <ImageView
         android:id="@+id/recent_by"
         android:layout_width="11sp"

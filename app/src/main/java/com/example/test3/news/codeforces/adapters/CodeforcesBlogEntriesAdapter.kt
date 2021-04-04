@@ -4,9 +4,9 @@ import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -73,8 +73,8 @@ class CodeforcesBlogEntriesAdapter(
         val author: TextView = view.findViewById(R.id.news_item_author)
         val time: TextView = view.findViewById(R.id.news_item_time)
         val rating: TextView = view.findViewById(R.id.news_item_rating)
-        val comments: TextView = view.findViewById(R.id.news_item_comments)
-        val commentsIcon: ImageView = view.findViewById(R.id.news_item_comment_icon)
+        val commentsCount: TextView = view.findViewById(R.id.news_item_comments_count)
+        val comments: Group = view.findViewById(R.id.news_item_comments)
         val newEntryIndicator: View = view.findViewById(R.id.news_item_dot_new)
     }
 
@@ -114,8 +114,8 @@ class CodeforcesBlogEntriesAdapter(
 
             newEntryIndicator.isVisible = newEntries.contains(blogId)
 
-            comments.text = info.comments
-            commentsIcon.isGone = info.comments.isEmpty()
+            commentsCount.text = info.comments
+            comments.isGone = info.comments.isEmpty()
 
             rating.apply{
                 if(info.rating==0) isVisible = false
