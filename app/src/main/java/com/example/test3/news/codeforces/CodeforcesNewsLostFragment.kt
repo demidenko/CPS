@@ -10,6 +10,8 @@ import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
 import com.example.test3.timeDifference
 import com.example.test3.utils.getCurrentTimeSeconds
+import com.example.test3.utils.off
+import com.example.test3.utils.on
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -35,6 +37,8 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
         )
     }
 
+    private val suspectsButton get() = newsFragment.suspectsLostButton
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerView.apply {
             adapter = itemsAdapter
@@ -44,6 +48,21 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
         }
 
         swipeRefreshLayout.isEnabled = false
+
+        suspectsButton.apply {
+            off()
+            setOnClickListener {
+                with(recyclerView){
+                    if(adapter == itemsAdapter){
+                        suspectsButton.on()
+                        adapter = itemsSuspectsAdapter
+                    } else {
+                        suspectsButton.off()
+                        adapter = itemsAdapter
+                    }
+                }
+            }
+        }
 
         subscribeNewEntries(itemsAdapter)
         subscribeRefreshOnRealColor { itemsAdapter.refresh() }

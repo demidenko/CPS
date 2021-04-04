@@ -79,6 +79,9 @@ class NewsFragment : CPSFragment() {
             if(CodeforcesNewsLostRecentWorker.isEnabled(mainActivity)){
                 fragments.add(createLostFragment())
             }
+            mainActivity.settingsDev.getDevEnabledLiveData().observe(viewLifecycleOwner){ use ->
+                suspectsLostButton.isVisible = use
+            }
         }
         CodeforcesNewsAdapter(this, fragments).apply {
             setButtons(CodeforcesTitle.RECENT, R.id.support_navigation_news_recent, this@NewsFragment)
@@ -201,11 +204,10 @@ class NewsFragment : CPSFragment() {
     }
 
 
-    private val updateLostInfoButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_lost_update_info) }
-
     val recentSwitchButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_recent_swap) }
-
     val topCommentsButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_top_comments) }
+    private val updateLostInfoButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_lost_update_info) }
+    val suspectsLostButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_lost_suspects) }
 
     private fun updateLostInfo() {
         lifecycleScope.launch {
