@@ -65,7 +65,7 @@ object CodeforcesUtils {
             i = s.indexOf("<div class=\"right-meta\">", i)
             i = s.indexOf("</ul>", i)
             i = s.lastIndexOf("</a>", i)
-            val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim()
+            val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim().toInt()
 
             res.add(CodeforcesBlogEntriesAdapter.BlogEntryInfo(id,title,author,authorColorTag,time,comments,rating))
         }

@@ -96,7 +96,7 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
                         author = it.authorHandle,
                         authorColorTag = it.authorColorTag,
                         time = timeDifference(it.creationTimeSeconds, currentTimeSeconds),
-                        comments = "",
+                        comments = 0,
                         rating = 0
                     )
                 }

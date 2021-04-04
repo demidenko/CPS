@@ -40,7 +40,7 @@ class CodeforcesBlogEntriesAdapter(
         val author: String,
         val authorColorTag: CodeforcesUtils.ColorTag,
         val time: String,
-        val comments: String,
+        val comments: Int,
         val rating: Int
     )
 
@@ -114,8 +114,8 @@ class CodeforcesBlogEntriesAdapter(
 
             newEntryIndicator.isVisible = newEntries.contains(blogId)
 
-            commentsCount.text = info.comments
-            comments.isGone = info.comments.isEmpty()
+            commentsCount.text = info.comments.toString()
+            comments.isGone = info.comments == 0
 
             rating.apply{
                 if(info.rating==0) isVisible = false
