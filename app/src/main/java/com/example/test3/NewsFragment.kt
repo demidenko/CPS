@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.*
 import android.widget.ImageButton
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.color
 import androidx.core.view.isVisible
 import androidx.datastore.preferences.core.edit
@@ -80,9 +81,9 @@ class NewsFragment : CPSFragment() {
             }
         }
         CodeforcesNewsAdapter(this, fragments).apply {
-            setButtons(CodeforcesTitle.RECENT, recentSwitchButton to true)
-            setButtons(CodeforcesTitle.LOST, updateLostInfoButton to true)
-            setButtons(CodeforcesTitle.TOP, topCommentsButton to true)
+            setButtons(CodeforcesTitle.RECENT, R.id.support_navigation_news_recent, this@NewsFragment)
+            setButtons(CodeforcesTitle.TOP, R.id.support_navigation_news_top, this@NewsFragment)
+            setButtons(CodeforcesTitle.LOST, R.id.support_navigation_news_lost, this@NewsFragment)
         }
     }
     private val tabLayout by lazy { requireView().findViewById<TabLayout>(R.id.cf_news_tab_layout) }
@@ -325,26 +326,19 @@ class CodeforcesNewsAdapter(
         hideSupportButtons(fragment.title)
     }
 
-    private val buttonsByTitle = mutableMapOf<CodeforcesTitle, List<ImageButton>>()
-    private val buttonVisibility = mutableMapOf<Int, Boolean>()
-    fun setButtons(title: CodeforcesTitle, vararg buttons: Pair<ImageButton,Boolean>){
-        buttonsByTitle[title] = buttons.unzip().first
-        buttons.forEach { (button, visibility) ->
-            buttonVisibility[button.id] = visibility
+    private val buttonsByTitle = mutableMapOf<CodeforcesTitle, ConstraintLayout>()
+    fun setButtons(title: CodeforcesTitle, resid: Int, newsFragment: NewsFragment){
+        with(newsFragment.requireBottomPanel()){
+            buttonsByTitle[title] = findViewById(resid)
         }
     }
 
     private fun hideSupportButtons(title: CodeforcesTitle) {
-        buttonsByTitle[title]?.forEach { button ->
-            buttonVisibility[button.id] = button.isVisible
-            button.isVisible = false
-        }
+        buttonsByTitle[title]?.isVisible = false
     }
 
     private fun showSupportButtons(title: CodeforcesTitle) {
-        buttonsByTitle[title]?.forEach { button ->
-            button.isVisible = buttonVisibility[button.id]!!
-        }
+        buttonsByTitle[title]?.isVisible = true
     }
 }
 

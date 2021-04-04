@@ -18,47 +18,55 @@
         app:layout_constraintEnd_toEndOf="parent"
         />
 
-    <ImageButton
-        android:id="@+id/navigation_news_lost_update_info"
-        android:tooltipText="update info"
+    <include
+        android:id="@+id/support_navigation_news_main"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        app:layout_constraintWidth_percent="0.25"
-        android:src="@drawable/ic_update_info"
-        style="@style/CPSImageButton"
+        app:layout_constraintWidth_percent="0.75"
+        layout="@layout/navigation_news_main"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/navigation_news_reload"
         android:visibility="gone"
         />
 
-    <ImageButton
-        android:id="@+id/navigation_news_recent_swap"
-        android:tooltipText="change view type"
+
+    <include
+        android:id="@+id/support_navigation_news_top"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        app:layout_constraintWidth_percent="0.25"
-        android:src="@drawable/ic_recent_mode_comments"
-        style="@style/CPSImageButton"
+        app:layout_constraintWidth_percent="0.75"
+        layout="@layout/navigation_news_top"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/navigation_news_reload"
         android:visibility="gone"
         />
 
-    <ImageButton
-        android:id="@+id/navigation_news_top_comments"
-        android:tooltipText="top comments"
+    <include
+        android:id="@+id/support_navigation_news_recent"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        app:layout_constraintWidth_percent="0.25"
-        android:src="@drawable/ic_comments_top"
-        style="@style/CPSImageButton"
+        app:layout_constraintWidth_percent="0.75"
+        layout="@layout/navigation_news_recent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/navigation_news_reload"
         android:visibility="gone"
         />
+
+    <include
+        android:id="@+id/support_navigation_news_lost"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        app:layout_constraintWidth_percent="0.75"
+        layout="@layout/navigation_news_lost"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/navigation_news_reload"
+        android:visibility="gone"
+        />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
