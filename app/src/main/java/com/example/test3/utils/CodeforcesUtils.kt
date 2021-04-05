@@ -34,6 +34,16 @@ object CodeforcesUtils {
 
     private val dateFormatRU = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
     private val dateFormatEN = SimpleDateFormat("MMM/dd/yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
+
+    private fun parseTimeString(str: String): Long {
+        val parser = if(str.contains('.')) dateFormatRU else dateFormatEN
+        return try {
+            TimeUnit.MILLISECONDS.toSeconds(parser.parse(str).time)
+        } catch (e: ParseException) {
+            0L
+        }
+    }
+
     fun parseBlogEntriesPage(s: String): List<CodeforcesBlogEntriesAdapter.BlogEntryInfo> {
         val res = mutableListOf<CodeforcesBlogEntriesAdapter.BlogEntryInfo>()
         var i = 0
@@ -56,7 +66,8 @@ object CodeforcesUtils {
             )
 
             i = s.indexOf("<span class=\"format-humantime\"", i)
-            val time = s.substring(s.indexOf('>',i)+1, s.indexOf("</span>",i))
+            i = s.indexOf('>', i)
+            val time = parseTimeString(s.substring(s.lastIndexOf('"',i-2)+1, i-1))
 
             i = s.indexOf("<div class=\"roundbox meta\"", i)
             i = s.indexOf("</span>", i)
@@ -74,10 +85,7 @@ object CodeforcesUtils {
     }
 
     fun parseCommentsPage(s: String): List<CodeforcesRecentAction> {
-        var dateFormat = dateFormatRU
-
         val comments = mutableListOf<CodeforcesRecentAction>()
-
         var i = 0
         while(true){
             i = s.indexOf("<table class=\"comment-table\">", i+1)
@@ -109,14 +117,7 @@ object CodeforcesUtils {
             i = s.indexOf("<span class=\"format-humantime\"", i)
             i = s.indexOf('>', i)
             val commentTime = s.substring(s.lastIndexOf('"',i-2)+1, i-1)
-            val commentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(
-                try{
-                    dateFormat.parse(commentTime).time
-                }catch (e : ParseException){
-                    dateFormat = if(dateFormat == dateFormatRU) dateFormatEN else dateFormatRU
-                    dateFormat.parse(commentTime).time
-                }
-            )
+            val commentTimeSeconds = parseTimeString(commentTime)
 
             i = s.indexOf("<div class=\"ttypography\">", i)
             val commentText = try{

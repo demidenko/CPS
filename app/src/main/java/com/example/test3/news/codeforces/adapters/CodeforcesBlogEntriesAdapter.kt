@@ -13,10 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
 import com.example.test3.news.codeforces.CodeforcesNewsFragment
-import com.example.test3.utils.CodeforcesURLFactory
-import com.example.test3.utils.CodeforcesUtils
-import com.example.test3.utils.MutableSetLiveSize
-import com.example.test3.utils.signedToString
+import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.Flow
@@ -39,7 +36,7 @@ class CodeforcesBlogEntriesAdapter(
         val title: String,
         val author: String,
         val authorColorTag: CodeforcesUtils.ColorTag,
-        val time: String,
+        val time: Long,
         val comments: Int,
         val rating: Int
     )
@@ -110,7 +107,7 @@ class CodeforcesBlogEntriesAdapter(
 
             author.text = codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
 
-            time.text = timeRUtoEN(info.time)
+            time.text = timeDifference(info.time, getCurrentTimeSeconds())
 
             newEntryIndicator.isVisible = newEntries.contains(blogId)
 

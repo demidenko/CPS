@@ -8,8 +8,6 @@ import com.example.test3.CodeforcesTitle
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
-import com.example.test3.timeDifference
-import com.example.test3.utils.getCurrentTimeSeconds
 import com.example.test3.utils.off
 import com.example.test3.utils.on
 import com.google.android.material.tabs.TabLayout
@@ -87,7 +85,6 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
     private fun makeDataFlow(blogEntriesFlow: Flow<List<LostBlogEntry>>) =
         blogEntriesFlow.distinctUntilChanged()
         .map { blogEntries ->
-            val currentTimeSeconds = getCurrentTimeSeconds()
             blogEntries.sortedByDescending { it.timeStamp }
                 .map {
                     CodeforcesBlogEntriesAdapter.BlogEntryInfo(
@@ -95,7 +92,7 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
                         title = it.title,
                         author = it.authorHandle,
                         authorColorTag = it.authorColorTag,
-                        time = timeDifference(it.creationTimeSeconds, currentTimeSeconds),
+                        time = it.creationTimeSeconds,
                         comments = 0,
                         rating = 0
                     )
