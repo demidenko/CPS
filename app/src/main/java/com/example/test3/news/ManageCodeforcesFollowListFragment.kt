@@ -1,6 +1,5 @@
 package com.example.test3.news
 
-import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageButton
@@ -15,13 +14,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
-import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
+import com.example.test3.news.codeforces.CodeforcesBlogEntriesFragment
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.observeUpdates
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsFollowWorker
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -50,23 +48,14 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             setHasFixedSize(true)
         }
 
-        val blogEntriesRecyclerView = view.findViewById<RecyclerView>(R.id.manage_cf_follow_user_blog_entries).apply {
-            isVisible = false
-            layoutManager = LinearLayoutManager(context)
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-            setHasFixedSize(true)
-        }
-
 
         val followListAdapter = FollowListItemsAdapter(mainActivity).apply {
             setOnSelectListener { info ->
-                followRecyclerView.isVisible = false
-                blogEntriesRecyclerView.adapter = CodeforcesBlogEntriesAdapter(
-                    this@ManageCodeforcesFollowListFragment,
-                    makeUserBlogEntriesSingleFlow(info, requireContext()),
-                    null
+                mainActivity.cpsFragmentManager.pushBack(
+                    CodeforcesBlogEntriesFragment().apply {
+                        setHandle(info.handle)
+                    }
                 )
-                blogEntriesRecyclerView.isVisible = true
             }
         }
 
@@ -204,21 +193,4 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         override fun getItemCount(): Int = list.size
 
     }
-
-    private fun makeUserBlogEntriesSingleFlow(userInfo: CodeforcesAccountManager.CodeforcesUserInfo, context: Context) =
-        flow {
-            val blogEntries =
-                CodeforcesAPI.getUserBlogEntries(userInfo.handle, NewsFragment.getCodeforcesContentLanguage(context))
-                    ?.result ?: emptyList()
-
-            emit(
-                blogEntries.map { blogEntry ->
-                    blogEntry.copy(
-                        title = fromHTML(blogEntry.title.removeSurrounding("<p>", "</p>")).toString()
-                    )
-                }
-            )
-        }
-
-
 }
