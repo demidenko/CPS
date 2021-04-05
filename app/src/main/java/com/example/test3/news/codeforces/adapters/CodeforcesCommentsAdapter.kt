@@ -7,17 +7,17 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.getColorFromResource
 import com.example.test3.makeIntentOpenUrl
-import com.example.test3.news.codeforces.CodeforcesNewsFragment
 import com.example.test3.timeDifference
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.Flow
 
 class CodeforcesCommentsAdapter(
-    fragment: CodeforcesNewsFragment,
+    fragment: Fragment,
     dataFlow: Flow<List<CodeforcesRecentAction>>,
     private val showTitle: Boolean = true
 ): CodeforcesNewsItemsAdapter<CodeforcesCommentsAdapter.CodeforcesCommentViewHolder,List<CodeforcesRecentAction>>(

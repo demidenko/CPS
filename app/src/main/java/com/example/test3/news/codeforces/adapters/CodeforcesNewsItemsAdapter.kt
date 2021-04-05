@@ -1,14 +1,14 @@
 package com.example.test3.news.codeforces.adapters
 
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.account_manager.CodeforcesAccountManager
-import com.example.test3.news.codeforces.CodeforcesNewsFragment
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 
 abstract class CodeforcesNewsItemsAdapter<H: RecyclerView.ViewHolder, T>(
-    fragment: CodeforcesNewsFragment,
+    fragment: Fragment,
     dataFlow: Flow<T>
 ): RecyclerView.Adapter<H>(), LifecycleOwner{
 
@@ -51,7 +51,7 @@ abstract class CodeforcesNewsItemsAdapter<H: RecyclerView.ViewHolder, T>(
 
 class AdapterLifecycleMerge(
     adapter: CodeforcesNewsItemsAdapter<*,*>,
-    fragment: CodeforcesNewsFragment
+    fragment: Fragment
 ){
     val lifecycleRegistry = LifecycleRegistry(adapter)
     private var adapterEvent: Lifecycle.Event = Lifecycle.Event.ON_STOP
