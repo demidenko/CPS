@@ -3,7 +3,6 @@ package com.example.test3.news.codeforces
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.test3.CodeforcesTitle
-import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,10 +51,10 @@ class CodeforcesNewsViewModel: ViewModel() {
     }
 
 
-    private val mainBlogEntries = DataLoader<List<CodeforcesBlogEntriesAdapter.BlogEntryInfo>>(emptyList())
+    private val mainBlogEntries = DataLoader<List<CodeforcesBlogEntry>>(emptyList())
     fun flowOfMainBlogEntries() = mainBlogEntries.getDataFlow()
 
-    private val topBlogEntries = DataLoader<List<CodeforcesBlogEntriesAdapter.BlogEntryInfo>>(emptyList())
+    private val topBlogEntries = DataLoader<List<CodeforcesBlogEntry>>(emptyList())
     fun flowOfTopBlogEntries() = topBlogEntries.getDataFlow()
 
     private val topComments = DataLoader<List<CodeforcesRecentAction>>(emptyList(), ignoreLoad = true)
@@ -81,7 +80,7 @@ class CodeforcesNewsViewModel: ViewModel() {
     }
 
 
-    private suspend fun loadBlogEntriesPage(page: String, lang: String): List<CodeforcesBlogEntriesAdapter.BlogEntryInfo>? {
+    private suspend fun loadBlogEntriesPage(page: String, lang: String): List<CodeforcesBlogEntry>? {
         val s = CodeforcesAPI.getPageSource(page, lang) ?: return null
         return CodeforcesUtils.parseBlogEntriesPage(s).takeIf { it.isNotEmpty() }
     }

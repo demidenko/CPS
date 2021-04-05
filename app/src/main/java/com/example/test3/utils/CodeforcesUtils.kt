@@ -3,7 +3,6 @@ package com.example.test3.utils
 import android.text.Spanned
 import com.example.test3.*
 import com.example.test3.account_manager.*
-import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -44,8 +43,8 @@ object CodeforcesUtils {
         }
     }
 
-    fun parseBlogEntriesPage(s: String): List<CodeforcesBlogEntriesAdapter.BlogEntryInfo> {
-        val res = mutableListOf<CodeforcesBlogEntriesAdapter.BlogEntryInfo>()
+    fun parseBlogEntriesPage(s: String): List<CodeforcesBlogEntry> {
+        val res = mutableListOf<CodeforcesBlogEntry>()
         var i = 0
         while (true) {
             i = s.indexOf("<div class=\"topic\"", i + 1)
@@ -78,7 +77,17 @@ object CodeforcesUtils {
             i = s.lastIndexOf("</a>", i)
             val comments = s.substring(s.lastIndexOf('>',i-1)+1,i).trim().toInt()
 
-            res.add(CodeforcesBlogEntriesAdapter.BlogEntryInfo(id,title,author,authorColorTag,time,comments,rating))
+            res.add(
+                CodeforcesBlogEntry(
+                    id = id,
+                    title = title,
+                    authorHandle = author,
+                    authorColorTag = authorColorTag,
+                    creationTimeSeconds = time,
+                    commentsCount = comments,
+                    rating = rating
+                )
+            )
         }
 
         return res
@@ -454,6 +463,7 @@ data class CodeforcesBlogEntry(
     val authorHandle: String,
     val creationTimeSeconds: Long,
     val rating: Int = 0,
+    val commentsCount: Int = 0,
     val authorColorTag: CodeforcesUtils.ColorTag = CodeforcesUtils.ColorTag.BLACK
 )
 

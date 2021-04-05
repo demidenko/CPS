@@ -24,30 +24,20 @@ import kotlinx.coroutines.runBlocking
 
 class CodeforcesBlogEntriesAdapter(
     fragment: CodeforcesNewsFragment,
-    dataFlow: Flow<List<BlogEntryInfo>>,
+    dataFlow: Flow<List<CodeforcesBlogEntry>>,
     private val viewedBlogEntriesIdsFlow: Flow<Set<Int>>?,
     val clearNewEntriesOnDataChange: Boolean = true
-): CodeforcesNewsItemsAdapter<CodeforcesBlogEntriesAdapter.CodeforcesBlogEntryViewHolder, List<CodeforcesBlogEntriesAdapter.BlogEntryInfo>>(
+): CodeforcesNewsItemsAdapter<CodeforcesBlogEntriesAdapter.CodeforcesBlogEntryViewHolder, List<CodeforcesBlogEntry>>(
     fragment, dataFlow
 ) {
 
-    data class BlogEntryInfo(
-        val blogId: Int,
-        val title: String,
-        val author: String,
-        val authorColorTag: CodeforcesUtils.ColorTag,
-        val time: Long,
-        val comments: Int,
-        val rating: Int
-    )
-
-    private var items: Array<BlogEntryInfo> = emptyArray()
+    private var items: Array<CodeforcesBlogEntry> = emptyArray()
     override fun getItemCount() = items.size
 
     private val newEntries = MutableSetLiveSize<Int>()
     fun getNewEntriesSize() = newEntries.sizeLiveData
 
-    override suspend fun applyData(data: List<BlogEntryInfo>) {
+    override suspend fun applyData(data: List<CodeforcesBlogEntry>) {
         items = data.toTypedArray()
         manageNewEntries()
     }
@@ -86,7 +76,7 @@ class CodeforcesBlogEntriesAdapter(
         with(holder){
             val info = items[position]
 
-            val blogId = info.blogId
+            val blogId = info.id
             view.setOnClickListener {
                 it.context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(blogId)))
                 if(newEntries.contains(blogId)){
@@ -105,14 +95,14 @@ class CodeforcesBlogEntriesAdapter(
 
             title.text = info.title
 
-            author.text = codeforcesAccountManager.makeSpan(info.author, info.authorColorTag)
+            author.text = codeforcesAccountManager.makeSpan(info.authorHandle, info.authorColorTag)
 
-            time.text = timeDifference(info.time, getCurrentTimeSeconds())
+            time.text = timeDifference(info.creationTimeSeconds, getCurrentTimeSeconds())
 
             newEntryIndicator.isVisible = newEntries.contains(blogId)
 
-            commentsCount.text = info.comments.toString()
-            comments.isGone = info.comments == 0
+            commentsCount.text = info.commentsCount.toString()
+            comments.isGone = info.commentsCount == 0
 
             rating.apply{
                 if(info.rating==0) isVisible = false
@@ -128,7 +118,7 @@ class CodeforcesBlogEntriesAdapter(
         }
     }
 
-    fun getBlogIDs() = items.map { it.blogId }
+    fun getBlogIDs() = items.map { it.id }
 
 
     private fun addToFollowListWithSnackBar(holder: CodeforcesBlogEntryViewHolder, mainActivity: MainActivity){

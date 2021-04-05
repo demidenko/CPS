@@ -8,6 +8,7 @@ import com.example.test3.CodeforcesTitle
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
+import com.example.test3.utils.CodeforcesBlogEntry
 import com.example.test3.utils.off
 import com.example.test3.utils.on
 import com.google.android.material.tabs.TabLayout
@@ -87,13 +88,13 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
         .map { blogEntries ->
             blogEntries.sortedByDescending { it.timeStamp }
                 .map {
-                    CodeforcesBlogEntriesAdapter.BlogEntryInfo(
-                        blogId = it.id,
+                    CodeforcesBlogEntry(
+                        id = it.id,
                         title = it.title,
-                        author = it.authorHandle,
+                        authorHandle = it.authorHandle,
                         authorColorTag = it.authorColorTag,
-                        time = it.creationTimeSeconds,
-                        comments = 0,
+                        creationTimeSeconds = it.creationTimeSeconds,
+                        commentsCount = 0,
                         rating = 0
                     )
                 }
