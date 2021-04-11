@@ -24,20 +24,22 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
         private val dao by lazy { getFollowDao(context) }
 
         suspend fun getHandles(): List<String> = dao.getAll().sortedByDescending { it.id }.map { it.handle }
-        suspend fun getBlogs(handle: String) = dao.getUserBlogs(handle)?.blogs
+        suspend fun getBlogEntries(handle: String) = dao.getUserBlogs(handle)?.blogs
 
         suspend fun add(handle: String): Boolean {
             if(dao.getUserBlogs(handle)!=null) return false
 
-            val locale = NewsFragment.getCodeforcesContentLanguage(context)
-            val userBlogs = CodeforcesAPI.getUserBlogEntries(handle,locale)?.result?.map { it.id }
-
             dao.insert(
                 UserBlogs(
                     handle = handle,
-                    blogs = userBlogs
+                    blogs = null
                 )
             )
+
+            val locale = NewsFragment.getCodeforcesContentLanguage(context)
+            val userBlogs = CodeforcesAPI.getUserBlogEntries(handle,locale)?.result?.map { it.id }
+
+            setBlogEntries(handle, userBlogs)
 
             return true
         }
@@ -58,7 +60,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
             dao.update(fromUserBlogs.copy(handle = toHandle))
         }
 
-        suspend fun setBlogs(handle: String, blogs: List<Int>?){
+        suspend fun setBlogEntries(handle: String, blogs: List<Int>?){
             val userBlogs = dao.getUserBlogs(handle) ?: return
             dao.update(userBlogs.copy(blogs = blogs))
         }
@@ -106,20 +108,20 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
             val result = response.result ?: return
 
             var hasNewBlog = false
-            val saved = connector.getBlogs(handle)?.toSet()
+            val saved = connector.getBlogEntries(handle)?.toSet()
 
             if(saved == null){
                 hasNewBlog = true
             }else{
                 result.forEach { blogEntry ->
-                    if(!saved.contains(blogEntry.id)){
+                    if(blogEntry.id !in saved){
                         hasNewBlog = true
                         notifyNewBlog(blogEntry)
                     }
                 }
             }
             if(hasNewBlog){
-                connector.setBlogs(handle, result.map { it.id })
+                connector.setBlogEntries(handle, result.map { it.id })
             }
         }
 
