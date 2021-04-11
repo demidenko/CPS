@@ -42,14 +42,13 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         setHasOptionsMenu(true)
 
         val followRecyclerView = view.findViewById<RecyclerView>(R.id.manage_cf_follow_users_list).apply {
-            isVisible = true
             layoutManager = LinearLayoutManager(context)
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             setHasFixedSize(true)
         }
 
 
-        val followListAdapter = FollowListItemsAdapter(mainActivity).apply {
+        val followListAdapter = FollowListItemsAdapter(this).apply {
             setOnSelectListener { info ->
                 mainActivity.cpsFragmentManager.pushBack(
                     CodeforcesBlogEntriesFragment().apply {
@@ -93,12 +92,14 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
     }
 
 
-    class FollowListItemsAdapter(val mainActivity: MainActivity) : RecyclerView.Adapter<FollowListItemsAdapter.ItemHolder>() {
+    class FollowListItemsAdapter(val fragment: CPSFragment) : RecyclerView.Adapter<FollowListItemsAdapter.ItemHolder>() {
 
-        private val codeforcesAccountManager by lazy { mainActivity.accountsFragment.codeforcesAccountManager }
+        private val codeforcesAccountManager = CodeforcesAccountManager(fragment.requireContext())
 
         private val list = mutableListOf<CodeforcesAccountManager.CodeforcesUserInfo>()
-        private val dataConnector = CodeforcesNewsFollowWorker.FollowDataConnector(mainActivity)
+        override fun getItemCount(): Int = list.size
+
+        private val dataConnector = CodeforcesNewsFollowWorker.FollowDataConnector(fragment.requireContext())
 
         private var openBlogEntriesCallback: ((CodeforcesAccountManager.CodeforcesUserInfo) -> Unit)? = null
         fun setOnSelectListener(callback: (CodeforcesAccountManager.CodeforcesUserInfo) -> Unit) {
@@ -132,7 +133,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
 
         suspend fun add(userInfo: CodeforcesAccountManager.CodeforcesUserInfo){
             if(!dataConnector.add(userInfo.handle)){
-                mainActivity.showToast("User already in list")
+                fragment.mainActivity.showToast("User already in list")
                 return
             }
             list.add(0, userInfo)
@@ -164,7 +165,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             holder.title.text = codeforcesAccountManager.makeSpan(userInfo)
 
             holder.view.setOnClickListener {
-                PopupMenu(mainActivity, holder.title, Gravity.CENTER_HORIZONTAL).apply {
+                PopupMenu(it.context, holder.title, Gravity.CENTER_HORIZONTAL).apply {
                     inflate(R.menu.popup_cf_follow_list_item)
 
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
@@ -190,7 +191,6 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             }
         }
 
-        override fun getItemCount(): Int = list.size
 
     }
 }
