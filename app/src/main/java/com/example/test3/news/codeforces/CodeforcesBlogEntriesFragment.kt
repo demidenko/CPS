@@ -14,6 +14,7 @@ import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.fromHTML
 import com.example.test3.workers.CodeforcesNewsFollowWorker
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 
 class CodeforcesBlogEntriesFragment: CPSFragment() {
@@ -56,8 +57,11 @@ class CodeforcesBlogEntriesFragment: CPSFragment() {
 
     private fun makeUserBlogEntriesSingleFlow(handle: String, context: Context) =
         flow {
-            val blogEntries = CodeforcesNewsFollowWorker.FollowDataConnector(context).loadBlogEntries(handle)
-            val authorColorTag = CodeforcesUtils.getRealColorTag(handle)
+            val (blogEntries, authorColorTag) = withContext(Dispatchers.IO){
+                val a = async { CodeforcesNewsFollowWorker.FollowDataConnector(context).loadBlogEntries(handle) }
+                val b = async { CodeforcesUtils.getRealColorTag(handle) }
+                Pair(a.await(), b.await())
+            }
             emit(
                 blogEntries.map { blogEntry ->
                     blogEntry.copy(
