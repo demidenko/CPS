@@ -12,6 +12,7 @@ import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.CodeforcesUtils
+import com.example.test3.utils.asyncPair
 import com.example.test3.utils.fromHTML
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import kotlinx.coroutines.*
@@ -58,9 +59,10 @@ class CodeforcesBlogEntriesFragment: CPSFragment() {
     private fun makeUserBlogEntriesSingleFlow(handle: String, context: Context) =
         flow {
             val (blogEntries, authorColorTag) = withContext(Dispatchers.IO){
-                val a = async { CodeforcesNewsFollowWorker.FollowDataConnector(context).loadBlogEntries(handle) }
-                val b = async { CodeforcesUtils.getRealColorTag(handle) }
-                Pair(a.await(), b.await())
+                asyncPair(
+                    { CodeforcesNewsFollowWorker.FollowDataConnector(context).loadBlogEntries(handle) },
+                    { CodeforcesUtils.getRealColorTag(handle) }
+                )
             }
             emit(
                 blogEntries.map { blogEntry ->

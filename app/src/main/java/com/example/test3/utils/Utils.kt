@@ -16,6 +16,8 @@ import androidx.lifecycle.MutableLiveData
 import com.example.test3.R
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.serialization.json.Json
@@ -206,5 +208,16 @@ enum class LoadingState {
                     else -> PENDING
                 }
             }
+    }
+}
+
+suspend inline fun<reified A, reified B> asyncPair(
+    crossinline callBackA: suspend () -> A,
+    crossinline callBackB: suspend () -> B,
+): Pair<A, B> {
+    return coroutineScope {
+        val a = async { callBackA() }
+        val b = async { callBackB() }
+        Pair(a.await(), b.await())
     }
 }
