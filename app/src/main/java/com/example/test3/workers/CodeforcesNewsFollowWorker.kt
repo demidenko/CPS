@@ -64,6 +64,56 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
             val userBlogs = dao.getUserBlogs(handle) ?: return
             dao.update(userBlogs.copy(blogs = blogs))
         }
+
+        suspend fun loadBlogEntries(handle: String) = loadBlogEntries(handle, NewsFragment.getCodeforcesContentLanguage(context))
+
+        suspend fun loadBlogEntries(handle: String, locale: String): List<CodeforcesBlogEntry> {
+            val response = CodeforcesAPI.getUserBlogEntries(handle, locale) ?: return emptyList()
+            if(response.status == CodeforcesAPIStatus.FAILED){
+                //"handle: You are not allowed to read that blog" -> no activity
+                if(response.isBlogHandleNotFound(handle)){
+                    val (realHandle, status) = CodeforcesUtils.getRealHandle(handle)
+                    when(status){
+                        STATUS.OK -> {
+                            changeHandle(handle, realHandle)
+                            return loadBlogEntries(realHandle, locale)
+                        }
+                        STATUS.NOT_FOUND -> remove(handle)
+                        STATUS.FAILED -> return emptyList()
+                    }
+                }
+                return emptyList()
+            }
+            val result = response.result ?: return emptyList()
+            val saved = getBlogEntries(handle)?.toSet()
+            var updated = false
+            if(saved == null) updated = true
+            else {
+                result
+                    .filter { it.id !in saved }
+                    .forEach { blogEntry ->
+                        updated = true
+                        notifyNewBlogEntry(blogEntry)
+                    }
+            }
+            if(updated) setBlogEntries(handle, result.map { it.id })
+            return result
+        }
+
+        private fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry){
+            val title = fromHTML(blogEntry.title.removeSurrounding("<p>", "</p>")).toString()
+            val n = notificationBuilder(context, NotificationChannels.codeforces_follow_new_blog).apply {
+                setSubText("New codeforces blog entry")
+                setContentTitle(blogEntry.authorHandle)
+                setBigContent(title)
+                setSmallIcon(R.drawable.ic_new_post)
+                setAutoCancel(true)
+                setShowWhen(true)
+                setWhen(TimeUnit.SECONDS.toMillis(blogEntry.creationTimeSeconds))
+                setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.blog(blogEntry.id), context))
+            }
+            NotificationManagerCompat.from(context).notify(NotificationIDs.makeCodeforcesFollowBlogID(blogEntry.id), n.build())
+        }
     }
 
     override suspend fun doWork(): Result {
@@ -83,51 +133,9 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
         val savedHandles = connector.getHandles()
         val locale = NewsFragment.getCodeforcesContentLanguage(context)
 
-        val proceeded = mutableSetOf<String>()
-        suspend fun proceedUser(handle: String){
-            if(!proceeded.add(handle.toLowerCase())) return
-
-            val response = CodeforcesAPI.getUserBlogEntries(handle, locale) ?: return
-            if(response.status == CodeforcesAPIStatus.FAILED){
-                //"handle: You are not allowed to read that blog" -> no activity
-                if(response.isBlogHandleNotFound(handle)){
-                    val (realHandle, status) = CodeforcesUtils.getRealHandle(handle)
-                    when(status){
-                        STATUS.OK -> {
-                            connector.changeHandle(handle, realHandle)
-                            proceedUser(realHandle)
-                            return
-                        }
-                        STATUS.NOT_FOUND -> connector.remove(handle)
-                        STATUS.FAILED -> return
-                    }
-                }
-                return
-            }
-
-            val result = response.result ?: return
-
-            var hasNewBlog = false
-            val saved = connector.getBlogEntries(handle)?.toSet()
-
-            if(saved == null){
-                hasNewBlog = true
-            }else{
-                result.forEach { blogEntry ->
-                    if(blogEntry.id !in saved){
-                        hasNewBlog = true
-                        notifyNewBlog(blogEntry)
-                    }
-                }
-            }
-            if(hasNewBlog){
-                connector.setBlogEntries(handle, result.map { it.id })
-            }
-        }
-
         val notificationManagerCompat = NotificationManagerCompat.from(context)
         savedHandles.forEachIndexed { index, handle ->
-            proceedUser(handle)
+            connector.loadBlogEntries(handle, locale)
             notificationManagerCompat.notify(
                 NotificationIDs.codeforces_follow_progress,
                 createProgressNotification().setProgress(savedHandles.size, index+1, false).build()
@@ -145,18 +153,4 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
             .setShowWhen(false)
     }
 
-    private fun notifyNewBlog(blogEntry: CodeforcesBlogEntry){
-        val title = fromHTML(blogEntry.title.removeSurrounding("<p>", "</p>")).toString()
-        val n = notificationBuilder(context, NotificationChannels.codeforces_follow_new_blog).apply {
-            setSubText("New codeforces blog")
-            setContentTitle(blogEntry.authorHandle)
-            setBigContent(title)
-            setSmallIcon(R.drawable.ic_new_post)
-            setAutoCancel(true)
-            setShowWhen(true)
-            setWhen(TimeUnit.SECONDS.toMillis(blogEntry.creationTimeSeconds))
-            setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.blog(blogEntry.id), context))
-        }
-        NotificationManagerCompat.from(context).notify(NotificationIDs.makeCodeforcesFollowBlogID(blogEntry.id), n.build())
-    }
 }

@@ -8,13 +8,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.test3.NewsFragment
 import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.ui.CPSFragment
-import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.fromHTML
+import com.example.test3.workers.CodeforcesNewsFollowWorker
 import kotlinx.coroutines.flow.flow
 
 class CodeforcesBlogEntriesFragment: CPSFragment() {
@@ -57,12 +56,8 @@ class CodeforcesBlogEntriesFragment: CPSFragment() {
 
     private fun makeUserBlogEntriesSingleFlow(handle: String, context: Context) =
         flow {
-            val blogEntries =
-                CodeforcesAPI.getUserBlogEntries(handle, NewsFragment.getCodeforcesContentLanguage(context))
-                    ?.result ?: emptyList()
-
+            val blogEntries = CodeforcesNewsFollowWorker.FollowDataConnector(context).loadBlogEntries(handle)
             val authorColorTag = CodeforcesUtils.getRealColorTag(handle)
-
             emit(
                 blogEntries.map { blogEntry ->
                     blogEntry.copy(
