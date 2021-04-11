@@ -329,6 +329,20 @@ object CodeforcesUtils {
         return s.substring(s.indexOf('>', i)+1, s.indexOf("</a", i))
     }
 
+    suspend fun getRealColorTag(handle: String): ColorTag {
+        val page = CodeforcesAPI.getPageSource(CodeforcesURLFactory.user(handle), "en") ?: return ColorTag.BLACK
+        return extractRealColorTag(page) ?: ColorTag.BLACK
+    }
+
+    private fun extractRealColorTag(s: String): ColorTag? {
+        var i = s.indexOf(" <div class=\"userbox\">")
+        if(i == -1) return null
+        i = s.indexOf("<div class=\"user-rank\">", i)
+        i = s.indexOf("class=\"rated-user", i)
+        return ColorTag.fromString(
+            s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
+        )
+    }
 }
 
 enum class CodeforcesAPIStatus{

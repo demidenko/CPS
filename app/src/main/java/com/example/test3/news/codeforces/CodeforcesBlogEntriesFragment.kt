@@ -13,6 +13,7 @@ import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.CodeforcesAPI
+import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.fromHTML
 import kotlinx.coroutines.flow.flow
 
@@ -60,10 +61,13 @@ class CodeforcesBlogEntriesFragment: CPSFragment() {
                 CodeforcesAPI.getUserBlogEntries(handle, NewsFragment.getCodeforcesContentLanguage(context))
                     ?.result ?: emptyList()
 
+            val authorColorTag = CodeforcesUtils.getRealColorTag(handle)
+
             emit(
                 blogEntries.map { blogEntry ->
                     blogEntry.copy(
-                        title = fromHTML(blogEntry.title.removeSurrounding("<p>", "</p>")).toString()
+                        title = fromHTML(blogEntry.title.removeSurrounding("<p>", "</p>")).toString(),
+                        authorColorTag = authorColorTag
                     )
                 }
             )
