@@ -17,9 +17,13 @@ abstract class CodeforcesNewsItemsAdapter<H: RecyclerView.ViewHolder, T>(
     private val lifecycleMerge = AdapterLifecycleMerge(this, fragment)
     override fun getLifecycle() = lifecycleMerge.lifecycleRegistry
 
+    private var previousValue: T? = null
+
     init {
         addRepeatingJob(Lifecycle.State.STARTED) {
             dataFlow.collect {
+                if (it == previousValue) return@collect
+                previousValue = it
                 applyData(it)
                 notifyDataSetChanged()
             }

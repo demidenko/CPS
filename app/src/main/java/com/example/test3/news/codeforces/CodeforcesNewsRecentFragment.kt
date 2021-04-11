@@ -34,7 +34,7 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
     private val commentsAdapter by lazy {
         CodeforcesCommentsAdapter(
             this,
-            newsFragment.newsViewModel.flowOfRecentActions().map { it.second }.distinctUntilChanged()
+            newsFragment.newsViewModel.flowOfRecentActions().map { it.second }
         )
     }
 
