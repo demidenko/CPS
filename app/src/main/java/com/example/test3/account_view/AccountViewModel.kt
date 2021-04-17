@@ -4,6 +4,8 @@ import androidx.lifecycle.*
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.utils.LoadingState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AccountViewModel() : ViewModel() {
@@ -27,10 +29,8 @@ class AccountViewModel() : ViewModel() {
         }
     }
 
-    private val states = mutableMapOf<String,MutableLiveData<LoadingState>>()
-
-    private fun accountLoadingState(managerName: String) = states.getOrPut(managerName) { MutableLiveData(LoadingState.PENDING) }
-
-    fun getAccountLoadingStateLiveData(managerName: String): LiveData<LoadingState> = accountLoadingState(managerName)
+    private val loadingStates = mutableMapOf<String,MutableStateFlow<LoadingState>>()
+    private fun accountLoadingState(managerName: String) = loadingStates.getOrPut(managerName) { MutableStateFlow(LoadingState.PENDING) }
+    fun getAccountLoadingStateFlow(managerName: String) = accountLoadingState(managerName).asStateFlow()
 }
 
