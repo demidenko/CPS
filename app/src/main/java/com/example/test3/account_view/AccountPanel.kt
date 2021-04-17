@@ -15,8 +15,10 @@ import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.*
 import com.example.test3.getColorFromResource
+import com.example.test3.utils.BlockedState
 import com.example.test3.utils.LoadingState
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 
@@ -71,39 +73,52 @@ abstract class AccountPanel(
             }
         })
 
-        val failColor = getColorFromResource(mainActivity, R.color.fail)
-
         mainActivity.accountsFragment.addRepeatingJob(Lifecycle.State.STARTED){
-            mainActivity.accountsFragment.accountViewModel
-                .getAccountLoadingStateFlow(manager.managerName)
-                .collect { loadingState ->
-                    if(loadingState == LoadingState.LOADING) block() else unblock()
-                    when(loadingState) {
-                        LoadingState.PENDING -> {
-                            reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {
-                                reloadButton.clearAnimation()
-                                reloadButton.isGone = true
-                            }.start()
-                        }
-                        LoadingState.LOADING -> {
-                            expandButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
-                                expandButton.isGone = true
-                            }.start()
-                            reloadButton.animate().setStartDelay(0).alpha(1f).setDuration(0).withStartAction {
-                                reloadButton.clearColorFilter()
-                                reloadButton.isVisible = true
-                            }.start()
-                            reloadButton.startAnimation(rotateAnimation)
-                        }
-                        LoadingState.FAILED -> {
-                            reloadButton.clearAnimation()
-                            reloadButton.setColorFilter(failColor)
-                        }
-                    }
-                }
+            launch { subscribeBlockedState() }
+            launch { subscribeLoadingState() }
         }
 
         return layout
+    }
+
+    private suspend fun subscribeLoadingState() {
+        mainActivity.accountsFragment.accountViewModel
+            .getAccountLoadingStateFlow(manager.managerName)
+            .collect { loadingState ->
+                when(loadingState) {
+                    LoadingState.PENDING -> {
+                        reloadButton.animate().setStartDelay(0).setDuration(1000).alpha(0f).withEndAction {
+                            reloadButton.clearAnimation()
+                            reloadButton.isGone = true
+                        }.start()
+                    }
+                    LoadingState.LOADING -> {
+                        expandButton.animate().setStartDelay(0).alpha(0f).setDuration(0).withEndAction {
+                            expandButton.isGone = true
+                        }.start()
+                        reloadButton.animate().setStartDelay(0).alpha(1f).setDuration(0).withStartAction {
+                            reloadButton.clearColorFilter()
+                            reloadButton.isVisible = true
+                        }.start()
+                        reloadButton.startAnimation(rotateAnimation)
+                    }
+                    LoadingState.FAILED -> {
+                        reloadButton.clearAnimation()
+                        reloadButton.setColorFilter(getColorFromResource(mainActivity, R.color.fail))
+                    }
+                }
+            }
+    }
+
+    private suspend fun subscribeBlockedState() {
+        mainActivity.accountsFragment.accountViewModel
+            .getAccountSmallViewBlockedState(manager.managerName)
+            .collect { blockedState ->
+                when(blockedState){
+                    BlockedState.BLOCKED -> block()
+                    BlockedState.UNBLOCKED -> unblock()
+                }
+            }
     }
 
     suspend fun isEmpty() = manager.getSavedInfo().isEmpty()

@@ -211,6 +211,10 @@ enum class LoadingState {
     }
 }
 
+enum class BlockedState {
+    BLOCKED, UNBLOCKED
+}
+
 suspend inline fun<reified A, reified B> asyncPair(
     crossinline callBackA: suspend () -> A,
     crossinline callBackB: suspend () -> B,
