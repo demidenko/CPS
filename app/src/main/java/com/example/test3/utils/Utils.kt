@@ -64,22 +64,6 @@ fun ImageButton.disable() {
     off()
 }
 
-class SharedReloadButton(private val button: ImageButton) {
-    private val current = mutableSetOf<String>()
-
-    fun startReload(tag: String) {
-        if(current.contains(tag)) throw Exception("$tag already started")
-        if(current.isEmpty()) button.disable()
-        current.add(tag);
-    }
-
-    fun stopReload(tag: String) {
-        //if(!current.contains(tag)) throw Exception("$tag not started to be stopped")
-        current.remove(tag)
-        if(current.isEmpty()) button.enable()
-    }
-}
-
 
 class MutableSetLiveSize<T>() {
     private val s = mutableSetOf<T>()
@@ -212,7 +196,15 @@ enum class LoadingState {
 }
 
 enum class BlockedState {
-    BLOCKED, UNBLOCKED
+    BLOCKED, UNBLOCKED;
+
+    companion object {
+        fun combineBlockedStatesFlows(states: List<Flow<BlockedState>>): Flow<BlockedState> =
+            combine(states){
+                if(it.contains(BLOCKED)) BLOCKED
+                else UNBLOCKED
+            }
+    }
 }
 
 suspend inline fun<reified A, reified B> asyncPair(

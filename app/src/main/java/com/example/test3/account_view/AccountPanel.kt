@@ -112,11 +112,17 @@ abstract class AccountPanel(
 
     private suspend fun subscribeBlockedState() {
         mainActivity.accountsFragment.accountViewModel
-            .getAccountSmallViewBlockedState(manager.managerName)
+            .getAccountSmallViewBlockedState(manager)
             .collect { blockedState ->
                 when(blockedState){
-                    BlockedState.BLOCKED -> block()
-                    BlockedState.UNBLOCKED -> unblock()
+                    BlockedState.BLOCKED -> {
+                        expandButton.isEnabled = false
+                        reloadButton.isEnabled = false
+                    }
+                    BlockedState.UNBLOCKED -> {
+                        reloadButton.isEnabled = true
+                        expandButton.isEnabled = true
+                    }
                 }
             }
     }
@@ -132,20 +138,6 @@ abstract class AccountPanel(
             layout.isVisible = true
             show(manager.getSavedInfo())
         }
-    }
-
-    fun isBlocked(): Boolean = !reloadButton.isEnabled
-
-    fun block(){
-        expandButton.isEnabled = false
-        reloadButton.isEnabled = false
-        mainActivity.accountsFragment.sharedReloadButton.startReload(manager.managerName)
-    }
-
-    fun unblock(){
-        mainActivity.accountsFragment.sharedReloadButton.stopReload(manager.managerName)
-        reloadButton.isEnabled = true
-        expandButton.isEnabled = true
     }
 
     fun reload() = reloadButton.callOnClick()

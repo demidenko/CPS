@@ -46,7 +46,7 @@ class AccountViewModel() : ViewModel() {
 
     private val blockedStates = mutableMapOf<String,MutableStateFlow<BlockedState>>()
     private fun accountSmallViewBlockedState(managerName: String) = blockedStates.getOrPut(managerName) { MutableStateFlow(BlockedState.UNBLOCKED) }
-    fun getAccountSmallViewBlockedState(managerName: String) = accountSmallViewBlockedState(managerName).asStateFlow()
+    fun getAccountSmallViewBlockedState(manager: AccountManager) = accountSmallViewBlockedState(manager.managerName).asStateFlow()
 
 
     private val clistImportProgress = MutableStateFlow<Pair<Int,Int>?>(null)

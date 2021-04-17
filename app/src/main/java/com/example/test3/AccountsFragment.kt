@@ -77,6 +77,17 @@ class AccountsFragment: CPSFragment() {
         }
 
         reloadButton.setOnClickListener { reloadAccounts() }
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
+            launch {
+                BlockedState.combineBlockedStatesFlows(
+                    panels.map { accountViewModel.getAccountSmallViewBlockedState(it.manager) }
+                ).collect {
+                    if(it == BlockedState.BLOCKED) reloadButton.disable()
+                    else reloadButton.enable()
+                }
+            }
+        }
+
         addAccountButton.setOnClickListener { addAccount() }
 
         mainActivity.subscribeProgressBar("clist import", accountViewModel.getClistImportProgress())
@@ -179,8 +190,5 @@ class AccountsFragment: CPSFragment() {
         val managerType = fragment.requireArguments().getString("manager") ?: throw Exception("Unset type of manager")
         return getPanel(managerType)
     }
-
-    val sharedReloadButton by lazy { SharedReloadButton(reloadButton) }
-
 
 }
