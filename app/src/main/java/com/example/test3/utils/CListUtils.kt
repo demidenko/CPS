@@ -1,7 +1,7 @@
 package com.example.test3.utils
 
-import com.example.test3.MainActivity
-import com.example.test3.account_manager.AccountManager
+import android.content.Context
+import com.example.test3.account_manager.*
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -15,18 +15,16 @@ import retrofit2.http.Query
 import java.io.IOException
 
 object CListUtils {
-    fun getManager(resource: String, userName: String, link: String, activity: MainActivity): Pair<AccountManager,String>? {
-        return with(activity.accountsFragment){
-            when(resource){
-                "codeforces.com" -> Pair(codeforcesAccountManager, userName)
-                "topcoder.com" -> Pair(topcoderAccountManager, userName)
-                "atcoder.jp" -> Pair(atcoderAccountManager, userName)
-                "acm.timus.ru", "timus.online" -> {
-                    val userId = link.substring(link.lastIndexOf('=')+1)
-                    Pair(timusAccountManager, userId)
-                }
-                else -> null
+    fun getManager(resource: String, userName: String, link: String, context: Context): Pair<AccountManager,String>? {
+        return when(resource){
+            "codeforces.com" -> Pair(CodeforcesAccountManager(context), userName)
+            "topcoder.com" -> Pair(TopCoderAccountManager(context), userName)
+            "atcoder.jp" -> Pair(AtCoderAccountManager(context), userName)
+            "acm.timus.ru", "timus.online" -> {
+                val userId = link.substring(link.lastIndexOf('=')+1)
+                Pair(TimusAccountManager(context), userId)
             }
+            else -> null
         }
     }
 }

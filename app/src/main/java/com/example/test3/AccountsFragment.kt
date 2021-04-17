@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.*
 import com.example.test3.account_view.*
@@ -17,6 +19,7 @@ import com.example.test3.ui.*
 import com.example.test3.utils.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 
 class AccountsFragment: CPSFragment() {
 
@@ -75,6 +78,16 @@ class AccountsFragment: CPSFragment() {
 
         reloadButton.setOnClickListener { reloadAccounts() }
         addAccountButton.setOnClickListener { addAccount() }
+
+        mainActivity.subscribeProgressBar("clist import", accountViewModel.getClistImportProgress())
+        mainActivity.addRepeatingJob(Lifecycle.State.STARTED){
+            launch {
+                accountViewModel.getClistImportProgress().collect {
+                    if(it != null) addAccountButton.disable()
+                    else addAccountButton.enable()
+                }
+            }
+        }
 
         mainActivity.settingsUI.useRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
             showPanels()
@@ -141,29 +154,7 @@ class AccountsFragment: CPSFragment() {
             val clistUserInfo = with(CListAccountManager(mainActivity)){
                 mainActivity.chooseUserID(emptyInfo(), this) as? CListAccountManager.CListUserInfo
             } ?: return@launch
-
-            addAccountButton.disable()
-
-            val supported = clistUserInfo.accounts.mapNotNull { (resource, userData) ->
-                CListUtils.getManager(resource, userData.first, userData.second, mainActivity)
-            }
-
-            //val progressInfo = BottomProgressInfo("clist import", mainActivity).start(supported.size)
-
-            supported.map { (manager, userID) ->
-                val panel = getPanel(manager.managerName)
-                async {
-                    while(panel.isBlocked()) delay(300)
-                    panel.block()
-                    val userInfo = manager.loadInfo(userID)
-                    manager.setSavedInfo(userInfo)
-                    panel.unblock()
-                    //progressInfo.increment()
-                }
-            }.awaitAll()
-
-            //progressInfo.finish()
-            addAccountButton.enable()
+            accountViewModel.clistImport(clistUserInfo, requireContext())
         }
     }
 
