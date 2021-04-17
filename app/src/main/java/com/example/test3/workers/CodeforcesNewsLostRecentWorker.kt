@@ -8,21 +8,21 @@ import com.example.test3.account_manager.STATUS
 import com.example.test3.news.settingsNews
 import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
-import com.example.test3.ui.BottomProgressInfo
 import com.example.test3.utils.*
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.concurrent.TimeUnit
 
 
 class CodeforcesNewsLostRecentWorker(private val context: Context, params: WorkerParameters): CoroutineWorker(context, params){
     companion object {
 
-        suspend fun updateInfo(context: Context, progressInfo: BottomProgressInfo?) {
+        suspend fun updateInfo(context: Context, progress: MutableStateFlow<Pair<Int,Int>?>) {
             val blogsDao = getLostBlogsDao(context)
 
             val blogEntries = blogsDao.getLost()
 
-            progressInfo?.start(blogEntries.size)
-
+            progress.value = 0 to blogEntries.size
+            var done = 0
 
             val users = CodeforcesUtils.getUsersInfo(blogEntries.map { it.authorHandle })
             val locale = NewsFragment.getCodeforcesContentLanguage(context)
@@ -55,10 +55,10 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
 
                 if(blogEntry != originalBlogEntry) blogsDao.update(blogEntry)
 
-                progressInfo?.increment()
+                progress.value = ++done to blogEntries.size
             }
 
-            progressInfo?.finish()
+            progress.value = null
         }
 
         suspend fun isEnabled(context: Context): Boolean = context.settingsNews.getLostEnabled()

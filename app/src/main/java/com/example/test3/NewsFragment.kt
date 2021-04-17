@@ -21,8 +21,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.test3.news.*
 import com.example.test3.news.codeforces.CodeforcesNewsFragment
 import com.example.test3.news.codeforces.CodeforcesNewsViewModel
-import com.example.test3.ui.BottomProgressInfo
 import com.example.test3.ui.CPSFragment
+import com.example.test3.ui.subscribeProgressBar
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.example.test3.workers.CodeforcesNewsLostRecentWorker
@@ -126,7 +126,15 @@ class NewsFragment : CPSFragment() {
         setHasOptionsMenu(true)
 
         reloadButton.setOnClickListener { reloadFragments() }
-        updateLostInfoButton.setOnClickListener { updateLostInfo() }
+
+        updateLostInfoButton.setOnClickListener { newsViewModel.updateLostInfo(requireContext()) }
+        mainActivity.subscribeProgressBar("update info of lost", newsViewModel.getUpdateLostInfoProgress())
+        mainActivity.addRepeatingJob(Lifecycle.State.STARTED){
+            newsViewModel.getUpdateLostInfoProgress().collect { progress ->
+                if(progress != null) updateLostInfoButton.disable()
+                else updateLostInfoButton.enable()
+            }
+        }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
             val titles = listOf(
@@ -208,14 +216,6 @@ class NewsFragment : CPSFragment() {
     val topCommentsButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_top_comments) }
     private val updateLostInfoButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_lost_update_info) }
     val suspectsLostButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_lost_suspects) }
-
-    private fun updateLostInfo() {
-        lifecycleScope.launch {
-            updateLostInfoButton.disable()
-            CodeforcesNewsLostRecentWorker.updateInfo(mainActivity, BottomProgressInfo("update info of lost", mainActivity))
-            updateLostInfoButton.enable()
-        }
-    }
 
     fun showSettingsNews(){
         mainActivity.cpsFragmentManager.pushBack(SettingsNewsFragment())

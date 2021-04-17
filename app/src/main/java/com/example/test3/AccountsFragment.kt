@@ -148,7 +148,7 @@ class AccountsFragment: CPSFragment() {
                 CListUtils.getManager(resource, userData.first, userData.second, mainActivity)
             }
 
-            val progressInfo = BottomProgressInfo("clist import", mainActivity).start(supported.size)
+            //val progressInfo = BottomProgressInfo("clist import", mainActivity).start(supported.size)
 
             supported.map { (manager, userID) ->
                 val panel = getPanel(manager.managerName)
@@ -158,11 +158,11 @@ class AccountsFragment: CPSFragment() {
                     val userInfo = manager.loadInfo(userID)
                     manager.setSavedInfo(userInfo)
                     panel.unblock()
-                    progressInfo.increment()
+                    //progressInfo.increment()
                 }
             }.awaitAll()
 
-            progressInfo.finish()
+            //progressInfo.finish()
             addAccountButton.enable()
         }
     }

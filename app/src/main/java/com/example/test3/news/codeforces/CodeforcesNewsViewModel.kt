@@ -1,9 +1,11 @@
 package com.example.test3.news.codeforces
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.test3.CodeforcesTitle
 import com.example.test3.utils.*
+import com.example.test3.workers.CodeforcesNewsLostRecentWorker
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -96,5 +98,13 @@ class CodeforcesNewsViewModel: ViewModel() {
         val comments = CodeforcesUtils.parseCommentsPage(s)
         if(blogEntries.isEmpty() || comments.isEmpty()) return null
         return Pair(blogEntries, comments)
+    }
+
+    private val updateLostInfoProgress = MutableStateFlow<Pair<Int,Int>?>(null)
+    fun getUpdateLostInfoProgress() = updateLostInfoProgress.asStateFlow()
+    fun updateLostInfo(context: Context) {
+        viewModelScope.launch {
+            CodeforcesNewsLostRecentWorker.updateInfo(context, updateLostInfoProgress)
+        }
     }
 }
