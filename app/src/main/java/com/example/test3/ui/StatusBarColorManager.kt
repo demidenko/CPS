@@ -2,13 +2,13 @@ package com.example.test3.ui
 
 import android.graphics.Color
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.addRepeatingJob
 import com.example.test3.MainActivity
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.RatedAccountManager
 import com.example.test3.account_manager.UserInfo
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -32,6 +32,9 @@ class StatusBarColorManager(
         if(current != null) return listOfNotNull(colors[current])
         return colors.values.toList()
     }
+
+    private val statusBarColor = MutableStateFlow<Int>(0)
+    fun getStatusBarColorFlow() = statusBarColor.asStateFlow()
 
     private var enabled: Boolean = true
     init {
@@ -57,9 +60,6 @@ class StatusBarColorManager(
             }
         }
     }
-
-    private val statusBarColor = MutableLiveData<Int>()
-    fun getStatusBarColorLiveData(): LiveData<Int> = statusBarColor
 
     private fun recalculateStatusBarColor() {
         val color = if(enabled){

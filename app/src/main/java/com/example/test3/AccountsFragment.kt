@@ -82,13 +82,11 @@ class AccountsFragment: CPSFragment() {
 
         reloadButton.setOnClickListener { reloadAccounts() }
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
-            launch {
-                BlockedState.combineBlockedStatesFlows(
-                    panels.map { accountViewModel.getAccountSmallViewBlockedState(it.manager) }
-                ).collect {
-                    if(it == BlockedState.BLOCKED) reloadButton.disable()
-                    else reloadButton.enable()
-                }
+            BlockedState.combineBlockedStatesFlows(
+                panels.map { accountViewModel.getAccountSmallViewBlockedState(it.manager) }
+            ).collect {
+                if(it == BlockedState.BLOCKED) reloadButton.disable()
+                else reloadButton.enable()
             }
         }
 
@@ -96,11 +94,9 @@ class AccountsFragment: CPSFragment() {
 
         mainActivity.subscribeProgressBar("clist import", accountViewModel.getClistImportProgress())
         mainActivity.addRepeatingJob(Lifecycle.State.STARTED){
-            launch {
-                accountViewModel.getClistImportProgress().collect {
-                    if(it != null) addAccountButton.disable()
-                    else addAccountButton.enable()
-                }
+            accountViewModel.getClistImportProgress().collect {
+                if(it != null) addAccountButton.disable()
+                else addAccountButton.enable()
             }
         }
 
@@ -108,8 +104,11 @@ class AccountsFragment: CPSFragment() {
             showPanels()
         }
 
-        statusBarColorManager.getStatusBarColorLiveData().observe(mainActivity){ color ->
-            mainActivity.window.statusBarColor = color
+
+        mainActivity.addRepeatingJob(Lifecycle.State.STARTED){
+            statusBarColorManager.getStatusBarColorFlow().collect(){ color ->
+                mainActivity.window.statusBarColor = color
+            }
         }
 
     }
