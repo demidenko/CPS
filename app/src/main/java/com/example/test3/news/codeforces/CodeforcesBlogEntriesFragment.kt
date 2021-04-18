@@ -5,18 +5,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.ui.CPSFragment
+import com.example.test3.ui.ignoreFirst
+import com.example.test3.ui.settingsUI
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.asyncPair
 import com.example.test3.utils.fromHTML
 import com.example.test3.workers.CodeforcesNewsFollowWorker
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 
 class CodeforcesBlogEntriesFragment: CPSFragment() {
 
@@ -44,15 +50,21 @@ class CodeforcesBlogEntriesFragment: CPSFragment() {
         cpsTitle = "::news.codeforces.blog"
         setBottomPanelId(R.id.support_navigation_empty, R.layout.navigation_empty)
 
+        val blogEntriesAdapter = CodeforcesBlogEntriesAdapter(
+            this,
+            makeUserBlogEntriesSingleFlow(getHandle(), requireContext()),
+            null
+        )
+
         view.findViewById<RecyclerView>(R.id.manage_cf_follow_user_blog_entries).apply {
             layoutManager = LinearLayoutManager(context)
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             setHasFixedSize(true)
-            adapter = CodeforcesBlogEntriesAdapter(
-                this@CodeforcesBlogEntriesFragment,
-                makeUserBlogEntriesSingleFlow(getHandle(), requireContext()),
-                null
-            )
+            adapter = blogEntriesAdapter
+        }
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
+            mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().collect { blogEntriesAdapter.refresh() }
         }
     }
 
