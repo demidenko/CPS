@@ -67,7 +67,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
 
         suspend fun loadBlogEntries(handle: String) = loadBlogEntries(handle, NewsFragment.getCodeforcesContentLanguage(context))
 
-        suspend fun loadBlogEntries(handle: String, locale: String): List<CodeforcesBlogEntry> {
+        suspend fun loadBlogEntries(handle: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
             val response = CodeforcesAPI.getUserBlogEntries(handle, locale) ?: return emptyList()
             if(response.status == CodeforcesAPIStatus.FAILED){
                 //"handle: You are not allowed to read that blog" -> no activity

@@ -3,6 +3,7 @@ package com.example.test3.news.codeforces
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.test3.CodeforcesLocale
 import com.example.test3.CodeforcesTitle
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsLostRecentWorker
@@ -65,35 +66,35 @@ class CodeforcesNewsViewModel: ViewModel() {
     private val recentActions = DataLoader<Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>>(Pair(emptyList(), emptyList()))
     fun flowOfRecentActions() = recentActions.getDataFlow()
 
-    fun reload(title: CodeforcesTitle, lang: String) {
+    fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
         when(title){
-            CodeforcesTitle.MAIN -> mainBlogEntries.load { loadBlogEntriesPage("/", lang) }
+            CodeforcesTitle.MAIN -> mainBlogEntries.load { loadBlogEntriesPage("/", locale) }
             CodeforcesTitle.TOP -> {
-                topBlogEntries.load { loadBlogEntriesPage("/top", lang) }
-                reloadTopComments(lang)
+                topBlogEntries.load { loadBlogEntriesPage("/top", locale) }
+                reloadTopComments(locale)
             }
-            CodeforcesTitle.RECENT -> recentActions.load { loadRecentActionsPage(lang) }
+            CodeforcesTitle.RECENT -> recentActions.load { loadRecentActionsPage(locale) }
             else -> return
         }
     }
 
-    fun reloadTopComments(lang: String) {
-        topComments.load { loadCommentsPage("/topComments?days=2", lang) }
+    fun reloadTopComments(locale: CodeforcesLocale) {
+        topComments.load { loadCommentsPage("/topComments?days=2", locale) }
     }
 
 
-    private suspend fun loadBlogEntriesPage(page: String, lang: String): List<CodeforcesBlogEntry>? {
-        val s = CodeforcesAPI.getPageSource(page, lang) ?: return null
+    private suspend fun loadBlogEntriesPage(page: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry>? {
+        val s = CodeforcesAPI.getPageSource(page, locale) ?: return null
         return CodeforcesUtils.parseBlogEntriesPage(s).takeIf { it.isNotEmpty() }
     }
 
-    private suspend fun loadCommentsPage(page: String, lang: String): List<CodeforcesRecentAction>? {
-        val s = CodeforcesAPI.getPageSource(page, lang) ?: return null
+    private suspend fun loadCommentsPage(page: String, locale: CodeforcesLocale): List<CodeforcesRecentAction>? {
+        val s = CodeforcesAPI.getPageSource(page, locale) ?: return null
         return CodeforcesUtils.parseCommentsPage(s).takeIf { it.isNotEmpty() }
     }
 
-    private suspend fun loadRecentActionsPage(lang: String): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>? {
-        val s = CodeforcesAPI.getPageSource("/recent-actions", lang) ?: return null
+    private suspend fun loadRecentActionsPage(locale: CodeforcesLocale): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>? {
+        val s = CodeforcesAPI.getPageSource("/recent-actions", locale) ?: return null
         val blogEntries = CodeforcesUtils.parseRecentBlogEntriesPage(s)
         val comments = CodeforcesUtils.parseCommentsPage(s)
         if(blogEntries.isEmpty() || comments.isEmpty()) return null

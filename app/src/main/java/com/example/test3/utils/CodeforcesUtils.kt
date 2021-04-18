@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
 object CodeforcesUtils {
 
     suspend fun getBlogCreationTimeSeconds(blogId: Int): Long {
-        return CodeforcesAPI.getBlogEntry(blogId,"ru")?.result?.creationTimeSeconds ?: return 0L
+        return CodeforcesAPI.getBlogEntry(blogId,CodeforcesLocale.RU)?.result?.creationTimeSeconds ?: return 0L
     }
 
     private val dateFormatRU = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
@@ -316,7 +316,7 @@ object CodeforcesUtils {
     }
 
     suspend fun getRealHandle(handle: String): Pair<String, STATUS> {
-        val page = CodeforcesAPI.getPageSource(CodeforcesURLFactory.user(handle), "en") ?: return handle to STATUS.FAILED
+        val page = CodeforcesAPI.getPageSource(CodeforcesURLFactory.user(handle), CodeforcesLocale.EN) ?: return handle to STATUS.FAILED
         val realHandle = extractRealHandle(page) ?: return handle to STATUS.NOT_FOUND
         return realHandle to STATUS.OK
     }
@@ -330,7 +330,7 @@ object CodeforcesUtils {
     }
 
     suspend fun getRealColorTag(handle: String): ColorTag {
-        val page = CodeforcesAPI.getPageSource(CodeforcesURLFactory.user(handle), "en") ?: return ColorTag.BLACK
+        val page = CodeforcesAPI.getPageSource(CodeforcesURLFactory.user(handle), CodeforcesLocale.EN) ?: return ColorTag.BLACK
         return extractRealColorTag(page) ?: ColorTag.BLACK
     }
 
@@ -607,14 +607,14 @@ object CodeforcesAPI {
     suspend fun getUsers(handles: Collection<String>) = makeAPICall(api.getUser(handles.joinToString(separator = ";")))
     suspend fun getUser(handle: String) = getUsers(listOf(handle))?.let { CodeforcesAPIResponse(it.status, it.result?.get(0), it.comment) }
 
-    suspend fun getBlogEntry(blogId: Int, locale: String) = makeAPICall(api.getBlogEntry(blogId,locale))
+    suspend fun getBlogEntry(blogId: Int, locale: CodeforcesLocale) = makeAPICall(api.getBlogEntry(blogId,locale.toString()))
 
     suspend fun getContestStandings(contestId: Int, handles: Collection<String>, showUnofficial: Boolean) = makeAPICall(api.getContestStandings(contestId, handles.joinToString(separator = ";"), showUnofficial))
     suspend fun getContestStandings(contestId: Int, handle: String, showUnofficial: Boolean) = getContestStandings(contestId, listOf(handle), showUnofficial)
 
     suspend fun getContestSubmissions(contestId: Int, handle: String) = makeAPICall(api.getContestStatus(contestId, handle))
 
-    suspend fun getUserBlogEntries(handle: String, locale: String) = makeAPICall(api.getUserBlogs(handle,locale))
+    suspend fun getUserBlogEntries(handle: String, locale: CodeforcesLocale) = makeAPICall(api.getUserBlogs(handle,locale.toString()))
 
     suspend fun getContestRatingChanges(contestId: Int) = makeAPICall(api.getContestRatingChanges(contestId))
 
@@ -686,7 +686,7 @@ object CodeforcesAPI {
 
     suspend fun getHandleSuggestions(str: String) = makeWEBCall(CallStringInvoker { web.getHandleSuggestions(str) })
 
-    suspend fun getPageSource(page: String, lang: String) = makeWEBCall(CallStringInvoker { web.getPage(page,lang) })
+    suspend fun getPageSource(page: String, locale: CodeforcesLocale) = makeWEBCall(CallStringInvoker { web.getPage(page,locale.toString()) })
 
 }
 

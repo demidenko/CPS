@@ -41,12 +41,23 @@ enum class CodeforcesTitle {
     MAIN, TOP, RECENT, LOST
 }
 
+enum class CodeforcesLocale {
+    EN, RU;
+
+    override fun toString(): String {
+        return when(this){
+            EN -> "en"
+            RU -> "ru"
+        }
+    }
+}
+
 class NewsFragment : CPSFragment() {
 
     companion object {
         private const val keySelectedTab = "selected_tab"
 
-        suspend fun getCodeforcesContentLanguage(context: Context) = if(context.settingsNews.getRussianContentEnabled()) "ru" else "en"
+        suspend fun getCodeforcesContentLanguage(context: Context) = if(context.settingsNews.getRussianContentEnabled()) CodeforcesLocale.RU else CodeforcesLocale.EN
     }
 
     val newsViewModel: CodeforcesNewsViewModel by viewModels()
@@ -198,8 +209,8 @@ class NewsFragment : CPSFragment() {
     private val reloadButton: ImageButton get() = requireBottomPanel().findViewById(R.id.navigation_news_reload)
     private val failColor by lazy { getColorFromResource(mainActivity, R.color.fail) }
 
-    private fun reloadFragment(fragment: CodeforcesNewsFragment, lang: String) {
-        newsViewModel.reload(fragment.title, lang)
+    private fun reloadFragment(fragment: CodeforcesNewsFragment, locale: CodeforcesLocale) {
+        newsViewModel.reload(fragment.title, locale)
     }
 
     suspend fun reloadFragment(fragment: CodeforcesNewsFragment) {
