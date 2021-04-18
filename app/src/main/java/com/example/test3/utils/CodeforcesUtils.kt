@@ -511,7 +511,7 @@ data class CodeforcesRecentAction(
 
 object CodeforcesAPI {
 
-    private const val callLimitExceededWaitTimeMillis: Long = 300
+    private const val callLimitExceededWaitTimeMillis: Long = 500
 
     interface API {
         @GET("contest.list")
@@ -579,27 +579,32 @@ object CodeforcesAPI {
         .build()
         .create(API::class.java)
 
-    private suspend fun <T> makeAPICall(call: Call<CodeforcesAPIResponse<T>>): CodeforcesAPIResponse<T>? = withContext(Dispatchers.IO){
-        var c = call
-        try{
-            while(true) {
-                val r = c.execute()
-                if (r.isSuccessful) return@withContext r.body()
-                val s = r.errorBody()?.string() ?: return@withContext null
-                val er = jsonCPS.decodeFromString<CodeforcesAPIErrorResponse>(s)
-                if (er.isCallLimitExceeded()) {
-                    delay(callLimitExceededWaitTimeMillis)
-                    c = c.clone()
-                    continue
-                }
-                return@withContext CodeforcesAPIResponse<T>(er)
-            }
-        }catch (e : IOException){
-            return@withContext null
-        }catch (e: SerializationException){
-            return@withContext null
+    private tailrec suspend fun<T> makeAPICall(call: Call<CodeforcesAPIResponse<T>>, callLimit: Int): CodeforcesAPIResponse<T>? {
+        if(callLimit == 0) return null
+        val r = call.execute()
+        if (r.isSuccessful) return r.body()
+        if(r.code() == 503) { //mike wtf?
+            delay(callLimitExceededWaitTimeMillis)
+            return makeAPICall(call.clone(), callLimit-1)
         }
-        null
+        val s = r.errorBody()?.string() ?: return null
+        val er = jsonCPS.decodeFromString<CodeforcesAPIErrorResponse>(s)
+        if (er.isCallLimitExceeded()) {
+            delay(callLimitExceededWaitTimeMillis)
+            return makeAPICall(call.clone(), callLimit-1)
+        }
+        return CodeforcesAPIResponse<T>(er)
+    }
+
+    private suspend fun <T> makeAPICall(call: Call<CodeforcesAPIResponse<T>>): CodeforcesAPIResponse<T>? = withContext(Dispatchers.IO){
+        return@withContext try{
+            makeAPICall(call, 10)
+        }catch (e : IOException){
+            null
+        }catch (e: SerializationException){
+            e.printStackTrace()
+            null
+        }
     }
 
     suspend fun getContests() = makeAPICall(api.getContests())
