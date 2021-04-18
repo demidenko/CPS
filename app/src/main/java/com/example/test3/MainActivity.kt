@@ -150,8 +150,8 @@ class MainActivity : AppCompatActivity(){
                             settingsUI.setUseStatusBar(!current)
                         }
                     }
-                    settingsUI.useStatusBarLiveData.observe(this@MainActivity){ use ->
-                        if(use) on() else off()
+                    addRepeatingJob(Lifecycle.State.STARTED){
+                        settingsUI.getUseStatusBarFlow().collect { use -> if(use) on() else off() }
                     }
                 }
 

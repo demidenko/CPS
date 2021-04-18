@@ -52,7 +52,7 @@ class SettingsUI(private val context: Context): CPSDataStore(context.settingsUI_
     }
 
     private val useStatusBar = dataStore.data.map { it[KEY_USE_STATUS_BAR] ?: true }
-    val useStatusBarLiveData = useStatusBar.distinctUntilChanged().asLiveData()
+    fun getUseStatusBarFlow() = useStatusBar.distinctUntilChanged()
     suspend fun getUseStatusBar() = useStatusBar.first()
     suspend fun setUseStatusBar(use: Boolean) {
         dataStore.edit { it[KEY_USE_STATUS_BAR] = use }

@@ -48,10 +48,10 @@ class StatusBarColorManager(
                         }
                     }
                 }
-            }
-            settingsUI.useStatusBarLiveData.observe(this){ use ->
-                enabled = use
-                recalculateStatusBarColor()
+                settingsUI.getUseStatusBarFlow().collect { use ->
+                    enabled = use
+                    recalculateStatusBarColor()
+                }
             }
             settingsUI.useRealColorsLiveData.observeUpdates(this){ use ->
                 runBlocking {
