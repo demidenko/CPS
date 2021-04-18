@@ -14,7 +14,6 @@ import androidx.core.text.color
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.asLiveData
 import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.RatedAccountManager
 import com.example.test3.ui.CPSDataStoreDelegate
@@ -122,9 +121,9 @@ class SettingsDev(context: Context) : CPSDataStore(context.settings_dev_dataStor
         private val KEY_DEV = booleanPreferencesKey("develop_enabled")
     }
 
-    private val flowDevEnabled = dataStore.data.map { it[KEY_DEV] ?: false }
-    fun getDevEnabled() = runBlocking { flowDevEnabled.first() }
-    fun getDevEnabledLiveData() = flowDevEnabled.asLiveData()
+    private val devEnabledFlow = dataStore.data.map { it[KEY_DEV] ?: false }
+    fun getDevEnabled() = runBlocking { devEnabledFlow.first() }
+    fun getDevEnabledFlow() = devEnabledFlow
     fun setDevEnabled(flag: Boolean) {
         runBlocking { dataStore.edit { it[KEY_DEV] = flag } }
     }

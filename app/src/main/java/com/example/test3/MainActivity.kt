@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
@@ -23,6 +25,7 @@ import com.example.test3.utils.on
 import com.example.test3.workers.WorkersCenter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import kotlin.coroutines.suspendCoroutine
 
 
@@ -59,9 +62,11 @@ class MainActivity : AppCompatActivity(){
             showUISettingsPanel = it.getBoolean(keyShowUIPanel)
         }
 
-        settingsDev.getDevEnabledLiveData().observe(this){ isChecked ->
-            val item = navigationMain.menu.findItem(R.id.navigation_develop)
-            item.isVisible = isChecked
+        addRepeatingJob(Lifecycle.State.STARTED){
+            settingsDev.getDevEnabledFlow().collect{ isChecked ->
+                val item = navigationMain.menu.findItem(R.id.navigation_develop)
+                item.isVisible = isChecked
+            }
         }
 
         val accountsStackId = cpsFragmentManager.getOrCreateStack(accountsFragment)
@@ -161,8 +166,10 @@ class MainActivity : AppCompatActivity(){
 
                 findViewById<ImageButton>(R.id.button_recreate_app)?.apply {
                     setOnClickListener { recreate() }
-                    settingsDev.getDevEnabledLiveData().observe(this@MainActivity){ enabled ->
-                        isVisible = enabled
+                    addRepeatingJob(Lifecycle.State.STARTED){
+                        settingsDev.getDevEnabledFlow().collect{ enabled ->
+                            isVisible = enabled
+                        }
                     }
                 }
             }

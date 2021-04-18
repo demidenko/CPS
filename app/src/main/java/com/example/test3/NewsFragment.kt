@@ -90,9 +90,6 @@ class NewsFragment : CPSFragment() {
             if(CodeforcesNewsLostRecentWorker.isEnabled(mainActivity)){
                 fragments.add(createLostFragment())
             }
-            mainActivity.settingsDev.getDevEnabledLiveData().observe(viewLifecycleOwner){ use ->
-                suspectsLostButton.isVisible = use
-            }
         }
         CodeforcesNewsAdapter(this, fragments).apply {
             setButtons(CodeforcesTitle.RECENT, R.id.support_navigation_news_recent, this@NewsFragment)
@@ -140,20 +137,17 @@ class NewsFragment : CPSFragment() {
 
         updateLostInfoButton.setOnClickListener { newsViewModel.updateLostInfo(requireContext()) }
         mainActivity.subscribeProgressBar("update info of lost", newsViewModel.getUpdateLostInfoProgress())
-        mainActivity.addRepeatingJob(Lifecycle.State.STARTED){
-            newsViewModel.getUpdateLostInfoProgress().collect { progress ->
-                if(progress != null) updateLostInfoButton.disable()
-                else updateLostInfoButton.enable()
-            }
-        }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
             val titles = listOf(
                 CodeforcesTitle.MAIN,
                 CodeforcesTitle.TOP,
                 CodeforcesTitle.RECENT
-            )
-            titles.forEach { launch { subscribeReloading(it) } }
+            ).onEach {
+                launch {
+                    subscribeReloading(it)
+                }
+            }
 
             launch {
                 LoadingState.combineLoadingStateFlows(titles.map { newsViewModel.getPageLoadingStateFlow(it) })
@@ -162,6 +156,19 @@ class NewsFragment : CPSFragment() {
                         if(loadingState == LoadingState.LOADING) reloadButton.disable()
                         else reloadButton.enable()
                     }
+            }
+
+            launch {
+                newsViewModel.getUpdateLostInfoProgress().collect { progress ->
+                    if(progress != null) updateLostInfoButton.disable()
+                    else updateLostInfoButton.enable()
+                }
+            }
+
+            launch {
+                mainActivity.settingsDev.getDevEnabledFlow().collect { use ->
+                    suspectsLostButton.isVisible = use
+                }
             }
         }
 
