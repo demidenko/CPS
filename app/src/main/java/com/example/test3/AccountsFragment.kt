@@ -82,11 +82,18 @@ class AccountsFragment: CPSFragment() {
 
         reloadButton.setOnClickListener { reloadAccounts() }
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
-            BlockedState.combineBlockedStatesFlows(
-                panels.map { accountViewModel.getAccountSmallViewBlockedState(it.manager) }
-            ).collect {
-                if(it == BlockedState.BLOCKED) reloadButton.disable()
-                else reloadButton.enable()
+            launch {
+                BlockedState.combineBlockedStatesFlows(
+                    panels.map { accountViewModel.getAccountSmallViewBlockedState(it.manager) }
+                ).collect {
+                    if(it == BlockedState.BLOCKED) reloadButton.disable()
+                    else reloadButton.enable()
+                }
+            }
+            launch {
+                mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().collect { use ->
+                    showPanels()
+                }
             }
         }
 
@@ -99,11 +106,6 @@ class AccountsFragment: CPSFragment() {
                 else addAccountButton.enable()
             }
         }
-
-        mainActivity.settingsUI.useRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
-            showPanels()
-        }
-
 
         mainActivity.addRepeatingJob(Lifecycle.State.STARTED){
             statusBarColorManager.getStatusBarColorFlow().collect(){ color ->

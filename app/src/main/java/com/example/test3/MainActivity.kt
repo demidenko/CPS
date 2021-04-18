@@ -138,8 +138,8 @@ class MainActivity : AppCompatActivity(){
                             setUseRealColors(!current)
                         }
                     }
-                    settingsUI.useRealColorsLiveData.observe(this@MainActivity){ use ->
-                        if(use) on() else off()
+                    addRepeatingJob(Lifecycle.State.STARTED){
+                        settingsUI.getUseRealColorsFlow().collect { use -> if(use) on() else off() }
                     }
                 }
 

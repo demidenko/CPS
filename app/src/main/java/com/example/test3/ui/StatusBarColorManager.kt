@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 private const val NO_COLOR = Color.TRANSPARENT
 
@@ -48,14 +47,16 @@ class StatusBarColorManager(
                         }
                     }
                 }
-                settingsUI.getUseStatusBarFlow().collect { use ->
-                    enabled = use
-                    recalculateStatusBarColor()
+                launch {
+                    settingsUI.getUseStatusBarFlow().collect { use ->
+                        enabled = use
+                        recalculateStatusBarColor()
+                    }
                 }
-            }
-            settingsUI.useRealColorsLiveData.observeUpdates(this){ use ->
-                runBlocking {
-                    managers.forEach { updateBy(it) }
+                launch {
+                    settingsUI.getUseRealColorsFlow().ignoreFirst().collect { use ->
+                        managers.forEach { updateBy(it) }
+                    }
                 }
             }
         }

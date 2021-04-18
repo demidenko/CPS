@@ -12,28 +12,22 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.asLiveData
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.getColorFromResource
 import com.example.test3.utils.CPSDataStore
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlin.reflect.KProperty
 
 
-fun<T> LiveData<T>.observeUpdates(owner: LifecycleOwner, _onChanged: (T)->Unit){
-    observe(owner, object : Observer<T> {
-        var ignore = true
-        override fun onChanged(t: T) {
-            if(!ignore) _onChanged(t)
-            else ignore = false
-        }
-    })
+fun<T> Flow<T>.ignoreFirst(): Flow<T> {
+    var ignore = true
+    return transform { value ->
+        if(!ignore) emit(value)
+        else ignore = false
+    }
 }
-
 
 class SettingsUI(private val context: Context): CPSDataStore(context.settingsUI_dataStore) {
     companion object {
@@ -45,7 +39,7 @@ class SettingsUI(private val context: Context): CPSDataStore(context.settingsUI_
     }
 
     private val useRealColorsFlow = dataStore.data.map { it[KEY_USE_REAL_COLORS] ?: false }
-    val useRealColorsLiveData = useRealColorsFlow.distinctUntilChanged().asLiveData()
+    fun getUseRealColorsFlow() = useRealColorsFlow.distinctUntilChanged()
     suspend fun getUseRealColors() = useRealColorsFlow.first()
     suspend fun setUseRealColors(use: Boolean) {
         dataStore.edit { it[KEY_USE_REAL_COLORS] = use }

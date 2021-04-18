@@ -7,6 +7,8 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,10 +18,11 @@ import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.codeforces.CodeforcesBlogEntriesFragment
 import com.example.test3.ui.CPSFragment
-import com.example.test3.ui.observeUpdates
+import com.example.test3.ui.ignoreFirst
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsFollowWorker
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -86,8 +89,10 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             buttonAdd.isVisible = true
         }
 
-        mainActivity.settingsUI.useRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
-            followListAdapter.notifyDataSetChanged()
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
+            mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().collect { use ->
+                followListAdapter.notifyDataSetChanged()
+            }
         }
     }
 

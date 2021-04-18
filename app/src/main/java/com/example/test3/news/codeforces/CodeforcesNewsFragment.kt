@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.*
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
-import com.example.test3.ui.observeUpdates
+import com.example.test3.ui.ignoreFirst
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.LoadingState
 import com.google.android.material.tabs.TabLayout
@@ -72,10 +72,10 @@ abstract class CodeforcesNewsFragment: Fragment() {
         }
     }
 
-    protected fun subscribeRefreshOnRealColor(refresh: (Boolean) -> Unit) {
-        newsFragment.mainActivity.settingsUI
-            .useRealColorsLiveData
-            .observeUpdates(viewLifecycleOwner, refresh)
+    protected fun subscribeRefreshOnRealColor(refresh: suspend (Boolean) -> Unit) {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
+            newsFragment.mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().collect(refresh)
+        }
     }
 
     protected fun subscribeLoadingState(loadingState: Flow<LoadingState>, swipeRefreshLayout: SwipeRefreshLayout) {

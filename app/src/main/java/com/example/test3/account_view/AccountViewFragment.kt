@@ -8,7 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.test3.*
 import com.example.test3.account_manager.RatedAccountManager
 import com.example.test3.ui.CPSFragment
-import com.example.test3.ui.observeUpdates
+import com.example.test3.ui.ignoreFirst
 import com.example.test3.ui.settingsUI
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.collect
@@ -43,11 +43,12 @@ class AccountViewFragment: CPSFragment() {
         fun showBigView() = lifecycleScope.launch { panel.showBigView(this@AccountViewFragment) }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
-            manager.getInfoFlow().collect{ showBigView() }
-        }
-
-        mainActivity.settingsUI.useRealColorsLiveData.observeUpdates(viewLifecycleOwner){ use ->
-            showBigView()
+            launch {
+                manager.getInfoFlow().collect{ showBigView() }
+            }
+            launch {
+                mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().collect { use -> showBigView() }
+            }
         }
 
         mainActivity.accountsFragment.statusBarColorManager.setCurrent(manager)
