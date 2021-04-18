@@ -1,12 +1,16 @@
 package com.example.test3.ui
 
 import android.graphics.Color
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.addRepeatingJob
 import com.example.test3.MainActivity
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.RatedAccountManager
 import com.example.test3.account_manager.UserInfo
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 private const val NO_COLOR = Color.TRANSPARENT
@@ -33,9 +37,13 @@ class StatusBarColorManager(
     init {
         checkManagers(managers)
         with(mainActivity){
-            managers.forEach {
-                it.getInfoLiveData().observe(this){ (manager, info) ->
-                    updateBy(manager, info)
+            addRepeatingJob(Lifecycle.State.STARTED){
+                managers.forEach {
+                    launch {
+                        it.getInfoFlow().collect{ (manager, info) ->
+                            updateBy(manager, info)
+                        }
+                    }
                 }
             }
             settingsUI.useStatusBarLiveData.observe(this){ use ->

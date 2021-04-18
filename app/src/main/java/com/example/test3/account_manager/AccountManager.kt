@@ -8,7 +8,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.lifecycle.asLiveData
 import com.example.test3.*
 import com.example.test3.ui.getUseRealColors
 import com.example.test3.utils.AtCoderRatingChange
@@ -16,6 +15,7 @@ import com.example.test3.utils.CPSDataStore
 import com.example.test3.utils.CodeforcesRatingChange
 import com.example.test3.utils.signedToString
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -27,7 +27,7 @@ abstract class AccountManager(val context: Context, val managerName: String) {
     abstract val userIDName: String
 
     protected abstract fun getDataStore(): AccountDataStore
-    fun getInfoLiveData() = getDataStore().getDataFlow().map { str -> this to strToInfo(str) }.asLiveData()
+    fun getInfoFlow() = getDataStore().getDataFlow().map { str -> this to strToInfo(str) }.distinctUntilChangedBy { it.second }
 
     abstract fun emptyInfo(): UserInfo
 

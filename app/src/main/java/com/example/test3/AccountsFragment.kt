@@ -59,13 +59,17 @@ class AccountsFragment: CPSFragment() {
         view.findViewById<LinearLayout>(R.id.panels_layout).apply {
             val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
 
-            panels.forEach { panel ->
-                addView(panel.createSmallView(), params)
-                val liveData = panel.manager.getInfoLiveData()
-                liveData.observe(viewLifecycleOwner){ (manager, info) ->
-                    lifecycleScope.launch { panel.show() }
-                    if(info.isEmpty()) notEmptyPanels.remove(manager.managerName)
-                    else notEmptyPanels.add(manager.managerName)
+            panels.forEach { panel -> addView(panel.createSmallView(), params) }
+
+            viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
+                panels.forEach { panel ->
+                    launch {
+                        panel.manager.getInfoFlow().collect { (manager, info) ->
+                            panel.show()
+                            if(info.isEmpty()) notEmptyPanels.remove(manager.managerName)
+                            else notEmptyPanels.add(manager.managerName)
+                        }
+                    }
                 }
             }
         }
