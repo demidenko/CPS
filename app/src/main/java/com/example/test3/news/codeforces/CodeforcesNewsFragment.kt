@@ -55,19 +55,21 @@ abstract class CodeforcesNewsFragment: Fragment() {
     }
 
     protected fun subscribeNewEntries(blogEntriesAdapter: CodeforcesBlogEntriesAdapter) {
-        blogEntriesAdapter.getNewEntriesSize().observe(viewLifecycleOwner){ count ->
-            val tab = newsFragment.getTab(title) ?: return@observe
-            if (count == 0) {
-                tab.badge?.apply {
-                    isVisible = false
-                    clearNumber()
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
+            blogEntriesAdapter.getNewEntriesSizeFlow().collect { count ->
+                val tab = newsFragment.getTab(title) ?: return@collect
+                if (count == 0) {
+                    tab.badge?.apply {
+                        isVisible = false
+                        clearNumber()
+                    }
+                } else {
+                    tab.badge?.apply {
+                        number = count
+                        isVisible = true
+                    }
+                    if (tab.isSelected && isVisible) saveBlogEntriesAsViewed(blogEntriesAdapter)
                 }
-            } else {
-                tab.badge?.apply {
-                    number = count
-                    isVisible = true
-                }
-                if (tab.isSelected && isVisible) saveBlogEntriesAsViewed(blogEntriesAdapter)
             }
         }
     }

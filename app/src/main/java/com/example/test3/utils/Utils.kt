@@ -11,14 +11,14 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.HtmlCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.test3.R
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
@@ -67,8 +67,8 @@ fun ImageButton.disable() {
 
 class MutableSetLiveSize<T>() {
     private val s = mutableSetOf<T>()
-    private val size = MutableLiveData<Int>(0)
-    val sizeLiveData: LiveData<Int> get() = size
+    private val size = MutableStateFlow<Int>(0)
+    val sizeFlow get() = size.asStateFlow()
 
     fun values() = s.toSet()
     fun contains(element: T) = s.contains(element)

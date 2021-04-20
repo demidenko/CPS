@@ -20,8 +20,8 @@ android {
         applicationId "com.example.test3"
         minSdkVersion 22
         targetSdkVersion 30
-        versionCode = 190
-        versionName '0.43.2'
+        versionCode = 191
+        versionName '0.43.3'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

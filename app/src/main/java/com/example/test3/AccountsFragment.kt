@@ -8,7 +8,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.isVisible
+import androidx.core.view.isGone
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
@@ -49,7 +49,7 @@ class AccountsFragment: CPSFragment() {
 
         cpsTitle = "::accounts"
         setBottomPanelId(R.id.support_navigation_accounts, R.layout.navigation_accounts)
-
+        
         val notEmptyPanels = MutableSetLiveSize<String>()
         view.findViewById<LinearLayout>(R.id.panels_layout).apply {
             val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
@@ -66,12 +66,10 @@ class AccountsFragment: CPSFragment() {
                         }
                     }
                 }
-            }
-        }
-
-        view.findViewById<TextView>(R.id.accounts_welcome_text).apply {
-            notEmptyPanels.sizeLiveData.observe(viewLifecycleOwner){ count ->
-                isVisible = count==0
+                launch {
+                    val welcomeTextView = view.findViewById<TextView>(R.id.accounts_welcome_text)
+                    notEmptyPanels.sizeFlow.collect { count -> welcomeTextView.isGone = count>0 }
+                }
             }
         }
 

@@ -35,7 +35,7 @@ class CodeforcesBlogEntriesAdapter(
     override fun getItemCount() = items.size
 
     private val newEntries = MutableSetLiveSize<Int>()
-    fun getNewEntriesSize() = newEntries.sizeLiveData
+    fun getNewEntriesSizeFlow() = newEntries.sizeFlow
 
     override suspend fun applyData(data: List<CodeforcesBlogEntry>) {
         items = data.toTypedArray()
