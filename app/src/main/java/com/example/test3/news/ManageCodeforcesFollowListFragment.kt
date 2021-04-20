@@ -67,19 +67,13 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             isVisible = false
         }
         buttonAdd.setOnClickListener {
+            buttonAdd.disable()
             lifecycleScope.launch {
-
-                val userInfo = mainActivity.chooseUserID(
-                    mainActivity.accountsFragment.codeforcesAccountManager.emptyInfo(),
-                    mainActivity.accountsFragment.codeforcesAccountManager
-                ) as? CodeforcesAccountManager.CodeforcesUserInfo ?: return@launch
-
-                buttonAdd.disable()
+                val userInfo = mainActivity.chooseUserID(CodeforcesAccountManager(mainActivity)) as? CodeforcesAccountManager.CodeforcesUserInfo ?: return@launch
                 followListAdapter.add(userInfo)
                 buttonAdd.enable()
                 followRecyclerView.scrollToPosition(0)
             }
-
         }
 
         lifecycleScope.launch {

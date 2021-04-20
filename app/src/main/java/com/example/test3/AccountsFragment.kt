@@ -146,7 +146,7 @@ class AccountsFragment: CPSFragment() {
                             setOnClickListener {
                                 dismiss()
                                 lifecycleScope.launch {
-                                    mainActivity.chooseUserID(panel.manager)?.let { userInfo ->
+                                    mainActivity.chooseUserIDFromSaved(panel.manager)?.let { userInfo ->
                                         panel.manager.setSavedInfo(userInfo)
                                     }
                                 }
@@ -167,9 +167,7 @@ class AccountsFragment: CPSFragment() {
 
     private fun clistImport() {
         lifecycleScope.launch {
-            val clistUserInfo = with(CListAccountManager(mainActivity)){
-                mainActivity.chooseUserID(emptyInfo(), this) as? CListAccountManager.CListUserInfo
-            } ?: return@launch
+            val clistUserInfo = mainActivity.chooseUserID(CListAccountManager(mainActivity)) as? CListAccountManager.CListUserInfo ?: return@launch
             accountViewModel.clistImport(clistUserInfo, requireContext())
         }
     }
