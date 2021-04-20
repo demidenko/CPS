@@ -25,19 +25,14 @@ class AccountsFragment: CPSFragment() {
 
     val accountViewModel: AccountViewModel by viewModels()
 
-    val codeforcesAccountManager by lazy { CodeforcesAccountManager(mainActivity) }
-    val atcoderAccountManager by lazy { AtCoderAccountManager(mainActivity) }
-    val topcoderAccountManager by lazy { TopCoderAccountManager(mainActivity) }
-    val acmpAccountManager by lazy { ACMPAccountManager(mainActivity) }
-    val timusAccountManager by lazy { TimusAccountManager(mainActivity) }
-
     private val panels by lazy {
+        val context = requireContext()
         listOf(
-            CodeforcesAccountPanel(mainActivity, codeforcesAccountManager),
-            AtCoderAccountPanel(mainActivity, atcoderAccountManager),
-            TopCoderAccountPanel(mainActivity, topcoderAccountManager),
-            ACMPAccountPanel(mainActivity, acmpAccountManager),
-            TimusAccountPanel(mainActivity, timusAccountManager)
+            CodeforcesAccountPanel(mainActivity, CodeforcesAccountManager(context)),
+            AtCoderAccountPanel(mainActivity, AtCoderAccountManager(context)),
+            TopCoderAccountPanel(mainActivity, TopCoderAccountManager(context)),
+            ACMPAccountPanel(mainActivity, ACMPAccountManager(context)),
+            TimusAccountPanel(mainActivity, TimusAccountManager(context))
         )
     }
 

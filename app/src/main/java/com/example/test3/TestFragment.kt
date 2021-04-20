@@ -14,8 +14,10 @@ import androidx.core.text.color
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.test3.account_manager.AtCoderAccountManager
+import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.HandleColor
-import com.example.test3.account_manager.RatedAccountManager
+import com.example.test3.account_manager.TopCoderAccountManager
 import com.example.test3.ui.CPSDataStoreDelegate
 import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.CPSDataStore
@@ -82,19 +84,20 @@ class TestFragment : CPSFragment() {
                 "Topcoder"
             ))
 
+            val context = requireContext()
             for(handleColor in HandleColor.values()){
                 val row = arrayListOf<CharSequence>()
 
                 row.add(
                     SpannableStringBuilder().bold {
-                        color(handleColor.getARGB(mainActivity.accountsFragment.codeforcesAccountManager, false)) { append(handleColor.name) }
+                        color(handleColor.getARGB(CodeforcesAccountManager(context), false)) { append(handleColor.name) }
                     }
                 )
 
-                arrayOf<RatedAccountManager>(
-                    mainActivity.accountsFragment.codeforcesAccountManager,
-                    mainActivity.accountsFragment.atcoderAccountManager,
-                    mainActivity.accountsFragment.topcoderAccountManager,
+                arrayOf(
+                    CodeforcesAccountManager(context),
+                    AtCoderAccountManager(context),
+                    TopCoderAccountManager(context),
                 ).forEach { manager ->
                     val s = SpannableStringBuilder().bold {
                         try {

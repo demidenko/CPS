@@ -17,6 +17,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.CodeforcesTitle
 import com.example.test3.R
+import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.ui.CPSDataStoreDelegate
 import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.*
@@ -111,6 +112,7 @@ class SettingsNewsFragment: CPSFragment(){
 
             val ratingOptions = CodeforcesUtils.ColorTag.values().filter { it != CodeforcesUtils.ColorTag.ADMIN }
 
+            val codeforcesAccountManager = CodeforcesAccountManager(requireContext())
             val ratingNames = ratingOptions.map { tag ->
                 when(tag){
                     CodeforcesUtils.ColorTag.BLACK -> "Exists"
@@ -124,7 +126,7 @@ class SettingsNewsFragment: CPSFragment(){
                     CodeforcesUtils.ColorTag.LEGENDARY -> "LGM"
                     else -> ""
                 }.let {
-                    mainActivity.accountsFragment.codeforcesAccountManager.makeSpan(it, tag)
+                    codeforcesAccountManager.makeSpan(it, tag)
                 }
             }
 
