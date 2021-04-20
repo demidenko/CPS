@@ -26,6 +26,7 @@ import com.example.test3.workers.WorkersCenter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlin.coroutines.suspendCoroutine
 
 
@@ -120,37 +121,29 @@ class MainActivity : AppCompatActivity(){
             setCustomView(R.layout.action_bar)
             customView?.apply {
 
-                findViewById<ImageButton>(R.id.button_ui_close)?.apply {
-                    setOnClickListener {
-                        showUISettingsPanel = false
-                    }
+                findViewById<ImageButton>(R.id.button_ui_close).apply {
+                    setOnClickListener { showUISettingsPanel = false }
                 }
 
-                findViewById<ImageButton>(R.id.button_origin_colors)?.apply {
+                val buttonOriginColors = findViewById<ImageButton>(R.id.button_origin_colors).apply {
                     setOnClickListener {
                         lifecycleScope.launch {
                             val current = getUseRealColors()
                             setUseRealColors(!current)
                         }
                     }
-                    addRepeatingJob(Lifecycle.State.STARTED){
-                        settingsUI.getUseRealColorsFlow().collect { use -> if(use) on() else off() }
-                    }
                 }
 
-                findViewById<ImageButton>(R.id.button_colored_status_bar)?.apply {
+                val buttonColoredStatusBar = findViewById<ImageButton>(R.id.button_colored_status_bar).apply {
                     setOnClickListener {
-                        lifecycleScope.launchWhenStarted {
+                        lifecycleScope.launch {
                             val current = settingsUI.getUseStatusBar()
                             settingsUI.setUseStatusBar(!current)
                         }
                     }
-                    addRepeatingJob(Lifecycle.State.STARTED){
-                        settingsUI.getUseStatusBarFlow().collect { use -> if(use) on() else off() }
-                    }
                 }
 
-                findViewById<ImageButton>(R.id.button_ui_mode)?.apply {
+                findViewById<ImageButton>(R.id.button_ui_mode).apply {
                     setOnClickListener {
                         when(getUIMode()){
                             UIMode.DARK -> setUIMode(UIMode.LIGHT)
@@ -159,16 +152,18 @@ class MainActivity : AppCompatActivity(){
                     }
                 }
 
-                findViewById<ImageButton>(R.id.button_recreate_app)?.apply {
+                val buttonRecreate = findViewById<ImageButton>(R.id.button_recreate_app).apply {
                     setOnClickListener { recreate() }
-                    addRepeatingJob(Lifecycle.State.STARTED){
-                        settingsDev.getDevEnabledFlow().collect{ enabled ->
-                            isVisible = enabled
-                        }
-                    }
+                }
+
+                addRepeatingJob(Lifecycle.State.STARTED){
+                    listOf(
+                        settingsUI.getUseRealColorsFlow().onEach { use -> with(buttonOriginColors) { if(use) on() else off() } },
+                        settingsUI.getUseStatusBarFlow().onEach { use -> with(buttonColoredStatusBar) { if(use) on() else off() } },
+                        settingsDev.getDevEnabledFlow().onEach { enabled -> buttonRecreate.isVisible = enabled }
+                    ).forEach { launch { it.collect() } }
                 }
             }
-
         }
     }
 
