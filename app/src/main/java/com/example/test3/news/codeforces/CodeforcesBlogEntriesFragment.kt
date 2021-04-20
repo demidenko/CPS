@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.ui.CPSFragment
-import com.example.test3.ui.ignoreFirst
+import com.example.test3.utils.ignoreFirst
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.asyncPair

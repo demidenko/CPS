@@ -9,25 +9,14 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import com.example.test3.MainActivity
 import com.example.test3.R
-import com.example.test3.getColorFromResource
 import com.example.test3.utils.CPSDataStore
+import com.example.test3.utils.getColorFromResource
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlin.reflect.KProperty
 
-
-fun<T> Flow<T>.ignoreFirst(): Flow<T> {
-    var ignore = true
-    return transform { value ->
-        if(!ignore) emit(value)
-        else ignore = false
-    }
-}
 
 class SettingsUI(private val context: Context): CPSDataStore(context.settingsUI_dataStore) {
     companion object {

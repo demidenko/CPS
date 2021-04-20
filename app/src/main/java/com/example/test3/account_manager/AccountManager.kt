@@ -10,10 +10,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.test3.*
 import com.example.test3.ui.getUseRealColors
-import com.example.test3.utils.AtCoderRatingChange
-import com.example.test3.utils.CPSDataStore
-import com.example.test3.utils.CodeforcesRatingChange
-import com.example.test3.utils.signedToString
+import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first

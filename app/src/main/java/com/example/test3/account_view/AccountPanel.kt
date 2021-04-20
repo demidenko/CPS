@@ -14,7 +14,7 @@ import androidx.lifecycle.addRepeatingJob
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.*
-import com.example.test3.getColorFromResource
+import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.BlockedState
 import com.example.test3.utils.LoadingState
 import kotlinx.coroutines.flow.collect

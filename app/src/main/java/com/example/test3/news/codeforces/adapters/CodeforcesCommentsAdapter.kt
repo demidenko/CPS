@@ -10,7 +10,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
-import com.example.test3.getColorFromResource
 import com.example.test3.makeIntentOpenUrl
 import com.example.test3.timeDifference
 import com.example.test3.utils.*

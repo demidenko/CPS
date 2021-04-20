@@ -1,5 +1,6 @@
 package com.example.test3.utils
 
+import android.content.Context
 import android.text.Html
 import android.text.Spanned
 import android.view.View
@@ -16,16 +17,21 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
 fun getCurrentTimeSeconds() = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+
+fun getColorFromResource(context: Context, resourceId: Int): Int {
+    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        context.resources.getColor(resourceId, null)
+    } else {
+        context.resources.getColor(resourceId)
+    }
+}
 
 val httpClient = OkHttpClient
     .Builder()
@@ -208,12 +214,20 @@ enum class BlockedState {
 }
 
 suspend inline fun<reified A, reified B> asyncPair(
-    crossinline callBackA: suspend () -> A,
-    crossinline callBackB: suspend () -> B,
+    crossinline getA: suspend () -> A,
+    crossinline getB: suspend () -> B,
 ): Pair<A, B> {
     return coroutineScope {
-        val a = async { callBackA() }
-        val b = async { callBackB() }
+        val a = async { getA() }
+        val b = async { getB() }
         Pair(a.await(), b.await())
+    }
+}
+
+fun<T> Flow<T>.ignoreFirst(): Flow<T> {
+    var ignore = true
+    return transform { value ->
+        if(!ignore) emit(value)
+        else ignore = false
     }
 }

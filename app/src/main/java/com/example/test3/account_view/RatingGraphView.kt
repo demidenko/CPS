@@ -10,7 +10,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.R
 import com.example.test3.account_manager.*
-import com.example.test3.getColorFromResource
+import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.disable
 import com.example.test3.utils.enable
 import com.example.test3.utils.getCurrentTimeSeconds

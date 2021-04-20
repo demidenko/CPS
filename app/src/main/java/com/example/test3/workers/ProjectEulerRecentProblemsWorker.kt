@@ -12,6 +12,7 @@ import com.example.test3.news.NewsFeed
 import com.example.test3.news.settingsNews
 import com.example.test3.utils.CPSDataStore
 import com.example.test3.utils.ProjectEulerAPI
+import com.example.test3.utils.getColorFromResource
 import kotlinx.coroutines.flow.first
 
 class ProjectEulerRecentProblemsWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {

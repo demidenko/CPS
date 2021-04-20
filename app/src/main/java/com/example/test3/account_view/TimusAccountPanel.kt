@@ -9,7 +9,7 @@ import com.example.test3.R
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.TimusAccountManager
 import com.example.test3.account_manager.UserInfo
-import com.example.test3.getColorFromResource
+import com.example.test3.utils.getColorFromResource
 
 class TimusAccountPanel(
     mainActivity: MainActivity,

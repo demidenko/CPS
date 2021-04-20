@@ -26,6 +26,7 @@ import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.AccountSuggestion
 import com.example.test3.account_manager.STATUS
 import com.example.test3.account_manager.UserInfo
+import com.example.test3.utils.getColorFromResource
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

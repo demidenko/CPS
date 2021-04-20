@@ -1,7 +1,6 @@
 package com.example.test3
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -20,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.ui.*
+import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.off
 import com.example.test3.utils.on
 import com.example.test3.workers.WorkersCenter
@@ -52,7 +52,6 @@ class MainActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         println("main create")
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
 
         setupUIMode()
@@ -63,7 +62,7 @@ class MainActivity : AppCompatActivity(){
         }
 
         addRepeatingJob(Lifecycle.State.STARTED){
-            settingsDev.getDevEnabledFlow().collect{ isChecked ->
+            settingsDev.getDevEnabledFlow().collect { isChecked ->
                 val item = navigationMain.menu.findItem(R.id.navigation_develop)
                 item.isVisible = isChecked
             }
@@ -76,7 +75,6 @@ class MainActivity : AppCompatActivity(){
         if(cpsFragmentManager.getCurrentStackId() == -1) cpsFragmentManager.switchToStack(accountsStackId)
 
         navigationMain.setOnNavigationItemSelectedListener { item ->
-
             val selectedStackId =
                 when(val id = item.itemId){
                     R.id.navigation_accounts -> accountsStackId
@@ -84,12 +82,9 @@ class MainActivity : AppCompatActivity(){
                     R.id.navigation_develop -> devStackId
                     else -> throw Exception("unknown selected navigation bar item: $id")
                 }
-
             cpsFragmentManager.switchToStack(selectedStackId)
-
             true
         }
-
 
         lifecycleScope.launchWhenStarted {
             WorkersCenter.startWorkers(this@MainActivity)
@@ -246,13 +241,4 @@ class MainActivity : AppCompatActivity(){
     }
 
 
-}
-
-
-fun getColorFromResource(context: Context, resourceId: Int): Int {
-    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-        context.resources.getColor(resourceId, null)
-    } else {
-        context.resources.getColor(resourceId)
-    }
 }

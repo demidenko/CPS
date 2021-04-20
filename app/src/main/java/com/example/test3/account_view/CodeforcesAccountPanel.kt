@@ -7,7 +7,7 @@ import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.UserInfo
-import com.example.test3.getColorFromResource
+import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.signedToString
 import com.example.test3.workers.WorkersCenter
 import kotlinx.coroutines.launch

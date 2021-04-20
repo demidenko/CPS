@@ -21,7 +21,7 @@ import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.codeforces.CodeforcesBlogEntriesFragment
 import com.example.test3.ui.CPSFragment
-import com.example.test3.ui.ignoreFirst
+import com.example.test3.utils.ignoreFirst
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.disable
