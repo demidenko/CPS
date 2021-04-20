@@ -1,7 +1,10 @@
 package com.example.test3.news
 
 import android.os.Bundle
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -13,14 +16,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.test3.*
+import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.codeforces.CodeforcesBlogEntriesFragment
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.ignoreFirst
 import com.example.test3.ui.settingsUI
-import com.example.test3.utils.*
+import com.example.test3.utils.CodeforcesUtils
+import com.example.test3.utils.disable
+import com.example.test3.utils.enable
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -69,10 +74,11 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         buttonAdd.setOnClickListener {
             buttonAdd.disable()
             lifecycleScope.launch {
-                val userInfo = mainActivity.chooseUserID(CodeforcesAccountManager(mainActivity)) as? CodeforcesAccountManager.CodeforcesUserInfo ?: return@launch
-                followListAdapter.add(userInfo)
+                mainActivity.chooseUserID(CodeforcesAccountManager(mainActivity))?.let { userInfo ->
+                    followListAdapter.add(userInfo as CodeforcesAccountManager.CodeforcesUserInfo)
+                    followRecyclerView.scrollToPosition(0)
+                }
                 buttonAdd.enable()
-                followRecyclerView.scrollToPosition(0)
             }
         }
 
