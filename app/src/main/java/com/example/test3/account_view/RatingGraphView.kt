@@ -10,9 +10,9 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.R
 import com.example.test3.account_manager.*
-import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.disable
 import com.example.test3.utils.enable
+import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.getCurrentTimeSeconds
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
@@ -229,10 +229,9 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
             val buttonLastMonth = view.findViewById<MaterialButton>(R.id.account_view_rating_graph_button_last_month)
             val buttonLastYear = view.findViewById<MaterialButton>(R.id.account_view_rating_graph_button_last_year)
 
-            val buttons = listOf(buttonAll, buttonLast10, buttonLastMonth, buttonLastYear)
             val activeTextColor = getColorFromResource(manager.context, R.color.textColor)
             val inactiveTextColor = getColorFromResource(manager.context, R.color.textColorAdditional)
-            buttons.forEach { button ->
+            val buttons = listOf(buttonAll, buttonLast10, buttonLastMonth, buttonLastYear).onEach { button ->
                 button.isVisible = false
                 button.setTextColor(inactiveTextColor)
             }
@@ -264,48 +263,26 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                             isVisible = true
                         }
 
-                        var showed = 0
-                        if(ratingGraphView.senseToShowLast10()){
-                            showed++
-                            buttonLast10.apply {
+                        var available = 0
+                        fun setAvailable(button: MaterialButton, onClick: () -> Unit){
+                            available++
+                            button.apply {
                                 isVisible = true
                                 setOnClickListener {
-                                    ratingGraphView.showLast10()
+                                    onClick()
                                     buttonClick(this)
                                 }
                             }
                         }
 
-                        if(ratingGraphView.senseToShowLastMonth()){
-                            showed++
-                            buttonLastMonth.apply {
-                                isVisible = true
-                                setOnClickListener {
-                                    ratingGraphView.showLastMonth()
-                                    buttonClick(this)
-                                }
-                            }
-                        }
+                        if(ratingGraphView.senseToShowLast10()) setAvailable(buttonLast10){ ratingGraphView.showLast10() }
 
-                        if(ratingGraphView.senseToShowLastYear()){
-                            showed++
-                            buttonLastYear.apply {
-                                isVisible = true
-                                setOnClickListener {
-                                    ratingGraphView.showLastYear()
-                                    buttonClick(this)
-                                }
-                            }
-                        }
+                        if(ratingGraphView.senseToShowLastMonth()) setAvailable(buttonLastMonth){ ratingGraphView.showLastMonth() }
 
-                        if(showed>0){
-                            buttonAll.apply {
-                                isVisible = true
-                                setOnClickListener {
-                                    ratingGraphView.showAll()
-                                    buttonClick(this)
-                                }
-                            }
+                        if(ratingGraphView.senseToShowLastYear()) setAvailable(buttonLastYear){ ratingGraphView.showLastYear() }
+
+                        if(available>0){
+                            setAvailable(buttonAll){ ratingGraphView.showAll() }
                         }
 
                         view.isVisible = true
