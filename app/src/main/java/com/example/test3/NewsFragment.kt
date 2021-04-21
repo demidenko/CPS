@@ -149,13 +149,11 @@ class NewsFragment : CPSFragment() {
             LoadingState.combineLoadingStateFlows(titles.map { newsViewModel.getPageLoadingStateFlow(it) })
                 .distinctUntilChanged()
                 .onEach { loadingState ->
-                    if(loadingState == LoadingState.LOADING) reloadButton.disable()
-                    else reloadButton.enable()
+                    reloadButton.enableIff(loadingState != LoadingState.LOADING)
                 }.launchIn(this)
 
             newsViewModel.getUpdateLostInfoProgress().onEach { progress ->
-                if(progress != null) updateLostInfoButton.disable()
-                else updateLostInfoButton.enable()
+                updateLostInfoButton.enableIff(progress == null)
             }.launchIn(this)
 
             mainActivity.settingsDev.getDevEnabledFlow().onEach { use ->

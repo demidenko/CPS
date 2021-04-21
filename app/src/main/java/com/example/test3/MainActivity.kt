@@ -20,8 +20,7 @@ import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.ui.*
 import com.example.test3.utils.getColorFromResource
-import com.example.test3.utils.off
-import com.example.test3.utils.on
+import com.example.test3.utils.onIff
 import com.example.test3.workers.WorkersCenter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
@@ -159,8 +158,8 @@ class MainActivity : AppCompatActivity(){
 
                 addRepeatingJob(Lifecycle.State.STARTED){
                     listOf(
-                        settingsUI.getUseRealColorsFlow().onEach { use -> with(buttonOriginColors) { if(use) on() else off() } },
-                        settingsUI.getUseStatusBarFlow().onEach { use -> with(buttonColoredStatusBar) { if(use) on() else off() } },
+                        settingsUI.getUseRealColorsFlow().onEach { use -> buttonOriginColors.onIff(use) },
+                        settingsUI.getUseStatusBarFlow().onEach { use -> buttonColoredStatusBar.onIff(use) },
                         settingsDev.getDevEnabledFlow().onEach { enabled -> buttonRecreate.isVisible = enabled }
                     ).forEach { it.launchIn(this) }
                 }

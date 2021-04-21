@@ -82,8 +82,7 @@ class AccountsFragment: CPSFragment() {
             BlockedState.combineBlockedStatesFlows(
                 panels.map { accountViewModel.getAccountSmallViewBlockedState(it.manager) }
             ).onEach {
-                if(it == BlockedState.BLOCKED) reloadButton.disable()
-                else reloadButton.enable()
+                reloadButton.enableIff(it != BlockedState.BLOCKED)
             }.launchIn(this)
 
             mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().onEach { showPanels() }.launchIn(this)
@@ -93,8 +92,7 @@ class AccountsFragment: CPSFragment() {
             }.launchIn(this)
 
             accountViewModel.getClistImportProgress().onEach {
-                if(it != null) addAccountButton.disable()
-                else addAccountButton.enable()
+                addAccountButton.enableIff(it == null)
             }.launchIn(this)
         }
 

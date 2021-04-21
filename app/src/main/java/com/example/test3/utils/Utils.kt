@@ -59,6 +59,9 @@ fun ImageButton.on() {
 fun ImageButton.off() {
     animate().alpha(.5f).setDuration(500).start()
 }
+fun ImageButton.onIff(condition: Boolean) {
+    if(condition) on() else off()
+}
 fun ImageButton.enable() {
     if(isEnabled) return
     on()
@@ -68,6 +71,9 @@ fun ImageButton.disable() {
     if(!isEnabled) return
     isEnabled = false
     off()
+}
+fun ImageButton.enableIff(condition: Boolean) {
+    if(condition) enable() else disable()
 }
 
 
