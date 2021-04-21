@@ -20,6 +20,8 @@ import com.example.test3.utils.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class AccountsFragment: CPSFragment() {
 
@@ -74,37 +76,29 @@ class AccountsFragment: CPSFragment() {
         }
 
         reloadButton.setOnClickListener { reloadAccounts() }
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
-            launch {
-                BlockedState.combineBlockedStatesFlows(
-                    panels.map { accountViewModel.getAccountSmallViewBlockedState(it.manager) }
-                ).collect {
-                    if(it == BlockedState.BLOCKED) reloadButton.disable()
-                    else reloadButton.enable()
-                }
-            }
-            launch {
-                mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().collect { use ->
-                    showPanels()
-                }
-            }
-        }
-
         addAccountButton.setOnClickListener { addAccount() }
 
-        mainActivity.subscribeProgressBar("clist import", accountViewModel.getClistImportProgress())
-        mainActivity.addRepeatingJob(Lifecycle.State.STARTED){
-            accountViewModel.getClistImportProgress().collect {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
+            BlockedState.combineBlockedStatesFlows(
+                panels.map { accountViewModel.getAccountSmallViewBlockedState(it.manager) }
+            ).onEach {
+                if(it == BlockedState.BLOCKED) reloadButton.disable()
+                else reloadButton.enable()
+            }.launchIn(this)
+
+            mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().onEach { showPanels() }.launchIn(this)
+
+            statusBarColorManager.getStatusBarColorFlow().onEach { color ->
+                mainActivity.window.statusBarColor = color
+            }.launchIn(this)
+
+            accountViewModel.getClistImportProgress().onEach {
                 if(it != null) addAccountButton.disable()
                 else addAccountButton.enable()
-            }
+            }.launchIn(this)
         }
 
-        mainActivity.addRepeatingJob(Lifecycle.State.STARTED){
-            statusBarColorManager.getStatusBarColorFlow().collect(){ color ->
-                mainActivity.window.statusBarColor = color
-            }
-        }
+        mainActivity.subscribeProgressBar("clist import", accountViewModel.getClistImportProgress())
 
     }
 

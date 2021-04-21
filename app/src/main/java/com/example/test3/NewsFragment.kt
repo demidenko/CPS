@@ -29,10 +29,7 @@ import com.example.test3.workers.CodeforcesNewsLostRecentWorker
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -149,27 +146,21 @@ class NewsFragment : CPSFragment() {
                 }
             }
 
-            launch {
-                LoadingState.combineLoadingStateFlows(titles.map { newsViewModel.getPageLoadingStateFlow(it) })
-                    .distinctUntilChanged()
-                    .collect { loadingState ->
-                        if(loadingState == LoadingState.LOADING) reloadButton.disable()
-                        else reloadButton.enable()
-                    }
-            }
+            LoadingState.combineLoadingStateFlows(titles.map { newsViewModel.getPageLoadingStateFlow(it) })
+                .distinctUntilChanged()
+                .onEach { loadingState ->
+                    if(loadingState == LoadingState.LOADING) reloadButton.disable()
+                    else reloadButton.enable()
+                }.launchIn(this)
 
-            launch {
-                newsViewModel.getUpdateLostInfoProgress().collect { progress ->
-                    if(progress != null) updateLostInfoButton.disable()
-                    else updateLostInfoButton.enable()
-                }
-            }
+            newsViewModel.getUpdateLostInfoProgress().onEach { progress ->
+                if(progress != null) updateLostInfoButton.disable()
+                else updateLostInfoButton.enable()
+            }.launchIn(this)
 
-            launch {
-                mainActivity.settingsDev.getDevEnabledFlow().collect { use ->
-                    suspectsLostButton.isVisible = use
-                }
-            }
+            mainActivity.settingsDev.getDevEnabledFlow().onEach { use ->
+                suspectsLostButton.isVisible = use
+            }.launchIn(this)
         }
 
         selectPage(savedInstanceState)

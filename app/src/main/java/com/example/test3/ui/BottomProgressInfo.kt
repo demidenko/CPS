@@ -12,7 +12,6 @@ import com.example.test3.R
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 class BottomProgressInfo(title: String, context: Context): ConstraintLayout(context) {
 
@@ -39,21 +38,19 @@ fun MainActivity.subscribeProgressBar(
 ){
     var progressBar: BottomProgressInfo? = null
     addRepeatingJob(Lifecycle.State.STARTED){
-        launch {
-            flow.collect { progress ->
-                if(progress == null) {
-                    progressBar?.let {
-                        progressBarHolder.removeView(it)
-                    }
-                    progressBar = null
-                } else {
-                    val bar = progressBar ?: BottomProgressInfo(title, this@subscribeProgressBar).also {
-                        progressBar = it
-                        progressBarHolder.addView(it)
-                    }
-                    val (cur, max) = progress
-                    bar.setState(cur, max)
+        flow.collect { progress ->
+            if(progress == null) {
+                progressBar?.let {
+                    progressBarHolder.removeView(it)
                 }
+                progressBar = null
+            } else {
+                val bar = progressBar ?: BottomProgressInfo(title, this@subscribeProgressBar).also {
+                    progressBar = it
+                    progressBarHolder.addView(it)
+                }
+                val (cur, max) = progress
+                bar.setState(cur, max)
             }
         }
     }

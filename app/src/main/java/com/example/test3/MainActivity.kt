@@ -26,6 +26,7 @@ import com.example.test3.workers.WorkersCenter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlin.coroutines.suspendCoroutine
 
@@ -161,7 +162,7 @@ class MainActivity : AppCompatActivity(){
                         settingsUI.getUseRealColorsFlow().onEach { use -> with(buttonOriginColors) { if(use) on() else off() } },
                         settingsUI.getUseStatusBarFlow().onEach { use -> with(buttonColoredStatusBar) { if(use) on() else off() } },
                         settingsDev.getDevEnabledFlow().onEach { enabled -> buttonRecreate.isVisible = enabled }
-                    ).forEach { launch { it.collect() } }
+                    ).forEach { it.launchIn(this) }
                 }
             }
         }
