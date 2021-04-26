@@ -49,10 +49,3 @@ data class LostBlogEntry(
     val isSuspect: Boolean,
     val timeStamp: Long
 )
-
-class ColorTagConverter {
-    @TypeConverter
-    fun stringToTag(str: String) = CodeforcesUtils.ColorTag.valueOf(str)
-    @TypeConverter
-    fun tagToString(tag: CodeforcesUtils.ColorTag) = tag.name
-}

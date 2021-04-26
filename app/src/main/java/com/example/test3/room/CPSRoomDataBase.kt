@@ -9,7 +9,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(entities = [LostBlogEntry::class, UserBlogs::class], version = 2)
-@TypeConverters(ColorTagConverter::class, IntsListConverter::class)
+@TypeConverters(IntsListConverter::class)
 abstract class RoomSingleton: RoomDatabase(){
     abstract fun lostBlogsDao(): LostBlogsDao
     abstract fun followListDao(): FollowListDao
