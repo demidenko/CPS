@@ -34,6 +34,8 @@ class CodeforcesBlogEntriesAdapter(
     private var items: Array<CodeforcesBlogEntry> = emptyArray()
     override fun getItemCount() = items.size
 
+    fun getBlogIDs() = items.map { it.id }
+
     private val newEntries = MutableSetLiveSize<Int>()
     fun getNewEntriesSizeFlow() = newEntries.sizeFlow
 
@@ -65,11 +67,22 @@ class CodeforcesBlogEntriesAdapter(
         val newEntryIndicator: View = view.findViewById(R.id.news_item_dot_new)
     }
 
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesBlogEntryViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.cf_news_page_item, parent, false) as ConstraintLayout
         return CodeforcesBlogEntryViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: CodeforcesBlogEntryViewHolder, position: Int, payloads: MutableList<Any>) {
+        if(payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+            return
+        }
+        payloads.forEach {
+            if(it is NEW_ENTRY) {
+                val blogId = items[position].id
+                holder.newEntryIndicator.isVisible = newEntries.contains(blogId)
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: CodeforcesBlogEntryViewHolder, position: Int) {
@@ -78,11 +91,11 @@ class CodeforcesBlogEntriesAdapter(
 
             val blogId = info.id
             view.setOnClickListener {
-                it.context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(blogId)))
                 if(newEntries.contains(blogId)){
                     newEntries.remove(blogId)
-                    notifyItemChanged(position)
+                    notifyItemChanged(position, NEW_ENTRY)
                 }
+                it.context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(blogId)))
             }
 
             view.isLongClickable = true
@@ -118,25 +131,27 @@ class CodeforcesBlogEntriesAdapter(
         }
     }
 
-    fun getBlogIDs() = items.map { it.id }
 
+    companion object {
+        private object NEW_ENTRY
 
-    private fun addToFollowListWithSnackBar(holder: CodeforcesBlogEntryViewHolder, mainActivity: MainActivity){
-        mainActivity.newsFragment.lifecycleScope.launch {
-            val connector = CodeforcesNewsFollowWorker.FollowDataConnector(mainActivity)
-            val handle = holder.author.text
-            when(connector.add(handle.toString())){
-                true -> {
-                    Snackbar.make(holder.view, SpannableStringBuilder("You now followed ").append(handle), Snackbar.LENGTH_LONG).apply {
-                        setAction("Manage"){
-                            mainActivity.newsFragment.showCodeforcesFollowListManager()
+        private fun addToFollowListWithSnackBar(holder: CodeforcesBlogEntryViewHolder, mainActivity: MainActivity){
+            mainActivity.newsFragment.lifecycleScope.launch {
+                val connector = CodeforcesNewsFollowWorker.FollowDataConnector(mainActivity)
+                val handle = holder.author.text
+                when(connector.add(handle.toString())){
+                    true -> {
+                        Snackbar.make(holder.view, SpannableStringBuilder("You now followed ").append(handle), Snackbar.LENGTH_LONG).apply {
+                            setAction("Manage"){
+                                mainActivity.newsFragment.showCodeforcesFollowListManager()
+                            }
                         }
                     }
-                }
-                false -> {
-                    Snackbar.make(holder.view, SpannableStringBuilder("You already followed ").append(handle), Snackbar.LENGTH_LONG)
-                }
-            }.setAnchorView(mainActivity.navigation).show()
+                    false -> {
+                        Snackbar.make(holder.view, SpannableStringBuilder("You already followed ").append(handle), Snackbar.LENGTH_LONG)
+                    }
+                }.setAnchorView(mainActivity.navigation).show()
+            }
         }
     }
 }
