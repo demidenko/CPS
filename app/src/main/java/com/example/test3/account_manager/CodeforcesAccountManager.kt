@@ -42,6 +42,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, m
         override fun link(): String = CodeforcesURLFactory.user(handle)
     }
 
+    override val homeURL = "https://codeforces.com"
 
     override fun isValidForSearch(char: Char) = isValidForUserID(char)
     override fun isValidForUserID(char: Char): Boolean {

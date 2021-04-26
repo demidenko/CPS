@@ -46,6 +46,8 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context, mana
         override fun link(): String = AtCoderURLFactory.user(handle)
     }
 
+    override val homeURL = "https://atcoder.jp"
+
     override fun isValidForSearch(char: Char) = isValidForUserID(char)
     override fun isValidForUserID(char: Char): Boolean {
         return when(char){

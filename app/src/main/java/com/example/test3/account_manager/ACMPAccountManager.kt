@@ -35,6 +35,7 @@ class ACMPAccountManager(context: Context): AccountManager(context, manager_name
     }
 
     override val userIDName = "id"
+    override val homeURL = "https://acmp.ru"
 
     override fun isValidForUserID(char: Char): Boolean {
         return char in '0'..'9'

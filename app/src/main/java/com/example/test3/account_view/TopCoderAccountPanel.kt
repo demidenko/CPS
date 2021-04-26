@@ -13,8 +13,6 @@ class TopCoderAccountPanel(
     override val manager: TopCoderAccountManager
 ): AccountPanel(mainActivity, manager)  {
 
-    override val homeURL = "https://www.topcoder.com/community/competitive-programming"
-
     override fun show(info: UserInfo) {
         showMainRated(textMain, textAdditional, manager, info)
     }

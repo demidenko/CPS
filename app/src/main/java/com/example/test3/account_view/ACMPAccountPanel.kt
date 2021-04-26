@@ -16,8 +16,6 @@ class ACMPAccountPanel(
     manager: ACMPAccountManager
 ): AccountPanel(mainActivity, manager)  {
 
-    override val homeURL = "https://acmp.ru"
-
     private val additionalColor = getColorFromResource(mainActivity, R.color.textColorAdditional)
 
     override fun show(info: UserInfo) { info as ACMPAccountManager.ACMPUserInfo

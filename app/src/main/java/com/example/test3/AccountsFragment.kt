@@ -119,7 +119,7 @@ class AccountsFragment: CPSFragment() {
                         }
 
                         findViewById<ImageButton>(R.id.dialog_add_account_item_help).setOnClickListener {
-                            startActivity(makeIntentOpenUrl("https://clist.by"))
+                            startActivity(makeIntentOpenUrl(CListAccountManager(requireContext()).homeURL))
                         }
                     }
 
@@ -138,7 +138,7 @@ class AccountsFragment: CPSFragment() {
                             }
 
                             findViewById<ImageButton>(R.id.dialog_add_account_item_help).setOnClickListener {
-                                startActivity(makeIntentOpenUrl(panel.homeURL))
+                                startActivity(makeIntentOpenUrl(panel.manager.homeURL))
                             }
                         }
                         listView.addView(itemView)

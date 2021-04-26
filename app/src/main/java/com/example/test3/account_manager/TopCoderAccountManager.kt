@@ -42,6 +42,8 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context, man
         override fun link(): String = "https://www.topcoder.com/members/$handle"
     }
 
+    override val homeURL = "https://www.topcoder.com/community/competitive-programming"
+
     override fun isValidForSearch(char: Char) = isValidForUserID(char)
     override fun isValidForUserID(char: Char): Boolean {
         return when(char){

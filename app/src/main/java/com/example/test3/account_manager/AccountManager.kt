@@ -8,7 +8,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.example.test3.*
+import com.example.test3.NotificationChannelLazy
+import com.example.test3.R
+import com.example.test3.makePendingIntentOpenURL
+import com.example.test3.notificationBuilder
 import com.example.test3.ui.getUseRealColors
 import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +25,7 @@ import java.util.concurrent.TimeUnit
 abstract class AccountManager(val context: Context, val managerName: String) {
 
     abstract val userIDName: String
+    abstract val homeURL: String
 
     protected abstract fun getDataStore(): AccountDataStore
     fun getInfoFlow() = getDataStore().getDataFlow().map { str -> this to strToInfo(str) }.distinctUntilChangedBy { it.second }

@@ -17,8 +17,6 @@ class CodeforcesAccountPanel(
     override val manager: CodeforcesAccountManager
 ): AccountPanel(mainActivity, manager) {
 
-    override val homeURL = "https://codeforces.com"
-
     override fun show(info: UserInfo) {
         showMainRated(textMain, textAdditional, manager, info)
     }

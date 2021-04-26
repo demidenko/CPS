@@ -26,6 +26,7 @@ class CListAccountManager(context: Context) : AccountManager(context, preference
     }
 
     override val userIDName = "login"
+    override val homeURL = "https://clist.by"
 
     override fun decodeFromString(str: String) = emptyInfo()
 

@@ -14,9 +14,9 @@ import androidx.lifecycle.addRepeatingJob
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.*
-import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.BlockedState
 import com.example.test3.utils.LoadingState
+import com.example.test3.utils.getColorFromResource
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -37,10 +37,8 @@ abstract class AccountPanel(
     }
 
     private val reloadButton = layout.findViewById<ImageButton>(R.id.account_panel_reload_button).apply {
-        setOnClickListener { mainActivity.accountsFragment.accountViewModel.reload(manager) }
+        setOnClickListener { reload() }
     }
-
-    abstract val homeURL: String
 
     companion object {
         private val startDelayMillis = TimeUnit.SECONDS.toMillis(3)
@@ -140,7 +138,7 @@ abstract class AccountPanel(
         }
     }
 
-    fun reload() = reloadButton.callOnClick()
+    fun reload() = mainActivity.accountsFragment.accountViewModel.reload(manager)
 
     fun callExpand(){
         mainActivity.cpsFragmentManager.pushBack(

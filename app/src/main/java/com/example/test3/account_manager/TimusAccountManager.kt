@@ -37,6 +37,7 @@ class TimusAccountManager(context: Context): AccountManager(context, manager_nam
     }
 
     override val userIDName = "id"
+    override val homeURL = "https://timus.online"
 
     override fun isValidForUserID(char: Char): Boolean {
         return char in '0'..'9'
