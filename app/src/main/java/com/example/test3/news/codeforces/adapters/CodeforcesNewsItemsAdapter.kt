@@ -14,21 +14,18 @@ abstract class CodeforcesNewsItemsAdapter<H: RecyclerView.ViewHolder, T>(
 
     protected val codeforcesAccountManager = CodeforcesAccountManager(fragment.requireContext())
 
-    fun refreshHandles() {
-        notifyItemRangeChanged(0, itemCount, UPDATE_COLOR)
-    }
 
     protected abstract fun refreshHandles(holder: H, position: Int)
 
+    fun refreshHandles() {
+        getActiveViewHolders().forEach { holder ->
+            refreshHandles(holder, holder.bindingAdapterPosition)
+        }
+    }
+
     @CallSuper
     override fun onBindViewHolder(holder: H, position: Int, payloads: MutableList<Any>) {
-        payloads.forEach {
-            if(it is UPDATE_COLOR) refreshHandles(holder, position)
-        }
         if(payloads.isEmpty()) super.onBindViewHolder(holder, position, payloads)
     }
 
-    companion object {
-        private object UPDATE_COLOR
-    }
 }

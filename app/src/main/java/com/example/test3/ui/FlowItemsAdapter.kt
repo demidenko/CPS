@@ -1,5 +1,6 @@
 package com.example.test3.ui
 
+import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
@@ -38,6 +39,19 @@ abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
     override fun unregisterAdapterDataObserver(observer: RecyclerView.AdapterDataObserver) {
         super.unregisterAdapterDataObserver(observer)
         if(!hasObservers()) lifecycleMerge.setAdapterEvent(Lifecycle.Event.ON_STOP)
+    }
+
+    private val holders = mutableListOf<H>()
+    protected fun getActiveViewHolders(): List<H> = holders.toList()
+
+    @CallSuper
+    override fun onViewAttachedToWindow(holder: H) {
+        holders.add(holder)
+    }
+
+    @CallSuper
+    override fun onViewDetachedFromWindow(holder: H) {
+        holders.remove(holder)
     }
 }
 
