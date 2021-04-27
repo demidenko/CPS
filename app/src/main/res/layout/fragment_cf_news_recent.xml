@@ -45,6 +45,7 @@
                 android:layout_height="match_parent"
                 android:visibility="gone"
                 android:scrollbars="vertical"
+                android:fadeScrollbars="false"
                 />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -53,6 +54,7 @@
                 android:layout_height="match_parent"
                 android:visibility="gone"
                 android:scrollbars="vertical"
+                android:fadeScrollbars="false"
                 />
 
         </LinearLayout>
