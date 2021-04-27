@@ -14,7 +14,6 @@ import com.example.test3.NewsFragment
 import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.news.codeforces.adapters.CodeforcesCommentsAdapter
-import com.example.test3.news.codeforces.adapters.CodeforcesNewsItemsAdapter
 import com.example.test3.utils.off
 import com.example.test3.utils.on
 import kotlinx.coroutines.launch
@@ -96,9 +95,8 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
 
         subscribeLoadingState(newsFragment.newsViewModel.getPageLoadingStateFlow(title), swipeRefreshLayout)
         subscribeRefreshOnRealColor {
-            listOf(recyclerViewBlogEntries, recyclerViewComments).forEach { rv ->
-                rv.adapter?.let { (it as CodeforcesNewsItemsAdapter<*,*>).refreshHandles() }
-            }
+            recyclerViewBlogEntries.codeforcesItemsAdapter?.refreshHandles()
+            recyclerViewComments.codeforcesItemsAdapter?.refreshHandles()
         }
 
         if(savedInstanceState == null) callReload()

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.*
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
+import com.example.test3.news.codeforces.adapters.CodeforcesNewsItemsAdapter
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.LoadingState
 import com.example.test3.utils.ignoreFirst
@@ -96,4 +97,6 @@ abstract class CodeforcesNewsFragment: Fragment() {
             }
         }
     }
+
+    val RecyclerView.codeforcesItemsAdapter: CodeforcesNewsItemsAdapter<*,*>? get() = adapter as? CodeforcesNewsItemsAdapter<*, *>
 }
