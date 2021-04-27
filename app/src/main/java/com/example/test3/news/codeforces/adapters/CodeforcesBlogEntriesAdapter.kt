@@ -27,7 +27,7 @@ class CodeforcesBlogEntriesAdapter(
     dataFlow: Flow<List<CodeforcesBlogEntry>>,
     private val viewedBlogEntriesIdsFlow: Flow<Set<Int>>?,
     val clearNewEntriesOnDataChange: Boolean = true
-): CodeforcesNewsItemsAdapter<CodeforcesBlogEntriesAdapter.CodeforcesBlogEntryViewHolder, List<CodeforcesBlogEntry>>(
+): CodeforcesNewsItemsTimedAdapter<CodeforcesBlogEntriesAdapter.CodeforcesBlogEntryViewHolder, List<CodeforcesBlogEntry>>(
     fragment, dataFlow
 ) {
 
@@ -57,14 +57,19 @@ class CodeforcesBlogEntriesAdapter(
 
 
 
-    class CodeforcesBlogEntryViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
+    class CodeforcesBlogEntryViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view), TimeDepends {
         val title: TextView = view.findViewById(R.id.news_item_title)
         val author: TextView = view.findViewById(R.id.news_item_author)
-        val time: TextView = view.findViewById(R.id.news_item_time)
+        private val time: TextView = view.findViewById(R.id.news_item_time)
         val rating: TextView = view.findViewById(R.id.news_item_rating)
         val commentsCount: TextView = view.findViewById(R.id.news_item_comments_count)
         val comments: Group = view.findViewById(R.id.news_item_comments)
         val newEntryIndicator: View = view.findViewById(R.id.news_item_dot_new)
+
+        override var startTimeSeconds: Long = 0
+        override fun refreshTime(currentTimeSeconds: Long) {
+            time.text = timeDifference(startTimeSeconds, currentTimeSeconds)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesBlogEntryViewHolder {
@@ -107,7 +112,8 @@ class CodeforcesBlogEntriesAdapter(
 
             author.text = codeforcesAccountManager.makeSpan(info.authorHandle, info.authorColorTag)
 
-            time.text = timeDifference(info.creationTimeSeconds, getCurrentTimeSeconds())
+            startTimeSeconds = info.creationTimeSeconds
+            refreshTime(getCurrentTimeSeconds())
 
             newEntryIndicator.isVisible = newEntries.contains(blogId)
 

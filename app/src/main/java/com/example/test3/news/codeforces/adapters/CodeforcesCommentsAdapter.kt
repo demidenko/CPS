@@ -19,7 +19,7 @@ class CodeforcesCommentsAdapter(
     fragment: Fragment,
     dataFlow: Flow<List<CodeforcesRecentAction>>,
     private val showTitle: Boolean = true
-): CodeforcesNewsItemsAdapter<CodeforcesCommentsAdapter.CodeforcesCommentViewHolder,List<CodeforcesRecentAction>>(
+): CodeforcesNewsItemsTimedAdapter<CodeforcesCommentsAdapter.CodeforcesCommentViewHolder,List<CodeforcesRecentAction>>(
     fragment, dataFlow
 ) {
 
@@ -30,13 +30,18 @@ class CodeforcesCommentsAdapter(
         items = data.toTypedArray()
     }
 
-    class CodeforcesCommentViewHolder(val view: ConstraintLayout): RecyclerView.ViewHolder(view) {
+    class CodeforcesCommentViewHolder(val view: ConstraintLayout): RecyclerView.ViewHolder(view), TimeDepends {
         val title: TextView = view.findViewById(R.id.news_item_title)
         val author: TextView = view.findViewById(R.id.news_item_author)
-        val time: TextView = view.findViewById(R.id.news_item_time)
+        private val time: TextView = view.findViewById(R.id.news_item_time)
         val rating: TextView = view.findViewById(R.id.news_item_rating)
         val commentContent: TextView = view.findViewById(R.id.news_item_comment_content)
         val titleWithArrow: Group = view.findViewById(R.id.news_item_title_with_arrow)
+
+        override var startTimeSeconds: Long = 0
+        override fun refreshTime(currentTimeSeconds: Long) {
+            time.text = timeDifference(startTimeSeconds, currentTimeSeconds)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodeforcesCommentViewHolder {
@@ -69,7 +74,8 @@ class CodeforcesCommentsAdapter(
 
             commentContent.text = CodeforcesUtils.fromCodeforcesHTML(comment.text)
 
-            time.text = timeDifference(comment.creationTimeSeconds, getCurrentTimeSeconds())
+            startTimeSeconds = comment.creationTimeSeconds
+            refreshTime(getCurrentTimeSeconds())
 
             view.setOnClickListener {
                 it.context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(blogEntry.id,comment.id)))
