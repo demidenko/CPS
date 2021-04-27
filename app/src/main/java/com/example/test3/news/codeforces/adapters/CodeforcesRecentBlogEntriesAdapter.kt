@@ -83,6 +83,14 @@ class CodeforcesRecentBlogEntriesAdapter(
 
     }
 
+    override fun refreshHandles(holder: CodeforcesRecentBlogEntryViewHolder, position: Int) {
+        val blogEntry = items[position]
+        with(holder){
+            author.text = codeforcesAccountManager.makeSpan(blogEntry.authorHandle, blogEntry.authorColorTag)
+            val commentators = calculateCommentatorsSpans(blogEntry.id)
+            comments.text = commentators.joinTo(SpannableStringBuilder())
+        }
+    }
 
     private fun makeItemClickListener(blogEntry: CodeforcesBlogEntry): View.OnClickListener {
         //remember to prevent update data while menu is open

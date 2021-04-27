@@ -36,7 +36,7 @@ class CodeforcesNewsMainFragment(): CodeforcesNewsFragment() {
 
         subscribeLoadingState(newsFragment.newsViewModel.getPageLoadingStateFlow(title), swipeRefreshLayout)
         subscribeNewEntries(itemsAdapter)
-        subscribeRefreshOnRealColor { itemsAdapter.refresh() }
+        subscribeRefreshOnRealColor { itemsAdapter.refreshHandles() }
 
         if(savedInstanceState == null) callReload()
     }

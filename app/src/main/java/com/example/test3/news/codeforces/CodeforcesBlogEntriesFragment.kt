@@ -13,11 +13,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.ui.CPSFragment
-import com.example.test3.utils.ignoreFirst
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.asyncPair
 import com.example.test3.utils.fromHTML
+import com.example.test3.utils.ignoreFirst
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -64,7 +64,7 @@ class CodeforcesBlogEntriesFragment: CPSFragment() {
         }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
-            mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().collect { blogEntriesAdapter.refresh() }
+            mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().collect { blogEntriesAdapter.refreshHandles() }
         }
     }
 

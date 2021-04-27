@@ -79,6 +79,11 @@ class CodeforcesCommentsAdapter(
         }
     }
 
+    override fun refreshHandles(holder: CodeforcesCommentViewHolder, position: Int) {
+        val recentAction = items[position]
+        val comment = recentAction.comment!!
+        holder.author.text = codeforcesAccountManager.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
+    }
 
 
 }

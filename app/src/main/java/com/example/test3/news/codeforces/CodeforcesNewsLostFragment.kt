@@ -64,7 +64,7 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
         }
 
         subscribeNewEntries(itemsAdapter)
-        subscribeRefreshOnRealColor { itemsAdapter.refresh() }
+        subscribeRefreshOnRealColor { itemsAdapter.refreshHandles() }
 
     }
 

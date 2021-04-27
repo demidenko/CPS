@@ -97,7 +97,7 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
         subscribeLoadingState(newsFragment.newsViewModel.getPageLoadingStateFlow(title), swipeRefreshLayout)
         subscribeRefreshOnRealColor {
             listOf(recyclerViewBlogEntries, recyclerViewComments).forEach { rv ->
-                rv.adapter?.let { (it as CodeforcesNewsItemsAdapter<*,*>).refresh() }
+                rv.adapter?.let { (it as CodeforcesNewsItemsAdapter<*,*>).refreshHandles() }
             }
         }
 

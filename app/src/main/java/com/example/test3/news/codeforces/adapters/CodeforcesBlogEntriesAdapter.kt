@@ -73,16 +73,13 @@ class CodeforcesBlogEntriesAdapter(
     }
 
     override fun onBindViewHolder(holder: CodeforcesBlogEntryViewHolder, position: Int, payloads: MutableList<Any>) {
-        if(payloads.isEmpty()) {
-            onBindViewHolder(holder, position)
-            return
-        }
         payloads.forEach {
             if(it is NEW_ENTRY) {
                 val blogId = items[position].id
                 holder.newEntryIndicator.isVisible = newEntries.contains(blogId)
             }
         }
+        super.onBindViewHolder(holder, position, payloads)
     }
 
     override fun onBindViewHolder(holder: CodeforcesBlogEntryViewHolder, position: Int) {
@@ -129,6 +126,11 @@ class CodeforcesBlogEntriesAdapter(
                 }
             }
         }
+    }
+
+    override fun refreshHandles(holder: CodeforcesBlogEntryViewHolder, position: Int) {
+        val info = items[position]
+        holder.author.text = codeforcesAccountManager.makeSpan(info.authorHandle, info.authorColorTag)
     }
 
 

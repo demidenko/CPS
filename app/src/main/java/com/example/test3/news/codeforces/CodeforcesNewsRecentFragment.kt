@@ -157,11 +157,11 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
 
         subscribeLoadingState(newsFragment.newsViewModel.getPageLoadingStateFlow(title), swipeRefreshLayout)
         subscribeRefreshOnRealColor {
-            blogEntriesAdapter.refresh()
-            commentsAdapter.refresh()
+            blogEntriesAdapter.refreshHandles()
+            commentsAdapter.refreshHandles()
             recyclerViewCommentsFiltered.adapter?.let {
                 drawBlogEntryHeader()
-                (it as CodeforcesCommentsAdapter).refresh()
+                (it as CodeforcesCommentsAdapter).refreshHandles()
             }
         }
 

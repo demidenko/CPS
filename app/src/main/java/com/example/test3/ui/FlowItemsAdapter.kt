@@ -28,12 +28,6 @@ abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
 
     abstract suspend fun applyData(data: T)
 
-    fun refresh(){
-        beforeRefresh()
-        notifyDataSetChanged()
-    }
-    protected open fun beforeRefresh() { }
-
 
     override fun registerAdapterDataObserver(observer: RecyclerView.AdapterDataObserver) {
         val before = hasObservers()
