@@ -53,7 +53,6 @@ class CodeforcesRecentBlogEntriesAdapter(
         val (blogEntries, comments) = data
         commentsByBlogEntry = comments.groupBy({ it.blogEntry!!.id }){ it.comment!! }
         items = blogEntries.toTypedArray()
-        notifyDataSetChanged()
     }
 
     class CodeforcesRecentBlogEntryViewHolder(val view: ConstraintLayout):  RecyclerView.ViewHolder(view){

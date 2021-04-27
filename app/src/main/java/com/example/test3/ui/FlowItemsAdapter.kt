@@ -10,7 +10,7 @@ abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
     fragment: Fragment,
     dataFlow: Flow<T>
 ): RecyclerView.Adapter<H>(), LifecycleOwner {
-    private val lifecycleMerge = AdapterLifecycleMerge(this, fragment)
+    private val lifecycleMerge by lazy { AdapterLifecycleMerge(this, fragment) }
     override fun getLifecycle() = lifecycleMerge.lifecycleRegistry
 
     private var previousValue: T? = null
