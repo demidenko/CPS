@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
+import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.google.android.material.snackbar.Snackbar
@@ -69,6 +70,10 @@ class CodeforcesBlogEntriesAdapter(
         private val commentsCount: TextView = view.findViewById(R.id.news_item_comments_count)
         private val comments: Group = view.findViewById(R.id.news_item_comments)
         private val newEntryIndicator: View = view.findViewById(R.id.news_item_dot_new)
+
+        fun setAuthor(handle: String, colorTag: CodeforcesUtils.ColorTag, manager: CodeforcesAccountManager) {
+            author.text = manager.makeSpan(handle, colorTag)
+        }
 
         fun setNewEntryIndicator(isNew: Boolean) {
             newEntryIndicator.isVisible = isNew
@@ -143,20 +148,19 @@ class CodeforcesBlogEntriesAdapter(
 
             title.text = blogEntry.title
 
-            author.text = codeforcesAccountManager.makeSpan(blogEntry.authorHandle, blogEntry.authorColorTag)
-
-            startTimeSeconds = blogEntry.creationTimeSeconds
-            refreshTime(getCurrentTimeSeconds())
-
+            setAuthor(blogEntry.authorHandle, blogEntry.authorColorTag, codeforcesAccountManager)
             setNewEntryIndicator(newEntries.contains(blogId))
             setComments(blogEntry.commentsCount)
             setRating(blogEntry.rating)
+
+            startTimeSeconds = blogEntry.creationTimeSeconds
+            refreshTime(getCurrentTimeSeconds())
         }
     }
 
     override fun refreshHandles(holder: CodeforcesBlogEntryViewHolder, position: Int) {
-        val info = items[position]
-        holder.author.text = codeforcesAccountManager.makeSpan(info.authorHandle, info.authorColorTag)
+        val blogEntry = items[position]
+        holder.setAuthor(blogEntry.authorHandle, blogEntry.authorColorTag, codeforcesAccountManager)
     }
 
     companion object {
