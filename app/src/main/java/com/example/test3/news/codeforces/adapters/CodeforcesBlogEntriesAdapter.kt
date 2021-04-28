@@ -40,10 +40,12 @@ class CodeforcesBlogEntriesAdapter(
     private val newEntries = MutableSetLiveSize<Int>()
     fun getNewEntriesSizeFlow() = newEntries.sizeFlow
 
-    override suspend fun applyData(data: List<CodeforcesBlogEntry>): DiffUtil.DiffResult? {
+    override suspend fun applyData(data: List<CodeforcesBlogEntry>): DiffUtil.DiffResult {
+        val oldItems = items
+        val oldNewEntries = newEntries.values()
         items = data.toTypedArray()
         manageNewEntries()
-        return null
+        return DiffUtil.calculateDiff(diffCallback(oldItems, items, oldNewEntries, newEntries.values()))
     }
 
     private suspend fun manageNewEntries() {
@@ -63,10 +65,33 @@ class CodeforcesBlogEntriesAdapter(
         val title: TextView = view.findViewById(R.id.news_item_title)
         val author: TextView = view.findViewById(R.id.news_item_author)
         private val time: TextView = view.findViewById(R.id.news_item_time)
-        val rating: TextView = view.findViewById(R.id.news_item_rating)
-        val commentsCount: TextView = view.findViewById(R.id.news_item_comments_count)
-        val comments: Group = view.findViewById(R.id.news_item_comments)
-        val newEntryIndicator: View = view.findViewById(R.id.news_item_dot_new)
+        private val rating: TextView = view.findViewById(R.id.news_item_rating)
+        private val commentsCount: TextView = view.findViewById(R.id.news_item_comments_count)
+        private val comments: Group = view.findViewById(R.id.news_item_comments)
+        private val newEntryIndicator: View = view.findViewById(R.id.news_item_dot_new)
+
+        fun setNewEntryIndicator(isNew: Boolean) {
+            newEntryIndicator.isVisible = isNew
+        }
+
+        fun setRating(rating: Int) {
+            this.rating.apply {
+                if(rating == 0) isGone = true
+                else {
+                    isVisible = true
+                    text = signedToString(rating)
+                    setTextColor(getColorFromResource(context,
+                        if (rating > 0) R.color.blog_rating_positive
+                        else R.color.blog_rating_negative
+                    ))
+                }
+            }
+        }
+
+        fun setComments(commentsCount: Int) {
+            this.commentsCount.text = commentsCount.toString()
+            comments.isGone = commentsCount == 0
+        }
 
         override var startTimeSeconds: Long = 0
         override fun refreshTime(currentTimeSeconds: Long) {
@@ -81,9 +106,15 @@ class CodeforcesBlogEntriesAdapter(
 
     override fun onBindViewHolder(holder: CodeforcesBlogEntryViewHolder, position: Int, payloads: MutableList<Any>) {
         payloads.forEach {
-            if(it is NEW_ENTRY) {
-                val blogId = items[position].id
-                holder.newEntryIndicator.isVisible = newEntries.contains(blogId)
+            if(it is List<*>) {
+                val blogEntry = items[position]
+                it.forEach { obj ->
+                    when(obj) {
+                        is NEW_ENTRY -> holder.setNewEntryIndicator(newEntries.contains(blogEntry.id))
+                        is UPDATE_RATING -> holder.setRating(blogEntry.rating)
+                        is UPDATE_COMMENTS -> holder.setComments(blogEntry.commentsCount)
+                    }
+                }
             }
         }
         super.onBindViewHolder(holder, position, payloads)
@@ -91,13 +122,13 @@ class CodeforcesBlogEntriesAdapter(
 
     override fun onBindViewHolder(holder: CodeforcesBlogEntryViewHolder, position: Int) {
         with(holder){
-            val info = items[position]
+            val blogEntry = items[position]
 
-            val blogId = info.id
+            val blogId = blogEntry.id
             view.setOnClickListener {
                 if(newEntries.contains(blogId)){
                     newEntries.remove(blogId)
-                    notifyItemChanged(position, NEW_ENTRY)
+                    notifyItemChanged(position, listOf(NEW_ENTRY))
                 }
                 it.context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(blogId)))
             }
@@ -110,29 +141,16 @@ class CodeforcesBlogEntriesAdapter(
                 }
             }
 
-            title.text = info.title
+            title.text = blogEntry.title
 
-            author.text = codeforcesAccountManager.makeSpan(info.authorHandle, info.authorColorTag)
+            author.text = codeforcesAccountManager.makeSpan(blogEntry.authorHandle, blogEntry.authorColorTag)
 
-            startTimeSeconds = info.creationTimeSeconds
+            startTimeSeconds = blogEntry.creationTimeSeconds
             refreshTime(getCurrentTimeSeconds())
 
-            newEntryIndicator.isVisible = newEntries.contains(blogId)
-
-            commentsCount.text = info.commentsCount.toString()
-            comments.isGone = info.commentsCount == 0
-
-            rating.apply{
-                if(info.rating==0) isVisible = false
-                else {
-                    isVisible = true
-                    text = signedToString(info.rating)
-                    setTextColor(getColorFromResource(context,
-                        if(info.rating>0) R.color.blog_rating_positive
-                        else R.color.blog_rating_negative
-                    ))
-                }
-            }
+            setNewEntryIndicator(newEntries.contains(blogId))
+            setComments(blogEntry.commentsCount)
+            setRating(blogEntry.rating)
         }
     }
 
@@ -141,9 +159,41 @@ class CodeforcesBlogEntriesAdapter(
         holder.author.text = codeforcesAccountManager.makeSpan(info.authorHandle, info.authorColorTag)
     }
 
-
     companion object {
         private object NEW_ENTRY
+        private object UPDATE_RATING
+        private object UPDATE_COMMENTS
+
+        private fun diffCallback(
+            old: Array<CodeforcesBlogEntry>,
+            new: Array<CodeforcesBlogEntry>,
+            oldNewEntries: Set<Int>,
+            newNewEntries: Set<Int>,
+        ) =
+            object : DiffUtil.Callback() {
+                override fun getOldListSize() = old.size
+                override fun getNewListSize() = new.size
+
+                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    return old[oldItemPosition].id == new[newItemPosition].id
+                }
+
+                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    return old[oldItemPosition] == new[newItemPosition]
+                }
+
+                override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+                    val oldBlogEntry = old[oldItemPosition]
+                    val newBlogEntry = new[newItemPosition]
+                    val id = newBlogEntry.id
+                    val res = mutableListOf<Any>()
+                    if(oldBlogEntry.rating != newBlogEntry.rating) res.add(UPDATE_RATING)
+                    if(oldBlogEntry.commentsCount != newBlogEntry.commentsCount) res.add(UPDATE_COMMENTS)
+                    if(oldNewEntries.contains(id) != newNewEntries.contains(id)) res.add(NEW_ENTRY)
+                    return res.takeIf { it.isNotEmpty() }
+                }
+
+            }
 
         private fun addToFollowListWithSnackBar(holder: CodeforcesBlogEntryViewHolder, mainActivity: MainActivity){
             mainActivity.newsFragment.lifecycleScope.launch {

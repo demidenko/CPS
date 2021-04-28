@@ -42,7 +42,7 @@ class CodeforcesCommentsAdapter(
         val commentContent: TextView = view.findViewById(R.id.news_item_comment_content)
         val titleWithArrow: Group = view.findViewById(R.id.news_item_title_with_arrow)
 
-        fun applyRating(rating: Int) {
+        fun setRating(rating: Int) {
             this.rating.apply {
                 if(rating == 0) isGone = true
                 else {
@@ -78,7 +78,7 @@ class CodeforcesCommentsAdapter(
 
             author.text = codeforcesAccountManager.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
 
-            applyRating(comment.rating)
+            setRating(comment.rating)
 
             commentContent.text = CodeforcesUtils.fromCodeforcesHTML(comment.text)
 
@@ -102,7 +102,7 @@ class CodeforcesCommentsAdapter(
             if(it is UPDATE_RATING) {
                 val recentAction = items[position]
                 val comment = recentAction.comment!!
-                holder.applyRating(comment.rating)
+                holder.setRating(comment.rating)
             }
         }
         super.onBindViewHolder(holder, position, payloads)
