@@ -8,6 +8,7 @@ import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.makeIntentOpenUrl
@@ -26,17 +27,34 @@ class CodeforcesCommentsAdapter(
     private var items: Array<CodeforcesRecentAction> = emptyArray()
     override fun getItemCount() = items.size
 
-    override suspend fun applyData(data: List<CodeforcesRecentAction>) {
-        items = data.toTypedArray()
+    override suspend fun applyData(data: List<CodeforcesRecentAction>): DiffUtil.DiffResult {
+        val newItems = data.toTypedArray()
+        return DiffUtil.calculateDiff(diffCallback(items, newItems)).also {
+            items = newItems
+        }
     }
 
     class CodeforcesCommentViewHolder(val view: ConstraintLayout): RecyclerView.ViewHolder(view), TimeDepends {
         val title: TextView = view.findViewById(R.id.news_item_title)
         val author: TextView = view.findViewById(R.id.news_item_author)
         private val time: TextView = view.findViewById(R.id.news_item_time)
-        val rating: TextView = view.findViewById(R.id.news_item_rating)
+        private val rating: TextView = view.findViewById(R.id.news_item_rating)
         val commentContent: TextView = view.findViewById(R.id.news_item_comment_content)
         val titleWithArrow: Group = view.findViewById(R.id.news_item_title_with_arrow)
+
+        fun applyRating(rating: Int) {
+            this.rating.apply {
+                if(rating == 0) isGone = true
+                else {
+                    isVisible = true
+                    text = signedToString(rating)
+                    setTextColor(getColorFromResource(context,
+                        if (rating > 0) R.color.blog_rating_positive
+                        else R.color.blog_rating_negative
+                    ))
+                }
+            }
+        }
 
         override var startTimeSeconds: Long = 0
         override fun refreshTime(currentTimeSeconds: Long) {
@@ -60,17 +78,7 @@ class CodeforcesCommentsAdapter(
 
             author.text = codeforcesAccountManager.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
 
-            rating.apply{
-                if(comment.rating == 0) isGone = true
-                else {
-                    isVisible = true
-                    text = signedToString(comment.rating)
-                    setTextColor(getColorFromResource(context,
-                        if (comment.rating > 0) R.color.blog_rating_positive
-                        else R.color.blog_rating_negative
-                    ))
-                }
-            }
+            applyRating(comment.rating)
 
             commentContent.text = CodeforcesUtils.fromCodeforcesHTML(comment.text)
 
@@ -85,11 +93,49 @@ class CodeforcesCommentsAdapter(
         }
     }
 
+    override fun onBindViewHolder(
+        holder: CodeforcesCommentViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        payloads.forEach {
+            if(it is UPDATE_RATING) {
+                val recentAction = items[position]
+                val comment = recentAction.comment!!
+                holder.applyRating(comment.rating)
+            }
+        }
+        super.onBindViewHolder(holder, position, payloads)
+    }
+
     override fun refreshHandles(holder: CodeforcesCommentViewHolder, position: Int) {
         val recentAction = items[position]
         val comment = recentAction.comment!!
         holder.author.text = codeforcesAccountManager.makeSpan(comment.commentatorHandle, comment.commentatorHandleColorTag)
     }
 
+    companion object {
+        private object UPDATE_RATING
 
+        private fun diffCallback(old: Array<CodeforcesRecentAction>, new: Array<CodeforcesRecentAction>) =
+            object : DiffUtil.Callback() {
+                override fun getOldListSize() = old.size
+                override fun getNewListSize() = new.size
+
+                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    return old[oldItemPosition].comment!!.id == new[newItemPosition].comment!!.id
+                }
+
+                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    return old[oldItemPosition] == new[newItemPosition]
+                }
+
+                override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+                    val oldComment = old[oldItemPosition].comment!!
+                    val newComment = new[newItemPosition].comment!!
+                    if(oldComment.rating != newComment.rating) return UPDATE_RATING
+                    return null
+                }
+            }
+    }
 }

@@ -3,6 +3,7 @@ package com.example.test3.ui
 import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -22,12 +23,13 @@ abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
                 if (it == previousValue) return@collect
                 previousValue = it
                 applyData(it)
-                notifyDataSetChanged()
+                    ?.dispatchUpdatesTo(this@FlowItemsAdapter)
+                    ?: notifyDataSetChanged()
             }
         }
     }
 
-    abstract suspend fun applyData(data: T)
+    abstract suspend fun applyData(data: T): DiffUtil.DiffResult?
 
 
     override fun registerAdapterDataObserver(observer: RecyclerView.AdapterDataObserver) {

@@ -12,10 +12,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.isActive
 
-abstract class CodeforcesNewsItemsAdapter<H: RecyclerView.ViewHolder, T>(
+abstract class CodeforcesNewsItemsAdapter<H : RecyclerView.ViewHolder, T>(
     fragment: Fragment,
     dataFlow: Flow<T>
-): FlowItemsAdapter<H,T>(fragment, dataFlow) {
+): FlowItemsAdapter<H, T>(fragment, dataFlow) {
 
     protected val codeforcesAccountManager = CodeforcesAccountManager(fragment.requireContext())
 
@@ -23,7 +23,8 @@ abstract class CodeforcesNewsItemsAdapter<H: RecyclerView.ViewHolder, T>(
 
     fun refreshHandles() {
         getActiveViewHolders().forEach { holder ->
-            refreshHandles(holder, holder.bindingAdapterPosition)
+            val position = holder.bindingAdapterPosition
+            if(position != RecyclerView.NO_POSITION) refreshHandles(holder, position)
         }
     }
 

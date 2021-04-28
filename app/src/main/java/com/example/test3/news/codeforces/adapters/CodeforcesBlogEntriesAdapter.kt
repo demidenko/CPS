@@ -11,6 +11,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
 import com.example.test3.utils.*
@@ -39,9 +40,10 @@ class CodeforcesBlogEntriesAdapter(
     private val newEntries = MutableSetLiveSize<Int>()
     fun getNewEntriesSizeFlow() = newEntries.sizeFlow
 
-    override suspend fun applyData(data: List<CodeforcesBlogEntry>) {
+    override suspend fun applyData(data: List<CodeforcesBlogEntry>): DiffUtil.DiffResult? {
         items = data.toTypedArray()
         manageNewEntries()
+        return null
     }
 
     private suspend fun manageNewEntries() {

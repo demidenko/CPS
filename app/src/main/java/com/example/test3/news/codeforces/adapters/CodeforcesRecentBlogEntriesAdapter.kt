@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.makeIntentOpenUrl
@@ -49,10 +50,11 @@ class CodeforcesRecentBlogEntriesAdapter(
             } ?: emptyList()
     }
 
-    override suspend fun applyData(data: Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>) {
+    override suspend fun applyData(data: Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>): DiffUtil.DiffResult? {
         val (blogEntries, comments) = data
         commentsByBlogEntry = comments.groupBy({ it.blogEntry!!.id }){ it.comment!! }
         items = blogEntries.toTypedArray()
+        return null
     }
 
     class CodeforcesRecentBlogEntryViewHolder(val view: ConstraintLayout):  RecyclerView.ViewHolder(view){
