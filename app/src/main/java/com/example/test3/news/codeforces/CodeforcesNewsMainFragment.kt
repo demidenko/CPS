@@ -12,15 +12,17 @@ import com.google.android.material.tabs.TabLayout
 class CodeforcesNewsMainFragment(): CodeforcesNewsFragment() {
 
     override val title = CodeforcesTitle.MAIN
-    private val itemsAdapter by lazy {
-        CodeforcesBlogEntriesAdapter(
+
+    private lateinit var itemsAdapter: CodeforcesBlogEntriesAdapter
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        itemsAdapter = CodeforcesBlogEntriesAdapter(
             this,
             newsFragment.newsViewModel.flowOfMainBlogEntries(),
             newsFragment.viewedDataStore.blogsViewedFlow(title)
         )
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerView.apply {
             adapter = itemsAdapter
             layoutManager = LinearLayoutManager(context)

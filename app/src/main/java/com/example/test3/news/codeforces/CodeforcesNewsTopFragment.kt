@@ -21,20 +21,6 @@ import kotlinx.coroutines.launch
 class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
 
     override val title = CodeforcesTitle.TOP
-    private val blogEntriesAdapter by lazy {
-        CodeforcesBlogEntriesAdapter(
-            this,
-            newsFragment.newsViewModel.flowOfTopBlogEntries(),
-            null
-        )
-    }
-    private val commentsAdapter by lazy {
-        CodeforcesCommentsAdapter(
-            this,
-            newsFragment.newsViewModel.flowOfTopComments()
-        )
-    }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,6 +35,20 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        val blogEntriesAdapter = CodeforcesBlogEntriesAdapter(
+            this,
+            newsFragment.newsViewModel.flowOfTopBlogEntries(),
+            null
+        )
+
+        val commentsAdapter by lazy {
+            CodeforcesCommentsAdapter(
+                this,
+                newsFragment.newsViewModel.flowOfTopComments()
+            )
+        }
+
         recyclerViewBlogEntries.apply {
             isVisible = true
             adapter = blogEntriesAdapter

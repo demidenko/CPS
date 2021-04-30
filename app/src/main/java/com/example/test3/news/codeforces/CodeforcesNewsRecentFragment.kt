@@ -24,20 +24,6 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
 
     override val title = CodeforcesTitle.RECENT
 
-    private val blogEntriesAdapter by lazy {
-        CodeforcesRecentBlogEntriesAdapter(
-            this,
-            newsFragment.newsViewModel.flowOfRecentActions()
-        )
-    }
-
-    private val commentsAdapter by lazy {
-        CodeforcesCommentsAdapter(
-            this,
-            newsFragment.newsViewModel.flowOfRecentActions().map { it.second }
-        )
-    }
-
     private fun commentsFilteredAdapter(blogId: Int) =
         CodeforcesCommentsAdapter(
             this,
@@ -111,6 +97,17 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        val blogEntriesAdapter = CodeforcesRecentBlogEntriesAdapter(
+            this,
+            newsFragment.newsViewModel.flowOfRecentActions()
+        )
+
+        val commentsAdapter = CodeforcesCommentsAdapter(
+            this,
+            newsFragment.newsViewModel.flowOfRecentActions().map { it.second }
+        )
+
         recyclerViewBlogEntries.apply {
             isVisible = true
             adapter = blogEntriesAdapter.apply {
