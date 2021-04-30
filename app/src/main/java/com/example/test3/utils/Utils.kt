@@ -83,7 +83,7 @@ class MutableSetLiveSize<T>() {
     val sizeFlow get() = size.asStateFlow()
 
     fun values() = s.toSet()
-    fun contains(element: T) = s.contains(element)
+    operator fun contains(element: T) = s.contains(element)
     fun add(element: T) {
         s.add(element)
         size.value = s.size

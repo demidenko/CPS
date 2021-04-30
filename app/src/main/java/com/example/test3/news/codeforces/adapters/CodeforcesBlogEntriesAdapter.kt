@@ -115,7 +115,7 @@ class CodeforcesBlogEntriesAdapter(
                 val blogEntry = items[position]
                 it.forEach { obj ->
                     when(obj) {
-                        is NEW_ENTRY -> holder.setNewEntryIndicator(newEntries.contains(blogEntry.id))
+                        is NEW_ENTRY -> holder.setNewEntryIndicator(blogEntry.id in newEntries)
                         is UPDATE_RATING -> holder.setRating(blogEntry.rating)
                         is UPDATE_COMMENTS -> holder.setComments(blogEntry.commentsCount)
                     }
@@ -131,7 +131,7 @@ class CodeforcesBlogEntriesAdapter(
 
             val blogId = blogEntry.id
             view.setOnClickListener {
-                if(newEntries.contains(blogId)){
+                if(blogId in newEntries){
                     newEntries.remove(blogId)
                     notifyItemChanged(position, listOf(NEW_ENTRY))
                 }
@@ -149,7 +149,7 @@ class CodeforcesBlogEntriesAdapter(
             title.text = blogEntry.title
 
             setAuthor(blogEntry.authorHandle, blogEntry.authorColorTag, codeforcesAccountManager)
-            setNewEntryIndicator(newEntries.contains(blogId))
+            setNewEntryIndicator(blogId in newEntries)
             setComments(blogEntry.commentsCount)
             setRating(blogEntry.rating)
 
@@ -193,7 +193,7 @@ class CodeforcesBlogEntriesAdapter(
                     val res = mutableListOf<Any>()
                     if(oldBlogEntry.rating != newBlogEntry.rating) res.add(UPDATE_RATING)
                     if(oldBlogEntry.commentsCount != newBlogEntry.commentsCount) res.add(UPDATE_COMMENTS)
-                    if(oldNewEntries.contains(id) != newNewEntries.contains(id)) res.add(NEW_ENTRY)
+                    if(id in oldNewEntries != id in newNewEntries) res.add(NEW_ENTRY)
                     return res.takeIf { it.isNotEmpty() }
                 }
 
