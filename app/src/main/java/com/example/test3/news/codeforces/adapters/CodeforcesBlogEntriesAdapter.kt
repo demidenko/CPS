@@ -133,7 +133,7 @@ class CodeforcesBlogEntriesAdapter(
             view.setOnClickListener {
                 if(blogId in newEntries){
                     newEntries.remove(blogId)
-                    notifyItemChanged(position, listOf(NEW_ENTRY))
+                    notifyItemChanged(bindingAdapterPosition, listOf(NEW_ENTRY))
                 }
                 it.context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.blog(blogId)))
             }
