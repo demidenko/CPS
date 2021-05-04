@@ -39,7 +39,7 @@ class CodeforcesBlogEntriesAdapter(
     fun getBlogIDs() = items.map { it.id }
 
     private val newEntries = MutableSetLiveSize<Int>()
-    fun getNewEntriesSizeFlow() = newEntries.sizeFlow
+    fun getNewEntriesSizeFlow() = newEntries.sizeStateFlow
 
     override suspend fun applyData(data: List<CodeforcesBlogEntry>): DiffUtil.DiffResult {
         val oldItems = items
@@ -54,7 +54,7 @@ class CodeforcesBlogEntriesAdapter(
         val currentBlogEntries = getBlogIDs()
         if(clearNewEntriesOnDataChange) newEntries.clear()
         else {
-            for(id in newEntries.values()) if(id !in currentBlogEntries) newEntries.remove(id)
+            newEntries.removeAll(newEntries.values().filter { it !in currentBlogEntries })
         }
         val newBlogEntries = currentBlogEntries.filter { it !in savedBlogEntries }
         newEntries.addAll(newBlogEntries)

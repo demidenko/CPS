@@ -80,22 +80,18 @@ fun ImageButton.enableIff(condition: Boolean) {
 class MutableSetLiveSize<T>() {
     private val s = mutableSetOf<T>()
     private val size = MutableStateFlow<Int>(0)
-    val sizeFlow get() = size.asStateFlow()
+    val sizeStateFlow get() = size.asStateFlow()
 
     fun values() = s.toSet()
+
     operator fun contains(element: T) = s.contains(element)
-    fun add(element: T) {
-        s.add(element)
-        size.value = s.size
-    }
-    fun addAll(elements: Collection<T>) {
-        s.addAll(elements)
-        size.value = s.size
-    }
-    fun remove(element: T) {
-        s.remove(element)
-        size.value = s.size
-    }
+
+    fun add(element: T) = s.add(element).also { size.value = s.size }
+    fun addAll(elements: Collection<T>) = s.addAll(elements).also { size.value = s.size }
+
+    fun remove(element: T) = s.remove(element).also { size.value = s.size }
+    fun removeAll(elements: Collection<T>) = s.removeAll(elements).also { size.value = s.size }
+
     fun clear() {
         s.clear()
         size.value = 0

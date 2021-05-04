@@ -70,7 +70,7 @@ class AccountsFragment: CPSFragment() {
                 }
                 launch {
                     val welcomeTextView = view.findViewById<TextView>(R.id.accounts_welcome_text)
-                    notEmptyPanels.sizeFlow.collect { count -> welcomeTextView.isGone = count>0 }
+                    notEmptyPanels.sizeStateFlow.collect { count -> welcomeTextView.isGone = count>0 }
                 }
             }
         }
