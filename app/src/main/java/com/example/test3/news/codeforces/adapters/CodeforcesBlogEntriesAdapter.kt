@@ -186,9 +186,12 @@ class CodeforcesBlogEntriesAdapter(
                     return old[oldItemPosition] == new[newItemPosition]
                 }
 
-                override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+                override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): List<Any>? {
                     val oldBlogEntry = old[oldItemPosition]
                     val newBlogEntry = new[newItemPosition]
+                    if(oldBlogEntry.title != newBlogEntry.title) return null
+                    if(oldBlogEntry.authorHandle != newBlogEntry.authorHandle) return null
+                    if(oldBlogEntry.authorColorTag != newBlogEntry.authorColorTag) return null
                     val id = newBlogEntry.id
                     val res = mutableListOf<Any>()
                     if(oldBlogEntry.rating != newBlogEntry.rating) res.add(UPDATE_RATING)
