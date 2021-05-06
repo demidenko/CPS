@@ -27,7 +27,7 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
     private fun commentsFilteredAdapter(blogId: Int) =
         CodeforcesCommentsAdapter(
             this,
-            newsFragment.newsViewModel.flowOfRecentActions().map { (_, comments) ->
+            newsFragment.newsViewModel.flowOfRecentActions(requireContext()).map { (_, comments) ->
                 comments.filter {
                     it.blogEntry?.id == blogId
                 }
@@ -100,12 +100,12 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
 
         val blogEntriesAdapter = CodeforcesRecentBlogEntriesAdapter(
             this,
-            newsFragment.newsViewModel.flowOfRecentActions()
+            newsFragment.newsViewModel.flowOfRecentActions(requireContext())
         )
 
         val commentsAdapter = CodeforcesCommentsAdapter(
             this,
-            newsFragment.newsViewModel.flowOfRecentActions().map { it.second }
+            newsFragment.newsViewModel.flowOfRecentActions(requireContext()).map { it.second }
         )
 
         recyclerViewBlogEntries.apply {
@@ -161,8 +161,6 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
                 it.refreshHandles()
             }
         }
-
-        if(savedInstanceState == null) callReload()
     }
 
 }

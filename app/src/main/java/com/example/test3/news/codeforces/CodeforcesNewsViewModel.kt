@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.test3.CodeforcesLocale
 import com.example.test3.CodeforcesTitle
+import com.example.test3.NewsFragment
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsLostRecentWorker
 import kotlinx.coroutines.flow.Flow
@@ -18,18 +19,28 @@ class CodeforcesNewsViewModel: ViewModel() {
 
     private inner class DataLoader<T>(
         init: T,
-        var ignoreLoad: Boolean = false
+        val getData: suspend (CodeforcesLocale) -> T?
     ) {
         private val dataFlow: MutableStateFlow<T> = MutableStateFlow(init)
-        fun getDataFlow(): StateFlow<T> = dataFlow.asStateFlow()
+
+        private var touched = false
+        fun getDataFlow(context: Context): StateFlow<T> {
+            if (!touched) {
+                touched = true
+                viewModelScope.launch {
+                    load(NewsFragment.getCodeforcesContentLanguage(context))
+                }
+            }
+            return dataFlow.asStateFlow()
+        }
 
         val loadingState: MutableStateFlow<LoadingState> = MutableStateFlow(LoadingState.PENDING)
 
-        fun load(getData: suspend () -> T?) {
-            if(ignoreLoad) return
+        fun load(locale: CodeforcesLocale) {
+            if(!touched) return
             loadingState.value = LoadingState.LOADING
             viewModelScope.launch {
-                val data = getData()
+                val data = getData(locale)
                 if(data == null) loadingState.value = LoadingState.FAILED
                 else {
                     dataFlow.value = data
@@ -54,34 +65,29 @@ class CodeforcesNewsViewModel: ViewModel() {
     }
 
 
-    private val mainBlogEntries = DataLoader<List<CodeforcesBlogEntry>>(emptyList())
-    fun flowOfMainBlogEntries() = mainBlogEntries.getDataFlow()
+    private val mainBlogEntries = DataLoader(emptyList()) { loadBlogEntriesPage("/", it) }
+    fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.getDataFlow(context)
 
-    private val topBlogEntries = DataLoader<List<CodeforcesBlogEntry>>(emptyList())
-    fun flowOfTopBlogEntries() = topBlogEntries.getDataFlow()
+    private val topBlogEntries = DataLoader(emptyList()) { loadBlogEntriesPage("/top", it) }
+    fun flowOfTopBlogEntries(context: Context) = topBlogEntries.getDataFlow(context)
 
-    private val topComments = DataLoader<List<CodeforcesRecentAction>>(emptyList(), ignoreLoad = true)
-    fun flowOfTopComments() = topComments.apply { ignoreLoad = false }.getDataFlow()
+    private val topComments = DataLoader(emptyList()) { loadCommentsPage("/topComments?days=2", it) }
+    fun flowOfTopComments(context: Context) = topComments.getDataFlow(context)
 
-    private val recentActions = DataLoader<Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>>(Pair(emptyList(), emptyList()))
-    fun flowOfRecentActions() = recentActions.getDataFlow()
+    private val recentActions = DataLoader(Pair(emptyList(), emptyList())) { loadRecentActionsPage(it) }
+    fun flowOfRecentActions(context: Context) = recentActions.getDataFlow(context)
 
     fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
         when(title){
-            CodeforcesTitle.MAIN -> mainBlogEntries.load { loadBlogEntriesPage("/", locale) }
+            CodeforcesTitle.MAIN -> mainBlogEntries.load(locale)
             CodeforcesTitle.TOP -> {
-                topBlogEntries.load { loadBlogEntriesPage("/top", locale) }
-                reloadTopComments(locale)
+                topBlogEntries.load(locale)
+                topComments.load(locale)
             }
-            CodeforcesTitle.RECENT -> recentActions.load { loadRecentActionsPage(locale) }
+            CodeforcesTitle.RECENT -> recentActions.load(locale)
             else -> return
         }
     }
-
-    fun reloadTopComments(locale: CodeforcesLocale) {
-        topComments.load { loadCommentsPage("/topComments?days=2", locale) }
-    }
-
 
     private suspend fun loadBlogEntriesPage(page: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry>? {
         val s = CodeforcesAPI.getPageSource(page, locale) ?: return null

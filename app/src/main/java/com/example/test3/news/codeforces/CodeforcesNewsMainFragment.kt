@@ -19,7 +19,7 @@ class CodeforcesNewsMainFragment(): CodeforcesNewsFragment() {
 
         itemsAdapter = CodeforcesBlogEntriesAdapter(
             this,
-            newsFragment.newsViewModel.flowOfMainBlogEntries(),
+            newsFragment.newsViewModel.flowOfMainBlogEntries(requireContext()),
             newsFragment.viewedDataStore.blogsViewedFlow(title)
         )
 
@@ -40,7 +40,6 @@ class CodeforcesNewsMainFragment(): CodeforcesNewsFragment() {
         subscribeNewEntries(itemsAdapter)
         subscribeRefreshOnRealColor { itemsAdapter.refreshHandles() }
 
-        if(savedInstanceState == null) callReload()
     }
 
     override fun onPageSelected(tab: TabLayout.Tab) {

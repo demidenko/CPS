@@ -5,18 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.CodeforcesTitle
-import com.example.test3.NewsFragment
 import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.news.codeforces.adapters.CodeforcesCommentsAdapter
 import com.example.test3.utils.off
 import com.example.test3.utils.on
-import kotlinx.coroutines.launch
 
 class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
 
@@ -38,14 +35,14 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
 
         val blogEntriesAdapter = CodeforcesBlogEntriesAdapter(
             this,
-            newsFragment.newsViewModel.flowOfTopBlogEntries(),
+            newsFragment.newsViewModel.flowOfTopBlogEntries(requireContext()),
             null
         )
 
         val commentsAdapter by lazy {
             CodeforcesCommentsAdapter(
                 this,
-                newsFragment.newsViewModel.flowOfTopComments()
+                newsFragment.newsViewModel.flowOfTopComments(requireContext())
             )
         }
 
@@ -78,12 +75,7 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
                     recyclerViewBlogEntries.isVisible = false
                     with(recyclerViewComments){
                         isVisible = true
-                        if(adapter == null){
-                            adapter = commentsAdapter
-                            lifecycleScope.launch {
-                                newsFragment.newsViewModel.reloadTopComments(NewsFragment.getCodeforcesContentLanguage(requireContext()))
-                            }
-                        }
+                        if(adapter == null) adapter = commentsAdapter
                     }
                 } else {
                     off()
@@ -98,8 +90,6 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
             recyclerViewBlogEntries.codeforcesItemsAdapter?.refreshHandles()
             recyclerViewComments.codeforcesItemsAdapter?.refreshHandles()
         }
-
-        if(savedInstanceState == null) callReload()
     }
 
 }
