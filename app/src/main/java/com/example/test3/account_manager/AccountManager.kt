@@ -15,7 +15,7 @@ import com.example.test3.notificationBuilder
 import com.example.test3.ui.getUseRealColors
 import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -28,7 +28,7 @@ abstract class AccountManager(val context: Context, val managerName: String) {
     abstract val homeURL: String
 
     protected abstract fun getDataStore(): AccountDataStore
-    fun getInfoFlow() = getDataStore().getDataFlow().map { str -> this to strToInfo(str) }.distinctUntilChangedBy { it.second }
+    fun getInfoFlow() = getDataStore().getDataFlow().distinctUntilChanged().map { str -> this to strToInfo(str) }
 
     abstract fun emptyInfo(): UserInfo
 
