@@ -34,13 +34,13 @@ class MainActivity : AppCompatActivity(){
 
     val defaultTextColor by lazy { getColorFromResource(this, R.color.textColor) }
 
-    private inline fun<reified T: CPSFragment> findOrCreateFragment(): T {
-        return supportFragmentManager.fragments.find { it is T } as? T ?: T::class.java.newInstance()
+    private inline fun<reified T: CPSFragment> findOrCreateFragment(create: () -> T): T {
+        return supportFragmentManager.fragments.firstNotNullOfOrNull { it as? T } ?: create()
     }
 
-    val accountsFragment by lazy { findOrCreateFragment<AccountsFragment>() }
-    val newsFragment by lazy { findOrCreateFragment<NewsFragment>() }
-    val devFragment by lazy { findOrCreateFragment<TestFragment>() }
+    val accountsFragment by lazy { findOrCreateFragment { AccountsFragment() } }
+    val newsFragment by lazy { findOrCreateFragment { NewsFragment() } }
+    val devFragment by lazy { findOrCreateFragment { TestFragment() } }
 
     val cpsFragmentManager by lazy { CPSFragmentManager(this, R.id.container_fragment) }
 
