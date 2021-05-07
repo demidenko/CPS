@@ -10,8 +10,8 @@ import com.example.test3.account_manager.UserInfo
 import com.example.test3.utils.ignoreFirst
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 private const val NO_COLOR = Color.TRANSPARENT
 
@@ -33,7 +33,7 @@ class StatusBarColorManager(
         return colors.values.toList()
     }
 
-    private val statusBarColor = MutableStateFlow<Int>(0)
+    private val statusBarColor = MutableStateFlow<Int>(NO_COLOR)
     fun getStatusBarColorFlow() = statusBarColor.asStateFlow()
 
     private var enabled: Boolean = true
@@ -42,23 +42,17 @@ class StatusBarColorManager(
         with(mainActivity){
             addRepeatingJob(Lifecycle.State.STARTED){
                 managers.forEach {
-                    launch {
-                        it.getInfoFlow().collect{ (manager, info) ->
-                            updateBy(manager, info)
-                        }
-                    }
+                    it.getInfoFlow().onEach { (manager, info) ->
+                        updateBy(manager, info)
+                    }.launchIn(this)
                 }
-                launch {
-                    settingsUI.getUseStatusBarFlow().collect { use ->
-                        enabled = use
-                        recalculateStatusBarColor()
-                    }
-                }
-                launch {
-                    settingsUI.getUseRealColorsFlow().ignoreFirst().collect { use ->
-                        managers.forEach { updateBy(it) }
-                    }
-                }
+                settingsUI.getUseStatusBarFlow().onEach { use ->
+                    enabled = use
+                    recalculateStatusBarColor()
+                }.launchIn(this)
+                settingsUI.getUseRealColorsFlow().ignoreFirst().onEach { use ->
+                    managers.forEach { updateBy(it) }
+                }.launchIn(this)
             }
         }
     }
@@ -79,35 +73,36 @@ class StatusBarColorManager(
     private fun updateBy(manager: AccountManager, info: UserInfo) {
         val name = manager.managerName
         if(!info.isEmpty()) {
-            colors[name] = ColorInfo()
-            if(manager is RatedAccountManager){
-                manager.getColor(info)?.let {
-                    colors[name] = ColorInfo(it, manager.getOrder(info))
-                }
-            }
+            colors[name] =
+                (manager as? RatedAccountManager)?.getColor(info)?.let {
+                    ColorInfo(it, manager.getOrder(info))
+                } ?: ColorInfo()
         } else {
             colors.remove(name)
         }
         recalculateStatusBarColor()
     }
 
-    private fun checkManagers(managers: List<AccountManager>) {
-        //check data file names
-        if(managers.map { it.managerName }.distinct().size != managers.size)
-            throw Exception("Not different managers names")
 
-        //check ranks of colors
-        managers.filterIsInstance<RatedAccountManager>().apply {
-            distinctBy { ratedManager ->
-                val colors = ratedManager.rankedHandleColorsList
-                colors.forEachIndexed { index, handleColor ->
-                    ratedManager.getColor(handleColor)
-                    if(index > 0 && handleColor < colors[index-1])
-                        throw Exception("${ratedManager.managerName}: color list is not sorted")
+    companion object {
+        private fun checkManagers(managers: List<AccountManager>) {
+            //check data file names
+            if(managers.map { it.managerName }.distinct().size != managers.size)
+                throw Exception("Not different managers names")
+
+            //check ranks of colors
+            managers.filterIsInstance<RatedAccountManager>().apply {
+                distinctBy { ratedManager ->
+                    val colors = ratedManager.rankedHandleColorsList
+                    colors.forEachIndexed { index, handleColor ->
+                        ratedManager.getColor(handleColor)
+                        if(index > 0 && handleColor < colors[index-1])
+                            throw Exception("${ratedManager.managerName}: color list is not sorted")
+                    }
+                    colors.size
+                }.apply {
+                    if(size != 1) throw Exception("different sizes for color lists")
                 }
-                colors.size
-            }.apply {
-                if(size != 1) throw Exception("different sizes for color lists")
             }
         }
     }
