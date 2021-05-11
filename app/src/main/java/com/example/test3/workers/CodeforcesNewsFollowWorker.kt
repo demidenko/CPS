@@ -85,17 +85,13 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
                 return emptyList()
             }
             val result = response.result ?: return emptyList()
-            val saved = getBlogEntries(handle)?.toSet()
-            var updated = false
-            if(saved == null) updated = true
-            else {
-                result
-                    .filter { it.id !in saved }
-                    .forEach { blogEntry ->
-                        updated = true
-                        notifyNewBlogEntry(blogEntry)
-                    }
-            }
+            val updated =
+                getBlogEntries(handle)?.toSet()?.let { saved ->
+                    result.filter { it.id !in saved }
+                        .onEach { blogEntry ->
+                            notifyNewBlogEntry(blogEntry)
+                        }.isNotEmpty()
+                } ?: true
             if(updated) setBlogEntries(handle, result.map { it.id })
             return result
         }
