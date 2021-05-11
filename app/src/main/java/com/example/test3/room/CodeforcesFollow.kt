@@ -51,7 +51,7 @@ class IntsListConverter {
     fun decodeToInts(s: String?): List<Int>? {
         if(s == null) return null
         return (s.indices step 4).map { i ->
-            ((s[i+3].toInt()*256 + s[i+2].toInt())*256 + s[i+1].toInt())*256 + s[i].toInt()
+            ((s[i+3].code*256 + s[i+2].code)*256 + s[i+1].code)*256 + s[i].code
         }
     }
 }

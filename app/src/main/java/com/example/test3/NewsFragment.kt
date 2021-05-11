@@ -326,7 +326,7 @@ class CodeforcesNewsAdapter(
         fragment.onPageSelected(tab)
         showSupportButtons(fragment.title)
 
-        newsFragment.cpsTitle = "::news.codeforces.${fragment.title.name.toLowerCase(Locale.ENGLISH)}"
+        newsFragment.cpsTitle = "::news.codeforces.${fragment.title.name.lowercase()}"
     }
     
     fun onPageUnselected(tab: TabLayout.Tab) {
@@ -365,20 +365,3 @@ fun timeDifference(fromTimeSeconds: Long, toTimeSeconds: Long): String {
     } + " ago"
 }
 
-fun timeRUtoEN(time: String): String{
-    val s = time.split(' ')
-    if(s.size == 3 && s.last()=="назад" && s.first().toIntOrNull()!=null){
-        val w = s[1]
-        return s.first() + " " + when {
-            w.startsWith("сек") -> "seconds"
-            w.startsWith("мин") -> "minutes"
-            w.startsWith("час") -> "hours"
-            w.startsWith("д") -> "days"
-            w.startsWith("нед") -> "weeks"
-            w.startsWith("мес") -> "months"
-            w=="лет" || w=="год" -> "years"
-            else -> w
-        } + " ago"
-    }
-    return time
-}
