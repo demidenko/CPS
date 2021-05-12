@@ -14,11 +14,11 @@ You can add accounts to show here by pressing [+] button below.
     </string>
 
     <string name="news_settings_cf_lost_description">
-"Catch new blogs from recent actions which get lost because of low activity."
+"Catch new blog entries from recent actions which get lost because of low activity."
     </string>
 
     <string name="news_settings_cf_follow_description">
-"Subscribe to users for new blogs notifications."
+"Subscription to new blog entries from specific users."
     </string>
 
 </resources>
