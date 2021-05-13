@@ -202,10 +202,10 @@ class MainActivity : AppCompatActivity(){
         return super.onOptionsItemSelected(item)
     }
 
-    suspend fun chooseUserIDFromSaved(manager: AccountManager) = chooseUserID(manager.getSavedInfo(), manager)
-    suspend fun chooseUserID(manager: AccountManager) = chooseUserID(manager.emptyInfo(), manager)
+    suspend fun<U: UserInfo> chooseUserIDFromSaved(manager: AccountManager<U>) = chooseUserID(manager.getSavedInfo(), manager)
+    suspend fun<U: UserInfo> chooseUserID(manager: AccountManager<U>) = chooseUserID(manager.emptyInfo(), manager)
 
-    private suspend fun chooseUserID(initialUserInfo: UserInfo, manager: AccountManager): UserInfo? {
+    private suspend fun<U: UserInfo> chooseUserID(initialUserInfo: U, manager: AccountManager<U>): U? {
         return withContext(lifecycleScope.coroutineContext) {
             suspendCoroutine { cont ->
                 val dialog = DialogAccountChooser(initialUserInfo, manager, cont)

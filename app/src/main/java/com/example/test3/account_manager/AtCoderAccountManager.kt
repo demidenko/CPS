@@ -23,7 +23,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class AtCoderAccountManager(context: Context): RatedAccountManager(context, manager_name), AccountSettingsProvider {
+class AtCoderAccountManager(context: Context)
+    : RatedAccountManager<AtCoderAccountManager.AtCoderUserInfo>(context, manager_name), AccountSettingsProvider {
 
     companion object {
         const val manager_name = "atcoder"
@@ -58,7 +59,7 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context, mana
 
     override fun emptyInfo() = AtCoderUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String, flags: Int): UserInfo {
+    override suspend fun downloadInfo(data: String, flags: Int): AtCoderUserInfo {
         val handle = data
         val res = AtCoderUserInfo(STATUS.FAILED, handle)
         val response = AtCoderAPI.getUser(handle) ?: return res
@@ -81,9 +82,9 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context, mana
 
     override fun decodeFromString(str: String) = jsonCPS.decodeFromString<AtCoderUserInfo>(str)
 
-    override fun encodeToString(info: UserInfo) = jsonCPS.encodeToString(info as AtCoderUserInfo)
+    override fun encodeToString(info: AtCoderUserInfo) = jsonCPS.encodeToString(info)
 
-    override fun getColor(info: UserInfo): Int?  = with(info as AtCoderUserInfo){
+    override fun getColor(info: AtCoderUserInfo): Int?  = with(info){
         if(status != STATUS.OK || rating == NOT_RATED) return null
         return getHandleColorARGB(info.rating)
     }
@@ -106,11 +107,11 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context, mana
         return@withContext res
     }
 
-    override suspend fun loadRatingHistory(info: UserInfo): List<RatingChange>? {
+    override suspend fun loadRatingHistory(info: AtCoderUserInfo): List<RatingChange>? {
         return AtCoderAPI.getRatingChanges(info.userID)?.map { RatingChange(it) }
     }
 
-    override fun getRating(info: UserInfo) = (info as AtCoderUserInfo).rating
+    override fun getRating(info: AtCoderUserInfo) = info.rating
 
     override val ratingsUpperBounds = arrayOf(
         400 to HandleColor.GRAY,
@@ -138,8 +139,7 @@ class AtCoderAccountManager(context: Context): RatedAccountManager(context, mana
         }
     }
 
-    override fun makeSpan(info: UserInfo): SpannableString {
-        info as AtCoderUserInfo
+    override fun makeSpan(info: AtCoderUserInfo): SpannableString {
         return SpannableString(info.handle).apply {
             getColor(info)?.let {
                 set(0, length, ForegroundColorSpan(it))

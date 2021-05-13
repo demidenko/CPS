@@ -7,7 +7,6 @@ import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.CodeforcesUserInfo
-import com.example.test3.account_manager.UserInfo
 import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.signedToString
 import com.example.test3.workers.WorkersCenter
@@ -16,18 +15,18 @@ import kotlinx.coroutines.launch
 class CodeforcesAccountPanel(
     mainActivity: MainActivity,
     override val manager: CodeforcesAccountManager
-): AccountPanel(mainActivity, manager) {
+): AccountPanel<CodeforcesUserInfo>(mainActivity, manager) {
 
-    override fun show(info: UserInfo) {
+    override fun show(info: CodeforcesUserInfo) {
         showMainRated(textMain, textAdditional, manager, info)
     }
 
     override val bigViewResource = R.layout.fragment_account_view_codeforces
 
-    override suspend fun showBigView(fragment: AccountViewFragment) {
+    override suspend fun showBigView(fragment: AccountViewFragment<CodeforcesUserInfo>) {
         val view = fragment.requireView()
 
-        val info = manager.getSavedInfo() as CodeforcesUserInfo
+        val info = manager.getSavedInfo()
 
         val handleView = view.findViewById<TextView>(R.id.account_view_handle)
         val ratingView = view.findViewById<TextView>(R.id.account_view_rating)
@@ -56,7 +55,7 @@ class CodeforcesAccountPanel(
 
     }
 
-    override suspend fun createSettingsView(fragment: AccountSettingsFragment) {
+    override suspend fun createSettingsView(fragment: AccountSettingsFragment<CodeforcesUserInfo>) {
 
         manager.apply {
             fragment.createAndAddSwitch(

@@ -76,7 +76,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             buttonAdd.disable()
             lifecycleScope.launch {
                 mainActivity.chooseUserID(CodeforcesAccountManager(mainActivity))?.let { userInfo ->
-                    followListAdapter.add(userInfo as CodeforcesUserInfo)
+                    followListAdapter.add(userInfo)
                     followRecyclerView.scrollToPosition(0)
                 }
                 buttonAdd.enable()

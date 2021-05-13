@@ -9,14 +9,15 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.R
+import com.example.test3.account_manager.UserInfo
 import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.setupSwitch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class AccountSettingsFragment: CPSFragment() {
+class AccountSettingsFragment<U: UserInfo>: CPSFragment() {
 
-    private val panel: AccountPanel by lazy { mainActivity.accountsFragment.getPanel(this) }
+    private val panel: AccountPanel<U> by lazy { mainActivity.accountsFragment.getPanel(this) }
 
     override fun onCreateView(
         inflater: LayoutInflater,

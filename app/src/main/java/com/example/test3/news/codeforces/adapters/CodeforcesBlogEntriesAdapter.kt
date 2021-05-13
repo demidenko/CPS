@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
-import com.example.test3.account_manager.CodeforcesUserInfo
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.google.android.material.snackbar.Snackbar
@@ -207,7 +206,7 @@ class CodeforcesBlogEntriesAdapter(
             mainActivity.newsFragment.lifecycleScope.launch {
                 val connector = CodeforcesNewsFollowWorker.FollowDataConnector(mainActivity)
                 val handle = holder.author.text
-                val userInfo = CodeforcesAccountManager(mainActivity).loadInfo(handle.toString()) as CodeforcesUserInfo
+                val userInfo = CodeforcesAccountManager(mainActivity).loadInfo(handle.toString())
                 when(connector.add(userInfo)){
                     true -> {
                         Snackbar.make(holder.view, SpannableStringBuilder("You now followed ").append(handle), Snackbar.LENGTH_LONG).apply {

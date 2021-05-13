@@ -8,17 +8,16 @@ import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.ACMPAccountManager
 import com.example.test3.account_manager.STATUS
-import com.example.test3.account_manager.UserInfo
 import com.example.test3.utils.getColorFromResource
 
 class ACMPAccountPanel(
     mainActivity: MainActivity,
     manager: ACMPAccountManager
-): AccountPanel(mainActivity, manager)  {
+): AccountPanel<ACMPAccountManager.ACMPUserInfo>(mainActivity, manager)  {
 
     private val additionalColor = getColorFromResource(mainActivity, R.color.textColorAdditional)
 
-    override fun show(info: UserInfo) { info as ACMPAccountManager.ACMPUserInfo
+    override fun show(info: ACMPAccountManager.ACMPUserInfo) {
         textMain.setTextSize(TypedValue.COMPLEX_UNIT_SP,17f) //TODO: bad spacing
         textAdditional.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
         with(info){
@@ -43,10 +42,10 @@ class ACMPAccountPanel(
 
     override val bigViewResource = R.layout.fragment_account_view_acmp
 
-    override suspend fun showBigView(fragment: AccountViewFragment) {
+    override suspend fun showBigView(fragment: AccountViewFragment<ACMPAccountManager.ACMPUserInfo>) {
         val view = fragment.requireView()
 
-        val info = manager.getSavedInfo() as ACMPAccountManager.ACMPUserInfo
+        val info = manager.getSavedInfo()
 
         view.findViewById<TextView>(R.id.account_view_name).apply {
             text = info.userName

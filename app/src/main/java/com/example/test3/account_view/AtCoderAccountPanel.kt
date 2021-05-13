@@ -5,25 +5,24 @@ import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.AtCoderAccountManager
-import com.example.test3.account_manager.UserInfo
 import com.example.test3.workers.WorkersCenter
 import kotlinx.coroutines.launch
 
 class AtCoderAccountPanel(
     mainActivity: MainActivity,
     override val manager: AtCoderAccountManager
-): AccountPanel(mainActivity, manager)  {
+): AccountPanel<AtCoderAccountManager.AtCoderUserInfo>(mainActivity, manager)  {
 
-    override fun show(info: UserInfo) {
+    override fun show(info: AtCoderAccountManager.AtCoderUserInfo) {
         showMainRated(textMain, textAdditional, manager, info)
     }
 
     override val bigViewResource = R.layout.fragment_account_view_atcoder
 
-    override suspend fun showBigView(fragment: AccountViewFragment) {
+    override suspend fun showBigView(fragment: AccountViewFragment<AtCoderAccountManager.AtCoderUserInfo>) {
         val view = fragment.requireView()
 
-        val info = manager.getSavedInfo() as AtCoderAccountManager.AtCoderUserInfo
+        val info = manager.getSavedInfo()
 
         val handleView = view.findViewById<TextView>(R.id.account_view_handle)
         val ratingView = view.findViewById<TextView>(R.id.account_view_rating)
@@ -33,7 +32,7 @@ class AtCoderAccountPanel(
         RatingGraphView.showInAccountViewFragment(fragment, manager)
     }
 
-    override suspend fun createSettingsView(fragment: AccountSettingsFragment) {
+    override suspend fun createSettingsView(fragment: AccountSettingsFragment<AtCoderAccountManager.AtCoderUserInfo>) {
         manager.apply {
             fragment.createAndAddSwitch(
                 "Rating changes observer",

@@ -131,9 +131,7 @@ class AccountsFragment: CPSFragment() {
                             setOnClickListener {
                                 dismiss()
                                 lifecycleScope.launch {
-                                    mainActivity.chooseUserIDFromSaved(panel.manager)?.let { userInfo ->
-                                        panel.manager.setSavedInfo(userInfo)
-                                    }
+                                    panel.manager.chooseAndSave(mainActivity)
                                 }
                             }
 
@@ -150,9 +148,15 @@ class AccountsFragment: CPSFragment() {
         }
     }
 
+    private suspend fun<U: UserInfo> AccountManager<U>.chooseAndSave(mainActivity: MainActivity) {
+        mainActivity.chooseUserIDFromSaved(this)?.let { info ->
+            setSavedInfo(info)
+        }
+    }
+
     private fun clistImport() {
         lifecycleScope.launch {
-            val clistUserInfo = mainActivity.chooseUserID(CListAccountManager(mainActivity)) as? CListAccountManager.CListUserInfo ?: return@launch
+            val clistUserInfo = mainActivity.chooseUserID(CListAccountManager(mainActivity)) ?: return@launch
             accountViewModel.clistImport(clistUserInfo, requireContext())
         }
     }
@@ -168,13 +172,13 @@ class AccountsFragment: CPSFragment() {
 
     private fun reloadAccounts() = panels.forEach { it.reload() }
 
-    fun getPanel(managerType: String): AccountPanel {
+    fun<U: UserInfo> getPanel(managerType: String): AccountPanel<U> {
         return panels.find { panel ->
             panel.manager.managerName == managerType
-        } ?: throw Exception("Unknown type of manager: $managerType")
+        } as? AccountPanel<U> ?: throw Exception("Unknown type of manager: $managerType")
     }
 
-    fun getPanel(fragment: CPSFragment): AccountPanel {
+    fun<U: UserInfo> getPanel(fragment: CPSFragment): AccountPanel<U> {
         val managerType = fragment.requireArguments().getString("manager") ?: throw Exception("Unset type of manager")
         return getPanel(managerType)
     }

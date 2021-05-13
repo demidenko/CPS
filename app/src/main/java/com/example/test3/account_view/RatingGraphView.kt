@@ -24,9 +24,9 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
     private lateinit var extraBitmap: Bitmap
 
 
-    private lateinit var accountManager: RatedAccountManager
+    private lateinit var accountManager: RatedAccountManager<*>
 
-    fun setManager(ratedAccountManager: RatedAccountManager){
+    fun setManager(ratedAccountManager: RatedAccountManager<*>){
         accountManager = ratedAccountManager
     }
 
@@ -209,7 +209,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
 
     companion object {
-        suspend fun showInAccountViewFragment(fragment: AccountViewFragment, manager: RatedAccountManager){
+        suspend fun<U: UserInfo> showInAccountViewFragment(fragment: AccountViewFragment<U>, manager: RatedAccountManager<U>){
 
             val view = fragment.requireView().findViewById<ConstraintLayout>(R.id.account_view_rating_graph_view)
 

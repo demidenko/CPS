@@ -17,7 +17,7 @@ private const val NO_COLOR = Color.TRANSPARENT
 
 class StatusBarColorManager(
     mainActivity: MainActivity,
-    managers: List<AccountManager>
+    managers: List<AccountManager<out UserInfo>>
 ) {
 
     private class ColorInfo(
@@ -43,7 +43,7 @@ class StatusBarColorManager(
             addRepeatingJob(Lifecycle.State.STARTED){
                 managers.forEach {
                     it.getInfoFlow().onEach { (manager, info) ->
-                        updateBy(manager, info)
+                        updateBy(manager)
                     }.launchIn(this)
                 }
                 settingsUI.getUseStatusBarFlow().onEach { use ->
@@ -64,13 +64,13 @@ class StatusBarColorManager(
         statusBarColor.value = color
     }
 
-    fun setCurrent(manager: AccountManager?) {
+    fun setCurrent(manager: AccountManager<*>?) {
         current = manager?.managerName
         recalculateStatusBarColor()
     }
 
-    private suspend fun updateBy(manager: AccountManager) = updateBy(manager, manager.getSavedInfo())
-    private fun updateBy(manager: AccountManager, info: UserInfo) {
+    private suspend fun<U: UserInfo> updateBy(manager: AccountManager<U>) = updateBy(manager, manager.getSavedInfo())
+    private fun<U: UserInfo> updateBy(manager: AccountManager<U>, info: U) {
         val name = manager.managerName
         if(!info.isEmpty()) {
             colors[name] =
@@ -85,13 +85,13 @@ class StatusBarColorManager(
 
 
     companion object {
-        private fun checkManagers(managers: List<AccountManager>) {
+        private fun checkManagers(managers: List<AccountManager<out UserInfo>>) {
             //check data file names
             if(managers.map { it.managerName }.distinct().size != managers.size)
                 throw Exception("Not different managers names")
 
             //check ranks of colors
-            managers.filterIsInstance<RatedAccountManager>().apply {
+            managers.filterIsInstance<RatedAccountManager<*>>().apply {
                 distinctBy { ratedManager ->
                     val colors = ratedManager.rankedHandleColorsList
                     colors.forEachIndexed { index, handleColor ->

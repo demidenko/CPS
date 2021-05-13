@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class ACMPAccountManager(context: Context): AccountManager(context, manager_name) {
+class ACMPAccountManager(context: Context): AccountManager<ACMPAccountManager.ACMPUserInfo>(context, manager_name) {
 
     companion object {
         const val manager_name = "acmp"
@@ -43,7 +43,7 @@ class ACMPAccountManager(context: Context): AccountManager(context, manager_name
 
     override fun emptyInfo() = ACMPUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String, flags: Int): UserInfo {
+    override suspend fun downloadInfo(data: String, flags: Int): ACMPUserInfo {
         val res = ACMPUserInfo(STATUS.FAILED, data)
         val s = ACMPAPI.getUser(data) ?: return res
         if(!s.contains("index.asp?main=status&id_mem=$data")) return res.apply { status = STATUS.NOT_FOUND }
@@ -70,7 +70,7 @@ class ACMPAccountManager(context: Context): AccountManager(context, manager_name
 
     override fun decodeFromString(str: String) = jsonCPS.decodeFromString<ACMPUserInfo>(str)
 
-    override fun encodeToString(info: UserInfo) = jsonCPS.encodeToString(info as ACMPUserInfo)
+    override fun encodeToString(info: ACMPUserInfo): String = jsonCPS.encodeToString(info)
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         if(str.toIntOrNull()!=null) return null

@@ -22,7 +22,7 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 
-abstract class AccountManager(val context: Context, val managerName: String) {
+abstract class AccountManager<U: UserInfo>(val context: Context, val managerName: String) {
 
     abstract val userIDName: String
     abstract val homeURL: String
@@ -30,10 +30,10 @@ abstract class AccountManager(val context: Context, val managerName: String) {
     protected abstract fun getDataStore(): AccountDataStore
     fun getInfoFlow() = getDataStore().getDataFlow().distinctUntilChanged().map { str -> this to strToInfo(str) }
 
-    abstract fun emptyInfo(): UserInfo
+    abstract fun emptyInfo(): U
 
-    protected abstract suspend fun downloadInfo(data: String, flags: Int): UserInfo
-    suspend fun loadInfo(data: String, flags: Int = 0): UserInfo {
+    protected abstract suspend fun downloadInfo(data: String, flags: Int): U
+    suspend fun loadInfo(data: String, flags: Int = 0): U {
         if(data.isBlank()) return emptyInfo()
         return withContext(Dispatchers.IO){
             downloadInfo(data, flags)
@@ -43,19 +43,19 @@ abstract class AccountManager(val context: Context, val managerName: String) {
     open suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = null
     open val isProvidesSuggestions = true
 
-    protected abstract fun decodeFromString(str: String): UserInfo
-    protected abstract fun encodeToString(info: UserInfo): String
+    protected abstract fun decodeFromString(str: String): U
+    protected abstract fun encodeToString(info: U): String
 
-    private fun strToInfo(str: String?): UserInfo = str?.let { decodeFromString(it) } ?: emptyInfo()
-    suspend fun getSavedInfo(): UserInfo = strToInfo(getDataStore().getString())
+    private fun strToInfo(str: String?): U = str?.let { decodeFromString(it) } ?: emptyInfo()
+    suspend fun getSavedInfo(): U = strToInfo(getDataStore().getString())
 
-    suspend fun setSavedInfo(info: UserInfo) {
+    suspend fun setSavedInfo(info: U) {
         val old = getSavedInfo()
         getDataStore().putString(encodeToString(info))
         if(info.userID != old.userID && this is AccountSettingsProvider) getSettings().resetRelatedData()
     }
 
-    open fun getColor(info: UserInfo): Int? = null
+    open fun getColor(info: U): Int? = null
 
     open fun isValidForSearch(char: Char): Boolean = true
     open fun isValidForUserID(char: Char): Boolean = true
@@ -65,7 +65,7 @@ interface AccountSettingsProvider {
     fun getSettings(): AccountSettingsDataStore
 }
 
-abstract class RatedAccountManager(context: Context, managerName: String) : AccountManager(context, managerName){
+abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: String) : AccountManager<U>(context, managerName){
     abstract fun getColor(handleColor: HandleColor): Int
     abstract val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
 
@@ -79,13 +79,13 @@ abstract class RatedAccountManager(context: Context, managerName: String) : Acco
         return getHandleColor(rating).getARGB(this)
     }
 
-    abstract fun makeSpan(info: UserInfo): SpannableString
+    abstract fun makeSpan(info: U): SpannableString
 
     override val userIDName = "handle"
 
     abstract val rankedHandleColorsList: Array<HandleColor>
-    abstract fun getRating(info: UserInfo): Int
-    fun getOrder(info: UserInfo): Double {
+    abstract fun getRating(info: U): Int
+    fun getOrder(info: U): Double {
         val rating = getRating(info)
         if(rating == NOT_RATED) return -1.0
         val handleColor = getHandleColor(rating)
@@ -100,8 +100,8 @@ abstract class RatedAccountManager(context: Context, managerName: String) : Acco
         }
     }
 
-    protected open suspend fun loadRatingHistory(info: UserInfo): List<RatingChange>? = null
-    suspend fun getRatingHistory(info: UserInfo): List<RatingChange>? = loadRatingHistory(info)?.sortedBy { it.timeSeconds }
+    protected open suspend fun loadRatingHistory(info: U): List<RatingChange>? = null
+    suspend fun getRatingHistory(info: U): List<RatingChange>? = loadRatingHistory(info)?.sortedBy { it.timeSeconds }
 }
 
 data class RatingChange(
@@ -182,12 +182,12 @@ enum class HandleColor(@ColorRes private val resid: Int) {
         val rankedTopCoder      = arrayOf(GRAY, GRAY, GREEN, GREEN, BLUE, YELLOW, YELLOW, YELLOW, YELLOW, RED)
     }
 
-    fun getARGB(manager: RatedAccountManager, realColor: Boolean): Int {
+    fun getARGB(manager: RatedAccountManager<*>, realColor: Boolean): Int {
         return if(realColor) (manager.getColor(this) + 0xFF000000).toInt()
             else getColorFromResource(manager.context,resid)
     }
 
-    fun getARGB(manager: RatedAccountManager) = getARGB(manager, manager.context.getUseRealColors())
+    fun getARGB(manager: RatedAccountManager<*>) = getARGB(manager, manager.context.getUseRealColors())
 
     class UnknownHandleColorException(color: HandleColor): Exception("${color.name} is invalid color for manager ")
 }
@@ -203,7 +203,7 @@ fun notifyRatingChange(
     context: Context,
     notificationChannel: NotificationChannelLazy,
     notificationID: Int,
-    accountManager: RatedAccountManager,
+    accountManager: RatedAccountManager<*>,
     handle: String, newRating: Int, oldRating: Int, rank: Int, url: String? = null, timeSeconds: Long? = null
 ){
     val n = notificationBuilder(context, notificationChannel).apply {

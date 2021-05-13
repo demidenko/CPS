@@ -37,14 +37,12 @@ data class CodeforcesUserInfo(
 }
 
 
-class CodeforcesAccountManager(context: Context): RatedAccountManager(context, manager_name), AccountSettingsProvider {
+class CodeforcesAccountManager(context: Context): RatedAccountManager<CodeforcesUserInfo>(context, manager_name), AccountSettingsProvider {
 
     companion object {
         const val manager_name = "codeforces"
         private val Context.account_codeforces_dataStore by preferencesDataStore(manager_name)
     }
-
-
 
     override val homeURL = "https://codeforces.com"
 
@@ -61,7 +59,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, m
 
 
 
-    override suspend fun downloadInfo(data: String, flags: Int): UserInfo {
+    override suspend fun downloadInfo(data: String, flags: Int): CodeforcesUserInfo {
         val handle = data
         val res = CodeforcesUserInfo(STATUS.FAILED, handle)
         val response = CodeforcesAPI.getUser(handle) ?: return res
@@ -90,9 +88,9 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, m
 
     override fun decodeFromString(str: String) = jsonCPS.decodeFromString<CodeforcesUserInfo>(str)
 
-    override fun encodeToString(info: UserInfo) = jsonCPS.encodeToString(info as CodeforcesUserInfo)
+    override fun encodeToString(info: CodeforcesUserInfo) = jsonCPS.encodeToString(info)
 
-    override fun getColor(info: UserInfo): Int? = with(info as CodeforcesUserInfo){
+    override fun getColor(info: CodeforcesUserInfo): Int? = with(info){
         if(status != STATUS.OK || rating == NOT_RATED) return null
         return getHandleColorARGB(info.rating)
     }
@@ -110,14 +108,13 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, m
         return@withContext res
     }
 
-    override suspend fun loadRatingHistory(info: UserInfo): List<RatingChange>? {
-        info as CodeforcesUserInfo
+    override suspend fun loadRatingHistory(info: CodeforcesUserInfo): List<RatingChange>? {
         val response = CodeforcesAPI.getUserRatingChanges(info.handle) ?: return null
         if(response.status!=CodeforcesAPIStatus.OK) return null
         return response.result?.map { RatingChange(it) }
     }
 
-    override fun getRating(info: UserInfo) = (info as CodeforcesUserInfo).rating
+    override fun getRating(info: CodeforcesUserInfo) = info.rating
 
     override val ratingsUpperBounds = arrayOf(
         1200 to HandleColor.GRAY,
@@ -154,8 +151,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, m
         }
     }
 
-    override fun makeSpan(info: UserInfo): SpannableString {
-        info as CodeforcesUserInfo
+    override fun makeSpan(info: CodeforcesUserInfo): SpannableString {
         return makeSpan(info.handle, CodeforcesUtils.getTagByRating(info.rating))
     }
 
@@ -178,7 +174,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, m
     }
 
     suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange){
-        val info = getSavedInfo() as CodeforcesUserInfo
+        val info = getSavedInfo()
 
         val settings = getSettings()
         val prevRatingChangeContestID = settings.getLastRatedContestID()

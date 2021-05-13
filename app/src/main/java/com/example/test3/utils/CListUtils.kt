@@ -15,7 +15,7 @@ import retrofit2.http.Query
 import java.io.IOException
 
 object CListUtils {
-    fun getManager(resource: String, userName: String, link: String, context: Context): Pair<AccountManager,String>? {
+    fun getManager(resource: String, userName: String, link: String, context: Context): Pair<AccountManager<out UserInfo>,String>? {
         return when(resource){
             "codeforces.com" -> Pair(CodeforcesAccountManager(context), userName)
             "topcoder.com" -> Pair(TopCoderAccountManager(context), userName)

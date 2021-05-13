@@ -5,7 +5,7 @@ import com.example.test3.utils.CListAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class CListAccountManager(context: Context) : AccountManager(context, preferences_file_name) {
+class CListAccountManager(context: Context) : AccountManager<CListAccountManager.CListUserInfo>(context, preferences_file_name) {
 
     companion object {
         const val preferences_file_name = "clist"
@@ -30,11 +30,11 @@ class CListAccountManager(context: Context) : AccountManager(context, preference
 
     override fun decodeFromString(str: String) = emptyInfo()
 
-    override fun encodeToString(info: UserInfo) = ""
+    override fun encodeToString(info: CListUserInfo) = ""
 
     override fun emptyInfo() = CListUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String, flags: Int): UserInfo {
+    override suspend fun downloadInfo(data: String, flags: Int): CListUserInfo {
         val login = data
         val res = CListUserInfo(STATUS.FAILED, login)
         val response = CListAPI.getUser(login) ?: return res

@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class TimusAccountManager(context: Context): AccountManager(context, manager_name) {
+class TimusAccountManager(context: Context): AccountManager<TimusAccountManager.TimusUserInfo>(context, manager_name) {
 
     companion object {
         const val manager_name = "timus"
@@ -45,7 +45,7 @@ class TimusAccountManager(context: Context): AccountManager(context, manager_nam
 
     override fun emptyInfo() = TimusUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String, flags: Int): UserInfo {
+    override suspend fun downloadInfo(data: String, flags: Int): TimusUserInfo {
         val res = TimusUserInfo(STATUS.FAILED, data)
         val s = TimusAPI.getUser(data) ?: return res
         var i = s.indexOf("<H2 CLASS=\"author_name\">")
@@ -74,7 +74,7 @@ class TimusAccountManager(context: Context): AccountManager(context, manager_nam
 
     override fun decodeFromString(str: String) = jsonCPS.decodeFromString<TimusUserInfo>(str)
 
-    override fun encodeToString(info: UserInfo) = jsonCPS.encodeToString(info as TimusUserInfo)
+    override fun encodeToString(info: TimusUserInfo) = jsonCPS.encodeToString(info)
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         if(str.toIntOrNull()!=null) return null

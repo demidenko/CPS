@@ -22,9 +22,9 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 
-abstract class AccountPanel(
+abstract class AccountPanel<U: UserInfo>(
     protected val mainActivity: MainActivity,
-    open val manager: AccountManager
+    open val manager: AccountManager<U>
 ){
 
     private val layout = mainActivity.layoutInflater.inflate(R.layout.account_panel, null) as ConstraintLayout
@@ -127,7 +127,7 @@ abstract class AccountPanel(
 
     suspend fun isEmpty() = manager.getSavedInfo().isEmpty()
 
-    protected abstract fun show(info: UserInfo)
+    protected abstract fun show(info: U)
 
     suspend fun show(){
         if(isEmpty()){
@@ -142,13 +142,13 @@ abstract class AccountPanel(
 
     fun callExpand(){
         mainActivity.cpsFragmentManager.pushBack(
-            AccountViewFragment().apply {
+            AccountViewFragment<U>().apply {
                 requireArguments().putString("manager", manager.managerName)
             }
         )
     }
 
-    fun showMainRated(handleView: TextView, ratingView: TextView, ratedAccountManager: RatedAccountManager, info: UserInfo) {
+    fun<U: UserInfo> showMainRated(handleView: TextView, ratingView: TextView, ratedAccountManager: RatedAccountManager<U>, info: U) {
         val color = ratedAccountManager.getColor(info) ?: mainActivity.defaultTextColor
         handleView.text = ratedAccountManager.makeSpan(info)
         ratingView.setTextColor(color)
@@ -162,14 +162,14 @@ abstract class AccountPanel(
 
     open val bigViewResource: Int = R.layout.fragment_account_view
 
-    open suspend fun showBigView(fragment: AccountViewFragment) {
+    open suspend fun showBigView(fragment: AccountViewFragment<U>) {
         val view = fragment.requireView()
 
         val userInfoTextView = view.findViewById<TextView>(R.id.account_user_info)
         userInfoTextView.text = manager.getSavedInfo().toString()
     }
 
-    open suspend fun createSettingsView(fragment: AccountSettingsFragment){}
+    open suspend fun createSettingsView(fragment: AccountSettingsFragment<U>){}
 
 }
 

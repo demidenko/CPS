@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.test3.account_manager.CodeforcesAccountManager
-import com.example.test3.account_manager.CodeforcesUserInfo
 import com.example.test3.account_manager.STATUS
 import com.example.test3.contest_watch.CodeforcesContestWatchWorker
 import com.example.test3.utils.CodeforcesAPI
@@ -24,7 +23,7 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
             return Result.success()
         }
 
-        val info = codeforcesAccountManager.getSavedInfo() as CodeforcesUserInfo
+        val info = codeforcesAccountManager.getSavedInfo()
         if(info.status != STATUS.OK) return Result.success()
 
         val currentTimeSeconds = getCurrentTimeSeconds()

@@ -7,6 +7,7 @@ import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.*
 import com.example.test3.account_manager.RatedAccountManager
+import com.example.test3.account_manager.UserInfo
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.ignoreFirst
@@ -15,9 +16,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-class AccountViewFragment: CPSFragment() {
+class AccountViewFragment<U: UserInfo>: CPSFragment() {
 
-    private val panel: AccountPanel by lazy { mainActivity.accountsFragment.getPanel(this) }
+    private val panel: AccountPanel<U> by lazy { mainActivity.accountsFragment.getPanel(this) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -85,7 +86,7 @@ class AccountViewFragment: CPSFragment() {
     private fun openSettings(){
         val managerType = panel.manager.managerName
         mainActivity.cpsFragmentManager.pushBack(
-            AccountSettingsFragment().apply {
+            AccountSettingsFragment<U>().apply {
                 requireArguments().putString("manager", managerType)
             }
         )

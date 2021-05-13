@@ -34,10 +34,10 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
-class DialogAccountChooser(
-    private val initialUserInfo: UserInfo,
-    private val manager: AccountManager,
-    private val cont: Continuation<UserInfo?>
+class DialogAccountChooser<U: UserInfo>(
+    private val initialUserInfo: U,
+    private val manager: AccountManager<U>,
+    private val cont: Continuation<U?>
 ): DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -112,10 +112,10 @@ class DialogAccountChooser(
         cont.resume(null)
     }
 
-    class UserIDChangeWatcher(
+    class UserIDChangeWatcher<U: UserInfo>(
         val fragment: Fragment,
-        val manager: AccountManager,
-        var lastLoadedInfo: UserInfo,
+        val manager: AccountManager<U>,
+        var lastLoadedInfo: U,
         val handleEditor: EditText,
         val saveButton: Button,
         val preview: TextView,
@@ -207,7 +207,7 @@ class DialogAccountChooser(
     }
 
 
-    class SuggestionsItemsAdapter(val watcher: UserIDChangeWatcher) : RecyclerView.Adapter<SuggestionsItemsAdapter.ItemHolder>(){
+    class SuggestionsItemsAdapter(val watcher: UserIDChangeWatcher<*>) : RecyclerView.Adapter<SuggestionsItemsAdapter.ItemHolder>(){
 
         class ItemHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view){
             val title: TextView = view.findViewById(R.id.suggestions_item_title)
@@ -257,7 +257,7 @@ class DialogAccountChooser(
 
     }
 
-    fun createSearchInputFilter(accountManager: AccountManager): InputFilter {
+    fun createSearchInputFilter(accountManager: AccountManager<*>): InputFilter {
         return InputFilter { source, start, end, dest, dstart, dend ->
             var keepOriginal = true
             val str = StringBuilder()

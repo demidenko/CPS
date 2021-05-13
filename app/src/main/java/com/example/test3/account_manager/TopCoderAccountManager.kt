@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class TopCoderAccountManager(context: Context): RatedAccountManager(context, manager_name) {
+class TopCoderAccountManager(context: Context): RatedAccountManager<TopCoderAccountManager.TopCoderUserInfo>(context, manager_name) {
 
     companion object {
         const val manager_name = "topcoder"
@@ -54,7 +54,7 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context, man
 
     override fun emptyInfo() = TopCoderUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String, flags: Int): UserInfo {
+    override suspend fun downloadInfo(data: String, flags: Int): TopCoderUserInfo {
         val handle = data
         val res = TopCoderUserInfo(STATUS.FAILED, handle)
 
@@ -79,15 +79,14 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context, man
 
     override fun decodeFromString(str: String) = jsonCPS.decodeFromString<TopCoderUserInfo>(str)
 
-    override fun encodeToString(info: UserInfo) = jsonCPS.encodeToString(info as TopCoderUserInfo)
+    override fun encodeToString(info: TopCoderUserInfo) = jsonCPS.encodeToString(info)
 
-    override fun getColor(info: UserInfo): Int? = with(info as TopCoderUserInfo){
+    override fun getColor(info: TopCoderUserInfo): Int? = with(info){
         if(status != STATUS.OK || rating_algorithm == NOT_RATED) return null
         return getHandleColorARGB(info.rating_algorithm)
     }
 
-    override suspend fun loadRatingHistory(info: UserInfo): List<RatingChange>? {
-        info as TopCoderUserInfo
+    override suspend fun loadRatingHistory(info: TopCoderUserInfo): List<RatingChange>? {
         val response = TopCoderAPI.getStatsHistory(info.handle) ?: return null
         if(!response.success || response.status!=200) return null
         return response.content[0].DATA_SCIENCE.SRM.history.map { topCoderRatingChange ->
@@ -98,7 +97,7 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context, man
         }
     }
 
-    override fun getRating(info: UserInfo) = (info as TopCoderUserInfo).rating_algorithm
+    override fun getRating(info: TopCoderUserInfo) = info.rating_algorithm
 
     override val ratingsUpperBounds = arrayOf(
         900 to HandleColor.GRAY,
@@ -120,8 +119,7 @@ class TopCoderAccountManager(context: Context): RatedAccountManager(context, man
         }
     }
 
-    override fun makeSpan(info: UserInfo): SpannableString {
-        info as TopCoderUserInfo
+    override fun makeSpan(info: TopCoderUserInfo): SpannableString {
         return SpannableString(info.handle).apply {
             getColor(info)?.let {
                 set(0, length, ForegroundColorSpan(it))
