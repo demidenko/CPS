@@ -27,21 +27,21 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
         suspend fun getHandles(): List<String> = dao.getAll().sortedByDescending { it.id }.map { it.handle }
         suspend fun getBlogEntries(handle: String) = dao.getUserBlog(handle)?.blogEntries
 
-        suspend fun add(handle: String): Boolean {
-            if(dao.getUserBlog(handle)!=null) return false
+        suspend fun add(info: CodeforcesUserInfo): Boolean {
+            if(dao.getUserBlog(info.handle)!=null) return false
 
             dao.insert(
                 CodeforcesUserBlog(
-                    handle = handle,
+                    handle = info.handle,
                     blogEntries = null,
-                    userInfo = CodeforcesUserInfo(STATUS.FAILED, "")
+                    userInfo = info
                 )
             )
 
             val locale = NewsFragment.getCodeforcesContentLanguage(context)
-            val blogEntries = CodeforcesAPI.getUserBlogEntries(handle,locale)?.result?.map { it.id }
+            val blogEntries = CodeforcesAPI.getUserBlogEntries(info.handle,locale)?.result?.map { it.id }
 
-            setBlogEntries(handle, blogEntries)
+            setBlogEntries(info.handle, blogEntries)
 
             return true
         }

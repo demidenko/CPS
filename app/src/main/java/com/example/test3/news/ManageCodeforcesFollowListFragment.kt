@@ -138,7 +138,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         }
 
         suspend fun add(userInfo: CodeforcesUserInfo){
-            if(!dataConnector.add(userInfo.handle)){
+            if(!dataConnector.add(userInfo)){
                 fragment.mainActivity.showToast("User already in list")
                 return
             }
