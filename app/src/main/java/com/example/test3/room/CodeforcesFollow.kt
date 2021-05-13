@@ -27,9 +27,13 @@ interface FollowListDao {
 
 @Entity(tableName = followListTableName)
 data class CodeforcesUserBlog(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+
     val handle: String,
-    val blogs: List<Int>?
+
+    @ColumnInfo(name = "blogs")
+    val blogEntries: List<Int>?
 )
 
 class IntsListConverter {

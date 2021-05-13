@@ -24,7 +24,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
         private val dao by lazy { getFollowDao(context) }
 
         suspend fun getHandles(): List<String> = dao.getAll().sortedByDescending { it.id }.map { it.handle }
-        suspend fun getBlogEntries(handle: String) = dao.getUserBlog(handle)?.blogs
+        suspend fun getBlogEntries(handle: String) = dao.getUserBlog(handle)?.blogEntries
 
         suspend fun add(handle: String): Boolean {
             if(dao.getUserBlog(handle)!=null) return false
@@ -32,14 +32,14 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
             dao.insert(
                 CodeforcesUserBlog(
                     handle = handle,
-                    blogs = null
+                    blogEntries = null
                 )
             )
 
             val locale = NewsFragment.getCodeforcesContentLanguage(context)
-            val userBlogs = CodeforcesAPI.getUserBlogEntries(handle,locale)?.result?.map { it.id }
+            val blogEntries = CodeforcesAPI.getUserBlogEntries(handle,locale)?.result?.map { it.id }
 
-            setBlogEntries(handle, userBlogs)
+            setBlogEntries(handle, blogEntries)
 
             return true
         }
@@ -50,19 +50,19 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
 
         suspend fun changeHandle(fromHandle: String, toHandle: String){
             if(fromHandle == toHandle) return
-            val fromUserBlogs = dao.getUserBlog(fromHandle) ?: return
-            dao.getUserBlog(toHandle)?.let { toUserBlogs ->
-                if(toUserBlogs.id != fromUserBlogs.id){
+            val fromUserBlog = dao.getUserBlog(fromHandle) ?: return
+            dao.getUserBlog(toHandle)?.let { toUserBlog ->
+                if(toUserBlog.id != fromUserBlog.id){
                     dao.remove(fromHandle)
                     return
                 }
             }
-            dao.update(fromUserBlogs.copy(handle = toHandle))
+            dao.update(fromUserBlog.copy(handle = toHandle))
         }
 
-        suspend fun setBlogEntries(handle: String, blogs: List<Int>?){
-            val userBlogs = dao.getUserBlog(handle) ?: return
-            dao.update(userBlogs.copy(blogs = blogs))
+        suspend fun setBlogEntries(handle: String, blogEntries: List<Int>?){
+            val userBlog = dao.getUserBlog(handle) ?: return
+            dao.update(userBlog.copy(blogEntries = blogEntries))
         }
 
         suspend fun loadBlogEntries(handle: String) = loadBlogEntries(handle, NewsFragment.getCodeforcesContentLanguage(context))
