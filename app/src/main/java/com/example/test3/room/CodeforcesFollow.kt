@@ -2,7 +2,7 @@ package com.example.test3.room
 
 import android.content.Context
 import androidx.room.*
-import com.example.test3.account_manager.CodeforcesAccountManager
+import com.example.test3.account_manager.CodeforcesUserInfo
 import com.example.test3.account_manager.STATUS
 import com.example.test3.utils.jsonCPS
 import kotlinx.serialization.SerializationException
@@ -41,7 +41,7 @@ data class CodeforcesUserBlog(
     @ColumnInfo(name = "blogs")
     val blogEntries: List<Int>?,
 
-    val userInfo: CodeforcesAccountManager.CodeforcesUserInfo
+    val userInfo: CodeforcesUserInfo
 )
 
 class IntsListConverter {
@@ -70,16 +70,16 @@ class IntsListConverter {
 
 class CodeforcesUserInfoConverter {
     @TypeConverter
-    fun userInfoToString(info: CodeforcesAccountManager.CodeforcesUserInfo): String {
+    fun userInfoToString(info: CodeforcesUserInfo): String {
         return jsonCPS.encodeToString(info)
     }
 
     @TypeConverter
-    fun stringToUserInfo(str: String): CodeforcesAccountManager.CodeforcesUserInfo {
+    fun stringToUserInfo(str: String): CodeforcesUserInfo {
         return try {
             jsonCPS.decodeFromString(str)
         } catch (e: SerializationException) {
-            CodeforcesAccountManager.CodeforcesUserInfo(
+            CodeforcesUserInfo(
                 status = STATUS.FAILED,
                 handle = ""
             )

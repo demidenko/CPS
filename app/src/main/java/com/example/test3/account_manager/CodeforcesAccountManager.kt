@@ -18,6 +18,25 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
+
+@Serializable
+data class CodeforcesUserInfo(
+    override var status: STATUS,
+    var handle: String,
+    var rating: Int = NOT_RATED,
+    var contribution: Int = 0
+): UserInfo() {
+    override val userID: String
+        get() = handle
+
+    override fun makeInfoOKString(): String {
+        return if(rating == NOT_RATED) "$handle [not rated]" else "$handle $rating"
+    }
+
+    override fun link(): String = CodeforcesURLFactory.user(handle)
+}
+
+
 class CodeforcesAccountManager(context: Context): RatedAccountManager(context, manager_name), AccountSettingsProvider {
 
     companion object {
@@ -25,22 +44,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager(context, m
         private val Context.account_codeforces_dataStore by preferencesDataStore(manager_name)
     }
 
-    @Serializable
-    data class CodeforcesUserInfo(
-        override var status: STATUS,
-        var handle: String,
-        var rating: Int = NOT_RATED,
-        var contribution: Int = 0
-    ): UserInfo() {
-        override val userID: String
-            get() = handle
 
-        override fun makeInfoOKString(): String {
-            return if(rating == NOT_RATED) "$handle [not rated]" else "$handle $rating"
-        }
-
-        override fun link(): String = CodeforcesURLFactory.user(handle)
-    }
 
     override val homeURL = "https://codeforces.com"
 

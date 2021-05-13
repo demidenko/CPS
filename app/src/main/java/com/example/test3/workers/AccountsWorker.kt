@@ -9,6 +9,7 @@ import androidx.work.WorkerParameters
 import com.example.test3.*
 import com.example.test3.account_manager.AtCoderAccountManager
 import com.example.test3.account_manager.CodeforcesAccountManager
+import com.example.test3.account_manager.CodeforcesUserInfo
 import com.example.test3.account_manager.STATUS
 import com.example.test3.utils.*
 import kotlinx.coroutines.*
@@ -35,7 +36,7 @@ class AccountsWorker(private val context: Context, params: WorkerParameters) : C
     }
 
     private suspend fun codeforcesRating() {
-        val info = codeforcesAccountManager.getSavedInfo() as CodeforcesAccountManager.CodeforcesUserInfo
+        val info = codeforcesAccountManager.getSavedInfo() as CodeforcesUserInfo
         if(info.status != STATUS.OK) return
 
         val response = CodeforcesAPI.getUserRatingChanges(info.handle) ?: return
@@ -73,11 +74,11 @@ class AccountsWorker(private val context: Context, params: WorkerParameters) : C
     }
 
     private suspend fun codeforcesContribution() {
-        val info = codeforcesAccountManager.getSavedInfo() as CodeforcesAccountManager.CodeforcesUserInfo
+        val info = codeforcesAccountManager.getSavedInfo() as CodeforcesUserInfo
         if(info.status != STATUS.OK) return
 
         val handle = info.handle
-        val contribution = (codeforcesAccountManager.loadInfo(handle) as CodeforcesAccountManager.CodeforcesUserInfo).let {
+        val contribution = (codeforcesAccountManager.loadInfo(handle) as CodeforcesUserInfo).let {
             if(it.status != STATUS.OK) return
             it.contribution
         }

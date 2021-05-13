@@ -6,6 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
+import com.example.test3.account_manager.CodeforcesUserInfo
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.signedToString
@@ -26,7 +27,7 @@ class CodeforcesAccountPanel(
     override suspend fun showBigView(fragment: AccountViewFragment) {
         val view = fragment.requireView()
 
-        val info = manager.getSavedInfo() as CodeforcesAccountManager.CodeforcesUserInfo
+        val info = manager.getSavedInfo() as CodeforcesUserInfo
 
         val handleView = view.findViewById<TextView>(R.id.account_view_handle)
         val ratingView = view.findViewById<TextView>(R.id.account_view_rating)

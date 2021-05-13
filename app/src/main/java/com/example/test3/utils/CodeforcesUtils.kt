@@ -262,9 +262,9 @@ object CodeforcesUtils {
         }
     }
 
-    suspend fun getUsersInfo(handlesList: List<String>, doRedirect: Boolean = false): Map<String, CodeforcesAccountManager.CodeforcesUserInfo> {
+    suspend fun getUsersInfo(handlesList: List<String>, doRedirect: Boolean = false): Map<String, CodeforcesUserInfo> {
         val res = handlesList.associateWith { handle ->
-            CodeforcesAccountManager.CodeforcesUserInfo(STATUS.FAILED, handle)
+            CodeforcesUserInfo(STATUS.FAILED, handle)
         }.toMutableMap()
 
         val handles = handlesList.toMutableList()
@@ -300,7 +300,7 @@ object CodeforcesUtils {
                     (realHandles[handle] ?: handle).let { realHandle ->
                         resultList.find { it.handle.equals(realHandle, true) }
                     }?.let { codeforcesUser ->
-                        res[handle] = CodeforcesAccountManager.CodeforcesUserInfo(
+                        res[handle] = CodeforcesUserInfo(
                             status = STATUS.OK,
                             handle = codeforcesUser.handle,
                             rating = codeforcesUser.rating

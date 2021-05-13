@@ -18,14 +18,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
+import com.example.test3.account_manager.CodeforcesUserInfo
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.codeforces.CodeforcesBlogEntriesFragment
 import com.example.test3.ui.CPSFragment
-import com.example.test3.utils.ignoreFirst
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.disable
 import com.example.test3.utils.enable
+import com.example.test3.utils.ignoreFirst
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -75,7 +76,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             buttonAdd.disable()
             lifecycleScope.launch {
                 mainActivity.chooseUserID(CodeforcesAccountManager(mainActivity))?.let { userInfo ->
-                    followListAdapter.add(userInfo as CodeforcesAccountManager.CodeforcesUserInfo)
+                    followListAdapter.add(userInfo as CodeforcesUserInfo)
                     followRecyclerView.scrollToPosition(0)
                 }
                 buttonAdd.enable()
@@ -101,13 +102,13 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
 
         private val codeforcesAccountManager = CodeforcesAccountManager(fragment.requireContext())
 
-        private val list = mutableListOf<CodeforcesAccountManager.CodeforcesUserInfo>()
+        private val list = mutableListOf<CodeforcesUserInfo>()
         override fun getItemCount(): Int = list.size
 
         private val dataConnector = CodeforcesNewsFollowWorker.FollowDataConnector(fragment.requireContext())
 
-        private var openBlogEntriesCallback: ((CodeforcesAccountManager.CodeforcesUserInfo) -> Unit)? = null
-        fun setOnSelectListener(callback: (CodeforcesAccountManager.CodeforcesUserInfo) -> Unit) {
+        private var openBlogEntriesCallback: ((CodeforcesUserInfo) -> Unit)? = null
+        fun setOnSelectListener(callback: (CodeforcesUserInfo) -> Unit) {
             openBlogEntriesCallback = callback
         }
 
@@ -136,7 +137,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             notifyItemRangeInserted(0, list.size)
         }
 
-        suspend fun add(userInfo: CodeforcesAccountManager.CodeforcesUserInfo){
+        suspend fun add(userInfo: CodeforcesUserInfo){
             if(!dataConnector.add(userInfo.handle)){
                 fragment.mainActivity.showToast("User already in list")
                 return
@@ -145,7 +146,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             notifyItemInserted(0)
         }
 
-        fun remove(userInfo: CodeforcesAccountManager.CodeforcesUserInfo){
+        fun remove(userInfo: CodeforcesUserInfo){
             val index = list.indexOf(userInfo).takeIf { it!=-1 } ?: return
 
             runBlocking {
