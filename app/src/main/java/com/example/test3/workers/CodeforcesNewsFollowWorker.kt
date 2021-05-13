@@ -7,6 +7,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.example.test3.*
+import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.settingsNews
 import com.example.test3.room.CodeforcesUserBlog
@@ -32,7 +33,8 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
             dao.insert(
                 CodeforcesUserBlog(
                     handle = handle,
-                    blogEntries = null
+                    blogEntries = null,
+                    userInfo = CodeforcesAccountManager.CodeforcesUserInfo(STATUS.FAILED, "")
                 )
             )
 

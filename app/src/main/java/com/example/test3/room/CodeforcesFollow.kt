@@ -2,6 +2,12 @@ package com.example.test3.room
 
 import android.content.Context
 import androidx.room.*
+import com.example.test3.account_manager.CodeforcesAccountManager
+import com.example.test3.account_manager.STATUS
+import com.example.test3.utils.jsonCPS
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 
 fun getFollowDao(context: Context) = RoomSingleton.getInstance(context).followListDao()
 
@@ -33,7 +39,9 @@ data class CodeforcesUserBlog(
     val handle: String,
 
     @ColumnInfo(name = "blogs")
-    val blogEntries: List<Int>?
+    val blogEntries: List<Int>?,
+
+    val userInfo: CodeforcesAccountManager.CodeforcesUserInfo
 )
 
 class IntsListConverter {
@@ -56,6 +64,25 @@ class IntsListConverter {
         if(s == null) return null
         return (s.indices step 4).map { i ->
             ((s[i+3].code*256 + s[i+2].code)*256 + s[i+1].code)*256 + s[i].code
+        }
+    }
+}
+
+class CodeforcesUserInfoConverter {
+    @TypeConverter
+    fun userInfoToString(info: CodeforcesAccountManager.CodeforcesUserInfo): String {
+        return jsonCPS.encodeToString(info)
+    }
+
+    @TypeConverter
+    fun stringToUserInfo(str: String): CodeforcesAccountManager.CodeforcesUserInfo {
+        return try {
+            jsonCPS.decodeFromString(str)
+        } catch (e: SerializationException) {
+            CodeforcesAccountManager.CodeforcesUserInfo(
+                status = STATUS.FAILED,
+                handle = ""
+            )
         }
     }
 }
