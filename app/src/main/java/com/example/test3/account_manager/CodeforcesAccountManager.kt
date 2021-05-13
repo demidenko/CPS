@@ -26,6 +26,13 @@ data class CodeforcesUserInfo(
     var rating: Int = NOT_RATED,
     var contribution: Int = 0
 ): UserInfo() {
+    constructor(codeforcesUser: CodeforcesUser): this(
+        status = STATUS.OK,
+        handle = codeforcesUser.handle,
+        rating = codeforcesUser.rating,
+        contribution = codeforcesUser.contribution
+    )
+
     override val userID: String
         get() = handle
 
@@ -77,13 +84,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager<Codeforces
             }
             return res
         }
-        val info = response.result!!
-        return res.copy(
-            status = STATUS.OK,
-            handle = info.handle,
-            rating = info.rating,
-            contribution = info.contribution
-        )
+        return CodeforcesUserInfo(response.result!!)
     }
 
     override fun decodeFromString(str: String) = jsonCPS.decodeFromString<CodeforcesUserInfo>(str)

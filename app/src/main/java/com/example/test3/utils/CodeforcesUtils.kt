@@ -300,11 +300,7 @@ object CodeforcesUtils {
                     (realHandles[handle] ?: handle).let { realHandle ->
                         resultList.find { it.handle.equals(realHandle, true) }
                     }?.let { codeforcesUser ->
-                        res[handle] = CodeforcesUserInfo(
-                            status = STATUS.OK,
-                            handle = codeforcesUser.handle,
-                            rating = codeforcesUser.rating
-                        )
+                        res[handle] = CodeforcesUserInfo(codeforcesUser)
                     }
                 }
             }
