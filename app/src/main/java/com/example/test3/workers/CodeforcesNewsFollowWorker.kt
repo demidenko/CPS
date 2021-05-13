@@ -73,13 +73,16 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
                 //"handle: You are not allowed to read that blog" -> no activity
                 if(response.isBlogHandleNotFound(handle)){
                     val (realHandle, status) = CodeforcesUtils.getRealHandle(handle)
-                    when(status){
+                    return when(status){
                         STATUS.OK -> {
                             changeHandle(handle, realHandle)
-                            return loadBlogEntries(realHandle, locale)
+                            loadBlogEntries(realHandle, locale)
                         }
-                        STATUS.NOT_FOUND -> remove(handle)
-                        STATUS.FAILED -> return emptyList()
+                        STATUS.NOT_FOUND -> {
+                            remove(handle)
+                            emptyList()
+                        }
+                        STATUS.FAILED -> emptyList()
                     }
                 }
                 return emptyList()
@@ -89,27 +92,13 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
                 getBlogEntries(handle)?.toSet()?.let { saved ->
                     result.filter { it.id !in saved }
                         .onEach { blogEntry ->
-                            notifyNewBlogEntry(blogEntry)
+                            notifyNewBlogEntry(blogEntry, context)
                         }.isNotEmpty()
                 } ?: true
             if(updated) setBlogEntries(handle, result.map { it.id })
             return result
         }
 
-        private fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry){
-            val title = fromHTML(blogEntry.title.removeSurrounding("<p>", "</p>")).toString()
-            val n = notificationBuilder(context, NotificationChannels.codeforces_follow_new_blog).apply {
-                setSubText("New codeforces blog entry")
-                setContentTitle(blogEntry.authorHandle)
-                setBigContent(title)
-                setSmallIcon(R.drawable.ic_new_post)
-                setAutoCancel(true)
-                setShowWhen(true)
-                setWhen(TimeUnit.SECONDS.toMillis(blogEntry.creationTimeSeconds))
-                setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.blog(blogEntry.id), context))
-            }
-            NotificationManagerCompat.from(context).notify(NotificationIDs.makeCodeforcesFollowBlogID(blogEntry.id), n.build())
-        }
     }
 
     override suspend fun doWork(): Result {
@@ -149,4 +138,19 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
             .setShowWhen(false)
     }
 
+}
+
+private fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry, context: Context){
+    val title = fromHTML(blogEntry.title.removeSurrounding("<p>", "</p>")).toString()
+    val n = notificationBuilder(context, NotificationChannels.codeforces_follow_new_blog).apply {
+        setSubText("New codeforces blog entry")
+        setContentTitle(blogEntry.authorHandle)
+        setBigContent(title)
+        setSmallIcon(R.drawable.ic_new_post)
+        setAutoCancel(true)
+        setShowWhen(true)
+        setWhen(TimeUnit.SECONDS.toMillis(blogEntry.creationTimeSeconds))
+        setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.blog(blogEntry.id), context))
+    }
+    NotificationManagerCompat.from(context).notify(NotificationIDs.makeCodeforcesFollowBlogID(blogEntry.id), n.build())
 }
