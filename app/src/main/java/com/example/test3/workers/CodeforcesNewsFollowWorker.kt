@@ -50,7 +50,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
             dao.remove(handle)
         }
 
-        suspend fun changeHandle(fromHandle: String, toHandle: String){
+        private suspend fun changeHandle(fromHandle: String, toHandle: String){
             if(fromHandle == toHandle) return
             val fromUserBlog = dao.getUserBlog(fromHandle) ?: return
             dao.getUserBlog(toHandle)?.let { toUserBlog ->
@@ -62,9 +62,16 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
             dao.update(fromUserBlog.copy(handle = toHandle))
         }
 
-        suspend fun setBlogEntries(handle: String, blogEntries: List<Int>?){
+        private suspend fun setBlogEntries(handle: String, blogEntries: List<Int>?){
             val userBlog = dao.getUserBlog(handle) ?: return
             dao.update(userBlog.copy(blogEntries = blogEntries))
+        }
+
+        private suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
+            if(info.status != STATUS.OK) return
+            if(info.handle != handle) changeHandle(handle, info.handle)
+            val userBlog = dao.getUserBlog(info.handle) ?: return
+            if(userBlog.userInfo != info) dao.update(userBlog.copy(userInfo = info))
         }
 
         suspend fun loadBlogEntries(handle: String) = loadBlogEntries(handle, NewsFragment.getCodeforcesContentLanguage(context))
@@ -99,6 +106,16 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
                 } ?: true
             if(updated) setBlogEntries(handle, result.map { it.id })
             return result
+        }
+
+        suspend fun updateUsersInfo() {
+            CodeforcesUtils.getUsersInfo(getHandles(), true)
+                .forEach { (handle, info) ->
+                    when (info.status) {
+                        STATUS.NOT_FOUND ->dao.remove(handle)
+                        STATUS.OK -> setUserInfo(handle, info)
+                    }
+                }
         }
 
     }

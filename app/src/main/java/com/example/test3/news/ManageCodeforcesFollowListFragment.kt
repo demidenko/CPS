@@ -13,22 +13,26 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.CodeforcesUserInfo
-import com.example.test3.account_manager.STATUS
 import com.example.test3.news.codeforces.CodeforcesBlogEntriesFragment
+import com.example.test3.news.codeforces.adapters.CodeforcesNewsItemsAdapter
+import com.example.test3.room.CodeforcesUserBlog
+import com.example.test3.room.getFollowDao
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.settingsUI
-import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.disable
 import com.example.test3.utils.enable
 import com.example.test3.utils.ignoreFirst
 import com.example.test3.workers.CodeforcesNewsFollowWorker
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -57,7 +61,12 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         }
 
 
-        val followListAdapter = FollowListItemsAdapter(this).apply {
+        val followListAdapter = FollowListItemsAdapter(
+            this,
+            getFollowDao(requireContext()).flowOfAll().map { blogs ->
+                blogs.sortedByDescending { it.id }
+            }
+        ).apply {
             setOnSelectListener { info ->
                 mainActivity.cpsFragmentManager.pushBack(
                     CodeforcesBlogEntriesFragment().apply {
@@ -76,7 +85,11 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             buttonAdd.disable()
             lifecycleScope.launch {
                 mainActivity.chooseUserID(CodeforcesAccountManager(mainActivity))?.let { userInfo ->
-                    followListAdapter.add(userInfo)
+                    val dataConnector = CodeforcesNewsFollowWorker.FollowDataConnector(requireContext())
+                    if(!dataConnector.add(userInfo)){
+                        mainActivity.showToast("User already in list")
+                        return@let
+                    }
                     followRecyclerView.scrollToPosition(0)
                 }
                 buttonAdd.enable()
@@ -85,25 +98,23 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
 
         lifecycleScope.launch {
             followRecyclerView.isEnabled = false
-            followListAdapter.initialize()
+            CodeforcesNewsFollowWorker.FollowDataConnector(requireContext()).updateUsersInfo()
             followRecyclerView.isEnabled = true
             buttonAdd.isVisible = true
         }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
-            mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().collect { use ->
-                followListAdapter.notifyDataSetChanged()
-            }
+            mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().collect { followListAdapter.refreshHandles() }
         }
     }
 
+    class FollowListItemsAdapter(
+        val fragment: CPSFragment,
+        dataFlow: Flow<List<CodeforcesUserBlog>>
+    ): CodeforcesNewsItemsAdapter<FollowListItemsAdapter.UserBlogInfoViewHolder,List<CodeforcesUserBlog>>(fragment, dataFlow) {
 
-    class FollowListItemsAdapter(val fragment: CPSFragment) : RecyclerView.Adapter<FollowListItemsAdapter.ItemHolder>() {
-
-        private val codeforcesAccountManager = CodeforcesAccountManager(fragment.requireContext())
-
-        private val list = mutableListOf<CodeforcesUserInfo>()
-        override fun getItemCount(): Int = list.size
+        private var items: Array<CodeforcesUserBlog> = emptyArray()
+        override fun getItemCount(): Int = items.size
 
         private val dataConnector = CodeforcesNewsFollowWorker.FollowDataConnector(fragment.requireContext())
 
@@ -112,65 +123,26 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             openBlogEntriesCallback = callback
         }
 
-        suspend fun initialize(){
-            val usersInfo = CodeforcesUtils.getUsersInfo(dataConnector.getHandles(), true)
-                .mapNotNull { (handle, info) ->
-                    if(info.status == STATUS.NOT_FOUND){
-                        dataConnector.remove(handle)
-                        null
-                    } else {
-                        if(info.status == STATUS.OK && info.handle != handle){
-                            dataConnector.changeHandle(handle, info.handle)
-                            info.handle to info
-                        } else {
-                            handle to info
-                        }
-                    }
-                }.toMap()
-
-            dataConnector.getHandles().mapNotNull { handle ->
-                usersInfo[handle]?.takeIf { it.status != STATUS.NOT_FOUND }
-            }.let { infos ->
-                list.addAll(infos)
-            }
-
-            notifyItemRangeInserted(0, list.size)
-        }
-
-        suspend fun add(userInfo: CodeforcesUserInfo){
-            if(!dataConnector.add(userInfo)){
-                fragment.mainActivity.showToast("User already in list")
-                return
-            }
-            list.add(0, userInfo)
-            notifyItemInserted(0)
-        }
-
         fun remove(userInfo: CodeforcesUserInfo){
-            val index = list.indexOf(userInfo).takeIf { it!=-1 } ?: return
-
             runBlocking {
                 dataConnector.remove(userInfo.handle)
             }
-            list.removeAt(index)
-            notifyItemRemoved(index)
         }
 
-        class ItemHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view) {
+        class UserBlogInfoViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view) {
             val title: TextView = view.findViewById(R.id.manage_cf_follow_users_list_item_title)
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserBlogInfoViewHolder {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.manage_cf_follow_list_item, parent, false) as ConstraintLayout
-            return ItemHolder(view)
+            return UserBlogInfoViewHolder(view)
         }
 
-        override fun onBindViewHolder(holder: ItemHolder, position: Int) {
-            val userInfo = list[position]
-            holder.title.text = codeforcesAccountManager.makeSpan(userInfo)
-
+        override fun onBindViewHolder(holder: UserBlogInfoViewHolder, position: Int) {
+            setHandle(holder, position)
             holder.view.setOnClickListener {
+                val userInfo = items[holder.bindingAdapterPosition].userInfo
                 PopupMenu(it.context, holder.title, Gravity.CENTER_HORIZONTAL).apply {
                     inflate(R.menu.popup_cf_follow_list_item)
 
@@ -197,6 +169,36 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             }
         }
 
+        private fun setHandle(holder: UserBlogInfoViewHolder, position: Int) {
+            with(items[position]){
+                holder.title.text = codeforcesAccountManager.makeSpan(userInfo.copy(handle = handle))
+            }
+        }
 
+        override fun refreshHandles(holder: UserBlogInfoViewHolder, position: Int) = setHandle(holder, position)
+
+        override suspend fun applyData(data: List<CodeforcesUserBlog>): DiffUtil.DiffResult {
+            val newItems = data.toTypedArray()
+            return DiffUtil.calculateDiff(diffCallback(items, newItems)).also {
+                items = newItems
+            }
+        }
+
+        companion object {
+            private fun diffCallback(old: Array<CodeforcesUserBlog>, new: Array<CodeforcesUserBlog>) =
+                object : DiffUtil.Callback() {
+                    override fun getOldListSize() = old.size
+                    override fun getNewListSize() = new.size
+
+                    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                        return old[oldItemPosition].id == new[newItemPosition].id
+                    }
+
+                    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                        return old[oldItemPosition] == new[newItemPosition]
+                    }
+
+                }
+        }
     }
 }

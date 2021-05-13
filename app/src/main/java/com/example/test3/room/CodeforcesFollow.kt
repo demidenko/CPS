@@ -5,6 +5,7 @@ import androidx.room.*
 import com.example.test3.account_manager.CodeforcesUserInfo
 import com.example.test3.account_manager.STATUS
 import com.example.test3.utils.jsonCPS
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -29,6 +30,9 @@ interface FollowListDao {
 
     @Query("SELECT * FROM $followListTableName")
     suspend fun getAll(): List<CodeforcesUserBlog>
+
+    @Query("SELECT * FROM $followListTableName")
+    fun flowOfAll(): Flow<List<CodeforcesUserBlog>>
 }
 
 @Entity(tableName = followListTableName)
