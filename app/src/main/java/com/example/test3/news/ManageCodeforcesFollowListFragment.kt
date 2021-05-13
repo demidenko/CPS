@@ -9,7 +9,6 @@ import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
@@ -79,7 +78,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         followRecyclerView.adapter = followListAdapter
 
         val buttonAdd = requireBottomPanel().findViewById<ImageButton>(R.id.navigation_cf_follow_add).apply {
-            isVisible = false
+            disable()
         }
         buttonAdd.setOnClickListener {
             buttonAdd.disable()
@@ -100,7 +99,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             followRecyclerView.isEnabled = false
             CodeforcesNewsFollowWorker.FollowDataConnector(requireContext()).updateUsersInfo()
             followRecyclerView.isEnabled = true
-            buttonAdd.isVisible = true
+            buttonAdd.enable()
         }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){

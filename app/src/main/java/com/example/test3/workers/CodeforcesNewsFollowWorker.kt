@@ -64,7 +64,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
 
         private suspend fun setBlogEntries(handle: String, blogEntries: List<Int>?){
             val userBlog = dao.getUserBlog(handle) ?: return
-            dao.update(userBlog.copy(blogEntries = blogEntries))
+            if(userBlog.blogEntries != blogEntries) dao.update(userBlog.copy(blogEntries = blogEntries))
         }
 
         private suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
