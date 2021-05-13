@@ -133,10 +133,8 @@ class CodeforcesCommentsAdapter(
                 override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
                     val oldComment = old[oldItemPosition].comment!!
                     val newComment = new[newItemPosition].comment!!
-                    if(oldComment.text != newComment.text) return null
-                    if(oldComment.commentatorHandle != newComment.commentatorHandle) return null
-                    if(oldComment.commentatorHandleColorTag != newComment.commentatorHandleColorTag) return null
-                    if(oldComment.rating != newComment.rating) return UPDATE_RATING
+                    val difference = classDifference(oldComment, newComment)
+                    if(difference == listOf(CodeforcesComment::rating)) return UPDATE_RATING
                     return null
                 }
             }

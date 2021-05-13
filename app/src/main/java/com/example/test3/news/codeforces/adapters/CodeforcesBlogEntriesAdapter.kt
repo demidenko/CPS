@@ -183,21 +183,27 @@ class CodeforcesBlogEntriesAdapter(
                 }
 
                 override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    return old[oldItemPosition] == new[newItemPosition]
+                    val oldBlogEntry = old[oldItemPosition]
+                    val newBlogEntry = new[newItemPosition]
+                    val id = newBlogEntry.id
+                    return (oldBlogEntry == newBlogEntry) && (id in oldNewEntries == id in newNewEntries)
                 }
 
+                private val fields = setOf(
+                    CodeforcesBlogEntry::rating,
+                    CodeforcesBlogEntry::commentsCount,
+                )
                 override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): List<Any>? {
                     val oldBlogEntry = old[oldItemPosition]
                     val newBlogEntry = new[newItemPosition]
-                    if(oldBlogEntry.title != newBlogEntry.title) return null
-                    if(oldBlogEntry.authorHandle != newBlogEntry.authorHandle) return null
-                    if(oldBlogEntry.authorColorTag != newBlogEntry.authorColorTag) return null
-                    val id = newBlogEntry.id
+                    val difference = classDifference(oldBlogEntry, newBlogEntry)
+                    if(!fields.containsAll(difference)) return null
                     val res = mutableListOf<Any>()
-                    if(oldBlogEntry.rating != newBlogEntry.rating) res.add(UPDATE_RATING)
-                    if(oldBlogEntry.commentsCount != newBlogEntry.commentsCount) res.add(UPDATE_COMMENTS)
+                    if(CodeforcesBlogEntry::rating in difference) res.add(UPDATE_RATING)
+                    if(CodeforcesBlogEntry::commentsCount in difference) res.add(UPDATE_COMMENTS)
+                    val id = newBlogEntry.id
                     if(id in oldNewEntries != id in newNewEntries) res.add(NEW_ENTRY)
-                    return res.takeIf { it.isNotEmpty() }
+                    return res
                 }
 
             }

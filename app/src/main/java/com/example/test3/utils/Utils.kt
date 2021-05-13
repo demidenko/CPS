@@ -22,6 +22,8 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.memberProperties
 
 fun getCurrentTimeSeconds() = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
 
@@ -231,5 +233,11 @@ fun<T> Flow<T>.ignoreFirst(): Flow<T> {
     return transform { value ->
         if(!ignore) emit(value)
         else ignore = false
+    }
+}
+
+inline fun<reified T: Any> classDifference(a: T, b: T): List<KProperty1<T, *>> {
+    return T::class.memberProperties.filter {
+        it.get(a) != it.get(b)
     }
 }
