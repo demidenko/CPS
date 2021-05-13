@@ -9,7 +9,7 @@ import androidx.work.WorkerParameters
 import com.example.test3.*
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.settingsNews
-import com.example.test3.room.UserBlogs
+import com.example.test3.room.CodeforcesUserBlog
 import com.example.test3.room.getFollowDao
 import com.example.test3.utils.*
 import java.util.concurrent.TimeUnit
@@ -24,13 +24,13 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
         private val dao by lazy { getFollowDao(context) }
 
         suspend fun getHandles(): List<String> = dao.getAll().sortedByDescending { it.id }.map { it.handle }
-        suspend fun getBlogEntries(handle: String) = dao.getUserBlogs(handle)?.blogs
+        suspend fun getBlogEntries(handle: String) = dao.getUserBlog(handle)?.blogs
 
         suspend fun add(handle: String): Boolean {
-            if(dao.getUserBlogs(handle)!=null) return false
+            if(dao.getUserBlog(handle)!=null) return false
 
             dao.insert(
-                UserBlogs(
+                CodeforcesUserBlog(
                     handle = handle,
                     blogs = null
                 )
@@ -50,8 +50,8 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
 
         suspend fun changeHandle(fromHandle: String, toHandle: String){
             if(fromHandle == toHandle) return
-            val fromUserBlogs = dao.getUserBlogs(fromHandle) ?: return
-            dao.getUserBlogs(toHandle)?.let { toUserBlogs ->
+            val fromUserBlogs = dao.getUserBlog(fromHandle) ?: return
+            dao.getUserBlog(toHandle)?.let { toUserBlogs ->
                 if(toUserBlogs.id != fromUserBlogs.id){
                     dao.remove(fromHandle)
                     return
@@ -61,7 +61,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
         }
 
         suspend fun setBlogEntries(handle: String, blogs: List<Int>?){
-            val userBlogs = dao.getUserBlogs(handle) ?: return
+            val userBlogs = dao.getUserBlog(handle) ?: return
             dao.update(userBlogs.copy(blogs = blogs))
         }
 

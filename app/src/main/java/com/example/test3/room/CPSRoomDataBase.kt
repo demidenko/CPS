@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [LostBlogEntry::class, UserBlogs::class], version = 2)
+@Database(entities = [LostBlogEntry::class, CodeforcesUserBlog::class], version = 2)
 @TypeConverters(IntsListConverter::class)
 abstract class RoomSingleton: RoomDatabase(){
     abstract fun lostBlogsDao(): LostBlogsDao
