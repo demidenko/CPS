@@ -7,7 +7,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.example.test3.*
-import com.example.test3.account_manager.CodeforcesUserInfo
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.settingsNews
 import com.example.test3.room.getFollowDao
@@ -26,25 +25,6 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
         suspend fun getHandles(): List<String> = dao.getAll().sortedByDescending { it.id }.map { it.handle }
         suspend fun getBlogEntries(handle: String) = dao.getUserBlog(handle)?.blogEntries
 
-        private suspend fun changeHandle(fromHandle: String, toHandle: String){
-            if(fromHandle == toHandle) return
-            val fromUserBlog = dao.getUserBlog(fromHandle) ?: return
-            dao.getUserBlog(toHandle)?.let { toUserBlog ->
-                if(toUserBlog.id != fromUserBlog.id){
-                    dao.remove(fromHandle)
-                    return
-                }
-            }
-            dao.update(fromUserBlog.copy(handle = toHandle))
-        }
-
-        private suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
-            if(info.status != STATUS.OK) return
-            if(info.handle != handle) changeHandle(handle, info.handle)
-            val userBlog = dao.getUserBlog(info.handle) ?: return
-            if(userBlog.userInfo != info) dao.update(userBlog.copy(userInfo = info))
-        }
-
         suspend fun loadBlogEntries(handle: String) = loadBlogEntries(handle, NewsFragment.getCodeforcesContentLanguage(context))
 
         suspend fun loadBlogEntries(handle: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
@@ -55,7 +35,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
                     val (realHandle, status) = CodeforcesUtils.getRealHandle(handle)
                     return when(status){
                         STATUS.OK -> {
-                            changeHandle(handle, realHandle)
+                            dao.changeHandle(handle, realHandle)
                             loadBlogEntries(realHandle, locale)
                         }
                         STATUS.NOT_FOUND -> {
@@ -84,7 +64,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
                 .forEach { (handle, info) ->
                     when (info.status) {
                         STATUS.NOT_FOUND -> dao.remove(handle)
-                        STATUS.OK -> setUserInfo(handle, info)
+                        STATUS.OK -> dao.setUserInfo(handle, info)
                     }
                 }
         }

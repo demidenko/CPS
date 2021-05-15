@@ -38,6 +38,25 @@ interface FollowListDao {
         val userBlog = getUserBlog(handle) ?: return
         if(userBlog.blogEntries != blogEntries) update(userBlog.copy(blogEntries = blogEntries))
     }
+
+    suspend fun changeHandle(fromHandle: String, toHandle: String){
+        if(fromHandle == toHandle) return
+        val fromUserBlog = getUserBlog(fromHandle) ?: return
+        getUserBlog(toHandle)?.let { toUserBlog ->
+            if(toUserBlog.id != fromUserBlog.id){
+                remove(fromHandle)
+                return
+            }
+        }
+        update(fromUserBlog.copy(handle = toHandle))
+    }
+
+    suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
+        if(info.status != STATUS.OK) return
+        if(info.handle != handle) changeHandle(handle, info.handle)
+        val userBlog = getUserBlog(info.handle) ?: return
+        if(userBlog.userInfo != info) update(userBlog.copy(userInfo = info))
+    }
 }
 
 @Entity(tableName = followListTableName)

@@ -88,12 +88,12 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         buttonAdd.setOnClickListener {
             buttonAdd.disable()
             lifecycleScope.launch {
-                mainActivity.chooseUserID(CodeforcesAccountManager(mainActivity))?.let { userInfo ->
+                mainActivity.chooseUserID(CodeforcesAccountManager(requireContext()))?.let { userInfo ->
                     if(!newsViewModel.addToFollowList(userInfo, requireContext())){
                         mainActivity.showToast("User already in list")
                         return@let
                     }
-                    followRecyclerView.scrollToPosition(0)
+                    followRecyclerView.scrollToPosition(0) //TODO not working
                 }
                 buttonAdd.enable()
             }
@@ -112,7 +112,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
     }
 
     class FollowListItemsAdapter(
-        val fragment: CPSFragment,
+        fragment: CPSFragment,
         dataFlow: Flow<List<CodeforcesUserBlog>>,
         val onShowBlog: ((CodeforcesUserInfo) -> Unit) = {},
         val onRemove: ((CodeforcesUserInfo) -> Unit) = {},
