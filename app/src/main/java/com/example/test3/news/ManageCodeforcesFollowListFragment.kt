@@ -9,6 +9,8 @@ import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Group
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
@@ -124,6 +126,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         class UserBlogInfoViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view) {
             val title: TextView = view.findViewById(R.id.manage_cf_follow_users_list_item_title)
             val blogSize: TextView = view.findViewById(R.id.manage_cf_follow_users_list_item_blog_size)
+            val blogInfo: Group = view.findViewById(R.id.manage_cf_follow_users_list_item_blog_info)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserBlogInfoViewHolder {
@@ -134,7 +137,12 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
 
         override fun onBindViewHolder(holder: UserBlogInfoViewHolder, position: Int) {
             setHandle(holder, position)
-            holder.blogSize.text = (items[position].blogEntries?.size ?: 0).toString()
+
+            with(items[position].blogEntries) {
+                holder.blogInfo.isVisible = this != null
+                if(this != null) holder.blogSize.text = size.toString()
+            }
+
             holder.view.setOnClickListener {
                 val userInfo = items[holder.bindingAdapterPosition].userInfo
                 PopupMenu(it.context, holder.title, Gravity.CENTER_HORIZONTAL).apply {

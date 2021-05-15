@@ -44,5 +44,12 @@
         app:layout_constraintBottom_toBottomOf="@id/manage_cf_follow_users_list_item_blog_icon"
         />
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/manage_cf_follow_users_list_item_blog_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="manage_cf_follow_users_list_item_blog_icon, manage_cf_follow_users_list_item_blog_size"
+        />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
