@@ -10,7 +10,6 @@ import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesUserInfo
 import com.example.test3.account_manager.STATUS
 import com.example.test3.news.settingsNews
-import com.example.test3.room.CodeforcesUserBlog
 import com.example.test3.room.getFollowDao
 import com.example.test3.utils.*
 import java.util.concurrent.TimeUnit
@@ -27,29 +26,6 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
         suspend fun getHandles(): List<String> = dao.getAll().sortedByDescending { it.id }.map { it.handle }
         suspend fun getBlogEntries(handle: String) = dao.getUserBlog(handle)?.blogEntries
 
-        suspend fun add(info: CodeforcesUserInfo): Boolean {
-            if(dao.getUserBlog(info.handle)!=null) return false
-
-            dao.insert(
-                CodeforcesUserBlog(
-                    handle = info.handle,
-                    blogEntries = null,
-                    userInfo = info
-                )
-            )
-
-            val locale = NewsFragment.getCodeforcesContentLanguage(context)
-            val blogEntries = CodeforcesAPI.getUserBlogEntries(info.handle,locale)?.result?.map { it.id }
-
-            setBlogEntries(info.handle, blogEntries)
-
-            return true
-        }
-
-        suspend fun remove(handle: String){
-            dao.remove(handle)
-        }
-
         private suspend fun changeHandle(fromHandle: String, toHandle: String){
             if(fromHandle == toHandle) return
             val fromUserBlog = dao.getUserBlog(fromHandle) ?: return
@@ -60,11 +36,6 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
                 }
             }
             dao.update(fromUserBlog.copy(handle = toHandle))
-        }
-
-        private suspend fun setBlogEntries(handle: String, blogEntries: List<Int>?){
-            val userBlog = dao.getUserBlog(handle) ?: return
-            if(userBlog.blogEntries != blogEntries) dao.update(userBlog.copy(blogEntries = blogEntries))
         }
 
         private suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
@@ -88,7 +59,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
                             loadBlogEntries(realHandle, locale)
                         }
                         STATUS.NOT_FOUND -> {
-                            remove(handle)
+                            dao.remove(handle)
                             emptyList()
                         }
                         STATUS.FAILED -> emptyList()
@@ -104,7 +75,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
                             notifyNewBlogEntry(blogEntry, context)
                         }.isNotEmpty()
                 } ?: true
-            if(updated) setBlogEntries(handle, result.map { it.id })
+            if(updated) dao.setBlogEntries(handle, result.map { it.id })
             return result
         }
 
@@ -112,7 +83,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
             CodeforcesUtils.getUsersInfo(getHandles(), true)
                 .forEach { (handle, info) ->
                     when (info.status) {
-                        STATUS.NOT_FOUND ->dao.remove(handle)
+                        STATUS.NOT_FOUND -> dao.remove(handle)
                         STATUS.OK -> setUserInfo(handle, info)
                     }
                 }

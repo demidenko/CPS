@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.test3.CodeforcesLocale
 import com.example.test3.CodeforcesTitle
 import com.example.test3.NewsFragment
+import com.example.test3.account_manager.CodeforcesUserInfo
+import com.example.test3.room.CodeforcesUserBlog
+import com.example.test3.room.getFollowDao
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsLostRecentWorker
 import kotlinx.coroutines.flow.Flow
@@ -114,4 +117,31 @@ class CodeforcesNewsViewModel: ViewModel() {
             CodeforcesNewsLostRecentWorker.updateInfo(context, updateLostInfoProgress)
         }
     }
+
+    suspend fun addToFollowList(info: CodeforcesUserInfo, context: Context): Boolean {
+        val dao = getFollowDao(context)
+        if(dao.getUserBlog(info.handle)!=null) return false
+
+        viewModelScope.launch {
+            dao.insert(
+                CodeforcesUserBlog(
+                    handle = info.handle,
+                    blogEntries = null,
+                    userInfo = info
+                )
+            )
+            val locale = NewsFragment.getCodeforcesContentLanguage(context)
+            val blogEntries = CodeforcesAPI.getUserBlogEntries(info.handle,locale)?.result?.map { it.id }
+            dao.setBlogEntries(info.handle, blogEntries)
+        }
+
+        return true
+    }
+
+    fun removeFromFollowList(handle: String, context: Context) {
+        viewModelScope.launch {
+            getFollowDao(context).remove(handle)
+        }
+    }
+
 }

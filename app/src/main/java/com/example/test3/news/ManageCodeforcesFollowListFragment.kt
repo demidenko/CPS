@@ -9,6 +9,7 @@ import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +21,7 @@ import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.CodeforcesUserInfo
 import com.example.test3.news.codeforces.CodeforcesBlogEntriesFragment
+import com.example.test3.news.codeforces.CodeforcesNewsViewModel
 import com.example.test3.news.codeforces.adapters.CodeforcesNewsItemsAdapter
 import com.example.test3.room.CodeforcesUserBlog
 import com.example.test3.room.getFollowDao
@@ -33,9 +35,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class ManageCodeforcesFollowListFragment: CPSFragment() {
+
+    private val newsViewModel: CodeforcesNewsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,21 +62,23 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             setHasFixedSize(true)
         }
 
+        val dataConnector = CodeforcesNewsFollowWorker.FollowDataConnector(requireContext())
 
         val followListAdapter = FollowListItemsAdapter(
             this,
+            //TODO(bad: reload by lifecycle)
             getFollowDao(requireContext()).flowOfAll().map { blogs ->
                 blogs.sortedByDescending { it.id }
-            }
-        ).apply {
-            setOnSelectListener { info ->
+            },
+            onShowBlog = { info ->
                 mainActivity.cpsFragmentManager.pushBack(
                     CodeforcesBlogEntriesFragment().apply {
                         setHandle(info.handle)
                     }
                 )
-            }
-        }
+            },
+            onRemove = { info -> newsViewModel.removeFromFollowList(info.handle, requireContext()) }
+        )
 
         followRecyclerView.adapter = followListAdapter
 
@@ -84,8 +89,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             buttonAdd.disable()
             lifecycleScope.launch {
                 mainActivity.chooseUserID(CodeforcesAccountManager(mainActivity))?.let { userInfo ->
-                    val dataConnector = CodeforcesNewsFollowWorker.FollowDataConnector(requireContext())
-                    if(!dataConnector.add(userInfo)){
+                    if(!newsViewModel.addToFollowList(userInfo, requireContext())){
                         mainActivity.showToast("User already in list")
                         return@let
                     }
@@ -97,7 +101,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
 
         lifecycleScope.launch {
             followRecyclerView.isEnabled = false
-            CodeforcesNewsFollowWorker.FollowDataConnector(requireContext()).updateUsersInfo()
+            dataConnector.updateUsersInfo()
             followRecyclerView.isEnabled = true
             buttonAdd.enable()
         }
@@ -109,24 +113,13 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
 
     class FollowListItemsAdapter(
         val fragment: CPSFragment,
-        dataFlow: Flow<List<CodeforcesUserBlog>>
+        dataFlow: Flow<List<CodeforcesUserBlog>>,
+        val onShowBlog: ((CodeforcesUserInfo) -> Unit) = {},
+        val onRemove: ((CodeforcesUserInfo) -> Unit) = {},
     ): CodeforcesNewsItemsAdapter<FollowListItemsAdapter.UserBlogInfoViewHolder,List<CodeforcesUserBlog>>(fragment, dataFlow) {
 
         private var items: Array<CodeforcesUserBlog> = emptyArray()
         override fun getItemCount(): Int = items.size
-
-        private val dataConnector = CodeforcesNewsFollowWorker.FollowDataConnector(fragment.requireContext())
-
-        private var openBlogEntriesCallback: ((CodeforcesUserInfo) -> Unit)? = null
-        fun setOnSelectListener(callback: (CodeforcesUserInfo) -> Unit) {
-            openBlogEntriesCallback = callback
-        }
-
-        fun remove(userInfo: CodeforcesUserInfo){
-            runBlocking {
-                dataConnector.remove(userInfo.handle)
-            }
-        }
 
         class UserBlogInfoViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view) {
             val title: TextView = view.findViewById(R.id.manage_cf_follow_users_list_item_title)
@@ -152,11 +145,11 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
                     setOnMenuItemClickListener {
                         when(it.itemId){
                             R.id.cf_follow_list_item_open_blogs -> {
-                                openBlogEntriesCallback?.invoke(userInfo)
+                                onShowBlog(userInfo)
                                 true
                             }
                             R.id.cf_follow_list_item_delete -> {
-                                remove(userInfo)
+                                onRemove(userInfo)
                                 true
                             }
                             else -> false

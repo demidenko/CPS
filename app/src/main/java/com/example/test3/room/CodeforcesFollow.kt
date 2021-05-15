@@ -33,6 +33,11 @@ interface FollowListDao {
 
     @Query("SELECT * FROM $followListTableName")
     fun flowOfAll(): Flow<List<CodeforcesUserBlog>>
+
+    suspend fun setBlogEntries(handle: String, blogEntries: List<Int>?) {
+        val userBlog = getUserBlog(handle) ?: return
+        if(userBlog.blogEntries != blogEntries) update(userBlog.copy(blogEntries = blogEntries))
+    }
 }
 
 @Entity(tableName = followListTableName)
