@@ -16,6 +16,32 @@
         app:layout_constraintTop_toTopOf="parent"
         android:text="Handle"
         android:singleLine="true"
+        app:layout_constraintEnd_toEndOf="@id/manage_cf_follow_users_list_item_blog_icon"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_bias="0"
+        />
+
+    <ImageView
+        android:id="@+id/manage_cf_follow_users_list_item_blog_icon"
+        android:layout_width="18sp"
+        android:layout_height="18sp"
+        android:src="@drawable/ic_blog"
+        app:layout_constraintEnd_toStartOf="@id/manage_cf_follow_users_list_item_blog_size"
+        app:layout_constraintTop_toTopOf="@id/manage_cf_follow_users_list_item_title"
+        app:layout_constraintBottom_toBottomOf="@id/manage_cf_follow_users_list_item_title"
+        app:tint="@color/textColorAdditional"
+        android:layout_marginEnd="2dp"
+        />
+
+    <TextView
+        android:id="@+id/manage_cf_follow_users_list_item_blog_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        app:tint="@color/textColorAdditional"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/manage_cf_follow_users_list_item_blog_icon"
+        app:layout_constraintBottom_toBottomOf="@id/manage_cf_follow_users_list_item_blog_icon"
         />
 
 

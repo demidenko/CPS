@@ -123,6 +123,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
 
         class UserBlogInfoViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view) {
             val title: TextView = view.findViewById(R.id.manage_cf_follow_users_list_item_title)
+            val blogSize: TextView = view.findViewById(R.id.manage_cf_follow_users_list_item_blog_size)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserBlogInfoViewHolder {
@@ -133,6 +134,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
 
         override fun onBindViewHolder(holder: UserBlogInfoViewHolder, position: Int) {
             setHandle(holder, position)
+            holder.blogSize.text = (items[position].blogEntries?.size ?: 0).toString()
             holder.view.setOnClickListener {
                 val userInfo = items[holder.bindingAdapterPosition].userInfo
                 PopupMenu(it.context, holder.title, Gravity.CENTER_HORIZONTAL).apply {
