@@ -60,7 +60,7 @@ object CodeforcesUtils {
             val author = s.substring(i+9,s.indexOf('"',i))
 
             i = s.indexOf("rated-user user-",i)
-            val authorColorTag = CodeforcesUtils.ColorTag.fromString(
+            val authorColorTag = ColorTag.fromString(
                 s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i))
             )
 
@@ -231,7 +231,7 @@ object CodeforcesUtils {
 
         companion object {
             fun fromString(str: String): ColorTag =
-                valueOf(str.removePrefix("user-").toUpperCase(Locale.ENGLISH))
+                valueOf(str.removePrefix("user-").uppercase(Locale.ENGLISH))
         }
     }
 
@@ -740,8 +740,6 @@ object CodeforcesURLFactory {
     fun user(handle: String) = "$main/profile/$handle"
 
     fun blog(blogId: Int) = "$main/blog/entry/$blogId"
-
-    fun userBlogs(handle: String) = "$main/blog/$handle"
 
     fun comment(blogId: Int, commentId: Long) = blog(blogId) + "#comment-$commentId"
 
