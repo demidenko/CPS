@@ -52,6 +52,7 @@ class CodeforcesBlogEntriesFragment: CPSFragment() {
 
         val blogEntriesAdapter = CodeforcesBlogEntriesAdapter(
             this,
+            //TODO(bad: reload by lifecycle)
             makeUserBlogEntriesSingleFlow(getHandle(), requireContext()),
             null
         )

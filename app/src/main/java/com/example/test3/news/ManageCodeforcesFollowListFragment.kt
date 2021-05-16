@@ -68,7 +68,6 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
 
         val followListAdapter = FollowListItemsAdapter(
             this,
-            //TODO(bad: reload by lifecycle)
             getFollowDao(requireContext()).flowOfAll().map { blogs ->
                 blogs.sortedByDescending { it.id }
             },
