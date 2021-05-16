@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.test3.CodeforcesLocale
 import com.example.test3.CodeforcesTitle
 import com.example.test3.NewsFragment
+import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.CodeforcesUserInfo
 import com.example.test3.room.CodeforcesUserBlog
 import com.example.test3.room.getFollowDao
@@ -121,7 +122,6 @@ class CodeforcesNewsViewModel: ViewModel() {
     suspend fun addToFollowList(info: CodeforcesUserInfo, context: Context): Boolean {
         val dao = getFollowDao(context)
         if(dao.getUserBlog(info.handle)!=null) return false
-
         viewModelScope.launch {
             dao.insert(
                 CodeforcesUserBlog(
@@ -134,7 +134,30 @@ class CodeforcesNewsViewModel: ViewModel() {
             val blogEntries = CodeforcesAPI.getUserBlogEntries(info.handle,locale)?.result?.map { it.id }
             dao.setBlogEntries(info.handle, blogEntries)
         }
+        return true
+    }
 
+    suspend fun addToFollowList(handle: String, context: Context): Boolean {
+        val dao = getFollowDao(context)
+        if(dao.getUserBlog(handle)!=null) return false
+        viewModelScope.launch {
+            val manager = CodeforcesAccountManager(context)
+            dao.insert(
+                CodeforcesUserBlog(
+                    handle = handle,
+                    blogEntries = null,
+                    userInfo = manager.emptyInfo()
+                )
+            )
+            launch {
+                val locale = NewsFragment.getCodeforcesContentLanguage(context)
+                val blogEntries = CodeforcesAPI.getUserBlogEntries(handle,locale)?.result?.map { it.id }
+                dao.setBlogEntries(handle, blogEntries)
+            }
+            launch {
+                dao.setUserInfo(handle, manager.loadInfo(handle))
+            }
+        }
         return true
     }
 

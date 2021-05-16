@@ -211,8 +211,7 @@ class CodeforcesBlogEntriesAdapter(
         private fun addToFollowListWithSnackBar(holder: CodeforcesBlogEntryViewHolder, mainActivity: MainActivity){
             mainActivity.newsFragment.lifecycleScope.launch {
                 val handle = holder.author.text
-                val userInfo = CodeforcesAccountManager(mainActivity).loadInfo(handle.toString())
-                when(mainActivity.newsFragment.newsViewModel.addToFollowList(userInfo, mainActivity)){
+                when(mainActivity.newsFragment.newsViewModel.addToFollowList(handle.toString(), mainActivity)){
                     true -> {
                         Snackbar.make(holder.view, SpannableStringBuilder("You now followed ").append(handle), Snackbar.LENGTH_LONG).apply {
                             setAction("Manage"){
@@ -221,7 +220,7 @@ class CodeforcesBlogEntriesAdapter(
                         }
                     }
                     false -> {
-                        Snackbar.make(holder.view, SpannableStringBuilder("You already followed ").append(handle), Snackbar.LENGTH_LONG)
+                        Snackbar.make(holder.view, SpannableStringBuilder("You already following ").append(handle), Snackbar.LENGTH_LONG)
                     }
                 }.setAnchorView(mainActivity.navigation).show()
             }
