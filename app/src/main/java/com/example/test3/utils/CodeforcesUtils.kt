@@ -325,9 +325,9 @@ object CodeforcesUtils {
         return s.substring(s.indexOf('>', i)+1, s.indexOf("</a", i))
     }
 
-    suspend fun getRealColorTag(handle: String): ColorTag {
-        val page = CodeforcesAPI.getPageSource(CodeforcesURLFactory.user(handle), CodeforcesLocale.EN) ?: return ColorTag.BLACK
-        return extractRealColorTag(page) ?: ColorTag.BLACK
+    suspend fun getRealColorTag(handle: String): ColorTag = withContext(Dispatchers.IO) {
+        CodeforcesAPI.getPageSource(CodeforcesURLFactory.user(handle), CodeforcesLocale.EN)
+            ?.let { page -> extractRealColorTag(page) } ?: ColorTag.BLACK
     }
 
     private fun extractRealColorTag(s: String): ColorTag? {

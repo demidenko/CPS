@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,10 +20,10 @@ import com.example.test3.utils.asyncPair
 import com.example.test3.utils.fromHTML
 import com.example.test3.utils.ignoreFirst
 import com.example.test3.workers.CodeforcesNewsFollowWorker
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.stateIn
 
 class CodeforcesBlogEntriesFragment: CPSFragment() {
 
@@ -52,7 +53,6 @@ class CodeforcesBlogEntriesFragment: CPSFragment() {
 
         val blogEntriesAdapter = CodeforcesBlogEntriesAdapter(
             this,
-            //TODO(bad: reload by lifecycle)
             makeUserBlogEntriesSingleFlow(getHandle(), requireContext()),
             null
         )
@@ -71,12 +71,10 @@ class CodeforcesBlogEntriesFragment: CPSFragment() {
 
     private fun makeUserBlogEntriesSingleFlow(handle: String, context: Context) =
         flow {
-            val (blogEntries, authorColorTag) = withContext(Dispatchers.IO){
-                asyncPair(
-                    { CodeforcesNewsFollowWorker.FollowDataConnector(context).loadBlogEntries(handle) },
-                    { CodeforcesUtils.getRealColorTag(handle) }
-                )
-            }
+            val (blogEntries, authorColorTag) = asyncPair(
+                { CodeforcesNewsFollowWorker.FollowDataConnector(context).loadBlogEntries(handle) },
+                { CodeforcesUtils.getRealColorTag(handle) }
+            )
             emit(
                 blogEntries.map { blogEntry ->
                     blogEntry.copy(
@@ -85,5 +83,5 @@ class CodeforcesBlogEntriesFragment: CPSFragment() {
                     )
                 }
             )
-        }
+        }.stateIn(lifecycleScope, SharingStarted.Lazily, emptyList())
 }
