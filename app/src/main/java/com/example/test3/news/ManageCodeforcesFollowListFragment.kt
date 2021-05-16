@@ -22,11 +22,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.CodeforcesUserInfo
+import com.example.test3.account_manager.STATUS
 import com.example.test3.news.codeforces.CodeforcesBlogEntriesFragment
 import com.example.test3.news.codeforces.CodeforcesNewsViewModel
 import com.example.test3.news.codeforces.adapters.CodeforcesNewsItemsAdapter
 import com.example.test3.room.CodeforcesUserBlog
 import com.example.test3.room.getFollowDao
+import com.example.test3.timeDifference
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.*
@@ -147,8 +149,13 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
                     ratingTextView = holder.contribution,
                     ratingGroupView = holder.contributionGroup
                 )
-                //TODO
-                holder.onlineGroup.isVisible = false
+
+                with(userInfo) {
+                    if(status == STATUS.OK) {
+                        holder.online.text = timeDifference(lastOnlineTimeSeconds, getCurrentTimeSeconds())
+                        holder.onlineGroup.isVisible = true
+                    } else holder.onlineGroup.isVisible = false
+                }
             }
 
             holder.view.setOnClickListener {

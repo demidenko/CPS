@@ -24,13 +24,15 @@ data class CodeforcesUserInfo(
     override var status: STATUS,
     var handle: String,
     var rating: Int = NOT_RATED,
-    var contribution: Int = 0
+    var contribution: Int = 0,
+    val lastOnlineTimeSeconds: Long = -1
 ): UserInfo() {
     constructor(codeforcesUser: CodeforcesUser): this(
         status = STATUS.OK,
         handle = codeforcesUser.handle,
         rating = codeforcesUser.rating,
-        contribution = codeforcesUser.contribution
+        contribution = codeforcesUser.contribution,
+        lastOnlineTimeSeconds = codeforcesUser.lastOnlineTimeSeconds
     )
 
     override val userID: String

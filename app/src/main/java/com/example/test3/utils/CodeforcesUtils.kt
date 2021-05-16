@@ -414,7 +414,8 @@ data class CodeforcesAPIErrorResponse(
 data class CodeforcesUser(
     val handle: String,
     val rating: Int = NOT_RATED,
-    val contribution: Int = 0
+    val contribution: Int = 0,
+    val lastOnlineTimeSeconds: Long = -1
 )
 
 @Serializable
