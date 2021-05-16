@@ -1,6 +1,10 @@
 package com.example.test3.utils
 
+import android.content.Context
 import android.text.Spanned
+import android.view.View
+import android.widget.TextView
+import androidx.core.view.isVisible
 import com.example.test3.*
 import com.example.test3.account_manager.*
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
@@ -338,6 +342,18 @@ object CodeforcesUtils {
         return ColorTag.fromString(
             s.substring(s.indexOf(' ',i)+1, s.indexOf('"',i+10))
         )
+    }
+
+    fun setVotedView(rating: Int, ratingTextView: TextView, ratingGroupView: View, context: Context = ratingTextView.context) {
+        if(rating == 0) ratingGroupView.isVisible = false
+        else {
+            ratingTextView.text = signedToString(rating)
+            ratingTextView.setTextColor(getColorFromResource(context,
+                if(rating>0) R.color.blog_rating_positive
+                else R.color.blog_rating_negative
+            ))
+            ratingGroupView.isVisible = true
+        }
     }
 }
 

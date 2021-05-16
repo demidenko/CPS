@@ -51,5 +51,61 @@
         app:constraint_referenced_ids="manage_cf_follow_users_list_item_blog_icon, manage_cf_follow_users_list_item_blog_size"
         />
 
+    <TextView
+        android:id="@+id/manage_cf_follow_users_list_item_online_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="online: "
+        android:textSize="13sp"
+        app:layout_constraintTop_toBottomOf="@id/manage_cf_follow_users_list_item_title"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textColor="@color/textColorAdditional"
+        />
+
+    <TextView
+        android:id="@+id/manage_cf_follow_users_list_item_online_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        app:layout_constraintTop_toBottomOf="@id/manage_cf_follow_users_list_item_title"
+        app:layout_constraintStart_toEndOf="@id/manage_cf_follow_users_list_item_online_title"
+        />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/manage_cf_follow_users_list_item_online"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="manage_cf_follow_users_list_item_online_title, manage_cf_follow_users_list_item_online_time"
+        />
+
+    <TextView
+        android:id="@+id/manage_cf_follow_users_list_item_contribution_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="cont.: "
+        android:textSize="13sp"
+        app:layout_constraintTop_toBottomOf="@id/manage_cf_follow_users_list_item_title"
+        app:layout_constraintStart_toEndOf="@id/manage_cf_follow_users_list_item_online_time"
+        android:textColor="@color/textColorAdditional"
+        android:layout_marginStart="5dp"
+        />
+
+    <TextView
+        android:id="@+id/manage_cf_follow_users_list_item_contribution_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/manage_cf_follow_users_list_item_title"
+        app:layout_constraintStart_toEndOf="@id/manage_cf_follow_users_list_item_contribution_title"
+        />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/manage_cf_follow_users_list_item_contribution"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="manage_cf_follow_users_list_item_contribution_title, manage_cf_follow_users_list_item_contribution_value"
+        />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

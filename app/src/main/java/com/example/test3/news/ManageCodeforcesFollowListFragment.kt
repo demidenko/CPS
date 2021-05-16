@@ -29,9 +29,7 @@ import com.example.test3.room.CodeforcesUserBlog
 import com.example.test3.room.getFollowDao
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.settingsUI
-import com.example.test3.utils.disable
-import com.example.test3.utils.enable
-import com.example.test3.utils.ignoreFirst
+import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -125,7 +123,11 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         class UserBlogInfoViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view) {
             val title: TextView = view.findViewById(R.id.manage_cf_follow_users_list_item_title)
             val blogSize: TextView = view.findViewById(R.id.manage_cf_follow_users_list_item_blog_size)
-            val blogInfo: Group = view.findViewById(R.id.manage_cf_follow_users_list_item_blog_info)
+            val blogGroup: Group = view.findViewById(R.id.manage_cf_follow_users_list_item_blog_info)
+            val contribution: TextView = view.findViewById(R.id.manage_cf_follow_users_list_item_contribution_value)
+            val contributionGroup: Group = view.findViewById(R.id.manage_cf_follow_users_list_item_contribution)
+            val online: TextView = view.findViewById(R.id.manage_cf_follow_users_list_item_online_time)
+            val onlineGroup: Group = view.findViewById(R.id.manage_cf_follow_users_list_item_online)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserBlogInfoViewHolder {
@@ -137,9 +139,16 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         override fun onBindViewHolder(holder: UserBlogInfoViewHolder, position: Int) {
             setHandle(holder, position)
 
-            with(items[position].blogEntries) {
-                holder.blogInfo.isVisible = this != null
-                if(this != null) holder.blogSize.text = size.toString()
+            with(items[position]) {
+                holder.blogGroup.isVisible = blogEntries != null
+                if(blogEntries != null) holder.blogSize.text = blogEntries.size.toString()
+                CodeforcesUtils.setVotedView(
+                    rating = userInfo.contribution,
+                    ratingTextView = holder.contribution,
+                    ratingGroupView = holder.contributionGroup
+                )
+                //TODO
+                holder.onlineGroup.isVisible = false
             }
 
             holder.view.setOnClickListener {
