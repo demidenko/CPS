@@ -1,14 +1,13 @@
 package com.example.test3.account_view
 
 import android.widget.TextView
-import androidx.core.view.isVisible
+import androidx.constraintlayout.widget.Group
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.CodeforcesUserInfo
-import com.example.test3.utils.getColorFromResource
-import com.example.test3.utils.signedToString
+import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.workers.WorkersCenter
 import kotlinx.coroutines.launch
 
@@ -30,26 +29,15 @@ class CodeforcesAccountPanel(
 
         val handleView = view.findViewById<TextView>(R.id.account_view_handle)
         val ratingView = view.findViewById<TextView>(R.id.account_view_rating)
-        val contributionView = view.findViewById<TextView>(R.id.account_view_cf_contribution)
 
         showMainRated(handleView, ratingView, manager, info)
 
-        contributionView.apply {
-            val contributionViewTitle = view.findViewById<TextView>(R.id.account_view_cf_contribution_title)
-            if(info.contribution == 0){
-                isVisible = false
-                contributionViewTitle.isVisible = false
-            }else {
-                isVisible = true
-                contributionViewTitle.isVisible = true
-                text = signedToString(info.contribution)
-                if (info.contribution > 0) {
-                    setTextColor(getColorFromResource(mainActivity, R.color.blog_rating_positive))
-                } else {
-                    setTextColor(getColorFromResource(mainActivity, R.color.blog_rating_negative))
-                }
-            }
-        }
+        CodeforcesUtils.setVotedView(
+            rating = info.contribution,
+            ratingTextView = view.findViewById<TextView>(R.id.account_view_cf_contribution_value),
+            ratingGroupView = view.findViewById<Group>(R.id.account_view_cf_contribution),
+            context = mainActivity
+        )
 
         RatingGraphView.showInAccountViewFragment(fragment, manager)
 

@@ -349,8 +349,8 @@ object CodeforcesUtils {
         else {
             ratingTextView.text = signedToString(rating)
             ratingTextView.setTextColor(getColorFromResource(context,
-                if(rating>0) R.color.blog_rating_positive
-                else R.color.blog_rating_negative
+                if(rating>0) R.color.voted_rating_positive
+                else R.color.voted_rating_negative
             ))
             ratingGroupView.isVisible = true
         }

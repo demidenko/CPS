@@ -14,7 +14,7 @@
     <color name="fail">#C84040</color>
 
     <color name="newEntryColor">@android:color/holo_green_light</color>
-    <color name="blog_rating_positive">@color/success</color>
-    <color name="blog_rating_negative">#969696</color>
+    <color name="voted_rating_positive">@color/success</color>
+    <color name="voted_rating_negative">#969696</color>
     <color name="blog_time">@color/textColorAdditional</color>
 </resources>

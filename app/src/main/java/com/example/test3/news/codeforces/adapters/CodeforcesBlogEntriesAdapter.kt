@@ -80,17 +80,11 @@ class CodeforcesBlogEntriesAdapter(
         }
 
         fun setRating(rating: Int) {
-            this.rating.apply {
-                if(rating == 0) isGone = true
-                else {
-                    isVisible = true
-                    text = signedToString(rating)
-                    setTextColor(getColorFromResource(context,
-                        if (rating > 0) R.color.blog_rating_positive
-                        else R.color.blog_rating_negative
-                    ))
-                }
-            }
+            CodeforcesUtils.setVotedView(
+                rating = rating,
+                ratingTextView = this.rating,
+                ratingGroupView = this.rating
+            )
         }
 
         fun setComments(commentsCount: Int) {

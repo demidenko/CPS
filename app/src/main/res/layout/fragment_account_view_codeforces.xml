@@ -37,12 +37,12 @@
         android:textColor="@color/textColorAdditional"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@id/account_view_handle"
-        app:layout_constraintTop_toTopOf="@id/account_view_cf_contribution"
-        app:layout_constraintBottom_toBottomOf="@id/account_view_cf_contribution"
+        app:layout_constraintTop_toTopOf="@id/account_view_cf_contribution_value"
+        app:layout_constraintBottom_toBottomOf="@id/account_view_cf_contribution_value"
         />
 
     <TextView
-        android:id="@+id/account_view_cf_contribution"
+        android:id="@+id/account_view_cf_contribution_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="+99"
@@ -51,6 +51,13 @@
         app:layout_constraintTop_toBottomOf="@id/account_view_rating"
         app:layout_constraintStart_toEndOf="@id/account_view_cf_contribution_title"
         android:layout_marginStart="5dp"
+        />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/account_view_cf_contribution"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="account_view_cf_contribution_title, account_view_cf_contribution_value"
         />
 
     <include

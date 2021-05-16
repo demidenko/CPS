@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Group
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
@@ -43,17 +42,11 @@ class CodeforcesCommentsAdapter(
         val titleWithArrow: Group = view.findViewById(R.id.news_item_title_with_arrow)
 
         fun setRating(rating: Int) {
-            this.rating.apply {
-                if(rating == 0) isGone = true
-                else {
-                    isVisible = true
-                    text = signedToString(rating)
-                    setTextColor(getColorFromResource(context,
-                        if (rating > 0) R.color.blog_rating_positive
-                        else R.color.blog_rating_negative
-                    ))
-                }
-            }
+            CodeforcesUtils.setVotedView(
+                rating = rating,
+                ratingTextView = this.rating,
+                ratingGroupView = this.rating
+            )
         }
 
         override var startTimeSeconds: Long = 0
