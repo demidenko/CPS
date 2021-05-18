@@ -130,9 +130,7 @@ class CodeforcesNewsViewModel: ViewModel() {
                     userInfo = info
                 )
             )
-            val locale = NewsFragment.getCodeforcesContentLanguage(context)
-            val blogEntries = CodeforcesAPI.getUserBlogEntries(info.handle,locale)?.result?.map { it.id }
-            dao.setBlogEntries(info.handle, blogEntries)
+            dao.loadBlogEntries(info.handle, context)
         }
         return true
     }
@@ -150,9 +148,7 @@ class CodeforcesNewsViewModel: ViewModel() {
                 )
             )
             launch {
-                val locale = NewsFragment.getCodeforcesContentLanguage(context)
-                val blogEntries = CodeforcesAPI.getUserBlogEntries(handle,locale)?.result?.map { it.id }
-                dao.setBlogEntries(handle, blogEntries)
+                dao.loadBlogEntries(handle, context)
             }
             launch {
                 dao.setUserInfo(handle, manager.loadInfo(handle))

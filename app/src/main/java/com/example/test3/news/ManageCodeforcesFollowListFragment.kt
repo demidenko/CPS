@@ -32,7 +32,6 @@ import com.example.test3.timeDifference
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.*
-import com.example.test3.workers.CodeforcesNewsFollowWorker
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
@@ -63,8 +62,6 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             setHasFixedSize(true)
         }
-
-        val dataConnector = CodeforcesNewsFollowWorker.FollowDataConnector(requireContext())
 
         val followListAdapter = FollowListItemsAdapter(
             this,
@@ -102,7 +99,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
 
         lifecycleScope.launch {
             followRecyclerView.isEnabled = false
-            dataConnector.updateUsersInfo()
+            getFollowDao(requireContext()).updateUsersInfo(requireContext())
             followRecyclerView.isEnabled = true
             buttonAdd.enable()
         }

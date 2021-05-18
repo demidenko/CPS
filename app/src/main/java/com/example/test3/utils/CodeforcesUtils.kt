@@ -391,6 +391,11 @@ data class CodeforcesAPIResponse<T>(
         return false
     }
 
+    fun isNotAllowedToReadThatBlog(): Boolean {
+        if(comment == "handle: You are not allowed to read that blog") return true
+        return false
+    }
+
     fun isContestRatingUnavailable(): Boolean {
         if(comment == "contestId: Rating changes are unavailable for this contest") return true
         return false

@@ -2,9 +2,11 @@ package com.example.test3.room
 
 import android.content.Context
 import androidx.room.*
+import com.example.test3.NewsFragment
 import com.example.test3.account_manager.CodeforcesUserInfo
 import com.example.test3.account_manager.STATUS
-import com.example.test3.utils.jsonCPS
+import com.example.test3.utils.*
+import com.example.test3.workers.notifyNewBlogEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
@@ -28,11 +30,13 @@ interface FollowListDao {
     @Query("DELETE FROM $followListTableName WHERE handle LIKE :handle")
     suspend fun remove(handle: String)
 
-    @Query("SELECT * FROM $followListTableName")
-    suspend fun getAll(): List<CodeforcesUserBlog>
+    @Query("SELECT handle FROM $followListTableName")
+    suspend fun getHandles(): List<String>
 
     @Query("SELECT * FROM $followListTableName")
     fun flowOfAll(): Flow<List<CodeforcesUserBlog>>
+
+    suspend fun getBlogEntries(handle: String) = getUserBlog(handle)?.blogEntries
 
     suspend fun setBlogEntries(handle: String, blogEntries: List<Int>?) {
         val userBlog = getUserBlog(handle) ?: return
@@ -56,6 +60,52 @@ interface FollowListDao {
         if(info.handle != handle) changeHandle(handle, info.handle)
         val userBlog = getUserBlog(info.handle) ?: return
         if(userBlog.userInfo != info) update(userBlog.copy(userInfo = info))
+    }
+
+    suspend fun loadBlogEntries(handle: String, context: Context): List<CodeforcesBlogEntry> {
+        val locale = NewsFragment.getCodeforcesContentLanguage(context)
+        val response = CodeforcesAPI.getUserBlogEntries(handle, locale) ?: return emptyList()
+        val blogEntries =
+            if(response.status == CodeforcesAPIStatus.FAILED) {
+                when {
+                    response.isBlogHandleNotFound(handle) -> {
+                        val (realHandle, status) = CodeforcesUtils.getRealHandle(handle)
+                        return when(status){
+                            STATUS.OK -> {
+                                changeHandle(handle, realHandle)
+                                loadBlogEntries(realHandle, context)
+                            }
+                            STATUS.NOT_FOUND -> {
+                                remove(handle)
+                                emptyList()
+                            }
+                            STATUS.FAILED -> emptyList()
+                        }
+                    }
+                    response.isNotAllowedToReadThatBlog() -> emptyList()
+                    else -> return emptyList()
+                }
+            } else response.result ?: return emptyList()
+        val updated =
+            getBlogEntries(handle)?.toSet()?.let { saved ->
+                blogEntries.filter { it.id !in saved }
+                    .onEach { blogEntry ->
+                        notifyNewBlogEntry(blogEntry, context)
+                    }.isNotEmpty()
+            } ?: true
+        if(updated) setBlogEntries(handle, blogEntries.map { it.id })
+        return blogEntries
+    }
+
+    suspend fun updateUsersInfo(context: Context) {
+        CodeforcesUtils.getUsersInfo(getHandles(), true)
+            .forEach { (handle, info) ->
+                when (info.status) {
+                    STATUS.NOT_FOUND -> remove(handle)
+                    STATUS.OK -> setUserInfo(handle, info)
+                }
+                if(getBlogEntries(handle) == null) loadBlogEntries(handle, context)
+            }
     }
 }
 
