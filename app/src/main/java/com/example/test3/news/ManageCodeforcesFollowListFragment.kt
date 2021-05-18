@@ -76,7 +76,13 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
                 )
             },
             onRemove = { info -> newsViewModel.removeFromFollowList(info.handle, requireContext()) }
-        )
+        ).apply {
+            registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    if(positionStart == 0) followRecyclerView.scrollToPosition(0)
+                }
+            })
+        }
 
         followRecyclerView.adapter = followListAdapter
 
@@ -91,7 +97,6 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
                         mainActivity.showToast("User already in list")
                         return@let
                     }
-                    followRecyclerView.scrollToPosition(0) //TODO not working
                 }
                 buttonAdd.enable()
             }
