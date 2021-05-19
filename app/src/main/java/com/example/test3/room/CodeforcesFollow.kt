@@ -59,7 +59,10 @@ interface FollowListDao {
         if(info.status != STATUS.OK) return
         if(info.handle != handle) changeHandle(handle, info.handle)
         val userBlog = getUserBlog(info.handle) ?: return
-        if(userBlog.userInfo != info) update(userBlog.copy(userInfo = info))
+        if(userBlog.userInfo != info) update(userBlog.copy(
+            handle = info.handle,
+            userInfo = info
+        ))
     }
 
     suspend fun loadBlogEntries(handle: String, context: Context): List<CodeforcesBlogEntry> {
@@ -104,8 +107,10 @@ interface FollowListDao {
                     STATUS.NOT_FOUND -> remove(handle)
                     STATUS.OK -> setUserInfo(handle, info)
                 }
-                if(getBlogEntries(handle) == null) loadBlogEntries(handle, context)
             }
+        getHandles().forEach { handle ->
+            if(getBlogEntries(handle) == null) loadBlogEntries(handle, context)
+        }
     }
 }
 
