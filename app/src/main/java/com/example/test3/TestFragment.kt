@@ -9,17 +9,25 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.bold
 import androidx.core.text.color
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.asFlow
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.work.WorkInfo
 import com.example.test3.account_manager.AtCoderAccountManager
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.TopCoderAccountManager
 import com.example.test3.ui.CPSDataStoreDelegate
 import com.example.test3.ui.CPSFragment
+import com.example.test3.ui.FlowItemsAdapter
 import com.example.test3.utils.CPSDataStore
 import com.example.test3.workers.WorkersCenter
 import kotlinx.coroutines.flow.first
@@ -45,21 +53,12 @@ class TestFragment : CPSFragment() {
         setBottomPanelId(R.id.support_navigation_develop, R.layout.navigation_dev)
 
         //show running jobs
-        val workersTextView = view.findViewById<TextView>(R.id.workers)
-        fun concat(a: String, b: String) = a + ".".repeat(42 - a.length - b.length) + b
-        WorkersCenter.getWorksLiveData(mainActivity).observe(mainActivity){ infos ->
-            val rows = infos.map { info ->
-                val str = info.tags.find { it!=WorkersCenter.commonTag }!!
-                    .split(".")
-                    .last()
-                    .removeSuffix("Worker")
-                str to info.state
-            }
-            workersTextView.text =
-                rows.sortedBy { it.first }.joinToString(separator = "\n"){ (str, state) -> concat(str, state.name) }
+        view.findViewById<RecyclerView>(R.id.workers).apply {
+            layoutManager = LinearLayoutManager(context)
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            setHasFixedSize(true)
+            adapter = WorkersInfoAdapter(this@TestFragment)
         }
-
-        val stuff = view.findViewById<TextView>(R.id.stuff_textview)
 
         //colors
         requireBottomPanel().findViewById<ImageButton>(R.id.navigation_dev_colors).setOnClickListener{
@@ -111,6 +110,52 @@ class TestFragment : CPSFragment() {
                 addRow(row)
             }
         }
+
+    }
+
+    private class WorkersInfoAdapter(
+        fragment: TestFragment
+    ): FlowItemsAdapter<WorkersInfoAdapter.WorkerInfoViewHolder, List<WorkInfo>>(
+        fragment,
+        WorkersCenter.getWorksLiveData(fragment.requireContext()).asFlow()
+    ) {
+
+        private var items: Array<WorkInfo> = emptyArray()
+        override fun getItemCount() = items.size
+
+        private fun workerName(info: WorkInfo) = info.tags.find { it!=WorkersCenter.commonTag }!!
+            .split(".")
+            .last()
+            .removeSuffix("Worker")
+
+        class WorkerInfoViewHolder(view: View): RecyclerView.ViewHolder(view) {
+            val name: TextView = view.findViewById(R.id.worker_name)
+            val state: TextView = view.findViewById(R.id.worker_state)
+        }
+
+        override suspend fun applyData(data: List<WorkInfo>): DiffUtil.DiffResult? {
+            items = data.sortedBy { workerName(it) }.toTypedArray()
+            return null
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WorkerInfoViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.dev_worker_info, parent, false) as ConstraintLayout
+            return WorkerInfoViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: WorkerInfoViewHolder, position: Int) {
+            val info = items[position]
+            holder.name.text = workerName(info)
+            holder.state.text = when(info.state){
+                WorkInfo.State.ENQUEUED -> "\uD83D\uDE34"
+                WorkInfo.State.RUNNING -> "\uD83E\uDD2A"
+                WorkInfo.State.SUCCEEDED -> "\uD83D\uDE0F"
+                WorkInfo.State.FAILED -> "\uD83D\uDE14"
+                WorkInfo.State.BLOCKED -> "\uD83E\uDD7A"
+                WorkInfo.State.CANCELLED -> "\uD83D\uDE10"
+            }
+        }
+
 
     }
 }

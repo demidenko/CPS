@@ -5,18 +5,6 @@
     android:id="@+id/support_navigation_develop"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageButton
-        android:id="@+id/navigation_dev_jobs"
-        android:tooltipText="show jobs"
-        android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        app:layout_constraintWidth_percent="0.25"
-        android:src="@drawable/ic_info"
-        style="@style/CPSImageButton"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
 
     <ImageButton
         android:id="@+id/navigation_dev_colors"
@@ -28,7 +16,7 @@
         style="@style/CPSImageButton"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/navigation_dev_jobs"
+        app:layout_constraintEnd_toEndOf="parent"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

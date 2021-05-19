@@ -4,28 +4,19 @@
     android:layout_height="match_parent"
     >
 
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/workers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:typeface="monospace"
         />
 
-    <TextView
-        android:id="@+id/stuff_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text=""
-        android:layout_below="@id/workers"
-        />
 
     <LinearLayout
         android:id="@+id/table_handle_colors"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/stuff_textview"
+        android:layout_below="@id/workers"
         android:orientation="vertical"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="30dp"

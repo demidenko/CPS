@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="3dp"
+    >
+
+    <TextView
+        android:id="@+id/worker_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/worker_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:text="Name"
+        android:typeface="monospace"
+        android:singleLine="true"
+        app:layout_constraintStart_toEndOf="@id/worker_state"
+        app:layout_constraintTop_toTopOf="@id/worker_state"
+        app:layout_constraintBottom_toBottomOf="@id/worker_state"
+        android:layout_marginStart="5dp"
+        />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
