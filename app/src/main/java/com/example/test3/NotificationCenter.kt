@@ -26,8 +26,8 @@ object NotificationChannels {
     val codeforces_contest_watcher by lazy { NotificationChannelLazy("cf_contest_watcher", "Contest watch", Importance.DEFAULT, group_codeforces) }
     val codeforces_rating_changes by lazy { NotificationChannelLazy("cf_rating_changes", "Rating changes", Importance.HIGH, group_codeforces) }
     val codeforces_contribution_changes by lazy { NotificationChannelLazy("cf_contribution_changes", "Contribution changes", Importance.MIN, group_codeforces) }
-    val codeforces_follow_new_blog by lazy { NotificationChannelLazy("cf_follow_new_blog", "Followed blogs", Importance.DEFAULT, group_codeforces) }
-    val codeforces_follow_progress by lazy { NotificationChannelLazy("cf_follow_progress", "Follow update progress", Importance.MIN, group_codeforces) }
+    val codeforces_follow_new_blog by lazy { NotificationChannelLazy("cf_follow_new_blog", "Follow: new blog entries", Importance.DEFAULT, group_codeforces) }
+    val codeforces_follow_progress by lazy { NotificationChannelLazy("cf_follow_progress", "Follow: update progress", Importance.MIN, group_codeforces) }
 
     //atcoder
     private val group_atcoder by lazy { NotificationChannelGroupLazy("atcoder", "AtCoder") }
