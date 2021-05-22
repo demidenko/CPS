@@ -203,17 +203,17 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager)
 
     companion object {
         private val Context.account_settings_codeforces_dataStore by preferencesDataStore(CodeforcesAccountManager.manager_name + "_account_settings")
-
-        private val KEY_OBS_RATING = booleanPreferencesKey("observe_rating")
-        private val KEY_LAST_RATED_CONTEST = intPreferencesKey("last_rated_contest")
-
-        private val KEY_OBS_CONTRIBUTION = booleanPreferencesKey("observe_contribution")
-
-        private val KEY_CONTEST_WATCH = booleanPreferencesKey("contest_watch")
-        private val KEY_CONTEST_WATCH_LAST_SUBMISSION = longPreferencesKey("contest_watch_last_submission")
-        private val KEY_CONTEST_WATCH_STARTED = intPreferencesKey("contest_watch_started_contest")
-        private val KEY_CONTEST_WATCH_CANCELED = stringPreferencesKey("contest_watch_canceled")
     }
+
+    private val KEY_OBS_RATING = booleanPreferencesKey("observe_rating")
+    private val KEY_LAST_RATED_CONTEST = intPreferencesKey("last_rated_contest")
+
+    private val KEY_OBS_CONTRIBUTION = booleanPreferencesKey("observe_contribution")
+
+    private val KEY_CONTEST_WATCH = booleanPreferencesKey("contest_watch")
+    private val KEY_CONTEST_WATCH_LAST_SUBMISSION = longPreferencesKey("contest_watch_last_submission")
+    private val KEY_CONTEST_WATCH_STARTED = intPreferencesKey("contest_watch_started_contest")
+    private val KEY_CONTEST_WATCH_CANCELED = stringPreferencesKey("contest_watch_canceled")
 
     override suspend fun resetRelatedData() {
         setLastRatedContestID(-1)

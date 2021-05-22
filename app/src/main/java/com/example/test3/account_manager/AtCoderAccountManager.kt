@@ -172,10 +172,10 @@ class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager)
 
     companion object {
         private val Context.account_settings_atcoder_dataStore by preferencesDataStore(AtCoderAccountManager.manager_name + "_account_settings")
-
-        private val KEY_OBS_RATING = booleanPreferencesKey("observe_rating")
-        private val KEY_LAST_RATED_CONTEST = stringPreferencesKey("last_rated_contest")
     }
+
+    private val KEY_OBS_RATING = booleanPreferencesKey("observe_rating")
+    private val KEY_LAST_RATED_CONTEST = stringPreferencesKey("last_rated_contest")
 
     override suspend fun resetRelatedData() {
         setLastRatedContestID("")
