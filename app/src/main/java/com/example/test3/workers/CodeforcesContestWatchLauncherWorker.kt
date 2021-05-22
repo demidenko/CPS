@@ -52,8 +52,8 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
             val resultId = response.result!!.let { submissions ->
                 for(submission in submissions){
                     if(firstID == null) firstID = submission.id
-                    if(lastKnownID != null && submission.id <= lastKnownID) return@let NOTHING
-                    if(isTooLate(submission.creationTimeSeconds)) return@let NOTHING
+                    if(lastKnownID != null && submission.id <= lastKnownID) return@let null
+                    if(isTooLate(submission.creationTimeSeconds)) return@let null
                     if(submission.author.participantType.participatedInContest()) return@let submission.contestId
                 }
                 CONTINUE
@@ -68,13 +68,15 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
             val settings = codeforcesAccountManager.getSettings().apply {
                 setContestWatchLastSubmissionID(firstID!!)
             }
-            val contestID = resultId.takeIf { it!=NOTHING } ?: settings.getContestWatchStartedContestID()
-            if(contestID != NOTHING){
-                if(canceled.none { it.first == contestID }) {
-                    settings.setContestWatchStartedContestID(contestID)
-                    CodeforcesContestWatchWorker.startWorker(context, info.handle, contestID)
+
+            (resultId ?: settings.getContestWatchStartedContestID())
+                ?.let { contestID ->
+                    if(canceled.none { it.first == contestID }) {
+                        settings.setContestWatchStartedContestID(contestID)
+                        CodeforcesContestWatchWorker.startWorker(context, info.handle, contestID)
+                    }
                 }
-            }
+
             return Result.success()
         }
     }
@@ -82,7 +84,7 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
     companion object {
         fun onStopWatcher(context: Context, contestID: Int) = runBlocking {
             with(CodeforcesAccountManager(context).getSettings()){
-                setContestWatchStartedContestID(NOTHING)
+                removeContestWatchStartedContestID()
                 val canceled = getContestWatchCanceled().toMutableList()
                 canceled.add(contestID to getCurrentTimeSeconds())
                 setContestWatchCanceled(canceled)
@@ -90,7 +92,6 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
         }
 
         private const val CONTINUE = 0
-        private const val NOTHING = -1
     }
 
 }

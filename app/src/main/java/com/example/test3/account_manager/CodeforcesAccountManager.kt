@@ -247,7 +247,8 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager)
         dataStore.edit { it[KEY_CONTEST_WATCH_LAST_SUBMISSION] = submissionID }
     }
 
-    suspend fun getContestWatchStartedContestID() = dataStore.data.first()[KEY_CONTEST_WATCH_STARTED] ?: -1
+    suspend fun getContestWatchStartedContestID() = dataStore.data.first()[KEY_CONTEST_WATCH_STARTED]
+    suspend fun removeContestWatchStartedContestID() { dataStore.edit { it.remove(KEY_CONTEST_WATCH_STARTED) } }
     suspend fun setContestWatchStartedContestID(contestID: Int){
         dataStore.edit { it[KEY_CONTEST_WATCH_STARTED] = contestID }
     }
