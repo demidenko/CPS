@@ -52,7 +52,7 @@ class ProjectEulerRecentProblemsWorker(private val context: Context, params: Wor
 
         if(newProblems.isEmpty()) return Result.success()
 
-        if(lastViewedProblemID != 0){
+        if(lastViewedProblemID != null){
             newProblems.forEach { (id, name) ->
                 val n = notificationBuilder(context, NotificationChannels.project_euler_problems).apply {
                     setSubText("Project Euler • New problem published!")
@@ -83,7 +83,7 @@ class ProjectEulerRecentProblemsWorker(private val context: Context, params: Wor
 
         private val KEY_LAST_RECENT_PROBLEM_ID = intPreferencesKey("last_recent_problem_id")
 
-        suspend fun getLastRecentProblemID() = dataStore.data.first()[KEY_LAST_RECENT_PROBLEM_ID] ?: 0
+        suspend fun getLastRecentProblemID() = dataStore.data.first()[KEY_LAST_RECENT_PROBLEM_ID]
         suspend fun setLastRecentProblemID(problemID: Int) {
             dataStore.edit { it[KEY_LAST_RECENT_PROBLEM_ID] = problemID }
         }

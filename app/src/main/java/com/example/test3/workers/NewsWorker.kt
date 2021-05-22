@@ -43,7 +43,7 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
             if(i==-1) break
 
             val currentID = s.substring(s.indexOf("_", i) + 1, s.indexOf(">", i)).toInt()
-            if(lastNewsID!=-1 && currentID<=lastNewsID) break
+            if(lastNewsID!=null && currentID<=lastNewsID) break
 
             val content = fromHTML(s.substring(i, s.indexOf("<br><br>", i))).toString()
 
@@ -52,7 +52,7 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
 
         if(news.isEmpty()) return
 
-        if(lastNewsID != 0){
+        if(lastNewsID != null){
             val group = "acmp_news_group"
 
             news.forEach { (id, content) ->
@@ -107,7 +107,7 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
 
         if(news.isEmpty()) return
 
-        if(lastNewsID!=""){
+        if(lastNewsID != null){
             news.forEach { (title, content) ->
                 val n = notificationBuilder(context, NotificationChannels.project_euler_news).apply {
                     setSubText("Project Euler news")
@@ -156,7 +156,7 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
 
         if(news.isEmpty()) return
 
-        if(lastNewsID!=""){
+        if(lastNewsID != null){
             news.forEach { (_, title, content) ->
                 val n = notificationBuilder(context, NotificationChannels.olympiads_zaoch_news).apply {
                     setSubText("zaoch news")
@@ -187,17 +187,17 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
         private val KEY_PROJECT_EULER_LAST_NEWS = stringPreferencesKey("project_euler_last_news")
         private val KEY_OLYMPIADS_ZAOCH_LAST_NEWS = stringPreferencesKey("olympiads_zaoch_last_news")
 
-        suspend fun getACMPLastNewsID() = dataStore.data.first()[KEY_ACMP_LAST_NEWS] ?: 0
+        suspend fun getACMPLastNewsID() = dataStore.data.first()[KEY_ACMP_LAST_NEWS]
         suspend fun setACMPLastNewsID(newsID: Int) {
             dataStore.edit { it[KEY_ACMP_LAST_NEWS] = newsID }
         }
 
-        suspend fun getProjectEulerLastNewsID() = dataStore.data.first()[KEY_PROJECT_EULER_LAST_NEWS] ?: ""
+        suspend fun getProjectEulerLastNewsID() = dataStore.data.first()[KEY_PROJECT_EULER_LAST_NEWS]
         suspend fun setProjectEulerLastNewsID(newsID: String) {
             dataStore.edit { it[KEY_PROJECT_EULER_LAST_NEWS] = newsID }
         }
 
-        suspend fun getOlympiadsZaochLastNewsID() = dataStore.data.first()[KEY_OLYMPIADS_ZAOCH_LAST_NEWS] ?: ""
+        suspend fun getOlympiadsZaochLastNewsID() = dataStore.data.first()[KEY_OLYMPIADS_ZAOCH_LAST_NEWS]
         suspend fun setOlympiadsZaochLastNewsID(newsID: String) {
             dataStore.edit { it[KEY_OLYMPIADS_ZAOCH_LAST_NEWS] = newsID }
         }
