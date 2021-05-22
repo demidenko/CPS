@@ -23,11 +23,11 @@ import kotlin.reflect.KProperty
 class SettingsUI(private val context: Context): CPSDataStore(context.settingsUI_dataStore) {
     companion object {
         private val Context.settingsUI_dataStore by preferencesDataStore("settings_ui")
-
-        private val KEY_USE_REAL_COLORS = booleanPreferencesKey("use_real_colors")
-        private val KEY_USE_STATUS_BAR = booleanPreferencesKey("use_status_bar")
-        private val KEY_UI_MODE = stringPreferencesKey("ui_mode")
     }
+
+    private val KEY_USE_REAL_COLORS = booleanPreferencesKey("use_real_colors")
+    private val KEY_USE_STATUS_BAR = booleanPreferencesKey("use_status_bar")
+    private val KEY_UI_MODE = stringPreferencesKey("ui_mode")
 
     private val useRealColorsFlow = dataStore.data.map { it[KEY_USE_REAL_COLORS] ?: false }
     fun flowOfUseRealColors() = useRealColorsFlow.distinctUntilChanged()

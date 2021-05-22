@@ -166,9 +166,9 @@ val Context.settingsDev by CPSDataStoreDelegate { SettingsDev(it) }
 class SettingsDev(context: Context) : CPSDataStore(context.settings_dev_dataStore) {
     companion object {
         private val Context.settings_dev_dataStore by preferencesDataStore("settings_develop")
-
-        private val KEY_DEV = booleanPreferencesKey("develop_enabled")
     }
+
+    private val KEY_DEV = booleanPreferencesKey("develop_enabled")
 
     private val devEnabledFlow = dataStore.data.map { it[KEY_DEV] ?: false }
     fun getDevEnabled() = runBlocking { devEnabledFlow.first() }

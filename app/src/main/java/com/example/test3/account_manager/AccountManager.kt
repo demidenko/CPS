@@ -120,9 +120,7 @@ data class RatingChange(
 }
 
 class AccountDataStore(dataStore: DataStore<Preferences>) : CPSDataStore(dataStore) {
-    companion object {
-        private val KEY_USER_INFO = stringPreferencesKey("user_info")
-    }
+    private val KEY_USER_INFO = stringPreferencesKey("user_info")
 
     internal fun flowOfData() = dataStore.data.map { it[KEY_USER_INFO] }
 

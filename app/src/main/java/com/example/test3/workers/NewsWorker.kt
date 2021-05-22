@@ -179,14 +179,13 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
     }
 
     class NewsWorkerDataStore(context: Context): CPSDataStore(context.news_worker_dataStore){
-
         companion object {
             private val Context.news_worker_dataStore by preferencesDataStore("worker_news")
-
-            private val KEY_ACMP_LAST_NEWS = intPreferencesKey("acmp_last_news")
-            private val KEY_PROJECT_EULER_LAST_NEWS = stringPreferencesKey("project_euler_last_news")
-            private val KEY_OLYMPIADS_ZAOCH_LAST_NEWS = stringPreferencesKey("olympiads_zaoch_last_news")
         }
+
+        private val KEY_ACMP_LAST_NEWS = intPreferencesKey("acmp_last_news")
+        private val KEY_PROJECT_EULER_LAST_NEWS = stringPreferencesKey("project_euler_last_news")
+        private val KEY_OLYMPIADS_ZAOCH_LAST_NEWS = stringPreferencesKey("olympiads_zaoch_last_news")
 
         suspend fun getACMPLastNewsID() = dataStore.data.first()[KEY_ACMP_LAST_NEWS] ?: 0
         suspend fun setACMPLastNewsID(newsID: Int) {

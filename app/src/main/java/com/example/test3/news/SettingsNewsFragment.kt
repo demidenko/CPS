@@ -229,18 +229,20 @@ class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_setting
 
     companion object {
         private val Context.news_settings_dataStore by preferencesDataStore("news_settings")
-
-        private val KEY_TAB = stringPreferencesKey("default_tab")
-        private val KEY_RU = booleanPreferencesKey("ru_lang")
-        private val KEY_LOST = booleanPreferencesKey("lost")
-        private val KEY_LOST_RATING = stringPreferencesKey("lost_min_rating")
-        private val KEY_FOLLOW = booleanPreferencesKey("follow")
-
-        private val KEY_FEED_PE = booleanPreferencesKey("news_feeds_project_euler_news")
-        private val KEY_FEED_PE_RECENT = booleanPreferencesKey("news_feeds_project_euler_recent")
-        private val KEY_FEED_ACMP = booleanPreferencesKey("news_feeds_acmp_news")
-        private val KEY_FEED_ZAOCH = booleanPreferencesKey("news_feeds_zaoch_news")
     }
+
+    private val KEY_TAB = stringPreferencesKey("default_tab")
+    private val KEY_RU = booleanPreferencesKey("ru_lang")
+    private val KEY_LOST = booleanPreferencesKey("lost")
+    private val KEY_LOST_RATING = stringPreferencesKey("lost_min_rating")
+    private val KEY_FOLLOW = booleanPreferencesKey("follow")
+
+    private val KEY_FEED = mapOf(
+        NewsFeed.PROJECT_EULER_NEWS to booleanPreferencesKey("news_feeds_project_euler_news"),
+        NewsFeed.PROJECT_EULER_RECENT to booleanPreferencesKey("news_feeds_project_euler_recent"),
+        NewsFeed.ACMP_NEWS to booleanPreferencesKey("news_feeds_acmp_news"),
+        NewsFeed.ZAOCH_NEWS to booleanPreferencesKey("news_feeds_zaoch_news")
+    )
 
     suspend fun getDefaultTab(): CodeforcesTitle {
         return dataStore.data.first()[KEY_TAB]?.let {
@@ -275,14 +277,7 @@ class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_setting
         dataStore.edit { it[KEY_FOLLOW] = flag }
     }
 
-    private fun getKey(newsFeed: NewsFeed): Preferences.Key<Boolean> {
-        return when(newsFeed){
-            NewsFeed.PROJECT_EULER_RECENT -> KEY_FEED_PE_RECENT
-            NewsFeed.PROJECT_EULER_NEWS -> KEY_FEED_PE
-            NewsFeed.ACMP_NEWS -> KEY_FEED_ACMP
-            NewsFeed.ZAOCH_NEWS -> KEY_FEED_ZAOCH
-        }
-    }
+    private fun getKey(newsFeed: NewsFeed): Preferences.Key<Boolean> = KEY_FEED[newsFeed]!!
 
     suspend fun getNewsFeedEnabled(newsFeed: NewsFeed) = dataStore.data.first()[getKey(newsFeed)] ?: false
     suspend fun setNewsFeedEnabled(newsFeed: NewsFeed, flag: Boolean){

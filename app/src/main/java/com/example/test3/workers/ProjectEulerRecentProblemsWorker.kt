@@ -77,12 +77,11 @@ class ProjectEulerRecentProblemsWorker(private val context: Context, params: Wor
     }
 
     class ProjectEulerRecentProblemsWorkerDataStore(context: Context): CPSDataStore(context.pe_recent_worker_dataStore) {
-
         companion object {
             private val Context.pe_recent_worker_dataStore by preferencesDataStore("worker_project_euler_recent")
-
-            private val KEY_LAST_RECENT_PROBLEM_ID = intPreferencesKey("last_recent_problem_id")
         }
+
+        private val KEY_LAST_RECENT_PROBLEM_ID = intPreferencesKey("last_recent_problem_id")
 
         suspend fun getLastRecentProblemID() = dataStore.data.first()[KEY_LAST_RECENT_PROBLEM_ID] ?: 0
         suspend fun setLastRecentProblemID(problemID: Int) {
