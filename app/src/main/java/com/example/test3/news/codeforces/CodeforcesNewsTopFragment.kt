@@ -85,7 +85,7 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
             }
         }
 
-        subscribeLoadingState(newsFragment.newsViewModel.getPageLoadingStateFlow(title), swipeRefreshLayout)
+        subscribeLoadingState(newsFragment.newsViewModel.flowOfPageLoadingState(title), swipeRefreshLayout)
         subscribeRefreshOnRealColor {
             recyclerViewBlogEntries.codeforcesItemsAdapter?.refreshHandles()
             recyclerViewComments.codeforcesItemsAdapter?.refreshHandles()

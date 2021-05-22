@@ -146,7 +146,7 @@ class NewsFragment : CPSFragment() {
                 }
             }
 
-            LoadingState.combineLoadingStateFlows(titles.map { newsViewModel.getPageLoadingStateFlow(it) })
+            LoadingState.combineLoadingStateFlows(titles.map { newsViewModel.flowOfPageLoadingState(it) })
                 .distinctUntilChanged()
                 .onEach { loadingState ->
                     reloadButton.enableIff(loadingState != LoadingState.LOADING)
@@ -156,7 +156,7 @@ class NewsFragment : CPSFragment() {
                 updateLostInfoButton.enableIff(progress == null)
             }.launchIn(this)
 
-            mainActivity.settingsDev.getDevEnabledFlow().onEach { use ->
+            mainActivity.settingsDev.flowOfDevEnabled().onEach { use ->
                 suspectsLostButton.isVisible = use
             }.launchIn(this)
         }
@@ -166,7 +166,7 @@ class NewsFragment : CPSFragment() {
     }
 
     private suspend fun subscribeReloading(title: CodeforcesTitle) {
-        newsViewModel.getPageLoadingStateFlow(title).collect { loadingState ->
+        newsViewModel.flowOfPageLoadingState(title).collect { loadingState ->
             val tab = tabLayout.getTabAt(codeforcesNewsAdapter.indexOf(title)) ?: return@collect
             tab.text = when(loadingState){
                 LoadingState.PENDING -> title.name

@@ -45,8 +45,8 @@ class AccountViewFragment<U: UserInfo>: CPSFragment() {
         fun showBigView() = lifecycleScope.launch { panel.showBigView(this@AccountViewFragment) }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
-            manager.getInfoFlow().onEach { showBigView() }.launchIn(this)
-            mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().onEach { showBigView() }.launchIn(this)
+            manager.flowOfInfo().onEach { showBigView() }.launchIn(this)
+            mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().onEach { showBigView() }.launchIn(this)
         }
 
         mainActivity.accountsFragment.statusBarColorManager.setCurrent(manager)

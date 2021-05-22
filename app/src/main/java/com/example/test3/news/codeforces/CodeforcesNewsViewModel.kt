@@ -54,7 +54,7 @@ class CodeforcesNewsViewModel: ViewModel() {
         }
     }
 
-    fun getPageLoadingStateFlow(title: CodeforcesTitle): Flow<LoadingState> {
+    fun flowOfPageLoadingState(title: CodeforcesTitle): Flow<LoadingState> {
         return when(title){
             CodeforcesTitle.MAIN -> mainBlogEntries.loadingState
             CodeforcesTitle.RECENT -> recentActions.loadingState

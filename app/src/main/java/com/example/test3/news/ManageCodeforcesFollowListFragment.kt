@@ -110,7 +110,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
-            mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().collect { followListAdapter.refreshHandles() }
+            mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().collect { followListAdapter.refreshHandles() }
         }
     }
 

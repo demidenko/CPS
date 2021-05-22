@@ -36,7 +36,7 @@ class CodeforcesNewsMainFragment(): CodeforcesNewsFragment() {
             setColorSchemeResources(R.color.colorAccent)
         }
 
-        subscribeLoadingState(newsFragment.newsViewModel.getPageLoadingStateFlow(title), swipeRefreshLayout)
+        subscribeLoadingState(newsFragment.newsViewModel.flowOfPageLoadingState(title), swipeRefreshLayout)
         subscribeNewEntries(itemsAdapter)
         subscribeRefreshOnRealColor { itemsAdapter.refreshHandles() }
 

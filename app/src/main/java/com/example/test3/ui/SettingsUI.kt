@@ -13,7 +13,9 @@ import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.utils.CPSDataStore
 import com.example.test3.utils.getColorFromResource
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlin.reflect.KProperty
 
@@ -28,14 +30,14 @@ class SettingsUI(private val context: Context): CPSDataStore(context.settingsUI_
     }
 
     private val useRealColorsFlow = dataStore.data.map { it[KEY_USE_REAL_COLORS] ?: false }
-    fun getUseRealColorsFlow() = useRealColorsFlow.distinctUntilChanged()
+    fun flowOfUseRealColors() = useRealColorsFlow.distinctUntilChanged()
     suspend fun getUseRealColors() = useRealColorsFlow.first()
     suspend fun setUseRealColors(use: Boolean) {
         dataStore.edit { it[KEY_USE_REAL_COLORS] = use }
     }
 
     private val useStatusBar = dataStore.data.map { it[KEY_USE_STATUS_BAR] ?: true }
-    fun getUseStatusBarFlow() = useStatusBar.distinctUntilChanged()
+    fun flowOfUseStatusBar() = useStatusBar.distinctUntilChanged()
     suspend fun getUseStatusBar() = useStatusBar.first()
     suspend fun setUseStatusBar(use: Boolean) {
         dataStore.edit { it[KEY_USE_STATUS_BAR] = use }

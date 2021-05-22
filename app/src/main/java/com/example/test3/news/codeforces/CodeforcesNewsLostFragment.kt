@@ -29,7 +29,7 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
 
         itemsAdapter = CodeforcesBlogEntriesAdapter(
             this,
-            makeDataFlow(getLostBlogsDao(requireContext()).getLostFlow()),
+            makeDataFlow(getLostBlogsDao(requireContext()).flowOfLost()),
             newsFragment.viewedDataStore.blogsViewedFlow(title),
             clearNewEntriesOnDataChange = false
         )
@@ -37,7 +37,7 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
         val itemsSuspectsAdapter by lazy {
             CodeforcesBlogEntriesAdapter(
                 this,
-                makeDataFlow(getLostBlogsDao(requireContext()).getSuspectsFlow()),
+                makeDataFlow(getLostBlogsDao(requireContext()).flowOfSuspects()),
                 null
             )
         }

@@ -65,7 +65,7 @@ class CodeforcesBlogEntriesFragment: CPSFragment() {
         }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
-            mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().collect { blogEntriesAdapter.refreshHandles() }
+            mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().collect { blogEntriesAdapter.refreshHandles() }
         }
     }
 

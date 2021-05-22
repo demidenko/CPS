@@ -77,7 +77,7 @@ abstract class CodeforcesNewsFragment: Fragment() {
 
     protected fun subscribeRefreshOnRealColor(refresh: suspend (Boolean) -> Unit) {
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
-            newsFragment.mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().collect(refresh)
+            newsFragment.mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().collect(refresh)
         }
     }
 

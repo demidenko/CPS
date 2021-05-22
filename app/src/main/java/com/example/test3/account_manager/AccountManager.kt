@@ -28,7 +28,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
     abstract val homeURL: String
 
     protected abstract fun getDataStore(): AccountDataStore
-    fun getInfoFlow() = getDataStore().getDataFlow().distinctUntilChanged().map { str -> this to strToInfo(str) }
+    fun flowOfInfo() = getDataStore().flowOfData().distinctUntilChanged().map { str -> this to strToInfo(str) }
 
     abstract fun emptyInfo(): U
 
@@ -124,7 +124,7 @@ class AccountDataStore(dataStore: DataStore<Preferences>) : CPSDataStore(dataSto
         private val KEY_USER_INFO = stringPreferencesKey("user_info")
     }
 
-    internal fun getDataFlow() = dataStore.data.map { it[KEY_USER_INFO] }
+    internal fun flowOfData() = dataStore.data.map { it[KEY_USER_INFO] }
 
     suspend fun getString(): String? = dataStore.data.first()[KEY_USER_INFO]
 

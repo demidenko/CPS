@@ -61,7 +61,7 @@ class AccountsFragment: CPSFragment() {
             viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
                 panels.forEach { panel ->
                     launch {
-                        panel.manager.getInfoFlow().collect { (manager, info) ->
+                        panel.manager.flowOfInfo().collect { (manager, info) ->
                             panel.show()
                             if(info.isEmpty()) notEmptyPanels.remove(manager.managerName)
                             else notEmptyPanels.add(manager.managerName)
@@ -85,7 +85,7 @@ class AccountsFragment: CPSFragment() {
                 reloadButton.enableIff(it != BlockedState.BLOCKED)
             }.launchIn(this)
 
-            mainActivity.settingsUI.getUseRealColorsFlow().ignoreFirst().onEach { showPanels() }.launchIn(this)
+            mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().onEach { showPanels() }.launchIn(this)
 
             statusBarColorManager.getStatusBarColorFlow().onEach { color ->
                 mainActivity.window.statusBarColor = color

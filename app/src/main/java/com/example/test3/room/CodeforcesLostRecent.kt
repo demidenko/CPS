@@ -30,13 +30,13 @@ interface LostBlogsDao{
     suspend fun getLost(): List<LostBlogEntry>
 
     @Query("SELECT * FROM $lostBlogsTableName where isSuspect = 0")
-    fun getLostFlow(): Flow<List<LostBlogEntry>>
+    fun flowOfLost(): Flow<List<LostBlogEntry>>
 
     @Query("SELECT * FROM $lostBlogsTableName where isSuspect = 1")
     suspend fun getSuspects(): List<LostBlogEntry>
 
     @Query("SELECT * FROM $lostBlogsTableName where isSuspect = 1")
-    fun getSuspectsFlow(): Flow<List<LostBlogEntry>>
+    fun flowOfSuspects(): Flow<List<LostBlogEntry>>
 }
 
 @Entity(tableName = lostBlogsTableName)

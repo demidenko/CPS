@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity(){
         }
 
         addRepeatingJob(Lifecycle.State.STARTED){
-            settingsDev.getDevEnabledFlow().collect { isChecked ->
+            settingsDev.flowOfDevEnabled().collect { isChecked ->
                 val item = navigationMain.menu.findItem(R.id.navigation_develop)
                 item.isVisible = isChecked
             }
@@ -158,9 +158,9 @@ class MainActivity : AppCompatActivity(){
 
                 addRepeatingJob(Lifecycle.State.STARTED){
                     listOf(
-                        settingsUI.getUseRealColorsFlow().onEach { use -> buttonOriginColors.onIff(use) },
-                        settingsUI.getUseStatusBarFlow().onEach { use -> buttonColoredStatusBar.onIff(use) },
-                        settingsDev.getDevEnabledFlow().onEach { enabled -> buttonRecreate.isVisible = enabled }
+                        settingsUI.flowOfUseRealColors().onEach { use -> buttonOriginColors.onIff(use) },
+                        settingsUI.flowOfUseStatusBar().onEach { use -> buttonColoredStatusBar.onIff(use) },
+                        settingsDev.flowOfDevEnabled().onEach { enabled -> buttonRecreate.isVisible = enabled }
                     ).forEach { it.launchIn(this) }
                 }
             }

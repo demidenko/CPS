@@ -42,15 +42,15 @@ class StatusBarColorManager(
         with(mainActivity){
             addRepeatingJob(Lifecycle.State.STARTED){
                 managers.forEach {
-                    it.getInfoFlow().onEach { (manager, info) ->
+                    it.flowOfInfo().onEach { (manager, info) ->
                         updateBy(manager)
                     }.launchIn(this)
                 }
-                settingsUI.getUseStatusBarFlow().onEach { use ->
+                settingsUI.flowOfUseStatusBar().onEach { use ->
                     enabled = use
                     recalculateStatusBarColor()
                 }.launchIn(this)
-                settingsUI.getUseRealColorsFlow().ignoreFirst().onEach { use ->
+                settingsUI.flowOfUseRealColors().ignoreFirst().onEach { use ->
                     managers.forEach { updateBy(it) }
                 }.launchIn(this)
             }

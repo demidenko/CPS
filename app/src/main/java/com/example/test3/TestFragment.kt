@@ -30,6 +30,7 @@ import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.FlowItemsAdapter
 import com.example.test3.utils.CPSDataStore
 import com.example.test3.workers.WorkersCenter
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
@@ -171,7 +172,7 @@ class SettingsDev(context: Context) : CPSDataStore(context.settings_dev_dataStor
 
     private val devEnabledFlow = dataStore.data.map { it[KEY_DEV] ?: false }
     fun getDevEnabled() = runBlocking { devEnabledFlow.first() }
-    fun getDevEnabledFlow() = devEnabledFlow
+    fun flowOfDevEnabled() = devEnabledFlow.distinctUntilChanged()
     fun setDevEnabled(flag: Boolean) {
         runBlocking { dataStore.edit { it[KEY_DEV] = flag } }
     }
