@@ -119,40 +119,26 @@ class CodeforcesNewsViewModel: ViewModel() {
         }
     }
 
-    suspend fun addToFollowList(info: CodeforcesUserInfo, context: Context): Boolean {
-        val dao = getFollowDao(context)
-        if(dao.getUserBlog(info.handle)!=null) return false
-        viewModelScope.launch {
-            dao.insert(
-                CodeforcesUserBlog(
-                    handle = info.handle,
-                    blogEntries = null,
-                    userInfo = info
-                )
-            )
-            dao.loadBlogEntries(info.handle, context)
-        }
-        return true
-    }
+    suspend fun addToFollowList(info: CodeforcesUserInfo, context: Context) = addToFollowList(info.handle, info, context)
+    suspend fun addToFollowList(handle: String, context: Context) = addToFollowList(handle, null, context)
 
-    suspend fun addToFollowList(handle: String, context: Context): Boolean {
+    private suspend fun addToFollowList(handle: String, info: CodeforcesUserInfo?, context: Context): Boolean {
         val dao = getFollowDao(context)
         if(dao.getUserBlog(handle)!=null) return false
         viewModelScope.launch {
-            val manager = CodeforcesAccountManager(context)
+            var manager: CodeforcesAccountManager? = null
             dao.insert(
                 CodeforcesUserBlog(
                     handle = handle,
                     blogEntries = null,
-                    userInfo = manager.emptyInfo()
+                    userInfo = info ?: CodeforcesAccountManager(context).let {
+                        manager = it
+                        it.emptyInfo()
+                    }
                 )
             )
-            launch {
-                dao.loadBlogEntries(handle, context)
-            }
-            launch {
-                dao.setUserInfo(handle, manager.loadInfo(handle))
-            }
+            manager?.run { launch { dao.setUserInfo(handle, loadInfo(handle)) } }
+            dao.loadBlogEntries(handle, context)
         }
         return true
     }
