@@ -177,16 +177,14 @@ class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager)
     private val KEY_OBS_RATING = booleanPreferencesKey("observe_rating")
     private val KEY_LAST_RATED_CONTEST = stringPreferencesKey("last_rated_contest")
 
-    override suspend fun resetRelatedData() {
-        setLastRatedContestID("")
-    }
+    override val keysForReset = listOf(KEY_LAST_RATED_CONTEST)
 
     suspend fun getObserveRating() = dataStore.data.first()[KEY_OBS_RATING] ?: false
     suspend fun setObserveRating(flag: Boolean){
         dataStore.edit { it[KEY_OBS_RATING] = flag }
     }
 
-    suspend fun getLastRatedContestID() = dataStore.data.first()[KEY_LAST_RATED_CONTEST] ?: ""
+    suspend fun getLastRatedContestID() = dataStore.data.first()[KEY_LAST_RATED_CONTEST]
     suspend fun setLastRatedContestID(contestID: String){
         dataStore.edit { it[KEY_LAST_RATED_CONTEST] = contestID }
     }

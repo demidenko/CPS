@@ -31,7 +31,7 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
             return TimeUnit.SECONDS.toHours(currentTimeSeconds - timeSeconds) >= 24
         }
 
-        val lastKnownID: Long
+        val lastKnownID: Long?
         val canceled: List<Pair<Int,Long>>
         with(codeforcesAccountManager.getSettings()){
             lastKnownID = getContestWatchLastSubmissionID()
@@ -52,7 +52,7 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
             val resultId = response.result!!.let { submissions ->
                 for(submission in submissions){
                     if(firstID == null) firstID = submission.id
-                    if(submission.id <= lastKnownID) return@let NOTHING
+                    if(lastKnownID != null && submission.id <= lastKnownID) return@let NOTHING
                     if(isTooLate(submission.creationTimeSeconds)) return@let NOTHING
                     if(submission.author.participantType.participatedInContest()) return@let submission.contestId
                 }

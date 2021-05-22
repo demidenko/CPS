@@ -61,7 +61,7 @@ class AccountsWorker(private val context: Context, params: WorkerParameters) : C
 
         settings.setLastRatedContestID(lastRatingChangeContestID)
 
-        if(prevRatingChangeContestID!=""){
+        if(prevRatingChangeContestID != null) {
             atcoderAccountManager.notifyRatingChange(info.handle, lastRatingChange)
             val newInfo = atcoderAccountManager.loadInfo(info.handle)
             if(newInfo.status!=STATUS.FAILED){

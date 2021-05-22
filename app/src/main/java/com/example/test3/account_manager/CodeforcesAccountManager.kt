@@ -186,7 +186,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager<Codeforces
 
         settings.setLastRatedContestID(ratingChange.contestId)
 
-        if(prevRatingChangeContestID!=-1){
+        if(prevRatingChangeContestID != null) {
             notifyRatingChange(ratingChange)
             val newInfo = loadInfo(info.handle)
             if(newInfo.status!=STATUS.FAILED){
@@ -215,19 +215,19 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager)
     private val KEY_CONTEST_WATCH_STARTED = intPreferencesKey("contest_watch_started_contest")
     private val KEY_CONTEST_WATCH_CANCELED = stringPreferencesKey("contest_watch_canceled")
 
-    override suspend fun resetRelatedData() {
-        setLastRatedContestID(-1)
-        setContestWatchLastSubmissionID(-1)
-        setContestWatchStartedContestID(-1)
-        setContestWatchCanceled(emptyList())
-    }
+    override val keysForReset get() = listOf(
+        KEY_LAST_RATED_CONTEST,
+        KEY_CONTEST_WATCH_LAST_SUBMISSION,
+        KEY_CONTEST_WATCH_STARTED,
+        KEY_CONTEST_WATCH_CANCELED
+    )
 
     suspend fun getObserveRating() = dataStore.data.first()[KEY_OBS_RATING] ?: false
     suspend fun setObserveRating(flag: Boolean){
         dataStore.edit { it[KEY_OBS_RATING] = flag }
     }
 
-    suspend fun getLastRatedContestID() = dataStore.data.first()[KEY_LAST_RATED_CONTEST] ?: -1
+    suspend fun getLastRatedContestID() = dataStore.data.first()[KEY_LAST_RATED_CONTEST]
     suspend fun setLastRatedContestID(contestID: Int){
         dataStore.edit { it[KEY_LAST_RATED_CONTEST] = contestID }
     }
@@ -242,7 +242,7 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager)
         dataStore.edit { it[KEY_CONTEST_WATCH] = flag }
     }
 
-    suspend fun getContestWatchLastSubmissionID() = dataStore.data.first()[KEY_CONTEST_WATCH_LAST_SUBMISSION] ?: -1
+    suspend fun getContestWatchLastSubmissionID() = dataStore.data.first()[KEY_CONTEST_WATCH_LAST_SUBMISSION]
     suspend fun setContestWatchLastSubmissionID(submissionID: Long){
         dataStore.edit { it[KEY_CONTEST_WATCH_LAST_SUBMISSION] = submissionID }
     }
