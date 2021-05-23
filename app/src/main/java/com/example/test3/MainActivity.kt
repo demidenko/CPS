@@ -20,7 +20,7 @@ import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.ui.*
 import com.example.test3.utils.getColorFromResource
-import com.example.test3.utils.onIff
+import com.example.test3.ui.onIff
 import com.example.test3.workers.WorkersCenter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*

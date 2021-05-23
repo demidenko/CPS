@@ -22,6 +22,7 @@ import com.example.test3.news.*
 import com.example.test3.news.codeforces.CodeforcesNewsFragment
 import com.example.test3.news.codeforces.CodeforcesNewsViewModel
 import com.example.test3.ui.CPSFragment
+import com.example.test3.ui.enableIff
 import com.example.test3.ui.subscribeProgressBar
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsFollowWorker

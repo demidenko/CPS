@@ -9,8 +9,8 @@ import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
 import com.example.test3.utils.CodeforcesBlogEntry
-import com.example.test3.utils.off
-import com.example.test3.utils.on
+import com.example.test3.ui.off
+import com.example.test3.ui.on
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged

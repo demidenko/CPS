@@ -12,8 +12,8 @@ import com.example.test3.CodeforcesTitle
 import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.news.codeforces.adapters.CodeforcesCommentsAdapter
-import com.example.test3.utils.off
-import com.example.test3.utils.on
+import com.example.test3.ui.off
+import com.example.test3.ui.on
 
 class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
 

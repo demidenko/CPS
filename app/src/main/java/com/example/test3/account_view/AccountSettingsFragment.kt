@@ -11,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.test3.R
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.ui.CPSFragment
-import com.example.test3.utils.setupSwitch
+import com.example.test3.ui.setupSwitch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
