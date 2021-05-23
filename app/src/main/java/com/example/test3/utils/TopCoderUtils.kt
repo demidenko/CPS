@@ -1,15 +1,68 @@
 package com.example.test3.utils
 
+import com.example.test3.account_manager.STATUS
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
+import okhttp3.ResponseBody
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 import java.io.IOException
+
+object TopCoderUtils {
+    private const val pageSize = 64
+    suspend fun findRankPageForHandle(targetHandle: String): Triple<STATUS, Int, Int> {
+        var from = 1
+        var to = 3000
+        while (from < to) {
+            val mid = (from + to) / 2
+            val usersInfo = getRankPage(mid) ?: return Triple(STATUS.FAILED, 0, 0)
+            if(usersInfo.isEmpty()) {
+                to = mid
+                continue
+            }
+
+            val firstHandle = usersInfo.first().first
+            val lastHandle = usersInfo.last().first
+            if(targetHandle.compareTo(firstHandle,true) < 0) to = mid
+            else {
+                if(targetHandle.compareTo(lastHandle,true) <= 0) {
+                    val pos = usersInfo.indexOfFirst { targetHandle.equals(it.first,true) }
+                    if (pos == -1) break
+                    return Triple(STATUS.OK, usersInfo[pos].second, mid+pos)
+                }
+                from = mid + pageSize
+            }
+        }
+        return Triple(STATUS.NOT_FOUND, 0, 0)
+    }
+
+    suspend fun getRankPage(from: Int): List<Pair<String,Int>>? {
+        val s = TopCoderAPI.getRankingPage(from, pageSize)?.body()?.string() ?: return null
+        val result = mutableListOf<Pair<String,Int>>()
+        try {
+            var i = 0
+            while(true){
+                i = s.indexOf("tc?module=MemberProfile", i+1)
+                if (i==-1) break
+                i = s.indexOf('>', i)
+                val handle = s.substring(i+1, s.indexOf('<',i))
+                i = s.indexOf("<td class=\"valueR\"", i)
+                val rating = s.substring(s.indexOf('>',i)+1, s.indexOf('<',i+1)).toInt()
+                result.add(handle to rating)
+            }
+        } catch (e: RuntimeException) {
+            return null
+        }
+        return result
+    }
+}
 
 @Serializable
 data class TopCoderUser(
@@ -105,6 +158,29 @@ object TopCoderAPI {
         }catch (e: IOException){
             null
         }catch (e: SerializationException){
+            null
+        }
+    }
+
+    interface WEB {
+        @GET("/tc?module=AlgoRank&sc=4&sd=asc")
+        fun algoRankPage(
+            @Query("nr") pageSize: Int,
+            @Query("sr") from: Int
+        ): Call<ResponseBody>
+    }
+
+    private val topcoderWEB = Retrofit.Builder()
+        .baseUrl("https://www.topcoder.com/")
+        .addCallAdapterFactory(CoroutineCallAdapterFactory())
+        .client(httpClient)
+        .build()
+        .create(WEB::class.java)
+
+    suspend fun getRankingPage(from: Int, size: Int): Response<ResponseBody>? = withContext(Dispatchers.IO) {
+        try {
+            topcoderWEB.algoRankPage(size, from).execute()
+        } catch (e: IOException) {
             null
         }
     }
