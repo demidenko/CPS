@@ -78,7 +78,7 @@ class CodeforcesContestWatchWorker(val context: Context, params: WorkerParameter
             setSmallIcon(R.drawable.ic_contest)
             setSubText(handle)
             setShowWhen(false)
-            setNotificationSilent()
+            setSilent(true)
             setStyle(NotificationCompat.DecoratedCustomViewStyle())
         }
 

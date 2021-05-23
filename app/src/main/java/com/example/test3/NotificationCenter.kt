@@ -151,7 +151,7 @@ fun makeSimpleNotification(context: Context, id: Int, title: String, content: St
         setSmallIcon(R.drawable.ic_news)
         setContentTitle(title)
         setContentText(content)
-        if(silent) setNotificationSilent()
+        setSilent(silent)
         setShowWhen(true)
         setWhen(System.currentTimeMillis())
     }

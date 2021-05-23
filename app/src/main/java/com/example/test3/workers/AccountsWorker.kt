@@ -96,11 +96,11 @@ class AccountsWorker(private val context: Context, params: WorkerParameters) : C
                 setSubText(handle)
                 setContentTitle("Contribution change: ${signedToString(oldShowedContribution)} → ${signedToString(contribution)}")
                 setSmallIcon(R.drawable.ic_person)
-                setNotificationSilent()
+                setSilent(true)
                 setAutoCancel(true)
                 setShowWhen(false)
                 setContentIntent(makePendingIntentOpenURL(info.link(), context))
-                extras = bundleOf(keyContribution to oldShowedContribution)
+                addExtras(bundleOf(keyContribution to oldShowedContribution))
             }
             notificationManager.notify( NotificationIDs.codeforces_contribution_changes, n.build())
         }
