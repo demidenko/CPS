@@ -47,7 +47,7 @@ class TopCoderAccountManager(context: Context): RatedAccountManager<TopCoderAcco
     override fun isValidForSearch(char: Char) = isValidForUserID(char)
     override fun isValidForUserID(char: Char): Boolean {
         return when(char){
-            in 'a'..'z', in 'A'..'Z', in '0'..'9', in " _.[]" -> true
+            in 'a'..'z', in 'A'..'Z', in '0'..'9', in " _.[]{}" -> true
             else -> false
         }
     }
