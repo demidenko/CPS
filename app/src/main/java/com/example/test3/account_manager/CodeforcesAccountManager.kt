@@ -196,6 +196,20 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager<Codeforces
             }
         }
     }
+
+    override val ratingUpperBoundRevolutions: List<Pair<Long, Array<Pair<Int, HandleColor>>>> =
+        listOf(
+            //https://codeforces.com/blog/entry/59228
+            1525364996L to arrayOf(
+                1200 to HandleColor.GRAY,
+                1400 to HandleColor.GREEN,
+                1600 to HandleColor.CYAN,
+                1900 to HandleColor.BLUE,
+                2200 to HandleColor.VIOLET,
+                2400 to HandleColor.ORANGE
+            )
+            //https://codeforces.com/blog/entry/20638
+        )
 }
 
 class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager)

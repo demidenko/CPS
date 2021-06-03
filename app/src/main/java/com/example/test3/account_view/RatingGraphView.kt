@@ -117,20 +117,31 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         }
 
         //rating stripes
-        val ratingBounds = accountManager.ratingsUpperBounds.toMutableList()
-        ratingBounds.add(Pair(Int.MAX_VALUE, HandleColor.RED))
-        ratingBounds.reversed().forEachIndexed { index, (upper, ratingColor) ->
-
-            val y = if(index == 0) height.toFloat() else {
-                val arr = floatArrayOf(0f, upper.toFloat())
+        val allRatingBounds = accountManager.ratingUpperBoundRevolutions.toMutableList()
+        allRatingBounds.add(getCurrentTimeSeconds() to accountManager.ratingsUpperBounds)
+        allRatingBounds.reversed().forEachIndexed { index, it ->
+            val lastTimeSeconds = it.first
+            val x = if(index == 0) width.toFloat() else {
+                val arr = floatArrayOf(lastTimeSeconds.toFloat(), 0f)
                 m.mapPoints(arr)
-                arr[1]
+                arr[0]
             }
 
-            extraCanvas.drawRect(0f, 0f, width.toFloat(), y, Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = ratingColor.getARGB(accountManager)
-                style = Paint.Style.FILL
-            })
+            val ratingBounds = it.second.toMutableList()
+            ratingBounds.add(Pair(Int.MAX_VALUE, HandleColor.RED))
+            ratingBounds.reversed().forEachIndexed { index, (upper, ratingColor) ->
+
+                val y = if(index == 0) height.toFloat() else {
+                    val arr = floatArrayOf(0f, upper.toFloat())
+                    m.mapPoints(arr)
+                    arr[1]
+                }
+
+                extraCanvas.drawRect(0f, 0f, x, y, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = ratingColor.getARGB(accountManager)
+                    style = Paint.Style.FILL
+                })
+            }
         }
 
         //rating path

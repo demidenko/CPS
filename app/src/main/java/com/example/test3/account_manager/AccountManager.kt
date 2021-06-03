@@ -102,6 +102,9 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: S
 
     protected open suspend fun loadRatingHistory(info: U): List<RatingChange>? = null
     suspend fun getRatingHistory(info: U): List<RatingChange>? = loadRatingHistory(info)?.sortedBy { it.timeSeconds }
+
+    //list of (last time, bounds)
+    open val ratingUpperBoundRevolutions: List<Pair<Long, Array<Pair<Int, HandleColor>>>> = emptyList()
 }
 
 data class RatingChange(
