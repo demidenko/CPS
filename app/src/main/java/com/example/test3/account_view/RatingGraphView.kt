@@ -119,6 +119,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         //rating stripes
         val allRatingBounds = accountManager.ratingUpperBoundRevolutions.toMutableList()
         allRatingBounds.add(getCurrentTimeSeconds() to accountManager.ratingsUpperBounds)
+        val rectangles = mutableListOf<Triple<Long,Int,HandleColor>>()
         allRatingBounds.sortedByDescending { it.first }.forEachIndexed { index, it ->
             val lastTimeSeconds = it.first
             val x = if(index == 0) width.toFloat() else {
@@ -141,6 +142,8 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                     color = ratingColor.getARGB(accountManager)
                     style = Paint.Style.FILL
                 })
+
+                rectangles.add(Triple(lastTimeSeconds, upper, ratingColor))
             }
         }
 
@@ -197,10 +200,14 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
             m.mapPoints(arr)
             val (x,y) = arr
 
+            val handleColor = rectangles.last { (timeSeconds, rating, color) ->
+                ratingChange.timeSeconds < timeSeconds && ratingChange.rating < rating
+            }.third
+
             //circle inner
             extraCanvas.drawCircle(x, y, circleRadius, Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 style = Paint.Style.FILL
-                color = accountManager.getHandleColorARGB(ratingChange.rating)
+                color = handleColor.getARGB(accountManager)
             })
 
             //circle outer
