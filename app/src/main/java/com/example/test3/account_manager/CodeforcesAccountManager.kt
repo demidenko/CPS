@@ -207,8 +207,23 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager<Codeforces
                 1900 to HandleColor.BLUE,
                 2200 to HandleColor.VIOLET,
                 2400 to HandleColor.ORANGE
-            )
+            ),
             //https://codeforces.com/blog/entry/20638
+            1443721088L to arrayOf(
+                1200 to HandleColor.GRAY,
+                1500 to HandleColor.GREEN,
+                1700 to HandleColor.BLUE,
+                1900 to HandleColor.VIOLET,
+                2200 to HandleColor.ORANGE
+            ),
+            //https://codeforces.com/blog/entry/3064
+            1320620562L to arrayOf(
+                1200 to HandleColor.GRAY,
+                1500 to HandleColor.GREEN,
+                1650 to HandleColor.BLUE,
+                2000 to HandleColor.ORANGE
+            )
+            //https://codeforces.com/blog/entry/126
         )
 }
 

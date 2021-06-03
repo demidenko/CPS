@@ -119,7 +119,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         //rating stripes
         val allRatingBounds = accountManager.ratingUpperBoundRevolutions.toMutableList()
         allRatingBounds.add(getCurrentTimeSeconds() to accountManager.ratingsUpperBounds)
-        allRatingBounds.reversed().forEachIndexed { index, it ->
+        allRatingBounds.sortedByDescending { it.first }.forEachIndexed { index, it ->
             val lastTimeSeconds = it.first
             val x = if(index == 0) width.toFloat() else {
                 val arr = floatArrayOf(lastTimeSeconds.toFloat(), 0f)
@@ -129,7 +129,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
             val ratingBounds = it.second.toMutableList()
             ratingBounds.add(Pair(Int.MAX_VALUE, HandleColor.RED))
-            ratingBounds.reversed().forEachIndexed { index, (upper, ratingColor) ->
+            ratingBounds.sortedByDescending { it.first }.forEachIndexed { index, (upper, ratingColor) ->
 
                 val y = if(index == 0) height.toFloat() else {
                     val arr = floatArrayOf(0f, upper.toFloat())
