@@ -221,7 +221,15 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager<Codeforces
                 1200 to HandleColor.GRAY,
                 1500 to HandleColor.GREEN,
                 1650 to HandleColor.BLUE,
+                1800 to HandleColor.VIOLET,
                 2000 to HandleColor.ORANGE
+            ),
+            //https://codeforces.com/blog/entry/1383
+            1298914585L to arrayOf(
+                1200 to HandleColor.GRAY,
+                1500 to HandleColor.GREEN,
+                1650 to HandleColor.BLUE,
+                2000 to HandleColor.YELLOW
             )
             //https://codeforces.com/blog/entry/126
         )
