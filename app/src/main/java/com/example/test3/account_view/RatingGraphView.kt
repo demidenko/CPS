@@ -17,6 +17,7 @@ import com.example.test3.utils.getCurrentTimeSeconds
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
+import kotlin.math.round
 
 class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
@@ -138,7 +139,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
                     arr[1]
                 }
 
-                extraCanvas.drawRect(0f, 0f, x, y, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                extraCanvas.drawRect(0f, 0f, round(x), round(y), Paint(Paint.ANTI_ALIAS_FLAG).apply {
                     color = ratingColor.getARGB(accountManager)
                     style = Paint.Style.FILL
                 })
