@@ -19,7 +19,7 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
         suspend fun updateInfo(context: Context, progress: MutableStateFlow<Pair<Int,Int>?>) {
             val blogsDao = getLostBlogsDao(context)
 
-            val blogEntries = blogsDao.getLost()
+            val blogEntries = blogsDao.getLost().sortedByDescending { it.id }
 
             progress.value = 0 to blogEntries.size
             var done = 0
