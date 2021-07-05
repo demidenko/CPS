@@ -89,14 +89,12 @@ interface FollowListDao {
                     else -> return emptyList()
                 }
             } else response.result ?: return emptyList()
-        val updated =
-            getBlogEntries(handle)?.toSet()?.let { saved ->
-                blogEntries.filter { it.id !in saved }
-                    .onEach { blogEntry ->
-                        notifyNewBlogEntry(blogEntry, context)
-                    }.isNotEmpty()
-            } ?: true
-        if(updated) setBlogEntries(handle, blogEntries.map { it.id })
+        getBlogEntries(handle)?.toSet()?.let { saved ->
+            for(blogEntry in  blogEntries) {
+                if(blogEntry.id !in saved) notifyNewBlogEntry(blogEntry, context)
+            }
+        }
+        setBlogEntries(handle, blogEntries.map { it.id })
         return blogEntries
     }
 
