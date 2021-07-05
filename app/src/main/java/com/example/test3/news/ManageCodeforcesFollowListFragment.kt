@@ -16,8 +16,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
@@ -29,10 +27,7 @@ import com.example.test3.news.codeforces.adapters.CodeforcesNewsItemsAdapter
 import com.example.test3.room.CodeforcesUserBlog
 import com.example.test3.room.getFollowDao
 import com.example.test3.timeDifference
-import com.example.test3.ui.CPSFragment
-import com.example.test3.ui.disable
-import com.example.test3.ui.enable
-import com.example.test3.ui.settingsUI
+import com.example.test3.ui.*
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -59,11 +54,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
 
         setHasOptionsMenu(true)
 
-        val followRecyclerView = view.findViewById<RecyclerView>(R.id.manage_cf_follow_users_list).apply {
-            layoutManager = LinearLayoutManager(context)
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-            setHasFixedSize(true)
-        }
+        val followRecyclerView = view.findViewById<RecyclerView>(R.id.manage_cf_follow_users_list).formatCPS()
 
         val followListAdapter = FollowListItemsAdapter(
             this,

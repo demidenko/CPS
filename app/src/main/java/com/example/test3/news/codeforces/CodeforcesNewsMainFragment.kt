@@ -2,11 +2,9 @@ package com.example.test3.news.codeforces
 
 import android.os.Bundle
 import android.view.View
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.test3.CodeforcesTitle
-import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
+import com.example.test3.ui.formatCPS
 import com.google.android.material.tabs.TabLayout
 
 class CodeforcesNewsMainFragment(): CodeforcesNewsFragment() {
@@ -23,18 +21,9 @@ class CodeforcesNewsMainFragment(): CodeforcesNewsFragment() {
             newsFragment.viewedDataStore.blogsViewedFlow(title)
         )
 
-        recyclerView.apply {
-            adapter = itemsAdapter
-            layoutManager = LinearLayoutManager(context)
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-            setHasFixedSize(true)
-        }
+        recyclerView.formatCPS().adapter = itemsAdapter
 
-        swipeRefreshLayout.apply {
-            setOnRefreshListener { callReload() }
-            setProgressBackgroundColorSchemeResource(R.color.backgroundAdditional)
-            setColorSchemeResources(R.color.colorAccent)
-        }
+        swipeRefreshLayout.formatCPS().setOnRefreshListener { callReload() }
 
         subscribeLoadingState(newsFragment.newsViewModel.flowOfPageLoadingState(title), swipeRefreshLayout)
         subscribeNewEntries(itemsAdapter)

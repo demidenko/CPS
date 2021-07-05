@@ -96,7 +96,7 @@ abstract class CodeforcesNewsFragment: Fragment() {
                 CodeforcesTitle.LOST -> CodeforcesNewsLostFragment()
             }
         }
-    }
 
-    val RecyclerView.codeforcesItemsAdapter: CodeforcesNewsItemsAdapter<*,*>? get() = adapter as? CodeforcesNewsItemsAdapter<*, *>
+        val RecyclerView.codeforcesItemsAdapter: CodeforcesNewsItemsAdapter<*,*>? get() = adapter as? CodeforcesNewsItemsAdapter<*, *>
+    }
 }

@@ -2,15 +2,14 @@ package com.example.test3.news.codeforces
 
 import android.os.Bundle
 import android.view.View
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.test3.CodeforcesTitle
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
-import com.example.test3.utils.CodeforcesBlogEntry
+import com.example.test3.ui.formatCPS
 import com.example.test3.ui.off
 import com.example.test3.ui.on
+import com.example.test3.utils.CodeforcesBlogEntry
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -42,12 +41,7 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
             )
         }
 
-        recyclerView.apply {
-            adapter = itemsAdapter
-            layoutManager = LinearLayoutManager(context)
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-            setHasFixedSize(true)
-        }
+        recyclerView.formatCPS().adapter = itemsAdapter
 
         suspectsButton.apply {
             off()

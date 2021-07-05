@@ -8,13 +8,12 @@ import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.room.getFollowDao
 import com.example.test3.ui.CPSFragment
+import com.example.test3.ui.formatCPS
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.utils.asyncPair
@@ -57,12 +56,7 @@ class CodeforcesBlogEntriesFragment: CPSFragment() {
             null
         )
 
-        view.findViewById<RecyclerView>(R.id.manage_cf_follow_user_blog_entries).apply {
-            layoutManager = LinearLayoutManager(context)
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-            setHasFixedSize(true)
-            adapter = blogEntriesAdapter
-        }
+        view.findViewById<RecyclerView>(R.id.manage_cf_follow_user_blog_entries).formatCPS().adapter = blogEntriesAdapter
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
             mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().collect { blogEntriesAdapter.refreshHandles() }

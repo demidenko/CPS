@@ -5,13 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.CodeforcesTitle
 import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.news.codeforces.adapters.CodeforcesCommentsAdapter
+import com.example.test3.ui.formatCPS
 import com.example.test3.ui.off
 import com.example.test3.ui.on
 
@@ -46,26 +45,16 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
             )
         }
 
-        recyclerViewBlogEntries.apply {
+        recyclerViewBlogEntries.formatCPS().apply {
             isVisible = true
             adapter = blogEntriesAdapter
-            layoutManager = LinearLayoutManager(context)
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-            setHasFixedSize(true)
         }
 
-        recyclerViewComments.apply {
+        recyclerViewComments.formatCPS().apply {
             isVisible = false
-            layoutManager = LinearLayoutManager(context)
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-            setHasFixedSize(true)
         }
 
-        swipeRefreshLayout.apply {
-            setOnRefreshListener { callReload() }
-            setProgressBackgroundColorSchemeResource(R.color.backgroundAdditional)
-            setColorSchemeResources(R.color.colorAccent)
-        }
+        swipeRefreshLayout.formatCPS().setOnRefreshListener { callReload() }
 
         newsFragment.topCommentsButton.apply {
             off()

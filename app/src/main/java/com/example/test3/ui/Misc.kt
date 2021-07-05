@@ -6,6 +6,10 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.R
 import com.google.android.material.switchmaterial.SwitchMaterial
 
@@ -123,4 +127,17 @@ fun ImageButton.disable() {
 
 fun ImageButton.enableIff(condition: Boolean) {
     if(condition) enable() else disable()
+}
+
+fun RecyclerView.formatCPS(): RecyclerView {
+    layoutManager = LinearLayoutManager(context)
+    addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+    setHasFixedSize(true)
+    return this
+}
+
+fun SwipeRefreshLayout.formatCPS(): SwipeRefreshLayout {
+    setProgressBackgroundColorSchemeResource(R.color.backgroundAdditional)
+    setColorSchemeResources(R.color.colorAccent)
+    return this
 }
