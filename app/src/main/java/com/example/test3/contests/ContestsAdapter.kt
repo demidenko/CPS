@@ -11,18 +11,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.makeIntentOpenUrl
 import com.example.test3.ui.FlowItemsAdapter
-import com.example.test3.utils.CodeforcesContest
-import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.durationHHMM
 import kotlinx.coroutines.flow.Flow
 import java.util.concurrent.TimeUnit
 
 class ContestsAdapter(
     fragment: Fragment,
-    dataFlow: Flow<List<CodeforcesContest>>
-): FlowItemsAdapter<ContestsAdapter.ContestViewHolder, List<CodeforcesContest>>(fragment, dataFlow) {
+    dataFlow: Flow<List<Contest>>
+): FlowItemsAdapter<ContestsAdapter.ContestViewHolder, List<Contest>>(fragment, dataFlow) {
 
-    private var items: Array<CodeforcesContest> = emptyArray()
+    private var items: Array<Contest> = emptyArray()
     override fun getItemCount() = items.size
 
     class ContestViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view) {
@@ -31,7 +29,7 @@ class ContestsAdapter(
         val duration: TextView = view.findViewById(R.id.contests_list_item_duration)
     }
 
-    override suspend fun applyData(data: List<CodeforcesContest>): DiffUtil.DiffResult? {
+    override suspend fun applyData(data: List<Contest>): DiffUtil.DiffResult? {
         items = data.toTypedArray()
         return null
     }
@@ -44,10 +42,12 @@ class ContestsAdapter(
     override fun onBindViewHolder(holder: ContestViewHolder, position: Int) {
         with(holder) {
             val contest = items[position]
-            title.text = contest.name
+            title.text = contest.title
             date.text = DateFormat.format("dd.MM.yyyy E HH:mm", TimeUnit.SECONDS.toMillis(contest.startTimeSeconds))
             duration.text = durationHHMM(contest.durationSeconds)
-            view.setOnClickListener { it.context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.contest(contest))) }
+            contest.link?.let { url ->
+                view.setOnClickListener { it.context.startActivity(makeIntentOpenUrl(url)) }
+            }
         }
     }
 

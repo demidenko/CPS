@@ -9,11 +9,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.test3.contests.Contest
 import com.example.test3.contests.ContestsAdapter
 import com.example.test3.contests.ContestsViewModel
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.formatCPS
-import com.example.test3.utils.CodeforcesContest
 import com.example.test3.utils.LoadingState
 import com.example.test3.utils.getCurrentTimeSeconds
 import kotlinx.coroutines.flow.collect
@@ -40,18 +40,23 @@ class ContestsFragment: CPSFragment() {
 
         val contestAdapter = ContestsAdapter(
             this,
-            contestViewModel.flowOfCodeforcesContests().map { contests ->
+            contestViewModel.flowOfContests().map { contests ->
                 val currentTimeSeconds = getCurrentTimeSeconds()
                 contests.filter { contest ->
                     currentTimeSeconds - contest.startTimeSeconds < TimeUnit.HOURS.toSeconds(48)
                 }.sortedWith(
-                    compareBy<CodeforcesContest> { it.phase }.thenBy { it.startTimeSeconds }
+                    compareBy<Contest> { it.getPhase(currentTimeSeconds) }.thenBy {
+                        when(it.getPhase(currentTimeSeconds)) {
+                            Contest.Phase.BEFORE -> it.startTimeSeconds
+                            Contest.Phase.RUNNING -> it.endTimeSeconds
+                            Contest.Phase.FINISHED -> -it.endTimeSeconds
+                        }
+                    }
                 )
             }
         )
-        val recyclerView = view.findViewById<RecyclerView>(R.id.contests_list).formatCPS().apply {
-            adapter = contestAdapter
-        }
+
+        view.findViewById<RecyclerView>(R.id.contests_list).formatCPS().adapter = contestAdapter
 
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.contests_list_swipe_refresh_layout).formatCPS().apply {
             setOnRefreshListener { callReload() }

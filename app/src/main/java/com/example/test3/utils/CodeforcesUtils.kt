@@ -767,10 +767,7 @@ object CodeforcesURLFactory {
 
     fun contest(contestId: Int) = "$main/contest/$contestId"
 
-    fun contest(contest: CodeforcesContest): String {
-        return if(contest.phase == CodeforcesContestPhase.BEFORE) "$main/contests/${contest.id}"
-        else contest(contest.id)
-    }
+    fun contestOuter(contestId: Int) = "$main/contests/$contestId"
 
     fun contestsWith(handle: String) = "$main/contests/with/$handle"
 
