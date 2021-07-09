@@ -46,6 +46,10 @@ fun fromHTML(s: String): Spanned {
 
 fun signedToString(x: Int): String = if(x>0) "+$x" else "$x"
 
+fun durationHHMM(seconds: Long) : String {
+    val minutes = TimeUnit.SECONDS.toMinutes(seconds)
+    return String.format("%02d:%02d", minutes/60, minutes%60)
+}
 
 class MutableSetLiveSize<T>() {
     private val s = mutableSetOf<T>()
