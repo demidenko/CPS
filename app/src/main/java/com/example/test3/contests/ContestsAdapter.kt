@@ -1,5 +1,6 @@
 package com.example.test3.contests
 
+import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
@@ -14,6 +15,7 @@ import com.example.test3.utils.CodeforcesContest
 import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.durationHHMM
 import kotlinx.coroutines.flow.Flow
+import java.util.concurrent.TimeUnit
 
 class ContestsAdapter(
     fragment: Fragment,
@@ -43,7 +45,7 @@ class ContestsAdapter(
         with(holder) {
             val contest = items[position]
             title.text = contest.name
-            date.text = "${contest.startTimeSeconds} ${contest.phase}"
+            date.text = DateFormat.format("dd.MM.yyyy E HH:mm", TimeUnit.SECONDS.toMillis(contest.startTimeSeconds))
             duration.text = durationHHMM(contest.durationSeconds)
             view.setOnClickListener { it.context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.contest(contest))) }
         }
