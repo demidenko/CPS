@@ -12,6 +12,11 @@
         android:title="news"/>
 
     <item
+        android:id="@+id/navigation_contests"
+        android:icon="@drawable/ic_contest"
+        android:title="contests"/>
+
+    <item
         android:id="@+id/navigation_develop"
         android:icon="@drawable/ic_develop"
         android:visible="false"

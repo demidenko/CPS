@@ -20,7 +20,6 @@ import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.ui.*
 import com.example.test3.utils.getColorFromResource
-import com.example.test3.ui.onIff
 import com.example.test3.workers.WorkersCenter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
@@ -40,6 +39,7 @@ class MainActivity : AppCompatActivity(){
 
     val accountsFragment by lazy { findOrCreateFragment { AccountsFragment() } }
     val newsFragment by lazy { findOrCreateFragment { NewsFragment() } }
+    val contestsFragment by lazy { findOrCreateFragment { ContestsFragment() } }
     val devFragment by lazy { findOrCreateFragment { TestFragment() } }
 
     val cpsFragmentManager by lazy { CPSFragmentManager(this, R.id.container_fragment) }
@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity(){
 
         val accountsStackId = cpsFragmentManager.getOrCreateStack(accountsFragment)
         val newsStackId = cpsFragmentManager.getOrCreateStack(newsFragment)
+        val contestsStackId = cpsFragmentManager.getOrCreateStack(contestsFragment)
         val devStackId = cpsFragmentManager.getOrCreateStack(devFragment)
 
         if(cpsFragmentManager.getCurrentStackId() == -1) cpsFragmentManager.switchToStack(accountsStackId)
@@ -80,6 +81,7 @@ class MainActivity : AppCompatActivity(){
                 when(val id = item.itemId){
                     R.id.navigation_accounts -> accountsStackId
                     R.id.navigation_news -> newsStackId
+                    R.id.navigation_contests -> contestsStackId
                     R.id.navigation_develop -> devStackId
                     else -> throw Exception("unknown selected navigation bar item: $id")
                 }
