@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity(){
 
         if(cpsFragmentManager.getCurrentStackId() == -1) cpsFragmentManager.switchToStack(accountsStackId)
 
-        navigationMain.setOnNavigationItemSelectedListener { item ->
+        navigationMain.setOnItemSelectedListener { item ->
             val selectedStackId =
                 when(val id = item.itemId){
                     R.id.navigation_accounts -> accountsStackId
