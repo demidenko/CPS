@@ -5,7 +5,7 @@ import com.example.test3.utils.CodeforcesURLFactory
 
 data class Contest (
     val platform: Platform,
-    val id: Long,
+    val id: String,
     val title: String,
     val startTimeSeconds: Long,
     val durationSeconds: Long,
@@ -22,7 +22,7 @@ data class Contest (
 
     constructor(contest: CodeforcesContest): this(
         Platform.codeforces,
-        contest.id.toLong(),
+        contest.id.toString(),
         contest.name,
         contest.startTimeSeconds,
         contest.durationSeconds,

@@ -46,9 +46,15 @@ class ContestsFragment: CPSFragment() {
             contestViewModel.flowOfContests().map { contests ->
                 val currentTimeSeconds = getCurrentTimeSeconds()
                 contests.filter { contest ->
-                    currentTimeSeconds - contest.startTimeSeconds < TimeUnit.HOURS.toSeconds(48)
+                    currentTimeSeconds - contest.endTimeSeconds < TimeUnit.HOURS.toSeconds(48)
                 }.sortedWith(
-                    compareBy<Contest> { it.getPhase(currentTimeSeconds) }.thenBy {
+                    compareBy<Contest> {
+                        when(it.getPhase(currentTimeSeconds)) {
+                            Contest.Phase.BEFORE -> 1
+                            Contest.Phase.RUNNING -> 0
+                            Contest.Phase.FINISHED -> 2
+                        }
+                    }.thenBy {
                         when(it.getPhase(currentTimeSeconds)) {
                             Contest.Phase.BEFORE -> it.startTimeSeconds
                             Contest.Phase.RUNNING -> it.endTimeSeconds
@@ -69,11 +75,12 @@ class ContestsFragment: CPSFragment() {
 
         addRepeatingJob(Lifecycle.State.STARTED) {
             contestViewModel.flowOfLoadingState().collect {
-                swipeRefreshLayout.isRefreshing = it == LoadingState.LOADING
                 reloadButton.apply {
                     enableIff(it != LoadingState.LOADING)
-                    setColorFilter(getColorFromResource(context, if(it == LoadingState.FAILED) R.color.fail else R.color.textColor))
+                    if(it == LoadingState.FAILED) setColorFilter(getColorFromResource(context, R.color.fail))
+                    else clearColorFilter()
                 }
+                swipeRefreshLayout.isRefreshing = it == LoadingState.LOADING
             }
         }
 
