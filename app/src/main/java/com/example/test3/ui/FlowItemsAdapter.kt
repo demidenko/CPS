@@ -58,6 +58,10 @@ abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
 }
 
 
+interface TimeDepends {
+    var startTimeSeconds: Long
+    fun refreshTime(currentTimeSeconds: Long)
+}
 
 class AdapterLifecycleMerge(
     adapter: FlowItemsAdapter<*, *>,

@@ -7,6 +7,7 @@ import androidx.lifecycle.addRepeatingJob
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.ui.FlowItemsAdapter
+import com.example.test3.ui.TimeDepends
 import com.example.test3.utils.getCurrentTimeSeconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -54,9 +55,4 @@ abstract class CodeforcesNewsItemsTimedAdapter<H, T>(
             }
         }
     }
-}
-
-interface TimeDepends {
-    var startTimeSeconds: Long
-    fun refreshTime(currentTimeSeconds: Long)
 }
