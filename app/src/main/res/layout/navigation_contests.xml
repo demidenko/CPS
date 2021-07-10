@@ -5,4 +5,17 @@
     android:id="@+id/support_navigation_contests"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <ImageButton
+        android:id="@+id/navigation_contests_reload"
+        android:tooltipText="reload"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        app:layout_constraintWidth_percent="0.25"
+        android:src="@drawable/ic_refresh"
+        style="@style/CPSImageButton"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

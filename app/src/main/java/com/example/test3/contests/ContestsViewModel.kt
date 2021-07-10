@@ -14,16 +14,25 @@ class ContestsViewModel: ViewModel() {
     private val loadingState = MutableStateFlow(LoadingState.PENDING)
     fun flowOfLoadingState(): StateFlow<LoadingState> = loadingState.asStateFlow()
 
+    private var touched = false
     private val contestsStateFlow = MutableStateFlow<List<Contest>>(emptyList())
-    fun flowOfContests(): StateFlow<List<Contest>> = contestsStateFlow.asStateFlow()
+    fun flowOfContests(): StateFlow<List<Contest>> =
+        contestsStateFlow.also {
+            if(!touched) {
+                touched = true
+                reload()
+            }
+        }.asStateFlow()
 
     fun reload() {
         viewModelScope.launch {
             loadingState.value = LoadingState.LOADING
-            val response = CodeforcesAPI.getContests() ?: return@launch
-            val contests = response.result ?: return@launch
-            contestsStateFlow.value = contests.map { Contest(it) }
-            loadingState.value = LoadingState.PENDING
+            loadingState.value = CodeforcesAPI.getContests()?.let { response ->
+                response.result?.let { contests ->
+                    contestsStateFlow.value = contests.map { Contest(it) }
+                    LoadingState.PENDING
+                }
+            } ?: LoadingState.FAILED
         }
     }
 }
