@@ -29,9 +29,10 @@ class ContestsAdapter(
         val duration: TextView = view.findViewById(R.id.contests_list_item_duration)
     }
 
-    override suspend fun applyData(data: List<Contest>): DiffUtil.DiffResult? {
+    override suspend fun applyData(data: List<Contest>): DiffUtil.DiffResult {
+        val oldItems = items
         items = data.toTypedArray()
-        return null
+        return DiffUtil.calculateDiff(diffCallback(oldItems, items))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContestViewHolder {
@@ -49,6 +50,24 @@ class ContestsAdapter(
                 view.setOnClickListener { it.context.startActivity(makeIntentOpenUrl(url)) }
             }
         }
+    }
+
+    companion object {
+        private fun diffCallback(old: Array<Contest>, new: Array<Contest>) =
+            object : DiffUtil.Callback() {
+                override fun getOldListSize() = old.size
+                override fun getNewListSize() = new.size
+
+                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    val oldContest = old[oldItemPosition]
+                    val newContest = new[newItemPosition]
+                    return (oldContest.platform == newContest.platform) && (oldContest.id == newContest.id)
+                }
+
+                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    return old[oldItemPosition] == new[newItemPosition]
+                }
+            }
     }
 
 }
