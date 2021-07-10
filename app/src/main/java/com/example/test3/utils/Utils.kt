@@ -51,6 +51,10 @@ fun durationHHMM(seconds: Long) : String {
     return String.format("%02d:%02d", minutes/60, minutes%60)
 }
 
+fun durationHHMMSS(seconds: Long) : String {
+    return String.format("%02d:%02d:%02d", seconds/60/60, seconds/60%60, seconds%60)
+}
+
 class MutableSetLiveSize<T>() {
     private val s = mutableSetOf<T>()
     private val size = MutableStateFlow<Int>(0)

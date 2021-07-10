@@ -6,13 +6,20 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.makeIntentOpenUrl
+import com.example.test3.timeDifference2
 import com.example.test3.ui.FlowItemsAdapter
+import com.example.test3.ui.TimeDepends
 import com.example.test3.utils.durationHHMM
+import com.example.test3.utils.getCurrentTimeSeconds
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.isActive
 import java.util.concurrent.TimeUnit
 
 class ContestsAdapter(
@@ -23,10 +30,41 @@ class ContestsAdapter(
     private var items: Array<Contest> = emptyArray()
     override fun getItemCount() = items.size
 
-    class ContestViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view) {
+    init {
+        addRepeatingJob(Lifecycle.State.RESUMED) {
+            while (isActive) {
+                getActiveViewHolders().takeIf { it.isNotEmpty() }?.let { holders ->
+                    val currentTimeSeconds = getCurrentTimeSeconds()
+                    holders.forEach { it.refreshTime(currentTimeSeconds) }
+                }
+                delay(1000)
+            }
+        }
+    }
+
+    class ContestViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view), TimeDepends {
         val title: TextView = view.findViewById(R.id.contests_list_item_title)
         val date: TextView = view.findViewById(R.id.contests_list_item_date)
-        val duration: TextView = view.findViewById(R.id.contests_list_item_duration)
+        private val durationTextView: TextView = view.findViewById(R.id.contests_list_item_duration)
+        private val phaseTextView: TextView = view.findViewById(R.id.contests_list_item_phase)
+
+        var duration: Long = 0
+            set(value) {
+                field = value
+                durationTextView.text = durationHHMM(value)
+            }
+
+        override var startTimeSeconds: Long = 0
+
+        override fun refreshTime(currentTimeSeconds: Long) {
+            val endTimeSeconds = startTimeSeconds + duration
+            phaseTextView.text =
+                when(Contest.getPhase(currentTimeSeconds, startTimeSeconds, endTimeSeconds)) {
+                    Contest.Phase.BEFORE -> "starts in " + timeDifference2(currentTimeSeconds, startTimeSeconds)
+                    Contest.Phase.RUNNING -> "ends in " + timeDifference2(currentTimeSeconds, endTimeSeconds)
+                    Contest.Phase.FINISHED -> ""
+                }
+        }
     }
 
     override suspend fun applyData(data: List<Contest>): DiffUtil.DiffResult {
@@ -45,7 +83,9 @@ class ContestsAdapter(
             val contest = items[position]
             title.text = contest.title
             date.text = DateFormat.format("dd.MM.yyyy E HH:mm", TimeUnit.SECONDS.toMillis(contest.startTimeSeconds))
-            duration.text = durationHHMM(contest.durationSeconds)
+            startTimeSeconds = contest.startTimeSeconds
+            duration = contest.durationSeconds
+            refreshTime(getCurrentTimeSeconds())
             contest.link?.let { url ->
                 view.setOnClickListener { it.context.startActivity(makeIntentOpenUrl(url)) }
             }

@@ -363,6 +363,14 @@ fun timeDifference(fromTimeSeconds: Long, toTimeSeconds: Long): String {
         t < TimeUnit.DAYS.toSeconds(31 * 2) -> "${TimeUnit.SECONDS.toDays(t) / 7} weeks"
         t < TimeUnit.DAYS.toSeconds(365 * 2) -> "${TimeUnit.SECONDS.toDays(t) / 31} months"
         else -> "${TimeUnit.SECONDS.toDays(t) / 365} years"
-    } + " ago"
+    }
+}
+
+fun timeAgo(fromTimeSeconds: Long, toTimeSeconds: Long) = timeDifference(fromTimeSeconds, toTimeSeconds) + "ago"
+
+fun timeDifference2(fromTimeSeconds: Long, toTimeSeconds: Long): String {
+    val t = toTimeSeconds - fromTimeSeconds
+    if(t < TimeUnit.HOURS.toSeconds(48)) return durationHHMMSS(t)
+    return timeDifference(fromTimeSeconds, toTimeSeconds)
 }
 

@@ -11,7 +11,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.makeIntentOpenUrl
-import com.example.test3.timeDifference
+import com.example.test3.timeAgo
+import com.example.test3.ui.TimeDepends
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.Flow
 
@@ -51,7 +52,7 @@ class CodeforcesCommentsAdapter(
 
         override var startTimeSeconds: Long = 0
         override fun refreshTime(currentTimeSeconds: Long) {
-            time.text = timeDifference(startTimeSeconds, currentTimeSeconds)
+            time.text = timeAgo(startTimeSeconds, currentTimeSeconds)
         }
     }
 

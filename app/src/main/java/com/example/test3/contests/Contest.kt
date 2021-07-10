@@ -14,11 +14,7 @@ data class Contest (
 
     val endTimeSeconds: Long get() = startTimeSeconds + durationSeconds
 
-    fun getPhase(currentTimesSeconds: Long): Phase {
-        if(currentTimesSeconds < startTimeSeconds) return Phase.BEFORE
-        if(currentTimesSeconds >= endTimeSeconds) return Phase.FINISHED
-        return Phase.RUNNING
-    }
+    fun getPhase(currentTimesSeconds: Long) = getPhase(currentTimesSeconds, startTimeSeconds, endTimeSeconds)
 
     constructor(contest: CodeforcesContest): this(
         Platform.codeforces,
@@ -38,5 +34,13 @@ data class Contest (
     enum class Platform {
         unknown,
         codeforces
+    }
+
+    companion object {
+        fun getPhase(currentTimesSeconds: Long, startTimeSeconds: Long, endTimeSeconds: Long): Phase {
+            if(currentTimesSeconds < startTimeSeconds) return Phase.BEFORE
+            if(currentTimesSeconds >= endTimeSeconds) return Phase.FINISHED
+            return Phase.RUNNING
+        }
     }
 }

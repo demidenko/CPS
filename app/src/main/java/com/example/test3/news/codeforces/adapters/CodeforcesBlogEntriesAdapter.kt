@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
+import com.example.test3.ui.TimeDepends
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsFollowWorker
 import com.google.android.material.snackbar.Snackbar
@@ -94,7 +95,7 @@ class CodeforcesBlogEntriesAdapter(
 
         override var startTimeSeconds: Long = 0
         override fun refreshTime(currentTimeSeconds: Long) {
-            time.text = timeDifference(startTimeSeconds, currentTimeSeconds)
+            time.text = timeAgo(startTimeSeconds, currentTimeSeconds)
         }
     }
 

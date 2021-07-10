@@ -45,11 +45,9 @@ abstract class CodeforcesNewsItemsTimedAdapter<H, T>(
     init {
         addRepeatingJob(Lifecycle.State.RESUMED) {
             while (isActive) {
-                with(getActiveViewHolders()){
-                    if(isNotEmpty()){
-                        val currentTimeSeconds = getCurrentTimeSeconds()
-                        forEach { holder -> holder.refreshTime(currentTimeSeconds) }
-                    }
+                getActiveViewHolders().takeIf { it.isNotEmpty() }?.let { holders ->
+                    val currentTimeSeconds = getCurrentTimeSeconds()
+                    holders.forEach { it.refreshTime(currentTimeSeconds) }
                 }
                 delay(1000)
             }

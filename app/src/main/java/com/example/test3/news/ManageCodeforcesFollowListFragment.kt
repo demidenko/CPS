@@ -26,7 +26,7 @@ import com.example.test3.news.codeforces.CodeforcesNewsViewModel
 import com.example.test3.news.codeforces.adapters.CodeforcesNewsItemsAdapter
 import com.example.test3.room.CodeforcesUserBlog
 import com.example.test3.room.getFollowDao
-import com.example.test3.timeDifference
+import com.example.test3.timeAgo
 import com.example.test3.ui.*
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.Flow
@@ -147,7 +147,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
 
                 with(userInfo) {
                     if(status == STATUS.OK) {
-                        holder.online.text = timeDifference(lastOnlineTimeSeconds, getCurrentTimeSeconds())
+                        holder.online.text = timeAgo(lastOnlineTimeSeconds, getCurrentTimeSeconds())
                         holder.onlineGroup.isVisible = true
                     } else holder.onlineGroup.isVisible = false
                 }
