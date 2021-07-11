@@ -16,6 +16,7 @@ import com.example.test3.contests.ContestsViewModel
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.enableIff
 import com.example.test3.ui.formatCPS
+import com.example.test3.utils.ComparablePair
 import com.example.test3.utils.LoadingState
 import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.getCurrentTimeSeconds
@@ -46,21 +47,15 @@ class ContestsFragment: CPSFragment() {
             contestViewModel.flowOfContests().map { contests ->
                 val currentTimeSeconds = getCurrentTimeSeconds()
                 contests.filter { contest ->
-                    currentTimeSeconds - contest.endTimeSeconds < TimeUnit.HOURS.toSeconds(48)
+                    currentTimeSeconds - contest.endTimeSeconds < TimeUnit.DAYS.toSeconds(7)
                 }.sortedWith(
                     compareBy<Contest> {
                         when(it.getPhase(currentTimeSeconds)) {
-                            Contest.Phase.BEFORE -> 1
-                            Contest.Phase.RUNNING -> 0
-                            Contest.Phase.FINISHED -> 2
+                            Contest.Phase.BEFORE -> ComparablePair(1, it.startTimeSeconds)
+                            Contest.Phase.RUNNING -> ComparablePair(0, it.endTimeSeconds)
+                            Contest.Phase.FINISHED -> ComparablePair(2, -it.endTimeSeconds)
                         }
-                    }.thenBy {
-                        when(it.getPhase(currentTimeSeconds)) {
-                            Contest.Phase.BEFORE -> it.startTimeSeconds
-                            Contest.Phase.RUNNING -> it.endTimeSeconds
-                            Contest.Phase.FINISHED -> -it.endTimeSeconds
-                        }
-                    }
+                    }.thenBy { it.durationSeconds }.thenBy { it.platform }.thenBy { it.id }
                 )
             }
         )

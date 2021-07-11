@@ -116,6 +116,16 @@ suspend inline fun<reified A, reified B> asyncPair(
     }
 }
 
+data class ComparablePair<A: Comparable<A>, B: Comparable<B>>(
+    val first: A,
+    val second: B
+): Comparable<ComparablePair<A, B>> {
+    override fun compareTo(other: ComparablePair<A, B>): Int {
+        val c = first.compareTo(other.first)
+        return if(c == 0) second.compareTo(other.second) else c
+    }
+}
+
 fun<T> Flow<T>.ignoreFirst(): Flow<T> {
     var ignore = true
     return transform { value ->
