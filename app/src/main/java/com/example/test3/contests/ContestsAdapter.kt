@@ -16,6 +16,7 @@ import com.example.test3.timeDifference2
 import com.example.test3.ui.FlowItemsAdapter
 import com.example.test3.ui.TimeDepends
 import com.example.test3.utils.durationHHMM
+import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.getCurrentTimeSeconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -55,15 +56,24 @@ class ContestsAdapter(
             }
 
         override var startTimeSeconds: Long = 0
+        private var lastPhase: Contest.Phase? = null
 
         override fun refreshTime(currentTimeSeconds: Long) {
             val endTimeSeconds = startTimeSeconds + duration
+            val phase = Contest.getPhase(currentTimeSeconds, startTimeSeconds, endTimeSeconds)
             phaseTextView.text =
-                when(Contest.getPhase(currentTimeSeconds, startTimeSeconds, endTimeSeconds)) {
+                when(phase) {
                     Contest.Phase.BEFORE -> "starts in " + timeDifference2(currentTimeSeconds, startTimeSeconds)
                     Contest.Phase.RUNNING -> "ends in " + timeDifference2(currentTimeSeconds, endTimeSeconds)
                     Contest.Phase.FINISHED -> ""
                 }
+            if(phase != lastPhase) {
+                lastPhase = phase
+                title.setTextColor(
+                    if(phase == Contest.Phase.FINISHED) getColorFromResource(view.context, R.color.textColorAdditional)
+                    else getColorFromResource(view.context, R.color.textColor)
+                )
+            }
         }
     }
 
