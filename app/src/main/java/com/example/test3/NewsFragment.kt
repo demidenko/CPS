@@ -366,7 +366,7 @@ fun timeDifference(fromTimeSeconds: Long, toTimeSeconds: Long): String {
     }
 }
 
-fun timeAgo(fromTimeSeconds: Long, toTimeSeconds: Long) = timeDifference(fromTimeSeconds, toTimeSeconds) + "ago"
+fun timeAgo(fromTimeSeconds: Long, toTimeSeconds: Long) = timeDifference(fromTimeSeconds, toTimeSeconds) + " ago"
 
 fun timeDifference2(fromTimeSeconds: Long, toTimeSeconds: Long): String {
     val t = toTimeSeconds - fromTimeSeconds
