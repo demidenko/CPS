@@ -2,6 +2,7 @@ package com.example.test3.contests
 
 import com.example.test3.utils.CodeforcesContest
 import com.example.test3.utils.CodeforcesURLFactory
+import com.example.test3.utils.ComparablePair
 
 data class Contest (
     val platform: Platform,
@@ -37,10 +38,18 @@ data class Contest (
     }
 
     companion object {
-        fun getPhase(currentTimesSeconds: Long, startTimeSeconds: Long, endTimeSeconds: Long): Phase {
-            if(currentTimesSeconds < startTimeSeconds) return Phase.BEFORE
-            if(currentTimesSeconds >= endTimeSeconds) return Phase.FINISHED
+        fun getPhase(currentTimeSeconds: Long, startTimeSeconds: Long, endTimeSeconds: Long): Phase {
+            if(currentTimeSeconds < startTimeSeconds) return Phase.BEFORE
+            if(currentTimeSeconds >= endTimeSeconds) return Phase.FINISHED
             return Phase.RUNNING
         }
+
+        fun getComparator(currentTimeSeconds: Long) = compareBy<Contest> {
+                when(it.getPhase(currentTimeSeconds)) {
+                    Phase.BEFORE -> ComparablePair(1, it.startTimeSeconds)
+                    Phase.RUNNING -> ComparablePair(0, it.endTimeSeconds)
+                    Phase.FINISHED -> ComparablePair(2, -it.endTimeSeconds)
+                }
+            }.thenBy { it.durationSeconds }.thenBy { it.platform }.thenBy { it.id }
     }
 }

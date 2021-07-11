@@ -15,9 +15,7 @@ import com.example.test3.makeIntentOpenUrl
 import com.example.test3.timeDifference2
 import com.example.test3.ui.FlowItemsAdapter
 import com.example.test3.ui.TimeDepends
-import com.example.test3.utils.durationHHMM
-import com.example.test3.utils.getColorFromResource
-import com.example.test3.utils.getCurrentTimeSeconds
+import com.example.test3.utils.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.isActive
@@ -34,9 +32,13 @@ class ContestsAdapter(
     init {
         addRepeatingJob(Lifecycle.State.RESUMED) {
             while (isActive) {
-                getActiveViewHolders().takeIf { it.isNotEmpty() }?.let { holders ->
-                    val currentTimeSeconds = getCurrentTimeSeconds()
-                    holders.forEach { it.refreshTime(currentTimeSeconds) }
+                val currentTimeSeconds = getCurrentTimeSeconds()
+                val comparator = Contest.getComparator(currentTimeSeconds)
+                getActiveViewHolders().forEach { it.refreshTime(currentTimeSeconds) }
+                if(!items.isSortedWith(comparator)) {
+                    val oldItems = items.clone()
+                    items.sortWith(comparator)
+                    DiffUtil.calculateDiff(diffCallback(oldItems, items)).dispatchUpdatesTo(this@ContestsAdapter)
                 }
                 delay(1000)
             }
@@ -78,9 +80,8 @@ class ContestsAdapter(
     }
 
     override suspend fun applyData(data: List<Contest>): DiffUtil.DiffResult {
-        val oldItems = items
-        items = data.toTypedArray()
-        return DiffUtil.calculateDiff(diffCallback(oldItems, items))
+        val newItems = data.sortedWith(Contest.getComparator(getCurrentTimeSeconds())).toTypedArray()
+        return DiffUtil.calculateDiff(diffCallback(items, newItems)).also { items = newItems }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContestViewHolder {

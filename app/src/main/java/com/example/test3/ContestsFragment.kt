@@ -10,13 +10,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.test3.contests.Contest
 import com.example.test3.contests.ContestsAdapter
 import com.example.test3.contests.ContestsViewModel
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.enableIff
 import com.example.test3.ui.formatCPS
-import com.example.test3.utils.ComparablePair
 import com.example.test3.utils.LoadingState
 import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.getCurrentTimeSeconds
@@ -48,15 +46,7 @@ class ContestsFragment: CPSFragment() {
                 val currentTimeSeconds = getCurrentTimeSeconds()
                 contests.filter { contest ->
                     currentTimeSeconds - contest.endTimeSeconds < TimeUnit.DAYS.toSeconds(7)
-                }.sortedWith(
-                    compareBy<Contest> {
-                        when(it.getPhase(currentTimeSeconds)) {
-                            Contest.Phase.BEFORE -> ComparablePair(1, it.startTimeSeconds)
-                            Contest.Phase.RUNNING -> ComparablePair(0, it.endTimeSeconds)
-                            Contest.Phase.FINISHED -> ComparablePair(2, -it.endTimeSeconds)
-                        }
-                    }.thenBy { it.durationSeconds }.thenBy { it.platform }.thenBy { it.id }
-                )
+                }
             }
         )
 

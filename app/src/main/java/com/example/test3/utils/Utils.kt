@@ -126,6 +126,11 @@ data class ComparablePair<A: Comparable<A>, B: Comparable<B>>(
     }
 }
 
+fun<T> Array<out T>.isSortedWith(comparator: Comparator<in T>): Boolean {
+    for(i in 1 until size) if(comparator.compare(get(i-1),get(i))>0) return false
+    return true
+}
+
 fun<T> Flow<T>.ignoreFirst(): Flow<T> {
     var ignore = true
     return transform { value ->
