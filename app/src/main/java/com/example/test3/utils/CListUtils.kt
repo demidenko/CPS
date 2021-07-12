@@ -2,9 +2,11 @@ package com.example.test3.utils
 
 import android.content.Context
 import com.example.test3.account_manager.*
+import com.example.test3.contests.Contest
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
@@ -29,7 +31,49 @@ object CListUtils {
     }
 }
 
+@Serializable
+class ClistApiContestsResponse(
+    val objects: List<ClistContest>
+)
+
+@Serializable
+data class ClistContest(
+    val resource_id: Int,
+    val id: Long,
+    val start: String,
+    val duration: Long,
+    val event: String,
+    val href: String,
+) {
+    fun getPlatform(): Contest.Platform = Contest.Platform.values().find { getClistApiResourceId(it) == resource_id }!!
+}
+
+fun getClistApiResourceId(platform: Contest.Platform) =
+    when(platform) {
+        Contest.Platform.unknown -> 0
+        Contest.Platform.codeforces -> 1
+        Contest.Platform.atcoder -> 93
+    }
+
 object CListAPI {
+    interface API {
+        @GET("contest/?format=json")
+        fun getContests(
+            @Query("username") login: String,
+            @Query("api_key") apikey: String,
+            @Query("start__gte") startTime: String,
+            @Query("resource_id__in") resources: String = ""
+        ): Call<ClistApiContestsResponse>
+    }
+
+    private val clistAPI = Retrofit.Builder()
+        .baseUrl("https://clist.by/api/v2/")
+        .addConverterFactory(jsonConverterFactory)
+        .addCallAdapterFactory(CoroutineCallAdapterFactory())
+        .client(httpClient)
+        .build()
+        .create(API::class.java)
+
     interface WEB {
         @GET("coder/{login}")
         fun getUser(
@@ -61,6 +105,22 @@ object CListAPI {
         try {
             clistWEB.getUsersSearch(str).execute()
         }catch (e: IOException){
+            null
+        }
+    }
+
+    suspend fun getContests(
+        login: String,
+        apikey: String,
+        platforms: List<Contest.Platform>,
+        startTime: String
+    ): List<ClistContest>? = withContext(Dispatchers.IO) {
+        try {
+            val call = clistAPI.getContests(login, apikey, startTime, platforms.joinToString{ getClistApiResourceId(it).toString() })
+            val r = call.execute()
+            if(!r.isSuccessful) null
+            else r.body()?.objects
+        } catch (e: IOException) {
             null
         }
     }
