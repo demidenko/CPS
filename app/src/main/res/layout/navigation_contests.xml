@@ -18,4 +18,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         />
 
+    <ImageButton
+        android:id="@+id/navigation_contests_settings"
+        android:tooltipText="settings"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        app:layout_constraintWidth_percent="0.25"
+        android:src="@drawable/ic_settings"
+        style="@style/CPSImageButton"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/navigation_contests_reload"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

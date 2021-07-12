@@ -11,6 +11,7 @@ import androidx.lifecycle.addRepeatingJob
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.contests.ContestsAdapter
+import com.example.test3.contests.ContestsSettingsFragment
 import com.example.test3.contests.ContestsViewModel
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.enableIff
@@ -58,6 +59,10 @@ class ContestsFragment: CPSFragment() {
             setOnClickListener { callReload() }
         }
 
+        val settingsButton = requireBottomPanel().findViewById<ImageButton>(R.id.navigation_contests_settings).apply {
+            setOnClickListener { showContestsSettings() }
+        }
+
         addRepeatingJob(Lifecycle.State.STARTED) {
             contestViewModel.flowOfLoadingState().collect {
                 reloadButton.apply {
@@ -75,5 +80,9 @@ class ContestsFragment: CPSFragment() {
 
     private fun callReload() {
         contestViewModel.reload()
+    }
+
+    private fun showContestsSettings() {
+        mainActivity.cpsFragmentManager.pushBack(ContestsSettingsFragment())
     }
 }
