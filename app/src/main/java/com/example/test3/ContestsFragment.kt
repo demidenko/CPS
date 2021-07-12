@@ -43,7 +43,7 @@ class ContestsFragment: CPSFragment() {
 
         val contestAdapter = ContestsAdapter(
             this,
-            contestViewModel.flowOfContests().map { contests ->
+            contestViewModel.flowOfContests(mainActivity).map { contests ->
                 val currentTimeSeconds = getCurrentTimeSeconds()
                 contests.filter { contest ->
                     currentTimeSeconds - contest.endTimeSeconds < TimeUnit.DAYS.toSeconds(7)
@@ -79,7 +79,7 @@ class ContestsFragment: CPSFragment() {
     }
 
     private fun callReload() {
-        contestViewModel.reload()
+        contestViewModel.reload(mainActivity)
     }
 
     private fun showContestsSettings() {
