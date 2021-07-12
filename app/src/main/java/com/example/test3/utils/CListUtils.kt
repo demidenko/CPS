@@ -15,6 +15,9 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 object CListUtils {
     fun getManager(resource: String, userName: String, link: String, context: Context): Pair<AccountManager<out UserInfo>,String>? {
@@ -113,10 +116,15 @@ object CListAPI {
         login: String,
         apikey: String,
         platforms: List<Contest.Platform>,
-        startTime: String
+        startTimeSeconds: Long
     ): List<ClistContest>? = withContext(Dispatchers.IO) {
         try {
-            val call = clistAPI.getContests(login, apikey, startTime, platforms.joinToString{ getClistApiResourceId(it).toString() })
+            val call = clistAPI.getContests(
+                login,
+                apikey,
+                secondsToString(startTimeSeconds),
+                platforms.joinToString { getClistApiResourceId(it).toString() }
+            )
             val r = call.execute()
             if(!r.isSuccessful) null
             else r.body()?.objects
@@ -124,4 +132,8 @@ object CListAPI {
             null
         }
     }
+
+    private val clistDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).apply { timeZone = TimeZone.getTimeZone("UTC") }
+    fun secondsToString(seconds: Long): String = clistDateFormat.format(Date(TimeUnit.SECONDS.toMillis(seconds)))
+    fun dateToSeconds(str: String): Long = TimeUnit.MILLISECONDS.toSeconds(clistDateFormat.parse(str).time)
 }

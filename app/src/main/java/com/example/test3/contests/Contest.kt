@@ -1,12 +1,6 @@
 package com.example.test3.contests
 
-import com.example.test3.utils.ClistContest
-import com.example.test3.utils.CodeforcesContest
-import com.example.test3.utils.CodeforcesURLFactory
-import com.example.test3.utils.ComparablePair
-import java.text.SimpleDateFormat
-import java.util.*
-import java.util.concurrent.TimeUnit
+import com.example.test3.utils.*
 
 data class Contest (
     val platform: Platform,
@@ -35,7 +29,7 @@ data class Contest (
         platform,
         extractContestId(contest, platform),
         contest.event,
-        TimeUnit.MILLISECONDS.toSeconds(clistDateFormat.parse(contest.start).time),
+        CListAPI.dateToSeconds(contest.start),
         contest.duration,
         link = contest.href
     )
@@ -66,8 +60,6 @@ data class Contest (
                     Phase.FINISHED -> ComparablePair(2, -it.endTimeSeconds)
                 }
             }.thenBy { it.durationSeconds }.thenBy { it.platform }.thenBy { it.id }
-
-        val clistDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).apply { timeZone = TimeZone.getTimeZone("UTC") }
 
         fun extractContestId(contest: ClistContest, platform: Platform): String {
             return when (platform) {
