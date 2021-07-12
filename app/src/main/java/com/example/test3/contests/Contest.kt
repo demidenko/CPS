@@ -67,6 +67,9 @@ data class Contest (
                     contest.href.removePrefix("http://").removePrefix("https://").removePrefix("codeforces.com/contests/")
                         .toIntOrNull()?.toString()
                 }
+                Platform.atcoder -> {
+                    contest.href.removePrefix("http://").removePrefix("https://").removePrefix("atcoder.jp/contests/")
+                }
                 else -> null
             } ?: contest.id.toString()
         }
