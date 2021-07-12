@@ -3,7 +3,9 @@ package com.example.test3.contests
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -50,6 +52,7 @@ class ContestsAdapter(
         val date: TextView = view.findViewById(R.id.contests_list_item_date)
         private val durationTextView: TextView = view.findViewById(R.id.contests_list_item_duration)
         private val phaseTextView: TextView = view.findViewById(R.id.contests_list_item_phase)
+        val icon: ImageView = view.findViewById(R.id.contests_list_item_icon)
 
         var duration: Long = 0
             set(value) {
@@ -93,10 +96,11 @@ class ContestsAdapter(
         with(holder) {
             val contest = items[position]
             title.text = contest.title
-            date.text = DateFormat.format("dd.MM.yyyy E HH:mm", TimeUnit.SECONDS.toMillis(contest.startTimeSeconds))
+            date.text = DateFormat.format("dd.MM E HH:mm", TimeUnit.SECONDS.toMillis(contest.startTimeSeconds))
             startTimeSeconds = contest.startTimeSeconds
             duration = contest.durationSeconds
             refreshTime(getCurrentTimeSeconds())
+            icon.setImageResource(getIcon(contest.platform))
             contest.link?.let { url ->
                 view.setOnClickListener { it.context.startActivity(makeIntentOpenUrl(url)) }
             }
@@ -104,6 +108,14 @@ class ContestsAdapter(
     }
 
     companion object {
+        @DrawableRes
+        private fun getIcon(platform: Contest.Platform): Int {
+            return when(platform) {
+                Contest.Platform.codeforces -> R.drawable.ic_cf_logo
+                else -> R.drawable.ic_cup
+            }
+        }
+
         private fun diffCallback(old: Array<Contest>, new: Array<Contest>) =
             object : DiffUtil.Callback() {
                 override fun getOldListSize() = old.size
