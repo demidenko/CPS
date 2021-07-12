@@ -188,7 +188,7 @@ class NewsFragment : CPSFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.menu_news_settings_button -> showSettingsNews()
+            R.id.menu_news_settings_button -> showNewsSettings()
             R.id.menu_news_follow_list -> showCodeforcesFollowListManager()
         }
         return super.onOptionsItemSelected(item)
@@ -225,8 +225,8 @@ class NewsFragment : CPSFragment() {
     private val updateLostInfoButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_lost_update_info) }
     val suspectsLostButton: ImageButton by lazy { requireBottomPanel().findViewById(R.id.navigation_news_lost_suspects) }
 
-    fun showSettingsNews(){
-        mainActivity.cpsFragmentManager.pushBack(SettingsNewsFragment())
+    fun showNewsSettings(){
+        mainActivity.cpsFragmentManager.pushBack(NewsSettingsFragment())
     }
 
     fun showCodeforcesFollowListManager(){

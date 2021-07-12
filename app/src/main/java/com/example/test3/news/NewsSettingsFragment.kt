@@ -19,7 +19,8 @@ import com.example.test3.CodeforcesTitle
 import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.ui.*
-import com.example.test3.utils.*
+import com.example.test3.utils.CPSDataStore
+import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.workers.WorkersCenter
 import com.example.test3.workers.WorkersNames
 import kotlinx.coroutines.flow.first
@@ -27,7 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
-class SettingsNewsFragment: CPSFragment(){
+class NewsSettingsFragment: CPSFragment(){
 
     private val newsFragment by lazy { mainActivity.newsFragment }
 
