@@ -111,7 +111,7 @@ class ContestsAdapter(
         @DrawableRes
         private fun getIcon(platform: Contest.Platform): Int {
             return when(platform) {
-                Contest.Platform.codeforces -> R.drawable.ic_cf_logo
+                Contest.Platform.codeforces -> R.drawable.ic_logo_codeforces
                 else -> R.drawable.ic_cup
             }
         }

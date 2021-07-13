@@ -36,7 +36,7 @@
         android:id="@+id/cf_news_logo"
         android:layout_width="20sp"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_cf_logo"
+        android:src="@drawable/ic_logo_codeforces"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="8dp"
         app:layout_constraintTop_toTopOf="@id/cf_news_tab_layout"

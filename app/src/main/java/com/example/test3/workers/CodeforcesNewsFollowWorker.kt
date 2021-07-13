@@ -50,7 +50,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
     private fun createProgressNotification(): NotificationCompat.Builder {
         return notificationBuilder(context, NotificationChannels.codeforces_follow_progress)
             .setContentTitle("Codeforces Follow Update...")
-            .setSmallIcon(R.drawable.ic_cf_logo)
+            .setSmallIcon(R.drawable.ic_logo_codeforces)
             .setSilent(true)
             .setShowWhen(false)
     }
