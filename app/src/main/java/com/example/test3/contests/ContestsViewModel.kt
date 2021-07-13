@@ -46,14 +46,12 @@ class ContestsViewModel: ViewModel() {
                 val contests = CListAPI.getContests(
                     login,
                     apikey,
-                    listOf(Contest.Platform.codeforces, Contest.Platform.atcoder),
+                    listOf(Contest.Platform.codeforces, Contest.Platform.atcoder, Contest.Platform.topcoder),
                     getCurrentTimeSeconds() - TimeUnit.DAYS.toSeconds(7)
-                )
-                contests?.let {
-                    contestsStateFlow.value = it.map { Contest(it) }
-                    LoadingState.PENDING
-                }
-            } ?: LoadingState.FAILED
+                ) ?: return@run LoadingState.FAILED
+                contestsStateFlow.value = contests.map { Contest(it) }
+                LoadingState.PENDING
+            }
         }
     }
 }

@@ -43,7 +43,8 @@ data class Contest (
     enum class Platform {
         unknown,
         codeforces,
-        atcoder
+        atcoder,
+        topcoder
     }
 
     companion object {
