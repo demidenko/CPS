@@ -54,15 +54,15 @@ class ContestsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContestViewHolder {
-        val layoutId = when (previewType) {
-            1 -> R.layout.contest_list_item
-            2 -> R.layout.contest_list_item2
-            else -> throw IllegalArgumentException("Unexpected preview type $previewType")
-        }
-        val view = LayoutInflater.from(parent.context).inflate(layoutId, parent, false) as ConstraintLayout
         return when (previewType) {
-            1 -> ContestViewHolder1(view)
-            2 -> ContestViewHolder1(view)
+            1 -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.contest_list_item, parent, false) as ConstraintLayout
+                ContestViewHolder1(view)
+            }
+            2 -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.contest_list_item2, parent, false) as ConstraintLayout
+                ContestViewHolder2(view)
+            }
             else -> throw IllegalArgumentException("Unexpected preview type $previewType")
         }
     }
@@ -92,7 +92,6 @@ class ContestsAdapter(
                 }
             }
     }
-
 }
 
 
@@ -110,6 +109,7 @@ abstract class ContestViewHolder(protected val view: ConstraintLayout): Recycler
         get() = companionContest!!
         set(value) {
             companionContest = value
+            lastPhase = null
             applyContest(value)
         }
 
@@ -127,6 +127,10 @@ abstract class ContestViewHolder(protected val view: ConstraintLayout): Recycler
     }
 
     abstract fun refresh(currentTimeSeconds: Long, phase: Contest.Phase, oldPhase: Contest.Phase?)
+
+    companion object {
+        fun makeDate(timeSeconds: Long): CharSequence = DateFormat.format("dd.MM E HH:mm", TimeUnit.SECONDS.toMillis(timeSeconds))
+    }
 }
 
 class ContestViewHolder1(view: ConstraintLayout): ContestViewHolder(view) {
@@ -138,7 +142,7 @@ class ContestViewHolder1(view: ConstraintLayout): ContestViewHolder(view) {
 
     override fun applyContest(contest: Contest) {
         title.text = contest.title
-        date.text = DateFormat.format("dd.MM E HH:mm", TimeUnit.SECONDS.toMillis(contest.startTimeSeconds))
+        date.text = makeDate(contest.startTimeSeconds)
         durationTextView.text = durationHHMM(contest.durationSeconds)
         icon.setImageResource(contest.platform.getIcon())
         view.setOnClickListener { contest.link?.let { url -> it.context.startActivity(makeIntentOpenUrl(url)) } }
@@ -168,12 +172,42 @@ class ContestViewHolder2(view: ConstraintLayout): ContestViewHolder(view) {
 
     override fun applyContest(contest: Contest) {
         title.text = contest.title
-        date.text = DateFormat.format("dd.MM E HH:mm", TimeUnit.SECONDS.toMillis(contest.startTimeSeconds))
         icon.setImageResource(contest.platform.getIcon())
         view.setOnClickListener { contest.link?.let { url -> it.context.startActivity(makeIntentOpenUrl(url)) } }
     }
 
     override fun refresh(currentTimeSeconds: Long, phase: Contest.Phase, oldPhase: Contest.Phase?) {
+        counterTextView.text = when (phase) {
+            Contest.Phase.BEFORE -> {
+                if(phase!=oldPhase) date.text = makeDate(contest)
+                "in " + timeDifference2(currentTimeSeconds, contest.startTimeSeconds)
+            }
+            Contest.Phase.RUNNING -> {
+                if(phase!=oldPhase) date.text = "running"
+                "left " + timeDifference2(currentTimeSeconds, contest.endTimeSeconds)
+            }
+            Contest.Phase.FINISHED -> {
+                if(phase!=oldPhase) date.text = "${makeDate(contest.startTimeSeconds)} - ${makeDate(contest.endTimeSeconds)}"
+                ""
+            }
+        }
 
+        if(phase != oldPhase) {
+            title.setTextColor(
+                if(phase == Contest.Phase.FINISHED) getColorFromResource(view.context, R.color.textColorAdditional)
+                else getColorFromResource(view.context, R.color.textColor)
+            )
+        }
+    }
+
+    companion object {
+        fun makeDate(contest: Contest): String {
+            val begin = makeDate(contest.startTimeSeconds)
+            val end =
+                if (contest.durationSeconds < TimeUnit.DAYS.toSeconds(1))
+                    DateFormat.format("HH:mm", TimeUnit.SECONDS.toMillis(contest.endTimeSeconds))
+                else "..."
+            return "$begin-$end"
+        }
     }
 }

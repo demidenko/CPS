@@ -49,7 +49,7 @@ class ContestsFragment: CPSFragment() {
                     currentTimeSeconds - contest.endTimeSeconds < TimeUnit.DAYS.toSeconds(7)
                 }
             },
-            previewType = 1
+            previewType = 2
         )
 
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.contests_list_swipe_refresh_layout).formatCPS().apply {
