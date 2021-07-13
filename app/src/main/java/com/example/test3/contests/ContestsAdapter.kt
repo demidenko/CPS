@@ -99,6 +99,7 @@ class ContestsAdapter(
 private fun Contest.Platform.getIcon(): Int {
     return when(this) {
         Contest.Platform.codeforces -> R.drawable.ic_logo_codeforces
+        Contest.Platform.atcoder -> R.drawable.ic_logo_atcoder
         Contest.Platform.topcoder -> R.drawable.ic_logo_topcoder
         else -> R.drawable.ic_cup
     }
