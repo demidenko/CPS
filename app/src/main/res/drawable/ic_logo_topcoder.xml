@@ -2,7 +2,9 @@
     android:width="166dp"
     android:height="166dp"
     android:viewportWidth="166"
-    android:viewportHeight="166">
+    android:viewportHeight="166"
+    android:tint="@color/textColor"
+    >
   <!---
   https://drive.google.com/drive/folders/10z78GNTbej15reKDTj2-fYiD-VsSbULg
   -->
