@@ -68,8 +68,8 @@ class ContestsAdapter(
             val phase = Contest.getPhase(currentTimeSeconds, startTimeSeconds, endTimeSeconds)
             phaseTextView.text =
                 when(phase) {
-                    Contest.Phase.BEFORE -> "starts in " + timeDifference2(currentTimeSeconds, startTimeSeconds)
-                    Contest.Phase.RUNNING -> "ends in " + timeDifference2(currentTimeSeconds, endTimeSeconds)
+                    Contest.Phase.BEFORE -> "in " + timeDifference2(currentTimeSeconds, startTimeSeconds)
+                    Contest.Phase.RUNNING -> "left " + timeDifference2(currentTimeSeconds, endTimeSeconds)
                     Contest.Phase.FINISHED -> ""
                 }
             if(phase != lastPhase) {
