@@ -128,6 +128,16 @@ abstract class ContestViewHolder(protected val view: ConstraintLayout): Recycler
 
     abstract fun refresh(currentTimeSeconds: Long, phase: Contest.Phase, oldPhase: Contest.Phase?)
 
+    protected fun showPhase(title: TextView, phase: Contest.Phase) {
+        title.setTextColor(getColorFromResource(view.context,
+            when (phase) {
+                Contest.Phase.FINISHED -> R.color.contest_finished
+                Contest.Phase.RUNNING -> R.color.contest_running
+                else -> R.color.textColor
+            }
+        ))
+    }
+
     companion object {
         fun makeDate(timeSeconds: Long): CharSequence = DateFormat.format("dd.MM E HH:mm", TimeUnit.SECONDS.toMillis(timeSeconds))
     }
@@ -155,12 +165,7 @@ class ContestViewHolder1(view: ConstraintLayout): ContestViewHolder(view) {
                 Contest.Phase.RUNNING -> "left " + timeDifference2(currentTimeSeconds, contest.endTimeSeconds)
                 Contest.Phase.FINISHED -> ""
             }
-        if(phase != oldPhase) {
-            title.setTextColor(
-                if(phase == Contest.Phase.FINISHED) getColorFromResource(view.context, R.color.textColorAdditional)
-                else getColorFromResource(view.context, R.color.textColor)
-            )
-        }
+        if(phase != oldPhase) showPhase(title, phase)
     }
 }
 
@@ -183,7 +188,7 @@ class ContestViewHolder2(view: ConstraintLayout): ContestViewHolder(view) {
                 "in " + timeDifference2(currentTimeSeconds, contest.startTimeSeconds)
             }
             Contest.Phase.RUNNING -> {
-                if(phase!=oldPhase) date.text = "running"
+                if(phase!=oldPhase) date.text = "ends ${makeDate(contest.endTimeSeconds)}"
                 "left " + timeDifference2(currentTimeSeconds, contest.endTimeSeconds)
             }
             Contest.Phase.FINISHED -> {
@@ -191,13 +196,7 @@ class ContestViewHolder2(view: ConstraintLayout): ContestViewHolder(view) {
                 ""
             }
         }
-
-        if(phase != oldPhase) {
-            title.setTextColor(
-                if(phase == Contest.Phase.FINISHED) getColorFromResource(view.context, R.color.textColorAdditional)
-                else getColorFromResource(view.context, R.color.textColor)
-            )
-        }
+        if(phase != oldPhase) showPhase(title, phase)
     }
 
     companion object {
