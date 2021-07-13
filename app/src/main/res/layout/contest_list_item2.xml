@@ -48,7 +48,6 @@
         android:fontFamily="monospace"
         android:textColor="@color/textColorAdditional"
         android:text="date and time"
-        android:layout_marginStart="4dp"
         />
 
     <TextView
