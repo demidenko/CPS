@@ -47,29 +47,38 @@ class ContestsAdapter(
         }
     }
 
-    class ContestViewHolder(val view: ConstraintLayout) : RecyclerView.ViewHolder(view), TimeDepends {
-        val title: TextView = view.findViewById(R.id.contests_list_item_title)
-        val date: TextView = view.findViewById(R.id.contests_list_item_date)
+    class ContestViewHolder(private val view: ConstraintLayout) : RecyclerView.ViewHolder(view), TimeDepends {
+        private val title: TextView = view.findViewById(R.id.contests_list_item_title)
+        private val date: TextView = view.findViewById(R.id.contests_list_item_date)
         private val durationTextView: TextView = view.findViewById(R.id.contests_list_item_duration)
         private val phaseTextView: TextView = view.findViewById(R.id.contests_list_item_phase)
-        val icon: ImageView = view.findViewById(R.id.contests_list_item_icon)
+        private val icon: ImageView = view.findViewById(R.id.contests_list_item_icon)
 
-        var duration: Long = 0
+        private var companionContest: Contest? = null
+        var contest: Contest
+            get() = companionContest!!
             set(value) {
-                field = value
-                durationTextView.text = durationHHMM(value)
+                companionContest = value
+                title.text = contest.title
+                date.text = DateFormat.format("dd.MM E HH:mm", TimeUnit.SECONDS.toMillis(contest.startTimeSeconds))
+                durationTextView.text = durationHHMM(value.durationSeconds)
+                icon.setImageResource(getIcon(contest.platform))
+                view.setOnClickListener { contest.link?.let { url -> it.context.startActivity(makeIntentOpenUrl(url)) } }
             }
 
-        override var startTimeSeconds: Long = 0
+        override var startTimeSeconds: Long
+            get() = contest.startTimeSeconds
+            @Deprecated("no effect, use contest = ")
+            set(value) {}
+
         private var lastPhase: Contest.Phase? = null
 
         override fun refreshTime(currentTimeSeconds: Long) {
-            val endTimeSeconds = startTimeSeconds + duration
-            val phase = Contest.getPhase(currentTimeSeconds, startTimeSeconds, endTimeSeconds)
+            val phase = contest.getPhase(currentTimeSeconds)
             phaseTextView.text =
                 when(phase) {
-                    Contest.Phase.BEFORE -> "in " + timeDifference2(currentTimeSeconds, startTimeSeconds)
-                    Contest.Phase.RUNNING -> "left " + timeDifference2(currentTimeSeconds, endTimeSeconds)
+                    Contest.Phase.BEFORE -> "in " + timeDifference2(currentTimeSeconds, contest.startTimeSeconds)
+                    Contest.Phase.RUNNING -> "left " + timeDifference2(currentTimeSeconds, contest.endTimeSeconds)
                     Contest.Phase.FINISHED -> ""
                 }
             if(phase != lastPhase) {
@@ -95,15 +104,8 @@ class ContestsAdapter(
     override fun onBindViewHolder(holder: ContestViewHolder, position: Int) {
         with(holder) {
             val contest = items[position]
-            title.text = contest.title
-            date.text = DateFormat.format("dd.MM E HH:mm", TimeUnit.SECONDS.toMillis(contest.startTimeSeconds))
-            startTimeSeconds = contest.startTimeSeconds
-            duration = contest.durationSeconds
+            holder.contest = contest
             refreshTime(getCurrentTimeSeconds())
-            icon.setImageResource(getIcon(contest.platform))
-            contest.link?.let { url ->
-                view.setOnClickListener { it.context.startActivity(makeIntentOpenUrl(url)) }
-            }
         }
     }
 
