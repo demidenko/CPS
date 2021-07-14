@@ -3,6 +3,7 @@ package com.example.test3.contests
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.test3.room.getContestsListDao
 import com.example.test3.utils.CListAPI
 import com.example.test3.utils.LoadingState
 import com.example.test3.utils.getCurrentTimeSeconds
@@ -16,16 +17,6 @@ class ContestsViewModel: ViewModel() {
 
     private val loadingState = MutableStateFlow(LoadingState.PENDING)
     fun flowOfLoadingState(): StateFlow<LoadingState> = loadingState.asStateFlow()
-
-    private var touched = false
-    private val contestsStateFlow = MutableStateFlow<List<Contest>>(emptyList())
-    fun flowOfContests(context: Context): StateFlow<List<Contest>> =
-        contestsStateFlow.also {
-            if(!touched) {
-                touched = true
-                reload(context)
-            }
-        }.asStateFlow()
 
     fun reload(context: Context) {
         viewModelScope.launch {
@@ -49,7 +40,7 @@ class ContestsViewModel: ViewModel() {
                     listOf(Contest.Platform.codeforces, Contest.Platform.atcoder, Contest.Platform.topcoder),
                     getCurrentTimeSeconds() - TimeUnit.DAYS.toSeconds(7)
                 ) ?: return@run LoadingState.FAILED
-                contestsStateFlow.value = contests.map { Contest(it) }
+                getContestsListDao(context).insert(contests.map { Contest(it) })
                 LoadingState.PENDING
             }
         }

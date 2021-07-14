@@ -13,6 +13,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.contests.ContestsAdapter
 import com.example.test3.contests.ContestsSettingsFragment
 import com.example.test3.contests.ContestsViewModel
+import com.example.test3.room.getContestsListDao
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.enableIff
 import com.example.test3.ui.formatCPS
@@ -43,7 +44,7 @@ class ContestsFragment: CPSFragment() {
 
         val contestAdapter = ContestsAdapter(
             this,
-            contestViewModel.flowOfContests(mainActivity).map { contests ->
+            getContestsListDao(mainActivity).flowOfContests().map { contests ->
                 val currentTimeSeconds = getCurrentTimeSeconds()
                 contests.filter { contest ->
                     currentTimeSeconds - contest.endTimeSeconds < TimeUnit.DAYS.toSeconds(7)
