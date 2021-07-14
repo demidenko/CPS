@@ -1,10 +1,7 @@
 package com.example.test3.room
 
 import android.content.Context
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.test3.contests.Contest
 import kotlinx.coroutines.flow.Flow
 
@@ -16,6 +13,19 @@ const val contestsListTableName = "contests_list"
 interface ContestsListDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(contests: List<Contest>)
+
+    @Delete
+    suspend fun remove(contests: List<Contest>)
+
+    suspend fun replace(platform: Contest.Platform, contests: List<Contest>) {
+        require(contests.all { it.platform == platform })
+        val ids = contests.mapTo(mutableSetOf()){ it.id }
+        getContests(platform)
+            .filter { it.id !in ids }
+            .takeIf { it.isNotEmpty() }
+            ?.let { remove(it) }
+        insert(contests)
+    }
 
     @Query("select * from $contestsListTableName")
     fun flowOfContests(): Flow<List<Contest>>

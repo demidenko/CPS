@@ -97,4 +97,10 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
         }
     }
 
+    suspend fun getClistApiLoginAndKey(): Pair<String,String>? {
+        val login = getClistApiLogin() ?: return null
+        val key = getClistApiKey() ?: return null
+        return login to key
+    }
+
 }

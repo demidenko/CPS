@@ -20,27 +20,17 @@ class ContestsViewModel: ViewModel() {
 
     fun reload(context: Context) {
         viewModelScope.launch {
-            /*loadingState.value = LoadingState.LOADING
-            loadingState.value = CodeforcesAPI.getContests()?.let { response ->
-                response.result?.let { contests ->
-                    contestsStateFlow.value = contests.map { Contest(it) }
-                    LoadingState.PENDING
-                }
-            } ?: LoadingState.FAILED*/
-
-
             loadingState.value = LoadingState.LOADING
-
             loadingState.value = run {
-                val login = context.settingsContests.getClistApiLogin() ?: return@run LoadingState.FAILED
-                val apikey = context.settingsContests.getClistApiKey() ?: return@run LoadingState.FAILED
-                val contests = CListAPI.getContests(
-                    login,
-                    apikey,
-                    listOf(Contest.Platform.codeforces, Contest.Platform.atcoder, Contest.Platform.topcoder),
+                val (login, apikey) = context.settingsContests.getClistApiLoginAndKey() ?: return@run LoadingState.FAILED
+                val platforms = listOf(Contest.Platform.codeforces, Contest.Platform.atcoder, Contest.Platform.topcoder)
+                val contestsList = CListAPI.getContests(
+                    login, apikey, platforms,
                     getCurrentTimeSeconds() - TimeUnit.DAYS.toSeconds(7)
                 ) ?: return@run LoadingState.FAILED
-                getContestsListDao(context).insert(contests.map { Contest(it) })
+                val grouped = contestsList.map { Contest(it) }.groupBy { it.platform }
+                val dao = getContestsListDao(context)
+                platforms.forEach { platform -> dao.replace(platform, grouped[platform] ?: emptyList()) }
                 LoadingState.PENDING
             }
         }
