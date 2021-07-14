@@ -1,18 +1,27 @@
 package com.example.test3.room
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.test3.contests.Contest
 
-@Database(entities = [LostBlogEntry::class, CodeforcesUserBlog::class], version = 3)
+@Database(
+    entities = [
+        LostBlogEntry::class,
+        CodeforcesUserBlog::class,
+        Contest::class
+    ],
+    version = 4,
+    autoMigrations = [
+        AutoMigration(from = 3, to = 4)
+    ]
+)
 @TypeConverters(IntsListConverter::class, CodeforcesUserInfoConverter::class)
 abstract class RoomSingleton: RoomDatabase(){
     abstract fun lostBlogsDao(): LostBlogsDao
     abstract fun followListDao(): FollowListDao
+    abstract fun contestsListDao(): ContestsListDao
 
     companion object {
         private var instance: RoomSingleton? = null

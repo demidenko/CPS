@@ -1,7 +1,13 @@
 package com.example.test3.contests
 
+import androidx.room.Entity
+import com.example.test3.room.contestsListTableName
 import com.example.test3.utils.*
 
+@Entity(
+    tableName = contestsListTableName,
+    primaryKeys = ["platform", "id"]
+)
 data class Contest (
     val platform: Platform,
     val id: String,
