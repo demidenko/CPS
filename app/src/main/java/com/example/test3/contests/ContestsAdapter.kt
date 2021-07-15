@@ -1,6 +1,10 @@
 package com.example.test3.contests
 
+import android.content.Context
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.text.format.DateFormat
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -144,6 +148,24 @@ abstract class ContestViewHolder(protected val view: ConstraintLayout): Recycler
 
     companion object {
         fun makeDate(timeSeconds: Long): CharSequence = DateFormat.format("dd.MM E HH:mm", TimeUnit.SECONDS.toMillis(timeSeconds))
+
+        fun muteTrailingBrackets(title: String, context: Context): CharSequence {
+            if (title.isEmpty() || title.last()!=')') return title
+            var i = title.length-2
+            var ballance = 1
+            while (ballance>0 && i>0) {
+                when (title[i]) {
+                    '(' -> --ballance
+                    ')' -> ++ballance
+                }
+                if (ballance == 0) break
+                --i
+            }
+            if (ballance!=0) return title
+            return SpannableStringBuilder(title).apply {
+                setSpan(ForegroundColorSpan(getColorFromResource(context,R.color.textColorAdditional)), i, title.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+            }
+        }
     }
 }
 
@@ -180,7 +202,7 @@ class ContestViewHolder2(view: ConstraintLayout): ContestViewHolder(view) {
     private val icon: ImageView = view.findViewById(R.id.contests_list_item_icon)
 
     override fun applyContest(contest: Contest) {
-        title.text = contest.title
+        title.text = muteTrailingBrackets(contest.title, view.context)
         icon.setImageResource(contest.platform.getIcon())
         view.setOnClickListener { contest.link?.let { url -> it.context.startActivity(makeIntentOpenUrl(url)) } }
     }
