@@ -58,6 +58,7 @@ fun getClistApiResourceId(platform: Contest.Platform) =
         Contest.Platform.codeforces -> 1
         Contest.Platform.atcoder -> 93
         Contest.Platform.topcoder -> 12
+        Contest.Platform.google -> 35
     }
 
 object CListAPI {

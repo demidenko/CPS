@@ -24,7 +24,12 @@ class ContestsViewModel: ViewModel() {
             loadingState.value = LoadingState.LOADING
             loadingState.value = run {
                 val (login, apikey) = context.settingsContests.getClistApiLoginAndKey() ?: return@run LoadingState.FAILED
-                val platforms = listOf(Contest.Platform.codeforces, Contest.Platform.atcoder, Contest.Platform.topcoder)
+                val platforms = listOf(
+                    Contest.Platform.codeforces,
+                    Contest.Platform.atcoder,
+                    Contest.Platform.topcoder,
+                    Contest.Platform.google
+                )
                 val clistContests = CListAPI.getContests(
                     login, apikey, platforms,
                     getCurrentTimeSeconds() - TimeUnit.DAYS.toSeconds(7)

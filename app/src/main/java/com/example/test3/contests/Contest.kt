@@ -50,7 +50,8 @@ data class Contest (
         unknown,
         codeforces,
         atcoder,
-        topcoder
+        topcoder,
+        google
     }
 
     companion object {
