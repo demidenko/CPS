@@ -17,6 +17,9 @@ interface ContestsListDao {
     @Delete
     suspend fun remove(contests: List<Contest>)
 
+    @Query("delete from $contestsListTableName where platform = :platform")
+    suspend fun remove(platform: Contest.Platform)
+
     suspend fun replace(platform: Contest.Platform, contests: List<Contest>) {
         require(contests.all { it.platform == platform })
         val ids = contests.mapTo(mutableSetOf()){ it.id }

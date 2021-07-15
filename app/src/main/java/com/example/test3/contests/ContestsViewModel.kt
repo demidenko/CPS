@@ -24,19 +24,16 @@ class ContestsViewModel: ViewModel() {
             loadingState.value = LoadingState.LOADING
             loadingState.value = run {
                 val (login, apikey) = context.settingsContests.getClistApiLoginAndKey() ?: return@run LoadingState.FAILED
-                val platforms = listOf(
-                    Contest.Platform.codeforces,
-                    Contest.Platform.atcoder,
-                    Contest.Platform.topcoder,
-                    Contest.Platform.codechef,
-                    Contest.Platform.google
-                )
+                val platforms = context.settingsContests.getEnabledPlatforms().toSet()
+                val dao = getContestsListDao(context)
+                Contest.Platform.getAll().forEach { platform ->
+                    if(platform !in platforms) dao.remove(platform)
+                }
                 val clistContests = CListAPI.getContests(
                     login, apikey, platforms,
                     getCurrentTimeSeconds() - TimeUnit.DAYS.toSeconds(7)
                 ) ?: return@run LoadingState.FAILED
                 val grouped = mapAndFilterClistResult(clistContests).groupBy { it.platform }
-                val dao = getContestsListDao(context)
                 platforms.forEach { platform -> dao.replace(platform, grouped[platform] ?: emptyList()) }
                 LoadingState.PENDING
             }

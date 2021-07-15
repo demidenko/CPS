@@ -53,6 +53,11 @@ data class Contest (
         topcoder,
         codechef,
         google
+        ;
+
+        companion object {
+            fun getAll(): List<Platform> = values().filter { it != unknown }
+        }
     }
 
     companion object {

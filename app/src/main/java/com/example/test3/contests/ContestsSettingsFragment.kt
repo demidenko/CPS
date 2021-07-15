@@ -7,8 +7,8 @@ import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -17,9 +17,14 @@ import com.example.test3.makeIntentOpenUrl
 import com.example.test3.ui.CPSDataStoreDelegate
 import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.CPSDataStore
+import com.example.test3.utils.jsonCPS
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 
 class ContestsSettingsFragment: CPSFragment() {
 
@@ -37,7 +42,7 @@ class ContestsSettingsFragment: CPSFragment() {
         cpsTitle = "::contests.settings"
         setHasOptionsMenu(true)
 
-        view.findViewById<ConstraintLayout>(R.id.contests_settings_clistid).apply {
+        view.findViewById<TextView>(R.id.contests_settings_clistid).apply {
             setOnClickListener {
                 val dialogView = mainActivity.layoutInflater.inflate(R.layout.dialog_clist_api, null)
                 val context = requireContext()
@@ -61,6 +66,12 @@ class ContestsSettingsFragment: CPSFragment() {
                 }.create().show()
             }
         }
+
+        view.findViewById<TextView>(R.id.contests_settings_platforms).apply {
+            setOnClickListener {
+                mainActivity.cpsFragmentManager.pushBack(ContestsSelectPlatformsFragment())
+            }
+        }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -78,6 +89,7 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
         private val Context.contests_settings_dataStore by preferencesDataStore("contests_settings")
     }
 
+    private val KEY_ENABLED_PLATFORMS get() = stringPreferencesKey("enabled_platforms")
     private val KEY_CLIST_API_LOGIN get() = stringPreferencesKey("clist_api_login")
     private val KEY_CLIST_API_KEY get() = stringPreferencesKey("clist_api_key")
 
@@ -101,6 +113,17 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
         val login = getClistApiLogin() ?: return null
         val key = getClistApiKey() ?: return null
         return login to key
+    }
+
+    fun flowOfEnabledPlatforms(): Flow<List<Contest.Platform>> = dataStore.data.map {
+        val str = dataStore.data.first()[KEY_ENABLED_PLATFORMS] ?: return@map emptyList()
+        jsonCPS.decodeFromString(str)
+    }
+    suspend fun getEnabledPlatforms(): List<Contest.Platform> = flowOfEnabledPlatforms().first()
+    suspend fun setEnabledPlatforms(platforms: List<Contest.Platform>) {
+        dataStore.edit {
+            it[KEY_ENABLED_PLATFORMS] = jsonCPS.encodeToString(platforms)
+        }
     }
 
 }

@@ -119,7 +119,7 @@ object CListAPI {
     suspend fun getContests(
         login: String,
         apikey: String,
-        platforms: List<Contest.Platform>,
+        platforms: Collection<Contest.Platform>,
         startTimeSeconds: Long
     ): List<ClistContest>? = withContext(Dispatchers.IO) {
         try {

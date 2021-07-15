@@ -13,24 +13,27 @@
         app:layout_scrollFlags="enterAlways"
         >
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <TextView
+            android:id="@+id/contests_settings_platforms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_margin="10dp"
+            android:padding="10dp"
+            android:background="@color/backgroundAdditional"
+            android:text="platforms"
+            />
+
+        <TextView
             android:id="@+id/contests_settings_clistid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginHorizontal="10dp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_margin="10dp"
             android:padding="10dp"
             android:background="@color/backgroundAdditional"
-            >
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                android:text="clist api access"
-                />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            android:text="clist api access"
+            />
 
     </LinearLayout>
 </ScrollView>
