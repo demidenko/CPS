@@ -47,6 +47,7 @@ data class ClistContest(
     val duration: Long,
     val event: String,
     val href: String,
+    val host: String
 ) {
     fun getPlatform(): Contest.Platform = Contest.Platform.values().find { getClistApiResourceId(it) == resource_id } ?: Contest.Platform.unknown
 }
