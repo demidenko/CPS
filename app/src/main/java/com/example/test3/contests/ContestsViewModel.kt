@@ -28,6 +28,7 @@ class ContestsViewModel: ViewModel() {
                     Contest.Platform.codeforces,
                     Contest.Platform.atcoder,
                     Contest.Platform.topcoder,
+                    Contest.Platform.codechef,
                     Contest.Platform.google
                 )
                 val clistContests = CListAPI.getContests(

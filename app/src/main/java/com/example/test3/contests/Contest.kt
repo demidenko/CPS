@@ -51,6 +51,7 @@ data class Contest (
         codeforces,
         atcoder,
         topcoder,
+        codechef,
         google
     }
 

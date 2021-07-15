@@ -101,6 +101,7 @@ private fun Contest.Platform.getIcon(): Int {
         Contest.Platform.codeforces -> R.drawable.ic_logo_codeforces
         Contest.Platform.atcoder -> R.drawable.ic_logo_atcoder
         Contest.Platform.topcoder -> R.drawable.ic_logo_topcoder
+        Contest.Platform.codechef -> R.drawable.ic_logo_codechef
         Contest.Platform.google -> R.drawable.ic_logo_google
         else -> R.drawable.ic_cup
     }
