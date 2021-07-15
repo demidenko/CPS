@@ -79,6 +79,9 @@ data class Contest (
                 Platform.atcoder -> {
                     contest.href.removePrefix("http://").removePrefix("https://").removePrefix("atcoder.jp/contests/")
                 }
+                Platform.codechef -> {
+                    contest.href.removePrefix("http://").removePrefix("https://").removePrefix("www.codechef.com/")
+                }
                 else -> null
             } ?: contest.id.toString()
         }
