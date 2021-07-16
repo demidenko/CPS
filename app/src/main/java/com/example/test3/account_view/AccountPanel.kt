@@ -71,7 +71,7 @@ abstract class AccountPanel<U: UserInfo>(
             }
         })
 
-        mainActivity.accountsFragment.addRepeatingJob(Lifecycle.State.STARTED){
+        mainActivity.accountsFragment.viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
             launch { subscribeBlockedState() }
             launch { subscribeLoadingState() }
         }
