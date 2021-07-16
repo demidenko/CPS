@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingHorizontal="15dp"
-    android:paddingTop="15dp"
+    android:paddingVertical="6dp"
+    android:layout_marginHorizontal="15dp"
+    android:layout_marginTop="15dp"
+    android:background="@color/backgroundAdditional"
     >
 
     <ImageView
         android:id="@+id/contest_select_icon"
-        android:layout_width="32sp"
-        android:layout_height="32sp"
+        android:layout_width="36sp"
+        android:layout_height="36sp"
         android:src="@drawable/ic_cup"
         app:layout_constraintTop_toTopOf="@id/contest_select_checkbox"
         app:layout_constraintBottom_toBottomOf="@id/contest_select_checkbox"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/contest_select_title"
+        android:layout_marginStart="10dp"
         />
 
     <TextView
@@ -37,6 +40,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
