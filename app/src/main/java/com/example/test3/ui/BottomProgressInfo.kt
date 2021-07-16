@@ -6,12 +6,14 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class BottomProgressInfo(title: String, context: Context): ConstraintLayout(context) {
 
@@ -37,8 +39,8 @@ fun MainActivity.subscribeProgressBar(
     flow: StateFlow<Pair<Int,Int>?>
 ){
     var progressBar: BottomProgressInfo? = null
-    addRepeatingJob(Lifecycle.State.STARTED){
-        flow.collect { progress ->
+    lifecycleScope.launch {
+        flow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { progress ->
             if(progress == null) {
                 progressBar?.let {
                     progressBarHolder.removeView(it)

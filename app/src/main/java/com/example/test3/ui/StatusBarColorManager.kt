@@ -2,7 +2,8 @@ package com.example.test3.ui
 
 import android.graphics.Color
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.test3.MainActivity
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.RatedAccountManager
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 private const val NO_COLOR = Color.TRANSPARENT
 
@@ -39,20 +41,22 @@ class StatusBarColorManager(
     private var enabled: Boolean = true
     init {
         checkManagers(managers)
-        with(mainActivity){
-            addRepeatingJob(Lifecycle.State.STARTED){
-                managers.forEach {
-                    it.flowOfInfo().onEach { (manager, info) ->
-                        updateBy(manager)
+        with(mainActivity) {
+            lifecycleScope.launch {
+                lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    managers.forEach {
+                        it.flowOfInfo().onEach { (manager, info) ->
+                            updateBy(manager)
+                        }.launchIn(this)
+                    }
+                    settingsUI.flowOfUseStatusBar().onEach { use ->
+                        enabled = use
+                        recalculateStatusBarColor()
+                    }.launchIn(this)
+                    settingsUI.flowOfUseRealColors().ignoreFirst().onEach { use ->
+                        managers.forEach { updateBy(it) }
                     }.launchIn(this)
                 }
-                settingsUI.flowOfUseStatusBar().onEach { use ->
-                    enabled = use
-                    recalculateStatusBarColor()
-                }.launchIn(this)
-                settingsUI.flowOfUseRealColors().ignoreFirst().onEach { use ->
-                    managers.forEach { updateBy(it) }
-                }.launchIn(this)
             }
         }
     }

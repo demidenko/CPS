@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
     fragment: HideShowLifecycleFragment,
@@ -17,13 +18,15 @@ abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
     private var previousValue: T? = null
 
     init {
-        addRepeatingJob(Lifecycle.State.STARTED) {
-            dataFlow.collect {
-                if (it == previousValue) return@collect
-                previousValue = it
-                applyData(it)
-                    ?.dispatchUpdatesTo(this@FlowItemsAdapter)
-                    ?: notifyDataSetChanged()
+        fragment.viewLifecycleOwner.lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                dataFlow.collect {
+                    if (it == previousValue) return@collect
+                    previousValue = it
+                    applyData(it)
+                        ?.dispatchUpdatesTo(this@FlowItemsAdapter)
+                        ?: notifyDataSetChanged()
+                }
             }
         }
     }

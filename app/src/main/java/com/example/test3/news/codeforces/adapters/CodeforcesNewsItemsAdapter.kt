@@ -2,7 +2,8 @@ package com.example.test3.news.codeforces.adapters
 
 import androidx.annotation.CallSuper
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.ui.FlowItemsAdapter
@@ -12,6 +13,7 @@ import com.example.test3.utils.getCurrentTimeSeconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 abstract class CodeforcesNewsItemsAdapter<H : RecyclerView.ViewHolder, T>(
     fragment: HideShowLifecycleFragment,
@@ -43,13 +45,15 @@ abstract class CodeforcesNewsItemsTimedAdapter<H, T>(
     where H: RecyclerView.ViewHolder, H: TimeDepends
 {
     init {
-        addRepeatingJob(Lifecycle.State.RESUMED) {
-            while (isActive) {
-                getActiveViewHolders().takeIf { it.isNotEmpty() }?.let { holders ->
-                    val currentTimeSeconds = getCurrentTimeSeconds()
-                    holders.forEach { it.refreshTime(currentTimeSeconds) }
+        fragment.viewLifecycleOwner.lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                while (isActive) {
+                    getActiveViewHolders().takeIf { it.isNotEmpty() }?.let { holders ->
+                        val currentTimeSeconds = getCurrentTimeSeconds()
+                        holders.forEach { it.refreshTime(currentTimeSeconds) }
+                    }
+                    delay(1000)
                 }
-                delay(1000)
             }
         }
     }

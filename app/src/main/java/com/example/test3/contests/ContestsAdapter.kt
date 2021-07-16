@@ -12,7 +12,8 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
@@ -25,6 +26,7 @@ import com.example.test3.utils.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class ContestsAdapter(
@@ -37,17 +39,19 @@ class ContestsAdapter(
     override fun getItemCount() = items.size
 
     init {
-        addRepeatingJob(Lifecycle.State.RESUMED) {
-            while (isActive) {
-                val currentTimeSeconds = getCurrentTimeSeconds()
-                val comparator = Contest.getComparator(currentTimeSeconds)
-                getActiveViewHolders().forEach { it.refreshTime(currentTimeSeconds) }
-                if(!items.isSortedWith(comparator)) {
-                    val oldItems = items.clone()
-                    items.sortWith(comparator)
-                    DiffUtil.calculateDiff(diffCallback(oldItems, items)).dispatchUpdatesTo(this@ContestsAdapter)
+        fragment.viewLifecycleOwner.lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                while (isActive) {
+                    val currentTimeSeconds = getCurrentTimeSeconds()
+                    val comparator = Contest.getComparator(currentTimeSeconds)
+                    getActiveViewHolders().forEach { it.refreshTime(currentTimeSeconds) }
+                    if(!items.isSortedWith(comparator)) {
+                        val oldItems = items.clone()
+                        items.sortWith(comparator)
+                        DiffUtil.calculateDiff(diffCallback(oldItems, items)).dispatchUpdatesTo(this@ContestsAdapter)
+                    }
+                    delay(1000)
                 }
-                delay(1000)
             }
         }
     }

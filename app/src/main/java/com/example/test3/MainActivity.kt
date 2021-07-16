@@ -13,9 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.*
 import com.example.test3.account_manager.AccountManager
 import com.example.test3.account_manager.UserInfo
 import com.example.test3.ui.*
@@ -62,11 +60,13 @@ class MainActivity : AppCompatActivity(){
             showUISettingsPanel = it.getBoolean(keyShowUIPanel)
         }
 
-        addRepeatingJob(Lifecycle.State.STARTED){
-            settingsDev.flowOfDevEnabled().collect { isChecked ->
-                val item = navigationMain.menu.findItem(R.id.navigation_develop)
-                item.isVisible = isChecked
-            }
+        lifecycleScope.launch {
+            settingsDev.flowOfDevEnabled()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { isChecked ->
+                    val item = navigationMain.menu.findItem(R.id.navigation_develop)
+                    item.isVisible = isChecked
+                }
         }
 
         val accountsStackId = cpsFragmentManager.getOrCreateStack(accountsFragment)
@@ -158,12 +158,14 @@ class MainActivity : AppCompatActivity(){
                     setOnClickListener { recreate() }
                 }
 
-                addRepeatingJob(Lifecycle.State.STARTED){
-                    listOf(
-                        settingsUI.flowOfUseRealColors().onEach { use -> buttonOriginColors.onIff(use) },
-                        settingsUI.flowOfUseStatusBar().onEach { use -> buttonColoredStatusBar.onIff(use) },
-                        settingsDev.flowOfDevEnabled().onEach { enabled -> buttonRecreate.isVisible = enabled }
-                    ).forEach { it.launchIn(this) }
+                lifecycleScope.launch {
+                    lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        listOf(
+                            settingsUI.flowOfUseRealColors().onEach { use -> buttonOriginColors.onIff(use) },
+                            settingsUI.flowOfUseStatusBar().onEach { use -> buttonColoredStatusBar.onIff(use) },
+                            settingsDev.flowOfDevEnabled().onEach { enabled -> buttonRecreate.isVisible = enabled }
+                        ).forEach { it.launchIn(this) }
+                    }
                 }
             }
         }
