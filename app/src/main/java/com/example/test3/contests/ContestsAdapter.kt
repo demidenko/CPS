@@ -40,7 +40,7 @@ class ContestsAdapter(
 
     init {
         fragment.viewLifecycleOwner.lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 while (isActive) {
                     val currentTimeSeconds = getCurrentTimeSeconds()
                     val comparator = Contest.getComparator(currentTimeSeconds)

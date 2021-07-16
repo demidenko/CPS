@@ -46,7 +46,7 @@ abstract class CodeforcesNewsItemsTimedAdapter<H, T>(
 {
     init {
         fragment.viewLifecycleOwner.lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 while (isActive) {
                     getActiveViewHolders().takeIf { it.isNotEmpty() }?.let { holders ->
                         val currentTimeSeconds = getCurrentTimeSeconds()

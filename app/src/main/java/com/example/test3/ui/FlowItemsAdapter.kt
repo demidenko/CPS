@@ -19,7 +19,7 @@ abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
 
     init {
         fragment.viewLifecycleOwner.lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 dataFlow.collect {
                     if (it == previousValue) return@collect
                     previousValue = it

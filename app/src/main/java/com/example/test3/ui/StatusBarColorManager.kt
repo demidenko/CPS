@@ -43,7 +43,7 @@ class StatusBarColorManager(
         checkManagers(managers)
         with(mainActivity) {
             lifecycleScope.launch {
-                lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
                     managers.forEach {
                         it.flowOfInfo().onEach { (manager, info) ->
                             updateBy(manager)

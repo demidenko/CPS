@@ -13,8 +13,8 @@ android {
         applicationId "com.example.test3"
         minSdkVersion 22
         targetSdkVersion 30
-        versionCode = 232
-        versionName '0.49.1'
+        versionCode = 233
+        versionName '0.49.2'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -55,8 +55,8 @@ dependencies {
     implementation "androidx.room:room-ktx:2.4.0-alpha03"
     kapt "androidx.room:room-compiler:2.4.0-alpha03"
 
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.0-alpha01"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.0-alpha01"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.0-alpha02"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.0-alpha02"
 
     implementation "androidx.activity:activity-ktx:1.2.3"
     implementation "androidx.fragment:fragment-ktx:1.3.5"

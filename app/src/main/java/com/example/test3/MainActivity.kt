@@ -159,7 +159,7 @@ class MainActivity : AppCompatActivity(){
                 }
 
                 lifecycleScope.launch {
-                    lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    repeatOnLifecycle(Lifecycle.State.STARTED) {
                         listOf(
                             settingsUI.flowOfUseRealColors().onEach { use -> buttonOriginColors.onIff(use) },
                             settingsUI.flowOfUseStatusBar().onEach { use -> buttonColoredStatusBar.onIff(use) },
