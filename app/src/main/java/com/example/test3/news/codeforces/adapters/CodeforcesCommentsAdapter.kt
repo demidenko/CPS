@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.makeIntentOpenUrl
-import com.example.test3.news.codeforces.CodeforcesNewsFragment
 import com.example.test3.timeAgo
 import com.example.test3.ui.HideShowLifecycleFragment
 import com.example.test3.ui.TimeDepends

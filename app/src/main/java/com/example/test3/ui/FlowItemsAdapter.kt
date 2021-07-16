@@ -71,18 +71,20 @@ class LifecycleMerge(
     private val lifecycleRegistry = LifecycleRegistry(originalLifecycleOwner)
     override fun getLifecycle(): Lifecycle = lifecycleRegistry
 
-    private var additionalEvent: Lifecycle.Event = Lifecycle.Event.ON_START
+    private var additionalEvent: Lifecycle.Event = Lifecycle.Event.ON_CREATE
     private var mainEvent: Lifecycle.Event = Lifecycle.Event.ON_STOP
     fun setAdditionalEvent(event: Lifecycle.Event){
         additionalEvent = event
         handle()
     }
-    fun setMainEvent(event: Lifecycle.Event){
+    private fun setMainEvent(event: Lifecycle.Event){
         mainEvent = event
         handle()
     }
     private fun handle(){
-        val event = maxOf(mainEvent, additionalEvent).takeIf { it>Lifecycle.Event.ON_RESUME } ?: minOf(mainEvent, additionalEvent)
+        val event = maxOf(mainEvent, additionalEvent)
+            .takeIf { it > Lifecycle.Event.ON_RESUME }
+            ?: minOf(mainEvent, additionalEvent)
         lifecycleRegistry.handleLifecycleEvent(event)
     }
 
