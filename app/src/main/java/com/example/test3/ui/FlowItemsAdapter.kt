@@ -16,7 +16,10 @@ abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
     private val lifecycleMerge by lazy { LifecycleMerge(fragment.getHideShowLifecycleOwner()) }
     override fun getLifecycle() = lifecycleMerge.lifecycle
 
+    private var started: Boolean = false
     fun startCollect() {
+        if (started) return
+        started = true
         fragment.viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 dataFlow.distinctUntilChanged().collect {
