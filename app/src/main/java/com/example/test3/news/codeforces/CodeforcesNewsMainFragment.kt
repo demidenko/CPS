@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import com.example.test3.CodeforcesTitle
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
+import com.example.test3.ui.flowAdapter
 import com.example.test3.ui.formatCPS
 import com.google.android.material.tabs.TabLayout
 
@@ -21,7 +22,7 @@ class CodeforcesNewsMainFragment(): CodeforcesNewsFragment() {
             newsFragment.viewedDataStore.blogsViewedFlow(title)
         )
 
-        recyclerView.formatCPS().adapter = itemsAdapter
+        recyclerView.formatCPS().flowAdapter = itemsAdapter
 
         swipeRefreshLayout.formatCPS().setOnRefreshListener { callReload() }
 

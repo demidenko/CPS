@@ -6,6 +6,7 @@ import com.example.test3.CodeforcesTitle
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
+import com.example.test3.ui.flowAdapter
 import com.example.test3.ui.formatCPS
 import com.example.test3.ui.off
 import com.example.test3.ui.on
@@ -41,18 +42,18 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
             )
         }
 
-        recyclerView.formatCPS().adapter = itemsAdapter
+        recyclerView.formatCPS().flowAdapter = itemsAdapter
 
         suspectsButton.apply {
             off()
             setOnClickListener {
-                with(recyclerView){
-                    if(adapter == itemsAdapter){
+                with(recyclerView) {
+                    flowAdapter = if(adapter == itemsAdapter) {
                         suspectsButton.on()
-                        adapter = itemsSuspectsAdapter
+                        itemsSuspectsAdapter
                     } else {
                         suspectsButton.off()
-                        adapter = itemsAdapter
+                        itemsAdapter
                     }
                 }
             }

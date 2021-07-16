@@ -75,7 +75,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             })
         }
 
-        followRecyclerView.adapter = followListAdapter
+        followRecyclerView.flowAdapter = followListAdapter
 
         val buttonAdd = requireBottomPanel().findViewById<ImageButton>(R.id.navigation_cf_follow_add).apply {
             disable()

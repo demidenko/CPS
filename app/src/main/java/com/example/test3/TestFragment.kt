@@ -23,10 +23,7 @@ import com.example.test3.account_manager.AtCoderAccountManager
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.account_manager.HandleColor
 import com.example.test3.account_manager.TopCoderAccountManager
-import com.example.test3.ui.CPSDataStoreDelegate
-import com.example.test3.ui.CPSFragment
-import com.example.test3.ui.FlowItemsAdapter
-import com.example.test3.ui.formatCPS
+import com.example.test3.ui.*
 import com.example.test3.utils.CPSDataStore
 import com.example.test3.workers.WorkersCenter
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -53,7 +50,7 @@ class TestFragment : CPSFragment() {
         setBottomPanelId(R.id.support_navigation_develop, R.layout.navigation_dev)
 
         //show running jobs
-        view.findViewById<RecyclerView>(R.id.workers).formatCPS().adapter = WorkersInfoAdapter(this@TestFragment)
+        view.findViewById<RecyclerView>(R.id.workers).formatCPS().flowAdapter = WorkersInfoAdapter(this@TestFragment)
 
         //colors
         requireBottomPanel().findViewById<ImageButton>(R.id.navigation_dev_colors).setOnClickListener{

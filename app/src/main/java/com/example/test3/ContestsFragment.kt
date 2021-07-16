@@ -14,6 +14,7 @@ import com.example.test3.contests.ContestsViewModel
 import com.example.test3.room.getContestsListDao
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.enableIff
+import com.example.test3.ui.flowAdapter
 import com.example.test3.ui.formatCPS
 import com.example.test3.utils.LoadingState
 import com.example.test3.utils.getColorFromResource
@@ -75,7 +76,7 @@ class ContestsFragment: CPSFragment() {
             }
         }
 
-        view.findViewById<RecyclerView>(R.id.contests_list).formatCPS().adapter = contestAdapter
+        view.findViewById<RecyclerView>(R.id.contests_list).formatCPS().flowAdapter = contestAdapter
 
     }
 

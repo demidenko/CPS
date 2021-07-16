@@ -6,23 +6,20 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
-    fragment: HideShowLifecycleFragment,
-    dataFlow: Flow<T>
+    private val fragment: HideShowLifecycleFragment,
+    private val dataFlow: Flow<T>
 ): RecyclerView.Adapter<H>(), LifecycleOwner {
     private val lifecycleMerge by lazy { LifecycleMerge(fragment.getHideShowLifecycleOwner()) }
     override fun getLifecycle() = lifecycleMerge.lifecycle
 
-    private var previousValue: T? = null
-
-    init {
+    fun startCollect() {
         fragment.viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                dataFlow.collect {
-                    if (it == previousValue) return@collect
-                    previousValue = it
+                dataFlow.distinctUntilChanged().collect {
                     applyData(it)
                         ?.dispatchUpdatesTo(this@FlowItemsAdapter)
                         ?: notifyDataSetChanged()
@@ -59,6 +56,11 @@ abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
     }
 }
 
+var RecyclerView.flowAdapter: FlowItemsAdapter<*, *>?
+    get() = adapter as? FlowItemsAdapter<*, *>
+    set(value) {
+        adapter = value?.apply { startCollect() }
+    }
 
 interface TimeDepends {
     var startTimeSeconds: Long
@@ -71,7 +73,7 @@ class LifecycleMerge(
     private val lifecycleRegistry = LifecycleRegistry(originalLifecycleOwner)
     override fun getLifecycle(): Lifecycle = lifecycleRegistry
 
-    private var additionalEvent: Lifecycle.Event = Lifecycle.Event.ON_CREATE
+    private var additionalEvent: Lifecycle.Event = Lifecycle.Event.ON_START
     private var mainEvent: Lifecycle.Event = Lifecycle.Event.ON_STOP
     fun setAdditionalEvent(event: Lifecycle.Event){
         additionalEvent = event

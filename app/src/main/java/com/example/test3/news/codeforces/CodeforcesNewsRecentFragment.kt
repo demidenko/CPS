@@ -14,6 +14,7 @@ import com.example.test3.R
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.news.codeforces.adapters.CodeforcesCommentsAdapter
 import com.example.test3.news.codeforces.adapters.CodeforcesRecentBlogEntriesAdapter
+import com.example.test3.ui.flowAdapter
 import com.example.test3.ui.formatCPS
 import com.example.test3.utils.CodeforcesBlogEntry
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -67,7 +68,7 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
 
     private fun openCommentsByBlogEntry(blogEntry: CodeforcesBlogEntry) {
         recyclerViewBlogEntries.isVisible = false
-        recyclerViewCommentsFiltered.adapter = commentsFilteredAdapter(blogEntry.id)
+        recyclerViewCommentsFiltered.flowAdapter = commentsFilteredAdapter(blogEntry.id)
         recyclerViewCommentsFiltered.isVisible = true
         headerInfo = blogEntry
         drawBlogEntryHeader()
@@ -75,7 +76,7 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
     }
 
     private fun closeCommentsByBlogEntry() {
-        recyclerViewCommentsFiltered.adapter = null
+        recyclerViewCommentsFiltered.flowAdapter = null
         recyclerViewCommentsFiltered.isVisible = false
         recyclerViewBlogEntries.isVisible = true
         headerInfo = null
@@ -109,14 +110,14 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
 
         recyclerViewBlogEntries.formatCPS().apply {
             isVisible = true
-            adapter = blogEntriesAdapter.apply {
+            flowAdapter = blogEntriesAdapter.apply {
                 setOnBlogSelectListener { openCommentsByBlogEntry(it) }
             }
         }
 
         recyclerViewComments.formatCPS().apply {
             isVisible = false
-            adapter = commentsAdapter
+            flowAdapter = commentsAdapter
         }
 
         recyclerViewCommentsFiltered.formatCPS().apply {

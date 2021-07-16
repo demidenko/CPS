@@ -10,6 +10,7 @@ import com.example.test3.CodeforcesTitle
 import com.example.test3.R
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.news.codeforces.adapters.CodeforcesCommentsAdapter
+import com.example.test3.ui.flowAdapter
 import com.example.test3.ui.formatCPS
 import com.example.test3.ui.off
 import com.example.test3.ui.on
@@ -47,7 +48,7 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
 
         recyclerViewBlogEntries.formatCPS().apply {
             isVisible = true
-            adapter = blogEntriesAdapter
+            flowAdapter = blogEntriesAdapter
         }
 
         recyclerViewComments.formatCPS().apply {
@@ -64,7 +65,7 @@ class CodeforcesNewsTopFragment(): CodeforcesNewsFragment() {
                     recyclerViewBlogEntries.isVisible = false
                     with(recyclerViewComments){
                         isVisible = true
-                        if(adapter == null) adapter = commentsAdapter
+                        if(adapter == null) flowAdapter = commentsAdapter
                     }
                 } else {
                     off()
