@@ -12,8 +12,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -102,7 +100,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
             buttonAdd.enable()
         }
 
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
+        launchAndRepeatWithViewLifecycle {
             mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().collect { followListAdapter.refreshHandles() }
         }
     }

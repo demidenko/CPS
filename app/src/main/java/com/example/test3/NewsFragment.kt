@@ -13,8 +13,6 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -136,7 +134,7 @@ class NewsFragment : CPSFragment() {
         updateLostInfoButton.setOnClickListener { newsViewModel.updateLostInfo(requireContext()) }
         mainActivity.subscribeProgressBar("update info of lost", newsViewModel.getUpdateLostInfoProgress())
 
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
+        launchAndRepeatWithViewLifecycle {
             val titles = listOf(
                 CodeforcesTitle.MAIN,
                 CodeforcesTitle.TOP,

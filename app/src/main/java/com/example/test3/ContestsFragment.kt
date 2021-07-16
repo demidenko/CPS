@@ -6,8 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.contests.ContestsAdapter
@@ -20,6 +18,7 @@ import com.example.test3.ui.formatCPS
 import com.example.test3.utils.LoadingState
 import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.getCurrentTimeSeconds
+import com.example.test3.utils.launchAndRepeatWithViewLifecycle
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import java.util.concurrent.TimeUnit
@@ -65,7 +64,7 @@ class ContestsFragment: CPSFragment() {
             setOnClickListener { showContestsSettings() }
         }
 
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
+        launchAndRepeatWithViewLifecycle {
             contestViewModel.flowOfLoadingState().collect {
                 reloadButton.apply {
                     enableIff(it != LoadingState.LOADING)

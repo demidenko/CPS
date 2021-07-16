@@ -6,10 +6,16 @@ import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
@@ -142,5 +148,16 @@ fun<T> Flow<T>.ignoreFirst(): Flow<T> {
 inline fun<reified T: Any> classDifference(a: T, b: T): List<KProperty1<T, *>> {
     return T::class.memberProperties.filter {
         it.get(a) != it.get(b)
+    }
+}
+
+inline fun Fragment.launchAndRepeatWithViewLifecycle(
+    minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
+    crossinline block: suspend CoroutineScope.() -> Unit
+) {
+    viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycle.repeatOnLifecycle(minActiveState) {
+            block()
+        }
     }
 }

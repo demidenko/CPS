@@ -10,8 +10,6 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.account_manager.*
 import com.example.test3.account_view.*
@@ -58,7 +56,7 @@ class AccountsFragment: CPSFragment() {
 
             panels.forEach { panel -> addView(panel.createSmallView(), params) }
 
-            viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
+            launchAndRepeatWithViewLifecycle {
                 panels.forEach { panel ->
                     launch {
                         panel.manager.flowOfInfo().collect { (manager, info) ->
@@ -78,7 +76,7 @@ class AccountsFragment: CPSFragment() {
         reloadButton.setOnClickListener { reloadAccounts() }
         addAccountButton.setOnClickListener { addAccount() }
 
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
+        launchAndRepeatWithViewLifecycle {
             BlockedState.combineBlockedStatesFlows(
                 panels.map { accountViewModel.getAccountSmallViewBlockedState(it.manager) }
             ).onEach {

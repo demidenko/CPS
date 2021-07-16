@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -16,6 +14,7 @@ import com.example.test3.ui.HideShowLifecycleFragment
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.LoadingState
 import com.example.test3.utils.ignoreFirst
+import com.example.test3.utils.launchAndRepeatWithViewLifecycle
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -56,7 +55,7 @@ abstract class CodeforcesNewsFragment: HideShowLifecycleFragment() {
     }
 
     protected fun subscribeNewEntries(blogEntriesAdapter: CodeforcesBlogEntriesAdapter) {
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
+        launchAndRepeatWithViewLifecycle {
             blogEntriesAdapter.getNewEntriesSizeFlow().collect { count ->
                 val tab = newsFragment.getTab(title) ?: return@collect
                 if (count == 0) {
@@ -76,13 +75,13 @@ abstract class CodeforcesNewsFragment: HideShowLifecycleFragment() {
     }
 
     protected fun subscribeRefreshOnRealColor(refresh: suspend (Boolean) -> Unit) {
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
+        launchAndRepeatWithViewLifecycle {
             newsFragment.mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().collect(refresh)
         }
     }
 
     protected fun subscribeLoadingState(loadingState: Flow<LoadingState>, swipeRefreshLayout: SwipeRefreshLayout) {
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
+        launchAndRepeatWithViewLifecycle {
             loadingState.distinctUntilChanged().collect { swipeRefreshLayout.isRefreshing = it == LoadingState.LOADING }
         }
     }

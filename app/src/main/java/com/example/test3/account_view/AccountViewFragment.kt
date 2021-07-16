@@ -2,8 +2,6 @@ package com.example.test3.account_view
 
 import android.os.Bundle
 import android.view.*
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.*
 import com.example.test3.account_manager.RatedAccountManager
@@ -11,6 +9,7 @@ import com.example.test3.account_manager.UserInfo
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.ignoreFirst
+import com.example.test3.utils.launchAndRepeatWithViewLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -44,7 +43,7 @@ class AccountViewFragment<U: UserInfo>: CPSFragment() {
 
         fun showBigView() = lifecycleScope.launch { panel.showBigView(this@AccountViewFragment) }
 
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
+        launchAndRepeatWithViewLifecycle {
             manager.flowOfInfo().onEach { showBigView() }.launchIn(this)
             mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().onEach { showBigView() }.launchIn(this)
         }

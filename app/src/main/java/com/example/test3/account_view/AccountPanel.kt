@@ -9,14 +9,13 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.*
 import com.example.test3.utils.BlockedState
 import com.example.test3.utils.LoadingState
 import com.example.test3.utils.getColorFromResource
+import com.example.test3.utils.launchAndRepeatWithViewLifecycle
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -71,7 +70,7 @@ abstract class AccountPanel<U: UserInfo>(
             }
         })
 
-        mainActivity.accountsFragment.viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED){
+        mainActivity.accountsFragment.launchAndRepeatWithViewLifecycle {
             launch { subscribeBlockedState() }
             launch { subscribeLoadingState() }
         }
