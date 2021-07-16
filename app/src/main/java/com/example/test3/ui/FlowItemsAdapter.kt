@@ -1,7 +1,6 @@
 package com.example.test3.ui
 
 import androidx.annotation.CallSuper
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -9,11 +8,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 
 abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
-    fragment: Fragment,
+    fragment: HideShowLifecycleFragment,
     dataFlow: Flow<T>
 ): RecyclerView.Adapter<H>(), LifecycleOwner {
-    private val lifecycleMerge by lazy { AdapterLifecycleMerge(this, fragment) }
-    override fun getLifecycle() = lifecycleMerge.lifecycleRegistry
+    private val lifecycleMerge by lazy { LifecycleMerge(fragment.getHideShowLifecycleOwner()) }
+    override fun getLifecycle() = lifecycleMerge.lifecycle
 
     private var previousValue: T? = null
 
@@ -35,12 +34,12 @@ abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
     override fun registerAdapterDataObserver(observer: RecyclerView.AdapterDataObserver) {
         val before = hasObservers()
         super.registerAdapterDataObserver(observer)
-        if(hasObservers() && !before) lifecycleMerge.setAdapterEvent(Lifecycle.Event.ON_START)
+        if(hasObservers() && !before) lifecycleMerge.setAdditionalEvent(Lifecycle.Event.ON_RESUME)
     }
 
     override fun unregisterAdapterDataObserver(observer: RecyclerView.AdapterDataObserver) {
         super.unregisterAdapterDataObserver(observer)
-        if(!hasObservers()) lifecycleMerge.setAdapterEvent(Lifecycle.Event.ON_STOP)
+        if(!hasObservers()) lifecycleMerge.setAdditionalEvent(Lifecycle.Event.ON_STOP)
     }
 
     private val holders = mutableListOf<H>()
@@ -63,30 +62,30 @@ interface TimeDepends {
     fun refreshTime(currentTimeSeconds: Long)
 }
 
-class AdapterLifecycleMerge(
-    adapter: FlowItemsAdapter<*, *>,
-    fragment: Fragment
-){
-    val lifecycleRegistry = LifecycleRegistry(adapter)
-    private var adapterEvent: Lifecycle.Event = Lifecycle.Event.ON_STOP
-    private var fragmentEvent: Lifecycle.Event = Lifecycle.Event.ON_STOP
-    fun setAdapterEvent(event: Lifecycle.Event){
-        adapterEvent = event
+class LifecycleMerge(
+    originalLifecycleOwner: LifecycleOwner
+): LifecycleOwner {
+    private val lifecycleRegistry = LifecycleRegistry(originalLifecycleOwner)
+    override fun getLifecycle(): Lifecycle = lifecycleRegistry
+
+    private var additionalEvent: Lifecycle.Event = Lifecycle.Event.ON_START
+    private var mainEvent: Lifecycle.Event = Lifecycle.Event.ON_STOP
+    fun setAdditionalEvent(event: Lifecycle.Event){
+        additionalEvent = event
         handle()
     }
-    fun setFragmentEvent(event: Lifecycle.Event){
-        fragmentEvent = event
+    fun setMainEvent(event: Lifecycle.Event){
+        mainEvent = event
         handle()
     }
     private fun handle(){
-        val event = maxOf(adapterEvent,fragmentEvent)
+        val event = maxOf(mainEvent, additionalEvent).takeIf { it>Lifecycle.Event.ON_RESUME } ?: minOf(mainEvent, additionalEvent)
         lifecycleRegistry.handleLifecycleEvent(event)
     }
 
     init {
-        fragment.lifecycle.addObserver(object : LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
-            fun onAny(owner: LifecycleOwner, event: Lifecycle.Event) = setFragmentEvent(event)
+        originalLifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
+            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) = setMainEvent(event)
         })
     }
 }

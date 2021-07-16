@@ -65,7 +65,7 @@ class ContestsFragment: CPSFragment() {
             setOnClickListener { showContestsSettings() }
         }
 
-        addRepeatingJob(Lifecycle.State.STARTED) {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) {
             contestViewModel.flowOfLoadingState().collect {
                 reloadButton.apply {
                     enableIff(it != LoadingState.LOADING)

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
@@ -13,6 +12,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.*
 import com.example.test3.news.codeforces.adapters.CodeforcesBlogEntriesAdapter
 import com.example.test3.news.codeforces.adapters.CodeforcesNewsItemsAdapter
+import com.example.test3.ui.HideShowLifecycleFragment
 import com.example.test3.ui.settingsUI
 import com.example.test3.utils.LoadingState
 import com.example.test3.utils.ignoreFirst
@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
-abstract class CodeforcesNewsFragment: Fragment() {
+abstract class CodeforcesNewsFragment: HideShowLifecycleFragment() {
 
     abstract val title: CodeforcesTitle
 

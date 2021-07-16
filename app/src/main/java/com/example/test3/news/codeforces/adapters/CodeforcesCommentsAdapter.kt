@@ -6,18 +6,19 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.makeIntentOpenUrl
+import com.example.test3.news.codeforces.CodeforcesNewsFragment
 import com.example.test3.timeAgo
+import com.example.test3.ui.HideShowLifecycleFragment
 import com.example.test3.ui.TimeDepends
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.Flow
 
 class CodeforcesCommentsAdapter(
-    fragment: Fragment,
+    fragment: HideShowLifecycleFragment,
     dataFlow: Flow<List<CodeforcesRecentAction>>,
     private val showTitle: Boolean = true
 ): CodeforcesNewsItemsTimedAdapter<CodeforcesCommentsAdapter.CodeforcesCommentViewHolder,List<CodeforcesRecentAction>>(

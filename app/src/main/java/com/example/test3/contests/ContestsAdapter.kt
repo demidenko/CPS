@@ -11,7 +11,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import androidx.recyclerview.widget.DiffUtil
@@ -19,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.R
 import com.example.test3.makeIntentOpenUrl
 import com.example.test3.timeDifference2
+import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.FlowItemsAdapter
 import com.example.test3.ui.TimeDepends
 import com.example.test3.utils.*
@@ -28,7 +28,7 @@ import kotlinx.coroutines.isActive
 import java.util.concurrent.TimeUnit
 
 class ContestsAdapter(
-    fragment: Fragment,
+    fragment: CPSFragment,
     dataFlow: Flow<List<Contest>>,
     val previewType: Int
 ): FlowItemsAdapter<ContestViewHolder, List<Contest>>(fragment, dataFlow) {

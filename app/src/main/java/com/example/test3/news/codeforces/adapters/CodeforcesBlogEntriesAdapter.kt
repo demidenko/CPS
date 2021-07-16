@@ -9,12 +9,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
+import com.example.test3.ui.HideShowLifecycleFragment
 import com.example.test3.ui.TimeDepends
 import com.example.test3.utils.*
 import com.example.test3.workers.CodeforcesNewsFollowWorker
@@ -26,7 +26,7 @@ import kotlinx.coroutines.runBlocking
 
 
 class CodeforcesBlogEntriesAdapter(
-    fragment: Fragment,
+    fragment: HideShowLifecycleFragment,
     dataFlow: Flow<List<CodeforcesBlogEntry>>,
     private val viewedBlogEntriesIdsFlow: Flow<Set<Int>>?,
     val clearNewEntriesOnDataChange: Boolean = true

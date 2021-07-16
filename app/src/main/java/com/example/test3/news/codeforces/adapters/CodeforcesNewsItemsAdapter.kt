@@ -1,12 +1,12 @@
 package com.example.test3.news.codeforces.adapters
 
 import androidx.annotation.CallSuper
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.ui.FlowItemsAdapter
+import com.example.test3.ui.HideShowLifecycleFragment
 import com.example.test3.ui.TimeDepends
 import com.example.test3.utils.getCurrentTimeSeconds
 import kotlinx.coroutines.delay
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.isActive
 
 abstract class CodeforcesNewsItemsAdapter<H : RecyclerView.ViewHolder, T>(
-    fragment: Fragment,
+    fragment: HideShowLifecycleFragment,
     dataFlow: Flow<T>
 ): FlowItemsAdapter<H, T>(fragment, dataFlow) {
 
@@ -37,7 +37,7 @@ abstract class CodeforcesNewsItemsAdapter<H : RecyclerView.ViewHolder, T>(
 }
 
 abstract class CodeforcesNewsItemsTimedAdapter<H, T>(
-    fragment: Fragment,
+    fragment: HideShowLifecycleFragment,
     dataFlow: Flow<T>
 ): CodeforcesNewsItemsAdapter<H, T>(fragment, dataFlow)
     where H: RecyclerView.ViewHolder, H: TimeDepends
