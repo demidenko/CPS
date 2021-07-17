@@ -53,7 +53,7 @@ class NewsFragment : CPSFragment() {
     companion object {
         private const val keySelectedTab = "selected_tab"
 
-        suspend fun getCodeforcesContentLanguage(context: Context) = if(context.settingsNews.getRussianContentEnabled()) CodeforcesLocale.RU else CodeforcesLocale.EN
+        suspend fun getCodeforcesContentLanguage(context: Context) = if(context.settingsNews.russianContentEnabled()) CodeforcesLocale.RU else CodeforcesLocale.EN
     }
 
     val newsViewModel: CodeforcesNewsViewModel by viewModels()

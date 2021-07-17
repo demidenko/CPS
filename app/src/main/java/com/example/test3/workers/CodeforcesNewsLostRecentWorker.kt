@@ -61,7 +61,7 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
             progress.value = null
         }
 
-        suspend fun isEnabled(context: Context): Boolean = context.settingsNews.getLostEnabled()
+        suspend fun isEnabled(context: Context): Boolean = context.settingsNews.lostEnabled()
     }
 
     override suspend fun doWork(): Result {

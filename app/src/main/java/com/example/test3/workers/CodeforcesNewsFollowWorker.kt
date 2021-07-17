@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 
 class CodeforcesNewsFollowWorker(private val context: Context, val params: WorkerParameters): CoroutineWorker(context, params) {
     companion object {
-        suspend fun isEnabled(context: Context): Boolean = context.settingsNews.getFollowEnabled()
+        suspend fun isEnabled(context: Context): Boolean = context.settingsNews.followEnabled()
     }
 
     override suspend fun doWork(): Result {

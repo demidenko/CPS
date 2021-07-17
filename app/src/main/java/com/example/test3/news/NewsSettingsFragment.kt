@@ -73,16 +73,16 @@ class NewsSettingsFragment: CPSFragment(){
             setupSwitch(
                 switchRuLang,
                 "Russian content",
-                mainActivity.settingsNews.getRussianContentEnabled()
+                mainActivity.settingsNews.russianContentEnabled()
             ){ buttonView, isChecked ->
                 lifecycleScope.launch {
                     buttonView.isEnabled = false
-                    mainActivity.settingsNews.setRussianContentEnabled(isChecked)
+                    mainActivity.settingsNews.russianContentEnabled(isChecked)
                     buttonView.isEnabled = true
                 }
             }
 
-            val isLostEnabled = mainActivity.settingsNews.getLostEnabled()
+            val isLostEnabled = mainActivity.settingsNews.lostEnabled()
             val switchLost = view.findViewById<ConstraintLayout>(R.id.news_settings_lost)
             val selectLostRating = view.findViewById<ConstraintLayout>(R.id.news_settings_lost_min_rating).apply {
                 isVisible = isLostEnabled
@@ -96,7 +96,7 @@ class NewsSettingsFragment: CPSFragment(){
             ){ buttonView, isChecked ->
                 lifecycleScope.launch {
                     buttonView.isEnabled = false
-                    mainActivity.settingsNews.setLostEnabled(isChecked)
+                    mainActivity.settingsNews.lostEnabled(isChecked)
                     if (isChecked) {
                         WorkersCenter.startCodeforcesNewsLostRecentWorker(mainActivity)
                         newsFragment.addLostTab()
@@ -147,12 +147,12 @@ class NewsSettingsFragment: CPSFragment(){
             setupSwitch(
                 switchFollow,
                 "Follow",
-                mainActivity.settingsNews.getFollowEnabled(),
+                mainActivity.settingsNews.followEnabled(),
                 getString(R.string.news_settings_cf_follow_description)
             ){ buttonView, isChecked ->
                 lifecycleScope.launch {
                     buttonView.isEnabled = false
-                    mainActivity.settingsNews.setFollowEnabled(isChecked)
+                    mainActivity.settingsNews.followEnabled(isChecked)
                     if (isChecked) {
                         WorkersCenter.startCodeforcesNewsFollowWorker(mainActivity)
                     } else {
@@ -232,10 +232,10 @@ class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_setting
     }
 
     private val KEY_TAB = stringPreferencesKey("default_tab")
-    private val KEY_RU = booleanPreferencesKey("ru_lang")
-    private val KEY_LOST = booleanPreferencesKey("lost")
+    val russianContentEnabled = Item(booleanPreferencesKey("ru_lang"), true)
+    val lostEnabled = Item(booleanPreferencesKey("lost"), false)
     private val KEY_LOST_RATING = stringPreferencesKey("lost_min_rating")
-    private val KEY_FOLLOW = booleanPreferencesKey("follow")
+    val followEnabled = Item(booleanPreferencesKey("follow"), false)
 
     private val KEY_FEED = mapOf(
         NewsFeed.PROJECT_EULER_NEWS to booleanPreferencesKey("news_feeds_project_euler_news"),
@@ -253,16 +253,6 @@ class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_setting
         dataStore.edit { it[KEY_TAB] = title.name }
     }
 
-    suspend fun getRussianContentEnabled() = dataStore.data.first()[KEY_RU] ?: true
-    suspend fun setRussianContentEnabled(flag: Boolean){
-        dataStore.edit { it[KEY_RU] = flag }
-    }
-
-    suspend fun getLostEnabled() = dataStore.data.first()[KEY_LOST] ?: false
-    suspend fun setLostEnabled(flag: Boolean){
-        dataStore.edit { it[KEY_LOST] = flag }
-    }
-
     suspend fun getLostMinRating(): CodeforcesUtils.ColorTag {
         return dataStore.data.first()[KEY_LOST_RATING]?.let {
             CodeforcesUtils.ColorTag.valueOf(it)
@@ -270,11 +260,6 @@ class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_setting
     }
     suspend fun setLostMinRating(tag: CodeforcesUtils.ColorTag) {
         dataStore.edit { it[KEY_LOST_RATING] = tag.name }
-    }
-
-    suspend fun getFollowEnabled() = dataStore.data.first()[KEY_FOLLOW] ?: false
-    suspend fun setFollowEnabled(flag: Boolean){
-        dataStore.edit { it[KEY_FOLLOW] = flag }
     }
 
     private fun getKey(newsFeed: NewsFeed): Preferences.Key<Boolean> = KEY_FEED[newsFeed]!!
