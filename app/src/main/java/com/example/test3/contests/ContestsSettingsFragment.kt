@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.test3.R
@@ -20,12 +19,7 @@ import com.example.test3.utils.CPSDataStore
 import com.example.test3.utils.getStringNotBlank
 import com.example.test3.utils.jsonCPS
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 
 class ContestsSettingsFragment: CPSFragment() {
 
@@ -90,8 +84,7 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
         private val Context.contests_settings_dataStore by preferencesDataStore("contests_settings")
     }
 
-    private val KEY_ENABLED_PLATFORMS get() = stringPreferencesKey("enabled_platforms")
-
+    val enabledPlatforms = jsonCPS.itemStringConvertible<List<Contest.Platform>>("enabled_platforms", emptyList())
     val clistApiLogin = ItemNullable(stringPreferencesKey("clist_api_login"))
     val clistApiKey = ItemNullable(stringPreferencesKey("clist_api_key"))
 
@@ -99,17 +92,6 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
         val login = clistApiLogin() ?: return null
         val key = clistApiKey() ?: return null
         return login to key
-    }
-
-    fun flowOfEnabledPlatforms(): Flow<List<Contest.Platform>> = dataStore.data.map {
-        val str = it[KEY_ENABLED_PLATFORMS] ?: return@map emptyList()
-        jsonCPS.decodeFromString(str)
-    }
-    suspend fun getEnabledPlatforms(): List<Contest.Platform> = flowOfEnabledPlatforms().first()
-    suspend fun setEnabledPlatforms(platforms: List<Contest.Platform>) {
-        dataStore.edit {
-            it[KEY_ENABLED_PLATFORMS] = jsonCPS.encodeToString(platforms)
-        }
     }
 
 }

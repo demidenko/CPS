@@ -76,7 +76,7 @@ class ContestsFragment: CPSFragment() {
 
 
             //TODO: enabled platforms auto reload doesn't work after app recreate/minimize
-            requireContext().settingsContests.flowOfEnabledPlatforms().let { flow ->
+            requireContext().settingsContests.enabledPlatforms.flow.let { flow ->
                 val dao = getContestsListDao(requireContext())
                 var currentPlatforms = flow.first()
                 flow.flowWithLifecycle(getHideShowLifecycleOwner().lifecycle, Lifecycle.State.RESUMED)

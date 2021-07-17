@@ -43,7 +43,7 @@ class ContestsSelectPlatformsFragment: CPSFragment() {
     }
 
     private suspend fun createPlatformsList(listView: LinearLayout) {
-        val enabledPlatforms = requireContext().settingsContests.getEnabledPlatforms().toMutableSet()
+        val enabledPlatforms = requireContext().settingsContests.enabledPlatforms().toMutableSet()
         Contest.Platform.getAll().forEach { platform ->
             layoutInflater.inflate(R.layout.contest_select_platform_item, listView)
             listView[listView.childCount-1].apply {
@@ -58,7 +58,7 @@ class ContestsSelectPlatformsFragment: CPSFragment() {
                         if (isChecked) enabledPlatforms.add(platform)
                         else enabledPlatforms.remove(platform)
                         runBlocking {
-                            requireContext().settingsContests.setEnabledPlatforms(enabledPlatforms.toList())
+                            requireContext().settingsContests.enabledPlatforms(enabledPlatforms.toList())
                         }
                         buttonView.isEnabled = true
                     }

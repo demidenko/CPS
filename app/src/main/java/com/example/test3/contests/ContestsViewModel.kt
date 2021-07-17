@@ -21,7 +21,7 @@ class ContestsViewModel: ViewModel() {
 
     fun reloadEnabledPlatforms(context: Context) {
         viewModelScope.launch {
-            val enabledPlatforms = context.settingsContests.getEnabledPlatforms().toSet()
+            val enabledPlatforms = context.settingsContests.enabledPlatforms().toSet()
             with(getContestsListDao(context)) {
                 Contest.Platform.getAll().forEach { platform ->
                     if(platform !in enabledPlatforms) remove(platform)

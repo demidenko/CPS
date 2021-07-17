@@ -19,6 +19,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
@@ -144,7 +146,35 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         }
     }
 
+    inner class ItemStringConvertible<T> (
+        name: String,
+        private val defaultValue: T,
+        private val encode: (T) -> String,
+        private val decode: (String) -> T,
+    ) {
+        val key = stringPreferencesKey(name)
+
+        val flow: Flow<T> = dataStore.data.map { it[key]?.let(decode) ?: defaultValue }.distinctUntilChanged()
+
+        //getter
+        suspend inline operator fun invoke(): T = flow.first()
+
+        //setter
+        suspend operator fun invoke(newValue: T) {
+            dataStore.edit { it[key] = encode(newValue) }
+        }
+    }
+
+    inline fun<reified T> Json.itemStringConvertible(name: String, defaultValue: T) =
+        ItemStringConvertible(
+            name = name,
+            defaultValue = defaultValue,
+            encode = ::encodeToString,
+            decode = ::decodeFromString
+        )
 }
+
+
 
 enum class LoadingState {
     PENDING, LOADING, FAILED;
