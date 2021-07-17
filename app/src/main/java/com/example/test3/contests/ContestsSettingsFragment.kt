@@ -17,6 +17,7 @@ import com.example.test3.makeIntentOpenUrl
 import com.example.test3.ui.CPSDataStoreDelegate
 import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.CPSDataStore
+import com.example.test3.utils.getStringNotBlank
 import com.example.test3.utils.jsonCPS
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.flow.Flow
@@ -50,17 +51,17 @@ class ContestsSettingsFragment: CPSFragment() {
                     startActivity(makeIntentOpenUrl("https://clist.by/api/v2/doc/"))
                 }
                 val loginTextField = dialogView.findViewById<TextInputLayout>(R.id.dialog_clist_api_login).apply {
-                    editText?.setText(runBlocking { context.settingsContests.getClistApiLogin() ?: "" })
+                    editText?.setText(runBlocking { context.settingsContests.clistApiLogin() ?: "" })
                 }
                 val apikeyTextField = dialogView.findViewById<TextInputLayout>(R.id.dialog_clist_api_key).apply {
-                    editText?.setText(runBlocking { context.settingsContests.getClistApiKey() ?: "" })
+                    editText?.setText(runBlocking { context.settingsContests.clistApiKey() ?: "" })
                 }
                 AlertDialog.Builder(mainActivity).apply {
                     setView(dialogView)
                     setPositiveButton("Save") { _, i ->
                         runBlocking {
-                            context.settingsContests.setClistApiLogin(loginTextField.editText?.text?.toString())
-                            context.settingsContests.setClistApiKey(apikeyTextField.editText?.text?.toString())
+                            context.settingsContests.clistApiLogin(loginTextField.editText?.getStringNotBlank())
+                            context.settingsContests.clistApiKey(apikeyTextField.editText?.getStringNotBlank())
                         }
                     }
                 }.create().show()
@@ -90,28 +91,13 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
     }
 
     private val KEY_ENABLED_PLATFORMS get() = stringPreferencesKey("enabled_platforms")
-    private val KEY_CLIST_API_LOGIN get() = stringPreferencesKey("clist_api_login")
-    private val KEY_CLIST_API_KEY get() = stringPreferencesKey("clist_api_key")
 
-    suspend fun getClistApiLogin() = dataStore.data.first()[KEY_CLIST_API_LOGIN]
-    suspend fun setClistApiLogin(login: String?) {
-        dataStore.edit {
-            if (login == null || login.isBlank()) it.remove(KEY_CLIST_API_LOGIN)
-            else it[KEY_CLIST_API_LOGIN] = login
-        }
-    }
-
-    suspend fun getClistApiKey() = dataStore.data.first()[KEY_CLIST_API_KEY]
-    suspend fun setClistApiKey(key: String?) {
-        dataStore.edit {
-            if (key == null || key.isBlank()) it.remove(KEY_CLIST_API_KEY)
-            else it[KEY_CLIST_API_KEY] = key
-        }
-    }
+    val clistApiLogin = ItemNullable(stringPreferencesKey("clist_api_login"))
+    val clistApiKey = ItemNullable(stringPreferencesKey("clist_api_key"))
 
     suspend fun getClistApiLoginAndKey(): Pair<String,String>? {
-        val login = getClistApiLogin() ?: return null
-        val key = getClistApiKey() ?: return null
+        val login = clistApiLogin() ?: return null
+        val key = clistApiKey() ?: return null
         return login to key
     }
 

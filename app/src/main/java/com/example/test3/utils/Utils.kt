@@ -3,9 +3,11 @@ package com.example.test3.utils
 import android.content.Context
 import android.text.Html
 import android.text.Spanned
+import android.widget.EditText
 import androidx.core.text.HtmlCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -82,7 +84,40 @@ class MutableSetLiveSize<T>() {
     }
 }
 
-open class CPSDataStore(protected val dataStore: DataStore<Preferences>)
+open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
+
+    inner class Item<T> (
+        private val key: Preferences.Key<T>,
+        private val defaultValue: T
+    ) {
+        fun flow(): Flow<T> = dataStore.data.map { it[key] ?: defaultValue }
+
+        //getter
+        suspend operator fun invoke(): T = flow().first()
+
+        //setter
+        suspend operator fun invoke(newValue: T) {
+            dataStore.edit { it[key] = newValue }
+        }
+    }
+
+    inner class ItemNullable<T> (
+        private val key: Preferences.Key<T>
+    ) {
+        fun flow(): Flow<T?> = dataStore.data.map { it[key] }
+
+        //getter
+        suspend operator fun invoke(): T? = flow().first()
+
+        //setter
+        suspend operator fun invoke(newValue: T?) {
+            dataStore.edit { prefs ->
+                newValue?.let { prefs[key] = it } ?: prefs.remove(key)
+            }
+        }
+    }
+
+}
 
 enum class LoadingState {
     PENDING, LOADING, FAILED;
@@ -172,3 +207,5 @@ inline fun Fragment.launchAndRepeatWithViewLifecycle(
         }
     }
 }
+
+fun EditText.getStringNotBlank(): String? = text?.toString()?.takeIf { it.isNotBlank() }
