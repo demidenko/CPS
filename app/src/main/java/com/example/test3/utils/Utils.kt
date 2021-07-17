@@ -91,7 +91,7 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         val key: Preferences.Key<T>,
         private val defaultValue: T
     ) {
-        val flow: Flow<T> = dataStore.data.map { it[key] ?: defaultValue }
+        val flow: Flow<T> = dataStore.data.map { it[key] ?: defaultValue }.distinctUntilChanged()
 
         //getter
         suspend inline operator fun invoke(): T = flow.first()
@@ -105,7 +105,7 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
     inner class ItemNullable<T> (
         val key: Preferences.Key<T>
     ) {
-        val flow: Flow<T?> = dataStore.data.map { it[key] }
+        val flow: Flow<T?> = dataStore.data.map { it[key] }.distinctUntilChanged()
 
         //getter
         suspend inline operator fun invoke(): T? = flow.first()
@@ -126,14 +126,14 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         constructor(name: String, defaultValue: T): this(
             name, defaultValue.javaClass, defaultValueCallback = { defaultValue }
         )
-        
+
         val key = stringPreferencesKey(name)
 
         val flow: Flow<T> = dataStore.data.map {
             it[key]?.let { str ->
                 clazz.enumConstants.first { it.name == str }
             } ?: defaultValueCallback()
-        }
+        }.distinctUntilChanged()
 
         //getter
         suspend inline operator fun invoke(): T = flow.first()
