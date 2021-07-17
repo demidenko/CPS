@@ -3,7 +3,6 @@ package com.example.test3.workers
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -14,7 +13,6 @@ import com.example.test3.news.NewsFeed
 import com.example.test3.news.settingsNews
 import com.example.test3.utils.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
 
 class NewsWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -35,7 +33,7 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
     private suspend fun parseACMP() {
         val s = ACMPAPI.getMainPage() ?: return
 
-        val lastNewsID = dataStore.getACMPLastNewsID()
+        val lastNewsID = dataStore.acmpLastNewsID()
         val news = mutableListOf<Pair<Int, String>>()
         var i = 0
         while (true) {
@@ -82,14 +80,14 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
 
         val firstID = news.first().first
         if(firstID != lastNewsID) {
-            dataStore.setACMPLastNewsID(firstID)
+            dataStore.acmpLastNewsID(firstID)
         }
     }
 
     private suspend fun parseProjectEuler() {
         val s = ProjectEulerAPI.getNewsPage() ?: return
 
-        val lastNewsID = dataStore.getProjectEulerLastNewsID()
+        val lastNewsID = dataStore.projectEulerLastNewsID()
 
         val news = mutableListOf<Pair<String, String>>()
         var i = 0
@@ -125,14 +123,14 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
 
         val firstID = news.first().first
         if(firstID != lastNewsID) {
-            dataStore.setProjectEulerLastNewsID(firstID)
+            dataStore.projectEulerLastNewsID(firstID)
         }
     }
 
     private suspend fun parseZaoch() {
         val s = OlympiadsZaochAPI.getMainPage() ?: return
 
-        val lastNewsID = dataStore.getOlympiadsZaochLastNewsID()
+        val lastNewsID = dataStore.olympiadsZaochLastNewsID()
 
         val news = mutableListOf<Triple<String, String, String>>()
         var i = 0
@@ -174,7 +172,7 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
 
         val firstID = news.first().first
         if(firstID != lastNewsID) {
-            dataStore.setOlympiadsZaochLastNewsID(firstID)
+            dataStore.olympiadsZaochLastNewsID(firstID)
         }
     }
 
@@ -183,24 +181,10 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
             private val Context.news_worker_dataStore by preferencesDataStore("worker_news")
         }
 
-        private val KEY_ACMP_LAST_NEWS = intPreferencesKey("acmp_last_news")
-        private val KEY_PROJECT_EULER_LAST_NEWS = stringPreferencesKey("project_euler_last_news")
-        private val KEY_OLYMPIADS_ZAOCH_LAST_NEWS = stringPreferencesKey("olympiads_zaoch_last_news")
+        val acmpLastNewsID = ItemNullable(intPreferencesKey("acmp_last_news"))
+        val projectEulerLastNewsID = ItemNullable(stringPreferencesKey("project_euler_last_news"))
+        val olympiadsZaochLastNewsID = ItemNullable(stringPreferencesKey("olympiads_zaoch_last_news"))
 
-        suspend fun getACMPLastNewsID() = dataStore.data.first()[KEY_ACMP_LAST_NEWS]
-        suspend fun setACMPLastNewsID(newsID: Int) {
-            dataStore.edit { it[KEY_ACMP_LAST_NEWS] = newsID }
-        }
-
-        suspend fun getProjectEulerLastNewsID() = dataStore.data.first()[KEY_PROJECT_EULER_LAST_NEWS]
-        suspend fun setProjectEulerLastNewsID(newsID: String) {
-            dataStore.edit { it[KEY_PROJECT_EULER_LAST_NEWS] = newsID }
-        }
-
-        suspend fun getOlympiadsZaochLastNewsID() = dataStore.data.first()[KEY_OLYMPIADS_ZAOCH_LAST_NEWS]
-        suspend fun setOlympiadsZaochLastNewsID(newsID: String) {
-            dataStore.edit { it[KEY_OLYMPIADS_ZAOCH_LAST_NEWS] = newsID }
-        }
     }
 
 }
