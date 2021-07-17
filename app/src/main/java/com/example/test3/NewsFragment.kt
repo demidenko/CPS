@@ -241,7 +241,7 @@ class NewsFragment : CPSFragment() {
         val index = savedInstanceState?.getInt(keySelectedTab)
             ?: with(codeforcesNewsAdapter){
                 val defaultTab = runBlocking {
-                    mainActivity.settingsNews.getDefaultTab()
+                    mainActivity.settingsNews.defaultTab()
                 }
                 indexOf(defaultTab).takeIf { it!=-1 } ?: indexOf(CodeforcesTitle.TOP)
             }

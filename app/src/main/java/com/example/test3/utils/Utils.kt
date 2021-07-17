@@ -8,6 +8,7 @@ import androidx.core.text.HtmlCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -114,6 +115,28 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
             dataStore.edit { prefs ->
                 newValue?.let { prefs[key] = it } ?: prefs.remove(key)
             }
+        }
+    }
+
+    inner class ItemEnum<T: Enum<T>> (
+        name: String,
+        private val clazz: Class<T>,
+        private val defaultValue: T
+    ) {
+        val key = stringPreferencesKey(name)
+
+        val flow: Flow<T> = dataStore.data.map {
+            it[key]?.let { str ->
+                clazz.enumConstants.first { it.name == str }
+            } ?: defaultValue
+        }
+
+        //getter
+        suspend inline operator fun invoke(): T = flow.first()
+
+        //setter
+        suspend operator fun invoke(newValue: T) {
+            dataStore.edit { it[key] = newValue.name }
         }
     }
 

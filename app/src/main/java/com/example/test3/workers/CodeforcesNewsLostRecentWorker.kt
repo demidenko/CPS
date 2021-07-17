@@ -94,7 +94,7 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
             TimeUnit.SECONDS.toDays(currentTimeSeconds - blogCreationTimeSeconds) > 7
 
         val blogsDao = getLostBlogsDao(context)
-        val minRatingColorTag = context.settingsNews.getLostMinRating()
+        val minRatingColorTag = context.settingsNews.lostMinRating()
 
         //get current suspects with removing old ones
         val suspects = blogsDao.getSuspects()

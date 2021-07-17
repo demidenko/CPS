@@ -10,8 +10,6 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import com.example.test3.CodeforcesTitle
@@ -22,7 +20,6 @@ import com.example.test3.utils.CPSDataStore
 import com.example.test3.utils.CodeforcesUtils
 import com.example.test3.workers.WorkersCenter
 import com.example.test3.workers.WorkersNames
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -59,11 +56,11 @@ class NewsSettingsFragment: CPSFragment(){
                 selectDefaultTab,
                 "Default tab",
                 tabOptions.map { it.name }.toTypedArray(),
-                tabOptions.indexOf(mainActivity.settingsNews.getDefaultTab()),
+                tabOptions.indexOf(mainActivity.settingsNews.defaultTab()),
             ){ buttonView, optionSelected ->
                 lifecycleScope.launch {
                     buttonView.isEnabled = false
-                    mainActivity.settingsNews.setDefaultTab(tabOptions[optionSelected])
+                    mainActivity.settingsNews.defaultTab(tabOptions[optionSelected])
                     buttonView.isEnabled = true
                 }
             }
@@ -133,11 +130,11 @@ class NewsSettingsFragment: CPSFragment(){
                 selectLostRating,
                 "Author at least",
                 ratingNames.toTypedArray(),
-                ratingOptions.indexOf(mainActivity.settingsNews.getLostMinRating())
+                ratingOptions.indexOf(mainActivity.settingsNews.lostMinRating())
             ){ buttonView, optionSelected ->
                 lifecycleScope.launch {
                     buttonView.isEnabled = false
-                    mainActivity.settingsNews.setLostMinRating(ratingOptions[optionSelected])
+                    mainActivity.settingsNews.lostMinRating(ratingOptions[optionSelected])
                     buttonView.isEnabled = true
                 }
             }
@@ -230,10 +227,10 @@ class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_setting
         private val Context.news_settings_dataStore by preferencesDataStore("news_settings")
     }
 
-    private val KEY_TAB = stringPreferencesKey("default_tab")
+    val defaultTab = ItemEnum("default_tab", CodeforcesTitle::class.java, CodeforcesTitle.TOP)
     val russianContentEnabled = Item(booleanPreferencesKey("ru_lang"), true)
     val lostEnabled = Item(booleanPreferencesKey("lost"), false)
-    private val KEY_LOST_RATING = stringPreferencesKey("lost_min_rating")
+    val lostMinRating = ItemEnum("lost_min_rating", CodeforcesUtils.ColorTag::class.java, CodeforcesUtils.ColorTag.ORANGE)
     val followEnabled = Item(booleanPreferencesKey("follow"), false)
 
     private val itemsByFeed = mapOf(
@@ -245,24 +242,6 @@ class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_setting
 
     suspend fun getNewsFeedEnabled(newsFeed: NewsFeed) = itemsByFeed[newsFeed]!!()
     suspend fun setNewsFeedEnabled(newsFeed: NewsFeed, flag: Boolean) = itemsByFeed[newsFeed]!!(flag)
-
-    suspend fun getDefaultTab(): CodeforcesTitle {
-        return dataStore.data.first()[KEY_TAB]?.let {
-            CodeforcesTitle.valueOf(it)
-        } ?: CodeforcesTitle.TOP
-    }
-    suspend fun setDefaultTab(title: CodeforcesTitle) {
-        dataStore.edit { it[KEY_TAB] = title.name }
-    }
-
-    suspend fun getLostMinRating(): CodeforcesUtils.ColorTag {
-        return dataStore.data.first()[KEY_LOST_RATING]?.let {
-            CodeforcesUtils.ColorTag.valueOf(it)
-        } ?: CodeforcesUtils.ColorTag.ORANGE
-    }
-    suspend fun setLostMinRating(tag: CodeforcesUtils.ColorTag) {
-        dataStore.edit { it[KEY_LOST_RATING] = tag.name }
-    }
 
 }
 
