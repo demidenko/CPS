@@ -227,10 +227,10 @@ class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_setting
         private val Context.news_settings_dataStore by preferencesDataStore("news_settings")
     }
 
-    val defaultTab = ItemEnum("default_tab", CodeforcesTitle::class.java, CodeforcesTitle.TOP)
+    val defaultTab = ItemEnum("default_tab", CodeforcesTitle.TOP)
     val russianContentEnabled = Item(booleanPreferencesKey("ru_lang"), true)
     val lostEnabled = Item(booleanPreferencesKey("lost"), false)
-    val lostMinRating = ItemEnum("lost_min_rating", CodeforcesUtils.ColorTag::class.java, CodeforcesUtils.ColorTag.ORANGE)
+    val lostMinRating = ItemEnum("lost_min_rating", CodeforcesUtils.ColorTag.ORANGE)
     val followEnabled = Item(booleanPreferencesKey("follow"), false)
 
     private val itemsByFeed = mapOf(

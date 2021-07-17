@@ -22,7 +22,7 @@ class SettingsUI(private val context: Context): CPSDataStore(context.settingsUI_
 
     val userRealColors = Item(booleanPreferencesKey("use_real_colors"), false)
     val useStatusBar = Item(booleanPreferencesKey("use_status_bar"), true)
-    val uiMode = ItemEnum("ui_mode", UIMode::class.java, getSystemUIMode(context))
+    val uiMode = ItemEnum("ui_mode", UIMode::class.java, defaultValueCallback = { getSystemUIMode(context) })
 }
 
 val Context.settingsUI by CPSDataStoreDelegate{ SettingsUI(it) }

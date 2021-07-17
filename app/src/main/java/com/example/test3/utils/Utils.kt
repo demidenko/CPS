@@ -121,14 +121,18 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
     inner class ItemEnum<T: Enum<T>> (
         name: String,
         private val clazz: Class<T>,
-        private val defaultValue: T
+        private val defaultValueCallback: () -> T
     ) {
+        constructor(name: String, defaultValue: T): this(
+            name, defaultValue.javaClass, defaultValueCallback = { defaultValue }
+        )
+        
         val key = stringPreferencesKey(name)
 
         val flow: Flow<T> = dataStore.data.map {
             it[key]?.let { str ->
                 clazz.enumConstants.first { it.name == str }
-            } ?: defaultValue
+            } ?: defaultValueCallback()
         }
 
         //getter
