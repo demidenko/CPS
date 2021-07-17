@@ -36,11 +36,11 @@ class AtCoderAccountPanel(
         manager.apply {
             fragment.createAndAddSwitch(
                 "Rating changes observer",
-                getSettings().getObserveRating()
+                getSettings().observeRating()
             ){ buttonView, isChecked ->
                 fragment.lifecycleScope.launch {
                     buttonView.isEnabled = false
-                    getSettings().setObserveRating(isChecked)
+                    getSettings().observeRating(isChecked)
                     if (isChecked) {
                         WorkersCenter.startAccountsWorker(mainActivity)
                     }

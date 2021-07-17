@@ -27,7 +27,7 @@ class AccountsWorker(private val context: Context, params: WorkerParameters) : C
             if(observeContribution()) jobs.add(launch { codeforcesContribution() })
         }
         with(atcoderAccountManager.getSettings()){
-            if(getObserveRating()) jobs.add(launch { atcoderRating() })
+            if(observeRating()) jobs.add(launch { atcoderRating() })
         }
         if(jobs.isEmpty()) WorkersCenter.stopWorker(context, WorkersNames.accounts_parsers)
         jobs.joinAll()
@@ -55,11 +55,11 @@ class AccountsWorker(private val context: Context, params: WorkerParameters) : C
         val lastRatingChangeContestID = lastRatingChange.getContestID()
 
         val settings = atcoderAccountManager.getSettings()
-        val prevRatingChangeContestID = settings.getLastRatedContestID()
+        val prevRatingChangeContestID = settings.lastRatedContestID()
 
         if(prevRatingChangeContestID == lastRatingChangeContestID && info.rating == lastRatingChange.NewRating) return
 
-        settings.setLastRatedContestID(lastRatingChangeContestID)
+        settings.lastRatedContestID(lastRatingChangeContestID)
 
         if(prevRatingChangeContestID != null) {
             atcoderAccountManager.notifyRatingChange(info.handle, lastRatingChange)

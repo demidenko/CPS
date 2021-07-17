@@ -7,7 +7,6 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import androidx.core.text.set
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.test3.NotificationChannels
@@ -17,7 +16,6 @@ import com.example.test3.utils.AtCoderRatingChange
 import com.example.test3.utils.AtCoderURLFactory
 import com.example.test3.utils.jsonCPS
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -174,18 +172,9 @@ class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager)
         private val Context.account_settings_atcoder_dataStore by preferencesDataStore(AtCoderAccountManager.manager_name + "_account_settings")
     }
 
-    private val KEY_OBS_RATING = booleanPreferencesKey("observe_rating")
-    private val KEY_LAST_RATED_CONTEST = stringPreferencesKey("last_rated_contest")
+    val observeRating = Item(booleanPreferencesKey("observe_rating"), false)
+    val lastRatedContestID = ItemNullable(stringPreferencesKey("last_rated_contest"))
 
-    override val keysForReset = listOf(KEY_LAST_RATED_CONTEST)
+    override val keysForReset = listOf(lastRatedContestID.key)
 
-    suspend fun getObserveRating() = dataStore.data.first()[KEY_OBS_RATING] ?: false
-    suspend fun setObserveRating(flag: Boolean){
-        dataStore.edit { it[KEY_OBS_RATING] = flag }
-    }
-
-    suspend fun getLastRatedContestID() = dataStore.data.first()[KEY_LAST_RATED_CONTEST]
-    suspend fun setLastRatedContestID(contestID: String){
-        dataStore.edit { it[KEY_LAST_RATED_CONTEST] = contestID }
-    }
 }
