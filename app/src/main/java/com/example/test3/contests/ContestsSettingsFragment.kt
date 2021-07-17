@@ -116,7 +116,7 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
     }
 
     fun flowOfEnabledPlatforms(): Flow<List<Contest.Platform>> = dataStore.data.map {
-        val str = dataStore.data.first()[KEY_ENABLED_PLATFORMS] ?: return@map emptyList()
+        val str = it[KEY_ENABLED_PLATFORMS] ?: return@map emptyList()
         jsonCPS.decodeFromString(str)
     }
     suspend fun getEnabledPlatforms(): List<Contest.Platform> = flowOfEnabledPlatforms().first()
