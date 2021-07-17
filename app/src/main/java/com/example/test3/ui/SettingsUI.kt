@@ -6,15 +6,11 @@ import android.view.View
 import android.view.WindowInsetsController
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.utils.CPSDataStore
 import com.example.test3.utils.getColorFromResource
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlin.reflect.KProperty
 
@@ -26,13 +22,7 @@ class SettingsUI(private val context: Context): CPSDataStore(context.settingsUI_
 
     val userRealColors = Item(booleanPreferencesKey("use_real_colors"), false)
     val useStatusBar = Item(booleanPreferencesKey("use_status_bar"), true)
-    private val KEY_UI_MODE = stringPreferencesKey("ui_mode")
-
-    private val uiModeFlow = dataStore.data.map { it[KEY_UI_MODE]?.let { UIMode.valueOf(it) } ?: getSystemUIMode(context) }
-    suspend fun getUIMode() = uiModeFlow.first()
-    suspend fun setUIMode(mode: UIMode) {
-        dataStore.edit { it[KEY_UI_MODE] = mode.name }
-    }
+    val uiMode = ItemEnum("ui_mode", UIMode::class.java, getSystemUIMode(context))
 }
 
 val Context.settingsUI by CPSDataStoreDelegate{ SettingsUI(it) }
@@ -66,10 +56,10 @@ fun MainActivity.setupUIMode() {
     }
 }
 
-fun MainActivity.getUIMode(): UIMode = runBlocking{ settingsUI.getUIMode() }
+fun MainActivity.getUIMode(): UIMode = runBlocking{ settingsUI.uiMode() }
 
 fun MainActivity.setUIMode(mode: UIMode) {
-    runBlocking { settingsUI.setUIMode(mode) }
+    runBlocking { settingsUI.uiMode(mode) }
     when(mode){
         UIMode.DARK -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         UIMode.LIGHT -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
