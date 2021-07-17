@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -237,12 +236,15 @@ class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_setting
     private val KEY_LOST_RATING = stringPreferencesKey("lost_min_rating")
     val followEnabled = Item(booleanPreferencesKey("follow"), false)
 
-    private val KEY_FEED = mapOf(
-        NewsFeed.PROJECT_EULER_NEWS to booleanPreferencesKey("news_feeds_project_euler_news"),
-        NewsFeed.PROJECT_EULER_RECENT to booleanPreferencesKey("news_feeds_project_euler_recent"),
-        NewsFeed.ACMP_NEWS to booleanPreferencesKey("news_feeds_acmp_news"),
-        NewsFeed.ZAOCH_NEWS to booleanPreferencesKey("news_feeds_zaoch_news")
+    private val itemsByFeed = mapOf(
+        NewsFeed.PROJECT_EULER_NEWS to Item(booleanPreferencesKey("news_feeds_project_euler_news"), false),
+        NewsFeed.PROJECT_EULER_RECENT to Item(booleanPreferencesKey("news_feeds_project_euler_recent"), false),
+        NewsFeed.ACMP_NEWS to Item(booleanPreferencesKey("news_feeds_acmp_news"), false),
+        NewsFeed.ZAOCH_NEWS to Item(booleanPreferencesKey("news_feeds_zaoch_news"), false)
     )
+
+    suspend fun getNewsFeedEnabled(newsFeed: NewsFeed) = itemsByFeed[newsFeed]!!()
+    suspend fun setNewsFeedEnabled(newsFeed: NewsFeed, flag: Boolean) = itemsByFeed[newsFeed]!!(flag)
 
     suspend fun getDefaultTab(): CodeforcesTitle {
         return dataStore.data.first()[KEY_TAB]?.let {
@@ -260,13 +262,6 @@ class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_setting
     }
     suspend fun setLostMinRating(tag: CodeforcesUtils.ColorTag) {
         dataStore.edit { it[KEY_LOST_RATING] = tag.name }
-    }
-
-    private fun getKey(newsFeed: NewsFeed): Preferences.Key<Boolean> = KEY_FEED[newsFeed]!!
-
-    suspend fun getNewsFeedEnabled(newsFeed: NewsFeed) = dataStore.data.first()[getKey(newsFeed)] ?: false
-    suspend fun setNewsFeedEnabled(newsFeed: NewsFeed, flag: Boolean){
-        dataStore.edit { it[getKey(newsFeed)] = flag }
     }
 
 }
