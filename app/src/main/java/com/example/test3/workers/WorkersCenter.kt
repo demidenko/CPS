@@ -67,7 +67,7 @@ object WorkersCenter {
         if(ProjectEulerRecentProblemsWorker.isEnabled(mainActivity)) startProjectEulerRecentProblemsWorker(mainActivity, false)
 
         with(CodeforcesAccountManager(mainActivity).getSettings()){
-            if(getContestWatchEnabled()) startCodeforcesContestWatchLauncherWorker(mainActivity, false)
+            if(contestWatchEnabled()) startCodeforcesContestWatchLauncherWorker(mainActivity, false)
         }
     }
 

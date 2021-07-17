@@ -16,7 +16,6 @@ import com.example.test3.ui.getUseRealColors
 import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
@@ -28,7 +27,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
     abstract val homeURL: String
 
     protected abstract fun getDataStore(): AccountDataStore
-    fun flowOfInfo() = getDataStore().flowOfData().distinctUntilChanged().map { str -> this to strToInfo(str) }
+    fun flowOfInfo() = getDataStore().userInfo.flow.distinctUntilChanged().map { str -> this to strToInfo(str) }
 
     abstract fun emptyInfo(): U
 
@@ -47,11 +46,11 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
     protected abstract fun encodeToString(info: U): String
 
     private fun strToInfo(str: String?): U = str?.let { decodeFromString(it) } ?: emptyInfo()
-    suspend fun getSavedInfo(): U = strToInfo(getDataStore().getString())
+    suspend fun getSavedInfo(): U = strToInfo(getDataStore().userInfo())
 
     suspend fun setSavedInfo(info: U) {
         val old = getSavedInfo()
-        getDataStore().putString(encodeToString(info))
+        getDataStore().userInfo(encodeToString(info))
         if(info.userID != old.userID && this is AccountSettingsProvider) getSettings().resetRelatedData()
     }
 
@@ -123,17 +122,7 @@ data class RatingChange(
 }
 
 class AccountDataStore(dataStore: DataStore<Preferences>) : CPSDataStore(dataStore) {
-    private val KEY_USER_INFO = stringPreferencesKey("user_info")
-
-    internal fun flowOfData() = dataStore.data.map { it[KEY_USER_INFO] }
-
-    suspend fun getString(): String? = dataStore.data.first()[KEY_USER_INFO]
-
-    suspend fun putString(str: String){
-        dataStore.edit {
-            it[KEY_USER_INFO] = str
-        }
-    }
+    val userInfo = ItemNullable(stringPreferencesKey("user_info"))
 }
 
 open class AccountSettingsDataStore(dataStore: DataStore<Preferences>) : CPSDataStore(dataStore) {

@@ -180,11 +180,11 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager<Codeforces
         val info = getSavedInfo()
 
         val settings = getSettings()
-        val prevRatingChangeContestID = settings.getLastRatedContestID()
+        val prevRatingChangeContestID = settings.lastRatedContestID()
 
         if(prevRatingChangeContestID == ratingChange.contestId && info.rating == ratingChange.newRating) return
 
-        settings.setLastRatedContestID(ratingChange.contestId)
+        settings.lastRatedContestID(ratingChange.contestId)
 
         if(prevRatingChangeContestID != null) {
             notifyRatingChange(ratingChange)
@@ -242,53 +242,22 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager)
         private val Context.account_settings_codeforces_dataStore by preferencesDataStore(CodeforcesAccountManager.manager_name + "_account_settings")
     }
 
-    private val KEY_OBS_RATING = booleanPreferencesKey("observe_rating")
-    private val KEY_LAST_RATED_CONTEST = intPreferencesKey("last_rated_contest")
+    val observeRating = Item(booleanPreferencesKey("observe_rating"), false)
+    val lastRatedContestID = ItemNullable(intPreferencesKey("last_rated_contest"))
 
-    private val KEY_OBS_CONTRIBUTION = booleanPreferencesKey("observe_contribution")
+    val observeContribution = Item(booleanPreferencesKey("observe_contribution"), false)
 
-    private val KEY_CONTEST_WATCH = booleanPreferencesKey("contest_watch")
-    private val KEY_CONTEST_WATCH_LAST_SUBMISSION = longPreferencesKey("contest_watch_last_submission")
-    private val KEY_CONTEST_WATCH_STARTED = intPreferencesKey("contest_watch_started_contest")
+    val contestWatchEnabled = Item(booleanPreferencesKey("contest_watch"), false)
+    val contestWatchLastSubmissionID = ItemNullable(longPreferencesKey("contest_watch_last_submission"))
+    val contestWatchStartedContestID = ItemNullable(intPreferencesKey("contest_watch_started_contest"))
     private val KEY_CONTEST_WATCH_CANCELED = stringPreferencesKey("contest_watch_canceled")
 
     override val keysForReset get() = listOf(
-        KEY_LAST_RATED_CONTEST,
-        KEY_CONTEST_WATCH_LAST_SUBMISSION,
-        KEY_CONTEST_WATCH_STARTED,
+        lastRatedContestID.key,
+        contestWatchLastSubmissionID.key,
+        contestWatchStartedContestID.key,
         KEY_CONTEST_WATCH_CANCELED
     )
-
-    suspend fun getObserveRating() = dataStore.data.first()[KEY_OBS_RATING] ?: false
-    suspend fun setObserveRating(flag: Boolean){
-        dataStore.edit { it[KEY_OBS_RATING] = flag }
-    }
-
-    suspend fun getLastRatedContestID() = dataStore.data.first()[KEY_LAST_RATED_CONTEST]
-    suspend fun setLastRatedContestID(contestID: Int){
-        dataStore.edit { it[KEY_LAST_RATED_CONTEST] = contestID }
-    }
-
-    suspend fun getObserveContribution() = dataStore.data.first()[KEY_OBS_CONTRIBUTION] ?: false
-    suspend fun setObserveContribution(flag: Boolean){
-        dataStore.edit { it[KEY_OBS_CONTRIBUTION] = flag }
-    }
-
-    suspend fun getContestWatchEnabled() = dataStore.data.first()[KEY_CONTEST_WATCH] ?: false
-    suspend fun setContestWatchEnabled(flag: Boolean){
-        dataStore.edit { it[KEY_CONTEST_WATCH] = flag }
-    }
-
-    suspend fun getContestWatchLastSubmissionID() = dataStore.data.first()[KEY_CONTEST_WATCH_LAST_SUBMISSION]
-    suspend fun setContestWatchLastSubmissionID(submissionID: Long){
-        dataStore.edit { it[KEY_CONTEST_WATCH_LAST_SUBMISSION] = submissionID }
-    }
-
-    suspend fun getContestWatchStartedContestID() = dataStore.data.first()[KEY_CONTEST_WATCH_STARTED]
-    suspend fun removeContestWatchStartedContestID() { dataStore.edit { it.remove(KEY_CONTEST_WATCH_STARTED) } }
-    suspend fun setContestWatchStartedContestID(contestID: Int){
-        dataStore.edit { it[KEY_CONTEST_WATCH_STARTED] = contestID }
-    }
 
     suspend fun getContestWatchCanceled(): List<Pair<Int,Long>> {
         val str = dataStore.data.first()[KEY_CONTEST_WATCH_CANCELED] ?: return emptyList()

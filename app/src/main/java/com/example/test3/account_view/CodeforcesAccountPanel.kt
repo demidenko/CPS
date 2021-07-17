@@ -48,11 +48,11 @@ class CodeforcesAccountPanel(
         manager.apply {
             fragment.createAndAddSwitch(
                 "Rating changes observer",
-                getSettings().getObserveRating()
+                getSettings().observeRating()
             ){ buttonView, isChecked ->
                 fragment.lifecycleScope.launch {
                     buttonView.isEnabled = false
-                    getSettings().setObserveRating(isChecked)
+                    getSettings().observeRating(isChecked)
                     if (isChecked) {
                         WorkersCenter.startAccountsWorker(mainActivity)
                     }
@@ -62,11 +62,11 @@ class CodeforcesAccountPanel(
 
             fragment.createAndAddSwitch(
                 "Contribution changes observer",
-                getSettings().getObserveContribution()
+                getSettings().observeContribution()
             ){ buttonView, isChecked ->
                 fragment.lifecycleScope.launch {
                     buttonView.isEnabled = false
-                    getSettings().setObserveContribution(isChecked)
+                    getSettings().observeContribution(isChecked)
                     if (isChecked) {
                         WorkersCenter.startAccountsWorker(mainActivity)
                     }
@@ -76,12 +76,12 @@ class CodeforcesAccountPanel(
 
             fragment.createAndAddSwitch(
                 "Contest watcher",
-                getSettings().getContestWatchEnabled(),
+                getSettings().contestWatchEnabled(),
                 fragment.getString(R.string.cf_contest_watcher_description)
             ){ buttonView, isChecked ->
                 fragment.lifecycleScope.launch {
                     buttonView.isEnabled = false
-                    getSettings().setContestWatchEnabled(isChecked)
+                    getSettings().contestWatchEnabled(isChecked)
                     if (isChecked) {
                         WorkersCenter.startCodeforcesContestWatchLauncherWorker(mainActivity)
                     }

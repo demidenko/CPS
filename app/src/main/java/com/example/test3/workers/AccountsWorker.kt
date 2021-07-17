@@ -23,8 +23,8 @@ class AccountsWorker(private val context: Context, params: WorkerParameters) : C
     override suspend fun doWork(): Result = withContext(Dispatchers.IO){
         val jobs = mutableListOf<Job>()
         with(codeforcesAccountManager.getSettings()){
-            if(getObserveRating()) jobs.add(launch { codeforcesRating() })
-            if(getObserveContribution()) jobs.add(launch { codeforcesContribution() })
+            if(observeRating()) jobs.add(launch { codeforcesRating() })
+            if(observeContribution()) jobs.add(launch { codeforcesContribution() })
         }
         with(atcoderAccountManager.getSettings()){
             if(getObserveRating()) jobs.add(launch { atcoderRating() })
