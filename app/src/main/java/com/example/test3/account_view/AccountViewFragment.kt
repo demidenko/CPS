@@ -45,7 +45,7 @@ class AccountViewFragment<U: UserInfo>: CPSFragment() {
 
         launchAndRepeatWithViewLifecycle {
             manager.flowOfInfo().onEach { showBigView() }.launchIn(this)
-            mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().onEach { showBigView() }.launchIn(this)
+            mainActivity.settingsUI.userRealColors.flow.ignoreFirst().onEach { showBigView() }.launchIn(this)
         }
 
         mainActivity.accountsFragment.statusBarColorManager.setCurrent(manager)

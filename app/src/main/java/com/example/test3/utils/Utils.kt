@@ -90,10 +90,10 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         private val key: Preferences.Key<T>,
         private val defaultValue: T
     ) {
-        fun flow(): Flow<T> = dataStore.data.map { it[key] ?: defaultValue }
+        val flow: Flow<T> = dataStore.data.map { it[key] ?: defaultValue }
 
         //getter
-        suspend operator fun invoke(): T = flow().first()
+        suspend inline operator fun invoke(): T = flow.first()
 
         //setter
         suspend operator fun invoke(newValue: T) {
@@ -104,10 +104,10 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
     inner class ItemNullable<T> (
         private val key: Preferences.Key<T>
     ) {
-        fun flow(): Flow<T?> = dataStore.data.map { it[key] }
+        val flow: Flow<T?> = dataStore.data.map { it[key] }
 
         //getter
-        suspend operator fun invoke(): T? = flow().first()
+        suspend inline operator fun invoke(): T? = flow.first()
 
         //setter
         suspend operator fun invoke(newValue: T?) {

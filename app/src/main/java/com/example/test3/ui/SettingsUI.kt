@@ -13,7 +13,6 @@ import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.utils.CPSDataStore
 import com.example.test3.utils.getColorFromResource
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
@@ -25,24 +24,9 @@ class SettingsUI(private val context: Context): CPSDataStore(context.settingsUI_
         private val Context.settingsUI_dataStore by preferencesDataStore("settings_ui")
     }
 
-    private val KEY_USE_REAL_COLORS = booleanPreferencesKey("use_real_colors")
-    private val KEY_USE_STATUS_BAR = booleanPreferencesKey("use_status_bar")
+    val userRealColors = Item(booleanPreferencesKey("use_real_colors"), false)
+    val useStatusBar = Item(booleanPreferencesKey("use_status_bar"), true)
     private val KEY_UI_MODE = stringPreferencesKey("ui_mode")
-
-    private val useRealColorsFlow = dataStore.data.map { it[KEY_USE_REAL_COLORS] ?: false }
-    fun flowOfUseRealColors() = useRealColorsFlow.distinctUntilChanged()
-    suspend fun getUseRealColors() = useRealColorsFlow.first()
-    suspend fun setUseRealColors(use: Boolean) {
-        dataStore.edit { it[KEY_USE_REAL_COLORS] = use }
-    }
-
-    private val useStatusBar = dataStore.data.map { it[KEY_USE_STATUS_BAR] ?: true }
-    fun flowOfUseStatusBar() = useStatusBar.distinctUntilChanged()
-    suspend fun getUseStatusBar() = useStatusBar.first()
-    suspend fun setUseStatusBar(use: Boolean) {
-        dataStore.edit { it[KEY_USE_STATUS_BAR] = use }
-    }
-
 
     private val uiModeFlow = dataStore.data.map { it[KEY_UI_MODE]?.let { UIMode.valueOf(it) } ?: getSystemUIMode(context) }
     suspend fun getUIMode() = uiModeFlow.first()
@@ -52,8 +36,8 @@ class SettingsUI(private val context: Context): CPSDataStore(context.settingsUI_
 }
 
 val Context.settingsUI by CPSDataStoreDelegate{ SettingsUI(it) }
-fun Context.getUseRealColors() = runBlocking { settingsUI.getUseRealColors() }
-suspend fun Context.setUseRealColors(use: Boolean) = settingsUI.setUseRealColors(use)
+fun Context.getUseRealColors() = runBlocking { settingsUI.userRealColors() }
+suspend fun Context.setUseRealColors(use: Boolean) = settingsUI.userRealColors(use)
 
 
 class CPSDataStoreDelegate<T: CPSDataStore>(

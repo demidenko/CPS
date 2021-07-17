@@ -83,7 +83,7 @@ class AccountsFragment: CPSFragment() {
                 reloadButton.enableIff(it != BlockedState.BLOCKED)
             }.launchIn(this)
 
-            mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().onEach { showPanels() }.launchIn(this)
+            mainActivity.settingsUI.userRealColors.flow.ignoreFirst().onEach { showPanels() }.launchIn(this)
 
             statusBarColorManager.getStatusBarColorFlow().onEach { color ->
                 mainActivity.window.statusBarColor = color

@@ -101,7 +101,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
         }
 
         launchAndRepeatWithViewLifecycle {
-            mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().collect { followListAdapter.refreshHandles() }
+            mainActivity.settingsUI.userRealColors.flow.ignoreFirst().collect { followListAdapter.refreshHandles() }
         }
     }
 

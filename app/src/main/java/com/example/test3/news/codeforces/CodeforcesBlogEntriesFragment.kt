@@ -55,7 +55,7 @@ class CodeforcesBlogEntriesFragment: CPSFragment() {
         view.findViewById<RecyclerView>(R.id.manage_cf_follow_user_blog_entries).formatCPS().flowAdapter = blogEntriesAdapter
 
         launchAndRepeatWithViewLifecycle {
-            mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().collect { blogEntriesAdapter.refreshHandles() }
+            mainActivity.settingsUI.userRealColors.flow.ignoreFirst().collect { blogEntriesAdapter.refreshHandles() }
         }
     }
 

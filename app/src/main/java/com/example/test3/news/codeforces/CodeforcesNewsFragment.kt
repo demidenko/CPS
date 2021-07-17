@@ -76,7 +76,7 @@ abstract class CodeforcesNewsFragment: HideShowLifecycleFragment() {
 
     protected fun subscribeRefreshOnRealColor(refresh: suspend (Boolean) -> Unit) {
         launchAndRepeatWithViewLifecycle {
-            newsFragment.mainActivity.settingsUI.flowOfUseRealColors().ignoreFirst().collect(refresh)
+            newsFragment.mainActivity.settingsUI.userRealColors.flow.ignoreFirst().collect(refresh)
         }
     }
 

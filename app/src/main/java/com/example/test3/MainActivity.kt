@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(){
         }
 
         lifecycleScope.launch {
-            settingsDev.flowOfDevEnabled()
+            settingsDev.devEnabled.flow
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { isChecked ->
                     val item = navigationMain.menu.findItem(R.id.navigation_develop)
@@ -139,8 +139,8 @@ class MainActivity : AppCompatActivity(){
                 val buttonColoredStatusBar = findViewById<ImageButton>(R.id.button_colored_status_bar).apply {
                     setOnClickListener {
                         lifecycleScope.launch {
-                            val current = settingsUI.getUseStatusBar()
-                            settingsUI.setUseStatusBar(!current)
+                            val current = settingsUI.useStatusBar()
+                            settingsUI.useStatusBar(!current)
                         }
                     }
                 }
@@ -161,9 +161,9 @@ class MainActivity : AppCompatActivity(){
                 lifecycleScope.launch {
                     repeatOnLifecycle(Lifecycle.State.STARTED) {
                         listOf(
-                            settingsUI.flowOfUseRealColors().onEach { use -> buttonOriginColors.onIff(use) },
-                            settingsUI.flowOfUseStatusBar().onEach { use -> buttonColoredStatusBar.onIff(use) },
-                            settingsDev.flowOfDevEnabled().onEach { enabled -> buttonRecreate.isVisible = enabled }
+                            settingsUI.userRealColors.flow.onEach { use -> buttonOriginColors.onIff(use) },
+                            settingsUI.useStatusBar.flow.onEach { use -> buttonColoredStatusBar.onIff(use) },
+                            settingsDev.devEnabled.flow.onEach { enabled -> buttonRecreate.isVisible = enabled }
                         ).forEach { it.launchIn(this) }
                     }
                 }

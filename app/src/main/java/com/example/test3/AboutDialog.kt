@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.runBlocking
 
 class AboutDialog: DialogFragment() {
 
@@ -38,14 +39,14 @@ class AboutDialog: DialogFragment() {
             val devTextView = findViewById<TextView>(R.id.about_dev_mode)
 
             val devCheckBox = findViewById<CheckBox>(R.id.about_dev_checkbox).apply {
-                context.settingsDev.getDevEnabled().let { devEnabled ->
+                runBlocking { context.settingsDev.devEnabled() }.let { devEnabled ->
                     isVisible = devEnabled
                     devTextView.isVisible = devEnabled
                     devTextView.text = makeDevModeText(devEnabled)
                     isChecked = devEnabled
                 }
                 setOnCheckedChangeListener { buttonView, isChecked ->
-                    context.settingsDev.setDevEnabled(isChecked)
+                    runBlocking { context.settingsDev.devEnabled(isChecked) }
                     devTextView.text = makeDevModeText(isChecked)
                 }
             }

@@ -49,11 +49,11 @@ class StatusBarColorManager(
                             updateBy(manager)
                         }.launchIn(this)
                     }
-                    settingsUI.flowOfUseStatusBar().onEach { use ->
+                    settingsUI.useStatusBar.flow.onEach { use ->
                         enabled = use
                         recalculateStatusBarColor()
                     }.launchIn(this)
-                    settingsUI.flowOfUseRealColors().ignoreFirst().onEach { use ->
+                    settingsUI.userRealColors.flow.ignoreFirst().onEach { use ->
                         managers.forEach { updateBy(it) }
                     }.launchIn(this)
                 }

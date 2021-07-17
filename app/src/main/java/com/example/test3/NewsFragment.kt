@@ -155,7 +155,7 @@ class NewsFragment : CPSFragment() {
                 updateLostInfoButton.enableIff(progress == null)
             }.launchIn(this)
 
-            mainActivity.settingsDev.flowOfDevEnabled().onEach { use ->
+            mainActivity.settingsDev.devEnabled.flow.onEach { use ->
                 suspectsLostButton.isVisible = use
             }.launchIn(this)
         }
