@@ -35,9 +35,9 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
         val canceled: List<Pair<Int,Long>>
         with(codeforcesAccountManager.getSettings()){
             lastKnownID = contestWatchLastSubmissionID()
-            canceled = getContestWatchCanceled().toMutableList().apply {
+            canceled = contestWatchCanceled().toMutableList().apply {
                 if(removeAll { (id, timeSeconds) -> isTooLate(timeSeconds) }){
-                    setContestWatchCanceled(this)
+                    contestWatchCanceled(this)
                 }
             }
         }
@@ -85,9 +85,9 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
         fun onStopWatcher(context: Context, contestID: Int) = runBlocking {
             with(CodeforcesAccountManager(context).getSettings()){
                 contestWatchStartedContestID(null)
-                val canceled = getContestWatchCanceled().toMutableList()
+                val canceled = contestWatchCanceled().toMutableList()
                 canceled.add(contestID to getCurrentTimeSeconds())
-                setContestWatchCanceled(canceled)
+                contestWatchCanceled(canceled)
             }
         }
 

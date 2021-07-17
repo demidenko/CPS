@@ -12,7 +12,6 @@ import com.example.test3.NotificationChannels
 import com.example.test3.NotificationIDs
 import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -250,20 +249,13 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager)
     val contestWatchEnabled = Item(booleanPreferencesKey("contest_watch"), false)
     val contestWatchLastSubmissionID = ItemNullable(longPreferencesKey("contest_watch_last_submission"))
     val contestWatchStartedContestID = ItemNullable(intPreferencesKey("contest_watch_started_contest"))
-    private val KEY_CONTEST_WATCH_CANCELED = stringPreferencesKey("contest_watch_canceled")
+    val contestWatchCanceled = jsonCPS.itemStringConvertible<List<Pair<Int,Long>>>("contest_watch_canceled", emptyList())
 
     override val keysForReset get() = listOf(
         lastRatedContestID.key,
         contestWatchLastSubmissionID.key,
         contestWatchStartedContestID.key,
-        KEY_CONTEST_WATCH_CANCELED
+        contestWatchCanceled.key
     )
 
-    suspend fun getContestWatchCanceled(): List<Pair<Int,Long>> {
-        val str = dataStore.data.first()[KEY_CONTEST_WATCH_CANCELED] ?: return emptyList()
-        return jsonCPS.decodeFromString(str)
-    }
-    suspend fun setContestWatchCanceled(list: List<Pair<Int,Long>>){
-        dataStore.edit { it[KEY_CONTEST_WATCH_CANCELED] = jsonCPS.encodeToString(list) }
-    }
 }
