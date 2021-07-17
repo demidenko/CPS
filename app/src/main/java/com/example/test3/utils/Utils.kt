@@ -145,6 +145,17 @@ fun<T> Flow<T>.ignoreFirst(): Flow<T> {
     }
 }
 
+suspend fun<T> collectionsDifference(
+    new: Collection<T>,
+    old: Collection<T>,
+    callback: suspend (added: Collection<T>, removed: Collection<T>) -> Unit
+) {
+    callback(
+        new.filter { it !in old },
+        old.filter { it !in new }
+    )
+}
+
 inline fun<reified T: Any> classDifference(a: T, b: T): List<KProperty1<T, *>> {
     return T::class.memberProperties.filter {
         it.get(a) != it.get(b)

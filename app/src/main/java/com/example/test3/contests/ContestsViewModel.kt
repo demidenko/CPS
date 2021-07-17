@@ -19,32 +19,44 @@ class ContestsViewModel: ViewModel() {
     private val loadingState = MutableStateFlow(LoadingState.PENDING)
     fun flowOfLoadingState(): StateFlow<LoadingState> = loadingState.asStateFlow()
 
-    fun reload(context: Context) {
+    fun reloadEnabledPlatforms(context: Context) {
+        viewModelScope.launch {
+            val enabledPlatforms = context.settingsContests.getEnabledPlatforms().toSet()
+            with(getContestsListDao(context)) {
+                Contest.Platform.getAll().forEach { platform ->
+                    if(platform !in enabledPlatforms) remove(platform)
+                }
+            }
+            reload(enabledPlatforms, context)
+        }
+    }
+
+    fun reload(platforms: Collection<Contest.Platform>, context: Context) {
+        if(platforms.isEmpty()) return
         viewModelScope.launch {
             loadingState.value = LoadingState.LOADING
             loadingState.value = run {
                 val (login, apikey) = context.settingsContests.getClistApiLoginAndKey() ?: return@run LoadingState.FAILED
-                val platforms = context.settingsContests.getEnabledPlatforms().toSet()
-                val dao = getContestsListDao(context)
-                Contest.Platform.getAll().forEach { platform ->
-                    if(platform !in platforms) dao.remove(platform)
-                }
                 val clistContests = CListAPI.getContests(
                     login, apikey, platforms,
                     getCurrentTimeSeconds() - TimeUnit.DAYS.toSeconds(7)
                 ) ?: return@run LoadingState.FAILED
                 val grouped = mapAndFilterClistResult(clistContests).groupBy { it.platform }
-                platforms.forEach { platform -> dao.replace(platform, grouped[platform] ?: emptyList()) }
+                with(getContestsListDao(context)) {
+                    platforms.forEach { platform -> replace(platform, grouped[platform] ?: emptyList()) }
+                }
                 LoadingState.PENDING
             }
         }
     }
 
-    private fun mapAndFilterClistResult(contests: List<ClistContest>): List<Contest> {
+    private fun mapAndFilterClistResult(contests: Collection<ClistContest>): List<Contest> {
         return contests.mapNotNull {
             val contest = Contest(it)
-            if(contest.platform == Contest.Platform.atcoder && it.host != "atcoder.jp") return@mapNotNull null
-            contest
+            when {
+                contest.platform == Contest.Platform.atcoder && it.host != "atcoder.jp" -> null
+                else -> contest
+            }
         }
     }
 }

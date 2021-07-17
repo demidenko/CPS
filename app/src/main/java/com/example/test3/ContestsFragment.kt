@@ -6,22 +6,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.test3.contests.ContestsAdapter
 import com.example.test3.contests.ContestsSettingsFragment
 import com.example.test3.contests.ContestsViewModel
+import com.example.test3.contests.settingsContests
 import com.example.test3.room.getContestsListDao
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.enableIff
 import com.example.test3.ui.flowAdapter
 import com.example.test3.ui.formatCPS
-import com.example.test3.utils.LoadingState
-import com.example.test3.utils.getColorFromResource
-import com.example.test3.utils.getCurrentTimeSeconds
-import com.example.test3.utils.launchAndRepeatWithViewLifecycle
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
+import com.example.test3.utils.*
+import kotlinx.coroutines.flow.*
 import java.util.concurrent.TimeUnit
 
 class ContestsFragment: CPSFragment() {
@@ -66,22 +65,38 @@ class ContestsFragment: CPSFragment() {
         }
 
         launchAndRepeatWithViewLifecycle {
-            contestViewModel.flowOfLoadingState().collect {
+            contestViewModel.flowOfLoadingState().onEach {
                 reloadButton.apply {
                     enableIff(it != LoadingState.LOADING)
                     if(it == LoadingState.FAILED) setColorFilter(getColorFromResource(context, R.color.fail))
                     else clearColorFilter()
                 }
                 swipeRefreshLayout.isRefreshing = it == LoadingState.LOADING
+            }.launchIn(this)
+
+
+            //TODO: enabled platforms auto reload doesn't work after app recreate/minimize
+            requireContext().settingsContests.flowOfEnabledPlatforms().let { flow ->
+                val dao = getContestsListDao(requireContext())
+                var currentPlatforms = flow.first()
+                flow.flowWithLifecycle(getHideShowLifecycleOwner().lifecycle, Lifecycle.State.RESUMED)
+                    .map { it.sorted() }
+                    .distinctUntilChanged()
+                    .onEach { platforms ->
+                        collectionsDifference(platforms, currentPlatforms) { added, removed ->
+                            removed.forEach { platform -> dao.remove(platform) }
+                            contestViewModel.reload(added, requireContext())
+                        }
+                        currentPlatforms = platforms
+                    }.launchIn(this)
             }
         }
 
         view.findViewById<RecyclerView>(R.id.contests_list).formatCPS().flowAdapter = contestAdapter
-
     }
 
     private fun callReload() {
-        contestViewModel.reload(mainActivity)
+        contestViewModel.reloadEnabledPlatforms(requireContext())
     }
 
     private fun showContestsSettings() {
