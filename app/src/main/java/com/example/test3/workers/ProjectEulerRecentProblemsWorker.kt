@@ -2,7 +2,6 @@ package com.example.test3.workers
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.work.CoroutineWorker
@@ -13,7 +12,6 @@ import com.example.test3.news.settingsNews
 import com.example.test3.utils.CPSDataStore
 import com.example.test3.utils.ProjectEulerAPI
 import com.example.test3.utils.getColorFromResource
-import kotlinx.coroutines.flow.first
 
 class ProjectEulerRecentProblemsWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -32,7 +30,7 @@ class ProjectEulerRecentProblemsWorker(private val context: Context, params: Wor
 
         val s = ProjectEulerAPI.getRecentProblemsPage() ?: return Result.retry()
 
-        val lastViewedProblemID = dataStore.getLastRecentProblemID()
+        val lastViewedProblemID = dataStore.lastRecentProblemID()
 
         val newProblems = mutableListOf<Pair<Int,String>>()
 
@@ -70,7 +68,7 @@ class ProjectEulerRecentProblemsWorker(private val context: Context, params: Wor
 
         val firstID = newProblems.first().first
         if(firstID != lastViewedProblemID) {
-            dataStore.setLastRecentProblemID(firstID)
+            dataStore.lastRecentProblemID(firstID)
         }
 
         return Result.success()
@@ -81,12 +79,8 @@ class ProjectEulerRecentProblemsWorker(private val context: Context, params: Wor
             private val Context.pe_recent_worker_dataStore by preferencesDataStore("worker_project_euler_recent")
         }
 
-        private val KEY_LAST_RECENT_PROBLEM_ID = intPreferencesKey("last_recent_problem_id")
+        val lastRecentProblemID = ItemNullable(intPreferencesKey("last_recent_problem_id"))
 
-        suspend fun getLastRecentProblemID() = dataStore.data.first()[KEY_LAST_RECENT_PROBLEM_ID]
-        suspend fun setLastRecentProblemID(problemID: Int) {
-            dataStore.edit { it[KEY_LAST_RECENT_PROBLEM_ID] = problemID }
-        }
     }
 
 }
