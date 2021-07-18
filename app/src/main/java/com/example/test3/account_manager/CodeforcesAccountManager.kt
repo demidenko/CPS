@@ -252,10 +252,10 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager)
     val contestWatchCanceled = jsonCPS.itemStringConvertible<List<Pair<Int,Long>>>("contest_watch_canceled", emptyList())
 
     override val keysForReset get() = listOf(
-        lastRatedContestID.key,
-        contestWatchLastSubmissionID.key,
-        contestWatchStartedContestID.key,
-        contestWatchCanceled.key
+        lastRatedContestID,
+        contestWatchLastSubmissionID,
+        contestWatchStartedContestID,
+        contestWatchCanceled
     )
 
 }

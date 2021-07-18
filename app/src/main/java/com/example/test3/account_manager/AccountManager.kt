@@ -126,11 +126,11 @@ class AccountDataStore(dataStore: DataStore<Preferences>) : CPSDataStore(dataSto
 }
 
 open class AccountSettingsDataStore(dataStore: DataStore<Preferences>) : CPSDataStore(dataStore) {
-    protected open val keysForReset: List<Preferences.Key<out Any>> = emptyList()
+    protected open val keysForReset: List<CPSDataStoreItem<*,*>> = emptyList()
     suspend fun resetRelatedData() {
         val keys = keysForReset.takeIf { it.isNotEmpty() } ?: return
         dataStore.edit { prefs ->
-            keys.forEach { prefs.remove(it) }
+            keys.forEach { prefs.remove(it.key) }
         }
     }
 }
