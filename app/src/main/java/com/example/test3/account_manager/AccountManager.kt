@@ -15,7 +15,6 @@ import com.example.test3.notificationBuilder
 import com.example.test3.ui.getUseRealColors
 import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
@@ -27,7 +26,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
     abstract val homeURL: String
 
     protected abstract fun getDataStore(): AccountDataStore
-    fun flowOfInfo() = getDataStore().userInfo.flow.distinctUntilChanged().map { str -> this to strToInfo(str) }
+    fun flowOfInfo() = getDataStore().userInfo.flow.map { str -> this to strToInfo(str) }
 
     abstract fun emptyInfo(): U
 

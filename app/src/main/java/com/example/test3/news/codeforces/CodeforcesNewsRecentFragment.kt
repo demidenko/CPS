@@ -17,7 +17,6 @@ import com.example.test3.news.codeforces.adapters.CodeforcesRecentBlogEntriesAda
 import com.example.test3.ui.flowAdapter
 import com.example.test3.ui.formatCPS
 import com.example.test3.utils.CodeforcesBlogEntry
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
@@ -31,7 +30,7 @@ class CodeforcesNewsRecentFragment(): CodeforcesNewsFragment() {
                 comments.filter {
                     it.blogEntry?.id == blogId
                 }
-            }.distinctUntilChanged(),
+            },
             showTitle = false
         )
 
