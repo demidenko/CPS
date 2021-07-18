@@ -84,9 +84,10 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
         private val Context.contests_settings_dataStore by preferencesDataStore("contests_settings")
     }
 
-    val enabledPlatforms = itemJsonConvertible<List<Contest.Platform>>(jsonCPS, "enabled_platforms", emptyList())
+    val enabledPlatforms = itemJsonConvertible<Set<Contest.Platform>>(jsonCPS, "enabled_platforms", emptySet())
     val clistApiLogin = ItemNullable(stringPreferencesKey("clist_api_login"))
     val clistApiKey = ItemNullable(stringPreferencesKey("clist_api_key"))
+    val lastReloadedPlatforms = itemJsonConvertible<Set<Contest.Platform>>(jsonCPS, "last_reloaded_platforms", emptySet())
 
     suspend fun getClistApiLoginAndKey(): Pair<String,String>? {
         val login = clistApiLogin() ?: return null

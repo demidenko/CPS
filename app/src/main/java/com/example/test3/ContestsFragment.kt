@@ -74,20 +74,17 @@ class ContestsFragment: CPSFragment() {
                 swipeRefreshLayout.isRefreshing = it == LoadingState.LOADING
             }.launchIn(this)
 
-
-            //TODO: enabled platforms auto reload doesn't work after app recreate/minimize
-            requireContext().settingsContests.enabledPlatforms.flow.let { flow ->
+            requireContext().settingsContests.let { dataStore ->
                 val dao = getContestsListDao(requireContext())
-                var currentPlatforms = flow.first()
-                flow.flowWithLifecycle(getHideShowLifecycleOwner().lifecycle, Lifecycle.State.RESUMED)
-                    .map { it.sorted() }
-                    .distinctUntilChanged()
-                    .onEach { platforms ->
-                        collectionsDifference(platforms, currentPlatforms) { added, removed ->
+                combine(dataStore.enabledPlatforms.flow, dataStore.lastReloadedPlatforms.flow) { a, b -> a to b }
+                    .filter { (current, lastReloaded) -> current != lastReloaded }
+                    .flowWithLifecycle(getHideShowLifecycleOwner().lifecycle, Lifecycle.State.RESUMED)
+                    .onEach { (current, lastReloaded) ->
+                        collectionsDifference(current, lastReloaded) { added, removed ->
                             removed.forEach { platform -> dao.remove(platform) }
                             contestViewModel.reload(added, requireContext())
                         }
-                        currentPlatforms = platforms
+                        dataStore.lastReloadedPlatforms(current)
                     }.launchIn(this)
             }
         }

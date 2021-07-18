@@ -58,7 +58,7 @@ class ContestsSelectPlatformsFragment: CPSFragment() {
                         if (isChecked) enabledPlatforms.add(platform)
                         else enabledPlatforms.remove(platform)
                         runBlocking {
-                            requireContext().settingsContests.enabledPlatforms(enabledPlatforms.toList())
+                            requireContext().settingsContests.enabledPlatforms(enabledPlatforms)
                         }
                         buttonView.isEnabled = true
                     }
