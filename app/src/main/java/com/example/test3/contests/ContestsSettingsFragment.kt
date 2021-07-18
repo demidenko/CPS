@@ -52,7 +52,7 @@ class ContestsSettingsFragment: CPSFragment() {
                 }
                 AlertDialog.Builder(mainActivity).apply {
                     setView(dialogView)
-                    setPositiveButton("Save") { _, i ->
+                    setPositiveButton("Save") { _, _ ->
                         runBlocking {
                             context.settingsContests.clistApiLogin(loginTextField.editText?.getStringNotBlank())
                             context.settingsContests.clistApiKey(apikeyTextField.editText?.getStringNotBlank())

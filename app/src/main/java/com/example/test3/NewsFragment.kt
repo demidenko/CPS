@@ -350,10 +350,10 @@ fun timeDifference(fromTimeSeconds: Long, toTimeSeconds: Long): String {
     return when {
         t < TimeUnit.MINUTES.toSeconds(2) -> "minute"
         t < TimeUnit.HOURS.toSeconds(2) -> "${TimeUnit.SECONDS.toMinutes(t)} minutes"
-        t < TimeUnit.HOURS.toSeconds(24 * 2) -> "${TimeUnit.SECONDS.toHours(t)} hours"
-        t < TimeUnit.DAYS.toSeconds(7 * 2) -> "${TimeUnit.SECONDS.toDays(t)} days"
-        t < TimeUnit.DAYS.toSeconds(31 * 2) -> "${TimeUnit.SECONDS.toDays(t) / 7} weeks"
-        t < TimeUnit.DAYS.toSeconds(365 * 2) -> "${TimeUnit.SECONDS.toDays(t) / 31} months"
+        t < TimeUnit.HOURS.toSeconds(24) * 2 -> "${TimeUnit.SECONDS.toHours(t)} hours"
+        t < TimeUnit.DAYS.toSeconds(7) * 2 -> "${TimeUnit.SECONDS.toDays(t)} days"
+        t < TimeUnit.DAYS.toSeconds(31) * 2 -> "${TimeUnit.SECONDS.toDays(t) / 7} weeks"
+        t < TimeUnit.DAYS.toSeconds(365) * 2 -> "${TimeUnit.SECONDS.toDays(t) / 31} months"
         else -> "${TimeUnit.SECONDS.toDays(t) / 365} years"
     }
 }

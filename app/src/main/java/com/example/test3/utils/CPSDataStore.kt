@@ -60,7 +60,7 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
 
         override fun fromPrefs(s: String?): T {
             return s?.let { str ->
-                clazz.enumConstants.first { it.name == str }
+                clazz.enumConstants?.first { it.name == str }
             } ?: defaultValueCallback()
         }
 

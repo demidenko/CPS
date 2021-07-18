@@ -131,9 +131,9 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
             val ratingBounds = it.second.toMutableList()
             ratingBounds.add(Pair(Int.MAX_VALUE, HandleColor.RED))
-            ratingBounds.sortedByDescending { it.first }.forEachIndexed { index, (upper, ratingColor) ->
+            ratingBounds.sortedByDescending { it.first }.forEachIndexed { index2, (upper, ratingColor) ->
 
-                val y = if(index == 0) height.toFloat() else {
+                val y = if(index2 == 0) height.toFloat() else {
                     val arr = floatArrayOf(0f, upper.toFloat())
                     m.mapPoints(arr)
                     arr[1]
