@@ -14,12 +14,9 @@ import com.example.test3.NotificationIDs
 import com.example.test3.utils.AtCoderAPI
 import com.example.test3.utils.AtCoderRatingChange
 import com.example.test3.utils.AtCoderURLFactory
-import com.example.test3.utils.jsonCPS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 
 class AtCoderAccountManager(context: Context)
     : RatedAccountManager<AtCoderAccountManager.AtCoderUserInfo>(context, manager_name), AccountSettingsProvider {
@@ -77,10 +74,6 @@ class AtCoderAccountManager(context: Context)
         res.status = STATUS.OK
         return res
     }
-
-    override fun decodeFromString(str: String) = jsonCPS.decodeFromString<AtCoderUserInfo>(str)
-
-    override fun encodeToString(info: AtCoderUserInfo) = jsonCPS.encodeToString(info)
 
     override fun getColor(info: AtCoderUserInfo): Int?  = with(info){
         if(status != STATUS.OK || rating == NOT_RATED) return null
@@ -146,7 +139,7 @@ class AtCoderAccountManager(context: Context)
         }
     }
 
-    override fun getDataStore() = AccountDataStore(context.account_atcoder_dataStore)
+    override fun getDataStore() = accountDataStore(context.account_atcoder_dataStore, emptyInfo())
     override fun getSettings() = AtCoderAccountSettingsDataStore(this)
 
     fun notifyRatingChange(handle: String, ratingChange: AtCoderRatingChange){

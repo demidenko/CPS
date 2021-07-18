@@ -280,7 +280,7 @@ class NewsFragment : CPSFragment() {
 
         private val itemsByTitle = mutableMapOf<CodeforcesTitle, ItemStringConvertible<Set<Int>>>()
         private fun itemByTitle(title: CodeforcesTitle) = itemsByTitle.getOrPut(title) {
-            jsonCPS.itemStringConvertible("blog_entries_${title.name}", emptySet())
+            itemJsonConvertible(jsonCPS, "blog_entries_${title.name}", emptySet())
         }
 
         fun flowOfViewedBlogEntries(title: CodeforcesTitle): Flow<Set<Int>> = itemByTitle(title).flow

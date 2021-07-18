@@ -14,8 +14,6 @@ import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 
 
 @Serializable
@@ -88,10 +86,6 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager<Codeforces
         return CodeforcesUserInfo(response.result!!)
     }
 
-    override fun decodeFromString(str: String) = jsonCPS.decodeFromString<CodeforcesUserInfo>(str)
-
-    override fun encodeToString(info: CodeforcesUserInfo) = jsonCPS.encodeToString(info)
-
     override fun getColor(info: CodeforcesUserInfo): Int? = with(info){
         if(status != STATUS.OK || rating == NOT_RATED) return null
         return getHandleColorARGB(info.rating)
@@ -157,7 +151,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager<Codeforces
         return makeSpan(info.handle, CodeforcesUtils.getTagByRating(info.rating))
     }
 
-    override fun getDataStore() = AccountDataStore(context.account_codeforces_dataStore)
+    override fun getDataStore() = accountDataStore(context.account_codeforces_dataStore, emptyInfo())
     override fun getSettings() = CodeforcesAccountSettingsDataStore(this)
 
     fun notifyRatingChange(ratingChange: CodeforcesRatingChange){
@@ -249,7 +243,7 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager)
     val contestWatchEnabled = Item(booleanPreferencesKey("contest_watch"), false)
     val contestWatchLastSubmissionID = ItemNullable(longPreferencesKey("contest_watch_last_submission"))
     val contestWatchStartedContestID = ItemNullable(intPreferencesKey("contest_watch_started_contest"))
-    val contestWatchCanceled = jsonCPS.itemStringConvertible<List<Pair<Int,Long>>>("contest_watch_canceled", emptyList())
+    val contestWatchCanceled = itemJsonConvertible<List<Pair<Int,Long>>>(jsonCPS, "contest_watch_canceled", emptyList())
 
     override val keysForReset get() = listOf(
         lastRatedContestID,

@@ -4,10 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.test3.utils.TimusAPI
 import com.example.test3.utils.fromHTML
-import com.example.test3.utils.jsonCPS
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 
 class TimusAccountManager(context: Context): AccountManager<TimusAccountManager.TimusUserInfo>(context, manager_name) {
 
@@ -72,10 +69,6 @@ class TimusAccountManager(context: Context): AccountManager<TimusAccountManager.
         return res
     }
 
-    override fun decodeFromString(str: String) = jsonCPS.decodeFromString<TimusUserInfo>(str)
-
-    override fun encodeToString(info: TimusUserInfo) = jsonCPS.encodeToString(info)
-
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         if(str.toIntOrNull()!=null) return null
         val s = TimusAPI.getUserSearch(str) ?: return null
@@ -96,5 +89,5 @@ class TimusAccountManager(context: Context): AccountManager<TimusAccountManager.
         return res
     }
 
-    override fun getDataStore() = AccountDataStore(context.account_timus_dataStore)
+    override fun getDataStore() = accountDataStore(context.account_timus_dataStore, emptyInfo())
 }

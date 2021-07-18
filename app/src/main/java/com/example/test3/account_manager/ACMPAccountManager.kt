@@ -3,10 +3,7 @@ package com.example.test3.account_manager
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.test3.utils.ACMPAPI
-import com.example.test3.utils.jsonCPS
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 
 class ACMPAccountManager(context: Context): AccountManager<ACMPAccountManager.ACMPUserInfo>(context, manager_name) {
 
@@ -68,10 +65,6 @@ class ACMPAccountManager(context: Context): AccountManager<ACMPAccountManager.AC
         return res
     }
 
-    override fun decodeFromString(str: String) = jsonCPS.decodeFromString<ACMPUserInfo>(str)
-
-    override fun encodeToString(info: ACMPUserInfo): String = jsonCPS.encodeToString(info)
-
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         if(str.toIntOrNull()!=null) return null
         val s = ACMPAPI.getUserSearch(str) ?: return null
@@ -92,6 +85,6 @@ class ACMPAccountManager(context: Context): AccountManager<ACMPAccountManager.AC
         return res
     }
 
-    override fun getDataStore() = AccountDataStore(context.account_acmp_dataStore)
+    override fun getDataStore() = accountDataStore(context.account_acmp_dataStore, emptyInfo())
 
 }

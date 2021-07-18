@@ -28,10 +28,6 @@ class CListAccountManager(context: Context) : AccountManager<CListAccountManager
     override val userIDName = "login"
     override val homeURL = "https://clist.by"
 
-    override fun decodeFromString(str: String) = emptyInfo()
-
-    override fun encodeToString(info: CListUserInfo) = ""
-
     override fun emptyInfo() = CListUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String, flags: Int): CListUserInfo {
@@ -80,7 +76,7 @@ class CListAccountManager(context: Context) : AccountManager<CListAccountManager
         return@withContext res
     }
 
-    override fun getDataStore(): AccountDataStore {
+    override fun getDataStore(): AccountDataStore<CListUserInfo> {
         throw IllegalAccessException("CList account manager can not provide data store")
     }
 

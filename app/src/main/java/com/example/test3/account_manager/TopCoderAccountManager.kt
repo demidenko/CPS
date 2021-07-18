@@ -8,10 +8,7 @@ import android.text.style.StyleSpan
 import androidx.core.text.set
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.test3.utils.TopCoderAPI
-import com.example.test3.utils.jsonCPS
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -77,10 +74,6 @@ class TopCoderAccountManager(context: Context): RatedAccountManager<TopCoderAcco
 
     override val isProvidesSuggestions = false
 
-    override fun decodeFromString(str: String) = jsonCPS.decodeFromString<TopCoderUserInfo>(str)
-
-    override fun encodeToString(info: TopCoderUserInfo) = jsonCPS.encodeToString(info)
-
     override fun getColor(info: TopCoderUserInfo): Int? = with(info){
         if(status != STATUS.OK || rating_algorithm == NOT_RATED) return null
         return getHandleColorARGB(info.rating_algorithm)
@@ -128,5 +121,5 @@ class TopCoderAccountManager(context: Context): RatedAccountManager<TopCoderAcco
         }
     }
 
-    override fun getDataStore() = AccountDataStore(context.account_topcoder_dataStore)
+    override fun getDataStore() = accountDataStore(context.account_topcoder_dataStore, emptyInfo())
 }

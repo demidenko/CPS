@@ -7,7 +7,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.test3.NotificationChannelLazy
 import com.example.test3.R
 import com.example.test3.makePendingIntentOpenURL
@@ -25,8 +24,8 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
     abstract val userIDName: String
     abstract val homeURL: String
 
-    protected abstract fun getDataStore(): AccountDataStore
-    fun flowOfInfo() = getDataStore().userInfo.flow.map { str -> this to strToInfo(str) }
+    protected abstract fun getDataStore(): AccountDataStore<U>
+    fun flowOfInfo() = getDataStore().userInfo.flow.map { info -> this to info }
 
     abstract fun emptyInfo(): U
 
@@ -41,15 +40,11 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
     open suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = null
     open val isProvidesSuggestions = true
 
-    protected abstract fun decodeFromString(str: String): U
-    protected abstract fun encodeToString(info: U): String
-
-    private fun strToInfo(str: String?): U = str?.let { decodeFromString(it) } ?: emptyInfo()
-    suspend fun getSavedInfo(): U = strToInfo(getDataStore().userInfo())
+    suspend fun getSavedInfo(): U = getDataStore().userInfo()
 
     suspend fun setSavedInfo(info: U) {
         val old = getSavedInfo()
-        getDataStore().userInfo(encodeToString(info))
+        getDataStore().userInfo(info)
         if(info.userID != old.userID && this is AccountSettingsProvider) getSettings().resetRelatedData()
     }
 
@@ -120,8 +115,13 @@ data class RatingChange(
     )
 }
 
-class AccountDataStore(dataStore: DataStore<Preferences>) : CPSDataStore(dataStore) {
-    val userInfo = ItemNullable(stringPreferencesKey("user_info"))
+class AccountDataStore<U: UserInfo>(
+    dataStore: DataStore<Preferences>,
+    val userInfo: ItemStringConvertible<U>
+) : CPSDataStore(dataStore)
+
+inline fun <reified U: UserInfo> accountDataStore(dataStore: DataStore<Preferences>, emptyUserInfo: U): AccountDataStore<U> {
+    return AccountDataStore(dataStore, CPSDataStore(dataStore).itemJsonConvertible(jsonCPS, "user_info", emptyUserInfo))
 }
 
 open class AccountSettingsDataStore(dataStore: DataStore<Preferences>) : CPSDataStore(dataStore) {
