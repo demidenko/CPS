@@ -30,7 +30,7 @@ class CodeforcesNewsLostFragment(): CodeforcesNewsFragment() {
         itemsAdapter = CodeforcesBlogEntriesAdapter(
             this,
             makeDataFlow(getLostBlogsDao(requireContext()).flowOfLost()),
-            newsFragment.viewedDataStore.blogsViewedFlow(title),
+            newsFragment.viewedDataStore.flowOfViewedBlogEntries(title),
             clearNewEntriesOnDataChange = false
         )
 

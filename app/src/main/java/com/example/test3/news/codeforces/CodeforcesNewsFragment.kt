@@ -50,7 +50,7 @@ abstract class CodeforcesNewsFragment: HideShowLifecycleFragment() {
     protected fun saveBlogEntriesAsViewed(blogEntriesAdapter: CodeforcesBlogEntriesAdapter) {
         val toSave = blogEntriesAdapter.getBlogIDs()
         lifecycleScope.launch {
-            newsFragment.viewedDataStore.setBlogsViewed(title, toSave)
+            newsFragment.viewedDataStore.setViewedBlogEntries(title, toSave)
         }
     }
 

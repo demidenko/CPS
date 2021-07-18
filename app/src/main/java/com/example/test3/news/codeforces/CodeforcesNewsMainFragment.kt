@@ -19,7 +19,7 @@ class CodeforcesNewsMainFragment(): CodeforcesNewsFragment() {
         itemsAdapter = CodeforcesBlogEntriesAdapter(
             this,
             newsFragment.newsViewModel.flowOfMainBlogEntries(requireContext()),
-            newsFragment.viewedDataStore.blogsViewedFlow(title)
+            newsFragment.viewedDataStore.flowOfViewedBlogEntries(title)
         )
 
         recyclerView.formatCPS().flowAdapter = itemsAdapter

@@ -8,8 +8,6 @@ import android.widget.ImageButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.color
 import androidx.core.view.isVisible
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -273,26 +271,22 @@ class NewsFragment : CPSFragment() {
         codeforcesNewsAdapter.remove(index)
     }
 
-    val viewedDataStore by lazy { CodeforcesNewsViewedBlogsDataStore(mainActivity) }
+    val viewedDataStore by lazy { CodeforcesNewsViewedBlogEntriesDataStore(mainActivity) }
 
-    class CodeforcesNewsViewedBlogsDataStore(context: Context): CPSDataStore(context.cf_blogs_viewed_dataStore){
-
+    class CodeforcesNewsViewedBlogEntriesDataStore(context: Context): CPSDataStore(context.cf_viewed_blog_entries_dataStore){
         companion object {
-            private val Context.cf_blogs_viewed_dataStore by preferencesDataStore("data_news_fragment_cf_viewed")
+            private val Context.cf_viewed_blog_entries_dataStore by preferencesDataStore("data_news_fragment_cf_viewed")
         }
 
-        private fun makeKey(title: CodeforcesTitle) = stringSetPreferencesKey("blogs_viewed_${title.name}")
-
-        fun blogsViewedFlow(title: CodeforcesTitle): Flow<Set<Int>> = dataStore.data.map {
-            it[makeKey(title)]
-                ?.map { str -> str.toInt() }
-                ?.toSet()
-                ?: emptySet()
+        private val itemsByTitle = mutableMapOf<CodeforcesTitle, ItemStringConvertible<Set<Int>>>()
+        private fun itemByTitle(title: CodeforcesTitle) = itemsByTitle.getOrPut(title) {
+            jsonCPS.itemStringConvertible("blog_entries_${title.name}", emptySet())
         }
 
-        suspend fun setBlogsViewed(title: CodeforcesTitle, blogIDs: Collection<Int>) {
-            dataStore.edit { it[makeKey(title)] = blogIDs.mapTo(mutableSetOf()){ id -> id.toString() } }
-        }
+        fun flowOfViewedBlogEntries(title: CodeforcesTitle): Flow<Set<Int>> = itemByTitle(title).flow
+
+        suspend fun setViewedBlogEntries(title: CodeforcesTitle, blogEntriesIds: Collection<Int>) =
+            itemByTitle(title)(blogEntriesIds.toSet())
     }
 }
 
