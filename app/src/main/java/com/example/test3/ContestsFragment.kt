@@ -82,9 +82,9 @@ class ContestsFragment: CPSFragment() {
                     .onEach { (current, lastReloaded) ->
                         collectionsDifference(current, lastReloaded) { added, removed ->
                             removed.forEach { platform -> dao.remove(platform) }
+                            dataStore.lastReloadedPlatforms(current)
                             contestViewModel.reload(added, requireContext())
                         }
-                        dataStore.lastReloadedPlatforms(current)
                     }.launchIn(this)
             }
         }
