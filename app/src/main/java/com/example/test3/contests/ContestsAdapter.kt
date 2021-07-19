@@ -29,8 +29,7 @@ import java.util.concurrent.TimeUnit
 
 class ContestsAdapter(
     fragment: CPSFragment,
-    dataFlow: Flow<List<Contest>>,
-    val previewType: Int
+    dataFlow: Flow<List<Contest>>
 ): FlowItemsAdapter<ContestViewHolder, List<Contest>>(fragment, dataFlow) {
 
     private var items: Array<Contest> = emptyArray()
@@ -59,17 +58,8 @@ class ContestsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContestViewHolder {
-        return when (previewType) {
-            1 -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.contest_list_item, parent, false) as ConstraintLayout
-                ContestViewHolder1(view)
-            }
-            2 -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.contest_list_item2, parent, false) as ConstraintLayout
-                ContestViewHolder2(view)
-            }
-            else -> throw IllegalArgumentException("Unexpected preview type $previewType")
-        }
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.contest_list_item_preview, parent, false) as ConstraintLayout
+        return ContestItemViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ContestViewHolder, position: Int) {
@@ -170,33 +160,7 @@ abstract class ContestViewHolder(protected val view: ConstraintLayout): Recycler
     }
 }
 
-class ContestViewHolder1(view: ConstraintLayout): ContestViewHolder(view) {
-    private val title: TextView = view.findViewById(R.id.contests_list_item_title)
-    private val date: TextView = view.findViewById(R.id.contests_list_item_date)
-    private val durationTextView: TextView = view.findViewById(R.id.contests_list_item_duration)
-    private val counterTextView: TextView = view.findViewById(R.id.contests_list_item_counter)
-    private val icon: ImageView = view.findViewById(R.id.contests_list_item_icon)
-
-    override fun applyContest(contest: Contest) {
-        title.text = contest.title
-        date.text = makeDate(contest.startTimeSeconds)
-        durationTextView.text = durationHHMM(contest.durationSeconds)
-        icon.setImageResource(contest.platform.getIcon())
-        view.setOnClickListener { contest.link?.let { url -> it.context.startActivity(makeIntentOpenUrl(url)) } }
-    }
-
-    override fun refresh(currentTimeSeconds: Long, phase: Contest.Phase, oldPhase: Contest.Phase?) {
-        counterTextView.text =
-            when(phase) {
-                Contest.Phase.BEFORE -> "in " + timeDifference2(currentTimeSeconds, contest.startTimeSeconds)
-                Contest.Phase.RUNNING -> "left " + timeDifference2(currentTimeSeconds, contest.endTimeSeconds)
-                Contest.Phase.FINISHED -> ""
-            }
-        if(phase != oldPhase) showPhase(title, phase)
-    }
-}
-
-class ContestViewHolder2(view: ConstraintLayout): ContestViewHolder(view) {
+class ContestItemViewHolder(view: ConstraintLayout): ContestViewHolder(view) {
     private val title: TextView = view.findViewById(R.id.contests_list_item_title)
     private val date: TextView = view.findViewById(R.id.contests_list_item_date)
     private val counterTextView: TextView = view.findViewById(R.id.contests_list_item_counter)
