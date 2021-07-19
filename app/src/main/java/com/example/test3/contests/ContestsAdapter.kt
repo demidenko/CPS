@@ -23,9 +23,7 @@ import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.FlowItemsAdapter
 import com.example.test3.ui.TimeDepends
 import com.example.test3.utils.*
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -41,7 +39,7 @@ class ContestsAdapter(
     init {
         fragment.viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                while (isActive) {
+                startTimer(1000) {
                     val currentTimeSeconds = getCurrentTimeSeconds()
                     val comparator = Contest.getComparator(currentTimeSeconds)
                     getActiveViewHolders().forEach { it.refreshTime(currentTimeSeconds) }
@@ -50,7 +48,6 @@ class ContestsAdapter(
                         items.sortWith(comparator)
                         DiffUtil.calculateDiff(diffCallback(oldItems, items)).dispatchUpdatesTo(this@ContestsAdapter)
                     }
-                    delay(1000)
                 }
             }
         }

@@ -10,9 +10,8 @@ import com.example.test3.ui.FlowItemsAdapter
 import com.example.test3.ui.HideShowLifecycleFragment
 import com.example.test3.ui.TimeDepends
 import com.example.test3.utils.getCurrentTimeSeconds
-import kotlinx.coroutines.delay
+import com.example.test3.utils.startTimer
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 abstract class CodeforcesNewsItemsAdapter<H : RecyclerView.ViewHolder, T>(
@@ -47,12 +46,11 @@ abstract class CodeforcesNewsItemsTimedAdapter<H, T>(
     init {
         fragment.viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                while (isActive) {
+                startTimer(1000) {
                     getActiveViewHolders().takeIf { it.isNotEmpty() }?.let { holders ->
                         val currentTimeSeconds = getCurrentTimeSeconds()
                         holders.forEach { it.refreshTime(currentTimeSeconds) }
                     }
-                    delay(1000)
                 }
             }
         }
