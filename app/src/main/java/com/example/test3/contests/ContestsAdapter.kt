@@ -3,10 +3,12 @@ package com.example.test3.contests
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -167,7 +169,8 @@ class ContestItemPreviewHolder(view: ConstraintLayout): ContestViewHolder(view) 
             titleAdditional.text = second
         }
         icon.setImageResource(contest.platform.getIcon())
-        view.setOnClickListener { contest.link?.let { url -> it.context.startActivity(makeIntentOpenUrl(url)) } }
+        //view.setOnClickListener { contest.link?.let { url -> it.context.startActivity(makeIntentOpenUrl(url)) } }
+
     }
 
     override fun refresh(currentTimeSeconds: Long, phase: Contest.Phase, oldPhase: Contest.Phase?) {
@@ -209,11 +212,32 @@ class ContestItemBigViewHolder(view: ConstraintLayout): ContestViewHolder(view) 
     private val icon: ImageView = view.findViewById(R.id.contests_list_item_icon)
 
     override fun applyContest(contest: Contest) {
-        TODO("Not yet implemented")
+        with(cutTrailingBrackets(contest.title)) {
+            title.text = first
+            titleAdditional.text = second
+            titleAdditional.isVisible = second.isNotBlank()
+        }
+        icon.setImageResource(contest.platform.getIcon())
+        view.findViewById<ImageButton>(R.id.contests_list_item_open).setOnClickListener {
+            contest.link?.let { url -> it.context.startActivity(makeIntentOpenUrl(url)) }
+        }
     }
 
     override fun refresh(currentTimeSeconds: Long, phase: Contest.Phase, oldPhase: Contest.Phase?) {
-        TODO("Not yet implemented")
+        dateStart.text = "start: ${makeDate(contest.startTimeSeconds)}"
+        dateEnd.text = "end: ${makeDate(contest.endTimeSeconds)}"
+        counterTextView.text = when (phase) {
+            Contest.Phase.BEFORE -> {
+                "starts in " + timeDifference2(currentTimeSeconds, contest.startTimeSeconds)
+            }
+            Contest.Phase.RUNNING -> {
+                "ends in " + timeDifference2(currentTimeSeconds, contest.endTimeSeconds)
+            }
+            Contest.Phase.FINISHED -> {
+                ""
+            }
+        }
+        if(phase != oldPhase) showPhase(title, phase)
     }
 
 
