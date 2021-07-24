@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.fragment.app.viewModels
 import com.example.test3.R
 import com.example.test3.makeIntentOpenUrl
 import com.example.test3.ui.CPSDataStoreDelegate
@@ -30,6 +31,8 @@ class ContestsSettingsFragment: CPSFragment() {
     ): View? {
         return inflater.inflate(R.layout.fragment_contests_settings, container, false)
     }
+
+    private val contestsViewModel: ContestsViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -67,6 +70,10 @@ class ContestsSettingsFragment: CPSFragment() {
                 mainActivity.cpsFragmentManager.pushBack(ContestsSelectPlatformsFragment())
             }
         }
+
+        view.findViewById<TextView>(R.id.contests_settings_clear_removed).setOnClickListener {
+            contestsViewModel.clearRemovedContests(requireContext())
+        }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -88,6 +95,7 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
     val clistApiLogin = ItemNullable(stringPreferencesKey("clist_api_login"))
     val clistApiKey = ItemNullable(stringPreferencesKey("clist_api_key"))
     val lastReloadedPlatforms = itemJsonConvertible<Set<Contest.Platform>>(jsonCPS, "last_reloaded_platforms", emptySet())
+    val removedContestsIds = itemJsonConvertible<Set<Pair<Contest.Platform,String>>>(jsonCPS, "removed_contests_ids", emptySet())
 
     suspend fun getClistApiLoginAndKey(): Pair<String,String>? {
         val login = clistApiLogin() ?: return null

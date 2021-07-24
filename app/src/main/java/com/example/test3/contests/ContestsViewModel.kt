@@ -60,4 +60,10 @@ class ContestsViewModel: ViewModel() {
             }
         }
     }
+
+    fun clearRemovedContests(context: Context) {
+        viewModelScope.launch {
+            context.settingsContests.removedContestsIds(emptySet())
+        }
+    }
 }

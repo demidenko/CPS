@@ -21,8 +21,10 @@ import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.FlowItemsAdapter
 import com.example.test3.ui.TimeDepends
 import com.example.test3.utils.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 
 class ContestsAdapter(
@@ -102,6 +104,21 @@ class ContestsAdapter(
             setOnMinimizeClickListener {
                 expandedItems.remove(contest.getCompositeId())
                 notifyItemChanged(bindingAdapterPosition)
+            }
+            setOnRemoveClickListener {
+                val context = it.context
+                MaterialAlertDialogBuilder(context)
+                    .setTitle("Remove contest from list?")
+                    .setPositiveButton("Yes") { d, _ ->
+                        with(context.settingsContests) {
+                            runBlocking {
+                                val ids = removedContestsIds()
+                                removedContestsIds(ids + contest.getCompositeId())
+                            }
+                        }
+                    }
+                    .setNegativeButton("No") { _, _ -> }
+                    .show()
             }
         }
     }
@@ -272,5 +289,8 @@ class ContestItemBigViewHolder(view: ConstraintLayout): ContestViewHolder(view) 
 
     fun setOnMinimizeClickListener(action: (View) -> Unit) =
         view.findViewById<ImageButton>(R.id.contests_list_item_minimize).setOnClickListener(action)
+
+    fun setOnRemoveClickListener(action: (View) -> Unit) =
+        view.findViewById<ImageButton>(R.id.contests_list_item_remove).setOnClickListener(action)
 
 }

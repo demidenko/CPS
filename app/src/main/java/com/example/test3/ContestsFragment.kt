@@ -10,10 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.test3.contests.ContestsAdapter
-import com.example.test3.contests.ContestsSettingsFragment
-import com.example.test3.contests.ContestsViewModel
-import com.example.test3.contests.settingsContests
+import com.example.test3.contests.*
 import com.example.test3.room.getContestsListDao
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.enableIff
@@ -43,12 +40,7 @@ class ContestsFragment: CPSFragment() {
 
         val contestAdapter = ContestsAdapter(
             this,
-            getContestsListDao(mainActivity).flowOfContests().map { contests ->
-                val currentTimeSeconds = getCurrentTimeSeconds()
-                contests.filter { contest ->
-                    currentTimeSeconds - contest.endTimeSeconds < TimeUnit.DAYS.toSeconds(7)
-                }
-            }
+            makeContestsFlow()
         )
 
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.contests_list_swipe_refresh_layout).formatCPS().apply {
@@ -97,5 +89,18 @@ class ContestsFragment: CPSFragment() {
 
     private fun showContestsSettings() {
         mainActivity.cpsFragmentManager.pushBack(ContestsSettingsFragment())
+    }
+
+    fun makeContestsFlow(): Flow<List<Contest>> {
+        val mainFlow = getContestsListDao(mainActivity).flowOfContests().map { contests ->
+            val currentTimeSeconds = getCurrentTimeSeconds()
+            contests.filter { contest ->
+                currentTimeSeconds - contest.endTimeSeconds < TimeUnit.DAYS.toSeconds(7)
+            }
+        }
+        val removedIds = mainActivity.settingsContests.removedContestsIds.flow
+        return mainFlow.combine(removedIds) { contests, removed ->
+            contests.filter { it.getCompositeId() !in removed }
+        }
     }
 }
