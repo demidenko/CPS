@@ -109,11 +109,13 @@ class ContestsAdapter(
                 val context = it.context
                 MaterialAlertDialogBuilder(context)
                     .setTitle("Remove contest from list?")
-                    .setPositiveButton("Yes") { d, _ ->
+                    .setPositiveButton("Yes") { _, _ ->
+                        val id = contest.getCompositeId()
+                        expandedItems.remove(id)
                         with(context.settingsContests) {
                             runBlocking {
                                 val ids = removedContestsIds()
-                                removedContestsIds(ids + contest.getCompositeId())
+                                removedContestsIds(ids + id)
                             }
                         }
                     }

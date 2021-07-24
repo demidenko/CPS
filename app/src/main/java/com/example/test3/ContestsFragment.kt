@@ -92,14 +92,14 @@ class ContestsFragment: CPSFragment() {
     }
 
     fun makeContestsFlow(): Flow<List<Contest>> {
-        val mainFlow = getContestsListDao(mainActivity).flowOfContests().map { contests ->
+        val contestsFlow = getContestsListDao(mainActivity).flowOfContests().map { contests ->
             val currentTimeSeconds = getCurrentTimeSeconds()
             contests.filter { contest ->
                 currentTimeSeconds - contest.endTimeSeconds < TimeUnit.DAYS.toSeconds(7)
             }
         }
-        val removedIds = mainActivity.settingsContests.removedContestsIds.flow
-        return mainFlow.combine(removedIds) { contests, removed ->
+        val removedIdsFlow = mainActivity.settingsContests.removedContestsIds.flow
+        return contestsFlow.combine(removedIdsFlow) { contests, removed ->
             contests.filter { it.getCompositeId() !in removed }
         }
     }
