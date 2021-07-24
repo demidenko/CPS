@@ -2,11 +2,11 @@ package com.example.test3.contests
 
 import android.text.format.DateFormat
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -55,20 +55,60 @@ class ContestsAdapter(
         return DiffUtil.calculateDiff(diffCallback(items, newItems)).also { items = newItems }
     }
 
+    private val expandedItems = mutableSetOf<Pair<Contest.Platform,String>>()
+    override fun getItemViewType(position: Int): Int {
+        if (items[position].getCompositeId() in expandedItems) return type_bigview
+        return type_preview
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContestViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.contest_list_item_preview, parent, false) as ConstraintLayout
-        return ContestItemPreviewHolder(view)
+        return when (viewType) {
+            type_preview -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.contest_list_item_preview, parent, false) as ConstraintLayout
+                ContestItemPreviewHolder(view)
+            }
+            type_bigview -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.contest_list_item_bigview, parent, false) as ConstraintLayout
+                ContestItemBigViewHolder(view)
+            }
+            else -> throw IllegalArgumentException("unknown viewType $viewType")
+        }
     }
 
     override fun onBindViewHolder(holder: ContestViewHolder, position: Int) {
+        when (holder) {
+            is ContestItemPreviewHolder -> bindViewHolder(holder, position)
+            is ContestItemBigViewHolder -> bindViewHolder(holder, position)
+        }
+    }
+
+    fun bindViewHolder(holder: ContestItemPreviewHolder, position: Int) {
         with(holder) {
             val contest = items[position]
             holder.contest = contest
             refreshTime(getCurrentTimeSeconds())
+            setOnClickListener {
+                expandedItems.add(contest.getCompositeId())
+                notifyItemChanged(bindingAdapterPosition)
+            }
+        }
+    }
+
+    fun bindViewHolder(holder: ContestItemBigViewHolder, position: Int) {
+        with(holder) {
+            val contest = items[position]
+            holder.contest = contest
+            refreshTime(getCurrentTimeSeconds())
+            setOnMinimizeClickListener {
+                expandedItems.remove(contest.getCompositeId())
+                notifyItemChanged(bindingAdapterPosition)
+            }
         }
     }
 
     companion object {
+        const val type_preview = 0
+        const val type_bigview = 1
         private fun diffCallback(old: Array<Contest>, new: Array<Contest>) =
             object : DiffUtil.Callback() {
                 override fun getOldListSize() = old.size
@@ -87,18 +127,6 @@ class ContestsAdapter(
     }
 }
 
-
-@DrawableRes
-internal fun Contest.Platform.getIcon(): Int {
-    return when(this) {
-        Contest.Platform.codeforces -> R.drawable.ic_logo_codeforces
-        Contest.Platform.atcoder -> R.drawable.ic_logo_atcoder
-        Contest.Platform.topcoder -> R.drawable.ic_logo_topcoder
-        Contest.Platform.codechef -> R.drawable.ic_logo_codechef
-        Contest.Platform.google -> R.drawable.ic_logo_google
-        else -> R.drawable.ic_cup
-    }
-}
 
 abstract class ContestViewHolder(protected val view: ConstraintLayout): RecyclerView.ViewHolder(view), TimeDepends {
     private var companionContest: Contest? = null
@@ -169,8 +197,10 @@ class ContestItemPreviewHolder(view: ConstraintLayout): ContestViewHolder(view) 
             titleAdditional.text = second
         }
         icon.setImageResource(contest.platform.getIcon())
-        //view.setOnClickListener { contest.link?.let { url -> it.context.startActivity(makeIntentOpenUrl(url)) } }
+    }
 
+    fun setOnClickListener(action: (View) -> Unit) {
+        view.setOnClickListener(action)
     }
 
     override fun refresh(currentTimeSeconds: Long, phase: Contest.Phase, oldPhase: Contest.Phase?) {
@@ -240,5 +270,7 @@ class ContestItemBigViewHolder(view: ConstraintLayout): ContestViewHolder(view) 
         if(phase != oldPhase) showPhase(title, phase)
     }
 
+    fun setOnMinimizeClickListener(action: (View) -> Unit) =
+        view.findViewById<ImageButton>(R.id.contests_list_item_minimize).setOnClickListener(action)
 
 }

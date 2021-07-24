@@ -1,6 +1,7 @@
 package com.example.test3.contests
 
 import androidx.room.Entity
+import com.example.test3.R
 import com.example.test3.room.contestsListTableName
 import com.example.test3.utils.*
 
@@ -20,6 +21,8 @@ data class Contest (
     val endTimeSeconds: Long get() = startTimeSeconds + durationSeconds
 
     fun getPhase(currentTimesSeconds: Long) = getPhase(currentTimesSeconds, startTimeSeconds, endTimeSeconds)
+
+    fun getCompositeId() = platform to id
 
     constructor(contest: CodeforcesContest): this(
         Platform.codeforces,
@@ -55,6 +58,17 @@ data class Contest (
         google
         ;
 
+        fun getIcon(): Int {
+            return when(this) {
+                codeforces -> R.drawable.ic_logo_codeforces
+                atcoder -> R.drawable.ic_logo_atcoder
+                topcoder -> R.drawable.ic_logo_topcoder
+                codechef -> R.drawable.ic_logo_codechef
+                google -> R.drawable.ic_logo_google
+                else -> R.drawable.ic_cup
+            }
+        }
+        
         companion object {
             fun getAll(): List<Platform> = values().filter { it != unknown }
         }
