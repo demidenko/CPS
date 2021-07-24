@@ -55,7 +55,7 @@ class ContestsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContestViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.contest_list_item_preview, parent, false) as ConstraintLayout
-        return ContestItemViewHolder(view)
+        return ContestItemPreviewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ContestViewHolder, position: Int) {
@@ -154,7 +154,7 @@ abstract class ContestViewHolder(protected val view: ConstraintLayout): Recycler
     }
 }
 
-class ContestItemViewHolder(view: ConstraintLayout): ContestViewHolder(view) {
+class ContestItemPreviewHolder(view: ConstraintLayout): ContestViewHolder(view) {
     private val title: TextView = view.findViewById(R.id.contests_list_item_title)
     private val titleAdditional: TextView = view.findViewById(R.id.contests_list_item_title_additional)
     private val date: TextView = view.findViewById(R.id.contests_list_item_date)
@@ -198,4 +198,23 @@ class ContestItemViewHolder(view: ConstraintLayout): ContestViewHolder(view) {
             return "$begin-$end"
         }
     }
+}
+
+class ContestItemBigViewHolder(view: ConstraintLayout): ContestViewHolder(view) {
+    private val title: TextView = view.findViewById(R.id.contests_list_item_title)
+    private val titleAdditional: TextView = view.findViewById(R.id.contests_list_item_title_additional)
+    private val dateStart: TextView = view.findViewById(R.id.contests_list_item_start_date)
+    private val dateEnd: TextView = view.findViewById(R.id.contests_list_item_end_date)
+    private val counterTextView: TextView = view.findViewById(R.id.contests_list_item_counter)
+    private val icon: ImageView = view.findViewById(R.id.contests_list_item_icon)
+
+    override fun applyContest(contest: Contest) {
+        TODO("Not yet implemented")
+    }
+
+    override fun refresh(currentTimeSeconds: Long, phase: Contest.Phase, oldPhase: Contest.Phase?) {
+        TODO("Not yet implemented")
+    }
+
+
 }

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="4dp"
+    android:paddingTop="4dp"
+    >
+
+    <ImageView
+        android:id="@+id/contests_list_item_icon"
+        android:layout_width="36sp"
+        android:layout_height="36sp"
+        android:src="@drawable/ic_cup"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/contests_list_item_start_date"
+        app:layout_constraintBottom_toBottomOf="@id/contests_list_item_counter"
+        app:tint="@color/textColor"
+        android:layout_margin="8dp"
+        />
+
+    <TextView
+        android:id="@+id/contests_list_item_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:text="Contest Title"
+        android:textColor="@color/textColor"
+        android:textSize="19sp"
+        android:textStyle="bold"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintEnd_toStartOf="@id/contests_list_item_minimize"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/contests_list_item_title_additional"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:text="(additional)"
+        android:textColor="@color/textColorAdditional"
+        android:textSize="19sp"
+        android:textStyle="bold"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintEnd_toStartOf="@id/contests_list_item_minimize"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/contests_list_item_title"
+        />
+
+    <TextView
+        android:id="@+id/contests_list_item_start_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:text="start: 26.07.2021 wd 09:00"
+        android:textColor="@color/textColorAdditional"
+        android:textSize="15sp"
+        app:layout_constraintStart_toEndOf="@id/contests_list_item_icon"
+        app:layout_constraintTop_toBottomOf="@id/contests_list_item_title_additional"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        />
+
+    <TextView
+        android:id="@+id/contests_list_item_end_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:text="end: 15.08.2021 sd 16:00"
+        android:textColor="@color/textColorAdditional"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="@id/contests_list_item_start_date"
+        app:layout_constraintTop_toBottomOf="@id/contests_list_item_start_date"
+        android:layout_marginStart="5dp"
+        />
+
+    <TextView
+        android:id="@+id/contests_list_item_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:text="counter"
+        android:textColor="@color/textColorAdditional"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="@id/contests_list_item_start_date"
+        app:layout_constraintTop_toBottomOf="@id/contests_list_item_end_date"
+        android:layout_marginStart="5dp"
+        />
+
+
+    <ImageButton
+        android:id="@+id/contests_list_item_minimize"
+        style="@style/CPSImageButton"
+        android:layout_width="36sp"
+        android:layout_height="36sp"
+        android:src="@drawable/ic_expand_less"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageButton
+        android:id="@+id/contests_list_item_open"
+        style="@style/CPSImageButton"
+        android:layout_width="36sp"
+        android:layout_height="36sp"
+        android:src="@drawable/ic_open_in_browser"
+        app:layout_constraintBottom_toTopOf="@id/contests_list_item_minimize"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+
+    <ImageButton
+        android:id="@+id/contests_list_item_remove"
+        style="@style/CPSImageButton"
+        android:layout_width="36sp"
+        android:layout_height="36sp"
+        android:src="@drawable/ic_delete"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/contests_list_item_open"
+        app:layout_constraintVertical_bias="0"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

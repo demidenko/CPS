@@ -17,7 +17,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/contests_list_item_title"
         app:layout_constraintBottom_toBottomOf="@id/contests_list_item_title"
-        app:layout_constraintHorizontal_bias="0"
         app:tint="@color/textColorAdditional"
         />
 
