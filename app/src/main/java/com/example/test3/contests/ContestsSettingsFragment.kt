@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.fragment.app.viewModels
@@ -19,6 +18,7 @@ import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.CPSDataStore
 import com.example.test3.utils.getStringNotBlank
 import com.example.test3.utils.jsonCPS
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.runBlocking
 
@@ -40,40 +40,40 @@ class ContestsSettingsFragment: CPSFragment() {
         cpsTitle = "::contests.settings"
         setHasOptionsMenu(true)
 
-        view.findViewById<TextView>(R.id.contests_settings_clistid).apply {
-            setOnClickListener {
-                val dialogView = mainActivity.layoutInflater.inflate(R.layout.dialog_clist_api, null)
-                val context = requireContext()
-                dialogView.findViewById<ImageButton>(R.id.dialog_clist_api_info).setOnClickListener {
-                    startActivity(makeIntentOpenUrl("https://clist.by/api/v2/doc/"))
-                }
-                val loginTextField = dialogView.findViewById<TextInputLayout>(R.id.dialog_clist_api_login).apply {
-                    editText?.setText(runBlocking { context.settingsContests.clistApiLogin() ?: "" })
-                }
-                val apikeyTextField = dialogView.findViewById<TextInputLayout>(R.id.dialog_clist_api_key).apply {
-                    editText?.setText(runBlocking { context.settingsContests.clistApiKey() ?: "" })
-                }
-                AlertDialog.Builder(mainActivity).apply {
-                    setView(dialogView)
-                    setPositiveButton("Save") { _, _ ->
-                        runBlocking {
-                            context.settingsContests.clistApiLogin(loginTextField.editText?.getStringNotBlank())
-                            context.settingsContests.clistApiKey(apikeyTextField.editText?.getStringNotBlank())
-                        }
-                    }
-                }.create().show()
-            }
+        view.findViewById<TextView>(R.id.contests_settings_clistid).setOnClickListener {
+            showClistApiAccessDialog()
         }
 
-        view.findViewById<TextView>(R.id.contests_settings_platforms).apply {
-            setOnClickListener {
-                mainActivity.cpsFragmentManager.pushBack(ContestsSelectPlatformsFragment())
-            }
+        view.findViewById<TextView>(R.id.contests_settings_platforms).setOnClickListener {
+            mainActivity.cpsFragmentManager.pushBack(ContestsSelectPlatformsFragment())
         }
 
         view.findViewById<TextView>(R.id.contests_settings_clear_removed).setOnClickListener {
             contestsViewModel.clearRemovedContests(requireContext())
         }
+    }
+
+    private fun showClistApiAccessDialog() {
+        val dialogView = mainActivity.layoutInflater.inflate(R.layout.dialog_clist_api, null)
+        val context = requireContext()
+        dialogView.findViewById<ImageButton>(R.id.dialog_clist_api_info).setOnClickListener {
+            startActivity(makeIntentOpenUrl("https://clist.by/api/v2/doc/"))
+        }
+        val loginTextField = dialogView.findViewById<TextInputLayout>(R.id.dialog_clist_api_login).apply {
+            editText?.setText(runBlocking { context.settingsContests.clistApiLogin() ?: "" })
+        }
+        val apikeyTextField = dialogView.findViewById<TextInputLayout>(R.id.dialog_clist_api_key).apply {
+            editText?.setText(runBlocking { context.settingsContests.clistApiKey() ?: "" })
+        }
+        MaterialAlertDialogBuilder(mainActivity).apply {
+            setView(dialogView)
+            setPositiveButton("Save") { _, _ ->
+                runBlocking {
+                    context.settingsContests.clistApiLogin(loginTextField.editText?.getStringNotBlank())
+                    context.settingsContests.clistApiKey(apikeyTextField.editText?.getStringNotBlank())
+                }
+            }
+        }.create().show()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {

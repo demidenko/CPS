@@ -6,42 +6,39 @@
     android:padding="10dp"
     >
 
-    <TextView
-        android:id="@+id/dialog_clist_api_title"
-        android:layout_width="wrap_content"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/dialog_custom_contest_title"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:text="clist.by::api"
-        android:typeface="monospace"
-        app:layout_constraintTop_toTopOf="@id/dialog_clist_api_info"
-        app:layout_constraintBottom_toBottomOf="@id/dialog_clist_api_info"
         app:layout_constraintStart_toStartOf="parent"
-        />
-
-    <ImageButton
-        android:id="@+id/dialog_clist_api_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_help"
-        style="@style/CPSImageButton"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/dialog_clist_api_login"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_clist_api_info"
         android:layout_marginTop="10dp"
-        android:hint="login"
+        android:hint="Contest Title"
         >
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"
+            android:inputType="text"
+            android:textSize="15sp"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/dialog_custom_contest_start"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_custom_contest_title"
+        android:layout_marginTop="10dp"
+        android:hint="Start Date"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
             android:typeface="monospace"
             android:textSize="15sp"
             />
@@ -49,26 +46,24 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/dialog_clist_api_key"
+        android:id="@+id/dialog_custom_contest_end"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_clist_api_login"
+        app:layout_constraintTop_toBottomOf="@id/dialog_custom_contest_start"
         android:layout_marginTop="10dp"
-        android:hint="api-key"
+        android:hint="End Date"
         >
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textVisiblePassword"
+            android:inputType="text"
             android:typeface="monospace"
             android:textSize="15sp"
             />
 
     </com.google.android.material.textfield.TextInputLayout>
-
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

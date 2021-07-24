@@ -66,4 +66,11 @@ class ContestsViewModel: ViewModel() {
             context.settingsContests.removedContestsIds(emptySet())
         }
     }
+
+    fun addCustomContest(contest: Contest, context: Context) {
+        require(contest.platform == Contest.Platform.unknown)
+        viewModelScope.launch {
+            getContestsListDao(context).insert(listOf(contest))
+        }
+    }
 }
