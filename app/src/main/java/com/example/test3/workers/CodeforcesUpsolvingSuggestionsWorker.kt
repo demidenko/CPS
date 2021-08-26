@@ -1,13 +1,12 @@
 package com.example.test3.workers
 
 import android.content.Context
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
-import com.example.test3.utils.CodeforcesAPI
-import com.example.test3.utils.CodeforcesProblemVerdict
-import com.example.test3.utils.asyncPair
-import com.example.test3.utils.getCurrentTimeSeconds
+import com.example.test3.utils.*
 import java.util.concurrent.TimeUnit
 
 class CodeforcesUpsolvingSuggestionsWorker(private val context: Context, params: WorkerParameters): CoroutineWorker(context, params) {
@@ -52,17 +51,40 @@ class CodeforcesUpsolvingSuggestionsWorker(private val context: Context, params:
                 .onEach { problem ->
                     if (problemSolvedBy.containsKey(problem).not()) return Result.failure()
                 }
+            val suggestedList = codeforcesAccountManager.getSettings().upsolvingSuggestedProblems().toMutableList()
             problemSolvedBy.forEach { (problem, countOfAccepted) ->
                 if (problem !in solvedProblems && countOfAccepted >= ratingChange.rank) {
-                    //TODO: consider to upsolve
-                    println("consider to upsolve: $contestId $problem (${ratingChange.rank} vs $countOfAccepted)")
-                    codeforcesAccountManager.getSettings()
+                    val problemContestAndIndex = contestId to problem
+                    if (problemContestAndIndex !in suggestedList) {
+                        suggestedList.add(problemContestAndIndex)
+                        notifyProblemForUpsolve(contestId, problem)
+                    }
                 }
             }
+            codeforcesAccountManager.getSettings().upsolvingSuggestedProblems(suggestedList)
         }
 
-
         return Result.success()
+    }
+
+    private fun notifyProblemForUpsolve(contestId: Int, problemIndex: String) {
+        val problemFullName = "$contestId$problemIndex"
+        val n = notificationBuilder(context, NotificationChannels.codeforces_upsolving_suggestion).apply {
+            setSmallIcon(R.drawable.ic_logo_codeforces)
+            setContentTitle("Consider to upsolve $problemFullName")
+            setSubText("codeforces upsolving suggestion")
+            setShowWhen(false)
+            setContentIntent(
+                makePendingIntentOpenURL(
+                    CodeforcesURLFactory.problem(contestId, problemIndex),
+                    context
+                )
+            )
+        }
+        NotificationManagerCompat.from(context).notify(
+            NotificationIDs.makeCodeforcesUpsolveProblemID(problemFullName),
+            n.build()
+        )
     }
 
 }

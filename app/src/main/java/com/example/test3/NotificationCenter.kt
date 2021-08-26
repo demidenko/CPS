@@ -28,6 +28,7 @@ object NotificationChannels {
     val codeforces_contribution_changes by lazy { NotificationChannelLazy("cf_contribution_changes", "Contribution changes", Importance.MIN, group_codeforces) }
     val codeforces_follow_new_blog by lazy { NotificationChannelLazy("cf_follow_new_blog", "Follow: new blog entries", Importance.DEFAULT, group_codeforces) }
     val codeforces_follow_progress by lazy { NotificationChannelLazy("cf_follow_progress", "Follow: update progress", Importance.MIN, group_codeforces) }
+    val codeforces_upsolving_suggestion by lazy { NotificationChannelLazy("cf_upsolving_suggestion", "Upsolving suggestions", Importance.DEFAULT, group_codeforces) }
 
     //atcoder
     private val group_atcoder by lazy { NotificationChannelGroupLazy("atcoder", "AtCoder") }
@@ -128,6 +129,7 @@ object NotificationIDs {
     val makeCodeforcesSystestSubmissionID = nextIntervalID()
     val makeCodeforcesFollowBlogID = nextIntervalID()
     val codeforces_follow_progress = nextID()
+    val makeCodeforcesUpsolveProblemID = nextIntervalID()
 
     //atcoder
     val atcoder_rating_changes = nextID()
