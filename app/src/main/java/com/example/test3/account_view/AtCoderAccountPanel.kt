@@ -1,12 +1,10 @@
 package com.example.test3.account_view
 
 import android.widget.TextView
-import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.AtCoderAccountManager
 import com.example.test3.workers.WorkersCenter
-import kotlinx.coroutines.launch
 
 class AtCoderAccountPanel(
     mainActivity: MainActivity,
@@ -33,20 +31,11 @@ class AtCoderAccountPanel(
     }
 
     override suspend fun createSettingsView(fragment: AccountSettingsFragment<AtCoderAccountManager.AtCoderUserInfo>) {
-        manager.apply {
-            fragment.createAndAddSwitch(
-                "Rating changes observer",
-                getSettings().observeRating()
-            ){ buttonView, isChecked ->
-                fragment.lifecycleScope.launch {
-                    buttonView.isEnabled = false
-                    getSettings().observeRating(isChecked)
-                    if (isChecked) {
-                        WorkersCenter.startAccountsWorker(mainActivity)
-                    }
-                    buttonView.isEnabled = true
-                }
-            }
+        with(manager.getSettings()) {
+            fragment.appendSettingsSwitch(
+                observeRating,
+                title = "Rating changes observer"
+            ) { WorkersCenter.startAccountsWorker(mainActivity) }
         }
     }
 
