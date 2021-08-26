@@ -44,7 +44,6 @@ class CodeforcesAccountPanel(
     }
 
     override suspend fun createSettingsView(fragment: AccountSettingsFragment<CodeforcesUserInfo>) {
-
         manager.apply {
             fragment.createAndAddSwitch(
                 "Rating changes observer",
@@ -84,6 +83,20 @@ class CodeforcesAccountPanel(
                     getSettings().contestWatchEnabled(isChecked)
                     if (isChecked) {
                         WorkersCenter.startCodeforcesContestWatchLauncherWorker(mainActivity)
+                    }
+                    buttonView.isEnabled = true
+                }
+            }
+
+            fragment.createAndAddSwitch(
+                "Upsolving suggestions",
+                getSettings().upsolvingSuggestionsEnabled()
+            ){ buttonView, isChecked ->
+                fragment.lifecycleScope.launch {
+                    buttonView.isEnabled = false
+                    getSettings().upsolvingSuggestionsEnabled(isChecked)
+                    if (isChecked) {
+                        WorkersCenter.startCodeforcesUpsolveSuggestionsWorker(mainActivity)
                     }
                     buttonView.isEnabled = true
                 }

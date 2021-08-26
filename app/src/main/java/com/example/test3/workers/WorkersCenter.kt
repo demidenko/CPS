@@ -13,6 +13,7 @@ object WorkersNames {
     const val codeforces_news_follow = "cf_follow"
     const val codeforces_contest_watcher = "cf_contest_watcher"
     const val codeforces_contest_watch_launcher = "cf_contest_watch_launcher"
+    const val codeforces_upsolving_suggestions = "cf_upsolving_suggestions"
     const val project_euler_recent_problems = "pe_recent"
 }
 
@@ -68,6 +69,7 @@ object WorkersCenter {
 
         with(CodeforcesAccountManager(mainActivity).getSettings()){
             if(contestWatchEnabled()) startCodeforcesContestWatchLauncherWorker(mainActivity, false)
+            if(upsolvingSuggestionsEnabled()) startCodeforcesUpsolveSuggestionsWorker(mainActivity, false)
         }
     }
 
@@ -97,6 +99,16 @@ object WorkersCenter {
             WorkersNames.codeforces_contest_watch_launcher,
             restart,
             TimeUnit.MINUTES to 45
+        )
+    }
+
+    fun startCodeforcesUpsolveSuggestionsWorker(context: Context, restart: Boolean = true) {
+        makeAndEnqueueWork<CodeforcesUpsolvingSuggestionsWorker>(
+            context,
+            WorkersNames.codeforces_upsolving_suggestions,
+            restart,
+            TimeUnit.HOURS to 3,
+            batteryNotLow = true
         )
     }
 
