@@ -1,7 +1,11 @@
 package com.example.test3
 
 import android.app.Dialog
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.CheckBox
@@ -24,11 +28,19 @@ class AboutDialog: DialogFragment() {
         val context = requireContext()
 
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_about, null).apply {
-            findViewById<TextView>(R.id.about_title)?.text = """
+
+            val title = """
                    Competitive
                    Programming
                 && Solving
             """.trimIndent()
+
+            val spannedTitle = SpannableString(title)
+            title.forEachIndexed { index, c ->
+                if(c.isUpperCase()) spannedTitle.setSpan(StyleSpan(Typeface.BOLD), index, index+1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+            }
+
+            findViewById<TextView>(R.id.about_title)?.text = spannedTitle
 
             val versionTextView = findViewById<TextView>(R.id.about_version).apply {
                 text = "   version = ${BuildConfig.VERSION_NAME}"
