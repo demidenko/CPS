@@ -203,16 +203,6 @@ object CodeforcesUtils {
         return blogEntries
     }
 
-    fun parseTestPercentage(s: String): Int? {
-        var i = s.indexOf("<span class=\"contest-state-regular\">")
-        if (i != -1) {
-            i = s.indexOf(">", i + 1)
-            val progress = s.substring(i + 1, s.indexOf("</", i + 1))
-            return progress.removeSuffix("%").toIntOrNull()
-        }
-        return null
-    }
-
     fun fromCodeforcesHTML(str: String): Spanned {
         var s = str
         s = s.replace("<code>", "<font face=monospace>").replace("</code>", "</font>")
@@ -711,6 +701,23 @@ object CodeforcesAPI {
 
     suspend fun getPageSource(page: String, locale: CodeforcesLocale) = makeWEBCall(CallStringInvoker { web.getPage(page,locale.toString()) })
 
+    suspend fun getContestSystemTestingPercentage(contestId: Int): Int? {
+        val s = getPageSource("contest/$contestId", CodeforcesLocale.EN) ?: return null
+        var i = s.indexOf("<span class=\"contest-state-regular\">")
+        if (i != -1) {
+            i = s.indexOf(">", i + 1)
+            val progress = s.substring(i + 1, s.indexOf("</", i + 1))
+            return progress.removeSuffix("%").toIntOrNull()
+        }
+        return null
+    }
+
+    suspend fun getContestProblemsAcceptedsCount(contestId: Int): Map<String, Int>? {
+        val str = getPageSource("contest/$contestId", CodeforcesLocale.EN) ?: return null
+        val cnt = mutableMapOf<String, Int>()
+        //TODO
+        return cnt
+    }
 }
 
 

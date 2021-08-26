@@ -1,6 +1,5 @@
 package com.example.test3.contest_watch
 
-import com.example.test3.CodeforcesLocale
 import com.example.test3.utils.*
 import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
@@ -70,11 +69,9 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
             if(phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST){
                 //get progress of testing (0% ... 100%)
                 delay(1000)
-                CodeforcesAPI.getPageSource("contest/$contestID", CodeforcesLocale.EN)?.let { page ->
-                    CodeforcesUtils.parseTestPercentage(page)?.let { percentage ->
-                        sysTestPercentage.value = percentage
-                        if(sysTestPercentage.isChanged()) onSetSysTestProgress(sysTestPercentage.value)
-                    }
+                CodeforcesAPI.getContestSystemTestingPercentage(contestID)?.let { percentage ->
+                    sysTestPercentage.value = percentage
+                    if(sysTestPercentage.isChanged()) onSetSysTestProgress(sysTestPercentage.value)
                 }
             }
 
