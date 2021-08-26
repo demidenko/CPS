@@ -9,13 +9,11 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.example.test3.MainActivity
 import com.example.test3.R
 import com.example.test3.account_manager.*
-import com.example.test3.utils.BlockedState
-import com.example.test3.utils.LoadingState
-import com.example.test3.utils.getColorFromResource
-import com.example.test3.utils.launchAndRepeatWithViewLifecycle
+import com.example.test3.utils.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -170,6 +168,25 @@ abstract class AccountPanel<U: UserInfo>(
 
     open suspend fun createSettingsView(fragment: AccountSettingsFragment<U>){}
 
+    suspend fun<U: UserInfo> AccountSettingsFragment<U>.appendSettingsSwitch(
+        item: CPSDataStore.Item<Boolean>,
+        title: String,
+        description: String = "",
+        onChecked: suspend () -> Unit
+    ) {
+        createAndAddSwitch(
+            title = title,
+            checked = item(),
+            description = description
+        ) { buttonView, isChecked ->
+            lifecycleScope.launch {
+                buttonView.isEnabled = false
+                item(isChecked)
+                if(isChecked) onChecked()
+                buttonView.isEnabled = true
+            }
+        }
+    }
 }
 
 private val rotateAnimation = RotateAnimation(
