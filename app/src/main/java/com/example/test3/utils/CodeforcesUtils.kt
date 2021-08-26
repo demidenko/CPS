@@ -715,7 +715,19 @@ object CodeforcesAPI {
     suspend fun getContestProblemsAcceptedsCount(contestId: Int): Map<String, Int>? {
         val str = getPageSource("contest/$contestId", CodeforcesLocale.EN) ?: return null
         val cnt = mutableMapOf<String, Int>()
-        //TODO
+        var i = 0
+        while (true) {
+            i = str.indexOf("<td class=\"id\">", i+1)
+            if(i==-1) break
+            i = str.indexOf("href", i)
+            val problemIndex = str.substring(str.indexOf(">", i)+1, str.indexOf("</a", i)).trim()
+            val p = str.indexOf("/contest/$contestId/status/$problemIndex", i)
+            val solvedBy: Int = if(p == -1) 0 else run {
+                i = str.indexOf("</a", p)
+                str.substring(str.lastIndexOf('x', i)+1, i).toInt()
+            }
+            cnt[problemIndex] = solvedBy
+        }
         return cnt
     }
 }
