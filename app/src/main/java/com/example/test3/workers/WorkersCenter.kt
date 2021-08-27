@@ -2,7 +2,6 @@ package com.example.test3.workers
 
 import android.content.Context
 import androidx.work.*
-import com.example.test3.MainActivity
 import com.example.test3.account_manager.CodeforcesAccountManager
 import java.util.concurrent.TimeUnit
 
@@ -59,17 +58,17 @@ object WorkersCenter {
 
     fun stopWorker(context: Context, workName: String) = getWorkManager(context).cancelUniqueWork(workName)
 
-    suspend fun startWorkers(mainActivity: MainActivity) {
-        startAccountsWorker(mainActivity, false)
-        startNewsWorker(mainActivity, false)
+    suspend fun startWorkers(context: Context) {
+        startAccountsWorker(context, false)
+        startNewsWorker(context, false)
 
-        if(CodeforcesNewsLostRecentWorker.isEnabled(mainActivity)) startCodeforcesNewsLostRecentWorker(mainActivity, false)
-        if(CodeforcesNewsFollowWorker.isEnabled(mainActivity)) startCodeforcesNewsFollowWorker(mainActivity, false)
-        if(ProjectEulerRecentProblemsWorker.isEnabled(mainActivity)) startProjectEulerRecentProblemsWorker(mainActivity, false)
+        if(CodeforcesNewsLostRecentWorker.isEnabled(context)) startCodeforcesNewsLostRecentWorker(context, false)
+        if(CodeforcesNewsFollowWorker.isEnabled(context)) startCodeforcesNewsFollowWorker(context, false)
+        if(ProjectEulerRecentProblemsWorker.isEnabled(context)) startProjectEulerRecentProblemsWorker(context, false)
 
-        with(CodeforcesAccountManager(mainActivity).getSettings()){
-            if(contestWatchEnabled()) startCodeforcesContestWatchLauncherWorker(mainActivity, false)
-            if(upsolvingSuggestionsEnabled()) startCodeforcesUpsolveSuggestionsWorker(mainActivity, false)
+        with(CodeforcesAccountManager(context).getSettings()){
+            if(contestWatchEnabled()) startCodeforcesContestWatchLauncherWorker(context, false)
+            if(upsolvingSuggestionsEnabled()) startCodeforcesUpsolveSuggestionsWorker(context, false)
         }
     }
 
