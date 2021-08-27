@@ -107,7 +107,7 @@ object WorkersCenter {
             context,
             WorkersNames.codeforces_upsolving_suggestions,
             restart,
-            TimeUnit.HOURS to 3, //TODO: increase and add flex
+            TimeUnit.HOURS to 12,
             batteryNotLow = true
         )
     }

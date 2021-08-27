@@ -30,15 +30,11 @@ class CodeforcesUpsolvingSuggestionsWorker(private val context: Context, params:
         for (ratingChange in ratingChanges) {
             val contestId = ratingChange.contestId
             val (userSubmissions, problemSolvedBy) = asyncPair(
-                {
-                    CodeforcesAPI.getContestSubmissions(
+                { CodeforcesAPI.getContestSubmissions(
                         contestId = contestId,
                         handle = handle
-                    )?.result
-                },
-                {
-                    CodeforcesAPI.getContestProblemsAcceptedsCount(contestId)
-                }
+                    )?.result },
+                { CodeforcesAPI.getContestProblemsAcceptedsCount(contestId) }
             ).let {
                 val first = it.first ?: return Result.failure()
                 val second = it.second ?: return Result.failure()
@@ -68,21 +64,17 @@ class CodeforcesUpsolvingSuggestionsWorker(private val context: Context, params:
     }
 
     private fun notifyProblemForUpsolve(contestId: Int, problemIndex: String) {
-        val problemFullName = "$contestId$problemIndex"
+        val problemFullId = "$contestId$problemIndex"
         val n = notificationBuilder(context, NotificationChannels.codeforces_upsolving_suggestion).apply {
-            setSmallIcon(R.drawable.ic_logo_codeforces)
-            setContentTitle("Consider to upsolve $problemFullName")
+            setSmallIcon(R.drawable.ic_training)
+            setContentTitle("Consider to upsolve problem $problemFullId")
             setSubText("codeforces upsolving suggestion")
             setShowWhen(false)
-            setContentIntent(
-                makePendingIntentOpenURL(
-                    CodeforcesURLFactory.problem(contestId, problemIndex),
-                    context
-                )
-            )
+            setAutoCancel(true)
+            setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.problem(contestId, problemIndex), context))
         }
         NotificationManagerCompat.from(context).notify(
-            NotificationIDs.makeCodeforcesUpsolveProblemID(problemFullName),
+            NotificationIDs.makeCodeforcesUpsolveProblemID(problemFullId),
             n.build()
         )
     }
