@@ -2,7 +2,6 @@ package com.example.test3.workers
 
 import android.content.Context
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -54,7 +53,7 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
             val group = "acmp_news_group"
 
             news.forEach { (id, content) ->
-                val n = notificationBuilder(context, NotificationChannels.acmp_news).apply {
+                notificationBuildAndNotify(context, NotificationChannels.acmp_news, NotificationIDs.makeACMPNewsNotificationID(id)) {
                     setSubText("acmp news")
                     setBigContent(content)
                     setSmallIcon(R.drawable.ic_news)
@@ -64,10 +63,9 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
                     setGroup(group)
                     setContentIntent(makePendingIntentOpenURL("https://acmp.ru", context))
                 }
-                NotificationManagerCompat.from(context).notify( NotificationIDs.makeACMPNewsNotificationID(id), n.build())
             }
 
-            val n = notificationBuilder(context, NotificationChannels.acmp_news).apply {
+            notificationBuildAndNotify(context, NotificationChannels.acmp_news, NotificationIDs.makeACMPNewsNotificationID(0)) {
                 setStyle(NotificationCompat.InboxStyle().setSummaryText("acmp news"))
                 setSmallIcon(R.drawable.ic_news)
                 setColor(getColorFromResource(context, R.color.acmp_main))
@@ -75,7 +73,6 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
                 setGroup(group)
                 setGroupSummary(true)
             }
-            NotificationManagerCompat.from(context).notify( NotificationIDs.makeACMPNewsNotificationID(0), n.build())
         }
 
         val firstID = news.first().first
@@ -107,7 +104,11 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
 
         if(lastNewsID != null){
             news.forEach { (title, content) ->
-                val n = notificationBuilder(context, NotificationChannels.project_euler_news).apply {
+                notificationBuildAndNotify(
+                    context,
+                    NotificationChannels.project_euler_news,
+                    NotificationIDs.makeProjectEulerNewsNotificationID(title)
+                ) {
                     setSubText("Project Euler news")
                     setContentTitle(title)
                     setBigContent(fromHTML(content))
@@ -117,7 +118,6 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
                     setAutoCancel(true)
                     setContentIntent(makePendingIntentOpenURL("https://projecteuler.net/news", context))
                 }
-                NotificationManagerCompat.from(context).notify( NotificationIDs.makeProjectEulerNewsNotificationID(title), n.build())
             }
         }
 
@@ -156,7 +156,11 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
 
         if(lastNewsID != null){
             news.forEach { (_, title, content) ->
-                val n = notificationBuilder(context, NotificationChannels.olympiads_zaoch_news).apply {
+                notificationBuildAndNotify(
+                    context,
+                    NotificationChannels.olympiads_zaoch_news,
+                    NotificationIDs.makeZaochNewsNotificationID(title)
+                ) {
                     setSubText("zaoch news")
                     setContentTitle(title)
                     setBigContent(fromHTML(content))
@@ -166,7 +170,6 @@ class NewsWorker(private val context: Context, params: WorkerParameters) : Corou
                     //setAutoCancel(true)
                     setContentIntent(makePendingIntentOpenURL("https://olympiads.ru/zaoch/", context))
                 }
-                NotificationManagerCompat.from(context).notify(NotificationIDs.makeZaochNewsNotificationID(title), n.build())
             }
         }
 

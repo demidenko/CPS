@@ -3,14 +3,13 @@ package com.example.test3.account_manager
 import android.content.Context
 import android.text.SpannableString
 import androidx.annotation.ColorRes
-import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.example.test3.NotificationChannelLazy
 import com.example.test3.R
 import com.example.test3.makePendingIntentOpenURL
-import com.example.test3.notificationBuilder
+import com.example.test3.notificationBuildAndNotify
 import com.example.test3.ui.getUseRealColors
 import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
@@ -197,11 +196,11 @@ data class AccountSuggestion(
 fun notifyRatingChange(
     context: Context,
     notificationChannel: NotificationChannelLazy,
-    notificationID: Int,
+    notificationId: Int,
     accountManager: RatedAccountManager<*>,
     handle: String, newRating: Int, oldRating: Int, rank: Int, url: String? = null, timeSeconds: Long? = null
 ){
-    val n = notificationBuilder(context, notificationChannel).apply {
+    notificationBuildAndNotify(context, notificationChannel, notificationId) {
         val decreased = newRating < oldRating
         setSmallIcon(if(decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
         setContentTitle("$handle new rating: $newRating")
@@ -217,5 +216,4 @@ fun notifyRatingChange(
             setWhen(TimeUnit.SECONDS.toMillis(timeSeconds))
         }
     }
-    NotificationManagerCompat.from(context).notify(notificationID, n.build())
 }

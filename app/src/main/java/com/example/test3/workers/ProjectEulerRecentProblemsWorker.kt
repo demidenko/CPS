@@ -1,7 +1,6 @@
 package com.example.test3.workers
 
 import android.content.Context
-import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.work.CoroutineWorker
@@ -52,7 +51,11 @@ class ProjectEulerRecentProblemsWorker(private val context: Context, params: Wor
 
         if(lastViewedProblemID != null){
             newProblems.forEach { (id, name) ->
-                val n = notificationBuilder(context, NotificationChannels.project_euler_problems).apply {
+                notificationBuildAndNotify(
+                    context,
+                    NotificationChannels.project_euler_problems,
+                    NotificationIDs.makeProjectEulerRecentProblemNotificationID(id)
+                ) {
                     setSubText("Project Euler • New problem published!")
                     setContentTitle("Problem $id")
                     setBigContent(name)
@@ -62,7 +65,6 @@ class ProjectEulerRecentProblemsWorker(private val context: Context, params: Wor
                     setAutoCancel(true)
                     setContentIntent(makePendingIntentOpenURL("https://projecteuler.net/problem=$id", context))
                 }
-                NotificationManagerCompat.from(context).notify(NotificationIDs.makeProjectEulerRecentProblemNotificationID(id), n.build())
             }
         }
 

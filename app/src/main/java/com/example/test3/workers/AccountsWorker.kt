@@ -92,7 +92,7 @@ class AccountsWorker(private val context: Context, params: WorkerParameters) : C
                 }?.notification?.extras?.getInt(keyContribution, info.contribution) ?: info.contribution
             }
 
-            val n = notificationBuilder(context, NotificationChannels.codeforces_contribution_changes).apply {
+            notificationBuilder(context, NotificationChannels.codeforces_contribution_changes) {
                 setSubText(handle)
                 setContentTitle("Contribution change: ${signedToString(oldShowedContribution)} → ${signedToString(contribution)}")
                 setSmallIcon(R.drawable.ic_person)
@@ -101,8 +101,7 @@ class AccountsWorker(private val context: Context, params: WorkerParameters) : C
                 setShowWhen(false)
                 setContentIntent(makePendingIntentOpenURL(info.link(), context))
                 addExtras(bundleOf(keyContribution to oldShowedContribution))
-            }
-            notificationManager.notify( NotificationIDs.codeforces_contribution_changes, n.build())
+            }.notifyBy(notificationManager, NotificationIDs.codeforces_contribution_changes)
         }
     }
 

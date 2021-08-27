@@ -139,8 +139,11 @@ class CodeforcesContestWatcherTableNotification(
     override fun onSetProblemSystestResult(submission: CodeforcesSubmission) {
         val problemName = "${submission.contestId}${submission.problem.index}"
         val result = submission.makeVerdict()
-
-        val n = notificationBuilder(context, NotificationChannels.codeforces_contest_watcher).apply {
+        notificationBuildAndNotify(
+            context,
+            NotificationChannels.codeforces_contest_watcher,
+            NotificationIDs.makeCodeforcesSystestSubmissionID(submission.id)
+        ) {
             if(submission.verdict == CodeforcesProblemVerdict.OK){
                 setSmallIcon(R.drawable.ic_problem_ok)
                 color = successColor
@@ -152,14 +155,8 @@ class CodeforcesContestWatcherTableNotification(
             setSubText("Codeforces system testing result")
             setShowWhen(false)
             setAutoCancel(true)
-            setContentIntent(
-                makePendingIntentOpenURL(
-                    CodeforcesURLFactory.submission(submission),
-                    context
-                )
-            )
+            setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.submission(submission), context))
         }
-        notificationManager.notify(NotificationIDs.makeCodeforcesSystestSubmissionID(submission.id), n.build())
     }
 
     override suspend fun onRatingChange(ratingChange: CodeforcesRatingChange) {

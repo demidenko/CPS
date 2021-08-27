@@ -48,18 +48,23 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
     }
 
     private fun createProgressNotification(): NotificationCompat.Builder {
-        return notificationBuilder(context, NotificationChannels.codeforces_follow_progress)
-            .setContentTitle("Codeforces Follow Update...")
-            .setSmallIcon(R.drawable.ic_logo_codeforces)
-            .setSilent(true)
-            .setShowWhen(false)
+        return notificationBuilder(context, NotificationChannels.codeforces_follow_progress) {
+            setContentTitle("Codeforces Follow Update...")
+            setSmallIcon(R.drawable.ic_logo_codeforces)
+            setSilent(true)
+            setShowWhen(false)
+        }
     }
 
 }
 
 fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry, context: Context){
     val title = fromHTML(blogEntry.title.removeSurrounding("<p>", "</p>")).toString()
-    val n = notificationBuilder(context, NotificationChannels.codeforces_follow_new_blog).apply {
+    notificationBuildAndNotify(
+        context,
+        NotificationChannels.codeforces_follow_new_blog,
+        NotificationIDs.makeCodeforcesFollowBlogID(blogEntry.id)
+    ) {
         setSubText("New codeforces blog entry")
         setContentTitle(blogEntry.authorHandle)
         setBigContent(title)
@@ -69,5 +74,4 @@ fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry, context: Context){
         setWhen(TimeUnit.SECONDS.toMillis(blogEntry.creationTimeSeconds))
         setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.blog(blogEntry.id), context))
     }
-    NotificationManagerCompat.from(context).notify(NotificationIDs.makeCodeforcesFollowBlogID(blogEntry.id), n.build())
 }

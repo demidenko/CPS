@@ -74,7 +74,7 @@ class CodeforcesContestWatchWorker(val context: Context, params: WorkerParameter
 
 
     private fun createNotificationBuilder(handle: String, contestID: Int): NotificationCompat.Builder {
-        val notification = notificationBuilder(context, NotificationChannels.codeforces_contest_watcher).apply {
+        val notification = notificationBuilder(context, NotificationChannels.codeforces_contest_watcher) {
             setSmallIcon(R.drawable.ic_contest)
             setSubText(handle)
             setShowWhen(false)

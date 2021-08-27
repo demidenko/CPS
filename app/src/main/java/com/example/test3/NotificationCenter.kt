@@ -13,11 +13,33 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
 
-fun notificationBuilder(context: Context, channel: NotificationChannelLazy): NotificationCompat.Builder {
-    return NotificationCompat.Builder(context, channel.getID(context))
+fun notificationBuilder(
+    context: Context,
+    channel: NotificationChannelLazy,
+    buildBody: NotificationCompat.Builder.() -> Unit
+): NotificationCompat.Builder {
+    return NotificationCompat.Builder(context, channel.getID(context)).apply(buildBody)
 }
 
+fun NotificationCompat.Builder.notifyBy(
+    m: NotificationManagerCompat,
+    notificationId: Int,
+) = m.notify(notificationId, build())
+
+fun NotificationCompat.Builder.notifyBy(
+    m: NotificationManager,
+    notificationId: Int,
+) = m.notify(notificationId, build())
+
+fun notificationBuildAndNotify(
+    context: Context,
+    channel: NotificationChannelLazy,
+    notificationId: Int,
+    buildBody: NotificationCompat.Builder.() -> Unit
+) = notificationBuilder(context, channel, buildBody).notifyBy(NotificationManagerCompat.from(context), notificationId)
+
 fun NotificationCompat.Builder.setBigContent(str: CharSequence) = setContentText(str).setStyle(NotificationCompat.BigTextStyle().bigText(str))
+
 
 object NotificationChannels {
 
@@ -148,8 +170,8 @@ object NotificationIDs {
     val test = nextID()
 }
 
-fun makeSimpleNotification(context: Context, id: Int, title: String, content: String, silent: Boolean = true){
-    val n = notificationBuilder(context, NotificationChannels.test).apply {
+fun makeSimpleNotification(context: Context, id: Int, title: String, content: String, silent: Boolean = true) {
+    notificationBuildAndNotify(context, NotificationChannels.test, id) {
         setSmallIcon(R.drawable.ic_news)
         setContentTitle(title)
         setContentText(content)
@@ -157,7 +179,6 @@ fun makeSimpleNotification(context: Context, id: Int, title: String, content: St
         setShowWhen(true)
         setWhen(System.currentTimeMillis())
     }
-    NotificationManagerCompat.from(context).notify(id, n.build())
 }
 
 fun makeIntentOpenUrl(url: String) = Intent(Intent.ACTION_VIEW, Uri.parse(url))

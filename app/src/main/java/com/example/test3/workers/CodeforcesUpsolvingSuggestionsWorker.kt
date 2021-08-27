@@ -1,7 +1,6 @@
 package com.example.test3.workers
 
 import android.content.Context
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.test3.*
@@ -65,7 +64,11 @@ class CodeforcesUpsolvingSuggestionsWorker(private val context: Context, params:
 
     private fun notifyProblemForUpsolve(contestId: Int, problemIndex: String) {
         val problemFullId = "$contestId$problemIndex"
-        val n = notificationBuilder(context, NotificationChannels.codeforces_upsolving_suggestion).apply {
+        notificationBuildAndNotify(
+            context,
+            NotificationChannels.codeforces_upsolving_suggestion,
+            NotificationIDs.makeCodeforcesUpsolveProblemID(problemFullId)
+        ) {
             setSmallIcon(R.drawable.ic_training)
             setContentTitle("Consider to upsolve problem $problemFullId")
             setSubText("codeforces upsolving suggestion")
@@ -73,10 +76,6 @@ class CodeforcesUpsolvingSuggestionsWorker(private val context: Context, params:
             setAutoCancel(true)
             setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.problem(contestId, problemIndex), context))
         }
-        NotificationManagerCompat.from(context).notify(
-            NotificationIDs.makeCodeforcesUpsolveProblemID(problemFullId),
-            n.build()
-        )
     }
 
 }
