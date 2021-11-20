@@ -17,7 +17,7 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
     abstract inner class CPSDataStoreItem<T, S> {
         abstract val key: Preferences.Key<S>
         protected abstract fun fromPrefs(s: S?): T
-        //TODO [toPrefs(t: T!!): S] in 1.6??
+        //TODO [toPrefs(t: T & Any): S] in 1.7??
         protected abstract fun toPrefs(t: T): S
 
         val flow: Flow<T> = dataStore.data.map { fromPrefs(it[key]) }.distinctUntilChanged()

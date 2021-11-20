@@ -74,6 +74,7 @@ class CodeforcesContestWatcherTableNotification(
                 CodeforcesContestType.IOI -> {
                     if(result.points != 0.0 ) bold { append(pts) }
                 }
+                else -> {}
             }
         }
 
