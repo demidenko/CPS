@@ -27,6 +27,8 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 
 class ContestsFragment: CPSFragment() {
 
@@ -112,7 +114,7 @@ class ContestsFragment: CPSFragment() {
         val contestsFlow = getContestsListDao(mainActivity).flowOfContests().map { contests ->
             val currentTimeSeconds = getCurrentTimeSeconds()
             contests.filter { contest ->
-                currentTimeSeconds - contest.endTimeSeconds < TimeUnit.DAYS.toSeconds(7)
+                (currentTimeSeconds - contest.endTimeSeconds).seconds < 7.days
             }
         }
         val removedIdsFlow = mainActivity.settingsContests.removedContestsIds.flow

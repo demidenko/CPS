@@ -10,7 +10,8 @@ import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesAPIStatus
 import com.example.test3.utils.getCurrentTimeSeconds
 import kotlinx.coroutines.runBlocking
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.seconds
 
 class CodeforcesContestWatchLauncherWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -28,7 +29,7 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
 
         val currentTimeSeconds = getCurrentTimeSeconds()
         fun isTooLate(timeSeconds: Long): Boolean {
-            return TimeUnit.SECONDS.toHours(currentTimeSeconds - timeSeconds) >= 24
+            return (currentTimeSeconds - timeSeconds).seconds >= 24.hours
         }
 
         val lastKnownID: Long?

@@ -16,8 +16,9 @@ import com.example.test3.utils.getColorFromResource
 import com.example.test3.utils.getCurrentTimeSeconds
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 import kotlin.math.round
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 
 class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
@@ -45,11 +46,11 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
         val currentSeconds = getCurrentTimeSeconds()
         ratingHistoryLastMonth = history.filter { ratingChange ->
-            TimeUnit.SECONDS.toDays(currentSeconds - ratingChange.timeSeconds) <= 30
+            (currentSeconds - ratingChange.timeSeconds).seconds <= 30.days
         }
 
         ratingHistoryLastYear = history.filter { ratingChange ->
-            TimeUnit.SECONDS.toDays(currentSeconds - ratingChange.timeSeconds) <= 365
+            (currentSeconds - ratingChange.timeSeconds).seconds <= 365.days
         }
 
         drawRating()
@@ -98,8 +99,8 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
         val currentSeconds = getCurrentTimeSeconds()
         val (minX, maxX) = when {
-            toShow === ratingHistoryLastMonth -> Pair(currentSeconds - TimeUnit.DAYS.toSeconds(30), currentSeconds)
-            toShow === ratingHistoryLastYear -> Pair(currentSeconds - TimeUnit.DAYS.toSeconds(365), currentSeconds)
+            toShow === ratingHistoryLastMonth -> Pair(currentSeconds - 30.days.inWholeSeconds, currentSeconds)
+            toShow === ratingHistoryLastYear -> Pair(currentSeconds - 365.days.inWholeSeconds, currentSeconds)
             else -> Pair(toShow.first().timeSeconds, toShow.last().timeSeconds)
         }.let { Pair(it.first.toFloat(), it.second.toFloat()) }
 
@@ -108,7 +109,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
         val m = Matrix()
         if(minX == maxX){
-            val bound = TimeUnit.DAYS.toSeconds(1).toFloat()
+            val bound = 1.days.inWholeSeconds.toFloat()
             m.preScale(width/(bound*2), height/(maxY-minY))
             m.preTranslate(-(minX-bound), -minY)
         }else{

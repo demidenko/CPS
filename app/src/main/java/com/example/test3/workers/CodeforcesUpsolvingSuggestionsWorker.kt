@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.utils.*
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.days
 
 class CodeforcesUpsolvingSuggestionsWorker(private val context: Context, params: WorkerParameters): CoroutineWorker(context, params) {
 
@@ -20,7 +20,7 @@ class CodeforcesUpsolvingSuggestionsWorker(private val context: Context, params:
 
         val handle = codeforcesAccountManager.getSavedInfo().handle
 
-        val deadLineTimeSeconds = getCurrentTimeSeconds() - TimeUnit.DAYS.toSeconds(90)
+        val deadLineTimeSeconds = getCurrentTimeSeconds() - 90.days.inWholeSeconds
         val ratingChanges = CodeforcesAPI.getUserRatingChanges(handle)
             ?.result
             ?.filter { it.ratingUpdateTimeSeconds > deadLineTimeSeconds }

@@ -11,7 +11,7 @@ import com.example.test3.workers.WorkersCenter
 import com.example.test3.workers.WorkersNames
 import kotlinx.coroutines.delay
 import java.util.concurrent.CancellationException
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.minutes
 
 class CodeforcesContestWatchWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -61,7 +61,7 @@ class CodeforcesContestWatchWorker(val context: Context, params: WorkerParameter
             }.start()
 
             while (true) {
-                delay(TimeUnit.MINUTES.toMillis(5))
+                delay(5.minutes.inWholeMilliseconds)
             }
         }catch (e: CancellationException){
             CodeforcesContestWatchLauncherWorker.onStopWatcher(context, contestID)

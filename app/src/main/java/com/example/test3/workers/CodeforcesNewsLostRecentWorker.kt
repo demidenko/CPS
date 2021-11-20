@@ -10,7 +10,9 @@ import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.seconds
 
 
 class CodeforcesNewsLostRecentWorker(private val context: Context, params: WorkerParameters): CoroutineWorker(context, params){
@@ -88,10 +90,10 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
         val currentTimeSeconds = getCurrentTimeSeconds()
 
         fun isNew(blogCreationTimeSeconds: Long): Boolean =
-            TimeUnit.SECONDS.toHours(currentTimeSeconds - blogCreationTimeSeconds) < 24
+            (currentTimeSeconds - blogCreationTimeSeconds).seconds < 24.hours
 
         fun isOldLost(blogCreationTimeSeconds: Long): Boolean =
-            TimeUnit.SECONDS.toDays(currentTimeSeconds - blogCreationTimeSeconds) > 7
+            (currentTimeSeconds - blogCreationTimeSeconds).seconds > 7.days
 
         val blogsDao = getLostBlogsDao(context)
         val minRatingColorTag = context.settingsNews.lostMinRating()

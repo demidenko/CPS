@@ -12,7 +12,7 @@ import androidx.core.text.italic
 import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.utils.*
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 
 class CodeforcesContestWatcherTableNotification(
     val context: Context,
@@ -101,9 +101,9 @@ class CodeforcesContestWatcherTableNotification(
         rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_phase, phase.getTitle()) }
     }
 
-    override fun onSetRemainingTime(timeSeconds: Long) {
+    override fun onSetRemainingTime(time: Duration) {
         changes = true
-        rviews.forEach { it.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime() + TimeUnit.SECONDS.toMillis(timeSeconds), null, true) }
+        rviews.forEach { it.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime() + time.inWholeMilliseconds, null, true) }
     }
 
     override fun onSetSysTestProgress(percents: Int) {

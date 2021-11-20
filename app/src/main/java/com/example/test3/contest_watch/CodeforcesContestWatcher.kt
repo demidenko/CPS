@@ -63,8 +63,8 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
             if(contestName.isChanged() || contestType.isChanged()) onSetContestNameAndType(contestName.value, contestType.value)
             if(phaseCodeforces.isChanged()) onSetContestPhase(phaseCodeforces.value)
 
-            if(phaseCodeforces.value == CodeforcesContestPhase.CODING && (durationSeconds.isChanged() || startTimeSeconds.isChanged())) timeSecondsFromStart?.let{
-                val remainingTime = durationSeconds.value - it
+            if(phaseCodeforces.value == CodeforcesContestPhase.CODING && (durationSeconds.isChanged() || startTimeSeconds.isChanged())) timeSecondsFromStart?.let {
+                val remainingTime = (durationSeconds.value - it).seconds
                 onSetRemainingTime(remainingTime)
             }
 
@@ -200,8 +200,8 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
         listeners.forEach { l -> l.onSetContestPhase(phase) }
     }
 
-    override fun onSetRemainingTime(timeSeconds: Long) {
-        listeners.forEach { l -> l.onSetRemainingTime(timeSeconds) }
+    override fun onSetRemainingTime(time: Duration) {
+        listeners.forEach { l -> l.onSetRemainingTime(time) }
     }
 
     override fun onSetSysTestProgress(percents: Int) {
@@ -242,7 +242,7 @@ interface CodeforcesContestWatchListener {
     fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType)
     fun onSetProblemNames(problemNames: Array<String>)
     fun onSetContestPhase(phase: CodeforcesContestPhase)
-    fun onSetRemainingTime(timeSeconds: Long)
+    fun onSetRemainingTime(time: Duration)
     fun onSetSysTestProgress(percents: Int)
     fun onSetContestantRank(rank: Int)
     fun onSetContestantPoints(points: Double)

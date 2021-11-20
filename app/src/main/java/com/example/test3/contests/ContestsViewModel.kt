@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.days
 
 class ContestsViewModel: ViewModel() {
 
@@ -40,7 +40,7 @@ class ContestsViewModel: ViewModel() {
                 val (login, apikey) = context.settingsContests.getClistApiLoginAndKey() ?: return@run LoadingState.FAILED
                 val clistContests = CListAPI.getContests(
                     login, apikey, platforms,
-                    getCurrentTimeSeconds() - TimeUnit.DAYS.toSeconds(7)
+                    getCurrentTimeSeconds() - 7.days.inWholeSeconds
                 ) ?: return@run LoadingState.FAILED
                 val grouped = mapAndFilterClistResult(clistContests).groupBy { it.platform }
                 with(getContestsListDao(context)) {

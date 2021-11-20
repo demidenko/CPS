@@ -16,7 +16,7 @@ import com.example.test3.account_manager.*
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 
 abstract class AccountPanel<U: UserInfo>(
@@ -38,13 +38,16 @@ abstract class AccountPanel<U: UserInfo>(
     }
 
     companion object {
-        private val startDelayMillis = TimeUnit.SECONDS.toMillis(3)
-        private val durationMillis = TimeUnit.SECONDS.toMillis(2)
+        private val startDelay = 3.seconds
+        private val duration = 2.seconds
         private fun animateDelayedHide(button: ImageButton){
             button.clearAnimation()
             button.animate().setStartDelay(0).setDuration(0).alpha(1f).withEndAction {
                 button.isVisible = true
-                button.animate().setStartDelay(startDelayMillis).setDuration(durationMillis).alpha(0f)
+                button.animate()
+                    .setStartDelay(startDelay.inWholeMilliseconds)
+                    .setDuration(duration.inWholeMilliseconds)
+                    .alpha(0f)
                     .withEndAction {
                         button.isGone = true
                     }.start()

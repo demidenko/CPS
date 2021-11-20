@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.work.*
 import com.example.test3.account_manager.CodeforcesAccountManager
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 object WorkersNames {
     const val accounts_parsers = "accounts"
@@ -28,13 +31,13 @@ object WorkersCenter {
         context: Context,
         name: String,
         restart: Boolean,
-        repeatInterval: Pair<TimeUnit, Long>,
-        flex: Pair<TimeUnit, Long> = repeatInterval,
+        repeatInterval: Duration,
+        flex: Duration = repeatInterval,
         batteryNotLow: Boolean = false
     ){
         val request = PeriodicWorkRequestBuilder<T>(
-            repeatInterval.second, repeatInterval.first,
-            flex.second, flex.first
+            repeatInterval.inWholeMilliseconds, TimeUnit.MILLISECONDS,
+            flex.inWholeMilliseconds, TimeUnit.MILLISECONDS
         ).addTag(commonTag)
             .setConstraints(
                 Constraints.Builder()
@@ -77,7 +80,7 @@ object WorkersCenter {
             context,
             WorkersNames.codeforces_news_lost_recent,
             restart,
-            TimeUnit.HOURS to 1
+            1.hours
         )
     }
 
@@ -86,8 +89,8 @@ object WorkersCenter {
             context,
             WorkersNames.codeforces_news_follow,
             restart,
-            TimeUnit.HOURS to 6,
-            TimeUnit.HOURS to 3,
+            6.hours,
+            3.hours,
             batteryNotLow = true
         )
     }
@@ -97,7 +100,7 @@ object WorkersCenter {
             context,
             WorkersNames.codeforces_contest_watch_launcher,
             restart,
-            TimeUnit.MINUTES to 45
+            45.minutes
         )
     }
 
@@ -106,7 +109,7 @@ object WorkersCenter {
             context,
             WorkersNames.codeforces_upsolving_suggestions,
             restart,
-            TimeUnit.HOURS to 12,
+            12.hours,
             batteryNotLow = true
         )
     }
@@ -116,7 +119,7 @@ object WorkersCenter {
             context,
             WorkersNames.accounts_parsers,
             restart,
-            TimeUnit.MINUTES to 15
+            15.minutes
         )
     }
 
@@ -125,7 +128,7 @@ object WorkersCenter {
             context,
             WorkersNames.news_parsers,
             restart,
-            TimeUnit.HOURS to 6,
+            6.hours,
             batteryNotLow = true
         )
     }
@@ -135,7 +138,7 @@ object WorkersCenter {
             context,
             WorkersNames.project_euler_recent_problems,
             restart,
-            TimeUnit.HOURS to 1
+            1.hours
         )
     }
 
