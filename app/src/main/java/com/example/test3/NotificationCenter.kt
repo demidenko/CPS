@@ -184,5 +184,5 @@ fun makeSimpleNotification(context: Context, id: Int, title: String, content: St
 fun makeIntentOpenUrl(url: String) = Intent(Intent.ACTION_VIEW, Uri.parse(url))
 
 fun makePendingIntentOpenURL(url: String, context: Context): PendingIntent {
-    return PendingIntent.getActivity(context, 0, Intent(Intent.ACTION_VIEW, Uri.parse(url)), 0)
+    return PendingIntent.getActivity(context, 0, Intent(Intent.ACTION_VIEW, Uri.parse(url)), PendingIntent.FLAG_IMMUTABLE)
 }

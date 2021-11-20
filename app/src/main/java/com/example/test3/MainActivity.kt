@@ -190,7 +190,7 @@ class MainActivity : AppCompatActivity(){
     }
 
     @SuppressLint("RestrictedApi")
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         (menu as? MenuBuilder)?.setOptionalIconsVisible(true)
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
