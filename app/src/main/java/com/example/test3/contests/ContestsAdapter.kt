@@ -26,6 +26,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 
 class ContestsAdapter(
     fragment: CPSFragment,
@@ -38,7 +40,7 @@ class ContestsAdapter(
     init {
         fragment.viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                startTimer(1000) {
+                startTimer(1.seconds) {
                     val currentTimeSeconds = getCurrentTimeSeconds()
                     val comparator = Contest.getComparator(currentTimeSeconds)
                     getActiveViewHolders().forEach { it.refreshTime(currentTimeSeconds) }
@@ -244,7 +246,7 @@ class ContestItemPreviewHolder(view: ConstraintLayout): ContestViewHolder(view) 
         fun makeDate(contest: Contest): String {
             val begin = makeDate(contest.startTimeSeconds)
             val end =
-                if (contest.durationSeconds < TimeUnit.DAYS.toSeconds(1))
+                if (contest.duration < 1.days)
                     DateFormat.format("HH:mm", TimeUnit.SECONDS.toMillis(contest.endTimeSeconds))
                 else "..."
             return "$begin-$end"

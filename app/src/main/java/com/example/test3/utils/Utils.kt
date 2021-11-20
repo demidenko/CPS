@@ -18,6 +18,7 @@ import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
+import kotlin.time.Duration
 
 fun getCurrentTimeSeconds() = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
 
@@ -53,9 +54,10 @@ fun durationHHMM(seconds: Long) : String {
     return String.format("%02d:%02d", minutes/60, minutes%60)
 }
 
-fun durationHHMMSS(seconds: Long) : String {
-    return String.format("%02d:%02d:%02d", seconds/60/60, seconds/60%60, seconds%60)
-}
+fun durationHHMMSS(duration: Duration) : String =
+    duration.toComponents { hours, minutes, seconds, _ ->
+        String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    }
 
 class MutableSetLiveSize<T>() {
     private val s = mutableSetOf<T>()
@@ -122,8 +124,8 @@ data class ComparablePair<A: Comparable<A>, B: Comparable<B>>(
     val second: B
 ): Comparable<ComparablePair<A, B>> {
     override fun compareTo(other: ComparablePair<A, B>): Int {
-        val c = first.compareTo(other.first)
-        return if(c == 0) second.compareTo(other.second) else c
+        val c = first compareTo other.first
+        return if(c == 0) second compareTo other.second else c
     }
 }
 
@@ -170,10 +172,10 @@ inline fun Fragment.launchAndRepeatWithViewLifecycle(
 
 fun EditText.getStringNotBlank(): String? = text?.toString()?.takeIf { it.isNotBlank() }
 
-suspend inline fun CoroutineScope.startTimer(delayMillis: Long, crossinline action: suspend () -> Unit) {
-    require(delayMillis > 0)
+suspend inline fun CoroutineScope.startTimer(delay: Duration, crossinline action: suspend () -> Unit) {
+    require(delay != Duration.ZERO)
     while (isActive) {
         action()
-        delay(delayMillis)
+        delay(delay.inWholeMilliseconds)
     }
 }

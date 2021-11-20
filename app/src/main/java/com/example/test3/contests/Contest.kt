@@ -4,6 +4,8 @@ import androidx.room.Entity
 import com.example.test3.R
 import com.example.test3.room.contestsListTableName
 import com.example.test3.utils.*
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @Entity(
     tableName = contestsListTableName,
@@ -19,6 +21,7 @@ data class Contest (
 ) {
 
     val endTimeSeconds: Long get() = startTimeSeconds + durationSeconds
+    val duration: Duration get() = durationSeconds.seconds
 
     fun getPhase(currentTimesSeconds: Long) = getPhase(currentTimesSeconds, startTimeSeconds, endTimeSeconds)
 

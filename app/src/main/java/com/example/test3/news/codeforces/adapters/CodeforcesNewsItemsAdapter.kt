@@ -13,6 +13,7 @@ import com.example.test3.utils.getCurrentTimeSeconds
 import com.example.test3.utils.startTimer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 abstract class CodeforcesNewsItemsAdapter<H : RecyclerView.ViewHolder, T>(
     fragment: HideShowLifecycleFragment,
@@ -46,7 +47,7 @@ abstract class CodeforcesNewsItemsTimedAdapter<H, T>(
     init {
         fragment.viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                startTimer(1000) {
+                startTimer(1.seconds) {
                     getActiveViewHolders().takeIf { it.isNotEmpty() }?.let { holders ->
                         val currentTimeSeconds = getCurrentTimeSeconds()
                         holders.forEach { it.refreshTime(currentTimeSeconds) }

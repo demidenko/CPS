@@ -28,7 +28,11 @@ import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.*
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 
 enum class CodeforcesTitle {
@@ -346,23 +350,23 @@ class CodeforcesNewsAdapter(
 
 
 fun timeDifference(fromTimeSeconds: Long, toTimeSeconds: Long): String {
-    val t = toTimeSeconds - fromTimeSeconds
+    val t: Duration = (toTimeSeconds - fromTimeSeconds).seconds
     return when {
-        t < TimeUnit.MINUTES.toSeconds(2) -> "minute"
-        t < TimeUnit.HOURS.toSeconds(2) -> "${TimeUnit.SECONDS.toMinutes(t)} minutes"
-        t < TimeUnit.HOURS.toSeconds(24) * 2 -> "${TimeUnit.SECONDS.toHours(t)} hours"
-        t < TimeUnit.DAYS.toSeconds(7) * 2 -> "${TimeUnit.SECONDS.toDays(t)} days"
-        t < TimeUnit.DAYS.toSeconds(31) * 2 -> "${TimeUnit.SECONDS.toDays(t) / 7} weeks"
-        t < TimeUnit.DAYS.toSeconds(365) * 2 -> "${TimeUnit.SECONDS.toDays(t) / 31} months"
-        else -> "${TimeUnit.SECONDS.toDays(t) / 365} years"
+        t < 2.minutes -> "minute"
+        t < 2.hours -> "${t.inWholeMinutes} minutes"
+        t < 24.hours * 2 -> "${t.inWholeHours} hours"
+        t < 7.days * 2 -> "${t.inWholeDays} days"
+        t < 31.days * 2 -> "${t.inWholeDays / 7} weeks"
+        t < 365.days * 2 -> "${t.inWholeDays / 31} months"
+        else -> "${t.inWholeDays / 365} years"
     }
 }
 
 fun timeAgo(fromTimeSeconds: Long, toTimeSeconds: Long) = timeDifference(fromTimeSeconds, toTimeSeconds) + " ago"
 
 fun timeDifference2(fromTimeSeconds: Long, toTimeSeconds: Long): String {
-    val t = toTimeSeconds - fromTimeSeconds
-    if(t < TimeUnit.HOURS.toSeconds(48)) return durationHHMMSS(t)
+    val t: Duration = (toTimeSeconds - fromTimeSeconds).seconds
+    if(t < 24.hours * 2) return durationHHMMSS(t)
     return timeDifference(fromTimeSeconds, toTimeSeconds)
 }
 

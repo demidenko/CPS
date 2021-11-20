@@ -2,7 +2,9 @@ package com.example.test3.contest_watch
 
 import com.example.test3.utils.*
 import kotlinx.coroutines.*
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class CodeforcesContestWatcher(val handle: String, val contestID: Int): CodeforcesContestWatchListener {
 
@@ -130,37 +132,37 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
 
             commit()
 
-            when(val delayMillis = getDelayMillis(phaseCodeforces.value, participationType.value)){
-                0L -> {
+            when(val delayTime = getDelay(phaseCodeforces.value, participationType.value)) {
+                Duration.ZERO -> {
                     return
                     //delay(60_000)
                 }
-                else -> delay(delayMillis)
+                else -> delay(delayTime.inWholeMilliseconds)
             }
         }
     }
 
     private var ratingChangeWaitingStartTimeMillis = 0L
-    private suspend fun getDelayMillis(contestPhase: CodeforcesContestPhase, participationType: CodeforcesParticipationType): Long {
+    private suspend fun getDelay(contestPhase: CodeforcesContestPhase, participationType: CodeforcesParticipationType): Duration {
         when(contestPhase){
-            CodeforcesContestPhase.CODING -> return 3_000
-            CodeforcesContestPhase.SYSTEM_TEST -> return 3_000
-            CodeforcesContestPhase.PENDING_SYSTEM_TEST -> return 15_000
+            CodeforcesContestPhase.CODING -> return 3.seconds
+            CodeforcesContestPhase.SYSTEM_TEST -> return 3.seconds
+            CodeforcesContestPhase.PENDING_SYSTEM_TEST -> return 15.seconds
             CodeforcesContestPhase.FINISHED -> {
-                if(checkRatingChanges(participationType)) return 0
+                if(checkRatingChanges(participationType)) return Duration.ZERO
 
                 val currentTimeMillis = System.currentTimeMillis()
                 if(ratingChangeWaitingStartTimeMillis == 0L) ratingChangeWaitingStartTimeMillis = currentTimeMillis
 
-                val hoursWaiting = TimeUnit.MILLISECONDS.toHours(currentTimeMillis - ratingChangeWaitingStartTimeMillis)
+                val hoursWaiting = (currentTimeMillis - ratingChangeWaitingStartTimeMillis).milliseconds.inWholeHours
                 return when {
-                    hoursWaiting<=0 -> 10_000
-                    hoursWaiting<=1 -> 30_000
-                    hoursWaiting<=3 -> 60_000
-                    else -> 0
+                    hoursWaiting <= 0 -> 10.seconds
+                    hoursWaiting <= 1 -> 30.seconds
+                    hoursWaiting <= 3 -> 60.seconds
+                    else -> 0.seconds
                 }
             }
-            else -> return 30_000
+            else -> return 30.seconds
         }
     }
 
