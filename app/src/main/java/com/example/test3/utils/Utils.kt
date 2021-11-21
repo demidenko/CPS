@@ -12,6 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
@@ -21,6 +22,7 @@ import kotlin.reflect.full.memberProperties
 import kotlin.time.Duration
 
 fun getCurrentTimeSeconds() = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+fun getCurrentTime() = Clock.System.now()
 
 fun getColorFromResource(context: Context, resourceId: Int): Int {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {

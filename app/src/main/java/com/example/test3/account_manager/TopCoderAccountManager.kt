@@ -11,7 +11,6 @@ import com.example.test3.utils.TopCoderAPI
 import kotlinx.serialization.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class TopCoderAccountManager(context: Context): RatedAccountManager<TopCoderAccountManager.TopCoderUserInfo>(context, manager_name) {
 
@@ -83,10 +82,7 @@ class TopCoderAccountManager(context: Context): RatedAccountManager<TopCoderAcco
         val response = TopCoderAPI.getStatsHistory(info.handle) ?: return null
         if(!response.success || response.status!=200) return null
         return response.content[0].DATA_SCIENCE.SRM.history.map { topCoderRatingChange ->
-            RatingChange(
-                rating = topCoderRatingChange.rating.toInt(),
-                timeSeconds = TimeUnit.MILLISECONDS.toSeconds(dateFormat.parse(topCoderRatingChange.date.removeSuffix("T00:00:00.000Z")).time)
-            )
+            RatingChange(topCoderRatingChange)
         }
     }
 

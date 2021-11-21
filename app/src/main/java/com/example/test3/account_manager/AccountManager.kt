@@ -15,6 +15,8 @@ import com.example.test3.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toInstant
 import java.util.concurrent.TimeUnit
 
 
@@ -93,24 +95,29 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: S
     }
 
     protected open suspend fun loadRatingHistory(info: U): List<RatingChange>? = null
-    suspend fun getRatingHistory(info: U): List<RatingChange>? = loadRatingHistory(info)?.sortedBy { it.timeSeconds }
+    suspend fun getRatingHistory(info: U): List<RatingChange>? = loadRatingHistory(info)?.sortedBy { it.date }
 
     //list of (last time, bounds)
-    open val ratingUpperBoundRevolutions: List<Pair<Long, Array<Pair<Int, HandleColor>>>> = emptyList()
+    open val ratingUpperBoundRevolutions: List<Pair<Instant, Array<Pair<Int, HandleColor>>>> = emptyList()
 }
 
 data class RatingChange(
     val rating: Int,
-    val timeSeconds: Long
+    val date: Instant
 ){
     constructor(ratingChange: CodeforcesRatingChange): this(
         ratingChange.newRating,
-        ratingChange.ratingUpdateTimeSeconds
+        Instant.fromEpochSeconds(ratingChange.ratingUpdateTimeSeconds)
     )
 
     constructor(ratingChange: AtCoderRatingChange): this(
         ratingChange.NewRating,
-        ratingChange.EndTime
+        Instant.fromEpochSeconds(ratingChange.EndTime)
+    )
+
+    constructor(ratingChange: TopCoderRatingChange): this(
+        ratingChange.rating.toInt(),
+        ratingChange.date.toInstant()
     )
 }
 

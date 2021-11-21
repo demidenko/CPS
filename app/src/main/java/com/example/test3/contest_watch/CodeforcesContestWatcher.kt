@@ -14,7 +14,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
         val phaseCodeforces = ChangingValue(CodeforcesContestPhase.UNDEFINED)
         val rank = ChangingValue(-1)
         val pointsTotal = ChangingValue(0.0)
-        val durationSeconds = ChangingValue(-1L)
+        val duration = ChangingValue(Duration.ZERO)
         val startTimeSeconds = ChangingValue(-1L)
         var problemNames: List<String>? = null
         val participationType = ChangingValue(CodeforcesParticipationType.NOT_PARTICIPATED)
@@ -23,7 +23,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
         val testedSubmissions = mutableSetOf<Long>()
 
         while (true) {
-            var timeSecondsFromStart: Long? = null
+            var timeFromStart: Duration? = null
             CodeforcesAPI.getContestStandings(
                 contestID,
                 handle,
@@ -39,8 +39,8 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
                     }
 
                     phaseCodeforces.value = contest.phase
-                    timeSecondsFromStart = contest.relativeTimeSeconds
-                    durationSeconds.value = contest.durationSeconds
+                    timeFromStart = contest.relativeTimeSeconds.seconds
+                    duration.value = contest.durationSeconds.seconds
                     startTimeSeconds.value = contest.startTimeSeconds
                     contestName.value = contest.name
                     contestType.value = contest.type
@@ -63,8 +63,8 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
             if(contestName.isChanged() || contestType.isChanged()) onSetContestNameAndType(contestName.value, contestType.value)
             if(phaseCodeforces.isChanged()) onSetContestPhase(phaseCodeforces.value)
 
-            if(phaseCodeforces.value == CodeforcesContestPhase.CODING && (durationSeconds.isChanged() || startTimeSeconds.isChanged())) timeSecondsFromStart?.let {
-                val remainingTime = (durationSeconds.value - it).seconds
+            if(phaseCodeforces.value == CodeforcesContestPhase.CODING && (duration.isChanged() || startTimeSeconds.isChanged())) timeFromStart?.let {
+                val remainingTime = duration.value - it
                 onSetRemainingTime(remainingTime)
             }
 

@@ -13,12 +13,11 @@ import com.example.test3.account_manager.*
 import com.example.test3.ui.disable
 import com.example.test3.ui.enable
 import com.example.test3.utils.getColorFromResource
-import com.example.test3.utils.getCurrentTimeSeconds
+import com.example.test3.utils.getCurrentTime
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 import kotlin.math.round
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.seconds
 
 class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
@@ -32,7 +31,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         accountManager = ratedAccountManager
     }
 
-    private var ratingHistory: List<RatingChange> = listOf(RatingChange(0,0L))
+    private var ratingHistory: List<RatingChange> =  emptyList()
     private var toShow = ratingHistory
     private lateinit var ratingHistoryLast10: List<RatingChange>
     private lateinit var ratingHistoryLastMonth: List<RatingChange>
@@ -44,13 +43,13 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
         ratingHistoryLast10 = history.takeLast(10)
 
-        val currentSeconds = getCurrentTimeSeconds()
+        val currentTime = getCurrentTime()
         ratingHistoryLastMonth = history.filter { ratingChange ->
-            (currentSeconds - ratingChange.timeSeconds).seconds <= 30.days
+            currentTime - ratingChange.date <= 30.days
         }
 
         ratingHistoryLastYear = history.filter { ratingChange ->
-            (currentSeconds - ratingChange.timeSeconds).seconds <= 365.days
+            currentTime - ratingChange.date <= 365.days
         }
 
         drawRating()
@@ -97,12 +96,12 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         val minY = toShow.minOf { it.rating } - 100f
         val maxY = toShow.maxOf { it.rating } + 100f
 
-        val currentSeconds = getCurrentTimeSeconds()
+        val currentTime = getCurrentTime()
         val (minX, maxX) = when {
-            toShow === ratingHistoryLastMonth -> Pair(currentSeconds - 30.days.inWholeSeconds, currentSeconds)
-            toShow === ratingHistoryLastYear -> Pair(currentSeconds - 365.days.inWholeSeconds, currentSeconds)
-            else -> Pair(toShow.first().timeSeconds, toShow.last().timeSeconds)
-        }.let { Pair(it.first.toFloat(), it.second.toFloat()) }
+            toShow === ratingHistoryLastMonth -> listOf(currentTime - 30.days, currentTime)
+            toShow === ratingHistoryLastYear -> listOf(currentTime - 365.days, currentTime)
+            else -> listOf(toShow.first().date, toShow.last().date)
+        }.map { it.epochSeconds.toFloat() }
 
         val circleRadius = 8f
         val circleStroke = 3f
@@ -119,33 +118,33 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         }
 
         //rating stripes
-        val allRatingBounds = accountManager.ratingUpperBoundRevolutions.toMutableList()
-        allRatingBounds.add(getCurrentTimeSeconds() to accountManager.ratingsUpperBounds)
-        val rectangles = mutableListOf<Triple<Long,Int,HandleColor>>()
-        allRatingBounds.sortedByDescending { it.first }.forEachIndexed { index, it ->
-            val lastTimeSeconds = it.first
-            val x = if(index == 0) width.toFloat() else {
-                val arr = floatArrayOf(lastTimeSeconds.toFloat(), 0f)
-                m.mapPoints(arr)
-                arr[0]
-            }
-
-            val ratingBounds = it.second.toMutableList()
-            ratingBounds.add(Pair(Int.MAX_VALUE, HandleColor.RED))
-            ratingBounds.sortedByDescending { it.first }.forEachIndexed { index2, (upper, ratingColor) ->
-
-                val y = if(index2 == 0) height.toFloat() else {
-                    val arr = floatArrayOf(0f, upper.toFloat())
+        val allRatingBounds = accountManager.ratingUpperBoundRevolutions + Pair(getCurrentTime(), accountManager.ratingsUpperBounds)
+        val rectangles = buildList {
+            allRatingBounds.sortedByDescending { it.first }.forEachIndexed { index, it ->
+                val lastTime = it.first
+                val x = if(index == 0) width.toFloat() else {
+                    val arr = floatArrayOf(lastTime.epochSeconds.toFloat(), 0f)
                     m.mapPoints(arr)
-                    arr[1]
+                    arr[0]
                 }
 
-                extraCanvas.drawRect(0f, 0f, round(x), round(y), Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = ratingColor.getARGB(accountManager)
-                    style = Paint.Style.FILL
-                })
+                (it.second + Pair(Int.MAX_VALUE, HandleColor.RED))
+                    .sortedByDescending { it.first }
+                    .forEachIndexed { index2, (upper, ratingColor) ->
 
-                rectangles.add(Triple(lastTimeSeconds, upper, ratingColor))
+                    val y = if(index2 == 0) height.toFloat() else {
+                        val arr = floatArrayOf(0f, upper.toFloat())
+                        m.mapPoints(arr)
+                        arr[1]
+                    }
+
+                    extraCanvas.drawRect(0f, 0f, round(x), round(y), Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                        color = ratingColor.getARGB(accountManager)
+                        style = Paint.Style.FILL
+                    })
+
+                    add(Triple(lastTime, upper, ratingColor))
+                }
             }
         }
 
@@ -153,7 +152,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         val pathWidth = 4f
         val path = Path()
         ratingHistory.forEachIndexed { index, ratingChange ->
-            val arr = floatArrayOf(ratingChange.timeSeconds.toFloat(), ratingChange.rating.toFloat())
+            val arr = floatArrayOf(ratingChange.date.epochSeconds.toFloat(), ratingChange.rating.toFloat())
             m.mapPoints(arr)
             val (x,y) = arr
             if(index == 0) path.moveTo(x, y)
@@ -173,7 +172,7 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         })
 
         ratingHistory.forEach { ratingChange ->
-            val arr = floatArrayOf(ratingChange.timeSeconds.toFloat(), ratingChange.rating.toFloat())
+            val arr = floatArrayOf(ratingChange.date.epochSeconds.toFloat(), ratingChange.rating.toFloat())
             m.mapPoints(arr)
             val (x,y) = arr
 
@@ -198,12 +197,12 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
 
         //rating points
         ratingHistory.forEach { ratingChange ->
-            val arr = floatArrayOf(ratingChange.timeSeconds.toFloat(), ratingChange.rating.toFloat())
+            val arr = floatArrayOf(ratingChange.date.epochSeconds.toFloat(), ratingChange.rating.toFloat())
             m.mapPoints(arr)
             val (x,y) = arr
 
-            val handleColor = rectangles.last { (timeSeconds, rating, color) ->
-                ratingChange.timeSeconds < timeSeconds && ratingChange.rating < rating
+            val handleColor = rectangles.last { (time, rating, color) ->
+                ratingChange.date < time && ratingChange.rating < rating
             }.third
 
             //circle inner
