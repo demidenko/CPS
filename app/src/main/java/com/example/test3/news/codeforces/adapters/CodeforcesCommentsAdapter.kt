@@ -15,6 +15,7 @@ import com.example.test3.ui.HideShowLifecycleFragment
 import com.example.test3.ui.TimeDepends
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
 
 class CodeforcesCommentsAdapter(
     fragment: HideShowLifecycleFragment,
@@ -51,8 +52,8 @@ class CodeforcesCommentsAdapter(
         }
 
         override var startTimeSeconds: Long = 0
-        override fun refreshTime(currentTimeSeconds: Long) {
-            time.text = timeAgo(startTimeSeconds, currentTimeSeconds)
+        override fun refreshTime(currentTime: Instant) {
+            time.text = timeAgo(startTimeSeconds, currentTime.epochSeconds)
         }
     }
 
@@ -77,7 +78,7 @@ class CodeforcesCommentsAdapter(
             commentContent.text = CodeforcesUtils.fromCodeforcesHTML(comment.text)
 
             startTimeSeconds = comment.creationTimeSeconds
-            refreshTime(getCurrentTimeSeconds())
+            refreshTime(getCurrentTime())
 
             view.setOnClickListener {
                 it.context.startActivity(makeIntentOpenUrl(CodeforcesURLFactory.comment(blogEntry.id,comment.id)))

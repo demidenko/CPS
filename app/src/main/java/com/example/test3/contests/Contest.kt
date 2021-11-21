@@ -4,6 +4,7 @@ import androidx.room.Entity
 import com.example.test3.R
 import com.example.test3.room.contestsListTableName
 import com.example.test3.utils.*
+import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -23,7 +24,7 @@ data class Contest (
     val endTimeSeconds: Long get() = startTimeSeconds + durationSeconds
     val duration: Duration get() = durationSeconds.seconds
 
-    fun getPhase(currentTimesSeconds: Long) = getPhase(currentTimesSeconds, startTimeSeconds, endTimeSeconds)
+    fun getPhase(currentTime: Instant) = getPhase(currentTime.epochSeconds, startTimeSeconds, endTimeSeconds)
 
     fun getCompositeId() = platform to id
 
@@ -84,25 +85,26 @@ data class Contest (
             return Phase.RUNNING
         }
 
-        fun getComparator(currentTimeSeconds: Long) = compareBy<Contest> {
-                when(it.getPhase(currentTimeSeconds)) {
+        fun getComparator(currentTime: Instant) = compareBy<Contest> {
+                when(it.getPhase(currentTime)) {
                     Phase.BEFORE -> ComparablePair(1, it.startTimeSeconds)
                     Phase.RUNNING -> ComparablePair(0, it.endTimeSeconds)
                     Phase.FINISHED -> ComparablePair(2, -it.endTimeSeconds)
                 }
             }.thenBy { it.durationSeconds }.thenBy { it.platform }.thenBy { it.id }
 
+        private fun String.removePrefixHttp() = removePrefix("http://").removePrefix("https://")
         fun extractContestId(contest: ClistContest, platform: Platform): String {
             return when (platform) {
                 Platform.codeforces -> {
-                    contest.href.removePrefix("http://").removePrefix("https://").removePrefix("codeforces.com/contests/")
+                    contest.href.removePrefixHttp().removePrefix("codeforces.com/contests/")
                         .toIntOrNull()?.toString()
                 }
                 Platform.atcoder -> {
-                    contest.href.removePrefix("http://").removePrefix("https://").removePrefix("atcoder.jp/contests/")
+                    contest.href.removePrefixHttp().removePrefix("atcoder.jp/contests/")
                 }
                 Platform.codechef -> {
-                    contest.href.removePrefix("http://").removePrefix("https://").removePrefix("www.codechef.com/")
+                    contest.href.removePrefixHttp().removePrefix("www.codechef.com/")
                 }
                 else -> null
             } ?: contest.id.toString()

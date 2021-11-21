@@ -9,7 +9,7 @@ import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.ui.FlowItemsAdapter
 import com.example.test3.ui.HideShowLifecycleFragment
 import com.example.test3.ui.TimeDepends
-import com.example.test3.utils.getCurrentTimeSeconds
+import com.example.test3.utils.getCurrentTime
 import com.example.test3.utils.startTimer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -49,8 +49,8 @@ abstract class CodeforcesNewsItemsTimedAdapter<H, T>(
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 startTimer(1.seconds) {
                     getActiveViewHolders().takeIf { it.isNotEmpty() }?.let { holders ->
-                        val currentTimeSeconds = getCurrentTimeSeconds()
-                        holders.forEach { it.refreshTime(currentTimeSeconds) }
+                        val currentTime = getCurrentTime()
+                        holders.forEach { it.refreshTime(currentTime) }
                     }
                 }
             }

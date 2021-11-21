@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Instant
 
 
 class CodeforcesBlogEntriesAdapter(
@@ -94,8 +95,8 @@ class CodeforcesBlogEntriesAdapter(
         }
 
         override var startTimeSeconds: Long = 0
-        override fun refreshTime(currentTimeSeconds: Long) {
-            time.text = timeAgo(startTimeSeconds, currentTimeSeconds)
+        override fun refreshTime(currentTime: Instant) {
+            time.text = timeAgo(startTimeSeconds, currentTime.epochSeconds)
         }
     }
 
@@ -149,7 +150,7 @@ class CodeforcesBlogEntriesAdapter(
             setRating(blogEntry.rating)
 
             startTimeSeconds = blogEntry.creationTimeSeconds
-            refreshTime(getCurrentTimeSeconds())
+            refreshTime(getCurrentTime())
         }
     }
 

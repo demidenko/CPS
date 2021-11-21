@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 
 abstract class FlowItemsAdapter<H: RecyclerView.ViewHolder, T>(
     private val fragment: HideShowLifecycleFragment,
@@ -67,7 +68,7 @@ var RecyclerView.flowAdapter: FlowItemsAdapter<*, *>?
 
 interface TimeDepends {
     var startTimeSeconds: Long
-    fun refreshTime(currentTimeSeconds: Long)
+    fun refreshTime(currentTime: Instant)
 }
 
 class LifecycleMerge(

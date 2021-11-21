@@ -25,6 +25,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Instant
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
@@ -41,9 +42,9 @@ class ContestsAdapter(
         fragment.viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 startTimer(1.seconds) {
-                    val currentTimeSeconds = getCurrentTimeSeconds()
-                    val comparator = Contest.getComparator(currentTimeSeconds)
-                    getActiveViewHolders().forEach { it.refreshTime(currentTimeSeconds) }
+                    val currentTime = getCurrentTime()
+                    val comparator = Contest.getComparator(currentTime)
+                    getActiveViewHolders().forEach { it.refreshTime(currentTime) }
                     if(!items.isSortedWith(comparator)) {
                         val oldItems = items.clone()
                         items.sortWith(comparator)
@@ -55,7 +56,7 @@ class ContestsAdapter(
     }
 
     override suspend fun applyData(data: List<Contest>): DiffUtil.DiffResult {
-        val newItems = data.sortedWith(Contest.getComparator(getCurrentTimeSeconds())).toTypedArray()
+        val newItems = data.sortedWith(Contest.getComparator(getCurrentTime())).toTypedArray()
         return DiffUtil.calculateDiff(diffCallback(items, newItems)).also { items = newItems }
     }
 
@@ -90,7 +91,7 @@ class ContestsAdapter(
         with(holder) {
             val contest = items[position]
             holder.contest = contest
-            refreshTime(getCurrentTimeSeconds())
+            refreshTime(getCurrentTime())
             setOnClickListener {
                 expandedItems.add(contest.getCompositeId())
                 notifyItemChanged(bindingAdapterPosition)
@@ -102,7 +103,7 @@ class ContestsAdapter(
         with(holder) {
             val contest = items[position]
             holder.contest = contest
-            refreshTime(getCurrentTimeSeconds())
+            refreshTime(getCurrentTime())
             setOnMinimizeClickListener {
                 expandedItems.remove(contest.getCompositeId())
                 notifyItemChanged(bindingAdapterPosition)
@@ -167,12 +168,12 @@ abstract class ContestViewHolder(protected val view: ConstraintLayout): Recycler
         set(value) {}
 
     private var lastPhase: Contest.Phase? = null
-    final override fun refreshTime(currentTimeSeconds: Long) {
-        val phase = contest.getPhase(currentTimeSeconds)
-        refresh(currentTimeSeconds, phase, lastPhase)
+    final override fun refreshTime(currentTime: Instant) {
+        val phase = contest.getPhase(currentTime)
+        refresh(currentTime, phase, lastPhase)
     }
 
-    abstract fun refresh(currentTimeSeconds: Long, phase: Contest.Phase, oldPhase: Contest.Phase?)
+    abstract fun refresh(currentTime: Instant, phase: Contest.Phase, oldPhase: Contest.Phase?)
 
     protected fun showPhase(title: TextView, phase: Contest.Phase) {
         title.setTextColor(getColorFromResource(view.context,
@@ -224,15 +225,15 @@ class ContestItemPreviewHolder(view: ConstraintLayout): ContestViewHolder(view) 
         view.setOnClickListener(action)
     }
 
-    override fun refresh(currentTimeSeconds: Long, phase: Contest.Phase, oldPhase: Contest.Phase?) {
+    override fun refresh(currentTime: Instant, phase: Contest.Phase, oldPhase: Contest.Phase?) {
         counterTextView.text = when (phase) {
             Contest.Phase.BEFORE -> {
                 if(phase!=oldPhase) date.text = makeDate(contest)
-                "in " + timeDifference2(currentTimeSeconds, contest.startTimeSeconds)
+                "in " + timeDifference2(currentTime.epochSeconds, contest.startTimeSeconds)
             }
             Contest.Phase.RUNNING -> {
                 if(phase!=oldPhase) date.text = "ends ${makeDate(contest.endTimeSeconds)}"
-                "left " + timeDifference2(currentTimeSeconds, contest.endTimeSeconds)
+                "left " + timeDifference2(currentTime.epochSeconds, contest.endTimeSeconds)
             }
             Contest.Phase.FINISHED -> {
                 if(phase!=oldPhase) date.text = "${makeDate(contest.startTimeSeconds)} - ${makeDate(contest.endTimeSeconds)}"
@@ -274,15 +275,15 @@ class ContestItemBigViewHolder(view: ConstraintLayout): ContestViewHolder(view) 
         }
     }
 
-    override fun refresh(currentTimeSeconds: Long, phase: Contest.Phase, oldPhase: Contest.Phase?) {
+    override fun refresh(currentTime: Instant, phase: Contest.Phase, oldPhase: Contest.Phase?) {
         dateStart.text = "start: ${makeDate(contest.startTimeSeconds)}"
         dateEnd.text = "end: ${makeDate(contest.endTimeSeconds)}"
         counterTextView.text = when (phase) {
             Contest.Phase.BEFORE -> {
-                "starts in " + timeDifference2(currentTimeSeconds, contest.startTimeSeconds)
+                "starts in " + timeDifference2(currentTime.epochSeconds, contest.startTimeSeconds)
             }
             Contest.Phase.RUNNING -> {
-                "ends in " + timeDifference2(currentTimeSeconds, contest.endTimeSeconds)
+                "ends in " + timeDifference2(currentTime.epochSeconds, contest.endTimeSeconds)
             }
             Contest.Phase.FINISHED -> {
                 ""
