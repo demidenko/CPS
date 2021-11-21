@@ -5,7 +5,6 @@ import com.example.test3.R
 import com.example.test3.room.contestsListTableName
 import com.example.test3.utils.*
 import kotlinx.datetime.Instant
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @Entity(
@@ -16,15 +15,14 @@ data class Contest (
     val platform: Platform,
     val id: String,
     val title: String,
-    val startTimeSeconds: Long,
+    val startTime: Instant,
     val durationSeconds: Long,
     val link: String? = null
 ) {
 
-    val endTimeSeconds: Long get() = startTimeSeconds + durationSeconds
-    val duration: Duration get() = durationSeconds.seconds
+    val endTime: Instant get() = startTime + durationSeconds.seconds
 
-    fun getPhase(currentTime: Instant) = getPhase(currentTime.epochSeconds, startTimeSeconds, endTimeSeconds)
+    fun getPhase(currentTime: Instant) = getPhase(currentTime, startTime, endTime)
 
     fun getCompositeId() = platform to id
 
@@ -32,7 +30,7 @@ data class Contest (
         Platform.codeforces,
         contest.id.toString(),
         contest.name,
-        contest.startTimeSeconds,
+        Instant.fromEpochSeconds(contest.startTimeSeconds),
         contest.durationSeconds,
         link = CodeforcesURLFactory.contestOuter(contest.id)
     )
@@ -42,7 +40,7 @@ data class Contest (
         platform,
         extractContestId(contest, platform),
         contest.event,
-        CListAPI.dateToSeconds(contest.start),
+        Instant.fromEpochSeconds(CListAPI.dateToSeconds(contest.start)),
         contest.duration,
         link = contest.href
     )
@@ -79,17 +77,17 @@ data class Contest (
     }
 
     companion object {
-        fun getPhase(currentTimeSeconds: Long, startTimeSeconds: Long, endTimeSeconds: Long): Phase {
-            if(currentTimeSeconds < startTimeSeconds) return Phase.BEFORE
-            if(currentTimeSeconds >= endTimeSeconds) return Phase.FINISHED
+        fun getPhase(currentTime: Instant, startTime: Instant, endTime: Instant): Phase {
+            if(currentTime < startTime) return Phase.BEFORE
+            if(currentTime >= endTime) return Phase.FINISHED
             return Phase.RUNNING
         }
 
         fun getComparator(currentTime: Instant) = compareBy<Contest> {
                 when(it.getPhase(currentTime)) {
-                    Phase.BEFORE -> ComparablePair(1, it.startTimeSeconds)
-                    Phase.RUNNING -> ComparablePair(0, it.endTimeSeconds)
-                    Phase.FINISHED -> ComparablePair(2, -it.endTimeSeconds)
+                    Phase.BEFORE -> ComparablePair(1, it.startTime.epochSeconds)
+                    Phase.RUNNING -> ComparablePair(0, it.endTime.epochSeconds)
+                    Phase.FINISHED -> ComparablePair(2, -it.endTime.epochSeconds)
                 }
             }.thenBy { it.durationSeconds }.thenBy { it.platform }.thenBy { it.id }
 

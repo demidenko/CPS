@@ -23,12 +23,12 @@ import com.example.test3.utils.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.Instant
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.seconds
 
 class ContestsFragment: CPSFragment() {
 
@@ -112,9 +112,9 @@ class ContestsFragment: CPSFragment() {
 
     fun makeContestsFlow(): Flow<List<Contest>> {
         val contestsFlow = getContestsListDao(mainActivity).flowOfContests().map { contests ->
-            val currentTimeSeconds = getCurrentTimeSeconds()
+            val currentTime = getCurrentTime()
             contests.filter { contest ->
-                (currentTimeSeconds - contest.endTimeSeconds).seconds < 7.days
+                currentTime - contest.endTime < 7.days
             }
         }
         val removedIdsFlow = mainActivity.settingsContests.removedContestsIds.flow
@@ -207,7 +207,7 @@ class ContestsFragment: CPSFragment() {
                 platform = Contest.Platform.unknown,
                 id = getCurrentTimeSeconds().toString(),
                 title = titleTextField.editText?.getStringNotBlank()!!,
-                startTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(startDate!!.time),
+                startTime = Instant.fromEpochMilliseconds(startDate!!.time),
                 durationSeconds = TimeUnit.MILLISECONDS.toSeconds(endDate!!.time - startDate!!.time),
             )
             contestViewModel.addCustomContest(contest, requireContext())

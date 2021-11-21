@@ -371,4 +371,4 @@ fun timeDifference2(fromTimeSeconds: Long, toTimeSeconds: Long): String {
     if(t < 24.hours * 2) return durationHHMMSS(t)
     return timeDifference(fromTimeSeconds, toTimeSeconds)
 }
-
+fun timeDifference2(fromTime: Instant, toTime: Instant) = timeDifference2(fromTime.epochSeconds, toTime.epochSeconds)

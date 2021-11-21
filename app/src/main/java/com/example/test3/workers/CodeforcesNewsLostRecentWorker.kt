@@ -10,9 +10,9 @@ import com.example.test3.room.LostBlogEntry
 import com.example.test3.room.getLostBlogsDao
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.seconds
 
 
 class CodeforcesNewsLostRecentWorker(private val context: Context, params: WorkerParameters): CoroutineWorker(context, params){
@@ -87,13 +87,10 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
 
         if(recentBlogEntries.isEmpty()) return Result.failure()
 
-        val currentTimeSeconds = getCurrentTimeSeconds()
+        val currentTime = getCurrentTime()
 
-        fun isNew(blogCreationTimeSeconds: Long): Boolean =
-            (currentTimeSeconds - blogCreationTimeSeconds).seconds < 24.hours
-
-        fun isOldLost(blogCreationTimeSeconds: Long): Boolean =
-            (currentTimeSeconds - blogCreationTimeSeconds).seconds > 7.days
+        fun isNew(blogCreationTime: Instant) = currentTime - blogCreationTime < 24.hours
+        fun isOldLost(blogCreationTime: Instant) = currentTime - blogCreationTime > 7.days
 
         val blogsDao = getLostBlogsDao(context)
         val minRatingColorTag = context.settingsNews.lostMinRating()
@@ -101,24 +98,24 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
         //get current suspects with removing old ones
         val suspects = blogsDao.getSuspects()
             .partition { blogEntry ->
-                isNew(blogEntry.creationTimeSeconds) && blogEntry.authorColorTag>=minRatingColorTag
+                isNew(blogEntry.creationTime) && blogEntry.authorColorTag>=minRatingColorTag
             }.also {
                 blogsDao.remove(it.second)
             }.first
 
         //catch new suspects from recent actions
         recentBlogEntries.forEach { blog ->
-            if(blog.authorColorTag>=minRatingColorTag && suspects.none { it.id == blog.id }){
-                val creationTimeSeconds = CodeforcesUtils.getBlogCreationTimeSeconds(blog.id)
-                if(isNew(creationTimeSeconds)){
+            if(blog.authorColorTag>=minRatingColorTag && suspects.none { it.id == blog.id }) {
+                val creationTime = CodeforcesUtils.getBlogCreationTime(blog.id)
+                if(isNew(creationTime)) {
                     val newSuspect = LostBlogEntry(
                         id = blog.id,
                         title = blog.title,
                         authorHandle = blog.authorHandle,
                         authorColorTag = blog.authorColorTag,
-                        creationTimeSeconds = creationTimeSeconds,
+                        creationTime = creationTime,
                         isSuspect = true,
-                        timeStamp = 0
+                        timeStamp = Instant.DISTANT_PAST
                     )
                     blogsDao.insert(newSuspect)
                 }
@@ -130,7 +127,7 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
         //remove from lost
         blogsDao.remove(
             blogsDao.getLost().filter { blogEntry ->
-                isOldLost(blogEntry.creationTimeSeconds) || blogEntry.id in recentBlogIDs
+                isOldLost(blogEntry.creationTime) || blogEntry.id in recentBlogIDs
             }
         )
 
@@ -139,7 +136,7 @@ class CodeforcesNewsLostRecentWorker(private val context: Context, params: Worke
             if(blogEntry.id !in recentBlogIDs){
                 blogsDao.update(blogEntry.copy(
                     isSuspect = false,
-                    timeStamp = currentTimeSeconds
+                    timeStamp = currentTime
                 ))
             }
         }

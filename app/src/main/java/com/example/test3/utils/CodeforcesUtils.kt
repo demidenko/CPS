@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
@@ -31,8 +32,10 @@ import java.util.concurrent.TimeUnit
 
 object CodeforcesUtils {
 
-    suspend fun getBlogCreationTimeSeconds(blogId: Int): Long {
-        return CodeforcesAPI.getBlogEntry(blogId,CodeforcesLocale.RU)?.result?.creationTimeSeconds ?: return 0L
+    suspend fun getBlogCreationTime(blogId: Int): Instant {
+        return CodeforcesAPI.getBlogEntry(blogId,CodeforcesLocale.RU)?.result?.let {
+            Instant.fromEpochSeconds(it.creationTimeSeconds)
+        } ?: Instant.DISTANT_PAST
     }
 
     private val dateFormatRU = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }

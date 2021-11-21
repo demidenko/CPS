@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
-import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
@@ -163,7 +162,7 @@ abstract class ContestViewHolder(protected val view: ConstraintLayout): Recycler
     abstract fun applyContest(contest: Contest)
 
     final override var startTime: Instant
-        get() = Instant.fromEpochSeconds(contest.startTimeSeconds)
+        get() = contest.startTime
         @Deprecated("no effect, use contest = ")
         set(value) {}
 
@@ -186,7 +185,7 @@ abstract class ContestViewHolder(protected val view: ConstraintLayout): Recycler
     }
 
     companion object {
-        fun makeDate(timeSeconds: Long): CharSequence = DateFormat.format("dd.MM E HH:mm", TimeUnit.SECONDS.toMillis(timeSeconds))
+        fun makeDate(time: Instant): CharSequence = DateFormat.format("dd.MM E HH:mm", time.toEpochMilliseconds())
 
         fun cutTrailingBrackets(title: String): Pair<String, String> {
             if (title.isEmpty() || title.last()!=')') return title to ""
@@ -229,14 +228,14 @@ class ContestItemPreviewHolder(view: ConstraintLayout): ContestViewHolder(view) 
         counterTextView.text = when (phase) {
             Contest.Phase.BEFORE -> {
                 if(phase!=oldPhase) date.text = makeDate(contest)
-                "in " + timeDifference2(currentTime.epochSeconds, contest.startTimeSeconds)
+                "in " + timeDifference2(currentTime, contest.startTime)
             }
             Contest.Phase.RUNNING -> {
-                if(phase!=oldPhase) date.text = "ends ${makeDate(contest.endTimeSeconds)}"
-                "left " + timeDifference2(currentTime.epochSeconds, contest.endTimeSeconds)
+                if(phase!=oldPhase) date.text = "ends ${makeDate(contest.endTime)}"
+                "left " + timeDifference2(currentTime, contest.endTime)
             }
             Contest.Phase.FINISHED -> {
-                if(phase!=oldPhase) date.text = "${makeDate(contest.startTimeSeconds)} - ${makeDate(contest.endTimeSeconds)}"
+                if(phase!=oldPhase) date.text = "${makeDate(contest.startTime)} - ${makeDate(contest.endTime)}"
                 ""
             }
         }
@@ -245,10 +244,10 @@ class ContestItemPreviewHolder(view: ConstraintLayout): ContestViewHolder(view) 
 
     companion object {
         fun makeDate(contest: Contest): String {
-            val begin = makeDate(contest.startTimeSeconds)
+            val begin = makeDate(contest.startTime)
             val end =
-                if (contest.duration < 1.days)
-                    DateFormat.format("HH:mm", TimeUnit.SECONDS.toMillis(contest.endTimeSeconds))
+                if (contest.durationSeconds.seconds < 1.days)
+                    DateFormat.format("HH:mm", contest.endTime.toEpochMilliseconds())
                 else "..."
             return "$begin-$end"
         }
@@ -276,14 +275,14 @@ class ContestItemBigViewHolder(view: ConstraintLayout): ContestViewHolder(view) 
     }
 
     override fun refresh(currentTime: Instant, phase: Contest.Phase, oldPhase: Contest.Phase?) {
-        dateStart.text = "start: ${makeDate(contest.startTimeSeconds)}"
-        dateEnd.text = "end: ${makeDate(contest.endTimeSeconds)}"
+        dateStart.text = "start: ${makeDate(contest.startTime)}"
+        dateEnd.text = "end: ${makeDate(contest.endTime)}"
         counterTextView.text = when (phase) {
             Contest.Phase.BEFORE -> {
-                "starts in " + timeDifference2(currentTime.epochSeconds, contest.startTimeSeconds)
+                "starts in " + timeDifference2(currentTime, contest.startTime)
             }
             Contest.Phase.RUNNING -> {
-                "ends in " + timeDifference2(currentTime.epochSeconds, contest.endTimeSeconds)
+                "ends in " + timeDifference2(currentTime, contest.endTime)
             }
             Contest.Phase.FINISHED -> {
                 ""

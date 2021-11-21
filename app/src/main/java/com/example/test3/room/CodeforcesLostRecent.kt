@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.*
 import com.example.test3.utils.CodeforcesUtils
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
 
 fun getLostBlogsDao(context: Context) = RoomSingleton.getInstance(context).lostBlogsDao()
 
@@ -44,8 +45,8 @@ data class LostBlogEntry(
     @PrimaryKey val id: Int,
     val title: String,
     val authorHandle: String,
-    val creationTimeSeconds: Long,
+    val creationTime: Instant,
     val authorColorTag: CodeforcesUtils.ColorTag = CodeforcesUtils.ColorTag.BLACK,
     val isSuspect: Boolean,
-    val timeStamp: Long
+    val timeStamp: Instant
 )

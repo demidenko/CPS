@@ -2,9 +2,11 @@ package com.example.test3.room
 
 import android.content.Context
 import androidx.room.*
+import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.test3.contests.Contest
+import kotlinx.datetime.Instant
 
 @Database(
     entities = [
@@ -12,12 +14,17 @@ import com.example.test3.contests.Contest
         CodeforcesUserBlog::class,
         Contest::class
     ],
-    version = 4,
+    version = 5,
     autoMigrations = [
-        AutoMigration(from = 3, to = 4)
+        AutoMigration(from = 3, to = 4),
+        AutoMigration(from = 4, to = 5, spec = RoomSingleton.RenameTimeAutoMigration::class),
     ]
 )
-@TypeConverters(IntsListConverter::class, CodeforcesUserInfoConverter::class)
+@TypeConverters(
+    IntsListConverter::class,
+    CodeforcesUserInfoConverter::class,
+    InstantSecondsConverter::class
+)
 abstract class RoomSingleton: RoomDatabase(){
     abstract fun lostBlogsDao(): LostBlogsDao
     abstract fun followListDao(): FollowListDao
@@ -45,4 +52,16 @@ abstract class RoomSingleton: RoomDatabase(){
             }
         }
     }
+
+    @RenameColumn(tableName = lostBlogsTableName, fromColumnName = "creationTimeSeconds", toColumnName = "creationTime")
+    @RenameColumn(tableName = contestsListTableName, fromColumnName = "startTimeSeconds", toColumnName = "startTime")
+    class RenameTimeAutoMigration: AutoMigrationSpec
+}
+
+class InstantSecondsConverter {
+    @TypeConverter
+    fun instantToSeconds(time: Instant): Long = time.epochSeconds
+
+    @TypeConverter
+    fun secondsToInstant(seconds: Long): Instant = Instant.fromEpochSeconds(seconds)
 }
