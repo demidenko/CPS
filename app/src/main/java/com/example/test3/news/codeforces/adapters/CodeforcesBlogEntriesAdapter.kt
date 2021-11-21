@@ -94,9 +94,9 @@ class CodeforcesBlogEntriesAdapter(
             comments.isGone = commentsCount == 0
         }
 
-        override var startTimeSeconds: Long = 0
+        override var startTime = Instant.DISTANT_PAST
         override fun refreshTime(currentTime: Instant) {
-            time.text = timeAgo(startTimeSeconds, currentTime.epochSeconds)
+            time.text = timeAgo(startTime, currentTime)
         }
     }
 
@@ -149,7 +149,7 @@ class CodeforcesBlogEntriesAdapter(
             setComments(blogEntry.commentsCount)
             setRating(blogEntry.rating)
 
-            startTimeSeconds = blogEntry.creationTimeSeconds
+            startTime = Instant.fromEpochSeconds(blogEntry.creationTimeSeconds)
             refreshTime(getCurrentTime())
         }
     }

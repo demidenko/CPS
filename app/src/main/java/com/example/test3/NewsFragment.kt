@@ -27,6 +27,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.Instant
 import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -363,6 +364,7 @@ fun timeDifference(fromTimeSeconds: Long, toTimeSeconds: Long): String {
 }
 
 fun timeAgo(fromTimeSeconds: Long, toTimeSeconds: Long) = timeDifference(fromTimeSeconds, toTimeSeconds) + " ago"
+fun timeAgo(fromTime: Instant, toTime: Instant) = timeDifference(fromTime.epochSeconds, toTime.epochSeconds) + " ago"
 
 fun timeDifference2(fromTimeSeconds: Long, toTimeSeconds: Long): String {
     val t: Duration = (toTimeSeconds - fromTimeSeconds).seconds

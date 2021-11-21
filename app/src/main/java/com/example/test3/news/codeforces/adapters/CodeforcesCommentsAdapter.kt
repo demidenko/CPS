@@ -51,9 +51,9 @@ class CodeforcesCommentsAdapter(
             )
         }
 
-        override var startTimeSeconds: Long = 0
+        override var startTime = Instant.DISTANT_PAST
         override fun refreshTime(currentTime: Instant) {
-            time.text = timeAgo(startTimeSeconds, currentTime.epochSeconds)
+            time.text = timeAgo(startTime, currentTime)
         }
     }
 
@@ -77,7 +77,7 @@ class CodeforcesCommentsAdapter(
 
             commentContent.text = CodeforcesUtils.fromCodeforcesHTML(comment.text)
 
-            startTimeSeconds = comment.creationTimeSeconds
+            startTime = Instant.fromEpochSeconds(comment.creationTimeSeconds)
             refreshTime(getCurrentTime())
 
             view.setOnClickListener {

@@ -67,7 +67,7 @@ var RecyclerView.flowAdapter: FlowItemsAdapter<*, *>?
     }
 
 interface TimeDepends {
-    var startTimeSeconds: Long
+    var startTime: Instant
     fun refreshTime(currentTime: Instant)
 }
 

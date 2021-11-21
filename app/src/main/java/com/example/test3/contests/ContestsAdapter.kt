@@ -162,8 +162,8 @@ abstract class ContestViewHolder(protected val view: ConstraintLayout): Recycler
 
     abstract fun applyContest(contest: Contest)
 
-    final override var startTimeSeconds: Long
-        get() = contest.startTimeSeconds
+    final override var startTime: Instant
+        get() = Instant.fromEpochSeconds(contest.startTimeSeconds)
         @Deprecated("no effect, use contest = ")
         set(value) {}
 
