@@ -23,14 +23,15 @@ data class CodeforcesUserInfo(
     var handle: String,
     var rating: Int = NOT_RATED,
     var contribution: Int = 0,
-    val lastOnlineTimeSeconds: Long = -1
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val lastOnlineTime: Instant = Instant.DISTANT_PAST
 ): UserInfo() {
     constructor(codeforcesUser: CodeforcesUser): this(
         status = STATUS.OK,
         handle = codeforcesUser.handle,
         rating = codeforcesUser.rating,
         contribution = codeforcesUser.contribution,
-        lastOnlineTimeSeconds = codeforcesUser.lastOnlineTimeSeconds
+        lastOnlineTime = codeforcesUser.lastOnlineTime
     )
 
     override val userID: String

@@ -409,7 +409,9 @@ data class CodeforcesUser(
     val handle: String,
     val rating: Int = NOT_RATED,
     val contribution: Int = 0,
-    val lastOnlineTimeSeconds: Long = -1
+    @SerialName("lastOnlineTimeSeconds")
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val lastOnlineTime: Instant = Instant.DISTANT_PAST
 )
 
 @Serializable

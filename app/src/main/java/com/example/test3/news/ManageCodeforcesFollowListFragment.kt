@@ -145,7 +145,7 @@ class ManageCodeforcesFollowListFragment: CPSFragment() {
 
                 with(userInfo) {
                     if(status == STATUS.OK) {
-                        holder.online.text = timeAgo(lastOnlineTimeSeconds, getCurrentTimeSeconds())
+                        holder.online.text = timeAgo(lastOnlineTime, getCurrentTime())
                         holder.onlineGroup.isVisible = true
                     } else holder.onlineGroup.isVisible = false
                 }
