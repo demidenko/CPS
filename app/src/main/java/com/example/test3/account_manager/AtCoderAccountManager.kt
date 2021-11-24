@@ -142,20 +142,18 @@ class AtCoderAccountManager(context: Context)
     override fun getDataStore() = accountDataStore(context.account_atcoder_dataStore, emptyInfo())
     override fun getSettings() = AtCoderAccountSettingsDataStore(this)
 
-    fun notifyRatingChange(handle: String, ratingChange: AtCoderRatingChange){
-        notifyRatingChange(
-            context,
-            NotificationChannels.atcoder_rating_changes,
-            NotificationIDs.atcoder_rating_changes,
-            this,
-            handle,
-            ratingChange.NewRating,
-            ratingChange.OldRating,
-            ratingChange.Place,
-            AtCoderURLFactory.userContestResult(handle, ratingChange.getContestID()),
-            ratingChange.EndTime
-        )
-    }
+    fun notifyRatingChange(handle: String, ratingChange: AtCoderRatingChange) = notifyRatingChange(
+        context,
+        NotificationChannels.atcoder_rating_changes,
+        NotificationIDs.atcoder_rating_changes,
+        this,
+        handle,
+        ratingChange.NewRating,
+        ratingChange.OldRating,
+        ratingChange.Place,
+        AtCoderURLFactory.userContestResult(handle, ratingChange.getContestID()),
+        ratingChange.EndTime
+    )
 }
 
 class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager)

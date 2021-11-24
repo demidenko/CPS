@@ -155,20 +155,18 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager<Codeforces
     override fun getDataStore() = accountDataStore(context.account_codeforces_dataStore, emptyInfo())
     override fun getSettings() = CodeforcesAccountSettingsDataStore(this)
 
-    fun notifyRatingChange(ratingChange: CodeforcesRatingChange){
-        notifyRatingChange(
-            context,
-            NotificationChannels.codeforces_rating_changes,
-            NotificationIDs.codeforces_rating_changes,
-            this,
-            ratingChange.handle,
-            ratingChange.newRating,
-            ratingChange.oldRating,
-            ratingChange.rank,
-            CodeforcesURLFactory.contestsWith(ratingChange.handle),
-            ratingChange.ratingUpdateTimeSeconds
-        )
-    }
+    fun notifyRatingChange(ratingChange: CodeforcesRatingChange) = notifyRatingChange(
+        context,
+        NotificationChannels.codeforces_rating_changes,
+        NotificationIDs.codeforces_rating_changes,
+        this,
+        ratingChange.handle,
+        ratingChange.newRating,
+        ratingChange.oldRating,
+        ratingChange.rank,
+        CodeforcesURLFactory.contestsWith(ratingChange.handle),
+        Instant.fromEpochSeconds(ratingChange.ratingUpdateTimeSeconds)
+    )
 
     suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange){
         val info = getSavedInfo()

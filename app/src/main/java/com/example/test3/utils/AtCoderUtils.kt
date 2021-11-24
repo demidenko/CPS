@@ -2,6 +2,7 @@ package com.example.test3.utils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import okhttp3.ResponseBody
@@ -18,7 +19,8 @@ data class AtCoderRatingChange(
     val NewRating: Int,
     val OldRating: Int,
     val Place: Int,
-    val EndTime: Long,
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val EndTime: Instant,
     val ContestName: String,
     val StandingsUrl: String
 ){

@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toInstant
-import java.util.concurrent.TimeUnit
 
 
 abstract class AccountManager<U: UserInfo>(val context: Context, val managerName: String) {
@@ -112,7 +111,7 @@ data class RatingChange(
 
     constructor(ratingChange: AtCoderRatingChange): this(
         ratingChange.NewRating,
-        Instant.fromEpochSeconds(ratingChange.EndTime)
+        ratingChange.EndTime
     )
 
     constructor(ratingChange: TopCoderRatingChange): this(
@@ -205,7 +204,7 @@ fun notifyRatingChange(
     notificationChannel: NotificationChannelLazy,
     notificationId: Int,
     accountManager: RatedAccountManager<*>,
-    handle: String, newRating: Int, oldRating: Int, rank: Int, url: String? = null, timeSeconds: Long? = null
+    handle: String, newRating: Int, oldRating: Int, rank: Int, url: String? = null, time: Instant? = null
 ){
     notificationBuildAndNotify(context, notificationChannel, notificationId) {
         val decreased = newRating < oldRating
@@ -218,9 +217,9 @@ fun notifyRatingChange(
         url?.let {
             setContentIntent(makePendingIntentOpenURL(url, context))
         }
-        timeSeconds?.let {
+        time?.let {
             setShowWhen(true)
-            setWhen(TimeUnit.SECONDS.toMillis(timeSeconds))
+            setWhen(time.toEpochMilliseconds())
         }
     }
 }

@@ -12,8 +12,8 @@ android {
         applicationId "com.example.test3"
         minSdkVersion 22
         targetSdkVersion 31
-        versionCode = 246
-        versionName '0.51.1'
+        versionCode = 247
+        versionName '0.51.2'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -39,7 +39,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.3.1'
