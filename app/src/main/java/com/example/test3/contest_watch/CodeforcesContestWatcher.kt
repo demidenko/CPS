@@ -2,6 +2,7 @@ package com.example.test3.contest_watch
 
 import com.example.test3.utils.*
 import kotlinx.coroutines.*
+import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -15,7 +16,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
         val rank = ChangingValue(-1)
         val pointsTotal = ChangingValue(0.0)
         val duration = ChangingValue(Duration.ZERO)
-        val startTimeSeconds = ChangingValue(-1L)
+        val startTime = ChangingValue(Instant.DISTANT_PAST)
         var problemNames: List<String>? = null
         val participationType = ChangingValue(CodeforcesParticipationType.NOT_PARTICIPATED)
         val sysTestPercentage = ChangingValue(-1)
@@ -41,7 +42,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
                     phaseCodeforces.value = contest.phase
                     timeFromStart = contest.relativeTimeSeconds.seconds
                     duration.value = contest.durationSeconds.seconds
-                    startTimeSeconds.value = contest.startTimeSeconds
+                    startTime.value = contest.startTime
                     contestName.value = contest.name
                     contestType.value = contest.type
 
@@ -63,7 +64,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
             if(contestName.isChanged() || contestType.isChanged()) onSetContestNameAndType(contestName.value, contestType.value)
             if(phaseCodeforces.isChanged()) onSetContestPhase(phaseCodeforces.value)
 
-            if(phaseCodeforces.value == CodeforcesContestPhase.CODING && (duration.isChanged() || startTimeSeconds.isChanged())) timeFromStart?.let {
+            if(phaseCodeforces.value == CodeforcesContestPhase.CODING && (duration.isChanged() || startTime.isChanged())) timeFromStart?.let {
                 val remainingTime = duration.value - it
                 onSetRemainingTime(remainingTime)
             }

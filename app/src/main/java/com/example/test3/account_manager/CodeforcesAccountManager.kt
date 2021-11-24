@@ -243,7 +243,7 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager)
     val contestWatchEnabled = Item(booleanPreferencesKey("contest_watch"), false)
     val contestWatchLastSubmissionID = ItemNullable(longPreferencesKey("contest_watch_last_submission"))
     val contestWatchStartedContestID = ItemNullable(intPreferencesKey("contest_watch_started_contest"))
-    val contestWatchCanceled = itemJsonConvertible<List<Pair<Int,Long>>>(jsonCPS, "contest_watch_canceled", emptyList())
+    val contestWatchCanceled = itemJsonConvertible<List<Pair<Int,Instant>>>(jsonCPS, "contest_watch_canceled", emptyList())
 
     val upsolvingSuggestionsEnabled = Item(booleanPreferencesKey("upsolving_suggestions"), false)
     val upsolvingSuggestedProblems = itemJsonConvertible<List<Pair<Int,String>>>(jsonCPS, "upsolving_suggested_problems_list", emptyList())

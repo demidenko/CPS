@@ -421,7 +421,9 @@ data class CodeforcesContest(
     val phase: CodeforcesContestPhase,
     val type: CodeforcesContestType,
     val durationSeconds: Long,
-    val startTimeSeconds: Long,
+    @SerialName("startTimeSeconds")
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val startTime: Instant,
     val relativeTimeSeconds: Long
 )
 
@@ -469,7 +471,9 @@ data class CodeforcesSubmission(
     val verdict: CodeforcesProblemVerdict = CodeforcesProblemVerdict.WAITING,
     val passedTestCount: Int,
     val id: Long,
-    val creationTimeSeconds: Long,
+    @SerialName("creationTimeSeconds")
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val creationTime: Instant,
     val testset: CodeforcesTestset
 ){
     fun makeVerdict(): String {

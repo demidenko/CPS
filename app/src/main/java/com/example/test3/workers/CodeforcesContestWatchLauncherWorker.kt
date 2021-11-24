@@ -8,10 +8,10 @@ import com.example.test3.account_manager.STATUS
 import com.example.test3.contest_watch.CodeforcesContestWatchWorker
 import com.example.test3.utils.CodeforcesAPI
 import com.example.test3.utils.CodeforcesAPIStatus
-import com.example.test3.utils.getCurrentTimeSeconds
+import com.example.test3.utils.getCurrentTime
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.seconds
 
 class CodeforcesContestWatchLauncherWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -27,17 +27,15 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
         val info = codeforcesAccountManager.getSavedInfo()
         if(info.status != STATUS.OK) return Result.success()
 
-        val currentTimeSeconds = getCurrentTimeSeconds()
-        fun isTooLate(timeSeconds: Long): Boolean {
-            return (currentTimeSeconds - timeSeconds).seconds >= 24.hours
-        }
+        val currentTime = getCurrentTime()
+        fun isTooLate(time: Instant) = currentTime - time >= 24.hours
 
         val lastKnownID: Long?
-        val canceled: List<Pair<Int,Long>>
+        val canceled: List<Pair<Int,Instant>>
         with(codeforcesAccountManager.getSettings()){
             lastKnownID = contestWatchLastSubmissionID()
             canceled = contestWatchCanceled().toMutableList().apply {
-                if(removeAll { (id, timeSeconds) -> isTooLate(timeSeconds) }){
+                if(removeAll { (id, time) -> isTooLate(time) }){
                     contestWatchCanceled(this)
                 }
             }
@@ -54,7 +52,7 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
                 for(submission in submissions){
                     if(firstID == null) firstID = submission.id
                     if(lastKnownID != null && submission.id <= lastKnownID) return@let null
-                    if(isTooLate(submission.creationTimeSeconds)) return@let null
+                    if(isTooLate(submission.creationTime)) return@let null
                     if(submission.author.participantType.participatedInContest()) return@let submission.contestId
                 }
                 CONTINUE
@@ -87,7 +85,7 @@ class CodeforcesContestWatchLauncherWorker(private val context: Context, params:
             with(CodeforcesAccountManager(context).getSettings()){
                 contestWatchStartedContestID(null)
                 val canceled = contestWatchCanceled()
-                contestWatchCanceled(canceled + Pair(contestID, getCurrentTimeSeconds()))
+                contestWatchCanceled(canceled + Pair(contestID, getCurrentTime()))
             }
         }
 

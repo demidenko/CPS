@@ -30,7 +30,7 @@ data class Contest (
         Platform.codeforces,
         contest.id.toString(),
         contest.name,
-        Instant.fromEpochSeconds(contest.startTimeSeconds),
+        contest.startTime,
         contest.durationSeconds,
         link = CodeforcesURLFactory.contestOuter(contest.id)
     )
