@@ -104,7 +104,7 @@ interface FollowListDao {
                 when (info.status) {
                     STATUS.NOT_FOUND -> remove(handle)
                     STATUS.OK -> setUserInfo(handle, info)
-                    STATUS.FAILED -> throw IllegalArgumentException("cant be FAILED here")
+                    STATUS.FAILED -> {}
                 }
             }
         getHandles().forEach { handle ->
