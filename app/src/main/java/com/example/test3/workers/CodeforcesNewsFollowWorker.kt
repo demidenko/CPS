@@ -12,7 +12,6 @@ import com.example.test3.room.getFollowDao
 import com.example.test3.utils.CodeforcesBlogEntry
 import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.utils.fromHTML
-import java.util.concurrent.TimeUnit
 
 class CodeforcesNewsFollowWorker(private val context: Context, val params: WorkerParameters): CoroutineWorker(context, params) {
     companion object {
@@ -71,7 +70,7 @@ fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry, context: Context){
         setSmallIcon(R.drawable.ic_new_post)
         setAutoCancel(true)
         setShowWhen(true)
-        setWhen(TimeUnit.SECONDS.toMillis(blogEntry.creationTimeSeconds))
+        setWhen(blogEntry.creationTime.toEpochMilliseconds())
         setContentIntent(makePendingIntentOpenURL(CodeforcesURLFactory.blog(blogEntry.id), context))
     }
 }

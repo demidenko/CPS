@@ -27,25 +27,22 @@ import java.net.SocketTimeoutException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 object CodeforcesUtils {
 
     suspend fun getBlogCreationTime(blogId: Int): Instant {
-        return CodeforcesAPI.getBlogEntry(blogId,CodeforcesLocale.RU)?.result?.let {
-            Instant.fromEpochSeconds(it.creationTimeSeconds)
-        } ?: Instant.DISTANT_PAST
+        return CodeforcesAPI.getBlogEntry(blogId,CodeforcesLocale.RU)?.result?.creationTime ?: Instant.DISTANT_PAST
     }
 
     private val dateFormatRU = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
     private val dateFormatEN = SimpleDateFormat("MMM/dd/yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
 
-    private fun parseTimeString(str: String): Long {
+    private fun parseTimeString(str: String): Instant {
         val parser = if(str.contains('.')) dateFormatRU else dateFormatEN
         return try {
-            TimeUnit.MILLISECONDS.toSeconds(parser.parse(str).time)
+            Instant.fromEpochMilliseconds(parser.parse(str).time)
         } catch (e: ParseException) {
-            0L
+            Instant.DISTANT_PAST
         }
     }
 
@@ -89,7 +86,7 @@ object CodeforcesUtils {
                     title = title,
                     authorHandle = author,
                     authorColorTag = authorColorTag,
-                    creationTimeSeconds = time,
+                    creationTime = time,
                     commentsCount = comments,
                     rating = rating
                 )
@@ -131,8 +128,8 @@ object CodeforcesUtils {
 
             i = s.indexOf("<span class=\"format-humantime\"", i)
             i = s.indexOf('>', i)
-            val commentTime = s.substring(s.lastIndexOf('"',i-2)+1, i-1)
-            val commentTimeSeconds = parseTimeString(commentTime)
+            val commentTimeStr = s.substring(s.lastIndexOf('"',i-2)+1, i-1)
+            val commentTime = parseTimeString(commentTimeStr)
 
             i = s.indexOf("<div class=\"ttypography\">", i)
             val commentText = try{
@@ -147,21 +144,21 @@ object CodeforcesUtils {
 
             comments.add(
                 CodeforcesRecentAction(
-                    timeSeconds = commentTimeSeconds,
+                    time = commentTime,
                     comment = CodeforcesComment(
                         id = commentId,
                         commentatorHandle = commentatorHandle,
                         commentatorHandleColorTag = commentatorHandleColorTag,
                         text = commentText,
                         rating = commentRating,
-                        creationTimeSeconds = commentTimeSeconds
+                        creationTime = commentTime
                     ),
                     blogEntry = CodeforcesBlogEntry(
                         id = blogId,
                         title = blogTitle,
                         authorHandle = blogAuthorHandle,
                         authorColorTag = blogAuthorHandleColorTag,
-                        creationTimeSeconds = 0
+                        creationTime = Instant.DISTANT_PAST
                     )
                 )
             )
@@ -197,7 +194,7 @@ object CodeforcesUtils {
                     title = title,
                     authorHandle = author,
                     authorColorTag = authorColorTag,
-                    creationTimeSeconds = 0L
+                    creationTime = Instant.DISTANT_PAST
                 )
             )
         }
@@ -485,7 +482,9 @@ data class CodeforcesBlogEntry(
     val id: Int,
     val title: String,
     val authorHandle: String,
-    val creationTimeSeconds: Long,
+    @SerialName("creationTimeSeconds")
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val creationTime: Instant,
     val rating: Int = 0,
     val commentsCount: Int = 0,
     val authorColorTag: CodeforcesUtils.ColorTag = CodeforcesUtils.ColorTag.BLACK
@@ -506,7 +505,9 @@ data class CodeforcesRatingChange(
 @Serializable
 data class CodeforcesComment(
     val id: Long,
-    val creationTimeSeconds: Long,
+    @SerialName("creationTimeSeconds")
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val creationTime: Instant,
     val commentatorHandle: String,
     val text: String,
     val rating: Int,
@@ -515,7 +516,9 @@ data class CodeforcesComment(
 
 @Serializable
 data class CodeforcesRecentAction(
-    val timeSeconds: Long,
+    @SerialName("timeSeconds")
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val time: Instant,
     val blogEntry: CodeforcesBlogEntry? = null,
     val comment: CodeforcesComment? = null
 )

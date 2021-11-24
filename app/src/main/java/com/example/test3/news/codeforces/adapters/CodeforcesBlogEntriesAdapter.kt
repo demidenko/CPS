@@ -149,7 +149,7 @@ class CodeforcesBlogEntriesAdapter(
             setComments(blogEntry.commentsCount)
             setRating(blogEntry.rating)
 
-            startTime = Instant.fromEpochSeconds(blogEntry.creationTimeSeconds)
+            startTime = blogEntry.creationTime
             refreshTime(getCurrentTime())
         }
     }

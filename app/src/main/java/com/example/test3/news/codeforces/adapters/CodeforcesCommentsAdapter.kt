@@ -77,7 +77,7 @@ class CodeforcesCommentsAdapter(
 
             commentContent.text = CodeforcesUtils.fromCodeforcesHTML(comment.text)
 
-            startTime = Instant.fromEpochSeconds(comment.creationTimeSeconds)
+            startTime = comment.creationTime
             refreshTime(getCurrentTime())
 
             view.setOnClickListener {
