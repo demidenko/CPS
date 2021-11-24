@@ -1,7 +1,6 @@
 package com.example.test3.utils
 
 import com.example.test3.account_manager.STATUS
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -9,7 +8,6 @@ import kotlinx.serialization.SerializationException
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -122,7 +120,8 @@ data class TopCoderUserStatsHistoryDataScience(
 
 
 object TopCoderAPI {
-    interface API {
+
+    private interface API {
         @GET("v2/users/{handle}")
         fun getUser(
             @Path("handle") handle: String
@@ -134,17 +133,11 @@ object TopCoderAPI {
         ): Call<TopCoderAPIv3Response<List<TopCoderUserStatsHistory>>>
     }
 
-    private val topcoderAPI = Retrofit.Builder()
-        .baseUrl("https://api.topcoder.com/")
-        .addConverterFactory(jsonConverterFactory)
-        .addCallAdapterFactory(CoroutineCallAdapterFactory())
-        .client(httpClient)
-        .build()
-        .create(API::class.java)
+    private val api = createRetrofitWithJson<API>("https://api.topcoder.com/")
 
     suspend fun getUser(handle: String): TopCoderUser? = withContext(Dispatchers.IO){
         try {
-            topcoderAPI.getUser(handle).execute().body()
+            api.getUser(handle).execute().body()
         }catch (e: IOException){
             null
         }catch (e: SerializationException){
@@ -154,7 +147,7 @@ object TopCoderAPI {
 
     suspend fun getStatsHistory(handle: String): TopCoderAPIv3Result<List<TopCoderUserStatsHistory>>? = withContext(Dispatchers.IO){
         try {
-            topcoderAPI.getStatsHistory(handle).execute().body()?.result
+            api.getStatsHistory(handle).execute().body()?.result
         }catch (e: IOException){
             null
         }catch (e: SerializationException){
@@ -162,7 +155,7 @@ object TopCoderAPI {
         }
     }
 
-    interface WEB {
+    private interface WEB {
         @GET("/tc?module=AlgoRank&sc=4&sd=asc")
         fun algoRankPage(
             @Query("nr") pageSize: Int,
@@ -170,16 +163,11 @@ object TopCoderAPI {
         ): Call<ResponseBody>
     }
 
-    private val topcoderWEB = Retrofit.Builder()
-        .baseUrl("https://www.topcoder.com/")
-        .addCallAdapterFactory(CoroutineCallAdapterFactory())
-        .client(httpClient)
-        .build()
-        .create(WEB::class.java)
+    private val web = createRetrofit<WEB>("https://www.topcoder.com/")
 
     suspend fun getRankingPage(from: Int, size: Int): Response<ResponseBody>? = withContext(Dispatchers.IO) {
         try {
-            topcoderWEB.algoRankPage(size, from).execute()
+            web.algoRankPage(size, from).execute()
         } catch (e: IOException) {
             null
         }

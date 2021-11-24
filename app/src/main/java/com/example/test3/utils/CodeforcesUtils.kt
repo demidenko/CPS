@@ -7,7 +7,6 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import com.example.test3.*
 import com.example.test3.account_manager.*
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -18,7 +17,6 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import okhttp3.ResponseBody
 import retrofit2.Call
-import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
@@ -524,7 +522,7 @@ object CodeforcesAPI {
 
     private const val callLimitExceededWaitTimeMillis: Long = 500
 
-    interface API {
+    private interface API {
         @GET("contest.list")
         fun getContests(
             @Query("locale") lang: String = "en",
@@ -582,13 +580,7 @@ object CodeforcesAPI {
         ): Call<CodeforcesAPIResponse<List<CodeforcesSubmission>>>
     }
 
-    private val api = Retrofit.Builder()
-        .baseUrl("https://codeforces.com/api/")
-        .addConverterFactory(jsonConverterFactory)
-        .addCallAdapterFactory(CoroutineCallAdapterFactory())
-        .client(httpClient)
-        .build()
-        .create(API::class.java)
+    private val api = createRetrofitWithJson<API>("https://codeforces.com/api/")
 
     private tailrec suspend fun<T> makeAPICall(call: Call<CodeforcesAPIResponse<T>>, callLimit: Int): CodeforcesAPIResponse<T>? {
         if(callLimit == 0) return null
@@ -639,7 +631,7 @@ object CodeforcesAPI {
     suspend fun getUserSubmissions(handle: String, count: Int = 10, from: Int = 1) = makeAPICall(api.getUserStatus(handle,count,from))
 
 
-    interface WEB {
+    private interface WEB {
         @GET("data/handles")
         fun getHandleSuggestions(
             @Query("q") prefix: String,
@@ -654,13 +646,7 @@ object CodeforcesAPI {
         ): Call<ResponseBody>
     }
 
-    private val web = Retrofit.Builder()
-        .baseUrl("https://codeforces.com/")
-        .addCallAdapterFactory(CoroutineCallAdapterFactory())
-        .client(httpClient)
-        .build()
-        .create(WEB::class.java)
-
+    private val web = createRetrofit<WEB>("https://codeforces.com/")
 
     private val RCPC = object {
 

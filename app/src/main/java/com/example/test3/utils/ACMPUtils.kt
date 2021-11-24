@@ -1,12 +1,10 @@
 package com.example.test3.utils
 
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Query
 import java.io.IOException
@@ -15,7 +13,7 @@ import java.nio.charset.Charset
 
 object ACMPAPI {
 
-    interface WEB {
+    private interface WEB {
         @GET(".")
         fun getMainPage(): Call<ResponseBody>
 
@@ -30,12 +28,7 @@ object ACMPAPI {
         ): Call<ResponseBody>
     }
 
-    private val acmpWEB = Retrofit.Builder()
-        .baseUrl("https://acmp.ru/")
-        .addCallAdapterFactory(CoroutineCallAdapterFactory())
-        .client(httpClient)
-        .build()
-        .create(WEB::class.java)
+    private val web = createRetrofit<WEB>("https://acmp.ru/")
 
     private val windows1251 = Charset.forName("windows-1251")
     private fun decode(r: Response<ResponseBody>?): String? =
@@ -45,7 +38,7 @@ object ACMPAPI {
     suspend fun getMainPage(): String? {
         try {
             return withContext(Dispatchers.IO) {
-                decode(acmpWEB.getMainPage().execute())
+                decode(web.getMainPage().execute())
             }
         }catch (e: IOException){
             return null
@@ -55,7 +48,7 @@ object ACMPAPI {
     suspend fun getUser(id: String): String? {
         try {
             return withContext(Dispatchers.IO){
-                decode(acmpWEB.getUser(id).execute())
+                decode(web.getUser(id).execute())
             }
         }catch (e: IOException){
             return null
@@ -65,7 +58,7 @@ object ACMPAPI {
     suspend fun getUserSearch(str: String): String? {
         try {
             return withContext(Dispatchers.IO){
-                decode(acmpWEB.getUserSearch(URLEncoder.encode(str, "windows-1251")).execute())
+                decode(web.getUserSearch(URLEncoder.encode(str, "windows-1251")).execute())
             }
         }catch (e: IOException){
             return null

@@ -1,6 +1,5 @@
 package com.example.test3.utils
 
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -8,7 +7,6 @@ import kotlinx.serialization.decodeFromString
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -31,7 +29,8 @@ data class AtCoderRatingChange(
 }
 
 object AtCoderAPI {
-    interface WEB {
+
+    private interface WEB {
         @GET("users/{handle}?graph=rating")
         fun getUser(
             @Path("handle") handle: String
@@ -43,16 +42,11 @@ object AtCoderAPI {
         ): Call<ResponseBody>
     }
 
-    private val atcoderWEB = Retrofit.Builder()
-        .baseUrl("https://atcoder.jp/")
-        .addCallAdapterFactory(CoroutineCallAdapterFactory())
-        .client(httpClient)
-        .build()
-        .create(WEB::class.java)
+    private val web = createRetrofit<WEB>("https://atcoder.jp/")
 
     suspend fun getUser(handle: String): Response<ResponseBody>? = withContext(Dispatchers.IO){
         try {
-            atcoderWEB.getUser(handle).execute()
+            web.getUser(handle).execute()
         }catch (e: IOException){
             null
         }
@@ -60,7 +54,7 @@ object AtCoderAPI {
 
     suspend fun getRankingSearch(str: String): Response<ResponseBody>? = withContext(Dispatchers.IO){
         try {
-            atcoderWEB.getRankingSearch(str).execute()
+            web.getRankingSearch(str).execute()
         }catch (e: IOException){
             null
         }
@@ -68,7 +62,7 @@ object AtCoderAPI {
 
     suspend fun getRatingChanges(handle: String): List<AtCoderRatingChange>? = withContext(Dispatchers.IO){
         try {
-            val response = atcoderWEB.getUser(handle).execute() ?: return@withContext null
+            val response = web.getUser(handle).execute() ?: return@withContext null
             if(!response.isSuccessful) return@withContext null
             val s = response.body()?.string() ?: return@withContext null
             val i = s.lastIndexOf("<script>var rating_history=[{")

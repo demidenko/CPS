@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -16,6 +17,7 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
+import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
@@ -40,6 +42,22 @@ val httpClient = OkHttpClient
 
 val jsonCPS = Json{ ignoreUnknownKeys = true }
 val jsonConverterFactory = jsonCPS.asConverterFactory(MediaType.get("application/json"))
+
+inline fun<reified T> createRetrofit(baseUrl: String): T = Retrofit.Builder()
+    .baseUrl(baseUrl)
+    .addCallAdapterFactory(CoroutineCallAdapterFactory())
+    .client(httpClient)
+    .build()
+    .create(T::class.java)
+
+inline fun<reified T> createRetrofitWithJson(baseUrl: String): T = Retrofit.Builder()
+    .baseUrl(baseUrl)
+    .addConverterFactory(jsonConverterFactory)
+    .addCallAdapterFactory(CoroutineCallAdapterFactory())
+    .client(httpClient)
+    .build()
+    .create(T::class.java)
+
 
 fun fromHTML(s: String): Spanned {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
