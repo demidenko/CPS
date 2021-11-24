@@ -20,6 +20,7 @@ import com.example.test3.timeDifference2
 import com.example.test3.ui.CPSFragment
 import com.example.test3.ui.FlowItemsAdapter
 import com.example.test3.ui.TimeDepends
+import com.example.test3.ui.enableIff
 import com.example.test3.utils.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.Flow
@@ -269,8 +270,11 @@ class ContestItemBigViewHolder(view: ConstraintLayout): ContestViewHolder(view) 
             titleAdditional.isVisible = second.isNotBlank()
         }
         icon.setImageResource(contest.platform.getIcon())
-        view.findViewById<ImageButton>(R.id.contests_list_item_open).setOnClickListener {
-            contest.link?.let { url -> it.context.startActivity(makeIntentOpenUrl(url)) }
+        view.findViewById<ImageButton>(R.id.contests_list_item_open).apply {
+            enableIff(contest.link != null)
+            setOnClickListener {
+                contest.link?.let { url -> it.context.startActivity(makeIntentOpenUrl(url)) }
+            }
         }
     }
 

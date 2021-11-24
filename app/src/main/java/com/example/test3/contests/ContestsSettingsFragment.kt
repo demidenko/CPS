@@ -18,8 +18,11 @@ import com.example.test3.ui.CPSFragment
 import com.example.test3.utils.CPSDataStore
 import com.example.test3.utils.getStringNotBlank
 import com.example.test3.utils.jsonCPS
+import com.example.test3.utils.launchAndRepeatWithViewLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 
 class ContestsSettingsFragment: CPSFragment() {
@@ -48,8 +51,16 @@ class ContestsSettingsFragment: CPSFragment() {
             mainActivity.cpsFragmentManager.pushBack(ContestsSelectPlatformsFragment())
         }
 
-        view.findViewById<TextView>(R.id.contests_settings_clear_removed).setOnClickListener {
-            contestsViewModel.clearRemovedContests(requireContext())
+        view.findViewById<TextView>(R.id.contests_settings_clear_removed).apply {
+            val initTitle = text.toString()
+            launchAndRepeatWithViewLifecycle {
+                requireContext().settingsContests.removedContestsIds.flow.onEach { removed ->
+                    text = "$initTitle (${removed.size})"
+                }.launchIn(this)
+            }
+            setOnClickListener {
+                contestsViewModel.clearRemovedContests(requireContext())
+            }
         }
     }
 
