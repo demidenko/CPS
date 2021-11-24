@@ -3,7 +3,10 @@ package com.example.test3.contests
 import androidx.room.Entity
 import com.example.test3.R
 import com.example.test3.room.contestsListTableName
-import com.example.test3.utils.*
+import com.example.test3.utils.ClistContest
+import com.example.test3.utils.CodeforcesContest
+import com.example.test3.utils.CodeforcesURLFactory
+import com.example.test3.utils.ComparablePair
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
 
@@ -40,7 +43,7 @@ data class Contest (
         platform,
         extractContestId(contest, platform),
         contest.event,
-        Instant.fromEpochSeconds(CListAPI.dateToSeconds(contest.start)),
+        Instant.parse(contest.start+"Z"),
         contest.duration,
         link = contest.href
     )
