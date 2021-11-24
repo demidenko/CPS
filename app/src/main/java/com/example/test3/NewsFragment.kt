@@ -33,7 +33,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 
 enum class CodeforcesTitle {
@@ -350,8 +349,8 @@ class CodeforcesNewsAdapter(
 }
 
 
-fun timeDifference(fromTimeSeconds: Long, toTimeSeconds: Long): String {
-    val t: Duration = (toTimeSeconds - fromTimeSeconds).seconds
+fun timeDifference(fromTime: Instant, toTime: Instant): String {
+    val t: Duration = toTime - fromTime
     return when {
         t < 2.minutes -> "minute"
         t < 2.hours -> "${t.inWholeMinutes} minutes"
@@ -363,12 +362,10 @@ fun timeDifference(fromTimeSeconds: Long, toTimeSeconds: Long): String {
     }
 }
 
-fun timeAgo(fromTimeSeconds: Long, toTimeSeconds: Long) = timeDifference(fromTimeSeconds, toTimeSeconds) + " ago"
-fun timeAgo(fromTime: Instant, toTime: Instant) = timeDifference(fromTime.epochSeconds, toTime.epochSeconds) + " ago"
+fun timeAgo(fromTime: Instant, toTime: Instant) = timeDifference(fromTime, toTime) + " ago"
 
-fun timeDifference2(fromTimeSeconds: Long, toTimeSeconds: Long): String {
-    val t: Duration = (toTimeSeconds - fromTimeSeconds).seconds
+fun timeDifference2(fromTime: Instant, toTime: Instant): String {
+    val t: Duration = toTime - fromTime
     if(t < 24.hours * 2) return durationHHMMSS(t)
-    return timeDifference(fromTimeSeconds, toTimeSeconds)
+    return timeDifference(fromTime, toTime)
 }
-fun timeDifference2(fromTime: Instant, toTime: Instant) = timeDifference2(fromTime.epochSeconds, toTime.epochSeconds)
