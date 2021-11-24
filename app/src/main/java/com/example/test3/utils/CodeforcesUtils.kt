@@ -12,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
@@ -497,7 +498,9 @@ data class CodeforcesRatingChange(
     val rank: Int,
     val oldRating: Int,
     val newRating: Int,
-    val ratingUpdateTimeSeconds: Long
+    @SerialName("ratingUpdateTimeSeconds")
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val ratingUpdateTime: Instant
 )
 
 @Serializable

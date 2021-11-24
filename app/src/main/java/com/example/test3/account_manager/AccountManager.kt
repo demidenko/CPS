@@ -106,7 +106,7 @@ data class RatingChange(
 ){
     constructor(ratingChange: CodeforcesRatingChange): this(
         ratingChange.newRating,
-        Instant.fromEpochSeconds(ratingChange.ratingUpdateTimeSeconds)
+        ratingChange.ratingUpdateTime
     )
 
     constructor(ratingChange: AtCoderRatingChange): this(

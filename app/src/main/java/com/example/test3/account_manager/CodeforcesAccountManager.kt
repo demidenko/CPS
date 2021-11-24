@@ -165,7 +165,7 @@ class CodeforcesAccountManager(context: Context): RatedAccountManager<Codeforces
         ratingChange.oldRating,
         ratingChange.rank,
         CodeforcesURLFactory.contestsWith(ratingChange.handle),
-        Instant.fromEpochSeconds(ratingChange.ratingUpdateTimeSeconds)
+        ratingChange.ratingUpdateTime
     )
 
     suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange){
@@ -252,7 +252,6 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager)
         contestWatchLastSubmissionID,
         contestWatchStartedContestID,
         contestWatchCanceled,
-        upsolvingSuggestionsEnabled,
         upsolvingSuggestedProblems
     )
 
