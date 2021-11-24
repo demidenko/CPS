@@ -205,7 +205,7 @@ class ContestsFragment: CPSFragment() {
 
             val contest = Contest(
                 platform = Contest.Platform.unknown,
-                id = getCurrentTimeSeconds().toString(),
+                id = getCurrentTime().toString(),
                 title = titleTextField.editText?.getStringNotBlank()!!,
                 startTime = Instant.fromEpochMilliseconds(startDate!!.time),
                 durationSeconds = TimeUnit.MILLISECONDS.toSeconds(endDate!!.time - startDate!!.time),
