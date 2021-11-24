@@ -4,10 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.test3.room.getContestsListDao
-import com.example.test3.utils.CListAPI
-import com.example.test3.utils.ClistContest
-import com.example.test3.utils.LoadingState
-import com.example.test3.utils.getCurrentTimeSeconds
+import com.example.test3.utils.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,7 +37,7 @@ class ContestsViewModel: ViewModel() {
                 val (login, apikey) = context.settingsContests.getClistApiLoginAndKey() ?: return@run LoadingState.FAILED
                 val clistContests = CListAPI.getContests(
                     login, apikey, platforms,
-                    getCurrentTimeSeconds() - 7.days.inWholeSeconds
+                    getCurrentTime() - 7.days
                 ) ?: return@run LoadingState.FAILED
                 val grouped = mapAndFilterClistResult(clistContests).groupBy { it.platform }
                 with(getContestsListDao(context)) {

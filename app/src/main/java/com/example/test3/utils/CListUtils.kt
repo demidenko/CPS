@@ -6,6 +6,7 @@ import com.example.test3.contests.Contest
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -120,13 +121,13 @@ object CListAPI {
         login: String,
         apikey: String,
         platforms: Collection<Contest.Platform>,
-        startTimeSeconds: Long
+        startTime: Instant
     ): List<ClistContest>? = withContext(Dispatchers.IO) {
         try {
             val call = clistAPI.getContests(
                 login,
                 apikey,
-                secondsToString(startTimeSeconds),
+                timeToString(startTime),
                 platforms.joinToString { getClistApiResourceId(it).toString() }
             )
             val r = call.execute()
@@ -138,6 +139,6 @@ object CListAPI {
     }
 
     private val clistDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).apply { timeZone = TimeZone.getTimeZone("UTC") }
-    fun secondsToString(seconds: Long): String = clistDateFormat.format(Date(TimeUnit.SECONDS.toMillis(seconds)))
+    fun timeToString(time: Instant): String = clistDateFormat.format(Date(time.toEpochMilliseconds()))
     fun dateToSeconds(str: String): Long = TimeUnit.MILLISECONDS.toSeconds(clistDateFormat.parse(str).time)
 }

@@ -6,6 +6,7 @@ import androidx.work.WorkerParameters
 import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.utils.*
+import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 
 class CodeforcesUpsolvingSuggestionsWorker(private val context: Context, params: WorkerParameters): CoroutineWorker(context, params) {
@@ -20,10 +21,10 @@ class CodeforcesUpsolvingSuggestionsWorker(private val context: Context, params:
 
         val handle = codeforcesAccountManager.getSavedInfo().handle
 
-        val deadLineTimeSeconds = getCurrentTimeSeconds() - 90.days.inWholeSeconds
+        val deadLine = getCurrentTime() - 90.days
         val ratingChanges = CodeforcesAPI.getUserRatingChanges(handle)
             ?.result
-            ?.filter { it.ratingUpdateTimeSeconds > deadLineTimeSeconds }
+            ?.filter { Instant.fromEpochSeconds(it.ratingUpdateTimeSeconds) > deadLine }
             ?: return Result.failure()
 
         for (ratingChange in ratingChanges) {
@@ -44,7 +45,7 @@ class CodeforcesUpsolvingSuggestionsWorker(private val context: Context, params:
                 .map { it.problem.index }
                 .toSet()
                 .onEach { problem ->
-                    if (problemSolvedBy.containsKey(problem).not()) return Result.failure()
+                    if(problem !in problemSolvedBy) return Result.failure()
                 }
             val suggestedList = codeforcesAccountManager.getSettings().upsolvingSuggestedProblems().toMutableList()
             problemSolvedBy.forEach { (problem, countOfAccepted) ->
