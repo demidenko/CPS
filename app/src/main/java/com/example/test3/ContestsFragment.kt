@@ -27,7 +27,6 @@ import kotlinx.datetime.Instant
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.days
 
 class ContestsFragment: CPSFragment() {
@@ -140,11 +139,11 @@ class ContestsFragment: CPSFragment() {
             setText("")
         }
 
-        fun parseOrNull(text: String?): Date? {
+        fun parseOrNull(text: String?): Instant? {
             return try {
                 text?.let { str ->
                     dateFormat.parse(str)?.let { date ->
-                        if (dateFormat.format(date) == str) date
+                        if (dateFormat.format(date) == str) Instant.fromEpochMilliseconds(date.time)
                         else null
                     }
                 }
@@ -153,7 +152,7 @@ class ContestsFragment: CPSFragment() {
             }
         }
 
-        fun getDates(): Pair<Date?, Date?> {
+        fun getDates(): Pair<Instant?, Instant?> {
             val startText = startTextField.editText?.getStringNotBlank()
             val endText = endTextField.editText?.getStringNotBlank()
             return parseOrNull(startText) to parseOrNull(endText)
@@ -162,7 +161,7 @@ class ContestsFragment: CPSFragment() {
         fun onChange() {
             val (startDate, endDate) = getDates()
             if (startDate!=null && endDate!=null) {
-                if (startDate.time < endDate.time) {
+                if (startDate < endDate) {
                     startTextField.error = null
                     endTextField.error = null
                 } else {
@@ -207,8 +206,8 @@ class ContestsFragment: CPSFragment() {
                 platform = Contest.Platform.unknown,
                 id = getCurrentTime().toString(),
                 title = titleTextField.editText?.getStringNotBlank()!!,
-                startTime = Instant.fromEpochMilliseconds(startDate!!.time),
-                durationSeconds = TimeUnit.MILLISECONDS.toSeconds(endDate!!.time - startDate!!.time),
+                startTime = startDate!!,
+                durationSeconds = (endDate!! - startDate!!).inWholeSeconds,
             )
             contestViewModel.addCustomContest(contest, requireContext())
 
