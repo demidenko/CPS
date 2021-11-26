@@ -25,7 +25,6 @@ class CodeforcesContestWatcherTableNotification(
     var contestPhase = CodeforcesContestPhase.UNDEFINED
     var changes = false
     var contestantRank = ""
-    var contestantPoints = ""
     var participationType = CodeforcesParticipationType.NOT_PARTICIPATED
 
     val rview_small = RemoteViews(context.packageName, R.layout.cf_watcher_notification_small)
@@ -94,9 +93,7 @@ class CodeforcesContestWatcherTableNotification(
     override fun onSetContestPhase(phase: CodeforcesContestPhase) {
         changes = true
         contestPhase = phase
-        rviews.forEach { it.setChronometer(
-            R.id.cf_watcher_notification_progress,
-            SystemClock.elapsedRealtime(), null, false) }
+        rviews.forEach { it.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime(), null, false) }
         rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_progress, "") }
         rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_phase, phase.getTitle()) }
     }
@@ -119,11 +116,7 @@ class CodeforcesContestWatcherTableNotification(
         rview_big.setTextViewText(R.id.cf_watcher_notification_rank, contestantRank)
     }
 
-    override fun onSetContestantPoints(points: Double) {
-        changes = true
-        contestantPoints = doubleToString(points)
-        rview_big.setTextViewText(R.id.cf_watcher_notification_points, contestantPoints)
-    }
+    override fun onSetContestantPoints(points: Double) { }
 
     override fun onSetParticipationType(type: CodeforcesParticipationType) {
         changes = true
@@ -173,7 +166,7 @@ class CodeforcesContestWatcherTableNotification(
             setTextViewText(
                 R.id.cf_watcher_notification_rank,
                 if(participationType == CodeforcesParticipationType.NOT_PARTICIPATED) "not participated"
-                else "rank: $contestantRank • points: $contestantPoints"
+                else "rank: $contestantRank"
             )
         })
 

@@ -60,41 +60,12 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/cf_watcher_notification_table_points"
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/cf_watcher_notification_table_rank"
-        android:layout_toEndOf="@id/cf_watcher_notification_table_rank"
-        android:layout_marginEnd="1dp"
-        >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/TextAppearance.Compat.Notification.Line2"
-            android:layout_marginBottom="1dp"
-            android:text="points"
-            />
-
-        <TextView
-            android:id="@+id/cf_watcher_notification_points"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/TextAppearance.Compat.Notification.Line2"
-            android:textStyle="bold"
-            android:layout_gravity="center_horizontal"
-            />
-
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/cf_watcher_notification_table_tasks"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_alignTop="@id/cf_watcher_notification_table_points"
-        android:layout_toEndOf="@id/cf_watcher_notification_table_points"
+        android:layout_alignTop="@id/cf_watcher_notification_table_rank"
+        android:layout_toEndOf="@id/cf_watcher_notification_table_rank"
         android:layout_alignParentEnd="true"
         >
 
