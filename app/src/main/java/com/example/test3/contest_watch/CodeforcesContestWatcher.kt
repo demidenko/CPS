@@ -4,7 +4,8 @@ import com.example.test3.utils.*
 import kotlinx.coroutines.*
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class CodeforcesContestWatcher(val handle: String, val contestID: Int): CodeforcesContestWatchListener {
@@ -143,24 +144,24 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
         }
     }
 
-    private var ratingChangeWaitingStartTimeMillis = 0L
+    private var ratingChangeWaitingStartTime = Instant.DISTANT_PAST
     private suspend fun getDelay(contestPhase: CodeforcesContestPhase, participationType: CodeforcesParticipationType): Duration {
-        when(contestPhase){
+        when(contestPhase) {
             CodeforcesContestPhase.CODING -> return 3.seconds
             CodeforcesContestPhase.SYSTEM_TEST -> return 3.seconds
             CodeforcesContestPhase.PENDING_SYSTEM_TEST -> return 15.seconds
             CodeforcesContestPhase.FINISHED -> {
                 if(checkRatingChanges(participationType)) return Duration.ZERO
 
-                val currentTimeMillis = System.currentTimeMillis()
-                if(ratingChangeWaitingStartTimeMillis == 0L) ratingChangeWaitingStartTimeMillis = currentTimeMillis
+                val currentTime = getCurrentTime()
+                if(ratingChangeWaitingStartTime == Instant.DISTANT_PAST) ratingChangeWaitingStartTime = currentTime
 
-                val hoursWaiting = (currentTimeMillis - ratingChangeWaitingStartTimeMillis).milliseconds.inWholeHours
+                val waiting = currentTime - ratingChangeWaitingStartTime
                 return when {
-                    hoursWaiting <= 0 -> 10.seconds
-                    hoursWaiting <= 1 -> 30.seconds
-                    hoursWaiting <= 3 -> 60.seconds
-                    else -> 0.seconds
+                    waiting < 30.minutes -> 10.seconds
+                    waiting < 1.hours -> 30.seconds
+                    waiting < 4.hours -> 1.minutes
+                    else -> Duration.ZERO
                 }
             }
             else -> return 30.seconds

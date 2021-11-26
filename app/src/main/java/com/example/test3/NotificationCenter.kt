@@ -11,6 +11,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.test3.utils.getCurrentTime
 
 
 fun notificationBuilder(
@@ -177,7 +178,7 @@ fun makeSimpleNotification(context: Context, id: Int, title: String, content: St
         setContentText(content)
         setSilent(silent)
         setShowWhen(true)
-        setWhen(System.currentTimeMillis())
+        setWhen(getCurrentTime().toEpochMilliseconds())
     }
 }
 

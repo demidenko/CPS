@@ -16,6 +16,7 @@ import com.example.test3.account_manager.*
 import com.example.test3.utils.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -58,16 +59,16 @@ abstract class AccountPanel<U: UserInfo>(
     fun createSmallView(): View {
         layout.setOnClickListener(object : View.OnClickListener{
             val buttons = listOf(reloadButton, expandButton)
-            var lastClickMillis: Long = 0
+            var lastClickTime = Instant.DISTANT_PAST
             override fun onClick(v: View) {
                 buttons.forEach { button ->
                     if(button.isEnabled) animateDelayedHide(button)
                 }
-                val currentTimeMillis = System.currentTimeMillis()
-                if(currentTimeMillis - lastClickMillis < 333 && expandButton.isEnabled){
+                val currentTime = getCurrentTime()
+                if(currentTime - lastClickTime < 1.seconds / 3 && expandButton.isEnabled) {
                     callExpand()
                 }
-                lastClickMillis = currentTimeMillis
+                lastClickTime = currentTime
             }
         })
 

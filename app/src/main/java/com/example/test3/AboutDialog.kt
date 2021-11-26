@@ -12,8 +12,14 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
+import com.example.test3.utils.getCurrentTime
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Instant
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.INFINITE
+import kotlin.time.Duration.Companion.ZERO
+import kotlin.time.Duration.Companion.seconds
 
 class AboutDialog: DialogFragment() {
 
@@ -114,23 +120,24 @@ class AboutDialog: DialogFragment() {
             longIndices = longs.toIntArray()
         }
 
-        private val timeClicks = LongArray(n)
+        private val timeClicks = Array(n) { Instant.DISTANT_PAST }
         private var clicks = 0
 
         override fun onClick(v: View?) {
-            val cur = System.currentTimeMillis()
-            if(clicks>0 && cur - timeClicks[(clicks-1)%n] > 1000) clicks = 0
-            timeClicks[clicks%n] = cur
+            getCurrentTime().let { cur ->
+                if(clicks > 0 && cur - timeClicks[(clicks-1)%n] > 1.seconds) clicks = 0
+                timeClicks[clicks%n] = cur
+            }
             ++clicks
-            if(clicks >= n){
+            if(clicks >= n) {
                 val t = (n-2 downTo 0).map { i ->
                     timeClicks[(clicks-1-i)%n] - timeClicks[(clicks-2-i)%n]
                 }
 
-                val x = longIndices.map { t[it] }.minOrNull() ?: Long.MAX_VALUE
-                val y = shortIndices.map { t[it] }.maxOrNull() ?: Long.MIN_VALUE
+                val x: Duration = longIndices.minOfOrNull { t[it] } ?: INFINITE
+                val y: Duration = shortIndices.maxOfOrNull { t[it] } ?: ZERO
 
-                if(x > y){
+                if(x > y) {
                     clicks = 0
                     callback()
                 }
