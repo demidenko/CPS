@@ -27,6 +27,7 @@ import java.net.SocketTimeoutException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.time.Duration
 
 object CodeforcesUtils {
 
@@ -420,7 +421,9 @@ data class CodeforcesContest(
     val name: String,
     val phase: CodeforcesContestPhase,
     val type: CodeforcesContestType,
-    val durationSeconds: Long,
+    @SerialName("durationSeconds")
+    @Serializable(with = DurationAsSecondsSerializer::class)
+    val duration: Duration,
     @SerialName("startTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val startTime: Instant,

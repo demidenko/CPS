@@ -34,7 +34,7 @@ data class Contest (
         contest.id.toString(),
         contest.name,
         contest.startTime,
-        contest.durationSeconds,
+        contest.duration.inWholeSeconds,
         link = CodeforcesURLFactory.contestOuter(contest.id)
     )
 

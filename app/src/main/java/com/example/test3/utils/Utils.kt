@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 fun getCurrentTime() = Clock.System.now()
 
@@ -201,8 +202,15 @@ suspend inline fun CoroutineScope.startTimer(delay: Duration, crossinline action
     }
 }
 
-object InstantAsSecondsSerializer : KSerializer<Instant> {
+object InstantAsSecondsSerializer: KSerializer<Instant> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Instant", PrimitiveKind.LONG)
     override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeLong(value.epochSeconds)
     override fun deserialize(decoder: Decoder): Instant = Instant.fromEpochSeconds(decoder.decodeLong())
+}
+
+object DurationAsSecondsSerializer: KSerializer<Duration> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Duration", PrimitiveKind.LONG)
+    override fun serialize(encoder: Encoder, value: Duration) = encoder.encodeLong(value.inWholeSeconds)
+    override fun deserialize(decoder: Decoder): Duration = decoder.decodeLong().seconds
+
 }

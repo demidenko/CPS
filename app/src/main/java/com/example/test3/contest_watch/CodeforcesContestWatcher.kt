@@ -42,7 +42,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
 
                     phaseCodeforces.value = contest.phase
                     timeFromStart = contest.relativeTimeSeconds.seconds
-                    duration.value = contest.durationSeconds.seconds
+                    duration.value = contest.duration
                     startTime.value = contest.startTime
                     contestName.value = contest.name
                     contestType.value = contest.type
