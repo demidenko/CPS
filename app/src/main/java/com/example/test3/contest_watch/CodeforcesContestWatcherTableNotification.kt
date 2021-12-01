@@ -12,7 +12,7 @@ import androidx.core.text.italic
 import com.example.test3.*
 import com.example.test3.account_manager.CodeforcesAccountManager
 import com.example.test3.utils.*
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class CodeforcesContestWatcherTableNotification(
     val context: Context,
@@ -21,9 +21,9 @@ class CodeforcesContestWatcherTableNotification(
 ): CodeforcesContestWatchListener {
     val notificationManager by lazy { NotificationManagerCompat.from(context) }
 
+    var changes = false
     var contestType = CodeforcesContestType.UNDEFINED
     var contestPhase = CodeforcesContestPhase.UNDEFINED
-    var changes = false
     var contestantRank = ""
     var participationType = CodeforcesParticipationType.NOT_PARTICIPATED
 
@@ -32,10 +32,22 @@ class CodeforcesContestWatcherTableNotification(
     val rviews = arrayOf(rview_small, rview_big)
     val rviewsByProblem = mutableMapOf<String, RemoteViews>()
 
-    override fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType) {
+    override fun onSetContestInfo(contest: CodeforcesContest) {
         changes = true
-        notificationTable.setSubText("$contestName • $handle")
-        this.contestType = contestType
+        notificationTable.setSubText("${contest.name} • $handle")
+        contestType = contest.type
+        contestPhase = contest.phase
+        rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_phase, contest.phase.getTitle()) }
+        when (contestPhase) {
+            CodeforcesContestPhase.CODING -> {
+                val remaining = contest.duration - contest.relativeTimeSeconds.seconds
+                rviews.forEach { it.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime() + remaining.inWholeMilliseconds, null, true) }
+            }
+            else -> {
+                rviews.forEach { it.setChronometer(R.id.cf_watcher_notification_progress, 0, null, false) }
+                rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_progress, "") }
+            }
+        }
     }
 
     private fun doubleToString(x: Double) = x.toString().removeSuffix(".0")
@@ -88,19 +100,6 @@ class CodeforcesContestWatcherTableNotification(
             rview_big.addView(R.id.cf_watcher_notification_table_tasks, r)
             rviewsByProblem[problemName] = r
         }
-    }
-
-    override fun onSetContestPhase(phase: CodeforcesContestPhase) {
-        changes = true
-        contestPhase = phase
-        rviews.forEach { it.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime(), null, false) }
-        rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_progress, "") }
-        rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_phase, phase.getTitle()) }
-    }
-
-    override fun onSetRemainingTime(time: Duration) {
-        changes = true
-        rviews.forEach { it.setChronometer(R.id.cf_watcher_notification_progress, SystemClock.elapsedRealtime() + time.inWholeMilliseconds, null, true) }
     }
 
     override fun onSetSysTestProgress(percents: Int) {

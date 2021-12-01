@@ -11,28 +11,40 @@ import kotlin.time.Duration.Companion.seconds
 class CodeforcesContestWatcher(val handle: String, val contestID: Int): CodeforcesContestWatchListener {
 
     suspend fun start(){
-        val contestName = ChangingValue("")
-        val contestType = ChangingValue(CodeforcesContestType.UNDEFINED)
-        val phaseCodeforces = ChangingValue(CodeforcesContestPhase.UNDEFINED)
-        val rank = ChangingValue(-1)
-        val pointsTotal = ChangingValue(0.0)
-        val duration = ChangingValue(Duration.ZERO)
-        val startTime = ChangingValue(Instant.DISTANT_PAST)
-        var problemNames: List<String>? = null
+        val contestInfo = ChangingValue(
+            CodeforcesContest(
+                id = -1,
+                name = "",
+                phase = CodeforcesContestPhase.UNDEFINED,
+                type = CodeforcesContestType.UNDEFINED,
+                duration = Duration.ZERO,
+                startTime = Instant.DISTANT_PAST,
+                relativeTimeSeconds = 0
+            ),
+            isEquals = { c1, c2 ->
+                c1.phase == c2.phase
+                        && c1.startTime == c2.startTime
+                        && c1.duration == c2.duration
+                        && c1.name == c2.name
+                        && c1.type == c2.type
+            }
+        )
+        val contestantRank = ChangingValue(-1)
+        val contestantPoints = ChangingValue(0.0)
         val participationType = ChangingValue(CodeforcesParticipationType.NOT_PARTICIPATED)
-        val sysTestPercentage = ChangingValue(-1)
+        var problemNames: List<String>? = null
         var problemsResults: List<ChangingValue<CodeforcesProblemResult>> = emptyList()
+        val sysTestPercentage = ChangingValue(-1)
         val testedSubmissions = mutableSetOf<Long>()
 
         while (true) {
-            var timeFromStart: Duration? = null
             CodeforcesAPI.getContestStandings(
                 contestID,
                 handle,
                 participationType.value!=CodeforcesParticipationType.CONTESTANT
             )?.run {
                 if(status == CodeforcesAPIStatus.FAILED){
-                    if(isContestNotStarted(contestID)) phaseCodeforces.value = CodeforcesContestPhase.BEFORE
+                    if(isContestNotStarted(contestID)) contestInfo.value = contestInfo.value.copy(phase = CodeforcesContestPhase.BEFORE)
                     return@run
                 }
                 result?.run {
@@ -40,19 +52,14 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
                         onSetProblemNames(it.toTypedArray())
                     }
 
-                    phaseCodeforces.value = contest.phase
-                    timeFromStart = contest.relativeTimeSeconds.seconds
-                    duration.value = contest.duration
-                    startTime.value = contest.startTime
-                    contestName.value = contest.name
-                    contestType.value = contest.type
+                    contestInfo.value = contest
 
                     rows.find { row ->
                         row.party.participantType.participatedInContest()
                     }?.let { row ->
                         participationType.value = row.party.participantType
-                        rank.value = row.rank
-                        pointsTotal.value = row.points
+                        contestantRank.value = row.rank
+                        contestantPoints.value = row.points
                         with(row.problemResults){
                             if (this.size != problemsResults.size) problemsResults = this.map { ChangingValue(it, true) }
                             else this.forEachIndexed { index, result -> problemsResults[index].value = result }
@@ -62,15 +69,9 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
             }
 
 
-            if(contestName.isChanged() || contestType.isChanged()) onSetContestNameAndType(contestName.value, contestType.value)
-            if(phaseCodeforces.isChanged()) onSetContestPhase(phaseCodeforces.value)
+            if(contestInfo.isChanged()) onSetContestInfo(contestInfo.value)
 
-            if(phaseCodeforces.value == CodeforcesContestPhase.CODING && (duration.isChanged() || startTime.isChanged())) timeFromStart?.let {
-                val remainingTime = duration.value - it
-                onSetRemainingTime(remainingTime)
-            }
-
-            if(phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST){
+            if(contestInfo.value.phase == CodeforcesContestPhase.SYSTEM_TEST){
                 //get progress of testing (0% ... 100%)
                 delay(1000)
                 CodeforcesAPI.getContestSystemTestingPercentage(contestID)?.let { percentage ->
@@ -83,16 +84,16 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
             if(participationType.isChanged()){
                 onSetParticipationType(participationType.value)
                 if(participationType.value == CodeforcesParticipationType.CONTESTANT){
-                    pointsTotal.value = 0.0
-                    rank.value = -1
+                    contestantPoints.value = 0.0
+                    contestantRank.value = -1
                     problemsResults = emptyList()
                     continue
                 }
             }
 
-            if(rank.value != -1){
-                if(rank.isChanged()) onSetContestantRank(rank.value)
-                if(pointsTotal.isChanged()) onSetContestantPoints(pointsTotal.value)
+            if(contestantRank.value != -1){
+                if(contestantRank.isChanged()) onSetContestantRank(contestantRank.value)
+                if(contestantPoints.isChanged()) onSetContestantPoints(contestantPoints.value)
 
                 problemsResults.forEachIndexed { index, changingValue ->
                     if(changingValue.isChanged()){
@@ -103,7 +104,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
                 }
             }
 
-            if((phaseCodeforces.value == CodeforcesContestPhase.SYSTEM_TEST || phaseCodeforces.value == CodeforcesContestPhase.FINISHED)
+            if((contestInfo.value.phase in listOf(CodeforcesContestPhase.SYSTEM_TEST, CodeforcesContestPhase.FINISHED))
                 && participationType.value.participatedInContest()
                 //&& contestType.value == CodeforcesContestType.CF
                 && problemsResults.any {
@@ -134,7 +135,7 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
 
             commit()
 
-            when(val delayTime = getDelay(phaseCodeforces.value, participationType.value)) {
+            when(val delayTime = getDelay(contestInfo.value.phase, participationType.value)) {
                 Duration.ZERO -> {
                     return
                     //delay(60_000)
@@ -190,20 +191,12 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
 
     fun addCodeforcesContestWatchListener(listener: CodeforcesContestWatchListener) = listeners.add(listener)
 
-    override fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType) {
-        listeners.forEach { l -> l.onSetContestNameAndType(contestName, contestType) }
+    override fun onSetContestInfo(contest: CodeforcesContest) {
+        listeners.forEach { l -> l.onSetContestInfo(contest) }
     }
 
     override fun onSetProblemNames(problemNames: Array<String>) {
         listeners.forEach { l -> l.onSetProblemNames(problemNames) }
-    }
-
-    override fun onSetContestPhase(phase: CodeforcesContestPhase) {
-        listeners.forEach { l -> l.onSetContestPhase(phase) }
-    }
-
-    override fun onSetRemainingTime(time: Duration) {
-        listeners.forEach { l -> l.onSetRemainingTime(time) }
     }
 
     override fun onSetSysTestProgress(percents: Int) {
@@ -241,10 +234,8 @@ class CodeforcesContestWatcher(val handle: String, val contestID: Int): Codeforc
 
 
 interface CodeforcesContestWatchListener {
-    fun onSetContestNameAndType(contestName: String, contestType: CodeforcesContestType)
+    fun onSetContestInfo(contest: CodeforcesContest)
     fun onSetProblemNames(problemNames: Array<String>)
-    fun onSetContestPhase(phase: CodeforcesContestPhase)
-    fun onSetRemainingTime(time: Duration)
     fun onSetSysTestProgress(percents: Int)
     fun onSetContestantRank(rank: Int)
     fun onSetContestantPoints(points: Double)
@@ -256,18 +247,21 @@ interface CodeforcesContestWatchListener {
 }
 
 
-class ChangingValue<T>(private var x: T, private var changingFlag: Boolean = false){
+class ChangingValue<T>(
+    private var x: T,
+    private var changingFlag: Boolean = false,
+    private val isEquals: (T, T) -> Boolean = { a, b -> a == b }
+) {
 
     fun isChanged(): Boolean = changingFlag
 
     var value: T
         get() = x
         set(newValue) {
-            if(newValue != x){
+            if(isEquals(newValue, x)) changingFlag = false
+            else {
                 changingFlag = true
                 x = newValue
-            }else{
-                changingFlag = false
             }
         }
 }
