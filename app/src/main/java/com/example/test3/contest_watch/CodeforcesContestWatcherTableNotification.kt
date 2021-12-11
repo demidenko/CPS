@@ -21,7 +21,6 @@ class CodeforcesContestWatcherTableNotification(
 ): CodeforcesContestWatchListener {
     val notificationManager by lazy { NotificationManagerCompat.from(context) }
 
-    var changes = false
     var contestType = CodeforcesContestType.UNDEFINED
     var contestPhase = CodeforcesContestPhase.UNDEFINED
     var contestantRank = ""
@@ -33,7 +32,6 @@ class CodeforcesContestWatcherTableNotification(
     val rviewsByProblem = mutableMapOf<String, RemoteViews>()
 
     override fun onSetContestInfo(contest: CodeforcesContest) {
-        changes = true
         notificationTable.setSubText("${contest.name} • $handle")
         contestType = contest.type
         contestPhase = contest.phase
@@ -48,6 +46,7 @@ class CodeforcesContestWatcherTableNotification(
                 rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_progress, "") }
             }
         }
+        change()
     }
 
     private fun doubleToString(x: Double) = x.toString().removeSuffix(".0")
@@ -90,7 +89,6 @@ class CodeforcesContestWatcherTableNotification(
         }
 
     override fun onSetProblemNames(problemNames: Array<String>) {
-        changes = true
         rview_big.removeAllViews(R.id.cf_watcher_notification_table_tasks)
         rviewsByProblem.clear()
         problemNames.forEach { problemName ->
@@ -100,33 +98,34 @@ class CodeforcesContestWatcherTableNotification(
             rview_big.addView(R.id.cf_watcher_notification_table_tasks, r)
             rviewsByProblem[problemName] = r
         }
+        change()
     }
 
     override fun onSetSysTestProgress(percents: Int) {
-        changes = true
         rviews.forEach { it.setTextViewText(R.id.cf_watcher_notification_progress, "$percents%") }
+        change()
     }
 
     override fun onSetContestantRank(rank: Int) {
-        changes = true
         contestantRank =
             if(participationType == CodeforcesParticipationType.CONTESTANT) "$rank"
             else "*$rank"
         rview_big.setTextViewText(R.id.cf_watcher_notification_rank, contestantRank)
+        change()
     }
 
     override fun onSetContestantPoints(points: Double) { }
 
     override fun onSetParticipationType(type: CodeforcesParticipationType) {
-        changes = true
         participationType = type
+        change()
     }
 
     override fun onSetProblemResult(problemName: String, result: CodeforcesProblemResult) {
-        changes = true
         rviewsByProblem[problemName]?.run{
             setTextViewText(R.id.cf_watcher_notification_table_column_cell, spanForProblemResult(result))
         }
+        change()
     }
 
     override fun onSetProblemSystestResult(submission: CodeforcesSubmission) {
@@ -156,11 +155,7 @@ class CodeforcesContestWatcherTableNotification(
         CodeforcesAccountManager(context).applyRatingChange(ratingChange)
     }
 
-    override fun commit() {
-        if(!changes) return
-        changes = false
-
-
+    private fun change() {
         notificationTable.setCustomContentView(rview_small.apply {
             setTextViewText(
                 R.id.cf_watcher_notification_rank,
@@ -173,7 +168,6 @@ class CodeforcesContestWatcherTableNotification(
             if (participationType == CodeforcesParticipationType.NOT_PARTICIPATED) null
             else rview_big
         )
-
 
         notificationManager.notify(NotificationIDs.codeforces_contest_watcher, notificationTable.build())
     }

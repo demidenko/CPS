@@ -9,7 +9,9 @@ import com.example.test3.utils.CodeforcesURLFactory
 import com.example.test3.workers.CodeforcesContestWatchLauncherWorker
 import com.example.test3.workers.WorkersCenter
 import com.example.test3.workers.WorkersNames
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.util.concurrent.CancellationException
 import kotlin.time.Duration.Companion.minutes
 
@@ -50,15 +52,15 @@ class CodeforcesContestWatchWorker(val context: Context, params: WorkerParameter
         setForeground(ForegroundInfo(NotificationIDs.codeforces_contest_watcher, notification.build()))
 
         try {
-            CodeforcesContestWatcher(handle, contestID,).apply {
-                addCodeforcesContestWatchListener(
-                    CodeforcesContestWatcherTableNotification(
-                        context,
-                        handle,
-                        notification
-                    )
-                )
-            }.start()
+            val listener = CodeforcesContestWatcherTableNotification(
+                context,
+                handle,
+                notification
+            )
+
+            withContext(Dispatchers.IO) {
+                CodeforcesContestWatcher(handle, contestID, listener).startIn(this)
+            }
 
             while (true) {
                 delay(5.minutes.inWholeMilliseconds)
