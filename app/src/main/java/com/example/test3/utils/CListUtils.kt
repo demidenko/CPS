@@ -14,6 +14,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import java.io.IOException
+import kotlin.time.Duration.Companion.days
 
 object CListUtils {
     fun getManager(resource: String, userName: String, link: String, context: Context): Pair<AccountManager<out UserInfo>,String>? {
@@ -66,6 +67,7 @@ object CListAPI {
             @Query("username") login: String,
             @Query("api_key") apikey: String,
             @Query("start__gte") startTime: String,
+            @Query("end__lte") endTime: String,
             @Query("resource_id__in") resources: String = ""
         ): Call<ClistApiContestsResponse>
     }
@@ -106,13 +108,15 @@ object CListAPI {
         login: String,
         apikey: String,
         platforms: Collection<Contest.Platform>,
-        startTime: Instant
+        startTime: Instant,
+        endTime: Instant = startTime + 120.days
     ): List<ClistContest>? = withContext(Dispatchers.IO) {
         try {
             val call = api.getContests(
                 login,
                 apikey,
                 startTime.toString(),
+                endTime.toString(),
                 platforms.joinToString { getClistApiResourceId(it).toString() }
             )
             val r = call.execute()
