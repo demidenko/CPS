@@ -41,7 +41,11 @@ class ProjectEulerRecentProblemsWorker(private val context: Context, params: Wor
             val problemID = s.substring(s.indexOf('>',i)+1, s.indexOf('<',i+1)).toInt()
             if(problemID == lastViewedProblemID) break
 
+            i = s.indexOf("<td>", i+1)
+            val j = s.indexOf("</td>", i)
+
             i = s.indexOf("</a",i)
+            if(i == -1 || i > j) continue
             val problemName = s.substring(s.lastIndexOf('>',i)+1, i)
 
             newProblems.add(Pair(problemID, problemName))
