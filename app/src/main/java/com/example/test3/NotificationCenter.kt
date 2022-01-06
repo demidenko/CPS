@@ -138,10 +138,10 @@ object NotificationIDs {
 
     data class IntervalID(val from: Int, val length: Int){
         init {
-            if(length < 1) throw IllegalArgumentException("illegal interval length: $length")
+            require(length > 0) { "illegal interval length: $length" }
         }
-        operator fun invoke(int: Int) = (int % length + length) % length + from
-        operator fun invoke(long: Long) = ((long % length).toInt() + length) % length + from
+        operator fun invoke(int: Int) = from + int.mod(length)
+        operator fun invoke(long: Long) = from + long.mod(length)
         operator fun invoke(str: String) = invoke(str.hashCode())
     }
 
