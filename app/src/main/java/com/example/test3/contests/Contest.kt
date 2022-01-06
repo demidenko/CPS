@@ -44,7 +44,7 @@ data class Contest (
         extractContestId(contest, platform),
         contest.event,
         Instant.parse(contest.start+"Z"),
-        contest.duration,
+        (Instant.parse(contest.end+"Z") - Instant.parse(contest.start+"Z")).inWholeSeconds,
         link = contest.href
     )
 
@@ -60,7 +60,8 @@ data class Contest (
         atcoder,
         topcoder,
         codechef,
-        google
+        google,
+        snarknews
         ;
 
         fun getIcon(): Int {

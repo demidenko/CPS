@@ -41,7 +41,7 @@ data class ClistContest(
     val resource_id: Int,
     val id: Long,
     val start: String,
-    val duration: Long,
+    val end: String,
     val event: String,
     val href: String,
     val host: String
@@ -57,6 +57,7 @@ fun getClistApiResourceId(platform: Contest.Platform) =
         Contest.Platform.topcoder -> 12
         Contest.Platform.codechef -> 2
         Contest.Platform.google -> 35
+        Contest.Platform.snarknews -> 9
     }
 
 object CListAPI {
