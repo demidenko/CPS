@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/ic_logo_atcoder.xml" value="0.2140625" />
+        <entry key="app/src/main/res/drawable/ic_logo_dmoj.xml" value="0.2140625" />
         <entry key="app/src/main/res/layout/account_panel.xml" value="0.30945945945945946" />
         <entry key="app/src/main/res/layout/action_bar.xml" value="0.30945945945945946" />
       </map>

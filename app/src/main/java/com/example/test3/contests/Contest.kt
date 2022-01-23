@@ -72,6 +72,7 @@ data class Contest (
                 topcoder -> R.drawable.ic_logo_topcoder
                 codechef -> R.drawable.ic_logo_codechef
                 google -> R.drawable.ic_logo_google
+                dmoj -> R.drawable.ic_logo_dmoj
                 else -> R.drawable.ic_cup
             }
         }
