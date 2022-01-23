@@ -58,6 +58,7 @@ fun getClistApiResourceId(platform: Contest.Platform) =
         Contest.Platform.codechef -> 2
         Contest.Platform.google -> 35
         Contest.Platform.snarknews -> 9
+        Contest.Platform.dmoj -> 77
     }
 
 object CListAPI {
