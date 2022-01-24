@@ -61,8 +61,8 @@ data class Contest (
         topcoder,
         codechef,
         google,
-        snarknews,
-        dmoj
+        dmoj,
+        snarknews
         ;
 
         fun getIcon(): Int {
