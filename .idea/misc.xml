@@ -3,10 +3,17 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/ic_close.xml" value="0.137" />
         <entry key="app/src/main/res/drawable/ic_logo_atcoder.xml" value="0.2140625" />
         <entry key="app/src/main/res/drawable/ic_logo_dmoj.xml" value="0.2140625" />
         <entry key="app/src/main/res/layout/account_panel.xml" value="0.30945945945945946" />
         <entry key="app/src/main/res/layout/action_bar.xml" value="0.30945945945945946" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1828125" />
+        <entry key="app/src/main/res/layout/contest_select_platform_item.xml" value="0.19791666666666666" />
+        <entry key="app/src/main/res/layout/dialog_about.xml" value="0.3523550724637681" />
+        <entry key="app/src/main/res/layout/fragment_contests_platforms.xml" value="0.35572916666666665" />
+        <entry key="app/src/main/res/layout/fragment_contests_settings.xml" value="0.19791666666666666" />
+        <entry key="app/src/main/res/layout/settings_ui_panel.xml" value="0.1828125" />
       </map>
     </option>
   </component>

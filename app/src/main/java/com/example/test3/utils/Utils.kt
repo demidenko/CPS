@@ -41,7 +41,7 @@ fun getColorFromResource(context: Context, resourceId: Int): Int {
     }
 }
 
-val httpClient = OkHttpClient
+val httpClient: OkHttpClient = OkHttpClient
     .Builder()
     .connectTimeout(15, TimeUnit.SECONDS)
     .readTimeout(15, TimeUnit.SECONDS)
@@ -212,5 +212,4 @@ object DurationAsSecondsSerializer: KSerializer<Duration> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Duration", PrimitiveKind.LONG)
     override fun serialize(encoder: Encoder, value: Duration) = encoder.encodeLong(value.inWholeSeconds)
     override fun deserialize(decoder: Decoder): Duration = decoder.decodeLong().seconds
-
 }

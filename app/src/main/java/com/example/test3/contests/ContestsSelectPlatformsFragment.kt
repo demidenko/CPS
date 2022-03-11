@@ -9,8 +9,12 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.get
+import androidx.core.view.isVisible
 import com.example.test3.R
 import com.example.test3.ui.CPSFragment
+import com.example.test3.utils.CListAPI
+import com.example.test3.utils.CListUtils
+import com.example.test3.utils.getClistApiResourceId
 import com.google.android.material.checkbox.MaterialCheckBox
 import kotlinx.coroutines.runBlocking
 
@@ -62,6 +66,19 @@ class ContestsSelectPlatformsFragment: CPSFragment() {
                         }
                         buttonView.isEnabled = true
                     }
+                }
+            }
+        }
+        layoutInflater.inflate(R.layout.contest_select_platform_item, listView)
+        listView[listView.childCount-1].apply {
+            findViewById<TextView>(R.id.contest_select_title).text = "Others"
+            findViewById<ImageView>(R.id.contest_select_icon).setImageResource(R.drawable.ic_cup)
+            findViewById<MaterialCheckBox>(R.id.contest_select_checkbox).isVisible = false
+            setOnClickListener {
+                runBlocking {
+                    val ids = Contest.Platform.getAll().map(::getClistApiResourceId).toSet()
+                    val resources = CListAPI.getResources(listView.context)?.filter { it.id !in ids }
+                    println(resources)
                 }
             }
         }

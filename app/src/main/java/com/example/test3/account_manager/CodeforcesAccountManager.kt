@@ -45,7 +45,11 @@ data class CodeforcesUserInfo(
 }
 
 
-class CodeforcesAccountManager(context: Context): RatedAccountManager<CodeforcesUserInfo>(context, manager_name), AccountSettingsProvider {
+class CodeforcesAccountManager(context: Context):
+    RatedAccountManager<CodeforcesUserInfo>(context, manager_name),
+    AccountSettingsProvider,
+    AccountsSuggestionsProvider
+{
 
     companion object {
         const val manager_name = "codeforces"

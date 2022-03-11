@@ -5,7 +5,10 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.example.test3.utils.ACMPAPI
 import kotlinx.serialization.Serializable
 
-class ACMPAccountManager(context: Context): AccountManager<ACMPAccountManager.ACMPUserInfo>(context, manager_name) {
+class ACMPAccountManager(context: Context):
+    AccountManager<ACMPAccountManager.ACMPUserInfo>(context, manager_name),
+    AccountsSuggestionsProvider
+{
 
     companion object {
         const val manager_name = "acmp"

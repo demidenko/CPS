@@ -5,7 +5,10 @@ import com.example.test3.utils.CListAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class CListAccountManager(context: Context) : AccountManager<CListAccountManager.CListUserInfo>(context, preferences_file_name) {
+class CListAccountManager(context: Context):
+    AccountManager<CListAccountManager.CListUserInfo>(context, preferences_file_name),
+    AccountsSuggestionsProvider
+{
 
     companion object {
         const val preferences_file_name = "clist"

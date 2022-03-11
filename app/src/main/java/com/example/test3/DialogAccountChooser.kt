@@ -22,10 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.test3.account_manager.AccountManager
-import com.example.test3.account_manager.AccountSuggestion
-import com.example.test3.account_manager.STATUS
-import com.example.test3.account_manager.UserInfo
+import com.example.test3.account_manager.*
 import com.example.test3.utils.getColorFromResource
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Job
@@ -191,7 +188,7 @@ class DialogAccountChooser<U: UserInfo>(
 
             if(isSelectedSuggestion) changedByChoose = false
             else {
-                if(manager.isProvidesSuggestions && userId.length >= 3){
+                if(manager is AccountsSuggestionsProvider && userId.length >= 3){
                     suggestionsAdapter.loading(suggestionsView)
                     jobSuggestions = fragment.lifecycleScope.launch {
                         delay(300)

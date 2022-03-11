@@ -34,11 +34,7 @@ class ContestsViewModel: ViewModel() {
         viewModelScope.launch {
             loadingState.value = LoadingState.LOADING
             loadingState.value = run {
-                val (login, apikey) = context.settingsContests.getClistApiLoginAndKey() ?: return@run LoadingState.FAILED
-                val clistContests = CListAPI.getContests(
-                    login, apikey, platforms,
-                    getCurrentTime() - 7.days
-                ) ?: return@run LoadingState.FAILED
+                val clistContests = CListAPI.getContests(context, platforms, getCurrentTime() - 7.days) ?: return@run LoadingState.FAILED
                 val grouped = mapAndFilterClistResult(clistContests).groupBy { it.platform }
                 with(getContestsListDao(context)) {
                     platforms.forEach { platform -> replace(platform, grouped[platform] ?: emptyList()) }

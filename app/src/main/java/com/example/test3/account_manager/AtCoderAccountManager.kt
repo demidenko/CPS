@@ -18,8 +18,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
-class AtCoderAccountManager(context: Context)
-    : RatedAccountManager<AtCoderAccountManager.AtCoderUserInfo>(context, manager_name), AccountSettingsProvider {
+class AtCoderAccountManager(context: Context):
+    RatedAccountManager<AtCoderAccountManager.AtCoderUserInfo>(context, manager_name),
+    AccountSettingsProvider,
+    AccountsSuggestionsProvider
+{
 
     companion object {
         const val manager_name = "atcoder"

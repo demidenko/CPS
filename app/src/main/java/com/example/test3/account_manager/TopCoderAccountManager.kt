@@ -12,7 +12,9 @@ import kotlinx.serialization.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
 
-class TopCoderAccountManager(context: Context): RatedAccountManager<TopCoderAccountManager.TopCoderUserInfo>(context, manager_name) {
+class TopCoderAccountManager(context: Context):
+    RatedAccountManager<TopCoderAccountManager.TopCoderUserInfo>(context, manager_name)
+{
 
     companion object {
         const val manager_name = "topcoder"
@@ -70,8 +72,6 @@ class TopCoderAccountManager(context: Context): RatedAccountManager<TopCoderAcco
 
         return res.apply { status = STATUS.OK }
     }
-
-    override val isProvidesSuggestions = false
 
     override fun getColor(info: TopCoderUserInfo): Int? = with(info){
         if(status != STATUS.OK || rating_algorithm == NOT_RATED) return null

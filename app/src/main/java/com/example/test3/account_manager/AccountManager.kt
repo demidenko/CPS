@@ -37,9 +37,6 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
         }
     }
 
-    open suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = null
-    open val isProvidesSuggestions = true
-
     suspend fun getSavedInfo(): U = getDataStore().userInfo()
 
     suspend fun setSavedInfo(info: U) {
@@ -58,7 +55,13 @@ interface AccountSettingsProvider {
     fun getSettings(): AccountSettingsDataStore
 }
 
-abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: String) : AccountManager<U>(context, managerName){
+interface AccountsSuggestionsProvider {
+    suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = null
+}
+
+abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: String):
+    AccountManager<U>(context, managerName)
+{
     abstract fun getColor(handleColor: HandleColor): Int
     abstract val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
 
@@ -103,7 +106,7 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: S
 data class RatingChange(
     val rating: Int,
     val date: Instant
-){
+) {
     constructor(ratingChange: CodeforcesRatingChange): this(
         ratingChange.newRating,
         ratingChange.ratingUpdateTime
@@ -123,13 +126,13 @@ data class RatingChange(
 class AccountDataStore<U: UserInfo>(
     dataStore: DataStore<Preferences>,
     val userInfo: ItemStringConvertible<U>
-) : CPSDataStore(dataStore)
+): CPSDataStore(dataStore)
 
 inline fun <reified U: UserInfo> accountDataStore(dataStore: DataStore<Preferences>, emptyUserInfo: U): AccountDataStore<U> {
     return AccountDataStore(dataStore, CPSDataStore(dataStore).itemJsonConvertible(jsonCPS, "user_info", emptyUserInfo))
 }
 
-open class AccountSettingsDataStore(dataStore: DataStore<Preferences>) : CPSDataStore(dataStore) {
+open class AccountSettingsDataStore(dataStore: DataStore<Preferences>): CPSDataStore(dataStore) {
     protected open val keysForReset: List<CPSDataStoreItem<*,*>> = emptyList()
     suspend fun resetRelatedData() {
         val keys = keysForReset.takeIf { it.isNotEmpty() } ?: return
@@ -146,7 +149,7 @@ enum class STATUS{
 }
 const val NOT_RATED = Int.MIN_VALUE
 
-abstract class UserInfo{
+abstract class UserInfo {
     abstract val userID: String
     abstract var status: STATUS
 
@@ -214,10 +217,8 @@ fun notifyRatingChange(
         setContentText("$difference (rank: $rank)")
         setSubText("${accountManager.managerName} rating changes")
         color = accountManager.getHandleColorARGB(newRating)
-        url?.let {
-            setContentIntent(makePendingIntentOpenURL(url, context))
-        }
-        time?.let {
+        if (url != null) setContentIntent(makePendingIntentOpenURL(url, context))
+        if (time != null) {
             setShowWhen(true)
             setWhen(time.toEpochMilliseconds())
         }

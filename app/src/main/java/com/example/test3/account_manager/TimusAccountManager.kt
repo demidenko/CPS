@@ -6,7 +6,10 @@ import com.example.test3.utils.TimusAPI
 import com.example.test3.utils.fromHTML
 import kotlinx.serialization.Serializable
 
-class TimusAccountManager(context: Context): AccountManager<TimusAccountManager.TimusUserInfo>(context, manager_name) {
+class TimusAccountManager(context: Context):
+    AccountManager<TimusAccountManager.TimusUserInfo>(context, manager_name),
+    AccountsSuggestionsProvider
+{
 
     companion object {
         const val manager_name = "timus"
