@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 
 class CListAccountManager(context: Context):
     AccountManager<CListAccountManager.CListUserInfo>(context, preferences_file_name),
-    AccountsSuggestionsProvider
+    AccountSuggestionsProvider
 {
 
     companion object {

@@ -188,7 +188,7 @@ class DialogAccountChooser<U: UserInfo>(
 
             if(isSelectedSuggestion) changedByChoose = false
             else {
-                if(manager is AccountsSuggestionsProvider && userId.length >= 3){
+                if(manager is AccountSuggestionsProvider && userId.length >= 3){
                     suggestionsAdapter.loading(suggestionsView)
                     jobSuggestions = fragment.lifecycleScope.launch {
                         delay(300)

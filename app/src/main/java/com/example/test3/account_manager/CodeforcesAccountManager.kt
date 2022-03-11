@@ -48,7 +48,8 @@ data class CodeforcesUserInfo(
 class CodeforcesAccountManager(context: Context):
     RatedAccountManager<CodeforcesUserInfo>(context, manager_name),
     AccountSettingsProvider,
-    AccountsSuggestionsProvider
+    AccountSuggestionsProvider,
+    RatingRevolutionsProvider
 {
 
     companion object {

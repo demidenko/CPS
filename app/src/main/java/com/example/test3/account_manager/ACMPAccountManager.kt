@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 class ACMPAccountManager(context: Context):
     AccountManager<ACMPAccountManager.ACMPUserInfo>(context, manager_name),
-    AccountsSuggestionsProvider
+    AccountSuggestionsProvider
 {
 
     companion object {

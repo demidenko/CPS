@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 class TimusAccountManager(context: Context):
     AccountManager<TimusAccountManager.TimusUserInfo>(context, manager_name),
-    AccountsSuggestionsProvider
+    AccountSuggestionsProvider
 {
 
     companion object {

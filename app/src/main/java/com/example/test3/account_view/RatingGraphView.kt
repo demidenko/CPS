@@ -118,7 +118,10 @@ class RatingGraphView(context: Context, attrs: AttributeSet) : View(context, att
         }
 
         //rating stripes
-        val allRatingBounds = accountManager.ratingUpperBoundRevolutions + Pair(getCurrentTime(), accountManager.ratingsUpperBounds)
+        val allRatingBounds = buildList {
+            (accountManager as? RatingRevolutionsProvider)?.let { addAll(it.ratingUpperBoundRevolutions) }
+            add(getCurrentTime() to accountManager.ratingsUpperBounds)
+        }
         val rectangles = buildList {
             allRatingBounds.sortedByDescending { it.first }.forEachIndexed { index, it ->
                 val lastTime = it.first

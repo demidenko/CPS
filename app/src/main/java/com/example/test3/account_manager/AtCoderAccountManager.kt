@@ -21,7 +21,7 @@ import kotlinx.serialization.Serializable
 class AtCoderAccountManager(context: Context):
     RatedAccountManager<AtCoderAccountManager.AtCoderUserInfo>(context, manager_name),
     AccountSettingsProvider,
-    AccountsSuggestionsProvider
+    AccountSuggestionsProvider
 {
 
     companion object {

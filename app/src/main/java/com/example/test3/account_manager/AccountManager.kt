@@ -55,10 +55,6 @@ interface AccountSettingsProvider {
     fun getSettings(): AccountSettingsDataStore
 }
 
-interface AccountsSuggestionsProvider {
-    suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = null
-}
-
 abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: String):
     AccountManager<U>(context, managerName)
 {
@@ -98,9 +94,6 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: S
 
     protected open suspend fun loadRatingHistory(info: U): List<RatingChange>? = null
     suspend fun getRatingHistory(info: U): List<RatingChange>? = loadRatingHistory(info)?.sortedBy { it.date }
-
-    //list of (last time, bounds)
-    open val ratingUpperBoundRevolutions: List<Pair<Instant, Array<Pair<Int, HandleColor>>>> = emptyList()
 }
 
 data class RatingChange(
@@ -201,6 +194,14 @@ data class AccountSuggestion(
     val userId: String
 )
 
+interface AccountSuggestionsProvider {
+    suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = null
+}
+
+interface RatingRevolutionsProvider {
+    //list of (last time, bounds)
+    val ratingUpperBoundRevolutions: List<Pair<Instant, Array<Pair<Int, HandleColor>>>>
+}
 
 fun notifyRatingChange(
     context: Context,
