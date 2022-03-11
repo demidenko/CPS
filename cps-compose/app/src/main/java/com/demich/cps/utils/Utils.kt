@@ -7,7 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.text.HtmlCompat
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import io.ktor.client.*
+import io.ktor.client.features.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
@@ -17,9 +20,6 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType
-import okhttp3.OkHttpClient
-import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -32,14 +32,18 @@ val context: Context
 
 fun getColorFromResource(context: Context, resourceId: Int): Int = context.resources.getColor(resourceId, null)
 
-val httpClient: OkHttpClient = OkHttpClient
-    .Builder()
-    .connectTimeout(15, TimeUnit.SECONDS)
-    .readTimeout(15, TimeUnit.SECONDS)
-    .build()
+val jsonCPS = Json { ignoreUnknownKeys = true }
 
-val jsonCPS = Json{ ignoreUnknownKeys = true }
-val jsonConverterFactory = jsonCPS.asConverterFactory(MediaType.get("application/json"))
+fun cpsHttpClient(block: HttpClientConfig<*>.() -> Unit) = HttpClient {
+    install(HttpTimeout) {
+        connectTimeoutMillis = 15.seconds.inWholeMilliseconds
+        requestTimeoutMillis = 15.seconds.inWholeMilliseconds
+    }
+    install(JsonFeature) {
+        serializer = KotlinxSerializer(jsonCPS)
+    }
+    block()
+}
 
 fun signedToString(x: Int): String = if(x>0) "+$x" else "$x"
 
