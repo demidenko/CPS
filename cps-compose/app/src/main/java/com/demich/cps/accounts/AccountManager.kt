@@ -1,0 +1,231 @@
+package com.demich.cps.accounts
+
+import android.content.Context
+import android.text.SpannableString
+import androidx.annotation.ColorRes
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import com.demich.cps.NotificationChannelLazy
+import com.demich.cps.R
+import com.demich.cps.makePendingIntentOpenURL
+import com.demich.cps.notificationBuildAndNotify
+import com.demich.cps.ui.settingsUI
+import com.demich.cps.utils.CPSDataStore
+import com.demich.cps.utils.getColorFromResource
+import com.demich.cps.utils.jsonCPS
+import com.demich.cps.utils.signedToString
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
+
+
+abstract class AccountManager<U: UserInfo>(val context: Context, val managerName: String) {
+
+    abstract val userIdTitle: String
+    abstract val urlHomePage: String
+
+    protected abstract fun getDataStore(): AccountDataStore<U>
+    fun flowOfInfo() = getDataStore().userInfo.flow.map { info -> this to info }
+
+    abstract fun emptyInfo(): U
+
+    protected abstract suspend fun downloadInfo(data: String, flags: Int): U
+    suspend fun loadInfo(data: String, flags: Int = 0): U {
+        if(data.isBlank()) return emptyInfo()
+        return withContext(Dispatchers.IO) {
+            downloadInfo(data, flags)
+        }
+    }
+
+    suspend fun getSavedInfo(): U = getDataStore().userInfo()
+
+    suspend fun setSavedInfo(info: U) {
+        val old = getSavedInfo()
+        getDataStore().userInfo(info)
+        if(info.userId != old.userId && this is AccountSettingsProvider) getSettings().resetRelatedData()
+    }
+
+    open fun getColor(info: U): Int? = null
+
+    open fun isValidForSearch(char: Char): Boolean = true
+    open fun isValidForUserId(char: Char): Boolean = true
+}
+
+interface AccountSettingsProvider {
+    fun getSettings(): AccountSettingsDataStore
+}
+
+abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: String):
+    AccountManager<U>(context, managerName)
+{
+    abstract fun getColor(handleColor: HandleColor): Int
+    abstract val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
+
+    fun getHandleColor(rating: Int): HandleColor {
+        return ratingsUpperBounds.find { (bound, color) ->
+            rating < bound
+        }?.second ?: HandleColor.RED
+    }
+
+    fun getHandleColorARGB(rating: Int): Int {
+        return getHandleColor(rating).getARGB(this)
+    }
+
+    abstract fun makeSpan(info: U): SpannableString
+
+    override val userIdTitle = "handle"
+
+    abstract val rankedHandleColorsList: Array<HandleColor>
+    abstract fun getRating(info: U): Int
+    fun getOrder(info: U): Double {
+        val rating = getRating(info)
+        if(rating == NOT_RATED) return -1.0
+        val handleColor = getHandleColor(rating)
+        if(handleColor == HandleColor.RED) return 1e9
+        val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
+        val j = rankedHandleColorsList.indexOfLast { handleColor == it }
+        ratingsUpperBounds.indexOfFirst { it.second == handleColor }.let { pos ->
+            val lower = if(pos>0) ratingsUpperBounds[pos-1].first else 0
+            val upper = ratingsUpperBounds[pos].first
+            val blockLength = (upper - lower).toDouble() / (j-i+1)
+            return i + (rating - lower) / blockLength
+        }
+    }
+
+    protected open suspend fun loadRatingHistory(info: U): List<RatingChange>? = null
+    suspend fun getRatingHistory(info: U): List<RatingChange>? = loadRatingHistory(info)?.sortedBy { it.date }
+}
+
+data class RatingChange(
+    val rating: Int,
+    val date: Instant
+) {
+    /*constructor(ratingChange: CodeforcesRatingChange): this(
+        ratingChange.newRating,
+        ratingChange.ratingUpdateTime
+    )
+
+    constructor(ratingChange: AtCoderRatingChange): this(
+        ratingChange.NewRating,
+        ratingChange.EndTime
+    )
+
+    constructor(ratingChange: TopCoderRatingChange): this(
+        ratingChange.rating.toInt(),
+        ratingChange.date.toInstant()
+    )*/
+}
+
+class AccountDataStore<U: UserInfo>(
+    dataStore: DataStore<Preferences>,
+    val userInfo: ItemStringConvertible<U>
+): CPSDataStore(dataStore)
+
+inline fun <reified U: UserInfo> accountDataStore(dataStore: DataStore<Preferences>, emptyUserInfo: U): AccountDataStore<U> {
+    return AccountDataStore(dataStore, CPSDataStore(dataStore).itemJsonConvertible(jsonCPS, "user_info", emptyUserInfo))
+}
+
+open class AccountSettingsDataStore(dataStore: DataStore<Preferences>): CPSDataStore(dataStore) {
+    protected open val keysForReset: List<CPSDataStoreItem<*,*>> = emptyList()
+    suspend fun resetRelatedData() {
+        val keys = keysForReset.takeIf { it.isNotEmpty() } ?: return
+        dataStore.edit { prefs ->
+            keys.forEach { prefs.remove(it.key) }
+        }
+    }
+}
+
+enum class STATUS{
+    OK,
+    NOT_FOUND,
+    FAILED
+}
+const val NOT_RATED = Int.MIN_VALUE
+
+abstract class UserInfo {
+    abstract val userId: String
+    abstract var status: STATUS
+
+    protected abstract fun makeInfoOKString(): String
+    fun makeInfoString(): String {
+        return when(status) {
+            STATUS.FAILED -> "Error on load: $userId"
+            STATUS.NOT_FOUND -> "Not found: $userId"
+            else -> makeInfoOKString()
+        }
+    }
+
+    abstract fun link(): String
+
+    fun isEmpty() = userId.isBlank()
+}
+
+
+enum class HandleColor(@ColorRes private val resId: Int) {
+    GRAY(R.color.GRAY),
+    BROWN(R.color.BROWN),
+    GREEN(R.color.GREEN),
+    CYAN(R.color.CYAN),
+    BLUE(R.color.BLUE),
+    VIOLET(R.color.VIOLET),
+    YELLOW(R.color.YELLOW),
+    ORANGE(R.color.ORANGE),
+    RED(R.color.RED);
+
+    companion object {
+        val rankedCodeforces    = arrayOf(GRAY, GRAY, GREEN, CYAN, BLUE, VIOLET, VIOLET, ORANGE, ORANGE, RED)
+        val rankedAtCoder       = arrayOf(GRAY, BROWN, GREEN, CYAN, BLUE, YELLOW, YELLOW, ORANGE, ORANGE, RED)
+        val rankedTopCoder      = arrayOf(GRAY, GRAY, GREEN, GREEN, BLUE, YELLOW, YELLOW, YELLOW, YELLOW, RED)
+    }
+
+    fun getARGB(manager: RatedAccountManager<*>, realColor: Boolean): Int {
+        return if(realColor) (manager.getColor(this) + 0xFF000000).toInt()
+            else getColorFromResource(manager.context, resId)
+    }
+
+    private fun Context.getUseRealColors() = runBlocking { settingsUI.useOriginalColors() }
+    fun getARGB(manager: RatedAccountManager<*>) = getARGB(manager, manager.context.getUseRealColors())
+
+    class UnknownHandleColorException(color: HandleColor): Exception("${color.name} is invalid color for manager ")
+}
+
+data class AccountSuggestion(
+    val title: String,
+    val info: String,
+    val userId: String
+)
+
+interface AccountSuggestionsProvider {
+    suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = null
+}
+
+interface RatingRevolutionsProvider {
+    //list of (last time, bounds)
+    val ratingUpperBoundRevolutions: List<Pair<Instant, Array<Pair<Int, HandleColor>>>>
+}
+
+fun notifyRatingChange(
+    context: Context,
+    notificationChannel: NotificationChannelLazy,
+    notificationId: Int,
+    accountManager: RatedAccountManager<*>,
+    handle: String, newRating: Int, oldRating: Int, rank: Int, url: String? = null, time: Instant? = null
+) {
+    notificationBuildAndNotify(context, notificationChannel, notificationId) {
+        val decreased = newRating < oldRating
+        setSmallIcon(if(decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
+        setContentTitle("$handle new rating: $newRating")
+        val difference = signedToString(newRating - oldRating)
+        setContentText("$difference (rank: $rank)")
+        setSubText("${accountManager.managerName} rating changes")
+        color = accountManager.getHandleColorARGB(newRating)
+        if (url != null) setContentIntent(makePendingIntentOpenURL(url, context))
+        if (time != null) {
+            setShowWhen(true)
+            setWhen(time.toEpochMilliseconds())
+        }
+    }
+}

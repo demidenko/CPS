@@ -122,12 +122,12 @@ class NotificationChannelLazy(
 }
 
 object NotificationIDs {
-    private object nextID {
+    private object nextId {
         private var id = 0
         operator fun invoke() = ++id
     }
 
-    private object nextIDInterval {
+    private object nextIdInterval {
         private var start = 1_000_000
         private val step = 1_000_000
         operator fun invoke() = IntervalID(start, step).also { start += step }
@@ -143,29 +143,29 @@ object NotificationIDs {
     }
 
     //codeforces
-    val codeforces_contest_watcher = nextID()
-    val codeforces_rating_changes = nextID()
-    val codeforces_contribution_changes = nextID()
-    val makeCodeforcesSystestSubmissionID = nextIDInterval()
-    val makeCodeforcesFollowBlogID = nextIDInterval()
-    val codeforces_follow_progress = nextID()
-    val makeCodeforcesUpsolveProblemID = nextIDInterval()
+    val codeforces_contest_watcher = nextId()
+    val codeforces_rating_changes = nextId()
+    val codeforces_contribution_changes = nextId()
+    val makeCodeforcesSystestSubmissionID = nextIdInterval()
+    val makeCodeforcesFollowBlogID = nextIdInterval()
+    val codeforces_follow_progress = nextId()
+    val makeCodeforcesUpsolveProblemID = nextIdInterval()
 
     //atcoder
-    val atcoder_rating_changes = nextID()
+    val atcoder_rating_changes = nextId()
 
     //project euler
-    val makeProjectEulerRecentProblemNotificationID = nextIDInterval()
-    val makeProjectEulerNewsNotificationID = nextIDInterval()
+    val makeProjectEulerRecentProblemNotificationID = nextIdInterval()
+    val makeProjectEulerNewsNotificationID = nextIdInterval()
 
     //acmp
-    val makeACMPNewsNotificationID = nextIDInterval()
+    val makeACMPNewsNotificationID = nextIdInterval()
 
     //zaoch
-    val makeZaochNewsNotificationID = nextIDInterval()
+    val makeZaochNewsNotificationID = nextIdInterval()
 
     //test
-    val testID = nextID()
+    val testID = nextId()
 }
 
 

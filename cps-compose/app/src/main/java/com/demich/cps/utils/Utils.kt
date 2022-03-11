@@ -30,6 +30,7 @@ val context: Context
     @ReadOnlyComposable
     get() = LocalContext.current
 
+fun getColorFromResource(context: Context, resourceId: Int): Int = context.resources.getColor(resourceId, null)
 
 val httpClient: OkHttpClient = OkHttpClient
     .Builder()
