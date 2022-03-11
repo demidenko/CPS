@@ -12,6 +12,7 @@ import com.demich.cps.makePendingIntentOpenURL
 import com.demich.cps.notificationBuildAndNotify
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.CPSDataStore
+import com.demich.cps.utils.codeforces.CodeforcesRatingChange
 import com.demich.cps.utils.getColorFromResource
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.signedToString
@@ -103,11 +104,11 @@ data class RatingChange(
     val rating: Int,
     val date: Instant
 ) {
-    /*constructor(ratingChange: CodeforcesRatingChange): this(
+    constructor(ratingChange: CodeforcesRatingChange): this(
         ratingChange.newRating,
         ratingChange.ratingUpdateTime
     )
-
+    /*
     constructor(ratingChange: AtCoderRatingChange): this(
         ratingChange.NewRating,
         ratingChange.EndTime

@@ -121,7 +121,7 @@ class NotificationChannelLazy(
     }
 }
 
-object NotificationIDs {
+object NotificationIds {
     private object nextId {
         private var id = 0
         operator fun invoke() = ++id
