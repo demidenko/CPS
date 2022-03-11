@@ -11,7 +11,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.example.test3.utils.getCurrentTime
 
 
 fun notificationBuilder(
@@ -44,35 +43,29 @@ fun NotificationCompat.Builder.setBigContent(str: CharSequence) = setContentText
 
 object NotificationChannels {
 
-    //codeforces
-    private val group_codeforces by lazy { NotificationChannelGroupLazy("codeforces", "CodeForces") }
-    val codeforces_contest_watcher by lazy { NotificationChannelLazy("cf_contest_watcher", "Contest watch", Importance.DEFAULT, group_codeforces) }
-    val codeforces_rating_changes by lazy { NotificationChannelLazy("cf_rating_changes", "Rating changes", Importance.HIGH, group_codeforces) }
-    val codeforces_contribution_changes by lazy { NotificationChannelLazy("cf_contribution_changes", "Contribution changes", Importance.MIN, group_codeforces) }
-    val codeforces_follow_new_blog by lazy { NotificationChannelLazy("cf_follow_new_blog", "Follow: new blog entries", Importance.DEFAULT, group_codeforces) }
-    val codeforces_follow_progress by lazy { NotificationChannelLazy("cf_follow_progress", "Follow: update progress", Importance.MIN, group_codeforces) }
-    val codeforces_upsolving_suggestion by lazy { NotificationChannelLazy("cf_upsolving_suggestion", "Upsolving suggestions", Importance.DEFAULT, group_codeforces) }
+    private val codeforces by lazyNotificationChannelGroup("codeforces", "CodeForces")
+    val codeforces_contest_watcher by codeforces.lazyChannel("cf_contest_watcher", "Contest watch")
+    val codeforces_rating_changes by codeforces.lazyChannel("cf_rating_changes", "Rating changes", Importance.HIGH)
+    val codeforces_contribution_changes by codeforces.lazyChannel("cf_contribution_changes", "Contribution changes", Importance.MIN)
+    val codeforces_follow_new_blog by codeforces.lazyChannel("cf_follow_new_blog", "Follow: new blog entries")
+    val codeforces_follow_progress by codeforces.lazyChannel("cf_follow_progress", "Follow: update progress", Importance.MIN)
+    val codeforces_upsolving_suggestion by codeforces.lazyChannel("cf_upsolving_suggestion", "Upsolving suggestions")
 
-    //atcoder
-    private val group_atcoder by lazy { NotificationChannelGroupLazy("atcoder", "AtCoder") }
-    val atcoder_rating_changes by lazy { NotificationChannelLazy("atcoder_rating_changes", "Rating changes", Importance.HIGH, group_atcoder) }
+    private val atcoder by lazyNotificationChannelGroup("atcoder", "AtCoder")
+    val atcoder_rating_changes by atcoder.lazyChannel("atcoder_rating_changes", "Rating changes", Importance.HIGH)
 
-    //project euler
-    private val group_project_euler by lazy { NotificationChannelGroupLazy("project_euler", "Project Euler") }
-    val project_euler_news by lazy { NotificationChannelLazy("pe_news", "Recent Problems", Importance.DEFAULT, group_project_euler) }
-    val project_euler_problems by lazy { NotificationChannelLazy("pe_problems", "News", Importance.DEFAULT, group_project_euler) }
+    private val project_euler by lazyNotificationChannelGroup("project_euler", "Project Euler")
+    val project_euler_news by project_euler.lazyChannel("pe_news", "Recent Problems")
+    val project_euler_problems by project_euler.lazyChannel("pe_problems", "News")
 
-    //acmp
-    private val group_acmp by lazy { NotificationChannelGroupLazy("acmp", "ACMP") }
-    val acmp_news by lazy { NotificationChannelLazy("acmp_news", "News", Importance.DEFAULT, group_acmp) }
+    private val acmp by lazyNotificationChannelGroup("acmp", "ACMP")
+    val acmp_news by acmp.lazyChannel("acmp_news", "News")
 
-    //zaoch
-    private val group_zaoch by lazy { NotificationChannelGroupLazy("zaoch", "olympiads.ru/zaoch") }
-    val olympiads_zaoch_news by lazy { NotificationChannelLazy("olympiads_zaoch_news", "News", Importance.DEFAULT, group_zaoch) }
+    private val zaoch by lazyNotificationChannelGroup("zaoch", "olympiads.ru/zaoch")
+    val olympiads_zaoch_news by zaoch.lazyChannel("olympiads_zaoch_news", "News")
 
-    //test
-    private val group_test by lazy { NotificationChannelGroupLazy("test", "Test group") }
-    val test by lazy { NotificationChannelLazy("test", "test channel", Importance.DEFAULT, group_test) }
+    private val testGroup by lazyNotificationChannelGroup("test", "Test group")
+    val test by testGroup.lazyChannel("test", "test channel")
 
 
     enum class Importance {
@@ -82,19 +75,23 @@ object NotificationChannels {
 
         @RequiresApi(Build.VERSION_CODES.N)
         fun convert(): Int =
-            when(this){
+            when(this) {
                 DEFAULT -> NotificationManager.IMPORTANCE_DEFAULT
                 MIN -> NotificationManager.IMPORTANCE_MIN
                 HIGH -> NotificationManager.IMPORTANCE_HIGH
             }
     }
+
+    private fun lazyNotificationChannelGroup(id: String, name: String) = lazy { NotificationChannelGroupLazy(id, name) }
+    private fun NotificationChannelGroupLazy.lazyChannel(id: String, name: String, importance: Importance = Importance.DEFAULT) =
+        lazy { NotificationChannelLazy(id, name, importance, this) }
 }
 
-class NotificationChannelGroupLazy(private val id: String, val name: String){
+class NotificationChannelGroupLazy(private val id: String, val name: String) {
     private var created = false
     @RequiresApi(Build.VERSION_CODES.O)
     fun getID(m: NotificationManagerCompat): String {
-        if(!created){
+        if(!created) {
             m.createNotificationChannelGroup(NotificationChannelGroup(id, name))
             created = true
         }
@@ -107,11 +104,11 @@ class NotificationChannelLazy(
     val name: String,
     private val importance: NotificationChannels.Importance,
     private val groupCreator: NotificationChannelGroupLazy
-){
+) {
     private var created = false
     fun getID(context: Context): String {
-        if(!created){
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+        if(!created) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 val m = NotificationManagerCompat.from(context)
                 val channel = NotificationChannel(id, name, importance.convert()).apply {
                     group = groupCreator.getID(m)
@@ -125,18 +122,18 @@ class NotificationChannelLazy(
 }
 
 object NotificationIDs {
-    object nextID {
+    private object nextID {
         private var id = 0
         operator fun invoke() = ++id
     }
 
-    object nextIntervalID {
+    private object nextIDInterval {
         private var start = 1_000_000
         private val step = 1_000_000
         operator fun invoke() = IntervalID(start, step).also { start += step }
     }
 
-    data class IntervalID(val from: Int, val length: Int){
+    data class IntervalID(val from: Int, val length: Int) {
         init {
             require(length > 0) { "illegal interval length: $length" }
         }
@@ -149,38 +146,28 @@ object NotificationIDs {
     val codeforces_contest_watcher = nextID()
     val codeforces_rating_changes = nextID()
     val codeforces_contribution_changes = nextID()
-    val makeCodeforcesSystestSubmissionID = nextIntervalID()
-    val makeCodeforcesFollowBlogID = nextIntervalID()
+    val makeCodeforcesSystestSubmissionID = nextIDInterval()
+    val makeCodeforcesFollowBlogID = nextIDInterval()
     val codeforces_follow_progress = nextID()
-    val makeCodeforcesUpsolveProblemID = nextIntervalID()
+    val makeCodeforcesUpsolveProblemID = nextIDInterval()
 
     //atcoder
     val atcoder_rating_changes = nextID()
 
     //project euler
-    val makeProjectEulerRecentProblemNotificationID = nextIntervalID()
-    val makeProjectEulerNewsNotificationID = nextIntervalID()
+    val makeProjectEulerRecentProblemNotificationID = nextIDInterval()
+    val makeProjectEulerNewsNotificationID = nextIDInterval()
 
     //acmp
-    val makeACMPNewsNotificationID = nextIntervalID()
+    val makeACMPNewsNotificationID = nextIDInterval()
 
     //zaoch
-    val makeZaochNewsNotificationID = nextIntervalID()
+    val makeZaochNewsNotificationID = nextIDInterval()
 
     //test
-    val test = nextID()
+    val testID = nextID()
 }
 
-fun makeSimpleNotification(context: Context, id: Int, title: String, content: String, silent: Boolean = true) {
-    notificationBuildAndNotify(context, NotificationChannels.test, id) {
-        setSmallIcon(R.drawable.ic_news)
-        setContentTitle(title)
-        setContentText(content)
-        setSilent(silent)
-        setShowWhen(true)
-        setWhen(getCurrentTime().toEpochMilliseconds())
-    }
-}
 
 fun makeIntentOpenUrl(url: String) = Intent(Intent.ACTION_VIEW, Uri.parse(url))
 
