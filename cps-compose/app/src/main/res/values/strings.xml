@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">CPS</string>
+
+    <string name="accounts_welcome">
+"/*
+Hello Coder!
+
+You can add your accounts here by pressing [+] button below.
+*/"
+    </string>
+
+    <string name="cf_contest_watcher_description">
+"Enables auto launched watcher of your contest participation. Allows to see contest phase, systest result notifications and catch rating changes early than usual."
+    </string>
+
+    <string name="news_settings_cf_lost_description">
+"Catch new blog entries from recent actions which get lost because of low activity."
+    </string>
+
+    <string name="news_settings_cf_follow_description">
+"Subscription to new blog entries from specific users."
+    </string>
+
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorAccent">@android:color/holo_blue_dark</color>
+
+    <color name="textColor">#D6D6D6</color>
+    <color name="textColorAdditional">#939393</color>
+
+    <color name="background">#121212</color>
+    <color name="backgroundAdditional">#222222</color>
+    <color name="navigation_background">#000000</color>
+    <color name="navigation_divider_color">#555555</color>
+
+    <color name="success">#339933</color>
+    <color name="fail">#C84040</color>
+
+    <color name="newEntryColor">@android:color/holo_green_light</color>
+    <color name="voted_rating_positive">@color/success</color>
+    <color name="voted_rating_negative">#969696</color>
+    <color name="blog_time">@color/textColorAdditional</color>
+
+    <color name="contest_running">@color/success</color>
+    <color name="contest_finished">@color/textColorAdditional</color>
+</resources>
