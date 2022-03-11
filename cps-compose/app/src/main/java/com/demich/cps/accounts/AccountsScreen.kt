@@ -8,6 +8,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -18,6 +22,7 @@ import com.demich.cps.R
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.context
 
 
 @Composable
@@ -39,10 +44,17 @@ fun AccountsScreen(navController: NavController) {
 
 @Composable
 fun AccountsBottomBar() {
+    var showChooser by rememberSaveable { mutableStateOf(false) }
     CPSIconButton(icon = Icons.Outlined.AddBox) {
         //TODO Open Add new account
+        showChooser = true
     }
     CPSIconButton(icon = Icons.Default.Refresh) {
         //TODO Reload Accounts
+    }
+    if (showChooser) {
+        DialogAccountChooser(manager = CodeforcesAccountManager(context), onDismissRequest = { showChooser = false }) {
+
+        }
     }
 }

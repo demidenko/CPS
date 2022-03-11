@@ -2,20 +2,28 @@ package com.demich.cps.ui
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.demich.cps.ui.theme.cpsColors
 
 @Composable
@@ -84,5 +92,26 @@ fun CounterButton(
         }
     ) {
         Text("$text: $counter")
+    }
+}
+
+@Composable
+fun CPSDialog(
+    horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
+    onDismissRequest: () -> Unit,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Dialog(onDismissRequest = onDismissRequest) {
+        Card(
+            elevation = 8.dp,
+            shape = RoundedCornerShape(12.dp),
+            backgroundColor = cpsColors.backgroundAdditional
+        ) {
+            Column(
+                modifier = Modifier.padding(all = 18.dp),
+                horizontalAlignment = horizontalAlignment,
+                content = content
+            )
+        }
     }
 }

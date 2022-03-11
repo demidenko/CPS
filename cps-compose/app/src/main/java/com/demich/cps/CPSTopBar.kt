@@ -3,7 +3,6 @@ package com.demich.cps
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -16,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.demich.cps.ui.*
@@ -184,34 +182,26 @@ private fun CPSAboutDialog(onDismissRequest: () -> Unit) {
 
     showDevModeLine = true //TODO enable by click pattern
 
-    Dialog(onDismissRequest = onDismissRequest) {
-        Card(
-            elevation = 8.dp,
-            shape = RoundedCornerShape(12.dp),
-            backgroundColor = cpsColors.backgroundAdditional
-        ) {
-            Column(
-                modifier = Modifier.padding(all = 18.dp),
-                horizontalAlignment = Alignment.Start
+    CPSDialog(
+        horizontalAlignment = Alignment.Start,
+        onDismissRequest = onDismissRequest
+    ) {
+        MonospacedText("   Competitive")
+        MonospacedText("   Programming")
+        MonospacedText("&& Solving")
+        MonospacedText("{")
+        MonospacedText("   version = ${BuildConfig.VERSION_NAME}")
+        if (showDevModeLine) {
+            Row(
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                MonospacedText("   Competitive")
-                MonospacedText("   Programming")
-                MonospacedText("&& Solving")
-                MonospacedText("{")
-                MonospacedText("   version = ${BuildConfig.VERSION_NAME}")
-                if (showDevModeLine) {
-                    Row(
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        MonospacedText("   dev_mode = $devModeEnabled", Modifier.weight(1f))
-                        CPSCheckBox(checked = devModeEnabled) { checked ->
-                            scope.launch { settingsDev.devModeEnabled(checked) }
-                        }
-                    }
+                MonospacedText("   dev_mode = $devModeEnabled", Modifier.weight(1f))
+                CPSCheckBox(checked = devModeEnabled) { checked ->
+                    scope.launch { settingsDev.devModeEnabled(checked) }
                 }
-                MonospacedText("}")
             }
         }
+        MonospacedText("}")
     }
 }
