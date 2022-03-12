@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.colorResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -23,6 +24,8 @@ import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
+import com.demich.cps.ui.theme.cpsColors
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,9 +49,10 @@ fun CPSScaffold(
     navController: NavHostController
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val systemUiController = rememberSystemUiController()
     Scaffold(
-        topBar = { CPSTopBar(navController, currentBackStackEntry) },
-        bottomBar = { CPSBottomBar(navController, currentBackStackEntry) }
+        topBar = { CPSTopBar(navController, currentBackStackEntry, systemUiController) },
+        bottomBar = { CPSBottomBar(navController, currentBackStackEntry, systemUiController) }
     ) {
         NavHost(navController = navController, startDestination = Screen.Accounts.route) {
             composable(Screen.Accounts.route) {

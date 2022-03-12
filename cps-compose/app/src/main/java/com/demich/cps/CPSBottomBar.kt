@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -17,12 +18,18 @@ import com.demich.cps.contests.ContestsBottomBar
 import com.demich.cps.news.NewsBottomBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
+import com.google.accompanist.systemuicontroller.SystemUiController
 
 @Composable
 fun CPSBottomBar(
     navController: NavHostController,
-    currentBackStackEntry: NavBackStackEntry?
+    currentBackStackEntry: NavBackStackEntry?,
+    systemUiController: SystemUiController
 ) {
+    systemUiController.setNavigationBarColor(
+        color = cpsColors.backgroundNavigation,
+        darkIcons = MaterialTheme.colors.isLight
+    )
     val currentScreen = currentBackStackEntry?.destination?.getScreen() ?: return
     if (currentScreen.enableBottomBar) {
         Row(

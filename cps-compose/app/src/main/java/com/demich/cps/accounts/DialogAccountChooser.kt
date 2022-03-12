@@ -25,7 +25,7 @@ fun<U: UserInfo> DialogAccountChooser(
     CPSDialog(onDismissRequest = onDismissRequest) {
         MonospacedText(
             text = "getUser(${manager.managerName}):",
-            fontSize = 20.sp,
+            fontSize = 16.sp,
             modifier = Modifier.fillMaxWidth()
         )
         TextField(
@@ -36,6 +36,11 @@ fun<U: UserInfo> DialogAccountChooser(
                 userId = str
                 userInfo = manager.emptyInfo()
                 loading = userId.isNotBlank()
+            },
+            label = {
+                var label = manager.userIdTitle
+                if (manager is AccountSuggestionsProvider) label += " or search query"
+                Text(label)
             }
         )
         if (loading) {

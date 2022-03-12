@@ -10,15 +10,16 @@ import androidx.compose.ui.graphics.Color
 
 private val LightColorPalette = lightColors(
     background = Color(248, 248, 248),
-    secondary = Color(21, 101, 192),
-    onBackground = Color(39, 39, 39)
+    primary = Color(21, 101, 192),
+    onBackground = Color(39, 39, 39),
+    error = Color(221, 34, 34)
 )
 
 private val DarkColorPalette = darkColors(
     background = Color(18, 18, 18),
-    secondary = Color(0, 153, 204),
+    primary = Color(0, 153, 204),
     onBackground = Color(214, 214, 214),
-    onSurface = Color.Red
+    error = Color(200, 64, 64)
 )
 
 
@@ -32,7 +33,7 @@ object cpsColors {
 
     val colorAccent: Color
         @Composable
-        get() = MaterialTheme.colors.secondary
+        get() = MaterialTheme.colors.primary
 
     val textColor: Color
         @Composable
@@ -57,6 +58,10 @@ object cpsColors {
     val dividerColor: Color
         //@Composable
         get() = Color(85, 85, 85)
+
+    val errorColor: Color
+    @Composable
+        get() = MaterialTheme.colors.error
 }
 
 

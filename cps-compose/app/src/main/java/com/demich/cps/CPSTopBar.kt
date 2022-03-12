@@ -1,5 +1,7 @@
 package com.demich.cps
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -20,13 +22,17 @@ import androidx.navigation.NavHostController
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
+import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.launch
 
 @Composable
 fun CPSTopBar(
     navController: NavHostController,
-    currentBackStackEntry: NavBackStackEntry?
+    currentBackStackEntry: NavBackStackEntry?,
+    systemUiController: SystemUiController
 ) {
+    ColorizeStatusBar(systemUiController)
+
     val currentScreen = currentBackStackEntry?.destination?.getScreen()
 
     var showUIPanel by rememberSaveable { mutableStateOf(false) }
@@ -204,4 +210,21 @@ private fun CPSAboutDialog(onDismissRequest: () -> Unit) {
         }
         MonospacedText("}")
     }
+}
+
+@Composable
+fun ColorizeStatusBar(
+    systemUiController: SystemUiController
+) {
+    val settingUI = context.settingsUI
+    val coloredStatusBar by settingUI.coloredStatusBar.collectAsState()
+    val statusBarColor by animateColorAsState(
+        //TODO: color must depends on currentScreen and (selected) accounts
+        targetValue = if (coloredStatusBar) cpsColors.errorColor else cpsColors.background,
+        animationSpec = tween(800)
+    )
+    systemUiController.setStatusBarColor(
+        color = statusBarColor,
+        darkIcons = MaterialTheme.colors.isLight
+    )
 }
