@@ -3,13 +3,20 @@ package com.demich.cps.accounts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,6 +28,7 @@ import com.demich.cps.utils.showToast
 import kotlinx.coroutines.delay
 import kotlin.reflect.KFunction1
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun<U: UserInfo> DialogAccountChooser(
     manager: AccountManager<U>,
@@ -42,6 +50,20 @@ fun<U: UserInfo> DialogAccountChooser(
         var loading by remember { mutableStateOf(false) }
         var showLoading by remember { mutableStateOf(false) }
 
+        val focusRequester = remember { FocusRequester() }
+        val keyboardController = LocalSoftwareKeyboardController.current
+
+        val done = {
+            if (userInfo.status != STATUS.NOT_FOUND && !loading) {
+                if (userId.all(manager::isValidForUserId)) {
+                    onResult(userInfo)
+                    onDismissRequest()
+                } else {
+                    context.showToast("${manager.userIdTitle} contains unacceptable symbols")
+                }
+            }
+        }
+
         MonospacedText(
             text = "getUser(${manager.managerName}):",
             fontSize = 16.sp,
@@ -50,6 +72,7 @@ fun<U: UserInfo> DialogAccountChooser(
 
         TextField(
             value = userId,
+            modifier = Modifier.focusRequester(focusRequester),
             singleLine = true,
             textStyle = TextStyle(fontSize = inputTextSize),
             onValueChange = { str ->
@@ -74,14 +97,7 @@ fun<U: UserInfo> DialogAccountChooser(
             trailingIcon = {
                 if (showLoading || userInfo.status != STATUS.NOT_FOUND)
                     IconButton(
-                        onClick = {
-                            if (userId.all(manager::isValidForUserId)) {
-                                onResult(userInfo)
-                                onDismissRequest()
-                            } else {
-                                context.showToast("${manager.userIdTitle} contains unacceptable symbols")
-                            }
-                        },
+                        onClick = done,
                         enabled = !loading
                     ) {
                         if (showLoading) {
@@ -104,7 +120,11 @@ fun<U: UserInfo> DialogAccountChooser(
                             )
                         }
                     }
-            }
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(
+                onDone = { done() }
+            ),
         )
 
         if (loading) {
@@ -117,6 +137,12 @@ fun<U: UserInfo> DialogAccountChooser(
             }
         } else {
             showLoading = false
+        }
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+            delay(300) //TODO fix this shit
+            keyboardController?.show()
         }
     }
 }
