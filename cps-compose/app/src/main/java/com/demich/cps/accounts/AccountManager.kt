@@ -159,7 +159,7 @@ const val NOT_RATED = Int.MIN_VALUE
 
 abstract class UserInfo {
     abstract val userId: String
-    abstract var status: STATUS
+    abstract val status: STATUS
 
     abstract fun link(): String
 

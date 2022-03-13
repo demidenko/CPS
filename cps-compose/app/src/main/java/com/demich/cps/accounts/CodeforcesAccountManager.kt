@@ -25,10 +25,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CodeforcesUserInfo(
-    override var status: STATUS,
-    var handle: String,
-    var rating: Int = NOT_RATED,
-    var contribution: Int = 0,
+    override val status: STATUS,
+    val handle: String,
+    val rating: Int = NOT_RATED,
+    val contribution: Int = 0,
     @Serializable(with = InstantAsSecondsSerializer::class)
     val lastOnlineTime: Instant = Instant.DISTANT_PAST
 ): UserInfo() {
