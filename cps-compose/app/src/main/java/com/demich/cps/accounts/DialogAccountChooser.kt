@@ -8,17 +8,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSDialog
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.context
+import com.demich.cps.utils.showToast
 import kotlinx.coroutines.delay
+import kotlin.reflect.KFunction1
 
 @Composable
 fun<U: UserInfo> DialogAccountChooser(
@@ -26,22 +27,33 @@ fun<U: UserInfo> DialogAccountChooser(
     onDismissRequest: () -> Unit,
     onResult: (U) -> Unit
 ) {
+    val context = context
+    val charValidator: KFunction1<Char, Boolean> =
+        if (manager is AccountSuggestionsProvider) manager::isValidForSearch
+        else manager::isValidForUserId
+
     CPSDialog(onDismissRequest = onDismissRequest) {
+        val iconSize = 32.dp
+        val inputTextSize = 18.sp
+        val resultTextSize = 14.sp
+
         var userId by remember { mutableStateOf("") }
         var userInfo by remember { mutableStateOf(manager.emptyInfo()) }
         var loading by remember { mutableStateOf(false) }
         var showLoading by remember { mutableStateOf(false) }
+
         MonospacedText(
             text = "getUser(${manager.managerName}):",
             fontSize = 16.sp,
             modifier = Modifier.fillMaxWidth()
         )
+
         TextField(
             value = userId,
             singleLine = true,
-            textStyle = TextStyle(fontSize = 18.sp),
+            textStyle = TextStyle(fontSize = inputTextSize),
             onValueChange = { str ->
-                if (!str.all(manager::isValidForSearch)) return@TextField
+                if (!str.all(charValidator)) return@TextField
                 userId = str
                 userInfo = manager.emptyInfo()
                 loading = userId.isNotBlank()
@@ -53,19 +65,25 @@ fun<U: UserInfo> DialogAccountChooser(
             },
             label = {
                 Text(
-                    text = infoString(userInfo, manager),
+                    text = makeUserInfoSpan(userInfo, manager),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 14.sp
+                    fontSize = resultTextSize
                 )
             },
             trailingIcon = {
                 if (showLoading || userInfo.status != STATUS.NOT_FOUND)
                     IconButton(
-                        onClick = { onResult(userInfo) },
+                        onClick = {
+                            if (userId.all(manager::isValidForUserId)) {
+                                onResult(userInfo)
+                                onDismissRequest()
+                            } else {
+                                context.showToast("${manager.userIdTitle} contains unacceptable symbols")
+                            }
+                        },
                         enabled = !loading
                     ) {
-                        val iconSize = 32.dp
                         if (showLoading) {
                             CircularProgressIndicator(
                                 color = cpsColors.textColor,
@@ -79,12 +97,16 @@ fun<U: UserInfo> DialogAccountChooser(
                                 tint = cpsColors.success,
                                 modifier = Modifier
                                     .size(iconSize)
-                                    .border(border = ButtonDefaults.outlinedBorder, shape = MaterialTheme.shapes.small)
+                                    .border(
+                                        border = ButtonDefaults.outlinedBorder,
+                                        shape = MaterialTheme.shapes.small
+                                    )
                             )
                         }
                     }
             }
         )
+
         if (loading) {
             LaunchedEffect(userId) {
                 delay(300)
@@ -100,26 +122,21 @@ fun<U: UserInfo> DialogAccountChooser(
 }
 
 @Composable
-private fun<U: UserInfo> infoString(userInfo: U, manager: AccountManager<U>): AnnotatedString {
+fun<U: UserInfo> makeUserInfoSpan(userInfo: U, manager: AccountManager<U>): AnnotatedString {
+    if (userInfo.isEmpty()) return AnnotatedString("")
     return buildAnnotatedString {
-        if (userInfo.isEmpty()) return@buildAnnotatedString
-        when (userInfo.status) {
-            STATUS.OK -> {
-                withStyle(SpanStyle(
-                    fontWeight = FontWeight.Bold,
-                    color = manager.getColor(userInfo)?.let { Color(it) } ?: cpsColors.textColor
-                )) {
-                    append(userInfo.makeInfoString())
+        withStyle(SpanStyle(color = cpsColors.textColor)) {
+            when (userInfo.status) {
+                STATUS.OK -> append(manager.makeOKInfoSpan(userInfo))
+                STATUS.NOT_FOUND -> {
+                    withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
+                        append("User not found")
+                    }
                 }
-            }
-            STATUS.NOT_FOUND -> {
-                withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = cpsColors.textColor)) {
-                    append("User not found")
-                }
-            }
-            STATUS.FAILED -> {
-                withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = cpsColors.textColor)) {
-                    append("Load failed")
+                STATUS.FAILED -> {
+                    withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
+                        append("Load failed")
+                    }
                 }
             }
         }

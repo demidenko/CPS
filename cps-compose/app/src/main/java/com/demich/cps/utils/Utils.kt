@@ -3,6 +3,7 @@ package com.demich.cps.utils
 import android.content.Context
 import android.text.Html
 import android.text.Spanned
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +30,8 @@ val context: Context
     @Composable
     @ReadOnlyComposable
     get() = LocalContext.current
+
+fun Context.showToast(title: String) = Toast.makeText(this, title, Toast.LENGTH_LONG).show()
 
 fun getColorFromResource(context: Context, resourceId: Int): Int = context.resources.getColor(resourceId, null)
 

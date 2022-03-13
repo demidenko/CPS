@@ -7,6 +7,7 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import com.demich.cps.accounts.HandleColor
 
 private val LightColorPalette = lightColors(
     background = Color(248, 248, 248),
@@ -66,6 +67,35 @@ object cpsColors {
     val errorColor: Color
         @Composable
         get() = MaterialTheme.colors.error
+
+    @Composable
+    fun handleColor(handleColor: HandleColor): Color {
+        if (isLight) {
+            return when(handleColor) {
+                HandleColor.GRAY -> Color(0xFF808080)
+                HandleColor.BROWN -> Color(0xFF804000)
+                HandleColor.GREEN -> Color(0xFF008000)
+                HandleColor.CYAN -> Color(0xFF03A89E)
+                HandleColor.BLUE -> Color(0xFF0000FF)
+                HandleColor.VIOLET -> Color(0xFFAA00AA)
+                HandleColor.YELLOW -> Color(0xFFDDC000)
+                HandleColor.ORANGE -> Color(0xFFFF8000)
+                HandleColor.RED -> Color(0xFFFF0000)
+            }
+        } else {
+            return when(handleColor) {
+                HandleColor.GRAY -> Color(0xFF888888)
+                HandleColor.BROWN -> Color(0xFF80461B)
+                HandleColor.GREEN -> Color(0xFF009000)
+                HandleColor.CYAN -> Color(0xFF00A89E)
+                HandleColor.BLUE -> Color(0xFF3F68F0)
+                HandleColor.VIOLET -> Color(0xFFB04ECC)
+                HandleColor.YELLOW -> Color(0xFFCCCC00)
+                HandleColor.ORANGE -> Color(0xFFFB8000)
+                HandleColor.RED -> Color(0xFFED301D)
+            }
+        }
+    }
 }
 
 

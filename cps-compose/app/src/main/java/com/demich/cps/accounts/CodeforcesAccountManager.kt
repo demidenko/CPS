@@ -1,12 +1,16 @@
 package com.demich.cps.accounts
 
 import android.content.Context
-import android.graphics.Typeface
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
-import android.text.style.StyleSpan
-import androidx.core.text.set
-import androidx.datastore.preferences.core.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
@@ -39,10 +43,6 @@ data class CodeforcesUserInfo(
     override val userId: String
         get() = handle
 
-    override fun makeInfoOKString(): String {
-        return if(rating == NOT_RATED) "$handle [not rated]" else "$handle $rating"
-    }
-
     override fun link(): String = CodeforcesURLFactory.user(handle)
 }
 
@@ -62,11 +62,9 @@ class CodeforcesAccountManager(context: Context):
     override val urlHomePage = CodeforcesURLFactory.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)
-    override fun isValidForUserId(char: Char): Boolean {
-        return when(char) {
-            in 'a'..'z', in 'A'..'Z', in '0'..'9', in "._-" -> true
-            else -> false
-        }
+    override fun isValidForUserId(char: Char) = when(char) {
+        in 'a'..'z', in 'A'..'Z', in '0'..'9', in "._-" -> true
+        else -> false
     }
 
 
@@ -75,28 +73,20 @@ class CodeforcesAccountManager(context: Context):
     override suspend fun downloadInfo(data: String, flags: Int): CodeforcesUserInfo {
         val handle = data
         try {
-            val user = CodeforcesAPI.getUser(handle)
-            return CodeforcesUserInfo(user)
+            return CodeforcesUserInfo(CodeforcesAPI.getUser(handle))
         } catch (exception: Throwable) {
-            val info = CodeforcesUserInfo(STATUS.FAILED, handle)
             if (exception is CodeforcesAPIErrorResponse && exception.isHandleNotFound() == handle) {
                 if((flags and 1) != 0) {
                     val (realHandle, status) = CodeforcesUtils.getRealHandle(handle)
                     return when(status) {
-                        STATUS.OK -> downloadInfo(realHandle, 0)
-                        STATUS.NOT_FOUND -> info.copy(status = STATUS.NOT_FOUND)
-                        STATUS.FAILED -> info
+                        STATUS.OK -> downloadInfo(data = realHandle, flags = 0)
+                        else -> CodeforcesUserInfo(status, handle)
                     }
                 }
-                return info.copy(status = STATUS.NOT_FOUND)
+                return CodeforcesUserInfo(STATUS.NOT_FOUND, handle)
             }
-            return info
+            return CodeforcesUserInfo(STATUS.FAILED, handle)
         }
-    }
-
-    override fun getColor(info: CodeforcesUserInfo): Int? = with(info) {
-        if(status != STATUS.OK || rating == NOT_RATED) return null
-        return getHandleColorARGB(info.rating)
     }
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
@@ -133,42 +123,66 @@ class CodeforcesAccountManager(context: Context):
 
     override val rankedHandleColorsList = HandleColor.rankedCodeforces
 
-    fun makeSpan(handle: String, tag: CodeforcesUtils.ColorTag) = SpannableString(handle).apply {
-        CodeforcesUtils.getHandleColorByTag(tag)?.getARGB(this@CodeforcesAccountManager)?.let { argb ->
-            set(
-                if(tag == CodeforcesUtils.ColorTag.LEGENDARY) 1 else 0,
-                handle.length,
-                ForegroundColorSpan(argb)
-            )
+    override fun originalColor(handleColor: HandleColor): Color =
+        when (handleColor) {
+            HandleColor.GRAY -> Color(0xFF808080)
+            HandleColor.GREEN -> Color(0xFF008000)
+            HandleColor.CYAN -> Color(0xFF03A89E)
+            HandleColor.BLUE -> Color(0xFF0000FF)
+            HandleColor.VIOLET -> Color(0xFFAA00AA)
+            HandleColor.ORANGE -> Color(0xFFFF8C00)
+            HandleColor.RED -> Color(0xFFFF0000)
+            else -> throw HandleColor.UnknownHandleColorException(handleColor, this)
         }
-        if(tag != CodeforcesUtils.ColorTag.BLACK) set(0, handle.length, StyleSpan(Typeface.BOLD))
+
+    @Composable
+    fun makeHandleSpan(handle: String, tag: CodeforcesUtils.ColorTag): AnnotatedString {
+        return buildAnnotatedString {
+            append(handle)
+            CodeforcesUtils.getHandleColorByTag(tag)?.let { handleColor ->
+                addStyle(
+                    style = SpanStyle(color = colorFor(handleColor)),
+                    start = if(tag == CodeforcesUtils.ColorTag.LEGENDARY) 1 else 0,
+                    end = handle.length
+                )
+            }
+            if (tag != CodeforcesUtils.ColorTag.BLACK) {
+                addStyle(
+                    style = SpanStyle(fontWeight = FontWeight.Bold),
+                    start = 0,
+                    end = handle.length
+                )
+            }
+        }
     }
 
-    override fun getColor(handleColor: HandleColor): Int {
-        return when (handleColor) {
-            HandleColor.GRAY -> 0x808080
-            HandleColor.GREEN -> 0x008000
-            HandleColor.CYAN -> 0x03A89E
-            HandleColor.BLUE -> 0x0000FF
-            HandleColor.VIOLET -> 0xAA00AA
-            HandleColor.ORANGE -> 0xFF8C00
-            HandleColor.RED -> 0xFF0000
-            else -> throw HandleColor.UnknownHandleColorException(handleColor)
+    @Composable
+    override fun makeOKInfoSpan(userInfo: CodeforcesUserInfo): AnnotatedString {
+        require(userInfo.status == STATUS.OK)
+        return buildAnnotatedString {
+            append(makeHandleSpan(
+                handle = userInfo.handle,
+                tag = CodeforcesUtils.getTagByRating(userInfo.rating)
+            ))
+            append(' ')
+            if (userInfo.rating != NOT_RATED) {
+                withStyle(SpanStyle(
+                    color = colorFor(rating = userInfo.rating),
+                    fontWeight = FontWeight.Bold
+                )) {
+                    append(userInfo.rating.toString())
+                }
+            } else append("[not rated]")
         }
-    }
-
-    override fun makeSpan(info: CodeforcesUserInfo): SpannableString {
-        return makeSpan(info.handle, CodeforcesUtils.getTagByRating(info.rating))
     }
 
     override fun getDataStore() = accountDataStore(context.account_codeforces_dataStore, emptyInfo())
     override fun getSettings() = CodeforcesAccountSettingsDataStore(this)
 
     fun notifyRatingChange(ratingChange: CodeforcesRatingChange) = notifyRatingChange(
-        context,
+        this,
         NotificationChannels.codeforces_rating_changes,
         NotificationIds.codeforces_rating_changes,
-        this,
         ratingChange.handle,
         ratingChange.newRating,
         ratingChange.oldRating,

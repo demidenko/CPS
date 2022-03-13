@@ -1,8 +1,12 @@
 package com.demich.cps.accounts
 
 import android.content.Context
-import android.text.SpannableString
 import androidx.annotation.ColorRes
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.AnnotatedString
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -11,14 +15,13 @@ import com.demich.cps.R
 import com.demich.cps.makePendingIntentOpenURL
 import com.demich.cps.notificationBuildAndNotify
 import com.demich.cps.ui.settingsUI
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.codeforces.CodeforcesRatingChange
-import com.demich.cps.utils.getColorFromResource
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.signedToString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 
@@ -49,33 +52,41 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
         if(info.userId != old.userId && this is AccountSettingsProvider) getSettings().resetRelatedData()
     }
 
-    open fun getColor(info: U): Int? = null
+    @Composable
+    open fun colorFor(userInfo: U): Color = Color.Unspecified
 
-    open fun isValidForSearch(char: Char): Boolean = true
+    @Composable
+    abstract fun makeOKInfoSpan(userInfo: U): AnnotatedString
+
     open fun isValidForUserId(char: Char): Boolean = true
-}
-
-interface AccountSettingsProvider {
-    fun getSettings(): AccountSettingsDataStore
 }
 
 abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: String):
     AccountManager<U>(context, managerName)
 {
-    abstract fun getColor(handleColor: HandleColor): Int
     abstract val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
+    fun getHandleColor(rating: Int): HandleColor =
+        ratingsUpperBounds
+            .firstOrNull { rating < it.first }?.second
+            ?: HandleColor.RED
 
-    fun getHandleColor(rating: Int): HandleColor {
-        return ratingsUpperBounds.find { (bound, color) ->
-            rating < bound
-        }?.second ?: HandleColor.RED
+    abstract fun originalColor(handleColor: HandleColor): Color
+
+    @Composable
+    fun colorFor(handleColor: HandleColor): Color {
+        val useOriginalColors by context.settingsUI.useOriginalColors.collectAsState()
+        return if (useOriginalColors) originalColor(handleColor)
+        else cpsColors.handleColor(handleColor)
     }
 
-    fun getHandleColorARGB(rating: Int): Int {
-        return getHandleColor(rating).getARGB(this)
-    }
+    @Composable
+    fun colorFor(rating: Int): Color = colorFor(handleColor = getHandleColor(rating))
 
-    abstract fun makeSpan(info: U): SpannableString
+    @Composable
+    override fun colorFor(userInfo: U): Color {
+        if (userInfo.status != STATUS.OK || getRating(userInfo) == NOT_RATED) return Color.Unspecified
+        return colorFor(rating = getRating(userInfo))
+    }
 
     override val userIdTitle = "handle"
 
@@ -150,15 +161,6 @@ abstract class UserInfo {
     abstract val userId: String
     abstract var status: STATUS
 
-    protected abstract fun makeInfoOKString(): String
-    fun makeInfoString(): String {
-        return when(status) {
-            STATUS.FAILED -> "Error on load: $userId"
-            STATUS.NOT_FOUND -> "Not found: $userId"
-            else -> makeInfoOKString()
-        }
-    }
-
     abstract fun link(): String
 
     fun isEmpty() = userId.isBlank()
@@ -182,15 +184,8 @@ enum class HandleColor(@ColorRes private val resId: Int) {
         val rankedTopCoder      = arrayOf(GRAY, GRAY, GREEN, GREEN, BLUE, YELLOW, YELLOW, YELLOW, YELLOW, RED)
     }
 
-    fun getARGB(manager: RatedAccountManager<*>, realColor: Boolean): Int {
-        return if(realColor) (manager.getColor(this) + 0xFF000000).toInt()
-            else getColorFromResource(manager.context, resId)
-    }
-
-    private fun Context.getUseRealColors() = runBlocking { settingsUI.useOriginalColors() }
-    fun getARGB(manager: RatedAccountManager<*>) = getARGB(manager, manager.context.getUseRealColors())
-
-    class UnknownHandleColorException(color: HandleColor): Exception("${color.name} is invalid color for manager ")
+    class UnknownHandleColorException(color: HandleColor, manager: RatedAccountManager<*>):
+        Throwable("Manager ${manager.managerName} does not support color ${color.name}")
 }
 
 data class AccountSuggestion(
@@ -201,6 +196,11 @@ data class AccountSuggestion(
 
 interface AccountSuggestionsProvider {
     suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = null
+    fun isValidForSearch(char: Char): Boolean = true
+}
+
+interface AccountSettingsProvider {
+    fun getSettings(): AccountSettingsDataStore
 }
 
 interface RatingRevolutionsProvider {
@@ -209,21 +209,20 @@ interface RatingRevolutionsProvider {
 }
 
 fun notifyRatingChange(
-    context: Context,
+    accountManager: RatedAccountManager<*>,
     notificationChannel: NotificationChannelLazy,
     notificationId: Int,
-    accountManager: RatedAccountManager<*>,
     handle: String, newRating: Int, oldRating: Int, rank: Int, url: String? = null, time: Instant? = null
 ) {
-    notificationBuildAndNotify(context, notificationChannel, notificationId) {
+    notificationBuildAndNotify(accountManager.context, notificationChannel, notificationId) {
         val decreased = newRating < oldRating
         setSmallIcon(if(decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
         setContentTitle("$handle new rating: $newRating")
         val difference = signedToString(newRating - oldRating)
         setContentText("$difference (rank: $rank)")
         setSubText("${accountManager.managerName} rating changes")
-        color = accountManager.getHandleColorARGB(newRating)
-        if (url != null) setContentIntent(makePendingIntentOpenURL(url, context))
+        color = accountManager.originalColor(accountManager.getHandleColor(newRating)).toArgb() //TODO not original but cpsColors
+        if (url != null) setContentIntent(makePendingIntentOpenURL(url, accountManager.context))
         if (time != null) {
             setShowWhen(true)
             setWhen(time.toEpochMilliseconds())
