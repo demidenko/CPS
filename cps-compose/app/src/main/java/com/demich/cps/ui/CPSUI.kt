@@ -79,14 +79,10 @@ fun MonospacedText(
 
 
 @Composable
-fun CounterButton(
-    text: String
-) {
+fun CounterButton(text: String) {
     var counter by rememberSaveable { mutableStateOf(0) }
     Button(
-        onClick = {
-            counter++
-        }
+        onClick = { counter++ }
     ) {
         Text("$text: $counter")
     }
@@ -107,10 +103,10 @@ fun CPSDialog(
             elevation = 8.dp,
             shape = RoundedCornerShape(12.dp),
             backgroundColor = cpsColors.backgroundAdditional,
-            modifier = Modifier.wrapContentHeight().padding(start = 26.dp, end = 26.dp, top = 12.dp, bottom = 12.dp)
+            modifier = Modifier.padding(start = 26.dp, end = 26.dp, top = 12.dp, bottom = 12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(all = 18.dp).fillMaxWidth().wrapContentHeight(),
+                modifier = Modifier.padding(all = 18.dp),
                 horizontalAlignment = horizontalAlignment,
                 content = content
             )

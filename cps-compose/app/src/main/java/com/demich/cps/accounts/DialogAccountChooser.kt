@@ -1,8 +1,8 @@
 package com.demich.cps.accounts
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -13,7 +13,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -21,11 +20,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSDialog
+import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.showToast
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.reflect.KFunction1
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -35,26 +36,29 @@ fun<U: UserInfo> DialogAccountChooser(
     onDismissRequest: () -> Unit,
     onResult: (U) -> Unit
 ) {
-    val context = context
     val charValidator: KFunction1<Char, Boolean> =
         if (manager is AccountSuggestionsProvider) manager::isValidForSearch
         else manager::isValidForUserId
 
     CPSDialog(onDismissRequest = onDismissRequest) {
+        val context = context
+
         val iconSize = 32.dp
         val inputTextSize = 18.sp
         val resultTextSize = 14.sp
 
         var userId by remember { mutableStateOf("") }
         var userInfo by remember { mutableStateOf(manager.emptyInfo()) }
-        var loading by remember { mutableStateOf(false) }
-        var showLoading by remember { mutableStateOf(false) }
+        var loadingInProgress by remember { mutableStateOf(false) }
+
+        var suggestionsList by remember { mutableStateOf(emptyList<AccountSuggestion>()) }
+        var blockSuggestionsReload by remember { mutableStateOf(false) }
+        var loadingSuggestionsInProgress by remember { mutableStateOf(false) }
 
         val focusRequester = remember { FocusRequester() }
-        val keyboardController = LocalSoftwareKeyboardController.current
 
         val done = {
-            if (userInfo.status != STATUS.NOT_FOUND && !loading) {
+            if (userInfo.status != STATUS.NOT_FOUND && !loadingInProgress) {
                 if (userId.all(manager::isValidForUserId)) {
                     onResult(userInfo)
                     onDismissRequest()
@@ -72,18 +76,18 @@ fun<U: UserInfo> DialogAccountChooser(
 
         TextField(
             value = userId,
-            modifier = Modifier.focusRequester(focusRequester),
+            modifier = Modifier.focusRequester(focusRequester).fillMaxWidth(),
             singleLine = true,
             textStyle = TextStyle(fontSize = inputTextSize),
             onValueChange = { str ->
                 if (!str.all(charValidator)) return@TextField
                 userId = str
-                userInfo = manager.emptyInfo()
-                loading = userId.isNotBlank()
             },
             placeholder = {
-                var label = manager.userIdTitle
-                if (manager is AccountSuggestionsProvider) label += " or search query"
+                val label = buildString {
+                    append(manager.userIdTitle)
+                    if (manager is AccountSuggestionsProvider) append(" or search query")
+                }
                 Text(text = label, color = cpsColors.textColorAdditional)
             },
             label = {
@@ -95,12 +99,12 @@ fun<U: UserInfo> DialogAccountChooser(
                 )
             },
             trailingIcon = {
-                if (showLoading || userInfo.status != STATUS.NOT_FOUND)
+                if (loadingInProgress || userInfo.status != STATUS.NOT_FOUND)
                     IconButton(
                         onClick = done,
-                        enabled = !loading
+                        enabled = !loadingInProgress
                     ) {
-                        if (showLoading) {
+                        if (loadingInProgress) {
                             CircularProgressIndicator(
                                 color = cpsColors.textColor,
                                 modifier = Modifier.size(iconSize),
@@ -122,27 +126,70 @@ fun<U: UserInfo> DialogAccountChooser(
                     }
             },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(
-                onDone = { done() }
-            ),
+            keyboardActions = KeyboardActions(onDone = { done() }),
         )
 
-        if (loading) {
-            LaunchedEffect(userId) {
-                delay(300)
-                showLoading = true
-                userInfo = manager.loadInfo(userId, 1)
-                showLoading = false
-                loading = false
+        LazyColumnWithScrollBar(
+            modifier = Modifier
+                .heightIn(max = 250.dp) //TODO ajustSpan like solution needed
+        ) {
+            items(suggestionsList, key = { it.userId }) {
+                SuggestionItem(it)
+                Divider()
             }
-        } else {
-            showLoading = false
+        }
+
+        LaunchedEffect(userId) {
+            if (userId.length < 3) {
+                suggestionsList = emptyList()
+                loadingSuggestionsInProgress = false
+            }
+            if (userId.isBlank()) {
+                loadingInProgress = false
+                loadingSuggestionsInProgress = false
+                return@LaunchedEffect
+            }
+            userInfo = manager.emptyInfo()
+            delay(300)
+            launch {
+                loadingInProgress = true
+                userInfo = manager.loadInfo(userId, 1)
+                loadingInProgress = false
+            }
+            if (manager is AccountSuggestionsProvider && userId.length > 2) {
+                launch {
+                    loadingSuggestionsInProgress = true
+                    suggestionsList = manager.loadSuggestions(userId) ?: emptyList() //TODO indicate error on null
+                    loadingSuggestionsInProgress = false
+                }
+            }
         }
 
         LaunchedEffect(Unit) {
+            delay(100) //TODO fix this shit: keyboard not showed without it
             focusRequester.requestFocus()
-            delay(300) //TODO fix this shit
-            keyboardController?.show()
+        }
+    }
+}
+
+@Composable
+private fun SuggestionItem(suggestion: AccountSuggestion) {
+    Row(
+        modifier = Modifier.padding(3.dp)
+    ) {
+        Text(
+            text = suggestion.title,
+            fontSize = 17.sp,
+            modifier = Modifier.weight(1f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        if (suggestion.info.isNotBlank()) {
+            Text(
+                text = suggestion.info,
+                fontSize = 17.sp,
+                modifier = Modifier.padding(start = 5.dp)
+            )
         }
     }
 }

@@ -1,14 +1,16 @@
 package com.demich.cps
 
 import android.content.Context
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -20,7 +22,9 @@ import com.demich.cps.accounts.makeUserInfoSpan
 import com.demich.cps.ui.CPSDialog
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.context
+import kotlin.random.Random
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DevelopScreen(navController: NavController) {
 
@@ -37,17 +41,39 @@ fun DevelopScreen(navController: NavController) {
         Button(onClick = { showDialog = true }) {
             Text("show")
         }
-        buildList {
+
+        val initial = buildList {
             codeforcesAccountManager.ratingsUpperBounds.forEach { (rating, color) ->
                 add(CodeforcesUserInfo(STATUS.OK, color.name, rating-1))
             }
             add(CodeforcesUserInfo(STATUS.OK, "RED", 2600))
             add(CodeforcesUserInfo(STATUS.OK, "NUTELLA", 3600))
-            add(CodeforcesUserInfo(STATUS.OK, "NOT_RATED"))
-            add(CodeforcesUserInfo(STATUS.NOT_FOUND, "NOT_FOUND"))
-            add(CodeforcesUserInfo(STATUS.FAILED, "FAILED"))
-        }.forEach { userInfo ->
-            Text(makeUserInfoSpan(userInfo = userInfo, manager = codeforcesAccountManager))
+            add(CodeforcesUserInfo(STATUS.OK, "Not rated"))
+            add(CodeforcesUserInfo(STATUS.NOT_FOUND, "Not found"))
+            add(CodeforcesUserInfo(STATUS.FAILED, "Failed"))
+        }
+
+        var list by remember { mutableStateOf(initial) }
+
+        LazyColumn {
+            items(items = list, key = { it.handle }) {
+                Text(
+                    text = makeUserInfoSpan(userInfo = it, manager = codeforcesAccountManager),
+                    modifier = Modifier.animateItemPlacement()
+                )
+            }
+        }
+
+        Row {
+            Button(onClick = { list = list.shuffled() }) {
+                Text("Shuffle")
+            }
+            Button(onClick = { list = initial.filter { Random.nextBoolean() } }) {
+                Text("Random")
+            }
+            Button(onClick = { list = initial }) {
+                Text("Reset")
+            }
         }
     }
 

@@ -26,9 +26,10 @@ fun LazyColumnWithScrollBar(
     scrollBarWidth: Dp = 5.dp,
     content: LazyListScope.() -> Unit
 ) {
-    Box {
+    Box(
+        modifier = modifier
+    ) {
         LazyColumn(
-            modifier = modifier.align(Alignment.TopCenter),
             state = state,
             contentPadding = contentPadding,
             verticalArrangement = verticalArrangement,
@@ -48,10 +49,9 @@ fun VerticalScrollBar(
     modifier: Modifier = Modifier,
     scrollBarColor: Color = cpsColors.textColor.copy(alpha = 0.5f)
 ) {
-    //TODO: min width
+    //TODO: window min height
     Column(
         modifier = modifier
-            .fillMaxHeight()
             .background(color = Color.Transparent)
     ) {
         val count = listState.layoutInfo.visibleItemsInfo.size
