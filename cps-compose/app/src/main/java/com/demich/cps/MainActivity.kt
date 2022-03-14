@@ -3,14 +3,16 @@ package com.demich.cps
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AllOut
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.runtime.*
-import androidx.compose.ui.res.colorResource
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -24,7 +26,6 @@ import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
-import com.demich.cps.ui.theme.cpsColors
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {
@@ -53,8 +54,12 @@ fun CPSScaffold(
     Scaffold(
         topBar = { CPSTopBar(navController, currentBackStackEntry, systemUiController) },
         bottomBar = { CPSBottomBar(navController, currentBackStackEntry, systemUiController) }
-    ) {
-        NavHost(navController = navController, startDestination = Screen.Accounts.route) {
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Accounts.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
             composable(Screen.Accounts.route) {
                 AccountsScreen(navController)
             }
