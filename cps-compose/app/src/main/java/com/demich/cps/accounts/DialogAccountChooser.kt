@@ -1,6 +1,7 @@
 package com.demich.cps.accounts
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
@@ -16,6 +17,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +42,8 @@ fun<U: UserInfo> DialogAccountChooser(
         if (manager is AccountSuggestionsProvider) manager::isValidForSearch
         else manager::isValidForUserId
 
+    val suggestionTextLimit = 3
+
     CPSDialog(onDismissRequest = onDismissRequest) {
         val context = context
 
@@ -47,7 +51,9 @@ fun<U: UserInfo> DialogAccountChooser(
         val inputTextSize = 18.sp
         val resultTextSize = 14.sp
 
-        var userId by remember { mutableStateOf("") }
+        var textFieldValue by remember { mutableStateOf(TextFieldValue()) }
+        val userId by derivedStateOf { textFieldValue.text }
+
         var userInfo by remember { mutableStateOf(manager.emptyInfo()) }
         var loadingInProgress by remember { mutableStateOf(false) }
 
@@ -75,13 +81,16 @@ fun<U: UserInfo> DialogAccountChooser(
         )
 
         TextField(
-            value = userId,
-            modifier = Modifier.focusRequester(focusRequester).fillMaxWidth(),
+            value = textFieldValue,
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .fillMaxWidth(),
             singleLine = true,
             textStyle = TextStyle(fontSize = inputTextSize),
-            onValueChange = { str ->
+            onValueChange = { value ->
+                val str = value.text
                 if (!str.all(charValidator)) return@TextField
-                userId = str
+                textFieldValue = value
             },
             placeholder = {
                 val label = buildString {
@@ -134,33 +143,44 @@ fun<U: UserInfo> DialogAccountChooser(
                 .heightIn(max = 250.dp) //TODO ajustSpan like solution needed
         ) {
             items(suggestionsList, key = { it.userId }) {
-                SuggestionItem(it)
+                SuggestionItem(it) { suggestion ->
+                    blockSuggestionsReload = true
+                    textFieldValue = TextFieldValue(
+                        text = suggestion.userId,
+                        selection = TextRange(suggestion.userId.length)
+                    )
+                }
                 Divider()
             }
         }
 
         LaunchedEffect(userId) {
-            if (userId.length < 3) {
+            userInfo = manager.emptyInfo()
+            if (userId.length < suggestionTextLimit) {
                 suggestionsList = emptyList()
                 loadingSuggestionsInProgress = false
+                blockSuggestionsReload = false
             }
             if (userId.isBlank()) {
                 loadingInProgress = false
                 loadingSuggestionsInProgress = false
                 return@LaunchedEffect
             }
-            userInfo = manager.emptyInfo()
             delay(300)
             launch {
                 loadingInProgress = true
                 userInfo = manager.loadInfo(userId, 1)
                 loadingInProgress = false
             }
-            if (manager is AccountSuggestionsProvider && userId.length > 2) {
-                launch {
-                    loadingSuggestionsInProgress = true
-                    suggestionsList = manager.loadSuggestions(userId) ?: emptyList() //TODO indicate error on null
-                    loadingSuggestionsInProgress = false
+            if (manager is AccountSuggestionsProvider && userId.length >= suggestionTextLimit) {
+                if (!blockSuggestionsReload) {
+                    launch {
+                        loadingSuggestionsInProgress = true
+                        suggestionsList = manager.loadSuggestions(userId) ?: emptyList() //TODO indicate error on null
+                        loadingSuggestionsInProgress = false
+                    }
+                } else {
+                    blockSuggestionsReload = false
                 }
             }
         }
@@ -173,9 +193,14 @@ fun<U: UserInfo> DialogAccountChooser(
 }
 
 @Composable
-private fun SuggestionItem(suggestion: AccountSuggestion) {
+private fun SuggestionItem(
+    suggestion: AccountSuggestion,
+    onClick: (AccountSuggestion) -> Unit
+) {
     Row(
-        modifier = Modifier.padding(3.dp)
+        modifier = Modifier
+            .padding(3.dp)
+            .clickable { onClick(suggestion) }
     ) {
         Text(
             text = suggestion.title,
