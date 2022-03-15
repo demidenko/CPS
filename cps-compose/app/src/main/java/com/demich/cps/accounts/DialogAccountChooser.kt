@@ -39,6 +39,7 @@ import kotlin.reflect.KFunction1
 @Composable
 fun<U: UserInfo> DialogAccountChooser(
     manager: AccountManager<U>,
+    initialUserInfo: U = manager.emptyInfo(),
     onDismissRequest: () -> Unit,
     onResult: (U) -> Unit
 ) {
@@ -55,16 +56,17 @@ fun<U: UserInfo> DialogAccountChooser(
         val inputTextSize = 18.sp
         val resultTextSize = 14.sp
 
-        var textFieldValue by remember { mutableStateOf(TextFieldValue()) }
+        var userInfo by remember { mutableStateOf(initialUserInfo) }
+
+        var textFieldValue by remember { mutableStateOf(initialUserInfo.userId.toTextFieldValue()) }
         val userId by derivedStateOf { textFieldValue.text }
 
-        var userInfo by remember { mutableStateOf(manager.emptyInfo()) }
         var loadingInProgress by remember { mutableStateOf(false) }
 
-        var suggestionsList by remember { mutableStateOf(emptyList<AccountSuggestion>()) }
-        var blockSuggestionsReload by remember { mutableStateOf(false) }
         var loadingSuggestionsInProgress by remember { mutableStateOf(false) }
         var suggestionsLoadError by remember { mutableStateOf(false) }
+        var blockSuggestionsReload by remember { mutableStateOf(false) }
+        var suggestionsList by remember { mutableStateOf(emptyList<AccountSuggestion>()) }
 
         val focusRequester = remember { FocusRequester() }
 
@@ -144,19 +146,18 @@ fun<U: UserInfo> DialogAccountChooser(
             keyboardActions = KeyboardActions(onDone = { done() }),
         )
 
-        SuggestionsList(
-            suggestions = suggestionsList,
-            isLoading = loadingSuggestionsInProgress,
-            isError = suggestionsLoadError,
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { suggestion ->
-                blockSuggestionsReload = true
-                textFieldValue = TextFieldValue(
-                    text = suggestion.userId,
-                    selection = TextRange(suggestion.userId.length)
-                )
-            }
-        )
+        if (manager is AccountSuggestionsProvider) {
+            SuggestionsList(
+                suggestions = suggestionsList,
+                isLoading = loadingSuggestionsInProgress,
+                isError = suggestionsLoadError,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { suggestion ->
+                    blockSuggestionsReload = true
+                    textFieldValue = suggestion.userId.toTextFieldValue()
+                }
+            )
+        }
 
         LaunchedEffect(userId) {
             userInfo = manager.emptyInfo()
@@ -293,6 +294,8 @@ private fun AccountChooserHeader(
         )
     }
 }
+
+private fun String.toTextFieldValue() = TextFieldValue(text = this, selection = TextRange(length))
 
 @Composable
 fun<U: UserInfo> makeUserInfoSpan(userInfo: U, manager: AccountManager<U>): AnnotatedString {

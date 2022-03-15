@@ -110,7 +110,7 @@ class CodeforcesAccountManager(context: Context):
         }.getOrNull()?.map { RatingChange(it) }
     }
 
-    override fun getRating(info: CodeforcesUserInfo) = info.rating
+    override fun getRating(userInfo: CodeforcesUserInfo) = userInfo.rating
 
     override val ratingsUpperBounds = arrayOf(
         1200 to HandleColor.GRAY,
@@ -157,9 +157,9 @@ class CodeforcesAccountManager(context: Context):
     }
 
     @Composable
-    override fun makeOKInfoSpan(userInfo: CodeforcesUserInfo): AnnotatedString {
-        require(userInfo.status == STATUS.OK)
-        return buildAnnotatedString {
+    override fun makeOKInfoSpan(userInfo: CodeforcesUserInfo): AnnotatedString =
+        buildAnnotatedString {
+            require(userInfo.status == STATUS.OK)
             append(makeHandleSpan(
                 handle = userInfo.handle,
                 tag = CodeforcesUtils.getTagByRating(userInfo.rating)
@@ -174,7 +174,6 @@ class CodeforcesAccountManager(context: Context):
                 }
             } else append("[not rated]")
         }
-    }
 
     override fun getDataStore() = accountDataStore(context.account_codeforces_dataStore, emptyInfo())
     override fun getSettings() = CodeforcesAccountSettingsDataStore(this)

@@ -79,6 +79,7 @@ object CodeforcesAPI {
             }
         }.getOrNull()
     }
+
     suspend fun getHandleSuggestions(str: String) = makeWEBCall {
         apiClient.get(urlString = "https://codeforces.com/data/handles") {
             parameter("q", str)

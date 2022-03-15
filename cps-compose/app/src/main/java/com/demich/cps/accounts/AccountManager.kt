@@ -16,6 +16,7 @@ import com.demich.cps.makePendingIntentOpenURL
 import com.demich.cps.notificationBuildAndNotify
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.AtCoderRatingChange
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.codeforces.CodeforcesRatingChange
 import com.demich.cps.utils.jsonCPS
@@ -91,9 +92,9 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: S
     override val userIdTitle = "handle"
 
     abstract val rankedHandleColorsList: Array<HandleColor>
-    abstract fun getRating(info: U): Int
-    fun getOrder(info: U): Double {
-        val rating = getRating(info)
+    abstract fun getRating(userInfo: U): Int
+    fun getOrder(userInfo: U): Double {
+        val rating = getRating(userInfo)
         if(rating == NOT_RATED) return -1.0
         val handleColor = getHandleColor(rating)
         if(handleColor == HandleColor.RED) return 1e9
@@ -119,12 +120,12 @@ data class RatingChange(
         ratingChange.newRating,
         ratingChange.ratingUpdateTime
     )
-    /*
+
     constructor(ratingChange: AtCoderRatingChange): this(
         ratingChange.NewRating,
         ratingChange.EndTime
     )
-
+    /*
     constructor(ratingChange: TopCoderRatingChange): this(
         ratingChange.rating.toInt(),
         ratingChange.date.toInstant()
