@@ -9,12 +9,16 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.*
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -28,10 +32,10 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.showToast
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.reflect.KFunction1
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun<U: UserInfo> DialogAccountChooser(
     manager: AccountManager<U>,
@@ -60,6 +64,7 @@ fun<U: UserInfo> DialogAccountChooser(
         var suggestionsList by remember { mutableStateOf(emptyList<AccountSuggestion>()) }
         var blockSuggestionsReload by remember { mutableStateOf(false) }
         var loadingSuggestionsInProgress by remember { mutableStateOf(false) }
+        var suggestionsLoadError by remember { mutableStateOf(false) }
 
         val focusRequester = remember { FocusRequester() }
 
@@ -74,11 +79,12 @@ fun<U: UserInfo> DialogAccountChooser(
             }
         }
 
-        MonospacedText(
+        AccountChooserHeader(
             text = "getUser(${manager.managerName}):",
-            fontSize = 16.sp,
-            modifier = Modifier.fillMaxWidth()
-        )
+            color = cpsColors.textColorAdditional
+        ) {
+            Icon(imageVector = Icons.Default.Person, contentDescription = null, tint = it)
+        }
 
         TextField(
             value = textFieldValue,
@@ -86,7 +92,7 @@ fun<U: UserInfo> DialogAccountChooser(
                 .focusRequester(focusRequester)
                 .fillMaxWidth(),
             singleLine = true,
-            textStyle = TextStyle(fontSize = inputTextSize),
+            textStyle = TextStyle(fontSize = inputTextSize, fontFamily = FontFamily.Monospace),
             onValueChange = { value ->
                 val str = value.text
                 if (!str.all(charValidator)) return@TextField
@@ -138,27 +144,26 @@ fun<U: UserInfo> DialogAccountChooser(
             keyboardActions = KeyboardActions(onDone = { done() }),
         )
 
-        LazyColumnWithScrollBar(
-            modifier = Modifier
-                .heightIn(max = 250.dp) //TODO ajustSpan like solution needed
-        ) {
-            items(suggestionsList, key = { it.userId }) {
-                SuggestionItem(it) { suggestion ->
-                    blockSuggestionsReload = true
-                    textFieldValue = TextFieldValue(
-                        text = suggestion.userId,
-                        selection = TextRange(suggestion.userId.length)
-                    )
-                }
-                Divider()
+        SuggestionsList(
+            suggestions = suggestionsList,
+            isLoading = loadingSuggestionsInProgress,
+            isError = suggestionsLoadError,
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { suggestion ->
+                blockSuggestionsReload = true
+                textFieldValue = TextFieldValue(
+                    text = suggestion.userId,
+                    selection = TextRange(suggestion.userId.length)
+                )
             }
-        }
+        )
 
         LaunchedEffect(userId) {
             userInfo = manager.emptyInfo()
             if (userId.length < suggestionTextLimit) {
                 suggestionsList = emptyList()
                 loadingSuggestionsInProgress = false
+                suggestionsLoadError = false
                 blockSuggestionsReload = false
             }
             if (userId.isBlank()) {
@@ -176,8 +181,12 @@ fun<U: UserInfo> DialogAccountChooser(
                 if (!blockSuggestionsReload) {
                     launch {
                         loadingSuggestionsInProgress = true
-                        suggestionsList = manager.loadSuggestions(userId) ?: emptyList() //TODO indicate error on null
+                        val result = manager.loadSuggestions(userId)
                         loadingSuggestionsInProgress = false
+                        if (isActive) { //Because of "StandaloneCoroutine was cancelled" exception during cancelling LaunchedEffect
+                            suggestionsList = result ?: emptyList()
+                            suggestionsLoadError = result == null
+                        }
                     }
                 } else {
                     blockSuggestionsReload = false
@@ -188,6 +197,47 @@ fun<U: UserInfo> DialogAccountChooser(
         LaunchedEffect(Unit) {
             delay(100) //TODO fix this shit: keyboard not showed without it
             focusRequester.requestFocus()
+        }
+    }
+}
+
+@Composable
+private fun SuggestionsList(
+    suggestions: List<AccountSuggestion>,
+    isLoading: Boolean,
+    isError: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: (AccountSuggestion) -> Unit
+) {
+    if (suggestions.isNotEmpty() || isLoading || isError)
+    Column(
+        modifier = modifier
+    ) {
+        AccountChooserHeader(
+            text = if (isError) "suggestions load failed" else "suggestions:",
+            color = if (isError) cpsColors.errorColor else cpsColors.textColorAdditional
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = it,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    tint = it,
+                    contentDescription = null
+                )
+            }
+        }
+        LazyColumnWithScrollBar(
+            modifier = Modifier
+                .heightIn(max = 250.dp) //TODO ajustSpan like solution needed
+        ) {
+            items(suggestions, key = { it.userId }) {
+                SuggestionItem(suggestion = it, onClick = onClick)
+                Divider()
+            }
         }
     }
 }
@@ -216,6 +266,31 @@ private fun SuggestionItem(
                 modifier = Modifier.padding(start = 5.dp)
             )
         }
+    }
+}
+
+@Composable
+private fun AccountChooserHeader(
+    text: String,
+    color: Color,
+    icon: @Composable (Color) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val iconSize = 18.dp
+        Box(modifier = Modifier
+            .padding(2.dp)
+            .size(iconSize)) {
+            icon(color)
+        }
+        MonospacedText(
+            text = text,
+            fontSize = 14.sp,
+            color = color
+        )
     }
 }
 
