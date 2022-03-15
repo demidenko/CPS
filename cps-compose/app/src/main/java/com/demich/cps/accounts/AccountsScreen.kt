@@ -101,5 +101,6 @@ fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
 private val Context.allAccountManagers: List<AccountManager<*>>
     get() = listOf(
         CodeforcesAccountManager(this),
-        AtCoderAccountManager(this)
+        AtCoderAccountManager(this),
+        ACMPAccountManager(this)
     )

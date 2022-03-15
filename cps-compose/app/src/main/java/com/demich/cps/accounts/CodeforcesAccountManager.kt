@@ -71,21 +71,22 @@ class CodeforcesAccountManager(context: Context):
     override fun emptyInfo() = CodeforcesUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String, flags: Int): CodeforcesUserInfo {
-        val handle = data
         try {
-            return CodeforcesUserInfo(CodeforcesAPI.getUser(handle))
-        } catch (exception: Throwable) {
-            if (exception is CodeforcesAPIErrorResponse && exception.isHandleNotFound() == handle) {
+            return CodeforcesUserInfo(CodeforcesAPI.getUser(handle = data))
+        } catch (e: Throwable) {
+            if (e is CodeforcesAPIErrorResponse && e.isHandleNotFound() == data) {
                 if((flags and 1) != 0) {
-                    val (realHandle, status) = CodeforcesUtils.getRealHandle(handle)
+                    val (realHandle, status) = CodeforcesUtils.getRealHandle(handle = data)
                     return when(status) {
                         STATUS.OK -> downloadInfo(data = realHandle, flags = 0)
-                        else -> CodeforcesUserInfo(status, handle)
+                        else -> CodeforcesUserInfo(status = status, handle = data)
                     }
+                } else {
+                    return CodeforcesUserInfo(status = STATUS.NOT_FOUND, handle = data)
                 }
-                return CodeforcesUserInfo(STATUS.NOT_FOUND, handle)
+            } else {
+                return CodeforcesUserInfo(status = STATUS.FAILED, handle = data)
             }
-            return CodeforcesUserInfo(STATUS.FAILED, handle)
         }
     }
 

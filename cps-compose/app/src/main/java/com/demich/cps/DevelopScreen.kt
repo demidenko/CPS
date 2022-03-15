@@ -27,6 +27,7 @@ import kotlin.random.Random
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DevelopScreen(navController: NavController) {
+    val scope = rememberCoroutineScope()
 
     var startShow by rememberSaveable { mutableStateOf(true) }
     var showDialog by rememberSaveable { mutableStateOf(false) }
