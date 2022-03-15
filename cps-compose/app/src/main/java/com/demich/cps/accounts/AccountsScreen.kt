@@ -1,17 +1,14 @@
 package com.demich.cps.accounts
 
+import android.content.Context
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.AddBox
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -23,6 +20,8 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 @Composable
@@ -44,17 +43,63 @@ fun AccountsScreen(navController: NavController) {
 
 @Composable
 fun AccountsBottomBar() {
-    var showChooser by rememberSaveable { mutableStateOf(false) }
-    CPSIconButton(icon = Icons.Outlined.AddBox) {
-        //TODO Open Add new account
-        showChooser = true
-    }
+    AddAccountButton()
+    ReloadAccountsButton()
+}
+
+@Composable
+private fun ReloadAccountsButton() {
     CPSIconButton(icon = Icons.Default.Refresh) {
         //TODO Reload Accounts
     }
-    if (showChooser) {
-        DialogAccountChooser(manager = CodeforcesAccountManager(context), onDismissRequest = { showChooser = false }) {
+}
 
+@Composable
+private fun AddAccountButton() {
+    var showMenu by remember { mutableStateOf(false) }
+    var chosenManager by remember { mutableStateOf<AccountManager<*>?>(null) }
+
+    Box {
+        CPSIconButton(icon = Icons.Outlined.AddBox) {
+            showMenu = true
+        }
+        DropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { showMenu = false },
+            modifier = Modifier.background(cpsColors.backgroundAdditional)
+        ) {
+            context.allAccountManagers.forEach { manager ->
+                DropdownMenuItem(
+                    onClick = {
+                        showMenu = false
+                        chosenManager = manager
+                    }
+                ) {
+                    MonospacedText(text = manager.managerName)
+                }
+            }
+        }
+        chosenManager?.ChangeSavedInfoDialog {
+            chosenManager = null
         }
     }
 }
+
+@Composable
+fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
+    onDismissRequest: () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    DialogAccountChooser(
+        manager = this,
+        initialUserInfo = runBlocking { getSavedInfo() },
+        onDismissRequest = onDismissRequest,
+        onResult = { userInfo -> scope.launch { setSavedInfo(userInfo) } }
+     )
+}
+
+private val Context.allAccountManagers: List<AccountManager<*>>
+    get() = listOf(
+        CodeforcesAccountManager(this),
+        AtCoderAccountManager(this)
+    )

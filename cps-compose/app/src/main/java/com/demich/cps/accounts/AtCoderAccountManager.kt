@@ -18,26 +18,25 @@ import com.demich.cps.utils.AtCoderRatingChange
 import com.demich.cps.utils.AtCoderURLFactory
 import kotlinx.serialization.Serializable
 
+@Serializable
+data class AtCoderUserInfo(
+    override val status: STATUS,
+    val handle: String,
+    val rating: Int = NOT_RATED
+): UserInfo() {
+    override val userId: String
+        get() = handle
+
+    override fun link(): String = AtCoderURLFactory.user(handle)
+}
+
 class AtCoderAccountManager(context: Context):
-    RatedAccountManager<AtCoderAccountManager.AtCoderUserInfo>(context, manager_name),
+    RatedAccountManager<AtCoderUserInfo>(context, manager_name),
     AccountSettingsProvider
 {
-
     companion object {
         const val manager_name = "atcoder"
         private val Context.account_atcoder_dataStore by preferencesDataStore(manager_name)
-    }
-
-    @Serializable
-    data class AtCoderUserInfo(
-        override val status: STATUS,
-        val handle: String,
-        val rating: Int = NOT_RATED
-    ): UserInfo() {
-        override val userId: String
-            get() = handle
-
-        override fun link(): String = AtCoderURLFactory.user(handle)
     }
 
     override val urlHomePage get() = AtCoderURLFactory.main
@@ -85,7 +84,7 @@ class AtCoderAccountManager(context: Context):
         2800 to HandleColor.ORANGE
     )
 
-    override val rankedHandleColorsList = HandleColor.rankedAtCoder
+    override val rankedHandleColorsList get() = HandleColor.rankedAtCoder
 
     override fun originalColor(handleColor: HandleColor): Color =
         when(handleColor) {

@@ -47,16 +47,16 @@ fun<U: UserInfo> DialogAccountChooser(
         if (manager is AccountSuggestionsProvider) manager::isValidForSearch
         else manager::isValidForUserId
 
-    val suggestionTextLimit = 3
-
     CPSDialog(onDismissRequest = onDismissRequest) {
         val context = context
 
         val iconSize = 32.dp
         val inputTextSize = 18.sp
         val resultTextSize = 14.sp
+        val suggestionTextLimit = 3
 
         var userInfo by remember { mutableStateOf(initialUserInfo) }
+        var ignoreLaunch by remember { mutableStateOf(true) }
 
         var textFieldValue by remember { mutableStateOf(initialUserInfo.userId.toTextFieldValue()) }
         val userId by derivedStateOf { textFieldValue.text }
@@ -160,6 +160,10 @@ fun<U: UserInfo> DialogAccountChooser(
         }
 
         LaunchedEffect(userId) {
+            if (ignoreLaunch) {
+                ignoreLaunch = false
+                return@LaunchedEffect
+            }
             userInfo = manager.emptyInfo()
             if (userId.length < suggestionTextLimit) {
                 suggestionsList = emptyList()
@@ -233,7 +237,7 @@ private fun SuggestionsList(
         }
         LazyColumnWithScrollBar(
             modifier = Modifier
-                .heightIn(max = 250.dp) //TODO ajustSpan like solution needed
+                .heightIn(max = 230.dp) //TODO ajustSpan like solution needed
         ) {
             items(suggestions, key = { it.userId }) {
                 SuggestionItem(suggestion = it, onClick = onClick)
@@ -283,7 +287,7 @@ private fun AccountChooserHeader(
     ) {
         val iconSize = 18.dp
         Box(modifier = Modifier
-            .padding(2.dp)
+            .padding(3.dp)
             .size(iconSize)) {
             icon(color)
         }

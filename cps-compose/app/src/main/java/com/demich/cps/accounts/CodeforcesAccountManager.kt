@@ -59,7 +59,7 @@ class CodeforcesAccountManager(context: Context):
         private val Context.account_codeforces_dataStore by preferencesDataStore(manager_name)
     }
 
-    override val urlHomePage = CodeforcesURLFactory.main
+    override val urlHomePage get() = CodeforcesURLFactory.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)
     override fun isValidForUserId(char: Char) = when(char) {
@@ -121,7 +121,7 @@ class CodeforcesAccountManager(context: Context):
         2400 to HandleColor.ORANGE
     )
 
-    override val rankedHandleColorsList = HandleColor.rankedCodeforces
+    override val rankedHandleColorsList get() = HandleColor.rankedCodeforces
 
     override fun originalColor(handleColor: HandleColor): Color =
         when (handleColor) {
