@@ -31,7 +31,7 @@ fun SmallAccountPanelTwoLines(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
+            .padding(start = 10.dp, top = 10.dp)
     ) {
         title()
         additionalTitle()
