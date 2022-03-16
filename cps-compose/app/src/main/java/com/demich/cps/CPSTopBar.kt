@@ -1,6 +1,7 @@
 package com.demich.cps
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -14,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -216,15 +218,26 @@ private fun CPSAboutDialog(onDismissRequest: () -> Unit) {
 fun ColorizeStatusBar(
     systemUiController: SystemUiController
 ) {
+    /*
+        Important:
+        with statusbar=off switching dark/light mode MUST be smoothly as everywhere else
+     */
     val settingUI = context.settingsUI
     val coloredStatusBar by settingUI.coloredStatusBar.collectAsState()
-    val statusBarColor by animateColorAsState(
-        //TODO: color must depends on currentScreen and (selected) accounts
-        targetValue = if (coloredStatusBar) cpsColors.errorColor else cpsColors.background,
-        animationSpec = tween(800)
-    )
-    systemUiController.setStatusBarColor(
-        color = statusBarColor,
-        darkIcons = MaterialTheme.colors.isLight
-    )
+    if (coloredStatusBar) {
+        val statusBarColor by animateColorAsState(
+            //TODO: color must depends on currentScreen and (selected) accounts
+            targetValue = cpsColors.errorColor,
+            animationSpec = tween(800)
+        )
+        systemUiController.setStatusBarColor(
+            color = statusBarColor,
+            darkIcons = MaterialTheme.colors.isLight
+        )
+    } else {
+        systemUiController.setStatusBarColor(
+            color = cpsColors.background,
+            darkIcons = MaterialTheme.colors.isLight
+        )
+    }
 }
