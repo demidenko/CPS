@@ -74,7 +74,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
 abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: String):
     AccountManager<U>(context, managerName)
 {
-    override val userIdTitle = "handle"
+    override val userIdTitle get() = "handle"
 
     abstract val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
     fun getHandleColor(rating: Int): HandleColor =

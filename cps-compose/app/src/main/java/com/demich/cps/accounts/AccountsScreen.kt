@@ -113,5 +113,6 @@ private val Context.allAccountManagers: List<AccountManager<*>>
     get() = listOf(
         CodeforcesAccountManager(this),
         AtCoderAccountManager(this),
+        CodeChefAccountManager(this),
         ACMPAccountManager(this)
     )

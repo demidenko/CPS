@@ -20,16 +20,16 @@ import kotlinx.serialization.decodeFromString
 import kotlin.time.Duration
 
 object CodeforcesAPI {
-    private val apiClient = cpsHttpClient {
+    private val client = cpsHttpClient {
         HttpResponseValidator {
             handleResponseException { exception ->
                 if (exception !is ResponseException) return@handleResponseException
                 val exceptionResponse = exception.response
                 val text = exceptionResponse.readText()
-                val codeforcesError by lazy { jsonCPS.decodeFromString<CodeforcesAPIErrorResponse>(text) }
                 if(exceptionResponse.status == HttpStatusCode.ServiceUnavailable) {
                     throw CodeforcesAPICallLimitExceeded()
                 }
+                val codeforcesError = jsonCPS.decodeFromString<CodeforcesAPIErrorResponse>(text)
                 throw codeforcesError
             }
         }
@@ -58,7 +58,7 @@ object CodeforcesAPI {
     }
 
     suspend fun getUsers(handles: Collection<String>): List<CodeforcesUser> = makeAPICall {
-        apiClient.get(urlString = "https://codeforces.com/api/user.info") {
+        client.get(urlString = "https://codeforces.com/api/user.info") {
             parameter("handles", handles.joinToString(separator = ";"))
         }
     }
@@ -66,7 +66,7 @@ object CodeforcesAPI {
     suspend fun getUser(handle: String) = getUsers(listOf(handle)).first()
 
     suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange> = makeAPICall {
-        apiClient.get(urlString = "https://codeforces.com/api/user.rating") {
+        client.get(urlString = "https://codeforces.com/api/user.rating") {
             parameter("handle", handle)
         }
     }
@@ -81,13 +81,13 @@ object CodeforcesAPI {
     }
 
     suspend fun getHandleSuggestions(str: String) = makeWEBCall {
-        apiClient.get(urlString = "https://codeforces.com/data/handles") {
+        client.get(urlString = "https://codeforces.com/data/handles") {
             parameter("q", str)
         }
     }
 
     suspend fun getPageSource(page: String, locale: CodeforcesLocale) = makeWEBCall {
-        apiClient.get(urlString = page) {
+        client.get(urlString = page) {
             parameter("locale", locale)
         }
     }

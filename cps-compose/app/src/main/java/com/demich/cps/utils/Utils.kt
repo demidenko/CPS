@@ -33,8 +33,6 @@ val context: Context
 
 fun Context.showToast(title: String) = Toast.makeText(this, title, Toast.LENGTH_LONG).show()
 
-fun getColorFromResource(context: Context, resourceId: Int): Int = context.resources.getColor(resourceId, null)
-
 val jsonCPS = Json { ignoreUnknownKeys = true }
 
 fun cpsHttpClient(block: HttpClientConfig<*>.() -> Unit) = HttpClient {
