@@ -7,6 +7,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -33,7 +36,8 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
     abstract val urlHomePage: String
 
     protected abstract fun getDataStore(): AccountDataStore<U>
-    fun flowOfInfo() = getDataStore().userInfo.flow.map { info -> this to info }
+    fun flowOfInfo() = getDataStore().userInfo.flow
+    fun flowOfInfoWithManager() = getDataStore().userInfo.flow.map { info -> info to this }
 
     abstract fun emptyInfo(): U
 
@@ -44,6 +48,8 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
             downloadInfo(data, flags)
         }
     }
+
+    open fun isValidForUserId(char: Char): Boolean = true
 
     suspend fun getSavedInfo(): U = getDataStore().userInfo()
 
@@ -59,12 +65,17 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
     @Composable
     abstract fun makeOKInfoSpan(userInfo: U): AnnotatedString
 
-    open fun isValidForUserId(char: Char): Boolean = true
+    @Composable
+    open fun Panel(userInfo: U) {
+
+    }
 }
 
 abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: String):
     AccountManager<U>(context, managerName)
 {
+    override val userIdTitle = "handle"
+
     abstract val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
     fun getHandleColor(rating: Int): HandleColor =
         ratingsUpperBounds
@@ -89,7 +100,21 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: S
         return colorFor(rating = getRating(userInfo))
     }
 
-    override val userIdTitle = "handle"
+    @Composable
+    open fun makeHandleSpan(userInfo: U): AnnotatedString =
+        buildAnnotatedString {
+            append(userInfo.userId)
+            colorFor(userInfo).takeIf { it != Color.Unspecified  }?.let { color ->
+                addStyle(
+                    style = SpanStyle(color = color, fontWeight = FontWeight.Bold),
+                    start = 0,
+                    end = length
+                )
+            }
+        }
+
+    @Composable
+    override fun Panel(userInfo: U) = SmallAccountPanelTypeRated(userInfo)
 
     abstract val rankedHandleColorsList: Array<HandleColor>
     abstract fun getRating(userInfo: U): Int

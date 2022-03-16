@@ -7,7 +7,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -137,8 +136,8 @@ class CodeforcesAccountManager(context: Context):
         }
 
     @Composable
-    fun makeHandleSpan(handle: String, tag: CodeforcesUtils.ColorTag): AnnotatedString {
-        return buildAnnotatedString {
+    fun makeHandleSpan(handle: String, tag: CodeforcesUtils.ColorTag): AnnotatedString =
+        buildAnnotatedString {
             append(handle)
             CodeforcesUtils.getHandleColorByTag(tag)?.let { handleColor ->
                 addStyle(
@@ -155,25 +154,23 @@ class CodeforcesAccountManager(context: Context):
                 )
             }
         }
-    }
+
+    @Composable
+    override fun makeHandleSpan(userInfo: CodeforcesUserInfo): AnnotatedString =
+        makeHandleSpan(
+            handle = userInfo.handle,
+            tag = CodeforcesUtils.getTagByRating(userInfo.rating)
+        )
 
     @Composable
     override fun makeOKInfoSpan(userInfo: CodeforcesUserInfo): AnnotatedString =
         buildAnnotatedString {
             require(userInfo.status == STATUS.OK)
-            append(makeHandleSpan(
-                handle = userInfo.handle,
-                tag = CodeforcesUtils.getTagByRating(userInfo.rating)
-            ))
-            append(' ')
-            if (userInfo.rating != NOT_RATED) {
-                withStyle(SpanStyle(
-                    color = colorFor(rating = userInfo.rating),
-                    fontWeight = FontWeight.Bold
-                )) {
-                    append(userInfo.rating.toString())
-                }
-            } else append("[not rated]")
+            append(makeHandleSpan(userInfo.copy(
+                handle = userInfo.handle
+                        + " "
+                        + (userInfo.rating.takeIf { it != NOT_RATED }?.toString() ?: "[not rated]")
+            )))
         }
 
     override fun getDataStore() = accountDataStore(context.account_codeforces_dataStore, emptyInfo())

@@ -26,18 +26,29 @@ import kotlinx.coroutines.runBlocking
 
 @Composable
 fun AccountsScreen(navController: NavController) {
+    var showWelcome by remember { mutableStateOf(false) }
+    val managers = context.allAccountManagers
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
             .fillMaxWidth()
             .background(cpsColors.background)
     ) {
-        MonospacedText(
-            text = stringResource(id = R.string.accounts_welcome),
-            color = cpsColors.textColorAdditional,
-            fontSize = 18.sp,
-            modifier = Modifier.padding(6.dp)
-        )
+        if (showWelcome) {
+            MonospacedText(
+                text = stringResource(id = R.string.accounts_welcome),
+                color = cpsColors.textColorAdditional,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(6.dp)
+            )
+        }
+        Column {
+            managers.forEach { manager ->
+                key(manager.managerName) {
+                    manager.Panel()
+                }
+            }
+        }
     }
 }
 
