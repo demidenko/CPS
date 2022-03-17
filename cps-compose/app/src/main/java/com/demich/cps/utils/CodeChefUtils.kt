@@ -1,14 +1,12 @@
 package com.demich.cps.utils
 
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.features.*
 import io.ktor.client.features.cookies.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.utils.io.*
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
 
 object CodeChefAPI {
@@ -31,23 +29,28 @@ object CodeChefAPI {
 
     class CodeChefCSRFTokenExpiredException: Throwable()
 
-    private object csrftoken {
-        private var token: String = ""
-        suspend operator fun invoke(): String {
-            if (token.isBlank()) recalc()
-            return token
-        }
-        suspend fun recalc() {
-            println("codechef x-csrf-token start recalc")
-            val page = client.get<String>("https://www.codechef.com/ratings/all")
-            var i = page.indexOf("window.csrfToken=")
-            require(i != -1)
-            i = page.indexOf('"', i)
-            token = page.substring(i+1, page.indexOf('"', i+1))
-            require(token.length == 64)
+    private suspend fun createAsync(): Deferred<String> {
+        return coroutineScope {
+            async {
+                println("codechef x-csrf-token start recalc...")
+                val page = client.get<String>("https://www.codechef.com/ratings/all")
+                var i = page.indexOf("window.csrfToken=")
+                require(i != -1)
+                i = page.indexOf('"', i)
+                page.substring(i+1, page.indexOf('"', i+1)).also {
+                    println("codechef x-csrf-token = $it")
+                    require(it.length == 64)
+                }
+            }
         }
     }
 
+    private var tokenDeferred: Deferred<String>? = null
+    private suspend fun getToken(): String {
+        //TODO shit actually
+        val d = tokenDeferred ?: createAsync().also { tokenDeferred = it }
+        return d.await()
+    }
 
     private suspend inline fun<reified T> HttpClient.getCodeChef(
         urlString: String,
@@ -55,14 +58,14 @@ object CodeChefAPI {
     ): T {
         return runCatching {
             get<T>(urlString) {
-                header("x-csrf-token", csrftoken())
+                header("x-csrf-token", getToken())
                 block()
             }
         }.getOrElse {
             if (it is CodeChefCSRFTokenExpiredException) {
-                csrftoken.recalc()
+                tokenDeferred = null
                 get<T>(urlString) {
-                    header("x-csrf-token", csrftoken())
+                    header("x-csrf-token", getToken())
                     block()
                 }
             } else throw it

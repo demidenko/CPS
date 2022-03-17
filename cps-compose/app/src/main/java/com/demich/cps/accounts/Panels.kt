@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,7 +45,9 @@ fun<U: UserInfo> RatedAccountManager<U>.SmallAccountPanelTypeRated(userInfo: U) 
         title = {
             Text(
                 text = makeHandleSpan(userInfo),
-                fontSize = 30.sp
+                fontSize = 30.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         },
         additionalTitle = {
@@ -53,7 +56,9 @@ fun<U: UserInfo> RatedAccountManager<U>.SmallAccountPanelTypeRated(userInfo: U) 
                 Text(
                     text = if (rating == NOT_RATED) "[not rated]" else rating.toString(),
                     fontSize = 25.sp,
-                    color = colorFor(rating = rating)
+                    color = colorFor(rating = rating),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -70,7 +75,9 @@ fun SmallAccountPanelTypeArchive(
             Text(
                 text = title,
                 fontSize = 18.sp,
-                color = cpsColors.textColor
+                color = cpsColors.textColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         },
         additionalTitle = {
@@ -84,7 +91,9 @@ fun SmallAccountPanelTypeArchive(
                     }
                 },
                 fontSize = 15.sp,
-                color = cpsColors.textColor
+                color = cpsColors.textColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     )

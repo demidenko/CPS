@@ -124,7 +124,7 @@ class CodeChefAccountManager(context: Context):
 
     private fun getRatingStarNumber(rating: Int): Int {
         val index = ratingsUpperBounds.indexOfFirst { rating < it.first }
-        return if (index == -1) ratingsUpperBounds.size else index + 1
+        return if (index == -1) ratingsUpperBounds.size + 1 else index + 1
     }
 
     @Composable
@@ -148,16 +148,15 @@ class CodeChefAccountManager(context: Context):
                     if (userInfo.status == STATUS.OK && userInfo.rating != NOT_RATED) {
                         Box(
                             modifier = Modifier
-                                .padding(all = 3.dp)
+                                .padding(all = 2.dp)
                                 .padding(end = 8.dp)
                                 .background(color = colorFor(rating = userInfo.rating))
-                                .padding(start = 3.dp, end = 3.dp)
+                                .padding(start = 4.dp, end = 4.dp)
                         ) {
                             Text(
                                 text = "${getRatingStarNumber(userInfo.rating)}$star",
                                 color = cpsColors.background,
-                                fontSize = 20.sp,
-                                fontFamily = FontFamily.SansSerif
+                                fontSize = 20.sp
                             )
                         }
                     }
