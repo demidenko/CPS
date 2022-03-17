@@ -1,11 +1,24 @@
 package com.demich.cps.accounts
 
 import android.content.Context
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.preferencesDataStore
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CodeChefAPI
 import com.demich.cps.utils.CodeChefUser
 import com.demich.cps.utils.CodeChefUtils
@@ -36,6 +49,8 @@ class CodeChefAccountManager(context: Context):
     companion object {
         const val manager_name = "codechef"
         private val Context.account_codechef_dataStore by preferencesDataStore(manager_name)
+
+        private const val star = '★'
     }
 
     override val urlHomePage get() = CodeChefUtils.CodeChefURLFactory.main
@@ -107,6 +122,61 @@ class CodeChefAccountManager(context: Context):
     override val rankedHandleColorsList: Array<HandleColor>
         get() = TODO("Not yet implemented")
 
+    private fun getRatingStarNumber(rating: Int): Int {
+        val index = ratingsUpperBounds.indexOfFirst { rating < it.first }
+        return if (index == -1) ratingsUpperBounds.size else index + 1
+    }
+
+    @Composable
+    override fun makeHandleSpan(userInfo: CodeChefUserInfo): AnnotatedString {
+        return buildAnnotatedString {
+            if (userInfo.status == STATUS.OK && userInfo.rating != NOT_RATED) {
+                withStyle(SpanStyle(color = colorFor(rating = userInfo.rating))) {
+                    append("${getRatingStarNumber(userInfo.rating)}$star")
+                }
+            }
+            append(' ')
+            append(userInfo.handle)
+        }
+    }
+
+    @Composable
+    override fun Panel(userInfo: CodeChefUserInfo) {
+        SmallAccountPanelTwoLines(
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (userInfo.status == STATUS.OK && userInfo.rating != NOT_RATED) {
+                        Box(
+                            modifier = Modifier
+                                .padding(all = 3.dp)
+                                .padding(end = 8.dp)
+                                .background(color = colorFor(rating = userInfo.rating))
+                                .padding(start = 3.dp, end = 3.dp)
+                        ) {
+                            Text(
+                                text = "${getRatingStarNumber(userInfo.rating)}$star",
+                                color = cpsColors.background,
+                                fontSize = 20.sp,
+                                fontFamily = FontFamily.SansSerif
+                            )
+                        }
+                    }
+                    Text(
+                        text = userInfo.handle,
+                        fontSize = 30.sp
+                    )
+                }
+            },
+            additionalTitle = {
+                if (userInfo.status == STATUS.OK) {
+                    Text(
+                        text = if (userInfo.rating == NOT_RATED) "[not rated]" else userInfo.rating.toString(),
+                        fontSize = 25.sp
+                    )
+                }
+            }
+        )
+    }
 
     @Composable
     override fun makeOKInfoSpan(userInfo: CodeChefUserInfo): AnnotatedString =

@@ -6,7 +6,9 @@ import io.ktor.client.features.*
 import io.ktor.client.features.cookies.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.ktor.utils.io.*
+import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.Serializable
 
 object CodeChefAPI {
@@ -20,11 +22,14 @@ object CodeChefAPI {
                 if (exception !is ResponseException) return@handleResponseException
                 val exceptionResponse = exception.response
                 val text = exceptionResponse.readText()
-                println("!!! ${exceptionResponse.status} ${exception.message}")
-                println("!!: $text")
+                if (exceptionResponse.status == HttpStatusCode.fromValue(403) && text == "{\"status\":\"apierror\",\"message\":\"Something went wrong\"}") {
+                    throw CodeChefCSRFTokenExpiredException()
+                }
             }
         }
     }
+
+    class CodeChefCSRFTokenExpiredException: Throwable()
 
     private object csrftoken {
         private var token: String = ""
@@ -33,6 +38,7 @@ object CodeChefAPI {
             return token
         }
         suspend fun recalc() {
+            println("codechef x-csrf-token start recalc")
             val page = client.get<String>("https://www.codechef.com/ratings/all")
             var i = page.indexOf("window.csrfToken=")
             require(i != -1)
@@ -53,8 +59,13 @@ object CodeChefAPI {
                 block()
             }
         }.getOrElse {
-            //TODO recalc token
-            throw it
+            if (it is CodeChefCSRFTokenExpiredException) {
+                csrftoken.recalc()
+                get<T>(urlString) {
+                    header("x-csrf-token", csrftoken())
+                    block()
+                }
+            } else throw it
         }
     }
 
