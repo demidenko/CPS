@@ -1,13 +1,12 @@
 package com.demich.cps.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import com.demich.cps.accounts.HandleColor
+import com.demich.cps.accounts.managers.HandleColor
 
 private val LightColorPalette = lightColors(
     background = Color(248, 248, 248),

@@ -1,4 +1,4 @@
-package com.demich.cps.accounts
+package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -201,7 +201,7 @@ class CodeforcesAccountManager(context: Context):
         if(prevRatingChangeContestId != null) {
             notifyRatingChange(ratingChange)
             val newInfo = loadInfo(info.handle)
-            if(newInfo.status!=STATUS.FAILED) {
+            if(newInfo.status!= STATUS.FAILED) {
                 setSavedInfo(newInfo)
             } else {
                 setSavedInfo(info.copy(rating = ratingChange.newRating))
@@ -251,7 +251,8 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
     AccountSettingsDataStore(manager.context.account_settings_codeforces_dataStore)
 {
     companion object {
-        private val Context.account_settings_codeforces_dataStore by preferencesDataStore(CodeforcesAccountManager.manager_name + "_account_settings")
+        private val Context.account_settings_codeforces_dataStore by preferencesDataStore(
+            CodeforcesAccountManager.manager_name + "_account_settings")
     }
 
     val observeRating = Item(booleanPreferencesKey("observe_rating"), false)

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.CPSDialog
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.MonospacedText
@@ -237,7 +238,7 @@ private fun SuggestionsList(
         }
         LazyColumnWithScrollBar(
             modifier = Modifier
-                .heightIn(max = 230.dp) //TODO ajustSpan like solution needed
+                .heightIn(max = 230.dp) //TODO adjustSpan like solution needed
         ) {
             items(suggestions, key = { it.userId }) {
                 SuggestionItem(suggestion = it, onClick = onClick)

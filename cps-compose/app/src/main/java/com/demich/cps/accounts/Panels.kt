@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,17 +17,25 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.LoadingState
 
 @Composable
-fun<U: UserInfo> AccountManager<U>.Panel() {
+fun<U: UserInfo> AccountManager<U>.Panel(accountsViewModel: AccountsViewModel) {
     val userInfo: U by flowOfInfo().collectAsState(emptyInfo())
+    val loadingState by accountsViewModel.loadingStateFor(this)
     if (!userInfo.isEmpty()) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 10.dp, top = 10.dp)
         ) {
+            when (loadingState) {
+                LoadingState.LOADING -> CircularProgressIndicator(modifier = Modifier.align(Alignment.TopEnd))
+                LoadingState.FAILED -> {}
+                LoadingState.PENDING -> Unit
+            }
             Panel(userInfo)
         }
     }
@@ -89,11 +98,12 @@ fun SmallAccountPanelTypeArchive(
         additionalTitle = {
             Text(
                 text = buildAnnotatedString {
-                    infoArgs.forEach {
+                    infoArgs.forEachIndexed { index, arg ->
+                        if (index > 0) append("  ")
                         withStyle(SpanStyle(color = cpsColors.textColorAdditional)) {
-                            append("${it.first}: ")
+                            append("${arg.first}: ")
                         }
-                        append("${it.second} ")
+                        append(arg.second)
                     }
                 },
                 fontSize = 15.sp,

@@ -11,17 +11,18 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavController
-import com.demich.cps.accounts.CodeforcesAccountManager
-import com.demich.cps.accounts.CodeforcesUserInfo
-import com.demich.cps.accounts.STATUS
 import com.demich.cps.accounts.makeUserInfoSpan
-import com.demich.cps.ui.CPSDialog
+import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.accounts.managers.CodeforcesUserInfo
+import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.context
+import com.demich.cps.utils.jsonSaver
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -29,20 +30,10 @@ import kotlin.random.Random
 fun DevelopScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
 
-    var startShow by rememberSaveable { mutableStateOf(true) }
-    var showDialog by rememberSaveable { mutableStateOf(false) }
-
     val context = context
     val codeforcesAccountManager = CodeforcesAccountManager(context)
 
     Column {
-        Button(onClick = { startShow = !startShow }) {
-            Text("start title: $startShow")
-        }
-        Button(onClick = { showDialog = true }) {
-            Text("show")
-        }
-
         val initial = buildList {
             codeforcesAccountManager.ratingsUpperBounds.forEach { (rating, color) ->
                 add(CodeforcesUserInfo(STATUS.OK, color.name, rating-1))
@@ -54,7 +45,8 @@ fun DevelopScreen(navController: NavController) {
             add(CodeforcesUserInfo(STATUS.FAILED, "Failed"))
         }
 
-        var list by remember { mutableStateOf(initial) }
+
+        var list by rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(initial) }
 
         LazyColumn {
             items(items = list, key = { it.handle }) {
@@ -77,21 +69,7 @@ fun DevelopScreen(navController: NavController) {
             }
         }
     }
-
-    if (showDialog)
-    CPSDialog(onDismissRequest = { showDialog = false }) {
-        var showTitle by rememberSaveable { mutableStateOf(startShow) }
-        Button(onClick = { showTitle = !showTitle }) {
-            if (showTitle) Text("hide title")
-            else Text("show title")
-        }
-        if (showTitle) {
-            Text(text = "title", fontSize = 36.sp)
-        }
-    }
 }
-
-
 
 
 val Context.settingsDev: SettingsDev
@@ -105,3 +83,28 @@ class SettingsDev(context: Context) : CPSDataStore(context.settings_dev_dataStor
     val devModeEnabled = Item(booleanPreferencesKey("develop_enabled"), false)
 
 }
+
+
+
+@Composable
+fun ContentLoadingButton(
+    text: String,
+    coroutineScope: CoroutineScope,
+    block: suspend () -> Unit
+) {
+    var enabled by rememberSaveable { mutableStateOf(true) }
+    Button(
+        enabled = enabled,
+        onClick = {
+            enabled = false
+            coroutineScope.launch {
+                block()
+                enabled = true
+            }
+        }
+    ) {
+        Text(text = text)
+    }
+}
+
+

@@ -24,6 +24,7 @@ import com.google.accompanist.systemuicontroller.SystemUiController
 fun CPSBottomBar(
     navController: NavHostController,
     currentBackStackEntry: NavBackStackEntry?,
+    cpsViewModels: CPSViewModels,
     systemUiController: SystemUiController
 ) {
     systemUiController.setNavigationBarColor(
@@ -39,7 +40,7 @@ fun CPSBottomBar(
                 .background(cpsColors.backgroundNavigation),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CPSBottomBarAdditional(currentScreen, navController, Modifier.weight(1f))
+            CPSBottomBarAdditional(currentScreen, navController, cpsViewModels, Modifier.weight(1f))
             CPSBottomBarVerticalDivider()
             CPSBottomBarMain(currentScreen, navController, Modifier.weight(1f))
         }
@@ -93,6 +94,7 @@ private fun CPSBottomBarMain(
 private fun CPSBottomBarAdditional(
     currentScreen: Screen,
     navController: NavHostController,
+    cpsViewModels: CPSViewModels,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -100,7 +102,7 @@ private fun CPSBottomBarAdditional(
         horizontalArrangement = Arrangement.End
     ) {
         when (currentScreen) {
-            Screen.Accounts -> AccountsBottomBar()
+            Screen.Accounts -> AccountsBottomBar(cpsViewModels.accountsViewModel)
             Screen.News -> NewsBottomBar()
             Screen.Contests -> ContestsBottomBar(navController)
             else -> {}

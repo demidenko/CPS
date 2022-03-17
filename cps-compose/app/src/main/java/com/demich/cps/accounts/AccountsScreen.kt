@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.demich.cps.R
+import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
@@ -28,7 +29,7 @@ import kotlinx.coroutines.runBlocking
 
 
 @Composable
-fun AccountsScreen(navController: NavController) {
+fun AccountsScreen(navController: NavController, accountsViewModel: AccountsViewModel) {
     var showWelcome by remember { mutableStateOf(false) }
     val managers = context.allAccountManagers
     Column(
@@ -48,7 +49,7 @@ fun AccountsScreen(navController: NavController) {
         Column {
             managers.forEach { manager ->
                 key(manager.managerName) {
-                    manager.Panel()
+                    manager.Panel(accountsViewModel)
                 }
             }
         }
@@ -56,15 +57,16 @@ fun AccountsScreen(navController: NavController) {
 }
 
 @Composable
-fun AccountsBottomBar() {
+fun AccountsBottomBar(accountsViewModel: AccountsViewModel) {
     AddAccountButton()
-    ReloadAccountsButton()
+    ReloadAccountsButton(accountsViewModel)
 }
 
 @Composable
-private fun ReloadAccountsButton() {
+private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
+    val context = context
     CPSIconButton(icon = Icons.Default.Refresh) {
-        //TODO Reload Accounts
+        accountsViewModel.reloadAll(context)
     }
 }
 

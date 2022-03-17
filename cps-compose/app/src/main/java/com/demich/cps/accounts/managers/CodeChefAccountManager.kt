@@ -1,4 +1,4 @@
-package com.demich.cps.accounts
+package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -13,11 +13,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.preferencesDataStore
+import com.demich.cps.accounts.SmallAccountPanelTwoLines
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CodeChefAPI
 import com.demich.cps.utils.CodeChefUser

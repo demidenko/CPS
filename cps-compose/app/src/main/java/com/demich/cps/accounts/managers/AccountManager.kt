@@ -1,4 +1,4 @@
-package com.demich.cps.accounts
+package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.annotation.ColorRes
@@ -15,6 +15,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.demich.cps.NotificationChannelLazy
 import com.demich.cps.R
+import com.demich.cps.accounts.SmallAccountPanelTypeRated
 import com.demich.cps.makePendingIntentOpenURL
 import com.demich.cps.notificationBuildAndNotify
 import com.demich.cps.ui.settingsUI

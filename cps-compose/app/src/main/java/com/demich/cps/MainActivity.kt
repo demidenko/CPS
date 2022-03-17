@@ -13,6 +13,7 @@ import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -20,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.demich.cps.accounts.AccountsScreen
+import com.demich.cps.accounts.AccountsViewModel
 import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.ContestsSettingsScreen
 import com.demich.cps.news.NewsScreen
@@ -51,9 +53,12 @@ fun CPSScaffold(
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val systemUiController = rememberSystemUiController()
+    val cpsViewModels = CPSViewModels(
+        accountsViewModel = viewModel()
+    )
     Scaffold(
         topBar = { CPSTopBar(navController, currentBackStackEntry, systemUiController) },
-        bottomBar = { CPSBottomBar(navController, currentBackStackEntry, systemUiController) }
+        bottomBar = { CPSBottomBar(navController, currentBackStackEntry, cpsViewModels, systemUiController) }
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -61,7 +66,7 @@ fun CPSScaffold(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Accounts.route) {
-                AccountsScreen(navController)
+                AccountsScreen(navController, cpsViewModels.accountsViewModel)
             }
             composable(Screen.News.route) {
                 NewsScreen(navController)
@@ -81,6 +86,10 @@ fun CPSScaffold(
         }
     }
 }
+
+class CPSViewModels(
+    val accountsViewModel: AccountsViewModel
+)
 
 
 

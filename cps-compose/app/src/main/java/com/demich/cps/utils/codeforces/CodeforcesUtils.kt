@@ -1,9 +1,9 @@
 package com.demich.cps.utils.codeforces
 
-import com.demich.cps.accounts.HandleColor
-import com.demich.cps.accounts.NOT_RATED
-import com.demich.cps.accounts.STATUS
-import com.demich.cps.news.CodeforcesLocale
+import com.demich.cps.accounts.managers.HandleColor
+import com.demich.cps.accounts.managers.NOT_RATED
+import com.demich.cps.accounts.managers.STATUS
+import com.demich.cps.news.codeforces.CodeforcesLocale
 import java.util.*
 
 object CodeforcesUtils {
@@ -61,7 +61,7 @@ object CodeforcesUtils {
 
     private fun extractRealHandle(s: String): String? {
         var i = s.indexOf(" <div class=\"userbox\">")
-        if(i == -1) return null
+        if (i == -1) return null
         i = s.indexOf("<div class=\"user-rank\">", i)
         i = s.indexOf("class=\"rated-user", i)
         return s.substring(s.indexOf('>', i)+1, s.indexOf("</a", i))

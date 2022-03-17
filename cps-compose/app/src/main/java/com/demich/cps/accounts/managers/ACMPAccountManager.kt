@@ -1,10 +1,11 @@
-package com.demich.cps.accounts
+package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.datastore.preferences.preferencesDataStore
+import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.utils.ACMPAPI
 import com.demich.cps.utils.ACMPUtils
 import kotlinx.serialization.Serializable

@@ -1,4 +1,4 @@
-package com.demich.cps.accounts
+package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.runtime.Composable

@@ -6,6 +6,8 @@ import android.text.Spanned
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.text.HtmlCompat
 import io.ktor.client.*
@@ -15,9 +17,11 @@ import io.ktor.client.features.json.serializer.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
@@ -38,7 +42,7 @@ val jsonCPS = Json { ignoreUnknownKeys = true }
 fun cpsHttpClient(block: HttpClientConfig<*>.() -> Unit) = HttpClient {
     install(HttpTimeout) {
         connectTimeoutMillis = 15.seconds.inWholeMilliseconds
-        requestTimeoutMillis = 15.seconds.inWholeMilliseconds
+        requestTimeoutMillis = 30.seconds.inWholeMilliseconds
     }
     install(JsonFeature) {
         serializer = KotlinxSerializer(jsonCPS)
@@ -46,7 +50,7 @@ fun cpsHttpClient(block: HttpClientConfig<*>.() -> Unit) = HttpClient {
     block()
 }
 
-fun signedToString(x: Int): String = if(x>0) "+$x" else "$x"
+fun signedToString(x: Int): String = if (x > 0) "+$x" else "$x"
 
 fun fromHTML(s: String): Spanned {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -60,12 +64,16 @@ data class ComparablePair<A: Comparable<A>, B: Comparable<B>>(
     val first: A,
     val second: B
 ): Comparable<ComparablePair<A, B>> {
-    override fun compareTo(other: ComparablePair<A, B>): Int {
-        val c = first compareTo other.first
-        return if(c == 0) second compareTo other.second else c
-    }
+    override fun compareTo(other: ComparablePair<A, B>): Int =
+        when (val c = first compareTo other.first) {
+            0 -> second compareTo other.second
+            else -> c
+        }
 }
 
+enum class LoadingState {
+    PENDING, LOADING, FAILED;
+}
 
 object InstantAsSecondsSerializer: KSerializer<Instant> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Instant", PrimitiveKind.LONG)
@@ -77,4 +85,9 @@ object DurationAsSecondsSerializer: KSerializer<Duration> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Duration", PrimitiveKind.LONG)
     override fun serialize(encoder: Encoder, value: Duration) = encoder.encodeLong(value.inWholeSeconds)
     override fun deserialize(decoder: Decoder): Duration = decoder.decodeLong().seconds
+}
+
+inline fun<reified T> jsonSaver() = object: Saver<T, String> {
+    override fun restore(value: String): T = jsonCPS.decodeFromString(value)
+    override fun SaverScope.save(value: T): String = jsonCPS.encodeToString(value)
 }
