@@ -1,5 +1,6 @@
 package com.demich.cps.accounts
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,7 +21,15 @@ import com.demich.cps.ui.theme.cpsColors
 @Composable
 fun<U: UserInfo> AccountManager<U>.Panel() {
     val userInfo: U by flowOfInfo().collectAsState(emptyInfo())
-    if (!userInfo.isEmpty()) Panel(userInfo)
+    if (!userInfo.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp, top = 10.dp)
+        ) {
+            Panel(userInfo)
+        }
+    }
 }
 
 @Composable
@@ -29,10 +38,7 @@ fun SmallAccountPanelTwoLines(
     additionalTitle: @Composable () -> Unit
 ) {
     Column(
-        horizontalAlignment = Alignment.Start,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 10.dp, top = 10.dp)
+        horizontalAlignment = Alignment.Start
     ) {
         title()
         additionalTitle()
