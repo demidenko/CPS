@@ -11,7 +11,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowRightAlt
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,7 +18,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.demich.cps.ui.CPSIconButton
+import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.LazyColumnWithScrollBar
+import com.demich.cps.utils.LoadingStatus
 import kotlinx.coroutines.launch
 
 @Composable
@@ -47,7 +48,7 @@ fun NewsScreen(navController: NavController) {
             trailingIcon = {
                 CPSIconButton(
                     icon = Icons.Default.ArrowRightAlt,
-                    enabledState = isValid,
+                    enabled = isValid,
                     onState = isValid
                 ) {
                     scope.launch {
@@ -61,7 +62,9 @@ fun NewsScreen(navController: NavController) {
         )
 
         LazyColumnWithScrollBar(
-            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
             state = listState,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -86,7 +89,7 @@ fun NewsSettingsScreen() {
 
 @Composable
 fun NewsBottomBar() {
-    CPSIconButton(icon = Icons.Default.Refresh) {
+    CPSReloadingButton(loadingStatus = LoadingStatus.PENDING) {
 
     }
 }

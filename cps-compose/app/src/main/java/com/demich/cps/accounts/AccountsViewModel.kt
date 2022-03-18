@@ -1,6 +1,5 @@
 package com.demich.cps.accounts
 
-import android.content.Context
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -8,25 +7,17 @@ import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.accounts.managers.UserInfo
-import com.demich.cps.utils.LoadingState
+import com.demich.cps.utils.LoadingStatus
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 
 class AccountsViewModel: ViewModel() {
-    private val loadingStates: MutableMap<String, MutableState<LoadingState>> = mutableMapOf()
+    private val loadingStatuses: MutableMap<String, MutableState<LoadingStatus>> = mutableMapOf()
 
-    fun loadingStateFor(manager: AccountManager<*>): MutableState<LoadingState> =
-        loadingStates.getOrPut(manager.managerName) { mutableStateOf(LoadingState.PENDING) }
-
-    fun reloadAll(context: Context) {
-        viewModelScope.launch {
-            context.allAccountManagers
-                .filterNot { it.getSavedInfo().isEmpty() }
-                .forEach { manager -> reload(manager) }
-        }
-    }
+    fun loadingStatusFor(manager: AccountManager<*>): MutableState<LoadingStatus> =
+        loadingStatuses.getOrPut(manager.managerName) { mutableStateOf(LoadingStatus.PENDING) }
 
 
     fun<U: UserInfo> reload(manager: AccountManager<U>) {
@@ -37,18 +28,26 @@ class AccountsViewModel: ViewModel() {
             //val blockedState = accountSmallViewBlockedState(manager.managerName)
             //blockedState.value = BlockedState.BLOCKED
 
-            var loadingState by loadingStateFor(manager)
-            if (loadingState == LoadingState.LOADING) return@launch
-            loadingState = LoadingState.LOADING
+            var loadingStatus by loadingStatusFor(manager)
+            //loadingStatus = if (loadingStatus == LoadingStatus.LOADING) LoadingStatus.PENDING else LoadingStatus.LOADING
+            //return@launch
+
+            if (loadingStatus == LoadingStatus.LOADING) return@launch
+            loadingStatus = LoadingStatus.LOADING
 
 
             delay(Random.nextLong(5000, 15000))
+            if (Random.nextBoolean()) {
+                loadingStatus = LoadingStatus.FAILED
+                return@launch
+            }
+
             val info = manager.loadInfo(savedInfo.userId, 1)
 
             if (info.status == STATUS.FAILED) {
-                loadingState = LoadingState.FAILED
+                loadingStatus = LoadingStatus.FAILED
             } else {
-                loadingState = LoadingState.PENDING
+                loadingStatus = LoadingStatus.PENDING
                 manager.setSavedInfo(info)
             }
 

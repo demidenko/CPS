@@ -2,6 +2,7 @@ package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -23,6 +24,7 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
+@Stable
 data class CodeforcesUserInfo(
     override val status: STATUS,
     val handle: String,

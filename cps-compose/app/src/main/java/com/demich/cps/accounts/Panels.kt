@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,23 +17,29 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
+import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LoadingState
 
 @Composable
-fun<U: UserInfo> AccountManager<U>.Panel(accountsViewModel: AccountsViewModel) {
+fun<U: UserInfo> AccountManager<U>.Panel(
+    accountsViewModel: AccountsViewModel,
+    modifier: Modifier = Modifier
+) {
     val userInfo: U by flowOfInfo().collectAsState(emptyInfo())
-    val loadingState by accountsViewModel.loadingStateFor(this)
+    val loadingStatus by accountsViewModel.loadingStatusFor(this)
     if (!userInfo.isEmpty()) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(start = 10.dp, top = 10.dp)
         ) {
-            when (loadingState) {
-                LoadingState.LOADING -> CircularProgressIndicator(modifier = Modifier.align(Alignment.TopEnd))
-                LoadingState.FAILED -> {}
-                LoadingState.PENDING -> Unit
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 5.dp)
+            ) {
+                CPSReloadingButton(loadingStatus = loadingStatus) {
+                    accountsViewModel.reload(manager = this@Panel)
+                }
             }
             Panel(userInfo)
         }

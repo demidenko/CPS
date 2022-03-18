@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,8 +20,10 @@ import androidx.navigation.NavController
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.CPSIconButton
+import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -30,8 +31,10 @@ import kotlinx.coroutines.runBlocking
 
 @Composable
 fun AccountsScreen(navController: NavController, accountsViewModel: AccountsViewModel) {
+    val context = context
+
     var showWelcome by remember { mutableStateOf(false) }
-    val managers = context.allAccountManagers
+
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
@@ -46,10 +49,14 @@ fun AccountsScreen(navController: NavController, accountsViewModel: AccountsView
                 modifier = Modifier.padding(6.dp)
             )
         }
+
         Column {
-            managers.forEach { manager ->
+            context.allAccountManagers.forEach { manager ->
                 key(manager.managerName) {
-                    manager.Panel(accountsViewModel)
+                    manager.Panel(
+                        accountsViewModel = accountsViewModel,
+                        modifier = Modifier.padding(start = 10.dp, top = 10.dp)
+                    )
                 }
             }
         }
@@ -65,8 +72,16 @@ fun AccountsBottomBar(accountsViewModel: AccountsViewModel) {
 @Composable
 private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
     val context = context
-    CPSIconButton(icon = Icons.Default.Refresh) {
-        accountsViewModel.reloadAll(context)
+    val combinedStatus by derivedStateOf {
+        val states = context.allAccountManagers.map { accountsViewModel.loadingStatusFor(it) }
+        when {
+            states.any { it.value == LoadingStatus.LOADING } -> LoadingStatus.LOADING
+            states.any { it.value == LoadingStatus.FAILED } -> LoadingStatus.FAILED
+            else -> LoadingStatus.PENDING
+        }
+    }
+    CPSReloadingButton(loadingStatus = combinedStatus) {
+        context.allAccountManagers.forEach { accountsViewModel.reload(it) }
     }
 }
 

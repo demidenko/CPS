@@ -2,9 +2,14 @@ package com.demich.cps.ui
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,27 +27,59 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.LoadingStatus
 
 @Composable
 fun CPSIconButton(
     icon: ImageVector,
+    color: Color = cpsColors.textColor,
     onState: Boolean = true,
-    enabledState: Boolean = true,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     val a by animateFloatAsState(if (onState) 1f else ContentAlpha.disabled, tween(800))
     IconButton(
         onClick = onClick,
-        enabled = enabledState
+        enabled = enabled
     ) {
         Icon(
             imageVector = icon,
-            tint = cpsColors.textColor,
+            tint = color,
             contentDescription = null,
             modifier = Modifier
                 .size(26.dp)
                 .alpha(a)
         )
+    }
+}
+
+
+@Composable
+fun CPSReloadingButton(
+    loadingStatus: LoadingStatus,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    IconButton(
+        enabled = loadingStatus != LoadingStatus.LOADING,
+        modifier = modifier,
+        onClick = onClick
+    ) {
+        if (loadingStatus == LoadingStatus.LOADING) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(20.dp),
+                color = cpsColors.textColor,
+                strokeWidth = 2.dp
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Rounded.Refresh,
+                tint = if (loadingStatus == LoadingStatus.FAILED) cpsColors.errorColor else cpsColors.textColor,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(28.dp)
+            )
+        }
     }
 }
 

@@ -71,7 +71,7 @@ data class ComparablePair<A: Comparable<A>, B: Comparable<B>>(
         }
 }
 
-enum class LoadingState {
+enum class LoadingStatus {
     PENDING, LOADING, FAILED;
 }
 
