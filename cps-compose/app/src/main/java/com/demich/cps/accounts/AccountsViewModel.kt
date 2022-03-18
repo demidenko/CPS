@@ -37,10 +37,10 @@ class AccountsViewModel: ViewModel() {
 
 
             delay(Random.nextLong(5000, 15000))
-            if (Random.nextBoolean()) {
+            /*if (Random.nextBoolean()) {
                 loadingStatus = LoadingStatus.FAILED
                 return@launch
-            }
+            }*/
 
             val info = manager.loadInfo(savedInfo.userId, 1)
 
