@@ -5,10 +5,7 @@ import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,6 +37,7 @@ fun<U: UserInfo> AccountManager<U>.Panel(
     if (!userInfo.isEmpty()) {
         Box(modifier = modifier
             .fillMaxWidth()
+            .heightIn(min = 48.dp)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = {

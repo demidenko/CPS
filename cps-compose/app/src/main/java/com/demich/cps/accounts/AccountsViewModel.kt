@@ -25,23 +25,10 @@ class AccountsViewModel: ViewModel() {
             val savedInfo = manager.getSavedInfo()
             if (savedInfo.isEmpty()) return@launch
 
-            //val blockedState = accountSmallViewBlockedState(manager.managerName)
-            //blockedState.value = BlockedState.BLOCKED
-
             var loadingStatus by loadingStatusFor(manager)
-            //loadingStatus = if (loadingStatus == LoadingStatus.LOADING) LoadingStatus.PENDING else LoadingStatus.LOADING
-            //return@launch
-
             if (loadingStatus == LoadingStatus.LOADING) return@launch
+
             loadingStatus = LoadingStatus.LOADING
-
-
-            delay(Random.nextLong(5000, 15000))
-            /*if (Random.nextBoolean()) {
-                loadingStatus = LoadingStatus.FAILED
-                return@launch
-            }*/
-
             val info = manager.loadInfo(savedInfo.userId, 1)
 
             if (info.status == STATUS.FAILED) {
@@ -50,8 +37,6 @@ class AccountsViewModel: ViewModel() {
                 loadingStatus = LoadingStatus.PENDING
                 manager.setSavedInfo(info)
             }
-
-            //blockedState.value = BlockedState.UNBLOCKED
         }
     }
 }
