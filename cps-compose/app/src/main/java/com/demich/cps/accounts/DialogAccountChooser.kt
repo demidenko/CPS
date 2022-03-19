@@ -32,9 +32,7 @@ import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.showToast
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.reflect.KFunction1
 
 @Composable
@@ -185,7 +183,7 @@ fun<U: UserInfo> DialogAccountChooser(
             }
             if (manager is AccountSuggestionsProvider && userId.length >= suggestionTextLimit) {
                 if (!blockSuggestionsReload) {
-                    launch {
+                    withContext(Dispatchers.IO) {
                         loadingSuggestionsInProgress = true
                         val result = manager.loadSuggestions(userId)
                         loadingSuggestionsInProgress = false
@@ -240,7 +238,7 @@ private fun SuggestionsList(
             modifier = Modifier
                 .heightIn(max = 230.dp) //TODO adjustSpan like solution needed
         ) {
-            items(suggestions, key = { it.userId }) {
+            items(suggestions) {
                 SuggestionItem(suggestion = it, onClick = onClick)
                 Divider()
             }

@@ -137,5 +137,6 @@ val Context.allAccountManagers: List<AccountManager<*>>
         CodeforcesAccountManager(this),
         AtCoderAccountManager(this),
         CodeChefAccountManager(this),
-        ACMPAccountManager(this)
+        ACMPAccountManager(this),
+        TimusAccountManager(this)
     )
