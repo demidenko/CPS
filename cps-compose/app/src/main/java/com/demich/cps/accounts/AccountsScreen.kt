@@ -72,14 +72,17 @@ fun AccountsBottomBar(accountsViewModel: AccountsViewModel) {
 @Composable
 private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
     val context = context
-    val combinedStatus by derivedStateOf {
-        val states = context.allAccountManagers.map { accountsViewModel.loadingStatusFor(it) }
-        when {
-            states.any { it.value == LoadingStatus.LOADING } -> LoadingStatus.LOADING
-            states.any { it.value == LoadingStatus.FAILED } -> LoadingStatus.FAILED
-            else -> LoadingStatus.PENDING
+    val combinedStatus by remember {
+        derivedStateOf {
+            val states = context.allAccountManagers.map { accountsViewModel.loadingStatusFor(it).value }
+            when {
+                states.contains(LoadingStatus.LOADING) -> LoadingStatus.LOADING
+                states.contains(LoadingStatus.FAILED) -> LoadingStatus.FAILED
+                else -> LoadingStatus.PENDING
+            }
         }
     }
+
     CPSReloadingButton(loadingStatus = combinedStatus) {
         context.allAccountManagers.forEach { accountsViewModel.reload(it) }
     }
