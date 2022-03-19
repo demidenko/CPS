@@ -41,29 +41,12 @@ fun CPSTopBar(
     var showAbout by rememberSaveable { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
 
-    @Composable
-    fun CPSMenuItem(title: String, icon: ImageVector, onClick: () -> Unit) {
-        DropdownMenuItem(
-            onClick = {
-                showMenu = false
-                onClick()
-            }
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .size(26.dp)
-            )
-            Text(text = title, modifier = Modifier.padding(end = 26.dp))
-        }
-    }
+    val menuDismissRequest = { showMenu = false }
 
     TopAppBar(
         backgroundColor = cpsColors.background,
         elevation = 0.dp,
-        contentPadding = PaddingValues(start = 10.dp, end = 4.dp),
+        contentPadding = PaddingValues(start = 10.dp),
         modifier = Modifier.height(56.dp)
     ) {
         if (showUIPanel) {
@@ -73,39 +56,37 @@ fun CPSTopBar(
                 CPSTitle(screen = currentScreen, modifier = Modifier.weight(1f))
             }
         }
-        Box {
-            IconButton(
-                onClick = { showMenu = true },
-                content = { Icon(Icons.Default.MoreVert, null) }
-            )
-            DropdownMenu(
-                expanded = showMenu,
-                modifier = Modifier.background(cpsColors.backgroundAdditional),
-                onDismissRequest = { showMenu = false },
-            ) {
-                CPSMenuItem("UI", Icons.Filled.SettingsApplications) {
-                    showUIPanel = true
+
+        IconButton(
+            onClick = { showMenu = true },
+            content = { Icon(Icons.Default.MoreVert, null) },
+        )
+
+        CPSDropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = menuDismissRequest,
+        ) {
+            CPSDropdownMenuItem(title = "UI", icon = Icons.Filled.SettingsApplications) {
+                showUIPanel = true
+            }
+            CPSDropdownMenuItem(title = "About", icon = Icons.Outlined.Info) {
+                showAbout = true
+            }
+            if (currentScreen == Screen.News) {
+                Divider(color = cpsColors.dividerColor)
+                CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
+                    navController.navigate(Screen.NewsSettings.route)
                 }
-                CPSMenuItem("About", Icons.Outlined.Info) {
-                    showAbout = true
-                }
-                if (currentScreen == Screen.News) {
-                    Divider(color = cpsColors.dividerColor)
-                    CPSMenuItem("Settings", Icons.Default.Settings) {
-                        navController.navigate(Screen.NewsSettings.route)
-                    }
-                    CPSMenuItem("Follow List", Icons.Rounded.PeopleAlt) {
-                        //TODO Open FollowList
-                    }
+                CPSDropdownMenuItem(title = "Follow List", icon = Icons.Rounded.PeopleAlt) {
+                    //TODO Open FollowList
                 }
             }
         }
     }
 
-    if (showAbout) CPSAboutDialog {
-        showAbout = false
-    }
+    if (showAbout) CPSAboutDialog(onDismissRequest = { showAbout = false })
 }
+
 
 @Composable
 private fun CPSTitle(
@@ -132,29 +113,9 @@ private fun UIPanel(
     modifier: Modifier = Modifier,
     onClosePanel: () -> Unit
 ) = Row(modifier = modifier) {
-    val settingsUI = context.settingsUI
     val scope = rememberCoroutineScope()
 
-    @Composable
-    fun DarkLightModeButton(mode: DarkLightMode, isSystemInDarkMode: Boolean) {
-        CPSIconButton(
-            icon = when (mode) {
-                DarkLightMode.SYSTEM -> Icons.Default.BrightnessAuto
-                else -> Icons.Default.BrightnessMedium
-            }
-        ) {
-            scope.launch {
-                settingsUI.darkLightMode(
-                    when (mode) {
-                        DarkLightMode.SYSTEM -> if (isSystemInDarkMode) DarkLightMode.LIGHT else DarkLightMode.DARK
-                        DarkLightMode.DARK -> DarkLightMode.LIGHT
-                        DarkLightMode.LIGHT -> DarkLightMode.DARK
-                    }
-                )
-            }
-        }
-    }
-
+    val settingsUI = context.settingsUI
     val useOriginalColors by settingsUI.useOriginalColors.collectAsState()
     val coloredStatusBar by settingsUI.coloredStatusBar.collectAsState()
     val darkLightMode by settingsUI.darkLightMode.collectAsState()
@@ -175,10 +136,39 @@ private fun UIPanel(
                 settingsUI.coloredStatusBar(!coloredStatusBar)
             }
         }
-        DarkLightModeButton(mode = darkLightMode, isSystemInDarkMode = isSystemInDarkTheme())
+        DarkLightModeButton(
+            mode = darkLightMode,
+            isSystemInDarkMode = isSystemInDarkTheme()
+        ) { mode ->
+            scope.launch {
+                settingsUI.darkLightMode(mode)
+            }
+        }
     }
 }
 
+@Composable
+private fun DarkLightModeButton(
+    mode: DarkLightMode,
+    isSystemInDarkMode: Boolean,
+    onModeChanged: (DarkLightMode) -> Unit
+) {
+    CPSIconButton(
+        icon = when (mode) {
+            DarkLightMode.SYSTEM -> Icons.Default.BrightnessAuto
+            else -> Icons.Default.BrightnessMedium
+        },
+        onClick = {
+            onModeChanged(
+                when (mode) {
+                    DarkLightMode.SYSTEM -> if (isSystemInDarkMode) DarkLightMode.LIGHT else DarkLightMode.DARK
+                    DarkLightMode.DARK -> DarkLightMode.LIGHT
+                    DarkLightMode.LIGHT -> DarkLightMode.DARK
+                }
+            )
+        }
+    )
+}
 
 @Composable
 private fun CPSAboutDialog(onDismissRequest: () -> Unit) {
@@ -222,8 +212,7 @@ fun ColorizeStatusBar(
         Important:
         with statusbar=off switching dark/light mode MUST be smoothly as everywhere else
      */
-    val settingUI = context.settingsUI
-    val coloredStatusBar by settingUI.coloredStatusBar.collectAsState()
+    val coloredStatusBar by context.settingsUI.coloredStatusBar.collectAsState()
     if (coloredStatusBar) {
         val statusBarColor by animateColorAsState(
             //TODO: color must depends on currentScreen and (selected) accounts

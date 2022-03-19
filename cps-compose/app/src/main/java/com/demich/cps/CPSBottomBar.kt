@@ -105,7 +105,7 @@ private fun CPSBottomBarAdditional(
             Screen.Accounts -> AccountsBottomBar(cpsViewModels.accountsViewModel)
             Screen.News -> NewsBottomBar()
             Screen.Contests -> ContestsBottomBar(navController)
-            else -> {}
+            else -> Unit
         }
     }
 }
