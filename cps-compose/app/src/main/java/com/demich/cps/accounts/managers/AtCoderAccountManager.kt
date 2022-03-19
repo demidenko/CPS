@@ -15,7 +15,6 @@ import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
 import com.demich.cps.utils.AtCoderAPI
 import com.demich.cps.utils.AtCoderRatingChange
-import com.demich.cps.utils.AtCoderURLFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -27,7 +26,7 @@ data class AtCoderUserInfo(
     override val userId: String
         get() = handle
 
-    override fun link(): String = AtCoderURLFactory.user(handle)
+    override fun link(): String = AtCoderAPI.URLFactory.user(handle)
 }
 
 class AtCoderAccountManager(context: Context):
@@ -39,7 +38,7 @@ class AtCoderAccountManager(context: Context):
         private val Context.account_atcoder_dataStore by preferencesDataStore(manager_name)
     }
 
-    override val urlHomePage get() = AtCoderURLFactory.main
+    override val urlHomePage get() = AtCoderAPI.URLFactory.main
 
     override fun isValidForUserId(char: Char): Boolean = when(char) {
         in 'a'..'z', in 'A'..'Z', in '0'..'9', in "_" -> true
@@ -125,7 +124,7 @@ class AtCoderAccountManager(context: Context):
         ratingChange.NewRating,
         ratingChange.OldRating,
         ratingChange.Place,
-        AtCoderURLFactory.userContestResult(handle, ratingChange.getContestId()),
+        AtCoderAPI.URLFactory.userContestResult(handle, ratingChange.getContestId()),
         ratingChange.EndTime
     )
 }

@@ -82,6 +82,11 @@ object CodeChefAPI {
             parameter("search", str)
         }
     }
+
+    object URLFactory {
+        const val main = "https://www.codechef.com"
+        fun user(username: String) = "$main/users/$username"
+    }
 }
 
 @Serializable
@@ -95,10 +100,3 @@ data class CodeChefUser(
 data class CodeChefSearchResult(
     val list: List<CodeChefUser>
 )
-
-object CodeChefUtils {
-    object CodeChefURLFactory {
-        const val main = "https://www.codechef.com"
-        fun user(username: String) = "$main/users/$username"
-    }
-}

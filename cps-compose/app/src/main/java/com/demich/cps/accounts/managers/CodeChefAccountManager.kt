@@ -21,7 +21,6 @@ import com.demich.cps.accounts.SmallAccountPanelTwoLines
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CodeChefAPI
 import com.demich.cps.utils.CodeChefUser
-import com.demich.cps.utils.CodeChefUtils
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -39,7 +38,7 @@ data class CodeChefUserInfo(
     override val userId: String
         get() = handle
 
-    override fun link() = CodeChefUtils.CodeChefURLFactory.user(handle)
+    override fun link() = CodeChefAPI.URLFactory.user(handle)
 }
 
 class CodeChefAccountManager(context: Context):
@@ -53,7 +52,7 @@ class CodeChefAccountManager(context: Context):
         private const val star = '★'
     }
 
-    override val urlHomePage get() = CodeChefUtils.CodeChefURLFactory.main
+    override val urlHomePage get() = CodeChefAPI.URLFactory.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)
     override fun isValidForUserId(char: Char) = when(char) {

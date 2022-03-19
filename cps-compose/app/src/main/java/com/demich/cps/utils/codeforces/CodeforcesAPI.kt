@@ -91,6 +91,26 @@ object CodeforcesAPI {
             parameter("locale", locale)
         }
     }
+
+    object URLFactory {
+        const val main = "https://codeforces.com"
+
+        fun user(handle: String) = "$main/profile/$handle"
+
+        fun blog(blogId: Int) = "$main/blog/entry/$blogId"
+
+        fun comment(blogId: Int, commentId: Long) = blog(blogId) + "#comment-$commentId"
+
+        fun contest(contestId: Int) = "$main/contest/$contestId"
+
+        fun contestOuter(contestId: Int) = "$main/contests/$contestId"
+
+        fun contestsWith(handle: String) = "$main/contests/with/$handle"
+
+        //fun submission(submission: CodeforcesSubmission) = "$main/contest/${submission.contestId}/submission/${submission.id}"
+
+        fun problem(contestId: Int, problemIndex: String) = "$main/contest/$contestId/problem/$problemIndex"
+    }
 }
 
 

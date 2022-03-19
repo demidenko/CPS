@@ -44,7 +44,7 @@ data class CodeforcesUserInfo(
     override val userId: String
         get() = handle
 
-    override fun link(): String = CodeforcesURLFactory.user(handle)
+    override fun link(): String = CodeforcesAPI.URLFactory.user(handle)
 }
 
 
@@ -60,7 +60,7 @@ class CodeforcesAccountManager(context: Context):
         private val Context.account_codeforces_dataStore by preferencesDataStore(manager_name)
     }
 
-    override val urlHomePage get() = CodeforcesURLFactory.main
+    override val urlHomePage get() = CodeforcesAPI.URLFactory.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)
     override fun isValidForUserId(char: Char) = when(char) {
@@ -186,7 +186,7 @@ class CodeforcesAccountManager(context: Context):
         ratingChange.newRating,
         ratingChange.oldRating,
         ratingChange.rank,
-        CodeforcesURLFactory.contestsWith(ratingChange.handle),
+        CodeforcesAPI.URLFactory.contestsWith(ratingChange.handle),
         ratingChange.ratingUpdateTime
     )
 

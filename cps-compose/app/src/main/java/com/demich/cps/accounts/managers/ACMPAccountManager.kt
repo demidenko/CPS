@@ -7,7 +7,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.utils.ACMPAPI
-import com.demich.cps.utils.ACMPUtils
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -22,7 +21,7 @@ data class ACMPUserInfo(
     override val userId: String
         get() = id
 
-    override fun link(): String = ACMPUtils.URLFactory.user(id.toInt())
+    override fun link(): String = ACMPAPI.URLFactory.user(id.toInt())
 }
 
 

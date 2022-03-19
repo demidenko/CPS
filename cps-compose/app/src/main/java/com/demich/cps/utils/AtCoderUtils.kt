@@ -50,7 +50,7 @@ object AtCoderAPI {
     }
 
     suspend fun getUserPage(handle: String): String = makeWEBCall {
-        client.get(urlString = AtCoderURLFactory.user(handle)) {
+        client.get(urlString = URLFactory.user(handle)) {
             parameter("graph", "rating")
         }
     }
@@ -58,14 +58,10 @@ object AtCoderAPI {
     suspend fun getRatingChanges(handle: String): List<AtCoderRatingChange>? {
         return null //TODO
     }
-}
 
-object AtCoderURLFactory {
-
-    const val main = "https://atcoder.jp"
-
-    fun user(handle: String) = "$main/users/$handle"
-
-    fun userContestResult(handle: String, contestId: String) = "$main/users/$handle/history/share/$contestId"
-
+    object URLFactory {
+        const val main = "https://atcoder.jp"
+        fun user(handle: String) = "$main/users/$handle"
+        fun userContestResult(handle: String, contestId: String) = "$main/users/$handle/history/share/$contestId"
+    }
 }
