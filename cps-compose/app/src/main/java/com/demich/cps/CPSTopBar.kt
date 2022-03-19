@@ -1,9 +1,7 @@
 package com.demich.cps
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -15,8 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavBackStackEntry
@@ -33,15 +29,14 @@ fun CPSTopBar(
     currentBackStackEntry: NavBackStackEntry?,
     systemUiController: SystemUiController
 ) {
-    ColorizeStatusBar(systemUiController)
-
     val currentScreen = currentBackStackEntry?.destination?.getScreen()
+
+    val coloredStatusBar by context.settingsUI.coloredStatusBar.collectAsState()
+    ColorizeStatusBar(systemUiController, coloredStatusBar)
 
     var showUIPanel by rememberSaveable { mutableStateOf(false) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
-
-    val menuDismissRequest = { showMenu = false }
 
     TopAppBar(
         backgroundColor = cpsColors.background,
@@ -49,11 +44,13 @@ fun CPSTopBar(
         contentPadding = PaddingValues(start = 10.dp),
         modifier = Modifier.height(56.dp)
     ) {
-        if (showUIPanel) {
-            UIPanel(modifier = Modifier.weight(1f)) { showUIPanel = false }
-        } else {
-            if (currentScreen != null) {
-                CPSTitle(screen = currentScreen, modifier = Modifier.weight(1f))
+        Box(modifier = Modifier.weight(1f)) {
+            if (showUIPanel) {
+                UIPanel(modifier = Modifier.fillMaxWidth()) { showUIPanel = false }
+            } else {
+                if (currentScreen != null) {
+                    CPSTitle(screen = currentScreen, modifier = Modifier.fillMaxWidth())
+                }
             }
         }
 
@@ -64,7 +61,7 @@ fun CPSTopBar(
 
         CPSDropdownMenu(
             expanded = showMenu,
-            onDismissRequest = menuDismissRequest,
+            onDismissRequest = { showMenu = false },
         ) {
             CPSDropdownMenuItem(title = "UI", icon = Icons.Filled.SettingsApplications) {
                 showUIPanel = true
@@ -206,13 +203,13 @@ private fun CPSAboutDialog(onDismissRequest: () -> Unit) {
 
 @Composable
 fun ColorizeStatusBar(
-    systemUiController: SystemUiController
+    systemUiController: SystemUiController,
+    coloredStatusBar: Boolean
 ) {
     /*
         Important:
-        with statusbar=off switching dark/light mode MUST be smoothly as everywhere else
+        with statusbar=off switching dark/light mode MUST be as fast as everywhere else
      */
-    val coloredStatusBar by context.settingsUI.coloredStatusBar.collectAsState()
     if (coloredStatusBar) {
         val statusBarColor by animateColorAsState(
             //TODO: color must depends on currentScreen and (selected) accounts
