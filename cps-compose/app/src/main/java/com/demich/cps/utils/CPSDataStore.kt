@@ -91,12 +91,12 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         override fun toPrefs(t: T): String = encode(t)
     }
 
-    inline fun<reified T> itemJsonConvertible(json: Json, name: String, defaultValue: T) =
+    inline fun<reified T> itemJsonConvertible(name: String, defaultValue: T) =
         ItemStringConvertible(
             name = name,
             defaultValue = defaultValue,
-            encode = json::encodeToString,
-            decode = json::decodeFromString
+            encode = jsonCPS::encodeToString,
+            decode = jsonCPS::decodeFromString
         )
 
 }

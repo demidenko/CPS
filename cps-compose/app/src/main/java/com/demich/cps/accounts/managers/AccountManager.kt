@@ -164,7 +164,7 @@ class AccountDataStore<U: UserInfo>(
 ): CPSDataStore(dataStore)
 
 inline fun <reified U: UserInfo> accountDataStore(dataStore: DataStore<Preferences>, emptyUserInfo: U): AccountDataStore<U> {
-    return AccountDataStore(dataStore, CPSDataStore(dataStore).itemJsonConvertible(jsonCPS, "user_info", emptyUserInfo))
+    return AccountDataStore(dataStore, CPSDataStore(dataStore).itemJsonConvertible(name = "user_info", defaultValue = emptyUserInfo))
 }
 
 open class AccountSettingsDataStore(dataStore: DataStore<Preferences>): CPSDataStore(dataStore) {
