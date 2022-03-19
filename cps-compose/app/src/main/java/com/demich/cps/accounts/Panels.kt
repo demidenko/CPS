@@ -35,40 +35,7 @@ fun<U: UserInfo> AccountManager<U>.Panel(
     val userInfo: U by flowOfInfo().collectAsState(emptyInfo())
     val loadingStatus by accountsViewModel.loadingStatusFor(this)
 
-    val hideDelay: Int = 3000
-    val hideDuration: Int = 2000
-
     var showUI by remember { mutableStateOf(false) }
-
-    val toState by remember {
-        derivedStateOf {
-            when (loadingStatus) {
-                LoadingStatus.PENDING -> {
-                    if (showUI) PanelState.PendingWithUI
-                    else PanelState.Pending
-                }
-                LoadingStatus.LOADING -> PanelState.Loading
-                LoadingStatus.FAILED -> PanelState.Failed
-            }
-        }
-    }
-
-
-
-    val transition = updateTransition(targetState = toState, label = "")
-    val uiAlpha by transition.animateFloat(
-        transitionSpec = {
-            when {
-                PanelState.PendingWithUI isTransitioningTo PanelState.Pending
-                    -> tween(delayMillis = hideDelay, durationMillis = hideDuration)
-                else -> snap()
-            }
-        },
-        label = ""
-    ) {
-        if (it == PanelState.Pending) 0f
-        else 1f
-    }
 
     if (!userInfo.isEmpty()) {
         Box(modifier = modifier
@@ -86,19 +53,17 @@ fun<U: UserInfo> AccountManager<U>.Panel(
                 )
             }
         ) {
-            if (transition.currentState != PanelState.Pending) Box(
+            AutoHiding(
+                targetState = remember(loadingStatus, showUI) { loadingStatus to showUI },
+                finishHidingState = LoadingStatus.PENDING to false,
+                startHidingState = LoadingStatus.PENDING to true,
+                hideDelay = 3000,
+                hideDuration = 2000,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .padding(end = 5.dp)
-                    .alpha(uiAlpha)
             ) {
-                CPSReloadingButton(
-                    loadingStatus = when(transition.currentState) {
-                        PanelState.Loading -> LoadingStatus.LOADING
-                        PanelState.Failed -> LoadingStatus.FAILED
-                        else -> LoadingStatus.PENDING
-                    }
-                ) {
+                CPSReloadingButton(loadingStatus = it.first) {
                     accountsViewModel.reload(manager = this@Panel)
                 }
             }
@@ -108,13 +73,40 @@ fun<U: UserInfo> AccountManager<U>.Panel(
     }
 }
 
-private enum class PanelState {
-    Pending,
-    PendingWithUI,
-    Loading,
-    Failed
-}
 
+@Composable
+private fun<S> AutoHiding(
+    targetState: S,
+    startHidingState: S,
+    finishHidingState: S,
+    hideDelay: Int,
+    hideDuration: Int,
+    modifier: Modifier = Modifier,
+    content: @Composable (S) -> Unit
+) {
+    val transition = updateTransition(targetState = targetState, label = "")
+    val uiAlpha by transition.animateFloat(
+        transitionSpec = {
+            when {
+                //TODO: reversed transitioning is glitching
+                startHidingState isTransitioningTo finishHidingState
+                -> tween(delayMillis = hideDelay, durationMillis = hideDuration)
+                else -> snap()
+            }
+        },
+        label = ""
+    ) {
+        if (it == finishHidingState) 0f else 1f
+    }
+    transition.currentState.let {
+        if (it != finishHidingState) {
+            Box(
+                modifier = modifier.alpha(uiAlpha),
+                content = { content(it) }
+            )
+        }
+    }
+}
 
 @Composable
 fun SmallAccountPanelTwoLines(
