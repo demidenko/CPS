@@ -1,15 +1,19 @@
 package com.demich.cps.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -20,7 +24,6 @@ import kotlin.math.max
 fun LazyColumnWithScrollBar(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
-    contentPadding: PaddingValues = PaddingValues(0.dp),
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     scrollBarWidth: Dp = 5.dp,
@@ -31,48 +34,46 @@ fun LazyColumnWithScrollBar(
     ) {
         LazyColumn(
             state = state,
-            contentPadding = contentPadding,
             verticalArrangement = verticalArrangement,
             horizontalAlignment = horizontalAlignment,
             content = content
         )
-        VerticalScrollBar(
+        VerticalScrollBarByCanvas(
             listState = state,
-            modifier = Modifier.align(Alignment.CenterEnd).width(scrollBarWidth)
+            scrollBarWidth = scrollBarWidth,
+            modifier = Modifier.align(Alignment.CenterEnd)
         )
     }
 }
 
 @Composable
-fun VerticalScrollBar(
+private fun VerticalScrollBarByCanvas(
     listState: LazyListState,
     modifier: Modifier = Modifier,
-    scrollBarColor: Color = cpsColors.textColor.copy(alpha = 0.5f)
+    scrollBarWidth: Dp,
+    scrollBarColor: Color = cpsColors.textColor.copy(alpha = 0.5f),
+    minimumScrollBarHeight: Dp = 10.dp
 ) {
-    //TODO: window min height
-    Column(
-        modifier = modifier
-            .background(color = Color.Transparent)
-    ) {
-        val count = listState.layoutInfo.visibleItemsInfo.size
-        if (count > 0) {
-            val windowWidth: Float = (listState.layoutInfo.viewportEndOffset - listState.layoutInfo.viewportStartOffset).toFloat()
-            val itemWidth: Float = listState.layoutInfo.visibleItemsInfo.sumOf { it.size } / count.toFloat()
-            val totalWidth: Float = listState.layoutInfo.totalItemsCount * itemWidth
-            val before: Float = listState.firstVisibleItemIndex * itemWidth - listState.layoutInfo.visibleItemsInfo.first().offset
-            val after: Float = max(0f, totalWidth - windowWidth - before)
-            if (before > 0) Box(modifier = Modifier.fillMaxWidth().weight(before))
-            if (before > 0 || after > 0) {
-                Box(modifier = Modifier
-                    .background(
-                        color = scrollBarColor,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .fillMaxWidth()
-                    .weight(windowWidth)
+    val info = listState.layoutInfo
+    val count = info.visibleItemsInfo.size
+    if (count > 0) {
+        val windowSize = info.viewportEndOffset - info.viewportStartOffset
+        val visibleItemsSize = info.visibleItemsInfo.sumOf { it.size }
+        if (windowSize < visibleItemsSize) {
+            Canvas(modifier = modifier.size(width = scrollBarWidth, height = windowSize.dp)) {
+                val itemSize: Float = visibleItemsSize.toFloat() / count
+                val totalSize: Float = info.totalItemsCount * itemSize
+                val beforeSize: Float = listState.firstVisibleItemIndex * itemSize - info.visibleItemsInfo.first().offset
+                val h = windowSize / totalSize * windowSize //real height of bar
+                val scrollBarHeight = max(h, minimumScrollBarHeight.toPx())
+                val offsetY = beforeSize / totalSize * windowSize - beforeSize / (totalSize - windowSize) * (scrollBarHeight - h)
+                drawRoundRect(
+                    color = scrollBarColor,
+                    topLeft = Offset(x = 0f, y = offsetY),
+                    size = Size(width = scrollBarWidth.toPx(), height = scrollBarHeight),
+                    cornerRadius = CornerRadius(4.dp.toPx())
                 )
             }
-            if (after > 0) Box(modifier = Modifier.fillMaxWidth().weight(after))
         }
     }
 }

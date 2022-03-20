@@ -284,10 +284,9 @@ private fun AccountChooserHeader(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val iconSize = 18.dp
         Box(modifier = Modifier
             .padding(3.dp)
-            .size(iconSize)) {
+            .size(18.dp)) {
             icon(color)
         }
         MonospacedText(
