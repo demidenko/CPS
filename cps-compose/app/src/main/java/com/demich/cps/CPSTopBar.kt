@@ -26,13 +26,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun CPSTopBar(
     navController: NavHostController,
-    currentBackStackEntry: NavBackStackEntry?,
-    systemUiController: SystemUiController
+    currentBackStackEntry: NavBackStackEntry?
 ) {
     val currentScreen = currentBackStackEntry?.destination?.getScreen()
-
-    val coloredStatusBar by context.settingsUI.coloredStatusBar.collectAsState()
-    ColorizeStatusBar(systemUiController, coloredStatusBar)
 
     var showUIPanel by rememberSaveable { mutableStateOf(false) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
@@ -169,9 +165,9 @@ private fun DarkLightModeButton(
 
 @Composable
 private fun CPSAboutDialog(onDismissRequest: () -> Unit) {
-    val settingsDev = context.settingsDev
     val scope = rememberCoroutineScope()
 
+    val settingsDev = context.settingsDev
     val devModeEnabled by settingsDev.devModeEnabled.collectAsState()
     var showDevModeLine by remember { mutableStateOf(devModeEnabled) }
 

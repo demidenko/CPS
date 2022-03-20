@@ -7,7 +7,6 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -17,7 +16,6 @@ import com.demich.cps.accounts.AccountsBottomBar
 import com.demich.cps.contests.ContestsBottomBar
 import com.demich.cps.news.NewsBottomBar
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.context
 import com.google.accompanist.systemuicontroller.SystemUiController
 
 @Composable
@@ -25,7 +23,8 @@ fun CPSBottomBar(
     navController: NavHostController,
     currentBackStackEntry: NavBackStackEntry?,
     cpsViewModels: CPSViewModels,
-    systemUiController: SystemUiController
+    systemUiController: SystemUiController,
+    devModeEnabled: Boolean
 ) {
     systemUiController.setNavigationBarColor(
         color = cpsColors.backgroundNavigation,
@@ -40,9 +39,19 @@ fun CPSBottomBar(
                 .background(cpsColors.backgroundNavigation),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CPSBottomBarAdditional(currentScreen, navController, cpsViewModels, Modifier.weight(1f))
+            CPSBottomBarAdditional(
+                currentScreen = currentScreen,
+                navController = navController,
+                cpsViewModels = cpsViewModels,
+                modifier = Modifier.weight(1f)
+            )
             CPSBottomBarVerticalDivider()
-            CPSBottomBarMain(currentScreen, navController, Modifier.weight(1f))
+            CPSBottomBarMain(
+                currentScreen = currentScreen,
+                navController = navController,
+                devModeEnabled = devModeEnabled,
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
@@ -51,9 +60,9 @@ fun CPSBottomBar(
 private fun CPSBottomBarMain(
     currentScreen: Screen,
     navController: NavHostController,
+    devModeEnabled: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val devModeEnabled by context.settingsDev.devModeEnabled.collectAsState()
     BottomNavigation(
         modifier = modifier.fillMaxWidth(),
         backgroundColor = cpsColors.backgroundNavigation,

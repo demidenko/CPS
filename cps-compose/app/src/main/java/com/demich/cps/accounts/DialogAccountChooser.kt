@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
@@ -49,7 +50,6 @@ fun<U: UserInfo> DialogAccountChooser(
     CPSDialog(onDismissRequest = onDismissRequest) {
         val context = context
 
-        val iconSize = 32.dp
         val inputTextSize = 18.sp
         val resultTextSize = 14.sp
         val suggestionTextLimit = 3
@@ -100,11 +100,13 @@ fun<U: UserInfo> DialogAccountChooser(
                 textFieldValue = value
             },
             placeholder = {
-                val label = buildString {
-                    append(manager.userIdTitle)
-                    if (manager is AccountSuggestionsProvider) append(" or search query")
-                }
-                Text(text = label, color = cpsColors.textColorAdditional)
+                Text(
+                    text = buildString {
+                        append(manager.userIdTitle)
+                        if (manager is AccountSuggestionsProvider) append(" or search query")
+                    },
+                    color = cpsColors.textColorAdditional
+                )
             },
             label = {
                 Text(
@@ -115,31 +117,12 @@ fun<U: UserInfo> DialogAccountChooser(
                 )
             },
             trailingIcon = {
-                if (loadingInProgress || userInfo.status != STATUS.NOT_FOUND)
-                    IconButton(
-                        onClick = done,
-                        enabled = !loadingInProgress
-                    ) {
-                        if (loadingInProgress) {
-                            CircularProgressIndicator(
-                                color = cpsColors.textColor,
-                                modifier = Modifier.size(iconSize),
-                                strokeWidth = 3.dp
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.Done,
-                                contentDescription = null,
-                                tint = cpsColors.success,
-                                modifier = Modifier
-                                    .size(iconSize)
-                                    .border(
-                                        border = ButtonDefaults.outlinedBorder,
-                                        shape = MaterialTheme.shapes.small
-                                    )
-                            )
-                        }
-                    }
+                TextFieldMainIcon(
+                    loadingInProgress = loadingInProgress,
+                    userInfoStatus = userInfo.status,
+                    iconSize = 32.dp,
+                    onDoneClick = done
+                )
             },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { done() }),
@@ -206,6 +189,41 @@ fun<U: UserInfo> DialogAccountChooser(
 }
 
 @Composable
+private fun TextFieldMainIcon(
+    loadingInProgress: Boolean,
+    userInfoStatus: STATUS,
+    iconSize: Dp,
+    onDoneClick: () -> Unit
+) {
+    if (loadingInProgress || userInfoStatus != STATUS.NOT_FOUND) {
+        IconButton(
+            onClick = onDoneClick,
+            enabled = !loadingInProgress
+        ) {
+            if (loadingInProgress) {
+                CircularProgressIndicator(
+                    color = cpsColors.textColor,
+                    modifier = Modifier.size(iconSize),
+                    strokeWidth = 3.dp
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Done,
+                    contentDescription = null,
+                    tint = cpsColors.success,
+                    modifier = Modifier
+                        .size(iconSize)
+                        .border(
+                            border = ButtonDefaults.outlinedBorder,
+                            shape = MaterialTheme.shapes.small
+                        )
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun SuggestionsList(
     suggestions: List<AccountSuggestion>,
     isLoading: Boolean,
@@ -213,34 +231,33 @@ private fun SuggestionsList(
     modifier: Modifier = Modifier,
     onClick: (AccountSuggestion) -> Unit
 ) {
-    if (suggestions.isNotEmpty() || isLoading || isError)
-    Column(
-        modifier = modifier
-    ) {
-        AccountChooserHeader(
-            text = if (isError) "suggestions load failed" else "suggestions:",
-            color = if (isError) cpsColors.errorColor else cpsColors.textColorAdditional
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    color = it,
-                    strokeWidth = 2.dp
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    tint = it,
-                    contentDescription = null
-                )
+    if (suggestions.isNotEmpty() || isLoading || isError) {
+        Column(modifier = modifier) {
+            AccountChooserHeader(
+                text = if (isError) "suggestions load failed" else "suggestions:",
+                color = if (isError) cpsColors.errorColor else cpsColors.textColorAdditional
+            ) { color ->
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = color,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        tint = color,
+                        contentDescription = null
+                    )
+                }
             }
-        }
-        LazyColumnWithScrollBar(
-            modifier = Modifier
-                .heightIn(max = 230.dp) //TODO adjustSpan like solution needed
-        ) {
-            items(suggestions) {
-                SuggestionItem(suggestion = it, onClick = onClick)
-                Divider()
+            LazyColumnWithScrollBar(
+                modifier = Modifier
+                    .heightIn(max = 230.dp) //TODO adjustSpan like solution needed
+            ) {
+                items(suggestions) {
+                    SuggestionItem(suggestion = it, onClick = onClick)
+                    Divider()
+                }
             }
         }
     }

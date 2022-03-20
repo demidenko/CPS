@@ -28,6 +28,7 @@ import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
+import com.demich.cps.utils.context
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {
@@ -53,12 +54,28 @@ fun CPSScaffold(
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val systemUiController = rememberSystemUiController()
+
     val cpsViewModels = CPSViewModels(
         accountsViewModel = viewModel()
     )
+
+    val coloredStatusBar by context.settingsUI.coloredStatusBar.collectAsState()
+    ColorizeStatusBar(systemUiController, coloredStatusBar)
+
+    val devModeEnabled by context.settingsDev.devModeEnabled.collectAsState()
+
     Scaffold(
-        topBar = { CPSTopBar(navController, currentBackStackEntry, systemUiController) },
-        bottomBar = { CPSBottomBar(navController, currentBackStackEntry, cpsViewModels, systemUiController) }
+        topBar = { CPSTopBar(
+            navController = navController,
+            currentBackStackEntry = currentBackStackEntry
+        ) },
+        bottomBar = { CPSBottomBar(
+            navController = navController,
+            currentBackStackEntry = currentBackStackEntry,
+            cpsViewModels = cpsViewModels,
+            systemUiController = systemUiController,
+            devModeEnabled = devModeEnabled
+        ) }
     ) { innerPadding ->
         NavHost(
             navController = navController,
