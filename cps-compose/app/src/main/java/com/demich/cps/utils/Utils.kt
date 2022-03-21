@@ -30,6 +30,10 @@ import kotlin.time.Duration.Companion.seconds
 
 fun getCurrentTime() = Clock.System.now()
 
+fun<T> T.touchLog(text: String) = also {
+    println("${getCurrentTime().epochSeconds}: $text")
+}
+
 val context: Context
     @Composable
     @ReadOnlyComposable

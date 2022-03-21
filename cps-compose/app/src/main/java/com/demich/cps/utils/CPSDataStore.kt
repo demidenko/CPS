@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -26,14 +25,16 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         //TODO [toPrefs(t: T & Any): S] in kotlin 1.7??
         protected abstract fun toPrefs(t: T): S
 
-        val flow: Flow<T> get() = dataStore.data.map { fromPrefs(it[key]) }.distinctUntilChanged()
+        val flow: Flow<T>
+            get() = dataStore.data.map { fromPrefs(it[key]) }.distinctUntilChanged()
+            //get() = dataStore.data.map { it[key] }.distinctUntilChanged().map { fromPrefs(it) }
+            //get() = dataStore.data.distinctUntilChangedBy { it[key] }.map { fromPrefs(it[key]) }
 
         @Composable
-        fun collectAsState(context: CoroutineContext = EmptyCoroutineContext): State<T> {
-            return flow.let {
-                it.collectAsState(initial = runBlocking { it.first() }, context = context)
+        fun collectAsState(context: CoroutineContext = EmptyCoroutineContext): State<T> =
+            with(flow) {
+                collectAsState(initial = runBlocking { first() }, context = context)
             }
-        }
 
         //getter
         suspend operator fun invoke(): T = fromPrefs(dataStore.data.first()[key])
@@ -63,19 +64,14 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
 
     inner class ItemEnum<T: Enum<T>> (
         name: String,
-        private val clazz: Class<T>,
-        private val defaultValueCallback: () -> T
+        private val defaultValue: T
     ): CPSDataStoreItem<T, String>() {
-        constructor(name: String, defaultValue: T): this(
-            name, defaultValue.javaClass, defaultValueCallback = { defaultValue }
-        )
         override val key = stringPreferencesKey(name)
 
-        override fun fromPrefs(s: String?): T {
-            return s?.let { str ->
-                clazz.enumConstants?.first { it.name == str }
-            } ?: defaultValueCallback()
-        }
+        override fun fromPrefs(s: String?): T =
+            s?.let { str ->
+                defaultValue.javaClass.enumConstants?.first { it.name == str }
+            } ?: defaultValue
 
         override fun toPrefs(t: T): String = t.name
     }
