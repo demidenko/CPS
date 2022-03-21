@@ -3,7 +3,6 @@ package com.demich.cps.accounts.managers
 import android.content.Context
 import androidx.annotation.ColorRes
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
@@ -18,12 +17,11 @@ import com.demich.cps.R
 import com.demich.cps.accounts.SmallAccountPanelTypeRated
 import com.demich.cps.makePendingIntentOpenURL
 import com.demich.cps.notificationBuildAndNotify
-import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.ui.useOriginalColors
 import com.demich.cps.utils.AtCoderRatingChange
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.codeforces.CodeforcesRatingChange
-import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.signedToString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -86,11 +84,9 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: S
     abstract fun originalColor(handleColor: HandleColor): Color
 
     @Composable
-    fun colorFor(handleColor: HandleColor): Color {
-        val useOriginalColors by context.settingsUI.useOriginalColors.collectAsState()
-        return if (useOriginalColors) originalColor(handleColor)
+    fun colorFor(handleColor: HandleColor): Color =
+        if (useOriginalColors) originalColor(handleColor)
         else cpsColors.handleColor(handleColor)
-    }
 
     @Composable
     fun colorFor(rating: Int): Color = colorFor(handleColor = getHandleColor(rating))

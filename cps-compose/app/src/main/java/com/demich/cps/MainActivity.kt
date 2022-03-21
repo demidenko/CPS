@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,6 +27,7 @@ import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.ContestsSettingsScreen
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
+import com.demich.cps.ui.LocalUseOriginalColors
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.context
@@ -35,14 +37,19 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val darkLightMode by settingsUI.darkLightMode.collectAsState()
             val navController = rememberNavController()
-            CPSTheme(
-                darkTheme = darkLightMode.isDarkMode()
+
+            val useOriginalColors by settingsUI.useOriginalColors.collectAsState()
+            val darkLightMode by settingsUI.darkLightMode.collectAsState()
+
+            CompositionLocalProvider(
+                LocalUseOriginalColors provides useOriginalColors
             ) {
-                CPSScaffold(
-                    navController = navController
-                )
+                CPSTheme(darkTheme = darkLightMode.isDarkMode()) {
+                    CPSScaffold(
+                        navController = navController
+                    )
+                }
             }
         }
     }

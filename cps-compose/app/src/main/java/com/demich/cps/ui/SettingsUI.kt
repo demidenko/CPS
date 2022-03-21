@@ -2,8 +2,10 @@ package com.demich.cps.ui
 
 import android.content.Context
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.utils.CPSDataStore
 
@@ -27,3 +29,10 @@ enum class DarkLightMode {
 
 val Context.settingsUI: SettingsUI
     get() = SettingsUI(this)
+
+
+val LocalUseOriginalColors = compositionLocalOf { false }
+val useOriginalColors: Boolean
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalUseOriginalColors.current
