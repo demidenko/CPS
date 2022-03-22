@@ -98,12 +98,12 @@ class CodeChefAccountManager(context: Context):
     override fun getRating(userInfo: CodeChefUserInfo): Int = userInfo.rating
 
     override val ratingsUpperBounds = arrayOf(
-        1400 to HandleColor.GRAY,
-        1600 to HandleColor.GREEN,
-        1800 to HandleColor.BLUE,
-        2000 to HandleColor.VIOLET,
-        2200 to HandleColor.YELLOW,
-        2500 to HandleColor.ORANGE
+        HandleColor.GRAY to 1400,
+        HandleColor.GREEN to 1600,
+        HandleColor.BLUE to 1800,
+        HandleColor.VIOLET to 2000,
+        HandleColor.YELLOW to 2200,
+        HandleColor.ORANGE to 2500
     )
 
     override fun originalColor(handleColor: HandleColor): Color =
@@ -118,10 +118,10 @@ class CodeChefAccountManager(context: Context):
             else -> throw HandleColor.UnknownHandleColorException(handleColor, this)
         }
 
-    override val rankedHandleColorsList get() = HandleColor.rankedCodeChef
+    override val rankedHandleColorsList = HandleColor.rankedCodeChef
 
     private fun getRatingStarNumber(rating: Int): Int {
-        val index = ratingsUpperBounds.indexOfFirst { rating < it.first }
+        val index = ratingsUpperBounds.indexOfFirst { rating < it.second }
         return if (index == -1) ratingsUpperBounds.size + 1 else index + 1
     }
 

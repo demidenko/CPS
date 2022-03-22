@@ -1,7 +1,6 @@
 package com.demich.cps.accounts.managers
 
 import android.content.Context
-import androidx.annotation.ColorRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -73,10 +72,10 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: S
 {
     override val userIdTitle get() = "handle"
 
-    abstract val ratingsUpperBounds: Array<Pair<Int, HandleColor>>
+    abstract val ratingsUpperBounds: Array<Pair<HandleColor, Int>>
     fun getHandleColor(rating: Int): HandleColor =
         ratingsUpperBounds
-            .firstOrNull { rating < it.first }?.second
+            .firstOrNull { rating < it.second }?.first
             ?: HandleColor.RED
 
     abstract fun originalColor(handleColor: HandleColor): Color
@@ -120,12 +119,12 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: S
         if(handleColor == HandleColor.RED) return 1e9
         val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
         val j = rankedHandleColorsList.indexOfLast { handleColor == it }
-        ratingsUpperBounds.indexOfFirst { it.second == handleColor }.let { pos ->
-            val lower = if(pos>0) ratingsUpperBounds[pos-1].first else 0
-            val upper = ratingsUpperBounds[pos].first
-            val blockLength = (upper - lower).toDouble() / (j-i+1)
-            return i + (rating - lower) / blockLength
-        }
+        val pos = ratingsUpperBounds.indexOfFirst { it.first == handleColor }
+        require(i != -1 && j >= i && pos != -1)
+        val lower = if(pos > 0) ratingsUpperBounds[pos-1].second else 0
+        val upper = ratingsUpperBounds[pos].second
+        val blockLength = (upper - lower).toDouble() / (j - i + 1)
+        return i + (rating - lower) / blockLength
     }
 
     protected open suspend fun loadRatingHistory(info: U): List<RatingChange>? = null
@@ -173,16 +172,16 @@ abstract class UserInfo {
 }
 
 
-enum class HandleColor(@ColorRes private val resId: Int) {
-    GRAY(R.color.GRAY),
-    BROWN(R.color.BROWN),
-    GREEN(R.color.GREEN),
-    CYAN(R.color.CYAN),
-    BLUE(R.color.BLUE),
-    VIOLET(R.color.VIOLET),
-    YELLOW(R.color.YELLOW),
-    ORANGE(R.color.ORANGE),
-    RED(R.color.RED);
+enum class HandleColor {
+    GRAY,
+    BROWN,
+    GREEN,
+    CYAN,
+    BLUE,
+    VIOLET,
+    YELLOW,
+    ORANGE,
+    RED;
 
     companion object {
         val rankedCodeforces    = arrayOf(GRAY, GRAY, GREEN, CYAN, BLUE, VIOLET, VIOLET, ORANGE, ORANGE, RED)

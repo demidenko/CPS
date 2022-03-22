@@ -83,14 +83,14 @@ class DmojAccountManager(context: Context):
     override fun getRating(userInfo: DmojUserInfo) = userInfo.rating
 
     override val ratingsUpperBounds = arrayOf(
-        1000 to HandleColor.GRAY,
-        1300 to HandleColor.GREEN,
-        1600 to HandleColor.BLUE,
-        1900 to HandleColor.VIOLET,
-        2400 to HandleColor.YELLOW
+        HandleColor.GRAY to 1000,
+        HandleColor.GREEN to 1300,
+        HandleColor.BLUE to 1600,
+        HandleColor.VIOLET to 1900,
+        HandleColor.YELLOW to 2400
     )
 
-    override val rankedHandleColorsList: Array<HandleColor> get() = HandleColor.rankedDmoj
+    override val rankedHandleColorsList = HandleColor.rankedDmoj
 
     override fun originalColor(handleColor: HandleColor) =
         when (handleColor) {

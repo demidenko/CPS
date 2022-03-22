@@ -78,16 +78,16 @@ class AtCoderAccountManager(context: Context):
     override fun getRating(userInfo: AtCoderUserInfo) = userInfo.rating
 
     override val ratingsUpperBounds = arrayOf(
-        400 to HandleColor.GRAY,
-        800 to HandleColor.BROWN,
-        1200 to HandleColor.GREEN,
-        1600 to HandleColor.CYAN,
-        2000 to HandleColor.BLUE,
-        2400 to HandleColor.YELLOW,
-        2800 to HandleColor.ORANGE
+        HandleColor.GRAY to 400,
+        HandleColor.BROWN to 800,
+        HandleColor.GREEN to 1200,
+        HandleColor.CYAN to 1600,
+        HandleColor.BLUE to 2000,
+        HandleColor.YELLOW to 2400,
+        HandleColor.ORANGE to 2800
     )
 
-    override val rankedHandleColorsList get() = HandleColor.rankedAtCoder
+    override val rankedHandleColorsList = HandleColor.rankedAtCoder
 
     override fun originalColor(handleColor: HandleColor): Color =
         when(handleColor) {

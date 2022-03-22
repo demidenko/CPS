@@ -119,15 +119,15 @@ class CodeforcesAccountManager(context: Context):
     override fun getRating(userInfo: CodeforcesUserInfo) = userInfo.rating
 
     override val ratingsUpperBounds = arrayOf(
-        1200 to HandleColor.GRAY,
-        1400 to HandleColor.GREEN,
-        1600 to HandleColor.CYAN,
-        1900 to HandleColor.BLUE,
-        2100 to HandleColor.VIOLET,
-        2400 to HandleColor.ORANGE
+        HandleColor.GRAY to 1200,
+        HandleColor.GREEN to 1400,
+        HandleColor.CYAN to 1600,
+        HandleColor.BLUE to 1900,
+        HandleColor.VIOLET to 2100,
+        HandleColor.ORANGE to 2400
     )
 
-    override val rankedHandleColorsList get() = HandleColor.rankedCodeforces
+    override val rankedHandleColorsList = HandleColor.rankedCodeforces
 
     override fun originalColor(handleColor: HandleColor): Color =
         when (handleColor) {

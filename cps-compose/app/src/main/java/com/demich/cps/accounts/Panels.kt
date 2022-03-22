@@ -171,7 +171,7 @@ fun SmallAccountPanelTypeArchive(
                         append(arg.second)
                     }
                 },
-                fontSize = 15.sp,
+                fontSize = 14.sp,
                 color = cpsColors.textColor,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

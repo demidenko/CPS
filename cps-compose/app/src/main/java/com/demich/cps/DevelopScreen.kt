@@ -35,7 +35,7 @@ fun DevelopScreen(navController: NavController) {
 
     Column {
         val initial = buildList {
-            codeforcesAccountManager.ratingsUpperBounds.forEach { (rating, color) ->
+            codeforcesAccountManager.ratingsUpperBounds.forEach { (color, rating) ->
                 add(CodeforcesUserInfo(STATUS.OK, color.name, rating-1))
             }
             add(CodeforcesUserInfo(STATUS.OK, "RED", 2600))
