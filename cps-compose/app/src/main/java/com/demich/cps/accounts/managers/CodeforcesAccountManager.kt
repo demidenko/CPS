@@ -106,11 +106,15 @@ class CodeforcesAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadRatingHistory(info: CodeforcesUserInfo): List<RatingChange>? {
-        return kotlin.runCatching {
+    override suspend fun loadRatingHistory(info: CodeforcesUserInfo): List<RatingChange>? =
+        kotlin.runCatching {
             CodeforcesAPI.getUserRatingChanges(info.handle)
-        }.getOrNull()?.map { RatingChange(it) }
-    }
+        }.getOrNull()?.map {
+            RatingChange(
+                rating = it.newRating,
+                date = it.ratingUpdateTime
+            )
+        }
 
     override fun getRating(userInfo: CodeforcesUserInfo) = userInfo.rating
 

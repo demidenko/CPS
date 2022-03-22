@@ -67,9 +67,13 @@ class AtCoderAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadRatingHistory(info: AtCoderUserInfo): List<RatingChange>? {
-        return AtCoderAPI.getRatingChanges(info.userId)?.map { RatingChange(it) }
-    }
+    override suspend fun loadRatingHistory(info: AtCoderUserInfo): List<RatingChange>? =
+        AtCoderAPI.getRatingChanges(info.userId)?.map {
+            RatingChange(
+                rating = it.NewRating,
+                date = it.EndTime
+            )
+        }
 
     override fun getRating(userInfo: AtCoderUserInfo) = userInfo.rating
 

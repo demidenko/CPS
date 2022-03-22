@@ -118,8 +118,7 @@ class CodeChefAccountManager(context: Context):
             else -> throw HandleColor.UnknownHandleColorException(handleColor, this)
         }
 
-    override val rankedHandleColorsList: Array<HandleColor>
-        get() = TODO("Not yet implemented")
+    override val rankedHandleColorsList get() = HandleColor.rankedCodeChef
 
     private fun getRatingStarNumber(rating: Int): Int {
         val index = ratingsUpperBounds.indexOfFirst { rating < it.first }

@@ -90,6 +90,8 @@ class DmojAccountManager(context: Context):
         2400 to HandleColor.YELLOW
     )
 
+    override val rankedHandleColorsList: Array<HandleColor> get() = HandleColor.rankedDmoj
+
     override fun originalColor(handleColor: HandleColor) =
         when (handleColor) {
             HandleColor.GRAY -> Color(0xFF999999)
@@ -100,8 +102,6 @@ class DmojAccountManager(context: Context):
             HandleColor.RED -> Color(0xFFEE0000)
             else -> throw HandleColor.UnknownHandleColorException(handleColor, this)
         }
-
-    override val rankedHandleColorsList: Array<HandleColor> get() = TODO("Not yet implemented")
 
     @Composable
     override fun makeOKInfoSpan(userInfo: DmojUserInfo): AnnotatedString =

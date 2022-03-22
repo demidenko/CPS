@@ -27,6 +27,7 @@ import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.ContestsSettingsScreen
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
+import com.demich.cps.ui.CPSStatusBar
 import com.demich.cps.ui.LocalUseOriginalColors
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
@@ -59,6 +60,8 @@ class MainActivity : ComponentActivity() {
 fun CPSScaffold(
     navController: NavHostController
 ) {
+    //val context = context
+
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val systemUiController = rememberSystemUiController()
 
@@ -66,8 +69,7 @@ fun CPSScaffold(
         accountsViewModel = viewModel()
     )
 
-    val coloredStatusBar by context.settingsUI.coloredStatusBar.collectAsState()
-    ColorizeStatusBar(systemUiController, coloredStatusBar)
+    CPSStatusBar(systemUiController)
 
     val devModeEnabled by context.settingsDev.devModeEnabled.collectAsState()
 

@@ -19,9 +19,7 @@ import com.demich.cps.makePendingIntentOpenURL
 import com.demich.cps.notificationBuildAndNotify
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.useOriginalColors
-import com.demich.cps.utils.AtCoderRatingChange
 import com.demich.cps.utils.CPSDataStore
-import com.demich.cps.utils.codeforces.CodeforcesRatingChange
 import com.demich.cps.utils.signedToString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -117,7 +115,7 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: S
     abstract fun getRating(userInfo: U): Int
     fun getOrder(userInfo: U): Double {
         val rating = getRating(userInfo)
-        if(rating == NOT_RATED) return -1.0
+        if(userInfo.status != STATUS.OK || rating == NOT_RATED) return -1.0
         val handleColor = getHandleColor(rating)
         if(handleColor == HandleColor.RED) return 1e9
         val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
@@ -137,22 +135,7 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: S
 data class RatingChange(
     val rating: Int,
     val date: Instant
-) {
-    constructor(ratingChange: CodeforcesRatingChange): this(
-        ratingChange.newRating,
-        ratingChange.ratingUpdateTime
-    )
-
-    constructor(ratingChange: AtCoderRatingChange): this(
-        ratingChange.NewRating,
-        ratingChange.EndTime
-    )
-    /*
-    constructor(ratingChange: TopCoderRatingChange): this(
-        ratingChange.rating.toInt(),
-        ratingChange.date.toInstant()
-    )*/
-}
+)
 
 class AccountDataStore<U: UserInfo>(
     dataStore: DataStore<Preferences>,
@@ -205,6 +188,9 @@ enum class HandleColor(@ColorRes private val resId: Int) {
         val rankedCodeforces    = arrayOf(GRAY, GRAY, GREEN, CYAN, BLUE, VIOLET, VIOLET, ORANGE, ORANGE, RED)
         val rankedAtCoder       = arrayOf(GRAY, BROWN, GREEN, CYAN, BLUE, YELLOW, YELLOW, ORANGE, ORANGE, RED)
         val rankedTopCoder      = arrayOf(GRAY, GRAY, GREEN, GREEN, BLUE, YELLOW, YELLOW, YELLOW, YELLOW, RED)
+        //TODO:
+        val rankedCodeChef      = arrayOf(GRAY, GRAY, GREEN, GREEN, BLUE, VIOLET, YELLOW, YELLOW, ORANGE, RED)
+        val rankedDmoj          = arrayOf(GRAY, GRAY, GREEN, GREEN, BLUE, VIOLET, VIOLET, YELLOW, YELLOW, RED)
     }
 
     class UnknownHandleColorException(color: HandleColor, manager: RatedAccountManager<*>):

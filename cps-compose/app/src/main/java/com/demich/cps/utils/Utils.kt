@@ -4,8 +4,8 @@ import android.content.Context
 import android.text.Html
 import android.text.Spanned
 import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.platform.LocalContext
@@ -14,6 +14,9 @@ import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
@@ -25,6 +28,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -95,3 +100,10 @@ inline fun<reified T> jsonSaver() = object: Saver<T, String> {
     override fun restore(value: String): T = jsonCPS.decodeFromString(value)
     override fun SaverScope.save(value: T): String = jsonCPS.encodeToString(value)
 }
+
+@Composable
+fun <T : R, R> Flow<T>.collectAsState(context: CoroutineContext = EmptyCoroutineContext): State<T> =
+    collectAsState(
+        initial = remember { runBlocking { first() } },
+        context = context
+    )

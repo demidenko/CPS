@@ -2,7 +2,6 @@ package com.demich.cps.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -11,11 +10,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
 
@@ -31,10 +27,7 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
             //get() = dataStore.data.distinctUntilChangedBy { it[key] }.map { fromPrefs(it[key]) }
 
         @Composable
-        fun collectAsState(context: CoroutineContext = EmptyCoroutineContext): State<T> =
-            with(flow) {
-                collectAsState(initial = runBlocking { first() }, context = context)
-            }
+        fun collectAsState(): State<T> = flow.collectAsState()
 
         //getter
         suspend operator fun invoke(): T = fromPrefs(dataStore.data.first()[key])

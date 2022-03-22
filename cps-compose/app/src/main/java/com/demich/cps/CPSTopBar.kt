@@ -1,11 +1,11 @@
 package com.demich.cps
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Info
@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavBackStackEntry
@@ -22,7 +21,6 @@ import androidx.navigation.NavHostController
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
-import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.launch
 
 @Composable
@@ -197,38 +195,4 @@ private fun CPSAboutDialog(onDismissRequest: () -> Unit) {
         }
         MonospacedText("}")
     }
-}
-
-@Composable
-fun ColorizeStatusBar(
-    systemUiController: SystemUiController,
-    coloredStatusBar: Boolean,
-    color: Color,
-    offColor: Color = cpsColors.background
-) {
-    /*
-        Important:
-        with statusbar=off switching dark/light mode MUST be as fast as everywhere else
-    */
-    val koef by animateFloatAsState(
-        targetValue = if (coloredStatusBar) 1f else 0f,
-        animationSpec = tween(buttonOnOffDurationMillis)
-    )
-    val statusBarColor by animateColorAsState(
-        targetValue = color,
-        animationSpec = tween(buttonOnOffDurationMillis)
-    )
-    val mixedColor by remember(offColor) {
-        fun point(l: Float, r: Float): Float = (r - l) * koef + l
-        derivedStateOf {
-            val r = point(offColor.red, statusBarColor.red)
-            val g = point(offColor.green, statusBarColor.green)
-            val b = point(offColor.blue, statusBarColor.blue)
-            Color(r, g, b)
-        }
-    }
-    systemUiController.setStatusBarColor(
-        color = mixedColor,
-        darkIcons = MaterialTheme.colors.isLight
-    )
 }
