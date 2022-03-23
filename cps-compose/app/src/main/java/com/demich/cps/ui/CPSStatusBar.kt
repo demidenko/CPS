@@ -14,8 +14,8 @@ import com.demich.cps.accounts.managers.HandleColor
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.UserInfo
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
+import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -26,14 +26,14 @@ fun CPSStatusBar(
     systemUiController: SystemUiController
 ) {
     val context = context
-    val coloredStatusBar by context.settingsUI.coloredStatusBar.collectAsState()
+    val coloredStatusBar by rememberCollect { context.settingsUI.coloredStatusBar.flow }
 
-    val color by remember {
+    val color by rememberCollect {
         combine(flows = context.allAccountManagers
             .filterIsInstance<RatedAccountManager<*>>()
             .map { it.flowOfRatedOrder() }
         ) { array -> array.maxByOrNull { it.order }?.takeIf { it.order > 0 } }
-    }.collectAsState()
+    }
 
     ColorizeStatusBar(
         systemUiController = systemUiController,

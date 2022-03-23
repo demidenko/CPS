@@ -22,6 +22,7 @@ import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.delay
 
 @Composable
@@ -29,8 +30,8 @@ fun<U: UserInfo> AccountManager<U>.Panel(
     accountsViewModel: AccountsViewModel,
     modifier: Modifier = Modifier
 ) {
-    val userInfo: U by flowOfInfo().collectAsState(emptyInfo())
-    val loadingStatus by accountsViewModel.loadingStatusFor(this)
+    val userInfo: U by rememberCollect { flowOfInfo() }
+    val loadingStatus by remember { accountsViewModel.loadingStatusFor(this) }
 
     var showUI by remember { mutableStateOf(false) }
 
@@ -51,6 +52,8 @@ fun<U: UserInfo> AccountManager<U>.Panel(
                 )
             }
         ) {
+            Panel(userInfo)
+
             AutoHiding(
                 targetState = remember(loadingStatus, showUI) { loadingStatus to showUI },
                 finishHidingState = LoadingStatus.PENDING to false,
@@ -65,8 +68,6 @@ fun<U: UserInfo> AccountManager<U>.Panel(
                     accountsViewModel.reload(manager = this@Panel)
                 }
             }
-
-            Panel(userInfo)
         }
     }
 }
@@ -136,7 +137,7 @@ fun<U: UserInfo> RatedAccountManager<U>.SmallAccountPanelTypeRated(userInfo: U) 
                 Text(
                     text = if (rating == NOT_RATED) "[not rated]" else rating.toString(),
                     fontSize = 25.sp,
-                    color = colorFor(rating = rating),
+                    color = if (rating == NOT_RATED) cpsColors.textColorAdditional else colorFor(rating = rating),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
