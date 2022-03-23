@@ -68,7 +68,7 @@ private fun CPSBottomBarMain(
         backgroundColor = cpsColors.backgroundNavigation,
         elevation = 0.dp
     ) {
-        Screen.majorScreens.forEach { (screen, icon) ->
+        Screen.majorScreens().forEach { (screen, icon) ->
             if (screen == Screen.Development && !devModeEnabled) return@forEach
             val isSelected = screen == currentScreen.rootScreen
             BottomNavigationItem(

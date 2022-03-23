@@ -2,7 +2,7 @@ package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -16,7 +16,6 @@ import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
 import com.demich.cps.utils.InstantAsSecondsSerializer
 import com.demich.cps.utils.codeforces.*
-import com.demich.cps.utils.jsonCPS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
@@ -24,7 +23,7 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-@Stable
+@Immutable
 data class CodeforcesUserInfo(
     override val status: STATUS,
     val handle: String,

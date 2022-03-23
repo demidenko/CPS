@@ -125,7 +125,7 @@ sealed class Screen(
     private val root: Screen? = null
 ) {
     val rootScreen: Screen get() = root ?: this
-    val subtitle = "::$route"
+    val subtitle: String get() = "::$route"
 
     object Accounts: Screen("accounts")
     object News: Screen("news")
@@ -135,29 +135,25 @@ sealed class Screen(
     object Development: Screen("develop")
 
     companion object {
-        val majorScreens by lazy {
-            listOf(
-                Accounts to Icons.Rounded.Person,
-                News to Icons.Default.Subtitles,
-                Contests to Icons.Filled.EmojiEvents,
-                Development to Icons.Default.AllOut
-            )
-        }
-        val all by lazy {
-            listOf(
-                Accounts,
-                News,
-                NewsSettings,
-                Contests,
-                ContestsSettings,
-                Development
-            )
-        }
+        fun majorScreens() = listOf(
+            Accounts to Icons.Rounded.Person,
+            News to Icons.Default.Subtitles,
+            Contests to Icons.Filled.EmojiEvents,
+            Development to Icons.Default.AllOut
+        )
+        fun all() = listOf(
+            Accounts,
+            News,
+            NewsSettings,
+            Contests,
+            ContestsSettings,
+            Development
+        )
     }
 }
 
 fun NavDestination.getScreen(): Screen {
-    return Screen.all.first { it.route == route }
+    return Screen.all().first { it.route == route }
 }
 
 

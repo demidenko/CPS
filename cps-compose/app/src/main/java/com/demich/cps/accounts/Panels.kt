@@ -22,7 +22,6 @@ import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.delay
 
 @Composable
@@ -30,7 +29,7 @@ fun<U: UserInfo> AccountManager<U>.Panel(
     accountsViewModel: AccountsViewModel,
     modifier: Modifier = Modifier
 ) {
-    val userInfo: U by rememberCollect { flowOfInfo() }
+    val userInfo: U by remember { flowOfInfo() }.collectAsState(initial = emptyInfo())
     val loadingStatus by remember { accountsViewModel.loadingStatusFor(this) }
 
     var showUI by remember { mutableStateOf(false) }
