@@ -2,10 +2,11 @@ package com.demich.cps.ui
 
 import android.content.Context
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.*
-import androidx.datastore.preferences.core.Preferences
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.utils.CPSDataStore
 
@@ -14,9 +15,12 @@ class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
         private val Context.settingsUI_dataStore by preferencesDataStore("settings_ui")
     }
 
-    val useOriginalColors = Item(booleanPreferencesKey("use_original_colors"), false)
-    val coloredStatusBar = Item(booleanPreferencesKey("use_status_bar"), true)
     val darkLightMode = ItemEnum("ui_mode", DarkLightMode.SYSTEM)
+
+    val useOriginalColors = Item(booleanPreferencesKey("use_original_colors"), false)
+
+    val coloredStatusBar = Item(booleanPreferencesKey("use_status_bar"), true)
+    val statusBarDisabledManagers = Item(stringSetPreferencesKey("status_bar_disabled_managers"), emptySet())
 }
 
 enum class DarkLightMode {

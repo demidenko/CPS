@@ -1,5 +1,6 @@
 package com.demich.cps.ui
 
+import android.content.Context
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -28,19 +29,12 @@ fun CPSStatusBar(
     val context = context
     val coloredStatusBar by rememberCollect { context.settingsUI.coloredStatusBar.flow }
 
-    val color by rememberCollect {
-        combine(flows = context.allAccountManagers
-            .filterIsInstance<RatedAccountManager<*>>()
-            .map { it.flowOfRatedOrder() }
-        ) { array -> array.maxByOrNull { it.order }?.takeIf { it.order > 0 } }
-    }
+    val color by rememberCollect { makeFlowOfBestOrder(context) }
 
     ColorizeStatusBar(
         systemUiController = systemUiController,
         coloredStatusBar = coloredStatusBar,
-        color = color?.run {
-            manager.colorFor(handleColor = handleColor)
-        } ?: cpsColors.background
+        color = color?.run { manager.colorFor(handleColor) } ?: cpsColors.background
     )
 }
 
@@ -58,6 +52,19 @@ private data class RatedOrder(
     val handleColor: HandleColor,
     val manager: RatedAccountManager<*>
 )
+
+private fun makeFlowOfBestOrder(context: Context): Flow<RatedOrder?> =
+    combine(
+        flow = combine(flows = context.allAccountManagers
+            .filterIsInstance<RatedAccountManager<*>>()
+            .map { it.flowOfRatedOrder() }
+        ) { it },
+        flow2 = context.settingsUI.statusBarDisabledManagers.flow
+    ) { orders, disabledManagers ->
+        orders.filter { it.order >= 0 }
+            .filter { it.manager.managerName !in disabledManagers }
+            .maxByOrNull { it.order }
+    }
 
 @Composable
 private fun ColorizeStatusBar(
