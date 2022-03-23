@@ -55,20 +55,6 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         override fun toPrefs(t: T?): T = t!!
     }
 
-    inner class ItemEnum<T: Enum<T>> (
-        name: String,
-        private val defaultValue: T
-    ): CPSDataStoreItem<T, String>() {
-        override val key = stringPreferencesKey(name)
-
-        override fun fromPrefs(s: String?): T =
-            s?.let { str ->
-                defaultValue.javaClass.enumConstants?.first { it.name == str }
-            } ?: defaultValue
-
-        override fun toPrefs(t: T): String = t.name
-    }
-
     inner class ItemStringConvertible<T> (
         name: String,
         private val defaultValue: T,
@@ -79,6 +65,14 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         override fun fromPrefs(s: String?): T = s?.let(decode) ?: defaultValue
         override fun toPrefs(t: T): String = encode(t)
     }
+
+    inline fun<reified T: Enum<T>> itemEnum(name: String, defaultValue: T) =
+        ItemStringConvertible(
+            name = name,
+            defaultValue = defaultValue,
+            encode = { it.name },
+            decode = ::enumValueOf
+        )
 
     inline fun<reified T> itemJsonConvertible(name: String, defaultValue: T) =
         ItemStringConvertible(
