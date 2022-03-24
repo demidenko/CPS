@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,6 +26,10 @@ import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
+import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.touchLog
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -33,7 +38,16 @@ import kotlinx.coroutines.runBlocking
 fun AccountsScreen(navController: NavController, accountsViewModel: AccountsViewModel) {
     val context = context
 
-    var showWelcome by remember { mutableStateOf(false) }
+    val accountsArray by rememberCollect {
+        combine(
+            flows = context.allAccountManagers
+                .map { it.flowOfInfoWithManager() }
+        ) { it }
+    }
+
+    val recordedAccounts by remember {
+        derivedStateOf { accountsArray.filterNot { it.userInfo.isEmpty() } }
+    }
 
     Column(
         horizontalAlignment = Alignment.Start,
@@ -41,19 +55,18 @@ fun AccountsScreen(navController: NavController, accountsViewModel: AccountsView
             .fillMaxWidth()
             .background(cpsColors.background)
     ) {
-        if (showWelcome) {
+        if (recordedAccounts.isEmpty()) {
             MonospacedText(
                 text = stringResource(id = R.string.accounts_welcome),
                 color = cpsColors.textColorAdditional,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(6.dp)
             )
-        }
-
-        Column {
-            context.allAccountManagers.forEach { manager ->
-                key(manager.managerName) {
-                    manager.Panel(
+        } else {
+            recordedAccounts.forEach {
+                key(it.manager.managerName) {
+                    PanelWithUI(
+                        userInfoWithManager = it,
                         accountsViewModel = accountsViewModel,
                         modifier = Modifier.padding(start = 10.dp, top = 10.dp)
                     )
@@ -65,7 +78,7 @@ fun AccountsScreen(navController: NavController, accountsViewModel: AccountsView
 
 @Composable
 fun AccountsBottomBar(accountsViewModel: AccountsViewModel) {
-    AddAccountButton()
+    AddAccountButton(accountsViewModel)
     ReloadAccountsButton(accountsViewModel)
 }
 
@@ -89,7 +102,7 @@ private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
 }
 
 @Composable
-private fun AddAccountButton() {
+private fun AddAccountButton(accountsViewModel: AccountsViewModel) {
     var showMenu by remember { mutableStateOf(false) }
     var chosenManager by remember { mutableStateOf<AccountManager<*>?>(null) }
 
@@ -109,6 +122,9 @@ private fun AddAccountButton() {
                         chosenManager = manager
                     }
                 ) {
+                    CPSIconButton(icon = Icons.Default.Delete) {
+                        accountsViewModel.delete(manager)
+                    }
                     MonospacedText(text = manager.managerName)
                 }
             }

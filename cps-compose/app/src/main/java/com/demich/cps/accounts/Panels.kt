@@ -25,12 +25,13 @@ import com.demich.cps.utils.LoadingStatus
 import kotlinx.coroutines.delay
 
 @Composable
-fun<U: UserInfo> AccountManager<U>.Panel(
+fun<U: UserInfo> PanelWithUI(
+    userInfoWithManager: UserInfoWithManager<U>,
     accountsViewModel: AccountsViewModel,
     modifier: Modifier = Modifier
 ) {
-    val userInfo: U by remember { flowOfInfo() }.collectAsState(initial = emptyInfo())
-    val loadingStatus by remember { accountsViewModel.loadingStatusFor(this) }
+    val (userInfo, manager) = userInfoWithManager
+    val loadingStatus by remember { accountsViewModel.loadingStatusFor(manager) }
 
     var showUI by remember { mutableStateOf(false) }
 
@@ -51,12 +52,12 @@ fun<U: UserInfo> AccountManager<U>.Panel(
                 )
             }
         ) {
-            Panel(userInfo)
+            manager.Panel(userInfo)
 
             AutoHiding(
-                targetState = remember(loadingStatus, showUI) { loadingStatus to showUI },
-                finishHidingState = LoadingStatus.PENDING to false,
+                currentState = remember(loadingStatus, showUI) { loadingStatus to showUI },
                 startHidingState = LoadingStatus.PENDING to true,
+                finishHidingState = LoadingStatus.PENDING to false,
                 hideDelay = 3000,
                 hideDuration = 2000,
                 modifier = Modifier
@@ -64,7 +65,7 @@ fun<U: UserInfo> AccountManager<U>.Panel(
                     .padding(end = 5.dp)
             ) {
                 CPSReloadingButton(loadingStatus = it.first) {
-                    accountsViewModel.reload(manager = this@Panel)
+                    accountsViewModel.reload(manager)
                 }
             }
         }
@@ -74,7 +75,7 @@ fun<U: UserInfo> AccountManager<U>.Panel(
 
 @Composable
 private fun<S> AutoHiding(
-    targetState: S,
+    currentState: S,
     startHidingState: S,
     finishHidingState: S,
     hideDelay: Int,
@@ -82,7 +83,7 @@ private fun<S> AutoHiding(
     modifier: Modifier = Modifier,
     content: @Composable (S) -> Unit
 ) {
-    val transition = updateTransition(targetState = targetState, label = "")
+    val transition = updateTransition(targetState = currentState, label = "")
     val uiAlpha by transition.animateFloat(
         transitionSpec = {
             when {

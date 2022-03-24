@@ -214,8 +214,8 @@ class CodeforcesAccountManager(context: Context):
         }
     }
 
-    override val ratingUpperBoundRevolutions: List<Pair<Instant, Array<Pair<Int, HandleColor>>>> =
-        listOf(
+    override val ratingUpperBoundRevolutions: List<Pair<Instant, Array<Pair<Int, HandleColor>>>>
+        get() = listOf(
             //https://codeforces.com/blog/entry/59228
             Instant.fromEpochSeconds(1525364996L) to arrayOf(
                 1200 to HandleColor.GRAY,

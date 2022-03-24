@@ -33,7 +33,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
 
     protected abstract fun getDataStore(): AccountDataStore<U>
     fun flowOfInfo() = getDataStore().userInfo.flow
-    fun flowOfInfoWithManager() = getDataStore().userInfo.flow.map { info -> info to this }
+    fun flowOfInfoWithManager() = getDataStore().userInfo.flow.map { info -> UserInfoWithManager(info, this) }
 
     abstract fun emptyInfo(): U
 
@@ -155,7 +155,7 @@ open class AccountSettingsDataStore(dataStore: DataStore<Preferences>): CPSDataS
     }
 }
 
-enum class STATUS{
+enum class STATUS {
     OK,
     NOT_FOUND,
     FAILED
@@ -171,6 +171,10 @@ abstract class UserInfo {
     fun isEmpty() = userId.isBlank()
 }
 
+data class UserInfoWithManager<U: UserInfo>(
+    val userInfo: U,
+    val manager: AccountManager<U>
+)
 
 enum class HandleColor {
     GRAY,

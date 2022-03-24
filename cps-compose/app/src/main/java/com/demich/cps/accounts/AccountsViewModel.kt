@@ -1,16 +1,16 @@
 package com.demich.cps.accounts
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.accounts.managers.UserInfo
 import com.demich.cps.utils.LoadingStatus
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 
 class AccountsViewModel: ViewModel() {
@@ -37,6 +37,15 @@ class AccountsViewModel: ViewModel() {
                 loadingStatus = LoadingStatus.PENDING
                 manager.setSavedInfo(info)
             }
+        }
+    }
+
+    fun<U: UserInfo> delete(manager: AccountManager<U>) {
+        viewModelScope.launch {
+            var loadingStatus by loadingStatusFor(manager)
+            require(loadingStatus != LoadingStatus.LOADING)
+            loadingStatus = LoadingStatus.PENDING
+            manager.setSavedInfo(manager.emptyInfo())
         }
     }
 }
