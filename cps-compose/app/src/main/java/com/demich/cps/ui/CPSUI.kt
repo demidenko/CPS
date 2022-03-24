@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.demich.cps.ui.theme.cpsColors
@@ -116,7 +117,8 @@ fun MonospacedText(
     color = color,
     fontSize = fontSize,
     fontFamily = FontFamily.Monospace,
-    maxLines = maxLines
+    maxLines = maxLines,
+    letterSpacing = 0.sp
 )
 
 
