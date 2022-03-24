@@ -112,20 +112,6 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: S
 
     abstract val rankedHandleColorsList: Array<HandleColor>
     abstract fun getRating(userInfo: U): Int
-    fun getOrder(userInfo: U): Double {
-        val rating = getRating(userInfo)
-        if(userInfo.status != STATUS.OK || rating == NOT_RATED) return -1.0
-        val handleColor = getHandleColor(rating)
-        if(handleColor == HandleColor.RED) return 1e9
-        val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
-        val j = rankedHandleColorsList.indexOfLast { handleColor == it }
-        val pos = ratingsUpperBounds.indexOfFirst { it.first == handleColor }
-        require(i != -1 && j >= i && pos != -1)
-        val lower = if(pos > 0) ratingsUpperBounds[pos-1].second else 0
-        val upper = ratingsUpperBounds[pos].second
-        val blockLength = (upper - lower).toDouble() / (j - i + 1)
-        return i + (rating - lower) / blockLength
-    }
 
     protected open suspend fun loadRatingHistory(info: U): List<RatingChange>? = null
     suspend fun getRatingHistory(info: U): List<RatingChange>? = loadRatingHistory(info)?.sortedBy { it.date }
