@@ -1,5 +1,8 @@
 package com.demich.cps
 
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
@@ -14,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavBackStackEntry
@@ -41,13 +45,15 @@ fun CPSTopBar(
         contentPadding = PaddingValues(start = 10.dp),
         modifier = Modifier.height(56.dp)
     ) {
-        Box(modifier = Modifier.weight(1f)) {
-            if (showUIPanel) {
+        Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+            CPSTitle(screen = currentScreen, modifier = Modifier.fillMaxWidth().align(Alignment.CenterStart))
+            androidx.compose.animation.AnimatedVisibility(
+                visible = showUIPanel,
+                enter = expandHorizontally(expandFrom = Alignment.Start),
+                exit = shrinkHorizontally(shrinkTowards = Alignment.Start),
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
                 UIPanel(modifier = Modifier.fillMaxWidth()) { showUIPanel = false }
-            } else {
-                if (currentScreen != null) {
-                    CPSTitle(screen = currentScreen, modifier = Modifier.fillMaxWidth())
-                }
             }
         }
 
@@ -84,10 +90,10 @@ fun CPSTopBar(
 
 @Composable
 private fun CPSTitle(
-    screen: Screen,
-    modifier: Modifier = Modifier
+    screen: Screen?,
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = 16.sp
 ) = Column(modifier = modifier) {
-    val fontSize = 16.sp
     MonospacedText(
         text = "Competitive Programming && Solving",
         color = cpsColors.textColor,
@@ -95,7 +101,7 @@ private fun CPSTitle(
         maxLines = 1
     )
     MonospacedText(
-        text = screen.subtitle,
+        text = screen?.subtitle ?: "",
         color = cpsColors.textColorAdditional,
         fontSize = fontSize,
         maxLines = 1
@@ -106,7 +112,7 @@ private fun CPSTitle(
 private fun UIPanel(
     modifier: Modifier = Modifier,
     onClosePanel: () -> Unit
-) = Row(modifier = modifier) {
+) = Row(modifier = modifier.background(cpsColors.background)) {
     val scope = rememberCoroutineScope()
 
     val settingsUI = context.settingsUI
