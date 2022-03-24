@@ -29,12 +29,13 @@ fun CPSStatusBar(
     val context = context
     val coloredStatusBar by rememberCollect { context.settingsUI.coloredStatusBar.flow }
 
-    val color by rememberCollect { makeFlowOfBestOrder(context) }
+    val bestOrder by rememberCollect { makeFlowOfBestOrder(context) }
 
+    val color = bestOrder?.run { manager.colorFor(handleColor) }
     ColorizeStatusBar(
         systemUiController = systemUiController,
-        coloredStatusBar = coloredStatusBar,
-        color = color?.run { manager.colorFor(handleColor) } ?: cpsColors.background
+        coloredStatusBar = coloredStatusBar && color != null,
+        color = color ?: cpsColors.background
     )
 }
 
