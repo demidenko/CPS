@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
@@ -50,26 +51,39 @@ fun<U: UserInfo> DialogAccountChooser(
     CPSDialog(onDismissRequest = onDismissRequest) {
         val context = context
 
-        val inputTextSize = 18.sp
-        val resultTextSize = 14.sp
-        val suggestionTextLimit = 3
+        val textFieldValue = remember { mutableStateOf(initialUserInfo.userId.toTextFieldValue()) }
+        val userId by remember { derivedStateOf { textFieldValue.value.text } }
 
         var userInfo by remember { mutableStateOf(initialUserInfo) }
-        var ignoreLaunch by remember { mutableStateOf(true) }
-
-        var textFieldValue by remember { mutableStateOf(initialUserInfo.userId.toTextFieldValue()) }
-        val userId by derivedStateOf { textFieldValue.text }
-
         var loadingInProgress by remember { mutableStateOf(false) }
 
+        var suggestionsList: List<AccountSuggestion> by remember { mutableStateOf(emptyList()) }
         var loadingSuggestionsInProgress by remember { mutableStateOf(false) }
         var suggestionsLoadError by remember { mutableStateOf(false) }
         var blockSuggestionsReload by remember { mutableStateOf(false) }
-        var suggestionsList by remember { mutableStateOf(emptyList<AccountSuggestion>()) }
 
         val focusRequester = remember { FocusRequester() }
+        var ignoreLaunch by remember { mutableStateOf(true) }
 
-        val done = {
+        AccountChooserHeader(
+            text = "getUser(${manager.managerName}):",
+            color = cpsColors.textColorAdditional
+        ) {
+            Icon(imageVector = Icons.Default.Person, contentDescription = null, tint = it)
+        }
+
+        UserIdTextField(
+            manager = manager,
+            userInfo = userInfo,
+            textFieldValue = textFieldValue,
+            loadingInProgress = loadingInProgress,
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .fillMaxWidth(),
+            inputTextSize = 18.sp,
+            resultTextSize = 14.sp,
+            inputValidator = charValidator
+        ) {
             if (userInfo.status != STATUS.NOT_FOUND && !loadingInProgress) {
                 if (userId.all(manager::isValidForUserId)) {
                     onResult(userInfo)
@@ -80,54 +94,6 @@ fun<U: UserInfo> DialogAccountChooser(
             }
         }
 
-        AccountChooserHeader(
-            text = "getUser(${manager.managerName}):",
-            color = cpsColors.textColorAdditional
-        ) {
-            Icon(imageVector = Icons.Default.Person, contentDescription = null, tint = it)
-        }
-
-        TextField(
-            value = textFieldValue,
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .fillMaxWidth(),
-            singleLine = true,
-            textStyle = TextStyle(fontSize = inputTextSize, fontFamily = FontFamily.Monospace),
-            onValueChange = { value ->
-                val str = value.text
-                if (!str.all(charValidator)) return@TextField
-                textFieldValue = value
-            },
-            placeholder = {
-                Text(
-                    text = buildString {
-                        append(manager.userIdTitle)
-                        if (manager is AccountSuggestionsProvider) append(" or search query")
-                    },
-                    color = cpsColors.textColorAdditional
-                )
-            },
-            label = {
-                Text(
-                    text = makeUserInfoSpan(userInfo, manager),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = resultTextSize
-                )
-            },
-            trailingIcon = {
-                TextFieldMainIcon(
-                    loadingInProgress = loadingInProgress,
-                    userInfoStatus = userInfo.status,
-                    iconSize = 32.dp,
-                    onDoneClick = done
-                )
-            },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { done() }),
-        )
-
         if (manager is AccountSuggestionsProvider) {
             SuggestionsList(
                 suggestions = suggestionsList,
@@ -136,11 +102,12 @@ fun<U: UserInfo> DialogAccountChooser(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { suggestion ->
                     blockSuggestionsReload = true
-                    textFieldValue = suggestion.userId.toTextFieldValue()
+                    textFieldValue.value = suggestion.userId.toTextFieldValue()
                 }
             )
         }
 
+        val suggestionTextLimit = 3
         LaunchedEffect(userId) {
             if (ignoreLaunch) {
                 ignoreLaunch = false
@@ -166,7 +133,7 @@ fun<U: UserInfo> DialogAccountChooser(
             }
             if (manager is AccountSuggestionsProvider && userId.length >= suggestionTextLimit) {
                 if (!blockSuggestionsReload) {
-                    withContext(Dispatchers.IO) {
+                    launch(Dispatchers.IO) {
                         loadingSuggestionsInProgress = true
                         val result = manager.loadSuggestions(userId)
                         loadingSuggestionsInProgress = false
@@ -186,6 +153,59 @@ fun<U: UserInfo> DialogAccountChooser(
             focusRequester.requestFocus()
         }
     }
+}
+
+@Composable
+private fun<U: UserInfo> UserIdTextField(
+    manager: AccountManager<U>,
+    userInfo: U,
+    textFieldValue: MutableState<TextFieldValue>,
+    loadingInProgress: Boolean,
+    modifier: Modifier,
+    inputTextSize: TextUnit,
+    resultTextSize: TextUnit,
+    inputValidator: (Char) -> Boolean,
+    onDoneRequest: () -> Unit
+) {
+    TextField(
+        value = textFieldValue.value,
+        modifier = modifier,
+        singleLine = true,
+        textStyle = TextStyle(fontSize = inputTextSize, fontFamily = FontFamily.Monospace),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = cpsColors.background
+        ),
+        onValueChange = {
+            if (it.text.all(inputValidator)) textFieldValue.value = it
+        },
+        placeholder = {
+            Text(
+                text = buildString {
+                    append(manager.userIdTitle)
+                    if (manager is AccountSuggestionsProvider) append(" or search query")
+                },
+                color = cpsColors.textColorAdditional
+            )
+        },
+        label = {
+            Text(
+                text = makeUserInfoSpan(userInfo, manager),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = resultTextSize
+            )
+        },
+        trailingIcon = {
+            TextFieldMainIcon(
+                loadingInProgress = loadingInProgress,
+                userInfoStatus = userInfo.status,
+                iconSize = 32.dp,
+                onDoneClick = onDoneRequest
+            )
+        },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { onDoneRequest() }),
+    )
 }
 
 @Composable
@@ -323,16 +343,8 @@ fun<U: UserInfo> makeUserInfoSpan(userInfo: U, manager: AccountManager<U>): Anno
         withStyle(SpanStyle(color = cpsColors.textColor)) {
             when (userInfo.status) {
                 STATUS.OK -> append(manager.makeOKInfoSpan(userInfo))
-                STATUS.NOT_FOUND -> {
-                    withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-                        append("User not found")
-                    }
-                }
-                STATUS.FAILED -> {
-                    withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-                        append("Load failed")
-                    }
-                }
+                STATUS.NOT_FOUND -> append(AnnotatedString("User not found", SpanStyle(fontStyle = FontStyle.Italic)))
+                STATUS.FAILED -> append(AnnotatedString("Loading failed", SpanStyle(fontStyle = FontStyle.Italic)))
             }
         }
     }
