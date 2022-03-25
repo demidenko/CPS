@@ -45,8 +45,12 @@ fun CPSTopBar(
         contentPadding = PaddingValues(start = 10.dp),
         modifier = Modifier.height(56.dp)
     ) {
-        Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-            CPSTitle(screen = currentScreen, modifier = Modifier.fillMaxWidth().align(Alignment.CenterStart))
+        Box(modifier = Modifier
+            .weight(1f)
+            .fillMaxHeight()) {
+            CPSTitle(screen = currentScreen, modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterStart))
             androidx.compose.animation.AnimatedVisibility(
                 visible = showUIPanel,
                 enter = expandHorizontally(expandFrom = Alignment.Start),
@@ -136,6 +140,16 @@ private fun UIPanel(
                 settingsUI.coloredStatusBar(!coloredStatusBar)
             }
         }
+        /*
+        TODO:
+        1) disable buttons iff recorded list is empty
+        2) disable bar iff none enabled
+        3) on enable click and if none enabled -> open menu
+        4) if someone checked -> enable bar (because of 2)
+         */
+        StatusBarAccountsButton(
+            enabled = coloredStatusBar
+        )
         DarkLightModeButton(
             mode = darkLightMode,
             isSystemInDarkMode = isSystemInDarkTheme()

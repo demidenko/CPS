@@ -4,9 +4,13 @@ import android.content.Context
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import com.demich.cps.accounts.allAccountManagers
@@ -18,6 +22,7 @@ import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 @Composable
 fun CPSStatusBar(
@@ -104,3 +109,59 @@ private fun ColorizeStatusBar(
     )
 }
 
+@Composable
+internal fun StatusBarAccountsButton(
+    enabled: Boolean
+) {
+    var showPopup by rememberSaveable { mutableStateOf(false) }
+    Box {
+        CPSIconButton(
+            icon = Icons.Default.ExpandMore,
+            enabled = enabled,
+            onState = enabled
+        ) {
+            showPopup = true
+        }
+        StatusBarAccountsPopup(expanded = showPopup) { showPopup = false }
+    }
+}
+
+@Composable
+private fun StatusBarAccountsPopup(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit
+) {
+    val context = context
+    val scope = rememberCoroutineScope()
+    val disabledManagers by rememberCollect {
+        context.settingsUI.statusBarDisabledManagers.flow
+    }
+
+    val ratedAccountsArray by rememberCollect {
+        combine(
+            flows = context.allAccountManagers
+                .filterIsInstance<RatedAccountManager<*>>()
+                .map { it.flowOfInfoWithManager() }
+        ) { it }
+    }
+
+    val recordedAccounts by remember {
+        derivedStateOf { ratedAccountsArray.filterNot { it.userInfo.isEmpty() } }
+    }
+
+    CPSDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest
+    ) {
+        recordedAccounts.forEach { (_, manager) ->
+            DropdownMenuItem(onClick = { }) {
+                CPSCheckBox(checked = manager.managerName !in disabledManagers) { checked ->
+                    val newValue = if (checked) disabledManagers - manager.managerName
+                    else disabledManagers + manager.managerName
+                    scope.launch { context.settingsUI.statusBarDisabledManagers(newValue) }
+                }
+                MonospacedText(text = manager.managerName)
+            }
+        }
+    }
+}
