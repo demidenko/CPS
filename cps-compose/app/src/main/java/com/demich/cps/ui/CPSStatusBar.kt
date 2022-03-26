@@ -167,11 +167,9 @@ fun StatusBarButtonsForUIPanel() {
                 scope.launch { settingsUI.coloredStatusBar(!coloredStatusBar) }
             }
         }
-        Box {
+        if (coloredStatusBar) Box {
             CPSIconButton(
                 icon = Icons.Default.ExpandMore,
-                enabled = coloredStatusBar,
-                onState = coloredStatusBar,
                 onClick = { showPopup = true }
             )
             StatusBarAccountsPopup(
@@ -227,6 +225,5 @@ private fun StatusBarAccountsPopup(
                 }
             )
         }
-
     }
 }
