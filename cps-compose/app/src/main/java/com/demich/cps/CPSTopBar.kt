@@ -119,9 +119,8 @@ private fun UIPanel(
 ) = Row(modifier = modifier.background(cpsColors.background)) {
     val scope = rememberCoroutineScope()
 
-    val settingsUI = context.settingsUI
+    val settingsUI = with(context) { remember { settingsUI } }
     val useOriginalColors by rememberCollect { settingsUI.useOriginalColors.flow }
-    val coloredStatusBar by rememberCollect { settingsUI.coloredStatusBar.flow }
     val darkLightMode by rememberCollect { settingsUI.darkLightMode.flow }
 
     CPSIconButton(icon = Icons.Default.Close, onClick = onClosePanel)
@@ -135,21 +134,7 @@ private fun UIPanel(
                 settingsUI.useOriginalColors(!useOriginalColors)
             }
         }
-        CPSIconButton(icon = Icons.Default.WebAsset, onState = coloredStatusBar) {
-            scope.launch {
-                settingsUI.coloredStatusBar(!coloredStatusBar)
-            }
-        }
-        /*
-        TODO:
-        1) disable buttons iff recorded list is empty
-        2) disable bar iff none enabled
-        3) on enable click and if none enabled -> open menu
-        4) if someone checked -> enable bar (because of 2)
-         */
-        StatusBarAccountsButton(
-            enabled = coloredStatusBar
-        )
+        StatusBarButtonsForUIPanel()
         DarkLightModeButton(
             mode = darkLightMode,
             isSystemInDarkMode = isSystemInDarkTheme()

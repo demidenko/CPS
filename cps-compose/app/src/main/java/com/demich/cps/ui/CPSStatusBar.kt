@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.WebAsset
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -117,6 +118,31 @@ private fun ColorizeStatusBar(
     systemUiController.setStatusBarColor(
         color = lerp(offColor, statusBarColor, koef),
         darkIcons = MaterialTheme.colors.isLight
+    )
+}
+
+
+@Composable
+fun StatusBarButtonsForUIPanel() {
+    val scope = rememberCoroutineScope()
+
+    val settingsUI = with(context) { remember { settingsUI } }
+    val coloredStatusBar by rememberCollect { settingsUI.coloredStatusBar.flow }
+
+    /*
+    TODO:
+    1) disable buttons iff recorded list is empty
+    2) disable bar iff none enabled
+    3) on enable click and if none enabled -> open menu
+    4) if someone checked -> enable bar (because of 2)
+     */
+    CPSIconButton(icon = Icons.Default.WebAsset, onState = coloredStatusBar) {
+        scope.launch {
+            settingsUI.coloredStatusBar(!coloredStatusBar)
+        }
+    }
+    StatusBarAccountsButton(
+        enabled = coloredStatusBar
     )
 }
 
