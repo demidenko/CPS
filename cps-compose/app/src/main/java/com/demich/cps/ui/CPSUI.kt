@@ -100,7 +100,10 @@ fun CPSCheckBox(
         checked = checked,
         modifier = modifier,
         enabled = enabled,
-        onCheckedChange = onCheckedChange
+        onCheckedChange = onCheckedChange,
+        colors = CheckboxDefaults.colors(
+            checkedColor = cpsColors.colorAccent
+        )
     )
 }
 

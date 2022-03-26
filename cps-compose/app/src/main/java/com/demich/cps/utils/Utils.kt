@@ -4,11 +4,14 @@ import android.content.Context
 import android.text.Html
 import android.text.Spanned
 import android.widget.Toast
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.SaverScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
 import androidx.core.text.HtmlCompat
 import io.ktor.client.*
 import io.ktor.client.features.*
@@ -68,6 +71,12 @@ fun fromHTML(s: String): Spanned {
         Html.fromHtml(s)
     }
 }
+
+@Stable
+fun Modifier.paddingHorizontal(padding: Dp) = this.padding(start = padding, end = padding)
+
+@Stable
+fun Modifier.paddingVertical(padding: Dp) = this.padding(top = padding, bottom = padding)
 
 data class ComparablePair<A: Comparable<A>, B: Comparable<B>>(
     val first: A,

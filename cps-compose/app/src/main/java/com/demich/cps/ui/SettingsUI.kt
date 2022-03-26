@@ -21,6 +21,7 @@ class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
 
     val coloredStatusBar = Item(booleanPreferencesKey("use_status_bar"), true)
     val statusBarDisabledManagers = Item(stringSetPreferencesKey("status_bar_disabled_managers"), emptySet())
+    val statusBarOrderByMaximum = Item(booleanPreferencesKey("status_bar_order_by_max"), true)
 }
 
 enum class DarkLightMode {
