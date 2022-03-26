@@ -144,38 +144,46 @@ fun StatusBarButtonsForUIPanel() {
         }
     }
 
-    /*
-    TODO:
-    1) disable buttons iff recorded list is empty
-    2) disable bar iff none enabled
-    3) on enable click and if none enabled -> open menu
-    4) if someone checked -> enable bar (because of 2)
-     */
     var showPopup by rememberSaveable { mutableStateOf(false) }
     val orderByMaximum by rememberCollect { settingsUI.statusBarOrderByMaximum.flow }
     val disabledManagers by rememberCollect { settingsUI.statusBarDisabledManagers.flow }
 
-    CPSIconButton(icon = Icons.Default.WebAsset, onState = coloredStatusBar) {
-        scope.launch {
-            settingsUI.coloredStatusBar(!coloredStatusBar)
+    val noneEnabled by remember {
+        derivedStateOf {
+            recordedAccounts.all {
+                it.manager.managerName in disabledManagers
+            }
         }
     }
 
-    Box {
+    if (recordedAccounts.isNotEmpty()) {
         CPSIconButton(
-            icon = Icons.Default.ExpandMore,
-            enabled = coloredStatusBar,
-            onState = coloredStatusBar,
-            onClick = { showPopup = true }
-        )
-        StatusBarAccountsPopup(
-            expanded = showPopup,
-            orderByMaximum = orderByMaximum,
-            disabledManagers = disabledManagers,
-            recordedAccounts = recordedAccounts,
-            onDismissRequest = { showPopup = false }
-        )
+            icon = Icons.Default.WebAsset,
+            onState = coloredStatusBar && !noneEnabled,
+        ) {
+            if (noneEnabled) {
+                showPopup = true
+            } else {
+                scope.launch { settingsUI.coloredStatusBar(!coloredStatusBar) }
+            }
+        }
+        Box {
+            CPSIconButton(
+                icon = Icons.Default.ExpandMore,
+                enabled = coloredStatusBar,
+                onState = coloredStatusBar,
+                onClick = { showPopup = true }
+            )
+            StatusBarAccountsPopup(
+                expanded = showPopup,
+                orderByMaximum = orderByMaximum,
+                disabledManagers = disabledManagers,
+                recordedAccounts = recordedAccounts,
+                onDismissRequest = { showPopup = false }
+            )
+        }
     }
+
 }
 
 
