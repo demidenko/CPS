@@ -126,53 +126,10 @@ private fun ColorizeStatusBar(
 fun StatusBarButtonsForUIPanel() {
     val scope = rememberCoroutineScope()
 
-    val settingsUI = with(context) { remember { settingsUI } }
-    val coloredStatusBar by rememberCollect { settingsUI.coloredStatusBar.flow }
-
-    /*
-    TODO:
-    1) disable buttons iff recorded list is empty
-    2) disable bar iff none enabled
-    3) on enable click and if none enabled -> open menu
-    4) if someone checked -> enable bar (because of 2)
-     */
-    CPSIconButton(icon = Icons.Default.WebAsset, onState = coloredStatusBar) {
-        scope.launch {
-            settingsUI.coloredStatusBar(!coloredStatusBar)
-        }
-    }
-    StatusBarAccountsButton(
-        enabled = coloredStatusBar
-    )
-}
-
-@Composable
-internal fun StatusBarAccountsButton(
-    enabled: Boolean
-) {
-    var showPopup by rememberSaveable { mutableStateOf(false) }
-    Box {
-        CPSIconButton(
-            icon = Icons.Default.ExpandMore,
-            enabled = enabled,
-            onState = enabled
-        ) {
-            showPopup = true
-        }
-        StatusBarAccountsPopup(expanded = showPopup) { showPopup = false }
-    }
-}
-
-@Composable
-private fun StatusBarAccountsPopup(
-    expanded: Boolean,
-    onDismissRequest: () -> Unit
-) {
     val context = context
-    val scope = rememberCoroutineScope()
+    val settingsUI = remember { context.settingsUI }
 
-    val disabledManagers by rememberCollect { context.settingsUI.statusBarDisabledManagers.flow }
-    val orderByMaximum by rememberCollect { context.settingsUI.statusBarOrderByMaximum.flow }
+    val coloredStatusBar by rememberCollect { settingsUI.coloredStatusBar.flow }
 
     val ratedAccountsArray by rememberCollect {
         combine(
@@ -181,10 +138,57 @@ private fun StatusBarAccountsPopup(
                 .map { it.flowOfInfoWithManager() }
         ) { it }
     }
-
     val recordedAccounts by remember {
-        derivedStateOf { ratedAccountsArray.filterNot { it.userInfo.isEmpty() } }
+        derivedStateOf {
+            ratedAccountsArray.filterNot { it.userInfo.isEmpty() }
+        }
     }
+
+    /*
+    TODO:
+    1) disable buttons iff recorded list is empty
+    2) disable bar iff none enabled
+    3) on enable click and if none enabled -> open menu
+    4) if someone checked -> enable bar (because of 2)
+     */
+    var showPopup by rememberSaveable { mutableStateOf(false) }
+    val orderByMaximum by rememberCollect { settingsUI.statusBarOrderByMaximum.flow }
+    val disabledManagers by rememberCollect { settingsUI.statusBarDisabledManagers.flow }
+
+    CPSIconButton(icon = Icons.Default.WebAsset, onState = coloredStatusBar) {
+        scope.launch {
+            settingsUI.coloredStatusBar(!coloredStatusBar)
+        }
+    }
+
+    Box {
+        CPSIconButton(
+            icon = Icons.Default.ExpandMore,
+            enabled = coloredStatusBar,
+            onState = coloredStatusBar,
+            onClick = { showPopup = true }
+        )
+        StatusBarAccountsPopup(
+            expanded = showPopup,
+            orderByMaximum = orderByMaximum,
+            disabledManagers = disabledManagers,
+            recordedAccounts = recordedAccounts,
+            onDismissRequest = { showPopup = false }
+        )
+    }
+}
+
+
+@Composable
+private fun StatusBarAccountsPopup(
+    expanded: Boolean,
+    orderByMaximum: Boolean,
+    disabledManagers: Set<String>,
+    recordedAccounts: List<UserInfoWithManager<out UserInfo>>,
+    onDismissRequest: () -> Unit
+) {
+    val settingsUI = with(context) { remember { settingsUI } }
+    val scope = rememberCoroutineScope()
 
     DropdownMenu(
         expanded = expanded,
@@ -196,7 +200,7 @@ private fun StatusBarAccountsPopup(
                 CPSCheckBox(checked = manager.managerName !in disabledManagers) { checked ->
                     val newValue = if (checked) disabledManagers - manager.managerName
                     else disabledManagers + manager.managerName
-                    scope.launch { context.settingsUI.statusBarDisabledManagers(newValue) }
+                    scope.launch { settingsUI.statusBarDisabledManagers(newValue) }
                 }
                 MonospacedText(text = manager.managerName)
             }
@@ -205,13 +209,13 @@ private fun StatusBarAccountsPopup(
             Button(
                 content = { Text(text = "worst", fontWeight = FontWeight.Bold.takeIf { !orderByMaximum }) },
                 onClick = {
-                    scope.launch { context.settingsUI.statusBarOrderByMaximum(false) }
+                    scope.launch { settingsUI.statusBarOrderByMaximum(false) }
                 }
             )
             Button(
                 content = { Text(text = "best", fontWeight = FontWeight.Bold.takeIf { orderByMaximum }) },
                 onClick = {
-                    scope.launch { context.settingsUI.statusBarOrderByMaximum(true) }
+                    scope.launch { settingsUI.statusBarOrderByMaximum(true) }
                 }
             )
         }
