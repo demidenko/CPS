@@ -20,20 +20,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable
 fun CPSTopBar(
-    navController: NavHostController,
-    currentBackStackEntry: NavBackStackEntry?
+    navController: NavHostController
 ) {
-    val currentScreen = currentBackStackEntry?.destination?.getScreen()
+    val currentScreen by remember(navController) {
+        navController.currentBackStackEntryFlow.map { it.destination.getScreen() }
+    }.collectAsState(initial = null)
 
     var showUIPanel by rememberSaveable { mutableStateOf(false) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
@@ -48,9 +49,12 @@ fun CPSTopBar(
         Box(modifier = Modifier
             .weight(1f)
             .fillMaxHeight()) {
-            CPSTitle(screen = currentScreen, modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.CenterStart))
+            CPSTitle(
+                screen = currentScreen,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterStart)
+            )
             androidx.compose.animation.AnimatedVisibility(
                 visible = showUIPanel,
                 enter = expandHorizontally(expandFrom = Alignment.Start),

@@ -6,32 +6,44 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AllOut
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Subtitles
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.demich.cps.accounts.AccountsBottomBar
 import com.demich.cps.contests.ContestsBottomBar
 import com.demich.cps.news.NewsBottomBar
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.context
+import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.systemuicontroller.SystemUiController
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun CPSBottomBar(
     navController: NavHostController,
-    currentBackStackEntry: NavBackStackEntry?,
     cpsViewModels: CPSViewModels,
-    systemUiController: SystemUiController,
-    devModeEnabled: Boolean
+    systemUiController: SystemUiController
 ) {
     systemUiController.setNavigationBarColor(
         color = cpsColors.backgroundNavigation,
         darkIcons = MaterialTheme.colors.isLight
     )
-    val currentScreen = currentBackStackEntry?.destination?.getScreen() ?: return
-    if (currentScreen.enableBottomBar) {
+
+    val currentScreen by remember(navController) {
+        navController.currentBackStackEntryFlow.map { it.destination.getScreen() }
+    }.collectAsState(initial = null)
+
+    currentScreen?.takeIf { it.enableBottomBar }?.let { screen ->
         Row(
             modifier = Modifier
                 .height(56.dp) //as BottomNavigationHeight
@@ -40,16 +52,15 @@ fun CPSBottomBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             CPSBottomBarAdditional(
-                currentScreen = currentScreen,
+                currentScreen = screen,
                 navController = navController,
                 cpsViewModels = cpsViewModels,
                 modifier = Modifier.weight(1f)
             )
             CPSBottomBarVerticalDivider()
             CPSBottomBarMain(
-                currentScreen = currentScreen,
+                currentScreen = screen,
                 navController = navController,
-                devModeEnabled = devModeEnabled,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -60,16 +71,24 @@ fun CPSBottomBar(
 private fun CPSBottomBarMain(
     currentScreen: Screen,
     navController: NavHostController,
-    devModeEnabled: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val devModeEnabled by with(context) { rememberCollect { settingsDev.devModeEnabled.flow } }
+    val majorScreens = remember {
+        listOf(
+            Screen.Accounts to Icons.Rounded.Person,
+            Screen.News to Icons.Default.Subtitles,
+            Screen.Contests to Icons.Filled.EmojiEvents,
+            Screen.Development to Icons.Default.AllOut
+        )
+    }
     BottomNavigation(
         modifier = modifier.fillMaxWidth(),
         backgroundColor = cpsColors.backgroundNavigation,
         elevation = 0.dp
     ) {
-        Screen.majorScreens().forEach { (screen, icon) ->
-            if (screen == Screen.Development && !devModeEnabled) return@forEach
+        for ((screen, icon) in majorScreens) {
+            if (screen == Screen.Development && !devModeEnabled) continue
             val isSelected = screen == currentScreen.rootScreen
             BottomNavigationItem(
                 icon = {

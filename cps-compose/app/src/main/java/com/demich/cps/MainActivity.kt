@@ -5,11 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AllOut
-import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.Subtitles
-import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -19,7 +14,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.demich.cps.accounts.AccountsScreen
 import com.demich.cps.accounts.AccountsViewModel
@@ -31,7 +25,6 @@ import com.demich.cps.ui.CPSStatusBar
 import com.demich.cps.ui.LocalUseOriginalColors
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
-import com.demich.cps.utils.context
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {
@@ -62,28 +55,22 @@ fun CPSScaffold(
 ) {
     //val context = context
 
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val systemUiController = rememberSystemUiController()
+
+    CPSStatusBar(systemUiController)
 
     val cpsViewModels = CPSViewModels(
         accountsViewModel = viewModel()
     )
 
-    CPSStatusBar(systemUiController)
-
-    val devModeEnabled by context.settingsDev.devModeEnabled.collectAsState()
-
     Scaffold(
         topBar = { CPSTopBar(
-            navController = navController,
-            currentBackStackEntry = currentBackStackEntry
+            navController = navController
         ) },
         bottomBar = { CPSBottomBar(
             navController = navController,
-            currentBackStackEntry = currentBackStackEntry,
             cpsViewModels = cpsViewModels,
-            systemUiController = systemUiController,
-            devModeEnabled = devModeEnabled
+            systemUiController = systemUiController
         ) }
     ) { innerPadding ->
         NavHost(
@@ -135,12 +122,6 @@ sealed class Screen(
     object Development: Screen("develop")
 
     companion object {
-        fun majorScreens() = listOf(
-            Accounts to Icons.Rounded.Person,
-            News to Icons.Default.Subtitles,
-            Contests to Icons.Filled.EmojiEvents,
-            Development to Icons.Default.AllOut
-        )
         fun all() = listOf(
             Accounts,
             News,
