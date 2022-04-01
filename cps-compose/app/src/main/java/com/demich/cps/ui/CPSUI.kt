@@ -38,6 +38,7 @@ fun CPSIconButton(
     color: Color = cpsColors.textColor,
     onState: Boolean = true,
     enabled: Boolean = true,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     val alpha by animateFloatAsState(
@@ -46,7 +47,8 @@ fun CPSIconButton(
     )
     IconButton(
         onClick = onClick,
-        enabled = enabled
+        enabled = enabled,
+        modifier = modifier
     ) {
         Icon(
             imageVector = icon,

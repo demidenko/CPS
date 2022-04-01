@@ -7,6 +7,10 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Expand
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,10 +23,13 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
+import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @Composable
 fun<U: UserInfo> PanelWithUI(
@@ -33,7 +40,10 @@ fun<U: UserInfo> PanelWithUI(
     val (userInfo, manager) = userInfoWithManager
     val loadingStatus by remember { accountsViewModel.loadingStatusFor(manager) }
 
-    var showUI by remember { mutableStateOf(false) }
+    var lastClickMillis by remember { mutableStateOf(0L) }
+    val uiAlpha by hidingState(lastClickMillis)
+
+    if (loadingStatus == LoadingStatus.LOADING) lastClickMillis = 0
 
     if (!userInfo.isEmpty()) {
         Box(modifier = modifier
@@ -41,12 +51,9 @@ fun<U: UserInfo> PanelWithUI(
             .heightIn(min = 48.dp)
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onPress = {
+                    onTap = {
                         if (loadingStatus != LoadingStatus.LOADING) {
-                            showUI = true
-                            tryAwaitRelease()
-                            delay(300)
-                            showUI = false
+                            lastClickMillis = getCurrentTime().toEpochMilliseconds()
                         }
                     }
                 )
@@ -54,24 +61,53 @@ fun<U: UserInfo> PanelWithUI(
         ) {
             manager.Panel(userInfo)
 
-            AutoHiding(
-                currentState = remember(loadingStatus, showUI) { loadingStatus to showUI },
-                startHidingState = LoadingStatus.PENDING to true,
-                finishHidingState = LoadingStatus.PENDING to false,
-                hideDelay = 3000,
-                hideDuration = 2000,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(end = 5.dp)
-            ) {
-                CPSReloadingButton(loadingStatus = it.first) {
-                    accountsViewModel.reload(manager)
+            Row(modifier = Modifier.align(Alignment.CenterEnd)) {
+                if (loadingStatus != LoadingStatus.LOADING && uiAlpha > 0f) {
+                    CPSIconButton(
+                        icon = Icons.Default.UnfoldMore,
+                        modifier = Modifier.alpha(uiAlpha)
+                    ) {
+                        //TODO: expand account
+                    }
+                }
+                if (loadingStatus != LoadingStatus.PENDING || uiAlpha > 0f) {
+                    CPSReloadingButton(
+                        loadingStatus = loadingStatus,
+                        modifier = Modifier.alpha(if (loadingStatus == LoadingStatus.PENDING) uiAlpha else 1f)
+                    ) {
+                        accountsViewModel.reload(manager)
+                    }
                 }
             }
         }
     }
 }
 
+@Composable
+private fun hidingState(
+    lastClickMillis: Long
+): State<Float> {
+    val a = remember { mutableStateOf(0f) }
+    val delayMillis = 3000
+    val durationMillis = 2000
+    LaunchedEffect(key1 = lastClickMillis) {
+        a.value = 1f
+        while (isActive) {
+            val dist = getCurrentTime().toEpochMilliseconds() - lastClickMillis
+            if (dist > delayMillis + durationMillis) {
+                a.value = 0f
+                break
+            }
+            if (dist < delayMillis) {
+                delay(delayMillis - dist)
+            } else {
+                a.value = (durationMillis - (dist - delayMillis)).toFloat() / durationMillis
+                delay(100)
+            }
+        }
+    }
+    return a
+}
 
 @Composable
 private fun<S> AutoHiding(
