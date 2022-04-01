@@ -8,8 +8,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Expand
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,7 +33,8 @@ import kotlinx.coroutines.isActive
 fun<U: UserInfo> PanelWithUI(
     userInfoWithManager: UserInfoWithManager<U>,
     accountsViewModel: AccountsViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onExpandRequest: () -> Unit
 ) {
     val (userInfo, manager) = userInfoWithManager
     val loadingStatus by remember { accountsViewModel.loadingStatusFor(manager) }
@@ -51,10 +50,13 @@ fun<U: UserInfo> PanelWithUI(
             .heightIn(min = 48.dp)
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onTap = {
+                    onPress = {
                         if (loadingStatus != LoadingStatus.LOADING) {
                             lastClickMillis = getCurrentTime().toEpochMilliseconds()
                         }
+                    },
+                    onDoubleTap = {
+                        onExpandRequest()
                     }
                 )
             }
@@ -65,10 +67,9 @@ fun<U: UserInfo> PanelWithUI(
                 if (loadingStatus != LoadingStatus.LOADING && uiAlpha > 0f) {
                     CPSIconButton(
                         icon = Icons.Default.UnfoldMore,
-                        modifier = Modifier.alpha(uiAlpha)
-                    ) {
-                        //TODO: expand account
-                    }
+                        modifier = Modifier.alpha(uiAlpha),
+                        onClick = onExpandRequest
+                    )
                 }
                 if (loadingStatus != LoadingStatus.PENDING || uiAlpha > 0f) {
                     CPSReloadingButton(

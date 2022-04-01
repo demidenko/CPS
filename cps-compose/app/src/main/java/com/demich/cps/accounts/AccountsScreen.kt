@@ -27,9 +27,8 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
-import com.demich.cps.utils.touchLog
+import com.demich.cps.utils.showToast
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -69,7 +68,10 @@ fun AccountsScreen(navController: NavController, accountsViewModel: AccountsView
                         userInfoWithManager = it,
                         accountsViewModel = accountsViewModel,
                         modifier = Modifier.padding(start = 10.dp, top = 10.dp)
-                    )
+                    ) {
+                        //TODO: expand account
+                        context.showToast("expand for ${it.manager.managerName}")
+                    }
                 }
             }
         }
