@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.AddBox
@@ -27,7 +28,6 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
-import com.demich.cps.utils.showToast
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -69,13 +69,22 @@ fun AccountsScreen(navController: NavController, accountsViewModel: AccountsView
                         accountsViewModel = accountsViewModel,
                         modifier = Modifier.padding(start = 10.dp, top = 10.dp)
                     ) {
-                        //TODO: expand account
-                        context.showToast("expand for ${it.type.name}")
+                        navController.navigate(route = "account/${it.type}")
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+fun AccountExpandedScreen(
+    type: AccountManagers,
+    navController: NavController
+) {
+    val context = context
+    val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
+    Text(text = manager.type.name)
 }
 
 @Composable

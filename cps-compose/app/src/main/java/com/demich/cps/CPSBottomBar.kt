@@ -40,7 +40,7 @@ fun CPSBottomBar(
     )
 
     val currentScreen by remember(navController) {
-        navController.currentBackStackEntryFlow.map { it.destination.getScreen() }
+        navController.currentBackStackEntryFlow.map { it.getScreen() }
     }.collectAsState(initial = null)
 
     currentScreen?.takeIf { it.enableBottomBar }?.let { screen ->

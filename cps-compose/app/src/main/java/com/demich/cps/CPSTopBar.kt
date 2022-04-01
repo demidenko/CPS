@@ -33,7 +33,7 @@ fun CPSTopBar(
     navController: NavHostController
 ) {
     val currentScreen by remember(navController) {
-        navController.currentBackStackEntryFlow.map { it.destination.getScreen() }
+        navController.currentBackStackEntryFlow.map { it.getScreen() }
     }.collectAsState(initial = null)
 
     var showUIPanel by rememberSaveable { mutableStateOf(false) }

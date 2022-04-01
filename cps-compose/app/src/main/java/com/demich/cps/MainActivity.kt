@@ -10,13 +10,14 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavDestination
-import androidx.navigation.NavHostController
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.demich.cps.accounts.AccountExpandedScreen
 import com.demich.cps.accounts.AccountsScreen
 import com.demich.cps.accounts.AccountsViewModel
+import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.ContestsSettingsScreen
 import com.demich.cps.news.NewsScreen
@@ -31,8 +32,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val navController = rememberNavController()
-
             val useOriginalColors by settingsUI.useOriginalColors.collectAsState()
             val darkLightMode by settingsUI.darkLightMode.collectAsState()
 
@@ -40,9 +39,7 @@ class MainActivity : ComponentActivity() {
                 LocalUseOriginalColors provides useOriginalColors
             ) {
                 CPSTheme(darkTheme = darkLightMode.isDarkMode()) {
-                    CPSScaffold(
-                        navController = navController
-                    )
+                    CPSScaffold()
                 }
             }
         }
@@ -50,10 +47,9 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun CPSScaffold(
-    navController: NavHostController
-) {
+fun CPSScaffold() {
     //val context = context
+    val navController = rememberNavController()
 
     val systemUiController = rememberSystemUiController()
 
@@ -80,6 +76,10 @@ fun CPSScaffold(
         ) {
             composable(Screen.Accounts.route) {
                 AccountsScreen(navController, cpsViewModels.accountsViewModel)
+            }
+            composable(Screen.AccountExpanded.route) {
+                val type = (it.getScreen() as Screen.AccountExpanded).type
+                AccountExpandedScreen(type, navController)
             }
             composable(Screen.News.route) {
                 NewsScreen(navController)
@@ -112,13 +112,22 @@ sealed class Screen(
     private val root: Screen? = null
 ) {
     val rootScreen: Screen get() = root ?: this
-    val subtitle: String get() = "::$route"
+    open val subtitle: String get() = "::$route"
 
     object Accounts: Screen("accounts")
+    class AccountExpanded(val type: AccountManagers): Screen(route = route, root = Accounts) {
+        companion object {
+            const val route = "account/{manager}"
+        }
+        override val subtitle get() = "::accounts.$type"
+    }
+
     object News: Screen("news")
     object NewsSettings: Screen("news.settings", root = News, enableBottomBar = false)
+
     object Contests: Screen("contests")
     object ContestsSettings: Screen("contests.settings", root = Contests, enableBottomBar = false)
+
     object Development: Screen("develop")
 
     companion object {
@@ -133,7 +142,12 @@ sealed class Screen(
     }
 }
 
-fun NavDestination.getScreen(): Screen {
+fun NavBackStackEntry.getScreen(): Screen {
+    val route = destination.route
+    if (route == Screen.AccountExpanded.route) {
+        val type = AccountManagers.valueOf(arguments?.getString("manager")!!)
+        return Screen.AccountExpanded(type)
+    }
     return Screen.all().first { it.route == route }
 }
 
