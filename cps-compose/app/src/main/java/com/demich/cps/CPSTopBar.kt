@@ -5,14 +5,12 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.rounded.PeopleAlt
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -21,6 +19,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.demich.cps.accounts.BuildAccountsMenu
+import com.demich.cps.news.BuildNewsMenu
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
@@ -80,13 +80,11 @@ fun CPSTopBar(
             CPSDropdownMenuItem(title = "About", icon = Icons.Outlined.Info) {
                 showAbout = true
             }
-            if (currentScreen == Screen.News) {
-                Divider(color = cpsColors.dividerColor)
-                CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
-                    navController.navigate(Screen.NewsSettings.route)
-                }
-                CPSDropdownMenuItem(title = "Follow List", icon = Icons.Rounded.PeopleAlt) {
-                    //TODO Open FollowList
+            currentScreen?.let {
+                when (it) {
+                    is Screen.News -> BuildNewsMenu(it, navController)
+                    is Screen.AccountExpanded -> BuildAccountsMenu(it)
+                    else -> Unit
                 }
             }
         }

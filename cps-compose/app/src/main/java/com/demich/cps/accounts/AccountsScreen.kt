@@ -6,11 +6,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,7 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.demich.cps.R
+import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.*
+import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.MonospacedText
@@ -91,6 +97,22 @@ fun AccountExpandedScreen(
 fun AccountsBottomBar(accountsViewModel: AccountsViewModel) {
     AddAccountButton(accountsViewModel)
     ReloadAccountsButton(accountsViewModel)
+}
+
+@Composable
+fun CPSDropdownMenuScope.BuildAccountsMenu(currentScreen: Screen) {
+    if (currentScreen is Screen.AccountExpanded) {
+        Divider(color = cpsColors.dividerColor)
+        CPSDropdownMenuItem(title = "Delete", icon = Icons.Default.DeleteForever) {
+            //TODO: Delete userInfo
+        }
+        CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
+            //TODO: Open Settings
+        }
+        CPSDropdownMenuItem(title = "Origin", icon = Icons.Default.Photo) {
+            //TODO: Open origin page
+        }
+    }
 }
 
 @Composable
