@@ -57,7 +57,9 @@ fun<U: UserInfo> PanelWithUI(
                         }
                     },
                     onDoubleTap = {
-                        onExpandRequest()
+                        if (loadingStatus != LoadingStatus.LOADING) {
+                            onExpandRequest()
+                        }
                     }
                 )
             }
