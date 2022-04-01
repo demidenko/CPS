@@ -52,6 +52,7 @@ fun<U: UserInfo> PanelWithUI(
                 detectTapGestures(
                     onPress = {
                         if (loadingStatus != LoadingStatus.LOADING) {
+                            tryAwaitRelease()
                             lastClickMillis = getCurrentTime().toEpochMilliseconds()
                         }
                     },
