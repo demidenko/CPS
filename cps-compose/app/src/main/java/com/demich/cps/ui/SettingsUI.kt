@@ -6,8 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.utils.CPSDataStore
 
 class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
@@ -20,7 +20,7 @@ class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
     val useOriginalColors = Item(booleanPreferencesKey("use_original_colors"), false)
 
     val coloredStatusBar = Item(booleanPreferencesKey("use_status_bar"), true)
-    val statusBarDisabledManagers = Item(stringSetPreferencesKey("status_bar_disabled_managers"), emptySet())
+    val statusBarDisabledManagers = itemEnumSet<AccountManagers>("status_bar_disabled_managers")
     val statusBarOrderByMaximum = Item(booleanPreferencesKey("status_bar_order_by_max"), true)
 }
 

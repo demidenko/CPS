@@ -25,8 +25,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 
+enum class AccountManagers {
+    codeforces,
+    atcoder,
+    codechef,
+    dmoj,
+    acmp,
+    timus
+}
 
-abstract class AccountManager<U: UserInfo>(val context: Context, val managerName: String) {
+abstract class AccountManager<U: UserInfo>(val context: Context, val type: AccountManagers) {
 
     abstract val userIdTitle: String
     abstract val urlHomePage: String
@@ -67,8 +75,8 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val managerName
     }
 }
 
-abstract class RatedAccountManager<U: UserInfo>(context: Context, managerName: String):
-    AccountManager<U>(context, managerName)
+abstract class RatedAccountManager<U: UserInfo>(context: Context, type: AccountManagers):
+    AccountManager<U>(context, type)
 {
     override val userIdTitle get() = "handle"
 
@@ -160,7 +168,9 @@ abstract class UserInfo {
 data class UserInfoWithManager<U: UserInfo>(
     val userInfo: U,
     val manager: AccountManager<U>
-)
+) {
+    val type: AccountManagers get() = manager.type
+}
 
 enum class HandleColor {
     GRAY,
@@ -183,7 +193,7 @@ enum class HandleColor {
     }
 
     class UnknownHandleColorException(color: HandleColor, manager: RatedAccountManager<*>):
-        Throwable("Manager ${manager.managerName} does not support color ${color.name}")
+        Throwable("Manager ${manager.type.name} does not support color ${color.name}")
 }
 
 data class AccountSuggestion(
@@ -218,7 +228,7 @@ fun notifyRatingChange(
         setContentTitle("$handle new rating: $newRating")
         val difference = signedToString(newRating - oldRating)
         setContentText("$difference (rank: $rank)")
-        setSubText("${accountManager.managerName} rating changes")
+        setSubText("${accountManager.type.name} rating changes")
         color = accountManager.originalColor(accountManager.getHandleColor(newRating)).toArgb() //TODO not original but cpsColors
         if (url != null) setContentIntent(makePendingIntentOpenURL(url, accountManager.context))
         if (time != null) {

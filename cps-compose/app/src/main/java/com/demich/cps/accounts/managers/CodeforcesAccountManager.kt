@@ -48,15 +48,14 @@ data class CodeforcesUserInfo(
 
 
 class CodeforcesAccountManager(context: Context):
-    RatedAccountManager<CodeforcesUserInfo>(context, manager_name),
+    RatedAccountManager<CodeforcesUserInfo>(context, AccountManagers.codeforces),
     AccountSettingsProvider,
     AccountSuggestionsProvider,
     RatingRevolutionsProvider
 {
 
     companion object {
-        const val manager_name = "codeforces"
-        private val Context.account_codeforces_dataStore by preferencesDataStore(manager_name)
+        private val Context.account_codeforces_dataStore by preferencesDataStore(AccountManagers.codeforces.name)
     }
 
     override val urlHomePage get() = CodeforcesAPI.URLFactory.main
@@ -256,8 +255,8 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
     AccountSettingsDataStore(manager.context.account_settings_codeforces_dataStore)
 {
     companion object {
-        private val Context.account_settings_codeforces_dataStore by preferencesDataStore(
-            CodeforcesAccountManager.manager_name + "_account_settings")
+        private val Context.account_settings_codeforces_dataStore
+            by preferencesDataStore(AccountManagers.codeforces.name + "_account_settings")
     }
 
     val observeRating = Item(booleanPreferencesKey("observe_rating"), false)

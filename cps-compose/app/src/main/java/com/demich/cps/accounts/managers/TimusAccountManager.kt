@@ -28,12 +28,11 @@ data class TimusUserInfo(
 }
 
 class TimusAccountManager(context: Context):
-    AccountManager<TimusUserInfo>(context, manager_name),
+    AccountManager<TimusUserInfo>(context, AccountManagers.timus),
     AccountSuggestionsProvider
 {
     companion object {
-        const val manager_name = "timus"
-        private val Context.account_timus_dataStore by preferencesDataStore(manager_name)
+        private val Context.account_timus_dataStore by preferencesDataStore(AccountManagers.timus.name)
     }
 
     override val userIdTitle get() = "id"

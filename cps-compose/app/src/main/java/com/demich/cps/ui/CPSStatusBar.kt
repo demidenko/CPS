@@ -89,7 +89,7 @@ private fun makeFlowOfBestOrder(context: Context): Flow<RatedOrder?> =
         flow3 = context.settingsUI.statusBarOrderByMaximum.flow
     ) { orders, disabledManagers, orderByMaximum ->
         orders.filterNotNull()
-            .filter { it.manager.managerName !in disabledManagers }
+            .filter { it.manager.type !in disabledManagers }
             .run {
                 if (orderByMaximum) maxByOrNull { it.order }
                 else minByOrNull { it.order }
@@ -150,9 +150,7 @@ fun StatusBarButtonsForUIPanel() {
 
     val noneEnabled by remember {
         derivedStateOf {
-            recordedAccounts.all {
-                it.manager.managerName in disabledManagers
-            }
+            recordedAccounts.all { it.type in disabledManagers }
         }
     }
 
@@ -189,7 +187,7 @@ fun StatusBarButtonsForUIPanel() {
 private fun StatusBarAccountsPopup(
     expanded: Boolean,
     orderByMaximum: Boolean,
-    disabledManagers: Set<String>,
+    disabledManagers: Set<AccountManagers>,
     recordedAccounts: List<UserInfoWithManager<out UserInfo>>,
     onDismissRequest: () -> Unit
 ) {
@@ -203,12 +201,12 @@ private fun StatusBarAccountsPopup(
     ) {
         recordedAccounts.forEach { (_, manager) ->
             Row(modifier = Modifier.padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                CPSCheckBox(checked = manager.managerName !in disabledManagers) { checked ->
-                    val newValue = if (checked) disabledManagers - manager.managerName
-                    else disabledManagers + manager.managerName
+                CPSCheckBox(checked = manager.type !in disabledManagers) { checked ->
+                    val newValue = if (checked) disabledManagers - manager.type
+                    else disabledManagers + manager.type
                     scope.launch { settingsUI.statusBarDisabledManagers(newValue) }
                 }
-                MonospacedText(text = manager.managerName)
+                MonospacedText(text = manager.type.name)
             }
         }
         Row(modifier = Modifier.paddingHorizontal(10.dp).align(Alignment.CenterHorizontally)) {

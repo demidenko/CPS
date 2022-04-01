@@ -6,6 +6,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -73,6 +74,13 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
             encode = { it.name },
             decode = ::enumValueOf
         )
+
+    inline fun<reified T: Enum<T>> itemEnumSet(name: String) =
+        object : CPSDataStoreItem<Set<T>, Set<String>>() {
+            override val key = stringSetPreferencesKey(name)
+            override fun fromPrefs(s: Set<String>?) = s?.mapTo(mutableSetOf()) { enumValueOf<T>(it) } ?: emptySet()
+            override fun toPrefs(t: Set<T>) = t.mapTo(mutableSetOf()) { it.name }
+        }
 
     inline fun<reified T> itemJsonConvertible(name: String, defaultValue: T) =
         ItemStringConvertible(

@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.managers.AccountManager
+import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.accounts.managers.UserInfo
 import com.demich.cps.utils.LoadingStatus
@@ -14,10 +15,10 @@ import kotlinx.coroutines.launch
 
 
 class AccountsViewModel: ViewModel() {
-    private val loadingStatuses: MutableMap<String, MutableState<LoadingStatus>> = mutableMapOf()
+    private val loadingStatuses: MutableMap<AccountManagers, MutableState<LoadingStatus>> = mutableMapOf()
 
     fun loadingStatusFor(manager: AccountManager<*>): MutableState<LoadingStatus> =
-        loadingStatuses.getOrPut(manager.managerName) { mutableStateOf(LoadingStatus.PENDING) }
+        loadingStatuses.getOrPut(manager.type) { mutableStateOf(LoadingStatus.PENDING) }
 
 
     fun<U: UserInfo> reload(manager: AccountManager<U>) {

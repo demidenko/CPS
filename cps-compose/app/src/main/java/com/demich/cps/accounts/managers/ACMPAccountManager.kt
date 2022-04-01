@@ -26,13 +26,12 @@ data class ACMPUserInfo(
 
 
 class ACMPAccountManager(context: Context):
-    AccountManager<ACMPUserInfo>(context, manager_name),
+    AccountManager<ACMPUserInfo>(context, AccountManagers.acmp),
     AccountSuggestionsProvider
 {
 
     companion object {
-        const val manager_name = "acmp"
-        private val Context.account_acmp_dataStore by preferencesDataStore(manager_name)
+        private val Context.account_acmp_dataStore by preferencesDataStore(AccountManagers.acmp.name)
     }
 
     override val userIdTitle get() = "id"

@@ -66,7 +66,7 @@ fun<U: UserInfo> DialogAccountChooser(
         var ignoreLaunch by remember { mutableStateOf(true) }
 
         AccountChooserHeader(
-            text = "getUser(${manager.managerName}):",
+            text = "getUser(${manager.type.name}):",
             color = cpsColors.textColorAdditional
         ) {
             Icon(imageVector = Icons.Default.Person, contentDescription = null, tint = it)

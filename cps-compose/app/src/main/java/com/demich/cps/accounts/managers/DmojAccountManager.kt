@@ -27,12 +27,11 @@ data class DmojUserInfo(
 }
 
 class DmojAccountManager(context: Context):
-    RatedAccountManager<DmojUserInfo>(context, manager_name),
+    RatedAccountManager<DmojUserInfo>(context, AccountManagers.dmoj),
     AccountSuggestionsProvider
 {
     companion object {
-        const val manager_name = "dmoj"
-        private val Context.account_dmoj_dataStore by preferencesDataStore(manager_name)
+        private val Context.account_dmoj_dataStore by preferencesDataStore(AccountManagers.dmoj.name)
     }
 
     override val urlHomePage get() = DmojAPI.URLFactory.main

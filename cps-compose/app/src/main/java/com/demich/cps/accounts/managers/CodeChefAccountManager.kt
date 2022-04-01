@@ -42,12 +42,11 @@ data class CodeChefUserInfo(
 }
 
 class CodeChefAccountManager(context: Context):
-    RatedAccountManager<CodeChefUserInfo>(context, manager_name),
+    RatedAccountManager<CodeChefUserInfo>(context, AccountManagers.codechef),
     AccountSuggestionsProvider
 {
     companion object {
-        const val manager_name = "codechef"
-        private val Context.account_codechef_dataStore by preferencesDataStore(manager_name)
+        private val Context.account_codechef_dataStore by preferencesDataStore(AccountManagers.codechef.name)
 
         private const val star = '★'
     }

@@ -63,14 +63,14 @@ fun AccountsScreen(navController: NavController, accountsViewModel: AccountsView
             )
         } else {
             recordedAccounts.forEach {
-                key(it.manager.managerName) {
+                key(it.type) {
                     PanelWithUI(
                         userInfoWithManager = it,
                         accountsViewModel = accountsViewModel,
                         modifier = Modifier.padding(start = 10.dp, top = 10.dp)
                     ) {
                         //TODO: expand account
-                        context.showToast("expand for ${it.manager.managerName}")
+                        context.showToast("expand for ${it.type.name}")
                     }
                 }
             }
@@ -127,7 +127,7 @@ private fun AddAccountButton(accountsViewModel: AccountsViewModel) {
                     CPSIconButton(icon = Icons.Default.Delete) {
                         accountsViewModel.delete(manager)
                     }
-                    MonospacedText(text = manager.managerName)
+                    MonospacedText(text = manager.type.name)
                 }
             }
         }

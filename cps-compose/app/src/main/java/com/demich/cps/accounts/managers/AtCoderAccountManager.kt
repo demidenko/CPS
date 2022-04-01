@@ -30,12 +30,11 @@ data class AtCoderUserInfo(
 }
 
 class AtCoderAccountManager(context: Context):
-    RatedAccountManager<AtCoderUserInfo>(context, manager_name),
+    RatedAccountManager<AtCoderUserInfo>(context, AccountManagers.atcoder),
     AccountSettingsProvider
 {
     companion object {
-        const val manager_name = "atcoder"
-        private val Context.account_atcoder_dataStore by preferencesDataStore(manager_name)
+        private val Context.account_atcoder_dataStore by preferencesDataStore(AccountManagers.atcoder.name)
     }
 
     override val urlHomePage get() = AtCoderAPI.URLFactory.main
@@ -138,7 +137,7 @@ class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager):
 {
     companion object {
         private val Context.account_settings_atcoder_dataStore
-            by preferencesDataStore(AtCoderAccountManager.manager_name + "_account_settings")
+            by preferencesDataStore(AccountManagers.atcoder.name + "_account_settings")
     }
 
     val observeRating = Item(booleanPreferencesKey("observe_rating"), false)
