@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -69,21 +70,24 @@ private fun CPSBottomBarMain(
     modifier: Modifier = Modifier
 ) {
     val devModeEnabled by with(context) { rememberCollect { settingsDev.devModeEnabled.flow } }
-    val majorScreens = remember {
-        listOf(
-            Screen.Accounts to Icons.Rounded.Person,
-            Screen.News to Icons.Default.Subtitles,
-            Screen.Contests to Icons.Filled.EmojiEvents,
-            Screen.Development to Icons.Default.AllOut
-        )
+    val rootScreens by remember {
+        derivedStateOf {
+            buildList {
+                add(Screen.Accounts to Icons.Rounded.Person)
+                add(Screen.News to Icons.Default.Subtitles)
+                add(Screen.Contests to Icons.Filled.EmojiEvents)
+                if (devModeEnabled) {
+                    add(Screen.Development to Icons.Default.AllOut)
+                }
+            }
+        }
     }
     BottomNavigation(
         modifier = modifier.fillMaxWidth(),
         backgroundColor = cpsColors.backgroundNavigation,
         elevation = 0.dp
     ) {
-        for ((screen, icon) in majorScreens) {
-            if (screen == Screen.Development && !devModeEnabled) continue
+        for ((screen, icon) in rootScreens) {
             val isSelected = screen == currentScreen.rootScreen
             BottomNavigationItem(
                 icon = {
