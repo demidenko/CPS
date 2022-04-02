@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.demich.cps.Screen
 import com.demich.cps.accounts.allAccountManagers
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.theme.cpsColors
@@ -29,25 +30,39 @@ import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable
 fun CPSStatusBar(
-    systemUiController: SystemUiController
+    systemUiController: SystemUiController,
+    currentScreen: Screen?
 ) {
     val context = context
     val coloredStatusBar by rememberCollect { context.settingsUI.coloredStatusBar.flow }
-
-    val bestOrder by rememberCollect { makeFlowOfBestOrder(context) }
-
+    val orderGetter by rememberCollect { makeFlowOfOrderGetter(context) }
     ColorizeStatusBar(
         systemUiController = systemUiController,
-        coloredStatusBar = coloredStatusBar && bestOrder != null,
-        color = bestOrder?.run { manager.colorFor(handleColor) } ?: cpsColors.background
+        coloredStatusBar = coloredStatusBar,
+        order = orderGetter[currentScreen]
     )
 }
 
+@Composable
+private fun ColorizeStatusBar(
+    systemUiController: SystemUiController,
+    coloredStatusBar: Boolean,
+    order: RatedOrder?,
+    offColor: Color = cpsColors.background
+) {
+    ColorizeStatusBar(
+        systemUiController = systemUiController,
+        isStatusBarEnabled = coloredStatusBar && order != null,
+        color = order?.run { manager.colorFor(handleColor) } ?: offColor,
+        offColor = offColor
+    )
+}
 
 private data class RatedOrder(
     val order: Double,
@@ -79,7 +94,21 @@ private fun<U: UserInfo> RatedAccountManager<U>.getOrder(userInfo: U): RatedOrde
 private fun<U: UserInfo> RatedAccountManager<U>.flowOfRatedOrder(): Flow<RatedOrder?> =
     flowOfInfo().map(this::getOrder)
 
-private fun makeFlowOfBestOrder(context: Context): Flow<RatedOrder?> =
+private data class OrderGetter(
+    private val validOrders: List<RatedOrder>,
+    private val orderByMaximum: Boolean
+) {
+    operator fun get(screen: Screen?): RatedOrder? {
+        return if (screen is Screen.AccountExpanded) {
+            validOrders.find { it.manager.type == screen.type }
+        } else {
+            if (orderByMaximum) validOrders.maxByOrNull { it.order }
+            else validOrders.minByOrNull { it.order }
+        }
+    }
+}
+
+private fun makeFlowOfOrderGetter(context: Context): Flow<OrderGetter> =
     combine(
         flow = combine(flows = context.allAccountManagers
             .filterIsInstance<RatedAccountManager<*>>()
@@ -88,27 +117,25 @@ private fun makeFlowOfBestOrder(context: Context): Flow<RatedOrder?> =
         flow2 = context.settingsUI.statusBarDisabledManagers.flow,
         flow3 = context.settingsUI.statusBarOrderByMaximum.flow
     ) { orders, disabledManagers, orderByMaximum ->
-        orders.filterNotNull()
-            .filter { it.manager.type !in disabledManagers }
-            .run {
-                if (orderByMaximum) maxByOrNull { it.order }
-                else minByOrNull { it.order }
-            }
-    }
+        OrderGetter(
+            validOrders = orders.filterNotNull().filter { it.manager.type !in disabledManagers },
+            orderByMaximum = orderByMaximum
+        )
+    }.distinctUntilChanged()
 
 @Composable
 private fun ColorizeStatusBar(
     systemUiController: SystemUiController,
-    coloredStatusBar: Boolean,
+    isStatusBarEnabled: Boolean,
     color: Color,
-    offColor: Color = cpsColors.background
+    offColor: Color
 ) {
     /*
         Important:
         with statusbar=off switching dark/light mode MUST be as fast as everywhere else
     */
     val koef by animateFloatAsState(
-        targetValue = if (coloredStatusBar) 1f else 0f,
+        targetValue = if (isStatusBarEnabled) 1f else 0f,
         animationSpec = tween(buttonOnOffDurationMillis)
     )
     val statusBarColor by animateColorAsState(

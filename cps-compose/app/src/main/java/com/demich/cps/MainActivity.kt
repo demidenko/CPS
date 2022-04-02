@@ -5,9 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
@@ -28,6 +26,7 @@ import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.flow.map
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,20 +48,29 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CPSScaffold() {
     val navController = rememberNavController()
+    val currentScreen by remember(navController) {
+        navController.currentBackStackEntryFlow.map { it.getScreen() }
+    }.collectAsState(initial = null)
+
     val systemUiController = rememberSystemUiController()
 
     val cpsViewModels = CPSViewModels(
         accountsViewModel = viewModel()
     )
 
-    CPSStatusBar(systemUiController)
+    CPSStatusBar(
+        systemUiController = systemUiController,
+        currentScreen = currentScreen
+    )
 
     Scaffold(
         topBar = { CPSTopBar(
-            navController = navController
+            navController = navController,
+            currentScreen = currentScreen
         ) },
         bottomBar = { CPSBottomBar(
             navController = navController,
+            currentScreen = currentScreen,
             cpsViewModels = cpsViewModels,
             systemUiController = systemUiController
         ) }

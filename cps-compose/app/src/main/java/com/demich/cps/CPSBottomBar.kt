@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,11 +25,11 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.systemuicontroller.SystemUiController
-import kotlinx.coroutines.flow.map
 
 @Composable
 fun CPSBottomBar(
     navController: NavHostController,
+    currentScreen: Screen?,
     cpsViewModels: CPSViewModels,
     systemUiController: SystemUiController
 ) {
@@ -38,10 +37,6 @@ fun CPSBottomBar(
         color = cpsColors.backgroundNavigation,
         darkIcons = MaterialTheme.colors.isLight
     )
-
-    val currentScreen by remember(navController) {
-        navController.currentBackStackEntryFlow.map { it.getScreen() }
-    }.collectAsState(initial = null)
 
     currentScreen?.takeIf { it.enableBottomBar }?.let { screen ->
         Row(
@@ -101,7 +96,8 @@ private fun CPSBottomBarMain(
                 onClick = {
                     if(!isSelected) {
                         navController.navigate(screen.route) {
-                            popUpTo(currentScreen.route) {
+                            //TODO: wtf it works?
+                            popUpTo(currentScreen.rootScreen.route) {
                                 saveState = true
                                 inclusive = true
                             }

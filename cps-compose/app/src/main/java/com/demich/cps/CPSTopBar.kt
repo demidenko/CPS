@@ -25,17 +25,13 @@ import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable
 fun CPSTopBar(
-    navController: NavHostController
+    navController: NavHostController,
+    currentScreen: Screen?
 ) {
-    val currentScreen by remember(navController) {
-        navController.currentBackStackEntryFlow.map { it.getScreen() }
-    }.collectAsState(initial = null)
-
     var showUIPanel by rememberSaveable { mutableStateOf(false) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
