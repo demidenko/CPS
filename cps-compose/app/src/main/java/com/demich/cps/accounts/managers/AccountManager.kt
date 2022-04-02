@@ -73,6 +73,9 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     open fun Panel(userInfo: U) {
 
     }
+
+    @Composable
+    open fun BigView(userInfo: U) = Panel(userInfo)
 }
 
 abstract class RatedAccountManager<U: UserInfo>(context: Context, type: AccountManagers):

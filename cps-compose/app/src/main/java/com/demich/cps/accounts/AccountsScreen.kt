@@ -2,14 +2,10 @@ package com.demich.cps.accounts
 
 import android.content.Context
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
@@ -90,7 +86,20 @@ fun AccountExpandedScreen(
 ) {
     val context = context
     val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
-    Text(text = manager.type.name)
+    AccountExpandedScreen(manager = manager)
+}
+
+@Composable
+private fun<U: UserInfo> AccountExpandedScreen(
+    manager: AccountManager<U>
+) {
+    val userInfo by rememberCollect { manager.flowOfInfo() }
+    Box(modifier = Modifier
+        .padding(all = 10.dp)
+        .fillMaxSize()
+    ) {
+        manager.BigView(userInfo)
+    }
 }
 
 @Composable

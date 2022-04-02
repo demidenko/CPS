@@ -50,6 +50,14 @@ object cpsColors {
         @Composable
         get() = MaterialTheme.colors.error
 
+    val votedRatingPositive: Color
+        @Composable
+        get() = success
+
+    val votedRatingNegative: Color
+        @Composable
+        get() = if (isLight) Color(128, 128, 128) else Color(150, 150, 150)
+
     @Composable
     fun handleColor(handleColor: HandleColor): Color {
         if (isLight) {

@@ -1,9 +1,16 @@
 package com.demich.cps.utils.codeforces
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.accounts.managers.HandleColor
 import com.demich.cps.accounts.managers.NOT_RATED
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.news.codeforces.CodeforcesLocale
+import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.signedToString
 import java.util.*
 
 object CodeforcesUtils {
@@ -65,6 +72,18 @@ object CodeforcesUtils {
         i = s.indexOf("<div class=\"user-rank\">", i)
         i = s.indexOf("class=\"rated-user", i)
         return s.substring(s.indexOf('>', i)+1, s.indexOf("</a", i))
+    }
+
+    @Composable
+    fun VotedText(rating: Int, fontSize: TextUnit) {
+        if (rating != 0) {
+            Text(
+                text = signedToString(rating),
+                color = if (rating > 0) cpsColors.votedRatingPositive else cpsColors.votedRatingNegative,
+                fontWeight = FontWeight.Bold,
+                fontSize = fontSize
+            )
+        }
     }
 
 }

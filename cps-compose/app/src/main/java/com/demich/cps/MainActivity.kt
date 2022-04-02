@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -24,6 +25,7 @@ import com.demich.cps.ui.CPSStatusBar
 import com.demich.cps.ui.LocalUseOriginalColors
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.map
@@ -53,6 +55,10 @@ fun CPSScaffold() {
     }.collectAsState(initial = null)
 
     val systemUiController = rememberSystemUiController()
+    systemUiController.setNavigationBarColor(
+        color = cpsColors.backgroundNavigation,
+        darkIcons = MaterialTheme.colors.isLight
+    )
 
     val cpsViewModels = CPSViewModels(
         accountsViewModel = viewModel()
@@ -71,8 +77,7 @@ fun CPSScaffold() {
         bottomBar = { CPSBottomBar(
             navController = navController,
             currentScreen = currentScreen,
-            cpsViewModels = cpsViewModels,
-            systemUiController = systemUiController
+            cpsViewModels = cpsViewModels
         ) }
     ) { innerPadding ->
         NavHost(

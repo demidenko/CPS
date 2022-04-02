@@ -1,21 +1,32 @@
 package com.demich.cps.accounts.managers
 
 import android.content.Context
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
+import com.demich.cps.accounts.SmallAccountPanelTypeRated
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.InstantAsSecondsSerializer
 import com.demich.cps.utils.codeforces.*
+import com.demich.cps.utils.signedToString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
@@ -176,6 +187,27 @@ class CodeforcesAccountManager(context: Context):
                         + (userInfo.rating.takeIf { it != NOT_RATED }?.toString() ?: "[not rated]")
             )))
         }
+
+    @Composable
+    override fun BigView(userInfo: CodeforcesUserInfo) {
+        Column {
+            SmallAccountPanelTypeRated(userInfo)
+            if (userInfo.contribution != 0) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "contribution:",
+                        color = cpsColors.textColorAdditional,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(end = 5.dp)
+                    )
+                    CodeforcesUtils.VotedText(
+                        rating = userInfo.contribution,
+                        fontSize = 20.sp
+                    )
+                }
+            }
+        }
+    }
 
     override fun getDataStore() = accountDataStore(context.account_codeforces_dataStore, emptyInfo())
     override fun getSettings() = CodeforcesAccountSettingsDataStore(this)

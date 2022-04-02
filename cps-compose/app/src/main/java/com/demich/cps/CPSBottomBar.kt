@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AllOut
 import androidx.compose.material.icons.filled.EmojiEvents
@@ -25,20 +24,13 @@ import com.demich.cps.news.NewsBottomBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
-import com.google.accompanist.systemuicontroller.SystemUiController
 
 @Composable
 fun CPSBottomBar(
     navController: NavHostController,
     currentScreen: Screen?,
-    cpsViewModels: CPSViewModels,
-    systemUiController: SystemUiController
+    cpsViewModels: CPSViewModels
 ) {
-    systemUiController.setNavigationBarColor(
-        color = cpsColors.backgroundNavigation,
-        darkIcons = MaterialTheme.colors.isLight
-    )
-
     currentScreen?.takeIf { it.enableBottomBar }?.let { screen ->
         Row(
             modifier = Modifier
