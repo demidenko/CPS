@@ -48,7 +48,8 @@ fun CPSTopBar(
     ) {
         Box(modifier = Modifier
             .weight(1f)
-            .fillMaxHeight()) {
+            .fillMaxHeight()
+        ) {
             CPSTitle(
                 screen = currentScreen,
                 modifier = Modifier
@@ -176,7 +177,7 @@ private fun CPSAboutDialog(onDismissRequest: () -> Unit) {
     val scope = rememberCoroutineScope()
 
     val settingsDev = context.settingsDev
-    val devModeEnabled by settingsDev.devModeEnabled.collectAsState()
+    val devModeEnabled by rememberCollect { settingsDev.devModeEnabled.flow }
     var showDevModeLine by remember { mutableStateOf(devModeEnabled) }
 
     showDevModeLine = true //TODO enable by click pattern

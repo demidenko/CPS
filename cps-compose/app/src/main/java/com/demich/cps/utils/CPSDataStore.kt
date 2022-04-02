@@ -27,9 +27,6 @@ open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
             //get() = dataStore.data.map { it[key] }.distinctUntilChanged().map { fromPrefs(it) }
             //get() = dataStore.data.distinctUntilChangedBy { it[key] }.map { fromPrefs(it[key]) }
 
-        @Composable
-        fun collectAsState(): State<T> = flow.collectAsState()
-
         //getter
         suspend operator fun invoke(): T = fromPrefs(dataStore.data.first()[key])
 

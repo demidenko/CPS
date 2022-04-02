@@ -26,19 +26,19 @@ import com.demich.cps.ui.CPSStatusBar
 import com.demich.cps.ui.LocalUseOriginalColors
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
+import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val useOriginalColors by settingsUI.useOriginalColors.collectAsState()
-            val darkLightMode by settingsUI.darkLightMode.collectAsState()
-
-            CompositionLocalProvider(
-                LocalUseOriginalColors provides useOriginalColors
-            ) {
-                CPSTheme(darkTheme = darkLightMode.isDarkMode()) {
+            val darkLightMode by rememberCollect { settingsUI.darkLightMode.flow }
+            CPSTheme(darkTheme = darkLightMode.isDarkMode()) {
+                val useOriginalColors by rememberCollect { settingsUI.useOriginalColors.flow }
+                CompositionLocalProvider(
+                    LocalUseOriginalColors provides useOriginalColors
+                ) {
                     CPSScaffold()
                 }
             }
@@ -48,16 +48,14 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CPSScaffold() {
-    //val context = context
     val navController = rememberNavController()
-
     val systemUiController = rememberSystemUiController()
-
-    CPSStatusBar(systemUiController)
 
     val cpsViewModels = CPSViewModels(
         accountsViewModel = viewModel()
     )
+
+    CPSStatusBar(systemUiController)
 
     Scaffold(
         topBar = { CPSTopBar(

@@ -111,13 +111,6 @@ inline fun<reified T> jsonSaver() = object: Saver<T, String> {
 }
 
 @Composable
-fun <T : R, R> Flow<T>.collectAsState(context: CoroutineContext = EmptyCoroutineContext): State<T> =
-    collectAsState(
-        initial = runBlocking { first() },
-        context = context
-    )
-
-@Composable
 fun<T> rememberCollect(block: () -> Flow<T>) =
     remember { block() }.let {
         it.collectAsState(initial = remember(it) { runBlocking { it.first() } })
