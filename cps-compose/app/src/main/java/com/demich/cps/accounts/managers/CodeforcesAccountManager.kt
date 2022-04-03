@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -22,15 +24,20 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
+import com.demich.cps.R
 import com.demich.cps.accounts.SmallAccountPanelTypeRated
+import com.demich.cps.ui.SwitchSettingsItem
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.InstantAsSecondsSerializer
 import com.demich.cps.utils.codeforces.*
-import com.demich.cps.utils.signedToString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlin.text.contains
+import kotlin.text.indexOf
+import kotlin.text.splitToSequence
+import kotlin.text.substring
 
 
 @Serializable
@@ -211,6 +218,28 @@ class CodeforcesAccountManager(context: Context):
 
     override fun getDataStore() = accountDataStore(context.account_codeforces_dataStore, emptyInfo())
     override fun getSettings() = CodeforcesAccountSettingsDataStore(this)
+
+    @Composable
+    override fun Settings() {
+        val settings = remember { getSettings() }
+        SwitchSettingsItem(
+            item = settings.observeRating,
+            title = "Rating changes observer"
+        )
+        SwitchSettingsItem(
+            item = settings.observeContribution,
+            title = "Contribution changes observer"
+        )
+        SwitchSettingsItem(
+            item = settings.contestWatchEnabled,
+            title = "Contest watcher",
+            description = stringResource(id = R.string.cf_contest_watcher_description)
+        )
+        SwitchSettingsItem(
+            item = settings.upsolvingSuggestionsEnabled,
+            title = "Upsolving suggestions"
+        )
+    }
 
     fun notifyRatingChange(ratingChange: CodeforcesRatingChange) = notifyRatingChange(
         this,

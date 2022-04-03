@@ -155,6 +155,9 @@ fun AccountSettingsScreen(
                 )
             }
         }
+        if (manager is AccountSettingsProvider) {
+            manager.Settings()
+        }
     }
 
     if (showChangeDialog) {

@@ -2,6 +2,7 @@ package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -13,6 +14,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
+import com.demich.cps.ui.SwitchSettingsItem
 import com.demich.cps.utils.AtCoderAPI
 import com.demich.cps.utils.AtCoderRatingChange
 import kotlinx.serialization.Serializable
@@ -118,6 +120,15 @@ class AtCoderAccountManager(context: Context):
 
     override fun getDataStore() = accountDataStore(context.account_atcoder_dataStore, emptyInfo())
     override fun getSettings() = AtCoderAccountSettingsDataStore(this)
+
+    @Composable
+    override fun Settings() {
+        val settings = remember { getSettings() }
+        SwitchSettingsItem(
+            item = settings.observeRating,
+            title = "Rating changes observer"
+        )
+    }
 
     fun notifyRatingChange(handle: String, ratingChange: AtCoderRatingChange) = notifyRatingChange(
         this,

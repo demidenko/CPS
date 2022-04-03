@@ -70,9 +70,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     abstract fun makeOKInfoSpan(userInfo: U): AnnotatedString
 
     @Composable
-    open fun Panel(userInfo: U) {
-
-    }
+    open fun Panel(userInfo: U) {}
 
     @Composable
     open fun BigView(userInfo: U) = Panel(userInfo)
@@ -212,6 +210,9 @@ interface AccountSuggestionsProvider {
 
 interface AccountSettingsProvider {
     fun getSettings(): AccountSettingsDataStore
+
+    @Composable
+    fun Settings() {}
 }
 
 interface RatingRevolutionsProvider {
