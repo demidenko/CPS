@@ -72,12 +72,6 @@ fun fromHTML(s: String): Spanned {
     }
 }
 
-@Stable
-fun Modifier.paddingHorizontal(padding: Dp) = this.padding(start = padding, end = padding)
-
-@Stable
-fun Modifier.paddingVertical(padding: Dp) = this.padding(top = padding, bottom = padding)
-
 data class ComparablePair<A: Comparable<A>, B: Comparable<B>>(
     val first: A,
     val second: B

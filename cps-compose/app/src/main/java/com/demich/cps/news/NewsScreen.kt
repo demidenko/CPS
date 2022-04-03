@@ -85,15 +85,13 @@ fun NewsScreen(navController: NavController) {
 }
 
 @Composable
-fun CPSDropdownMenuScope.BuildNewsMenu(currentScreen: Screen, navController: NavController) {
-    if (currentScreen == Screen.News) {
-        Divider(color = cpsColors.dividerColor)
-        CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
-            navController.navigate(Screen.NewsSettings.route)
-        }
-        CPSDropdownMenuItem(title = "Follow List", icon = Icons.Rounded.PeopleAlt) {
-            //TODO Open FollowList
-        }
+fun CPSDropdownMenuScope.BuildNewsMenu(navController: NavController) {
+    Divider(color = cpsColors.dividerColor)
+    CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
+        navController.navigate(Screen.NewsSettings.route)
+    }
+    CPSDropdownMenuItem(title = "Follow List", icon = Icons.Rounded.PeopleAlt) {
+        //TODO Open FollowList
     }
 }
 

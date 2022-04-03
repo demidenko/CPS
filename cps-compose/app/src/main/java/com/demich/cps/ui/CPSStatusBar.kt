@@ -8,7 +8,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.WebAsset
@@ -25,7 +28,6 @@ import com.demich.cps.accounts.allAccountManagers
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
-import com.demich.cps.utils.paddingHorizontal
 import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.flow.Flow
@@ -236,7 +238,7 @@ private fun StatusBarAccountsPopup(
                 MonospacedText(text = manager.type.name)
             }
         }
-        Row(modifier = Modifier.paddingHorizontal(10.dp).align(Alignment.CenterHorizontally)) {
+        Row(modifier = Modifier.padding(horizontal = 10.dp).align(Alignment.CenterHorizontally)) {
             Button(
                 content = { Text(text = "worst", fontWeight = FontWeight.Bold.takeIf { !orderByMaximum }) },
                 onClick = {

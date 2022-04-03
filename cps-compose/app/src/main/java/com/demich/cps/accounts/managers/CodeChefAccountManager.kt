@@ -148,7 +148,7 @@ class CodeChefAccountManager(context: Context):
                                 .padding(all = 2.dp)
                                 .padding(end = 8.dp)
                                 .background(color = colorFor(rating = userInfo.rating))
-                                .padding(start = 4.dp, end = 4.dp)
+                                .padding(horizontal = 4.dp)
                         ) {
                             Text(
                                 text = "${getRatingStarNumber(userInfo.rating)}$star",

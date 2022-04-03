@@ -7,7 +7,6 @@ import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.Settings
@@ -20,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.demich.cps.R
-import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.*
+import com.demich.cps.makeIntentOpenUrl
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
@@ -104,23 +103,32 @@ private fun<U: UserInfo> AccountExpandedScreen(
 
 @Composable
 fun AccountsBottomBar(accountsViewModel: AccountsViewModel) {
-    AddAccountButton(accountsViewModel)
+    AddAccountButton()
     ReloadAccountsButton(accountsViewModel)
 }
 
 @Composable
-fun CPSDropdownMenuScope.BuildAccountsMenu(currentScreen: Screen) {
-    if (currentScreen is Screen.AccountExpanded) {
-        Divider(color = cpsColors.dividerColor)
-        CPSDropdownMenuItem(title = "Delete", icon = Icons.Default.DeleteForever) {
-            //TODO: Delete userInfo
+fun CPSDropdownMenuScope.BuildAccountExpandedMenu(
+    type: AccountManagers,
+    navController: NavController,
+    accountsViewModel: AccountsViewModel
+) {
+    val context = context
+    val manager = context.allAccountManagers.first { it.type == type }
+    Divider(color = cpsColors.dividerColor)
+    CPSDropdownMenuItem(title = "Delete", icon = Icons.Default.DeleteForever) {
+        //TODO: Ask in alert dialog
+        accountsViewModel.delete(manager)
+        navController.popBackStack()
+    }
+    CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
+        //TODO: Open Settings
+    }
+    CPSDropdownMenuItem(title = "Origin", icon = Icons.Default.Photo) {
+        val url = runBlocking {
+            manager.getSavedInfo().link()
         }
-        CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
-            //TODO: Open Settings
-        }
-        CPSDropdownMenuItem(title = "Origin", icon = Icons.Default.Photo) {
-            //TODO: Open origin page
-        }
+        context.startActivity(makeIntentOpenUrl(url))
     }
 }
 
@@ -144,7 +152,7 @@ private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
 }
 
 @Composable
-private fun AddAccountButton(accountsViewModel: AccountsViewModel) {
+private fun AddAccountButton() {
     var showMenu by remember { mutableStateOf(false) }
     var chosenManager by remember { mutableStateOf<AccountManager<*>?>(null) }
 
@@ -157,16 +165,15 @@ private fun AddAccountButton(accountsViewModel: AccountsViewModel) {
             onDismissRequest = { showMenu = false },
             modifier = Modifier.background(cpsColors.backgroundAdditional)
         ) {
-            context.allAccountManagers.forEach { manager ->
+            context.allAccountManagers
+                .filter { runBlocking { it.getSavedInfo() }.isEmpty() }
+                .forEach { manager ->
                 DropdownMenuItem(
                     onClick = {
                         showMenu = false
                         chosenManager = manager
                     }
                 ) {
-                    CPSIconButton(icon = Icons.Default.Delete) {
-                        accountsViewModel.delete(manager)
-                    }
                     MonospacedText(text = manager.type.name)
                 }
             }

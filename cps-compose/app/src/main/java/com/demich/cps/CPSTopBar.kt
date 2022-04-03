@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.demich.cps.accounts.BuildAccountsMenu
+import com.demich.cps.accounts.BuildAccountExpandedMenu
 import com.demich.cps.news.BuildNewsMenu
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
@@ -30,7 +30,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun CPSTopBar(
     navController: NavHostController,
-    currentScreen: Screen?
+    currentScreen: Screen?,
+    cpsViewModels: CPSViewModels
 ) {
     var showUIPanel by rememberSaveable { mutableStateOf(false) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
@@ -79,8 +80,12 @@ fun CPSTopBar(
             }
             currentScreen?.let {
                 when (it) {
-                    is Screen.News -> BuildNewsMenu(it, navController)
-                    is Screen.AccountExpanded -> BuildAccountsMenu(it)
+                    is Screen.News -> BuildNewsMenu(navController)
+                    is Screen.AccountExpanded -> BuildAccountExpandedMenu(
+                        type = it.type,
+                        navController = navController,
+                        accountsViewModel = cpsViewModels.accountsViewModel
+                    )
                     else -> Unit
                 }
             }
