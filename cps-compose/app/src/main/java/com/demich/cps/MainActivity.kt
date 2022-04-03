@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.demich.cps.accounts.AccountExpandedScreen
+import com.demich.cps.accounts.AccountSettingsScreen
 import com.demich.cps.accounts.AccountsScreen
 import com.demich.cps.accounts.AccountsViewModel
 import com.demich.cps.accounts.managers.AccountManagers
@@ -96,18 +97,25 @@ fun CPSScaffold(
                 val type = (it.getScreen() as Screen.AccountExpanded).type
                 AccountExpandedScreen(type, navController, cpsViewModels.accountsViewModel)
             }
+            composable(Screen.AccountSettings.route) {
+                val type = (it.getScreen() as Screen.AccountSettings).type
+                AccountSettingsScreen(type)
+            }
+
             composable(Screen.News.route) {
                 NewsScreen(navController)
             }
             composable(Screen.NewsSettings.route) {
                 NewsSettingsScreen()
             }
+
             composable(Screen.Contests.route) {
                 ContestsScreen(navController)
             }
             composable(Screen.ContestsSettings.route) {
                 ContestsSettingsScreen(navController)
             }
+
             composable(Screen.Development.route) {
                 DevelopScreen(navController)
             }
@@ -130,11 +138,20 @@ sealed class Screen(
     open val subtitle: String get() = "::$route"
 
     object Accounts: Screen("accounts")
-    class AccountExpanded(val type: AccountManagers): Screen(route = route, root = Accounts) {
+    class AccountExpanded(val type: AccountManagers)
+        : Screen(route = route, root = Accounts) {
+        override val subtitle get() = "::accounts.$type"
         companion object {
             const val route = "account/{manager}"
         }
-        override val subtitle get() = "::accounts.$type"
+    }
+    class AccountSettings(val type: AccountManagers)
+        : Screen(route = route, root = Accounts, enableBottomBar = false) {
+        override val subtitle get() = "::accounts.$type.settings"
+        companion object {
+            const val route = "account_settings/{manager}"
+            fun route(type: AccountManagers) = "account_settings/$type"
+        }
     }
 
     object News: Screen("news")
@@ -145,16 +162,6 @@ sealed class Screen(
 
     object Development: Screen("develop")
 
-    companion object {
-        fun all() = listOf(
-            Accounts,
-            News,
-            NewsSettings,
-            Contests,
-            ContestsSettings,
-            Development
-        )
-    }
 }
 
 fun NavBackStackEntry.getScreen(): Screen {
@@ -163,7 +170,18 @@ fun NavBackStackEntry.getScreen(): Screen {
         val type = AccountManagers.valueOf(arguments?.getString("manager")!!)
         return Screen.AccountExpanded(type)
     }
-    return Screen.all().first { it.route == route }
+    if (route == Screen.AccountSettings.route) {
+        val type = AccountManagers.valueOf(arguments?.getString("manager")!!)
+        return Screen.AccountSettings(type)
+    }
+    return listOf(
+        Screen.Accounts,
+        Screen.News,
+        Screen.NewsSettings,
+        Screen.Contests,
+        Screen.ContestsSettings,
+        Screen.Development
+    ).first { it.route == route }
 }
 
 

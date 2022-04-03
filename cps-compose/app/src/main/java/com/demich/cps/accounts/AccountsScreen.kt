@@ -2,6 +2,7 @@ package com.demich.cps.accounts
 
 import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -13,16 +14,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.demich.cps.R
+import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.makeIntentOpenUrl
-import com.demich.cps.ui.CPSDropdownMenuScope
-import com.demich.cps.ui.CPSIconButton
-import com.demich.cps.ui.CPSReloadingButton
-import com.demich.cps.ui.MonospacedText
+import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
@@ -128,6 +128,41 @@ private fun<U: UserInfo> AccountExpandedScreen(
 }
 
 @Composable
+fun AccountSettingsScreen(
+    type: AccountManagers
+) {
+    val context = context
+    val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
+    val userInfo by rememberCollect { manager.flowOfInfo() }
+
+    var showChangeDialog by remember { mutableStateOf(false) }
+
+    SettingsColumn {
+        SettingsItem(
+            modifier = Modifier.clickable { showChangeDialog = true }
+        ) {
+            Column {
+                Text(
+                    text = manager.userIdTitle + ":",
+                    color = cpsColors.textColorAdditional,
+                    fontSize = 18.sp
+                )
+                Text(
+                    text = userInfo.userId,
+                    fontSize = 26.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+
+    if (showChangeDialog) {
+        manager.ChangeSavedInfoDialog { showChangeDialog = false }
+    }
+}
+
+@Composable
 fun AccountsBottomBar(accountsViewModel: AccountsViewModel) {
     AddAccountButton()
     ReloadAccountsButton(accountsViewModel)
@@ -146,7 +181,7 @@ fun CPSDropdownMenuScope.BuildAccountExpandedMenu(
         accountsViewModel.showDeleteDialog.value = true
     }
     CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
-        //TODO: Open Settings
+        navController.navigate(Screen.AccountSettings.route(manager.type))
     }
     CPSDropdownMenuItem(title = "Origin", icon = Icons.Default.Photo) {
         val url = runBlocking {

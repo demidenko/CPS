@@ -101,11 +101,13 @@ private data class OrderGetter(
     private val orderByMaximum: Boolean
 ) {
     operator fun get(screen: Screen?): RatedOrder? {
-        return if (screen is Screen.AccountExpanded) {
-            validOrders.find { it.manager.type == screen.type }
-        } else {
-            if (orderByMaximum) validOrders.maxByOrNull { it.order }
-            else validOrders.minByOrNull { it.order }
+        return when (screen) {
+            is Screen.AccountExpanded -> validOrders.find { it.manager.type == screen.type }
+            is Screen.AccountSettings -> validOrders.find { it.manager.type == screen.type }
+            else -> {
+                if (orderByMaximum) validOrders.maxByOrNull { it.order }
+                else validOrders.minByOrNull { it.order }
+            }
         }
     }
 }
