@@ -49,4 +49,6 @@ class AccountsViewModel: ViewModel() {
             manager.setSavedInfo(manager.emptyInfo())
         }
     }
+
+    val showDeleteDialog = mutableStateOf(false)
 }

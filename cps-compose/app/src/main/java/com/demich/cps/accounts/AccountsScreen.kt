@@ -3,9 +3,7 @@ package com.demich.cps.accounts
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Photo
@@ -81,11 +79,39 @@ fun AccountsScreen(navController: NavController, accountsViewModel: AccountsView
 @Composable
 fun AccountExpandedScreen(
     type: AccountManagers,
-    navController: NavController
+    navController: NavController,
+    accountsViewModel: AccountsViewModel
 ) {
     val context = context
     val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
     AccountExpandedScreen(manager = manager)
+
+    var showDeleteDialog by accountsViewModel.showDeleteDialog
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            confirmButton = {
+                TextButton(
+                    content = { Text("Yes") },
+                    onClick = {
+                        navController.popBackStack()
+                        accountsViewModel.delete(manager)
+                        showDeleteDialog = false
+                    }
+                )
+            },
+            dismissButton = {
+                TextButton(
+                    content = { Text("No") },
+                    onClick = { showDeleteDialog = false }
+                )
+            },
+            title = {
+                Text("Delete $type account?")
+            },
+            backgroundColor = cpsColors.background
+        )
+    }
 }
 
 @Composable
@@ -117,9 +143,7 @@ fun CPSDropdownMenuScope.BuildAccountExpandedMenu(
     val manager = context.allAccountManagers.first { it.type == type }
     Divider(color = cpsColors.dividerColor)
     CPSDropdownMenuItem(title = "Delete", icon = Icons.Default.DeleteForever) {
-        //TODO: Ask in alert dialog
-        accountsViewModel.delete(manager)
-        navController.popBackStack()
+        accountsViewModel.showDeleteDialog.value = true
     }
     CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
         //TODO: Open Settings

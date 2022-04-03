@@ -94,7 +94,7 @@ fun CPSScaffold(
             }
             composable(Screen.AccountExpanded.route) {
                 val type = (it.getScreen() as Screen.AccountExpanded).type
-                AccountExpandedScreen(type, navController)
+                AccountExpandedScreen(type, navController, cpsViewModels.accountsViewModel)
             }
             composable(Screen.News.route) {
                 NewsScreen(navController)
