@@ -82,29 +82,16 @@ fun CPSScaffold(
     var menu: (@Composable CPSDropdownMenuScope.() -> Unit)? by remember { mutableStateOf(null) }
 
     fun NavGraphBuilder.cpsComposable(route: String, content: @Composable (NavBackStackEntry) -> Unit) {
-        //TODO: NavHost(): graph rebuilds after every navigation :(
         composable(route) {
             menu = null
             content(it)
         }
     }
 
-    Scaffold(
-        topBar = { CPSTopBar(
-            currentScreen = currentScreen,
-            additionalMenu = menu
-        ) },
-        bottomBar = { CPSBottomBar(
-            navController = navController,
-            currentScreen = currentScreen,
-            cpsViewModels = cpsViewModels
-        ) }
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.Accounts.route,
-            modifier = Modifier.padding(innerPadding)
-        ) {
+    val navBuilder: NavGraphBuilder.() -> Unit = remember(
+        navController, cpsViewModels
+    ) {
+        {
             cpsComposable(Screen.Accounts.route) {
                 AccountsScreen(navController, cpsViewModels.accountsViewModel)
             }
@@ -165,6 +152,25 @@ fun CPSScaffold(
                 DevelopScreen(navController)
             }
         }
+    }
+
+    Scaffold(
+        topBar = { CPSTopBar(
+            currentScreen = currentScreen,
+            additionalMenu = menu
+        ) },
+        bottomBar = { CPSBottomBar(
+            navController = navController,
+            currentScreen = currentScreen,
+            cpsViewModels = cpsViewModels
+        ) }
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Accounts.route,
+            modifier = Modifier.padding(innerPadding),
+            builder = navBuilder
+        )
     }
 }
 
