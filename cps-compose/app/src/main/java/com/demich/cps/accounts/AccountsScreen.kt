@@ -6,9 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.Photo
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,9 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.demich.cps.R
-import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.*
-import com.demich.cps.makeIntentOpenUrl
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
@@ -80,30 +75,31 @@ fun AccountsScreen(navController: NavController, accountsViewModel: AccountsView
 fun AccountExpandedScreen(
     type: AccountManagers,
     navController: NavController,
-    accountsViewModel: AccountsViewModel
+    accountsViewModel: AccountsViewModel,
+    showDeleteDialog: Boolean,
+    onDismissDeleteDialog: () -> Unit
 ) {
     val context = context
     val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
     AccountExpandedScreen(manager = manager)
 
-    var showDeleteDialog by accountsViewModel.showDeleteDialog
     if (showDeleteDialog) {
         AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
+            onDismissRequest = onDismissDeleteDialog,
             confirmButton = {
                 TextButton(
-                    content = { Text("Yes") },
+                    content = { Text(text = "Delete", color = cpsColors.errorColor) },
                     onClick = {
                         navController.popBackStack()
                         accountsViewModel.delete(manager)
-                        showDeleteDialog = false
+                        onDismissDeleteDialog()
                     }
                 )
             },
             dismissButton = {
                 TextButton(
-                    content = { Text("No") },
-                    onClick = { showDeleteDialog = false }
+                    content = { Text("Cancel") },
+                    onClick = onDismissDeleteDialog
                 )
             },
             title = {
@@ -169,29 +165,6 @@ fun AccountSettingsScreen(
 fun AccountsBottomBar(accountsViewModel: AccountsViewModel) {
     AddAccountButton()
     ReloadAccountsButton(accountsViewModel)
-}
-
-@Composable
-fun CPSDropdownMenuScope.BuildAccountExpandedMenu(
-    type: AccountManagers,
-    navController: NavController,
-    accountsViewModel: AccountsViewModel
-) {
-    val context = context
-    val manager = context.allAccountManagers.first { it.type == type }
-    Divider(color = cpsColors.dividerColor)
-    CPSDropdownMenuItem(title = "Delete", icon = Icons.Default.DeleteForever) {
-        accountsViewModel.showDeleteDialog.value = true
-    }
-    CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
-        navController.navigate(Screen.AccountSettings.route(manager.type))
-    }
-    CPSDropdownMenuItem(title = "Origin", icon = Icons.Default.Photo) {
-        val url = runBlocking {
-            manager.getSavedInfo().link()
-        }
-        context.startActivity(makeIntentOpenUrl(url))
-    }
 }
 
 @Composable

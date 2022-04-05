@@ -5,6 +5,7 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
@@ -18,9 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import com.demich.cps.accounts.BuildAccountExpandedMenu
-import com.demich.cps.news.BuildNewsMenu
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
@@ -29,9 +27,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CPSTopBar(
-    navController: NavHostController,
     currentScreen: Screen?,
-    cpsViewModels: CPSViewModels
+    additionalMenu: @Composable() (CPSDropdownMenuScope.() -> Unit)?,
 ) {
     var showUIPanel by rememberSaveable { mutableStateOf(false) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
@@ -78,16 +75,9 @@ fun CPSTopBar(
             CPSDropdownMenuItem(title = "About", icon = Icons.Outlined.Info) {
                 showAbout = true
             }
-            currentScreen?.let {
-                when (it) {
-                    is Screen.News -> BuildNewsMenu(navController)
-                    is Screen.AccountExpanded -> BuildAccountExpandedMenu(
-                        type = it.type,
-                        navController = navController,
-                        accountsViewModel = cpsViewModels.accountsViewModel
-                    )
-                    else -> Unit
-                }
+            additionalMenu?.let {
+                Divider(color = cpsColors.dividerColor)
+                it()
             }
         }
     }

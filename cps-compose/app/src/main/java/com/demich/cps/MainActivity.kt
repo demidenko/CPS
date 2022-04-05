@@ -6,31 +6,37 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.rounded.PeopleAlt
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.demich.cps.accounts.AccountExpandedScreen
-import com.demich.cps.accounts.AccountSettingsScreen
-import com.demich.cps.accounts.AccountsScreen
-import com.demich.cps.accounts.AccountsViewModel
+import com.demich.cps.accounts.*
 import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.ContestsSettingsScreen
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
+import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSStatusBar
 import com.demich.cps.ui.LocalUseOriginalColors
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,11 +79,20 @@ fun CPSScaffold(
         currentScreen = currentScreen
     )
 
+    var menu: (@Composable CPSDropdownMenuScope.() -> Unit)? by remember { mutableStateOf(null) }
+
+    fun NavGraphBuilder.cpsComposable(route: String, content: @Composable (NavBackStackEntry) -> Unit) {
+        //TODO: NavHost(): graph rebuilds after every navigation :(
+        composable(route) {
+            menu = null
+            content(it)
+        }
+    }
+
     Scaffold(
         topBar = { CPSTopBar(
-            navController = navController,
             currentScreen = currentScreen,
-            cpsViewModels = cpsViewModels
+            additionalMenu = menu
         ) },
         bottomBar = { CPSBottomBar(
             navController = navController,
@@ -90,33 +105,63 @@ fun CPSScaffold(
             startDestination = Screen.Accounts.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Accounts.route) {
+            cpsComposable(Screen.Accounts.route) {
                 AccountsScreen(navController, cpsViewModels.accountsViewModel)
             }
-            composable(Screen.AccountExpanded.route) {
+            cpsComposable(Screen.AccountExpanded.route) {
                 val type = (it.getScreen() as Screen.AccountExpanded).type
-                AccountExpandedScreen(type, navController, cpsViewModels.accountsViewModel)
+                var showDeleteDialog by remember { mutableStateOf(false) }
+                AccountExpandedScreen(
+                    type = type,
+                    navController = navController,
+                    accountsViewModel = cpsViewModels.accountsViewModel,
+                    showDeleteDialog = showDeleteDialog,
+                    onDismissDeleteDialog = { showDeleteDialog = false }
+                )
+                menu = {
+                    val context = context
+                    CPSDropdownMenuItem(title = "Delete", icon = Icons.Default.DeleteForever) {
+                        showDeleteDialog = true
+                    }
+                    CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
+                        navController.navigate(Screen.AccountSettings.route(type))
+                    }
+                    CPSDropdownMenuItem(title = "Origin", icon = Icons.Default.Photo) {
+                        val url = runBlocking {
+                            context.allAccountManagers.first { it.type == type }.getSavedInfo().link()
+                        }
+                        context.startActivity(makeIntentOpenUrl(url))
+                    }
+                }
             }
-            composable(Screen.AccountSettings.route) {
+            cpsComposable(Screen.AccountSettings.route) {
                 val type = (it.getScreen() as Screen.AccountSettings).type
                 AccountSettingsScreen(type)
             }
 
-            composable(Screen.News.route) {
+            cpsComposable(Screen.News.route) {
                 NewsScreen(navController)
+                menu = {
+                    CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
+                        navController.navigate(Screen.NewsSettings.route)
+                    }
+                    CPSDropdownMenuItem(title = "Follow List", icon = Icons.Rounded.PeopleAlt) {
+                        //TODO Open FollowList
+                    }
+                }
             }
-            composable(Screen.NewsSettings.route) {
+            cpsComposable(Screen.NewsSettings.route) {
                 NewsSettingsScreen()
             }
 
-            composable(Screen.Contests.route) {
+            cpsComposable(Screen.Contests.route) {
                 ContestsScreen(navController)
             }
-            composable(Screen.ContestsSettings.route) {
+            cpsComposable(Screen.ContestsSettings.route) {
                 ContestsSettingsScreen(navController)
             }
 
-            composable(Screen.Development.route) {
+            cpsComposable(Screen.Development.route) {
                 DevelopScreen(navController)
             }
         }
