@@ -154,7 +154,9 @@ class AtCoderAccountManager(context: Context):
             )
         }
         setBottomBarContent {
-            RatingLoadButton(ratingGraphUIStates)
+            if (userInfo.status == STATUS.OK && userInfo.rating != NOT_RATED) {
+                RatingLoadButton(ratingGraphUIStates)
+            }
         }
     }
 

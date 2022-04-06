@@ -225,7 +225,9 @@ class CodeforcesAccountManager(context: Context):
         }
         setBottomBarContent {
             //TODO: upsolving list button (icon = Icons.Default.FitnessCenter)
-            RatingLoadButton(ratingGraphUIStates)
+            if (userInfo.status == STATUS.OK && userInfo.rating != NOT_RATED) {
+                RatingLoadButton(ratingGraphUIStates)
+            }
         }
     }
 
