@@ -6,6 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,7 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.demich.cps.R
+import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.*
+import com.demich.cps.makeIntentOpenUrl
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
@@ -81,7 +86,7 @@ fun AccountExpandedScreen(
 ) {
     val context = context
     val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
-    AccountExpandedScreen(manager = manager)
+    AccountExpandedPanel(manager = manager)
 
     if (showDeleteDialog) {
         AlertDialog(
@@ -111,7 +116,7 @@ fun AccountExpandedScreen(
 }
 
 @Composable
-private fun<U: UserInfo> AccountExpandedScreen(
+private fun<U: UserInfo> AccountExpandedPanel(
     manager: AccountManager<U>
 ) {
     val userInfo by rememberCollect { manager.flowOfInfo() }
@@ -158,6 +163,25 @@ fun AccountSettingsScreen(
 
     if (showChangeDialog) {
         manager.ChangeSavedInfoDialog { showChangeDialog = false }
+    }
+}
+
+fun accountExpandedMenuBuilder(
+    type: AccountManagers,
+    navController: NavController,
+    onShowDeleteDialog: () -> Unit
+)
+: @Composable CPSDropdownMenuScope.() -> Unit = {
+    val context = context
+    CPSDropdownMenuItem(title = "Delete", icon = Icons.Default.DeleteForever, onClick = onShowDeleteDialog)
+    CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
+        navController.navigate(Screen.AccountSettings.route(type))
+    }
+    CPSDropdownMenuItem(title = "Origin", icon = Icons.Default.Photo) {
+        val url = runBlocking {
+            context.allAccountManagers.first { it.type == type }.getSavedInfo().link()
+        }
+        context.startActivity(makeIntentOpenUrl(url))
     }
 }
 
@@ -232,7 +256,7 @@ fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
      )
 }
 
-val Context.allAccountManagers: List<AccountManager<*>>
+val Context.allAccountManagers: List<AccountManager<out UserInfo>>
     get() = listOf(
         CodeforcesAccountManager(this),
         AtCoderAccountManager(this),

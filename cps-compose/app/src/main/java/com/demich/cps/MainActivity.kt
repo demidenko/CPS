@@ -6,11 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.Photo
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.rounded.PeopleAlt
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,18 +20,17 @@ import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.ContestsSettingsScreen
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
+import com.demich.cps.news.newsMenuBuilder
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSStatusBar
 import com.demich.cps.ui.LocalUseOriginalColors
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,21 +99,11 @@ fun CPSScaffold(
                     showDeleteDialog = showDeleteDialog,
                     onDismissDeleteDialog = { showDeleteDialog = false }
                 )
-                menu = {
-                    val context = context
-                    CPSDropdownMenuItem(title = "Delete", icon = Icons.Default.DeleteForever) {
-                        showDeleteDialog = true
-                    }
-                    CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
-                        navController.navigate(Screen.AccountSettings.route(type))
-                    }
-                    CPSDropdownMenuItem(title = "Origin", icon = Icons.Default.Photo) {
-                        val url = runBlocking {
-                            context.allAccountManagers.first { it.type == type }.getSavedInfo().link()
-                        }
-                        context.startActivity(makeIntentOpenUrl(url))
-                    }
-                }
+                menu = accountExpandedMenuBuilder(
+                    type = type,
+                    navController = navController,
+                    onShowDeleteDialog = { showDeleteDialog = true }
+                )
             }
             cpsComposable(Screen.AccountSettings.route) {
                 val type = (it.getScreen() as Screen.AccountSettings).type
@@ -128,14 +112,7 @@ fun CPSScaffold(
 
             cpsComposable(Screen.News.route) {
                 NewsScreen(navController)
-                menu = {
-                    CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
-                        navController.navigate(Screen.NewsSettings.route)
-                    }
-                    CPSDropdownMenuItem(title = "Follow List", icon = Icons.Rounded.PeopleAlt) {
-                        //TODO Open FollowList
-                    }
-                }
+                menu = newsMenuBuilder(navController)
             }
             cpsComposable(Screen.NewsSettings.route) {
                 NewsSettingsScreen()

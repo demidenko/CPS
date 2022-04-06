@@ -11,12 +11,16 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowRightAlt
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.rounded.PeopleAlt
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.demich.cps.Screen
+import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.LazyColumnWithScrollBar
@@ -91,3 +95,12 @@ fun NewsBottomBar() {
     }
 }
 
+fun newsMenuBuilder(navController: NavController)
+: @Composable CPSDropdownMenuScope.() -> Unit = {
+    CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
+        navController.navigate(Screen.NewsSettings.route)
+    }
+    CPSDropdownMenuItem(title = "Follow List", icon = Icons.Rounded.PeopleAlt) {
+        //TODO Open FollowList
+    }
+}
