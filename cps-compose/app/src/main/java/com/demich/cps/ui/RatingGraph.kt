@@ -7,10 +7,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Timeline
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,42 +22,62 @@ import com.demich.cps.utils.jsonSaver
 import kotlinx.coroutines.launch
 
 
+@Stable
+data class RatingGraphUIStates (
+    val showRatingGraphState: MutableState<Boolean>,
+    val loadingStatusState: MutableState<LoadingStatus>,
+    val ratingChangesState: MutableState<List<RatingChange>>
+)
+
 @Composable
-fun createRatingStuffStates(): Triple<MutableState<Boolean>, MutableState<LoadingStatus>, MutableState<List<RatingChange>>> {
+fun rememberRatingGraphUIStates(): RatingGraphUIStates {
     val showRatingGraph = rememberSaveable { mutableStateOf(false) }
     val ratingLoadingStatus = rememberSaveable { mutableStateOf(LoadingStatus.PENDING) }
     val ratingChanges = rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(emptyList<RatingChange>()) }
-    return Triple(showRatingGraph, ratingLoadingStatus, ratingChanges)
+    return RatingGraphUIStates(showRatingGraph, ratingLoadingStatus, ratingChanges)
 }
 
 @Composable
 fun<U: UserInfo> RatedAccountManager<U>.RatingLoadButton(
-    showRatingGraphState: MutableState<Boolean>,
-    loadingStatusState: MutableState<LoadingStatus>,
-    ratingChangesState: MutableState<List<RatingChange>>
+    ratingGraphUIStates: RatingGraphUIStates
 ) {
     val scope = rememberCoroutineScope()
     CPSIconButton(
         icon = Icons.Default.Timeline,
-        enabled = !showRatingGraphState.value,
-        onState = !showRatingGraphState.value
+        enabled = !ratingGraphUIStates.showRatingGraphState.value,
+        onState = !ratingGraphUIStates.showRatingGraphState.value
     ) {
-        loadingStatusState.value = LoadingStatus.LOADING
-        showRatingGraphState.value = true
+        ratingGraphUIStates.loadingStatusState.value = LoadingStatus.LOADING
+        ratingGraphUIStates.showRatingGraphState.value = true
         scope.launch {
             val ratingChanges = getRatingHistory(getSavedInfo())
             if (ratingChanges == null) {
-                loadingStatusState.value = LoadingStatus.FAILED
+                ratingGraphUIStates.loadingStatusState.value = LoadingStatus.FAILED
             } else {
-                loadingStatusState.value = LoadingStatus.PENDING
-                ratingChangesState.value = ratingChanges
+                ratingGraphUIStates.loadingStatusState.value = LoadingStatus.PENDING
+                ratingGraphUIStates.ratingChangesState.value = ratingChanges
             }
         }
     }
 }
 
+
 @Composable
 fun RatingGraph(
+    ratingGraphUIStates: RatingGraphUIStates,
+    modifier: Modifier = Modifier
+) {
+    if (ratingGraphUIStates.showRatingGraphState.value) {
+        RatingGraph(
+            loadingStatus = ratingGraphUIStates.loadingStatusState.value,
+            ratingChanges = ratingGraphUIStates.ratingChangesState.value,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+private fun RatingGraph(
     loadingStatus: LoadingStatus,
     ratingChanges: List<RatingChange>,
     modifier: Modifier = Modifier

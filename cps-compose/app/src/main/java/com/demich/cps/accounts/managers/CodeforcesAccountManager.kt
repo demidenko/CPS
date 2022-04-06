@@ -24,10 +24,7 @@ import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
 import com.demich.cps.R
 import com.demich.cps.accounts.SmallAccountPanelTypeRated
-import com.demich.cps.ui.RatingGraph
-import com.demich.cps.ui.RatingLoadButton
-import com.demich.cps.ui.SwitchSettingsItem
-import com.demich.cps.ui.createRatingStuffStates
+import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.InstantAsSecondsSerializer
 import com.demich.cps.utils.codeforces.*
@@ -199,7 +196,7 @@ class CodeforcesAccountManager(context: Context):
         setBottomBarContent: (@Composable RowScope.() -> Unit) -> Unit,
         modifier: Modifier
     ) {
-        val (showRatingGraph, ratingLoadingStatus, ratingChanges) = createRatingStuffStates()
+        val ratingGraphUIStates = rememberRatingGraphUIStates()
         Box(modifier = modifier) {
             Column {
                 SmallAccountPanelTypeRated(userInfo)
@@ -218,23 +215,16 @@ class CodeforcesAccountManager(context: Context):
                     }
                 }
             }
-            if (showRatingGraph.value) {
-                RatingGraph(
-                    loadingStatus = ratingLoadingStatus.value,
-                    ratingChanges = ratingChanges.value,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                )
-            }
+            RatingGraph(
+                ratingGraphUIStates = ratingGraphUIStates,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+            )
         }
         setBottomBarContent {
             //TODO: upsolving list button (icon = Icons.Default.FitnessCenter)
-            RatingLoadButton(
-                showRatingGraphState = showRatingGraph,
-                loadingStatusState = ratingLoadingStatus,
-                ratingChangesState = ratingChanges
-            )
+            RatingLoadButton(ratingGraphUIStates)
         }
     }
 
