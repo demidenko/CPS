@@ -1,16 +1,18 @@
 package com.demich.cps.ui
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.managers.RatedAccountManager
@@ -65,12 +67,14 @@ fun<U: UserInfo> RatedAccountManager<U>.RatingLoadButton(
 @Composable
 fun RatingGraph(
     ratingGraphUIStates: RatingGraphUIStates,
+    manager: RatedAccountManager<out UserInfo>,
     modifier: Modifier = Modifier
 ) {
     if (ratingGraphUIStates.showRatingGraphState.value) {
         RatingGraph(
             loadingStatus = ratingGraphUIStates.loadingStatusState.value,
             ratingChanges = ratingGraphUIStates.ratingChangesState.value,
+            manager = manager,
             modifier = modifier
         )
     }
@@ -80,27 +84,25 @@ fun RatingGraph(
 private fun RatingGraph(
     loadingStatus: LoadingStatus,
     ratingChanges: List<RatingChange>,
+    manager: RatedAccountManager<out UserInfo>,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
     ) {
-        Row {
-            TextButton(onClick = { /*TODO*/ }) {
-                Text(text = "all")
-            }
-            TextButton(onClick = { /*TODO*/ }) {
-                Text(text = "last 10")
-            }
-            TextButton(onClick = { /*TODO*/ }) {
-                Text(text = "last month")
-            }
-            TextButton(onClick = { /*TODO*/ }) {
-                Text(text = "last year")
-            }
+        if (loadingStatus == LoadingStatus.PENDING) {
+            val titles = listOf("all", "last 10", "last month", "last year")
+            var selected by rememberSaveable { mutableStateOf(0) }
+            TextButtonsSelectRow(
+                modifier = Modifier.background(cpsColors.background),
+                values = titles.indices.toList(),
+                selectedValue = selected,
+                text = { value -> titles[value] },
+                onSelect = { value -> selected = value }
+            )
         }
         Box(modifier = Modifier
-            .height(256.dp)
+            .height(250.dp)
             .fillMaxWidth()
             .background(cpsColors.backgroundAdditional),
             contentAlignment = Alignment.Center
@@ -113,9 +115,21 @@ private fun RatingGraph(
                     fontWeight = FontWeight.Bold
                 )
                 LoadingStatus.PENDING -> {
-                    Text(text = "size = ${ratingChanges.size}")
+                    DrawRatingGraph(manager = manager, ratingChanges = ratingChanges)
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun<U: UserInfo> DrawRatingGraph(
+    manager: RatedAccountManager<U>,
+    ratingChanges: List<RatingChange>
+) {
+    Canvas(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        drawRect(color = Color.Red, size = Size(this.size.width/2, this.size.height/2))
     }
 }

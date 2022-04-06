@@ -135,6 +135,7 @@ class AtCoderAccountManager(context: Context):
             SmallAccountPanelTypeRated(userInfo)
             RatingGraph(
                 ratingGraphUIStates = ratingGraphUIStates,
+                manager = this@AtCoderAccountManager,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()

@@ -8,10 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.WebAsset
@@ -21,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.*
@@ -239,19 +235,18 @@ private fun StatusBarAccountsPopup(
                 MonospacedText(text = manager.type.name)
             }
         }
-        Row(modifier = Modifier.padding(horizontal = 10.dp).align(Alignment.CenterHorizontally)) {
-            Button(
-                content = { Text(text = "worst", fontWeight = FontWeight.Bold.takeIf { !orderByMaximum }) },
-                onClick = {
-                    scope.launch { settingsUI.statusBarOrderByMaximum(false) }
-                }
-            )
-            Button(
-                content = { Text(text = "best", fontWeight = FontWeight.Bold.takeIf { orderByMaximum }) },
-                onClick = {
-                    scope.launch { settingsUI.statusBarOrderByMaximum(true) }
-                }
-            )
-        }
+        TextButtonsSelectRow(
+            values = listOf(false, true),
+            selectedValue = orderByMaximum,
+            text = { value ->
+                if (value) "best" else "worst"
+            },
+            onSelect = { value ->
+                scope.launch { settingsUI.statusBarOrderByMaximum(value) }
+            },
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .align(Alignment.CenterHorizontally)
+        )
     }
 }

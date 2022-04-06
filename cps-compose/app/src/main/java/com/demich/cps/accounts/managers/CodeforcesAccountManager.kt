@@ -217,6 +217,7 @@ class CodeforcesAccountManager(context: Context):
             }
             RatingGraph(
                 ratingGraphUIStates = ratingGraphUIStates,
+                manager = this@CodeforcesAccountManager,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()

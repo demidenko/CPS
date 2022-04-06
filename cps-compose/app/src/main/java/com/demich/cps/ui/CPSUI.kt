@@ -2,10 +2,7 @@ package com.demich.cps.ui
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -22,6 +19,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -159,6 +157,27 @@ fun CPSDialog(
                 horizontalAlignment = horizontalAlignment,
                 content = content
             )
+        }
+    }
+}
+
+@Composable
+fun<T> TextButtonsSelectRow(
+    values: List<T>,
+    selectedValue: T,
+    modifier: Modifier = Modifier,
+    text: (T) -> String,
+    onSelect: (T) -> Unit
+) {
+    Row(modifier = modifier) {
+        values.forEach { value ->
+            TextButton(onClick = { onSelect(value) }) {
+                Text(
+                    text = text(value),
+                    color = if (value == selectedValue) cpsColors.colorAccent else cpsColors.textColorAdditional,
+                    fontWeight = if (value == selectedValue) FontWeight.Bold else FontWeight.Normal
+                )
+            }
         }
     }
 }
