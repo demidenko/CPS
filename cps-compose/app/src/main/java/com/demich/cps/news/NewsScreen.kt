@@ -49,8 +49,7 @@ fun NewsScreen(navController: NavController) {
             trailingIcon = {
                 CPSIconButton(
                     icon = Icons.Default.ArrowRightAlt,
-                    enabled = isValid,
-                    onState = isValid
+                    enabled = isValid
                 ) {
                     scope.launch {
                         listState.scrollToItem(inputIndex.toInt())

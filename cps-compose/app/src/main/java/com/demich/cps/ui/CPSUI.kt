@@ -34,8 +34,8 @@ const val buttonOnOffDurationMillis: Int = 800
 fun CPSIconButton(
     icon: ImageVector,
     color: Color = cpsColors.textColor,
-    onState: Boolean = true,
     enabled: Boolean = true,
+    onState: Boolean = enabled,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -82,8 +82,7 @@ fun CPSReloadingButton(
                 imageVector = Icons.Rounded.Refresh,
                 tint = if (loadingStatus == LoadingStatus.FAILED) cpsColors.errorColor else cpsColors.textColor,
                 contentDescription = null,
-                modifier = Modifier
-                    .size(28.dp)
+                modifier = Modifier.size(28.dp)
             )
         }
     }
