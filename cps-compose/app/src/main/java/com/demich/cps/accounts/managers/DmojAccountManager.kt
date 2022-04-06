@@ -1,7 +1,12 @@
 package com.demich.cps.accounts.managers
 
 import android.content.Context
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -9,10 +14,18 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.datastore.preferences.preferencesDataStore
+import com.demich.cps.accounts.SmallAccountPanelTypeRated
+import com.demich.cps.ui.RatingGraph
+import com.demich.cps.ui.RatingLoadButton
+import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.utils.DmojAPI
+import com.demich.cps.utils.DmojRatingChange
+import com.demich.cps.utils.jsonCPS
 import io.ktor.client.features.*
 import io.ktor.http.*
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 
 @Serializable
 data class DmojUserInfo(
@@ -76,7 +89,21 @@ class DmojAccountManager(context: Context):
     }
 
     override suspend fun loadRatingHistory(info: DmojUserInfo): List<RatingChange>? {
-        TODO("not yet")
+        try {
+            val s = DmojAPI.getUserPage(handle = info.handle)
+            val i = s.indexOf("var rating_history = [")
+            if (i == -1) return emptyList()
+            val j = s.indexOf("];", i)
+            val str = s.substring(s.indexOf('[', i), j+1)
+            return jsonCPS.decodeFromString<List<DmojRatingChange>>(str).map {
+                RatingChange(
+                    rating = it.rating,
+                    date = Instant.fromEpochMilliseconds(it.timestamp.toLong())
+                )
+            }
+        } catch (e: Throwable) {
+            return null
+        }
     }
 
     override fun getRating(userInfo: DmojUserInfo) = userInfo.rating
@@ -117,6 +144,28 @@ class DmojAccountManager(context: Context):
                 else append("[not rated]")
             }
         }
+
+    @Composable
+    override fun BigView(
+        userInfo: DmojUserInfo,
+        setBottomBarContent: (@Composable RowScope.() -> Unit) -> Unit,
+        modifier: Modifier
+    ) {
+        val ratingGraphUIStates = rememberRatingGraphUIStates()
+        Box(modifier = modifier) {
+            SmallAccountPanelTypeRated(userInfo)
+            RatingGraph(
+                ratingGraphUIStates = ratingGraphUIStates,
+                manager = this@DmojAccountManager,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+            )
+        }
+        setBottomBarContent {
+            RatingLoadButton(ratingGraphUIStates)
+        }
+    }
 
     override fun getDataStore() = accountDataStore(context.account_dmoj_dataStore, emptyInfo())
 }

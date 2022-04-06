@@ -17,6 +17,10 @@ object DmojAPI {
         return jsonCPS.decodeFromJsonElement(obj)
     }
 
+    suspend fun getUserPage(handle: String): String {
+        return client.get(URLFactory.main + "/user/$handle")
+    }
+
     suspend fun getSuggestions(query: String): List<DmojSuggestion> {
         val str = client.get<String>(URLFactory.main + "/widgets/select2/user_search?term=$query&_type=query&q=$query")
         val json = Json.parseToJsonElement(str).jsonObject
@@ -42,4 +46,13 @@ data class DmojUserResult(
 data class DmojSuggestion(
     val text: String,
     val id: String
+)
+
+@Serializable
+data class DmojRatingChange(
+    val label: String,
+    val rating: Int,
+    val ranking: Int,
+    val link: String,
+    val timestamp: Double
 )
