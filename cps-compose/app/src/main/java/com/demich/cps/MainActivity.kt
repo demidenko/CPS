@@ -3,10 +3,12 @@ package com.demich.cps
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
@@ -18,8 +20,10 @@ import com.demich.cps.accounts.*
 import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.ContestsSettingsScreen
+import com.demich.cps.contests.contestsBottomBarBuilder
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
+import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSStatusBar
@@ -74,10 +78,12 @@ fun CPSScaffold(
     )
 
     var menu: (@Composable CPSDropdownMenuScope.() -> Unit)? by remember { mutableStateOf(null) }
+    var bottomBar: (@Composable RowScope.() -> Unit)? by remember { mutableStateOf(null) }
 
     fun NavGraphBuilder.cpsComposable(route: String, content: @Composable (NavBackStackEntry) -> Unit) {
         composable(route) {
             menu = null
+            bottomBar = null
             content(it)
         }
     }
@@ -88,16 +94,18 @@ fun CPSScaffold(
         {
             cpsComposable(Screen.Accounts.route) {
                 AccountsScreen(navController, cpsViewModels.accountsViewModel)
+                bottomBar = accountsBottomBarBuilder(cpsViewModels.accountsViewModel)
             }
             cpsComposable(Screen.AccountExpanded.route) {
                 val type = (it.getScreen() as Screen.AccountExpanded).type
-                var showDeleteDialog by remember { mutableStateOf(false) }
+                var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
                 AccountExpandedScreen(
                     type = type,
                     navController = navController,
                     accountsViewModel = cpsViewModels.accountsViewModel,
                     showDeleteDialog = showDeleteDialog,
-                    onDismissDeleteDialog = { showDeleteDialog = false }
+                    onDismissDeleteDialog = { showDeleteDialog = false },
+                    setBottomBarContent = { content -> bottomBar = content }
                 )
                 menu = accountExpandedMenuBuilder(
                     type = type,
@@ -113,6 +121,7 @@ fun CPSScaffold(
             cpsComposable(Screen.News.route) {
                 NewsScreen(navController)
                 menu = newsMenuBuilder(navController)
+                bottomBar = newsBottomBarBuilder()
             }
             cpsComposable(Screen.NewsSettings.route) {
                 NewsSettingsScreen()
@@ -120,6 +129,7 @@ fun CPSScaffold(
 
             cpsComposable(Screen.Contests.route) {
                 ContestsScreen(navController)
+                bottomBar = contestsBottomBarBuilder(navController)
             }
             cpsComposable(Screen.ContestsSettings.route) {
                 ContestsSettingsScreen(navController)
@@ -139,7 +149,7 @@ fun CPSScaffold(
         bottomBar = { CPSBottomBar(
             navController = navController,
             currentScreen = currentScreen,
-            cpsViewModels = cpsViewModels
+            additionalBottomBar = bottomBar
         ) }
     ) { innerPadding ->
         NavHost(

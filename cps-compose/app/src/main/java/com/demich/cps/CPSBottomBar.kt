@@ -18,9 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.demich.cps.accounts.AccountsBottomBar
-import com.demich.cps.contests.ContestsBottomBar
-import com.demich.cps.news.NewsBottomBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
@@ -29,9 +26,9 @@ import com.demich.cps.utils.rememberCollect
 fun CPSBottomBar(
     navController: NavHostController,
     currentScreen: Screen?,
-    cpsViewModels: CPSViewModels
+    additionalBottomBar: @Composable() (RowScope.() -> Unit)? = null
 ) {
-    currentScreen?.takeIf { it.enableBottomBar }?.let { screen ->
+    if (currentScreen != null && currentScreen.enableBottomBar) {
         Row(
             modifier = Modifier
                 .height(56.dp) //as BottomNavigationHeight
@@ -40,14 +37,12 @@ fun CPSBottomBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             CPSBottomBarAdditional(
-                currentScreen = screen,
-                navController = navController,
-                cpsViewModels = cpsViewModels,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                content = additionalBottomBar ?: {}
             )
             CPSBottomBarVerticalDivider()
             CPSBottomBarMain(
-                currentScreen = screen,
+                currentScreen = currentScreen,
                 navController = navController,
                 modifier = Modifier.weight(1f)
             )
@@ -112,22 +107,14 @@ private fun CPSBottomBarMain(
 
 @Composable
 private fun CPSBottomBarAdditional(
-    currentScreen: Screen,
-    navController: NavHostController,
-    cpsViewModels: CPSViewModels,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
-    ) {
-        when (currentScreen) {
-            Screen.Accounts -> AccountsBottomBar(cpsViewModels.accountsViewModel)
-            Screen.News -> NewsBottomBar()
-            Screen.Contests -> ContestsBottomBar(navController)
-            else -> Unit
-        }
-    }
+        horizontalArrangement = Arrangement.End,
+        content = content
+    )
 }
 
 @Composable

@@ -1,7 +1,10 @@
 package com.demich.cps.accounts.managers
 
 import android.content.Context
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
@@ -24,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 enum class AccountManagers {
     codeforces,
@@ -33,6 +37,17 @@ enum class AccountManagers {
     acmp,
     timus
 }
+
+val Context.allAccountManagers: List<AccountManager<out UserInfo>>
+    get() = listOf(
+        CodeforcesAccountManager(this),
+        AtCoderAccountManager(this),
+        CodeChefAccountManager(this),
+        DmojAccountManager(this),
+        ACMPAccountManager(this),
+        TimusAccountManager(this)
+    )
+
 
 abstract class AccountManager<U: UserInfo>(val context: Context, val type: AccountManagers) {
 
@@ -73,7 +88,13 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     open fun Panel(userInfo: U) {}
 
     @Composable
-    open fun BigView(userInfo: U) = Panel(userInfo)
+    open fun BigView(
+        userInfo: U,
+        setBottomBarContent: (@Composable RowScope.() -> Unit) -> Unit,
+        modifier: Modifier = Modifier
+     ) = Box(modifier) {
+        Panel(userInfo)
+    }
 }
 
 abstract class RatedAccountManager<U: UserInfo>(context: Context, type: AccountManagers):
@@ -123,9 +144,14 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, type: AccountM
     abstract fun getRating(userInfo: U): Int
 
     protected open suspend fun loadRatingHistory(info: U): List<RatingChange>? = null
-    suspend fun getRatingHistory(info: U): List<RatingChange>? = loadRatingHistory(info)?.sortedBy { it.date }
+    suspend fun getRatingHistory(info: U): List<RatingChange>? {
+        return kotlin.runCatching {
+            loadRatingHistory(info)?.sortedBy { it.date }
+        }.getOrNull()
+    }
 }
 
+@Serializable
 data class RatingChange(
     val rating: Int,
     val date: Instant

@@ -1,6 +1,5 @@
 package com.demich.cps.accounts
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -82,11 +82,15 @@ fun AccountExpandedScreen(
     navController: NavController,
     accountsViewModel: AccountsViewModel,
     showDeleteDialog: Boolean,
-    onDismissDeleteDialog: () -> Unit
+    onDismissDeleteDialog: () -> Unit,
+    setBottomBarContent: (@Composable RowScope.() -> Unit) -> Unit
 ) {
     val context = context
     val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
-    AccountExpandedPanel(manager = manager)
+    AccountExpandedPanel(
+        manager = manager,
+        setBottomBarContent = setBottomBarContent
+    )
 
     if (showDeleteDialog) {
         AlertDialog(
@@ -117,15 +121,17 @@ fun AccountExpandedScreen(
 
 @Composable
 private fun<U: UserInfo> AccountExpandedPanel(
-    manager: AccountManager<U>
+    manager: AccountManager<U>,
+    setBottomBarContent: (@Composable RowScope.() -> Unit) -> Unit
 ) {
     val userInfo by rememberCollect { manager.flowOfInfo() }
-    Box(modifier = Modifier
-        .padding(all = 10.dp)
-        .fillMaxSize()
-    ) {
-        manager.BigView(userInfo)
-    }
+    manager.BigView(
+        userInfo = userInfo,
+        setBottomBarContent = setBottomBarContent,
+        modifier = Modifier
+            .padding(all = 10.dp)
+            .fillMaxSize()
+    )
 }
 
 @Composable
@@ -178,15 +184,15 @@ fun accountExpandedMenuBuilder(
         navController.navigate(Screen.AccountSettings.route(type))
     }
     CPSDropdownMenuItem(title = "Origin", icon = Icons.Default.Photo) {
-        val url = runBlocking {
-            context.allAccountManagers.first { it.type == type }.getSavedInfo().link()
+        val url = context.allAccountManagers.first { it.type == type }.run {
+            runBlocking { getSavedInfo().link() }
         }
         context.startActivity(makeIntentOpenUrl(url))
     }
 }
 
-@Composable
-fun AccountsBottomBar(accountsViewModel: AccountsViewModel) {
+fun accountsBottomBarBuilder(accountsViewModel: AccountsViewModel)
+: @Composable RowScope.() -> Unit = {
     AddAccountButton()
     ReloadAccountsButton(accountsViewModel)
 }
@@ -213,7 +219,7 @@ private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
 @Composable
 private fun AddAccountButton() {
     var showMenu by remember { mutableStateOf(false) }
-    var chosenManager by remember { mutableStateOf<AccountManager<*>?>(null) }
+    var chosenManager: AccountManager<*>? by remember { mutableStateOf(null) }
 
     Box {
         CPSIconButton(icon = Icons.Outlined.AddBox) {
@@ -255,13 +261,3 @@ fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
         onResult = { userInfo -> scope.launch { setSavedInfo(userInfo) } }
      )
 }
-
-val Context.allAccountManagers: List<AccountManager<out UserInfo>>
-    get() = listOf(
-        CodeforcesAccountManager(this),
-        AtCoderAccountManager(this),
-        CodeChefAccountManager(this),
-        DmojAccountManager(this),
-        ACMPAccountManager(this),
-        TimusAccountManager(this)
-    )

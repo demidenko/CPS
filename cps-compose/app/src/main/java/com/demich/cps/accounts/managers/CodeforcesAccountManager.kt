@@ -1,9 +1,7 @@
 package com.demich.cps.accounts.managers
 
 import android.content.Context
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -26,7 +24,10 @@ import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
 import com.demich.cps.R
 import com.demich.cps.accounts.SmallAccountPanelTypeRated
+import com.demich.cps.ui.RatingGraph
+import com.demich.cps.ui.RatingLoadButton
 import com.demich.cps.ui.SwitchSettingsItem
+import com.demich.cps.ui.createRatingStuffStates
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.InstantAsSecondsSerializer
 import com.demich.cps.utils.codeforces.*
@@ -35,9 +36,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.text.contains
-import kotlin.text.indexOf
-import kotlin.text.splitToSequence
-import kotlin.text.substring
 
 
 @Serializable
@@ -196,23 +194,47 @@ class CodeforcesAccountManager(context: Context):
         }
 
     @Composable
-    override fun BigView(userInfo: CodeforcesUserInfo) {
-        Column {
-            SmallAccountPanelTypeRated(userInfo)
-            if (userInfo.contribution != 0) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "contribution:",
-                        color = cpsColors.textColorAdditional,
-                        fontSize = 18.sp,
-                        modifier = Modifier.padding(end = 5.dp)
-                    )
-                    CodeforcesUtils.VotedText(
-                        rating = userInfo.contribution,
-                        fontSize = 20.sp
-                    )
+    override fun BigView(
+        userInfo: CodeforcesUserInfo,
+        setBottomBarContent: (@Composable RowScope.() -> Unit) -> Unit,
+        modifier: Modifier
+    ) {
+        val (showRatingGraph, ratingLoadingStatus, ratingChanges) = createRatingStuffStates()
+        Box(modifier = modifier) {
+            Column {
+                SmallAccountPanelTypeRated(userInfo)
+                if (userInfo.contribution != 0) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "contribution:",
+                            color = cpsColors.textColorAdditional,
+                            fontSize = 18.sp,
+                            modifier = Modifier.padding(end = 5.dp)
+                        )
+                        CodeforcesUtils.VotedText(
+                            rating = userInfo.contribution,
+                            fontSize = 20.sp
+                        )
+                    }
                 }
             }
+            if (showRatingGraph.value) {
+                RatingGraph(
+                    loadingStatus = ratingLoadingStatus.value,
+                    ratingChanges = ratingChanges.value,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                )
+            }
+        }
+        setBottomBarContent {
+            //TODO: upsolving list button (icon = Icons.Default.FitnessCenter)
+            RatingLoadButton(
+                showRatingGraphState = showRatingGraph,
+                loadingStatusState = ratingLoadingStatus,
+                ratingChangesState = ratingChanges
+            )
         }
     }
 

@@ -1,5 +1,6 @@
 package com.demich.cps.contests
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
@@ -15,8 +16,8 @@ fun ContestsScreen(navController: NavController) {
 
 }
 
-@Composable
-fun ContestsBottomBar(navController: NavController) {
+fun contestsBottomBarBuilder(navController: NavController)
+: @Composable RowScope.() -> Unit = {
     CPSIconButton(icon = Icons.Default.Settings) {
         navController.navigate(Screen.ContestsSettings.route)
     }

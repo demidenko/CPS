@@ -1,8 +1,13 @@
 package com.demich.cps.accounts.managers
 
 import android.content.Context
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -14,7 +19,11 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
+import com.demich.cps.accounts.SmallAccountPanelTypeRated
+import com.demich.cps.ui.RatingGraph
+import com.demich.cps.ui.RatingLoadButton
 import com.demich.cps.ui.SwitchSettingsItem
+import com.demich.cps.ui.createRatingStuffStates
 import com.demich.cps.utils.AtCoderAPI
 import com.demich.cps.utils.AtCoderRatingChange
 import kotlinx.serialization.Serializable
@@ -117,6 +126,34 @@ class AtCoderAccountManager(context: Context):
                 else append("[not rated]")
             }
         }
+
+    @Composable
+    override fun BigView(
+        userInfo: AtCoderUserInfo,
+        setBottomBarContent: (@Composable RowScope.() -> Unit) -> Unit,
+        modifier: Modifier
+    ) {
+        val (showRatingGraph, ratingLoadingStatus, ratingChanges) = createRatingStuffStates()
+        Box(modifier = modifier) {
+            SmallAccountPanelTypeRated(userInfo)
+            if (showRatingGraph.value) {
+                RatingGraph(
+                    loadingStatus = ratingLoadingStatus.value,
+                    ratingChanges = ratingChanges.value,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                )
+            }
+        }
+        setBottomBarContent {
+            RatingLoadButton(
+                showRatingGraphState = showRatingGraph,
+                loadingStatusState = ratingLoadingStatus,
+                ratingChangesState = ratingChanges
+            )
+        }
+    }
 
     override fun getDataStore() = accountDataStore(context.account_atcoder_dataStore, emptyInfo())
     override fun getSettings() = AtCoderAccountSettingsDataStore(this)

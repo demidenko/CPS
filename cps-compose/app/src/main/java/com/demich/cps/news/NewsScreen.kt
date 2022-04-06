@@ -1,9 +1,6 @@
 package com.demich.cps.news
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Divider
@@ -88,8 +85,8 @@ fun NewsSettingsScreen() {
 
 }
 
-@Composable
-fun NewsBottomBar() {
+fun newsBottomBarBuilder()
+: @Composable RowScope.() -> Unit = {
     CPSReloadingButton(loadingStatus = LoadingStatus.PENDING) {
 
     }
