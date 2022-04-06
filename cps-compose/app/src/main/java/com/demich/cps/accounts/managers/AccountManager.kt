@@ -243,7 +243,7 @@ interface AccountSettingsProvider {
 
 interface RatingRevolutionsProvider {
     //list of (last time, bounds)
-    val ratingUpperBoundRevolutions: List<Pair<Instant, Array<Pair<Int, HandleColor>>>>
+    val ratingUpperBoundRevolutions: List<Pair<Instant, Array<Pair<HandleColor, Int>>>>
 }
 
 fun notifyRatingChange(

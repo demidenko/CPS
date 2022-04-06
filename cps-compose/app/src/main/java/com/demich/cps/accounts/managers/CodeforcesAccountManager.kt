@@ -287,39 +287,39 @@ class CodeforcesAccountManager(context: Context):
         }
     }
 
-    override val ratingUpperBoundRevolutions: List<Pair<Instant, Array<Pair<Int, HandleColor>>>>
+    override val ratingUpperBoundRevolutions: List<Pair<Instant, Array<Pair<HandleColor, Int>>>>
         get() = listOf(
             //https://codeforces.com/blog/entry/59228
             Instant.fromEpochSeconds(1525364996L) to arrayOf(
-                1200 to HandleColor.GRAY,
-                1400 to HandleColor.GREEN,
-                1600 to HandleColor.CYAN,
-                1900 to HandleColor.BLUE,
-                2200 to HandleColor.VIOLET,
-                2400 to HandleColor.ORANGE
+                HandleColor.GRAY to 1200,
+                HandleColor.GREEN to 1400,
+                HandleColor.CYAN to 1600,
+                HandleColor.BLUE to 1900,
+                HandleColor.VIOLET to 2200,
+                HandleColor.ORANGE to 2400
             ),
             //https://codeforces.com/blog/entry/20638
             Instant.fromEpochSeconds(1443721088L) to arrayOf(
-                1200 to HandleColor.GRAY,
-                1500 to HandleColor.GREEN,
-                1700 to HandleColor.BLUE,
-                1900 to HandleColor.VIOLET,
-                2200 to HandleColor.ORANGE
+                HandleColor.GRAY to 1200,
+                HandleColor.GREEN to 1500,
+                HandleColor.BLUE to 1700,
+                HandleColor.VIOLET to 1900,
+                HandleColor.ORANGE to 2200
             ),
             //https://codeforces.com/blog/entry/3064
             Instant.fromEpochSeconds(1320620562L) to arrayOf(
-                1200 to HandleColor.GRAY,
-                1500 to HandleColor.GREEN,
-                1650 to HandleColor.BLUE,
-                1800 to HandleColor.VIOLET,
-                2000 to HandleColor.ORANGE
+                HandleColor.GRAY to 1200,
+                HandleColor.GREEN to 1500,
+                HandleColor.BLUE to 1650,
+                HandleColor.VIOLET to 1800,
+                HandleColor.ORANGE to 2000
             ),
             //https://codeforces.com/blog/entry/1383
             Instant.fromEpochSeconds(1298914585L) to arrayOf(
-                1200 to HandleColor.GRAY,
-                1500 to HandleColor.GREEN,
-                1650 to HandleColor.BLUE,
-                2000 to HandleColor.YELLOW
+                HandleColor.GRAY to 1200,
+                HandleColor.GREEN to 1500,
+                HandleColor.BLUE to 1650,
+                HandleColor.YELLOW to 2000
             )
             //https://codeforces.com/blog/entry/126
         )
