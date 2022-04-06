@@ -80,9 +80,9 @@ class AtCoderAccountManager(context: Context):
         try {
             val s = AtCoderAPI.getUserPage(handle = info.handle)
             val i = s.lastIndexOf("<script>var rating_history=[{")
-            if (i == -1) return null
-            val j = s.indexOf("}];</script>", i)
-            val str = s.substring(s.indexOf('=',i)+1, j+2)
+            if (i == -1) return emptyList()
+            val j = s.indexOf("];</script>", i)
+            val str = s.substring(s.indexOf('[', i), j+1)
             return jsonCPS.decodeFromString<List<AtCoderRatingChange>>(str).map {
                 RatingChange(
                     rating = it.NewRating,
