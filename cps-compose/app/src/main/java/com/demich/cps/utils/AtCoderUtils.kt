@@ -55,10 +55,6 @@ object AtCoderAPI {
         }
     }
 
-    suspend fun getRatingChanges(handle: String): List<AtCoderRatingChange>? {
-        return null //TODO
-    }
-
     object URLFactory {
         const val main = "https://atcoder.jp"
         fun user(handle: String) = "$main/users/$handle"

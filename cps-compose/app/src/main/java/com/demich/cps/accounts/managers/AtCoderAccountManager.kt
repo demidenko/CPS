@@ -23,7 +23,9 @@ import com.demich.cps.accounts.SmallAccountPanelTypeRated
 import com.demich.cps.ui.*
 import com.demich.cps.utils.AtCoderAPI
 import com.demich.cps.utils.AtCoderRatingChange
+import com.demich.cps.utils.jsonCPS
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 
 @Serializable
 data class AtCoderUserInfo(
@@ -74,13 +76,23 @@ class AtCoderAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadRatingHistory(info: AtCoderUserInfo): List<RatingChange>? =
-        AtCoderAPI.getRatingChanges(info.userId)?.map {
-            RatingChange(
-                rating = it.NewRating,
-                date = it.EndTime
-            )
+    override suspend fun loadRatingHistory(info: AtCoderUserInfo): List<RatingChange>? {
+        try {
+            val s = AtCoderAPI.getUserPage(handle = info.handle)
+            val i = s.lastIndexOf("<script>var rating_history=[{")
+            if (i == -1) return null
+            val j = s.indexOf("}];</script>", i)
+            val str = s.substring(s.indexOf('=',i)+1, j+2)
+            return jsonCPS.decodeFromString<List<AtCoderRatingChange>>(str).map {
+                RatingChange(
+                    rating = it.NewRating,
+                    date = it.EndTime
+                )
+            }
+        } catch (e: Throwable) {
+            return null
         }
+    }
 
     override fun getRating(userInfo: AtCoderUserInfo) = userInfo.rating
 
