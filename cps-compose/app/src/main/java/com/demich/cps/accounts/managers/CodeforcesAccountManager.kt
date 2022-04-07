@@ -147,6 +147,7 @@ class CodeforcesAccountManager(context: Context):
             HandleColor.CYAN -> Color(0xFF03A89E)
             HandleColor.BLUE -> Color(0xFF0000FF)
             HandleColor.VIOLET -> Color(0xFFAA00AA)
+            HandleColor.YELLOW -> Color(0xFFBBBB00)
             HandleColor.ORANGE -> Color(0xFFFF8C00)
             HandleColor.RED -> Color(0xFFFF0000)
             else -> throw HandleColor.UnknownHandleColorException(handleColor, this)
