@@ -31,6 +31,7 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.jsonSaver
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import kotlin.math.round
 
 
 @Stable
@@ -198,7 +199,9 @@ private fun DrawRatingGraph(
     rectangles: List<PointWithColor>,
     circleRadius: Float = 6f,
     circleBorderWidth: Float = 3f,
-    pathWidth: Float = 4f
+    pathWidth: Float = 4f,
+    shadowOffset: Offset = Offset(4f, -4f),
+    shadowAlpha: Float = 0.3f
 ) {
     Canvas(
         modifier = Modifier
@@ -206,22 +209,42 @@ private fun DrawRatingGraph(
             .clipToBounds()
     ) {
         scale(scaleX = 1f, scaleY = -1f) {
-            //rating colors
-            rectangles.forEach { (rx, ry, handleColor) ->
-                val (px, py) = translator.pointToWindow(rx, ry, size)
-                drawRect(
-                    color = colorsMap[handleColor]!!,
-                    topLeft = Offset.Zero,
-                    size = Size(px, py)
-                )
-            }
-
             val ratingPath = Path().apply {
                 ratingChanges.forEachIndexed { index, point ->
                     val (px, py) = translator.pointToWindow(point.first, point.second, size)
                     if (index == 0) moveTo(px, py)
                     else lineTo(px, py)
                 }
+            }
+
+            //rating filled areas
+            rectangles.forEach { (rx, ry, handleColor) ->
+                val (px, py) = translator.pointToWindow(rx, ry, size)
+                drawRect(
+                    color = colorsMap[handleColor]!!,
+                    topLeft = Offset.Zero,
+                    size = Size(round(px), round(py))
+                )
+            }
+
+            //shadow of rating path
+            drawPath(
+                path = Path().apply { addPath(ratingPath, shadowOffset) },
+                color = Color.Black,
+                style = Stroke(width = pathWidth),
+                alpha = shadowAlpha
+            )
+
+            //shadow of rating points
+            ratingChanges.forEach { (x, y) ->
+                val center = translator.pointToWindow(x, y, size)
+                drawCircle(
+                    color = Color.Black,
+                    radius = circleRadius + circleBorderWidth,
+                    center = center + shadowOffset,
+                    style = Fill,
+                    alpha = shadowAlpha
+                )
             }
 
             //rating path
@@ -234,17 +257,17 @@ private fun DrawRatingGraph(
             //rating points
             ratingChanges.forEach { (x, y) ->
                 val coveredBy = rectangles.last { (rx, ry) -> x < rx && y < ry }
-                val (px, py) = translator.pointToWindow(x, y, size)
+                val center = translator.pointToWindow(x, y, size)
                 drawCircle(
                     color = Color.Black,
                     radius = circleRadius + circleBorderWidth,
-                    center = Offset(px, py),
+                    center = center,
                     style = Fill
                 )
                 drawCircle(
                     color = colorsMap[coveredBy.handleColor]!!,
                     radius = circleRadius,
-                    center = Offset(px, py),
+                    center = center,
                     style = Fill
                 )
             }
@@ -258,10 +281,10 @@ private data class CoordinateTranslator(
     private val rangeX: Pair<Float, Float>,
     private val rangeY: Pair<Float, Float>,
 ) {
-    fun pointToWindow(x: Long, y: Long, size: Size): Pair<Float, Float> {
+    fun pointToWindow(x: Long, y: Long, size: Size): Offset {
         val px = (x - rangeX.first) / (rangeX.second - rangeX.first) * size.width
         val py = (y - rangeY.first) / (rangeY.second - rangeY.first) * size.height
-        return Pair(px, py)
+        return Offset(px, py)
     }
 }
 
