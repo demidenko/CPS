@@ -19,6 +19,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -113,27 +114,39 @@ private fun RatingGraph(
         modifier = modifier
     ) {
 
-        var filterType by rememberSaveable { mutableStateOf(RatingFilterType.all) }
         val translator by remember { mutableStateOf(CoordinateTranslator()) }
+
+        var filterType by remember { mutableStateOf(RatingFilterType.all) }
+        var timeRange by remember {
+            mutableStateOf(Instant.DISTANT_PAST .. Instant.DISTANT_FUTURE)
+        }
 
         //TODO: save translator somehow
         DisposableEffect(key1 = filterType, key2 = ratingChanges, effect = {
             if (ratingChanges.isNotEmpty())
             when (val type = filterType) {
-                RatingFilterType.all -> translator.setWindow(
-                    minRating = ratingChanges.minOf { it.rating },
-                    maxRating = ratingChanges.maxOf { it.rating },
-                    startTime = ratingChanges.first().date,
-                    endTime = ratingChanges.last().date
-                )
+                RatingFilterType.all -> {
+                    val startTime = ratingChanges.first().date
+                    val endTime = ratingChanges.last().date
+                    translator.setWindow(
+                        minRating = ratingChanges.minOf { it.rating },
+                        maxRating = ratingChanges.maxOf { it.rating },
+                        startTime = startTime,
+                        endTime = endTime
+                    )
+                    timeRange = startTime .. endTime
+                }
                 RatingFilterType.last10 -> {
                     val last10Changes = ratingChanges.takeLast(10)
+                    val startTime = last10Changes.first().date
+                    val endTime = last10Changes.last().date
                     translator.setWindow(
                         minRating = last10Changes.minOf { it.rating },
                         maxRating = last10Changes.maxOf { it.rating },
-                        startTime = last10Changes.first().date,
-                        endTime = last10Changes.last().date
+                        startTime = startTime,
+                        endTime = endTime
                     )
+                    timeRange = startTime .. endTime
                 }
                 RatingFilterType.lastMonth, RatingFilterType.lastYear -> {
                     val now = getCurrentTime()
@@ -145,6 +158,7 @@ private fun RatingGraph(
                         startTime = startTime,
                         endTime = now
                     )
+                    timeRange = startTime .. now
                 }
             }
             onDispose {  }
@@ -175,7 +189,8 @@ private fun RatingGraph(
                         RatingFilterType.lastYear -> "last year"
                     }
                 },
-                onSelect = { type -> filterType = type }
+                onSelect = { type -> filterType = type },
+                modifier = Modifier.background(cpsColors.background)
             )
         }
 
@@ -201,6 +216,7 @@ private fun RatingGraph(
                             manager = manager,
                             ratingChanges = ratingChanges,
                             translator = translator,
+                            timeRange = timeRange,
                             modifier = Modifier
                                 .pointerInput(Unit) {
                                     detectTransformGestures { centroid, pan, zoom, rotation ->
@@ -221,6 +237,7 @@ private fun<U: UserInfo> DrawRatingGraph(
     manager: RatedAccountManager<U>,
     ratingChanges: List<RatingChange>,
     translator: CoordinateTranslator,
+    timeRange: ClosedRange<Instant>,
     modifier: Modifier = Modifier
 ) {
     val rectangles = remember(manager.type) {
@@ -261,6 +278,7 @@ private fun<U: UserInfo> DrawRatingGraph(
     DrawRatingGraph(
         ratingChanges = ratingChanges.map { it.date.epochSeconds to it.rating.toLong() }.sortedBy { it.first },
         translator = translator,
+        timeRange = timeRange,
         colorsMap = managerSupportedColors.associateWith { manager.colorFor(handleColor = it) },
         rectangles = rectangles,
         modifier = modifier
@@ -271,6 +289,7 @@ private fun<U: UserInfo> DrawRatingGraph(
 private fun DrawRatingGraph(
     ratingChanges: List<Pair<Long, Long>>,
     translator: CoordinateTranslator,
+    timeRange: ClosedRange<Instant>,
     colorsMap: Map<HandleColor, Color>,
     rectangles: List<PointWithColor>,
     circleRadius: Float = 6f,
@@ -302,6 +321,17 @@ private fun DrawRatingGraph(
                     color = colorsMap[handleColor]!!,
                     topLeft = Offset.Zero,
                     size = Size(round(px), round(py))
+                )
+            }
+
+            //time range lines
+            listOf(timeRange.start, timeRange.endInclusive).forEach {
+                val x = translator.pointToWindow(it.epochSeconds, 0).x
+                drawLine(
+                    color = Color.Black,
+                    start = Offset(x, 0f),
+                    end = Offset(x, size.height),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
                 )
             }
 
