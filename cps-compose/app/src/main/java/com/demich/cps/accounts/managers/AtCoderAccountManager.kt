@@ -86,7 +86,10 @@ class AtCoderAccountManager(context: Context):
             return jsonCPS.decodeFromString<List<AtCoderRatingChange>>(str).map {
                 RatingChange(
                     rating = it.NewRating,
-                    date = it.EndTime
+                    oldRating = it.OldRating,
+                    date = it.EndTime,
+                    title = it.ContestName,
+                    rank = it.Place
                 )
             }
         } catch (e: Throwable) {
