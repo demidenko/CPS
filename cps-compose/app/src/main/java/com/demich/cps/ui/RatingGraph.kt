@@ -29,10 +29,12 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.jsonSaver
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.math.round
+import kotlin.time.Duration.Companion.days
 
 
 @Stable
@@ -92,6 +94,13 @@ fun RatingGraph(
     }
 }
 
+private enum class RatingFilterType {
+    all,
+    last10,
+    lastMonth,
+    lastYear
+}
+
 @Composable
 private fun RatingGraph(
     loadingStatus: LoadingStatus,
@@ -103,6 +112,73 @@ private fun RatingGraph(
     Column(
         modifier = modifier
     ) {
+
+        var filterType by rememberSaveable { mutableStateOf(RatingFilterType.all) }
+        val translator by remember { mutableStateOf(CoordinateTranslator()) }
+
+        //TODO: save translator somehow
+        DisposableEffect(key1 = filterType, key2 = ratingChanges, effect = {
+            if (ratingChanges.isNotEmpty())
+            when (val type = filterType) {
+                RatingFilterType.all -> translator.setWindow(
+                    minRating = ratingChanges.minOf { it.rating },
+                    maxRating = ratingChanges.maxOf { it.rating },
+                    startTime = ratingChanges.first().date,
+                    endTime = ratingChanges.last().date
+                )
+                RatingFilterType.last10 -> {
+                    val last10Changes = ratingChanges.takeLast(10)
+                    translator.setWindow(
+                        minRating = last10Changes.minOf { it.rating },
+                        maxRating = last10Changes.maxOf { it.rating },
+                        startTime = last10Changes.first().date,
+                        endTime = last10Changes.last().date
+                    )
+                }
+                RatingFilterType.lastMonth, RatingFilterType.lastYear -> {
+                    val now = getCurrentTime()
+                    val startTime = now - (if (type == RatingFilterType.lastMonth) 30.days else 365.days)
+                    val lastChanges = ratingChanges.filter { it.date >= startTime }
+                    translator.setWindow(
+                        minRating = lastChanges.minOf { it.rating },
+                        maxRating = lastChanges.maxOf { it.rating },
+                        startTime = startTime,
+                        endTime = now
+                    )
+                }
+            }
+            onDispose {  }
+        })
+
+        if (loadingStatus == LoadingStatus.PENDING && ratingChanges.isNotEmpty()) {
+            TextButtonsSelectRow(
+                values = buildList {
+                    add(RatingFilterType.all)
+                    if (ratingChanges.size > 10) add(RatingFilterType.last10)
+
+                    val now = getCurrentTime()
+                    val firstInMonth = ratingChanges.indexOfFirst { it.date >= now - 30.days }
+                    val firstInYear = ratingChanges.indexOfFirst { it.date >= now - 365.days }
+                    if (firstInMonth > 0 && firstInMonth != -1) {
+                        add(RatingFilterType.lastMonth)
+                    }
+                    if (firstInYear > 0 && firstInYear != -1 && firstInYear != firstInMonth) {
+                        add(RatingFilterType.lastYear)
+                    }
+                },
+                selectedValue = filterType,
+                text = {
+                    when (it) {
+                        RatingFilterType.all -> "all"
+                        RatingFilterType.last10 -> "last 10"
+                        RatingFilterType.lastMonth -> "last month"
+                        RatingFilterType.lastYear -> "last year"
+                    }
+                },
+                onSelect = { type -> filterType = type }
+            )
+        }
+
         Box(modifier = Modifier
             .height(240.dp)
             .fillMaxWidth()
@@ -121,15 +197,6 @@ private fun RatingGraph(
                     if (ratingChanges.isEmpty()) {
                         Text(text = "Rating history is empty")
                     } else {
-                        val translator = remember {
-                            CoordinateTranslator(
-                                minRating = ratingChanges.minOf { it.rating } - 100,
-                                maxRating = ratingChanges.maxOf { it.rating } + 100,
-                                startTime = ratingChanges.minOf { it.date },
-                                endTime = ratingChanges.maxOf { it.date }
-                            )
-                        }
-
                         DrawRatingGraph(
                             manager = manager,
                             ratingChanges = ratingChanges,
@@ -287,17 +354,26 @@ private fun DrawRatingGraph(
     }
 }
 
-private class CoordinateTranslator(
-    minRating: Int,
-    maxRating: Int,
-    startTime: Instant,
-    endTime: Instant
-) {
-    private var minY: Float by mutableStateOf(minRating.toFloat())
-    private var maxY: Float by mutableStateOf(maxRating.toFloat())
-    private var minX: Float by mutableStateOf(startTime.epochSeconds.toFloat())
-    private var maxX: Float by mutableStateOf(endTime.epochSeconds.toFloat())
+private class CoordinateTranslator() {
+    private var minY: Float by mutableStateOf(0f)
+    private var maxY: Float by mutableStateOf(0f)
+    private var minX: Float by mutableStateOf(0f)
+    private var maxX: Float by mutableStateOf(0f)
     var size: Size = Size.Unspecified
+
+    fun setWindow(
+        minRating: Int,
+        maxRating: Int,
+        startTime: Instant,
+        endTime: Instant
+    ) {
+        minY = minRating.toFloat() - 100f
+        maxY = maxRating.toFloat() + 100f
+
+        //TODO x insets
+        minX = startTime.epochSeconds.toFloat()
+        maxX = endTime.epochSeconds.toFloat()
+    }
 
     fun pointToWindow(x: Long, y: Long): Offset {
         val px = (x - minX) / (maxX - minX) * size.width

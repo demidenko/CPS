@@ -173,8 +173,7 @@ fun<T> TextButtonsSelectRow(
             TextButton(onClick = { onSelect(value) }) {
                 Text(
                     text = text(value),
-                    color = if (value == selectedValue) cpsColors.colorAccent else cpsColors.textColorAdditional,
-                    fontWeight = if (value == selectedValue) FontWeight.Bold else FontWeight.Normal
+                    color = if (value == selectedValue) cpsColors.colorAccent else cpsColors.textColorAdditional
                 )
             }
         }
