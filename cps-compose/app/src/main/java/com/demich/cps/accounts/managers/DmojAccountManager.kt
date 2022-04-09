@@ -98,7 +98,9 @@ class DmojAccountManager(context: Context):
             return jsonCPS.decodeFromString<List<DmojRatingChange>>(str).map {
                 RatingChange(
                     rating = it.rating,
-                    date = Instant.fromEpochMilliseconds(it.timestamp.toLong())
+                    date = Instant.fromEpochMilliseconds(it.timestamp.toLong()),
+                    title = it.label,
+                    rank = it.ranking
                 )
             }
         } catch (e: Throwable) {

@@ -264,6 +264,7 @@ data class CodeforcesBlogEntry(
 @Serializable
 data class CodeforcesRatingChange(
     val contestId: Int,
+    val contestName: String,
     val handle: String,
     val rank: Int,
     val oldRating: Int,

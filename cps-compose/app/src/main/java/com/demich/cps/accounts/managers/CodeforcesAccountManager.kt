@@ -123,7 +123,10 @@ class CodeforcesAccountManager(context: Context):
         }.getOrNull()?.map {
             RatingChange(
                 rating = it.newRating,
-                date = it.ratingUpdateTime
+                oldRating = it.oldRating,
+                date = it.ratingUpdateTime,
+                title = it.contestName,
+                rank = it.rank
             )
         }
 
