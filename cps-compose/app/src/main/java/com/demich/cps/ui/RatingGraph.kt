@@ -2,6 +2,7 @@ package com.demich.cps.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -120,6 +121,7 @@ private fun RatingGraph(
         var timeRange by remember {
             mutableStateOf(Instant.DISTANT_PAST .. Instant.DISTANT_FUTURE)
         }
+        var selectedRatingChange: RatingChange? by remember{ mutableStateOf(null) }
 
         //TODO: save translator somehow
         DisposableEffect(key1 = filterType, key2 = ratingChanges, effect = {
@@ -217,11 +219,28 @@ private fun RatingGraph(
                             ratingChanges = ratingChanges,
                             translator = translator,
                             timeRange = timeRange,
+                            selectedRatingChange = selectedRatingChange,
                             modifier = Modifier
                                 .pointerInput(Unit) {
-                                    detectTransformGestures { centroid, pan, zoom, rotation ->
+                                    detectTransformGestures { centroid, pan, zoom, _ ->
                                         translator.move(pan)
                                         translator.scale(centroid, zoom)
+                                    }
+                                }
+                                .pointerInput(Unit) {
+                                    detectTapGestures { tapPoint ->
+                                        selectedRatingChange = ratingChanges
+                                            .map {
+                                                val p = translator.pointToWindow(
+                                                    x = it.date.epochSeconds,
+                                                    y = it.rating.toLong(),
+                                                    reverseY = true
+                                                )
+                                                it to (p - tapPoint).getDistance()
+                                            }
+                                            .minByOrNull { it.second }
+                                            ?.takeIf { it.second < 50f }
+                                            ?.first
                                     }
                                 }
                         )
@@ -232,12 +251,15 @@ private fun RatingGraph(
     }
 }
 
+private fun RatingChange.toLongPoint() = date.epochSeconds to rating.toLong()
+
 @Composable
 private fun<U: UserInfo> DrawRatingGraph(
     manager: RatedAccountManager<U>,
     ratingChanges: List<RatingChange>,
     translator: CoordinateTranslator,
     timeRange: ClosedRange<Instant>,
+    selectedRatingChange: RatingChange?,
     modifier: Modifier = Modifier
 ) {
     val rectangles = remember(manager.type) {
@@ -276,9 +298,10 @@ private fun<U: UserInfo> DrawRatingGraph(
     }
 
     DrawRatingGraph(
-        ratingChanges = ratingChanges.map { it.date.epochSeconds to it.rating.toLong() }.sortedBy { it.first },
+        ratingChanges = ratingChanges.map { it.toLongPoint() }.sortedBy { it.first },
         translator = translator,
         timeRange = timeRange,
+        selectedRatingChange = selectedRatingChange?.toLongPoint(),
         colorsMap = managerSupportedColors.associateWith { manager.colorFor(handleColor = it) },
         rectangles = rectangles,
         modifier = modifier
@@ -290,6 +313,7 @@ private fun DrawRatingGraph(
     ratingChanges: List<Pair<Long, Long>>,
     translator: CoordinateTranslator,
     timeRange: ClosedRange<Instant>,
+    selectedRatingChange: Pair<Long, Long>?,
     colorsMap: Map<HandleColor, Color>,
     rectangles: List<PointWithColor>,
     circleRadius: Float = 6f,
@@ -299,6 +323,11 @@ private fun DrawRatingGraph(
     shadowAlpha: Float = 0.3f,
     modifier: Modifier = Modifier
 ) {
+    fun getPointRadius(x: Long, y: Long): Float {
+        return if (selectedRatingChange != null && x to y == selectedRatingChange)
+            circleRadius * 1.5f
+        else circleRadius
+    }
     Canvas(
         modifier = modifier
             .fillMaxSize()
@@ -348,7 +377,7 @@ private fun DrawRatingGraph(
                 val center = translator.pointToWindow(x, y)
                 drawCircle(
                     color = Color.Black,
-                    radius = circleRadius + circleBorderWidth,
+                    radius = getPointRadius(x, y) + circleBorderWidth,
                     center = center + shadowOffset,
                     style = Fill,
                     alpha = shadowAlpha
@@ -368,13 +397,13 @@ private fun DrawRatingGraph(
                 val center = translator.pointToWindow(x, y)
                 drawCircle(
                     color = Color.Black,
-                    radius = circleRadius + circleBorderWidth,
+                    radius = getPointRadius(x, y) + circleBorderWidth,
                     center = center,
                     style = Fill
                 )
                 drawCircle(
                     color = colorsMap[coveredBy.handleColor]!!,
-                    radius = circleRadius,
+                    radius = getPointRadius(x, y),
                     center = center,
                     style = Fill
                 )
@@ -405,11 +434,21 @@ private class CoordinateTranslator() {
         maxX = endTime.epochSeconds.toFloat()
     }
 
-    fun pointToWindow(x: Long, y: Long): Offset {
+    fun pointToWindow(
+        x: Long,
+        y: Long,
+        reverseY: Boolean = false
+    ): Offset {
         val px = (x - minX) / (maxX - minX) * size.width
         val py = (y - minY) / (maxY - minY) * size.height
+        if (reverseY) return Offset(px, size.height - py)
         return Offset(px, py)
     }
+
+    fun fromWindow(offset: Offset) = Offset(
+        x = offset.x / size.width * (maxX - minX) + minX,
+        y = (size.height - offset.y) / size.height * (maxY - minY) + minY
+    )
 
     fun move(offset: Offset) {
         val dx = offset.x / size.width * (maxX - minX)
