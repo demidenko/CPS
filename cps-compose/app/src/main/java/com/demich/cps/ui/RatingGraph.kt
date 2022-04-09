@@ -111,90 +111,61 @@ private fun RatingGraph(
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(5.dp)
 ) {
-    Column(
-        modifier = modifier
+    val translator by remember { mutableStateOf(CoordinateTranslator()) }
+
+    var filterType by remember { mutableStateOf(RatingFilterType.all) }
+    var timeRange by remember {
+        mutableStateOf(Instant.DISTANT_PAST .. Instant.DISTANT_FUTURE)
+    }
+
+    fun setFilterData(
+        filteredRatingChanges: List<RatingChange>,
+        startTime: Instant = filteredRatingChanges.first().date,
+        endTime: Instant = filteredRatingChanges.last().date
     ) {
+        translator.setWindow(
+            minRating = filteredRatingChanges.minOf { it.rating },
+            maxRating = filteredRatingChanges.maxOf { it.rating },
+            startTime = startTime,
+            endTime = endTime
+        )
+        timeRange = startTime .. endTime
+    }
 
-        val translator by remember { mutableStateOf(CoordinateTranslator()) }
+    var selectedRatingChange: RatingChange? by remember{ mutableStateOf(null) }
 
-        var filterType by remember { mutableStateOf(RatingFilterType.all) }
-        var timeRange by remember {
-            mutableStateOf(Instant.DISTANT_PAST .. Instant.DISTANT_FUTURE)
-        }
-        var selectedRatingChange: RatingChange? by remember{ mutableStateOf(null) }
-
-        //TODO: save translator somehow
-        DisposableEffect(key1 = filterType, key2 = ratingChanges, effect = {
-            if (ratingChanges.isNotEmpty())
+    //TODO: save translator somehow
+    DisposableEffect(key1 = filterType, key2 = ratingChanges, effect = {
+        if (ratingChanges.isNotEmpty())
             when (val type = filterType) {
-                RatingFilterType.all -> {
-                    val startTime = ratingChanges.first().date
-                    val endTime = ratingChanges.last().date
-                    translator.setWindow(
-                        minRating = ratingChanges.minOf { it.rating },
-                        maxRating = ratingChanges.maxOf { it.rating },
-                        startTime = startTime,
-                        endTime = endTime
-                    )
-                    timeRange = startTime .. endTime
-                }
-                RatingFilterType.last10 -> {
-                    val last10Changes = ratingChanges.takeLast(10)
-                    val startTime = last10Changes.first().date
-                    val endTime = last10Changes.last().date
-                    translator.setWindow(
-                        minRating = last10Changes.minOf { it.rating },
-                        maxRating = last10Changes.maxOf { it.rating },
-                        startTime = startTime,
-                        endTime = endTime
-                    )
-                    timeRange = startTime .. endTime
-                }
+                RatingFilterType.all ->
+                    setFilterData(filteredRatingChanges = ratingChanges)
+                RatingFilterType.last10 ->
+                    setFilterData(filteredRatingChanges = ratingChanges.takeLast(10))
                 RatingFilterType.lastMonth, RatingFilterType.lastYear -> {
                     val now = getCurrentTime()
                     val startTime = now - (if (type == RatingFilterType.lastMonth) 30.days else 365.days)
-                    val lastChanges = ratingChanges.filter { it.date >= startTime }
-                    translator.setWindow(
-                        minRating = lastChanges.minOf { it.rating },
-                        maxRating = lastChanges.maxOf { it.rating },
+                    setFilterData(
+                        filteredRatingChanges = ratingChanges.filter { it.date >= startTime },
                         startTime = startTime,
                         endTime = now
                     )
-                    timeRange = startTime .. now
                 }
             }
-            onDispose {  }
-        })
+        onDispose {  }
+    })
 
-        if (loadingStatus == LoadingStatus.PENDING && ratingChanges.isNotEmpty()) {
-            TextButtonsSelectRow(
-                values = buildList {
-                    add(RatingFilterType.all)
-                    if (ratingChanges.size > 10) add(RatingFilterType.last10)
-
-                    val now = getCurrentTime()
-                    val firstInMonth = ratingChanges.indexOfFirst { it.date >= now - 30.days }
-                    val firstInYear = ratingChanges.indexOfFirst { it.date >= now - 365.days }
-                    if (firstInMonth > 0 && firstInMonth != -1) {
-                        add(RatingFilterType.lastMonth)
-                    }
-                    if (firstInYear > 0 && firstInYear != -1 && firstInYear != firstInMonth) {
-                        add(RatingFilterType.lastYear)
-                    }
-                },
-                selectedValue = filterType,
-                text = {
-                    when (it) {
-                        RatingFilterType.all -> "all"
-                        RatingFilterType.last10 -> "last 10"
-                        RatingFilterType.lastMonth -> "last month"
-                        RatingFilterType.lastYear -> "last year"
-                    }
-                },
-                onSelect = { type -> filterType = type },
-                modifier = Modifier.background(cpsColors.background)
-            )
-        }
+    Column(
+        modifier = modifier
+    ) {
+        RatingGraphHeader(
+            loadingStatus = loadingStatus,
+            ratingChanges = ratingChanges,
+            selectedFilterType = filterType,
+            onSelectFilterType = { filterType = it },
+            selectedRatingChange = selectedRatingChange,
+            onCloseRatingChange = { selectedRatingChange = null }
+        )
 
         Box(modifier = Modifier
             .height(240.dp)
@@ -251,7 +222,55 @@ private fun RatingGraph(
     }
 }
 
-private fun RatingChange.toLongPoint() = date.epochSeconds to rating.toLong()
+@Composable
+private fun RatingGraphHeader(
+    loadingStatus: LoadingStatus,
+    ratingChanges: List<RatingChange>,
+    selectedFilterType: RatingFilterType,
+    onSelectFilterType: (RatingFilterType) -> Unit,
+    selectedRatingChange: RatingChange?,
+    onCloseRatingChange: () -> Unit
+) {
+    if (selectedRatingChange != null) {
+        Column(
+            modifier = Modifier.background(cpsColors.background)
+        ) {
+            Text(text = selectedRatingChange.rating.toString())
+            Text(text = selectedRatingChange.date.toString())
+        }
+    } else
+    if (loadingStatus == LoadingStatus.PENDING && ratingChanges.isNotEmpty()) {
+        TextButtonsSelectRow(
+            values = remember(ratingChanges) {
+                buildList {
+                    add(RatingFilterType.all)
+                    if (ratingChanges.size > 10) add(RatingFilterType.last10)
+
+                    val now = getCurrentTime()
+                    val firstInMonth = ratingChanges.indexOfFirst { it.date >= now - 30.days }
+                    val firstInYear = ratingChanges.indexOfFirst { it.date >= now - 365.days }
+                    if (firstInMonth > 0 && firstInMonth != -1) {
+                        add(RatingFilterType.lastMonth)
+                    }
+                    if (firstInYear > 0 && firstInYear != -1 && firstInYear != firstInMonth) {
+                        add(RatingFilterType.lastYear)
+                    }
+                }
+            },
+            selectedValue = selectedFilterType,
+            text = {
+                when (it) {
+                    RatingFilterType.all -> "all"
+                    RatingFilterType.last10 -> "last 10"
+                    RatingFilterType.lastMonth -> "last month"
+                    RatingFilterType.lastYear -> "last year"
+                }
+            },
+            onSelect = onSelectFilterType,
+            modifier = Modifier.background(cpsColors.background)
+        )
+    }
+}
 
 @Composable
 private fun<U: UserInfo> DrawRatingGraph(
@@ -316,18 +335,18 @@ private fun DrawRatingGraph(
     selectedRatingChange: Pair<Long, Long>?,
     colorsMap: Map<HandleColor, Color>,
     rectangles: List<PointWithColor>,
+    modifier: Modifier = Modifier,
     circleRadius: Float = 6f,
     circleBorderWidth: Float = 3f,
     pathWidth: Float = 4f,
     shadowOffset: Offset = Offset(4f, -4f),
-    shadowAlpha: Float = 0.3f,
-    modifier: Modifier = Modifier
+    shadowAlpha: Float = 0.3f
 ) {
-    fun getPointRadius(x: Long, y: Long): Float {
-        return if (selectedRatingChange != null && x to y == selectedRatingChange)
-            circleRadius * 1.5f
-        else circleRadius
-    }
+    fun pointMultiplier(x: Long, y: Long) =
+        if (selectedRatingChange != null && x to y == selectedRatingChange) 1.5f else 1f
+
+    val dashEffect = remember { PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f) }
+
     Canvas(
         modifier = modifier
             .fillMaxSize()
@@ -360,7 +379,7 @@ private fun DrawRatingGraph(
                     color = Color.Black,
                     start = Offset(x, 0f),
                     end = Offset(x, size.height),
-                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+                    pathEffect = dashEffect
                 )
             }
 
@@ -377,7 +396,7 @@ private fun DrawRatingGraph(
                 val center = translator.pointToWindow(x, y)
                 drawCircle(
                     color = Color.Black,
-                    radius = getPointRadius(x, y) + circleBorderWidth,
+                    radius = (circleRadius + circleBorderWidth) * pointMultiplier(x, y),
                     center = center + shadowOffset,
                     style = Fill,
                     alpha = shadowAlpha
@@ -397,13 +416,13 @@ private fun DrawRatingGraph(
                 val center = translator.pointToWindow(x, y)
                 drawCircle(
                     color = Color.Black,
-                    radius = getPointRadius(x, y) + circleBorderWidth,
+                    radius = (circleRadius + circleBorderWidth) * pointMultiplier(x, y),
                     center = center,
                     style = Fill
                 )
                 drawCircle(
                     color = colorsMap[coveredBy.handleColor]!!,
-                    radius = getPointRadius(x, y),
+                    radius = circleRadius * pointMultiplier(x, y),
                     center = center,
                     style = Fill
                 )
@@ -413,7 +432,7 @@ private fun DrawRatingGraph(
     }
 }
 
-private class CoordinateTranslator() {
+private class CoordinateTranslator {
     private var minY: Float by mutableStateOf(0f)
     private var maxY: Float by mutableStateOf(0f)
     private var minX: Float by mutableStateOf(0f)
@@ -426,6 +445,10 @@ private class CoordinateTranslator() {
         startTime: Instant,
         endTime: Instant
     ) {
+        if (startTime == endTime) {
+            setWindow(minRating, maxRating, startTime - 1.days, endTime + 1.days)
+            return
+        }
         minY = minRating.toFloat() - 100f
         maxY = maxRating.toFloat() + 100f
 
@@ -440,15 +463,11 @@ private class CoordinateTranslator() {
         reverseY: Boolean = false
     ): Offset {
         val px = (x - minX) / (maxX - minX) * size.width
-        val py = (y - minY) / (maxY - minY) * size.height
-        if (reverseY) return Offset(px, size.height - py)
+        val py = ((y - minY) / (maxY - minY) * size.height).let {
+            if (reverseY) size.height - it else it
+        }
         return Offset(px, py)
     }
-
-    fun fromWindow(offset: Offset) = Offset(
-        x = offset.x / size.width * (maxX - minX) + minX,
-        y = (size.height - offset.y) / size.height * (maxY - minY) + minY
-    )
 
     fun move(offset: Offset) {
         val dx = offset.x / size.width * (maxX - minX)
@@ -462,7 +481,6 @@ private class CoordinateTranslator() {
     fun scale(center: Offset, scale: Float) {
         val cx = center.x / size.width * (maxX - minX) + minX
         val cy = center.y / size.height * (maxY - minY) + minY
-
         minX = (minX - cx) / scale + cx
         maxX = (maxX - cx) / scale + cx
         minY = (minY - cy) / scale + cy
@@ -475,3 +493,5 @@ private data class PointWithColor(
     val y: Long,
     val handleColor: HandleColor
 )
+
+private fun RatingChange.toLongPoint() = date.epochSeconds to rating.toLong()
