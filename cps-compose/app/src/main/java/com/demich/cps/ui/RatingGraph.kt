@@ -2,6 +2,7 @@ package com.demich.cps.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
@@ -19,10 +20,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.managers.*
@@ -120,14 +121,26 @@ private fun RatingGraph(
                     if (ratingChanges.isEmpty()) {
                         Text(text = "Rating history is empty")
                     } else {
-                        val minRating = ratingChanges.minOf { it.rating } - 100
-                        val maxRating = ratingChanges.maxOf { it.rating } + 100
-                        val startTime = ratingChanges.minOf { it.date }
-                        val endTime = ratingChanges.maxOf { it.date }
+                        val translator = remember {
+                            CoordinateTranslator(
+                                minRating = ratingChanges.minOf { it.rating } - 100,
+                                maxRating = ratingChanges.maxOf { it.rating } + 100,
+                                startTime = ratingChanges.minOf { it.date },
+                                endTime = ratingChanges.maxOf { it.date }
+                            )
+                        }
+
                         DrawRatingGraph(
                             manager = manager,
                             ratingChanges = ratingChanges,
-                            minRating, maxRating, startTime, endTime
+                            translator = translator,
+                            modifier = Modifier
+                                .pointerInput(Unit) {
+                                    detectTransformGestures { centroid, pan, zoom, rotation ->
+                                        translator.move(pan)
+                                        translator.scale(centroid, zoom)
+                                    }
+                                }
                         )
                     }
                 }
@@ -140,10 +153,8 @@ private fun RatingGraph(
 private fun<U: UserInfo> DrawRatingGraph(
     manager: RatedAccountManager<U>,
     ratingChanges: List<RatingChange>,
-    minRating: Int,
-    maxRating: Int,
-    startTime: Instant,
-    endTime: Instant
+    translator: CoordinateTranslator,
+    modifier: Modifier = Modifier
 ) {
     val rectangles = remember(manager.type) {
         buildList {
@@ -182,12 +193,10 @@ private fun<U: UserInfo> DrawRatingGraph(
 
     DrawRatingGraph(
         ratingChanges = ratingChanges.map { it.date.epochSeconds to it.rating.toLong() }.sortedBy { it.first },
-        translator = CoordinateTranslator(
-            rangeX = startTime.epochSeconds.toFloat() to endTime.epochSeconds.toFloat(),
-            rangeY = minRating.toFloat() to maxRating.toFloat(),
-        ),
+        translator = translator,
         colorsMap = managerSupportedColors.associateWith { manager.colorFor(handleColor = it) },
-        rectangles = rectangles
+        rectangles = rectangles,
+        modifier = modifier
     )
 }
 
@@ -201,17 +210,19 @@ private fun DrawRatingGraph(
     circleBorderWidth: Float = 3f,
     pathWidth: Float = 4f,
     shadowOffset: Offset = Offset(4f, -4f),
-    shadowAlpha: Float = 0.3f
+    shadowAlpha: Float = 0.3f,
+    modifier: Modifier = Modifier
 ) {
     Canvas(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .clipToBounds()
     ) {
+        translator.size = size
         scale(scaleX = 1f, scaleY = -1f) {
             val ratingPath = Path().apply {
                 ratingChanges.forEachIndexed { index, point ->
-                    val (px, py) = translator.pointToWindow(point.first, point.second, size)
+                    val (px, py) = translator.pointToWindow(point.first, point.second)
                     if (index == 0) moveTo(px, py)
                     else lineTo(px, py)
                 }
@@ -219,7 +230,7 @@ private fun DrawRatingGraph(
 
             //rating filled areas
             rectangles.forEach { (rx, ry, handleColor) ->
-                val (px, py) = translator.pointToWindow(rx, ry, size)
+                val (px, py) = translator.pointToWindow(rx, ry)
                 drawRect(
                     color = colorsMap[handleColor]!!,
                     topLeft = Offset.Zero,
@@ -237,7 +248,7 @@ private fun DrawRatingGraph(
 
             //shadow of rating points
             ratingChanges.forEach { (x, y) ->
-                val center = translator.pointToWindow(x, y, size)
+                val center = translator.pointToWindow(x, y)
                 drawCircle(
                     color = Color.Black,
                     radius = circleRadius + circleBorderWidth,
@@ -257,7 +268,7 @@ private fun DrawRatingGraph(
             //rating points
             ratingChanges.forEach { (x, y) ->
                 val coveredBy = rectangles.last { (rx, ry) -> x < rx && y < ry }
-                val center = translator.pointToWindow(x, y, size)
+                val center = translator.pointToWindow(x, y)
                 drawCircle(
                     color = Color.Black,
                     radius = circleRadius + circleBorderWidth,
@@ -276,15 +287,41 @@ private fun DrawRatingGraph(
     }
 }
 
-@Immutable
-private data class CoordinateTranslator(
-    private val rangeX: Pair<Float, Float>,
-    private val rangeY: Pair<Float, Float>,
+private class CoordinateTranslator(
+    minRating: Int,
+    maxRating: Int,
+    startTime: Instant,
+    endTime: Instant
 ) {
-    fun pointToWindow(x: Long, y: Long, size: Size): Offset {
-        val px = (x - rangeX.first) / (rangeX.second - rangeX.first) * size.width
-        val py = (y - rangeY.first) / (rangeY.second - rangeY.first) * size.height
+    private var minY: Float by mutableStateOf(minRating.toFloat())
+    private var maxY: Float by mutableStateOf(maxRating.toFloat())
+    private var minX: Float by mutableStateOf(startTime.epochSeconds.toFloat())
+    private var maxX: Float by mutableStateOf(endTime.epochSeconds.toFloat())
+    var size: Size = Size.Unspecified
+
+    fun pointToWindow(x: Long, y: Long): Offset {
+        val px = (x - minX) / (maxX - minX) * size.width
+        val py = (y - minY) / (maxY - minY) * size.height
         return Offset(px, py)
+    }
+
+    fun move(offset: Offset) {
+        val dx = offset.x / size.width * (maxX - minX)
+        minX -= dx
+        maxX -= dx
+        val dy = -offset.y / size.height * (maxY - minY)
+        minY -= dy
+        maxY -= dy
+    }
+
+    fun scale(center: Offset, scale: Float) {
+        val cx = center.x / size.width * (maxX - minX) + minX
+        val cy = center.y / size.height * (maxY - minY) + minY
+
+        minX = (minX - cx) / scale + cx
+        maxX = (maxX - cx) / scale + cx
+        minY = (minY - cy) / scale + cy
+        maxY = (maxY - cy) / scale + cy
     }
 }
 
