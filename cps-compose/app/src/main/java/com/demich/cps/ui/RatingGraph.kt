@@ -28,11 +28,13 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.jsonSaver
+import com.demich.cps.utils.signedToString
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.math.round
@@ -232,12 +234,7 @@ private fun RatingGraphHeader(
     onCloseRatingChange: () -> Unit
 ) {
     if (selectedRatingChange != null) {
-        Column(
-            modifier = Modifier.background(cpsColors.background)
-        ) {
-            Text(text = selectedRatingChange.rating.toString())
-            Text(text = selectedRatingChange.date.toString())
-        }
+        ContestResult(selectedRatingChange)
     } else
     if (loadingStatus == LoadingStatus.PENDING && ratingChanges.isNotEmpty()) {
         TextButtonsSelectRow(
@@ -269,6 +266,34 @@ private fun RatingGraphHeader(
             onSelect = onSelectFilterType,
             modifier = Modifier.background(cpsColors.background)
         )
+    }
+}
+
+@Composable
+private fun ContestResult(
+    ratingChange: RatingChange
+) {
+    Row(
+        modifier = Modifier
+            .background(cpsColors.background)
+            .fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = ratingChange.title)
+            Text(text = ratingChange.rating.toString())
+            //date, rank, rating
+        }
+        if (ratingChange.oldRating != null) {
+            val change = ratingChange.rating - ratingChange.oldRating
+            Text(
+                text = signedToString(change),
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 

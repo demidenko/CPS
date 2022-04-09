@@ -154,7 +154,10 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, type: AccountM
 @Serializable
 data class RatingChange(
     val rating: Int,
-    val date: Instant
+    val date: Instant,
+    val title: String = "",
+    val oldRating: Int? = null,
+    val rank: Int? = null
 )
 
 class AccountDataStore<U: UserInfo>(
