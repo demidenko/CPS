@@ -156,6 +156,8 @@ private fun RatingGraph(
         onDispose {  }
     })
 
+    val rectangles = remember(manager.type) { RatingGraphRectangles(manager) }
+
     Column(
         modifier = modifier
     ) {
@@ -163,6 +165,7 @@ private fun RatingGraph(
             loadingStatus = loadingStatus,
             ratingChanges = ratingChanges,
             manager = manager,
+            rectangles = rectangles,
             selectedFilterType = filterType,
             onSelectFilterType = { filterType = it },
             selectedRatingChange = selectedRatingChange,
@@ -188,8 +191,9 @@ private fun RatingGraph(
                         Text(text = "Rating history is empty")
                     } else {
                         DrawRatingGraph(
-                            manager = manager,
                             ratingChanges = ratingChanges,
+                            manager = manager,
+                            rectangles = rectangles,
                             translator = translator,
                             timeRange = timeRange,
                             selectedRatingChange = selectedRatingChange,
@@ -221,6 +225,7 @@ private fun RatingGraphHeader(
     loadingStatus: LoadingStatus,
     ratingChanges: List<RatingChange>,
     manager: RatedAccountManager<out UserInfo>,
+    rectangles: RatingGraphRectangles,
     selectedFilterType: RatingFilterType,
     onSelectFilterType: (RatingFilterType) -> Unit,
     selectedRatingChange: RatingChange?,
@@ -230,6 +235,7 @@ private fun RatingGraphHeader(
         ContestResult(
             ratingChange = selectedRatingChange,
             manager = manager,
+            rectangles = rectangles,
             modifier = Modifier
                 .padding(bottom = 3.dp)
                 .background(cpsColors.backgroundAdditional, shape)
@@ -273,6 +279,7 @@ private fun RatingGraphHeader(
 private fun ContestResult(
     ratingChange: RatingChange,
     manager: RatedAccountManager<out UserInfo>,
+    rectangles: RatingGraphRectangles,
     modifier: Modifier = Modifier,
     titleFontSize: TextUnit = 16.sp,
     subTitleFontSize: TextUnit = 12.sp,
@@ -305,8 +312,10 @@ private fun ContestResult(
                 text = ratingChange.rating.toString(),
                 fontSize = majorFontSize,
                 fontWeight = FontWeight.Bold,
-                //TODO: color with revolutions
-                color = manager.colorFor(rating = ratingChange.rating),
+                color = manager.colorFor(handleColor = rectangles.getHandleColor(
+                    x = ratingChange.date.epochSeconds,
+                    y = ratingChange.rating.toLong()
+                )),
             )
             if (ratingChange.oldRating != null) {
                 val change = ratingChange.rating - ratingChange.oldRating
@@ -324,42 +333,14 @@ private fun ContestResult(
 
 @Composable
 private fun<U: UserInfo> DrawRatingGraph(
-    manager: RatedAccountManager<U>,
     ratingChanges: List<RatingChange>,
+    manager: RatedAccountManager<U>,
+    rectangles: RatingGraphRectangles,
     translator: CoordinateTranslator,
     timeRange: ClosedRange<Instant>,
     selectedRatingChange: RatingChange?,
     modifier: Modifier = Modifier
 ) {
-    val rectangles = remember(manager.type) {
-        buildList {
-            (manager.ratingsUpperBounds + Pair(HandleColor.RED, Int.MAX_VALUE))
-                .sortedByDescending { it.second }
-                .forEach {
-                    add(PointWithColor(
-                        x = Long.MAX_VALUE,
-                        y = it.second.toLong(),
-                        handleColor = it.first
-                    ))
-                }
-            if (manager is RatingRevolutionsProvider) {
-                manager.ratingUpperBoundRevolutions
-                    .sortedByDescending { it.first }
-                    .forEach { (time, bounds) ->
-                        (bounds + Pair(HandleColor.RED, Int.MAX_VALUE))
-                            .sortedByDescending { it.second }
-                            .forEach {
-                                add(PointWithColor(
-                                    x = time.epochSeconds,
-                                    y = it.second.toLong(),
-                                    handleColor = it.first
-                                ))
-                            }
-                    }
-            }
-        }
-    }
-
     val managerSupportedColors = remember(manager.type) {
         HandleColor.values().filter {
             runCatching { manager.originalColor(it) }.isSuccess
@@ -384,7 +365,7 @@ private fun DrawRatingGraph(
     timeRange: ClosedRange<Instant>,
     selectedRatingChange: Pair<Long, Long>?,
     colorsMap: Map<HandleColor, Color>,
-    rectangles: List<PointWithColor>,
+    rectangles: RatingGraphRectangles,
     modifier: Modifier = Modifier,
     circleRadius: Float = 6f,
     circleBorderWidth: Float = 3f,
@@ -413,7 +394,7 @@ private fun DrawRatingGraph(
             }
 
             //rating filled areas
-            rectangles.forEach { (rx, ry, handleColor) ->
+            rectangles.rectangles.forEach { (rx, ry, handleColor) ->
                 val (px, py) = translator.pointToWindow(rx, ry)
                 drawRect(
                     color = colorsMap[handleColor]!!,
@@ -472,7 +453,6 @@ private fun DrawRatingGraph(
 
             //rating points
             ratingChanges.forEach { (x, y) ->
-                val coveredBy = rectangles.last { (rx, ry) -> x < rx && y < ry }
                 val center = translator.pointToWindow(x, y)
                 drawCircle(
                     color = Color.Black,
@@ -481,16 +461,18 @@ private fun DrawRatingGraph(
                     style = Fill
                 )
                 drawCircle(
-                    color = colorsMap[coveredBy.handleColor]!!,
+                    color = colorsMap[rectangles.getHandleColor(x, y)]!!,
                     radius = circleRadius * radiusMultiplier(x, y),
                     center = center,
                     style = Fill
                 )
             }
-
         }
     }
 }
+
+
+private fun RatingChange.toLongPoint() = date.epochSeconds to rating.toLong()
 
 private class CoordinateTranslator {
     private var minY: Float by mutableStateOf(0f)
@@ -577,4 +559,38 @@ private data class PointWithColor(
     val handleColor: HandleColor
 )
 
-private fun RatingChange.toLongPoint() = date.epochSeconds to rating.toLong()
+@Immutable
+private class RatingGraphRectangles(
+    manager: RatedAccountManager<out UserInfo>
+) {
+    val rectangles: List<PointWithColor> = buildList {
+        (manager.ratingsUpperBounds + Pair(HandleColor.RED, Int.MAX_VALUE))
+            .sortedByDescending { it.second }
+            .forEach {
+                add(PointWithColor(
+                    x = Long.MAX_VALUE,
+                    y = it.second.toLong(),
+                    handleColor = it.first
+                ))
+            }
+        if (manager is RatingRevolutionsProvider) {
+            manager.ratingUpperBoundRevolutions
+                .sortedByDescending { it.first }
+                .forEach { (time, bounds) ->
+                    (bounds + Pair(HandleColor.RED, Int.MAX_VALUE))
+                        .sortedByDescending { it.second }
+                        .forEach {
+                            add(PointWithColor(
+                                x = time.epochSeconds,
+                                y = it.second.toLong(),
+                                handleColor = it.first
+                            ))
+                        }
+                }
+        }
+    }
+
+    fun getHandleColor(x: Long, y: Long): HandleColor =
+        rectangles.last { (rx, ry) -> x < rx && y < ry }.handleColor
+
+}
