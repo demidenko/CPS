@@ -305,6 +305,7 @@ private fun ContestResult(
                 text = ratingChange.rating.toString(),
                 fontSize = majorFontSize,
                 fontWeight = FontWeight.Bold,
+                //TODO: color with revolutions
                 color = manager.colorFor(rating = ratingChange.rating),
             )
             if (ratingChange.oldRating != null) {
@@ -421,15 +422,25 @@ private fun DrawRatingGraph(
                 )
             }
 
-            //time range lines
-            listOf(timeRange.start, timeRange.endInclusive).forEach {
-                val x = translator.pointToWindow(it.epochSeconds, 0).x
+            //time dashes
+            if (selectedRatingChange != null) {
+                val p = selectedRatingChange.let { translator.pointToWindow(it.first, it.second) }
                 drawLine(
                     color = Color.Black,
-                    start = Offset(x, 0f),
-                    end = Offset(x, size.height),
+                    start = Offset(p.x, size.height),
+                    end = p,
                     pathEffect = dashEffect
                 )
+            } else {
+                listOf(timeRange.start, timeRange.endInclusive).forEach {
+                    val x = translator.pointToWindow(it.epochSeconds, 0).x
+                    drawLine(
+                        color = Color.Black,
+                        start = Offset(x, 0f),
+                        end = Offset(x, size.height),
+                        pathEffect = dashEffect
+                    )
+                }
             }
 
             //shadow of rating path
