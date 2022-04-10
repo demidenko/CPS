@@ -26,15 +26,14 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.getCurrentTime
-import com.demich.cps.utils.jsonSaver
-import com.demich.cps.utils.signedToString
+import com.demich.cps.utils.*
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.math.round
@@ -163,10 +162,11 @@ private fun RatingGraph(
         RatingGraphHeader(
             loadingStatus = loadingStatus,
             ratingChanges = ratingChanges,
+            manager = manager,
             selectedFilterType = filterType,
             onSelectFilterType = { filterType = it },
             selectedRatingChange = selectedRatingChange,
-            onCloseRatingChange = { selectedRatingChange = null }
+            shape = shape
         )
 
         Box(modifier = Modifier
@@ -202,18 +202,10 @@ private fun RatingGraph(
                                 }
                                 .pointerInput(Unit) {
                                     detectTapGestures { tapPoint ->
-                                        selectedRatingChange = ratingChanges
-                                            .map {
-                                                val p = translator.pointToWindow(
-                                                    x = it.date.epochSeconds,
-                                                    y = it.rating.toLong(),
-                                                    reverseY = true
-                                                )
-                                                it to (p - tapPoint).getDistance()
-                                            }
-                                            .minByOrNull { it.second }
-                                            ?.takeIf { it.second < 50f }
-                                            ?.first
+                                        selectedRatingChange = translator.getNearestRatingChange(
+                                            ratingChanges = ratingChanges,
+                                            tap = tapPoint
+                                        )
                                     }
                                 }
                         )
@@ -228,13 +220,21 @@ private fun RatingGraph(
 private fun RatingGraphHeader(
     loadingStatus: LoadingStatus,
     ratingChanges: List<RatingChange>,
+    manager: RatedAccountManager<out UserInfo>,
     selectedFilterType: RatingFilterType,
     onSelectFilterType: (RatingFilterType) -> Unit,
     selectedRatingChange: RatingChange?,
-    onCloseRatingChange: () -> Unit
+    shape: Shape
 ) {
     if (selectedRatingChange != null) {
-        ContestResult(selectedRatingChange)
+        ContestResult(
+            ratingChange = selectedRatingChange,
+            manager = manager,
+            modifier = Modifier
+                .padding(bottom = 3.dp)
+                .background(cpsColors.backgroundAdditional, shape)
+                .padding(all = 5.dp)
+        )
     } else
     if (loadingStatus == LoadingStatus.PENDING && ratingChanges.isNotEmpty()) {
         TextButtonsSelectRow(
@@ -271,29 +271,53 @@ private fun RatingGraphHeader(
 
 @Composable
 private fun ContestResult(
-    ratingChange: RatingChange
+    ratingChange: RatingChange,
+    manager: RatedAccountManager<out UserInfo>,
+    modifier: Modifier = Modifier,
+    titleFontSize: TextUnit = 16.sp,
+    subTitleFontSize: TextUnit = 12.sp,
+    majorFontSize: TextUnit = 30.sp,
 ) {
     Row(
-        modifier = Modifier
-            .background(cpsColors.background)
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.Center
+            modifier = Modifier.weight(1f)
         ) {
-            Text(text = ratingChange.title)
-            Text(text = ratingChange.rating.toString())
-            //date, rank, rating
-        }
-        if (ratingChange.oldRating != null) {
-            val change = ratingChange.rating - ratingChange.oldRating
+            Text(text = ratingChange.title, fontSize = titleFontSize)
             Text(
-                text = signedToString(change),
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold
+                text = buildAnnotatedString {
+                    append(ratingChange.date.format("dd.MM.yyyy HH:mm"))
+                    ratingChange.rank?.let {
+                        append("  rank: $it")
+                    }
+                },
+                fontSize = subTitleFontSize,
+                color = cpsColors.textColorAdditional
             )
         }
+        Column(
+            modifier = Modifier.padding(start = 5.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = ratingChange.rating.toString(),
+                fontSize = majorFontSize,
+                fontWeight = FontWeight.Bold,
+                color = manager.colorFor(rating = ratingChange.rating),
+            )
+            if (ratingChange.oldRating != null) {
+                val change = ratingChange.rating - ratingChange.oldRating
+                Text(
+                    text = signedToString(change),
+                    fontSize = subTitleFontSize,
+                    fontWeight = FontWeight.Bold,
+                    color = if (change < 0) cpsColors.errorColor else cpsColors.success,
+                )
+            }
+        }
+
     }
 }
 
@@ -367,7 +391,7 @@ private fun DrawRatingGraph(
     shadowOffset: Offset = Offset(4f, -4f),
     shadowAlpha: Float = 0.3f
 ) {
-    fun pointMultiplier(x: Long, y: Long) =
+    fun radiusMultiplier(x: Long, y: Long) =
         if (selectedRatingChange != null && x to y == selectedRatingChange) 1.5f else 1f
 
     val dashEffect = remember { PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f) }
@@ -421,7 +445,7 @@ private fun DrawRatingGraph(
                 val center = translator.pointToWindow(x, y)
                 drawCircle(
                     color = Color.Black,
-                    radius = (circleRadius + circleBorderWidth) * pointMultiplier(x, y),
+                    radius = (circleRadius + circleBorderWidth) * radiusMultiplier(x, y),
                     center = center + shadowOffset,
                     style = Fill,
                     alpha = shadowAlpha
@@ -441,13 +465,13 @@ private fun DrawRatingGraph(
                 val center = translator.pointToWindow(x, y)
                 drawCircle(
                     color = Color.Black,
-                    radius = (circleRadius + circleBorderWidth) * pointMultiplier(x, y),
+                    radius = (circleRadius + circleBorderWidth) * radiusMultiplier(x, y),
                     center = center,
                     style = Fill
                 )
                 drawCircle(
                     color = colorsMap[coveredBy.handleColor]!!,
-                    radius = circleRadius * pointMultiplier(x, y),
+                    radius = circleRadius * radiusMultiplier(x, y),
                     center = center,
                     style = Fill
                 )
@@ -510,6 +534,29 @@ private class CoordinateTranslator {
         maxX = (maxX - cx) / scale + cx
         minY = (minY - cy) / scale + cy
         maxY = (maxY - cy) / scale + cy
+    }
+
+    fun getNearestRatingChange(
+        ratingChanges: List<RatingChange>,
+        tap: Offset,
+        tapRadius: Float = 50f
+    ): RatingChange? {
+        var pos = -1
+        var minDist = Float.POSITIVE_INFINITY
+        for (i in ratingChanges.indices) {
+            val o = ratingChanges[i].toLongPoint().let {
+                pointToWindow(x = it.first, y = it.second, reverseY = true)
+            }
+            val dist = (o - tap).getDistance()
+            if (dist <= tapRadius && dist < minDist) {
+                pos = i
+                minDist = dist
+            }
+        }
+        if (pos == -1) return null
+        val res = ratingChanges[pos]
+        if (pos == 0 || res.oldRating != null) return res
+        return res.copy(oldRating = ratingChanges[pos-1].rating)
     }
 }
 
