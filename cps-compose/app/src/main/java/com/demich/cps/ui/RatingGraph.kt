@@ -204,7 +204,7 @@ private fun RatingGraph(
                                         translator.scale(centroid, zoom)
                                     }
                                 }
-                                .pointerInput(Unit) {
+                                .pointerInput(ratingChanges) {
                                     detectTapGestures { tapPoint ->
                                         selectedRatingChange = translator.getNearestRatingChange(
                                             ratingChanges = ratingChanges,
