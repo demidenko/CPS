@@ -78,7 +78,7 @@ object cpsColors {
                 HandleColor.BROWN -> Color(0xFF80461B)
                 HandleColor.GREEN -> Color(0xFF009000)
                 HandleColor.CYAN -> Color(0xFF00A89E)
-                HandleColor.BLUE -> Color(0xFF3F68F0)
+                HandleColor.BLUE -> Color(0xFF0F68F0)
                 HandleColor.VIOLET -> Color(0xFFB04ECC)
                 HandleColor.YELLOW -> Color(0xFFCCCC00)
                 HandleColor.ORANGE -> Color(0xFFFB8000)
