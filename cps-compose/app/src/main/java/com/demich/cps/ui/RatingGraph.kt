@@ -381,7 +381,7 @@ private fun DrawRatingGraph(
         translator.size = size
         val ratingPath = Path().apply {
             ratingPoints.forEachIndexed { index, point ->
-                val (px, py) = translator.pointToWindow(point)
+                val (px, py) = translator.pointToOffset(point)
                 if (index == 0) moveTo(px, py)
                 else lineTo(px, py)
             }
@@ -389,7 +389,7 @@ private fun DrawRatingGraph(
 
         //rating filled areas
         rectangles.rectangles.forEach { (point, handleColor) ->
-            val (px, py) = translator.pointToWindow(point).let {
+            val (px, py) = translator.pointToOffset(point).let {
                 round(it.x) to round(it.y)
             }
             drawRect(
@@ -401,7 +401,7 @@ private fun DrawRatingGraph(
 
         //time dashes
         if (selectedPoint != null) {
-            val p = translator.pointToWindow(selectedPoint)
+            val p = translator.pointToOffset(selectedPoint)
             drawLine(
                 color = Color.Black,
                 start = Offset(p.x, 0f),
@@ -410,7 +410,7 @@ private fun DrawRatingGraph(
             )
         } else {
             listOf(timeRange.first, timeRange.second).forEach {
-                val p = translator.pointToWindow(it.epochSeconds, 0)
+                val p = translator.pointToOffset(it.epochSeconds, 0)
                 drawLine(
                     color = Color.Black,
                     start = Offset(p.x, 0f),
@@ -430,7 +430,7 @@ private fun DrawRatingGraph(
 
         //shadow of rating points
         ratingPoints.forEach { point ->
-            val center = translator.pointToWindow(point)
+            val center = translator.pointToOffset(point)
             drawCircle(
                 color = Color.Black,
                 radius = (circleRadius + circleBorderWidth) * radiusMultiplier(point),
@@ -449,7 +449,7 @@ private fun DrawRatingGraph(
 
         //rating points
         ratingPoints.forEach { point ->
-            val center = translator.pointToWindow(point)
+            val center = translator.pointToOffset(point)
             drawCircle(
                 color = Color.Black,
                 radius = (circleRadius + circleBorderWidth) * radiusMultiplier(point),
@@ -500,14 +500,12 @@ private class CoordinateTranslator {
         maxX = endTime.epochSeconds.toFloat()
     }
 
-    fun pointToWindow(x: Long, y: Long): Offset {
-        val px = (x - minX) / (maxX - minX) * size.width
-        val py = size.height - ((y - minY) / (maxY - minY) * size.height)
-        return Offset(px, py)
-    }
+    fun pointToOffset(x: Long, y: Long) = Offset(
+        x = (x - minX) / (maxX - minX) * size.width,
+        y = size.height - ((y - minY) / (maxY - minY) * size.height)
+    )
 
-    fun pointToWindow(point: Point)
-        = pointToWindow(point.x, point.y)
+    fun pointToOffset(point: Point) = pointToOffset(point.x, point.y)
 
     fun move(offset: Offset) {
         val dx = offset.x / size.width * (maxX - minX)
@@ -520,7 +518,7 @@ private class CoordinateTranslator {
 
     fun scale(center: Offset, scale: Float) {
         val cx = center.x / size.width * (maxX - minX) + minX
-        val cy = center.y / size.height * (maxY - minY) + minY
+        val cy = (size.height - center.y) / size.height * (maxY - minY) + minY
         minX = (minX - cx) / scale + cx
         maxX = (maxX - cx) / scale + cx
         minY = (minY - cy) / scale + cy
@@ -535,7 +533,7 @@ private class CoordinateTranslator {
         var pos = -1
         var minDist = Float.POSITIVE_INFINITY
         for (i in ratingChanges.indices) {
-            val o = pointToWindow(ratingChanges[i].toPoint())
+            val o = pointToOffset(ratingChanges[i].toPoint())
             val dist = (o - tap).getDistance()
             if (dist <= tapRadius && dist < minDist) {
                 pos = i
