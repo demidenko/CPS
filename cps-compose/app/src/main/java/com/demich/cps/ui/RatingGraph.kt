@@ -116,7 +116,7 @@ private fun RatingGraph(
 
     var filterType by remember { mutableStateOf(RatingFilterType.all) }
     var timeRange by remember {
-        mutableStateOf(Instant.DISTANT_PAST .. Instant.DISTANT_FUTURE)
+        mutableStateOf(Instant.DISTANT_PAST to Instant.DISTANT_FUTURE)
     }
 
     fun setFilterData(
@@ -130,7 +130,7 @@ private fun RatingGraph(
             startTime = startTime,
             endTime = endTime
         )
-        timeRange = startTime .. endTime
+        timeRange = startTime to endTime
     }
 
     var selectedRatingChange: RatingChange? by remember{ mutableStateOf(null) }
@@ -248,7 +248,6 @@ private fun RatingGraphHeader(
                 buildList {
                     add(RatingFilterType.all)
                     if (ratingChanges.size > 10) add(RatingFilterType.last10)
-
                     val now = getCurrentTime()
                     val firstInMonth = ratingChanges.indexOfFirst { it.date >= now - 30.days }
                     val firstInYear = ratingChanges.indexOfFirst { it.date >= now - 365.days }
@@ -312,10 +311,7 @@ private fun ContestResult(
                 text = ratingChange.rating.toString(),
                 fontSize = majorFontSize,
                 fontWeight = FontWeight.Bold,
-                color = manager.colorFor(handleColor = rectangles.getHandleColor(
-                    x = ratingChange.date.epochSeconds,
-                    y = ratingChange.rating.toLong()
-                )),
+                color = manager.colorFor(handleColor = rectangles.getHandleColor(ratingChange.toPoint())),
             )
             if (ratingChange.oldRating != null) {
                 val change = ratingChange.rating - ratingChange.oldRating
@@ -337,7 +333,7 @@ private fun<U: UserInfo> DrawRatingGraph(
     manager: RatedAccountManager<U>,
     rectangles: RatingGraphRectangles,
     translator: CoordinateTranslator,
-    timeRange: ClosedRange<Instant>,
+    timeRange: Pair<Instant, Instant>,
     selectedRatingChange: RatingChange?,
     modifier: Modifier = Modifier
 ) {
@@ -348,10 +344,10 @@ private fun<U: UserInfo> DrawRatingGraph(
     }
 
     DrawRatingGraph(
-        ratingChanges = ratingChanges.map { it.toLongPoint() }.sortedBy { it.first },
+        ratingPoints = ratingChanges.map { it.toPoint() }.sortedBy { it.x },
         translator = translator,
         timeRange = timeRange,
-        selectedRatingChange = selectedRatingChange?.toLongPoint(),
+        selectedPoint = selectedRatingChange?.toPoint(),
         colorsMap = managerSupportedColors.associateWith { manager.colorFor(handleColor = it) },
         rectangles = rectangles,
         modifier = modifier
@@ -360,10 +356,10 @@ private fun<U: UserInfo> DrawRatingGraph(
 
 @Composable
 private fun DrawRatingGraph(
-    ratingChanges: List<Pair<Long, Long>>,
+    ratingPoints: List<Point>,
     translator: CoordinateTranslator,
-    timeRange: ClosedRange<Instant>,
-    selectedRatingChange: Pair<Long, Long>?,
+    timeRange: Pair<Instant, Instant>,
+    selectedPoint: Point?,
     colorsMap: Map<HandleColor, Color>,
     rectangles: RatingGraphRectangles,
     modifier: Modifier = Modifier,
@@ -373,8 +369,7 @@ private fun DrawRatingGraph(
     shadowOffset: Offset = Offset(4f, -4f),
     shadowAlpha: Float = 0.3f
 ) {
-    fun radiusMultiplier(x: Long, y: Long) =
-        if (selectedRatingChange != null && x to y == selectedRatingChange) 1.5f else 1f
+    fun radiusMultiplier(point: Point) = if (selectedPoint == point) 1.5f else 1f
 
     val dashEffect = remember { PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f) }
 
@@ -386,16 +381,16 @@ private fun DrawRatingGraph(
         translator.size = size
         scale(scaleX = 1f, scaleY = -1f) {
             val ratingPath = Path().apply {
-                ratingChanges.forEachIndexed { index, point ->
-                    val (px, py) = translator.pointToWindow(point.first, point.second)
+                ratingPoints.forEachIndexed { index, point ->
+                    val (px, py) = translator.pointToWindow(point)
                     if (index == 0) moveTo(px, py)
                     else lineTo(px, py)
                 }
             }
 
             //rating filled areas
-            rectangles.rectangles.forEach { (rx, ry, handleColor) ->
-                val (px, py) = translator.pointToWindow(rx, ry)
+            rectangles.rectangles.forEach { (point, handleColor) ->
+                val (px, py) = translator.pointToWindow(point)
                 drawRect(
                     color = colorsMap[handleColor]!!,
                     topLeft = Offset.Zero,
@@ -404,8 +399,8 @@ private fun DrawRatingGraph(
             }
 
             //time dashes
-            if (selectedRatingChange != null) {
-                val p = selectedRatingChange.let { translator.pointToWindow(it.first, it.second) }
+            if (selectedPoint != null) {
+                val p = translator.pointToWindow(selectedPoint)
                 drawLine(
                     color = Color.Black,
                     start = Offset(p.x, size.height),
@@ -413,7 +408,7 @@ private fun DrawRatingGraph(
                     pathEffect = dashEffect
                 )
             } else {
-                listOf(timeRange.start, timeRange.endInclusive).forEach {
+                listOf(timeRange.first, timeRange.second).forEach {
                     val x = translator.pointToWindow(it.epochSeconds, 0).x
                     drawLine(
                         color = Color.Black,
@@ -433,11 +428,11 @@ private fun DrawRatingGraph(
             )
 
             //shadow of rating points
-            ratingChanges.forEach { (x, y) ->
-                val center = translator.pointToWindow(x, y)
+            ratingPoints.forEach { point ->
+                val center = translator.pointToWindow(point)
                 drawCircle(
                     color = Color.Black,
-                    radius = (circleRadius + circleBorderWidth) * radiusMultiplier(x, y),
+                    radius = (circleRadius + circleBorderWidth) * radiusMultiplier(point),
                     center = center + shadowOffset,
                     style = Fill,
                     alpha = shadowAlpha
@@ -452,17 +447,17 @@ private fun DrawRatingGraph(
             )
 
             //rating points
-            ratingChanges.forEach { (x, y) ->
-                val center = translator.pointToWindow(x, y)
+            ratingPoints.forEach { point ->
+                val center = translator.pointToWindow(point)
                 drawCircle(
                     color = Color.Black,
-                    radius = (circleRadius + circleBorderWidth) * radiusMultiplier(x, y),
+                    radius = (circleRadius + circleBorderWidth) * radiusMultiplier(point),
                     center = center,
                     style = Fill
                 )
                 drawCircle(
-                    color = colorsMap[rectangles.getHandleColor(x, y)]!!,
-                    radius = circleRadius * radiusMultiplier(x, y),
+                    color = colorsMap[rectangles.getHandleColor(point)]!!,
+                    radius = circleRadius * radiusMultiplier(point),
                     center = center,
                     style = Fill
                 )
@@ -471,8 +466,6 @@ private fun DrawRatingGraph(
     }
 }
 
-
-private fun RatingChange.toLongPoint() = date.epochSeconds to rating.toLong()
 
 private class CoordinateTranslator {
     private var minY: Float by mutableStateOf(0f)
@@ -499,17 +492,16 @@ private class CoordinateTranslator {
         maxX = endTime.epochSeconds.toFloat()
     }
 
-    fun pointToWindow(
-        x: Long,
-        y: Long,
-        reverseY: Boolean = false
-    ): Offset {
+    fun pointToWindow(x: Long, y: Long, reverseY: Boolean = false): Offset {
         val px = (x - minX) / (maxX - minX) * size.width
         val py = ((y - minY) / (maxY - minY) * size.height).let {
             if (reverseY) size.height - it else it
         }
         return Offset(px, py)
     }
+
+    fun pointToWindow(point: Point, reverseY: Boolean = false)
+        = pointToWindow(point.x, point.y, reverseY)
 
     fun move(offset: Offset) {
         val dx = offset.x / size.width * (maxX - minX)
@@ -537,9 +529,7 @@ private class CoordinateTranslator {
         var pos = -1
         var minDist = Float.POSITIVE_INFINITY
         for (i in ratingChanges.indices) {
-            val o = ratingChanges[i].toLongPoint().let {
-                pointToWindow(x = it.first, y = it.second, reverseY = true)
-            }
+            val o = pointToWindow(ratingChanges[i].toPoint(), reverseY = true)
             val dist = (o - tap).getDistance()
             if (dist <= tapRadius && dist < minDist) {
                 pos = i
@@ -553,25 +543,15 @@ private class CoordinateTranslator {
     }
 }
 
-private data class PointWithColor(
-    val x: Long,
-    val y: Long,
-    val handleColor: HandleColor
-)
-
 @Immutable
 private class RatingGraphRectangles(
     manager: RatedAccountManager<out UserInfo>
 ) {
-    val rectangles: List<PointWithColor> = buildList {
+    val rectangles: List<Pair<Point,HandleColor>> = buildList {
         (manager.ratingsUpperBounds + Pair(HandleColor.RED, Int.MAX_VALUE))
             .sortedByDescending { it.second }
             .forEach {
-                add(PointWithColor(
-                    x = Long.MAX_VALUE,
-                    y = it.second.toLong(),
-                    handleColor = it.first
-                ))
+                add(Point(x = Long.MAX_VALUE, y = it.second.toLong()) to it.first)
             }
         if (manager is RatingRevolutionsProvider) {
             manager.ratingUpperBoundRevolutions
@@ -580,17 +560,19 @@ private class RatingGraphRectangles(
                     (bounds + Pair(HandleColor.RED, Int.MAX_VALUE))
                         .sortedByDescending { it.second }
                         .forEach {
-                            add(PointWithColor(
-                                x = time.epochSeconds,
-                                y = it.second.toLong(),
-                                handleColor = it.first
-                            ))
+                            add(Point(x = time.epochSeconds, y = it.second.toLong()) to it.first)
                         }
                 }
         }
     }
 
-    fun getHandleColor(x: Long, y: Long): HandleColor =
-        rectangles.last { (rx, ry) -> x < rx && y < ry }.handleColor
+    fun getHandleColor(point: Point): HandleColor =
+        rectangles.last { (r, _) -> point.x < r.x && point.y < r.y }.second
 
 }
+
+private data class Point(val x: Long, val y: Long) {
+
+}
+
+private fun RatingChange.toPoint() = Point(x = date.epochSeconds, y = rating.toLong())
