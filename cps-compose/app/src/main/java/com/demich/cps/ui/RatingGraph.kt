@@ -379,6 +379,8 @@ private fun DrawRatingGraph(
             .clipToBounds()
     ) {
         translator.size = size
+        translator.borderX = circleRadius * 5
+
         val ratingPath = Path().apply {
             ratingPoints.forEachIndexed { index, point ->
                 val (px, py) = translator.pointToOffset(point)
@@ -480,7 +482,9 @@ private class CoordinateTranslator {
     private var maxY: Float by mutableStateOf(0f)
     private var minX: Float by mutableStateOf(0f)
     private var maxX: Float by mutableStateOf(0f)
+
     var size: Size = Size.Unspecified
+    var borderX: Float = 0f
 
     fun setWindow(
         minRating: Int,
@@ -494,21 +498,33 @@ private class CoordinateTranslator {
         }
         minY = minRating.toFloat() - 100f
         maxY = maxRating.toFloat() + 100f
-
-        //TODO x insets
         minX = startTime.epochSeconds.toFloat()
         maxX = endTime.epochSeconds.toFloat()
     }
 
+    private fun transformX(
+        x: Float,
+        fromWidth: Float,
+        toWidth: Float
+    ) = (x - fromWidth/2) * (fromWidth / toWidth) + (fromWidth / 2)
+
     fun pointToOffset(x: Long, y: Long) = Offset(
-        x = (x - minX) / (maxX - minX) * size.width,
+        x = transformX(
+            x = (x - minX) / (maxX - minX) * size.width,
+            fromWidth = size.width,
+            toWidth = size.width + borderX * 2
+        ),
         y = size.height - ((y - minY) / (maxY - minY) * size.height)
     )
 
     fun pointToOffset(point: Point) = pointToOffset(point.x, point.y)
 
     private fun offsetToPoint(offset: Offset) = Offset(
-        x = offset.x / size.width * (maxX - minX) + minX,
+        x = transformX(
+            x = offset.x,
+            fromWidth = size.width + borderX * 2,
+            toWidth = size.width
+        ) / size.width * (maxX - minX) + minX,
         y = (size.height - offset.y) / size.height * (maxY - minY) + minY
     )
 
