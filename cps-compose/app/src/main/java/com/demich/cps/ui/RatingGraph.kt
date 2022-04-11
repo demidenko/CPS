@@ -396,8 +396,8 @@ private fun DrawRatingGraph(
             }
             drawRect(
                 color = colorsMap[handleColor]!!,
-                topLeft = Offset(0f, py),
-                size = Size(px, size.height - py)
+                topLeft = Offset.Zero,
+                size = Size(px, py)
             )
         }
 
@@ -571,26 +571,27 @@ private class RatingGraphRectangles(
     manager: RatedAccountManager<out UserInfo>
 ) {
     val rectangles: List<Pair<Point,HandleColor>> = buildList {
-        (manager.ratingsUpperBounds + Pair(HandleColor.RED, Int.MAX_VALUE))
-            .sortedByDescending { it.second }
-            .forEach {
-                add(Point(x = Long.MAX_VALUE, y = it.second.toLong()) to it.first)
+        fun addBounds(bounds: Array<Pair<HandleColor, Int>>, x: Long) {
+            bounds.sortedBy { it.second }.let { list ->
+                for (i in list.indices) {
+                    val y = if (i == 0) Int.MIN_VALUE else list[i-1].second
+                    add(Point(x = x, y = y.toLong()) to list[i].first)
+                }
+                add(Point(x = x, y = list.last().second.toLong()) to HandleColor.RED)
             }
+        }
+        addBounds(x = Long.MAX_VALUE, bounds = manager.ratingsUpperBounds)
         if (manager is RatingRevolutionsProvider) {
             manager.ratingUpperBoundRevolutions
                 .sortedByDescending { it.first }
                 .forEach { (time, bounds) ->
-                    (bounds + Pair(HandleColor.RED, Int.MAX_VALUE))
-                        .sortedByDescending { it.second }
-                        .forEach {
-                            add(Point(x = time.epochSeconds, y = it.second.toLong()) to it.first)
-                        }
+                    addBounds(x = time.epochSeconds, bounds = bounds)
                 }
         }
     }
 
     fun getHandleColor(point: Point): HandleColor =
-        rectangles.last { (r, _) -> point.x < r.x && point.y < r.y }.second
+        rectangles.last { (r, _) -> point.x < r.x && point.y >= r.y }.second
 
 }
 
