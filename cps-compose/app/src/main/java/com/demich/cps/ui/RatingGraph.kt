@@ -103,6 +103,41 @@ private enum class RatingFilterType {
     lastYear
 }
 
+private data class RatingGraphBounds(
+    val minRating: Int,
+    val maxRating: Int,
+    val startTime: Instant,
+    val endTime: Instant
+)
+
+private fun createBounds(
+    ratingChanges: List<RatingChange>,
+    startTime: Instant = ratingChanges.first().date,
+    endTime: Instant = ratingChanges.last().date
+) = RatingGraphBounds(
+    minRating = ratingChanges.minOf { it.rating },
+    maxRating = ratingChanges.maxOf { it.rating },
+    startTime = startTime,
+    endTime = endTime
+)
+
+private fun createBounds(
+    ratingChanges: List<RatingChange>,
+    filterType: RatingFilterType
+) = when (filterType) {
+    RatingFilterType.all -> createBounds(ratingChanges)
+    RatingFilterType.last10 -> createBounds(ratingChanges.takeLast(10))
+    RatingFilterType.lastMonth, RatingFilterType.lastYear -> {
+        val now = getCurrentTime()
+        val startTime = now - (if (filterType == RatingFilterType.lastMonth) 30.days else 365.days)
+        createBounds(
+            ratingChanges = ratingChanges.filter { it.date >= startTime },
+            startTime = startTime,
+            endTime = now
+        )
+    }
+}
+
 @Composable
 private fun RatingGraph(
     loadingStatus: LoadingStatus,
@@ -111,50 +146,17 @@ private fun RatingGraph(
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(5.dp)
 ) {
-    val translator by remember { mutableStateOf(CoordinateTranslator()) }
+    val translator = rememberCoordinateTranslator()
 
-    var filterType by rememberSaveable { mutableStateOf(RatingFilterType.all) }
-    var timeRange by remember {
-        mutableStateOf(Instant.DISTANT_PAST to Instant.DISTANT_FUTURE)
-    }
-
-    fun setFilterData(
-        filteredRatingChanges: List<RatingChange>,
-        startTime: Instant = filteredRatingChanges.first().date,
-        endTime: Instant = filteredRatingChanges.last().date
-    ) {
-        translator.setWindow(
-            minRating = filteredRatingChanges.minOf { it.rating },
-            maxRating = filteredRatingChanges.maxOf { it.rating },
-            startTime = startTime,
-            endTime = endTime
-        )
-        timeRange = startTime to endTime
+    var filterType by rememberSaveable(ratingChanges) {
+        if (ratingChanges.isNotEmpty()) {
+            translator.setWindow(createBounds(ratingChanges, RatingFilterType.all))
+        }
+        mutableStateOf(RatingFilterType.all)
     }
 
     var selectedRatingChange: RatingChange?
         by rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(null) }
-
-    //TODO: save translator somehow
-    DisposableEffect(key1 = filterType, key2 = ratingChanges, effect = {
-        if (ratingChanges.isNotEmpty())
-            when (val type = filterType) {
-                RatingFilterType.all ->
-                    setFilterData(filteredRatingChanges = ratingChanges)
-                RatingFilterType.last10 ->
-                    setFilterData(filteredRatingChanges = ratingChanges.takeLast(10))
-                RatingFilterType.lastMonth, RatingFilterType.lastYear -> {
-                    val now = getCurrentTime()
-                    val startTime = now - (if (type == RatingFilterType.lastMonth) 30.days else 365.days)
-                    setFilterData(
-                        filteredRatingChanges = ratingChanges.filter { it.date >= startTime },
-                        startTime = startTime,
-                        endTime = now
-                    )
-                }
-            }
-        onDispose {  }
-    })
 
     val rectangles = remember(manager.type) { RatingGraphRectangles(manager) }
 
@@ -167,7 +169,10 @@ private fun RatingGraph(
             manager = manager,
             rectangles = rectangles,
             selectedFilterType = filterType,
-            onSelectFilterType = { filterType = it },
+            onSelectFilterType = {
+                translator.setWindow(createBounds(ratingChanges, it))
+                filterType = it
+            },
             selectedRatingChange = selectedRatingChange,
             shape = shape
         )
@@ -195,7 +200,7 @@ private fun RatingGraph(
                             manager = manager,
                             rectangles = rectangles,
                             translator = translator,
-                            timeRange = timeRange,
+                            filterType = filterType,
                             selectedRatingChange = selectedRatingChange,
                             modifier = Modifier
                                 .pointerInput(Unit) {
@@ -333,7 +338,7 @@ private fun<U: UserInfo> DrawRatingGraph(
     manager: RatedAccountManager<U>,
     rectangles: RatingGraphRectangles,
     translator: CoordinateTranslator,
-    timeRange: Pair<Instant, Instant>,
+    filterType: RatingFilterType,
     selectedRatingChange: RatingChange?,
     modifier: Modifier = Modifier
 ) {
@@ -341,6 +346,10 @@ private fun<U: UserInfo> DrawRatingGraph(
         HandleColor.values().filter {
             runCatching { manager.originalColor(it) }.isSuccess
         }
+    }
+
+    val timeRange = remember(key1 = filterType, key2 = ratingChanges) {
+        createBounds(ratingChanges, filterType).run { startTime to endTime }
     }
 
     DrawRatingGraph(
@@ -478,29 +487,43 @@ private fun DrawRatingGraph(
 }
 
 
-private class CoordinateTranslator {
-    private var minY: Float by mutableStateOf(0f)
-    private var maxY: Float by mutableStateOf(0f)
-    private var minX: Float by mutableStateOf(0f)
-    private var maxX: Float by mutableStateOf(0f)
+@Composable
+private fun rememberCoordinateTranslator(): CoordinateTranslator {
+    val minXState = rememberSaveable { mutableStateOf(0f) }
+    val maxXState = rememberSaveable { mutableStateOf(0f) }
+    val minYState = rememberSaveable { mutableStateOf(0f) }
+    val maxYState = rememberSaveable { mutableStateOf(0f) }
+    return remember { CoordinateTranslator(minXState, maxXState, minYState, maxYState) }
+}
+
+private class CoordinateTranslator(
+    minXState: MutableState<Float>,
+    maxXState: MutableState<Float>,
+    minYState: MutableState<Float>,
+    maxYState: MutableState<Float>,
+) {
+    private var minY: Float by minYState
+    private var maxY: Float by maxYState
+    private var minX: Float by minXState
+    private var maxX: Float by maxXState
 
     var size: Size = Size.Unspecified
     var borderX: Float = 0f
 
-    fun setWindow(
-        minRating: Int,
-        maxRating: Int,
-        startTime: Instant,
-        endTime: Instant
-    ) {
-        if (startTime == endTime) {
-            setWindow(minRating, maxRating, startTime - 1.days, endTime + 1.days)
+    fun setWindow(bounds: RatingGraphBounds) {
+        if (bounds.startTime == bounds.endTime) {
+            setWindow(bounds.copy(
+                startTime = bounds.startTime - 1.days,
+                endTime = bounds.endTime + 1.days
+            ))
             return
         }
-        minY = minRating.toFloat() - 100f
-        maxY = maxRating.toFloat() + 100f
-        minX = startTime.epochSeconds.toFloat()
-        maxX = endTime.epochSeconds.toFloat()
+        with(bounds) {
+            minY = minRating.toFloat() - 100f
+            maxY = maxRating.toFloat() + 100f
+            minX = startTime.epochSeconds.toFloat()
+            maxX = endTime.epochSeconds.toFloat()
+        }
     }
 
     private fun transformX(
@@ -596,8 +619,6 @@ private class RatingGraphRectangles(
 
 }
 
-private data class Point(val x: Long, val y: Long) {
-
-}
+private data class Point(val x: Long, val y: Long)
 
 private fun RatingChange.toPoint() = Point(x = date.epochSeconds, y = rating.toLong())
