@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -366,10 +365,11 @@ private fun DrawRatingGraph(
     circleRadius: Float = 6f,
     circleBorderWidth: Float = 3f,
     pathWidth: Float = 4f,
-    shadowOffset: Offset = Offset(4f, -4f),
-    shadowAlpha: Float = 0.3f
+    shadowOffset: Offset = Offset(4f, 4f),
+    shadowAlpha: Float = 0.3f,
+    selectedPointRadiusMultiplier: Float = 1.5f
 ) {
-    fun radiusMultiplier(point: Point) = if (selectedPoint == point) 1.5f else 1f
+    fun radiusMultiplier(point: Point) = if (selectedPoint == point) selectedPointRadiusMultiplier else 1f
 
     val dashEffect = remember { PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f) }
 
@@ -379,85 +379,93 @@ private fun DrawRatingGraph(
             .clipToBounds()
     ) {
         translator.size = size
-        scale(scaleX = 1f, scaleY = -1f) {
-            val ratingPath = Path().apply {
-                ratingPoints.forEachIndexed { index, point ->
-                    val (px, py) = translator.pointToWindow(point)
-                    if (index == 0) moveTo(px, py)
-                    else lineTo(px, py)
-                }
-            }
-
-            //rating filled areas
-            rectangles.rectangles.forEach { (point, handleColor) ->
+        val ratingPath = Path().apply {
+            ratingPoints.forEachIndexed { index, point ->
                 val (px, py) = translator.pointToWindow(point)
-                drawRect(
-                    color = colorsMap[handleColor]!!,
-                    topLeft = Offset.Zero,
-                    size = Size(round(px), round(py))
-                )
+                if (index == 0) moveTo(px, py)
+                else lineTo(px, py)
             }
+        }
 
-            //time dashes
-            if (selectedPoint != null) {
-                val p = translator.pointToWindow(selectedPoint)
+        //rating filled areas
+        rectangles.rectangles.forEach { (point, handleColor) ->
+            val (px, py) = translator.pointToWindow(point).let {
+                round(it.x) to round(it.y)
+            }
+            drawRect(
+                color = colorsMap[handleColor]!!,
+                topLeft = Offset(0f, py),
+                size = Size(px, size.height - py)
+            )
+        }
+
+        //time dashes
+        if (selectedPoint != null) {
+            val p = translator.pointToWindow(selectedPoint)
+            drawLine(
+                color = Color.Black,
+                start = Offset(p.x, 0f),
+                end = p,
+                pathEffect = dashEffect
+            )
+        } else {
+            listOf(timeRange.first, timeRange.second).forEach {
+                val p = translator.pointToWindow(it.epochSeconds, 0)
                 drawLine(
                     color = Color.Black,
-                    start = Offset(p.x, size.height),
-                    end = p,
+                    start = Offset(p.x, 0f),
+                    end = Offset(p.x, size.height),
                     pathEffect = dashEffect
                 )
-            } else {
-                listOf(timeRange.first, timeRange.second).forEach {
-                    val x = translator.pointToWindow(it.epochSeconds, 0).x
-                    drawLine(
-                        color = Color.Black,
-                        start = Offset(x, 0f),
-                        end = Offset(x, size.height),
-                        pathEffect = dashEffect
-                    )
-                }
             }
+        }
 
-            //shadow of rating path
-            drawPath(
-                path = Path().apply { addPath(ratingPath, shadowOffset) },
+        //shadow of rating path
+        drawPath(
+            path = Path().apply { addPath(ratingPath, shadowOffset) },
+            color = Color.Black,
+            style = Stroke(width = pathWidth),
+            alpha = shadowAlpha
+        )
+
+        //shadow of rating points
+        ratingPoints.forEach { point ->
+            val center = translator.pointToWindow(point)
+            drawCircle(
                 color = Color.Black,
-                style = Stroke(width = pathWidth),
+                radius = (circleRadius + circleBorderWidth) * radiusMultiplier(point),
+                center = center + shadowOffset,
+                style = Fill,
                 alpha = shadowAlpha
             )
+        }
 
-            //shadow of rating points
-            ratingPoints.forEach { point ->
-                val center = translator.pointToWindow(point)
-                drawCircle(
-                    color = Color.Black,
-                    radius = (circleRadius + circleBorderWidth) * radiusMultiplier(point),
-                    center = center + shadowOffset,
-                    style = Fill,
-                    alpha = shadowAlpha
-                )
-            }
+        //rating path
+        drawPath(
+            path = ratingPath,
+            color = Color.Black,
+            style = Stroke(width = pathWidth)
+        )
 
-            //rating path
-            drawPath(
-                path = ratingPath,
+        //rating points
+        ratingPoints.forEach { point ->
+            val center = translator.pointToWindow(point)
+            drawCircle(
                 color = Color.Black,
-                style = Stroke(width = pathWidth)
+                radius = (circleRadius + circleBorderWidth) * radiusMultiplier(point),
+                center = center,
+                style = Fill
             )
-
-            //rating points
-            ratingPoints.forEach { point ->
-                val center = translator.pointToWindow(point)
+            drawCircle(
+                color = colorsMap[rectangles.getHandleColor(point)]!!,
+                radius = circleRadius * radiusMultiplier(point),
+                center = center,
+                style = Fill
+            )
+            if (point == selectedPoint) {
                 drawCircle(
                     color = Color.Black,
-                    radius = (circleRadius + circleBorderWidth) * radiusMultiplier(point),
-                    center = center,
-                    style = Fill
-                )
-                drawCircle(
-                    color = colorsMap[rectangles.getHandleColor(point)]!!,
-                    radius = circleRadius * radiusMultiplier(point),
+                    radius = (circleRadius / 2) * radiusMultiplier(point),
                     center = center,
                     style = Fill
                 )
@@ -492,16 +500,14 @@ private class CoordinateTranslator {
         maxX = endTime.epochSeconds.toFloat()
     }
 
-    fun pointToWindow(x: Long, y: Long, reverseY: Boolean = false): Offset {
+    fun pointToWindow(x: Long, y: Long): Offset {
         val px = (x - minX) / (maxX - minX) * size.width
-        val py = ((y - minY) / (maxY - minY) * size.height).let {
-            if (reverseY) size.height - it else it
-        }
+        val py = size.height - ((y - minY) / (maxY - minY) * size.height)
         return Offset(px, py)
     }
 
-    fun pointToWindow(point: Point, reverseY: Boolean = false)
-        = pointToWindow(point.x, point.y, reverseY)
+    fun pointToWindow(point: Point)
+        = pointToWindow(point.x, point.y)
 
     fun move(offset: Offset) {
         val dx = offset.x / size.width * (maxX - minX)
@@ -529,7 +535,7 @@ private class CoordinateTranslator {
         var pos = -1
         var minDist = Float.POSITIVE_INFINITY
         for (i in ratingChanges.indices) {
-            val o = pointToWindow(ratingChanges[i].toPoint(), reverseY = true)
+            val o = pointToWindow(ratingChanges[i].toPoint())
             val dist = (o - tap).getDistance()
             if (dist <= tapRadius && dist < minDist) {
                 pos = i
