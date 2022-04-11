@@ -51,7 +51,7 @@ fun rememberRatingGraphUIStates(): RatingGraphUIStates {
     val showRatingGraph = rememberSaveable { mutableStateOf(false) }
     val ratingLoadingStatus = rememberSaveable { mutableStateOf(LoadingStatus.PENDING) }
     val ratingChanges = rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(emptyList<RatingChange>()) }
-    return RatingGraphUIStates(showRatingGraph, ratingLoadingStatus, ratingChanges)
+    return remember { RatingGraphUIStates(showRatingGraph, ratingLoadingStatus, ratingChanges) }
 }
 
 @Composable
@@ -113,7 +113,7 @@ private fun RatingGraph(
 ) {
     val translator by remember { mutableStateOf(CoordinateTranslator()) }
 
-    var filterType by remember { mutableStateOf(RatingFilterType.all) }
+    var filterType by rememberSaveable { mutableStateOf(RatingFilterType.all) }
     var timeRange by remember {
         mutableStateOf(Instant.DISTANT_PAST to Instant.DISTANT_FUTURE)
     }
@@ -132,7 +132,8 @@ private fun RatingGraph(
         timeRange = startTime to endTime
     }
 
-    var selectedRatingChange: RatingChange? by remember{ mutableStateOf(null) }
+    var selectedRatingChange: RatingChange?
+        by rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(null) }
 
     //TODO: save translator somehow
     DisposableEffect(key1 = filterType, key2 = ratingChanges, effect = {
