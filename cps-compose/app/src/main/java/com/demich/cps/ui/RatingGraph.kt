@@ -507,18 +507,21 @@ private class CoordinateTranslator {
 
     fun pointToOffset(point: Point) = pointToOffset(point.x, point.y)
 
+    private fun offsetToPoint(offset: Offset) = Offset(
+        x = offset.x / size.width * (maxX - minX) + minX,
+        y = (size.height - offset.y) / size.height * (maxY - minY) + minY
+    )
+
     fun move(offset: Offset) {
-        val dx = offset.x / size.width * (maxX - minX)
+        val (dx, dy) = offsetToPoint(offset) - offsetToPoint(Offset.Zero)
         minX -= dx
         maxX -= dx
-        val dy = -offset.y / size.height * (maxY - minY)
         minY -= dy
         maxY -= dy
     }
 
     fun scale(center: Offset, scale: Float) {
-        val cx = center.x / size.width * (maxX - minX) + minX
-        val cy = (size.height - center.y) / size.height * (maxY - minY) + minY
+        val (cx, cy) = offsetToPoint(center)
         minX = (minX - cx) / scale + cx
         maxX = (maxX - cx) / scale + cx
         minY = (minY - cy) / scale + cy
