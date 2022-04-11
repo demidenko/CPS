@@ -100,9 +100,12 @@ object DurationAsSecondsSerializer: KSerializer<Duration> {
     override fun deserialize(decoder: Decoder): Duration = decoder.decodeLong().seconds
 }
 
-inline fun<reified T> jsonSaver() = object: Saver<T, String> {
-    override fun restore(value: String): T = jsonCPS.decodeFromString(value)
-    override fun SaverScope.save(value: T): String = jsonCPS.encodeToString(value)
+@Composable
+inline fun<reified T> jsonSaver() = remember {
+    object : Saver<T, String> {
+        override fun restore(value: String): T = jsonCPS.decodeFromString(value)
+        override fun SaverScope.save(value: T): String = jsonCPS.encodeToString(value)
+    }
 }
 
 @Composable
