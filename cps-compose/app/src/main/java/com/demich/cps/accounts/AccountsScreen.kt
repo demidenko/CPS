@@ -20,10 +20,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.demich.cps.*
 import com.demich.cps.R
-import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.*
-import com.demich.cps.makeIntentOpenUrl
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
@@ -179,8 +178,7 @@ fun accountExpandedMenuBuilder(
     type: AccountManagers,
     navController: NavController,
     onShowDeleteDialog: () -> Unit
-)
-: @Composable CPSDropdownMenuScope.() -> Unit = {
+): AdditionalMenuBuilder = {
     val context = context
     CPSDropdownMenuItem(title = "Delete", icon = Icons.Default.DeleteForever, onClick = onShowDeleteDialog)
     CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
@@ -195,7 +193,7 @@ fun accountExpandedMenuBuilder(
 }
 
 fun accountsBottomBarBuilder(accountsViewModel: AccountsViewModel)
-: @Composable RowScope.() -> Unit = {
+: AdditionalBottomBarBuilder = {
     AddAccountButton()
     ReloadAccountsButton(accountsViewModel)
 }

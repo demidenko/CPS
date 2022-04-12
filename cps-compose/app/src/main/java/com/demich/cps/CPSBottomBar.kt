@@ -22,11 +22,13 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 
+typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
+
 @Composable
 fun CPSBottomBar(
     navController: NavHostController,
     currentScreen: Screen?,
-    additionalBottomBar: @Composable() (RowScope.() -> Unit)? = null
+    additionalBottomBar: AdditionalBottomBarBuilder? = null
 ) {
     if (currentScreen != null && currentScreen.enableBottomBar) {
         Row(

@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.demich.cps.AdditionalBottomBarBuilder
+import com.demich.cps.AdditionalMenuBuilder
 import com.demich.cps.Screen
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIconButton
@@ -85,14 +87,14 @@ fun NewsSettingsScreen() {
 }
 
 fun newsBottomBarBuilder()
-: @Composable RowScope.() -> Unit = {
+: AdditionalBottomBarBuilder = {
     CPSReloadingButton(loadingStatus = LoadingStatus.PENDING) {
 
     }
 }
 
 fun newsMenuBuilder(navController: NavController)
-: @Composable CPSDropdownMenuScope.() -> Unit = {
+: AdditionalMenuBuilder = {
     CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
         navController.navigate(Screen.NewsSettings.route)
     }

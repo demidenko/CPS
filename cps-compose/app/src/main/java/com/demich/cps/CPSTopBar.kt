@@ -25,10 +25,12 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.launch
 
+typealias AdditionalMenuBuilder = @Composable CPSDropdownMenuScope.() -> Unit
+
 @Composable
 fun CPSTopBar(
     currentScreen: Screen?,
-    additionalMenu: @Composable() (CPSDropdownMenuScope.() -> Unit)?,
+    additionalMenu: AdditionalMenuBuilder?,
 ) {
     var showUIPanel by rememberSaveable { mutableStateOf(false) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
