@@ -10,9 +10,11 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -35,19 +37,39 @@ import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AccountsScreen(navController: NavController, accountsViewModel: AccountsViewModel) {
+fun AccountsScreen(
+    navController: NavController,
+    accountsViewModel: AccountsViewModel,
+    onSetAdditionalMenu: (AdditionalMenuBuilder) -> Unit
+) {
     val context = context
+    val scope = rememberCoroutineScope()
 
-    val accountsArray by rememberCollect {
+    val recordedAccounts by rememberCollect {
         combine(
             flows = context.allAccountManagers
                 .map { it.flowOfInfoWithManager() }
-        ) { it }
+        ) { it }.combine(context.settingsUI.accountsOrder.flow) { accountsArray, order ->
+            order.mapNotNull { type ->
+                accountsArray.find { it.type == type }?.takeIf { !it.userInfo.isEmpty() }
+            }
+        }
     }
 
-    val recordedAccounts by remember {
-        derivedStateOf { accountsArray.filterNot { it.userInfo.isEmpty() } }
+    var showAccountsReorderUI by rememberSaveable { mutableStateOf(false) }
+    if (recordedAccounts.size > 1) {
+        onSetAdditionalMenu {
+            CPSDropdownMenuItem(title = "Reorder", icon = Icons.Default.Reorder) {
+                //TODO: showAccountsReorderUI = true
+                scope.launch {
+                    context.settingsUI.run {
+                        accountsOrder(accountsOrder().shuffled())
+                    }
+                }
+            }
+        }
     }
+
 
     LazyColumn(
         horizontalAlignment = Alignment.Start,
@@ -67,6 +89,7 @@ fun AccountsScreen(navController: NavController, accountsViewModel: AccountsView
                 PanelWithUI(
                     userInfoWithManager = it,
                     accountsViewModel = accountsViewModel,
+                    showReorderUI = showAccountsReorderUI,
                     modifier = Modifier
                         .padding(start = 10.dp, top = 10.dp)
                         .animateItemPlacement()

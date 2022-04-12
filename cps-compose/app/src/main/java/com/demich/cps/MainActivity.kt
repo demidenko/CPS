@@ -81,6 +81,7 @@ fun CPSScaffold(
     var bottomBar: AdditionalBottomBarBuilder? by remember { mutableStateOf(null) }
 
     fun NavGraphBuilder.cpsComposable(route: String, content: @Composable (NavBackStackEntry) -> Unit) {
+        //TODO: bottombar (and menu) glich caused by crossfade during navigation
         composable(route) {
             menu = null
             bottomBar = null
@@ -93,7 +94,11 @@ fun CPSScaffold(
     ) {
         {
             cpsComposable(Screen.Accounts.route) {
-                AccountsScreen(navController, cpsViewModels.accountsViewModel)
+                AccountsScreen(
+                    navController = navController,
+                    accountsViewModel = cpsViewModels.accountsViewModel,
+                    onSetAdditionalMenu = { menu = it }
+                )
                 bottomBar = accountsBottomBarBuilder(cpsViewModels.accountsViewModel)
             }
             cpsComposable(Screen.AccountExpanded.route) {

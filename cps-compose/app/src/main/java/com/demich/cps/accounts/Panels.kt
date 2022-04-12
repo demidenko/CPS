@@ -33,6 +33,7 @@ import kotlinx.coroutines.isActive
 fun<U: UserInfo> PanelWithUI(
     userInfoWithManager: UserInfoWithManager<U>,
     accountsViewModel: AccountsViewModel,
+    showReorderUI: Boolean,
     modifier: Modifier = Modifier,
     onExpandRequest: () -> Unit
 ) {
@@ -66,23 +67,43 @@ fun<U: UserInfo> PanelWithUI(
         ) {
             manager.Panel(userInfo)
 
-            Row(modifier = Modifier.align(Alignment.CenterEnd)) {
-                if (loadingStatus != LoadingStatus.LOADING && uiAlpha > 0f) {
-                    CPSIconButton(
-                        icon = Icons.Default.UnfoldMore,
-                        modifier = Modifier.alpha(uiAlpha),
-                        onClick = onExpandRequest
-                    )
-                }
-                if (loadingStatus != LoadingStatus.PENDING || uiAlpha > 0f) {
-                    CPSReloadingButton(
-                        loadingStatus = loadingStatus,
-                        modifier = Modifier.alpha(if (loadingStatus == LoadingStatus.PENDING) uiAlpha else 1f)
-                    ) {
-                        accountsViewModel.reload(manager)
-                    }
-                }
+            if (showReorderUI) {
+                //TODO
+            } else {
+                AccountPanelUI(
+                    loadingStatus = loadingStatus,
+                    uiAlpha = uiAlpha,
+                    onReloadRequest = { accountsViewModel.reload(manager) },
+                    onExpandRequest = onExpandRequest
+                )
             }
+
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.AccountPanelUI(
+    loadingStatus: LoadingStatus,
+    uiAlpha: Float,
+    modifier: Modifier = Modifier,
+    onReloadRequest: () -> Unit,
+    onExpandRequest: () -> Unit
+) {
+    Row(modifier = modifier.align(Alignment.CenterEnd)) {
+        if (loadingStatus != LoadingStatus.LOADING && uiAlpha > 0f) {
+            CPSIconButton(
+                icon = Icons.Default.UnfoldMore,
+                modifier = Modifier.alpha(uiAlpha),
+                onClick = onExpandRequest
+            )
+        }
+        if (loadingStatus != LoadingStatus.PENDING || uiAlpha > 0f) {
+            CPSReloadingButton(
+                loadingStatus = loadingStatus,
+                modifier = Modifier.alpha(if (loadingStatus == LoadingStatus.PENDING) uiAlpha else 1f),
+                onClick = onReloadRequest
+            )
         }
     }
 }
@@ -111,40 +132,6 @@ private fun hidingState(
         }
     }
     return a
-}
-
-@Composable
-private fun<S> AutoHiding(
-    currentState: S,
-    startHidingState: S,
-    finishHidingState: S,
-    hideDelay: Int,
-    hideDuration: Int,
-    modifier: Modifier = Modifier,
-    content: @Composable (S) -> Unit
-) {
-    val transition = updateTransition(targetState = currentState, label = "")
-    val uiAlpha by transition.animateFloat(
-        transitionSpec = {
-            when {
-                //TODO: reversed transitioning is glitching
-                startHidingState isTransitioningTo finishHidingState
-                -> tween(delayMillis = hideDelay, durationMillis = hideDuration)
-                else -> snap()
-            }
-        },
-        label = ""
-    ) {
-        if (it == finishHidingState) 0f else 1f
-    }
-    transition.currentState.let {
-        if (it != finishHidingState) {
-            Box(
-                modifier = modifier.alpha(uiAlpha),
-                content = { content(it) }
-            )
-        }
-    }
 }
 
 @Composable
