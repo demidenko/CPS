@@ -1,14 +1,16 @@
 package com.demich.cps.accounts
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,6 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AccountsScreen(navController: NavController, accountsViewModel: AccountsViewModel) {
     val context = context
@@ -47,13 +50,13 @@ fun AccountsScreen(navController: NavController, accountsViewModel: AccountsView
         derivedStateOf { accountsArray.filterNot { it.userInfo.isEmpty() } }
     }
 
-    Column(
+    LazyColumn(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
             .fillMaxWidth()
             .background(cpsColors.background)
     ) {
-        if (recordedAccounts.isEmpty()) {
+        if (recordedAccounts.isEmpty()) item {
             MonospacedText(
                 text = stringResource(id = R.string.accounts_welcome),
                 color = cpsColors.textColorAdditional,
@@ -61,15 +64,15 @@ fun AccountsScreen(navController: NavController, accountsViewModel: AccountsView
                 modifier = Modifier.padding(6.dp)
             )
         } else {
-            recordedAccounts.forEach {
-                key(it.type) {
-                    PanelWithUI(
-                        userInfoWithManager = it,
-                        accountsViewModel = accountsViewModel,
-                        modifier = Modifier.padding(start = 10.dp, top = 10.dp)
-                    ) {
-                        navController.navigate(route = "account/${it.type}")
-                    }
+            items(recordedAccounts, key = { it.type }) {
+                PanelWithUI(
+                    userInfoWithManager = it,
+                    accountsViewModel = accountsViewModel,
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .animateItemPlacement()
+                ) {
+                    navController.navigate(route = "account/${it.type}")
                 }
             }
         }
