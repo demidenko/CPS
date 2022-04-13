@@ -48,25 +48,28 @@ fun<U: UserInfo> PanelWithUI(
 
     if (loadingStatus == LoadingStatus.LOADING) lastClickMillis = 0
 
+    val clickEnabled by remember(visibleOrder == null) {
+        derivedStateOf {
+            loadingStatus != LoadingStatus.LOADING && visibleOrder == null
+        }
+    }
+
     if (!userInfo.isEmpty()) {
         Box(modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 48.dp)
-            .pointerInput(Unit) {
-                //TODO ignore if reorder
-                detectTapGestures(
-                    onPress = {
-                        if (loadingStatus != LoadingStatus.LOADING) {
+            .pointerInput(clickEnabled) {
+                if (clickEnabled) {
+                    detectTapGestures(
+                        onPress = {
                             tryAwaitRelease()
                             lastClickMillis = getCurrentTime().toEpochMilliseconds()
-                        }
-                    },
-                    onDoubleTap = {
-                        if (loadingStatus != LoadingStatus.LOADING) {
+                        },
+                        onDoubleTap = {
                             onExpandRequest()
                         }
-                    }
-                )
+                    )
+                }
             }
         ) {
             manager.Panel(userInfo)
