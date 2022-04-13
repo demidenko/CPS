@@ -61,6 +61,7 @@ private fun ColorizeStatusBar(
     )
 }
 
+@Immutable
 private data class RatedRank(
     val rank: Double,
     val handleColor: HandleColor,
@@ -157,17 +158,12 @@ fun StatusBarButtonsForUIPanel() {
 
     val coloredStatusBar by rememberCollect { settingsUI.coloredStatusBar.flow }
 
-    val ratedAccountsArray by rememberCollect {
+    val recordedAccounts by rememberCollect {
         combine(
             flows = context.allAccountManagers
                 .filterIsInstance<RatedAccountManager<*>>()
                 .map { it.flowOfInfoWithManager() }
-        ) { it }
-    }
-    val recordedAccounts by remember {
-        derivedStateOf {
-            ratedAccountsArray.filterNot { it.userInfo.isEmpty() }
-        }
+        ) { array -> array.filterNot { it.userInfo.isEmpty() } }
     }
 
     var showPopup by rememberSaveable { mutableStateOf(false) }
