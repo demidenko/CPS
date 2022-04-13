@@ -43,7 +43,6 @@ fun AccountsScreen(
     onSetAdditionalMenu: (AdditionalMenuBuilder) -> Unit
 ) {
     val context = context
-    val scope = rememberCoroutineScope()
 
     val recordedAccounts by rememberCollect {
         combine(
@@ -57,11 +56,8 @@ fun AccountsScreen(
     }
 
     var showAccountsReorderUI by rememberSaveable { mutableStateOf(false) }
-    val orderSettingsData by remember {
-        derivedStateOf {
-            if (showAccountsReorderUI) context.settingsUI.accountsOrder to recordedAccounts.map { it.type }
-            else null
-        }
+    val visibleOrder by remember {
+        derivedStateOf { if (showAccountsReorderUI) recordedAccounts.map { it.type } else null }
     }
     if (recordedAccounts.size > 1) {
         onSetAdditionalMenu {
@@ -87,16 +83,16 @@ fun AccountsScreen(
                     modifier = Modifier.padding(6.dp)
                 )
             } else {
-                items(recordedAccounts, key = { it.type }) {
+                items(recordedAccounts, key = { it.type }) { userInfoWithManager ->
                     PanelWithUI(
-                        userInfoWithManager = it,
+                        userInfoWithManager = userInfoWithManager,
                         accountsViewModel = accountsViewModel,
-                        orderSettingsData = orderSettingsData,
+                        visibleOrder = visibleOrder,
                         modifier = Modifier
                             .padding(start = 10.dp, top = 10.dp)
                             .animateItemPlacement()
                     ) {
-                        navController.navigate(route = "account/${it.type}")
+                        navController.navigate(route = "account/${userInfoWithManager.type}")
                     }
                 }
             }

@@ -23,9 +23,10 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
+import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.CPSDataStoreItem
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.context
 import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -36,7 +37,7 @@ fun<U: UserInfo> PanelWithUI(
     userInfoWithManager: UserInfoWithManager<U>,
     accountsViewModel: AccountsViewModel,
     modifier: Modifier = Modifier,
-    orderSettingsData: Pair<CPSDataStoreItem<List<AccountManagers>>, List<AccountManagers>>? = null,
+    visibleOrder: List<AccountManagers>? = null,
     onExpandRequest: () -> Unit
 ) {
     val (userInfo, manager) = userInfoWithManager
@@ -70,7 +71,7 @@ fun<U: UserInfo> PanelWithUI(
         ) {
             manager.Panel(userInfo)
 
-            if (orderSettingsData == null) {
+            if (visibleOrder == null) {
                 AccountPanelUI(
                     loadingStatus = loadingStatus,
                     uiAlpha = uiAlpha,
@@ -81,8 +82,7 @@ fun<U: UserInfo> PanelWithUI(
             } else {
                 AccountMovingUI(
                     type = manager.type,
-                    visibleOrder = orderSettingsData.second,
-                    item = orderSettingsData.first,
+                    visibleOrder = visibleOrder,
                     modifier = Modifier.align(Alignment.CenterEnd)
                 )
             }
@@ -122,11 +122,12 @@ private fun AccountPanelUI(
 private fun AccountMovingUI(
     type: AccountManagers,
     visibleOrder: List<AccountManagers>,
-    item: CPSDataStoreItem<List<AccountManagers>>,
     modifier: Modifier = Modifier
 ) {
+    val context = context
     val scope = rememberCoroutineScope()
     fun saveOrder(newVisibleOrder: List<AccountManagers>) {
+        val item = context.settingsUI.accountsOrder
         scope.launch {
             val oldOrder = item().let { order ->
                 //adding looks useless but not
