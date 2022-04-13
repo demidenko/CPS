@@ -38,11 +38,11 @@ fun CPSStatusBar(
 ) {
     val context = context
     val coloredStatusBar by rememberCollect { context.settingsUI.coloredStatusBar.flow }
-    val orderGetter by rememberCollect { makeFlowOfOrderGetter(context) }
+    val rankGetter by rememberCollect { makeFlowOfRankGetter(context) }
     ColorizeStatusBar(
         systemUiController = systemUiController,
         coloredStatusBar = coloredStatusBar,
-        order = orderGetter[currentScreen]
+        rank = rankGetter[currentScreen]
     )
 }
 
@@ -50,29 +50,29 @@ fun CPSStatusBar(
 private fun ColorizeStatusBar(
     systemUiController: SystemUiController,
     coloredStatusBar: Boolean,
-    order: RatedOrder?,
+    rank: RatedRank?,
     offColor: Color = cpsColors.background
 ) {
     ColorizeStatusBar(
         systemUiController = systemUiController,
-        isStatusBarEnabled = coloredStatusBar && order != null,
-        color = order?.run { manager.colorFor(handleColor) } ?: offColor,
+        isStatusBarEnabled = coloredStatusBar && rank != null,
+        color = rank?.run { manager.colorFor(handleColor) } ?: offColor,
         offColor = offColor
     )
 }
 
-private data class RatedOrder(
-    val order: Double,
+private data class RatedRank(
+    val rank: Double,
     val handleColor: HandleColor,
     val manager: RatedAccountManager<*>
 )
 
-private fun<U: UserInfo> RatedAccountManager<U>.getOrder(userInfo: U): RatedOrder? {
+private fun<U: UserInfo> RatedAccountManager<U>.getRank(userInfo: U): RatedRank? {
     if (userInfo.status != STATUS.OK) return null
     val rating = getRating(userInfo)
     if(rating == NOT_RATED) return null
     val handleColor = getHandleColor(rating)
-    if(handleColor == HandleColor.RED) return RatedOrder(order = 1e9, handleColor = handleColor, manager = this)
+    if(handleColor == HandleColor.RED) return RatedRank(rank = 1e9, handleColor = handleColor, manager = this)
     val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
     val j = rankedHandleColorsList.indexOfLast { handleColor == it }
     val pos = ratingsUpperBounds.indexOfFirst { it.first == handleColor }
@@ -80,45 +80,45 @@ private fun<U: UserInfo> RatedAccountManager<U>.getOrder(userInfo: U): RatedOrde
     val lower = if(pos > 0) ratingsUpperBounds[pos-1].second else 0
     val upper = ratingsUpperBounds[pos].second
     val blockLength = (upper - lower).toDouble() / (j - i + 1)
-    return RatedOrder(
-        order = i + (rating - lower) / blockLength,
+    return RatedRank(
+        rank = i + (rating - lower) / blockLength,
         handleColor = handleColor,
         manager = this
     )
 }
 
 
-private fun<U: UserInfo> RatedAccountManager<U>.flowOfRatedOrder(): Flow<RatedOrder?> =
-    flowOfInfo().map(this::getOrder)
+private fun<U: UserInfo> RatedAccountManager<U>.flowOfRatedRank(): Flow<RatedRank?> =
+    flowOfInfo().map(this::getRank)
 
-private data class OrderGetter(
-    private val validOrders: List<RatedOrder>,
-    private val orderByMaximum: Boolean
+private data class RankGetter(
+    private val validRanks: List<RatedRank>,
+    private val resultByMaximum: Boolean
 ) {
-    operator fun get(screen: Screen?): RatedOrder? {
+    operator fun get(screen: Screen?): RatedRank? {
         return when (screen) {
-            is Screen.AccountExpanded -> validOrders.find { it.manager.type == screen.type }
-            is Screen.AccountSettings -> validOrders.find { it.manager.type == screen.type }
+            is Screen.AccountExpanded -> validRanks.find { it.manager.type == screen.type }
+            is Screen.AccountSettings -> validRanks.find { it.manager.type == screen.type }
             else -> {
-                if (orderByMaximum) validOrders.maxByOrNull { it.order }
-                else validOrders.minByOrNull { it.order }
+                if (resultByMaximum) validRanks.maxByOrNull { it.rank }
+                else validRanks.minByOrNull { it.rank }
             }
         }
     }
 }
 
-private fun makeFlowOfOrderGetter(context: Context): Flow<OrderGetter> =
+private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
     combine(
         flow = combine(flows = context.allAccountManagers
             .filterIsInstance<RatedAccountManager<*>>()
-            .map { it.flowOfRatedOrder() }
+            .map { it.flowOfRatedRank() }
         ) { it },
         flow2 = context.settingsUI.statusBarDisabledManagers.flow,
-        flow3 = context.settingsUI.statusBarOrderByMaximum.flow
-    ) { orders, disabledManagers, orderByMaximum ->
-        OrderGetter(
-            validOrders = orders.filterNotNull().filter { it.manager.type !in disabledManagers },
-            orderByMaximum = orderByMaximum
+        flow3 = context.settingsUI.statusBarResultByMaximum.flow
+    ) { ranks, disabledManagers, resultByMaximum ->
+        RankGetter(
+            validRanks = ranks.filterNotNull().filter { it.manager.type !in disabledManagers },
+            resultByMaximum = resultByMaximum
         )
     }.distinctUntilChanged()
 
@@ -171,7 +171,7 @@ fun StatusBarButtonsForUIPanel() {
     }
 
     var showPopup by rememberSaveable { mutableStateOf(false) }
-    val orderByMaximum by rememberCollect { settingsUI.statusBarOrderByMaximum.flow }
+    val resultByMaximum by rememberCollect { settingsUI.statusBarResultByMaximum.flow }
     val disabledManagers by rememberCollect { settingsUI.statusBarDisabledManagers.flow }
 
     val noneEnabled by remember {
@@ -198,7 +198,7 @@ fun StatusBarButtonsForUIPanel() {
             )
             StatusBarAccountsPopup(
                 expanded = showPopup,
-                orderByMaximum = orderByMaximum,
+                resultByMaximum = resultByMaximum,
                 disabledManagers = disabledManagers,
                 recordedAccounts = recordedAccounts,
                 onDismissRequest = { showPopup = false }
@@ -212,7 +212,7 @@ fun StatusBarButtonsForUIPanel() {
 @Composable
 private fun StatusBarAccountsPopup(
     expanded: Boolean,
-    orderByMaximum: Boolean,
+    resultByMaximum: Boolean,
     disabledManagers: Set<AccountManagers>,
     recordedAccounts: List<UserInfoWithManager<out UserInfo>>,
     onDismissRequest: () -> Unit
@@ -237,12 +237,12 @@ private fun StatusBarAccountsPopup(
         }
         TextButtonsSelectRow(
             values = listOf(false, true),
-            selectedValue = orderByMaximum,
+            selectedValue = resultByMaximum,
             text = { value ->
                 if (value) "best" else "worst"
             },
             onSelect = { value ->
-                scope.launch { settingsUI.statusBarOrderByMaximum(value) }
+                scope.launch { settingsUI.statusBarResultByMaximum(value) }
             },
             modifier = Modifier
                 .padding(horizontal = 10.dp)

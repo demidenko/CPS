@@ -21,7 +21,7 @@ class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
 
     val coloredStatusBar = Item(booleanPreferencesKey("use_status_bar"), true)
     val statusBarDisabledManagers = itemEnumSet<AccountManagers>("status_bar_disabled_managers")
-    val statusBarOrderByMaximum = Item(booleanPreferencesKey("status_bar_order_by_max"), true)
+    val statusBarResultByMaximum = Item(booleanPreferencesKey("status_bar_result_by_max"), true)
 
     val accountsOrder = itemJsonConvertible("accounts_order", AccountManagers.values().toList())
 }
