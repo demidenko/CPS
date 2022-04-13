@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.CPSDataStore
+import com.demich.cps.utils.CPSDataStoreItem
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.launch
 
@@ -47,7 +47,7 @@ fun SettingsItem(
 
 @Composable
 fun SwitchSettingsItem(
-    item: CPSDataStore.Item<Boolean>,
+    item: CPSDataStoreItem<Boolean>,
     title: String,
     description: String = "",
 ) {

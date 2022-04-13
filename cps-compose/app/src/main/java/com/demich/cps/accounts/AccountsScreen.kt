@@ -57,46 +57,57 @@ fun AccountsScreen(
     }
 
     var showAccountsReorderUI by rememberSaveable { mutableStateOf(false) }
+    val orderSettingsData by remember {
+        derivedStateOf {
+            if (showAccountsReorderUI) context.settingsUI.accountsOrder to recordedAccounts.map { it.type }
+            else null
+        }
+    }
     if (recordedAccounts.size > 1) {
         onSetAdditionalMenu {
             CPSDropdownMenuItem(title = "Reorder", icon = Icons.Default.Reorder) {
-                //TODO: showAccountsReorderUI = true
-                scope.launch {
-                    context.settingsUI.run {
-                        accountsOrder(accountsOrder().shuffled())
-                    }
-                }
+                showAccountsReorderUI = true
             }
         }
     }
 
 
-    LazyColumn(
-        horizontalAlignment = Alignment.Start,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(cpsColors.background)
-    ) {
-        if (recordedAccounts.isEmpty()) item {
-            MonospacedText(
-                text = stringResource(id = R.string.accounts_welcome),
-                color = cpsColors.textColorAdditional,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(6.dp)
-            )
-        } else {
-            items(recordedAccounts, key = { it.type }) {
-                PanelWithUI(
-                    userInfoWithManager = it,
-                    accountsViewModel = accountsViewModel,
-                    showReorderUI = showAccountsReorderUI,
-                    modifier = Modifier
-                        .padding(start = 10.dp, top = 10.dp)
-                        .animateItemPlacement()
-                ) {
-                    navController.navigate(route = "account/${it.type}")
+    Box(modifier = Modifier.fillMaxHeight()) {
+        LazyColumn(
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(cpsColors.background)
+        ) {
+            if (recordedAccounts.isEmpty()) item {
+                MonospacedText(
+                    text = stringResource(id = R.string.accounts_welcome),
+                    color = cpsColors.textColorAdditional,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(6.dp)
+                )
+            } else {
+                items(recordedAccounts, key = { it.type }) {
+                    PanelWithUI(
+                        userInfoWithManager = it,
+                        accountsViewModel = accountsViewModel,
+                        orderSettingsData = orderSettingsData,
+                        modifier = Modifier
+                            .padding(start = 10.dp, top = 10.dp)
+                            .animateItemPlacement()
+                    ) {
+                        navController.navigate(route = "account/${it.type}")
+                    }
                 }
             }
+        }
+        if (showAccountsReorderUI) {
+            //TODO: this button instead of whole bottom bar
+            Button(
+                onClick = { showAccountsReorderUI = false },
+                content = { Text("Done") },
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
         }
     }
 }

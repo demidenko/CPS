@@ -23,7 +23,7 @@ class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
     val statusBarDisabledManagers = itemEnumSet<AccountManagers>("status_bar_disabled_managers")
     val statusBarResultByMaximum = Item(booleanPreferencesKey("status_bar_result_by_max"), true)
 
-    val accountsOrder = itemJsonConvertible("accounts_order", AccountManagers.values().toList())
+    val accountsOrder = itemJsonConvertible<List<AccountManagers>>(name = "accounts_order", defaultValue = emptyList())
 }
 
 enum class DarkLightMode {

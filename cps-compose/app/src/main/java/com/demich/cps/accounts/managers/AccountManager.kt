@@ -170,7 +170,7 @@ inline fun <reified U: UserInfo> accountDataStore(dataStore: DataStore<Preferenc
 }
 
 open class AccountSettingsDataStore(dataStore: DataStore<Preferences>): CPSDataStore(dataStore) {
-    protected open val keysForReset: List<CPSDataStoreItem<*,*>> = emptyList()
+    protected open val keysForReset: List<DataStoreItem<*,*>> = emptyList()
     suspend fun resetRelatedData() {
         val keys = keysForReset.takeIf { it.isNotEmpty() } ?: return
         dataStore.edit { prefs ->

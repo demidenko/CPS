@@ -1,13 +1,13 @@
 package com.demich.cps.accounts
 
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,17 +24,19 @@ import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.CPSDataStoreItem
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 @Composable
 fun<U: UserInfo> PanelWithUI(
     userInfoWithManager: UserInfoWithManager<U>,
     accountsViewModel: AccountsViewModel,
-    showReorderUI: Boolean,
     modifier: Modifier = Modifier,
+    orderSettingsData: Pair<CPSDataStoreItem<List<AccountManagers>>, List<AccountManagers>>? = null,
     onExpandRequest: () -> Unit
 ) {
     val (userInfo, manager) = userInfoWithManager
@@ -50,6 +52,7 @@ fun<U: UserInfo> PanelWithUI(
             .fillMaxWidth()
             .heightIn(min = 48.dp)
             .pointerInput(Unit) {
+                //TODO ignore if reorder
                 detectTapGestures(
                     onPress = {
                         if (loadingStatus != LoadingStatus.LOADING) {
@@ -67,14 +70,20 @@ fun<U: UserInfo> PanelWithUI(
         ) {
             manager.Panel(userInfo)
 
-            if (showReorderUI) {
-                //TODO
-            } else {
+            if (orderSettingsData == null) {
                 AccountPanelUI(
                     loadingStatus = loadingStatus,
                     uiAlpha = uiAlpha,
                     onReloadRequest = { accountsViewModel.reload(manager) },
-                    onExpandRequest = onExpandRequest
+                    onExpandRequest = onExpandRequest,
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                )
+            } else {
+                AccountMovingUI(
+                    type = manager.type,
+                    visibleOrder = orderSettingsData.second,
+                    item = orderSettingsData.first,
+                    modifier = Modifier.align(Alignment.CenterEnd)
                 )
             }
 
@@ -83,14 +92,14 @@ fun<U: UserInfo> PanelWithUI(
 }
 
 @Composable
-private fun BoxScope.AccountPanelUI(
+private fun AccountPanelUI(
     loadingStatus: LoadingStatus,
     uiAlpha: Float,
     modifier: Modifier = Modifier,
     onReloadRequest: () -> Unit,
     onExpandRequest: () -> Unit
 ) {
-    Row(modifier = modifier.align(Alignment.CenterEnd)) {
+    Row(modifier = modifier) {
         if (loadingStatus != LoadingStatus.LOADING && uiAlpha > 0f) {
             CPSIconButton(
                 icon = Icons.Default.UnfoldMore,
@@ -103,6 +112,59 @@ private fun BoxScope.AccountPanelUI(
                 loadingStatus = loadingStatus,
                 modifier = Modifier.alpha(if (loadingStatus == LoadingStatus.PENDING) uiAlpha else 1f),
                 onClick = onReloadRequest
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun AccountMovingUI(
+    type: AccountManagers,
+    visibleOrder: List<AccountManagers>,
+    item: CPSDataStoreItem<List<AccountManagers>>,
+    modifier: Modifier = Modifier
+) {
+    val scope = rememberCoroutineScope()
+    fun saveOrder(newVisibleOrder: List<AccountManagers>) {
+        scope.launch {
+            val oldOrder = item().let { order ->
+                //adding looks useless but not
+                order + AccountManagers.values().filter { it !in order }
+            }
+            item(newValue = newVisibleOrder + oldOrder.filter { it !in newVisibleOrder })
+        }
+    }
+
+    Column(modifier = modifier) {
+        if (visibleOrder.first() != type) {
+            Icon(
+                imageVector = Icons.Default.ArrowDropUp,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .clickable {
+                        val index = visibleOrder.indexOf(type)
+                        saveOrder(visibleOrder.toMutableList().apply {
+                            this[index] = this[index - 1]
+                            this[index - 1] = type
+                        })
+                    }
+            )
+        }
+        if (visibleOrder.last() != type) {
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .clickable {
+                        val index = visibleOrder.indexOf(type)
+                        saveOrder(visibleOrder.toMutableList().apply {
+                            this[index] = this[index + 1]
+                            this[index + 1] = type
+                        })
+                    }
             )
         }
     }
