@@ -80,16 +80,9 @@ class CListAccountManager(context: Context):
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         try {
             val s = CListAPI.getUsersSearchPage(str)
-            return buildList {
-                var i = 0
-                while (true) {
-                    i = s.indexOf("<td class=\"username\">", i+1)
-                    if (i == -1) break
-                    var j = s.indexOf("<span", i)
-                    j = s.indexOf("<a href=", j)
-                    val login = s.substring(s.indexOf("\">",j)+2, s.indexOf("</a",j))
-                    add(AccountSuggestion(login,"",login))
-                }
+            return Jsoup.parse(s).select("td.username").map {
+                val login = it.text()
+                AccountSuggestion(title = login, userId = login)
             }
         } catch (e: Throwable) {
             return null

@@ -8,6 +8,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.utils.ACMPAPI
 import kotlinx.serialization.Serializable
+import org.jsoup.Jsoup
 
 @Serializable
 data class ACMPUserInfo(
@@ -77,20 +78,17 @@ class ACMPAccountManager(context: Context):
         if (str.toIntOrNull() != null) return emptyList()
         try {
             val s = ACMPAPI.getUsersSearch(str)
-            return buildList {
-                var k = s.indexOf("<table cellspacing=1 cellpadding=2 align=center class=main>")
-                while(true) {
-                    k = s.indexOf("<tr class=white>", k+1)
-                    if (k == -1) break
-                    var i = s.indexOf("<td>", k+1)
-                    i = s.indexOf('>',i+4)
-                    val userId = s.substring(s.lastIndexOf("id=",i)+3, i)
-                    val userName = s.substring(i+1, s.indexOf("</a",i))
-                    i = s.indexOf("<td align=right>", i)
-                    i = s.indexOf("</a></td>", i)
-                    val tasks = s.substring(s.lastIndexOf('>',i)+1, i)
-                    add(AccountSuggestion(userName, tasks, userId))
-                }
+            return Jsoup.parse(s).selectFirst("table.main")?.select("tr.white")?.mapNotNull { row ->
+                val cols = row.select("td")
+                val userId = cols[1].selectFirst("a")?.attr("href")
+                    ?.removePrefix("/?main=user&id=") ?: return@mapNotNull null
+                val userName = cols[1].text()
+                val tasks = cols[3].text()
+                AccountSuggestion(
+                    title = userName,
+                    userId = userId,
+                    info = tasks
+                )
             }
         } catch (e: Throwable) {
             return null

@@ -229,8 +229,8 @@ enum class HandleColor {
 
 data class AccountSuggestion(
     val title: String,
-    val info: String,
-    val userId: String
+    val userId: String,
+    val info: String = ""
 )
 
 interface AccountSuggestionsProvider {
