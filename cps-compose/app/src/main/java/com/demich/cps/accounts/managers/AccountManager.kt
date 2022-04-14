@@ -35,7 +35,8 @@ enum class AccountManagers {
     codechef,
     dmoj,
     acmp,
-    timus
+    timus,
+    clist
 }
 
 val Context.allAccountManagers: List<AccountManager<out UserInfo>>

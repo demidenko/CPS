@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -22,23 +23,25 @@ data class ProgressBarInfo(
     operator fun inc(): ProgressBarInfo = copy(current = current + 1)
 }
 
-class ProgressBarViewModel: ViewModel() {
+class ProgressBarsViewModel: ViewModel() {
     val progressBars = mutableStateListOf<String>()
 
     private val states = mutableMapOf<String, MutableStateFlow<ProgressBarInfo>>()
 
     @Composable
-    fun collectProgress(id: String) = states[id]!!.collectAsState()
+    fun collectProgress(id: String) = states.getValue(id).collectAsState()
 
     fun doJob(
         id: String,
+        coroutineScope: CoroutineScope = viewModelScope,
         block: suspend CoroutineScope.(MutableStateFlow<ProgressBarInfo>) -> Unit
     ) {
-        viewModelScope.launch {
+        coroutineScope.launch {
             require(id !in states) { "progress bar with id=$id is already started" }
             val progressStateFlow = states.getOrPut(id) { MutableStateFlow(ProgressBarInfo(total = 0)) }
             progressBars.add(id)
             block(progressStateFlow)
+            delay(1000)
             progressBars.remove(id)
             states.remove(id)
         }

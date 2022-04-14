@@ -18,13 +18,10 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavController
 import com.demich.cps.accounts.makeUserInfoSpan
-import com.demich.cps.accounts.managers.CodeforcesAccountManager
-import com.demich.cps.accounts.managers.CodeforcesUserInfo
-import com.demich.cps.accounts.managers.RatingChange
-import com.demich.cps.accounts.managers.STATUS
+import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.RatingGraph
-import com.demich.cps.ui.bottomprogressbar.ProgressBarViewModel
+import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.utils.*
 import kotlinx.coroutines.CoroutineScope
@@ -128,10 +125,10 @@ class SettingsDev(context: Context) : CPSDataStore(context.settings_dev_dataStor
 }
 
 fun developAdditionalBottomBarBuilder(
-    progressBarViewModel: ProgressBarViewModel
+    progressBarsViewModel: ProgressBarsViewModel
 ): AdditionalBottomBarBuilder = {
     CPSIconButton(icon = Icons.Default.Add) {
-        progressBarViewModel.doJob(
+        progressBarsViewModel.doJob(
             id = Random.nextLong().toString()
         ) { state ->
             val total = Random.nextInt(5, 15)
@@ -140,7 +137,6 @@ fun developAdditionalBottomBarBuilder(
                 delay(1000)
                 state.value++
             }
-            delay(1000)
         }
     }
 }

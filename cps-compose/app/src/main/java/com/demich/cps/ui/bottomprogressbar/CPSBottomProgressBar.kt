@@ -22,14 +22,14 @@ import com.demich.cps.ui.theme.cpsColors
 
 @Composable
 fun CPSBottomProgressBarsColumn(
-    progressBarViewModel: ProgressBarViewModel,
+    progressBarsViewModel: ProgressBarsViewModel,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
         modifier = modifier
     ) {
-        this.items(items = progressBarViewModel.progressBars, key = { it }) {
-            val progress by progressBarViewModel.collectProgress(id = it)
+        this.items(items = progressBarsViewModel.progressBars, key = { it }) {
+            val progress by progressBarsViewModel.collectProgress(id = it)
             CPSBottomProgressBar(
                 progressBarInfo = progress,
                 modifier = Modifier.padding(all = 3.dp)

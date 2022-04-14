@@ -222,10 +222,10 @@ fun accountExpandedMenuBuilder(
     }
 }
 
-fun accountsBottomBarBuilder(accountsViewModel: AccountsViewModel)
+fun accountsBottomBarBuilder(cpsViewModels: CPSViewModels)
 : AdditionalBottomBarBuilder = {
-    AddAccountButton()
-    ReloadAccountsButton(accountsViewModel)
+    AddAccountButton(cpsViewModels)
+    ReloadAccountsButton(cpsViewModels.accountsViewModel)
 }
 
 @Composable
@@ -248,12 +248,17 @@ private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
 }
 
 @Composable
-private fun AddAccountButton() {
+private fun AddAccountButton(cpsViewModels: CPSViewModels) {
     var showMenu by remember { mutableStateOf(false) }
-    var chosenManager: AccountManager<*>? by remember { mutableStateOf(null) }
+    var chosenManager: AccountManagers? by remember { mutableStateOf(null) }
+
+    val context = context
 
     Box {
-        CPSIconButton(icon = Icons.Outlined.AddBox) {
+        CPSIconButton(
+            icon = Icons.Outlined.AddBox,
+            enabled = AccountsViewModel.clistImportId !in cpsViewModels.progressBarsViewModel.progressBars
+        ) {
             showMenu = true
         }
         DropdownMenu(
@@ -264,24 +269,37 @@ private fun AddAccountButton() {
             context.allAccountManagers
                 .filter { runBlocking { it.getSavedInfo() }.isEmpty() }
                 .forEach { manager ->
-                DropdownMenuItem(
-                    onClick = {
-                        showMenu = false
-                        chosenManager = manager
-                    }
-                ) {
-                    MonospacedText(text = manager.type.name)
+                    DropdownMenuItem(
+                        onClick = {
+                            showMenu = false
+                            chosenManager = manager.type
+                        },
+                        content = { MonospacedText(text = manager.type.name) }
+                    )
                 }
-            }
+            DropdownMenuItem(
+                onClick = {
+                    showMenu = false
+                    chosenManager = AccountManagers.clist
+                },
+                content = { MonospacedText(text = "import from clist.by") }
+            )
         }
-        chosenManager?.ChangeSavedInfoDialog {
-            chosenManager = null
+        
+        chosenManager?.let { type -> 
+            if (type == AccountManagers.clist) {
+                CListImportDialog(cpsViewModels) { chosenManager = null }
+            } else {
+                context.allAccountManagers
+                    .first { it.type == type }
+                    .ChangeSavedInfoDialog { chosenManager = null }
+            }
         }
     }
 }
 
 @Composable
-fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
+private fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
     onDismissRequest: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -290,5 +308,26 @@ fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
         initialUserInfo = runBlocking { getSavedInfo() },
         onDismissRequest = onDismissRequest,
         onResult = { userInfo -> scope.launch { setSavedInfo(userInfo) } }
-     )
+    )
+}
+
+@Composable
+private fun CListImportDialog(
+    cpsViewModels: CPSViewModels,
+    onDismissRequest: () -> Unit
+) {
+    val context = context
+    val cListAccountManager = remember { CListAccountManager(context) }
+    DialogAccountChooser(
+        manager = cListAccountManager,
+        initialUserInfo = cListAccountManager.emptyInfo(),
+        onDismissRequest = onDismissRequest,
+        onResult = { userInfo ->
+            cpsViewModels.accountsViewModel.runClistImport(
+                cListUserInfo = userInfo,
+                progressBarsViewModel = cpsViewModels.progressBarsViewModel,
+                context = context
+            )
+        }
+    )
 }

@@ -29,7 +29,7 @@ import com.demich.cps.news.newsMenuBuilder
 import com.demich.cps.ui.CPSStatusBar
 import com.demich.cps.ui.LocalUseOriginalColors
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
-import com.demich.cps.ui.bottomprogressbar.ProgressBarViewModel
+import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val cpsViewModels = CPSViewModels(
                 accountsViewModel = viewModel(),
-                progressBarViewModel = viewModel()
+                progressBarsViewModel = viewModel()
             )
             val darkLightMode by rememberCollect { settingsUI.darkLightMode.flow }
             CPSTheme(darkTheme = darkLightMode.isDarkMode()) {
@@ -102,7 +102,7 @@ fun CPSScaffold(
                     accountsViewModel = cpsViewModels.accountsViewModel,
                     onSetAdditionalMenu = { menu = it }
                 )
-                bottomBar = accountsBottomBarBuilder(cpsViewModels.accountsViewModel)
+                bottomBar = accountsBottomBarBuilder(cpsViewModels)
             }
             cpsComposable(Screen.AccountExpanded.route) {
                 val type = (it.getScreen() as Screen.AccountExpanded).type
@@ -145,7 +145,7 @@ fun CPSScaffold(
 
             cpsComposable(Screen.Development.route) {
                 DevelopScreen(navController)
-                bottomBar = developAdditionalBottomBarBuilder(cpsViewModels.progressBarViewModel)
+                bottomBar = developAdditionalBottomBarBuilder(cpsViewModels.progressBarsViewModel)
             }
         }
     }
@@ -171,7 +171,7 @@ fun CPSScaffold(
                 builder = navBuilder
             )
             CPSBottomProgressBarsColumn(
-                progressBarViewModel = cpsViewModels.progressBarViewModel,
+                progressBarsViewModel = cpsViewModels.progressBarsViewModel,
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
@@ -180,7 +180,7 @@ fun CPSScaffold(
 
 class CPSViewModels(
     val accountsViewModel: AccountsViewModel,
-    val progressBarViewModel: ProgressBarViewModel
+    val progressBarsViewModel: ProgressBarsViewModel
 )
 
 
