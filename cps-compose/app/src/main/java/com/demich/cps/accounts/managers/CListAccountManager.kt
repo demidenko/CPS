@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.buildAnnotatedString
 import com.demich.cps.utils.CListAPI
+import io.ktor.client.features.*
+import io.ktor.http.*
 import org.jsoup.Jsoup
 
 
@@ -44,7 +46,23 @@ class CListAccountManager(context: Context):
                     val userName = cols[2].select("span").map { it.text() }.firstOrNull { it.isNotBlank() } ?: return@forEach
                     accounts[resource] = userName to link
                 }
-            //TODO: parse buttons
+
+            //buttons
+            body.getElementsByClass("account btn-group btn-group-sm").forEach { button ->
+                val a = button.select("a")
+                if (a.isEmpty()) return@forEach
+                val href = a[0].attr("href")
+                val resource = href.removePrefix("/resource/").removeSuffix("/")
+                val link = button.getElementsByClass("fas fa-external-link-alt").first()?.parent()?.attr("href") ?: ""
+                val span = a[1].selectFirst("span") ?: return@forEach
+                val userName = span.run {
+                    val attr = "title"
+                    val withAttr = getElementsByAttribute(attr).first()
+                    if (withAttr == null) text()
+                    else withAttr.attr(attr)
+                }
+                accounts[resource] = userName to link
+            }
 
             return CListUserInfo(
                 status = STATUS.OK,
@@ -52,6 +70,9 @@ class CListAccountManager(context: Context):
                 accounts = accounts
             )
         } catch (e: Throwable) {
+            if (e is ClientRequestException && e.response.status == HttpStatusCode.NotFound) {
+                return CListUserInfo(status = STATUS.NOT_FOUND, login = data)
+            }
             return CListUserInfo(status = STATUS.FAILED, login = data)
         }
     }
