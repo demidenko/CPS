@@ -19,7 +19,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -112,6 +112,7 @@ fun MonospacedText(
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
     fontSize: TextUnit = TextUnit.Unspecified,
+    textAlign: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE
 ) = Text(
     text = text,
@@ -119,6 +120,7 @@ fun MonospacedText(
     color = color,
     fontSize = fontSize,
     fontFamily = FontFamily.Monospace,
+    textAlign = textAlign,
     maxLines = maxLines,
     letterSpacing = 0.sp
 )

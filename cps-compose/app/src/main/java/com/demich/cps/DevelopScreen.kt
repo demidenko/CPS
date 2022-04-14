@@ -8,6 +8,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -20,13 +22,14 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.accounts.managers.STATUS
+import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.RatingGraph
-import com.demich.cps.ui.RatingGraphUIStates
+import com.demich.cps.ui.bottomprogressbar.ProgressBarViewModel
 import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.utils.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
@@ -108,7 +111,6 @@ fun DevelopScreen(navController: NavController) {
         ) {
             Text("random graph")
         }
-
     }
 }
 
@@ -125,7 +127,23 @@ class SettingsDev(context: Context) : CPSDataStore(context.settings_dev_dataStor
 
 }
 
-
+fun developAdditionalBottomBarBuilder(
+    progressBarViewModel: ProgressBarViewModel
+): AdditionalBottomBarBuilder = {
+    CPSIconButton(icon = Icons.Default.Add) {
+        progressBarViewModel.doJob(
+            id = Random.nextLong().toString()
+        ) { state ->
+            val total = Random.nextInt(5, 15)
+            state.value = state.value.copy(total = total, title = total.toString())
+            repeat(total) {
+                delay(1000)
+                state.value++
+            }
+            delay(1000)
+        }
+    }
+}
 
 @Composable
 fun ContentLoadingButton(

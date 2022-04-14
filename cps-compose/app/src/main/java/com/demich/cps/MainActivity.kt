@@ -3,12 +3,14 @@ package com.demich.cps
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
@@ -17,7 +19,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.demich.cps.accounts.*
-import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.ContestsSettingsScreen
 import com.demich.cps.contests.contestsBottomBarBuilder
@@ -25,9 +26,10 @@ import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
 import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
-import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSStatusBar
 import com.demich.cps.ui.LocalUseOriginalColors
+import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
+import com.demich.cps.ui.bottomprogressbar.ProgressBarViewModel
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
@@ -41,7 +43,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val cpsViewModels = CPSViewModels(
-                accountsViewModel = viewModel()
+                accountsViewModel = viewModel(),
+                progressBarViewModel = viewModel()
             )
             val darkLightMode by rememberCollect { settingsUI.darkLightMode.flow }
             CPSTheme(darkTheme = darkLightMode.isDarkMode()) {
@@ -142,6 +145,7 @@ fun CPSScaffold(
 
             cpsComposable(Screen.Development.route) {
                 DevelopScreen(navController)
+                bottomBar = developAdditionalBottomBarBuilder(cpsViewModels.progressBarViewModel)
             }
         }
     }
@@ -157,17 +161,26 @@ fun CPSScaffold(
             additionalBottomBar = bottomBar
         ) }
     ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.Accounts.route,
-            modifier = Modifier.padding(innerPadding),
-            builder = navBuilder
-        )
+        Box(modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()
+        ) {
+            NavHost(
+                navController = navController,
+                startDestination = Screen.Accounts.route,
+                builder = navBuilder
+            )
+            CPSBottomProgressBarsColumn(
+                progressBarViewModel = cpsViewModels.progressBarViewModel,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+        }
     }
 }
 
 class CPSViewModels(
-    val accountsViewModel: AccountsViewModel
+    val accountsViewModel: AccountsViewModel,
+    val progressBarViewModel: ProgressBarViewModel
 )
 
 
