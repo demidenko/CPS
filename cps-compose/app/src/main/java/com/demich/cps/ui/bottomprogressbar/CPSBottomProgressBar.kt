@@ -51,21 +51,21 @@ fun CPSBottomProgressBar(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)
+            modifier = Modifier.padding(vertical = 4.dp)
         ) {
             MonospacedText(
                 text = progressBarInfo.title,
                 fontSize = 13.sp,
                 color = cpsColors.textColorAdditional,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.weight(3f)
+                modifier = Modifier.weight(3f).padding(horizontal = 5.dp)
             )
             val progress by animateFloatAsState(targetValue = progressBarInfo.fraction)
             LinearProgressIndicator(
                 progress = progress,
                 modifier = Modifier
                     .weight(5f)
-                    .padding(start = 5.dp)
+                    .padding(end = 10.dp)
             )
         }
     }

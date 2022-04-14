@@ -57,7 +57,7 @@ class AccountsViewModel: ViewModel() {
         progressBarsViewModel: ProgressBarsViewModel,
         context: Context
     ) {
-        progressBarsViewModel.doJob(id = clistImportId, coroutineScope = viewModelScope) { progress ->
+        progressBarsViewModel.doJob(id = ProgressBarsViewModel.clistImportId, coroutineScope = viewModelScope) { progress ->
             val supported = cListUserInfo.accounts.mapNotNull { (resource, userData) ->
                 CListUtils.getManager(resource, userData.first, userData.second)
             }
@@ -79,9 +79,5 @@ class AccountsViewModel: ViewModel() {
 
     private suspend fun<U: UserInfo> loadAndSave(manager: AccountManager<U>, userId: String) {
         manager.setSavedInfo(manager.loadInfo(userId))
-    }
-
-    companion object {
-        const val clistImportId = "clist_import"
     }
 }

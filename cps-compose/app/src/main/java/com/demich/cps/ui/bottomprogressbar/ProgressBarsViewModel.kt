@@ -46,4 +46,10 @@ class ProgressBarsViewModel: ViewModel() {
             states.remove(id)
         }
     }
+
+    val clistImportIsRunning: Boolean get() = clistImportId in progressBars
+
+    companion object {
+        const val clistImportId = "clist_import"
+    }
 }

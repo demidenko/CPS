@@ -257,10 +257,10 @@ private fun AddAccountButton(cpsViewModels: CPSViewModels) {
     Box {
         CPSIconButton(
             icon = Icons.Outlined.AddBox,
-            enabled = AccountsViewModel.clistImportId !in cpsViewModels.progressBarsViewModel.progressBars
-        ) {
-            showMenu = true
-        }
+            enabled = cpsViewModels.progressBarsViewModel.clistImportIsRunning.not(),
+            onClick = { showMenu = true }
+        )
+
         DropdownMenu(
             expanded = showMenu,
             onDismissRequest = { showMenu = false },
