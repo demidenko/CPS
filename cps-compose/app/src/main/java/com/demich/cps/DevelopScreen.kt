@@ -31,6 +31,19 @@ import kotlin.random.Random
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
+
+class SettingsDev(context: Context): CPSDataStore(context.settings_dev_dataStore) {
+    companion object {
+        private val Context.settings_dev_dataStore by preferencesDataStore("settings_develop")
+    }
+
+    val devModeEnabled = Item(booleanPreferencesKey("develop_enabled"), false)
+}
+
+val Context.settingsDev: SettingsDev
+    get() = SettingsDev(this)
+
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DevelopScreen(navController: NavController) {
@@ -45,7 +58,7 @@ fun DevelopScreen(navController: NavController) {
                 codeforcesAccountManager.ratingsUpperBounds.forEach { (color, rating) ->
                     add(CodeforcesUserInfo(STATUS.OK, color.name, rating - 1))
                 }
-                add(CodeforcesUserInfo(STATUS.OK, "RED", 2600))
+                add(CodeforcesUserInfo(STATUS.OK, HandleColor.RED.name, 2600))
                 add(CodeforcesUserInfo(STATUS.OK, "NUTELLA", 3600))
                 add(CodeforcesUserInfo(STATUS.OK, "Not rated"))
                 add(CodeforcesUserInfo(STATUS.NOT_FOUND, "Not found"))
@@ -111,18 +124,6 @@ fun DevelopScreen(navController: NavController) {
     }
 }
 
-
-val Context.settingsDev: SettingsDev
-    get() = SettingsDev(this)
-
-class SettingsDev(context: Context) : CPSDataStore(context.settings_dev_dataStore) {
-    companion object {
-        private val Context.settings_dev_dataStore by preferencesDataStore("settings_develop")
-    }
-
-    val devModeEnabled = Item(booleanPreferencesKey("develop_enabled"), false)
-
-}
 
 fun developAdditionalBottomBarBuilder(
     progressBarsViewModel: ProgressBarsViewModel

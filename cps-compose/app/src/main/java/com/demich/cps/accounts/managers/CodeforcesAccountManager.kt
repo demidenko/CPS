@@ -173,22 +173,12 @@ class CodeforcesAccountManager(context: Context):
         }
 
     @Composable
-    override fun makeHandleSpan(userInfo: CodeforcesUserInfo): AnnotatedString =
+    override fun makeOKSpan(text: String, rating: Int): AnnotatedString =
         makeHandleSpan(
-            handle = userInfo.handle,
-            tag = CodeforcesUtils.getTagByRating(userInfo.rating)
+            handle = text,
+            tag = CodeforcesUtils.getTagByRating(rating)
         )
 
-    @Composable
-    override fun makeOKInfoSpan(userInfo: CodeforcesUserInfo): AnnotatedString =
-        buildAnnotatedString {
-            require(userInfo.status == STATUS.OK)
-            append(makeHandleSpan(userInfo.copy(
-                handle = userInfo.handle
-                        + " "
-                        + (userInfo.rating.takeIf { it != NOT_RATED }?.toString() ?: "[not rated]")
-            )))
-        }
 
     @Composable
     override fun BigView(

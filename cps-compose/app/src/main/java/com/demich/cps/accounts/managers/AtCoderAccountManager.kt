@@ -2,18 +2,12 @@ package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -21,7 +15,10 @@ import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
 import com.demich.cps.accounts.SmallAccountPanelTypeRated
-import com.demich.cps.ui.*
+import com.demich.cps.ui.RatingGraph
+import com.demich.cps.ui.RatingLoadButton
+import com.demich.cps.ui.SwitchSettingsItem
+import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.utils.AtCoderAPI
 import com.demich.cps.utils.AtCoderRatingChange
 import com.demich.cps.utils.jsonCPS
@@ -118,21 +115,6 @@ class AtCoderAccountManager(context: Context):
             HandleColor.ORANGE -> Color(0xFFFF8000)
             HandleColor.RED -> Color(0xFFFF0000)
             else -> throw HandleColor.UnknownHandleColorException(handleColor, this)
-        }
-
-    @Composable
-    override fun makeOKInfoSpan(userInfo: AtCoderUserInfo): AnnotatedString =
-        buildAnnotatedString {
-            require(userInfo.status == STATUS.OK)
-            withStyle(SpanStyle(
-                color = colorFor(userInfo),
-                fontWeight = if (userInfo.rating != NOT_RATED) FontWeight.Bold else null
-            )) {
-                append(userInfo.handle)
-                append(' ')
-                if (userInfo.rating != NOT_RATED) append(userInfo.rating.toString())
-                else append("[not rated]")
-            }
         }
 
     @Composable

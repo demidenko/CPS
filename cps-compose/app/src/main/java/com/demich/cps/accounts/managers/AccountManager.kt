@@ -2,14 +2,12 @@ package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -77,9 +75,6 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     }
 
     @Composable
-    open fun colorFor(userInfo: U): Color = Color.Unspecified
-
-    @Composable
     abstract fun makeOKInfoSpan(userInfo: U): AnnotatedString
 
     @Composable
@@ -94,7 +89,6 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
         Panel(userInfo)
     }
 }
-
 abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: AccountManagers):
     AccountManager<U>(context, type)
 {
@@ -117,22 +111,28 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
     fun colorFor(rating: Int): Color = colorFor(handleColor = getHandleColor(rating))
 
     @Composable
-    override fun colorFor(userInfo: U): Color {
-        return if (userInfo.isRated()) colorFor(rating = userInfo.rating) else Color.Unspecified
+    fun makeHandleSpan(userInfo: U): AnnotatedString = with(userInfo) {
+        if (status == STATUS.OK) makeOKSpan(text = handle, rating = rating)
+        else AnnotatedString(text = handle)
     }
 
     @Composable
-    open fun makeHandleSpan(userInfo: U): AnnotatedString =
-        buildAnnotatedString {
-            append(userInfo.userId)
-            colorFor(userInfo).takeIf { it != Color.Unspecified  }?.let { color ->
-                addStyle(
-                    style = SpanStyle(color = color, fontWeight = FontWeight.Bold),
-                    start = 0,
-                    end = length
-                )
-            }
-        }
+    open fun makeOKSpan(text: String, rating: Int): AnnotatedString {
+        return if (rating == NOT_RATED) AnnotatedString(text = text)
+        else AnnotatedString(
+            text = text,
+            spanStyle = SpanStyle(color = colorFor(rating = rating), fontWeight = FontWeight.Bold)
+        )
+    }
+
+    @Composable
+    final override fun makeOKInfoSpan(userInfo: U) = with(userInfo) {
+        require(status == STATUS.OK)
+        makeOKSpan(
+            text = handle + " " + (rating.takeIf { it != NOT_RATED }?.toString() ?: "[not rated]"),
+            rating = rating
+        )
+    }
 
     @Composable
     override fun Panel(userInfo: U) = SmallAccountPanelTypeRated(userInfo)

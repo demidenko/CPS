@@ -2,7 +2,6 @@ package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -124,20 +123,13 @@ class DmojAccountManager(context: Context):
         }
 
     @Composable
-    override fun makeOKInfoSpan(userInfo: DmojUserInfo): AnnotatedString =
-        buildAnnotatedString {
-            //TODO: first letter from 3000
-            require(userInfo.status == STATUS.OK)
-            withStyle(SpanStyle(
-                color = colorFor(userInfo),
-                fontWeight = if (userInfo.rating != NOT_RATED) FontWeight.Bold else null
-            )) {
-                append(userInfo.handle)
-                append(' ')
-                if (userInfo.rating != NOT_RATED) append(userInfo.rating.toString())
-                else append("[not rated]")
-            }
+    override fun makeOKSpan(text: String, rating: Int): AnnotatedString {
+        if (rating == NOT_RATED || rating < 3000) return super.makeOKSpan(text, rating)
+        return buildAnnotatedString {
+            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(text[0]) }
+            append(super.makeOKSpan(text.substring(startIndex = 1), rating))
         }
+    }
 
     @Composable
     override fun BigView(

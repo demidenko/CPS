@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.preferencesDataStore
@@ -148,27 +147,16 @@ class CodeChefAccountManager(context: Context):
     }
 
     @Composable
-    override fun makeHandleSpan(userInfo: CodeChefUserInfo): AnnotatedString {
-        return buildAnnotatedString {
-            if (userInfo.isRated()) {
-                withStyle(SpanStyle(color = colorFor(rating = userInfo.rating))) {
-                    append("${getRatingStarNumber(userInfo.rating)}$star ")
-                }
-            }
-            append(userInfo.handle)
+    override fun makeOKSpan(text: String, rating: Int) = buildAnnotatedString {
+        if (rating != NOT_RATED) {
+            append(AnnotatedString(
+                text = "${getRatingStarNumber(rating)}$star ",
+                spanStyle = SpanStyle(color = colorFor(rating = rating))
+            ))
         }
+        append(text)
     }
 
-    @Composable
-    override fun makeOKInfoSpan(userInfo: CodeChefUserInfo): AnnotatedString =
-        buildAnnotatedString {
-            require(userInfo.status == STATUS.OK)
-            append(makeHandleSpan(userInfo.copy(
-                handle = userInfo.handle
-                        + " "
-                        + (userInfo.rating.takeIf { it != NOT_RATED }?.toString() ?: "[not rated]")
-            )))
-        }
 
     @Composable
     override fun Panel(userInfo: CodeChefUserInfo) {
