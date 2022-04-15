@@ -60,7 +60,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
 
     protected abstract suspend fun downloadInfo(data: String, flags: Int): U
     suspend fun loadInfo(data: String, flags: Int = 0): U {
-        if(data.isBlank()) return emptyInfo()
+        if (data.isBlank()) return emptyInfo()
         return withContext(Dispatchers.IO) {
             downloadInfo(data, flags)
         }
@@ -73,7 +73,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     suspend fun setSavedInfo(info: U) {
         val old = getSavedInfo()
         getDataStore().userInfo(info)
-        if(info.userId != old.userId && this is AccountSettingsProvider) getSettings().resetRelatedData()
+        if (info.userId != old.userId && this is AccountSettingsProvider) getSettings().resetRelatedData()
     }
 
     @Composable
@@ -118,7 +118,7 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
 
     @Composable
     override fun colorFor(userInfo: U): Color {
-        return if (userInfo.isRated()) colorFor(rating = userInfo.rating) else  Color.Unspecified
+        return if (userInfo.isRated()) colorFor(rating = userInfo.rating) else Color.Unspecified
     }
 
     @Composable
@@ -263,7 +263,7 @@ fun notifyRatingChange(
 ) {
     notificationBuildAndNotify(accountManager.context, notificationChannel, notificationId) {
         val decreased = newRating < oldRating
-        setSmallIcon(if(decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
+        setSmallIcon(if (decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
         setContentTitle("$handle new rating: $newRating")
         val difference = signedToString(newRating - oldRating)
         setContentText("$difference (rank: $rank)")
