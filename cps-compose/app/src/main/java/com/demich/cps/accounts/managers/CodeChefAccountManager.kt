@@ -133,10 +133,9 @@ class CodeChefAccountManager(context: Context):
         return buildAnnotatedString {
             if (userInfo.status == STATUS.OK && userInfo.rating != NOT_RATED) {
                 withStyle(SpanStyle(color = colorFor(rating = userInfo.rating))) {
-                    append("${getRatingStarNumber(userInfo.rating)}$star")
+                    append("${getRatingStarNumber(userInfo.rating)}$star ")
                 }
             }
-            append(' ')
             append(userInfo.handle)
         }
     }
