@@ -106,3 +106,13 @@ data class CodeChefUser(
 data class CodeChefSearchResult(
     val list: List<CodeChefUser>
 )
+
+
+@Serializable
+data class CodeChefRatingChange(
+    val code: String,
+    val name: String,
+    val rating: String,
+    val rank: String,
+    val end_date: String
+)

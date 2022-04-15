@@ -2,9 +2,7 @@ package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,12 +15,21 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.preferencesDataStore
+import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallAccountPanelTwoLines
+import com.demich.cps.accounts.SmallAccountPanelTypeRated
+import com.demich.cps.ui.RatingGraph
+import com.demich.cps.ui.RatingLoadButton
+import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CodeChefAPI
+import com.demich.cps.utils.CodeChefRatingChange
+import com.demich.cps.utils.jsonCPS
 import io.ktor.client.features.*
 import io.ktor.http.*
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import org.jsoup.Jsoup
 
 @Serializable
@@ -95,7 +102,22 @@ class CodeChefAccountManager(context: Context):
     }
 
     override suspend fun loadRatingHistory(info: CodeChefUserInfo): List<RatingChange>? {
-        TODO("not yet")
+        try {
+            val s = CodeChefAPI.getUserPage(handle = info.handle)
+            val i = s.indexOf("var all_rating = ")
+            if (i == -1) return emptyList()
+            val ar = s.substring(s.indexOf("[", i), s.indexOf("];", i) + 1)
+            return jsonCPS.decodeFromString<List<CodeChefRatingChange>>(ar).map {
+                RatingChange(
+                    rating = it.rating.toInt(),
+                    rank = it.rank.toInt(),
+                    title = it.name,
+                    date = Instant.parse(it.end_date.split(' ').run { "${get(0)}T${get(1)}Z" })
+                )
+            }
+        } catch (e: Throwable) {
+            return null
+        }
     }
 
     override fun getRating(userInfo: CodeChefUserInfo): Int = userInfo.rating
@@ -141,6 +163,17 @@ class CodeChefAccountManager(context: Context):
     }
 
     @Composable
+    override fun makeOKInfoSpan(userInfo: CodeChefUserInfo): AnnotatedString =
+        buildAnnotatedString {
+            require(userInfo.status == STATUS.OK)
+            append(makeHandleSpan(userInfo.copy(
+                handle = userInfo.handle
+                        + " "
+                        + (userInfo.rating.takeIf { it != NOT_RATED }?.toString() ?: "[not rated]")
+            )))
+        }
+
+    @Composable
     override fun Panel(userInfo: CodeChefUserInfo) {
         SmallAccountPanelTwoLines(
             title = {
@@ -178,15 +211,28 @@ class CodeChefAccountManager(context: Context):
     }
 
     @Composable
-    override fun makeOKInfoSpan(userInfo: CodeChefUserInfo): AnnotatedString =
-        buildAnnotatedString {
-            require(userInfo.status == STATUS.OK)
-            append(makeHandleSpan(userInfo.copy(
-                handle = userInfo.handle
-                        + " "
-                        + (userInfo.rating.takeIf { it != NOT_RATED }?.toString() ?: "[not rated]")
-            )))
+    override fun BigView(
+        userInfo: CodeChefUserInfo,
+        setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
+        modifier: Modifier
+    ) {
+        val ratingGraphUIStates = rememberRatingGraphUIStates()
+        Box(modifier = modifier) {
+            SmallAccountPanelTypeRated(userInfo)
+            RatingGraph(
+                ratingGraphUIStates = ratingGraphUIStates,
+                manager = this@CodeChefAccountManager,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+            )
         }
+        setBottomBarContent {
+            if (userInfo.status == STATUS.OK && userInfo.rating != NOT_RATED) {
+                RatingLoadButton(ratingGraphUIStates)
+            }
+        }
+    }
 
     override fun getDataStore() = accountDataStore(context.account_codechef_dataStore, emptyInfo())
 }
