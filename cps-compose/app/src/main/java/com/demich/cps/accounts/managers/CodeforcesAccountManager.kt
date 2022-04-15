@@ -231,10 +231,6 @@ class CodeforcesAccountManager(context: Context):
             title = "Rating changes observer"
         )
         SwitchSettingsItem(
-            item = settings.observeContribution,
-            title = "Contribution changes observer"
-        )
-        SwitchSettingsItem(
             item = settings.contestWatchEnabled,
             title = "Contest watcher",
             description = stringResource(id = R.string.cf_contest_watcher_description)
@@ -242,6 +238,10 @@ class CodeforcesAccountManager(context: Context):
         SwitchSettingsItem(
             item = settings.upsolvingSuggestionsEnabled,
             title = "Upsolving suggestions"
+        )
+        SwitchSettingsItem(
+            item = settings.observeContribution,
+            title = "Contribution changes observer"
         )
     }
 
