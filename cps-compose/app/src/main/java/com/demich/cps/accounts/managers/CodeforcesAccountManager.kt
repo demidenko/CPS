@@ -20,6 +20,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
 import com.demich.cps.R
@@ -197,7 +198,7 @@ class CodeforcesAccountManager(context: Context):
     @Composable
     override fun BigView(
         userInfo: CodeforcesUserInfo,
-        setBottomBarContent: (@Composable RowScope.() -> Unit) -> Unit,
+        setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier
     ) {
         val ratingGraphUIStates = rememberRatingGraphUIStates()
@@ -221,7 +222,6 @@ class CodeforcesAccountManager(context: Context):
             }
             RatingGraph(
                 ratingGraphUIStates = ratingGraphUIStates,
-                manager = this@CodeforcesAccountManager,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()

@@ -218,10 +218,9 @@ class CodeChefAccountManager(context: Context):
     ) {
         val ratingGraphUIStates = rememberRatingGraphUIStates()
         Box(modifier = modifier) {
-            SmallAccountPanelTypeRated(userInfo)
+            Panel(userInfo)
             RatingGraph(
                 ratingGraphUIStates = ratingGraphUIStates,
-                manager = this@CodeChefAccountManager,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()

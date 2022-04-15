@@ -14,11 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import com.demich.cps.NotificationChannelLazy
-import com.demich.cps.R
+import com.demich.cps.*
 import com.demich.cps.accounts.SmallAccountPanelTypeRated
-import com.demich.cps.makePendingIntentOpenURL
-import com.demich.cps.notificationBuildAndNotify
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.useOriginalColors
 import com.demich.cps.utils.CPSDataStore
@@ -91,7 +88,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     @Composable
     open fun BigView(
         userInfo: U,
-        setBottomBarContent: (@Composable RowScope.() -> Unit) -> Unit,
+        setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier = Modifier
      ) = Box(modifier) {
         Panel(userInfo)

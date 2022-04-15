@@ -115,7 +115,7 @@ fun AccountExpandedScreen(
     accountsViewModel: AccountsViewModel,
     showDeleteDialog: Boolean,
     onDismissDeleteDialog: () -> Unit,
-    setBottomBarContent: (@Composable RowScope.() -> Unit) -> Unit
+    setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
     val context = context
     val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
@@ -154,7 +154,7 @@ fun AccountExpandedScreen(
 @Composable
 private fun<U: UserInfo> AccountExpandedPanel(
     manager: AccountManager<U>,
-    setBottomBarContent: (@Composable RowScope.() -> Unit) -> Unit
+    setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
     val userInfo by rememberCollect { manager.flowOfInfo() }
     manager.BigView(

@@ -14,6 +14,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.datastore.preferences.preferencesDataStore
+import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallAccountPanelTypeRated
 import com.demich.cps.ui.RatingGraph
 import com.demich.cps.ui.RatingLoadButton
@@ -146,7 +147,7 @@ class DmojAccountManager(context: Context):
     @Composable
     override fun BigView(
         userInfo: DmojUserInfo,
-        setBottomBarContent: (@Composable RowScope.() -> Unit) -> Unit,
+        setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier
     ) {
         val ratingGraphUIStates = rememberRatingGraphUIStates()
@@ -154,7 +155,6 @@ class DmojAccountManager(context: Context):
             SmallAccountPanelTypeRated(userInfo)
             RatingGraph(
                 ratingGraphUIStates = ratingGraphUIStates,
-                manager = this@DmojAccountManager,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()

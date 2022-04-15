@@ -79,6 +79,15 @@ fun<U: UserInfo> RatedAccountManager<U>.RatingLoadButton(
     }
 }
 
+@Composable
+fun<U: UserInfo> RatedAccountManager<U>.RatingGraph(
+    ratingGraphUIStates: RatingGraphUIStates,
+    modifier: Modifier = Modifier
+) = RatingGraph(
+    ratingGraphUIStates = ratingGraphUIStates,
+    manager = this,
+    modifier = modifier
+)
 
 @Composable
 fun RatingGraph(

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
 import com.demich.cps.accounts.SmallAccountPanelTypeRated
@@ -142,7 +143,7 @@ class AtCoderAccountManager(context: Context):
     @Composable
     override fun BigView(
         userInfo: AtCoderUserInfo,
-        setBottomBarContent: (@Composable RowScope.() -> Unit) -> Unit,
+        setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier
     ) {
         val ratingGraphUIStates = rememberRatingGraphUIStates()
@@ -150,7 +151,6 @@ class AtCoderAccountManager(context: Context):
             SmallAccountPanelTypeRated(userInfo)
             RatingGraph(
                 ratingGraphUIStates = ratingGraphUIStates,
-                manager = this@AtCoderAccountManager,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
