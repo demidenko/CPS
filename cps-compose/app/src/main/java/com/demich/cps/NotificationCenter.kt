@@ -22,14 +22,14 @@ fun notificationBuilder(
 }
 
 fun NotificationCompat.Builder.notifyBy(
-    m: NotificationManagerCompat,
+    notificationManager: NotificationManagerCompat,
     notificationId: Int,
-) = m.notify(notificationId, build())
+) = notificationManager.notify(notificationId, build())
 
 fun NotificationCompat.Builder.notifyBy(
-    m: NotificationManager,
+    notificationManager: NotificationManager,
     notificationId: Int,
-) = m.notify(notificationId, build())
+) = notificationManager.notify(notificationId, build())
 
 fun notificationBuildAndNotify(
     context: Context,
@@ -43,29 +43,35 @@ fun NotificationCompat.Builder.setBigContent(str: CharSequence) = setContentText
 
 object NotificationChannels {
 
-    private val codeforces by lazyNotificationChannelGroup("codeforces", "CodeForces")
-    val codeforces_contest_watcher by codeforces.lazyChannel("cf_contest_watcher", "Contest watch")
-    val codeforces_rating_changes by codeforces.lazyChannel("cf_rating_changes", "Rating changes", Importance.HIGH)
-    val codeforces_contribution_changes by codeforces.lazyChannel("cf_contribution_changes", "Contribution changes", Importance.MIN)
-    val codeforces_follow_new_blog by codeforces.lazyChannel("cf_follow_new_blog", "Follow: new blog entries")
-    val codeforces_follow_progress by codeforces.lazyChannel("cf_follow_progress", "Follow: update progress", Importance.MIN)
-    val codeforces_upsolving_suggestion by codeforces.lazyChannel("cf_upsolving_suggestion", "Upsolving suggestions")
+    object codeforces: NotificationChannelGroupLazy("codeforces", "CodeForces") {
+        val rating_changes = channel("cf_rating_changes", "Rating changes", Importance.HIGH)
+        val contribution_changes = channel("cf_contribution_changes", "Contribution changes", Importance.MIN)
+        val contest_watcher = channel("cf_contest_watcher", "Contest watch")
+        val follow_new_blog = channel("cf_follow_new_blog", "Follow: new blog entries")
+        val follow_progress = channel("cf_follow_progress", "Follow: update progress", Importance.MIN)
+        val upsolving_suggestion = channel("cf_upsolving_suggestion", "Upsolving suggestions")
+    }
 
-    private val atcoder by lazyNotificationChannelGroup("atcoder", "AtCoder")
-    val atcoder_rating_changes by atcoder.lazyChannel("atcoder_rating_changes", "Rating changes", Importance.HIGH)
+    object atcoder: NotificationChannelGroupLazy("atcoder", "AtCoder") {
+        val rating_changes = channel("atcoder_rating_changes", "Rating changes", Importance.HIGH)
+    }
 
-    private val project_euler by lazyNotificationChannelGroup("project_euler", "Project Euler")
-    val project_euler_news by project_euler.lazyChannel("pe_news", "Recent Problems")
-    val project_euler_problems by project_euler.lazyChannel("pe_problems", "News")
+    object project_euler: NotificationChannelGroupLazy("project_euler", "Project Euler") {
+        val news = channel("pe_news", "Recent Problems")
+        val problems = channel("pe_problems", "News")
+    }
 
-    private val acmp by lazyNotificationChannelGroup("acmp", "ACMP")
-    val acmp_news by acmp.lazyChannel("acmp_news", "News")
+    object acmp: NotificationChannelGroupLazy("acmp", "ACMP") {
+        val news = channel("acmp_news", "News")
+    }
 
-    private val zaoch by lazyNotificationChannelGroup("zaoch", "olympiads.ru/zaoch")
-    val olympiads_zaoch_news by zaoch.lazyChannel("olympiads_zaoch_news", "News")
+    object olympiads_zaoch: NotificationChannelGroupLazy("olympiads_zaoch", "olympiads.ru/zaoch") {
+        val news = channel("olympiads_zaoch_news", "News")
+    }
 
-    private val testGroup by lazyNotificationChannelGroup("test", "Test group")
-    val test by testGroup.lazyChannel("test", "test channel")
+    object test: NotificationChannelGroupLazy("test", "Test group") {
+        val test = channel("test", "test channel")
+    }
 
 
     enum class Importance {
@@ -82,12 +88,14 @@ object NotificationChannels {
             }
     }
 
-    private fun lazyNotificationChannelGroup(id: String, name: String) = lazy { NotificationChannelGroupLazy(id, name) }
-    private fun NotificationChannelGroupLazy.lazyChannel(id: String, name: String, importance: Importance = Importance.DEFAULT) =
-        lazy { NotificationChannelLazy(id, name, importance, this) }
+    private fun NotificationChannelGroupLazy.channel(
+        id: String,
+        name: String,
+        importance: Importance = Importance.DEFAULT
+    ) = NotificationChannelLazy(id, name, importance, this)
 }
 
-class NotificationChannelGroupLazy(private val id: String, val name: String) {
+abstract class NotificationChannelGroupLazy(private val id: String, val name: String) {
     private var created = false
     @RequiresApi(Build.VERSION_CODES.O)
     fun getId(m: NotificationManagerCompat): String {
@@ -103,7 +111,7 @@ class NotificationChannelLazy(
     private val id: String,
     val name: String,
     private val importance: NotificationChannels.Importance,
-    private val groupCreator: NotificationChannelGroupLazy
+    private val groupLazy: NotificationChannelGroupLazy
 ) {
     private var created = false
     fun getId(context: Context): String {
@@ -111,7 +119,7 @@ class NotificationChannelLazy(
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 val m = NotificationManagerCompat.from(context)
                 val channel = NotificationChannel(id, name, importance.convert()).apply {
-                    group = groupCreator.getId(m)
+                    group = groupLazy.getId(m)
                 }
                 m.createNotificationChannel(channel)
             }

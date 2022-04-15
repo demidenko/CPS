@@ -246,15 +246,15 @@ class CodeforcesAccountManager(context: Context):
     }
 
     fun notifyRatingChange(ratingChange: CodeforcesRatingChange) = notifyRatingChange(
-        this,
-        NotificationChannels.codeforces_rating_changes,
-        NotificationIds.codeforces_rating_changes,
-        ratingChange.handle,
-        ratingChange.newRating,
-        ratingChange.oldRating,
-        ratingChange.rank,
-        CodeforcesAPI.URLFactory.contestsWith(ratingChange.handle),
-        ratingChange.ratingUpdateTime
+        manager = this,
+        notificationChannel = NotificationChannels.codeforces.rating_changes,
+        notificationId = NotificationIds.codeforces_rating_changes,
+        handle = ratingChange.handle,
+        newRating = ratingChange.newRating,
+        oldRating = ratingChange.oldRating,
+        rank = ratingChange.rank,
+        url = CodeforcesAPI.URLFactory.contestsWith(ratingChange.handle),
+        time = ratingChange.ratingUpdateTime
     )
 
     suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange) {

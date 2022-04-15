@@ -256,20 +256,20 @@ interface RatingRevolutionsProvider {
 }
 
 fun notifyRatingChange(
-    accountManager: RatedAccountManager<*>,
+    manager: RatedAccountManager<out RatedUserInfo>,
     notificationChannel: NotificationChannelLazy,
     notificationId: Int,
     handle: String, newRating: Int, oldRating: Int, rank: Int, url: String? = null, time: Instant? = null
 ) {
-    notificationBuildAndNotify(accountManager.context, notificationChannel, notificationId) {
+    notificationBuildAndNotify(manager.context, notificationChannel, notificationId) {
         val decreased = newRating < oldRating
         setSmallIcon(if (decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
         setContentTitle("$handle new rating: $newRating")
         val difference = signedToString(newRating - oldRating)
         setContentText("$difference (rank: $rank)")
-        setSubText("${accountManager.type.name} rating changes")
-        color = accountManager.originalColor(accountManager.getHandleColor(newRating)).toArgb() //TODO not original but cpsColors
-        if (url != null) setContentIntent(makePendingIntentOpenURL(url, accountManager.context))
+        setSubText("${manager.type.name} rating changes")
+        color = manager.originalColor(manager.getHandleColor(newRating)).toArgb() //TODO not original but cpsColors
+        if (url != null) setContentIntent(makePendingIntentOpenURL(url, manager.context))
         if (time != null) {
             setShowWhen(true)
             setWhen(time.toEpochMilliseconds())
