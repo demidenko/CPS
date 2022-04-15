@@ -153,15 +153,15 @@ class AtCoderAccountManager(context: Context):
     }
 
     fun notifyRatingChange(handle: String, ratingChange: AtCoderRatingChange) = notifyRatingChange(
-        this,
-        NotificationChannels.atcoder_rating_changes,
-        NotificationIds.atcoder_rating_changes,
-        handle,
-        ratingChange.NewRating,
-        ratingChange.OldRating,
-        ratingChange.Place,
-        AtCoderAPI.URLFactory.userContestResult(handle, ratingChange.getContestId()),
-        ratingChange.EndTime
+        manager = this,
+        notificationChannel = NotificationChannels.atcoder.rating_changes,
+        notificationId = NotificationIds.atcoder_rating_changes,
+        handle = handle,
+        newRating = ratingChange.NewRating,
+        oldRating = ratingChange.OldRating,
+        rank = ratingChange.Place,
+        url = AtCoderAPI.URLFactory.userContestResult(handle, ratingChange.getContestId()),
+        time = ratingChange.EndTime
     )
 }
 
