@@ -18,7 +18,7 @@ fun notificationBuilder(
     channel: NotificationChannelLazy,
     buildBody: NotificationCompat.Builder.() -> Unit
 ): NotificationCompat.Builder {
-    return NotificationCompat.Builder(context, channel.getID(context)).apply(buildBody)
+    return NotificationCompat.Builder(context, channel.getId(context)).apply(buildBody)
 }
 
 fun NotificationCompat.Builder.notifyBy(
@@ -90,8 +90,8 @@ object NotificationChannels {
 class NotificationChannelGroupLazy(private val id: String, val name: String) {
     private var created = false
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getID(m: NotificationManagerCompat): String {
-        if(!created) {
+    fun getId(m: NotificationManagerCompat): String {
+        if (!created) {
             m.createNotificationChannelGroup(NotificationChannelGroup(id, name))
             created = true
         }
@@ -106,12 +106,12 @@ class NotificationChannelLazy(
     private val groupCreator: NotificationChannelGroupLazy
 ) {
     private var created = false
-    fun getID(context: Context): String {
-        if(!created) {
+    fun getId(context: Context): String {
+        if (!created) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 val m = NotificationManagerCompat.from(context)
                 val channel = NotificationChannel(id, name, importance.convert()).apply {
-                    group = groupCreator.getID(m)
+                    group = groupCreator.getId(m)
                 }
                 m.createNotificationChannel(channel)
             }
@@ -130,10 +130,10 @@ object NotificationIds {
     private object nextIdInterval {
         private var start = 1_000_000
         private val step = 1_000_000
-        operator fun invoke() = IntervalID(start, step).also { start += step }
+        operator fun invoke() = IntervalId(start, step).also { start += step }
     }
 
-    data class IntervalID(val from: Int, val length: Int) {
+    data class IntervalId(val from: Int, val length: Int) {
         init {
             require(length > 0) { "illegal interval length: $length" }
         }
@@ -146,26 +146,26 @@ object NotificationIds {
     val codeforces_contest_watcher = nextId()
     val codeforces_rating_changes = nextId()
     val codeforces_contribution_changes = nextId()
-    val makeCodeforcesSystestSubmissionID = nextIdInterval()
-    val makeCodeforcesFollowBlogID = nextIdInterval()
+    val makeCodeforcesSystestSubmissionId = nextIdInterval()
+    val makeCodeforcesFollowBlogId = nextIdInterval()
     val codeforces_follow_progress = nextId()
-    val makeCodeforcesUpsolveProblemID = nextIdInterval()
+    val makeCodeforcesUpsolveProblemId = nextIdInterval()
 
     //atcoder
     val atcoder_rating_changes = nextId()
 
     //project euler
-    val makeProjectEulerRecentProblemNotificationID = nextIdInterval()
-    val makeProjectEulerNewsNotificationID = nextIdInterval()
+    val makeProjectEulerRecentProblemNotificationId = nextIdInterval()
+    val makeProjectEulerNewsNotificationId = nextIdInterval()
 
     //acmp
-    val makeACMPNewsNotificationID = nextIdInterval()
+    val makeACMPNewsNotificationId = nextIdInterval()
 
     //zaoch
-    val makeZaochNewsNotificationID = nextIdInterval()
+    val makeZaochNewsNotificationId = nextIdInterval()
 
     //test
-    val testID = nextId()
+    val testId = nextId()
 }
 
 
