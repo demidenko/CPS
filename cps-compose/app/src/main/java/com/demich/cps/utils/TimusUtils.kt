@@ -3,10 +3,7 @@ package com.demich.cps.utils
 import io.ktor.client.request.*
 
 object TimusAPI {
-
-    private val client = cpsHttpClient {
-
-    }
+    private val client = cpsHttpClient { }
 
     suspend fun getUserPage(id: Int): String {
         return client.get(URLFactory.user(id)) {

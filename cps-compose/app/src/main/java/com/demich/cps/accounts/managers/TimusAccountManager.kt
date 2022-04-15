@@ -7,8 +7,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.utils.TimusAPI
-import com.demich.cps.utils.fromHTML
 import kotlinx.serialization.Serializable
+import org.jsoup.Jsoup
 
 
 @Serializable
@@ -46,29 +46,22 @@ class TimusAccountManager(context: Context):
     override suspend fun downloadInfo(data: String, flags: Int): TimusUserInfo {
         try {
             val s = TimusAPI.getUserPage(data.toInt())
-            var i = s.indexOf("<H2 CLASS=\"author_name\">")
-            if (i == -1) return TimusUserInfo(status = STATUS.NOT_FOUND, id = data)
-            i = s.indexOf("<TITLE>")
-            val userName = s.substring(s.indexOf('>',i)+1, s.indexOf('@',i)-1)
-            i = s.indexOf("<TD CLASS=\"author_stats_value\"", i+1)
-            require(i != -1)
-            i = s.indexOf('>', i)
-            val rankTasks = s.substring(i + 1, s.indexOf(' ', i)).toInt()
-            i = s.indexOf('>', s.indexOf("<TD CLASS=\"author_stats_value\"", i + 1))
-            val solvedTasks = s.substring(i + 1, s.indexOf(' ', i)).toInt()
-            i = s.indexOf('>', s.indexOf("<TD CLASS=\"author_stats_value\"", i + 1))
-            val rankRating = s.substring(i + 1, s.indexOf(' ', i)).toInt()
-            i = s.indexOf('>', s.indexOf("<TD CLASS=\"author_stats_value\"", i + 1))
-            val rating = s.substring(i + 1, s.indexOf(' ', i)).toInt()
-            return TimusUserInfo(
-                status = STATUS.OK,
-                id = data,
-                userName = userName,
-                rating = rating,
-                solvedTasks = solvedTasks,
-                rankTasks = rankTasks,
-                rankRating = rankRating
-            )
+            with(Jsoup.parse(s)) {
+                val userName = selectFirst("h2.author_name")?.text()
+                    ?: return TimusUserInfo(status = STATUS.NOT_FOUND, id = data)
+                val rows = select("td.author_stats_value").map { row ->
+                    row.text().let { it.substring(0, it.indexOf(" out of ")) }
+                }
+                return TimusUserInfo(
+                    status = STATUS.OK,
+                    id = data,
+                    userName = userName,
+                    rating = rows[3].toInt(),
+                    solvedTasks = rows[1].toInt(),
+                    rankTasks = rows[0].toInt(),
+                    rankRating = rows[2].toInt()
+                )
+            }
         } catch (e: Throwable) {
             return TimusUserInfo(status = STATUS.FAILED, id = data)
         }
@@ -77,22 +70,22 @@ class TimusAccountManager(context: Context):
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         if (str.toIntOrNull() != null) return emptyList()
         try {
-            val s = TimusAPI.getSearchPage(str)
-            return buildList {
-                var i = s.indexOf("CLASS=\"ranklist\"")
-                require(i != -1)
-                while(true) {
-                    i = s.indexOf("<TD CLASS=\"name\">", i)
-                    if (i == -1) break
-                    i = s.indexOf("?id=", i+1)
-                    val userid = s.substring(i+4, s.indexOf('"',i))
-                    val username = fromHTML(s.substring(s.indexOf('>', i) + 1, s.indexOf("</A", i))).toString()
-                    i = s.indexOf("<TD>", i+1)
-                    i = s.indexOf("<TD>", i+1)
-                    val tasks = s.substring(i+4, s.indexOf("</TD",i))
-                    add(AccountSuggestion(username, tasks, userid))
+            return Jsoup.parse(TimusAPI.getSearchPage(str))
+                .selectFirst("table.ranklist")
+                ?.select("td.name")
+                ?.mapNotNull { nameColumn ->
+                    val userId = nameColumn.selectFirst("a")
+                        ?.attr("href")
+                        ?.let {
+                            it.substring(it.indexOf("id=")+3)
+                        } ?: return@mapNotNull null
+                    val tasks = nameColumn.nextElementSibling()?.nextElementSibling()?.text() ?: ""
+                    AccountSuggestion(
+                        userId = userId,
+                        title = nameColumn.text(),
+                        info = tasks
+                    )
                 }
-            }
         } catch (e: Throwable) {
             return null
         }
