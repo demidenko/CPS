@@ -6,11 +6,14 @@ import io.ktor.client.features.cookies.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.Serializable
 
 object CodeChefAPI {
     private val client = cpsHttpClient {
+        followRedirects = false
         //BrowserUserAgent()
         install(HttpCookies) {
             storage = AcceptAllCookiesStorage()
@@ -72,6 +75,9 @@ object CodeChefAPI {
         }
     }
 
+    suspend fun getUserPage(handle: String): String {
+        return client.get(URLFactory.user(handle))
+    }
 
     suspend fun getSuggestions(str: String): CodeChefSearchResult {
         return client.getCodeChef("https://www.codechef.com/api/ratings/all") {

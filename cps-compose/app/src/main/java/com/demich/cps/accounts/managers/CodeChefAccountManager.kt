@@ -20,8 +20,10 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.accounts.SmallAccountPanelTwoLines
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CodeChefAPI
-import com.demich.cps.utils.CodeChefUser
+import io.ktor.client.features.*
+import io.ktor.http.*
 import kotlinx.serialization.Serializable
+import org.jsoup.Jsoup
 
 @Serializable
 data class CodeChefUserInfo(
@@ -29,12 +31,6 @@ data class CodeChefUserInfo(
     val handle: String,
     val rating: Int = NOT_RATED
 ): UserInfo() {
-    constructor(codeChefUser: CodeChefUser): this(
-        status = STATUS.OK,
-        handle = codeChefUser.username,
-        rating = codeChefUser.rating
-    )
-
     override val userId: String
         get() = handle
 
@@ -63,22 +59,30 @@ class CodeChefAccountManager(context: Context):
 
     override suspend fun downloadInfo(data: String, flags: Int): CodeChefUserInfo {
         try {
-            //TODO need more confident way to get user
-            val list = CodeChefAPI.getSuggestions(data).list
-            return list.find {
-                it.username == data
-            }?.let {
-                CodeChefUserInfo(it)
-            } ?: CodeChefUserInfo(status = STATUS.NOT_FOUND, handle = data)
+            Jsoup.parse(CodeChefAPI.getUserPage(handle = data)).run {
+                val rating = selectFirst("div.rating-ranks")
+                    ?.select("a")
+                    ?.takeIf { !it.all { it.text() == "Inactive" } }
+                    ?.let { selectFirst("div.rating-header > div.rating-number")?.text()?.toInt() }
+                    ?: NOT_RATED
+                val userName = selectFirst("section.user-details")?.selectFirst("span.m-username--link")
+                return CodeChefUserInfo(
+                    status = STATUS.OK,
+                    handle = userName?.text() ?: data,
+                    rating = rating
+                )
+            }
         } catch (e: Throwable) {
+            if (e is RedirectResponseException && e.response.status == HttpStatusCode.fromValue(302)) {
+                return CodeChefUserInfo(status = STATUS.NOT_FOUND, handle = data)
+            }
             return CodeChefUserInfo(status = STATUS.FAILED, handle = data)
         }
     }
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         try {
-            val list = CodeChefAPI.getSuggestions(str).list
-            return list.map {
+            return CodeChefAPI.getSuggestions(str).list.map {
                 AccountSuggestion(
                     title = it.username,
                     info = it.rating.toString(),
