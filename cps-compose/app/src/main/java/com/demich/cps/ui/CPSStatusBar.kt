@@ -65,13 +65,12 @@ private fun ColorizeStatusBar(
 private data class RatedRank(
     val rank: Double,
     val handleColor: HandleColor,
-    val manager: RatedAccountManager<*>
+    val manager: RatedAccountManager<out RatedUserInfo>
 )
 
-private fun<U: UserInfo> RatedAccountManager<U>.getRank(userInfo: U): RatedRank? {
-    if (userInfo.status != STATUS.OK) return null
-    val rating = getRating(userInfo)
-    if(rating == NOT_RATED) return null
+private fun<U: RatedUserInfo> RatedAccountManager<U>.getRank(userInfo: U): RatedRank? {
+    if (!userInfo.isRated()) return null
+    val rating = userInfo.rating
     val handleColor = getHandleColor(rating)
     if(handleColor == HandleColor.RED) return RatedRank(rank = 1e9, handleColor = handleColor, manager = this)
     val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
@@ -89,7 +88,7 @@ private fun<U: UserInfo> RatedAccountManager<U>.getRank(userInfo: U): RatedRank?
 }
 
 
-private fun<U: UserInfo> RatedAccountManager<U>.flowOfRatedRank(): Flow<RatedRank?> =
+private fun<U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(): Flow<RatedRank?> =
     flowOfInfo().map(this::getRank)
 
 private data class RankGetter(
@@ -111,7 +110,7 @@ private data class RankGetter(
 private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
     combine(
         flow = combine(flows = context.allAccountManagers
-            .filterIsInstance<RatedAccountManager<*>>()
+            .filterIsInstance<RatedAccountManager<out RatedUserInfo>>()
             .map { it.flowOfRatedRank() }
         ) { it },
         flow2 = context.settingsUI.statusBarDisabledManagers.flow,

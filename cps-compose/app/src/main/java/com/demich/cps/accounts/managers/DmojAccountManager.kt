@@ -31,12 +31,9 @@ import kotlinx.serialization.decodeFromString
 @Serializable
 data class DmojUserInfo(
     override val status: STATUS,
-    val handle: String,
-    val rating: Int = NOT_RATED
-): UserInfo() {
-    override val userId: String
-        get() = handle
-
+    override val handle: String,
+    override val rating: Int = NOT_RATED
+): RatedUserInfo() {
     override fun link() = DmojAPI.URLFactory.user(handle)
 }
 
@@ -105,8 +102,6 @@ class DmojAccountManager(context: Context):
         }
     }
 
-    override fun getRating(userInfo: DmojUserInfo) = userInfo.rating
-
     override val ratingsUpperBounds = arrayOf(
         HandleColor.GRAY to 1000,
         HandleColor.GREEN to 1300,
@@ -161,7 +156,7 @@ class DmojAccountManager(context: Context):
             )
         }
         setBottomBarContent {
-            if (userInfo.status == STATUS.OK && userInfo.rating != NOT_RATED) {
+            if (userInfo.isRated()) {
                 RatingLoadButton(ratingGraphUIStates)
             }
         }

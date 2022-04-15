@@ -40,12 +40,12 @@ import kotlin.text.contains
 @Immutable
 data class CodeforcesUserInfo(
     override val status: STATUS,
-    val handle: String,
-    val rating: Int = NOT_RATED,
+    override val handle: String,
+    override val rating: Int = NOT_RATED,
     val contribution: Int = 0,
     @Serializable(with = InstantAsSecondsSerializer::class)
     val lastOnlineTime: Instant = Instant.DISTANT_PAST
-): UserInfo() {
+): RatedUserInfo() {
     constructor(codeforcesUser: CodeforcesUser): this(
         status = STATUS.OK,
         handle = codeforcesUser.handle,
@@ -53,9 +53,6 @@ data class CodeforcesUserInfo(
         contribution = codeforcesUser.contribution,
         lastOnlineTime = codeforcesUser.lastOnlineTime
     )
-
-    override val userId: String
-        get() = handle
 
     override fun link(): String = CodeforcesAPI.URLFactory.user(handle)
 }
@@ -130,8 +127,6 @@ class CodeforcesAccountManager(context: Context):
                 rank = it.rank
             )
         }
-
-    override fun getRating(userInfo: CodeforcesUserInfo) = userInfo.rating
 
     override val ratingsUpperBounds = arrayOf(
         HandleColor.GRAY to 1200,
@@ -229,7 +224,7 @@ class CodeforcesAccountManager(context: Context):
         }
         setBottomBarContent {
             //TODO: upsolving list button (icon = Icons.Default.FitnessCenter)
-            if (userInfo.status == STATUS.OK && userInfo.rating != NOT_RATED) {
+            if (userInfo.isRated()) {
                 RatingLoadButton(ratingGraphUIStates)
             }
         }

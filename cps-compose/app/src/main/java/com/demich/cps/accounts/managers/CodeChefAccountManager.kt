@@ -2,7 +2,10 @@ package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,7 +20,6 @@ import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallAccountPanelTwoLines
-import com.demich.cps.accounts.SmallAccountPanelTypeRated
 import com.demich.cps.ui.RatingGraph
 import com.demich.cps.ui.RatingLoadButton
 import com.demich.cps.ui.rememberRatingGraphUIStates
@@ -35,12 +37,9 @@ import org.jsoup.Jsoup
 @Serializable
 data class CodeChefUserInfo(
     override val status: STATUS,
-    val handle: String,
-    val rating: Int = NOT_RATED
-): UserInfo() {
-    override val userId: String
-        get() = handle
-
+    override val handle: String,
+    override val rating: Int = NOT_RATED
+): RatedUserInfo() {
     override fun link() = CodeChefAPI.URLFactory.user(handle)
 }
 
@@ -120,8 +119,6 @@ class CodeChefAccountManager(context: Context):
         }
     }
 
-    override fun getRating(userInfo: CodeChefUserInfo): Int = userInfo.rating
-
     override val ratingsUpperBounds = arrayOf(
         HandleColor.GRAY to 1400,
         HandleColor.GREEN to 1600,
@@ -153,7 +150,7 @@ class CodeChefAccountManager(context: Context):
     @Composable
     override fun makeHandleSpan(userInfo: CodeChefUserInfo): AnnotatedString {
         return buildAnnotatedString {
-            if (userInfo.status == STATUS.OK && userInfo.rating != NOT_RATED) {
+            if (userInfo.isRated()) {
                 withStyle(SpanStyle(color = colorFor(rating = userInfo.rating))) {
                     append("${getRatingStarNumber(userInfo.rating)}$star ")
                 }
@@ -178,7 +175,7 @@ class CodeChefAccountManager(context: Context):
         SmallAccountPanelTwoLines(
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (userInfo.status == STATUS.OK && userInfo.rating != NOT_RATED) {
+                    if (userInfo.isRated()) {
                         Box(
                             modifier = Modifier
                                 .padding(all = 2.dp)
@@ -227,7 +224,7 @@ class CodeChefAccountManager(context: Context):
             )
         }
         setBottomBarContent {
-            if (userInfo.status == STATUS.OK && userInfo.rating != NOT_RATED) {
+            if (userInfo.isRated()) {
                 RatingLoadButton(ratingGraphUIStates)
             }
         }

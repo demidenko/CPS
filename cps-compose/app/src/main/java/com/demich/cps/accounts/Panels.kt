@@ -214,7 +214,7 @@ fun SmallAccountPanelTwoLines(
 }
 
 @Composable
-fun<U: UserInfo> RatedAccountManager<U>.SmallAccountPanelTypeRated(userInfo: U) {
+fun<U: RatedUserInfo> RatedAccountManager<U>.SmallAccountPanelTypeRated(userInfo: U) {
     SmallAccountPanelTwoLines(
         title = {
             Text(
@@ -226,7 +226,7 @@ fun<U: UserInfo> RatedAccountManager<U>.SmallAccountPanelTypeRated(userInfo: U) 
         },
         additionalTitle = {
             if (userInfo.status == STATUS.OK) {
-                val rating = getRating(userInfo)
+                val rating = userInfo.rating
                 Text(
                     text = if (rating == NOT_RATED) "[not rated]" else rating.toString(),
                     fontSize = 25.sp,

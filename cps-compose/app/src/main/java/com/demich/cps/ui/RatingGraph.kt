@@ -55,7 +55,7 @@ fun rememberRatingGraphUIStates(): RatingGraphUIStates {
 }
 
 @Composable
-fun<U: UserInfo> RatedAccountManager<U>.RatingLoadButton(
+fun<U: RatedUserInfo> RatedAccountManager<U>.RatingLoadButton(
     ratingGraphUIStates: RatingGraphUIStates
 ) {
     val scope = rememberCoroutineScope()
@@ -80,7 +80,7 @@ fun<U: UserInfo> RatedAccountManager<U>.RatingLoadButton(
 }
 
 @Composable
-fun<U: UserInfo> RatedAccountManager<U>.RatingGraph(
+fun<U: RatedUserInfo> RatedAccountManager<U>.RatingGraph(
     ratingGraphUIStates: RatingGraphUIStates,
     modifier: Modifier = Modifier
 ) = RatingGraph(
@@ -92,7 +92,7 @@ fun<U: UserInfo> RatedAccountManager<U>.RatingGraph(
 @Composable
 fun RatingGraph(
     ratingGraphUIStates: RatingGraphUIStates,
-    manager: RatedAccountManager<out UserInfo>,
+    manager: RatedAccountManager<out RatedUserInfo>,
     modifier: Modifier = Modifier
 ) {
     if (ratingGraphUIStates.showRatingGraphState.value) {
@@ -151,7 +151,7 @@ private fun createBounds(
 private fun RatingGraph(
     loadingStatus: LoadingStatus,
     ratingChanges: List<RatingChange>,
-    manager: RatedAccountManager<out UserInfo>,
+    manager: RatedAccountManager<out RatedUserInfo>,
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(5.dp)
 ) {
@@ -238,7 +238,7 @@ private fun RatingGraph(
 private fun RatingGraphHeader(
     loadingStatus: LoadingStatus,
     ratingChanges: List<RatingChange>,
-    manager: RatedAccountManager<out UserInfo>,
+    manager: RatedAccountManager<out RatedUserInfo>,
     rectangles: RatingGraphRectangles,
     selectedFilterType: RatingFilterType,
     onSelectFilterType: (RatingFilterType) -> Unit,
@@ -291,7 +291,7 @@ private fun RatingGraphHeader(
 @Composable
 private fun ContestResult(
     ratingChange: RatingChange,
-    manager: RatedAccountManager<out UserInfo>,
+    manager: RatedAccountManager<out RatedUserInfo>,
     rectangles: RatingGraphRectangles,
     modifier: Modifier = Modifier,
     titleFontSize: TextUnit = 16.sp,
@@ -342,7 +342,7 @@ private fun ContestResult(
 }
 
 @Composable
-private fun<U: UserInfo> DrawRatingGraph(
+private fun<U: RatedUserInfo> DrawRatingGraph(
     ratingChanges: List<RatingChange>,
     manager: RatedAccountManager<U>,
     rectangles: RatingGraphRectangles,
@@ -601,7 +601,7 @@ private class CoordinateTranslator(
 
 @Immutable
 private class RatingGraphRectangles(
-    manager: RatedAccountManager<out UserInfo>
+    manager: RatedAccountManager<out RatedUserInfo>
 ) {
     val rectangles: List<Pair<Point,HandleColor>> = buildList {
         fun addBounds(bounds: Array<Pair<HandleColor, Int>>, x: Long) {

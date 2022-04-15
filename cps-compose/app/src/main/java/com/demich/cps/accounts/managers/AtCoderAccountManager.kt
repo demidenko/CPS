@@ -31,12 +31,9 @@ import kotlinx.serialization.decodeFromString
 @Serializable
 data class AtCoderUserInfo(
     override val status: STATUS,
-    val handle: String,
-    val rating: Int = NOT_RATED
-): UserInfo() {
-    override val userId: String
-        get() = handle
-
+    override val handle: String,
+    override val rating: Int = NOT_RATED
+): RatedUserInfo() {
     override fun link(): String = AtCoderAPI.URLFactory.user(handle)
 }
 
@@ -98,8 +95,6 @@ class AtCoderAccountManager(context: Context):
         }
     }
 
-    override fun getRating(userInfo: AtCoderUserInfo) = userInfo.rating
-
     override val ratingsUpperBounds = arrayOf(
         HandleColor.GRAY to 400,
         HandleColor.BROWN to 800,
@@ -157,7 +152,7 @@ class AtCoderAccountManager(context: Context):
             )
         }
         setBottomBarContent {
-            if (userInfo.status == STATUS.OK && userInfo.rating != NOT_RATED) {
+            if (userInfo.isRated()) {
                 RatingLoadButton(ratingGraphUIStates)
             }
         }

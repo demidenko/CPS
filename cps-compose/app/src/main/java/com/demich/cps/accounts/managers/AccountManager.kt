@@ -95,7 +95,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     }
 }
 
-abstract class RatedAccountManager<U: UserInfo>(context: Context, type: AccountManagers):
+abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: AccountManagers):
     AccountManager<U>(context, type)
 {
     override val userIdTitle get() = "handle"
@@ -118,8 +118,7 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, type: AccountM
 
     @Composable
     override fun colorFor(userInfo: U): Color {
-        if (userInfo.status != STATUS.OK || getRating(userInfo) == NOT_RATED) return Color.Unspecified
-        return colorFor(rating = getRating(userInfo))
+        return if (userInfo.isRated()) colorFor(rating = userInfo.rating) else  Color.Unspecified
     }
 
     @Composable
@@ -139,7 +138,6 @@ abstract class RatedAccountManager<U: UserInfo>(context: Context, type: AccountM
     override fun Panel(userInfo: U) = SmallAccountPanelTypeRated(userInfo)
 
     abstract val rankedHandleColorsList: Array<HandleColor>
-    abstract fun getRating(userInfo: U): Int
 
     protected open suspend fun loadRatingHistory(info: U): List<RatingChange>? = null
     suspend fun getRatingHistory(info: U): List<RatingChange>? {
@@ -191,6 +189,16 @@ abstract class UserInfo {
     abstract fun link(): String
 
     fun isEmpty() = userId.isBlank()
+}
+
+abstract class RatedUserInfo: UserInfo() {
+    abstract val handle: String
+    abstract val rating: Int
+
+    final override val userId: String
+        get() = handle
+
+    fun isRated() = status == STATUS.OK && rating != NOT_RATED
 }
 
 data class UserInfoWithManager<U: UserInfo>(
