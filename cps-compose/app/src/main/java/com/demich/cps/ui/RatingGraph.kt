@@ -358,15 +358,20 @@ private fun<U: RatedUserInfo> DrawRatingGraph(
         }
     }
 
-    val timeRange = remember(key1 = filterType, key2 = ratingChanges) {
-        createBounds(ratingChanges, filterType).run { startTime to endTime }
+    val timeMarkers: List<Instant> = remember(key1 = filterType, key2 = ratingChanges) {
+        if (filterType == RatingFilterType.all || ratingChanges.size < 2) emptyList()
+        else {
+            createBounds(ratingChanges, filterType).run {
+                listOf(startTime, endTime)
+            }
+        }
     }
 
     DrawRatingGraph(
         ratingPoints = ratingChanges.map { it.toPoint() }.sortedBy { it.x },
         translator = translator,
-        timeRange = timeRange,
         selectedPoint = selectedRatingChange?.toPoint(),
+        markVerticals = timeMarkers.map { it.epochSeconds },
         colorsMap = managerSupportedColors.associateWith { manager.colorFor(handleColor = it) },
         rectangles = rectangles,
         modifier = modifier
@@ -377,8 +382,8 @@ private fun<U: RatedUserInfo> DrawRatingGraph(
 private fun DrawRatingGraph(
     ratingPoints: List<Point>,
     translator: CoordinateTranslator,
-    timeRange: Pair<Instant, Instant>,
     selectedPoint: Point?,
+    markVerticals: List<Long>,
     colorsMap: Map<HandleColor, Color>,
     rectangles: RatingGraphRectangles,
     modifier: Modifier = Modifier,
@@ -431,8 +436,8 @@ private fun DrawRatingGraph(
                 pathEffect = dashEffect
             )
         } else {
-            listOf(timeRange.first, timeRange.second).forEach {
-                val p = translator.pointToOffset(it.epochSeconds, 0)
+            markVerticals.forEach { x ->
+                val p = translator.pointToOffset(x, 0)
                 drawLine(
                     color = Color.Black,
                     start = Offset(p.x, 0f),
