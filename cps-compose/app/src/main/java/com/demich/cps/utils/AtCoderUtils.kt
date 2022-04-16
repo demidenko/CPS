@@ -24,7 +24,7 @@ data class AtCoderRatingChange(
 }
 
 object AtCoderAPI {
-    private val client = cpsHttpClient { }
+    private val client = cpsHttpClient(json = false) { }
 
     private suspend fun makeWEBCall(block: suspend () -> String): String {
         return kotlin.runCatching {

@@ -10,7 +10,7 @@ import java.nio.charset.Charset
 
 object ACMPAPI {
     private val windows1251 = Charset.forName("windows-1251")
-    private val client = cpsHttpClient {
+    private val client = cpsHttpClient(json = false) {
         Charsets {
             register(windows1251)
             responseCharsetFallback = windows1251

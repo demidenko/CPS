@@ -49,13 +49,18 @@ fun Context.showToast(title: String) = Toast.makeText(this, title, Toast.LENGTH_
 
 val jsonCPS = Json { ignoreUnknownKeys = true }
 
-fun cpsHttpClient(block: HttpClientConfig<*>.() -> Unit) = HttpClient {
+fun cpsHttpClient(
+    json: Boolean = true,
+    block: HttpClientConfig<*>.() -> Unit
+) = HttpClient {
     install(HttpTimeout) {
         connectTimeoutMillis = 15.seconds.inWholeMilliseconds
         requestTimeoutMillis = 30.seconds.inWholeMilliseconds
     }
-    install(JsonFeature) {
-        serializer = KotlinxSerializer(jsonCPS)
+    if (json) {
+        install(JsonFeature) {
+            serializer = KotlinxSerializer(jsonCPS)
+        }
     }
     block()
 }
