@@ -108,7 +108,7 @@ class CodeforcesAccountManager(context: Context):
                     val i = it.indexOf('|')
                     if (i != -1) {
                         val handle = it.substring(i + 1)
-                        add(AccountSuggestion(handle, "", handle))
+                        add(AccountSuggestion(title = handle, userId = handle))
                     }
                 }
             }
