@@ -44,29 +44,28 @@ class ACMPAccountManager(context: Context):
 
     override suspend fun downloadInfo(data: String, flags: Int): ACMPUserInfo {
         try {
-            val s = ACMPAPI.getUserPage(id = data.toInt())
-            var i = s.indexOf("<title>")
-            require(i != -1)
-            val userName = s.substring(s.indexOf('>',i)+1, s.indexOf("</title>")).trim()
-            i = s.indexOf("Решенные задачи")
-            require(i != -1)
-            i = s.indexOf('(', i)
-            val solvedTasks = s.substring(i+1, s.indexOf(')',i)).toInt()
-            i = s.indexOf("<b class=btext>Рейтинг:")
-            require(i != -1)
-            i = s.indexOf(':', i)
-            val rating = s.substring(i+2, s.indexOf('/', i)-1).toInt()
-            i = s.lastIndexOf("<b class=btext>Место:", i)
-            i = s.indexOf(':', i)
-            val rank = s.substring(i+2, s.indexOf('/', i)-1).toInt()
-            return ACMPUserInfo(
-                status = STATUS.OK,
-                id = data,
-                userName = userName,
-                rating = rating,
-                solvedTasks = solvedTasks,
-                rank = rank
-            )
+            return with(Jsoup.parse(ACMPAPI.getUserPage(id = data.toInt()))) {
+                val userName = title().trim()
+                val box = body().select("h4").firstOrNull { it.text() == "Общая статистика" }?.parent()!!
+                val bs = box.select("b.btext").map { it.text() }
+                val solvedTasks = bs.first { it.startsWith("Решенные задачи") }.let {
+                    it.substring(it.indexOf('(')+1, it.indexOf(')')).toInt()
+                }
+                val rating = bs.first { it.startsWith("Рейтинг:") }.let {
+                    it.substring(it.indexOf(':')+2, it.indexOf('/')-1).toInt()
+                }
+                val rank = bs.first { it.startsWith("Место:") }.let {
+                    it.substring(it.indexOf(':')+2, it.indexOf('/')-1).toInt()
+                }
+                ACMPUserInfo(
+                    status = STATUS.OK,
+                    id = data,
+                    userName = userName,
+                    rating = rating,
+                    solvedTasks = solvedTasks,
+                    rank = rank
+                )
+            }
         } catch (e: ACMPAPI.ACMPPageNotFoundException) {
             return ACMPUserInfo(status = STATUS.NOT_FOUND, id = data)
         } catch (e: Throwable) {
