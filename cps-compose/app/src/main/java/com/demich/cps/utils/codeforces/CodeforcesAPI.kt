@@ -23,19 +23,17 @@ object CodeforcesAPI {
         HttpResponseValidator {
             handleResponseException { exception ->
                 if (exception !is ResponseException) return@handleResponseException
-                val exceptionResponse = exception.response
-                val text = exceptionResponse.readText()
-                if(exceptionResponse.status == HttpStatusCode.ServiceUnavailable) {
+                val response = exception.response
+                if(response.status == HttpStatusCode.ServiceUnavailable) {
                     throw CodeforcesAPICallLimitExceeded()
                 }
-                val codeforcesError = jsonCPS.decodeFromString<CodeforcesAPIErrorResponse>(text)
-                throw codeforcesError
+                throw jsonCPS.decodeFromString<CodeforcesAPIErrorResponse>(response.readText())
             }
         }
     }
 
     private const val callLimitExceededWaitTimeMillis: Long = 500
-    class CodeforcesAPICallLimitExceeded: Throwable()
+    private class CodeforcesAPICallLimitExceeded: Throwable()
 
     private suspend fun<T> makeAPICall(block: suspend () -> CodeforcesAPIResponse<T>): T {
         repeat(10) { iteration ->
@@ -57,7 +55,7 @@ object CodeforcesAPI {
     }
 
     suspend fun getUsers(handles: Collection<String>): List<CodeforcesUser> = makeAPICall {
-        client.get(urlString = "https://codeforces.com/api/user.info") {
+        client.get(urlString = "${URLFactory.api}/user.info") {
             parameter("handles", handles.joinToString(separator = ";"))
         }
     }
@@ -65,7 +63,7 @@ object CodeforcesAPI {
     suspend fun getUser(handle: String) = getUsers(listOf(handle)).first()
 
     suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange> = makeAPICall {
-        client.get(urlString = "https://codeforces.com/api/user.rating") {
+        client.get(urlString = "${URLFactory.api}/user.rating") {
             parameter("handle", handle)
         }
     }
@@ -80,7 +78,7 @@ object CodeforcesAPI {
     }
 
     suspend fun getHandleSuggestions(str: String) = makeWEBCall {
-        client.get(urlString = "https://codeforces.com/data/handles") {
+        client.get(urlString = "${URLFactory.main}/data/handles") {
             parameter("q", str)
         }
     }
@@ -109,6 +107,8 @@ object CodeforcesAPI {
         //fun submission(submission: CodeforcesSubmission) = "$main/contest/${submission.contestId}/submission/${submission.id}"
 
         fun problem(contestId: Int, problemIndex: String) = "$main/contest/$contestId/problem/$problemIndex"
+
+        const val api = "$main/api"
     }
 }
 
