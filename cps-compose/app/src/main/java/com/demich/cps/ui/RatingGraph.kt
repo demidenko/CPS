@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -441,24 +442,26 @@ private fun DrawRatingGraph(
             }
         }
 
-        //shadow of rating path
-        drawPath(
-            path = Path().apply { addPath(ratingPath, shadowOffset) },
-            color = Color.Black,
-            style = Stroke(width = pathWidth),
-            alpha = shadowAlpha
-        )
-
-        //shadow of rating points
-        ratingPoints.forEach { point ->
-            val center = translator.pointToOffset(point)
-            drawCircle(
+        //shadow
+        translate(left = shadowOffset.x, top = shadowOffset.y) {
+            //shadow of rating path
+            drawPath(
+                path = ratingPath,
                 color = Color.Black,
-                radius = (circleRadius + circleBorderWidth) * radiusMultiplier(point),
-                center = center + shadowOffset,
-                style = Fill,
+                style = Stroke(width = pathWidth),
                 alpha = shadowAlpha
             )
+            //shadow of rating points
+            ratingPoints.forEach { point ->
+                val center = translator.pointToOffset(point)
+                drawCircle(
+                    color = Color.Black,
+                    radius = (circleRadius + circleBorderWidth) * radiusMultiplier(point),
+                    center = center,
+                    style = Fill,
+                    alpha = shadowAlpha
+                )
+            }
         }
 
         //rating path
