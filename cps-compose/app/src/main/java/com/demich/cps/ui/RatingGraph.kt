@@ -261,7 +261,6 @@ private fun RatingGraphHeader(
         TextButtonsSelectRow(
             values = remember(ratingChanges) {
                 buildList {
-                    add(RatingFilterType.all)
                     if (ratingChanges.size > 10) add(RatingFilterType.last10)
                     val now = getCurrentTime()
                     val firstInMonth = ratingChanges.indexOfFirst { it.date >= now - 30.days }
@@ -272,6 +271,7 @@ private fun RatingGraphHeader(
                     if (firstInYear > 0 && firstInYear != -1 && firstInYear != firstInMonth) {
                         add(RatingFilterType.lastYear)
                     }
+                    if (isNotEmpty()) add(index = 0, RatingFilterType.all)
                 }
             },
             selectedValue = selectedFilterType,
