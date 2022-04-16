@@ -1,8 +1,6 @@
 package com.demich.cps.utils
 
-import io.ktor.client.features.*
 import io.ktor.client.request.*
-import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
@@ -26,20 +24,7 @@ data class AtCoderRatingChange(
 }
 
 object AtCoderAPI {
-    private val client = cpsHttpClient {
-        HttpResponseValidator {
-            handleResponseException { exception ->
-                if (exception !is ResponseException) return@handleResponseException
-                val exceptionResponse = exception.response
-                if (exceptionResponse.status == HttpStatusCode.NotFound) {
-                    throw AtCoderPageNotFoundException()
-                }
-                throw exception
-            }
-        }
-    }
-
-    class AtCoderPageNotFoundException : Throwable("AtCoderAPI: page not found")
+    private val client = cpsHttpClient { }
 
     private suspend fun makeWEBCall(block: suspend () -> String): String {
         return kotlin.runCatching {

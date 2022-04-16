@@ -22,8 +22,11 @@ import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.utils.AtCoderAPI
 import com.demich.cps.utils.AtCoderRatingChange
 import com.demich.cps.utils.jsonCPS
+import io.ktor.client.features.*
+import io.ktor.http.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import org.jsoup.Jsoup
 
 @Serializable
 data class AtCoderUserInfo(
@@ -54,19 +57,17 @@ class AtCoderAccountManager(context: Context):
     override suspend fun downloadInfo(data: String, flags: Int): AtCoderUserInfo {
         try {
             val s = AtCoderAPI.getUserPage(handle = data)
-            var i = s.lastIndexOf("class=\"username\"")
-            i = s.indexOf("</span", i)
-            val handle = s.substring(s.lastIndexOf('>',i)+1, i)
-            i = s.indexOf("<th class=\"no-break\">Rating</th>")
-            val rating = if (i == -1) NOT_RATED
-            else {
-                i = s.indexOf("</span", i)
-                s.substring(s.lastIndexOf('>',i)+1, i).toInt()
+            return with(Jsoup.parse(s)) {
+                val handle = selectFirst("a.username")!!.text()
+                val rating = select("th.no-break").find { it.text() == "Rating" }
+                    ?.nextElementSibling()
+                    ?.text()?.toInt() ?: NOT_RATED
+                AtCoderUserInfo(status = STATUS.OK, handle = handle, rating = rating)
             }
-            return AtCoderUserInfo(status = STATUS.OK, handle = handle, rating = rating)
-        } catch (e: AtCoderAPI.AtCoderPageNotFoundException) {
-            return AtCoderUserInfo(status = STATUS.NOT_FOUND, handle = data)
         } catch (e: Throwable) {
+            if (e is ClientRequestException && e.response.status == HttpStatusCode.NotFound) {
+                return AtCoderUserInfo(status = STATUS.NOT_FOUND, handle = data)
+            }
             return AtCoderUserInfo(status = STATUS.FAILED, handle = data)
         }
     }
