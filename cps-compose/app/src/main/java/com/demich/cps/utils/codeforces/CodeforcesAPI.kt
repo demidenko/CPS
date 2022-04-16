@@ -218,6 +218,7 @@ data class CodeforcesContestStandings(
 data class CodeforcesProblem(
     val name: String,
     val index: String,
+    val contestId: Int = -1,
     val points: Double = 0.0
 )
 

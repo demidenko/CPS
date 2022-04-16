@@ -335,7 +335,7 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
     val contestWatchCanceled = itemJsonConvertible<List<Pair<Int,Instant>>>(name = "contest_watch_canceled", defaultValue = emptyList())
 
     val upsolvingSuggestionsEnabled = Item(booleanPreferencesKey("upsolving_suggestions"), false)
-    val upsolvingSuggestedProblems = itemJsonConvertible<List<Pair<Int,String>>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
+    val upsolvingSuggestedProblems = itemJsonConvertible<List<CodeforcesProblem>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
 
     override val keysForReset get() = listOf(
         lastRatedContestId,
