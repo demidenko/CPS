@@ -128,6 +128,6 @@ class ACMPAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = accountDataStore(context.account_acmp_dataStore, emptyInfo())
+    override fun getDataStore() = accountDataStore(context.account_acmp_dataStore)
 
 }

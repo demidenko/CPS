@@ -220,7 +220,7 @@ class CodeforcesAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = accountDataStore(context.account_codeforces_dataStore, emptyInfo())
+    override fun getDataStore() = accountDataStore(context.account_codeforces_dataStore)
     override fun getSettings() = CodeforcesAccountSettingsDataStore(this)
 
     @Composable

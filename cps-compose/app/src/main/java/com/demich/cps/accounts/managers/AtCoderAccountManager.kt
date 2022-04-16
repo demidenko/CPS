@@ -141,7 +141,7 @@ class AtCoderAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = accountDataStore(context.account_atcoder_dataStore, emptyInfo())
+    override fun getDataStore() = accountDataStore(context.account_atcoder_dataStore)
     override fun getSettings() = AtCoderAccountSettingsDataStore(this)
 
     @Composable

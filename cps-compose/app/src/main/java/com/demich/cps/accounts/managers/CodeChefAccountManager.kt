@@ -217,5 +217,5 @@ class CodeChefAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = accountDataStore(context.account_codechef_dataStore, emptyInfo())
+    override fun getDataStore() = accountDataStore(context.account_codechef_dataStore)
 }

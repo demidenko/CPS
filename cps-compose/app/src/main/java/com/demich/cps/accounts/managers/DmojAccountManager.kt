@@ -154,5 +154,5 @@ class DmojAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = accountDataStore(context.account_dmoj_dataStore, emptyInfo())
+    override fun getDataStore() = accountDataStore(context.account_dmoj_dataStore)
 }

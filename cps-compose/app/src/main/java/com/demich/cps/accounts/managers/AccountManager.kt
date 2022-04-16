@@ -57,7 +57,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     suspend fun setSavedInfo(info: U) {
         val old = getSavedInfo()
         getDataStore().userInfo(info)
-        if (info.userId != old.userId && this is AccountSettingsProvider) getSettings().resetRelatedData()
+        if (info.userId != old.userId && this is AccountSettingsProvider) getSettings().resetRelatedItems()
     }
 
     @Composable
