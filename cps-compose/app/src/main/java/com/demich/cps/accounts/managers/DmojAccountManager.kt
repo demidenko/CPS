@@ -127,7 +127,7 @@ class DmojAccountManager(context: Context):
         if (rating < 3000) return super.makeRatedSpan(text, rating)
         return buildAnnotatedString {
             withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(text[0]) }
-            append(super.makeOKSpan(text.substring(startIndex = 1), rating))
+            append(super.makeRatedSpan(text.substring(startIndex = 1), rating))
         }
     }
 
