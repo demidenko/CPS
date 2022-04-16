@@ -18,7 +18,7 @@ interface CPSDataStoreItem<T> {
     suspend operator fun invoke(newValue: T)
 }
 
-open class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
+abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
 
     abstract inner class DataStoreItem<T, S>: CPSDataStoreItem<T> {
         abstract val key: Preferences.Key<S>

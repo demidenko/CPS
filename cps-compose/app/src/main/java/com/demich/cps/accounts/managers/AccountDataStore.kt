@@ -7,20 +7,21 @@ import androidx.datastore.preferences.core.edit
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.CPSDataStoreItem
 
-class AccountDataStore<U: UserInfo>(
-    dataStore: DataStore<Preferences>,
-    val userInfo: CPSDataStoreItem<U>
-): CPSDataStore(dataStore)
+abstract class AccountDataStore<U: UserInfo>(
+    dataStore: DataStore<Preferences>
+): CPSDataStore(dataStore) {
+    abstract val userInfo: CPSDataStoreItem<U>
+}
 
 inline fun<reified U: UserInfo> AccountManager<U>.accountDataStore(
     dataStore: DataStore<Preferences>
-) = AccountDataStore(
-    dataStore = dataStore,
-    userInfo = CPSDataStore(dataStore).itemJsonConvertible(
-        name = "user_info",
-        defaultValue = emptyInfo()
-    )
-)
+): AccountDataStore<U> = object : AccountDataStore<U>(dataStore = dataStore) {
+        override val userInfo = itemJsonConvertible(
+            name = "user_info",
+            defaultValue = emptyInfo()
+        )
+    }
+
 
 open class AccountSettingsDataStore(dataStore: DataStore<Preferences>): CPSDataStore(dataStore) {
     protected open val keysForReset: List<DataStoreItem<*, *>> = emptyList()
