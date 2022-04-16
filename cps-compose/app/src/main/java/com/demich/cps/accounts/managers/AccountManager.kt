@@ -9,14 +9,10 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import com.demich.cps.*
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.useOriginalColors
-import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.signedToString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -159,25 +155,6 @@ data class RatingChange(
     val rank: Int? = null
 )
 
-class AccountDataStore<U: UserInfo>(
-    dataStore: DataStore<Preferences>,
-    val userInfo: ItemStringConvertible<U>
-): CPSDataStore(dataStore)
-
-inline fun <reified U: UserInfo> accountDataStore(dataStore: DataStore<Preferences>, emptyUserInfo: U): AccountDataStore<U> {
-    return AccountDataStore(dataStore, CPSDataStore(dataStore).itemJsonConvertible(name = "user_info", defaultValue = emptyUserInfo))
-}
-
-open class AccountSettingsDataStore(dataStore: DataStore<Preferences>): CPSDataStore(dataStore) {
-    protected open val keysForReset: List<DataStoreItem<*,*>> = emptyList()
-    suspend fun resetRelatedData() {
-        val keys = keysForReset.takeIf { it.isNotEmpty() } ?: return
-        dataStore.edit { prefs ->
-            keys.forEach { prefs.remove(it.key) }
-        }
-    }
-}
-
 enum class STATUS {
     OK,
     NOT_FOUND,
@@ -246,13 +223,6 @@ data class AccountSuggestion(
 interface AccountSuggestionsProvider {
     suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = null
     fun isValidForSearch(char: Char): Boolean = true
-}
-
-interface AccountSettingsProvider {
-    fun getSettings(): AccountSettingsDataStore
-
-    @Composable
-    fun Settings() {}
 }
 
 interface RatingRevolutionsProvider {
