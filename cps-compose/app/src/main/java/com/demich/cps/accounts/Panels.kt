@@ -226,11 +226,10 @@ fun<U: RatedUserInfo> RatedAccountManager<U>.SmallRatedAccountPanel(
     },
     additionalTitle: @Composable () -> Unit = {
         if (userInfo.status == STATUS.OK) {
-            val rating = userInfo.rating
             Text(
-                text = if (rating == NOT_RATED) "[not rated]" else rating.toString(),
+                text = userInfo.ratingToString(),
                 fontSize = 25.sp,
-                color = if (rating == NOT_RATED) cpsColors.textColorAdditional else colorFor(rating = rating),
+                color = if (userInfo.isRated()) colorFor(rating = userInfo.rating) else cpsColors.textColorAdditional,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

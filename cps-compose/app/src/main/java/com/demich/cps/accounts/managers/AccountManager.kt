@@ -132,7 +132,7 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
     final override fun makeOKInfoSpan(userInfo: U) = with(userInfo) {
         require(status == STATUS.OK)
         makeOKSpan(
-            text = handle + " " + (rating.takeIf { it != NOT_RATED }?.toString() ?: "[not rated]"),
+            text = handle + " " + ratingToString(),
             rating = rating
         )
     }
@@ -202,6 +202,8 @@ abstract class RatedUserInfo: UserInfo() {
         get() = handle
 
     fun isRated() = status == STATUS.OK && rating != NOT_RATED
+
+    fun ratingToString() = if (rating == NOT_RATED) "[not rated]" else rating.toString()
 }
 
 data class UserInfoWithManager<U: UserInfo>(

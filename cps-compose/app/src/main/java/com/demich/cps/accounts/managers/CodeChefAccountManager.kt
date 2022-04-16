@@ -186,7 +186,7 @@ class CodeChefAccountManager(context: Context):
             additionalTitle = {
                 if (userInfo.status == STATUS.OK) {
                     Text(
-                        text = if (userInfo.rating == NOT_RATED) "[not rated]" else userInfo.rating.toString(),
+                        text = userInfo.ratingToString(),
                         fontSize = 25.sp
                     )
                 }
