@@ -1,6 +1,5 @@
 package com.demich.cps.utils.codeforces
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontWeight
@@ -8,9 +7,9 @@ import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.accounts.managers.HandleColor
 import com.demich.cps.accounts.managers.NOT_RATED
 import com.demich.cps.accounts.managers.STATUS
-import com.demich.cps.news.codeforces.CodeforcesLocale
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.signedToString
+import org.jsoup.Jsoup
 import java.util.*
 
 object CodeforcesUtils {
@@ -67,11 +66,8 @@ object CodeforcesUtils {
     }
 
     private fun extractRealHandle(s: String): String? {
-        var i = s.indexOf(" <div class=\"userbox\">")
-        if (i == -1) return null
-        i = s.indexOf("<div class=\"user-rank\">", i)
-        i = s.indexOf("class=\"rated-user", i)
-        return s.substring(s.indexOf('>', i)+1, s.indexOf("</a", i))
+        val userBox = Jsoup.parse(s).selectFirst("div.userbox") ?: return null
+        return userBox.selectFirst("a.rated-user")?.text()
     }
 
     @Composable
@@ -89,3 +85,13 @@ object CodeforcesUtils {
 }
 
 
+enum class CodeforcesLocale {
+    EN, RU;
+
+    override fun toString(): String {
+        return when(this){
+            EN -> "en"
+            RU -> "ru"
+        }
+    }
+}

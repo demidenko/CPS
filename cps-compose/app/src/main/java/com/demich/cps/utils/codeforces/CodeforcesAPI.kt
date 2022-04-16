@@ -1,7 +1,6 @@
 package com.demich.cps.utils.codeforces
 
 import com.demich.cps.accounts.managers.NOT_RATED
-import com.demich.cps.news.codeforces.CodeforcesLocale
 import com.demich.cps.utils.DurationAsSecondsSerializer
 import com.demich.cps.utils.InstantAsSecondsSerializer
 import com.demich.cps.utils.cpsHttpClient
