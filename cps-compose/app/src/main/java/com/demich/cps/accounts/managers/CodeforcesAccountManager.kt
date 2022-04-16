@@ -24,7 +24,7 @@ import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
 import com.demich.cps.R
-import com.demich.cps.accounts.SmallAccountPanelTypeRated
+import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.InstantAsSecondsSerializer
@@ -189,7 +189,7 @@ class CodeforcesAccountManager(context: Context):
         val ratingGraphUIStates = rememberRatingGraphUIStates()
         Box(modifier = modifier) {
             Column {
-                SmallAccountPanelTypeRated(userInfo)
+                SmallRatedAccountPanel(userInfo)
                 if (userInfo.contribution != 0) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(

@@ -13,7 +13,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.demich.cps.*
-import com.demich.cps.accounts.SmallAccountPanelTypeRated
+import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.useOriginalColors
 import com.demich.cps.utils.CPSDataStore
@@ -135,7 +135,7 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
     }
 
     @Composable
-    override fun Panel(userInfo: U) = SmallAccountPanelTypeRated(userInfo)
+    override fun Panel(userInfo: U) = SmallRatedAccountPanel(userInfo)
 
     abstract val rankedHandleColorsList: Array<HandleColor>
 

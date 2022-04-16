@@ -214,28 +214,32 @@ fun SmallAccountPanelTwoLines(
 }
 
 @Composable
-fun<U: RatedUserInfo> RatedAccountManager<U>.SmallAccountPanelTypeRated(userInfo: U) {
-    SmallAccountPanelTwoLines(
-        title = {
+fun<U: RatedUserInfo> RatedAccountManager<U>.SmallRatedAccountPanel(
+    userInfo: U,
+    title: @Composable () -> Unit = {
+        Text(
+            text = makeHandleSpan(userInfo),
+            fontSize = 30.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    },
+    additionalTitle: @Composable () -> Unit = {
+        if (userInfo.status == STATUS.OK) {
+            val rating = userInfo.rating
             Text(
-                text = makeHandleSpan(userInfo),
-                fontSize = 30.sp,
+                text = if (rating == NOT_RATED) "[not rated]" else rating.toString(),
+                fontSize = 25.sp,
+                color = if (rating == NOT_RATED) cpsColors.textColorAdditional else colorFor(rating = rating),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-        },
-        additionalTitle = {
-            if (userInfo.status == STATUS.OK) {
-                val rating = userInfo.rating
-                Text(
-                    text = if (rating == NOT_RATED) "[not rated]" else rating.toString(),
-                    fontSize = 25.sp,
-                    color = if (rating == NOT_RATED) cpsColors.textColorAdditional else colorFor(rating = rating),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
         }
+    }
+) {
+    SmallAccountPanelTwoLines(
+        title = title,
+        additionalTitle = additionalTitle
     )
 }
 
@@ -257,12 +261,12 @@ fun SmallAccountPanelTypeArchive(
         additionalTitle = {
             Text(
                 text = buildAnnotatedString {
-                    infoArgs.forEachIndexed { index, arg ->
+                    infoArgs.forEachIndexed { index, (key, value) ->
                         if (index > 0) append("  ")
                         withStyle(SpanStyle(color = cpsColors.textColorAdditional)) {
-                            append("${arg.first}: ")
+                            append("${key}: ")
                         }
-                        append(arg.second)
+                        append(value)
                     }
                 },
                 fontSize = 14.sp,

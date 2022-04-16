@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.AdditionalBottomBarBuilder
-import com.demich.cps.accounts.SmallAccountPanelTwoLines
+import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.ui.RatingGraph
 import com.demich.cps.ui.RatingLoadButton
 import com.demich.cps.ui.rememberRatingGraphUIStates
@@ -160,7 +160,8 @@ class CodeChefAccountManager(context: Context):
 
     @Composable
     override fun Panel(userInfo: CodeChefUserInfo) {
-        SmallAccountPanelTwoLines(
+        SmallRatedAccountPanel(
+            userInfo = userInfo,
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (userInfo.isRated()) {

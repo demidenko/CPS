@@ -14,7 +14,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
-import com.demich.cps.accounts.SmallAccountPanelTypeRated
+import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.ui.RatingGraph
 import com.demich.cps.ui.RatingLoadButton
 import com.demich.cps.ui.SwitchSettingsItem
@@ -126,7 +126,7 @@ class AtCoderAccountManager(context: Context):
     ) {
         val ratingGraphUIStates = rememberRatingGraphUIStates()
         Box(modifier = modifier) {
-            SmallAccountPanelTypeRated(userInfo)
+            SmallRatedAccountPanel(userInfo)
             RatingGraph(
                 ratingGraphUIStates = ratingGraphUIStates,
                 modifier = Modifier
