@@ -70,14 +70,6 @@ fun signedToString(x: Int): String = if (x > 0) "+$x" else "$x"
 fun Instant.format(dateFormat: String): String =
     DateFormat.format(dateFormat, toEpochMilliseconds()).toString()
 
-fun fromHTML(s: String): Spanned {
-    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-        Html.fromHtml(s, HtmlCompat.FROM_HTML_MODE_LEGACY)
-    } else {
-        Html.fromHtml(s)
-    }
-}
-
 data class ComparablePair<A: Comparable<A>, B: Comparable<B>>(
     val first: A,
     val second: B
