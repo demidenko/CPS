@@ -173,7 +173,7 @@ class CodeforcesAccountManager(context: Context):
         }
 
     @Composable
-    override fun makeOKSpan(text: String, rating: Int): AnnotatedString =
+    override fun makeRatedSpan(text: String, rating: Int): AnnotatedString =
         makeHandleSpan(
             handle = text,
             tag = CodeforcesUtils.getTagByRating(rating)

@@ -147,13 +147,11 @@ class CodeChefAccountManager(context: Context):
     }
 
     @Composable
-    override fun makeOKSpan(text: String, rating: Int) = buildAnnotatedString {
-        if (rating != NOT_RATED) {
-            append(AnnotatedString(
-                text = "${getRatingStarNumber(rating)}$star ",
-                spanStyle = SpanStyle(color = colorFor(rating = rating))
-            ))
-        }
+    override fun makeRatedSpan(text: String, rating: Int) = buildAnnotatedString {
+        append(AnnotatedString(
+            text = "${getRatingStarNumber(rating)}$star ",
+            spanStyle = SpanStyle(color = colorFor(rating = rating))
+        ))
         append(text)
     }
 

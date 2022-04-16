@@ -117,12 +117,15 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
     }
 
     @Composable
-    open fun makeOKSpan(text: String, rating: Int): AnnotatedString {
+    open fun makeRatedSpan(text: String, rating: Int) = AnnotatedString(
+        text = text,
+        spanStyle = SpanStyle(color = colorFor(rating = rating), fontWeight = FontWeight.Bold)
+    )
+
+    @Composable
+    fun makeOKSpan(text: String, rating: Int): AnnotatedString {
         return if (rating == NOT_RATED) AnnotatedString(text = text)
-        else AnnotatedString(
-            text = text,
-            spanStyle = SpanStyle(color = colorFor(rating = rating), fontWeight = FontWeight.Bold)
-        )
+        else makeRatedSpan(text, rating)
     }
 
     @Composable

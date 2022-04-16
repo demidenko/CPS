@@ -123,8 +123,8 @@ class DmojAccountManager(context: Context):
         }
 
     @Composable
-    override fun makeOKSpan(text: String, rating: Int): AnnotatedString {
-        if (rating == NOT_RATED || rating < 3000) return super.makeOKSpan(text, rating)
+    override fun makeRatedSpan(text: String, rating: Int): AnnotatedString {
+        if (rating < 3000) return super.makeRatedSpan(text, rating)
         return buildAnnotatedString {
             withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(text[0]) }
             append(super.makeOKSpan(text.substring(startIndex = 1), rating))
