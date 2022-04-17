@@ -44,7 +44,10 @@ object CodeforcesAPI {
             }.onSuccess {
                 return it.result
             }.onFailure { exception ->
-                if (exception is CodeforcesAPICallLimitExceeded) {
+                if (
+                    exception is CodeforcesAPIErrorResponse && exception.isCallLimitExceeded()
+                    || exception is CodeforcesAPICallLimitExceeded
+                ) {
                     delay(callLimitExceededWaitTimeMillis)
                 } else {
                     throw exception
