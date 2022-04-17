@@ -10,19 +10,20 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
 interface CPSDataStoreItem<T> {
+    val key: Preferences.Key<*>
     val flow: Flow<T>
     suspend operator fun invoke(): T
     suspend operator fun invoke(newValue: T)
 }
 
-fun CPSDataStore.itemBoolean(name: String, defaultValue: Boolean) =
+fun CPSDataStore.itemBoolean(name: String, defaultValue: Boolean): CPSDataStoreItem<Boolean> =
     Item(booleanPreferencesKey(name), defaultValue)
 
 
 abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
 
     abstract inner class DataStoreItem<T, S>: CPSDataStoreItem<T> {
-        abstract val key: Preferences.Key<S>
+        abstract override val key: Preferences.Key<S>
         protected abstract fun fromPrefs(s: S?): T
         //TODO [toPrefs(t: T & Any): S] in kotlin 1.7??
         protected abstract fun toPrefs(t: T): S

@@ -24,7 +24,7 @@ inline fun<reified U: UserInfo> AccountManager<U>.accountDataStore(
 
 
 open class AccountSettingsDataStore(dataStore: DataStore<Preferences>): CPSDataStore(dataStore) {
-    protected open val keysForReset: List<DataStoreItem<*, *>> = emptyList()
+    protected open val keysForReset: List<CPSDataStoreItem<*>> = emptyList()
     suspend fun resetRelatedItems() {
         val keys = keysForReset.takeIf { it.isNotEmpty() } ?: return
         dataStore.edit { prefs ->
