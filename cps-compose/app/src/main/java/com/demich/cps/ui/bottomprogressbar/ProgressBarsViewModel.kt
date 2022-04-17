@@ -41,7 +41,7 @@ class ProgressBarsViewModel: ViewModel() {
             val progressStateFlow = states.getOrPut(id) { MutableStateFlow(ProgressBarInfo(total = 0)) }
             progressBars.add(id)
             block(progressStateFlow)
-            delay(1000)
+            if (progressStateFlow.value.total > 0) delay(1000)
             progressBars.remove(id)
             states.remove(id)
         }
