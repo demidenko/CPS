@@ -1,7 +1,10 @@
 package com.demich.cps.utils
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -64,17 +67,6 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         override fun fromPrefs(s: String?): T = s?.let(decode) ?: defaultValue
         override fun toPrefs(t: T): String = encode(t)
     }
-
-    fun itemBoolean(name: String, defaultValue: Boolean) = Item(booleanPreferencesKey(name), defaultValue)
-
-    fun itemInt(name: String, defaultValue: Int) = Item(intPreferencesKey(name), defaultValue)
-    fun itemIntNullable(name: String) = ItemNullable(intPreferencesKey(name))
-
-    fun itemLong(name: String, defaultValue: Long) = Item(longPreferencesKey(name), defaultValue)
-    fun itemLongNullable(name: String) = ItemNullable(longPreferencesKey(name))
-
-    fun itemString(name: String, defaultValue: String) = Item(stringPreferencesKey(name), defaultValue)
-    fun itemStringNullable(name: String) = ItemNullable(stringPreferencesKey(name))
 
     inline fun<reified T: Enum<T>> itemEnum(name: String, defaultValue: T) =
         ItemStringConvertible(
