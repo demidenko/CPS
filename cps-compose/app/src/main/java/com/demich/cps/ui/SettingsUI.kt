@@ -9,6 +9,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.itemBoolean
+import com.demich.cps.utils.itemJsonable
 
 class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
     companion object {
@@ -23,7 +24,7 @@ class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
     val statusBarDisabledManagers = itemEnumSet<AccountManagers>("status_bar_disabled_managers")
     val statusBarResultByMaximum = itemBoolean(name = "status_bar_result_by_max", defaultValue = true)
 
-    val accountsOrder = itemJsonConvertible<List<AccountManagers>>(name = "accounts_order", defaultValue = emptyList())
+    val accountsOrder = itemJsonable<List<AccountManagers>>(name = "accounts_order", defaultValue = emptyList())
 }
 
 enum class DarkLightMode {

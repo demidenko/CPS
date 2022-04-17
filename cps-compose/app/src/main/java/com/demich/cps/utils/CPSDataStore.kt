@@ -31,6 +31,13 @@ fun CPSDataStore.itemLong(name: String, defaultValue: Long): CPSDataStoreItem<Lo
 fun CPSDataStore.itemLongNullable(name: String): CPSDataStoreItem<Long?> =
     ItemNullable(longPreferencesKey(name))
 
+inline fun<reified T> CPSDataStore.itemJsonable(name: String, defaultValue: T) =
+    ItemStringConvertible(
+        name = name,
+        defaultValue = defaultValue,
+        encode = jsonCPS::encodeToString,
+        decode = jsonCPS::decodeFromString
+    )
 
 
 abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
@@ -98,12 +105,6 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
             override fun toPrefs(t: Set<T>) = t.mapTo(mutableSetOf()) { it.name }
         }
 
-    inline fun<reified T> itemJsonConvertible(name: String, defaultValue: T) =
-        ItemStringConvertible(
-            name = name,
-            defaultValue = defaultValue,
-            encode = jsonCPS::encodeToString,
-            decode = jsonCPS::decodeFromString
-        )
+
 
 }

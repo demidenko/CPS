@@ -27,11 +27,8 @@ import com.demich.cps.ui.RatingLoadButton
 import com.demich.cps.ui.SwitchSettingsItem
 import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.InstantAsSecondsSerializer
+import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.*
-import com.demich.cps.utils.itemBoolean
-import com.demich.cps.utils.itemIntNullable
-import com.demich.cps.utils.itemLongNullable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
@@ -335,10 +332,10 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
     val contestWatchEnabled = itemBoolean(name = "contest_watch", defaultValue = false)
     val contestWatchLastSubmissionId = itemLongNullable(name = "contest_watch_last_submission")
     val contestWatchStartedContestId = itemIntNullable(name = "contest_watch_started_contest")
-    val contestWatchCanceled = itemJsonConvertible<List<Pair<Int,Instant>>>(name = "contest_watch_canceled", defaultValue = emptyList())
+    val contestWatchCanceled = itemJsonable<List<Pair<Int,Instant>>>(name = "contest_watch_canceled", defaultValue = emptyList())
 
     val upsolvingSuggestionsEnabled = itemBoolean(name = "upsolving_suggestions", defaultValue = false)
-    val upsolvingSuggestedProblems = itemJsonConvertible<List<CodeforcesProblem>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
+    val upsolvingSuggestedProblems = itemJsonable<List<CodeforcesProblem>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
 
     override val keysForReset get() = listOf(
         lastRatedContestId,
