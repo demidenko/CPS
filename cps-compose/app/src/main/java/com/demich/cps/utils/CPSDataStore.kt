@@ -31,6 +31,12 @@ fun CPSDataStore.itemLong(name: String, defaultValue: Long): CPSDataStoreItem<Lo
 fun CPSDataStore.itemLongNullable(name: String): CPSDataStoreItem<Long?> =
     ItemNullable(longPreferencesKey(name))
 
+fun CPSDataStore.itemString(name: String, defaultValue: String): CPSDataStoreItem<String> =
+    Item(stringPreferencesKey(name), defaultValue)
+
+fun CPSDataStore.itemStringNullable(name: String): CPSDataStoreItem<String?> =
+    ItemNullable(stringPreferencesKey(name))
+
 inline fun<reified T> CPSDataStore.itemJsonable(name: String, defaultValue: T) =
     ItemStringConvertible(
         name = name,

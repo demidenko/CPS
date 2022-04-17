@@ -8,7 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.NotificationChannels
@@ -18,10 +17,7 @@ import com.demich.cps.ui.RatingGraph
 import com.demich.cps.ui.RatingLoadButton
 import com.demich.cps.ui.SwitchSettingsItem
 import com.demich.cps.ui.rememberRatingGraphUIStates
-import com.demich.cps.utils.AtCoderAPI
-import com.demich.cps.utils.AtCoderRatingChange
-import com.demich.cps.utils.itemBoolean
-import com.demich.cps.utils.jsonCPS
+import com.demich.cps.utils.*
 import io.ktor.client.features.*
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
@@ -175,7 +171,7 @@ class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager):
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)
-    val lastRatedContestId = ItemNullable(stringPreferencesKey("last_rated_contest"))
+    val lastRatedContestId = itemStringNullable(name = "last_rated_contest")
 
     override val keysForReset = listOf(lastRatedContestId)
 
