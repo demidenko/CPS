@@ -1,6 +1,5 @@
 package com.demich.cps.contests
 
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
@@ -9,7 +8,6 @@ import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
-import com.demich.cps.ui.CounterButton
 import com.demich.cps.utils.LoadingStatus
 
 @Composable
@@ -25,9 +23,4 @@ fun contestsBottomBarBuilder(navController: NavController)
     CPSReloadingButton(loadingStatus = LoadingStatus.PENDING) {
 
     }
-}
-
-@Composable
-fun ContestsSettingsScreen(navController: NavController) {
-    CounterButton(text = "cs")
 }

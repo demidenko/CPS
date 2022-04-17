@@ -97,3 +97,22 @@ private fun SwitchSettingsItem(
         }
     }
 }
+
+@Composable
+fun<T> SettingsItemWithInfo(
+    modifier: Modifier = Modifier,
+    item: CPSDataStoreItem<T>,
+    title: String,
+    infoContent: @Composable (T) -> Unit
+) {
+    val value by rememberCollect { item.flow }
+    SettingsItem(modifier = modifier) {
+        Column {
+            Text(
+                text = title,
+                fontSize = 18.sp
+            )
+            infoContent(value)
+        }
+    }
+}

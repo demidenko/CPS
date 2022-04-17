@@ -29,6 +29,7 @@ import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
+import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -218,7 +219,7 @@ fun accountExpandedMenuBuilder(
         val url = context.allAccountManagers.first { it.type == type }.run {
             runBlocking { getSavedInfo().link() }
         }
-        context.startActivity(makeIntentOpenUrl(url))
+        context.openUrlInBrowser(url)
     }
 }
 

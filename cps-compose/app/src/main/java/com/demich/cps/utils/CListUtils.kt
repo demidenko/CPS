@@ -35,5 +35,7 @@ object CListAPI {
     object URLFactory {
         const val main = "https://clist.by"
         fun user(login: String) = "$main/coder/$login"
+
+        val apiHelp get() = "$main/api/v2/doc/"
     }
 }

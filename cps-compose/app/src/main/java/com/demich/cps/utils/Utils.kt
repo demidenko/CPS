@@ -1,8 +1,6 @@
 package com.demich.cps.utils
 
 import android.content.Context
-import android.text.Html
-import android.text.Spanned
 import android.text.format.DateFormat
 import android.widget.Toast
 import androidx.compose.runtime.Composable
@@ -12,7 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.text.HtmlCompat
+import com.demich.cps.makeIntentOpenUrl
 import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
@@ -46,6 +44,8 @@ val context: Context
     get() = LocalContext.current
 
 fun Context.showToast(title: String) = Toast.makeText(this, title, Toast.LENGTH_LONG).show()
+
+fun Context.openUrlInBrowser(url: String) = startActivity(makeIntentOpenUrl(url))
 
 val jsonCPS = Json { ignoreUnknownKeys = true }
 
