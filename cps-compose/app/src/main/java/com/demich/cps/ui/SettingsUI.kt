@@ -7,21 +7,19 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.accounts.managers.AccountManagers
-import com.demich.cps.utils.CPSDataStore
-import com.demich.cps.utils.itemBoolean
-import com.demich.cps.utils.itemJsonable
+import com.demich.cps.utils.*
 
 class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
     companion object {
         private val Context.settingsUI_dataStore by preferencesDataStore("settings_ui")
     }
 
-    val darkLightMode = itemEnum("ui_mode", DarkLightMode.SYSTEM)
+    val darkLightMode = itemEnum(name = "ui_mode", defaultValue = DarkLightMode.SYSTEM)
 
     val useOriginalColors = itemBoolean(name = "use_original_colors", defaultValue = false)
 
     val coloredStatusBar = itemBoolean(name = "use_status_bar", defaultValue = true)
-    val statusBarDisabledManagers = itemEnumSet<AccountManagers>("status_bar_disabled_managers")
+    val statusBarDisabledManagers = itemEnumSet<AccountManagers>(name = "status_bar_disabled_managers")
     val statusBarResultByMaximum = itemBoolean(name = "status_bar_result_by_max", defaultValue = true)
 
     val accountsOrder = itemJsonable<List<AccountManagers>>(name = "accounts_order", defaultValue = emptyList())
