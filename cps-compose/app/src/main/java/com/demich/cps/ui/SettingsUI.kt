@@ -7,7 +7,9 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.accounts.managers.AccountManagers
-import com.demich.cps.utils.*
+import com.demich.cps.utils.CPSDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
     companion object {
@@ -22,7 +24,11 @@ class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
     val statusBarDisabledManagers = itemEnumSet<AccountManagers>(name = "status_bar_disabled_managers")
     val statusBarResultByMaximum = itemBoolean(name = "status_bar_result_by_max", defaultValue = true)
 
-    val accountsOrder = itemJsonable<List<AccountManagers>>(name = "accounts_order", defaultValue = emptyList())
+    private val accountsOrder = itemJsonable<List<AccountManagers>>(name = "accounts_order", defaultValue = emptyList())
+    suspend fun saveAccountsOrder(order: List<AccountManagers>) = accountsOrder(order)
+    fun flowOfAccountsOrder(): Flow<List<AccountManagers>> = accountsOrder.flow.map { order ->
+        order + AccountManagers.values().filter { it !in order }
+    }
 }
 
 enum class DarkLightMode {

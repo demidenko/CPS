@@ -49,7 +49,7 @@ fun AccountsScreen(
         combine(
             flows = context.allAccountManagers
                 .map { it.flowOfInfoWithManager() }
-        ) { it }.combine(context.settingsUI.accountsOrder.flow) { accountsArray, order ->
+        ) { it }.combine(context.settingsUI.flowOfAccountsOrder()) { accountsArray, order ->
             order.mapNotNull { type ->
                 accountsArray.find { it.type == type }?.takeIf { !it.userInfo.isEmpty() }
             }

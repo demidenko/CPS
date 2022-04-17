@@ -130,13 +130,8 @@ private fun AccountMovingUI(
     val context = context
     val scope = rememberCoroutineScope()
     fun saveOrder(newVisibleOrder: List<AccountManagers>) {
-        val item = context.settingsUI.accountsOrder
         scope.launch {
-            val oldOrder = item().let { order ->
-                //adding looks useless but not
-                order + AccountManagers.values().filter { it !in order }
-            }
-            item(newValue = newVisibleOrder + oldOrder.filter { it !in newVisibleOrder })
+            context.settingsUI.saveAccountsOrder(newVisibleOrder)
         }
     }
 
