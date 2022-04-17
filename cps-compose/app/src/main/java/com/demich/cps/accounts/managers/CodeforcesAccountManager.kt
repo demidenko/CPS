@@ -16,8 +16,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.NotificationChannels
@@ -32,6 +30,8 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.InstantAsSecondsSerializer
 import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.itemBoolean
+import com.demich.cps.utils.itemIntNullable
+import com.demich.cps.utils.itemLongNullable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
@@ -328,13 +328,13 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)
-    val lastRatedContestId = ItemNullable(intPreferencesKey("last_rated_contest"))
+    val lastRatedContestId = itemIntNullable(name = "last_rated_contest")
 
     val observeContribution = itemBoolean(name = "observe_contribution", defaultValue = false)
 
     val contestWatchEnabled = itemBoolean(name = "contest_watch", defaultValue = false)
-    val contestWatchLastSubmissionId = ItemNullable(longPreferencesKey("contest_watch_last_submission"))
-    val contestWatchStartedContestId = ItemNullable(intPreferencesKey("contest_watch_started_contest"))
+    val contestWatchLastSubmissionId = itemLongNullable(name = "contest_watch_last_submission")
+    val contestWatchStartedContestId = itemIntNullable(name = "contest_watch_started_contest")
     val contestWatchCanceled = itemJsonConvertible<List<Pair<Int,Instant>>>(name = "contest_watch_canceled", defaultValue = emptyList())
 
     val upsolvingSuggestionsEnabled = itemBoolean(name = "upsolving_suggestions", defaultValue = false)

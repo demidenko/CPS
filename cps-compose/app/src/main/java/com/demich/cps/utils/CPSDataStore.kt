@@ -19,6 +19,19 @@ interface CPSDataStoreItem<T> {
 fun CPSDataStore.itemBoolean(name: String, defaultValue: Boolean): CPSDataStoreItem<Boolean> =
     Item(booleanPreferencesKey(name), defaultValue)
 
+fun CPSDataStore.itemInt(name: String, defaultValue: Int): CPSDataStoreItem<Int> =
+    Item(intPreferencesKey(name), defaultValue)
+
+fun CPSDataStore.itemIntNullable(name: String): CPSDataStoreItem<Int?> =
+    ItemNullable(intPreferencesKey(name))
+
+fun CPSDataStore.itemLong(name: String, defaultValue: Long): CPSDataStoreItem<Long> =
+    Item(longPreferencesKey(name), defaultValue)
+
+fun CPSDataStore.itemLongNullable(name: String): CPSDataStoreItem<Long?> =
+    ItemNullable(longPreferencesKey(name))
+
+
 
 abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
 
