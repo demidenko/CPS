@@ -1,10 +1,7 @@
 package com.demich.cps.utils
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.core.stringSetPreferencesKey
+import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -17,6 +14,10 @@ interface CPSDataStoreItem<T> {
     suspend operator fun invoke(): T
     suspend operator fun invoke(newValue: T)
 }
+
+fun CPSDataStore.itemBoolean(name: String, defaultValue: Boolean) =
+    Item(booleanPreferencesKey(name), defaultValue)
+
 
 abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
 

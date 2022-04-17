@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavController
 import com.demich.cps.accounts.makeUserInfoSpan
@@ -37,7 +36,7 @@ class SettingsDev(context: Context): CPSDataStore(context.settings_dev_dataStore
         private val Context.settings_dev_dataStore by preferencesDataStore("settings_develop")
     }
 
-    val devModeEnabled = Item(booleanPreferencesKey("develop_enabled"), false)
+    val devModeEnabled = itemBoolean(name = "develop_enabled", defaultValue = false)
 }
 
 val Context.settingsDev: SettingsDev

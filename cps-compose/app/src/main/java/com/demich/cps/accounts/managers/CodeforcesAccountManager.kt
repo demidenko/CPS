@@ -16,7 +16,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -25,10 +24,14 @@ import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
 import com.demich.cps.R
 import com.demich.cps.accounts.SmallRatedAccountPanel
-import com.demich.cps.ui.*
+import com.demich.cps.ui.RatingGraph
+import com.demich.cps.ui.RatingLoadButton
+import com.demich.cps.ui.SwitchSettingsItem
+import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.InstantAsSecondsSerializer
 import com.demich.cps.utils.codeforces.*
+import com.demich.cps.utils.itemBoolean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
@@ -324,17 +327,17 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
             by preferencesDataStore(AccountManagers.codeforces.name + "_account_settings")
     }
 
-    val observeRating = Item(booleanPreferencesKey("observe_rating"), false)
+    val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)
     val lastRatedContestId = ItemNullable(intPreferencesKey("last_rated_contest"))
 
-    val observeContribution = Item(booleanPreferencesKey("observe_contribution"), false)
+    val observeContribution = itemBoolean(name = "observe_contribution", defaultValue = false)
 
-    val contestWatchEnabled = Item(booleanPreferencesKey("contest_watch"), false)
+    val contestWatchEnabled = itemBoolean(name = "contest_watch", defaultValue = false)
     val contestWatchLastSubmissionId = ItemNullable(longPreferencesKey("contest_watch_last_submission"))
     val contestWatchStartedContestId = ItemNullable(intPreferencesKey("contest_watch_started_contest"))
     val contestWatchCanceled = itemJsonConvertible<List<Pair<Int,Instant>>>(name = "contest_watch_canceled", defaultValue = emptyList())
 
-    val upsolvingSuggestionsEnabled = Item(booleanPreferencesKey("upsolving_suggestions"), false)
+    val upsolvingSuggestionsEnabled = itemBoolean(name = "upsolving_suggestions", defaultValue = false)
     val upsolvingSuggestedProblems = itemJsonConvertible<List<CodeforcesProblem>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
 
     override val keysForReset get() = listOf(
