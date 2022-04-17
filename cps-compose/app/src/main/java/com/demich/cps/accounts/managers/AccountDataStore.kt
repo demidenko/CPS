@@ -6,7 +6,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.CPSDataStoreItem
-import com.demich.cps.utils.itemJsonable
 
 abstract class AccountDataStore<U: UserInfo>(
     dataStore: DataStore<Preferences>
