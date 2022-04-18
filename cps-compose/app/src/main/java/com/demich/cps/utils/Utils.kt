@@ -101,6 +101,12 @@ data class ComparablePair<A: Comparable<A>, B: Comparable<B>>(
         }
 }
 
+fun <T> List<T>.isSortedWith(comparator: Comparator<in T>): Boolean {
+    if (size < 2) return true
+    for (i in 1 until size) if (comparator.compare(get(i-1),get(i)) > 0) return false
+    return true
+}
+
 enum class LoadingStatus {
     PENDING, LOADING, FAILED;
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -19,21 +20,21 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.utils.context
+import com.demich.cps.utils.isSortedWith
 import com.demich.cps.utils.rememberCollect
 
 @Composable
-fun ContestsScreen(
-    navController: NavController,
-    contestsViewModel: ContestsViewModel
-) {
+fun ContestsScreen(contestsViewModel: ContestsViewModel) {
     val contests by rememberCollect { contestsViewModel.flowOfContests() }
 
     val currentTime by collectCurrentTime()
 
-    val contestsSorted by remember {
+    val contestsSorted by remember(contests) {
+        val cached = contests.toMutableList()
         derivedStateOf {
-            //TODO: optimize
-            contests.sortedWith(Contest.getComparator(currentTime))
+            val comparator = Contest.getComparator(currentTime)
+            if (!cached.isSortedWith(comparator)) cached.sortWith(comparator)
+            cached
         }
     }
 
@@ -73,6 +74,9 @@ fun contestsBottomBarBuilder(
     contestsViewModel: ContestsViewModel
 ): AdditionalBottomBarBuilder = {
     val context = context
+    CPSIconButton(icon = Icons.Default.Add) {
+        contestsViewModel.addRandomContest()
+    }
     CPSIconButton(icon = Icons.Default.Settings) {
         navController.navigate(Screen.ContestsSettings.route)
     }
