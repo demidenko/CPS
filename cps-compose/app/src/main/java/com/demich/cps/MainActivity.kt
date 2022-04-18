@@ -80,7 +80,7 @@ fun CPSScaffold(
         currentScreen = currentScreen
     )
 
-    var menu: AdditionalMenuBuilder? by remember { mutableStateOf(null) }
+    var menu: CPSMenuBuilder? by remember { mutableStateOf(null) }
     var bottomBar: AdditionalBottomBarBuilder? by remember { mutableStateOf(null) }
 
     fun NavGraphBuilder.cpsComposable(route: String, content: @Composable (NavBackStackEntry) -> Unit) {

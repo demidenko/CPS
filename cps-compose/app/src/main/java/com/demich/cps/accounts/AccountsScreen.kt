@@ -41,7 +41,7 @@ import kotlinx.coroutines.runBlocking
 fun AccountsScreen(
     navController: NavController,
     accountsViewModel: AccountsViewModel,
-    onSetAdditionalMenu: (AdditionalMenuBuilder) -> Unit
+    onSetAdditionalMenu: (CPSMenuBuilder) -> Unit
 ) {
     val context = context
 
@@ -209,7 +209,7 @@ fun accountExpandedMenuBuilder(
     type: AccountManagers,
     navController: NavController,
     onShowDeleteDialog: () -> Unit
-): AdditionalMenuBuilder = {
+): CPSMenuBuilder = {
     val context = context
     CPSDropdownMenuItem(title = "Delete", icon = Icons.Default.DeleteForever, onClick = onShowDeleteDialog)
     CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {

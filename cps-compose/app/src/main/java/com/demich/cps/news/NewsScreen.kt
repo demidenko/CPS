@@ -17,9 +17,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.demich.cps.AdditionalBottomBarBuilder
-import com.demich.cps.AdditionalMenuBuilder
+import com.demich.cps.CPSMenuBuilder
 import com.demich.cps.Screen
-import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.LazyColumnWithScrollBar
@@ -94,7 +93,7 @@ fun newsBottomBarBuilder()
 }
 
 fun newsMenuBuilder(navController: NavController)
-: AdditionalMenuBuilder = {
+: CPSMenuBuilder = {
     CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
         navController.navigate(Screen.NewsSettings.route)
     }

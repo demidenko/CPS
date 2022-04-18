@@ -110,7 +110,7 @@ private fun CPSBottomBarMain(
 @Composable
 private fun CPSBottomBarAdditional(
     modifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit
+    content: AdditionalBottomBarBuilder
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),

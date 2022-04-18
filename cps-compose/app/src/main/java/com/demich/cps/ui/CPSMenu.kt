@@ -13,13 +13,14 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.demich.cps.CPSMenuBuilder
 import com.demich.cps.ui.theme.cpsColors
 
 @Composable
 fun CPSDropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    content: @Composable CPSDropdownMenuScope.() -> Unit
+    content: CPSMenuBuilder
 ) = Box {
     DropdownMenu(
         expanded = expanded,
