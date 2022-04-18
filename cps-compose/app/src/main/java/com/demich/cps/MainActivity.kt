@@ -138,7 +138,7 @@ fun CPSScaffold(
             }
 
             cpsComposable(Screen.Contests.route) {
-                ContestsScreen(navController)
+                ContestsScreen(navController, cpsViewModels.contestsViewModel)
                 bottomBar = contestsBottomBarBuilder(navController, cpsViewModels.contestsViewModel)
             }
             cpsComposable(Screen.ContestsSettings.route) {

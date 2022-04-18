@@ -88,6 +88,23 @@ data class ClistContest(
     val href: String,
     val host: String
 ) {
-    //fun getPlatform(): Contest.Platform = Contest.Platform.values().find { getClistApiResourceId(it) == resource_id } ?: Contest.Platform.unknown
+    fun getPlatform(): Contest.Platform = Contest.Platform.values().find { CListUtils.getClistApiResourceId(it) == resource_id } ?: Contest.Platform.unknown
+
+    fun extractContestId(platform: Contest.Platform): String {
+        return when (platform) {
+            Contest.Platform.codeforces -> {
+                href.removePrefixHttp().removePrefix("codeforces.com/contests/")
+                    .toIntOrNull()?.toString()
+            }
+            Contest.Platform.atcoder -> {
+                href.removePrefixHttp().removePrefix("atcoder.jp/contests/")
+            }
+            Contest.Platform.codechef -> {
+                href.removePrefixHttp().removePrefix("www.codechef.com/")
+            }
+            else -> null
+        } ?: id.toString()
+    }
 }
 
+private fun String.removePrefixHttp() = removePrefix("http://").removePrefix("https://")

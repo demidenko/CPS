@@ -1,6 +1,34 @@
 package com.demich.cps.contests
 
-class Contest {
+import androidx.compose.runtime.Immutable
+import com.demich.cps.utils.ClistContest
+import kotlinx.datetime.Instant
+import kotlin.time.Duration.Companion.seconds
+
+@Immutable
+data class Contest (
+    val platform: Platform,
+    val id: String,
+    val title: String,
+    val startTime: Instant,
+    val durationSeconds: Long,
+    val link: String? = null
+) {
+    constructor(contest: ClistContest): this(contest, contest.getPlatform())
+    private constructor(contest: ClistContest, platform: Platform): this(
+        platform,
+        contest.extractContestId(platform),
+        contest.event,
+        Instant.parse(contest.start+"Z"),
+        (Instant.parse(contest.end+"Z") - Instant.parse(contest.start+"Z")).inWholeSeconds,
+        link = contest.href
+    )
+
+    //val endTime: Instant get() = startTime + durationSeconds.seconds
+
+    //fun getPhase(currentTime: Instant) = getPhase(currentTime, startTime, endTime)
+
+    val compositeId get() = platform to id
 
     enum class Platform {
         unknown,
