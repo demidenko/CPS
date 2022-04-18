@@ -16,15 +16,20 @@ import com.demich.cps.Screen
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.LazyColumnWithScrollBar
+import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.utils.isSortedWith
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun ContestsScreen(contestsViewModel: ContestsViewModel) {
-    val contests by contestsViewModel.flowOfContests().collectAsState()
+    val context = context
+
 
     val currentTime by collectCurrentTime()
 
+    val contests by contestsViewModel.flowOfContests().collectAsState()
     val contestsSorted by remember(contests) {
         val cached = contests.toMutableList()
         derivedStateOf {
@@ -34,10 +39,15 @@ fun ContestsScreen(contestsViewModel: ContestsViewModel) {
         }
     }
 
-    ContestsList(
-        contests = contestsSorted,
-        currentTimeSeconds = currentTime.epochSeconds
-    )
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = contestsViewModel.loadingStatus == LoadingStatus.LOADING),
+        onRefresh = { contestsViewModel.reload(context) }
+    ) {
+        ContestsList(
+            contests = contestsSorted,
+            currentTimeSeconds = currentTime.epochSeconds
+        )
+    }
 }
 
 @Composable
