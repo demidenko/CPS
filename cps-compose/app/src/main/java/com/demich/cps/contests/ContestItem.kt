@@ -5,7 +5,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -22,10 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.R
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.format
-import com.demich.cps.utils.getCurrentTime
-import com.demich.cps.utils.timeDifference
-import com.demich.cps.utils.toHHMMSS
+import com.demich.cps.utils.*
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
@@ -37,17 +36,17 @@ import kotlin.time.Duration.Companion.hours
 @Composable
 fun ContestItem(
     contest: Contest,
-    currentTimeMillis: Long, //Instant is not Stable
+    currentTimeSeconds: Long, //Instant is not Stable
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         ContestItemHeader(
             contest = contest,
-            phase = contest.getPhase(Instant.fromEpochMilliseconds(currentTimeMillis))
+            phase = contest.getPhase(Instant.fromEpochSeconds(currentTimeSeconds))
         )
         ContestItemFooter(
             contest = contest,
-            currentTimeMillis = currentTimeMillis,
+            currentTimeSeconds = currentTimeSeconds,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -92,10 +91,10 @@ private fun ContestItemHeader(
 @Composable
 private fun ContestItemFooter(
     contest: Contest,
-    currentTimeMillis: Long,
+    currentTimeSeconds: Long,
     modifier: Modifier = Modifier
 ) {
-    val currentTime = Instant.fromEpochMilliseconds(currentTimeMillis)
+    val currentTime = Instant.fromEpochSeconds(currentTimeSeconds)
 
     val date: String
     val counter: String
@@ -151,7 +150,6 @@ private fun contestTimeDifference(fromTime: Instant, toTime: Instant): String {
 
 @Composable
 fun collectCurrentTime(): State<Instant> {
-    //TODO: not collect in background
     return remember {
         flow {
             while (currentCoroutineContext().isActive) {
@@ -161,7 +159,7 @@ fun collectCurrentTime(): State<Instant> {
                 kotlinx.coroutines.delay(1000 - currentTime.toEpochMilliseconds() % 1000)
             }
         }
-    }.collectAsState(initial = getCurrentTime())
+    }.collectAsStateLifecycleAware(initial = getCurrentTime())
 }
 
 @Composable

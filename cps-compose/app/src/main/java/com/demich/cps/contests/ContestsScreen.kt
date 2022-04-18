@@ -7,10 +7,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -21,11 +18,10 @@ import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.utils.context
 import com.demich.cps.utils.isSortedWith
-import com.demich.cps.utils.rememberCollect
 
 @Composable
 fun ContestsScreen(contestsViewModel: ContestsViewModel) {
-    val contests by rememberCollect { contestsViewModel.flowOfContests() }
+    val contests by contestsViewModel.flowOfContests().collectAsState()
 
     val currentTime by collectCurrentTime()
 
@@ -40,23 +36,24 @@ fun ContestsScreen(contestsViewModel: ContestsViewModel) {
 
     ContestsList(
         contests = contestsSorted,
-        currentTimeMillis = currentTime.toEpochMilliseconds()
+        currentTimeSeconds = currentTime.epochSeconds
     )
 }
 
 @Composable
 private fun ContestsList(
     contests: List<Contest>,
-    currentTimeMillis: Long,
+    currentTimeSeconds: Long,
     modifier: Modifier = Modifier
 ) {
     LazyColumnWithScrollBar(
         modifier = modifier.fillMaxSize()
     ) {
-        items(contests, key = { it.compositeId }) { contest ->
+        //TODO: key effects jumping on reorder
+        items(contests/*, key = { it.compositeId }*/) { contest ->
             ContestItem(
                 contest = contest,
-                currentTimeMillis = currentTimeMillis,
+                currentTimeSeconds = currentTimeSeconds,
                 modifier = Modifier.padding(
                     start = 4.dp,
                     end = 7.dp,
