@@ -159,7 +159,7 @@ fun collectCurrentTime(): State<Instant> {
                 kotlinx.coroutines.delay(1000 - currentTime.toEpochMilliseconds() % 1000)
             }
         }
-    }.collectAsStateLifecycleAware(initial = getCurrentTime())
+    }.collectAsStateLifecycleAware(initial = remember { getCurrentTime() })
 }
 
 @Composable
