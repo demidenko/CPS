@@ -11,8 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,7 +41,10 @@ fun ContestItem(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        ContestItemHeader(contest = contest)
+        ContestItemHeader(
+            contest = contest,
+            phase = contest.getPhase(Instant.fromEpochMilliseconds(currentTimeMillis))
+        )
         ContestItemFooter(
             contest = contest,
             currentTimeMillis = currentTimeMillis,
@@ -48,7 +54,10 @@ fun ContestItem(
 }
 
 @Composable
-private fun ContestItemHeader(contest: Contest) {
+private fun ContestItemHeader(
+    contest: Contest,
+    phase: Contest.Phase
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -58,8 +67,20 @@ private fun ContestItemHeader(contest: Contest) {
             modifier = Modifier.padding(end = 4.dp),
             size = 18.sp
         )
+
         Text(
-            text = contest.title,
+            text = buildAnnotatedString {
+                val (title, brackets) = cutTrailingBrackets(contest.title.trim())
+                append(title)
+                if (brackets.isNotBlank()) withStyle(SpanStyle(color = cpsColors.textColorAdditional)) {
+                    append(brackets)
+                }
+            },
+            color = when (phase) {
+                Contest.Phase.BEFORE -> cpsColors.textColor
+                Contest.Phase.RUNNING -> cpsColors.success
+                Contest.Phase.FINISHED -> cpsColors.textColorAdditional
+            },
             fontSize = 19.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
@@ -88,7 +109,7 @@ private fun ContestItemFooter(
             counter = "in " + contestTimeDifference(currentTime, contest.startTime)
         }
         Contest.Phase.FINISHED -> {
-            date = contest.startTime.contestDate() + " " + contest.endTime.contestDate()
+            date = contest.startTime.contestDate() + " - " + contest.endTime.contestDate()
             counter = ""
         }
     }
@@ -173,4 +194,25 @@ private fun Contest.dateRange(): String {
     val start = startTime.contestDate()
     val end = if (duration < 1.days) endTime.format("HH:mm") else "..."
     return "$start-$end"
+}
+
+
+private fun cutTrailingBrackets(title: String): Pair<String, String> {
+    fun Char.isOpenBracket() = this == '(' || this == '（'
+    fun Char.isClosedBracket() = this == ')' || this == '）'
+
+    if (title.isEmpty() || !title.last().isClosedBracket()) return title to ""
+    var i = title.length-2
+    var ballance = 1
+    while (ballance > 0 && i > 0) {
+        val c = title[i]
+        when {
+            c.isOpenBracket() -> --ballance
+            c.isClosedBracket() -> ++ballance
+        }
+        if (ballance == 0) break
+        --i
+    }
+    if (ballance != 0) return title to ""
+    return title.substring(0, i) to title.substring(i)
 }
