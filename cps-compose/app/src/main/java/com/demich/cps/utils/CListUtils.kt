@@ -1,7 +1,13 @@
 package com.demich.cps.utils
 
+import android.content.Context
 import com.demich.cps.accounts.managers.*
+import com.demich.cps.contests.Contest
+import com.demich.cps.contests.settingsContests
 import io.ktor.client.request.*
+import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
+import kotlin.time.Duration.Companion.days
 
 object CListUtils {
     fun getManager(resource: String, userName: String, link: String): Pair<AccountManagers, String>? {
@@ -17,6 +23,17 @@ object CListUtils {
             else -> null
         }
     }
+
+    fun getClistApiResourceId(platform: Contest.Platform) =
+        when(platform) {
+            Contest.Platform.unknown -> 0
+            Contest.Platform.codeforces -> 1
+            Contest.Platform.atcoder -> 93
+            Contest.Platform.topcoder -> 12
+            Contest.Platform.codechef -> 2
+            Contest.Platform.google -> 35
+            Contest.Platform.dmoj -> 77
+        }
 }
 
 object CListAPI {
@@ -32,6 +49,22 @@ object CListAPI {
         }
     }
 
+    suspend fun getContests(
+        context: Context,
+        platforms: Collection<Contest.Platform>,
+        startTime: Instant,
+        endTime: Instant = startTime + 120.days
+    ): List<ClistContest> {
+        val (login, apiKey) = context.settingsContests.clistApiLoginAndKey()
+        return client.get<ClistApiResponse<ClistContest>>("https://clist.by/api/v2/contest/?format=json") {
+            parameter("username", login)
+            parameter("api_key", apiKey)
+            parameter("start__gte", startTime.toString())
+            parameter("end__lte", endTime.toString())
+            parameter("resource_id__in", platforms.joinToString { CListUtils.getClistApiResourceId(it).toString() })
+        }.objects
+    }
+
     object URLFactory {
         const val main = "https://clist.by"
         fun user(login: String) = "$main/coder/$login"
@@ -39,3 +72,22 @@ object CListAPI {
         val apiHelp get() = "$main/api/v2/doc/"
     }
 }
+
+@Serializable
+class ClistApiResponse<T>(
+    val objects: List<T>
+)
+
+@Serializable
+data class ClistContest(
+    val resource_id: Int,
+    val id: Long,
+    val start: String,
+    val end: String,
+    val event: String,
+    val href: String,
+    val host: String
+) {
+    //fun getPlatform(): Contest.Platform = Contest.Platform.values().find { getClistApiResourceId(it) == resource_id } ?: Contest.Platform.unknown
+}
+

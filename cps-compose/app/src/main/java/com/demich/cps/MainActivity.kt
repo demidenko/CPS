@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import com.demich.cps.accounts.*
 import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.ContestsSettingsScreen
+import com.demich.cps.contests.ContestsViewModel
 import com.demich.cps.contests.contestsBottomBarBuilder
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
@@ -44,6 +45,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val cpsViewModels = CPSViewModels(
                 accountsViewModel = viewModel(),
+                contestsViewModel = viewModel(),
                 progressBarsViewModel = viewModel()
             )
             val darkLightMode by rememberCollect { settingsUI.darkLightMode.flow }
@@ -137,7 +139,7 @@ fun CPSScaffold(
 
             cpsComposable(Screen.Contests.route) {
                 ContestsScreen(navController)
-                bottomBar = contestsBottomBarBuilder(navController)
+                bottomBar = contestsBottomBarBuilder(navController, cpsViewModels.contestsViewModel)
             }
             cpsComposable(Screen.ContestsSettings.route) {
                 ContestsSettingsScreen(navController)
@@ -180,6 +182,7 @@ fun CPSScaffold(
 
 class CPSViewModels(
     val accountsViewModel: AccountsViewModel,
+    val contestsViewModel: ContestsViewModel,
     val progressBarsViewModel: ProgressBarsViewModel
 )
 
