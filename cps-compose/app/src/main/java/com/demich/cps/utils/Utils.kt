@@ -30,6 +30,9 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 fun getCurrentTime() = Clock.System.now()
@@ -69,6 +72,23 @@ fun signedToString(x: Int): String = if (x > 0) "+$x" else "$x"
 
 fun Instant.format(dateFormat: String): String =
     DateFormat.format(dateFormat, toEpochMilliseconds()).toString()
+
+fun Duration.toHHMMSS(): String = toComponents { hours, minutes, seconds, _ ->
+    String.format("%02d:%02d:%02d", hours, minutes, seconds)
+}
+
+fun timeDifference(fromTime: Instant, toTime: Instant): String {
+    val t: Duration = toTime - fromTime
+    return when {
+        t < 2.minutes -> "minute"
+        t < 2.hours -> "${t.inWholeMinutes} minutes"
+        t < 24.hours * 2 -> "${t.inWholeHours} hours"
+        t < 7.days * 2 -> "${t.inWholeDays} days"
+        t < 31.days * 2 -> "${t.inWholeDays / 7} weeks"
+        t < 365.days * 2 -> "${t.inWholeDays / 31} months"
+        else -> "${t.inWholeDays / 365} years"
+    }
+}
 
 data class ComparablePair<A: Comparable<A>, B: Comparable<B>>(
     val first: A,
