@@ -26,10 +26,23 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 fun ContestsScreen(contestsViewModel: ContestsViewModel) {
     val context = context
 
+    val contests by contestsViewModel.flowOfContests().collectAsState()
 
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = contestsViewModel.loadingStatus == LoadingStatus.LOADING),
+        onRefresh = { contestsViewModel.reload(context) }
+    ) {
+        ContestsList(
+            contests = contests
+        )
+    }
+}
+
+
+@Composable
+private fun ContestsList(contests: List<Contest>) {
     val currentTime by collectCurrentTime()
 
-    val contests by contestsViewModel.flowOfContests().collectAsState()
     val contestsSorted by remember(contests) {
         val cached = contests.toMutableList()
         derivedStateOf {
@@ -39,15 +52,10 @@ fun ContestsScreen(contestsViewModel: ContestsViewModel) {
         }
     }
 
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = contestsViewModel.loadingStatus == LoadingStatus.LOADING),
-        onRefresh = { contestsViewModel.reload(context) }
-    ) {
-        ContestsList(
-            contests = contestsSorted,
-            currentTimeSeconds = currentTime.epochSeconds
-        )
-    }
+    ContestsList(
+        contests = contestsSorted,
+        currentTimeSeconds = currentTime.epochSeconds
+    )
 }
 
 @Composable
