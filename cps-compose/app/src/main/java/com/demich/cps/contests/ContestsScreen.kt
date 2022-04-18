@@ -1,6 +1,7 @@
 package com.demich.cps.contests
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
@@ -8,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -16,6 +18,7 @@ import com.demich.cps.Screen
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.LazyColumnWithScrollBar
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.utils.isSortedWith
@@ -44,7 +47,7 @@ private fun ContestsList(contests: List<Contest>) {
     val currentTime by collectCurrentTime()
 
     val contestsSorted by remember(contests) {
-        val cached = contests.toMutableList()
+        val cached = contests.toMutableStateList()
         derivedStateOf {
             val comparator = Contest.getComparator(currentTime)
             if (!cached.isSortedWith(comparator)) cached.sortWith(comparator)
@@ -52,34 +55,41 @@ private fun ContestsList(contests: List<Contest>) {
         }
     }
 
-    ContestsList(
-        contests = contestsSorted,
-        currentTimeSeconds = currentTime.epochSeconds
-    )
+    CompositionLocalProvider(LocalCurrentTimeEachSecond provides currentTime) {
+        ContestsSortedList(
+            contestsSorted = contestsSorted,
+            //currentTimeSeconds = currentTime.epochSeconds
+        )
+    }
+
 }
 
 @Composable
-private fun ContestsList(
-    contests: List<Contest>,
-    currentTimeSeconds: Long,
+private fun ContestsSortedList(
+    contestsSorted: SnapshotStateList<Contest>,
+    //currentTimeSeconds: Long,
     modifier: Modifier = Modifier
 ) {
     LazyColumnWithScrollBar(
         modifier = modifier.fillMaxSize()
     ) {
+        //TODO: list redraws when in / out FINISHED item
+        println("redraw list ****************")
         //TODO: key effects jumping on reorder
-        items(contests/*, key = { it.compositeId }*/) { contest ->
+        items(contestsSorted/*, key = { it.compositeId }*/) { contest ->
             ContestItem(
                 contest = contest,
-                currentTimeSeconds = currentTimeSeconds,
-                modifier = Modifier.padding(
-                    start = 4.dp,
-                    end = 7.dp,
-                    top = 4.dp,
-                    bottom = 3.dp
-                )
+                //currentTimeSeconds = currentTimeSeconds,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 4.dp,
+                        end = 7.dp,
+                        top = 4.dp,
+                        bottom = 3.dp
+                    )
             )
-            Divider()
+            Divider(color = cpsColors.dividerColor)
         }
     }
 }

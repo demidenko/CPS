@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,17 +37,18 @@ import kotlin.time.Duration.Companion.hours
 @Composable
 fun ContestItem(
     contest: Contest,
-    currentTimeSeconds: Long, //Instant is not Stable
+    //currentTimeSeconds: Long, //Instant is not Stable
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         ContestItemHeader(
             contest = contest,
-            phase = contest.getPhase(Instant.fromEpochSeconds(currentTimeSeconds))
+            phase = contest.getPhase(LocalCurrentTimeEachSecond.current),
+            modifier = Modifier.fillMaxWidth()
         )
         ContestItemFooter(
             contest = contest,
-            currentTimeSeconds = currentTimeSeconds,
+            currentTimeSeconds = LocalCurrentTimeEachSecond.current.epochSeconds,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -55,10 +57,11 @@ fun ContestItem(
 @Composable
 private fun ContestItemHeader(
     contest: Contest,
-    phase: Contest.Phase
+    phase: Contest.Phase,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         ContestPlatformIcon(
@@ -66,26 +69,36 @@ private fun ContestItemHeader(
             modifier = Modifier.padding(end = 4.dp),
             size = 18.sp
         )
-
-        Text(
-            text = buildAnnotatedString {
-                val (title, brackets) = cutTrailingBrackets(contest.title.trim())
-                append(title)
-                if (brackets.isNotBlank()) withStyle(SpanStyle(color = cpsColors.textColorAdditional)) {
-                    append(brackets)
-                }
-            },
-            color = when (phase) {
-                Contest.Phase.BEFORE -> cpsColors.textColor
-                Contest.Phase.RUNNING -> cpsColors.success
-                Contest.Phase.FINISHED -> cpsColors.textColorAdditional
-            },
-            fontSize = 19.sp,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+        ContestColoredTitle(
+            contest = contest,
+            phase = phase
         )
     }
+}
+
+@Composable
+private fun ContestColoredTitle(
+    contest: Contest,
+    phase: Contest.Phase
+) {
+    Text(
+        text = buildAnnotatedString {
+            val (title, brackets) = cutTrailingBrackets(contest.title.trim())
+            append(title)
+            if (brackets.isNotBlank()) withStyle(SpanStyle(color = cpsColors.textColorAdditional)) {
+                append(brackets)
+            }
+        },
+        color = when (phase) {
+            Contest.Phase.BEFORE -> cpsColors.textColor
+            Contest.Phase.RUNNING -> cpsColors.success
+            Contest.Phase.FINISHED -> cpsColors.textColorAdditional
+        },
+        fontSize = 19.sp,
+        fontWeight = FontWeight.Bold,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
 }
 
 @Composable
@@ -147,6 +160,9 @@ private fun contestTimeDifference(fromTime: Instant, toTime: Instant): String {
     if(t < 24.hours * 2) return t.toHHMMSS()
     return timeDifference(fromTime, toTime)
 }
+
+
+val LocalCurrentTimeEachSecond = compositionLocalOf { getCurrentTime() }
 
 @Composable
 fun collectCurrentTime(): State<Instant> {
