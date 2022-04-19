@@ -22,9 +22,8 @@ android {
     }
 
     buildTypes {
-        //todo https://www.reddit.com/r/androiddev/comments/n61qxh/jetpack_compose_lazycolumn_laggy/h8b9c8m/?utm_source=reddit&utm_medium=web2x&context=3
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
