@@ -18,7 +18,6 @@ import com.demich.cps.Screen
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.LazyColumnWithScrollBar
-import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.utils.isSortedWith
@@ -89,7 +88,7 @@ private fun ContestsSortedList(
                         bottom = 3.dp
                     )
             )
-            Divider(color = cpsColors.dividerColor)
+            Divider()
         }
     }
 }
