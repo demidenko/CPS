@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -20,6 +21,7 @@ import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.utils.isSortedWith
+import com.demich.cps.utils.jsonSaver
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
@@ -66,6 +68,8 @@ private fun ContestsSortedList(
     contestsSortedState: State<List<Contest>>,
     modifier: Modifier = Modifier
 ) {
+    var expandedItems: Set<Pair<Contest.Platform, String>>
+        by rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(emptySet()) }
     LazyColumnWithScrollBar(
         modifier = modifier.fillMaxSize()
     ) {
@@ -82,7 +86,13 @@ private fun ContestsSortedList(
                         end = 7.dp,
                         top = 4.dp,
                         bottom = 3.dp
-                    )
+                    ),
+                expanded = contest.compositeId in expandedItems,
+                onClick = {
+                    val id = it.compositeId
+                    if (id in expandedItems) expandedItems -= id
+                    else expandedItems += id
+                }
             )
             Divider()
         }

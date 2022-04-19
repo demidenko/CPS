@@ -1,5 +1,6 @@
 package com.demich.cps.contests
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -11,6 +12,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -37,21 +39,45 @@ import kotlin.time.Duration.Companion.hours
 @Composable
 fun ContestItem(
     contest: Contest,
+    expanded: Boolean,
+    onClick: (Contest) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
-        ContestItemHeader(
-            platform = contest.platform,
-            contestTitle = contest.title,
-            phase = contest.getPhase(LocalCurrentTimeEachSecond.current),
-            modifier = Modifier.fillMaxWidth()
-        )
-        ContestItemFooter(
-            contest = contest,
-            currentTimeSeconds = LocalCurrentTimeEachSecond.current.epochSeconds,
-            modifier = Modifier.fillMaxWidth()
-        )
+    val currentTime = LocalCurrentTimeEachSecond.current
+    Column(
+        modifier = modifier.clickable { onClick(contest) }
+    ) {
+        if (!expanded) {
+            ContestItemContent(
+                contest = contest,
+                currentTime = currentTime
+            )
+        } else {
+            ContestExpandedItemContent(
+                contest = contest,
+                currentTime = currentTime
+            )
+        }
+
     }
+}
+
+@Composable
+private fun ContestItemContent(
+    contest: Contest,
+    currentTime: Instant
+) {
+    ContestItemHeader(
+        platform = contest.platform,
+        contestTitle = contest.title,
+        phase = contest.getPhase(currentTime),
+        modifier = Modifier.fillMaxWidth()
+    )
+    ContestItemFooter(
+        contest = contest,
+        currentTimeSeconds = currentTime.epochSeconds,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @Composable
@@ -65,15 +91,17 @@ private fun ContestItemHeader(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        println("header $contestTitle")
         ContestPlatformIcon(
             platform = platform,
             modifier = Modifier.padding(end = 4.dp),
-            size = 18.sp
+            size = 18.sp,
+            color = cpsColors.textColorAdditional
         )
         ContestColoredTitle(
             contestTitle = contestTitle,
-            phase = phase
+            phase = phase,
+            singleLine = true,
+            modifier = Modifier.weight(1f)
         )
     }
 }
@@ -81,7 +109,9 @@ private fun ContestItemHeader(
 @Composable
 private fun ContestColoredTitle(
     contestTitle: String,
-    phase: Contest.Phase
+    phase: Contest.Phase,
+    singleLine: Boolean,
+    modifier: Modifier = Modifier
 ) {
     Text(
         text = buildAnnotatedString {
@@ -98,8 +128,9 @@ private fun ContestColoredTitle(
         },
         fontSize = 19.sp,
         fontWeight = FontWeight.Bold,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
+        maxLines = if (singleLine) 1 else Int.MAX_VALUE,
+        overflow = if (singleLine) TextOverflow.Ellipsis else TextOverflow.Clip,
+        modifier = modifier
     )
 }
 
@@ -114,13 +145,13 @@ private fun ContestItemFooter(
     val date: String
     val counter: String
     when (contest.getPhase(currentTime)) {
-        Contest.Phase.RUNNING -> {
-            date = "ends " + contest.endTime.contestDate()
-            counter = "left " + contestTimeDifference(currentTime, contest.endTime)
-        }
         Contest.Phase.BEFORE -> {
             date = contest.dateRange()
             counter = "in " + contestTimeDifference(currentTime, contest.startTime)
+        }
+        Contest.Phase.RUNNING -> {
+            date = "ends " + contest.endTime.contestDate()
+            counter = "left " + contestTimeDifference(currentTime, contest.endTime)
         }
         Contest.Phase.FINISHED -> {
             date = contest.startTime.contestDate() + " - " + contest.endTime.contestDate()
@@ -157,6 +188,101 @@ private fun ContestItemFooter(
     }
 }
 
+
+
+@Composable
+private fun ContestExpandedItemContent(
+    contest: Contest,
+    currentTime: Instant
+) {
+    ContestExpandedItemHeader(
+        platform = contest.platform,
+        contestTitle = contest.title,
+        phase = contest.getPhase(currentTime),
+        modifier = Modifier.fillMaxWidth()
+    )
+    ContestExpandedItemFooter(
+        contest = contest,
+        currentTimeSeconds = currentTime.epochSeconds,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+private fun ContestExpandedItemHeader(
+    platform: Contest.Platform,
+    contestTitle: String,
+    phase: Contest.Phase,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ContestPlatformIcon(
+            platform = platform,
+            modifier = Modifier.padding(end = 4.dp).padding(all = 5.dp),
+            size = 30.sp,
+            color = if (phase == Contest.Phase.FINISHED) cpsColors.textColorAdditional else cpsColors.textColor
+        )
+        ContestColoredTitle(
+            contestTitle = contestTitle,
+            phase = phase,
+            singleLine = false,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun ContestExpandedItemFooter(
+    contest: Contest,
+    currentTimeSeconds: Long,
+    modifier: Modifier = Modifier
+) {
+    val currentTime = Instant.fromEpochSeconds(currentTimeSeconds)
+    ContestExpandedItemFooter(
+        startDate = contest.startTime.contestDate(),
+        endDate = contest.endTime.contestDate(),
+        counter = when (contest.getPhase(currentTime)) {
+            Contest.Phase.BEFORE -> "starts in " + contestTimeDifference(currentTime, contest.startTime)
+            Contest.Phase.RUNNING -> "ends in " + contestTimeDifference(currentTime, contest.endTime)
+            Contest.Phase.FINISHED -> ""
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun ContestExpandedItemFooter(
+    startDate: String,
+    endDate: String,
+    counter: String,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier) {
+        Column(modifier = Modifier.align(Alignment.CenterStart)) {
+            MonospacedText(
+                text = startDate,
+                fontSize = 15.sp,
+                color = cpsColors.textColorAdditional
+            )
+            MonospacedText(
+                text = endDate,
+                fontSize = 15.sp,
+                color = cpsColors.textColorAdditional
+            )
+        }
+        MonospacedText(
+            text = counter,
+            fontSize = 15.sp,
+            color = cpsColors.textColorAdditional,
+            modifier = Modifier.align(Alignment.BottomEnd)
+        )
+    }
+}
+
+
 private fun contestTimeDifference(fromTime: Instant, toTime: Instant): String {
     val t: Duration = toTime - fromTime
     if(t < 24.hours * 2) return t.toHHMMSS()
@@ -184,7 +310,8 @@ fun collectCurrentTime(): State<Instant> {
 fun ContestPlatformIcon(
     platform: Contest.Platform,
     modifier: Modifier = Modifier,
-    size: TextUnit
+    size: TextUnit,
+    color: Color
 ) {
     val iconId = when (platform) {
         Contest.Platform.codeforces -> R.drawable.ic_logo_codeforces
@@ -199,7 +326,7 @@ fun ContestPlatformIcon(
     Icon(
         painter = iconId?.let { painterResource(it) } ?: rememberVectorPainter(Icons.Default.EmojiEvents),
         modifier = modifier.size(with(LocalDensity.current) { size.toDp() }),
-        tint = cpsColors.textColorAdditional,
+        tint = color,
         contentDescription = null
     )
 }
