@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -45,19 +44,18 @@ fun ContestsScreen(contestsViewModel: ContestsViewModel) {
 private fun ContestsList(contests: List<Contest>) {
     val currentTime by collectCurrentTime()
 
-    val contestsSorted by remember(contests) {
-        val cached = contests.toMutableStateList()
-        derivedStateOf {
+    val sortedState = remember(contests) {
+        mutableStateOf(contests)
+    }.apply {
+        value.let {
             val comparator = Contest.getComparator(currentTime)
-            if (!cached.isSortedWith(comparator)) cached.sortWith(comparator)
-            cached
+            if (!it.isSortedWith(comparator)) value = it.sortedWith(comparator)
         }
     }
 
     CompositionLocalProvider(LocalCurrentTimeEachSecond provides currentTime) {
         ContestsSortedList(
-            contestsSorted = contestsSorted,
-            //currentTimeSeconds = currentTime.epochSeconds
+            contestsSortedState = sortedState
         )
     }
 
@@ -65,20 +63,18 @@ private fun ContestsList(contests: List<Contest>) {
 
 @Composable
 private fun ContestsSortedList(
-    contestsSorted: SnapshotStateList<Contest>,
-    //currentTimeSeconds: Long,
+    contestsSortedState: State<List<Contest>>,
     modifier: Modifier = Modifier
 ) {
     LazyColumnWithScrollBar(
         modifier = modifier.fillMaxSize()
     ) {
-        //TODO: list redraws when in / out FINISHED item
-        println("redraw list ****************")
-        //TODO: key effects jumping on reorder
-        items(contestsSorted/*, key = { it.compositeId }*/) { contest ->
+        items(
+            items = contestsSortedState.value,
+            /*key = { it.compositeId }*/ //TODO: key effects jumping on reorder
+        ) { contest ->
             ContestItem(
                 contest = contest,
-                //currentTimeSeconds = currentTimeSeconds,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(

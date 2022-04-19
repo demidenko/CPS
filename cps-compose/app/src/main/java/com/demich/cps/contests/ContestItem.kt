@@ -37,12 +37,12 @@ import kotlin.time.Duration.Companion.hours
 @Composable
 fun ContestItem(
     contest: Contest,
-    //currentTimeSeconds: Long, //Instant is not Stable
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         ContestItemHeader(
-            contest = contest,
+            platform = contest.platform,
+            contestTitle = contest.title,
             phase = contest.getPhase(LocalCurrentTimeEachSecond.current),
             modifier = Modifier.fillMaxWidth()
         )
@@ -56,7 +56,8 @@ fun ContestItem(
 
 @Composable
 private fun ContestItemHeader(
-    contest: Contest,
+    platform: Contest.Platform,
+    contestTitle: String,
     phase: Contest.Phase,
     modifier: Modifier = Modifier
 ) {
@@ -64,13 +65,14 @@ private fun ContestItemHeader(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        println("header $contestTitle")
         ContestPlatformIcon(
-            platform = contest.platform,
+            platform = platform,
             modifier = Modifier.padding(end = 4.dp),
             size = 18.sp
         )
         ContestColoredTitle(
-            contest = contest,
+            contestTitle = contestTitle,
             phase = phase
         )
     }
@@ -78,12 +80,12 @@ private fun ContestItemHeader(
 
 @Composable
 private fun ContestColoredTitle(
-    contest: Contest,
+    contestTitle: String,
     phase: Contest.Phase
 ) {
     Text(
         text = buildAnnotatedString {
-            val (title, brackets) = cutTrailingBrackets(contest.title.trim())
+            val (title, brackets) = cutTrailingBrackets(contestTitle.trim())
             append(title)
             if (brackets.isNotBlank()) withStyle(SpanStyle(color = cpsColors.textColorAdditional)) {
                 append(brackets)

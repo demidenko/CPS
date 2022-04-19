@@ -7,7 +7,7 @@ import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-@Immutable
+@Immutable //TODO: wtf this MAKE NOT SENSE?? (because of Instant field?)
 data class Contest (
     val platform: Platform,
     val id: String,
