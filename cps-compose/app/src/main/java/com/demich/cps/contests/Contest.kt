@@ -52,13 +52,11 @@ data class Contest (
         dmoj,
         google
         ;
-
-        companion object {
-            fun getAll(): List<Platform> = values().filter { it != unknown }
-        }
     }
 
     companion object {
+        fun getPlatforms(): List<Platform> = Platform.values().filter { it != Platform.unknown }
+
         fun getComparator(currentTime: Instant) = compareBy<Contest> { contest ->
             when(contest.getPhase(currentTime)) {
                 Phase.BEFORE -> ComparablePair(1, contest.startTime.epochSeconds)

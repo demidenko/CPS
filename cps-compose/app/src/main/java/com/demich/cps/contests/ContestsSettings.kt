@@ -166,7 +166,7 @@ private fun ContestPlatformsSettingsItem(
     ) { enabledPlatforms ->
         val text = when {
             enabledPlatforms.isEmpty() -> "none selected"
-            enabledPlatforms.size == Contest.Platform.getAll().size -> "all selected"
+            enabledPlatforms.size == Contest.getPlatforms().size -> "all selected"
             enabledPlatforms.size < 4 -> enabledPlatforms.joinToString(separator = ", ")
             else -> enabledPlatforms.toList().let { "${it[0]}, ${it[1]} and ${it.size - 2} more" }
         }
@@ -189,7 +189,7 @@ private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
     val settings = remember { context.settingsContests }
     val enabled by rememberCollect { settings.enabledPlatforms.flow }
     CPSDialog(onDismissRequest = onDismissRequest) {
-        Contest.Platform.getAll().forEach { platform ->
+        Contest.getPlatforms().forEach { platform ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ContestPlatformIcon(
                     platform = platform,
@@ -212,7 +212,7 @@ private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
                 content = { Text(text = "Select all") },
                 onClick = {
                     scope.launch {
-                        context.settingsContests.enabledPlatforms(Contest.Platform.getAll().toSet())
+                        context.settingsContests.enabledPlatforms(Contest.getPlatforms().toSet())
                     }
                 },
                 modifier = Modifier.align(Alignment.CenterStart)
@@ -237,5 +237,5 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
 
     val clistApiAccess = itemJsonable(name = "clist_api_access", defaultValue = CListAPI.ApiAccess("", ""))
 
-    val enabledPlatforms = itemEnumSet(name = "enabled_platforms", defaultValue = Contest.Platform.getAll().toSet())
+    val enabledPlatforms = itemEnumSet(name = "enabled_platforms", defaultValue = Contest.getPlatforms().toSet())
 }
