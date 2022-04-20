@@ -40,12 +40,11 @@ import kotlin.time.Duration.Companion.hours
 fun ContestItem(
     contest: Contest,
     expanded: Boolean,
-    onClick: (Contest) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val currentTime = LocalCurrentTimeEachSecond.current
     Column(
-        modifier = modifier.clickable { onClick(contest) }
+        modifier = modifier
     ) {
         if (!expanded) {
             ContestItemContent(
@@ -216,12 +215,11 @@ private fun ContestExpandedItemHeader(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        modifier = modifier
     ) {
         ContestPlatformIcon(
             platform = platform,
-            modifier = Modifier.padding(end = 4.dp).padding(all = 5.dp),
+            modifier = Modifier.padding(end = 4.dp).padding(all = 5.dp).align(Alignment.Top),
             size = 30.sp,
             color = if (phase == Contest.Phase.FINISHED) cpsColors.textColorAdditional else cpsColors.textColor
         )
@@ -229,7 +227,7 @@ private fun ContestExpandedItemHeader(
             contestTitle = contestTitle,
             phase = phase,
             singleLine = false,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f).align(Alignment.CenterVertically)
         )
     }
 }

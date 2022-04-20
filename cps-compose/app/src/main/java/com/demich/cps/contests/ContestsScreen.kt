@@ -1,5 +1,6 @@
 package com.demich.cps.contests
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -79,20 +80,20 @@ private fun ContestsSortedList(
         ) { contest ->
             ContestItem(
                 contest = contest,
+                expanded = contest.compositeId in expandedItems,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable {
+                        val id = contest.compositeId
+                        if (id in expandedItems) expandedItems -= id
+                        else expandedItems += id
+                    }
                     .padding(
                         start = 4.dp,
                         end = 7.dp,
                         top = 4.dp,
                         bottom = 3.dp
-                    ),
-                expanded = contest.compositeId in expandedItems,
-                onClick = {
-                    val id = it.compositeId
-                    if (id in expandedItems) expandedItems -= id
-                    else expandedItems += id
-                }
+                    )
             )
             Divider()
         }
