@@ -10,7 +10,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Immutable //TODO: wtf this MAKE NOT SENSE?? (because of Instant field?)
 data class Contest (
-    val platform: Platform,
+    val platform: Platform?,
     val id: String,
     val title: String,
     val startTime: Instant,
@@ -32,9 +32,8 @@ data class Contest (
         contest = contest,
         platform = getPlatforms()
             .find { CListUtils.getClistApiResourceId(it) == contest.resource_id }
-            ?: Platform.unknown
     )
-    private constructor(contest: ClistContest, platform: Platform): this(
+    private constructor(contest: ClistContest, platform: Platform?): this(
         platform = platform,
         id = CListUtils.extractContestId(contest, platform),
         title = contest.event,
@@ -50,7 +49,6 @@ data class Contest (
     }
 
     enum class Platform {
-        unknown,
         codeforces,
         atcoder,
         codechef,
@@ -61,7 +59,7 @@ data class Contest (
     }
 
     companion object {
-        fun getPlatforms(): List<Platform> = Platform.values().filter { it != Platform.unknown }
+        fun getPlatforms() = Platform.values()
 
         fun getComparator(currentTime: Instant) = compareBy<Contest> { contest ->
             when(contest.getPhase(currentTime)) {

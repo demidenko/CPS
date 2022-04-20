@@ -50,7 +50,7 @@ class ContestsViewModel: ViewModel() {
             title = Random.nextBits(10).toString(2),
             startTime = currentTime + duration,
             durationSeconds = 60,
-            platform = Contest.Platform.unknown,
+            platform = null,
             id = Random.nextLong().toString()
         )
         contestsStateFlow.value += contest

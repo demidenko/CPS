@@ -24,7 +24,6 @@ object CListUtils {
 
     fun getClistApiResourceId(platform: Contest.Platform): Int =
         when(platform) {
-            Contest.Platform.unknown -> 0
             Contest.Platform.codeforces -> 1
             Contest.Platform.atcoder -> 93
             Contest.Platform.topcoder -> 12
@@ -33,7 +32,7 @@ object CListUtils {
             Contest.Platform.dmoj -> 77
         }
 
-    fun extractContestId(contest: ClistContest, platform: Contest.Platform): String =
+    fun extractContestId(contest: ClistContest, platform: Contest.Platform?): String =
         when (platform) {
             Contest.Platform.codeforces -> {
                 contest.href.removePrefixHttp().removePrefix("codeforces.com/contests/")

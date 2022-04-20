@@ -69,7 +69,7 @@ private fun ContestsSortedList(
     contestsSortedState: State<List<Contest>>,
     modifier: Modifier = Modifier
 ) {
-    var expandedItems: Set<Pair<Contest.Platform, String>>
+    var expandedItems: Set<Pair<Contest.Platform?, String>>
         by rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(emptySet()) }
     LazyColumnWithScrollBar(
         modifier = modifier.fillMaxSize()

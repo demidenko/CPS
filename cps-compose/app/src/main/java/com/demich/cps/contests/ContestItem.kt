@@ -1,6 +1,5 @@
 package com.demich.cps.contests
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -81,7 +80,7 @@ private fun ContestItemContent(
 
 @Composable
 private fun ContestItemHeader(
-    platform: Contest.Platform,
+    platform: Contest.Platform?,
     contestTitle: String,
     phase: Contest.Phase,
     modifier: Modifier = Modifier
@@ -209,7 +208,7 @@ private fun ContestExpandedItemContent(
 
 @Composable
 private fun ContestExpandedItemHeader(
-    platform: Contest.Platform,
+    platform: Contest.Platform?,
     contestTitle: String,
     phase: Contest.Phase,
     modifier: Modifier = Modifier
@@ -306,7 +305,7 @@ fun collectCurrentTime(): State<Instant> {
 
 @Composable
 fun ContestPlatformIcon(
-    platform: Contest.Platform,
+    platform: Contest.Platform?,
     modifier: Modifier = Modifier,
     size: TextUnit,
     color: Color
