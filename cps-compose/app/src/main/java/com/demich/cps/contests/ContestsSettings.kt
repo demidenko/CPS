@@ -36,40 +36,51 @@ fun ContestsSettingsScreen(navController: NavController) {
     var showCListApiDialog by rememberSaveable { mutableStateOf(false) }
 
     SettingsColumn {
-        SettingsItemWithInfo(
-            modifier = Modifier.clickable { showCListApiDialog = true },
+        ClistApiKeySettingsItem(
             item = settings.clistApiAccess,
-            title = "Clist API access"
-        ) { (login, key) ->
-            if (login.isBlank()) {
-                Text(
-                    text = "click to setup",
-                    fontSize = 15.sp,
-                    color = cpsColors.textColorAdditional
-                )
-            } else {
-                Text(
-                    text = buildAnnotatedString {
-                        append(login)
-                        if (key.isBlank()) withStyle(SpanStyle(color = cpsColors.errorColor)) {
-                            append(" [api-key is empty]")
-                        }
-                    },
-                    fontFamily = FontFamily.Monospace,
-                    color = cpsColors.textColor,
-                    fontSize = 13.sp
-                )
-            }
-        }
+            onShowDialog = { showCListApiDialog = true }
+        )
     }
 
     if (showCListApiDialog) {
-        CListAPIDialog { showCListApiDialog = false }
+        ClistApiDialog { showCListApiDialog = false }
     }
 }
 
 @Composable
-private fun CListAPIDialog(
+private fun ClistApiKeySettingsItem(
+    onShowDialog: () -> Unit,
+    item: CPSDataStoreItem<CListAPI.ApiAccess>
+) {
+    SettingsItemWithInfo(
+        modifier = Modifier.clickable(onClick = onShowDialog),
+        item = item,
+        title = "Clist API access"
+    ) { (login, key) ->
+        if (login.isBlank()) {
+            Text(
+                text = "click to setup",
+                fontSize = 15.sp,
+                color = cpsColors.textColorAdditional
+            )
+        } else {
+            Text(
+                text = buildAnnotatedString {
+                    append(login)
+                    if (key.isBlank()) withStyle(SpanStyle(color = cpsColors.errorColor)) {
+                        append(" [api-key is empty]")
+                    }
+                },
+                fontFamily = FontFamily.Monospace,
+                color = cpsColors.textColor,
+                fontSize = 13.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun ClistApiDialog(
     onDismissRequest: () -> Unit
 ) {
     val context = context
@@ -89,7 +100,7 @@ private fun CListAPIDialog(
             }
         }
 
-        ClistTextField(
+        ClistApiTextField(
             input = apiAccess.login,
             onChangeInput = { apiAccess = apiAccess.copy(login = it) },
             title = "login",
@@ -98,7 +109,7 @@ private fun CListAPIDialog(
                 .padding(top = 8.dp)
         )
 
-        ClistTextField(
+        ClistApiTextField(
             input = apiAccess.key,
             onChangeInput = { apiAccess = apiAccess.copy(key = it) },
             title = "api-key",
@@ -132,7 +143,7 @@ private fun CListAPIDialog(
 }
 
 @Composable
-private fun ClistTextField(
+private fun ClistApiTextField(
     input: String,
     onChangeInput: (String) -> Unit,
     title: String,
