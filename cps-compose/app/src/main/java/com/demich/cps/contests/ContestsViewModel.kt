@@ -24,21 +24,26 @@ class ContestsViewModel: ViewModel() {
     private val contestsStateFlow = MutableStateFlow<List<Contest>>(emptyList())
     fun flowOfContests() = contestsStateFlow.asStateFlow()
 
+    private val errorStateFlow = MutableStateFlow<Throwable?>(null)
+    fun flowOfError() = errorStateFlow.asStateFlow()
+
     fun reload(context: Context) {
         viewModelScope.launch {
             loadingStatus = LoadingStatus.LOADING
+            errorStateFlow.value = null
             val settings = context.settingsContests
             runCatching {
-                val contests = CListAPI.getContests(
+                CListAPI.getContests(
                     apiAccess = settings.clistApiAccess(),
                     platforms = settings.enabledPlatforms(),
                     startTime = getCurrentTime() - 7.days
                 ).mapAndFilterResult()
-                contestsStateFlow.value = contests
-            }.onSuccess {
+            }.onSuccess { contests ->
                 loadingStatus = LoadingStatus.PENDING
+                contestsStateFlow.value = contests
             }.onFailure {
                 loadingStatus = LoadingStatus.FAILED
+                errorStateFlow.value = it
             }
         }
     }

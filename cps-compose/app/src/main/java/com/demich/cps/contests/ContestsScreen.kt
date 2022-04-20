@@ -1,50 +1,67 @@
 package com.demich.cps.contests
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
+import com.demich.cps.settingsDev
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.LazyColumnWithScrollBar
-import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.context
-import com.demich.cps.utils.isSortedWith
-import com.demich.cps.utils.jsonSaver
+import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.*
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import io.ktor.client.features.*
+import io.ktor.http.*
 
 @Composable
 fun ContestsScreen(contestsViewModel: ContestsViewModel) {
     val context = context
 
     val contests by contestsViewModel.flowOfContests().collectAsState()
+    val error by contestsViewModel.flowOfError().collectAsState()
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = contestsViewModel.loadingStatus == LoadingStatus.LOADING),
         onRefresh = { contestsViewModel.reload(context) }
     ) {
-        ContestsList(
-            contests = contests
-        )
+        Column {
+            LoadingError(
+                error = error,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+            ContestsList(
+                contests = contests,
+                modifier = Modifier.fillMaxWidth().weight(1f)
+            )
+        }
     }
 }
 
 
 @Composable
-private fun ContestsList(contests: List<Contest>) {
+private fun ContestsList(
+    contests: List<Contest>,
+    modifier: Modifier = Modifier
+) {
     val currentTime by collectCurrentTime()
 
     val sortedState = remember(contests) {
@@ -58,7 +75,8 @@ private fun ContestsList(contests: List<Contest>) {
 
     CompositionLocalProvider(LocalCurrentTimeEachSecond provides currentTime) {
         ContestsSortedList(
-            contestsSortedState = sortedState
+            contestsSortedState = sortedState,
+            modifier = modifier
         )
     }
 
@@ -71,9 +89,7 @@ private fun ContestsSortedList(
 ) {
     var expandedItems: Set<Pair<Contest.Platform?, String>>
         by rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(emptySet()) }
-    LazyColumnWithScrollBar(
-        modifier = modifier.fillMaxSize()
-    ) {
+    LazyColumnWithScrollBar(modifier = modifier) {
         items(
             items = contestsSortedState.value,
             /*key = { it.compositeId }*/ //TODO: key effects jumping on reorder
@@ -97,6 +113,37 @@ private fun ContestsSortedList(
             )
             Divider()
         }
+    }
+}
+
+@Composable
+private fun LoadingError(
+    error: Throwable?,
+    modifier: Modifier = Modifier
+) {
+    val context = context
+    val devModeEnabled by rememberCollect { context.settingsDev.devModeEnabled.flow }
+    val message = when {
+        error == null -> null
+        error is ClientRequestException && error.response.status == HttpStatusCode.Unauthorized
+            -> "Incorrect clist::api access"
+        error is ClientRequestException && error.response.status == HttpStatusCode.TooManyRequests
+            -> "Too many requests, try later"
+        else -> {
+            if (devModeEnabled) "Unknown error: ${error.message}"
+            else null
+        }
+    }
+    if (message != null) {
+        Text(
+            text = message,
+            textAlign = TextAlign.Center,
+            color = cpsColors.background,
+            fontSize = 13.sp,
+            modifier = modifier
+                .background(color = cpsColors.errorColor)
+                .padding(all = 2.dp)
+        )
     }
 }
 
