@@ -47,10 +47,10 @@ data class Contest (
         unknown,
         codeforces,
         atcoder,
-        topcoder,
         codechef,
-        google,
-        dmoj
+        topcoder,
+        dmoj,
+        google
         ;
 
         companion object {

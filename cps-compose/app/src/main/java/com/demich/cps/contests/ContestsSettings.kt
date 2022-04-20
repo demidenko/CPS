@@ -2,10 +2,7 @@ package com.demich.cps.contests
 
 import android.content.Context
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
@@ -33,27 +30,21 @@ import kotlinx.coroutines.runBlocking
 fun ContestsSettingsScreen(navController: NavController) {
     val settings = with(context) { remember { settingsContests } }
 
-    var showCListApiDialog by rememberSaveable { mutableStateOf(false) }
-
     SettingsColumn {
-        ClistApiKeySettingsItem(
-            item = settings.clistApiAccess,
-            onShowDialog = { showCListApiDialog = true }
+        ContestPlatformsSettingsItem(
+            item = settings.enabledPlatforms
         )
-    }
-
-    if (showCListApiDialog) {
-        ClistApiDialog { showCListApiDialog = false }
+        ClistApiKeySettingsItem(item = settings.clistApiAccess)
     }
 }
 
 @Composable
 private fun ClistApiKeySettingsItem(
-    onShowDialog: () -> Unit,
     item: CPSDataStoreItem<CListAPI.ApiAccess>
 ) {
+    var showDialog by rememberSaveable { mutableStateOf(false) }
     SettingsItemWithInfo(
-        modifier = Modifier.clickable(onClick = onShowDialog),
+        modifier = Modifier.clickable { showDialog = true },
         item = item,
         title = "Clist API access"
     ) { (login, key) ->
@@ -77,12 +68,14 @@ private fun ClistApiKeySettingsItem(
             )
         }
     }
+
+    if (showDialog) {
+        ClistApiDialog { showDialog = false }
+    }
 }
 
 @Composable
-private fun ClistApiDialog(
-    onDismissRequest: () -> Unit
-) {
+private fun ClistApiDialog(onDismissRequest: () -> Unit) {
     val context = context
     val scope = rememberCoroutineScope()
 
@@ -161,7 +154,77 @@ private fun ClistApiTextField(
     )
 }
 
+@Composable
+private fun ContestPlatformsSettingsItem(
+    item: CPSDataStoreItem<Set<Contest.Platform>>
+) {
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    SettingsItemWithInfo(
+        modifier = Modifier.clickable { showDialog = true },
+        item = item,
+        title = "Platforms"
+    ) { enabledPlatforms ->
+        val text = when {
+            enabledPlatforms.isEmpty() -> "none selected"
+            enabledPlatforms.size == Contest.Platform.getAll().size -> "all selected"
+            enabledPlatforms.size < 4 -> enabledPlatforms.joinToString(separator = ", ")
+            else -> enabledPlatforms.toList().let { "${it[0]}, ${it[1]} and ${it.size - 2} more" }
+        }
+        Text(
+            text = text,
+            fontSize = 15.sp,
+            color = cpsColors.textColorAdditional
+        )
+    }
 
+    if (showDialog) {
+        ContestPlatformsDialog(onDismissRequest = { showDialog = false })
+    }
+}
+
+@Composable
+private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
+    val context = context
+    val scope = rememberCoroutineScope()
+    val settings = remember { context.settingsContests }
+    val enabled by rememberCollect { settings.enabledPlatforms.flow }
+    CPSDialog(onDismissRequest = onDismissRequest) {
+        Contest.Platform.getAll().forEach { platform ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                ContestPlatformIcon(
+                    platform = platform,
+                    size = 28.sp,
+                    color = cpsColors.textColor,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                MonospacedText(text = platform.name, modifier = Modifier.weight(1f))
+                CPSCheckBox(checked = platform in enabled) {
+                     scope.launch {
+                         context.settingsContests.enabledPlatforms(
+                             newValue = if (it) enabled + platform else enabled - platform
+                         )
+                     }
+                }
+            }
+        }
+        Box(modifier = Modifier.fillMaxWidth().padding(top = 5.dp)) {
+            TextButton(
+                content = { Text(text = "Select all") },
+                onClick = {
+                    scope.launch {
+                        context.settingsContests.enabledPlatforms(Contest.Platform.getAll().toSet())
+                    }
+                },
+                modifier = Modifier.align(Alignment.CenterStart)
+            )
+            TextButton(
+                content = { Text(text = "Close") },
+                onClick = onDismissRequest,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+        }
+    }
+}
 
 val Context.settingsContests: ContestsSettingsDataStore
     get() = ContestsSettingsDataStore(this)
