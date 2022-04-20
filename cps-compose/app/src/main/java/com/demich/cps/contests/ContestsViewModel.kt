@@ -27,10 +27,11 @@ class ContestsViewModel: ViewModel() {
     fun reload(context: Context) {
         viewModelScope.launch {
             loadingStatus = LoadingStatus.LOADING
+            val settings = context.settingsContests
             runCatching {
                 val contests = CListAPI.getContests(
-                    context = context,
-                    platforms = Contest.Platform.getAll(),
+                    apiAccess = settings.clistApiAccess(),
+                    platforms = settings.enabledPlatforms(),
                     startTime = getCurrentTime() - 7.days
                 ).mapAndFilterResult()
                 contestsStateFlow.value = contests

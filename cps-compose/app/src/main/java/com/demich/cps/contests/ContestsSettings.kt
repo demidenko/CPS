@@ -24,10 +24,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavController
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.CListAPI
-import com.demich.cps.utils.CPSDataStore
-import com.demich.cps.utils.context
-import com.demich.cps.utils.openUrlInBrowser
+import com.demich.cps.utils.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -41,7 +38,7 @@ fun ContestsSettingsScreen(navController: NavController) {
     SettingsColumn {
         SettingsItemWithInfo(
             modifier = Modifier.clickable { showCListApiDialog = true },
-            item = settings.clistApiLoginAndKey,
+            item = settings.clistApiAccess,
             title = "Clist API access"
         ) { (login, key) ->
             if (login.isBlank()) {
@@ -78,16 +75,8 @@ private fun CListAPIDialog(
     val context = context
     val scope = rememberCoroutineScope()
 
-    var apiLogin by rememberSaveable {
-        mutableStateOf(
-            runBlocking { context.settingsContests.clistApiLoginAndKey().first }
-        )
-    }
-
-    var apiKey by rememberSaveable {
-        mutableStateOf(
-            runBlocking { context.settingsContests.clistApiLoginAndKey().second }
-        )
+    var apiAccess by rememberSaveable(stateSaver = jsonSaver()) {
+        mutableStateOf(runBlocking { context.settingsContests.clistApiAccess() })
     }
 
     CPSDialog(onDismissRequest = onDismissRequest) {
@@ -101,8 +90,8 @@ private fun CListAPIDialog(
         }
 
         ClistTextField(
-            input = apiLogin,
-            onChangeInput = { apiLogin = it },
+            input = apiAccess.login,
+            onChangeInput = { apiAccess = apiAccess.copy(login = it) },
             title = "login",
             modifier = Modifier
                 .fillMaxWidth()
@@ -110,8 +99,8 @@ private fun CListAPIDialog(
         )
 
         ClistTextField(
-            input = apiKey,
-            onChangeInput = { apiKey = it },
+            input = apiAccess.key,
+            onChangeInput = { apiAccess = apiAccess.copy(key = it) },
             title = "api-key",
             modifier = Modifier
                 .fillMaxWidth()
@@ -131,7 +120,7 @@ private fun CListAPIDialog(
                 onClick = {
                     scope.launch {
                         with(context.settingsContests) {
-                            clistApiLoginAndKey(newValue = apiLogin to apiKey)
+                            clistApiAccess(apiAccess)
                         }
                         onDismissRequest()
                     }
@@ -172,5 +161,7 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
         private val Context.contests_settings_dataStore by preferencesDataStore("contests_settings")
     }
 
-    val clistApiLoginAndKey = itemJsonable(name = "clist_api_login_key", defaultValue = Pair("", ""))
+    val clistApiAccess = itemJsonable(name = "clist_api_access", defaultValue = CListAPI.ApiAccess("", ""))
+
+    val enabledPlatforms = itemEnumSet(name = "enabled_platforms", defaultValue = Contest.Platform.getAll().toSet())
 }

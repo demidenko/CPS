@@ -114,10 +114,10 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
             decode = ::enumValueOf
         )
 
-    protected inline fun<reified T: Enum<T>> itemEnumSet(name: String): CPSDataStoreItem<Set<T>> =
+    protected inline fun<reified T: Enum<T>> itemEnumSet(name: String, defaultValue: Set<T> = emptySet()): CPSDataStoreItem<Set<T>> =
         object : DataStoreItem<Set<T>, Set<String>>(dataStore) {
             override val key = stringSetPreferencesKey(name)
-            override fun fromPrefs(s: Set<String>?) = s?.mapTo(mutableSetOf()) { enumValueOf<T>(it) } ?: emptySet()
+            override fun fromPrefs(s: Set<String>?) = s?.mapTo(mutableSetOf()) { enumValueOf<T>(it) } ?: defaultValue
             override fun toPrefs(t: Set<T>) = t.mapTo(mutableSetOf()) { it.name }
         }
 

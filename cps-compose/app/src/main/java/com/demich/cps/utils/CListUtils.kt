@@ -50,15 +50,14 @@ object CListAPI {
     }
 
     suspend fun getContests(
-        context: Context,
+        apiAccess: ApiAccess,
         platforms: Collection<Contest.Platform>,
         startTime: Instant,
         endTime: Instant = startTime + 120.days
     ): List<ClistContest> {
-        val (login, apiKey) = context.settingsContests.clistApiLoginAndKey()
         return client.get<ClistApiResponse<ClistContest>>("https://clist.by/api/v2/contest/?format=json") {
-            parameter("username", login)
-            parameter("api_key", apiKey)
+            parameter("username", apiAccess.login)
+            parameter("api_key", apiAccess.key)
             parameter("start__gte", startTime.toString())
             parameter("end__lte", endTime.toString())
             parameter("resource_id__in", platforms.joinToString { CListUtils.getClistApiResourceId(it).toString() })
@@ -71,10 +70,16 @@ object CListAPI {
 
         val apiHelp get() = "$main/api/v2/doc/"
     }
+
+    @Serializable
+    data class ApiAccess(
+        val login: String,
+        val key: String
+    )
 }
 
 @Serializable
-class ClistApiResponse<T>(
+private class ClistApiResponse<T>(
     val objects: List<T>
 )
 
