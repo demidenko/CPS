@@ -1,9 +1,7 @@
 package com.demich.cps.utils
 
-import android.content.Context
-import com.demich.cps.accounts.managers.*
+import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.contests.Contest
-import com.demich.cps.contests.settingsContests
 import io.ktor.client.request.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -11,7 +9,7 @@ import kotlin.time.Duration.Companion.days
 
 object CListUtils {
     fun getManager(resource: String, userName: String, link: String): Pair<AccountManagers, String>? {
-        return when(resource){
+        return when(resource) {
             "codeforces.com" -> AccountManagers.codeforces to userName
             "atcoder.jp" -> AccountManagers.atcoder to userName
             "codechef.com" -> AccountManagers.codechef to userName
@@ -24,7 +22,7 @@ object CListUtils {
         }
     }
 
-    fun getClistApiResourceId(platform: Contest.Platform) =
+    fun getClistApiResourceId(platform: Contest.Platform): Int =
         when(platform) {
             Contest.Platform.unknown -> 0
             Contest.Platform.codeforces -> 1
@@ -34,6 +32,21 @@ object CListUtils {
             Contest.Platform.google -> 35
             Contest.Platform.dmoj -> 77
         }
+
+    fun extractContestId(contest: ClistContest, platform: Contest.Platform): String =
+        when (platform) {
+            Contest.Platform.codeforces -> {
+                contest.href.removePrefixHttp().removePrefix("codeforces.com/contests/")
+                    .toIntOrNull()?.toString()
+            }
+            Contest.Platform.atcoder -> {
+                contest.href.removePrefixHttp().removePrefix("atcoder.jp/contests/")
+            }
+            Contest.Platform.codechef -> {
+                contest.href.removePrefixHttp().removePrefix("www.codechef.com/")
+            }
+            else -> null
+        } ?: contest.id.toString()
 }
 
 object CListAPI {
@@ -92,24 +105,6 @@ data class ClistContest(
     val event: String,
     val href: String,
     val host: String
-) {
-    fun getPlatform(): Contest.Platform = Contest.Platform.values().find { CListUtils.getClistApiResourceId(it) == resource_id } ?: Contest.Platform.unknown
-
-    fun extractContestId(platform: Contest.Platform): String {
-        return when (platform) {
-            Contest.Platform.codeforces -> {
-                href.removePrefixHttp().removePrefix("codeforces.com/contests/")
-                    .toIntOrNull()?.toString()
-            }
-            Contest.Platform.atcoder -> {
-                href.removePrefixHttp().removePrefix("atcoder.jp/contests/")
-            }
-            Contest.Platform.codechef -> {
-                href.removePrefixHttp().removePrefix("www.codechef.com/")
-            }
-            else -> null
-        } ?: id.toString()
-    }
-}
+)
 
 private fun String.removePrefixHttp() = removePrefix("http://").removePrefix("https://")

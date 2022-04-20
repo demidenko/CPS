@@ -1,6 +1,7 @@
 package com.demich.cps.contests
 
 import androidx.compose.runtime.Immutable
+import com.demich.cps.utils.CListUtils
 import com.demich.cps.utils.ClistContest
 import com.demich.cps.utils.ComparablePair
 import kotlinx.datetime.Instant
@@ -27,13 +28,18 @@ data class Contest (
         return Phase.RUNNING
     }
 
-    constructor(contest: ClistContest): this(contest, contest.getPlatform())
+    constructor(contest: ClistContest): this(
+        contest = contest,
+        platform = getPlatforms()
+            .find { CListUtils.getClistApiResourceId(it) == contest.resource_id }
+            ?: Platform.unknown
+    )
     private constructor(contest: ClistContest, platform: Platform): this(
-        platform,
-        contest.extractContestId(platform),
-        contest.event,
-        Instant.parse(contest.start+"Z"),
-        (Instant.parse(contest.end+"Z") - Instant.parse(contest.start+"Z")).inWholeSeconds,
+        platform = platform,
+        id = CListUtils.extractContestId(contest, platform),
+        title = contest.event,
+        startTime = Instant.parse(contest.start+"Z"),
+        durationSeconds = (Instant.parse(contest.end+"Z") - Instant.parse(contest.start+"Z")).inWholeSeconds,
         link = contest.href
     )
 
