@@ -11,6 +11,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
@@ -57,6 +58,46 @@ object CodeforcesAPI {
         throw CodeforcesAPICallLimitExceeded()
     }
 
+    private val RCPC = object {
+
+        private var rcpc_value: String = ""
+
+        override fun toString(): String = rcpc_value
+
+        private var last_c = ""
+        fun recalc(source: String) = runBlocking {
+            val i = source.indexOf("c=toNumbers(")
+            val c = source.substring(source.indexOf("(\"",i)+2, source.indexOf("\")",i))
+            if(c == last_c) return@runBlocking
+            rcpc_value = decodeAES(c)
+            last_c = c
+            println("$c: $rcpc_value")
+        }
+    }
+
+    private suspend fun getCodeforcesWeb(
+        urlString: String,
+        block: HttpRequestBuilder.() -> Unit = {}
+    ): String? {
+        val callGet = suspend {
+            client.get<String>(urlString) {
+                header("Cookie", "RCPC=$RCPC")
+                block()
+            }
+        }
+        return kotlin.runCatching {
+            withContext(Dispatchers.IO) {
+                val s = callGet()
+                if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
+                    RCPC.recalc(s)
+                    delay(300)
+                    callGet()
+                } else s
+            }
+        }.getOrNull()
+    }
+
+
     suspend fun getUsers(handles: Collection<String>): List<CodeforcesUser> = makeAPICall {
         client.get(urlString = "${URLFactory.api}/user.info") {
             parameter("handles", handles.joinToString(separator = ";"))
@@ -71,23 +112,14 @@ object CodeforcesAPI {
         }
     }
 
-    private suspend fun makeWEBCall(block: suspend () -> String): String? {
-        //TODO: RCPC retry
-        return kotlin.runCatching {
-            withContext(Dispatchers.IO) {
-                block()
-            }
-        }.getOrNull()
-    }
-
-    suspend fun getHandleSuggestions(str: String) = makeWEBCall {
-        client.get(urlString = "${URLFactory.main}/data/handles") {
+    suspend fun getHandleSuggestions(str: String): String? {
+        return getCodeforcesWeb(urlString = "${URLFactory.main}/data/handles") {
             parameter("q", str)
         }
     }
 
-    suspend fun getPageSource(page: String, locale: CodeforcesLocale) = makeWEBCall {
-        client.get(urlString = page) {
+    suspend fun getPageSource(page: String, locale: CodeforcesLocale): String? {
+        return getCodeforcesWeb(urlString = page) {
             parameter("locale", locale)
         }
     }

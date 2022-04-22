@@ -47,22 +47,22 @@ object CodeChefAPI {
         return d.await()
     }
 
-    private suspend inline fun<reified T> HttpClient.getCodeChef(
+    private suspend inline fun<reified T> getCodeChef(
         urlString: String,
-        block: HttpRequestBuilder.() -> Unit = {}
+        crossinline block: HttpRequestBuilder.() -> Unit = {}
     ): T {
-        return runCatching {
-            get<T>(urlString) {
+        val callGet = suspend {
+            client.get<T>(urlString) {
                 header("x-csrf-token", getToken())
                 block()
             }
+        }
+        return kotlin.runCatching {
+            callGet()
         }.getOrElse {
             if (it is CodeChefCSRFTokenExpiredException) {
                 tokenDeferred = null
-                get<T>(urlString) {
-                    header("x-csrf-token", getToken())
-                    block()
-                }
+                callGet()
             } else throw it
         }
     }
@@ -72,7 +72,7 @@ object CodeChefAPI {
     }
 
     suspend fun getSuggestions(str: String): CodeChefSearchResult {
-        return client.getCodeChef("${URLFactory.main}/api/ratings/all") {
+        return getCodeChef("${URLFactory.main}/api/ratings/all") {
             parameter("itemsPerPage", 40)
             parameter("order", "asc")
             parameter("page", 1)
