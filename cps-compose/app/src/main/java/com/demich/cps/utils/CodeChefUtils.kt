@@ -30,21 +30,26 @@ object CodeChefApi {
 
     private class CodeChefCSRFTokenExpiredException: Throwable()
 
-
-    private var tokenDeferred: Deferred<String>? = null
-    private suspend fun getToken(): String {
-        val d = tokenDeferred ?: client.async {
-            println("codechef x-csrf-token start recalc...")
-            val page = client.get<String>("${urls.main}/ratings/all")
-            var i = page.indexOf("window.csrfToken=")
-            require(i != -1)
-            i = page.indexOf('"', i)
-            page.substring(i+1, page.indexOf('"', i+1)).also {
-                println("codechef x-csrf-token = $it")
-                require(it.length == 64)
-            }
-        }.also { tokenDeferred = it }
-        return d.await()
+    private object CSRFToken {
+        private var tokenDeferred: Deferred<String>? = null
+        fun clear() {
+            tokenDeferred?.cancel()
+            tokenDeferred = null
+        }
+        suspend operator fun invoke(): String {
+            val d = tokenDeferred ?: client.async {
+                println("codechef x-csrf-token start recalc...")
+                val page = client.get<String>("${urls.main}/ratings/all")
+                var i = page.indexOf("window.csrfToken=")
+                require(i != -1)
+                i = page.indexOf('"', i)
+                page.substring(i+1, page.indexOf('"', i+1)).also {
+                    println("codechef x-csrf-token = $it")
+                    require(it.length == 64)
+                }
+            }.also { tokenDeferred = it }
+            return d.await()
+        }
     }
 
     private suspend inline fun<reified T> getCodeChef(
@@ -53,7 +58,7 @@ object CodeChefApi {
     ): T {
         val callGet = suspend {
             client.get<T>(urlString) {
-                header("x-csrf-token", getToken())
+                header("x-csrf-token", CSRFToken())
                 block()
             }
         }
@@ -61,7 +66,7 @@ object CodeChefApi {
             callGet()
         }.getOrElse {
             if (it is CodeChefCSRFTokenExpiredException) {
-                tokenDeferred = null
+                CSRFToken.clear()
                 callGet()
             } else throw it
         }
