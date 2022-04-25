@@ -65,10 +65,10 @@ object CodeforcesAPI {
         override fun toString(): String = rcpc_value
 
         private var last_c = ""
-        fun recalc(source: String) = runBlocking {
+        fun recalc(source: String) {
             val i = source.indexOf("c=toNumbers(")
             val c = source.substring(source.indexOf("(\"",i)+2, source.indexOf("\")",i))
-            if(c == last_c) return@runBlocking
+            if(c == last_c) return
             rcpc_value = decodeAES(c)
             last_c = c
             println("$c: $rcpc_value")
