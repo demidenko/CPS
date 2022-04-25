@@ -54,7 +54,7 @@ data class CodeforcesUserInfo(
         lastOnlineTime = codeforcesUser.lastOnlineTime
     )
 
-    override fun link(): String = CodeforcesAPI.URLFactory.user(handle)
+    override fun link(): String = CodeforcesApi.urls.user(handle)
 }
 
 
@@ -69,7 +69,7 @@ class CodeforcesAccountManager(context: Context):
         private val Context.account_codeforces_dataStore by preferencesDataStore(AccountManagers.codeforces.name)
     }
 
-    override val urlHomePage get() = CodeforcesAPI.URLFactory.main
+    override val urlHomePage get() = CodeforcesApi.urls.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)
     override fun isValidForUserId(char: Char) = when(char) {
@@ -82,7 +82,7 @@ class CodeforcesAccountManager(context: Context):
 
     override suspend fun downloadInfo(data: String, flags: Int): CodeforcesUserInfo {
         try {
-            return CodeforcesUserInfo(CodeforcesAPI.getUser(handle = data))
+            return CodeforcesUserInfo(CodeforcesApi.getUser(handle = data))
         } catch (e: Throwable) {
             if (e is CodeforcesAPIErrorResponse && e.isHandleNotFound() == data) {
                 if((flags and 1) != 0) {
@@ -101,7 +101,7 @@ class CodeforcesAccountManager(context: Context):
     }
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
-        val s = CodeforcesAPI.getHandleSuggestions(str) ?: return null
+        val s = CodeforcesApi.getHandleSuggestions(str) ?: return null
         return withContext(Dispatchers.IO) {
             buildList {
                 s.splitToSequence('\n').filter { !it.contains('=') }.forEach {
@@ -117,7 +117,7 @@ class CodeforcesAccountManager(context: Context):
 
     override suspend fun loadRatingHistory(info: CodeforcesUserInfo): List<RatingChange>? =
         kotlin.runCatching {
-            CodeforcesAPI.getUserRatingChanges(info.handle)
+            CodeforcesApi.getUserRatingChanges(info.handle)
         }.getOrNull()?.map {
             RatingChange(
                 rating = it.newRating,
@@ -253,7 +253,7 @@ class CodeforcesAccountManager(context: Context):
         newRating = ratingChange.newRating,
         oldRating = ratingChange.oldRating,
         rank = ratingChange.rank,
-        url = CodeforcesAPI.URLFactory.contestsWith(ratingChange.handle),
+        url = CodeforcesApi.urls.contestsWith(ratingChange.handle),
         time = ratingChange.ratingUpdateTime
     )
 

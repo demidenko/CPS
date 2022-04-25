@@ -40,7 +40,7 @@ fun ContestsSettingsScreen(navController: NavController) {
 
 @Composable
 private fun ClistApiKeySettingsItem(
-    item: CPSDataStoreItem<CListAPI.ApiAccess>
+    item: CPSDataStoreItem<CListApi.ApiAccess>
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
     SettingsItemWithInfo(
@@ -89,7 +89,7 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
                 .weight(1f)
                 .padding(start = 4.dp))
             CPSIconButton(icon = Icons.Default.HelpOutline) {
-                context.openUrlInBrowser(CListAPI.URLFactory.apiHelp)
+                context.openUrlInBrowser(CListApi.urls.apiHelp)
             }
         }
 
@@ -235,7 +235,7 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
         private val Context.contests_settings_dataStore by preferencesDataStore("contests_settings")
     }
 
-    val clistApiAccess = itemJsonable(name = "clist_api_access", defaultValue = CListAPI.ApiAccess("", ""))
+    val clistApiAccess = itemJsonable(name = "clist_api_access", defaultValue = CListApi.ApiAccess("", ""))
 
     val enabledPlatforms = itemEnumSet(name = "enabled_platforms", defaultValue = Contest.getPlatforms().toSet())
 }

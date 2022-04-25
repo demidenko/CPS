@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.demich.cps.utils.CListAPI
+import com.demich.cps.utils.CListApi
 import com.demich.cps.utils.ClistContest
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.getCurrentTime
@@ -33,7 +33,7 @@ class ContestsViewModel: ViewModel() {
             errorStateFlow.value = null
             val settings = context.settingsContests
             runCatching {
-                CListAPI.getContests(
+                CListApi.getContests(
                     apiAccess = settings.clistApiAccess(),
                     platforms = settings.enabledPlatforms(),
                     startTime = getCurrentTime() - 7.days

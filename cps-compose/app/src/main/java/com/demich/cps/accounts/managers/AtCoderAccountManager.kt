@@ -30,7 +30,7 @@ data class AtCoderUserInfo(
     override val handle: String,
     override val rating: Int = NOT_RATED
 ): RatedUserInfo() {
-    override fun link(): String = AtCoderAPI.URLFactory.user(handle)
+    override fun link(): String = AtCoderApi.urls.user(handle)
 }
 
 class AtCoderAccountManager(context: Context):
@@ -41,7 +41,7 @@ class AtCoderAccountManager(context: Context):
         private val Context.account_atcoder_dataStore by preferencesDataStore(AccountManagers.atcoder.name)
     }
 
-    override val urlHomePage get() = AtCoderAPI.URLFactory.main
+    override val urlHomePage get() = AtCoderApi.urls.main
 
     override fun isValidForUserId(char: Char): Boolean = when(char) {
         in 'a'..'z', in 'A'..'Z', in '0'..'9', in "_" -> true
@@ -52,7 +52,7 @@ class AtCoderAccountManager(context: Context):
 
     override suspend fun downloadInfo(data: String, flags: Int): AtCoderUserInfo {
         try {
-            val s = AtCoderAPI.getUserPage(handle = data)
+            val s = AtCoderApi.getUserPage(handle = data)
             return with(Jsoup.parse(s)) {
                 val handle = selectFirst("a.username")!!.text()
                 val rating = select("th.no-break").find { it.text() == "Rating" }
@@ -70,7 +70,7 @@ class AtCoderAccountManager(context: Context):
 
     override suspend fun loadRatingHistory(info: AtCoderUserInfo): List<RatingChange>? {
         try {
-            val s = AtCoderAPI.getUserPage(handle = info.handle)
+            val s = AtCoderApi.getUserPage(handle = info.handle)
             val i = s.lastIndexOf("<script>var rating_history=[{")
             if (i == -1) return emptyList()
             val j = s.indexOf("];</script>", i)
@@ -157,7 +157,7 @@ class AtCoderAccountManager(context: Context):
         newRating = ratingChange.NewRating,
         oldRating = ratingChange.OldRating,
         rank = ratingChange.Place,
-        url = AtCoderAPI.URLFactory.userContestResult(handle, ratingChange.getContestId()),
+        url = AtCoderApi.urls.userContestResult(handle, ratingChange.getContestId()),
         time = ratingChange.EndTime
     )
 }

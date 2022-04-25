@@ -48,15 +48,15 @@ object CListUtils {
         } ?: contest.id.toString()
 }
 
-object CListAPI {
+object CListApi {
     private val client = cpsHttpClient {  }
 
     suspend fun getUserPage(login: String): String {
-        return client.get(URLFactory.user(login))
+        return client.get(urls.user(login))
     }
 
     suspend fun getUsersSearchPage(str: String): String {
-        return client.get(URLFactory.main + "/coders") {
+        return client.get(urls.main + "/coders") {
             parameter("search", str)
         }
     }
@@ -76,7 +76,7 @@ object CListAPI {
         }.objects
     }
 
-    object URLFactory {
+    object urls {
         const val main = "https://clist.by"
         fun user(login: String) = "$main/coder/$login"
 

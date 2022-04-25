@@ -23,7 +23,7 @@ import com.demich.cps.ui.RatingGraph
 import com.demich.cps.ui.RatingLoadButton
 import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.CodeChefAPI
+import com.demich.cps.utils.CodeChefApi
 import com.demich.cps.utils.CodeChefRatingChange
 import com.demich.cps.utils.jsonCPS
 import io.ktor.client.features.*
@@ -39,7 +39,7 @@ data class CodeChefUserInfo(
     override val handle: String,
     override val rating: Int = NOT_RATED
 ): RatedUserInfo() {
-    override fun link() = CodeChefAPI.URLFactory.user(handle)
+    override fun link() = CodeChefApi.urls.user(handle)
 }
 
 class CodeChefAccountManager(context: Context):
@@ -52,7 +52,7 @@ class CodeChefAccountManager(context: Context):
         private const val star = '★'
     }
 
-    override val urlHomePage get() = CodeChefAPI.URLFactory.main
+    override val urlHomePage get() = CodeChefApi.urls.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)
     override fun isValidForUserId(char: Char) = when(char) {
@@ -64,7 +64,7 @@ class CodeChefAccountManager(context: Context):
 
     override suspend fun downloadInfo(data: String, flags: Int): CodeChefUserInfo {
         try {
-            Jsoup.parse(CodeChefAPI.getUserPage(handle = data)).run {
+            Jsoup.parse(CodeChefApi.getUserPage(handle = data)).run {
                 val rating = selectFirst("div.rating-ranks")
                     ?.select("a")
                     ?.takeIf { !it.all { it.text() == "Inactive" } }
@@ -87,7 +87,7 @@ class CodeChefAccountManager(context: Context):
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         try {
-            return CodeChefAPI.getSuggestions(str).list.map {
+            return CodeChefApi.getSuggestions(str).list.map {
                 AccountSuggestion(
                     title = it.username,
                     info = it.rating.toString(),
@@ -101,7 +101,7 @@ class CodeChefAccountManager(context: Context):
 
     override suspend fun loadRatingHistory(info: CodeChefUserInfo): List<RatingChange>? {
         try {
-            val s = CodeChefAPI.getUserPage(handle = info.handle)
+            val s = CodeChefApi.getUserPage(handle = info.handle)
             val i = s.indexOf("var all_rating = ")
             if (i == -1) return emptyList()
             val ar = s.substring(s.indexOf("[", i), s.indexOf("];", i) + 1)

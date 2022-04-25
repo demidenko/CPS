@@ -60,7 +60,7 @@ object CodeforcesUtils {
     }
 
     suspend fun getRealHandle(handle: String): Pair<String, STATUS> {
-        val page = CodeforcesAPI.getPageSource(CodeforcesAPI.URLFactory.user(handle), CodeforcesLocale.EN) ?: return handle to STATUS.FAILED
+        val page = CodeforcesApi.getPageSource(CodeforcesApi.urls.user(handle), CodeforcesLocale.EN) ?: return handle to STATUS.FAILED
         val realHandle = extractRealHandle(page) ?: return handle to STATUS.NOT_FOUND
         return realHandle to STATUS.OK
     }

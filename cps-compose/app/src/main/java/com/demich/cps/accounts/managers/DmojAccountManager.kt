@@ -18,7 +18,7 @@ import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.ui.RatingGraph
 import com.demich.cps.ui.RatingLoadButton
 import com.demich.cps.ui.rememberRatingGraphUIStates
-import com.demich.cps.utils.DmojAPI
+import com.demich.cps.utils.DmojApi
 import com.demich.cps.utils.DmojRatingChange
 import com.demich.cps.utils.jsonCPS
 import io.ktor.client.features.*
@@ -33,7 +33,7 @@ data class DmojUserInfo(
     override val handle: String,
     override val rating: Int = NOT_RATED
 ): RatedUserInfo() {
-    override fun link() = DmojAPI.URLFactory.user(handle)
+    override fun link() = DmojApi.urls.user(handle)
 }
 
 class DmojAccountManager(context: Context):
@@ -44,7 +44,7 @@ class DmojAccountManager(context: Context):
         private val Context.account_dmoj_dataStore by preferencesDataStore(AccountManagers.dmoj.name)
     }
 
-    override val urlHomePage get() = DmojAPI.URLFactory.main
+    override val urlHomePage get() = DmojApi.urls.main
 
     override fun isValidForUserId(char: Char): Boolean = when(char) {
         in 'a'..'z', in 'A'..'Z', in '0'..'9', in "_" -> true
@@ -55,7 +55,7 @@ class DmojAccountManager(context: Context):
 
     override suspend fun downloadInfo(data: String, flags: Int): DmojUserInfo {
         try {
-            val res = DmojAPI.getUser(handle = data)
+            val res = DmojApi.getUser(handle = data)
             return DmojUserInfo(
                 status = STATUS.OK,
                 handle = res.username,
@@ -73,7 +73,7 @@ class DmojAccountManager(context: Context):
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         try {
-            return DmojAPI.getSuggestions(query = str).map {
+            return DmojApi.getSuggestions(query = str).map {
                 AccountSuggestion(title = it.text, userId = it.id)
             }
         } catch (e: Throwable) {
@@ -83,7 +83,7 @@ class DmojAccountManager(context: Context):
 
     override suspend fun loadRatingHistory(info: DmojUserInfo): List<RatingChange>? {
         try {
-            val s = DmojAPI.getUserPage(handle = info.handle)
+            val s = DmojApi.getUserPage(handle = info.handle)
             val i = s.indexOf("var rating_history = [")
             if (i == -1) return emptyList()
             val j = s.indexOf("];", i)

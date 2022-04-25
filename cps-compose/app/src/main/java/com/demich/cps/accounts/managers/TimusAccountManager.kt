@@ -6,7 +6,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
-import com.demich.cps.utils.TimusAPI
+import com.demich.cps.utils.TimusApi
 import kotlinx.serialization.Serializable
 import org.jsoup.Jsoup
 
@@ -24,7 +24,7 @@ data class TimusUserInfo(
     override val userId: String
         get() = id
 
-    override fun link(): String = TimusAPI.URLFactory.user(id.toInt())
+    override fun link(): String = TimusApi.urls.user(id.toInt())
 }
 
 class TimusAccountManager(context: Context):
@@ -36,7 +36,7 @@ class TimusAccountManager(context: Context):
     }
 
     override val userIdTitle get() = "id"
-    override val urlHomePage get() = TimusAPI.URLFactory.main
+    override val urlHomePage get() = TimusApi.urls.main
 
     override fun isValidForUserId(char: Char): Boolean = char in '0'..'9'
     override fun isValidForSearch(char: Char): Boolean = true
@@ -45,7 +45,7 @@ class TimusAccountManager(context: Context):
 
     override suspend fun downloadInfo(data: String, flags: Int): TimusUserInfo {
         try {
-            val s = TimusAPI.getUserPage(data.toInt())
+            val s = TimusApi.getUserPage(data.toInt())
             with(Jsoup.parse(s)) {
                 val userName = selectFirst("h2.author_name")?.text()
                     ?: return TimusUserInfo(status = STATUS.NOT_FOUND, id = data)
@@ -70,7 +70,7 @@ class TimusAccountManager(context: Context):
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         if (str.toIntOrNull() != null) return emptyList()
         try {
-            return Jsoup.parse(TimusAPI.getSearchPage(str))
+            return Jsoup.parse(TimusApi.getSearchPage(str))
                 .selectFirst("table.ranklist")
                 ?.select("td.name")
                 ?.mapNotNull { nameColumn ->

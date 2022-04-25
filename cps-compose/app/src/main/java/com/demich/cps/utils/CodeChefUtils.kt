@@ -1,15 +1,15 @@
 package com.demich.cps.utils
 
-import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.features.cookies.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.serialization.Serializable
 
-object CodeChefAPI {
+object CodeChefApi {
     private val client = cpsHttpClient {
         followRedirects = false
         //BrowserUserAgent()
@@ -35,7 +35,7 @@ object CodeChefAPI {
     private suspend fun getToken(): String {
         val d = tokenDeferred ?: client.async {
             println("codechef x-csrf-token start recalc...")
-            val page = client.get<String>("${URLFactory.main}/ratings/all")
+            val page = client.get<String>("${urls.main}/ratings/all")
             var i = page.indexOf("window.csrfToken=")
             require(i != -1)
             i = page.indexOf('"', i)
@@ -68,11 +68,11 @@ object CodeChefAPI {
     }
 
     suspend fun getUserPage(handle: String): String {
-        return client.get(URLFactory.user(handle))
+        return client.get(urls.user(handle))
     }
 
     suspend fun getSuggestions(str: String): CodeChefSearchResult {
-        return getCodeChef("${URLFactory.main}/api/ratings/all") {
+        return getCodeChef("${urls.main}/api/ratings/all") {
             parameter("itemsPerPage", 40)
             parameter("order", "asc")
             parameter("page", 1)
@@ -81,7 +81,7 @@ object CodeChefAPI {
         }
     }
 
-    object URLFactory {
+    object urls {
         const val main = "https://www.codechef.com"
         fun user(username: String) = "$main/users/$username"
     }

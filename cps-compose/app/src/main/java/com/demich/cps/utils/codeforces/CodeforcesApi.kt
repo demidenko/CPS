@@ -11,7 +11,6 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
@@ -19,7 +18,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlin.time.Duration
 
-object CodeforcesAPI {
+object CodeforcesApi {
     private val client = cpsHttpClient {
         HttpResponseValidator {
             handleResponseException { exception ->
@@ -99,7 +98,7 @@ object CodeforcesAPI {
 
 
     suspend fun getUsers(handles: Collection<String>): List<CodeforcesUser> = makeAPICall {
-        client.get(urlString = "${URLFactory.api}/user.info") {
+        client.get(urlString = "${urls.api}/user.info") {
             parameter("handles", handles.joinToString(separator = ";"))
         }
     }
@@ -107,13 +106,13 @@ object CodeforcesAPI {
     suspend fun getUser(handle: String) = getUsers(listOf(handle)).first()
 
     suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange> = makeAPICall {
-        client.get(urlString = "${URLFactory.api}/user.rating") {
+        client.get(urlString = "${urls.api}/user.rating") {
             parameter("handle", handle)
         }
     }
 
     suspend fun getHandleSuggestions(str: String): String? {
-        return getCodeforcesWeb(urlString = "${URLFactory.main}/data/handles") {
+        return getCodeforcesWeb(urlString = "${urls.main}/data/handles") {
             parameter("q", str)
         }
     }
@@ -124,7 +123,7 @@ object CodeforcesAPI {
         }
     }
 
-    object URLFactory {
+    object urls {
         const val main = "https://codeforces.com"
 
         fun user(handle: String) = "$main/profile/$handle"

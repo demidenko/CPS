@@ -3,7 +3,7 @@ package com.demich.cps.accounts.managers
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.buildAnnotatedString
-import com.demich.cps.utils.CListAPI
+import com.demich.cps.utils.CListApi
 import io.ktor.client.features.*
 import io.ktor.http.*
 import org.jsoup.Jsoup
@@ -17,7 +17,7 @@ data class CListUserInfo(
     override val userId: String
         get() = login
 
-    override fun link(): String = CListAPI.URLFactory.user(login)
+    override fun link(): String = CListApi.urls.user(login)
 }
 
 class CListAccountManager(context: Context):
@@ -25,13 +25,13 @@ class CListAccountManager(context: Context):
     AccountSuggestionsProvider
 {
     override val userIdTitle = "login"
-    override val urlHomePage = CListAPI.URLFactory.main
+    override val urlHomePage = CListApi.urls.main
 
     override fun emptyInfo() = CListUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String, flags: Int): CListUserInfo {
         try {
-            val s = CListAPI.getUserPage(login = data)
+            val s = CListApi.getUserPage(login = data)
             val accounts = mutableMapOf<String, Pair<String, String>>()
 
             val body = Jsoup.parse(s).body()
@@ -79,7 +79,7 @@ class CListAccountManager(context: Context):
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         try {
-            val s = CListAPI.getUsersSearchPage(str)
+            val s = CListApi.getUsersSearchPage(str)
             return Jsoup.parse(s).select("td.username").map {
                 val login = it.text()
                 AccountSuggestion(title = login, userId = login)

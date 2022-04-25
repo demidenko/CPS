@@ -6,7 +6,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
-import com.demich.cps.utils.ACMPAPI
+import com.demich.cps.utils.ACMPApi
 import kotlinx.serialization.Serializable
 import org.jsoup.Jsoup
 
@@ -22,7 +22,7 @@ data class ACMPUserInfo(
     override val userId: String
         get() = id
 
-    override fun link(): String = ACMPAPI.URLFactory.user(id.toInt())
+    override fun link(): String = ACMPApi.urls.user(id.toInt())
 }
 
 
@@ -36,7 +36,7 @@ class ACMPAccountManager(context: Context):
     }
 
     override val userIdTitle get() = "id"
-    override val urlHomePage get() = ACMPAPI.URLFactory.main
+    override val urlHomePage get() = ACMPApi.urls.main
 
     override fun isValidForUserId(char: Char): Boolean = char in '0'..'9'
 
@@ -44,7 +44,7 @@ class ACMPAccountManager(context: Context):
 
     override suspend fun downloadInfo(data: String, flags: Int): ACMPUserInfo {
         try {
-            return with(Jsoup.parse(ACMPAPI.getUserPage(id = data.toInt()))) {
+            return with(Jsoup.parse(ACMPApi.getUserPage(id = data.toInt()))) {
                 val userName = title().trim()
                 val box = body().select("h4").firstOrNull { it.text() == "Общая статистика" }?.parent()!!
                 val bs = box.select("b.btext").map { it.text() }
@@ -66,7 +66,7 @@ class ACMPAccountManager(context: Context):
                     rank = rank
                 )
             }
-        } catch (e: ACMPAPI.ACMPPageNotFoundException) {
+        } catch (e: ACMPApi.ACMPPageNotFoundException) {
             return ACMPUserInfo(status = STATUS.NOT_FOUND, id = data)
         } catch (e: Throwable) {
             return ACMPUserInfo(status = STATUS.FAILED, id = data)
@@ -76,7 +76,7 @@ class ACMPAccountManager(context: Context):
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
         if (str.toIntOrNull() != null) return emptyList()
         try {
-            val s = ACMPAPI.getUsersSearch(str)
+            val s = ACMPApi.getUsersSearch(str)
             return Jsoup.parse(s).selectFirst("table.main")?.select("tr.white")?.mapNotNull { row ->
                 val cols = row.select("td")
                 val userId = cols[1].selectFirst("a")?.attr("href")

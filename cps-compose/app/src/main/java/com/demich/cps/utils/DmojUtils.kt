@@ -7,29 +7,29 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
-object DmojAPI {
+object DmojApi {
     private val client = cpsHttpClient { }
 
     suspend fun getUser(handle: String): DmojUserResult {
-        val str = client.get<String>(URLFactory.main + "/api/v2/user/$handle")
+        val str = client.get<String>(urls.main + "/api/v2/user/$handle")
         val json = Json.parseToJsonElement(str).jsonObject
         val obj = json["data"]!!.jsonObject["object"]!!
         return jsonCPS.decodeFromJsonElement(obj)
     }
 
     suspend fun getUserPage(handle: String): String {
-        return client.get(URLFactory.main + "/user/$handle")
+        return client.get(urls.main + "/user/$handle")
     }
 
     suspend fun getSuggestions(query: String): List<DmojSuggestion> {
-        val str = client.get<String>(URLFactory.main + "/widgets/select2/user_search?term=$query&_type=query&q=$query")
+        val str = client.get<String>(urls.main + "/widgets/select2/user_search?term=$query&_type=query&q=$query")
         val json = Json.parseToJsonElement(str).jsonObject
         return jsonCPS.decodeFromJsonElement(
             json["results"]!!.jsonArray
         )
     }
 
-    object URLFactory {
+    object urls {
         const val main = "https://dmoj.ca"
         fun user(username: String) = "$main/user/$username"
     }
