@@ -356,17 +356,13 @@ private fun Contest.dateRange(): String {
 
 
 private fun cutTrailingBrackets(title: String): Pair<String, String> {
-    fun Char.isOpenBracket() = this == '(' || this == '（'
-    fun Char.isClosedBracket() = this == ')' || this == '）'
-
-    if (title.isEmpty() || !title.last().isClosedBracket()) return title to ""
+    if (title.isEmpty() || title.last() != ')') return title to ""
     var i = title.length-2
     var ballance = 1
     while (ballance > 0 && i > 0) {
-        val c = title[i]
-        when {
-            c.isOpenBracket() -> --ballance
-            c.isClosedBracket() -> ++ballance
+        when(title[i]) {
+            '(' -> --ballance
+            ')' -> ++ballance
         }
         if (ballance == 0) break
         --i

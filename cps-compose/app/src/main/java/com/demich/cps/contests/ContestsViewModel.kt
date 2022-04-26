@@ -50,8 +50,12 @@ class ContestsViewModel: ViewModel() {
 private fun Collection<ClistContest>.mapAndFilterResult(): List<Contest> {
     return mapNotNull {
         val contest = Contest(it)
-        when {
-            contest.platform == Contest.Platform.atcoder && it.host != "atcoder.jp" -> null
+        when (contest.platform) {
+            Contest.Platform.atcoder -> {
+                if (it.host == "atcoder.jp")
+                    contest.copy(title = contest.title.replace("（", " (").replace('）',')'))
+                else null
+            }
             else -> contest
         }
     }
