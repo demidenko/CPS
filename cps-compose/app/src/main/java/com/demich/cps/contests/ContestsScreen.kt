@@ -1,8 +1,10 @@
 package com.demich.cps.contests
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
@@ -29,6 +31,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import io.ktor.client.features.*
 import io.ktor.http.*
+import java.net.UnknownHostException
 
 @Composable
 fun ContestsScreen(contestsViewModel: ContestsViewModel) {
@@ -49,7 +52,9 @@ fun ContestsScreen(contestsViewModel: ContestsViewModel) {
             )
             ContestsList(
                 contests = contests,
-                modifier = Modifier.fillMaxWidth().weight(1f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             )
         }
     }
@@ -116,24 +121,25 @@ private fun ContestsSortedList(
 }
 
 @Composable
-private fun LoadingError(
+private fun ColumnScope.LoadingError(
     error: Throwable?,
     modifier: Modifier = Modifier
 ) {
     val context = context
     val devModeEnabled by rememberCollect { context.settingsDev.devModeEnabled.flow }
     val message = when {
-        error == null -> null
+        error == null -> ""
+        error is UnknownHostException
+            -> "Connection failed"
         error is ClientRequestException && error.response.status == HttpStatusCode.Unauthorized
             -> "Incorrect clist::api access"
         error is ClientRequestException && error.response.status == HttpStatusCode.TooManyRequests
-            -> "Too many requests, try later"
+            -> "Too many requests"
         else -> {
-            if (devModeEnabled) "Unknown error: ${error.message}"
-            else null
+            if(devModeEnabled) "$error" else ""
         }
     }
-    if (message != null) {
+    AnimatedVisibility(visible = message.isNotBlank()) {
         Text(
             text = message,
             textAlign = TextAlign.Center,
