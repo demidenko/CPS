@@ -133,12 +133,12 @@ private fun createBounds(
 
 private fun createBounds(
     ratingChanges: List<RatingChange>,
-    filterType: RatingFilterType
+    filterType: RatingFilterType,
+    now: Instant
 ) = when (filterType) {
     RatingFilterType.all -> createBounds(ratingChanges)
     RatingFilterType.last10 -> createBounds(ratingChanges.takeLast(10))
     RatingFilterType.lastMonth, RatingFilterType.lastYear -> {
-        val now = getCurrentTime()
         val startTime = now - (if (filterType == RatingFilterType.lastMonth) 30.days else 365.days)
         createBounds(
             ratingChanges = ratingChanges.filter { it.date >= startTime },
@@ -158,9 +158,14 @@ private fun RatingGraph(
 ) {
     val translator = rememberCoordinateTranslator()
 
+    val currentTime = remember(ratingChanges) { getCurrentTime() }
     var filterType by rememberSaveable(ratingChanges) {
         if (ratingChanges.isNotEmpty()) {
-            translator.setWindow(createBounds(ratingChanges, RatingFilterType.all))
+            translator.setWindow(createBounds(
+                ratingChanges = ratingChanges,
+                filterType = RatingFilterType.all,
+                now = currentTime
+            ))
         }
         mutableStateOf(RatingFilterType.all)
     }
@@ -178,9 +183,14 @@ private fun RatingGraph(
             ratingChanges = ratingChanges,
             manager = manager,
             rectangles = rectangles,
+            currentTime = currentTime,
             selectedFilterType = filterType,
             onSelectFilterType = {
-                translator.setWindow(createBounds(ratingChanges, it))
+                translator.setWindow(createBounds(
+                    ratingChanges = ratingChanges,
+                    filterType = it,
+                    now = currentTime
+                ))
                 filterType = it
             },
             selectedRatingChange = selectedRatingChange,
@@ -210,6 +220,7 @@ private fun RatingGraph(
                             manager = manager,
                             rectangles = rectangles,
                             translator = translator,
+                            currentTime = currentTime,
                             filterType = filterType,
                             selectedRatingChange = selectedRatingChange,
                             modifier = Modifier
@@ -241,6 +252,7 @@ private fun RatingGraphHeader(
     ratingChanges: List<RatingChange>,
     manager: RatedAccountManager<out RatedUserInfo>,
     rectangles: RatingGraphRectangles,
+    currentTime: Instant,
     selectedFilterType: RatingFilterType,
     onSelectFilterType: (RatingFilterType) -> Unit,
     selectedRatingChange: RatingChange?,
@@ -255,16 +267,16 @@ private fun RatingGraphHeader(
                 .padding(bottom = 3.dp)
                 .background(cpsColors.backgroundAdditional, shape)
                 .padding(all = 5.dp)
+                .fillMaxWidth()
         )
     } else
     if (loadingStatus == LoadingStatus.PENDING && ratingChanges.isNotEmpty()) {
         TextButtonsSelectRow(
-            values = remember(ratingChanges) {
+            values = remember(ratingChanges, currentTime) {
                 buildList {
                     if (ratingChanges.size > 10) add(RatingFilterType.last10)
-                    val now = getCurrentTime()
-                    val firstInMonth = ratingChanges.indexOfFirst { it.date >= now - 30.days }
-                    val firstInYear = ratingChanges.indexOfFirst { it.date >= now - 365.days }
+                    val firstInMonth = ratingChanges.indexOfFirst { it.date >= currentTime - 30.days }
+                    val firstInYear = ratingChanges.indexOfFirst { it.date >= currentTime - 365.days }
                     if (firstInMonth > 0 && firstInMonth != -1) {
                         add(RatingFilterType.lastMonth)
                     }
@@ -300,7 +312,7 @@ private fun ContestResult(
     majorFontSize: TextUnit = 30.sp,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
@@ -348,6 +360,7 @@ private fun<U: RatedUserInfo> DrawRatingGraph(
     manager: RatedAccountManager<U>,
     rectangles: RatingGraphRectangles,
     translator: CoordinateTranslator,
+    currentTime: Instant,
     filterType: RatingFilterType,
     selectedRatingChange: RatingChange?,
     modifier: Modifier = Modifier
@@ -361,7 +374,7 @@ private fun<U: RatedUserInfo> DrawRatingGraph(
     val timeMarkers: List<Instant> = remember(key1 = filterType, key2 = ratingChanges) {
         if (filterType == RatingFilterType.all || ratingChanges.size < 2) emptyList()
         else {
-            createBounds(ratingChanges, filterType).run {
+            createBounds(ratingChanges, filterType, currentTime).run {
                 listOf(startTime, endTime)
             }
         }
