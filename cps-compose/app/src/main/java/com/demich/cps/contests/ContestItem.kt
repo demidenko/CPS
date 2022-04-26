@@ -76,7 +76,7 @@ private fun ContestItemContent(
     )
     ContestItemFooter(
         contest = contest,
-        currentTimeSeconds = currentTime.epochSeconds,
+        currentTime = currentTime,
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -138,11 +138,9 @@ private fun ContestColoredTitle(
 @Composable
 private fun ContestItemFooter(
     contest: Contest,
-    currentTimeSeconds: Long,
+    currentTime: Instant,
     modifier: Modifier = Modifier
 ) {
-    val currentTime = Instant.fromEpochSeconds(currentTimeSeconds)
-
     val date: String
     val counter: String
     when (contest.getPhase(currentTime)) {
