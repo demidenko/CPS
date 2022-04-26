@@ -5,6 +5,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
@@ -24,6 +26,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.R
+import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
@@ -201,7 +204,7 @@ private fun ContestExpandedItemContent(
     )
     ContestExpandedItemFooter(
         contest = contest,
-        currentTimeSeconds = currentTime.epochSeconds,
+        currentTime = currentTime,
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -218,7 +221,10 @@ private fun ContestExpandedItemHeader(
     ) {
         ContestPlatformIcon(
             platform = platform,
-            modifier = Modifier.padding(end = 4.dp).padding(all = 5.dp).align(Alignment.Top),
+            modifier = Modifier
+                .padding(end = 4.dp)
+                .padding(all = 5.dp)
+                .align(Alignment.Top),
             size = 30.sp,
             color = if (phase == Contest.Phase.FINISHED) cpsColors.textColorAdditional else cpsColors.textColor
         )
@@ -226,7 +232,9 @@ private fun ContestExpandedItemHeader(
             contestTitle = contestTitle,
             phase = phase,
             singleLine = false,
-            modifier = Modifier.weight(1f).align(Alignment.CenterVertically)
+            modifier = Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically)
         )
     }
 }
@@ -234,10 +242,9 @@ private fun ContestExpandedItemHeader(
 @Composable
 private fun ContestExpandedItemFooter(
     contest: Contest,
-    currentTimeSeconds: Long,
+    currentTime: Instant,
     modifier: Modifier = Modifier
 ) {
-    val currentTime = Instant.fromEpochSeconds(currentTimeSeconds)
     ContestExpandedItemFooter(
         startDate = contest.startTime.contestDate(),
         endDate = contest.endTime.contestDate(),
@@ -257,25 +264,38 @@ private fun ContestExpandedItemFooter(
     counter: String,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier) {
-        Column(modifier = Modifier.align(Alignment.CenterStart)) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.align(Alignment.CenterStart)) {
+                MonospacedText(
+                    text = startDate,
+                    fontSize = 15.sp,
+                    color = cpsColors.textColorAdditional
+                )
+                MonospacedText(
+                    text = endDate,
+                    fontSize = 15.sp,
+                    color = cpsColors.textColorAdditional
+                )
+            }
+            CPSIconButton(
+                icon = Icons.Default.MoreVert,
+                color = cpsColors.textColorAdditional,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
+               //TODO: menu
+            }
+        }
+        if (counter.isNotBlank()) {
             MonospacedText(
-                text = startDate,
-                fontSize = 15.sp,
-                color = cpsColors.textColorAdditional
-            )
-            MonospacedText(
-                text = endDate,
+                text = counter,
                 fontSize = 15.sp,
                 color = cpsColors.textColorAdditional
             )
         }
-        MonospacedText(
-            text = counter,
-            fontSize = 15.sp,
-            color = cpsColors.textColorAdditional,
-            modifier = Modifier.align(Alignment.BottomEnd)
-        )
     }
 }
 
