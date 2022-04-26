@@ -13,9 +13,7 @@ import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.seconds
 
 class ContestsViewModel: ViewModel() {
     var loadingStatus by mutableStateOf(LoadingStatus.PENDING)
@@ -46,19 +44,6 @@ class ContestsViewModel: ViewModel() {
                 errorStateFlow.value = it
             }
         }
-    }
-
-    fun addRandomContest() {
-        val currentTime = getCurrentTime()
-        val duration = Random.nextLong(from = -30, until = 30).seconds
-        val contest = Contest(
-            title = Random.nextBits(10).toString(2),
-            startTime = currentTime + duration,
-            durationSeconds = 60,
-            platform = null,
-            id = Random.nextLong().toString()
-        )
-        contestsStateFlow.value += contest
     }
 }
 

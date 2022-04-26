@@ -19,10 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.demich.cps.accounts.*
-import com.demich.cps.contests.ContestsScreen
-import com.demich.cps.contests.ContestsSettingsScreen
-import com.demich.cps.contests.ContestsViewModel
-import com.demich.cps.contests.contestsBottomBarBuilder
+import com.demich.cps.contests.*
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
 import com.demich.cps.news.newsBottomBarBuilder
@@ -139,7 +136,8 @@ fun CPSScaffold(
 
             cpsComposable(Screen.Contests.route) {
                 ContestsScreen(cpsViewModels.contestsViewModel)
-                bottomBar = contestsBottomBarBuilder(navController, cpsViewModels.contestsViewModel)
+                menu = contestsMenuBuilder(navController)
+                bottomBar = contestsBottomBarBuilder(cpsViewModels.contestsViewModel)
             }
             cpsComposable(Screen.ContestsSettings.route) {
                 ContestsSettingsScreen(navController)

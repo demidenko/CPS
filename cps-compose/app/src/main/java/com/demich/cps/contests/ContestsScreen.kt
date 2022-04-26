@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -19,9 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.demich.cps.AdditionalBottomBarBuilder
+import com.demich.cps.CPSMenuBuilder
 import com.demich.cps.Screen
 import com.demich.cps.settingsDev
-import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
@@ -147,17 +146,18 @@ private fun LoadingError(
     }
 }
 
+fun contestsMenuBuilder(
+    navController: NavController
+): CPSMenuBuilder = {
+    CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
+        navController.navigate(Screen.ContestsSettings.route)
+    }
+}
+
 fun contestsBottomBarBuilder(
-    navController: NavController,
     contestsViewModel: ContestsViewModel
 ): AdditionalBottomBarBuilder = {
     val context = context
-    CPSIconButton(icon = Icons.Default.Add) {
-        contestsViewModel.addRandomContest()
-    }
-    CPSIconButton(icon = Icons.Default.Settings) {
-        navController.navigate(Screen.ContestsSettings.route)
-    }
     CPSReloadingButton(loadingStatus = contestsViewModel.loadingStatus) {
         contestsViewModel.reload(context)
     }
