@@ -15,7 +15,6 @@
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.CPS">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
