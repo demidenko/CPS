@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -23,6 +26,7 @@ import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.CPSMenuBuilder
 import com.demich.cps.Screen
 import com.demich.cps.settingsDev
+import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
@@ -34,7 +38,37 @@ import io.ktor.http.*
 import java.net.UnknownHostException
 
 @Composable
-fun ContestsScreen(contestsViewModel: ContestsViewModel) {
+fun ContestsScreen(
+    contestsViewModel: ContestsViewModel,
+    searchEnabledState: MutableState<Boolean>
+) {
+    var searchText by rememberSaveable { mutableStateOf("") }
+    Column {
+        if (searchEnabledState.value) {
+            ContestsSearch(
+                modifier = Modifier.fillMaxWidth(),
+                value = searchText,
+                onValueChange = {
+                    searchText = it
+                },
+                onClose = {
+                    searchEnabledState.value = false
+                    searchText = ""
+                }
+            )
+        }
+        ContestsScreen(
+            contestsViewModel = contestsViewModel,
+            searchText = searchText
+        )
+    }
+}
+
+@Composable
+private fun ContestsScreen(
+    contestsViewModel: ContestsViewModel,
+    searchText: String
+) {
     val context = context
 
     val contests by contestsViewModel.flowOfContests().collectAsState()
@@ -51,7 +85,11 @@ fun ContestsScreen(contestsViewModel: ContestsViewModel) {
                     .fillMaxWidth()
             )
             ContestsList(
-                contests = contests,
+                contests = contests.filter { contest ->
+                    val inTitle = contest.title.contains(searchText, ignoreCase = true)
+                    val inPlatformName = contest.platform?.name?.contains(searchText, ignoreCase = true) ?: false
+                    inTitle || inPlatformName
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
@@ -121,6 +159,26 @@ private fun ContestsSortedList(
 }
 
 @Composable
+private fun ContestsSearch(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    onClose: () -> Unit
+) {
+    OutlinedTextField(
+        modifier = modifier,
+        value = value,
+        onValueChange = onValueChange,
+        trailingIcon = {
+            CPSIconButton(icon = Icons.Default.Close) {
+                onClose()
+            }
+        },
+        label = { Text("Search") }
+    )
+}
+
+@Composable
 private fun ColumnScope.LoadingError(
     error: Throwable?,
     modifier: Modifier = Modifier
@@ -161,9 +219,13 @@ fun contestsMenuBuilder(
 }
 
 fun contestsBottomBarBuilder(
-    contestsViewModel: ContestsViewModel
+    contestsViewModel: ContestsViewModel,
+    onEnableSearch: () -> Unit
 ): AdditionalBottomBarBuilder = {
     val context = context
+    CPSIconButton(icon = Icons.Default.Search) {
+        onEnableSearch()
+    }
     CPSReloadingButton(loadingStatus = contestsViewModel.loadingStatus) {
         contestsViewModel.reload(context)
     }

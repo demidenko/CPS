@@ -135,9 +135,16 @@ fun CPSScaffold(
             }
 
             cpsComposable(Screen.Contests.route) {
-                ContestsScreen(cpsViewModels.contestsViewModel)
+                val searchEnabled = rememberSaveable { mutableStateOf(false) }
+                ContestsScreen(
+                    contestsViewModel = cpsViewModels.contestsViewModel,
+                    searchEnabledState = searchEnabled
+                )
+                bottomBar = contestsBottomBarBuilder(
+                    contestsViewModel = cpsViewModels.contestsViewModel,
+                    onEnableSearch = { searchEnabled.value = true }
+                )
                 menu = contestsMenuBuilder(navController)
-                bottomBar = contestsBottomBarBuilder(cpsViewModels.contestsViewModel)
             }
             cpsComposable(Screen.ContestsSettings.route) {
                 ContestsSettingsScreen(navController)
