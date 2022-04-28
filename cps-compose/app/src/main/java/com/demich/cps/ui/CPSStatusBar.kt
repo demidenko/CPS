@@ -8,10 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.WebAsset
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -177,7 +175,7 @@ fun StatusBarButtonsForUIPanel() {
 
     if (recordedAccounts.isNotEmpty()) {
         CPSIconButton(
-            icon = Icons.Default.WebAsset,
+            icon = CPSIcons.StatusBar,
             onState = coloredStatusBar && !noneEnabled,
         ) {
             if (noneEnabled) {
@@ -188,7 +186,7 @@ fun StatusBarButtonsForUIPanel() {
         }
         if (coloredStatusBar) Box {
             CPSIconButton(
-                icon = Icons.Default.ExpandMore,
+                icon = CPSIcons.MoveDown,
                 onClick = { showPopup = true }
             )
             StatusBarAccountsPopup(

@@ -5,11 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AllOut
-import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.Subtitles
-import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -18,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
@@ -62,11 +58,11 @@ private fun CPSBottomBarMain(
     val rootScreens by remember {
         derivedStateOf {
             buildList {
-                add(Screen.Accounts to Icons.Rounded.Person)
-                add(Screen.News to Icons.Default.Subtitles)
-                add(Screen.Contests to Icons.Filled.EmojiEvents)
+                add(Screen.Accounts to CPSIcons.Account)
+                add(Screen.News to CPSIcons.News)
+                add(Screen.Contests to CPSIcons.Contest)
                 if (devModeEnabled) {
-                    add(Screen.Development to Icons.Default.AllOut)
+                    add(Screen.Development to CPSIcons.Development)
                 }
             }
         }

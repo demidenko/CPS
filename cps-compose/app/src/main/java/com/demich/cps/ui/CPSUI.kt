@@ -5,8 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -79,7 +77,7 @@ fun CPSReloadingButton(
             )
         } else {
             Icon(
-                imageVector = Icons.Rounded.Refresh,
+                imageVector = CPSIcons.Reload,
                 tint = if (loadingStatus == LoadingStatus.FAILED) cpsColors.errorColor else cpsColors.textColor,
                 contentDescription = null,
                 modifier = Modifier.size(28.dp)

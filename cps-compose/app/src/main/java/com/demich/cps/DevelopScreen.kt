@@ -8,8 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -19,6 +17,7 @@ import androidx.navigation.NavController
 import com.demich.cps.accounts.makeUserInfoSpan
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.CPSIconButton
+import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.RatingGraph
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.ui.rememberRatingGraphUIStates
@@ -127,7 +126,7 @@ fun DevelopScreen(navController: NavController) {
 fun developAdditionalBottomBarBuilder(
     progressBarsViewModel: ProgressBarsViewModel
 ): AdditionalBottomBarBuilder = {
-    CPSIconButton(icon = Icons.Default.Add) {
+    CPSIconButton(icon = CPSIcons.Add) {
         progressBarsViewModel.doJob(
             id = Random.nextLong().toString()
         ) { state ->

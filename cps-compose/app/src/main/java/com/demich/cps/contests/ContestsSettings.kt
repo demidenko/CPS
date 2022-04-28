@@ -6,14 +6,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.*
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -88,7 +89,7 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
             MonospacedText(text = "clist.by::api", modifier = Modifier
                 .weight(1f)
                 .padding(start = 4.dp))
-            CPSIconButton(icon = Icons.Default.HelpOutline) {
+            CPSIconButton(icon = CPSIcons.Help) {
                 context.openUrlInBrowser(CListApi.urls.apiHelp)
             }
         }

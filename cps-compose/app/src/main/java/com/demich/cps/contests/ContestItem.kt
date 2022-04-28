@@ -3,8 +3,6 @@ package com.demich.cps.contests
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.R
 import com.demich.cps.ui.CPSDropdownMenu
 import com.demich.cps.ui.CPSIconButton
+import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
@@ -299,17 +298,17 @@ private fun ContestItemMenuButton(
     var showMenu by remember { mutableStateOf(false) }
     Box(modifier = modifier) {
         CPSIconButton(
-            icon = Icons.Default.MoreVert,
+            icon = CPSIcons.More,
             color = cpsColors.textColorAdditional,
             onClick = { showMenu = true }
         )
         CPSDropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
             if (contestUrl != null) {
-                CPSDropdownMenuItem(title = "Open in browser", icon = Icons.Default.ExitToApp) {
+                CPSDropdownMenuItem(title = "Open in browser", icon = CPSIcons.OpenInBrowser) {
                     context.openUrlInBrowser(contestUrl)
                 }
             }
-            CPSDropdownMenuItem(title = "Remove", icon = Icons.Default.DeleteForever) {
+            CPSDropdownMenuItem(title = "Remove", icon = CPSIcons.Delete) {
                 //TODO: contest to ignore list
             }
         }
@@ -357,7 +356,7 @@ fun ContestPlatformIcon(
     }
 
     Icon(
-        painter = iconId?.let { painterResource(it) } ?: rememberVectorPainter(Icons.Default.EmojiEvents),
+        painter = iconId?.let { painterResource(it) } ?: rememberVectorPainter(CPSIcons.Contest),
         modifier = modifier.size(with(LocalDensity.current) { size.toDp() }),
         tint = color,
         contentDescription = null

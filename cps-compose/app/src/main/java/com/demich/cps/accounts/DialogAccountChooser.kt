@@ -7,10 +7,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,12 +25,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.CPSDialog
+import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.showToast
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlin.reflect.KFunction1
 
 @Composable
@@ -69,7 +69,7 @@ fun<U: UserInfo> DialogAccountChooser(
             text = "getUser(${manager.type.name}):",
             color = cpsColors.textColorAdditional
         ) {
-            Icon(imageVector = Icons.Default.Person, contentDescription = null, tint = it)
+            Icon(imageVector = CPSIcons.Account, contentDescription = null, tint = it)
         }
 
         UserIdTextField(
@@ -228,7 +228,7 @@ private fun TextFieldMainIcon(
                 )
             } else {
                 Icon(
-                    imageVector = Icons.Default.Done,
+                    imageVector = CPSIcons.Done,
                     contentDescription = null,
                     tint = cpsColors.success,
                     modifier = Modifier
@@ -264,7 +264,7 @@ private fun SuggestionsList(
                     )
                 } else {
                     Icon(
-                        imageVector = Icons.Default.Search,
+                        imageVector = CPSIcons.Search,
                         tint = color,
                         contentDescription = null
                     )

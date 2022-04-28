@@ -9,9 +9,6 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -64,17 +61,17 @@ fun CPSTopBar(
 
         IconButton(
             onClick = { showMenu = true },
-            content = { Icon(Icons.Default.MoreVert, null) },
+            content = { Icon(CPSIcons.More, null) },
         )
 
         CPSDropdownMenu(
             expanded = showMenu,
             onDismissRequest = { showMenu = false },
         ) {
-            CPSDropdownMenuItem(title = "UI", icon = Icons.Filled.SettingsApplications) {
+            CPSDropdownMenuItem(title = "UI", icon = CPSIcons.SettingsUI) {
                 showUIPanel = true
             }
-            CPSDropdownMenuItem(title = "About", icon = Icons.Outlined.Info) {
+            CPSDropdownMenuItem(title = "About", icon = CPSIcons.Info) {
                 showAbout = true
             }
             additionalMenu?.let {
@@ -119,13 +116,13 @@ private fun UIPanel(
     val useOriginalColors by rememberCollect { settingsUI.useOriginalColors.flow }
     val darkLightMode by rememberCollect { settingsUI.darkLightMode.flow }
 
-    CPSIconButton(icon = Icons.Default.Close, onClick = onClosePanel)
+    CPSIconButton(icon = CPSIcons.Close, onClick = onClosePanel)
     Row(
         modifier = Modifier.weight(1f),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CPSIconButton(icon = Icons.Default.ColorLens, onState = useOriginalColors) {
+        CPSIconButton(icon = CPSIcons.Colors, onState = useOriginalColors) {
             scope.launch {
                 settingsUI.useOriginalColors(!useOriginalColors)
             }
@@ -150,8 +147,8 @@ private fun DarkLightModeButton(
 ) {
     CPSIconButton(
         icon = when (mode) {
-            DarkLightMode.SYSTEM -> Icons.Default.BrightnessAuto
-            else -> Icons.Default.BrightnessMedium
+            DarkLightMode.SYSTEM -> CPSIcons.DarkLightAuto
+            else -> CPSIcons.DarkLight
         },
         onClick = {
             onModeChanged(

@@ -1,13 +1,11 @@
 package com.demich.cps.news
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.rounded.PeopleAlt
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.CPSMenuBuilder
 import com.demich.cps.Screen
+import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.utils.LoadingStatus
 
@@ -30,10 +28,10 @@ fun newsBottomBarBuilder()
 
 fun newsMenuBuilder(navController: NavController)
 : CPSMenuBuilder = {
-    CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
+    CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings) {
         navController.navigate(Screen.NewsSettings.route)
     }
-    CPSDropdownMenuItem(title = "Follow List", icon = Icons.Rounded.PeopleAlt) {
+    CPSDropdownMenuItem(title = "Follow List", icon = CPSIcons.Accounts) {
         //TODO Open FollowList
     }
 }

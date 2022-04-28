@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -63,7 +61,7 @@ fun<U: RatedUserInfo> RatedAccountManager<U>.RatingLoadButton(
     var showRatingGraph by ratingGraphUIStates.showRatingGraphState
     var loadingStatus by ratingGraphUIStates.loadingStatusState
     CPSIconButton(
-        icon = Icons.Default.Timeline,
+        icon = CPSIcons.RatingGraph,
         enabled = !showRatingGraph || loadingStatus == LoadingStatus.FAILED
     ) {
         ratingGraphUIStates.loadingStatusState.value = LoadingStatus.LOADING

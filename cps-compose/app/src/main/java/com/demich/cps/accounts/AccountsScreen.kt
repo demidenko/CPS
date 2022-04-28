@@ -7,12 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.Photo
-import androidx.compose.material.icons.filled.Reorder
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -62,7 +56,7 @@ fun AccountsScreen(
     }
     if (recordedAccounts.size > 1) {
         onSetAdditionalMenu {
-            CPSDropdownMenuItem(title = "Reorder", icon = Icons.Default.Reorder) {
+            CPSDropdownMenuItem(title = "Reorder", icon = CPSIcons.Reorder) {
                 showAccountsReorderUI = true
             }
         }
@@ -211,11 +205,11 @@ fun accountExpandedMenuBuilder(
     onShowDeleteDialog: () -> Unit
 ): CPSMenuBuilder = {
     val context = context
-    CPSDropdownMenuItem(title = "Delete", icon = Icons.Default.DeleteForever, onClick = onShowDeleteDialog)
-    CPSDropdownMenuItem(title = "Settings", icon = Icons.Default.Settings) {
+    CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete, onClick = onShowDeleteDialog)
+    CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings) {
         navController.navigate(Screen.AccountSettings.route(type))
     }
-    CPSDropdownMenuItem(title = "Origin", icon = Icons.Default.Photo) {
+    CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         val url = context.allAccountManagers.first { it.type == type }.run {
             runBlocking { getSavedInfo().link() }
         }
@@ -257,7 +251,7 @@ private fun AddAccountButton(cpsViewModels: CPSViewModels) {
 
     Box {
         CPSIconButton(
-            icon = Icons.Outlined.AddBox,
+            icon = CPSIcons.Add,
             enabled = cpsViewModels.progressBarsViewModel.clistImportIsRunning.not(),
             onClick = { showMenu = true }
         )

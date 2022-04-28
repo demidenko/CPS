@@ -5,10 +5,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.CPSIconButton
+import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
@@ -105,7 +102,7 @@ private fun AccountPanelUI(
     Row(modifier = modifier) {
         if (loadingStatus != LoadingStatus.LOADING && uiAlpha > 0f) {
             CPSIconButton(
-                icon = Icons.Default.UnfoldMore,
+                icon = CPSIcons.Expand,
                 modifier = Modifier.alpha(uiAlpha),
                 onClick = onExpandRequest
             )
@@ -138,7 +135,7 @@ private fun AccountMovingUI(
     Column(modifier = modifier) {
         if (visibleOrder.first() != type) {
             Icon(
-                imageVector = Icons.Default.ArrowDropUp,
+                imageVector = CPSIcons.MoveUp,
                 contentDescription = null,
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
@@ -153,7 +150,7 @@ private fun AccountMovingUI(
         }
         if (visibleOrder.last() != type) {
             Icon(
-                imageVector = Icons.Default.ArrowDropDown,
+                imageVector = CPSIcons.MoveDown,
                 contentDescription = null,
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
