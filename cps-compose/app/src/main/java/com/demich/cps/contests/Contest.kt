@@ -1,13 +1,19 @@
 package com.demich.cps.contests
 
 import androidx.compose.runtime.Immutable
+import androidx.room.Entity
 import com.demich.cps.utils.CListUtils
 import com.demich.cps.utils.ClistContest
 import com.demich.cps.utils.ComparablePair
+import com.demich.cps.room.ContestsListDao
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+@Entity(
+    tableName = ContestsListDao.contestsListTableName,
+    primaryKeys = ["platform", "id"]
+)
 @Immutable //TODO: wtf this MAKE NOT SENSE?? (because of Instant field?)
 data class Contest (
     val platform: Platform?,
