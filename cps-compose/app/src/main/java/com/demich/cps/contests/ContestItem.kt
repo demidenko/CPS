@@ -4,13 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +21,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.R
+import com.demich.cps.ui.CPSDropdownMenu
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
@@ -44,30 +40,15 @@ fun ContestItem(
     expanded: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val currentTime = LocalCurrentTimeEachSecond.current
-    Column(
-        modifier = modifier
-    ) {
-        if (!expanded) {
-            ContestItemContent(
-                contest = contest,
-                currentTime = currentTime
-            )
-        } else {
-            ContestExpandedItemContent(
-                contest = contest,
-                currentTime = currentTime
-            )
-        }
-
+    Column(modifier = modifier) {
+        if (!expanded) ContestItemContent(contest = contest)
+        else ContestExpandedItemContent(contest = contest)
     }
 }
 
 @Composable
-private fun ContestItemContent(
-    contest: Contest,
-    currentTime: Instant
-) {
+private fun ContestItemContent(contest: Contest) {
+    val currentTime = LocalCurrentTimeEachSecond.current
     ContestItemHeader(
         platform = contest.platform,
         contestTitle = contest.title,
@@ -190,10 +171,8 @@ private fun ContestItemFooter(
 
 
 @Composable
-private fun ContestExpandedItemContent(
-    contest: Contest,
-    currentTime: Instant
-) {
+private fun ContestExpandedItemContent(contest: Contest) {
+    val currentTime = LocalCurrentTimeEachSecond.current
     ContestExpandedItemHeader(
         platform = contest.platform,
         contestTitle = contest.title,
@@ -251,6 +230,7 @@ private fun ContestExpandedItemFooter(
             Contest.Phase.RUNNING -> "ends in " + contestTimeDifference(currentTime, contest.endTime)
             Contest.Phase.FINISHED -> ""
         },
+        contestUrl = contest.link,
         modifier = modifier
     )
 }
@@ -260,33 +240,19 @@ private fun ContestExpandedItemFooter(
     startDate: String,
     endDate: String,
     counter: String,
+    contestUrl: String?,
     modifier: Modifier = Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.align(Alignment.CenterStart)) {
-                MonospacedText(
-                    text = startDate,
-                    fontSize = 15.sp,
-                    color = cpsColors.textColorAdditional
-                )
-                MonospacedText(
-                    text = endDate,
-                    fontSize = 15.sp,
-                    color = cpsColors.textColorAdditional
-                )
-            }
-            CPSIconButton(
-                icon = Icons.Default.MoreVert,
-                color = cpsColors.textColorAdditional,
-                modifier = Modifier.align(Alignment.CenterEnd)
-            ) {
-               //TODO: menu
-            }
-        }
+        ContestExpandedItemDatesAndMenuButton(
+            startDate = startDate,
+            endDate = endDate,
+            contestUrl = contestUrl,
+            modifier = Modifier.fillMaxWidth()
+        )
         if (counter.isNotBlank()) {
             MonospacedText(
                 text = counter,
@@ -297,6 +263,58 @@ private fun ContestExpandedItemFooter(
     }
 }
 
+@Composable
+private fun ContestExpandedItemDatesAndMenuButton(
+    startDate: String,
+    endDate: String,
+    contestUrl: String?,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier) {
+        Column(modifier = Modifier.align(Alignment.CenterStart)) {
+            MonospacedText(
+                text = startDate,
+                fontSize = 15.sp,
+                color = cpsColors.textColorAdditional
+            )
+            MonospacedText(
+                text = endDate,
+                fontSize = 15.sp,
+                color = cpsColors.textColorAdditional
+            )
+        }
+        ContestItemMenuButton(
+            contestUrl = contestUrl,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        )
+    }
+}
+
+@Composable
+private fun ContestItemMenuButton(
+    contestUrl: String?,
+    modifier: Modifier = Modifier
+) {
+    val context = context
+    var showMenu by remember { mutableStateOf(false) }
+    Box(modifier = modifier) {
+        CPSIconButton(
+            icon = Icons.Default.MoreVert,
+            color = cpsColors.textColorAdditional,
+            onClick = { showMenu = true }
+        )
+        CPSDropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+            if (contestUrl != null) {
+                CPSDropdownMenuItem(title = "Open in browser", icon = Icons.Default.ExitToApp) {
+                    context.openUrlInBrowser(contestUrl)
+                }
+            }
+            CPSDropdownMenuItem(title = "Remove", icon = Icons.Default.DeleteForever) {
+                //TODO: contest to ignore list
+            }
+        }
+    }
+}
 
 private fun contestTimeDifference(fromTime: Instant, toTime: Instant): String {
     val t: Duration = toTime - fromTime

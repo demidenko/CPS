@@ -45,7 +45,7 @@ fun ContestsScreen(
     var searchText by rememberSaveable { mutableStateOf("") }
     Column {
         if (searchEnabledState.value) {
-            ContestsSearch(
+            ContestsSearchField(
                 modifier = Modifier.fillMaxWidth(),
                 value = searchText,
                 onValueChange = {
@@ -85,11 +85,8 @@ private fun ContestsScreen(
                     .fillMaxWidth()
             )
             ContestsList(
-                contests = contests.filter { contest ->
-                    val inTitle = contest.title.contains(searchText, ignoreCase = true)
-                    val inPlatformName = contest.platform?.name?.contains(searchText, ignoreCase = true) ?: false
-                    inTitle || inPlatformName
-                },
+                contests = contests,
+                searchText = searchText,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
@@ -102,6 +99,7 @@ private fun ContestsScreen(
 @Composable
 private fun ContestsList(
     contests: List<Contest>,
+    searchText: String,
     modifier: Modifier = Modifier
 ) {
     val currentTime by collectCurrentTime()
@@ -117,7 +115,8 @@ private fun ContestsList(
 
     CompositionLocalProvider(LocalCurrentTimeEachSecond provides currentTime) {
         ContestsSortedList(
-            contestsSortedState = sortedState,
+            contestsSortedListState = sortedState,
+            searchText = searchText,
             modifier = modifier
         )
     }
@@ -126,14 +125,24 @@ private fun ContestsList(
 
 @Composable
 private fun ContestsSortedList(
-    contestsSortedState: State<List<Contest>>,
+    contestsSortedListState: State<List<Contest>>,
+    searchText: String,
     modifier: Modifier = Modifier
 ) {
     var expandedItems: Set<Pair<Contest.Platform?, String>>
         by rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(emptySet()) }
+
+    val filteredContests = remember(contestsSortedListState.value, searchText) {
+        contestsSortedListState.value.filter { contest ->
+            val inTitle = contest.title.contains(searchText, ignoreCase = true)
+            val inPlatformName = contest.platform?.name?.contains(searchText, ignoreCase = true) ?: false
+            inTitle || inPlatformName
+        }
+    }
+
     LazyColumnWithScrollBar(modifier = modifier) {
         items(
-            items = contestsSortedState.value,
+            items = filteredContests,
             /*key = { it.compositeId }*/ //TODO: key effects jumping on reorder
         ) { contest ->
             ContestItem(
@@ -159,7 +168,7 @@ private fun ContestsSortedList(
 }
 
 @Composable
-private fun ContestsSearch(
+private fun ContestsSearchField(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
