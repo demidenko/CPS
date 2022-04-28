@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demich.cps.room.contestsListDao
 import com.demich.cps.utils.CListApi
 import com.demich.cps.utils.ClistContest
 import com.demich.cps.utils.LoadingStatus
@@ -19,30 +20,46 @@ class ContestsViewModel: ViewModel() {
     var loadingStatus by mutableStateOf(LoadingStatus.PENDING)
         private set
 
-    private val contestsStateFlow = MutableStateFlow<List<Contest>>(emptyList())
-    fun flowOfContests() = contestsStateFlow.asStateFlow()
-
     private val errorStateFlow = MutableStateFlow<Throwable?>(null)
     fun flowOfError() = errorStateFlow.asStateFlow()
 
-    fun reload(context: Context) {
+    fun reloadEnabledPlatforms(context: Context) {
         viewModelScope.launch {
-            loadingStatus = LoadingStatus.LOADING
-            errorStateFlow.value = null
             val settings = context.settingsContests
-            runCatching {
-                CListApi.getContests(
-                    apiAccess = settings.clistApiAccess(),
-                    platforms = settings.enabledPlatforms(),
-                    startTime = getCurrentTime() - 7.days
-                ).mapAndFilterResult()
-            }.onSuccess { contests ->
-                loadingStatus = LoadingStatus.PENDING
-                contestsStateFlow.value = contests
-            }.onFailure {
-                loadingStatus = LoadingStatus.FAILED
-                errorStateFlow.value = it
+            val enabledPlatforms = settings.enabledPlatforms()
+            context.contestsListDao.run {
+                Contest.getPlatforms().forEach { platform ->
+                    if (platform !in enabledPlatforms) remove(platform)
+                }
             }
+            reload(platforms = enabledPlatforms, context = context)
+        }
+    }
+
+    private suspend fun reload(platforms: Collection<Contest.Platform>, context: Context) {
+        if (platforms.isEmpty()) return
+
+        errorStateFlow.value = null
+        loadingStatus = LoadingStatus.LOADING
+
+        runCatching {
+            val settings = context.settingsContests
+            CListApi.getContests(
+                apiAccess = settings.clistApiAccess(),
+                platforms = settings.enabledPlatforms(),
+                startTime = getCurrentTime() - 7.days
+            ).mapAndFilterResult()
+        }.onSuccess { contests: List<Contest> ->
+            val grouped = contests.groupBy { it.platform }
+            context.contestsListDao.run {
+                platforms.forEach { platform ->
+                    replace(platform = platform, contests = grouped[platform] ?: emptyList())
+                }
+            }
+            loadingStatus = LoadingStatus.PENDING
+        }.onFailure {
+            loadingStatus = LoadingStatus.FAILED
+            errorStateFlow.value = it
         }
     }
 }

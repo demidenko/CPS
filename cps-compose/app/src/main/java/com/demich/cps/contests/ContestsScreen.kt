@@ -72,7 +72,7 @@ private fun ContestsScreen(
     val context = context
 
     val contests by rememberCollect {
-        contestsViewModel.flowOfContests()
+        context.contestsListDao.flowOfContests()
             .combine(context.settingsContests.ignoredContests.flow) { list, ignoreList ->
                 list.filter { contest -> contest.compositeId !in ignoreList }
             }
@@ -82,7 +82,7 @@ private fun ContestsScreen(
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = contestsViewModel.loadingStatus == LoadingStatus.LOADING),
-        onRefresh = { contestsViewModel.reload(context) }
+        onRefresh = { contestsViewModel.reloadEnabledPlatforms(context) }
     ) {
         Column {
             LoadingError(
@@ -242,6 +242,6 @@ fun contestsBottomBarBuilder(
         onEnableSearch()
     }
     CPSReloadingButton(loadingStatus = contestsViewModel.loadingStatus) {
-        contestsViewModel.reload(context)
+        contestsViewModel.reloadEnabledPlatforms(context)
     }
 }
