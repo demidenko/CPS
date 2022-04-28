@@ -2,10 +2,10 @@ package com.demich.cps.contests
 
 import androidx.compose.runtime.Immutable
 import androidx.room.Entity
+import com.demich.cps.room.ContestsListDao
 import com.demich.cps.utils.CListUtils
 import com.demich.cps.utils.ClistContest
 import com.demich.cps.utils.ComparablePair
-import com.demich.cps.room.ContestsListDao
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -67,7 +67,10 @@ data class Contest (
     }
 
     companion object {
-        fun getPlatforms() = Platform.values().filter { it != Platform.unknown }
+        private var cachedPlatforms: List<Platform>? = null
+        fun getPlatforms(): List<Platform> = cachedPlatforms
+            ?: Platform.values().filter { it != Platform.unknown }
+            .also { cachedPlatforms = it }
 
         fun getComparator(currentTime: Instant) = compareBy<Contest> { contest ->
             when(contest.getPhase(currentTime)) {
