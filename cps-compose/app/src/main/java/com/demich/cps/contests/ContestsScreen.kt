@@ -21,6 +21,7 @@ import androidx.navigation.NavController
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.CPSMenuBuilder
 import com.demich.cps.Screen
+import com.demich.cps.room.contestsListDao
 import com.demich.cps.settingsDev
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -134,13 +135,13 @@ private fun ContestsSortedList(
     searchText: String,
     modifier: Modifier = Modifier
 ) {
-    var expandedItems: Set<Pair<Contest.Platform?, String>>
+    var expandedItems: Set<Pair<Contest.Platform, String>>
         by rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(emptySet()) }
 
     val filteredContests = remember(contestsSortedListState.value, searchText) {
         contestsSortedListState.value.filter { contest ->
             val inTitle = contest.title.contains(searchText, ignoreCase = true)
-            val inPlatformName = contest.platform?.name?.contains(searchText, ignoreCase = true) ?: false
+            val inPlatformName = contest.platform.name.contains(searchText, ignoreCase = true)
             inTitle || inPlatformName
         }
     }

@@ -24,6 +24,7 @@ object CListUtils {
 
     fun getClistApiResourceId(platform: Contest.Platform): Int =
         when(platform) {
+            Contest.Platform.unknown -> throw IllegalArgumentException("unknown not allowed")
             Contest.Platform.codeforces -> 1
             Contest.Platform.atcoder -> 93
             Contest.Platform.topcoder -> 12

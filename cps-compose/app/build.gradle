@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -12,7 +13,7 @@ android {
         minSdk 23
         targetSdk 32
 
-        versionCode 102
+        versionCode 103
         versionName '1.5.2'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -30,7 +31,7 @@ android {
 
     applicationVariants.all { variant ->
         if (variant.name.contains("debug")) {
-            variant.mergedFlavor.applicationId = "com.demich.cps.debug"
+            variant.mergedFlavor.applicationId += ".debug"
         }
     }
 
@@ -73,8 +74,8 @@ dependencies {
 
     implementation "androidx.datastore:datastore-preferences:1.0.0"
 
-    implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 
     implementation "io.ktor:ktor-client-okhttp:$ktor_version"
     implementation "io.ktor:ktor-client-json:$ktor_version"
