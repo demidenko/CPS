@@ -43,6 +43,7 @@ fun ContestsScreen(
     var searchText by rememberSaveable { mutableStateOf("") }
     Column {
         if (searchEnabledState.value) {
+            //TODO: show in bottom, imePadding, focus request
             ContestsSearchField(
                 modifier = Modifier.fillMaxWidth(),
                 value = searchText,
