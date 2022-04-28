@@ -130,3 +130,7 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         )
 
 }
+
+suspend fun<T> CPSDataStoreItem<List<T>>.add(value: T) {
+    invoke(newValue = invoke() + value)
+}

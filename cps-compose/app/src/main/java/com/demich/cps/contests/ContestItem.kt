@@ -1,8 +1,10 @@
 package com.demich.cps.contests
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +30,7 @@ import com.demich.cps.utils.*
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -222,24 +225,20 @@ private fun ContestExpandedItemFooter(
     modifier: Modifier = Modifier
 ) {
     ContestExpandedItemFooter(
-        startDate = contest.startTime.contestDate(),
-        endDate = contest.endTime.contestDate(),
+        contest = contest,
         counter = when (contest.getPhase(currentTime)) {
             Contest.Phase.BEFORE -> "starts in " + contestTimeDifference(currentTime, contest.startTime)
             Contest.Phase.RUNNING -> "ends in " + contestTimeDifference(currentTime, contest.endTime)
             Contest.Phase.FINISHED -> ""
         },
-        contestUrl = contest.link,
         modifier = modifier
     )
 }
 
 @Composable
 private fun ContestExpandedItemFooter(
-    startDate: String,
-    endDate: String,
+    contest: Contest,
     counter: String,
-    contestUrl: String?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -247,9 +246,7 @@ private fun ContestExpandedItemFooter(
         modifier = modifier
     ) {
         ContestExpandedItemDatesAndMenuButton(
-            startDate = startDate,
-            endDate = endDate,
-            contestUrl = contestUrl,
+            contest = contest,
             modifier = Modifier.fillMaxWidth()
         )
         if (counter.isNotBlank()) {
@@ -264,26 +261,24 @@ private fun ContestExpandedItemFooter(
 
 @Composable
 private fun ContestExpandedItemDatesAndMenuButton(
-    startDate: String,
-    endDate: String,
-    contestUrl: String?,
+    contest: Contest,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
         Column(modifier = Modifier.align(Alignment.CenterStart)) {
             MonospacedText(
-                text = startDate,
+                text = contest.startTime.contestDate(),
                 fontSize = 15.sp,
                 color = cpsColors.textColorAdditional
             )
             MonospacedText(
-                text = endDate,
+                text = contest.endTime.contestDate(),
                 fontSize = 15.sp,
                 color = cpsColors.textColorAdditional
             )
         }
         ContestItemMenuButton(
-            contestUrl = contestUrl,
+            contest = contest,
             modifier = Modifier.align(Alignment.CenterEnd)
         )
     }
@@ -291,11 +286,13 @@ private fun ContestExpandedItemDatesAndMenuButton(
 
 @Composable
 private fun ContestItemMenuButton(
-    contestUrl: String?,
+    contest: Contest,
     modifier: Modifier = Modifier
 ) {
     val context = context
+    val scope = rememberCoroutineScope()
     var showMenu by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
     Box(modifier = modifier) {
         CPSIconButton(
             icon = CPSIcons.More,
@@ -303,16 +300,51 @@ private fun ContestItemMenuButton(
             onClick = { showMenu = true }
         )
         CPSDropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-            if (contestUrl != null) {
+            if (contest.link != null) {
                 CPSDropdownMenuItem(title = "Open in browser", icon = CPSIcons.OpenInBrowser) {
-                    context.openUrlInBrowser(contestUrl)
+                    context.openUrlInBrowser(contest.link)
                 }
             }
-            CPSDropdownMenuItem(title = "Remove", icon = CPSIcons.Delete) {
-                //TODO: contest to ignore list
+            CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete) {
+                showDeleteDialog = true
             }
         }
     }
+    if (showDeleteDialog) {
+        ContestDeleteDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            onDeleteRequest = {
+                scope.launch {
+                    context.settingsContests.ignoredContests.add(contest.compositeId)
+                }
+                showDeleteDialog = false
+            }
+        )
+    }
+}
+
+@Composable
+private fun ContestDeleteDialog(
+    onDeleteRequest: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(
+                content = { Text(text = "Delete", color = cpsColors.errorColor) },
+                onClick = onDeleteRequest
+            )
+        },
+        dismissButton = {
+            TextButton(
+                content = { Text("Cancel") },
+                onClick = onDismissRequest
+            )
+        },
+        title = { Text("Delete contest from list?") },
+        backgroundColor = cpsColors.background
+    )
 }
 
 private fun contestTimeDifference(fromTime: Instant, toTime: Instant): String {

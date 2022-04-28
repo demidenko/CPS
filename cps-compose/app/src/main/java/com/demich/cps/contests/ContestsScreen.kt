@@ -32,6 +32,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import io.ktor.client.features.*
 import io.ktor.http.*
+import kotlinx.coroutines.flow.combine
 import java.net.UnknownHostException
 
 @Composable
@@ -68,7 +69,13 @@ private fun ContestsScreen(
 ) {
     val context = context
 
-    val contests by contestsViewModel.flowOfContests().collectAsState()
+    val contests by rememberCollect {
+        contestsViewModel.flowOfContests()
+            .combine(context.settingsContests.ignoredContests.flow) { list, ignoreList ->
+                list.filter { contest -> contest.compositeId !in ignoreList }
+            }
+    }
+
     val error by contestsViewModel.flowOfError().collectAsState()
 
     SwipeRefresh(
