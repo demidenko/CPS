@@ -35,9 +35,15 @@ class ContestsViewModel: ViewModel() {
     }
 
     private suspend fun reload(platforms: Collection<Contest.Platform>, context: Context) {
-        if (platforms.isEmpty()) return
+        require(loadingStatus != LoadingStatus.LOADING) //TODO consider cases and solutions
 
         errorStateFlow.value = null
+
+        if (platforms.isEmpty()) {
+            loadingStatus = LoadingStatus.PENDING
+            return
+        }
+
         loadingStatus = LoadingStatus.LOADING
 
         kotlin.runCatching {
