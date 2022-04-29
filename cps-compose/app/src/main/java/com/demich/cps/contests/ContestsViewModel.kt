@@ -42,14 +42,17 @@ class ContestsViewModel: ViewModel() {
 
         kotlin.runCatching {
             val settings = context.settingsContests
+            val now = getCurrentTime()
             val contests = CListApi.getContests(
                 apiAccess = settings.clistApiAccess(),
                 platforms = platforms,
-                startTime = getCurrentTime() - 7.days
+                maxStartTime = now + 120.days,
+                minEndTime = now - 7.days
             ).mapAndFilterResult()
+                .filter { it.duration < 32.days } //TODO: setup max duration in settings
             settings.lastLoadedPlatforms.addAll(platforms)
             contests
-        }.onSuccess { contests: List<Contest> ->
+        }.onSuccess { contests ->
             val grouped = contests.groupBy { it.platform }
             context.contestsListDao.let { dao ->
                 platforms.forEach { platform ->

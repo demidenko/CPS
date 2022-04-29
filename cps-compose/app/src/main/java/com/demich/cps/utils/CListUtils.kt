@@ -5,7 +5,6 @@ import com.demich.cps.contests.Contest
 import io.ktor.client.request.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
-import kotlin.time.Duration.Companion.days
 
 object CListUtils {
     fun getManager(resource: String, userName: String, link: String): Pair<AccountManagers, String>? {
@@ -65,14 +64,15 @@ object CListApi {
     suspend fun getContests(
         apiAccess: ApiAccess,
         platforms: Collection<Contest.Platform>,
-        startTime: Instant,
-        endTime: Instant = startTime + 120.days
+        maxStartTime: Instant,
+        minEndTime: Instant
     ): List<ClistContest> {
-        return client.get<ClistApiResponse<ClistContest>>("https://clist.by/api/v2/contest/?format=json") {
+        return client.get<ClistApiResponse<ClistContest>>("https://clist.by/api/v2/contest") {
+            parameter("format", "json")
             parameter("username", apiAccess.login)
             parameter("api_key", apiAccess.key)
-            parameter("start__gte", startTime.toString())
-            parameter("end__lte", endTime.toString())
+            parameter("start__lte", maxStartTime.toString())
+            parameter("end__gte", minEndTime.toString())
             parameter("resource_id__in", platforms.joinToString { CListUtils.getClistApiResourceId(it).toString() })
         }.objects
     }
