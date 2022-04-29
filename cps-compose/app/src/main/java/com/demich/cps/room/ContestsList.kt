@@ -5,7 +5,8 @@ import androidx.room.*
 import com.demich.cps.contests.Contest
 import kotlinx.coroutines.flow.Flow
 
-val Context.contestsListDao get() = RoomSingleton.getInstance(this).contestsListDao()
+val Context.contestsListDao: ContestsListDao
+    get() = RoomSingleton.getInstance(this).contestsListDao()
 
 @Dao
 interface ContestsListDao {

@@ -7,10 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.room.contestsListDao
-import com.demich.cps.utils.CListApi
-import com.demich.cps.utils.ClistContest
-import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -32,6 +29,7 @@ class ContestsViewModel: ViewModel() {
                     if (platform !in enabledPlatforms) remove(platform)
                 }
             }
+            settings.lastLoadedPlatforms(newValue = emptySet())
             reload(platforms = enabledPlatforms, context = context)
         }
     }
@@ -42,24 +40,41 @@ class ContestsViewModel: ViewModel() {
         errorStateFlow.value = null
         loadingStatus = LoadingStatus.LOADING
 
-        runCatching {
+        kotlin.runCatching {
             val settings = context.settingsContests
-            CListApi.getContests(
+            val contests = CListApi.getContests(
                 apiAccess = settings.clistApiAccess(),
-                platforms = settings.enabledPlatforms(),
+                platforms = platforms,
                 startTime = getCurrentTime() - 7.days
             ).mapAndFilterResult()
+            settings.lastLoadedPlatforms.addAll(platforms)
+            contests
         }.onSuccess { contests: List<Contest> ->
             val grouped = contests.groupBy { it.platform }
-            context.contestsListDao.run {
+            context.contestsListDao.let { dao ->
                 platforms.forEach { platform ->
-                    replace(platform = platform, contests = grouped[platform] ?: emptyList())
+                    dao.replace(platform = platform, contests = grouped[platform] ?: emptyList())
                 }
             }
             loadingStatus = LoadingStatus.PENDING
         }.onFailure {
             loadingStatus = LoadingStatus.FAILED
             errorStateFlow.value = it
+        }
+    }
+
+    fun syncEnabledAndLastReloaded(context: Context) {
+        viewModelScope.launch {
+            val settings = context.settingsContests
+            val enabled = settings.enabledPlatforms()
+            val lastReloaded = settings.lastLoadedPlatforms()
+            val toReload = enabled.filter { it !in lastReloaded }
+            val toRemove = lastReloaded.filter { it !in enabled }
+            settings.lastLoadedPlatforms(newValue = lastReloaded - toRemove /* = enabled - toReload*/)
+            context.contestsListDao.let { dao ->
+                toRemove.forEach { platform -> dao.remove(platform) }
+                reload(platforms = toReload, context = context)
+            }
         }
     }
 }

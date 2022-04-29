@@ -99,6 +99,11 @@ private fun ContestsScreen(
             )
         }
     }
+
+    //TODO: first time app on screen, what to do?
+    LaunchedEffect(Unit) {
+        contestsViewModel.syncEnabledAndLastReloaded(context)
+    }
 }
 
 

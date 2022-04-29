@@ -131,6 +131,16 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
 
 }
 
+@JvmName("addList")
 suspend fun<T> CPSDataStoreItem<List<T>>.add(value: T) {
     invoke(newValue = invoke() + value)
+}
+
+@JvmName("addSet")
+suspend fun<T> CPSDataStoreItem<Set<T>>.add(value: T) {
+    invoke(newValue = invoke() + value)
+}
+
+suspend fun<T> CPSDataStoreItem<Set<T>>.addAll(values: Collection<T>) {
+    invoke(newValue = invoke() + values)
 }
