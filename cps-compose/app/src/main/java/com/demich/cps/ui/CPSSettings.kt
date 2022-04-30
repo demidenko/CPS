@@ -2,6 +2,7 @@ package com.demich.cps.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
@@ -38,7 +39,7 @@ fun SettingsItem(
     Spacer(modifier = Modifier.height(10.dp).fillMaxWidth())
     Box(
         modifier = modifier
-            .background(cpsColors.backgroundAdditional)
+            .background(cpsColors.backgroundAdditional, RoundedCornerShape(4.dp))
             .fillMaxWidth()
             .padding(all = 10.dp)
     ) {
@@ -77,7 +78,8 @@ private fun SwitchSettingsItem(
             ) {
                 Text(
                     text = title,
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
                 if (description.isNotBlank()) {
                     Text(
@@ -112,7 +114,7 @@ fun<T> SettingsItemWithInfo(
             Text(
                 text = title,
                 fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.SemiBold
             )
             infoContent(value)
         }
