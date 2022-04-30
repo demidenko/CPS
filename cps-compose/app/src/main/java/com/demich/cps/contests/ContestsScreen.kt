@@ -71,7 +71,7 @@ private fun ContestsScreen(
 ) {
     val context = context
 
-    val contests by rememberCollect {
+    val contestsState = rememberCollect {
         context.contestsListDao.flowOfContests()
             .combine(context.settingsContests.ignoredContests.flow) { list, ignoreList ->
                 list.filter { contest -> contest.compositeId !in ignoreList }
@@ -91,7 +91,7 @@ private fun ContestsScreen(
                     .fillMaxWidth()
             )
             ContestsList(
-                contests = contests,
+                contestsState = contestsState,
                 searchText = searchText,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -109,14 +109,14 @@ private fun ContestsScreen(
 
 @Composable
 private fun ContestsList(
-    contests: List<Contest>,
+    contestsState: State<List<Contest>>,
     searchText: String,
     modifier: Modifier = Modifier
 ) {
     val currentTime by collectCurrentTime()
 
-    val sortedState = remember(contests) {
-        mutableStateOf(contests)
+    val sortedState = remember(contestsState.value) {
+        mutableStateOf(contestsState.value)
     }.apply {
         value.let {
             val comparator = Contest.getComparator(currentTime)

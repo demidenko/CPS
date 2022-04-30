@@ -28,6 +28,7 @@ import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -364,7 +365,8 @@ fun collectCurrentTime(): State<Instant> {
                 val currentTime = getCurrentTime()
                 emit(currentTime)
                 println(currentTime)
-                kotlinx.coroutines.delay(1000 - currentTime.toEpochMilliseconds() % 1000)
+                val rem = currentTime.toEpochMilliseconds() % 1000
+                delay(timeMillis = if (rem == 0L) 1000 else 1000 - rem)
             }
         }
     }.collectAsStateLifecycleAware(initial = remember { getCurrentTime() })
