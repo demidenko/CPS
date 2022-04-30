@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.room.contestsListDao
 import com.demich.cps.utils.*
 import kotlinx.coroutines.flow.MutableStateFlow

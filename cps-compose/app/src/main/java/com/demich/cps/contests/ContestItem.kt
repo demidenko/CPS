@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.R
+import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.ui.CPSDropdownMenu
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
