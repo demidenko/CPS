@@ -53,7 +53,8 @@ class ContestsViewModel: ViewModel() {
                 apiAccess = settings.clistApiAccess(),
                 platforms = platforms,
                 maxStartTime = now + 120.days,
-                minEndTime = now - 7.days
+                minEndTime = now - 7.days,
+                includeResourceIds = { settings.clistAdditionalResources().map { it.id } }
             ).mapAndFilterResult()
                 .filter { it.duration < 32.days } //TODO: setup max duration in settings
             settings.lastLoadedPlatforms.addAll(platforms)
@@ -73,6 +74,7 @@ class ContestsViewModel: ViewModel() {
     }
 
     fun syncEnabledAndLastReloaded(context: Context) {
+        //TODO: sync clist additional
         viewModelScope.launch {
             val settings = context.settingsContests
             val enabled = settings.enabledPlatforms()

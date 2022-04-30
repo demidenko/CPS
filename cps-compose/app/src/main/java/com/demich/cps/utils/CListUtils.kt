@@ -74,13 +74,24 @@ object CListApi {
             parameter("api_key", apiAccess.key)
             parameter("start__lte", maxStartTime.toString())
             parameter("end__gte", minEndTime.toString())
-            val resources = buildList {
+            val resourceIds: List<Int> = buildList {
                 for (platform in platforms) {
                     if (platform == Contest.Platform.unknown) addAll(includeResourceIds())
                     else add(CListUtils.getClistApiResourceId(platform))
                 }
             }
-            parameter("resource_id__in", resources.joinToString())
+            parameter("resource_id__in", resourceIds.joinToString())
+        }.objects
+    }
+
+    suspend fun getResources(
+        apiAccess: ApiAccess
+    ): List<ClistResource> {
+        return client.get<ClistApiResponse<ClistResource>>(urlString = "https://clist.by/api/v2/resource") {
+            parameter("format", "json")
+            parameter("username", apiAccess.login)
+            parameter("api_key", apiAccess.key)
+            parameter("limit", 1000)
         }.objects
     }
 
@@ -112,6 +123,12 @@ data class ClistContest(
     val event: String,
     val href: String,
     val host: String
+)
+
+@Serializable
+data class ClistResource(
+    val id: Int,
+    val name: String
 )
 
 private fun String.removePrefixHttp() = removePrefix("http://").removePrefix("https://")

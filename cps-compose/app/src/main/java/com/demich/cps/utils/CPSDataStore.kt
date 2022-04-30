@@ -136,6 +136,11 @@ suspend fun<T> CPSDataStoreItem<List<T>>.add(value: T) {
     invoke(newValue = invoke() + value)
 }
 
+@JvmName("removeList")
+suspend fun<T> CPSDataStoreItem<List<T>>.remove(value: T) {
+    invoke(newValue = invoke() - value)
+}
+
 @JvmName("addSet")
 suspend fun<T> CPSDataStoreItem<Set<T>>.add(value: T) {
     invoke(newValue = invoke() + value)

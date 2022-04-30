@@ -137,6 +137,7 @@ fun CounterButton(text: String) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CPSDialog(
+    modifier: Modifier = Modifier,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     onDismissRequest: () -> Unit,
     content: @Composable ColumnScope.() -> Unit
@@ -152,7 +153,7 @@ fun CPSDialog(
             modifier = Modifier.padding(horizontal = 26.dp, vertical = 12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(all = 18.dp),
+                modifier = modifier.padding(all = 18.dp),
                 horizontalAlignment = horizontalAlignment,
                 content = content
             )

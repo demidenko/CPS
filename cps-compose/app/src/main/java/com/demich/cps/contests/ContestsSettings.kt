@@ -3,6 +3,8 @@ package com.demich.cps.contests
 import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
@@ -14,6 +16,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -36,6 +39,7 @@ fun ContestsSettingsScreen(navController: NavController) {
             item = settings.enabledPlatforms
         )
         ClistApiKeySettingsItem(item = settings.clistApiAccess)
+        ClistAdditionalPlatforms(item = settings.clistAdditionalResources)
     }
 }
 
@@ -228,6 +232,105 @@ private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
     }
 }
 
+
+@Composable
+private fun ClistAdditionalPlatforms(
+    item: CPSDataStoreItem<List<ClistResource>>
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    SettingsItemWithInfo(
+        modifier = Modifier.clickable { showDialog = true },
+        item = item,
+        title = "Clist additional"
+    ) { resources ->
+        Text(
+            text = resources.joinToString { it.name },
+            fontSize = 15.sp,
+            color = cpsColors.textColorAdditional,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+
+    if (showDialog) {
+        ClistAdditionalResourcesDialog(
+            item = item,
+            onDismissRequest = { showDialog = false }
+        )
+    }
+}
+
+@Composable
+fun ClistAdditionalResourcesDialog(
+    item: CPSDataStoreItem<List<ClistResource>>,
+    onDismissRequest: () -> Unit
+) {
+    val context = context
+    val scope = rememberCoroutineScope()
+
+    var loadingStatus by remember { mutableStateOf(LoadingStatus.PENDING) }
+    var unselectedItems: List<ClistResource> by remember { mutableStateOf(emptyList()) }
+
+    val selectedItems by rememberCollect { item.flow }
+
+    LaunchedEffect(Unit) {
+        loadingStatus = LoadingStatus.LOADING
+        kotlin.runCatching {
+            CListApi.getResources(apiAccess = context.settingsContests.clistApiAccess())
+        }.onFailure {
+            loadingStatus = LoadingStatus.FAILED
+        }.onSuccess { resources ->
+            val alreadySupported = Contest.platformsExceptUnknown.map { CListUtils.getClistApiResourceId(it) }
+            unselectedItems = resources
+                .filter { it.id !in alreadySupported }
+                .sortedBy { it.name }
+            loadingStatus = LoadingStatus.PENDING
+        }
+    }
+
+    CPSDialog(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(max = 400.dp),
+        onDismissRequest = onDismissRequest
+    ) {
+        LazyColumnWithScrollBar(
+            modifier = Modifier.weight(1f)
+        ) {
+            items(items = selectedItems, key = { it.id }) { resource ->
+                Text(
+                    text = resource.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            scope.launch { item.remove(resource) }
+                        }
+                        .padding(all = 2.dp)
+                )
+                Divider()
+            }
+        }
+
+        LazyColumnWithScrollBar(
+            modifier = Modifier.weight(1f).padding(top = 4.dp)
+        ) {
+            items(items = unselectedItems, key = { it.id }) { resource ->
+                Text(
+                    text = resource.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(enabled = resource !in selectedItems) {
+                            scope.launch { item.add(resource) }
+                        }
+                        .padding(all = 2.dp)
+                )
+                Divider()
+            }
+        }
+    }
+}
+
+
 val Context.settingsContests: ContestsSettingsDataStore
     get() = ContestsSettingsDataStore(this)
 
@@ -237,9 +340,10 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
         private val Context.contests_settings_dataStore by preferencesDataStore("contests_settings")
     }
 
-    val clistApiAccess = itemJsonable(name = "clist_api_access", defaultValue = CListApi.ApiAccess("", ""))
-
     val enabledPlatforms = itemEnumSet(name = "enabled_platforms", defaultValue = Contest.platforms.toSet())
     val lastLoadedPlatforms = itemEnumSet<Contest.Platform>(name = "last_reloaded_platforms", defaultValue = emptySet())
     val ignoredContests = itemJsonable(name = "ignored_contests_list", defaultValue = emptyList<Pair<Contest.Platform, String>>())
+
+    val clistApiAccess = itemJsonable(name = "clist_api_access", defaultValue = CListApi.ApiAccess("", ""))
+    val clistAdditionalResources = itemJsonable<List<ClistResource>>(name = "clist_additional_resources", defaultValue = emptyList())
 }
