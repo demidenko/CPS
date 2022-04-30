@@ -64,6 +64,7 @@ object CListApi {
     suspend fun getContests(
         apiAccess: ApiAccess,
         platforms: Collection<Contest.Platform>,
+        includeResourceIds: suspend () -> List<Int> = { emptyList() },
         maxStartTime: Instant,
         minEndTime: Instant
     ): List<ClistContest> {
@@ -73,7 +74,13 @@ object CListApi {
             parameter("api_key", apiAccess.key)
             parameter("start__lte", maxStartTime.toString())
             parameter("end__gte", minEndTime.toString())
-            parameter("resource_id__in", platforms.joinToString { CListUtils.getClistApiResourceId(it).toString() })
+            val resources = buildList {
+                for (platform in platforms) {
+                    if (platform == Contest.Platform.unknown) addAll(includeResourceIds())
+                    else add(CListUtils.getClistApiResourceId(platform))
+                }
+            }
+            parameter("resource_id__in", resources.joinToString())
         }.objects
     }
 

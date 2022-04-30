@@ -36,7 +36,7 @@ data class Contest (
 
     constructor(contest: ClistContest): this(
         contest = contest,
-        platform = getPlatforms()
+        platform = platformsExceptUnknown
             .find { CListUtils.getClistApiResourceId(it) == contest.resource_id }
             ?: Platform.unknown
     )
@@ -67,10 +67,8 @@ data class Contest (
     }
 
     companion object {
-        private var cachedPlatforms: List<Platform>? = null
-        fun getPlatforms(): List<Platform> = cachedPlatforms
-            ?: Platform.values().filter { it != Platform.unknown }
-            .also { cachedPlatforms = it }
+        val platforms: List<Platform> by lazy { Platform.values().toList() }
+        val platformsExceptUnknown: List<Platform> by lazy { Platform.values().filter { it != Platform.unknown } }
 
         fun getComparator(currentTime: Instant) = compareBy<Contest> { contest ->
             when(contest.getPhase(currentTime)) {

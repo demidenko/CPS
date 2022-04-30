@@ -25,7 +25,7 @@ class ContestsViewModel: ViewModel() {
             val settings = context.settingsContests
             val enabledPlatforms = settings.enabledPlatforms()
             context.contestsListDao.run {
-                Contest.getPlatforms().forEach { platform ->
+                Contest.platforms.forEach { platform ->
                     if (platform !in enabledPlatforms) remove(platform)
                 }
             }
