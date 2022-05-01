@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.Contest
 import com.demich.cps.ui.CPSDialog
 import com.demich.cps.ui.LazyColumnWithScrollBar
+import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.SettingsItemWithInfo
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
@@ -77,38 +78,75 @@ private fun ClistAdditionalResourcesDialog(
     }
 
     CPSDialog(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(max = 400.dp),
+        modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismissRequest
     ) {
-        LazyColumnWithScrollBar(
-            modifier = Modifier.weight(1f)
-        ) {
-            items(items = selectedItems, key = { it.id }) { resource ->
+        SelectedPlatforms(
+            resources = selectedItems,
+            modifier = Modifier
+                .padding(all = 3.dp)
+                .heightIn(max = 200.dp)
+        ) { resource ->
+            scope.launch { item.remove(resource) }
+        }
+
+        UnselectedPlatforms(
+            loadingStatus = loadingStatus,
+            resources = unselectedItems - selectedItems,
+            modifier = Modifier
+                .padding(all = 3.dp)
+                .heightIn(max = 200.dp),
+            onClick = { resource ->
+                scope.launch { item.add(resource) }
+            }
+        )
+
+
+    }
+}
+
+@Composable
+private fun SelectedPlatforms(
+    modifier: Modifier = Modifier,
+    resources: List<ClistResource>,
+    onClick: (ClistResource) -> Unit
+) {
+    LazyColumnWithScrollBar(modifier = modifier) {
+        items(items = resources, key = { it.id }) { resource ->
+            Text(
+                text = resource.name,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        onClick(resource)
+                    }
+                    .padding(all = 2.dp)
+            )
+            Divider()
+        }
+    }
+}
+
+@Composable
+private fun UnselectedPlatforms(
+    modifier: Modifier = Modifier,
+    loadingStatus: LoadingStatus,
+    resources: List<ClistResource>,
+    onClick: (ClistResource) -> Unit
+) {
+    LoadingContentBox(
+        loadingStatus = loadingStatus,
+        failedText = "Failed to load resources",
+        modifier = modifier
+    ) {
+        LazyColumnWithScrollBar {
+            items(items = resources, key = { it.id }) { resource ->
                 Text(
                     text = resource.name,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            scope.launch { item.remove(resource) }
-                        }
-                        .padding(all = 2.dp)
-                )
-                Divider()
-            }
-        }
-
-        LazyColumnWithScrollBar(
-            modifier = Modifier.weight(1f).padding(top = 4.dp)
-        ) {
-            items(items = unselectedItems, key = { it.id }) { resource ->
-                Text(
-                    text = resource.name,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(enabled = resource !in selectedItems) {
-                            scope.launch { item.add(resource) }
+                            onClick(resource)
                         }
                         .padding(all = 2.dp)
                 )

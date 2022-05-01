@@ -195,50 +195,42 @@ private fun RatingGraph(
             shape = shape
         )
 
-        Box(modifier = Modifier
-            .height(240.dp)
-            .fillMaxWidth()
-            .background(cpsColors.backgroundAdditional, shape)
-            .clip(shape),
-            contentAlignment = Alignment.Center
+        LoadingContentBox(
+            loadingStatus = loadingStatus,
+            failedText = "Failed to load rating history",
+            modifier = Modifier
+                .height(240.dp)
+                .fillMaxWidth()
+                .background(cpsColors.backgroundAdditional, shape)
+                .clip(shape)
         ) {
-            when (loadingStatus) {
-                LoadingStatus.LOADING -> CircularProgressIndicator(color = cpsColors.textColor, strokeWidth = 3.dp)
-                LoadingStatus.FAILED -> Text(
-                    text = "Failed to load rating history",
-                    color = cpsColors.errorColor,
-                    fontWeight = FontWeight.Bold
+            if (ratingChanges.isEmpty()) {
+                Text(text = "Rating history is empty")
+            } else {
+                DrawRatingGraph(
+                    ratingChanges = ratingChanges,
+                    manager = manager,
+                    rectangles = rectangles,
+                    translator = translator,
+                    currentTime = currentTime,
+                    filterType = filterType,
+                    selectedRatingChange = selectedRatingChange,
+                    modifier = Modifier
+                        .pointerInput(Unit) {
+                            detectTransformGestures { centroid, pan, zoom, _ ->
+                                translator.move(pan)
+                                translator.scale(centroid, zoom)
+                            }
+                        }
+                        .pointerInput(ratingChanges) {
+                            detectTapGestures { tapPoint ->
+                                selectedRatingChange = translator.getNearestRatingChange(
+                                    ratingChanges = ratingChanges,
+                                    tap = tapPoint
+                                )
+                            }
+                        }
                 )
-                LoadingStatus.PENDING -> {
-                    if (ratingChanges.isEmpty()) {
-                        Text(text = "Rating history is empty")
-                    } else {
-                        DrawRatingGraph(
-                            ratingChanges = ratingChanges,
-                            manager = manager,
-                            rectangles = rectangles,
-                            translator = translator,
-                            currentTime = currentTime,
-                            filterType = filterType,
-                            selectedRatingChange = selectedRatingChange,
-                            modifier = Modifier
-                                .pointerInput(Unit) {
-                                    detectTransformGestures { centroid, pan, zoom, _ ->
-                                        translator.move(pan)
-                                        translator.scale(centroid, zoom)
-                                    }
-                                }
-                                .pointerInput(ratingChanges) {
-                                    detectTapGestures { tapPoint ->
-                                        selectedRatingChange = translator.getNearestRatingChange(
-                                            ratingChanges = ratingChanges,
-                                            tap = tapPoint
-                                        )
-                                    }
-                                }
-                        )
-                    }
-                }
             }
         }
     }
