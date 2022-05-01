@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demich.cps.contests.loaders.ClistContestsLoader
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.room.contestsListDao
@@ -52,7 +53,7 @@ class ContestsViewModel: ViewModel() {
             val settings = context.settingsContests
             val contests = loadContests(
                 platforms = platforms,
-                settings = settings
+                context = context
             )
 
             settings.lastReloadedPlatforms.addAll(platforms)
@@ -80,17 +81,12 @@ class ContestsViewModel: ViewModel() {
 
     private suspend fun loadContests(
         platforms: Collection<Contest.Platform>,
-        settings: ContestsSettingsDataStore
+        context: Context
     ): List<Contest> {
-        val now = getCurrentTime()
-        val contests = CListApi.getContests(
-            apiAccess = settings.clistApiAccess(),
+        return ClistContestsLoader().getContests(
             platforms = platforms,
-            maxStartTime = now + 120.days,
-            minEndTime = now - 7.days,
-            includeResourceIds = { settings.clistAdditionalResources().map { it.id } }
-        ).mapAndFilterResult()
-        return contests
+            context = context
+        )
     }
 
     fun syncEnabledAndLastReloaded(context: Context) {
@@ -120,19 +116,5 @@ class ContestsViewModel: ViewModel() {
         val enabled = settings.clistAdditionalResources().map { it.id }.toSet()
         val lastReloaded = settings.clistLastReloadedAdditionalResources()
         return enabled != lastReloaded //hope it is proper equals
-    }
-}
-
-private fun Collection<ClistContest>.mapAndFilterResult(): List<Contest> {
-    return mapNotNull {
-        val contest = Contest(it)
-        when (contest.platform) {
-            Contest.Platform.atcoder -> {
-                if (it.host == "atcoder.jp")
-                    contest.copy(title = contest.title.replace("（", " (").replace('）',')'))
-                else null
-            }
-            else -> contest
-        }
     }
 }
