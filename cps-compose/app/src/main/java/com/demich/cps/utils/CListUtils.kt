@@ -68,18 +68,19 @@ object CListApi {
         maxStartTime: Instant,
         minEndTime: Instant
     ): List<ClistContest> {
+        val resourceIds: List<Int> = buildList {
+            for (platform in platforms) {
+                if (platform == Contest.Platform.unknown) addAll(includeResourceIds())
+                else add(CListUtils.getClistApiResourceId(platform))
+            }
+        }
+        if (resourceIds.isEmpty()) return emptyList()
         return client.get<ClistApiResponse<ClistContest>>("https://clist.by/api/v2/contest") {
             parameter("format", "json")
             parameter("username", apiAccess.login)
             parameter("api_key", apiAccess.key)
             parameter("start__lte", maxStartTime.toString())
             parameter("end__gte", minEndTime.toString())
-            val resourceIds: List<Int> = buildList {
-                for (platform in platforms) {
-                    if (platform == Contest.Platform.unknown) addAll(includeResourceIds())
-                    else add(CListUtils.getClistApiResourceId(platform))
-                }
-            }
             parameter("resource_id__in", resourceIds.joinToString())
         }.objects
     }

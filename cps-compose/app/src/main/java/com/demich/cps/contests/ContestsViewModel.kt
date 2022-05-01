@@ -49,9 +49,18 @@ class ContestsViewModel: ViewModel() {
             return
         }
 
+        val settings = context.settingsContests
+        if (Contest.Platform.unknown in platforms) {
+            if (settings.clistAdditionalResources().isEmpty()) {
+                return reload(
+                    platforms = platforms - Contest.Platform.unknown,
+                    context = context
+                )
+            }
+        }
+
         loadingStatus = LoadingStatus.LOADING
 
-        val settings = context.settingsContests
         val resultsGrouped = loadContests(
             platforms = platforms,
             settings = settings
