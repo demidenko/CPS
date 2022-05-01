@@ -50,27 +50,21 @@ class ContestsViewModel: ViewModel() {
 
         kotlin.runCatching {
             val settings = context.settingsContests
-            val now = getCurrentTime()
-
-            val getClistAdditionalResourceIds = suspend {
-                settings.clistAdditionalResources().map { it.id }.toSet()
-            }
-
-            val contests = CListApi.getContests(
-                apiAccess = settings.clistApiAccess(),
+            val contests = loadContests(
                 platforms = platforms,
-                maxStartTime = now + 120.days,
-                minEndTime = now - 7.days,
-                includeResourceIds = getClistAdditionalResourceIds
-            ).mapAndFilterResult()
-                .filter { it.duration < 32.days } //TODO: setup max duration in settings
+                settings = settings
+            )
 
             settings.lastReloadedPlatforms.addAll(platforms)
             if (Contest.Platform.unknown in platforms) {
-                settings.clistLastReloadedAdditionalResources(newValue = getClistAdditionalResourceIds())
+                settings.clistLastReloadedAdditionalResources.addAll(
+                    values = settings.clistAdditionalResources().map { it.id }
+                )
             }
 
-            contests.groupBy { it.platform }
+            contests
+                .filter { it.duration < 32.days } //TODO: setup max duration in settings
+                .groupBy { it.platform }
         }.onSuccess { grouped ->
             context.contestsListDao.let { dao ->
                 platforms.forEach { platform ->
@@ -82,6 +76,21 @@ class ContestsViewModel: ViewModel() {
             loadingStatus = LoadingStatus.FAILED
             errorStateFlow.value = it
         }
+    }
+
+    private suspend fun loadContests(
+        platforms: Collection<Contest.Platform>,
+        settings: ContestsSettingsDataStore
+    ): List<Contest> {
+        val now = getCurrentTime()
+        val contests = CListApi.getContests(
+            apiAccess = settings.clistApiAccess(),
+            platforms = platforms,
+            maxStartTime = now + 120.days,
+            minEndTime = now - 7.days,
+            includeResourceIds = { settings.clistAdditionalResources().map { it.id } }
+        ).mapAndFilterResult()
+        return contests
     }
 
     fun syncEnabledAndLastReloaded(context: Context) {
