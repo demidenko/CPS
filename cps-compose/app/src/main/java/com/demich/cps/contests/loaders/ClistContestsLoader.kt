@@ -2,25 +2,26 @@ package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.settings.ContestTimePrefs
-import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.utils.CListApi
 import com.demich.cps.utils.ClistContest
 
-class ClistContestsLoader: ContestsLoaderMultiple(
+class ClistContestsLoader(
+    val apiAccess: CListApi.ApiAccess,
+    val includeResourceIds: suspend () -> Collection<Int>
+): ContestsLoaderMultiple(
     supportedPlatforms = Contest.platforms.toSet(),
     type = ContestsLoaders.clist
 ) {
     override suspend fun loadContests(
         platforms: Set<Contest.Platform>,
-        timeLimits: ContestTimePrefs.Limits,
-        settings: ContestsSettingsDataStore
+        timeLimits: ContestTimePrefs.Limits
     ): List<Contest> {
         val contests = CListApi.getContests(
-            apiAccess = settings.clistApiAccess(),
+            apiAccess = apiAccess,
             platforms = platforms,
             maxStartTime = timeLimits.maxStartTime,
             minEndTime = timeLimits.minEndTime,
-            includeResourceIds = { settings.clistAdditionalResources().map { it.id } }
+            includeResourceIds = includeResourceIds
         ).mapAndFilterResult()
         return contests
     }

@@ -2,7 +2,6 @@ package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.settings.ContestTimePrefs
-import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.utils.codeforces.CodeforcesApi
 
 class CodeforcesContestsLoader: ContestsLoader(
@@ -11,8 +10,7 @@ class CodeforcesContestsLoader: ContestsLoader(
 ) {
     override suspend fun loadContests(
         platform: Contest.Platform,
-        timeLimits: ContestTimePrefs.Limits,
-        settings: ContestsSettingsDataStore
+        timeLimits: ContestTimePrefs.Limits
     ): List<Contest> {
         return CodeforcesApi.getContests().map { contest ->
             Contest(

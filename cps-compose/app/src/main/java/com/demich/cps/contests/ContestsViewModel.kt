@@ -13,7 +13,6 @@ import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.room.contestsListDao
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.addAll
-import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -49,18 +48,9 @@ class ContestsViewModel: ViewModel() {
             return
         }
 
-        val settings = context.settingsContests
-        if (Contest.Platform.unknown in platforms) {
-            if (settings.clistAdditionalResources().isEmpty()) {
-                return reload(
-                    platforms = platforms - Contest.Platform.unknown,
-                    context = context
-                )
-            }
-        }
-
         loadingStatus = LoadingStatus.LOADING
 
+        val settings = context.settingsContests
         val resultsGrouped = loadContests(
             platforms = platforms,
             settings = settings
@@ -92,27 +82,6 @@ class ContestsViewModel: ViewModel() {
         } ?: LoadingStatus.PENDING
     }
 
-    private suspend fun loadContests(
-        platforms: Collection<Contest.Platform>,
-        settings: ContestsSettingsDataStore
-    ): Map<Contest.Platform, List<Result<List<Contest>>>> {
-        val timeLimits = settings.contestsTimePrefs().createLimits(now = getCurrentTime())
-        return getContests(
-            //TODO: read setup from settings
-            setup = platforms.associateWith { platform ->
-                when (platform) {
-                    Contest.Platform.codeforces -> listOf(
-                        ContestsLoaders.codeforces,
-                        ContestsLoaders.clist
-                    )
-                    else -> listOf(ContestsLoaders.clist)
-                }
-            },
-            timeLimits = timeLimits,
-            settings = settings
-        )
-    }
-
     fun syncEnabledAndLastReloaded(context: Context) {
         viewModelScope.launch {
             val settings = context.settingsContests
@@ -141,4 +110,31 @@ class ContestsViewModel: ViewModel() {
         val lastReloaded = settings.clistLastReloadedAdditionalResources()
         return enabled != lastReloaded //hope it is proper equals
     }
+}
+
+private suspend fun loadContests(
+    platforms: Collection<Contest.Platform>,
+    settings: ContestsSettingsDataStore
+): Map<Contest.Platform, List<Result<List<Contest>>>> {
+    if (Contest.Platform.unknown in platforms) {
+        if (settings.clistAdditionalResources().isEmpty()) {
+            return loadContests(
+                platforms = platforms - Contest.Platform.unknown,
+                settings = settings
+            ) + Pair(Contest.Platform.unknown, listOf(Result.success(emptyList())))
+        }
+    }
+    return getContests(
+        //TODO: read setup from settings
+        setup = platforms.associateWith { platform ->
+            when (platform) {
+                Contest.Platform.codeforces -> listOf(
+                    ContestsLoaders.codeforces,
+                    ContestsLoaders.clist
+                )
+                else -> listOf(ContestsLoaders.clist)
+            }
+        },
+        settings = settings
+    )
 }
