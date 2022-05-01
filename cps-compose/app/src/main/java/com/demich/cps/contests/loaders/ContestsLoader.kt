@@ -3,6 +3,12 @@ package com.demich.cps.contests.loaders
 import android.content.Context
 import com.demich.cps.contests.Contest
 
+
+enum class ContestsLoaders {
+    clist,
+    codeforces
+}
+
 abstract class ContestsLoader(
     val supportedPlatforms: Set<Contest.Platform>
 ) {

@@ -111,6 +111,12 @@ object CodeforcesApi {
         }
     }
 
+    suspend fun getContests(): List<CodeforcesContest> = makeAPICall {
+        client.get(urlString = "${urls.api}/contest.list") {
+            parameter("gym", false)
+        }
+    }
+
     suspend fun getHandleSuggestions(str: String): String? {
         return getCodeforcesWeb(urlString = "${urls.main}/data/handles") {
             parameter("q", str)
