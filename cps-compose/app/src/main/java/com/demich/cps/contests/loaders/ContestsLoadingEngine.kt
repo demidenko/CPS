@@ -1,16 +1,23 @@
 package com.demich.cps.contests.loaders
 
-import android.content.Context
 import com.demich.cps.contests.Contest
-import kotlinx.coroutines.*
+import com.demich.cps.contests.settings.ContestTimePrefs
+import com.demich.cps.contests.settings.ContestsSettingsDataStore
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 suspend fun getContests(
     setup: Map<Contest.Platform, List<ContestsLoaders>>,
-    context: Context
-): List<Contest> {
+    timeLimits: ContestTimePrefs.Limits,
+    settings: ContestsSettingsDataStore
+): Map<Contest.Platform, List<Result<List<Contest>>>> {
     val groupedResults = coroutineScope {
         val loaders = getAllLoaders().associateBy { it.type }
-        val memorizer = MultipleLoadersMemorizer(setup = setup, context = context)
+        val memorizer = MultipleLoadersMemorizer(setup, timeLimits, settings)
         setup.map { (platform, priorities) ->
             require(priorities.isNotEmpty())
             async {
@@ -19,16 +26,14 @@ suspend fun getContests(
                     priorities = priorities,
                     loaders = loaders,
                     memorizer = memorizer,
-                    context = context
+                    timeLimits = timeLimits,
+                    settings = settings
                 )
                 platform to result
             }
         }.awaitAll().toMap()
     }
-    return groupedResults.flatMap { (platform, results) ->
-        //TODO: throwables
-        results.last().getOrDefault(emptyList())
-    }
+    return groupedResults
 }
 
 private suspend fun loadUntilSuccess(
@@ -36,7 +41,8 @@ private suspend fun loadUntilSuccess(
     priorities: List<ContestsLoaders>,
     loaders: Map<ContestsLoaders, ContestsLoader>,
     memorizer: MultipleLoadersMemorizer,
-    context: Context
+    timeLimits: ContestTimePrefs.Limits,
+    settings: ContestsSettingsDataStore
 ): List<Result<List<Contest>>> {
     val results = mutableListOf<Result<List<Contest>>>()
     for (loaderType in priorities) {
@@ -47,7 +53,7 @@ private suspend fun loadUntilSuccess(
             }
         } else {
             runCatching {
-                loader.getContests(platform = platform, context = context)
+                loader.getContests(platform, timeLimits, settings)
             }
         }
         results.add(result)
@@ -58,13 +64,17 @@ private suspend fun loadUntilSuccess(
 
 private class MultipleLoadersMemorizer(
     private val setup: Map<Contest.Platform, List<ContestsLoaders>>,
-    private val context: Context
+    private val timeLimits: ContestTimePrefs.Limits,
+    private val settings: ContestsSettingsDataStore
 ) {
+    private val mutex = Mutex()
     private val results = mutableMapOf<ContestsLoaders, Deferred<Result<List<Contest>>>>()
     suspend fun get(loader: ContestsLoaderMultiple): Result<List<Contest>> {
-        return runBlocking {
-            results.getOrPut(loader.type) {
-                async { runLoader(loader) }
+        return coroutineScope {
+            mutex.withLock {
+                results.getOrPut(loader.type) {
+                    async { runLoader(loader) }
+                }
             }
         }.await()
     }
@@ -76,7 +86,8 @@ private class MultipleLoadersMemorizer(
         return kotlin.runCatching {
             loader.getContests(
                 platforms = platforms,
-                context = context
+                timeLimits = timeLimits,
+                settings = settings
             )
         }
     }

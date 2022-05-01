@@ -6,15 +6,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.demich.cps.contests.loaders.ClistContestsLoader
+import com.demich.cps.contests.loaders.ContestsLoaders
+import com.demich.cps.contests.loaders.getContests
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.room.contestsListDao
-import com.demich.cps.utils.*
+import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.addAll
+import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.days
 
 class ContestsViewModel: ViewModel() {
     var loadingStatus by mutableStateOf(LoadingStatus.PENDING)
@@ -49,43 +51,56 @@ class ContestsViewModel: ViewModel() {
 
         loadingStatus = LoadingStatus.LOADING
 
-        kotlin.runCatching {
-            val settings = context.settingsContests
-            val contests = loadContests(
-                platforms = platforms,
-                context = context
-            )
+        val settings = context.settingsContests
+        val resultsGrouped = loadContests(
+            platforms = platforms,
+            settings = settings
+        )
 
-            settings.lastReloadedPlatforms.addAll(platforms)
-            if (Contest.Platform.unknown in platforms) {
-                settings.clistLastReloadedAdditionalResources.addAll(
-                    values = settings.clistAdditionalResources().map { it.id }
+        settings.lastReloadedPlatforms.addAll(platforms)
+        if (Contest.Platform.unknown in platforms) {
+            settings.clistLastReloadedAdditionalResources.addAll(
+                values = settings.clistAdditionalResources().map { it.id }
+            )
+        }
+
+        val dao = context.contestsListDao
+        var anyThrowable: Throwable? = null
+        platforms.forEach { platform ->
+            resultsGrouped.getValue(platform).last().onFailure {
+                anyThrowable = it
+            }.onSuccess { contests ->
+                dao.replace(
+                    platform = platform,
+                    contests = contests
                 )
             }
-
-            contests
-                .filter { it.duration < 32.days } //TODO: setup max duration in settings
-                .groupBy { it.platform }
-        }.onSuccess { grouped ->
-            context.contestsListDao.let { dao ->
-                platforms.forEach { platform ->
-                    dao.replace(platform = platform, contests = grouped[platform] ?: emptyList())
-                }
-            }
-            loadingStatus = LoadingStatus.PENDING
-        }.onFailure {
-            loadingStatus = LoadingStatus.FAILED
-            errorStateFlow.value = it
         }
+
+        loadingStatus = anyThrowable?.let {
+            errorStateFlow.value = it
+            LoadingStatus.FAILED
+        } ?: LoadingStatus.PENDING
     }
 
     private suspend fun loadContests(
         platforms: Collection<Contest.Platform>,
-        context: Context
-    ): List<Contest> {
-        return ClistContestsLoader().getContests(
-            platforms = platforms,
-            context = context
+        settings: ContestsSettingsDataStore
+    ): Map<Contest.Platform, List<Result<List<Contest>>>> {
+        val timeLimits = settings.contestsTimePrefs().createLimits(now = getCurrentTime())
+        return getContests(
+            //TODO: read setup from settings
+            setup = platforms.associateWith { platform ->
+                when (platform) {
+                    Contest.Platform.codeforces -> listOf(
+                        ContestsLoaders.codeforces,
+                        ContestsLoaders.clist
+                    )
+                    else -> listOf(ContestsLoaders.clist)
+                }
+            },
+            timeLimits = timeLimits,
+            settings = settings
         )
     }
 

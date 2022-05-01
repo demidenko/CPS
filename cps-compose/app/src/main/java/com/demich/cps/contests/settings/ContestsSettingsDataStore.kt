@@ -6,6 +6,11 @@ import com.demich.cps.contests.Contest
 import com.demich.cps.utils.CListApi
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.ClistResource
+import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 
 val Context.settingsContests: ContestsSettingsDataStore
     get() = ContestsSettingsDataStore(this)
@@ -23,4 +28,25 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
     val clistApiAccess = itemJsonable(name = "clist_api_access", defaultValue = CListApi.ApiAccess("", ""))
     val clistAdditionalResources = itemJsonable<List<ClistResource>>(name = "clist_additional_resources", defaultValue = emptyList())
     val clistLastReloadedAdditionalResources = itemJsonable<Set<Int>>(name = "clist_additional_last_reloaded", defaultValue = emptySet())
+
+    val contestsTimePrefs = itemJsonable(name = "contests_time_prefs", defaultValue = ContestTimePrefs())
+
+}
+
+@Serializable
+data class ContestTimePrefs(
+    private val nowToStartTimeMaxTimeSeconds: Long = 120.days.inWholeSeconds,
+    private val endTimeToNowMaxTimeSeconds: Long = 7.days.inWholeSeconds,
+    private val maxContestDurationSeconds: Long = 30.days.inWholeSeconds,
+) {
+    fun createLimits(now: Instant) = Limits(
+        maxStartTime = now + nowToStartTimeMaxTimeSeconds.seconds,
+        minEndTime = now - endTimeToNowMaxTimeSeconds.seconds,
+        maxDuration = maxContestDurationSeconds.seconds
+    )
+    data class Limits(
+        val maxStartTime: Instant,
+        val minEndTime: Instant,
+        val maxDuration: Duration
+    )
 }
