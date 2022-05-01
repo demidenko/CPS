@@ -10,7 +10,8 @@ enum class ContestsLoaders {
 }
 
 abstract class ContestsLoader(
-    val supportedPlatforms: Set<Contest.Platform>
+    val supportedPlatforms: Set<Contest.Platform>,
+    val type: ContestsLoaders
 ) {
     abstract suspend fun loadContests(platform: Contest.Platform, context: Context): List<Contest>
 
@@ -21,8 +22,9 @@ abstract class ContestsLoader(
 }
 
 abstract class ContestsLoaderMultiple(
-    supportedPlatforms: Set<Contest.Platform>
-): ContestsLoader(supportedPlatforms) {
+    supportedPlatforms: Set<Contest.Platform>,
+    type: ContestsLoaders
+): ContestsLoader(supportedPlatforms, type) {
 
     protected abstract suspend fun loadContests(
         platforms: Set<Contest.Platform>,

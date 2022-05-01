@@ -5,7 +5,8 @@ import com.demich.cps.contests.Contest
 import com.demich.cps.utils.codeforces.CodeforcesApi
 
 class CodeforcesContestsLoader: ContestsLoader(
-    supportedPlatforms = setOf(Contest.Platform.codeforces)
+    supportedPlatforms = setOf(Contest.Platform.codeforces),
+    type = ContestsLoaders.codeforces
 ) {
     override suspend fun loadContests(platform: Contest.Platform, context: Context): List<Contest> {
         return CodeforcesApi.getContests().map { contest ->

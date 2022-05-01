@@ -9,7 +9,8 @@ import com.demich.cps.utils.getCurrentTime
 import kotlin.time.Duration.Companion.days
 
 class ClistContestsLoader: ContestsLoaderMultiple(
-    supportedPlatforms = Contest.platforms.toSet()
+    supportedPlatforms = Contest.platforms.toSet(),
+    type = ContestsLoaders.clist
 ) {
     override suspend fun loadContests(platforms: Set<Contest.Platform>, context: Context): List<Contest> {
         val settings = context.settingsContests
