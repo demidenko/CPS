@@ -17,9 +17,10 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
     }
 
     val enabledPlatforms = itemEnumSet(name = "enabled_platforms", defaultValue = Contest.platforms.toSet())
-    val lastLoadedPlatforms = itemEnumSet<Contest.Platform>(name = "last_reloaded_platforms", defaultValue = emptySet())
+    val lastReloadedPlatforms = itemEnumSet<Contest.Platform>(name = "last_reloaded_platforms", defaultValue = emptySet())
     val ignoredContests = itemJsonable<List<Pair<Contest.Platform, String>>>(name = "ignored_contests_list", defaultValue = emptyList())
 
     val clistApiAccess = itemJsonable(name = "clist_api_access", defaultValue = CListApi.ApiAccess("", ""))
     val clistAdditionalResources = itemJsonable<List<ClistResource>>(name = "clist_additional_resources", defaultValue = emptyList())
+    val clistLastReloadedAdditionalResources = itemJsonable<Set<Int>>(name = "clist_additional_last_reloaded", defaultValue = emptySet())
 }

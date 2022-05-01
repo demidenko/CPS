@@ -64,7 +64,7 @@ object CListApi {
     suspend fun getContests(
         apiAccess: ApiAccess,
         platforms: Collection<Contest.Platform>,
-        includeResourceIds: suspend () -> List<Int> = { emptyList() },
+        includeResourceIds: suspend () -> Collection<Int> = { emptyList() },
         maxStartTime: Instant,
         minEndTime: Instant
     ): List<ClistContest> {

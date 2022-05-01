@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.room.contestsListDao
 import com.demich.cps.utils.*
@@ -30,7 +31,7 @@ class ContestsViewModel: ViewModel() {
                     if (platform !in enabledPlatforms) remove(platform)
                 }
             }
-            settings.lastLoadedPlatforms(newValue = emptySet())
+            settings.lastReloadedPlatforms(newValue = emptySet())
             reload(platforms = enabledPlatforms, context = context)
         }
     }
@@ -50,18 +51,27 @@ class ContestsViewModel: ViewModel() {
         kotlin.runCatching {
             val settings = context.settingsContests
             val now = getCurrentTime()
+
+            val getClistAdditionalResourceIds = suspend {
+                settings.clistAdditionalResources().map { it.id }.toSet()
+            }
+
             val contests = CListApi.getContests(
                 apiAccess = settings.clistApiAccess(),
                 platforms = platforms,
                 maxStartTime = now + 120.days,
                 minEndTime = now - 7.days,
-                includeResourceIds = { settings.clistAdditionalResources().map { it.id } }
+                includeResourceIds = getClistAdditionalResourceIds
             ).mapAndFilterResult()
                 .filter { it.duration < 32.days } //TODO: setup max duration in settings
-            settings.lastLoadedPlatforms.addAll(platforms)
-            contests
-        }.onSuccess { contests ->
-            val grouped = contests.groupBy { it.platform }
+
+            settings.lastReloadedPlatforms.addAll(platforms)
+            if (Contest.Platform.unknown in platforms) {
+                settings.clistLastReloadedAdditionalResources(newValue = getClistAdditionalResourceIds())
+            }
+
+            contests.groupBy { it.platform }
+        }.onSuccess { grouped ->
             context.contestsListDao.let { dao ->
                 platforms.forEach { platform ->
                     dao.replace(platform = platform, contests = grouped[platform] ?: emptyList())
@@ -75,19 +85,32 @@ class ContestsViewModel: ViewModel() {
     }
 
     fun syncEnabledAndLastReloaded(context: Context) {
-        //TODO: sync clist additional
         viewModelScope.launch {
             val settings = context.settingsContests
             val enabled = settings.enabledPlatforms()
-            val lastReloaded = settings.lastLoadedPlatforms()
-            val toReload = enabled.filter { it !in lastReloaded }
-            val toRemove = lastReloaded.filter { it !in enabled }
-            settings.lastLoadedPlatforms(newValue = lastReloaded - toRemove /* = enabled - toReload*/)
-            context.contestsListDao.let { dao ->
-                toRemove.forEach { platform -> dao.remove(platform) }
-                reload(platforms = toReload, context = context)
+            val lastReloaded = settings.lastReloadedPlatforms()
+            (lastReloaded - enabled).takeIf { it.isNotEmpty() }?.let { toRemove ->
+                settings.lastReloadedPlatforms(newValue = lastReloaded - toRemove)
+                context.contestsListDao.let { dao ->
+                    toRemove.forEach { platform -> dao.remove(platform) }
+                }
             }
+
+            val toReload = (enabled - lastReloaded).toMutableSet()
+
+            if (needToReloadClistAdditional(settings)) {
+                settings.clistLastReloadedAdditionalResources(newValue = emptySet())
+                toReload.add(Contest.Platform.unknown)
+            }
+
+            reload(platforms = toReload, context = context)
         }
+    }
+
+    private suspend fun needToReloadClistAdditional(settings: ContestsSettingsDataStore): Boolean {
+        val enabled = settings.clistAdditionalResources().map { it.id }.toSet()
+        val lastReloaded = settings.clistLastReloadedAdditionalResources()
+        return enabled != lastReloaded //hope it is proper equals
     }
 }
 
