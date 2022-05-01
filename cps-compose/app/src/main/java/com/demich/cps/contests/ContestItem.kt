@@ -364,7 +364,7 @@ fun collectCurrentTime(): State<Instant> {
         flow {
             while (currentCoroutineContext().isActive) {
                 val currentTime = getCurrentTime()
-                emit(currentTime)
+                emit(Instant.fromEpochSeconds(currentTime.epochSeconds))
                 println(currentTime)
                 val rem = currentTime.toEpochMilliseconds() % 1000
                 delay(timeMillis = if (rem == 0L) 1000 else 1000 - rem)
