@@ -27,12 +27,16 @@ class ContestsViewModel: ViewModel() {
             }
         }
 
-    val errorsToShow: State<List<Pair<ContestsLoaders,Throwable>>>
-        @Composable
-        get() = remember {
+    @Composable
+    fun getErrorsListState(): State<List<Pair<ContestsLoaders,Throwable>>>
+         = remember {
             derivedStateOf {
                 Contest.platforms
-                    .flatMap { mutableErrorsList(platform = it).value }
+                    .flatMap { platform ->
+                        if (mutableLoadingStatusFor(platform).value == LoadingStatus.FAILED)
+                            mutableErrorsList(platform).value
+                        else emptyList()
+                    }
                     .distinct()
             }
         }

@@ -78,7 +78,7 @@ private fun ContestsScreen(
             }
     }
 
-    val errorsList by contestsViewModel.errorsToShow
+    val errorsList by contestsViewModel.getErrorsListState()
     val loadingStatus by contestsViewModel.loadingStatus
 
     SwipeRefresh(
