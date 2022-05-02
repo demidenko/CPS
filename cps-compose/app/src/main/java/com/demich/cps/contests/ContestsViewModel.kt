@@ -13,8 +13,6 @@ import com.demich.cps.room.contestsListDao
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.addAll
 import com.demich.cps.utils.combine
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ContestsViewModel: ViewModel() {
@@ -29,14 +27,25 @@ class ContestsViewModel: ViewModel() {
             }
         }
 
-    private val loadingStatuses: MutableMap<Contest.Platform, MutableState<LoadingStatus>> = mutableMapOf()
+    val errorsToShow: State<List<Pair<ContestsLoaders,Throwable>>>
+        @Composable
+        get() = remember {
+            derivedStateOf {
+                Contest.platforms
+                    .flatMap { mutableErrorsList(platform = it).value }
+                    .distinct()
+            }
+        }
 
-    private fun mutableLoadingStatusFor(platform: Contest.Platform): MutableState<LoadingStatus> =
+    private val loadingStatuses: MutableMap<Contest.Platform, MutableState<LoadingStatus>> = mutableMapOf()
+    private fun mutableLoadingStatusFor(platform: Contest.Platform) =
         loadingStatuses.getOrPut(platform) { mutableStateOf(LoadingStatus.PENDING) }
 
+    private val errors: MutableMap<Contest.Platform, MutableState<List<Pair<ContestsLoaders,Throwable>>>> = mutableMapOf()
+    private fun mutableErrorsList(platform: Contest.Platform) =
+        errors.getOrPut(platform) { mutableStateOf(emptyList()) }
 
-    private val errorStateFlow = MutableStateFlow<Throwable?>(null)
-    fun flowOfError() = errorStateFlow.asStateFlow()
+
 
     fun reloadEnabledPlatforms(context: Context) {
         viewModelScope.launch {
@@ -53,10 +62,12 @@ class ContestsViewModel: ViewModel() {
     }
 
     private suspend fun reload(platforms: Collection<Contest.Platform>, context: Context) {
-        errorStateFlow.value = null //TODO: consume errors
-
         if (platforms.isEmpty()) {
             return
+        }
+
+        platforms.forEach { platform ->
+            mutableErrorsList(platform).value = emptyList()
         }
 
         val settings = context.settingsContests
@@ -68,13 +79,15 @@ class ContestsViewModel: ViewModel() {
             )
         }
 
-        println("reload ${platforms.joinToString()}")
         loadContests(
             platforms = platforms,
             settings = settings,
             contestsReceiver = ContestsReceiver(
                 dao = context.contestsListDao,
                 getLoadingStatusState = { mutableLoadingStatusFor(it) },
+                consumeError = { platform, loaderType, e ->
+                    mutableErrorsList(platform).value += loaderType to e
+                }
             )
         )
     }
@@ -147,6 +160,7 @@ private suspend fun loadContests(
 class ContestsReceiver(
     private val dao: ContestsListDao,
     private val getLoadingStatusState: (Contest.Platform) -> MutableState<LoadingStatus>,
+    val consumeError: (Contest.Platform, ContestsLoaders, Throwable) -> Unit
 ) {
     fun startLoading(platform: Contest.Platform) {
         var loadingStatus by getLoadingStatusState(platform)
@@ -154,16 +168,12 @@ class ContestsReceiver(
         loadingStatus = LoadingStatus.LOADING
     }
 
-    fun consumeError(platform: Contest.Platform, loaderType: ContestsLoaders, e: Throwable) {
-
-    }
-
     suspend fun finishSuccess(platform: Contest.Platform, contests: List<Contest>) {
         getLoadingStatusState(platform).value = LoadingStatus.PENDING
         dao.replace(platform = platform, contests = contests)
     }
 
-    suspend fun finishFailed(platform: Contest.Platform) {
+    fun finishFailed(platform: Contest.Platform) {
         getLoadingStatusState(platform).value = LoadingStatus.FAILED
     }
 }

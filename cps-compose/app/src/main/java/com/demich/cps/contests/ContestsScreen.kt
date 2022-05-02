@@ -21,6 +21,7 @@ import androidx.navigation.NavController
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.CPSMenuBuilder
 import com.demich.cps.Screen
+import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.room.contestsListDao
 import com.demich.cps.settingsDev
@@ -79,7 +80,7 @@ private fun ContestsScreen(
             }
     }
 
-    val error by contestsViewModel.flowOfError().collectAsState()
+    val errorsList by contestsViewModel.errorsToShow
     val loadingStatus by contestsViewModel.loadingStatus
 
     SwipeRefresh(
@@ -88,7 +89,7 @@ private fun ContestsScreen(
     ) {
         Column {
             LoadingError(
-                error = error,
+                errors = errorsList,
                 modifier = Modifier
                     .fillMaxWidth()
             )
@@ -202,12 +203,12 @@ private fun ContestsSearchField(
 
 @Composable
 private fun ColumnScope.LoadingError(
-    error: Throwable?,
+    errors: List<Pair<ContestsLoaders,Throwable>>,
     modifier: Modifier = Modifier
 ) {
     val context = context
     val devModeEnabled by rememberCollect { context.settingsDev.devModeEnabled.flow }
-    val message = when {
+    /*val message = when {
         error == null -> ""
         error is UnknownHostException
             -> "Connection failed"
@@ -218,10 +219,10 @@ private fun ColumnScope.LoadingError(
         else -> {
             if(devModeEnabled) "$error" else ""
         }
-    }
-    AnimatedVisibility(visible = message.isNotBlank()) {
+    }*/
+    AnimatedVisibility(visible = errors.isNotEmpty()) {
         Text(
-            text = message,
+            text = errors.map { it.second}.distinct().joinToString(),
             textAlign = TextAlign.Center,
             color = cpsColors.background,
             fontSize = 13.sp,
