@@ -13,6 +13,7 @@ import com.demich.cps.room.contestsListDao
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.add
 import com.demich.cps.utils.addAll
+import com.demich.cps.utils.combine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -23,12 +24,9 @@ class ContestsViewModel: ViewModel() {
         @Composable
         get() = remember {
             derivedStateOf {
-                val states = Contest.platforms.map { mutableLoadingStatusFor(platform = it) }
-                when {
-                    states.any { it.value == LoadingStatus.LOADING } -> LoadingStatus.LOADING
-                    states.any { it.value == LoadingStatus.FAILED } -> LoadingStatus.FAILED
-                    else -> LoadingStatus.PENDING
-                }
+                Contest.platforms
+                    .map { mutableLoadingStatusFor(platform = it).value }
+                    .combine()
             }
         }
 

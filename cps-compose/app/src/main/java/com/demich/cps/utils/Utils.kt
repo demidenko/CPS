@@ -94,6 +94,13 @@ enum class LoadingStatus {
     PENDING, LOADING, FAILED;
 }
 
+fun Iterable<LoadingStatus>.combine(): LoadingStatus
+    = when {
+        contains(LoadingStatus.LOADING) -> LoadingStatus.LOADING
+        contains(LoadingStatus.FAILED) -> LoadingStatus.FAILED
+        else -> LoadingStatus.PENDING
+    }
+
 object InstantAsSecondsSerializer: KSerializer<Instant> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Instant", PrimitiveKind.LONG)
     override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeLong(value.epochSeconds)

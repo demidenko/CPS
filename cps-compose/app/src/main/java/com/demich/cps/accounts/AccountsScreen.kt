@@ -21,10 +21,7 @@ import com.demich.cps.R
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.context
-import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.*
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -228,12 +225,9 @@ private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
     val context = context
     val combinedStatus by remember {
         derivedStateOf {
-            val states = context.allAccountManagers.map { accountsViewModel.loadingStatusFor(it).value }
-            when {
-                states.contains(LoadingStatus.LOADING) -> LoadingStatus.LOADING
-                states.contains(LoadingStatus.FAILED) -> LoadingStatus.FAILED
-                else -> LoadingStatus.PENDING
-            }
+            context.allAccountManagers
+                .map { accountsViewModel.loadingStatusFor(it).value }
+                .combine()
         }
     }
 
