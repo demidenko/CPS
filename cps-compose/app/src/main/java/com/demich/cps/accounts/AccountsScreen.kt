@@ -32,7 +32,8 @@ import kotlinx.coroutines.runBlocking
 fun AccountsScreen(
     accountsViewModel: AccountsViewModel,
     onExpandAccount: (AccountManagers) -> Unit,
-    onSetAdditionalMenu: (CPSMenuBuilder) -> Unit
+    onSetAdditionalMenu: (CPSMenuBuilder) -> Unit,
+    reorderEnabledState: MutableState<Boolean>
 ) {
     val context = context
 
@@ -47,14 +48,13 @@ fun AccountsScreen(
         }
     }
 
-    var showAccountsReorderUI by rememberSaveable { mutableStateOf(false) }
     val visibleOrder by remember {
-        derivedStateOf { if (showAccountsReorderUI) recordedAccounts.map { it.type } else null }
+        derivedStateOf { if (reorderEnabledState.value) recordedAccounts.map { it.type } else null }
     }
     if (recordedAccounts.size > 1) {
         onSetAdditionalMenu {
             CPSDropdownMenuItem(title = "Reorder", icon = CPSIcons.Reorder) {
-                showAccountsReorderUI = true
+                reorderEnabledState.value = true
             }
         }
     }
@@ -87,17 +87,6 @@ fun AccountsScreen(
                     )
                 }
             }
-        }
-        if (showAccountsReorderUI) {
-            //TODO: this button instead of whole bottom bar
-            Button(
-                onClick = { showAccountsReorderUI = false },
-                content = {
-                    Icon(imageVector = CPSIcons.Reorder, contentDescription = null)
-                    Text("Done")
-                },
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
         }
     }
 }
@@ -214,10 +203,19 @@ fun accountExpandedMenuBuilder(
     }
 }
 
-fun accountsBottomBarBuilder(cpsViewModels: CPSViewModels)
-: AdditionalBottomBarBuilder = {
-    AddAccountButton(cpsViewModels)
-    ReloadAccountsButton(cpsViewModels.accountsViewModel)
+fun accountsBottomBarBuilder(
+    cpsViewModels: CPSViewModels,
+    reorderEnabledState: MutableState<Boolean>
+): AdditionalBottomBarBuilder = {
+    if (reorderEnabledState.value) {
+        CPSIconButton(
+            icon = CPSIcons.ReorderDone,
+            onClick = { reorderEnabledState.value = false }
+        )
+    } else {
+        AddAccountButton(cpsViewModels)
+        ReloadAccountsButton(cpsViewModels.accountsViewModel)
+    }
 }
 
 @Composable

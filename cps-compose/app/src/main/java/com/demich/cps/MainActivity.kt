@@ -96,12 +96,17 @@ fun CPSScaffold(
     ) {
         {
             cpsComposable(Screen.Accounts.route) {
+                val reorderEnabledState = rememberSaveable { mutableStateOf(false) }
                 AccountsScreen(
                     accountsViewModel = cpsViewModels.accountsViewModel,
                     onExpandAccount = { type -> navController.navigate(route = "account/$type") },
-                    onSetAdditionalMenu = { menu = it }
+                    onSetAdditionalMenu = { menu = it },
+                    reorderEnabledState = reorderEnabledState
                 )
-                bottomBar = accountsBottomBarBuilder(cpsViewModels)
+                bottomBar = accountsBottomBarBuilder(
+                    cpsViewModels = cpsViewModels,
+                    reorderEnabledState = reorderEnabledState
+                )
             }
             cpsComposable(Screen.AccountExpanded.route) {
                 val type = (it.getScreen() as Screen.AccountExpanded).type

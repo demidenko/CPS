@@ -33,6 +33,7 @@ object CPSIcons {
     val Origin get() = Icons.Default.Photo
     val Expand get() = Icons.Default.UnfoldMore
     val Reorder get() = Icons.Default.Reorder
+    val ReorderDone get() = Icons.Default.PlaylistAddCheck
     val MoveUp get() = Icons.Default.ArrowDropUp
     val MoveDown get() = Icons.Default.ArrowDropDown
     val RatingGraph get() = Icons.Default.Timeline
