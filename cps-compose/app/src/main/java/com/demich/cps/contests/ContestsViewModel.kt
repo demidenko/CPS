@@ -5,6 +5,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.loaders.ContestsLoaders
+import com.demich.cps.contests.loaders.ContestsReceiver
 import com.demich.cps.contests.loaders.getContests
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
@@ -69,10 +70,6 @@ class ContestsViewModel: ViewModel() {
             return
         }
 
-        platforms.forEach { platform ->
-            mutableErrorsList(platform).value = emptyList()
-        }
-
         val settings = context.settingsContests
 
         settings.lastReloadedPlatforms.addAll(platforms)
@@ -88,9 +85,7 @@ class ContestsViewModel: ViewModel() {
             contestsReceiver = ContestsReceiver(
                 dao = context.contestsListDao,
                 getLoadingStatusState = { mutableLoadingStatusFor(it) },
-                consumeError = { platform, loaderType, e ->
-                    mutableErrorsList(platform).value += loaderType to e
-                }
+                getErrorsListState = { mutableErrorsList(it) }
             )
         )
     }
@@ -157,25 +152,4 @@ private suspend fun loadContests(
         settings = settings,
         contestsReceiver = contestsReceiver
     )
-}
-
-class ContestsReceiver(
-    private val dao: ContestsListDao,
-    private val getLoadingStatusState: (Contest.Platform) -> MutableState<LoadingStatus>,
-    val consumeError: (Contest.Platform, ContestsLoaders, Throwable) -> Unit
-) {
-    fun startLoading(platform: Contest.Platform) {
-        var loadingStatus by getLoadingStatusState(platform)
-        require(loadingStatus != LoadingStatus.LOADING)
-        loadingStatus = LoadingStatus.LOADING
-    }
-
-    suspend fun finishSuccess(platform: Contest.Platform, contests: List<Contest>) {
-        getLoadingStatusState(platform).value = LoadingStatus.PENDING
-        dao.replace(platform = platform, contests = contests)
-    }
-
-    fun finishFailed(platform: Contest.Platform) {
-        getLoadingStatusState(platform).value = LoadingStatus.FAILED
-    }
 }

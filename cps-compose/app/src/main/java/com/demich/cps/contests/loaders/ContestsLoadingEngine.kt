@@ -1,7 +1,6 @@
 package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
-import com.demich.cps.contests.ContestsReceiver
 import com.demich.cps.contests.settings.ContestTimePrefs
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.utils.getCurrentTime
