@@ -6,7 +6,6 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -55,15 +54,13 @@ private fun CPSBottomBarMain(
     modifier: Modifier = Modifier
 ) {
     val devModeEnabled by with(context) { rememberCollect { settingsDev.devModeEnabled.flow } }
-    val rootScreens by remember {
-        derivedStateOf {
-            buildList {
-                add(Screen.Accounts to CPSIcons.Account)
-                add(Screen.News to CPSIcons.News)
-                add(Screen.Contests to CPSIcons.Contest)
-                if (devModeEnabled) {
-                    add(Screen.Development to CPSIcons.Development)
-                }
+    val rootScreens = remember(devModeEnabled) {
+        buildList {
+            add(Screen.Accounts to CPSIcons.Account)
+            add(Screen.News to CPSIcons.News)
+            add(Screen.Contests to CPSIcons.Contest)
+            if (devModeEnabled) {
+                add(Screen.Development to CPSIcons.Development)
             }
         }
     }

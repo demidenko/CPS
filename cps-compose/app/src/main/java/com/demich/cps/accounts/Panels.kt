@@ -44,13 +44,8 @@ fun<U: UserInfo> PanelWithUI(
 
     if (loadingStatus == LoadingStatus.LOADING) lastClickMillis = 0
 
-    val clickEnabled by remember(visibleOrder == null) {
-        derivedStateOf {
-            loadingStatus != LoadingStatus.LOADING && visibleOrder == null
-        }
-    }
-
     if (!userInfo.isEmpty()) {
+        val clickEnabled = loadingStatus != LoadingStatus.LOADING && visibleOrder == null
         Box(modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 48.dp)
