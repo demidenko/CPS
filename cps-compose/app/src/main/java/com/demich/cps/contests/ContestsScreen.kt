@@ -80,9 +80,10 @@ private fun ContestsScreen(
     }
 
     val error by contestsViewModel.flowOfError().collectAsState()
+    val loadingStatus by contestsViewModel.loadingStatus
 
     SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = contestsViewModel.loadingStatus == LoadingStatus.LOADING),
+        state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
         onRefresh = { contestsViewModel.reloadEnabledPlatforms(context) }
     ) {
         Column {
@@ -247,7 +248,8 @@ fun contestsBottomBarBuilder(
     CPSIconButton(icon = CPSIcons.Search) {
         onEnableSearch()
     }
-    CPSReloadingButton(loadingStatus = contestsViewModel.loadingStatus) {
+    val loadingStatus by contestsViewModel.loadingStatus
+    CPSReloadingButton(loadingStatus = loadingStatus) {
         contestsViewModel.reloadEnabledPlatforms(context)
     }
 }

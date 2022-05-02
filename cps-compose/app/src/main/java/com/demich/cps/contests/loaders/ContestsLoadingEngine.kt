@@ -1,39 +1,36 @@
 package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
+import com.demich.cps.contests.ContestsReceiver
 import com.demich.cps.contests.settings.ContestTimePrefs
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.utils.getCurrentTime
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 suspend fun getContests(
     setup: Map<Contest.Platform, List<ContestsLoaders>>,
-    settings: ContestsSettingsDataStore
-): Map<Contest.Platform, List<Result<List<Contest>>>> {
+    settings: ContestsSettingsDataStore,
+    contestsReceiver: ContestsReceiver
+) {
     val timeLimits = settings.contestsTimePrefs().createLimits(now = getCurrentTime())
     val loaders = settings.createLoaders().associateBy { it.type }
-    val groupedResults = coroutineScope {
-        val memorizer = MultipleLoadersMemorizer(setup, timeLimits)
-        setup.map { (platform, priorities) ->
-            require(priorities.isNotEmpty())
-            async {
-                val result = loadUntilSuccess(
+    val memorizer = MultipleLoadersMemorizer(setup, timeLimits)
+    coroutineScope {
+        setup.forEach { (platform, priorities) ->
+            launch {
+                loadUntilSuccess(
                     platform = platform,
                     priorities = priorities,
                     loaders = loaders,
                     memorizer = memorizer,
-                    timeLimits = timeLimits
+                    timeLimits = timeLimits,
+                    contestsReceiver = contestsReceiver
                 )
-                platform to result
             }
-        }.awaitAll().toMap()
+        }
     }
-    return groupedResults
 }
 
 private suspend fun loadUntilSuccess(
@@ -41,9 +38,11 @@ private suspend fun loadUntilSuccess(
     priorities: List<ContestsLoaders>,
     loaders: Map<ContestsLoaders, ContestsLoader>,
     memorizer: MultipleLoadersMemorizer,
-    timeLimits: ContestTimePrefs.Limits
-): List<Result<List<Contest>>> {
-    val results = mutableListOf<Result<List<Contest>>>()
+    timeLimits: ContestTimePrefs.Limits,
+    contestsReceiver: ContestsReceiver
+) {
+    require(priorities.isNotEmpty())
+    contestsReceiver.startLoading(platform)
     for (loaderType in priorities) {
         val loader = loaders.getValue(loaderType)
         val result: Result<List<Contest>> = if (loader is ContestsLoaderMultiple) {
@@ -55,10 +54,14 @@ private suspend fun loadUntilSuccess(
                 loader.getContests(platform = platform, timeLimits = timeLimits)
             }
         }
-        results.add(result)
-        if (result.isSuccess) break
+        result.onSuccess { contests ->
+            contestsReceiver.finishSuccess(platform, contests)
+            return
+        }.onFailure {
+            contestsReceiver.consumeError(platform, loaderType, it)
+        }
     }
-    return results
+    contestsReceiver.finishFailed(platform)
 }
 
 private class MultipleLoadersMemorizer(

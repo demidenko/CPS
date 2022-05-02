@@ -1,25 +1,42 @@
 package com.demich.cps.contests
 
 import android.content.Context
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.contests.loaders.getContests
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
+import com.demich.cps.room.ContestsListDao
 import com.demich.cps.room.contestsListDao
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.add
 import com.demich.cps.utils.addAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ContestsViewModel: ViewModel() {
-    var loadingStatus by mutableStateOf(LoadingStatus.PENDING)
-        private set
+
+    val loadingStatus: State<LoadingStatus>
+        @Composable
+        get() = remember {
+            derivedStateOf {
+                val states = Contest.platforms.map { mutableLoadingStatusFor(platform = it) }
+                when {
+                    states.any { it.value == LoadingStatus.LOADING } -> LoadingStatus.LOADING
+                    states.any { it.value == LoadingStatus.FAILED } -> LoadingStatus.FAILED
+                    else -> LoadingStatus.PENDING
+                }
+            }
+        }
+
+    private val loadingStatuses: MutableMap<Contest.Platform, MutableState<LoadingStatus>> = mutableMapOf()
+
+    private fun mutableLoadingStatusFor(platform: Contest.Platform): MutableState<LoadingStatus> =
+        loadingStatuses.getOrPut(platform) { mutableStateOf(LoadingStatus.PENDING) }
+
 
     private val errorStateFlow = MutableStateFlow<Throwable?>(null)
     fun flowOfError() = errorStateFlow.asStateFlow()
@@ -39,47 +56,30 @@ class ContestsViewModel: ViewModel() {
     }
 
     private suspend fun reload(platforms: Collection<Contest.Platform>, context: Context) {
-        require(loadingStatus != LoadingStatus.LOADING) //TODO consider cases and solutions
-
-        errorStateFlow.value = null
+        errorStateFlow.value = null //TODO: consume errors
 
         if (platforms.isEmpty()) {
-            loadingStatus = LoadingStatus.PENDING
             return
         }
 
-        loadingStatus = LoadingStatus.LOADING
-
         val settings = context.settingsContests
-        val resultsGrouped = loadContests(
+
+        loadContests(
             platforms = platforms,
-            settings = settings
-        )
-
-        settings.lastReloadedPlatforms.addAll(platforms)
-        if (Contest.Platform.unknown in platforms) {
-            settings.clistLastReloadedAdditionalResources.addAll(
-                values = settings.clistAdditionalResources().map { it.id }
+            settings = settings,
+            contestsReceiver = ContestsReceiver(
+                dao = context.contestsListDao,
+                getLoadingStatusState = { mutableLoadingStatusFor(it) },
+                onLoadingFinished = { platform ->
+                    settings.lastReloadedPlatforms.add(platform)
+                    if (platform == Contest.Platform.unknown) {
+                        settings.clistLastReloadedAdditionalResources.addAll(
+                            values = settings.clistAdditionalResources().map { it.id }
+                        )
+                    }
+                }
             )
-        }
-
-        val dao = context.contestsListDao
-        var anyThrowable: Throwable? = null
-        platforms.forEach { platform ->
-            resultsGrouped.getValue(platform).last().onFailure {
-                anyThrowable = it
-            }.onSuccess { contests ->
-                dao.replace(
-                    platform = platform,
-                    contests = contests
-                )
-            }
-        }
-
-        loadingStatus = anyThrowable?.let {
-            errorStateFlow.value = it
-            LoadingStatus.FAILED
-        } ?: LoadingStatus.PENDING
+        )
     }
 
     fun syncEnabledAndLastReloaded(context: Context) {
@@ -114,17 +114,24 @@ class ContestsViewModel: ViewModel() {
 
 private suspend fun loadContests(
     platforms: Collection<Contest.Platform>,
-    settings: ContestsSettingsDataStore
-): Map<Contest.Platform, List<Result<List<Contest>>>> {
+    settings: ContestsSettingsDataStore,
+    contestsReceiver: ContestsReceiver
+) {
     if (Contest.Platform.unknown in platforms) {
         if (settings.clistAdditionalResources().isEmpty()) {
-            return loadContests(
+            contestsReceiver.finishSuccess(
+                platform = Contest.Platform.unknown,
+                contests = emptyList()
+            )
+            loadContests(
                 platforms = platforms - Contest.Platform.unknown,
-                settings = settings
-            ) + Pair(Contest.Platform.unknown, listOf(Result.success(emptyList())))
+                settings = settings,
+                contestsReceiver = contestsReceiver
+            )
+            return
         }
     }
-    return getContests(
+    getContests(
         //TODO: read setup from settings
         setup = platforms.associateWith { platform ->
             when (platform) {
@@ -135,6 +142,34 @@ private suspend fun loadContests(
                 else -> listOf(ContestsLoaders.clist)
             }
         },
-        settings = settings
+        settings = settings,
+        contestsReceiver = contestsReceiver
     )
+}
+
+class ContestsReceiver(
+    private val dao: ContestsListDao,
+    private val getLoadingStatusState: (Contest.Platform) -> MutableState<LoadingStatus>,
+    private val onLoadingFinished: suspend (Contest.Platform) -> Unit
+) {
+    fun startLoading(platform: Contest.Platform) {
+        var loadingStatus by getLoadingStatusState(platform)
+        require(loadingStatus != LoadingStatus.LOADING)
+        loadingStatus = LoadingStatus.LOADING
+    }
+
+    fun consumeError(platform: Contest.Platform, loaderType: ContestsLoaders, e: Throwable) {
+
+    }
+
+    suspend fun finishSuccess(platform: Contest.Platform, contests: List<Contest>) {
+        getLoadingStatusState(platform).value = LoadingStatus.PENDING
+        dao.replace(platform = platform, contests = contests)
+        onLoadingFinished(platform)
+    }
+
+    suspend fun finishFailed(platform: Contest.Platform) {
+        getLoadingStatusState(platform).value = LoadingStatus.FAILED
+        onLoadingFinished(platform)
+    }
 }

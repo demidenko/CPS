@@ -1,10 +1,7 @@
 package com.demich.cps.accounts
 
 import android.content.Context
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.managers.*
@@ -19,8 +16,11 @@ import kotlinx.coroutines.launch
 class AccountsViewModel: ViewModel() {
     private val loadingStatuses: MutableMap<AccountManagers, MutableState<LoadingStatus>> = mutableMapOf()
 
-    fun loadingStatusFor(manager: AccountManager<*>): MutableState<LoadingStatus> =
+    private fun mutableLoadingStatusFor(manager: AccountManager<*>): MutableState<LoadingStatus> =
         loadingStatuses.getOrPut(manager.type) { mutableStateOf(LoadingStatus.PENDING) }
+
+    fun loadingStatusFor(manager: AccountManager<*>): State<LoadingStatus> =
+        mutableLoadingStatusFor(manager)
 
 
     fun<U: UserInfo> reload(manager: AccountManager<U>) {
@@ -28,7 +28,7 @@ class AccountsViewModel: ViewModel() {
             val savedInfo = manager.getSavedInfo()
             if (savedInfo.isEmpty()) return@launch
 
-            var loadingStatus by loadingStatusFor(manager)
+            var loadingStatus by mutableLoadingStatusFor(manager)
             if (loadingStatus == LoadingStatus.LOADING) return@launch
 
             loadingStatus = LoadingStatus.LOADING
@@ -45,7 +45,7 @@ class AccountsViewModel: ViewModel() {
 
     fun<U: UserInfo> delete(manager: AccountManager<U>) {
         viewModelScope.launch {
-            var loadingStatus by loadingStatusFor(manager)
+            var loadingStatus by mutableLoadingStatusFor(manager)
             require(loadingStatus != LoadingStatus.LOADING)
             loadingStatus = LoadingStatus.PENDING
             manager.setSavedInfo(manager.emptyInfo())
@@ -65,7 +65,7 @@ class AccountsViewModel: ViewModel() {
             val managers = context.allAccountManagers
             supported.map { (type, userId) ->
                 val manager = managers.first { it.type == type }
-                var loadingStatus by loadingStatusFor(manager)
+                var loadingStatus by mutableLoadingStatusFor(manager)
                 launch {
                     //TODO: what if already loading??
                     loadingStatus = LoadingStatus.LOADING
