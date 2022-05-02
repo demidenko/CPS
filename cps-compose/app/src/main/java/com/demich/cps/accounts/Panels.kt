@@ -59,8 +59,9 @@ fun<U: UserInfo> PanelWithUI(
                 if (clickEnabled) {
                     detectTapGestures(
                         onPress = {
-                            tryAwaitRelease()
-                            lastClickMillis = getCurrentTime().toEpochMilliseconds()
+                            if (tryAwaitRelease()) {
+                                lastClickMillis = getCurrentTime().toEpochMilliseconds()
+                            }
                         },
                         onDoubleTap = {
                             onExpandRequest()
