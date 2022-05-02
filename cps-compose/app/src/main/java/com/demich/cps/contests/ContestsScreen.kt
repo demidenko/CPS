@@ -223,9 +223,14 @@ private fun ColumnScope.LoadingError(
 }
 
 fun contestsMenuBuilder(
-    navController: NavController
+    navController: NavController,
+    contestsViewModel: ContestsViewModel
 ): CPSMenuBuilder = {
-    CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings) {
+    CPSDropdownMenuItem(
+        title = "Settings",
+        icon = CPSIcons.Settings,
+        enabled = contestsViewModel.loadingStatus.value != LoadingStatus.LOADING
+    ) {
         navController.navigate(Screen.ContestsSettings.route)
     }
 }
@@ -235,11 +240,13 @@ fun contestsBottomBarBuilder(
     onEnableSearch: () -> Unit
 ): AdditionalBottomBarBuilder = {
     val context = context
-    CPSIconButton(icon = CPSIcons.Search) {
-        onEnableSearch()
-    }
-    val loadingStatus by contestsViewModel.loadingStatus
-    CPSReloadingButton(loadingStatus = loadingStatus) {
+    CPSIconButton(
+        icon = CPSIcons.Search,
+        onClick = onEnableSearch
+    )
+    CPSReloadingButton(
+        loadingStatus = contestsViewModel.loadingStatus.value
+    ) {
         contestsViewModel.reloadEnabledPlatforms(context)
     }
 }

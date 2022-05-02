@@ -37,8 +37,10 @@ class CPSDropdownMenuScope(private val menuDismissRequest: () -> Unit) {
     fun CPSDropdownMenuItem(
         title: String,
         icon: ImageVector,
+        enabled: Boolean = true,
         onClick: () -> Unit
     ) = DropdownMenuItem(
+        enabled = enabled,
         onClick = {
             menuDismissRequest()
             onClick()

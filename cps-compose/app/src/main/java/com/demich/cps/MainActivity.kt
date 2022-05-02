@@ -144,7 +144,10 @@ fun CPSScaffold(
                     contestsViewModel = cpsViewModels.contestsViewModel,
                     onEnableSearch = { searchEnabled.value = true }
                 )
-                menu = contestsMenuBuilder(navController)
+                menu = contestsMenuBuilder(
+                    navController = navController,
+                    contestsViewModel = cpsViewModels.contestsViewModel
+                )
             }
             cpsComposable(Screen.ContestsSettings.route) {
                 ContestsSettingsScreen(navController)
