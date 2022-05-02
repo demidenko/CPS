@@ -44,45 +44,44 @@ fun<U: UserInfo> PanelWithUI(
 
     if (loadingStatus == LoadingStatus.LOADING) lastClickMillis = 0
 
-    if (!userInfo.isEmpty()) {
-        val clickEnabled = loadingStatus != LoadingStatus.LOADING && visibleOrder == null
-        Box(modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 48.dp)
-            .pointerInput(clickEnabled) {
-                if (clickEnabled) {
-                    detectTapGestures(
-                        onPress = {
-                            if (tryAwaitRelease()) {
-                                lastClickMillis = getCurrentTime().toEpochMilliseconds()
-                            }
-                        },
-                        onDoubleTap = {
-                            onExpandRequest()
+    val clickEnabled = loadingStatus != LoadingStatus.LOADING && visibleOrder == null
+
+    Box(modifier = modifier
+        .fillMaxWidth()
+        .heightIn(min = 48.dp)
+        .pointerInput(clickEnabled) {
+            if (clickEnabled) {
+                detectTapGestures(
+                    onPress = {
+                        if (tryAwaitRelease()) {
+                            lastClickMillis = getCurrentTime().toEpochMilliseconds()
                         }
-                    )
-                }
-            }
-        ) {
-            manager.Panel(userInfo)
-
-            if (visibleOrder == null) {
-                AccountPanelUI(
-                    loadingStatus = loadingStatus,
-                    lastClickMillis = lastClickMillis,
-                    onReloadRequest = { accountsViewModel.reload(manager) },
-                    onExpandRequest = onExpandRequest,
-                    modifier = Modifier.align(Alignment.CenterEnd)
-                )
-            } else {
-                AccountMovingUI(
-                    type = manager.type,
-                    visibleOrder = visibleOrder,
-                    modifier = Modifier.align(Alignment.CenterEnd)
+                    },
+                    onDoubleTap = {
+                        onExpandRequest()
+                    }
                 )
             }
-
         }
+    ) {
+        manager.Panel(userInfo)
+
+        if (visibleOrder == null) {
+            AccountPanelUI(
+                loadingStatus = loadingStatus,
+                lastClickMillis = lastClickMillis,
+                onReloadRequest = { accountsViewModel.reload(manager) },
+                onExpandRequest = onExpandRequest,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+        } else {
+            AccountMovingUI(
+                type = manager.type,
+                visibleOrder = visibleOrder,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+        }
+
     }
 }
 

@@ -61,29 +61,29 @@ fun AccountsScreen(
 
 
     Box(modifier = Modifier.fillMaxHeight()) {
-        LazyColumn(
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(cpsColors.background)
-        ) {
-            if (recordedAccounts.isEmpty()) item {
-                MonospacedText(
-                    text = stringResource(id = R.string.accounts_welcome),
-                    color = cpsColors.textColorAdditional,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(6.dp)
-                )
-            } else {
+        if (recordedAccounts.isEmpty()) {
+            MonospacedText(
+                text = stringResource(id = R.string.accounts_welcome),
+                color = cpsColors.textColorAdditional,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(6.dp)
+            )
+        } else {
+            LazyColumn(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(cpsColors.background)
+            ) {
                 items(recordedAccounts, key = { it.type }) { userInfoWithManager ->
                     PanelWithUI(
                         userInfoWithManager = userInfoWithManager,
+                        onExpandRequest = { onExpandAccount(userInfoWithManager.type) },
                         accountsViewModel = accountsViewModel,
                         visibleOrder = visibleOrder,
                         modifier = Modifier
                             .padding(start = 10.dp, top = 10.dp)
-                            .animateItemPlacement(),
-                        onExpandRequest = { onExpandAccount(userInfoWithManager.type) }
+                            .animateItemPlacement()
                     )
                 }
             }
@@ -92,7 +92,10 @@ fun AccountsScreen(
             //TODO: this button instead of whole bottom bar
             Button(
                 onClick = { showAccountsReorderUI = false },
-                content = { Text("Done") },
+                content = {
+                    Icon(imageVector = CPSIcons.Reorder, contentDescription = null)
+                    Text("Done")
+                },
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
