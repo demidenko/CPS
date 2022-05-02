@@ -11,7 +11,6 @@ import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.room.ContestsListDao
 import com.demich.cps.room.contestsListDao
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.add
 import com.demich.cps.utils.addAll
 import com.demich.cps.utils.combine
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,20 +61,20 @@ class ContestsViewModel: ViewModel() {
 
         val settings = context.settingsContests
 
+        settings.lastReloadedPlatforms.addAll(platforms)
+        if (Contest.Platform.unknown in platforms) {
+            settings.clistLastReloadedAdditionalResources.addAll(
+                values = settings.clistAdditionalResources().map { it.id }
+            )
+        }
+
+        println("reload ${platforms.joinToString()}")
         loadContests(
             platforms = platforms,
             settings = settings,
             contestsReceiver = ContestsReceiver(
                 dao = context.contestsListDao,
                 getLoadingStatusState = { mutableLoadingStatusFor(it) },
-                onLoadingFinished = { platform ->
-                    settings.lastReloadedPlatforms.add(platform)
-                    if (platform == Contest.Platform.unknown) {
-                        settings.clistLastReloadedAdditionalResources.addAll(
-                            values = settings.clistAdditionalResources().map { it.id }
-                        )
-                    }
-                }
             )
         )
     }
@@ -148,7 +147,6 @@ private suspend fun loadContests(
 class ContestsReceiver(
     private val dao: ContestsListDao,
     private val getLoadingStatusState: (Contest.Platform) -> MutableState<LoadingStatus>,
-    private val onLoadingFinished: suspend (Contest.Platform) -> Unit
 ) {
     fun startLoading(platform: Contest.Platform) {
         var loadingStatus by getLoadingStatusState(platform)
@@ -163,11 +161,9 @@ class ContestsReceiver(
     suspend fun finishSuccess(platform: Contest.Platform, contests: List<Contest>) {
         getLoadingStatusState(platform).value = LoadingStatus.PENDING
         dao.replace(platform = platform, contests = contests)
-        onLoadingFinished(platform)
     }
 
     suspend fun finishFailed(platform: Contest.Platform) {
         getLoadingStatusState(platform).value = LoadingStatus.FAILED
-        onLoadingFinished(platform)
     }
 }
