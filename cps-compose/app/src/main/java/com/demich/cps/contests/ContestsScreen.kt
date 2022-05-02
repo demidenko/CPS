@@ -22,6 +22,7 @@ import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.CPSMenuBuilder
 import com.demich.cps.Screen
 import com.demich.cps.contests.loaders.ContestsLoaders
+import com.demich.cps.contests.loaders.makeCombinedMessage
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.room.contestsListDao
 import com.demich.cps.settingsDev
@@ -33,10 +34,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import io.ktor.client.features.*
-import io.ktor.http.*
 import kotlinx.coroutines.flow.combine
-import java.net.UnknownHostException
 
 @Composable
 fun ContestsScreen(
@@ -208,21 +206,12 @@ private fun ColumnScope.LoadingError(
 ) {
     val context = context
     val devModeEnabled by rememberCollect { context.settingsDev.devModeEnabled.flow }
-    /*val message = when {
-        error == null -> ""
-        error is UnknownHostException
-            -> "Connection failed"
-        error is ClientRequestException && error.response.status == HttpStatusCode.Unauthorized
-            -> "Incorrect clist::api access"
-        error is ClientRequestException && error.response.status == HttpStatusCode.TooManyRequests
-            -> "Too many requests"
-        else -> {
-            if(devModeEnabled) "$error" else ""
-        }
-    }*/
     AnimatedVisibility(visible = errors.isNotEmpty()) {
         Text(
-            text = errors.map { it.second}.distinct().joinToString(),
+            text = makeCombinedMessage(
+                errors = errors,
+                developEnabled = devModeEnabled
+            ),
             textAlign = TextAlign.Center,
             color = cpsColors.background,
             fontSize = 13.sp,

@@ -45,17 +45,16 @@ class ContestsViewModel: ViewModel() {
     private fun mutableErrorsList(platform: Contest.Platform) =
         errors.getOrPut(platform) { mutableStateOf(emptyList()) }
 
-
+    private suspend fun removePlatform(platform: Contest.Platform, dao: ContestsListDao) {
+        dao.remove(platform)
+        mutableErrorsList(platform).value = emptyList()
+        mutableLoadingStatusFor(platform).value = LoadingStatus.PENDING
+    }
 
     fun reloadEnabledPlatforms(context: Context) {
         viewModelScope.launch {
             val settings = context.settingsContests
             val enabledPlatforms = settings.enabledPlatforms()
-            context.contestsListDao.run {
-                Contest.platforms.forEach { platform ->
-                    if (platform !in enabledPlatforms) remove(platform)
-                }
-            }
             settings.lastReloadedPlatforms(newValue = emptySet())
             reload(platforms = enabledPlatforms, context = context)
         }
@@ -99,9 +98,8 @@ class ContestsViewModel: ViewModel() {
             val lastReloaded = settings.lastReloadedPlatforms()
             (lastReloaded - enabled).takeIf { it.isNotEmpty() }?.let { toRemove ->
                 settings.lastReloadedPlatforms(newValue = lastReloaded - toRemove)
-                context.contestsListDao.let { dao ->
-                    toRemove.forEach { platform -> dao.remove(platform) }
-                }
+                val dao = context.contestsListDao
+                toRemove.forEach { platform -> removePlatform(platform, dao) }
             }
 
             val toReload = (enabled - lastReloaded).toMutableSet()
