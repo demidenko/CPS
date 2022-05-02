@@ -30,8 +30,8 @@ import kotlinx.coroutines.runBlocking
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AccountsScreen(
-    navController: NavController,
     accountsViewModel: AccountsViewModel,
+    onExpandAccount: (AccountManagers) -> Unit,
     onSetAdditionalMenu: (CPSMenuBuilder) -> Unit
 ) {
     val context = context
@@ -82,10 +82,9 @@ fun AccountsScreen(
                         visibleOrder = visibleOrder,
                         modifier = Modifier
                             .padding(start = 10.dp, top = 10.dp)
-                            .animateItemPlacement()
-                    ) {
-                        navController.navigate(route = "account/${userInfoWithManager.type}")
-                    }
+                            .animateItemPlacement(),
+                        onExpandRequest = { onExpandAccount(userInfoWithManager.type) }
+                    )
                 }
             }
         }

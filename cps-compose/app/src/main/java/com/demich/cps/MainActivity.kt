@@ -97,8 +97,8 @@ fun CPSScaffold(
         {
             cpsComposable(Screen.Accounts.route) {
                 AccountsScreen(
-                    navController = navController,
                     accountsViewModel = cpsViewModels.accountsViewModel,
+                    onExpandAccount = { type -> navController.navigate(route = "account/$type") },
                     onSetAdditionalMenu = { menu = it }
                 )
                 bottomBar = accountsBottomBarBuilder(cpsViewModels)
