@@ -108,9 +108,11 @@ fun CPSScaffold(
                 var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
                 AccountExpandedScreen(
                     type = type,
-                    navController = navController,
-                    accountsViewModel = cpsViewModels.accountsViewModel,
                     showDeleteDialog = showDeleteDialog,
+                    onDeleteRequest = { manager ->
+                        navController.popBackStack()
+                        cpsViewModels.accountsViewModel.delete(manager)
+                    },
                     onDismissDeleteDialog = { showDeleteDialog = false },
                     setBottomBarContent = { content -> bottomBar = content }
                 )

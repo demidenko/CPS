@@ -102,9 +102,8 @@ fun AccountsScreen(
 @Composable
 fun AccountExpandedScreen(
     type: AccountManagers,
-    navController: NavController,
-    accountsViewModel: AccountsViewModel,
     showDeleteDialog: Boolean,
+    onDeleteRequest: (AccountManager<out UserInfo>) -> Unit,
     onDismissDeleteDialog: () -> Unit,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
@@ -122,8 +121,7 @@ fun AccountExpandedScreen(
                 TextButton(
                     content = { Text(text = "Delete", color = cpsColors.errorColor) },
                     onClick = {
-                        navController.popBackStack()
-                        accountsViewModel.delete(manager)
+                        onDeleteRequest(manager)
                         onDismissDeleteDialog()
                     }
                 )
