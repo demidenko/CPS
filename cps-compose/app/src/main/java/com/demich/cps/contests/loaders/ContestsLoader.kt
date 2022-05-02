@@ -2,6 +2,10 @@ package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.settings.ContestTimePrefs
+import io.ktor.client.features.*
+import io.ktor.http.*
+import java.net.SocketException
+import java.net.UnknownHostException
 
 
 enum class ContestsLoaders {
