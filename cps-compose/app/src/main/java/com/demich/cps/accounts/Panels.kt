@@ -41,7 +41,6 @@ fun<U: UserInfo> PanelWithUI(
     val loadingStatus by remember { accountsViewModel.loadingStatusFor(manager) }
 
     var lastClickMillis by remember { mutableStateOf(0L) }
-    val uiAlpha by hidingState(lastClickMillis)
 
     if (loadingStatus == LoadingStatus.LOADING) lastClickMillis = 0
 
@@ -75,7 +74,7 @@ fun<U: UserInfo> PanelWithUI(
             if (visibleOrder == null) {
                 AccountPanelUI(
                     loadingStatus = loadingStatus,
-                    uiAlpha = uiAlpha,
+                    lastClickMillis = lastClickMillis,
                     onReloadRequest = { accountsViewModel.reload(manager) },
                     onExpandRequest = onExpandRequest,
                     modifier = Modifier.align(Alignment.CenterEnd)
@@ -95,12 +94,13 @@ fun<U: UserInfo> PanelWithUI(
 @Composable
 private fun AccountPanelUI(
     loadingStatus: LoadingStatus,
-    uiAlpha: Float,
+    lastClickMillis: Long,
     modifier: Modifier = Modifier,
     onReloadRequest: () -> Unit,
     onExpandRequest: () -> Unit
 ) {
     Row(modifier = modifier) {
+        val uiAlpha by hidingState(lastClickMillis)
         if (loadingStatus != LoadingStatus.LOADING && uiAlpha > 0f) {
             CPSIconButton(
                 icon = CPSIcons.Expand,
