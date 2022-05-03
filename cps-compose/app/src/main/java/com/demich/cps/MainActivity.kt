@@ -15,11 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.demich.cps.accounts.*
-import com.demich.cps.contests.*
+import com.demich.cps.contests.ContestsScreen
+import com.demich.cps.contests.ContestsViewModel
+import com.demich.cps.contests.contestsBottomBarBuilder
+import com.demich.cps.contests.contestsMenuBuilder
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
@@ -37,7 +41,7 @@ import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.map
 
-class MainActivity : ComponentActivity() {
+class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -46,19 +50,10 @@ class MainActivity : ComponentActivity() {
                 contestsViewModel = viewModel(),
                 progressBarsViewModel = viewModel()
             )
-            val darkLightMode by rememberCollect { settingsUI.darkLightMode.flow }
-            CPSTheme(darkTheme = darkLightMode.isDarkMode()) {
-                val systemUiController = rememberSystemUiController()
-                systemUiController.setNavigationBarColor(
-                    color = cpsColors.backgroundNavigation,
-                    darkIcons = MaterialTheme.colors.isLight
-                )
+            CPSTheme {
                 val useOriginalColors by rememberCollect { settingsUI.useOriginalColors.flow }
                 CompositionLocalProvider(LocalUseOriginalColors provides useOriginalColors) {
-                    CPSScaffold(
-                        cpsViewModels,
-                        systemUiController
-                    )
+                    CPSContent(cpsViewModels = cpsViewModels)
                 }
             }
         }
@@ -66,19 +61,47 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun CPSScaffold(
+private fun CPSContent(
     cpsViewModels: CPSViewModels,
-    systemUiController: SystemUiController
+    navController: NavHostController = rememberNavController()
 ) {
-    val navController = rememberNavController()
     val currentScreen by remember(navController) {
         navController.currentBackStackEntryFlow.map { it.getScreen() }
     }.collectAsState(initial = null)
+
+    NavigationAndStatusBars(
+        currentScreen = currentScreen
+    )
+
+    CPSScaffold(
+        cpsViewModels = cpsViewModels,
+        navController = navController,
+        currentScreen = currentScreen
+    )
+}
+
+@Composable
+private fun NavigationAndStatusBars(
+    currentScreen: Screen?,
+    systemUiController: SystemUiController = rememberSystemUiController()
+) {
+    systemUiController.setNavigationBarColor(
+        color = cpsColors.backgroundNavigation,
+        darkIcons = MaterialTheme.colors.isLight
+    )
 
     CPSStatusBar(
         systemUiController = systemUiController,
         currentScreen = currentScreen
     )
+}
+
+@Composable
+private fun CPSScaffold(
+    cpsViewModels: CPSViewModels,
+    navController: NavHostController,
+    currentScreen: Screen?
+) {
 
     var menu: CPSMenuBuilder? by remember { mutableStateOf(null) }
     var bottomBar: AdditionalBottomBarBuilder? by remember { mutableStateOf(null) }

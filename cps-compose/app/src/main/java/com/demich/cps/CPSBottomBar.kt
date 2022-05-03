@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
@@ -21,7 +21,7 @@ typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
 
 @Composable
 fun CPSBottomBar(
-    navController: NavHostController,
+    navController: NavController,
     currentScreen: Screen?,
     additionalBottomBar: AdditionalBottomBarBuilder? = null
 ) {
@@ -50,7 +50,7 @@ fun CPSBottomBar(
 @Composable
 private fun CPSBottomBarMain(
     currentScreen: Screen,
-    navController: NavHostController,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     val devModeEnabled by with(context) { rememberCollect { settingsDev.devModeEnabled.flow } }

@@ -4,12 +4,16 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.demich.cps.ui.settingsUI
+import com.demich.cps.utils.context
+import com.demich.cps.utils.rememberCollect
 
 private val LightColorPalette = lightColors(
     background = Color(248, 248, 248),
@@ -27,9 +31,11 @@ private val DarkColorPalette = darkColors(
 
 
 @Composable
-fun CPSTheme(darkTheme: Boolean, content: @Composable () -> Unit) {
+fun CPSTheme(content: @Composable () -> Unit) {
+    val context = context
+    val darkLightMode by rememberCollect { context.settingsUI.darkLightMode.flow }
     MaterialTheme(
-        colors = if (darkTheme) DarkColorPalette else LightColorPalette,
+        colors = if (darkLightMode.isDarkMode()) DarkColorPalette else LightColorPalette,
         typography = Typography(
             body1 = TextStyle(
                 fontFamily = FontFamily.Default,

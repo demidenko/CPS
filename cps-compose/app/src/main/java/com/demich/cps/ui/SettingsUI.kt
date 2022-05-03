@@ -16,7 +16,7 @@ class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
         private val Context.settingsUI_dataStore by preferencesDataStore("settings_ui")
     }
 
-    val darkLightMode = itemEnum(name = "ui_mode", defaultValue = DarkLightMode.SYSTEM)
+    val darkLightMode = itemEnum(name = "dark_light_mode", defaultValue = DarkLightMode.SYSTEM)
 
     val useOriginalColors = itemBoolean(name = "use_original_colors", defaultValue = false)
 
