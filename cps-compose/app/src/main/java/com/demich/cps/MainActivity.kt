@@ -84,6 +84,7 @@ fun CPSScaffold(
     var bottomBar: AdditionalBottomBarBuilder? by remember { mutableStateOf(null) }
 
     fun NavGraphBuilder.cpsComposable(route: String, content: @Composable (NavBackStackEntry) -> Unit) {
+        //TODO: bottom bar glich on change screens
         composable(route) {
             menu = null
             bottomBar = null
