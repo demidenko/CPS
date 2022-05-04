@@ -6,7 +6,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -632,6 +631,8 @@ private class RatingGraphRectangles(
                     addBounds(x = time.epochSeconds, bounds = bounds)
                 }
         }
+    }.apply {
+        require(isSortedWith(compareByDescending<Pair<Point, HandleColor>> { it.first.x }.thenBy { it.first.y }))
     }
 
     fun getHandleColor(point: Point): HandleColor =
