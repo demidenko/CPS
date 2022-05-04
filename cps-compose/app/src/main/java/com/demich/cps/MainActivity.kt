@@ -65,34 +65,18 @@ private fun CPSContent(
     cpsViewModels: CPSViewModels,
     navController: NavHostController = rememberNavController()
 ) {
-    val currentScreen by remember(navController) {
+    val currentScreenState = remember(navController) {
         navController.currentBackStackEntryFlow.map { it.getScreen() }
     }.collectAsState(initial = null)
 
     NavigationAndStatusBars(
-        currentScreen = currentScreen
+        currentScreen = currentScreenState.value
     )
 
     CPSScaffold(
         cpsViewModels = cpsViewModels,
         navController = navController,
-        currentScreen = currentScreen
-    )
-}
-
-@Composable
-private fun NavigationAndStatusBars(
-    currentScreen: Screen?,
-    systemUiController: SystemUiController = rememberSystemUiController()
-) {
-    systemUiController.setNavigationBarColor(
-        color = cpsColors.backgroundNavigation,
-        darkIcons = MaterialTheme.colors.isLight
-    )
-
-    CPSStatusBar(
-        systemUiController = systemUiController,
-        currentScreen = currentScreen
+        currentScreenState = currentScreenState
     )
 }
 
@@ -100,7 +84,7 @@ private fun NavigationAndStatusBars(
 private fun CPSScaffold(
     cpsViewModels: CPSViewModels,
     navController: NavHostController,
-    currentScreen: Screen?
+    currentScreenState: State<Screen?>
 ) {
 
     var menu: CPSMenuBuilder? by remember { mutableStateOf(null) }
@@ -109,6 +93,7 @@ private fun CPSScaffold(
     fun NavGraphBuilder.cpsComposable(route: String, content: @Composable (NavBackStackEntry) -> Unit) {
         //TODO: bottom bar glich on change screens
         composable(route) {
+            println("${it.getScreen()} ${currentScreenState.value}")
             menu = null
             bottomBar = null
             content(it)
@@ -193,12 +178,12 @@ private fun CPSScaffold(
 
     Scaffold(
         topBar = { CPSTopBar(
-            currentScreen = currentScreen,
+            currentScreen = currentScreenState.value,
             additionalMenu = menu
         ) },
         bottomBar = { CPSBottomBar(
             navController = navController,
-            currentScreen = currentScreen,
+            currentScreen = currentScreenState.value,
             additionalBottomBar = bottomBar
         ) }
     ) { innerPadding ->
@@ -217,6 +202,22 @@ private fun CPSScaffold(
             )
         }
     }
+}
+
+@Composable
+private fun NavigationAndStatusBars(
+    currentScreen: Screen?,
+    systemUiController: SystemUiController = rememberSystemUiController()
+) {
+    systemUiController.setNavigationBarColor(
+        color = cpsColors.backgroundNavigation,
+        darkIcons = MaterialTheme.colors.isLight
+    )
+
+    CPSStatusBar(
+        systemUiController = systemUiController,
+        currentScreen = currentScreen
+    )
 }
 
 class CPSViewModels(
