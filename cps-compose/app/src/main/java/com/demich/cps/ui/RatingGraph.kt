@@ -642,9 +642,26 @@ private class RatingGraphRectangles(
         rectangles.last { (r, _) -> point.x < r.x && point.y >= r.y }.second
 
     fun iterateWithHandleColor(points: List<Point>, block: (Point, HandleColor) -> Unit) {
-        //TODO: speed up
-        points.forEach {
-            block(it, getHandleColor(it))
+        /*
+        fast version of
+        points.forEach { point -> block(point, getHandleColor(point)) }
+         */
+        require(points.isSortedWith(compareBy { it.x }))
+        var r = rectangles.size
+        var l = r
+        points.forEach { point ->
+            val (x, y) = point
+            while (l == rectangles.size || x >= rectangles[l].first.x) {
+                r = l
+                do --l while (l > 0 && rectangles[l-1].first.x == rectangles[r-1].first.x)
+            }
+            var sl = l
+            var sr = r
+            while (sl < sr) {
+                val mid = (sl + sr) / 2
+                if (rectangles[mid].first.y <= y) sl = mid+1 else sr = mid
+            }
+            block(point, rectangles[sl-1].second)
         }
     }
 }
