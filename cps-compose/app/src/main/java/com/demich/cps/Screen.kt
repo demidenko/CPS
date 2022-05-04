@@ -16,6 +16,8 @@ sealed class Screen(
     class AccountExpanded(val type: AccountManagers)
         : Screen(route = route, root = Accounts) {
         override val subtitle get() = "::accounts.$type"
+        override fun equals(other: Any?) = other is AccountExpanded && other.type == type
+        override fun hashCode() = type.ordinal
         companion object {
             const val route = "account/{manager}"
         }
@@ -23,6 +25,8 @@ sealed class Screen(
     class AccountSettings(val type: AccountManagers)
         : Screen(route = route, root = Accounts, enableBottomBar = false) {
         override val subtitle get() = "::accounts.$type.settings"
+        override fun equals(other: Any?) = other is AccountSettings && other.type == type
+        override fun hashCode() = type.ordinal
         companion object {
             const val route = "account_settings/{manager}"
             fun route(type: AccountManagers) = "account_settings/$type"

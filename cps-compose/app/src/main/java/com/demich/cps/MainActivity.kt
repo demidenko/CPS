@@ -80,6 +80,25 @@ private fun CPSContent(
     )
 }
 
+private class BuildersHolder(
+    private val currentScreenState: State<Screen?>,
+    val screen: Screen,
+
+    private val menuBuilderState: MutableState<CPSMenuBuilder?>,
+    private val bottomBarBuilderState: MutableState<AdditionalBottomBarBuilder?>
+) {
+    var menu: CPSMenuBuilder?
+        get() = menuBuilderState.value
+        set(value) { if (screen == currentScreenState.value) menuBuilderState.value = value }
+
+    var bottomBar: AdditionalBottomBarBuilder?
+        get() = bottomBarBuilderState.value
+        set(value) { if (screen == currentScreenState.value) bottomBarBuilderState.value = value }
+
+    val menuSetter get() = menuBuilderState.component2()
+    val bottomBarSetter get() = bottomBarBuilderState.component2()
+}
+
 @Composable
 private fun CPSScaffold(
     cpsViewModels: CPSViewModels,
@@ -87,16 +106,23 @@ private fun CPSScaffold(
     currentScreenState: State<Screen?>
 ) {
 
-    var menu: CPSMenuBuilder? by remember { mutableStateOf(null) }
-    var bottomBar: AdditionalBottomBarBuilder? by remember { mutableStateOf(null) }
+    val menuBuilderState = remember { mutableStateOf<CPSMenuBuilder?>(null) }
+    val bottomBarBuilderState = remember { mutableStateOf<AdditionalBottomBarBuilder?>(null) }
 
-    fun NavGraphBuilder.cpsComposable(route: String, content: @Composable (NavBackStackEntry) -> Unit) {
-        //TODO: bottom bar glich on change screens
+    fun NavGraphBuilder.cpsComposable(route: String, content: @Composable (BuildersHolder) -> Unit) {
         composable(route) {
-            println("${it.getScreen()} ${currentScreenState.value}")
-            menu = null
-            bottomBar = null
-            content(it)
+            val holder: BuildersHolder = remember {
+                BuildersHolder(
+                    currentScreenState = currentScreenState,
+                    screen = it.getScreen(),
+                    menuBuilderState = menuBuilderState,
+                    bottomBarBuilderState = bottomBarBuilderState
+                )
+            }.apply {
+                menu = null
+                bottomBar = null
+            }
+            content(holder)
         }
     }
 
@@ -104,21 +130,21 @@ private fun CPSScaffold(
         navController, cpsViewModels
     ) {
         {
-            cpsComposable(Screen.Accounts.route) {
+            cpsComposable(Screen.Accounts.route) { holder ->
                 val reorderEnabledState = rememberSaveable { mutableStateOf(false) }
                 AccountsScreen(
                     accountsViewModel = cpsViewModels.accountsViewModel,
                     onExpandAccount = { type -> navController.navigate(route = "account/$type") },
-                    onSetAdditionalMenu = { menu = it },
+                    onSetAdditionalMenu = holder.menuSetter,
                     reorderEnabledState = reorderEnabledState
                 )
-                bottomBar = accountsBottomBarBuilder(
+                holder.bottomBar = accountsBottomBarBuilder(
                     cpsViewModels = cpsViewModels,
                     reorderEnabledState = reorderEnabledState
                 )
             }
-            cpsComposable(Screen.AccountExpanded.route) {
-                val type = (it.getScreen() as Screen.AccountExpanded).type
+            cpsComposable(Screen.AccountExpanded.route) { holder ->
+                val type = (holder.screen as Screen.AccountExpanded).type
                 var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
                 AccountExpandedScreen(
                     type = type,
@@ -128,39 +154,39 @@ private fun CPSScaffold(
                         cpsViewModels.accountsViewModel.delete(manager)
                     },
                     onDismissDeleteDialog = { showDeleteDialog = false },
-                    setBottomBarContent = { content -> bottomBar = content }
+                    setBottomBarContent = holder.bottomBarSetter
                 )
-                menu = accountExpandedMenuBuilder(
+                holder.menu = accountExpandedMenuBuilder(
                     type = type,
                     navController = navController,
                     onShowDeleteDialog = { showDeleteDialog = true }
                 )
             }
-            cpsComposable(Screen.AccountSettings.route) {
-                val type = (it.getScreen() as Screen.AccountSettings).type
+            cpsComposable(Screen.AccountSettings.route) { holder ->
+                val type = (holder.screen as Screen.AccountSettings).type
                 AccountSettingsScreen(type)
             }
 
-            cpsComposable(Screen.News.route) {
+            cpsComposable(Screen.News.route) { holder ->
                 NewsScreen(navController)
-                menu = newsMenuBuilder(navController)
-                bottomBar = newsBottomBarBuilder()
+                holder.menu = newsMenuBuilder(navController)
+                holder.bottomBar = newsBottomBarBuilder()
             }
             cpsComposable(Screen.NewsSettings.route) {
                 NewsSettingsScreen()
             }
 
-            cpsComposable(Screen.Contests.route) {
+            cpsComposable(Screen.Contests.route) { holder ->
                 val searchEnabled = rememberSaveable { mutableStateOf(false) }
                 ContestsScreen(
                     contestsViewModel = cpsViewModels.contestsViewModel,
                     searchEnabledState = searchEnabled
                 )
-                bottomBar = contestsBottomBarBuilder(
+                holder.bottomBar = contestsBottomBarBuilder(
                     contestsViewModel = cpsViewModels.contestsViewModel,
                     onEnableSearch = { searchEnabled.value = true }
                 )
-                menu = contestsMenuBuilder(
+                holder.menu = contestsMenuBuilder(
                     navController = navController,
                     contestsViewModel = cpsViewModels.contestsViewModel
                 )
@@ -169,9 +195,9 @@ private fun CPSScaffold(
                 ContestsSettingsScreen(navController)
             }
 
-            cpsComposable(Screen.Development.route) {
+            cpsComposable(Screen.Development.route) { holder ->
                 DevelopScreen(navController)
-                bottomBar = developAdditionalBottomBarBuilder(cpsViewModels.progressBarsViewModel)
+                holder.bottomBar = developAdditionalBottomBarBuilder(cpsViewModels.progressBarsViewModel)
             }
         }
     }
@@ -179,12 +205,12 @@ private fun CPSScaffold(
     Scaffold(
         topBar = { CPSTopBar(
             currentScreen = currentScreenState.value,
-            additionalMenu = menu
+            additionalMenu = menuBuilderState.value
         ) },
         bottomBar = { CPSBottomBar(
             navController = navController,
             currentScreen = currentScreenState.value,
-            additionalBottomBar = bottomBar
+            additionalBottomBar = bottomBarBuilderState.value
         ) }
     ) { innerPadding ->
         Box(modifier = Modifier
