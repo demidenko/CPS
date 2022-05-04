@@ -417,12 +417,12 @@ private fun DrawRatingGraph(
         }
 
         //rating filled areas
-        rectangles.rectangles.forEach { (point, handleColor) ->
+        rectangles.forEach { point, handleColor ->
             val (px, py) = translator.pointToOffset(point).let {
                 round(it.x) to round(it.y)
             }
             drawRect(
-                color = colorsMap[handleColor]!!,
+                color = colorsMap.getValue(handleColor),
                 topLeft = Offset.Zero,
                 size = Size(px, py)
             )
@@ -479,7 +479,7 @@ private fun DrawRatingGraph(
         )
 
         //rating points
-        ratingPoints.forEach { point ->
+        rectangles.iterateWithHandleColor(ratingPoints) { point, handleColor ->
             val center = translator.pointToOffset(point)
             drawCircle(
                 color = Color.Black,
@@ -488,7 +488,7 @@ private fun DrawRatingGraph(
                 style = Fill
             )
             drawCircle(
-                color = colorsMap[rectangles.getHandleColor(point)]!!,
+                color = colorsMap.getValue(handleColor),
                 radius = circleRadius * radiusMultiplier(point),
                 center = center,
                 style = Fill
@@ -613,7 +613,7 @@ private class CoordinateTranslator(
 private class RatingGraphRectangles(
     manager: RatedAccountManager<out RatedUserInfo>
 ) {
-    val rectangles: List<Pair<Point,HandleColor>> = buildList {
+    private val rectangles: List<Pair<Point,HandleColor>> = buildList {
         fun addBounds(bounds: Array<Pair<HandleColor, Int>>, x: Long) {
             bounds.sortedBy { it.second }.let { list ->
                 for (i in list.indices) {
@@ -635,9 +635,18 @@ private class RatingGraphRectangles(
         require(isSortedWith(compareByDescending<Pair<Point, HandleColor>> { it.first.x }.thenBy { it.first.y }))
     }
 
+    fun forEach(block: (Point, HandleColor) -> Unit) =
+        rectangles.forEach { block(it.first, it.second) }
+
     fun getHandleColor(point: Point): HandleColor =
         rectangles.last { (r, _) -> point.x < r.x && point.y >= r.y }.second
 
+    fun iterateWithHandleColor(points: List<Point>, block: (Point, HandleColor) -> Unit) {
+        //TODO: speed up
+        points.forEach {
+            block(it, getHandleColor(it))
+        }
+    }
 }
 
 private data class Point(val x: Long, val y: Long)
