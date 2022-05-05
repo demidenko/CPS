@@ -34,21 +34,29 @@ object CodeforcesApi {
 
     private const val callLimitExceededWaitTimeMillis: Long = 500
     private class CodeforcesAPICallLimitExceeded: Throwable()
+    private fun isCallLimitExceeded(e: Throwable): Boolean {
+        if (e is CodeforcesAPIErrorResponse) return e.isCallLimitExceeded()
+        if (e is CodeforcesAPICallLimitExceeded) return true
+        return false
+    }
 
-    private suspend fun<T> makeAPICall(block: suspend () -> CodeforcesAPIResponse<T>): T {
-        repeat(10) { iteration ->
+    private suspend inline fun<reified T> getCodeforcesApi(
+        urlString: String,
+        crossinline block: HttpRequestBuilder.() -> Unit = {}
+    ): T {
+        val callGet = suspend {
+            client.get<CodeforcesAPIResponse<T>>(urlString = urlString, block = block)
+        }
+        (10 downTo 1).forEach { iteration ->
             kotlin.runCatching {
                 withContext(Dispatchers.IO) {
-                    block()
+                    callGet()
                 }
             }.onSuccess {
                 return it.result
             }.onFailure { exception ->
-                if (
-                    exception is CodeforcesAPIErrorResponse && exception.isCallLimitExceeded()
-                    || exception is CodeforcesAPICallLimitExceeded
-                ) {
-                    delay(callLimitExceededWaitTimeMillis)
+                if (isCallLimitExceeded(exception)) {
+                    if (iteration > 1) delay(callLimitExceededWaitTimeMillis)
                 } else {
                     throw exception
                 }
@@ -97,22 +105,22 @@ object CodeforcesApi {
     }
 
 
-    suspend fun getUsers(handles: Collection<String>): List<CodeforcesUser> = makeAPICall {
-        client.get(urlString = "${urls.api}/user.info") {
+    suspend fun getUsers(handles: Collection<String>): List<CodeforcesUser> {
+        return getCodeforcesApi(urlString = "${urls.api}/user.info") {
             parameter("handles", handles.joinToString(separator = ";"))
         }
     }
 
     suspend fun getUser(handle: String) = getUsers(listOf(handle)).first()
 
-    suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange> = makeAPICall {
-        client.get(urlString = "${urls.api}/user.rating") {
+    suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange> {
+        return getCodeforcesApi(urlString = "${urls.api}/user.rating") {
             parameter("handle", handle)
         }
     }
 
-    suspend fun getContests(): List<CodeforcesContest> = makeAPICall {
-        client.get(urlString = "${urls.api}/contest.list") {
+    suspend fun getContests(): List<CodeforcesContest> {
+        return getCodeforcesApi(urlString = "${urls.api}/contest.list") {
             parameter("gym", false)
         }
     }

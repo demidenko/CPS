@@ -13,7 +13,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -192,11 +191,11 @@ private fun CPSScaffold(
                 )
             }
             cpsComposable(Screen.ContestsSettings.route) {
-                ContestsSettingsScreen(navController)
+                ContestsSettingsScreen()
             }
 
             cpsComposable(Screen.Development.route) { holder ->
-                DevelopScreen(navController)
+                DevelopScreen()
                 holder.bottomBar = developAdditionalBottomBarBuilder(cpsViewModels.progressBarsViewModel)
             }
         }

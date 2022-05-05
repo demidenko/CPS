@@ -13,7 +13,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.navigation.NavController
 import com.demich.cps.accounts.makeUserInfoSpan
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.CPSIconButton
@@ -44,7 +43,7 @@ val Context.settingsDev: SettingsDev
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DevelopScreen(navController: NavController) {
+fun DevelopScreen() {
     val scope = rememberCoroutineScope()
 
     val context = context

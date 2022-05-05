@@ -14,12 +14,12 @@ import kotlinx.coroutines.launch
 
 
 class AccountsViewModel: ViewModel() {
-    private val loadingStatuses: MutableMap<AccountManagers, MutableState<LoadingStatus>> = mutableMapOf()
+    private val loadingStatuses = mutableMapOf<AccountManagers, MutableState<LoadingStatus>>()
 
-    private fun mutableLoadingStatusFor(manager: AccountManager<*>): MutableState<LoadingStatus> =
+    private fun mutableLoadingStatusFor(manager: AccountManager<out UserInfo>): MutableState<LoadingStatus> =
         loadingStatuses.getOrPut(manager.type) { mutableStateOf(LoadingStatus.PENDING) }
 
-    fun loadingStatusFor(manager: AccountManager<*>): State<LoadingStatus> =
+    fun loadingStatusFor(manager: AccountManager<out UserInfo>): State<LoadingStatus> =
         mutableLoadingStatusFor(manager)
 
 

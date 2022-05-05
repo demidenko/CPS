@@ -72,13 +72,13 @@ private fun List<Contest>.filterWith(timeLimits: ContestTimePrefs.Limits) =
     }
 
 fun makeCombinedMessage(
-    errors: List<Pair<ContestsLoaders,Throwable>>,
+    errors: List<Pair<ContestsLoaders, Throwable>>,
     developEnabled: Boolean
 ): String {
     if (errors.isEmpty()) return ""
     val g = errors.groupBy(
         valueTransform = { it.first },
-        keySelector = { (loaderType, e) ->
+        keySelector = { (_, e) ->
             when {
                 e is UnknownHostException || e is SocketException
                     -> "Connection failed"
@@ -87,13 +87,11 @@ fun makeCombinedMessage(
                 e is ClientRequestException && e.response.status == HttpStatusCode.TooManyRequests
                     -> "Too many requests"
                 else -> {
-                    if (developEnabled) "$e" else null
+                    if (developEnabled) "$e" else "Failed"
                 }
             }
         }
     )
 
-    return g.mapNotNull { (msg, list) ->
-        if (msg == null) null else msg to list.distinct()
-    }.joinToString { (msg, list) -> "$list: $msg" }
+    return g.entries.joinToString { (msg, list) -> "$list: $msg" }
 }
