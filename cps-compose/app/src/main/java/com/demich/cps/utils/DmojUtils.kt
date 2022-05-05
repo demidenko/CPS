@@ -24,9 +24,14 @@ object DmojApi {
     suspend fun getSuggestions(query: String): List<DmojSuggestion> {
         val str = client.get<String>(urls.main + "/widgets/select2/user_search?term=$query&_type=query&q=$query")
         val json = Json.parseToJsonElement(str).jsonObject
-        return jsonCPS.decodeFromJsonElement(
-            json["results"]!!.jsonArray
-        )
+        return jsonCPS.decodeFromJsonElement(json["results"]!!.jsonArray)
+    }
+
+    suspend fun getContests(): List<DmojContest> {
+        val str = client.get<String>(urls.main + "/api/v2/contests")
+        val json = Json.parseToJsonElement(str).jsonObject
+        val obj = json["data"]!!.jsonObject["objects"]!!
+        return jsonCPS.decodeFromJsonElement(obj)
     }
 
     object urls {
@@ -55,4 +60,12 @@ data class DmojRatingChange(
     val ranking: Int,
     val link: String,
     val timestamp: Double
+)
+
+@Serializable
+data class DmojContest(
+    val key: String,
+    val name: String,
+    val start_time: String,
+    val end_time: String
 )

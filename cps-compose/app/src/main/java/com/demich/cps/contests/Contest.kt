@@ -34,6 +34,22 @@ data class Contest (
         return Phase.RUNNING
     }
 
+    constructor(
+        platform: Platform,
+        id: String,
+        title: String,
+        startTime: Instant,
+        endTime: Instant,
+        link: String? = null
+    ): this(
+        platform = platform,
+        id = id,
+        title = title,
+        startTime = startTime,
+        durationSeconds = (endTime - startTime).inWholeSeconds,
+        link = link
+    )
+
     constructor(contest: ClistContest): this(
         contest = contest,
         platform = platformsExceptUnknown
@@ -45,7 +61,7 @@ data class Contest (
         id = CListUtils.extractContestId(contest, platform),
         title = contest.event,
         startTime = Instant.parse(contest.start+"Z"),
-        durationSeconds = (Instant.parse(contest.end+"Z") - Instant.parse(contest.start+"Z")).inWholeSeconds,
+        endTime = Instant.parse(contest.end+"Z"),
         link = contest.href
     )
 
