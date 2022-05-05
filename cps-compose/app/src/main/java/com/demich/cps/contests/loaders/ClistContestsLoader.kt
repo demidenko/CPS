@@ -8,10 +8,7 @@ import com.demich.cps.utils.ClistContest
 class ClistContestsLoader(
     val apiAccess: CListApi.ApiAccess,
     val includeResourceIds: suspend () -> Collection<Int>
-): ContestsLoaderMultiple(
-    supportedPlatforms = Contest.platforms.toSet(),
-    type = ContestsLoaders.clist
-) {
+): ContestsLoaderMultiple(type = ContestsLoaders.clist) {
     override suspend fun loadContests(
         platforms: Set<Contest.Platform>,
         timeLimits: ContestTimePrefs.Limits

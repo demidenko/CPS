@@ -8,15 +8,15 @@ import java.net.SocketException
 import java.net.UnknownHostException
 
 
-enum class ContestsLoaders {
-    clist,
-    codeforces
+enum class ContestsLoaders(val supportedPlatforms: Set<Contest.Platform>) {
+    clist(Contest.platforms.toSet()),
+    codeforces(Contest.Platform.codeforces)
+    ;
+
+    constructor(platform: Contest.Platform): this(setOf(platform))
 }
 
-abstract class ContestsLoader(
-    val supportedPlatforms: Set<Contest.Platform>,
-    val type: ContestsLoaders
-) {
+abstract class ContestsLoader(val type: ContestsLoaders) {
     abstract suspend fun loadContests(
         platform: Contest.Platform,
         timeLimits: ContestTimePrefs.Limits
@@ -26,7 +26,7 @@ abstract class ContestsLoader(
         platform: Contest.Platform,
         timeLimits: ContestTimePrefs.Limits
     ): List<Contest> {
-        require(platform in supportedPlatforms)
+        require(platform in type.supportedPlatforms)
         return loadContests(
             platform = platform,
             timeLimits = timeLimits
@@ -34,10 +34,7 @@ abstract class ContestsLoader(
     }
 }
 
-abstract class ContestsLoaderMultiple(
-    supportedPlatforms: Set<Contest.Platform>,
-    type: ContestsLoaders
-): ContestsLoader(supportedPlatforms, type) {
+abstract class ContestsLoaderMultiple(type: ContestsLoaders): ContestsLoader(type) {
 
     protected abstract suspend fun loadContests(
         platforms: Set<Contest.Platform>,
@@ -49,7 +46,7 @@ abstract class ContestsLoaderMultiple(
         timeLimits: ContestTimePrefs.Limits
     ): List<Contest> {
         if (platforms.isEmpty()) return emptyList()
-        require(supportedPlatforms.containsAll(platforms))
+        require(type.supportedPlatforms.containsAll(platforms))
         return loadContests(
             platforms = platforms.toSet(),
             timeLimits = timeLimits

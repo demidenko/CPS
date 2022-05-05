@@ -4,10 +4,7 @@ import com.demich.cps.contests.Contest
 import com.demich.cps.contests.settings.ContestTimePrefs
 import com.demich.cps.utils.codeforces.CodeforcesApi
 
-class CodeforcesContestsLoader: ContestsLoader(
-    supportedPlatforms = setOf(Contest.Platform.codeforces),
-    type = ContestsLoaders.codeforces
-) {
+class CodeforcesContestsLoader: ContestsLoader(type = ContestsLoaders.codeforces) {
     override suspend fun loadContests(
         platform: Contest.Platform,
         timeLimits: ContestTimePrefs.Limits
