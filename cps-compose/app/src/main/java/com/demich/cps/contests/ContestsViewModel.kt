@@ -139,20 +139,7 @@ private suspend fun loadContests(
         }
     }
     getContests(
-        //TODO: read setup from settings
-        setup = platforms.associateWith { platform ->
-            when (platform) {
-                Contest.Platform.codeforces -> listOf(
-                    ContestsLoaders.codeforces,
-                    ContestsLoaders.clist
-                )
-                Contest.Platform.dmoj -> listOf(
-                    ContestsLoaders.clist,
-                    ContestsLoaders.dmoj
-                )
-                else -> listOf(ContestsLoaders.clist)
-            }
-        },
+        setup = settings.contestsLoadersPriorityLists().filterKeys { it in platforms },
         settings = settings,
         contestsReceiver = contestsReceiver
     )
