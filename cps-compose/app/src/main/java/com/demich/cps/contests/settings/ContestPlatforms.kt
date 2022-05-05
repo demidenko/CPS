@@ -64,9 +64,10 @@ private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
     val enabled by rememberCollect { settings.enabledPlatforms.flow }
     CPSDialog(onDismissRequest = onDismissRequest) {
         Contest.platformsExceptUnknown.forEach { platform ->
+            val availableLoaders = ContestsLoaders.values().filter { platform in it.supportedPlatforms }.toSet()
             PlatformCheckRow(
                 platform = platform,
-                availableLoaders = ContestsLoaders.values().filter { platform in it.supportedPlatforms },
+                availableLoaders = availableLoaders,
                 isChecked = platform in enabled
             ) { checked ->
                 scope.launch {
@@ -75,6 +76,11 @@ private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
                     )
                 }
             }
+            LoadersPriorityList(
+                platform = platform,
+                availableOptions = availableLoaders,
+                settingsItem = settings.contestsLoadersPriorityLists
+            )
         }
         Box(
             modifier = Modifier
@@ -103,7 +109,7 @@ private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
 @Composable
 private fun PlatformCheckRow(
     platform: Contest.Platform,
-    availableLoaders: Collection<ContestsLoaders>,
+    availableLoaders: Set<ContestsLoaders>,
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
