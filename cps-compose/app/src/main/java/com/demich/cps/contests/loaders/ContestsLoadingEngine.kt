@@ -105,5 +105,6 @@ private suspend fun ContestsSettingsDataStore.createLoaders(
             includeResourceIds = { clistAdditionalResources().map { it.id } }
         )
         ContestsLoaders.codeforces -> CodeforcesContestsLoader()
+        ContestsLoaders.dmoj -> DmojContestsLoader()
     }
 }

@@ -44,6 +44,9 @@ object CListUtils {
             Contest.Platform.codechef -> {
                 contest.href.removePrefixHttp().removePrefix("www.codechef.com/")
             }
+            Contest.Platform.dmoj -> {
+                contest.href.removePrefixHttp().removePrefix("dmoj.ca/contest/")
+            }
             else -> null
         } ?: contest.id.toString()
 }

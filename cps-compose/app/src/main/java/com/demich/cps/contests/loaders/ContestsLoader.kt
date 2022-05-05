@@ -10,7 +10,8 @@ import java.net.UnknownHostException
 
 enum class ContestsLoaders(val supportedPlatforms: Set<Contest.Platform>) {
     clist(Contest.platforms.toSet()),
-    codeforces(Contest.Platform.codeforces)
+    codeforces(Contest.Platform.codeforces),
+    dmoj(Contest.Platform.dmoj)
     ;
 
     constructor(platform: Contest.Platform): this(setOf(platform))

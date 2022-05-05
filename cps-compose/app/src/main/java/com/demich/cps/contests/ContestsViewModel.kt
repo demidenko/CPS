@@ -146,6 +146,10 @@ private suspend fun loadContests(
                     ContestsLoaders.codeforces,
                     ContestsLoaders.clist
                 )
+                Contest.Platform.dmoj -> listOf(
+                    ContestsLoaders.clist,
+                    ContestsLoaders.dmoj
+                )
                 else -> listOf(ContestsLoaders.clist)
             }
         },
