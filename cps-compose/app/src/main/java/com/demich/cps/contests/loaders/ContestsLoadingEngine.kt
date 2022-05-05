@@ -13,9 +13,13 @@ suspend fun getContests(
     settings: ContestsSettingsDataStore,
     contestsReceiver: ContestsReceiver
 ) {
+    val loaders = settings.createLoaders(
+        loaderTypes = setup.flatMapTo(mutableSetOf()) { it.value }
+    ).associateBy { it.type }
+
     val timeLimits = settings.contestsTimePrefs().createLimits(now = getCurrentTime())
-    val loaders = settings.createLoaders().associateBy { it.type }
     val memorizer = MultipleLoadersMemorizer(setup, timeLimits)
+
     coroutineScope {
         setup.forEach { (platform, priorities) ->
             launch {
@@ -92,10 +96,14 @@ private class MultipleLoadersMemorizer(
     }
 }
 
-private suspend fun ContestsSettingsDataStore.createLoaders(): List<ContestsLoader> = listOf(
-        ClistContestsLoader(
+private suspend fun ContestsSettingsDataStore.createLoaders(
+    loaderTypes: Set<ContestsLoaders>
+): List<ContestsLoader> = loaderTypes.map { loaderType ->
+    when (loaderType) {
+        ContestsLoaders.clist -> ClistContestsLoader(
             apiAccess = clistApiAccess(),
             includeResourceIds = { clistAdditionalResources().map { it.id } }
-        ),
-        CodeforcesContestsLoader()
-    )
+        )
+        ContestsLoaders.codeforces -> CodeforcesContestsLoader()
+    }
+}
