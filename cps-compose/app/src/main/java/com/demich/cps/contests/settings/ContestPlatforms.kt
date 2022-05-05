@@ -19,10 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.ContestPlatformIcon
-import com.demich.cps.ui.CPSCheckBox
-import com.demich.cps.ui.CPSDialog
-import com.demich.cps.ui.MonospacedText
-import com.demich.cps.ui.SettingsItemWithInfo
+import com.demich.cps.contests.loaders.ContestsLoaders
+import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CPSDataStoreItem
 import com.demich.cps.utils.context
@@ -66,8 +64,9 @@ private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
     val enabled by rememberCollect { settings.enabledPlatforms.flow }
     CPSDialog(onDismissRequest = onDismissRequest) {
         Contest.platformsExceptUnknown.forEach { platform ->
-            PlatformCheckBox(
+            PlatformCheckRow(
                 platform = platform,
+                availableLoaders = ContestsLoaders.values().filter { platform in it.supportedPlatforms },
                 isChecked = platform in enabled
             ) { checked ->
                 scope.launch {
@@ -77,9 +76,11 @@ private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
                 }
             }
         }
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 5.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 5.dp)
+        ) {
             TextButton(
                 content = { Text(text = "Select all") },
                 onClick = {
@@ -87,6 +88,7 @@ private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
                         context.settingsContests.enabledPlatforms(Contest.platforms.toSet())
                     }
                 },
+                enabled = enabled.size != Contest.platforms.size,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
             TextButton(
@@ -99,8 +101,9 @@ private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
 }
 
 @Composable
-private fun PlatformCheckBox(
+private fun PlatformCheckRow(
     platform: Contest.Platform,
+    availableLoaders: Collection<ContestsLoaders>,
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
@@ -112,6 +115,11 @@ private fun PlatformCheckBox(
             modifier = Modifier.padding(end = 8.dp)
         )
         MonospacedText(text = platform.name, modifier = Modifier.weight(1f))
+        if (isChecked && availableLoaders.size > 1) {
+            CPSIconButton(icon = CPSIcons.Settings) {
+                //TODO: setup priority list of loaders
+            }
+        }
         CPSCheckBox(
             checked = isChecked,
             onCheckedChange = onCheckedChange
