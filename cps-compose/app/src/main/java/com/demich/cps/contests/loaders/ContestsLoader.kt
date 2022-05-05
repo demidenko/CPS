@@ -87,11 +87,11 @@ fun makeCombinedMessage(
                 e is ClientRequestException && e.response.status == HttpStatusCode.TooManyRequests
                     -> "Too many requests"
                 else -> {
-                    if (developEnabled) "$e" else "Failed"
+                    if (developEnabled) "$e" else "Some kind of error..."
                 }
             }
         }
     )
 
-    return g.entries.joinToString { (msg, list) -> "$list: $msg" }
+    return g.entries.joinToString { (msg, list) -> "${list.distinct()}: $msg" }
 }
