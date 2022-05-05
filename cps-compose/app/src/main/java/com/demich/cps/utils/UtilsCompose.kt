@@ -3,7 +3,6 @@ package com.demich.cps.utils
 import android.content.Context
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
@@ -26,10 +25,10 @@ val context: Context
 
 @Composable
 inline fun<reified T> jsonSaver() = remember {
-    object : Saver<T, String> {
-        override fun restore(value: String): T = jsonCPS.decodeFromString(value)
-        override fun SaverScope.save(value: T): String = jsonCPS.encodeToString(value)
-    }
+    Saver<T, String>(
+        restore = jsonCPS::decodeFromString,
+        save = { jsonCPS.encodeToString(it) }
+    )
 }
 
 
