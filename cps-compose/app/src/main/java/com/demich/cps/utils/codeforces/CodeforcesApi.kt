@@ -378,3 +378,18 @@ enum class CodeforcesTestset {
     SAMPLES, PRETESTS, TESTS, CHALLENGES,
     TESTS1, TESTS2, TESTS3, TESTS4, TESTS5, TESTS6, TESTS7, TESTS8, TESTS9, TESTS10
 }
+
+
+/*
+TODO: code 200, text:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Codeforces</title>
+</head>
+<body>
+    <p>Codeforces is temporarily unavailable. Please, return in several minutes. Please try <a href="https://m1.codeforces.com/">m1.codeforces.com</a>, <a href="https://m2.codeforces.com/">m2.codeforces.com</a> or <a href="https://m3.codeforces.com/">m3.codeforces.com</a></p>
+</body>
+</html>
+ */
