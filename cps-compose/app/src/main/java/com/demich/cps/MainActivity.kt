@@ -28,6 +28,7 @@ import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
 import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
+import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSStatusBar
 import com.demich.cps.ui.LocalUseOriginalColors
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn

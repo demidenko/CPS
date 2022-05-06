@@ -3,9 +3,9 @@ package com.demich.cps.news
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.demich.cps.AdditionalBottomBarBuilder
-import com.demich.cps.CPSMenuBuilder
 import com.demich.cps.Screen
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.utils.LoadingStatus
 

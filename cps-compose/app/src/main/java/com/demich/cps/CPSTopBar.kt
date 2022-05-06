@@ -22,8 +22,6 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.launch
 
-typealias CPSMenuBuilder = @Composable CPSDropdownMenuScope.() -> Unit
-
 @Composable
 fun CPSTopBar(
     currentScreen: Screen?,
@@ -59,14 +57,15 @@ fun CPSTopBar(
             }
         }
 
-        IconButton(
-            onClick = { showMenu = true },
-            content = { Icon(CPSIcons.More, null) },
-        )
-
-        CPSDropdownMenu(
+        ContentWithCPSDropdownMenu(
             expanded = showMenu,
             onDismissRequest = { showMenu = false },
+            content = {
+                IconButton(
+                    onClick = { showMenu = true },
+                    content = { Icon(CPSIcons.More, null) },
+                )
+            }
         ) {
             CPSDropdownMenuItem(title = "UI", icon = CPSIcons.SettingsUI) {
                 showUIPanel = true

@@ -1,7 +1,6 @@
 package com.demich.cps.contests.settings
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
@@ -12,8 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.loaders.ContestsLoaders
-import com.demich.cps.ui.CPSDropdownMenu
+import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.utils.CPSDataStoreItem
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.flow.map
@@ -96,13 +96,15 @@ private fun PriorityListItem(
     onOptionSelected: (ContestsLoaders) -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
-    Box(
-        modifier = modifier.clickable { showMenu = true }
+    ContentWithCPSDropdownMenu(
+        modifier = modifier.clickable { showMenu = true },
+        expanded = showMenu,
+        onDismissRequest = { showMenu = false },
+        content = {
+            Text(text = loaderType.name)
+        }
     ) {
-        Text(text = loaderType.name)
-        LoadersPopup(
-            expanded = showMenu,
-            onDismissRequest = { showMenu = false },
+        LoadersMenu(
             options = availableOptions - loaderType,
             deleteOption = deleteEnabled,
             onDeleteRequest = onDeleteRequest,
@@ -118,13 +120,13 @@ private fun PriorityListItemAdd(
     onOptionSelected: (ContestsLoaders) -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
-    Box(
-        modifier = modifier.clickable { showMenu = true }
+    ContentWithCPSDropdownMenu(
+        modifier = modifier.clickable { showMenu = true },
+        expanded = showMenu,
+        onDismissRequest = { showMenu = false },
+        content = { Text(text = "+ add") }
     ) {
-        Text(text = "+ add")
-        LoadersPopup(
-            expanded = showMenu,
-            onDismissRequest = { showMenu = false },
+        LoadersMenu(
             options = availableOptions,
             deleteOption = false,
             onDeleteRequest = {},
@@ -134,28 +136,24 @@ private fun PriorityListItemAdd(
 }
 
 @Composable
-private fun LoadersPopup(
-    expanded: Boolean,
-    onDismissRequest: () -> Unit,
+private fun CPSDropdownMenuScope.LoadersMenu(
     options: Set<ContestsLoaders>,
     deleteOption: Boolean,
     onDeleteRequest: () -> Unit,
     onOptionSelected: (ContestsLoaders) -> Unit
 ) {
-    CPSDropdownMenu(expanded = expanded, onDismissRequest = onDismissRequest) {
-        options.forEach { option ->
-            CPSDropdownMenuItem(
-                title = option.name,
-                icon = CPSIcons.Add,
-                onClick = { onOptionSelected(option) }
-            )
-        }
-        if (deleteOption) {
-            CPSDropdownMenuItem(
-                title = "delete",
-                icon = CPSIcons.Delete,
-                onClick = onDeleteRequest
-            )
-        }
+    options.forEach { option ->
+        CPSDropdownMenuItem(
+            title = option.name,
+            icon = CPSIcons.Add,
+            onClick = { onOptionSelected(option) }
+        )
+    }
+    if (deleteOption) {
+        CPSDropdownMenuItem(
+            title = "delete",
+            icon = CPSIcons.Delete,
+            onClick = onDeleteRequest
+        )
     }
 }

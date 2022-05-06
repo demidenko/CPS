@@ -22,10 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.R
 import com.demich.cps.contests.settings.settingsContests
-import com.demich.cps.ui.CPSDropdownMenu
-import com.demich.cps.ui.CPSIconButton
-import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.MonospacedText
+import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import kotlinx.coroutines.currentCoroutineContext
@@ -295,21 +292,25 @@ private fun ContestItemMenuButton(
     val scope = rememberCoroutineScope()
     var showMenu by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
-    Box(modifier = modifier) {
-        CPSIconButton(
-            icon = CPSIcons.More,
-            color = cpsColors.textColorAdditional,
-            onClick = { showMenu = true }
-        )
-        CPSDropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-            if (contest.link != null) {
-                CPSDropdownMenuItem(title = "Open in browser", icon = CPSIcons.OpenInBrowser) {
-                    context.openUrlInBrowser(contest.link)
-                }
+    ContentWithCPSDropdownMenu(
+        expanded = showMenu,
+        onDismissRequest = { showMenu = false },
+        modifier = modifier,
+        content = {
+            CPSIconButton(
+                icon = CPSIcons.More,
+                color = cpsColors.textColorAdditional,
+                onClick = { showMenu = true },
+            )
+        }
+    ) {
+        if (contest.link != null) {
+            CPSDropdownMenuItem(title = "Open in browser", icon = CPSIcons.OpenInBrowser) {
+                context.openUrlInBrowser(contest.link)
             }
-            CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete) {
-                showDeleteDialog = true
-            }
+        }
+        CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete) {
+            showDeleteDialog = true
         }
     }
     if (showDeleteDialog) {
