@@ -21,6 +21,7 @@ import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
+import com.demich.cps.utils.mutate
 import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.flow.Flow
@@ -221,9 +222,11 @@ private fun StatusBarAccountsPopup(
         recordedAccounts.forEach { (_, manager) ->
             Row(modifier = Modifier.padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                 CPSCheckBox(checked = manager.type !in disabledManagers) { checked ->
-                    val newValue = if (checked) disabledManagers - manager.type
-                    else disabledManagers + manager.type
-                    scope.launch { settingsUI.statusBarDisabledManagers(newValue) }
+                    scope.launch {
+                        settingsUI.statusBarDisabledManagers.mutate {
+                            if (checked) remove(manager.type) else add(manager.type)
+                        }
+                    }
                 }
                 MonospacedText(text = manager.type.name)
             }

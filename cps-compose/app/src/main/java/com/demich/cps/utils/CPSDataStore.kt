@@ -48,9 +48,7 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
 
         override suspend fun edit(transform: (T) -> T) {
             dataStore.edit { prefs ->
-                prefs[key]?.let {
-                    prefs[key] = toPrefs(transform(fromPrefs(it)))
-                }
+                prefs[key] = toPrefs(transform(fromPrefs(prefs[key])))
             }
         }
     }
