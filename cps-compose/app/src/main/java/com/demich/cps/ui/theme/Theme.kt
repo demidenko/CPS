@@ -18,7 +18,7 @@ import com.demich.cps.utils.rememberCollect
 private val LightColorPalette = lightColors(
     background = Color(248, 248, 248),
     primary = Color(21, 101, 192),
-    onBackground = Color(39, 39, 39),
+    onBackground = Color(36, 36, 36),
     error = Color(221, 34, 34)
 )
 

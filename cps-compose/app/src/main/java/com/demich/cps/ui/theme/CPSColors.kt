@@ -24,7 +24,7 @@ object cpsColors {
 
     val textColorAdditional: Color
         @Composable
-        get() = if (isLight) Color(133, 133, 133) else Color(147, 147, 147)
+        get() = if (isLight) Color(118, 118, 118) else Color(147, 147, 147)
 
     val background: Color
         @Composable
