@@ -1,10 +1,9 @@
 package com.demich.cps.contests.settings
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -63,25 +62,38 @@ private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
     val scope = rememberCoroutineScope()
     val settings = remember { context.settingsContests }
     val enabled by rememberCollect { settings.enabledPlatforms.flow }
+    val priorities by rememberCollect { settings.contestsLoadersPriorityLists.flow }
     CPSDialog(onDismissRequest = onDismissRequest) {
-        Contest.platformsExceptUnknown.forEach { platform ->
-            val availableLoaders = ContestsLoaders.values().filter { platform in it.supportedPlatforms }.toSet()
-            PlatformCheckRow(
-                platform = platform,
-                availableLoaders = availableLoaders,
-                isChecked = platform in enabled
-            ) { checked ->
-                scope.launch {
-                    context.settingsContests.enabledPlatforms.mutate {
-                        if (checked) add(platform) else remove(platform)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f, false)
+        ) {
+            items(items = Contest.platformsExceptUnknown, key = { it }) { platform ->
+                val availableLoaders = ContestsLoaders.values().filter { platform in it.supportedPlatforms }.toSet()
+                PlatformCheckRow(
+                    platform = platform,
+                    availableLoaders = availableLoaders,
+                    isChecked = platform in enabled
+                ) { checked ->
+                    scope.launch {
+                        context.settingsContests.enabledPlatforms.mutate {
+                            if (checked) add(platform) else remove(platform)
+                        }
                     }
                 }
+                LoadersPriorityList(
+                    availableOptions = availableLoaders,
+                    priorityList = priorities.getValue(platform),
+                    onListChange = { newList ->
+                        scope.launch {
+                            settings.contestsLoadersPriorityLists.mutate {
+                                this[platform] = newList
+                            }
+                        }
+                    }
+                )
             }
-            LoadersPriorityList(
-                platform = platform,
-                availableOptions = availableLoaders,
-                settingsItem = settings.contestsLoadersPriorityLists
-            )
         }
         Box(
             modifier = Modifier

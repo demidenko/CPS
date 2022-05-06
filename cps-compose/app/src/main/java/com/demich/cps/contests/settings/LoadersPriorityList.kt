@@ -4,43 +4,27 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.demich.cps.contests.Contest
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
-import com.demich.cps.utils.CPSDataStoreItem
-import com.demich.cps.utils.mutate
-import com.demich.cps.utils.rememberCollect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 
 @Composable
 fun LoadersPriorityList(
     modifier: Modifier = Modifier,
-    platform: Contest.Platform,
     availableOptions: Set<ContestsLoaders>,
-    settingsItem: CPSDataStoreItem<Map<Contest.Platform,List<ContestsLoaders>>>
+    priorityList: List<ContestsLoaders>,
+    onListChange: (List<ContestsLoaders>) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-    val priorityList: List<ContestsLoaders> by rememberCollect {
-        settingsItem.flow.map { it.getValue(platform) }
-    }
     LoadersPriorityList(
         modifier = modifier,
         list = priorityList,
         availableOptions = availableOptions,
-        onListChange = { newList ->
-            scope.launch {
-                settingsItem.mutate { this[platform] = newList }
-            }
-        }
+        onListChange = { newList -> onListChange(newList) }
     )
 }
 
@@ -56,6 +40,7 @@ private fun LoadersPriorityList(
         list.forEachIndexed { index, loaderType ->
             PriorityListItem(
                 loaderType = loaderType,
+                index = index + 1,
                 deleteEnabled = list.size > 1,
                 onDeleteRequest = {
                     val newList = list.toMutableList()
@@ -79,7 +64,8 @@ private fun LoadersPriorityList(
                 onOptionSelected = { loaderType ->
                     require(loaderType !in list)
                     onListChange(list + loaderType)
-                }
+                },
+                modifier = Modifier.padding(all = 2.dp)
             )
         }
     }
@@ -89,6 +75,7 @@ private fun LoadersPriorityList(
 private fun PriorityListItem(
     modifier: Modifier = Modifier,
     loaderType: ContestsLoaders,
+    index: Int,
     deleteEnabled: Boolean,
     onDeleteRequest: () -> Unit,
     availableOptions: Set<ContestsLoaders>,
@@ -100,7 +87,7 @@ private fun PriorityListItem(
         expanded = showMenu,
         onDismissRequest = { showMenu = false },
         content = {
-            Text(text = loaderType.name)
+            Text(text = "$index. $loaderType")
         }
     ) {
         LoadersMenu(
