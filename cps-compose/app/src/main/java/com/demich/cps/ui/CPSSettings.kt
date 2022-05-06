@@ -2,7 +2,9 @@ package com.demich.cps.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
@@ -25,8 +27,10 @@ fun SettingsColumn(
 ) {
     Column(
         modifier = Modifier
-            .padding(horizontal = 10.dp)
+            .padding(all = 10.dp)
+            .verticalScroll(rememberScrollState())
             .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
         content = content
     )
 }
@@ -36,7 +40,6 @@ fun SettingsItem(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Spacer(modifier = Modifier.height(10.dp).fillMaxWidth())
     Box(
         modifier = modifier
             .background(cpsColors.backgroundAdditional, RoundedCornerShape(4.dp))

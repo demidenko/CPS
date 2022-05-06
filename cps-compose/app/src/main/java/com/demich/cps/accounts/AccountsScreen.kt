@@ -71,8 +71,11 @@ fun AccountsScreen(
         } else {
             LazyColumn(
                 horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(vertical = 10.dp)
+                    .padding(start = 10.dp)
                     .background(cpsColors.background)
             ) {
                 items(recordedAccounts, key = { it.type }) { userInfoWithManager ->
@@ -81,9 +84,7 @@ fun AccountsScreen(
                         onExpandRequest = { onExpandAccount(userInfoWithManager.type) },
                         accountsViewModel = accountsViewModel,
                         visibleOrder = visibleOrder,
-                        modifier = Modifier
-                            .padding(start = 10.dp, top = 10.dp)
-                            .animateItemPlacement()
+                        modifier = Modifier.animateItemPlacement()
                     )
                 }
             }
