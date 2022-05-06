@@ -15,6 +15,7 @@ import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.utils.CPSDataStoreItem
+import com.demich.cps.utils.mutate
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -37,9 +38,7 @@ fun LoadersPriorityList(
         availableOptions = availableOptions,
         onListChange = { newList ->
             scope.launch {
-                val newMap = settingsItem().toMutableMap()
-                newMap[platform] = newList
-                settingsItem(newValue = newMap)
+                settingsItem.mutate { this[platform] = newList }
             }
         }
     )

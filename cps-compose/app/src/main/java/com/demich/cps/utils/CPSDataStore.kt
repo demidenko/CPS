@@ -150,6 +150,12 @@ suspend fun<T> CPSDataStoreItem<Set<T>>.mutate(block: MutableSet<T>.() -> Unit) 
     edit { it.toMutableSet().apply(block) }
 }
 
+@JvmName("mutateMap")
+suspend fun<K, V> CPSDataStoreItem<Map<K,V>>.mutate(block: MutableMap<K,V>.() -> Unit) {
+    edit { it.toMutableMap().apply(block) }
+}
+
+
 @JvmName("addList")
 suspend fun<T> CPSDataStoreItem<List<T>>.add(value: T) {
     mutate { this.add(element = value) }

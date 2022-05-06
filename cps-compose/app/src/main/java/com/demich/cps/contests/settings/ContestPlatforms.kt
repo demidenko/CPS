@@ -24,6 +24,7 @@ import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CPSDataStoreItem
 import com.demich.cps.utils.context
+import com.demich.cps.utils.mutate
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.launch
 
@@ -71,9 +72,9 @@ private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
                 isChecked = platform in enabled
             ) { checked ->
                 scope.launch {
-                    context.settingsContests.enabledPlatforms(
-                        newValue = if (checked) enabled + platform else enabled - platform
-                    )
+                    context.settingsContests.enabledPlatforms.mutate {
+                        if (checked) add(platform) else remove(platform)
+                    }
                 }
             }
             LoadersPriorityList(
@@ -91,7 +92,7 @@ private fun ContestPlatformsDialog(onDismissRequest: () -> Unit) {
                 content = { Text(text = "Select all") },
                 onClick = {
                     scope.launch {
-                        context.settingsContests.enabledPlatforms(Contest.platforms.toSet())
+                        context.settingsContests.enabledPlatforms(newValue = Contest.platforms.toSet())
                     }
                 },
                 enabled = enabled.size != Contest.platforms.size,
