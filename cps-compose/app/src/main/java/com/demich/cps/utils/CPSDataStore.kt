@@ -18,6 +18,8 @@ interface CPSDataStoreItem<T> {
 
     //setter
     suspend operator fun invoke(newValue: T)
+
+    suspend fun edit(transform: (T) -> T)
 }
 
 
@@ -41,6 +43,14 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         override suspend operator fun invoke(newValue: T) {
             dataStore.edit { prefs ->
                 newValue?.let { prefs[key] = toPrefs(it) } ?: prefs.remove(key)
+            }
+        }
+
+        override suspend fun edit(transform: (T) -> T) {
+            dataStore.edit { prefs ->
+                prefs[key]?.let {
+                    prefs[key] = toPrefs(transform(fromPrefs(it)))
+                }
             }
         }
     }
@@ -131,21 +141,23 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
 
 }
 
-@JvmName("addList")
-suspend fun<T> CPSDataStoreItem<List<T>>.add(value: T) {
-    invoke(newValue = invoke() + value)
+
+@JvmName("mutateList")
+suspend fun<T> CPSDataStoreItem<List<T>>.mutate(block: MutableList<T>.() -> Unit) {
+    edit { it.toMutableList().apply(block) }
 }
 
-@JvmName("removeList")
-suspend fun<T> CPSDataStoreItem<List<T>>.remove(value: T) {
-    invoke(newValue = invoke() - value)
+@JvmName("mutateSet")
+suspend fun<T> CPSDataStoreItem<Set<T>>.mutate(block: MutableSet<T>.() -> Unit) {
+    edit { it.toMutableSet().apply(block) }
+}
+
+@JvmName("addList")
+suspend fun<T> CPSDataStoreItem<List<T>>.add(value: T) {
+    mutate { this.add(element = value) }
 }
 
 @JvmName("addSet")
 suspend fun<T> CPSDataStoreItem<Set<T>>.add(value: T) {
-    invoke(newValue = invoke() + value)
-}
-
-suspend fun<T> CPSDataStoreItem<Set<T>>.addAll(values: Collection<T>) {
-    invoke(newValue = invoke() + values)
+    mutate { this.add(element = value) }
 }

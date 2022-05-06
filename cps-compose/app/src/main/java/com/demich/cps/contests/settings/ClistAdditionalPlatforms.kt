@@ -86,7 +86,7 @@ private fun ClistAdditionalResourcesDialog(
                 .padding(bottom = 3.dp)
                 .heightIn(max = 200.dp)
         ) { resource ->
-            scope.launch { item.remove(resource) }
+            scope.launch { item.mutate { remove(resource) } }
         }
 
         Text(text = "available:")
@@ -96,7 +96,7 @@ private fun ClistAdditionalResourcesDialog(
             modifier = Modifier
                 .heightIn(max = 200.dp),
             onClick = { resource ->
-                scope.launch { item(newValue = listOf(resource) + item()) }
+                scope.launch { item.mutate { add(index = 0, element = resource) } }
             }
         )
 
