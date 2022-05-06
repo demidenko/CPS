@@ -173,7 +173,7 @@ private fun<U: UserInfo> UserIdTextField(
         singleLine = true,
         textStyle = TextStyle(fontSize = inputTextSize, fontFamily = FontFamily.Monospace),
         colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = cpsColors.background
+            backgroundColor = cpsColors.backgroundNavigation
         ),
         onValueChange = {
             if (it.text.all(inputValidator)) textFieldValue.value = it

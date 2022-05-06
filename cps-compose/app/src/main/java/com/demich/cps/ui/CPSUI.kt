@@ -149,7 +149,7 @@ fun CPSDialog(
         Card(
             elevation = 8.dp,
             shape = RoundedCornerShape(12.dp),
-            backgroundColor = cpsColors.backgroundAdditional,
+            backgroundColor = cpsColors.background,
             modifier = Modifier.padding(horizontal = 26.dp, vertical = 12.dp)
         ) {
             Column(
