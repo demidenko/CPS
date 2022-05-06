@@ -12,45 +12,29 @@ import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 
-
 @Composable
 fun LoadersPriorityList(
     modifier: Modifier = Modifier,
-    availableOptions: Set<ContestsLoaders>,
     priorityList: List<ContestsLoaders>,
-    onListChange: (List<ContestsLoaders>) -> Unit
-) {
-    LoadersPriorityList(
-        modifier = modifier,
-        list = priorityList,
-        availableOptions = availableOptions,
-        onListChange = { newList -> onListChange(newList) }
-    )
-}
-
-@Composable
-private fun LoadersPriorityList(
-    modifier: Modifier = Modifier,
-    list: List<ContestsLoaders>,
     availableOptions: Set<ContestsLoaders>,
     onListChange: (List<ContestsLoaders>) -> Unit
 ) {
-    require(list.isNotEmpty())
+    require(priorityList.isNotEmpty())
     Column(modifier = modifier) {
-        list.forEachIndexed { index, loaderType ->
+        priorityList.forEachIndexed { index, loaderType ->
             PriorityListItem(
                 loaderType = loaderType,
                 index = index + 1,
-                deleteEnabled = list.size > 1,
+                deleteEnabled = priorityList.size > 1,
                 onDeleteRequest = {
-                    val newList = list.toMutableList()
+                    val newList = priorityList.toMutableList()
                     newList.removeAt(index)
                     onListChange(newList)
                 },
                 availableOptions = availableOptions,
                 onOptionSelected = { newType ->
                     require(newType != loaderType)
-                    val newList = list.toMutableList()
+                    val newList = priorityList.toMutableList()
                     newList.remove(newType)
                     newList[newList.indexOf(loaderType)] = newType
                     onListChange(newList)
@@ -58,12 +42,12 @@ private fun LoadersPriorityList(
                 modifier = Modifier.padding(all = 2.dp)
             )
         }
-        if (!list.containsAll(availableOptions)) {
+        if (!priorityList.containsAll(availableOptions)) {
             PriorityListItemAdd(
-                availableOptions = availableOptions - list,
+                availableOptions = availableOptions - priorityList,
                 onOptionSelected = { loaderType ->
-                    require(loaderType !in list)
-                    onListChange(list + loaderType)
+                    require(loaderType !in priorityList)
+                    onListChange(priorityList + loaderType)
                 },
                 modifier = Modifier.padding(all = 2.dp)
             )
