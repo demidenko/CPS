@@ -131,7 +131,7 @@ private fun CPSDropdownMenuScope.LoadersMenu(
     options.forEach { option ->
         CPSDropdownMenuItem(
             title = option.name,
-            icon = CPSIcons.Add,
+            icon = CPSIcons.Insert,
             onClick = { onOptionSelected(option) }
         )
     }

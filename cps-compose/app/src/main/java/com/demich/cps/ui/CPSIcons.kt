@@ -4,9 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.rounded.PeopleAlt
-import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.*
 
 object CPSIcons {
     val Account get() = Icons.Rounded.Person
@@ -24,7 +22,7 @@ object CPSIcons {
     val Info get() = Icons.Outlined.Info
     val More get() = Icons.Default.MoreVert
     val Search get() = Icons.Default.Search
-    val Delete get() = Icons.Default.DeleteForever
+    val Delete get() = Icons.Rounded.DeleteForever
     val OpenInBrowser get() = Icons.Default.ExitToApp
     val DarkLight get() = Icons.Default.BrightnessMedium
     val DarkLightAuto get() = Icons.Default.BrightnessAuto
@@ -37,4 +35,5 @@ object CPSIcons {
     val MoveUp get() = Icons.Default.ArrowDropUp
     val MoveDown get() = Icons.Default.ArrowDropDown
     val RatingGraph get() = Icons.Default.Timeline
+    val Insert get() = Icons.Rounded.ReadMore
 }
