@@ -61,9 +61,10 @@ fun CPSTopBar(
             expanded = showMenu,
             onDismissRequest = { showMenu = false },
             content = {
-                IconButton(
+                CPSIconButton(
+                    icon = CPSIcons.More,
+                    color = cpsColors.textColor,
                     onClick = { showMenu = true },
-                    content = { Icon(CPSIcons.More, null) },
                 )
             }
         ) {
