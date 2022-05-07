@@ -15,7 +15,7 @@ import com.demich.cps.utils.rememberCollect
 import kotlin.time.Duration
 
 @Composable
-fun ContestDateLimitsSettingsItem() {
+fun DateConstraintsSettingsItem() {
     val context = context
     val settings = remember { context.settingsContests }
     val dateConstraints by rememberCollect { settings.contestsDateConstraints.flow }

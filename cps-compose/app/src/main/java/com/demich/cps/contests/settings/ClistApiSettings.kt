@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun ClistApiKeySettingsItem() {
+fun ClistApiAccessSettingsItem() {
     val context = context
     val settings = remember { context.settingsContests }
 

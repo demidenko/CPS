@@ -8,7 +8,7 @@ import com.demich.cps.ui.SettingsColumn
 fun ContestsSettingsScreen() {
     SettingsColumn {
         ContestPlatformsSettingsItem()
-        ClistApiKeySettingsItem()
-        ContestDateLimitsSettingsItem()
+        ClistApiAccessSettingsItem()
+        DateConstraintsSettingsItem()
     }
 }
