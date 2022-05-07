@@ -30,29 +30,29 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
     val clistAdditionalResources = itemJsonable<List<ClistResource>>(name = "clist_additional_resources", defaultValue = emptyList())
     val clistLastReloadedAdditionalResources = itemJsonable<Set<Int>>(name = "clist_additional_last_reloaded", defaultValue = emptySet())
 
-    val contestsDateLimits = itemJsonable(name = "contests_date_limits", defaultValue = ContestDateLimits())
+    val contestsDateConstraints = itemJsonable(name = "contests_date_constraints", defaultValue = ContestDateConstraints())
 
     val contestsLoadersPriorityLists = itemJsonable(name = "loading_priorities", defaultValue = defaultLoadingPriorities)
 
 }
 
 @Serializable
-data class ContestDateLimits(
+data class ContestDateConstraints(
+    @Serializable(with = DurationAsSecondsSerializer::class)
+    val maxDuration: Duration = 30.days,
+
     @Serializable(with = DurationAsSecondsSerializer::class)
     val nowToStartTimeMaxDuration: Duration = 120.days,
 
     @Serializable(with = DurationAsSecondsSerializer::class)
     val endTimeToNowMaxDuration: Duration = 7.days,
-
-    @Serializable(with = DurationAsSecondsSerializer::class)
-    val maxContestDuration: Duration = 30.days,
 ) {
-    fun createLimits(now: Instant) = Limits(
-        maxStartTime = now + nowToStartTimeMaxDuration,
-        minEndTime = now - endTimeToNowMaxDuration,
-        maxDuration = maxContestDuration
+    fun makeFor(currentTime: Instant) = Current(
+        maxStartTime = currentTime + nowToStartTimeMaxDuration,
+        minEndTime = currentTime - endTimeToNowMaxDuration,
+        maxDuration = maxDuration
     )
-    data class Limits(
+    data class Current(
         val maxStartTime: Instant,
         val minEndTime: Instant,
         val maxDuration: Duration

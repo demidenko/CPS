@@ -1,7 +1,7 @@
 package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
-import com.demich.cps.contests.settings.ContestDateLimits
+import com.demich.cps.contests.settings.ContestDateConstraints
 import io.ktor.client.features.*
 import io.ktor.http.*
 import java.net.SocketException
@@ -20,18 +20,18 @@ enum class ContestsLoaders(val supportedPlatforms: Set<Contest.Platform>) {
 abstract class ContestsLoader(val type: ContestsLoaders) {
     abstract suspend fun loadContests(
         platform: Contest.Platform,
-        timeLimits: ContestDateLimits.Limits
+        dateConstraints: ContestDateConstraints.Current
     ): List<Contest>
 
     suspend fun getContests(
         platform: Contest.Platform,
-        timeLimits: ContestDateLimits.Limits
+        dateConstraints: ContestDateConstraints.Current
     ): List<Contest> {
         require(platform in type.supportedPlatforms)
         return loadContests(
             platform = platform,
-            timeLimits = timeLimits
-        ).filterWith(timeLimits)
+            dateConstraints = dateConstraints
+        ).filterWith(dateConstraints)
     }
 }
 
@@ -39,34 +39,34 @@ abstract class ContestsLoaderMultiple(type: ContestsLoaders): ContestsLoader(typ
 
     protected abstract suspend fun loadContests(
         platforms: Set<Contest.Platform>,
-        timeLimits: ContestDateLimits.Limits
+        dateConstraints: ContestDateConstraints.Current
     ): List<Contest>
 
     suspend fun getContests(
         platforms: Collection<Contest.Platform>,
-        timeLimits: ContestDateLimits.Limits
+        dateConstraints: ContestDateConstraints.Current
     ): List<Contest> {
         if (platforms.isEmpty()) return emptyList()
         require(type.supportedPlatforms.containsAll(platforms))
         return loadContests(
             platforms = platforms.toSet(),
-            timeLimits = timeLimits
-        ).filterWith(timeLimits)
+            dateConstraints = dateConstraints
+        ).filterWith(dateConstraints)
     }
 
     final override suspend fun loadContests(
         platform: Contest.Platform,
-        timeLimits: ContestDateLimits.Limits
-    ) = loadContests(platforms = setOf(platform), timeLimits = timeLimits)
+        dateConstraints: ContestDateConstraints.Current
+    ) = loadContests(platforms = setOf(platform), dateConstraints = dateConstraints)
 }
 
-private fun List<Contest>.filterWith(timeLimits: ContestDateLimits.Limits) =
+private fun List<Contest>.filterWith(dateConstraints: ContestDateConstraints.Current) =
     filter { contest ->
-        contest.duration <= timeLimits.maxDuration
+        contest.duration <= dateConstraints.maxDuration
         &&
-        contest.startTime <= timeLimits.maxStartTime
+        contest.startTime <= dateConstraints.maxStartTime
         &&
-        contest.endTime >= timeLimits.minEndTime
+        contest.endTime >= dateConstraints.minEndTime
     }
 
 fun makeCombinedMessage(

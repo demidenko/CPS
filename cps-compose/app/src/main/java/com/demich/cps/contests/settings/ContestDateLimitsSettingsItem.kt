@@ -15,38 +15,37 @@ import com.demich.cps.utils.rememberCollect
 import kotlin.time.Duration
 
 @Composable
-fun ContestDateLimitsSettingsItem(
-
-) {
+fun ContestDateLimitsSettingsItem() {
     val context = context
     val settings = remember { context.settingsContests }
-    val dateLimits by rememberCollect { settings.contestsDateLimits.flow }
+    val dateConstraints by rememberCollect { settings.contestsDateConstraints.flow }
 
     ExpandableSettingsItem(
-        title = "Date limits",
-        collapsedContent = {
-            SettingsSubtitle(
-                text = "duration ≤ ${dateLimits.maxContestDuration}; start - now ≤ ${dateLimits.nowToStartTimeMaxDuration}; now - end ≤ ${dateLimits.endTimeToNowMaxDuration}"
-            )
-        },
+        title = "Date constraints",
+        collapsedContent = { SettingsSubtitle(makeInfoString(dateConstraints)) },
         expandedContent = {
             Column {
                 DurationRow(
                     title = "Max duration = ",
-                    duration = dateLimits.maxContestDuration
+                    duration = dateConstraints.maxDuration
                 )
                 DurationRow(
                     title = "Max start - now = ",
-                    duration = dateLimits.nowToStartTimeMaxDuration
+                    duration = dateConstraints.nowToStartTimeMaxDuration
                 )
                 DurationRow(
                     title = "Max now - end = ",
-                    duration = dateLimits.endTimeToNowMaxDuration
+                    duration = dateConstraints.endTimeToNowMaxDuration
                 )
             }
         }
     )
 }
+
+private fun makeInfoString(dateConstraints: ContestDateConstraints): String =
+    with(dateConstraints) {
+        "duration ≤ $maxDuration; start ≤ now + $nowToStartTimeMaxDuration; now - $endTimeToNowMaxDuration ≤ end"
+    }
 
 @Composable
 private fun DurationRow(

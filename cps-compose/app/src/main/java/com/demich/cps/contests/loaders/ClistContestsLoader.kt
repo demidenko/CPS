@@ -1,7 +1,7 @@
 package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
-import com.demich.cps.contests.settings.ContestDateLimits
+import com.demich.cps.contests.settings.ContestDateConstraints
 import com.demich.cps.utils.CListApi
 import com.demich.cps.utils.ClistContest
 
@@ -11,13 +11,13 @@ class ClistContestsLoader(
 ): ContestsLoaderMultiple(type = ContestsLoaders.clist) {
     override suspend fun loadContests(
         platforms: Set<Contest.Platform>,
-        timeLimits: ContestDateLimits.Limits
+        dateConstraints: ContestDateConstraints.Current
     ): List<Contest> {
         val contests = CListApi.getContests(
             apiAccess = apiAccess,
             platforms = platforms,
-            maxStartTime = timeLimits.maxStartTime,
-            minEndTime = timeLimits.minEndTime,
+            maxStartTime = dateConstraints.maxStartTime,
+            minEndTime = dateConstraints.minEndTime,
             includeResourceIds = includeResourceIds
         ).mapAndFilterResult()
         return contests
