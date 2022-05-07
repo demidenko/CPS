@@ -10,44 +10,17 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.Contest
-import com.demich.cps.ui.*
-import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.ui.CPSDialog
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.LazyColumnWithScrollBar
+import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.utils.*
 import kotlinx.coroutines.launch
 
 @Composable
-fun ClistAdditionalPlatformsSettingsItem(
-    item: CPSDataStoreItem<List<ClistResource>>
-) {
-    var showDialog by remember { mutableStateOf(false) }
-    SettingsItemWithInfo(
-        modifier = Modifier.clickable { showDialog = true },
-        item = item,
-        title = "Clist additional platforms"
-    ) { resources ->
-        Text(
-            text = resources.joinToString { it.name },
-            fontSize = 15.sp,
-            color = cpsColors.textColorAdditional,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-
-    if (showDialog) {
-        ClistAdditionalResourcesDialog(
-            item = item,
-            onDismissRequest = { showDialog = false }
-        )
-    }
-}
-
-@Composable
-private fun ClistAdditionalResourcesDialog(
+fun ClistAdditionalResourcesDialog(
     item: CPSDataStoreItem<List<ClistResource>>,
     onDismissRequest: () -> Unit
 ) {

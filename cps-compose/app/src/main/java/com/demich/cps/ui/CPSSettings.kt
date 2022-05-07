@@ -44,7 +44,8 @@ fun SettingsItem(
         modifier = modifier
             .background(cpsColors.backgroundAdditional, RoundedCornerShape(4.dp))
             .fillMaxWidth()
-            .padding(all = 10.dp)
+            .padding(all = 10.dp),
+        contentAlignment = Alignment.CenterStart
     ) {
         content()
     }
@@ -111,8 +112,8 @@ fun<T> SettingsItemWithInfo(
     title: String,
     infoContent: @Composable (T) -> Unit
 ) {
-    val value by rememberCollect { item.flow }
     SettingsItem(modifier = modifier) {
+        val value by rememberCollect { item.flow }
         Column {
             Text(
                 text = title,

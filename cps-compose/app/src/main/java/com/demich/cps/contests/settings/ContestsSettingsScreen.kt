@@ -11,8 +11,9 @@ fun ContestsSettingsScreen() {
     val settings = with(context) { remember { settingsContests } }
 
     SettingsColumn {
-        ContestPlatformsSettingsItem(item = settings.enabledPlatforms)
+        ContestPlatformsSettingsItem(
+            enabledPlatformsItem = settings.enabledPlatforms
+        )
         ClistApiKeySettingsItem(item = settings.clistApiAccess)
-        ClistAdditionalPlatformsSettingsItem(item = settings.clistAdditionalResources)
     }
 }

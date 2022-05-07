@@ -65,7 +65,7 @@ private fun ContestItemContent(contest: Contest) {
 
 @Composable
 private fun ContestItemHeader(
-    platform: Contest.Platform?,
+    platform: Contest.Platform,
     contestTitle: String,
     phase: Contest.Phase,
     modifier: Modifier = Modifier
@@ -189,7 +189,7 @@ private fun ContestExpandedItemContent(contest: Contest) {
 
 @Composable
 private fun ContestExpandedItemHeader(
-    platform: Contest.Platform?,
+    platform: Contest.Platform,
     contestTitle: String,
     phase: Contest.Phase,
     modifier: Modifier = Modifier
@@ -376,7 +376,7 @@ fun collectCurrentTime(): State<Instant> {
 
 @Composable
 fun ContestPlatformIcon(
-    platform: Contest.Platform?,
+    platform: Contest.Platform,
     modifier: Modifier = Modifier,
     size: TextUnit,
     color: Color
@@ -388,7 +388,7 @@ fun ContestPlatformIcon(
         Contest.Platform.codechef -> R.drawable.ic_logo_codechef
         Contest.Platform.google -> R.drawable.ic_logo_google
         Contest.Platform.dmoj -> R.drawable.ic_logo_dmoj
-        else -> null
+        Contest.Platform.unknown -> null
     }
 
     Icon(

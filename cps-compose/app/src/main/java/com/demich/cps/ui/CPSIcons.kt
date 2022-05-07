@@ -36,4 +36,5 @@ object CPSIcons {
     val MoveDown get() = Icons.Default.ArrowDropDown
     val RatingGraph get() = Icons.Default.Timeline
     val Insert get() = Icons.Rounded.ReadMore
+    val EditList get() = Icons.Default.EditNote
 }
