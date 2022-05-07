@@ -30,13 +30,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun ClistApiKeySettingsItem(
-    item: CPSDataStoreItem<CListApi.ApiAccess>
-) {
+fun ClistApiKeySettingsItem() {
+    val context = context
+    val settings = remember { context.settingsContests }
+
     var showDialog by rememberSaveable { mutableStateOf(false) }
     SettingsItemWithInfo(
         modifier = Modifier.clickable { showDialog = true },
-        item = item,
+        item = settings.clistApiAccess,
         title = "Clist API access"
     ) { (login, key) ->
         if (login.isBlank()) {

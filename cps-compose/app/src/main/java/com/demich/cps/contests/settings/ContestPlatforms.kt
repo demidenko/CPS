@@ -18,20 +18,18 @@ import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.CPSDataStoreItem
 import com.demich.cps.utils.context
 import com.demich.cps.utils.mutate
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.launch
 
 @Composable
-fun ContestPlatformsSettingsItem(
-    enabledPlatformsItem: CPSDataStoreItem<Set<Contest.Platform>>
-) {
-
+fun ContestPlatformsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
-    val enabledPlatforms by rememberCollect { enabledPlatformsItem.flow }
+
+    val settings = remember { context.settingsContests }
+    val enabledPlatforms by rememberCollect { settings.enabledPlatforms.flow }
 
     var expanded by rememberSaveable { mutableStateOf(false) }
     SettingsItem(
