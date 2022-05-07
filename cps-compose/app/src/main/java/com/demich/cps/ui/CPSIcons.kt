@@ -30,6 +30,7 @@ object CPSIcons {
     val StatusBar get() = Icons.Default.WebAsset
     val Origin get() = Icons.Default.Photo
     val Expand get() = Icons.Default.UnfoldMore
+    val Collapse get() = Icons.Default.ExpandLess
     val Reorder get() = Icons.Default.Reorder
     val ReorderDone get() = Icons.Default.PlaylistAddCheck
     val MoveUp get() = Icons.Default.ArrowDropUp

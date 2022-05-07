@@ -1,15 +1,12 @@
 package com.demich.cps.contests.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,11 +28,10 @@ fun ContestPlatformsSettingsItem() {
     val settings = remember { context.settingsContests }
     val enabledPlatforms by rememberCollect { settings.enabledPlatforms.flow }
 
-    var expanded by rememberSaveable { mutableStateOf(false) }
-    SettingsItem(
-        modifier = Modifier.clickable(enabled = !expanded) { expanded = true }
-    ) {
-        if (expanded) {
+    ExpandableSettingsItem(
+        title = "Platforms",
+        collapsedContent = { ContestPlatformsSettingsItemContent(enabledPlatforms) },
+        expandedContent = {
             ContestPlatformsSettingsItemExpandedContent(
                 enabledPlatforms = enabledPlatforms,
                 onCheckedChange = { platform, checked ->
@@ -46,37 +42,26 @@ fun ContestPlatformsSettingsItem() {
                     }
                 }
             )
-        } else {
-            ContestPlatformsSettingsItemContent(
-                enabledPlatforms = enabledPlatforms
-            )
         }
-    }
+    )
 }
 
 @Composable
 private fun ContestPlatformsSettingsItemContent(
     enabledPlatforms: Set<Contest.Platform>
 ) {
-    Column {
-        Text(
-            text = "Platforms",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-        val platforms = enabledPlatforms - Contest.Platform.unknown
-        val text = when {
-            platforms.isEmpty() -> "none selected"
-            platforms.size == Contest.platformsExceptUnknown.size -> "all selected"
-            platforms.size < 4 -> platforms.joinToString()
-            else -> platforms.toList().let { "${it[0]}, ${it[1]} and ${it.size - 2} more" }
-        }
-        Text(
-            text = text,
-            fontSize = 15.sp,
-            color = cpsColors.textColorAdditional
-        )
+    val platforms = enabledPlatforms - Contest.Platform.unknown
+    val text = when {
+        platforms.isEmpty() -> "none selected"
+        platforms.size == Contest.platformsExceptUnknown.size -> "all selected"
+        platforms.size < 4 -> platforms.joinToString()
+        else -> platforms.toList().let { "${it[0]}, ${it[1]} and ${it.size - 2} more" }
     }
+    Text(
+        text = text,
+        fontSize = 15.sp,
+        color = cpsColors.textColorAdditional
+    )
 }
 
 @Composable
@@ -85,23 +70,16 @@ private fun ContestPlatformsSettingsItemExpandedContent(
     onCheckedChange: (Contest.Platform, Boolean) -> Unit
 ) {
     Column {
-        Text(
-            text = "Platforms",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-        Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-            Contest.platformsExceptUnknown.forEach { platform ->
-                val availableLoaders = ContestsLoaders.values().filter { platform in it.supportedPlatforms }.toSet()
-                PlatformCheckRow(
-                    platform = platform,
-                    availableLoaders = availableLoaders,
-                    isChecked = platform in enabledPlatforms,
-                    onCheckedChange = { onCheckedChange(platform, it) }
-                )
-            }
-            ClistAdditionalRow()
+        Contest.platformsExceptUnknown.forEach { platform ->
+            val availableLoaders = ContestsLoaders.values().filter { platform in it.supportedPlatforms }.toSet()
+            PlatformCheckRow(
+                platform = platform,
+                availableLoaders = availableLoaders,
+                isChecked = platform in enabledPlatforms,
+                onCheckedChange = { onCheckedChange(platform, it) }
+            )
         }
+        ClistAdditionalRow()
     }
 }
 
