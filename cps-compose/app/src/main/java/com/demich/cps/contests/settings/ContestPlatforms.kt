@@ -121,13 +121,32 @@ private fun PlatformCheckRow(
         )
         MonospacedText(text = platform.name, modifier = Modifier.weight(1f))
         if (isChecked && availableLoaders.size > 1) {
-            CPSIconButton(icon = CPSIcons.Settings) {
-                //TODO: setup priority list of loaders
-            }
+            LoadersSetupButton(
+                platform = platform,
+                availableLoaders = availableLoaders
+            )
         }
         CPSCheckBox(
             checked = isChecked,
             onCheckedChange = onCheckedChange
+        )
+    }
+}
+
+@Composable
+private fun LoadersSetupButton(
+    platform: Contest.Platform,
+    availableLoaders: Set<ContestsLoaders>
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    CPSIconButton(icon = CPSIcons.Settings) {
+        showDialog = true
+    }
+    if (showDialog) {
+        LoadersPriorityListDialog(
+            platform = platform,
+            availableOptions = availableLoaders,
+            onDismissRequest = { showDialog = false }
         )
     }
 }

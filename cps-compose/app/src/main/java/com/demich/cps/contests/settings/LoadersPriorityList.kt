@@ -2,15 +2,56 @@ package com.demich.cps.contests.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.demich.cps.contests.Contest
 import com.demich.cps.contests.loaders.ContestsLoaders
+import com.demich.cps.ui.CPSDialog
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
+import com.demich.cps.utils.context
+import com.demich.cps.utils.mutate
+import com.demich.cps.utils.rememberCollect
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+
+@Composable
+fun LoadersPriorityListDialog(
+    platform: Contest.Platform,
+    availableOptions: Set<ContestsLoaders>,
+    onDismissRequest: () -> Unit
+) {
+    val context = context
+    val scope = rememberCoroutineScope()
+
+    val settings = remember { context.settingsContests }
+    val priorityList by rememberCollect {
+        settings.contestsLoadersPriorityLists.flow.map { it.getValue(platform) }
+    }
+
+    CPSDialog(
+        modifier = Modifier.fillMaxWidth(),
+        onDismissRequest = onDismissRequest
+    ) {
+        Text(text = "$platform loading priority list")
+        LoadersPriorityList(
+            priorityList = priorityList,
+            availableOptions = availableOptions,
+            onListChange = { newList ->
+                scope.launch {
+                    settings.contestsLoadersPriorityLists.mutate {
+                        this[platform] = newList
+                    }
+                }
+            }
+        )
+    }
+}
 
 @Composable
 fun LoadersPriorityList(
