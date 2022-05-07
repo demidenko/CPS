@@ -1,7 +1,7 @@
 package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
-import com.demich.cps.contests.settings.ContestTimePrefs
+import com.demich.cps.contests.settings.ContestDateLimits
 import io.ktor.client.features.*
 import io.ktor.http.*
 import java.net.SocketException
@@ -20,12 +20,12 @@ enum class ContestsLoaders(val supportedPlatforms: Set<Contest.Platform>) {
 abstract class ContestsLoader(val type: ContestsLoaders) {
     abstract suspend fun loadContests(
         platform: Contest.Platform,
-        timeLimits: ContestTimePrefs.Limits
+        timeLimits: ContestDateLimits.Limits
     ): List<Contest>
 
     suspend fun getContests(
         platform: Contest.Platform,
-        timeLimits: ContestTimePrefs.Limits
+        timeLimits: ContestDateLimits.Limits
     ): List<Contest> {
         require(platform in type.supportedPlatforms)
         return loadContests(
@@ -39,12 +39,12 @@ abstract class ContestsLoaderMultiple(type: ContestsLoaders): ContestsLoader(typ
 
     protected abstract suspend fun loadContests(
         platforms: Set<Contest.Platform>,
-        timeLimits: ContestTimePrefs.Limits
+        timeLimits: ContestDateLimits.Limits
     ): List<Contest>
 
     suspend fun getContests(
         platforms: Collection<Contest.Platform>,
-        timeLimits: ContestTimePrefs.Limits
+        timeLimits: ContestDateLimits.Limits
     ): List<Contest> {
         if (platforms.isEmpty()) return emptyList()
         require(type.supportedPlatforms.containsAll(platforms))
@@ -56,11 +56,11 @@ abstract class ContestsLoaderMultiple(type: ContestsLoaders): ContestsLoader(typ
 
     final override suspend fun loadContests(
         platform: Contest.Platform,
-        timeLimits: ContestTimePrefs.Limits
+        timeLimits: ContestDateLimits.Limits
     ) = loadContests(platforms = setOf(platform), timeLimits = timeLimits)
 }
 
-private fun List<Contest>.filterWith(timeLimits: ContestTimePrefs.Limits) =
+private fun List<Contest>.filterWith(timeLimits: ContestDateLimits.Limits) =
     filter { contest ->
         contest.duration <= timeLimits.maxDuration
         &&

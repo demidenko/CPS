@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
@@ -132,6 +133,19 @@ fun<T> SettingsItemWithInfo(
 }
 
 @Composable
+fun SettingsSubtitle(
+    text: String
+) {
+    Text(
+        text = text,
+        fontSize = 15.sp,
+        color = cpsColors.textColorAdditional,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
 fun ExpandableSettingsItem(
     title: String,
     collapsedContent: @Composable () -> Unit,
@@ -149,9 +163,12 @@ fun ExpandableSettingsItem(
                     fontWeight = FontWeight.SemiBold
                 )
                 if (expanded) {
-                    Box(modifier = Modifier.padding(horizontal = 10.dp)) {
-                        expandedContent()
-                    }
+                    Box(
+                        content = { expandedContent() },
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp)
+                            .padding(top = 8.dp)
+                    )
                 } else {
                     collapsedContent()
                 }

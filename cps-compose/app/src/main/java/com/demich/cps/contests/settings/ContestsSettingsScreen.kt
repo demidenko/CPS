@@ -9,5 +9,6 @@ fun ContestsSettingsScreen() {
     SettingsColumn {
         ContestPlatformsSettingsItem()
         ClistApiKeySettingsItem()
+        ContestDateLimitsSettingsItem()
     }
 }

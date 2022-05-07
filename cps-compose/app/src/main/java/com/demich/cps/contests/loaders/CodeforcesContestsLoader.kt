@@ -1,13 +1,13 @@
 package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
-import com.demich.cps.contests.settings.ContestTimePrefs
+import com.demich.cps.contests.settings.ContestDateLimits
 import com.demich.cps.utils.codeforces.CodeforcesApi
 
 class CodeforcesContestsLoader: ContestsLoader(type = ContestsLoaders.codeforces) {
     override suspend fun loadContests(
         platform: Contest.Platform,
-        timeLimits: ContestTimePrefs.Limits
+        timeLimits: ContestDateLimits.Limits
     ): List<Contest> {
         return CodeforcesApi.getContests().map { contest ->
             Contest(

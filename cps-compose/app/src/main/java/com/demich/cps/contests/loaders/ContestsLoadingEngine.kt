@@ -1,7 +1,7 @@
 package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
-import com.demich.cps.contests.settings.ContestTimePrefs
+import com.demich.cps.contests.settings.ContestDateLimits
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.*
@@ -17,7 +17,7 @@ suspend fun getContests(
         loaderTypes = setup.flatMapTo(mutableSetOf()) { it.value }
     ).associateBy { it.type }
 
-    val timeLimits = settings.contestsTimePrefs().createLimits(now = getCurrentTime())
+    val timeLimits = settings.contestsDateLimits().createLimits(now = getCurrentTime())
     val memorizer = MultipleLoadersMemorizer(setup, timeLimits)
 
     coroutineScope {
@@ -41,7 +41,7 @@ private suspend fun loadUntilSuccess(
     priorities: List<ContestsLoaders>,
     loaders: Map<ContestsLoaders, ContestsLoader>,
     memorizer: MultipleLoadersMemorizer,
-    timeLimits: ContestTimePrefs.Limits,
+    timeLimits: ContestDateLimits.Limits,
     contestsReceiver: ContestsReceiver
 ) {
     require(priorities.isNotEmpty())
@@ -69,7 +69,7 @@ private suspend fun loadUntilSuccess(
 
 private class MultipleLoadersMemorizer(
     private val setup: Map<Contest.Platform, List<ContestsLoaders>>,
-    private val timeLimits: ContestTimePrefs.Limits
+    private val timeLimits: ContestDateLimits.Limits
 ) {
     private val mutex = Mutex()
     private val results = mutableMapOf<ContestsLoaders, Deferred<Result<List<Contest>>>>()

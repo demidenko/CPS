@@ -7,11 +7,11 @@ import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.utils.CListApi
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.ClistResource
+import com.demich.cps.utils.DurationAsSecondsSerializer
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.seconds
 
 val Context.settingsContests: ContestsSettingsDataStore
     get() = ContestsSettingsDataStore(this)
@@ -30,22 +30,27 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
     val clistAdditionalResources = itemJsonable<List<ClistResource>>(name = "clist_additional_resources", defaultValue = emptyList())
     val clistLastReloadedAdditionalResources = itemJsonable<Set<Int>>(name = "clist_additional_last_reloaded", defaultValue = emptySet())
 
-    val contestsTimePrefs = itemJsonable(name = "contests_time_prefs", defaultValue = ContestTimePrefs())
+    val contestsDateLimits = itemJsonable(name = "contests_date_limits", defaultValue = ContestDateLimits())
 
     val contestsLoadersPriorityLists = itemJsonable(name = "loading_priorities", defaultValue = defaultLoadingPriorities)
 
 }
 
 @Serializable
-data class ContestTimePrefs(
-    private val nowToStartTimeMaxTimeSeconds: Long = 120.days.inWholeSeconds,
-    private val endTimeToNowMaxTimeSeconds: Long = 7.days.inWholeSeconds,
-    private val maxContestDurationSeconds: Long = 30.days.inWholeSeconds,
+data class ContestDateLimits(
+    @Serializable(with = DurationAsSecondsSerializer::class)
+    val nowToStartTimeMaxDuration: Duration = 120.days,
+
+    @Serializable(with = DurationAsSecondsSerializer::class)
+    val endTimeToNowMaxDuration: Duration = 7.days,
+
+    @Serializable(with = DurationAsSecondsSerializer::class)
+    val maxContestDuration: Duration = 30.days,
 ) {
     fun createLimits(now: Instant) = Limits(
-        maxStartTime = now + nowToStartTimeMaxTimeSeconds.seconds,
-        minEndTime = now - endTimeToNowMaxTimeSeconds.seconds,
-        maxDuration = maxContestDurationSeconds.seconds
+        maxStartTime = now + nowToStartTimeMaxDuration,
+        minEndTime = now - endTimeToNowMaxDuration,
+        maxDuration = maxContestDuration
     )
     data class Limits(
         val maxStartTime: Instant,
@@ -63,7 +68,7 @@ private val defaultLoadingPriorities by lazy {
             )
             Contest.Platform.dmoj -> listOf(
                 ContestsLoaders.clist,
-                //ContestsLoaders.dmoj
+                ContestsLoaders.dmoj
             )
             else -> listOf(ContestsLoaders.clist)
         }

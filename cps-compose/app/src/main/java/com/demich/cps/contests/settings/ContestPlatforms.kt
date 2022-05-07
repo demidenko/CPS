@@ -57,11 +57,7 @@ private fun ContestPlatformsSettingsItemContent(
         platforms.size < 4 -> platforms.joinToString()
         else -> platforms.toList().let { "${it[0]}, ${it[1]} and ${it.size - 2} more" }
     }
-    Text(
-        text = text,
-        fontSize = 15.sp,
-        color = cpsColors.textColorAdditional
-    )
+    SettingsSubtitle(text = text)
 }
 
 @Composable
