@@ -1,11 +1,8 @@
 package com.demich.cps.contests.settings
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -15,10 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.CPSDialog
+import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.ExpandableSettingsItem
 import com.demich.cps.ui.SettingsSubtitle
+import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
@@ -116,6 +115,7 @@ private fun DurationPickerDialog(
             mutableStateOf(hours == 0)
         }
     }
+
     var input by remember {
         val number = if (inDays) initDuration.inWholeDays
         else initDuration.inWholeHours
@@ -131,21 +131,24 @@ private fun DurationPickerDialog(
     }
 
     CPSDialog(onDismissRequest = onDismissRequest) {
-        Text(title)
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            BasicTextField(
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            OutlinedTextField(
                 value = input,
                 onValueChange = { str ->
                     input = str.filter { it.isDigit() }
                 },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 textStyle = TextStyle(
                     color = cpsColors.textColor,
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center
                 ),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                label = {
+                    Text(title)
+                }
             )
-            Column {
+            Row {
                 RadioButtonTitled(title = "hours", selected = !inDays) {
                     inDays = false
                 }
@@ -154,22 +157,14 @@ private fun DurationPickerDialog(
                 }
             }
         }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+
+        CPSDialogCancelAcceptButtons(
+            acceptTitle = "Save",
+            acceptEnabled = duration != null,
+            onCancelClick = onDismissRequest
         ) {
-            TextButton(
-                content = { Text("Cancel") },
-                onClick = onDismissRequest
-            )
-            TextButton(
-                enabled = duration != null,
-                content = { Text("Save") },
-                onClick = {
-                    onDurationSelect(duration!!)
-                    onDismissRequest()
-                }
-            )
+            onDurationSelect(duration!!)
+            onDismissRequest()
         }
     }
 }

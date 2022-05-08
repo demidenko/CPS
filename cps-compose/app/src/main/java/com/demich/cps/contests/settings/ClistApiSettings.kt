@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.*
+import com.demich.cps.ui.dialogs.CPSDialog
+import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import kotlinx.coroutines.launch
@@ -105,22 +107,15 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
                 .padding(top = 8.dp)
         )
 
-        Row(
-            horizontalArrangement = Arrangement.End,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
+        CPSDialogCancelAcceptButtons(
+            acceptTitle = "Save",
+            onCancelClick = onDismissRequest,
+            modifier = Modifier.padding(top = 8.dp)
         ) {
-            TextButton(onClick = onDismissRequest) { Text("Cancel") }
-            TextButton(
-                onClick = {
-                    scope.launch {
-                        context.settingsContests.clistApiAccess(newValue = apiAccess)
-                        onDismissRequest()
-                    }
-                },
-                content = { Text("Save") }
-            )
+            scope.launch {
+                context.settingsContests.clistApiAccess(newValue = apiAccess)
+                onDismissRequest()
+            }
         }
     }
 }

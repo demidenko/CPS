@@ -3,12 +3,9 @@ package com.demich.cps.ui
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -19,8 +16,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 
@@ -123,33 +118,6 @@ fun MonospacedText(
     letterSpacing = 0.sp
 )
 
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun CPSDialog(
-    modifier: Modifier = Modifier,
-    horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
-    onDismissRequest: () -> Unit,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        Card(
-            elevation = 8.dp,
-            shape = RoundedCornerShape(12.dp),
-            backgroundColor = cpsColors.background,
-            modifier = Modifier.padding(horizontal = 26.dp, vertical = 12.dp)
-        ) {
-            Column(
-                modifier = modifier.padding(all = 18.dp),
-                horizontalAlignment = horizontalAlignment,
-                content = content
-            )
-        }
-    }
-}
 
 @Composable
 fun<T> TextButtonsSelectRow(
