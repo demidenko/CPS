@@ -2,18 +2,23 @@ package com.demich.cps.contests.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.mutate
 import com.demich.cps.utils.rememberCollect
@@ -38,8 +43,9 @@ fun LoadersPriorityListDialog(
         modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismissRequest
     ) {
-        Text(text = "$platform loading priority list")
+        Text(text = "$platform loading priority list = ")
         LoadersPriorityList(
+            modifier = Modifier.padding(vertical = 4.dp),
             priorityList = priorityList,
             availableOptions = availableOptions,
             onListChange = { newList ->
@@ -50,6 +56,19 @@ fun LoadersPriorityListDialog(
                 }
             }
         )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = CPSIcons.Info,
+                contentDescription = null,
+                modifier = Modifier.padding(all = 8.dp),
+                tint = cpsColors.textColorAdditional
+            )
+            Text(
+                text = "Order in which contest api-loaders are executed until success.",
+                color = cpsColors.textColorAdditional,
+                fontSize = 14.sp
+            )
+        }
     }
 }
 
@@ -63,7 +82,7 @@ fun LoadersPriorityList(
     require(priorityList.isNotEmpty())
     Column(modifier = modifier) {
         priorityList.forEachIndexed { index, loaderType ->
-            PriorityListItem(
+            PriorityListItemLoader(
                 loaderType = loaderType,
                 index = index + 1,
                 deleteEnabled = priorityList.size > 1,
@@ -79,8 +98,7 @@ fun LoadersPriorityList(
                     newList.remove(newType)
                     newList[newList.indexOf(loaderType)] = newType
                     onListChange(newList)
-                },
-                modifier = Modifier.padding(all = 2.dp)
+                }
             )
         }
         if (!priorityList.containsAll(availableOptions)) {
@@ -89,15 +107,14 @@ fun LoadersPriorityList(
                 onOptionSelected = { loaderType ->
                     require(loaderType !in priorityList)
                     onListChange(priorityList + loaderType)
-                },
-                modifier = Modifier.padding(all = 2.dp)
+                }
             )
         }
     }
 }
 
 @Composable
-private fun PriorityListItem(
+private fun PriorityListItemLoader(
     modifier: Modifier = Modifier,
     loaderType: ContestsLoaders,
     index: Int,
@@ -106,22 +123,13 @@ private fun PriorityListItem(
     availableOptions: Set<ContestsLoaders>,
     onOptionSelected: (ContestsLoaders) -> Unit
 ) {
-    var showMenu by remember { mutableStateOf(false) }
-    ContentWithCPSDropdownMenu(
-        modifier = modifier.clickable { showMenu = true },
-        expanded = showMenu,
-        onDismissRequest = { showMenu = false },
-        content = {
-            Text(text = "$index. $loaderType")
-        }
-    ) {
-        LoadersMenu(
-            options = availableOptions - loaderType,
-            deleteOption = deleteEnabled,
-            onDeleteRequest = onDeleteRequest,
-            onOptionSelected = onOptionSelected
-        )
-    }
+    PriorityListItem(
+        modifier = modifier,
+        text = "$index. $loaderType",
+        options = availableOptions - loaderType,
+        onOptionSelected = onOptionSelected,
+        onDeleteRequest = onDeleteRequest.takeIf { deleteEnabled }
+    )
 }
 
 @Composable
@@ -130,17 +138,34 @@ private fun PriorityListItemAdd(
     availableOptions: Set<ContestsLoaders>,
     onOptionSelected: (ContestsLoaders) -> Unit
 ) {
+    PriorityListItem(
+        modifier = modifier,
+        text = "+ add",
+        options = availableOptions,
+        onOptionSelected = onOptionSelected
+    )
+}
+
+@Composable
+private fun PriorityListItem(
+    modifier: Modifier = Modifier,
+    text: String,
+    options: Set<ContestsLoaders>,
+    onOptionSelected: (ContestsLoaders) -> Unit,
+    onDeleteRequest: (() -> Unit)? = null
+) {
     var showMenu by remember { mutableStateOf(false) }
     ContentWithCPSDropdownMenu(
-        modifier = modifier.clickable { showMenu = true },
+        modifier = modifier
+            .clickable { showMenu = true }
+            .padding(all = 6.dp),
         expanded = showMenu,
         onDismissRequest = { showMenu = false },
-        content = { Text(text = "+ add") }
+        content = { Text(text = text) }
     ) {
         LoadersMenu(
-            options = availableOptions,
-            deleteOption = false,
-            onDeleteRequest = {},
+            options = options,
+            onDeleteRequest = onDeleteRequest,
             onOptionSelected = onOptionSelected
         )
     }
@@ -149,8 +174,7 @@ private fun PriorityListItemAdd(
 @Composable
 private fun CPSDropdownMenuScope.LoadersMenu(
     options: Set<ContestsLoaders>,
-    deleteOption: Boolean,
-    onDeleteRequest: () -> Unit,
+    onDeleteRequest: (() -> Unit)?,
     onOptionSelected: (ContestsLoaders) -> Unit
 ) {
     options.forEach { option ->
@@ -160,7 +184,7 @@ private fun CPSDropdownMenuScope.LoadersMenu(
             onClick = { onOptionSelected(option) }
         )
     }
-    if (deleteOption) {
+    if (onDeleteRequest != null) {
         CPSDropdownMenuItem(
             title = "delete",
             icon = CPSIcons.Delete,

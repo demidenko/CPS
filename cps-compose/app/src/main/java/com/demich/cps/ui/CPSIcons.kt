@@ -38,4 +38,5 @@ object CPSIcons {
     val RatingGraph get() = Icons.Default.Timeline
     val Insert get() = Icons.Rounded.ReadMore
     val EditList get() = Icons.Default.EditNote
+    val SetupLoaders get() = Icons.Default.PermDataSetting
 }

@@ -113,7 +113,7 @@ private fun LoadersSetupButton(
     availableLoaders: Set<ContestsLoaders>
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    CPSIconButton(icon = CPSIcons.Settings) {
+    CPSIconButton(icon = CPSIcons.SetupLoaders) {
         showDialog = true
     }
     if (showDialog) {

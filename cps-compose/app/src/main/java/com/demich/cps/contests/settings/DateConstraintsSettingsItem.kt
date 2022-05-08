@@ -134,30 +134,28 @@ private fun DurationPickerDialog(
     }
 
     CPSDialog(onDismissRequest = onDismissRequest) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            OutlinedTextField(
-                value = input,
-                onValueChange = { str ->
-                    input = str.filter { it.isDigit() }
-                },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                textStyle = TextStyle(
-                    color = cpsColors.textColor,
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Center
-                ),
-                label = {
-                    Text(title)
-                }
-            )
-            Row {
-                CPSRadioButtonTitled(title = "hours", selected = !inDays) {
-                    inDays = false
-                }
-                CPSRadioButtonTitled(title = "days", selected = inDays) {
-                    inDays = true
-                }
+        OutlinedTextField(
+            value = input,
+            onValueChange = { str ->
+                input = str.filter { it.isDigit() }
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            textStyle = TextStyle(
+                color = cpsColors.textColor,
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center
+            ),
+            label = {
+                Text(title)
+            }
+        )
+        Row {
+            CPSRadioButtonTitled(title = "hours", selected = !inDays) {
+                inDays = false
+            }
+            CPSRadioButtonTitled(title = "days", selected = inDays) {
+                inDays = true
             }
         }
 
