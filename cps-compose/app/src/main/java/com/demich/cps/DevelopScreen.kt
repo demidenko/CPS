@@ -4,8 +4,7 @@ import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -13,20 +12,21 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.datastore.preferences.preferencesDataStore
-import com.demich.cps.accounts.makeUserInfoSpan
-import com.demich.cps.accounts.managers.*
+import com.demich.cps.accounts.managers.AccountManagers
+import com.demich.cps.accounts.managers.RatedAccountManager
+import com.demich.cps.accounts.managers.RatedUserInfo
+import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.RatingGraph
+import com.demich.cps.ui.CPSRadioButtonTitled
+import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
-import com.demich.cps.ui.rememberRatingGraphUIStates
-import com.demich.cps.utils.*
+import com.demich.cps.utils.CPSDataStore
+import com.demich.cps.utils.context
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
-import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.seconds
 
 
 class SettingsDev(context: Context): CPSDataStore(context.settings_dev_dataStore) {
@@ -47,78 +47,10 @@ fun DevelopScreen() {
     val scope = rememberCoroutineScope()
 
     val context = context
-    val codeforcesAccountManager = CodeforcesAccountManager(context)
 
-    Column {
-        val initial = remember {
-            buildList {
-                codeforcesAccountManager.ratingsUpperBounds.forEach { (color, rating) ->
-                    add(CodeforcesUserInfo(STATUS.OK, color.name, rating - 1))
-                }
-                add(CodeforcesUserInfo(STATUS.OK, HandleColor.RED.name, 2600))
-                add(CodeforcesUserInfo(STATUS.OK, "NUTELLA", 3600))
-                add(CodeforcesUserInfo(STATUS.OK, "Not rated"))
-                add(CodeforcesUserInfo(STATUS.NOT_FOUND, "Not found"))
-                add(CodeforcesUserInfo(STATUS.FAILED, "Failed"))
-            }
-        }
-
-
-        Row {
-            var list by rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(initial) }
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(items = list, key = { it.handle }) {
-                    Text(
-                        text = makeUserInfoSpan(userInfo = it, manager = codeforcesAccountManager),
-                        modifier = Modifier.animateItemPlacement()
-                    )
-                }
-            }
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Button(onClick = { list = list.shuffled() }) {
-                    Text("Shuffle")
-                }
-                Button(onClick = { list = initial.filter { Random.nextBoolean() } }) {
-                    Text("Random")
-                }
-                Button(onClick = { list = initial }) {
-                    Text("Reset")
-                }
-            }
-        }
-
-
-        val ratingGraphUIStates = rememberRatingGraphUIStates().apply {
-            showRatingGraphState.value = true
-            loadingStatusState.value = LoadingStatus.PENDING
-        }
-
-        RatingGraph(
-            ratingGraphUIStates = ratingGraphUIStates,
-            manager = CodeforcesAccountManager(context)
-        )
-
-        Button(
-            onClick = {
-                val n = (1 shl Random.nextInt(5)) - 1
-                val list = mutableListOf<RatingChange>()
-                repeat(n) {
-                    val date = (getCurrentTime() - 4000.days) + Random.nextLong(
-                        from = 0,
-                        until = 4000.days.inWholeSeconds
-                    ).seconds
-                    val rating = Random.nextInt(from = 0, until = 3000)
-                    list.add(RatingChange(rating, date))
-                }
-                ratingGraphUIStates.ratingChangesState.value = list.sortedBy { it.date }
-            }
-        ) {
-            Text("random graph")
-        }
-    }
+    TestHandles(
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 
@@ -160,4 +92,54 @@ fun ContentLoadingButton(
     }
 }
 
+@Composable
+private fun TestHandles(
+    modifier: Modifier = Modifier
+) {
+    val context = context
+    val managers = remember {
+        context.allAccountManagers
+            .filterIsInstance<RatedAccountManager<*>>()
+    }
+
+    var selectedType by rememberSaveable {
+        mutableStateOf(AccountManagers.codeforces)
+    }
+
+    Row(modifier = modifier) {
+        HandlesList(
+            manager = managers.first { it.type == selectedType },
+            modifier = Modifier.weight(1f)
+        )
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            managers.forEach { manager ->
+                CPSRadioButtonTitled(
+                    title = manager.type.name,
+                    selected = selectedType == manager.type
+                ) {
+                    selectedType = manager.type
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HandlesList(
+    manager: RatedAccountManager<out RatedUserInfo>,
+    modifier: Modifier = Modifier
+) {
+    LazyColumnWithScrollBar(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        items(4000) { rating ->
+            Text(
+                text = manager.makeRatedSpan(text = rating.toString(), rating = rating)
+            )
+        }
+    }
+}
 
