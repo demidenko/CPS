@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -81,20 +82,53 @@ fun CPSReloadingButton(
 
 @Composable
 fun CPSCheckBox(
-    checked: Boolean,
     modifier: Modifier = Modifier,
+    checked: Boolean,
     enabled: Boolean = true,
     onCheckedChange: ((Boolean) -> Unit)? = null,
 ) {
     Checkbox(
-        checked = checked,
         modifier = modifier,
+        checked = checked,
         enabled = enabled,
         onCheckedChange = onCheckedChange,
         colors = CheckboxDefaults.colors(
             checkedColor = cpsColors.colorAccent
         )
     )
+}
+
+@Composable
+fun CPSRadioButton(
+    modifier: Modifier = Modifier,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    RadioButton(
+        modifier = modifier,
+        selected = selected,
+        onClick = onClick,
+        colors = RadioButtonDefaults.colors(
+            selectedColor = cpsColors.colorAccent
+        )
+    )
+}
+
+
+@Composable
+fun CPSRadioButtonTitled(
+    modifier: Modifier = Modifier,
+    title: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        CPSRadioButton(selected = selected, onClick = onClick)
+        Text(text = title)
+    }
 }
 
 @Composable

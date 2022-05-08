@@ -1,9 +1,11 @@
 package com.demich.cps.contests.settings
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
@@ -14,9 +16,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.dialogs.CPSDialog
+import com.demich.cps.ui.CPSRadioButtonTitled
 import com.demich.cps.ui.ExpandableSettingsItem
 import com.demich.cps.ui.SettingsSubtitle
+import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
@@ -149,10 +152,10 @@ private fun DurationPickerDialog(
                 }
             )
             Row {
-                RadioButtonTitled(title = "hours", selected = !inDays) {
+                CPSRadioButtonTitled(title = "hours", selected = !inDays) {
                     inDays = false
                 }
-                RadioButtonTitled(title = "days", selected = inDays) {
+                CPSRadioButtonTitled(title = "days", selected = inDays) {
                     inDays = true
                 }
             }
@@ -166,21 +169,5 @@ private fun DurationPickerDialog(
             onDurationSelect(duration!!)
             onDismissRequest()
         }
-    }
-}
-
-@Composable
-private fun RadioButtonTitled(
-    modifier: Modifier = Modifier,
-    title: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(selected = selected, onClick = onClick)
-        Text(text = title)
     }
 }
