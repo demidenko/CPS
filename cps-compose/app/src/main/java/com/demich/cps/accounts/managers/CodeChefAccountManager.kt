@@ -25,6 +25,7 @@ import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CodeChefApi
 import com.demich.cps.utils.CodeChefRatingChange
+import com.demich.cps.utils.append
 import com.demich.cps.utils.jsonCPS
 import io.ktor.client.features.*
 import io.ktor.http.*
@@ -148,10 +149,7 @@ class CodeChefAccountManager(context: Context):
 
     @Composable
     override fun makeRatedSpan(text: String, rating: Int) = buildAnnotatedString {
-        append(AnnotatedString(
-            text = "${getRatingStarNumber(rating)}$star ",
-            spanStyle = SpanStyle(color = colorFor(rating = rating))
-        ))
+        append(text = "${getRatingStarNumber(rating)}$star ", color = colorFor(rating = rating))
         append(text)
     }
 

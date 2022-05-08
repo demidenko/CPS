@@ -2,7 +2,7 @@ package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.utils.CListApi
 import io.ktor.client.features.*
 import io.ktor.http.*
@@ -91,7 +91,7 @@ class CListAccountManager(context: Context):
 
     @Composable
     override fun makeOKInfoSpan(userInfo: CListUserInfo) = with(userInfo) {
-        buildAnnotatedString { append("$login (${accounts.size})") }
+        AnnotatedString("$login (${accounts.size})")
     }
 
     override fun getDataStore(): AccountDataStore<CListUserInfo> {

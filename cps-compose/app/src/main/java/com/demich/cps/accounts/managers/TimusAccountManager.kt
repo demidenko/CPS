@@ -3,7 +3,6 @@ package com.demich.cps.accounts.managers
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.utils.TimusApi
@@ -92,13 +91,9 @@ class TimusAccountManager(context: Context):
     }
 
     @Composable
-    override fun makeOKInfoSpan(userInfo: TimusUserInfo): AnnotatedString =
-        buildAnnotatedString {
-            require(userInfo.status == STATUS.OK)
-            append(userInfo.userName)
-            append(' ')
-            append(userInfo.solvedTasks.toString())
-        }
+    override fun makeOKInfoSpan(userInfo: TimusUserInfo) = with(userInfo) {
+        AnnotatedString("$userName $solvedTasks")
+    }
 
     @Composable
     override fun Panel(userInfo: TimusUserInfo) {

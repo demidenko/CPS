@@ -103,10 +103,7 @@ class ACMPAccountManager(context: Context):
                 append(words[0])
                 for(i in 1 until words.size) append(" ${words[i][0]}.")
             }
-            if (userInfo.solvedTasks > 0) {
-                append(' ')
-                append("[${userInfo.solvedTasks} / ${userInfo.rating}]")
-            }
+            if (userInfo.solvedTasks > 0) append(" [${userInfo.solvedTasks} / ${userInfo.rating}]")
         }
 
     @Composable

@@ -101,9 +101,7 @@ private fun ContestColoredTitle(
         text = buildAnnotatedString {
             val (title, brackets) = cutTrailingBrackets(contestTitle.trim())
             append(title)
-            if (brackets.isNotBlank()) withStyle(SpanStyle(color = cpsColors.textColorAdditional)) {
-                append(brackets)
-            }
+            if (brackets.isNotBlank()) append(brackets, color = cpsColors.textColorAdditional)
         },
         color = when (phase) {
             Contest.Phase.BEFORE -> cpsColors.textColor

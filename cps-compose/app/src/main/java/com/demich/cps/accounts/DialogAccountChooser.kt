@@ -29,6 +29,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.showToast
 import kotlinx.coroutines.Dispatchers
@@ -343,8 +344,8 @@ fun<U: UserInfo> makeUserInfoSpan(userInfo: U, manager: AccountManager<U>): Anno
         withStyle(SpanStyle(color = cpsColors.textColor)) {
             when (userInfo.status) {
                 STATUS.OK -> append(manager.makeOKInfoSpan(userInfo))
-                STATUS.NOT_FOUND -> append(AnnotatedString("User not found", SpanStyle(fontStyle = FontStyle.Italic)))
-                STATUS.FAILED -> append(AnnotatedString("Loading failed", SpanStyle(fontStyle = FontStyle.Italic)))
+                STATUS.NOT_FOUND -> append(text = "User not found", fontStyle = FontStyle.Italic)
+                STATUS.FAILED -> append(text = "Loading failed", fontStyle = FontStyle.Italic)
             }
         }
     }

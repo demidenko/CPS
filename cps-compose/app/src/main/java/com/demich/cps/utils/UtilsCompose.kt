@@ -3,8 +3,13 @@ package com.demich.cps.utils
 import android.content.Context
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
@@ -64,3 +69,22 @@ fun <T : R, R> Flow<T>.collectAsStateLifecycleAware(
 fun <T> StateFlow<T>.collectAsStateLifecycleAware(
     context: CoroutineContext = EmptyCoroutineContext
 ): State<T> = collectAsStateLifecycleAware(initial = value, context = context)
+
+
+fun AnnotatedString.Builder.append(
+    text: String,
+    color: Color = Color.Unspecified,
+    fontWeight: FontWeight? = null,
+    fontStyle: FontStyle? = null
+) {
+    append(
+        AnnotatedString(
+        text = text,
+        spanStyle = SpanStyle(
+            color = color,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle
+        )
+    )
+    )
+}

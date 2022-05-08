@@ -20,6 +20,7 @@ import com.demich.cps.ui.RatingLoadButton
 import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.utils.DmojApi
 import com.demich.cps.utils.DmojRatingChange
+import com.demich.cps.utils.append
 import com.demich.cps.utils.jsonCPS
 import io.ktor.client.features.*
 import io.ktor.http.*
@@ -126,8 +127,8 @@ class DmojAccountManager(context: Context):
     override fun makeRatedSpan(text: String, rating: Int): AnnotatedString {
         if (rating < 3000) return super.makeRatedSpan(text, rating)
         return buildAnnotatedString {
-            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(text[0]) }
-            append(super.makeRatedSpan(text.substring(startIndex = 1), rating))
+            append(text[0].toString(), fontWeight = FontWeight.Bold)
+            append(super.makeRatedSpan(text.drop(1), rating))
         }
     }
 

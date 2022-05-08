@@ -23,6 +23,7 @@ import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.delay
@@ -249,9 +250,7 @@ fun SmallAccountPanelTypeArchive(
                 text = buildAnnotatedString {
                     infoArgs.forEachIndexed { index, (key, value) ->
                         if (index > 0) append("  ")
-                        withStyle(SpanStyle(color = cpsColors.textColorAdditional)) {
-                            append("${key}: ")
-                        }
+                        append(text = "${key}: ", color = cpsColors.textColorAdditional)
                         append(value)
                     }
                 },
