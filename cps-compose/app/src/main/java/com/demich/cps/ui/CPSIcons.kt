@@ -39,4 +39,5 @@ object CPSIcons {
     val Insert get() = Icons.Rounded.ReadMore
     val EditList get() = Icons.Default.EditNote
     val SetupLoaders get() = Icons.Default.PermDataSetting
+    val Star get() = Icons.Default.Star
 }

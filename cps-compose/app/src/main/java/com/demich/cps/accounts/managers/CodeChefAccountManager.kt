@@ -7,8 +7,6 @@ import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallRatedAccountPanel
+import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.RatingGraph
 import com.demich.cps.ui.RatingLoadButton
 import com.demich.cps.ui.rememberRatingGraphUIStates
@@ -158,43 +157,38 @@ class CodeChefAccountManager(context: Context):
 
     @Composable
     private fun StarBox(
+        modifier: Modifier = Modifier,
         rating: Int,
         textColor: Color,
-        fontSize: TextUnit = 20.sp,
-        modifier: Modifier = Modifier
+        fontSize: TextUnit
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Text(
             modifier = modifier
                 .background(color = colorFor(rating = rating))
-                .padding(horizontal = 4.dp, vertical = 1.dp)
-        ) {
-            Text(
-                text = buildAnnotatedString {
-                    append(getRatingStarNumber(rating).toString())
-                    appendInlineContent(star)
-                },
-                color = textColor,
-                fontSize = fontSize,
-                inlineContent = mapOf(
-                    star to InlineTextContent(
-                        Placeholder(
-                            width = fontSize,
-                            height = fontSize,
-                            placeholderVerticalAlign = PlaceholderVerticalAlign.Center
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = null,
-                            tint = textColor,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                )
+                .padding(horizontal = 4.dp, vertical = 1.dp),
+            text = buildAnnotatedString {
+                append(getRatingStarNumber(rating).toString())
+                appendInlineContent(star)
+            },
+            color = textColor,
+            fontSize = fontSize,
+            inlineContent = mapOf(
+                star to InlineTextContent(
+                    Placeholder(
+                        width = fontSize,
+                        height = fontSize,
+                        placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                    )
+                ) {
+                    Icon(
+                        imageVector = CPSIcons.Star,
+                        contentDescription = null,
+                        tint = textColor,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             )
-
-        }
+        )
     }
 
     @Composable
@@ -207,6 +201,7 @@ class CodeChefAccountManager(context: Context):
                         StarBox(
                             rating = userInfo.rating,
                             textColor = cpsColors.background,
+                            fontSize = 20.sp,
                             modifier = Modifier.padding(end = 8.dp)
                         )
                     }
