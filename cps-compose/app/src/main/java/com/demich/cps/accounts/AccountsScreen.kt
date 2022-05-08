@@ -6,9 +6,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -16,12 +17,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.demich.cps.*
+import com.demich.cps.AdditionalBottomBarBuilder
+import com.demich.cps.CPSViewModels
 import com.demich.cps.R
+import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.*
+import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.*
+import com.demich.cps.utils.combine
+import com.demich.cps.utils.context
+import com.demich.cps.utils.openUrlInBrowser
+import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -108,28 +115,10 @@ fun AccountExpandedScreen(
     )
 
     if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = onDismissDeleteDialog,
-            confirmButton = {
-                TextButton(
-                    content = { Text(text = "Delete", color = cpsColors.errorColor) },
-                    onClick = {
-                        onDeleteRequest(manager)
-                        onDismissDeleteDialog()
-                    }
-                )
-            },
-            dismissButton = {
-                TextButton(
-                    content = { Text("Cancel") },
-                    onClick = onDismissDeleteDialog
-                )
-            },
-            title = {
-                Text("Delete $type account?")
-            },
-            backgroundColor = cpsColors.background
-        )
+        CPSDeleteDialog(title = "Delete $type account?", onDismissRequest = onDismissDeleteDialog) {
+            onDeleteRequest(manager)
+            onDismissDeleteDialog()
+        }
     }
 }
 

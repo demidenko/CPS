@@ -2,6 +2,7 @@ package com.demich.cps.ui.dialogs
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -61,4 +62,31 @@ fun CPSDialogCancelAcceptButtons(
             content = { Text(acceptTitle) }
         )
     }
+}
+
+@Composable
+fun CPSDeleteDialog(
+    title: String,
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(
+                content = { Text(text = "Delete", color = cpsColors.errorColor) },
+                onClick = onConfirmRequest
+            )
+        },
+        dismissButton = {
+            TextButton(
+                content = { Text("Cancel") },
+                onClick = onDismissRequest
+            )
+        },
+        title = {
+            Text(text = title)
+        },
+        backgroundColor = cpsColors.background
+    )
 }

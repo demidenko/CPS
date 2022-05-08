@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.R
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.ui.*
+import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import kotlinx.coroutines.currentCoroutineContext
@@ -314,9 +315,10 @@ private fun ContestItemMenuButton(
         }
     }
     if (showDeleteDialog) {
-        ContestDeleteDialog(
+        CPSDeleteDialog(
+            title = "Delete contest from list?",
             onDismissRequest = { showDeleteDialog = false },
-            onDeleteRequest = {
+            onConfirmRequest = {
                 scope.launch {
                     context.settingsContests.ignoredContests.add(contest.compositeId)
                 }
@@ -324,30 +326,6 @@ private fun ContestItemMenuButton(
             }
         )
     }
-}
-
-@Composable
-private fun ContestDeleteDialog(
-    onDeleteRequest: () -> Unit,
-    onDismissRequest: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            TextButton(
-                content = { Text(text = "Delete", color = cpsColors.errorColor) },
-                onClick = onDeleteRequest
-            )
-        },
-        dismissButton = {
-            TextButton(
-                content = { Text("Cancel") },
-                onClick = onDismissRequest
-            )
-        },
-        title = { Text("Delete contest from list?") },
-        backgroundColor = cpsColors.background
-    )
 }
 
 private fun contestTimeDifference(fromTime: Instant, toTime: Instant): String {
