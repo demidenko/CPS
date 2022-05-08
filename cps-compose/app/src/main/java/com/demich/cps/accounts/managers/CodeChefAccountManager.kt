@@ -2,18 +2,19 @@ package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.*
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.preferencesDataStore
@@ -49,7 +50,7 @@ class CodeChefAccountManager(context: Context):
     companion object {
         private val Context.account_codechef_dataStore by preferencesDataStore(AccountManagers.codechef.name)
 
-        private const val star = '★'
+        private const val star = "★"
     }
 
     override val urlHomePage get() = CodeChefApi.urls.main
@@ -155,6 +156,46 @@ class CodeChefAccountManager(context: Context):
         append(text)
     }
 
+    @Composable
+    private fun StarBox(
+        rating: Int,
+        textColor: Color,
+        fontSize: TextUnit = 20.sp,
+        modifier: Modifier = Modifier
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .background(color = colorFor(rating = rating))
+                .padding(horizontal = 4.dp, vertical = 1.dp)
+        ) {
+            Text(
+                text = buildAnnotatedString {
+                    append(getRatingStarNumber(rating).toString())
+                    appendInlineContent(star)
+                },
+                color = textColor,
+                fontSize = fontSize,
+                inlineContent = mapOf(
+                    star to InlineTextContent(
+                        Placeholder(
+                            width = fontSize,
+                            height = fontSize,
+                            placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            tint = textColor,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                )
+            )
+
+        }
+    }
 
     @Composable
     override fun Panel(userInfo: CodeChefUserInfo) {
@@ -163,19 +204,11 @@ class CodeChefAccountManager(context: Context):
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (userInfo.isRated()) {
-                        Box(
-                            modifier = Modifier
-                                .padding(all = 2.dp)
-                                .padding(end = 8.dp)
-                                .background(color = colorFor(rating = userInfo.rating))
-                                .padding(horizontal = 4.dp)
-                        ) {
-                            Text(
-                                text = "${getRatingStarNumber(userInfo.rating)}$star",
-                                color = cpsColors.background,
-                                fontSize = 20.sp
-                            )
-                        }
+                        StarBox(
+                            rating = userInfo.rating,
+                            textColor = cpsColors.background,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
                     }
                     Text(
                         text = userInfo.handle,
