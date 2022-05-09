@@ -31,7 +31,7 @@ class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
         order + AccountManagers.values().filter { it !in order }
     }
 
-    val startScreenRoute = itemString(name = "start_screen_route", defaultValue = Screen.Accounts.route)
+    val startScreenRoute = itemString(name = "start_screen_route", defaultValue = Screen.Accounts.routePattern)
 }
 
 enum class DarkLightMode {

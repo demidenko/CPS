@@ -16,7 +16,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.CPSViewModels
 import com.demich.cps.R
@@ -177,13 +176,13 @@ fun AccountSettingsScreen(
 
 fun accountExpandedMenuBuilder(
     type: AccountManagers,
-    navController: NavController,
+    navigator: CPSNavigator,
     onShowDeleteDialog: () -> Unit
 ): CPSMenuBuilder = {
     val context = context
     CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete, onClick = onShowDeleteDialog)
     CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings) {
-        navController.navigate(Screen.AccountSettings.route(type))
+        navigator.navigateTo(Screen.AccountSettings(type))
     }
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         val url = context.allAccountManagers.first { it.type == type }.run {

@@ -17,27 +17,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
 import com.demich.cps.contests.Contest
 import com.demich.cps.news.codeforces.CodeforcesTitle
-import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.CPSMenuBuilder
-import com.demich.cps.ui.CPSReloadingButton
-import com.demich.cps.ui.platformPainter
+import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 
 @Composable
-fun NewsScreen(navController: NavController) {
+fun NewsScreen(navigator: CPSNavigator) {
     TabsHeader(
+        navigator = navigator,
         modifier = Modifier.fillMaxWidth()
     )
 }
 
 @Composable
 private fun TabsHeader(
+    navigator: CPSNavigator,
     modifier: Modifier = Modifier
 ) {
     var selected by rememberSaveable { mutableStateOf(CodeforcesTitle.MAIN) }
@@ -108,10 +106,11 @@ fun newsBottomBarBuilder()
     }
 }
 
-fun newsMenuBuilder(navController: NavController)
-: CPSMenuBuilder = {
+fun newsMenuBuilder(
+    navigator: CPSNavigator
+): CPSMenuBuilder = {
     CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings) {
-        navController.navigate(Screen.NewsSettings.route)
+        navigator.navigateTo(Screen.NewsSettings)
     }
     CPSDropdownMenuItem(title = "Follow List", icon = CPSIcons.Accounts) {
         //TODO Open FollowList

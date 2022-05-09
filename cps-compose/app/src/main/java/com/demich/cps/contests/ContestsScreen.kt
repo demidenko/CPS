@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
 import com.demich.cps.contests.loaders.ContestsLoaders
@@ -219,7 +218,7 @@ private fun ColumnScope.LoadingError(
 }
 
 fun contestsMenuBuilder(
-    navController: NavController,
+    navigator: CPSNavigator,
     contestsViewModel: ContestsViewModel
 ): CPSMenuBuilder = {
     CPSDropdownMenuItem(
@@ -227,7 +226,7 @@ fun contestsMenuBuilder(
         icon = CPSIcons.Settings,
         enabled = contestsViewModel.loadingStatus.value != LoadingStatus.LOADING
     ) {
-        navController.navigate(Screen.ContestsSettings.route)
+        navigator.navigateTo(Screen.ContestsSettings)
     }
 }
 

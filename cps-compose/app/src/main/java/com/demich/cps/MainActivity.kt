@@ -28,12 +28,9 @@ import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
 import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
-import com.demich.cps.ui.CPSMenuBuilder
-import com.demich.cps.ui.CPSStatusBar
-import com.demich.cps.ui.LocalUseOriginalColors
+import com.demich.cps.ui.*
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
-import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
@@ -77,8 +74,7 @@ private fun CPSContent(
 
     CPSScaffold(
         cpsViewModels = cpsViewModels,
-        navController = navController,
-        currentScreenState = currentScreenState
+        navController = navController
     )
 }
 
@@ -104,10 +100,9 @@ private class BuildersHolder(
 @Composable
 private fun CPSScaffold(
     cpsViewModels: CPSViewModels,
-    navController: NavHostController,
-    currentScreenState: State<Screen?>
+    navController: NavHostController
 ) {
-
+    val navigator = rememberCPSNavigator(navController = navController)
     val menuBuilderState = remember { mutableStateOf<CPSMenuBuilder?>(null) }
     val bottomBarBuilderState = remember { mutableStateOf<AdditionalBottomBarBuilder?>(null) }
 
@@ -115,7 +110,7 @@ private fun CPSScaffold(
         composable(route) {
             val holder: BuildersHolder = remember {
                 BuildersHolder(
-                    currentScreenState = currentScreenState,
+                    currentScreenState = navigator.currentScreenState,
                     screen = it.getScreen(),
                     menuBuilderState = menuBuilderState,
                     bottomBarBuilderState = bottomBarBuilderState
@@ -129,14 +124,14 @@ private fun CPSScaffold(
     }
 
     val navBuilder: NavGraphBuilder.() -> Unit = remember(
-        navController, cpsViewModels
+        navigator, cpsViewModels
     ) {
         {
-            cpsComposable(Screen.Accounts.route) { holder ->
+            cpsComposable(Screen.Accounts.routePattern) { holder ->
                 val reorderEnabledState = rememberSaveable { mutableStateOf(false) }
                 AccountsScreen(
                     accountsViewModel = cpsViewModels.accountsViewModel,
-                    onExpandAccount = { type -> navController.navigate(route = "account/$type") },
+                    onExpandAccount = { type -> navigator.navigateTo(Screen.AccountExpanded(type)) },
                     onSetAdditionalMenu = holder.menuSetter,
                     reorderEnabledState = reorderEnabledState
                 )
@@ -145,14 +140,14 @@ private fun CPSScaffold(
                     reorderEnabledState = reorderEnabledState
                 )
             }
-            cpsComposable(Screen.AccountExpanded.route) { holder ->
+            cpsComposable(Screen.AccountExpanded.routePattern) { holder ->
                 val type = (holder.screen as Screen.AccountExpanded).type
                 var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
                 AccountExpandedScreen(
                     type = type,
                     showDeleteDialog = showDeleteDialog,
                     onDeleteRequest = { manager ->
-                        navController.popBackStack()
+                        navigator.popBack()
                         cpsViewModels.accountsViewModel.delete(manager)
                     },
                     onDismissDeleteDialog = { showDeleteDialog = false },
@@ -160,25 +155,25 @@ private fun CPSScaffold(
                 )
                 holder.menu = accountExpandedMenuBuilder(
                     type = type,
-                    navController = navController,
+                    navigator = navigator,
                     onShowDeleteDialog = { showDeleteDialog = true }
                 )
             }
-            cpsComposable(Screen.AccountSettings.route) { holder ->
+            cpsComposable(Screen.AccountSettings.routePattern) { holder ->
                 val type = (holder.screen as Screen.AccountSettings).type
                 AccountSettingsScreen(type)
             }
 
-            cpsComposable(Screen.News.route) { holder ->
-                NewsScreen(navController)
-                holder.menu = newsMenuBuilder(navController)
+            cpsComposable(Screen.News.routePattern) { holder ->
+                NewsScreen(navigator = navigator)
+                holder.menu = newsMenuBuilder(navigator = navigator)
                 holder.bottomBar = newsBottomBarBuilder()
             }
-            cpsComposable(Screen.NewsSettings.route) {
+            cpsComposable(Screen.NewsSettings.routePattern) {
                 NewsSettingsScreen()
             }
 
-            cpsComposable(Screen.Contests.route) { holder ->
+            cpsComposable(Screen.Contests.routePattern) { holder ->
                 val searchEnabled = rememberSaveable { mutableStateOf(false) }
                 ContestsScreen(
                     contestsViewModel = cpsViewModels.contestsViewModel,
@@ -189,15 +184,15 @@ private fun CPSScaffold(
                     onEnableSearch = { searchEnabled.value = true }
                 )
                 holder.menu = contestsMenuBuilder(
-                    navController = navController,
+                    navigator = navigator,
                     contestsViewModel = cpsViewModels.contestsViewModel
                 )
             }
-            cpsComposable(Screen.ContestsSettings.route) {
+            cpsComposable(Screen.ContestsSettings.routePattern) {
                 ContestsSettingsScreen()
             }
 
-            cpsComposable(Screen.Development.route) { holder ->
+            cpsComposable(Screen.Development.routePattern) { holder ->
                 DevelopScreen()
                 holder.bottomBar = developAdditionalBottomBarBuilder(cpsViewModels.progressBarsViewModel)
             }
@@ -206,12 +201,11 @@ private fun CPSScaffold(
 
     Scaffold(
         topBar = { CPSTopBar(
-            currentScreen = currentScreenState.value,
+            navigator = navigator,
             additionalMenu = menuBuilderState.value
         ) },
         bottomBar = { CPSBottomBar(
-            navController = navController,
-            currentScreen = currentScreenState.value,
+            navigator = navigator,
             additionalBottomBar = bottomBarBuilderState.value
         ) }
     ) { innerPadding ->

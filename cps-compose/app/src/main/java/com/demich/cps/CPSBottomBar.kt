@@ -16,8 +16,8 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
-import androidx.navigation.NavController
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
@@ -28,11 +28,10 @@ typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
 
 @Composable
 fun CPSBottomBar(
-    navController: NavController,
-    currentScreen: Screen?,
+    navigator: CPSNavigator,
     additionalBottomBar: AdditionalBottomBarBuilder? = null
 ) {
-    if (currentScreen == null || currentScreen.enableBottomBar) {
+    if (navigator.isBottomBarEnabled) {
         Row(
             modifier = Modifier
                 .height(56.dp) //as BottomNavigationHeight
@@ -46,8 +45,7 @@ fun CPSBottomBar(
             )
             CPSBottomBarVerticalDivider()
             CPSBottomBarMain(
-                currentScreen = currentScreen,
-                navController = navController,
+                navigator = navigator,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -57,9 +55,8 @@ fun CPSBottomBar(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CPSBottomBarMain(
-    currentScreen: Screen?,
-    modifier: Modifier = Modifier,
-    navController: NavController
+    navigator: CPSNavigator,
+    modifier: Modifier = Modifier
 ) {
     val context = context
     val scope = rememberCoroutineScope()
@@ -82,17 +79,9 @@ private fun CPSBottomBarMain(
     CPSBottomNavigationMainItems(
         modifier = modifier.fillMaxSize(),
         rootScreens = rootScreens,
-        selectedRootScreen = currentScreen?.rootScreen,
+        selectedRootScreen = navigator.currentScreen?.rootScreen,
         onSelect = { screen ->
-            navController.navigate(screen.route) {
-                //TODO: wtf it works?
-                popUpTo(currentScreen!!.rootScreen.route) {
-                    saveState = true
-                    inclusive = true
-                }
-                launchSingleTop = true
-                restoreState = true
-            }
+            navigator.navigateTo(screen)
         },
         onLongPress = { screen ->
             showChangeStartScreenDialogFor = screen
@@ -105,7 +94,7 @@ private fun CPSBottomBarMain(
             onDismissRequest = { showChangeStartScreenDialogFor = null },
             onConfirmRequest = {
                 scope.launch {
-                    context.settingsUI.startScreenRoute(newValue = screen.route)
+                    context.settingsUI.startScreenRoute(newValue = screen.routePattern)
                     showChangeStartScreenDialogFor = null
                 }
             }
@@ -175,7 +164,7 @@ private fun ChangeStartScreenDialog(
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = {
-            Text(text = "Set ${screen.route.replaceFirstChar { it.uppercaseChar() }} as start page?")
+            Text(text = "Set ${screen.routePattern.replaceFirstChar { it.uppercaseChar() }} as start page?")
         },
         dismissButton = {
             TextButton(onClick = onDismissRequest) {

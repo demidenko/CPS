@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CPSTopBar(
-    currentScreen: Screen?,
+    navigator: CPSNavigator,
     additionalMenu: CPSMenuBuilder?,
 ) {
     var showUIPanel by rememberSaveable { mutableStateOf(false) }
@@ -41,7 +41,7 @@ fun CPSTopBar(
             .fillMaxHeight()
         ) {
             CPSTitle(
-                screen = currentScreen,
+                navigator = navigator,
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterStart)
@@ -86,7 +86,7 @@ fun CPSTopBar(
 
 @Composable
 private fun CPSTitle(
-    screen: Screen?,
+    navigator: CPSNavigator,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 16.sp
 ) = Column(modifier = modifier) {
@@ -97,7 +97,7 @@ private fun CPSTitle(
         maxLines = 1
     )
     MonospacedText(
-        text = screen?.subtitle ?: "",
+        text = navigator.subtitle,
         color = cpsColors.textColorAdditional,
         fontSize = fontSize,
         maxLines = 1
