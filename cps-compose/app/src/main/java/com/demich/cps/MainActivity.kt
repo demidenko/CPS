@@ -36,10 +36,12 @@ import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -217,9 +219,12 @@ private fun CPSScaffold(
             .padding(innerPadding)
             .fillMaxSize()
         ) {
+            val startRoute = with(context) {
+                remember { runBlocking { settingsUI.startScreenRoute() } }
+            }
             NavHost(
                 navController = navController,
-                startDestination = Screen.Accounts.route,
+                startDestination = startRoute,
                 builder = navBuilder
             )
             CPSBottomProgressBarsColumn(

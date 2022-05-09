@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.datastore.preferences.preferencesDataStore
+import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.utils.CPSDataStore
 import kotlinx.coroutines.flow.Flow
@@ -29,6 +30,8 @@ class SettingsUI(context: Context): CPSDataStore(context.settingsUI_dataStore) {
     fun flowOfAccountsOrder(): Flow<List<AccountManagers>> = accountsOrder.flow.map { order ->
         order + AccountManagers.values().filter { it !in order }
     }
+
+    val startScreenRoute = itemString(name = "start_screen_route", defaultValue = Screen.Accounts.route)
 }
 
 enum class DarkLightMode {
