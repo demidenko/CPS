@@ -1,26 +1,19 @@
 package com.demich.cps.contests
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.R
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
@@ -357,18 +350,8 @@ fun ContestPlatformIcon(
     size: TextUnit,
     color: Color
 ) {
-    val iconId = when (platform) {
-        Contest.Platform.codeforces -> R.drawable.ic_logo_codeforces
-        Contest.Platform.atcoder -> R.drawable.ic_logo_atcoder
-        Contest.Platform.topcoder -> R.drawable.ic_logo_topcoder
-        Contest.Platform.codechef -> R.drawable.ic_logo_codechef
-        Contest.Platform.google -> R.drawable.ic_logo_google
-        Contest.Platform.dmoj -> R.drawable.ic_logo_dmoj
-        Contest.Platform.unknown -> null
-    }
-
     Icon(
-        painter = iconId?.let { painterResource(it) } ?: rememberVectorPainter(CPSIcons.Contest),
+        painter = platformPainter(platform),
         modifier = modifier.size(with(LocalDensity.current) { size.toDp() }),
         tint = color,
         contentDescription = null

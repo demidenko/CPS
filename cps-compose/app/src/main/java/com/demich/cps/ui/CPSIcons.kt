@@ -5,6 +5,12 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
+import com.demich.cps.R
+import com.demich.cps.contests.Contest
 
 object CPSIcons {
     val Account get() = Icons.Rounded.Person
@@ -40,4 +46,19 @@ object CPSIcons {
     val EditList get() = Icons.Default.EditNote
     val SetupLoaders get() = Icons.Default.PermDataSetting
     val Star get() = Icons.Default.Star
+}
+
+
+@Composable
+fun platformPainter(platform: Contest.Platform): Painter {
+    val iconId = when (platform) {
+        Contest.Platform.codeforces -> R.drawable.ic_logo_codeforces
+        Contest.Platform.atcoder -> R.drawable.ic_logo_atcoder
+        Contest.Platform.topcoder -> R.drawable.ic_logo_topcoder
+        Contest.Platform.codechef -> R.drawable.ic_logo_codechef
+        Contest.Platform.google -> R.drawable.ic_logo_google
+        Contest.Platform.dmoj -> R.drawable.ic_logo_dmoj
+        Contest.Platform.unknown -> null
+    }
+    return iconId?.let { painterResource(it) } ?: rememberVectorPainter(CPSIcons.Contest)
 }
