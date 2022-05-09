@@ -142,8 +142,8 @@ private fun ContestsSortedList(
 
     val filteredContests = remember(contestsSortedListState.value, searchText) {
         contestsSortedListState.value.filter { contest ->
-            val inTitle = contest.title.contains(searchText, ignoreCase = true)
-            val inPlatformName = contest.platform.name.contains(searchText, ignoreCase = true)
+            val inTitle = contest.title.containsTokensAsSubsequence(searchText, ignoreCase = true)
+            val inPlatformName = contest.platform.name.containsTokensAsSubsequence(searchText, ignoreCase = true)
             inTitle || inPlatformName
         }
     }
