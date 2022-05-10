@@ -16,7 +16,7 @@ import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
-import com.demich.cps.utils.mutate
+import com.demich.cps.utils.edit
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.launch
 
@@ -36,7 +36,7 @@ fun ContestPlatformsSettingsItem() {
                 enabledPlatforms = enabledPlatforms,
                 onCheckedChange = { platform, checked ->
                     scope.launch {
-                        context.settingsContests.enabledPlatforms.mutate {
+                        context.settingsContests.enabledPlatforms.edit {
                             if (checked) add(platform) else remove(platform)
                         }
                     }

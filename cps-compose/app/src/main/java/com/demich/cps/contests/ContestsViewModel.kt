@@ -13,7 +13,7 @@ import com.demich.cps.room.ContestsListDao
 import com.demich.cps.room.contestsListDao
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
-import com.demich.cps.utils.mutate
+import com.demich.cps.utils.edit
 import kotlinx.coroutines.launch
 
 class ContestsViewModel: ViewModel() {
@@ -72,10 +72,10 @@ class ContestsViewModel: ViewModel() {
 
         val settings = context.settingsContests
 
-        settings.lastReloadedPlatforms.mutate { addAll(platforms) }
+        settings.lastReloadedPlatforms.edit { addAll(platforms) }
         if (Contest.Platform.unknown in platforms) {
             val ids = settings.clistAdditionalResources().map { it.id }
-            settings.clistLastReloadedAdditionalResources.mutate { addAll(ids) }
+            settings.clistLastReloadedAdditionalResources.edit { addAll(ids) }
         }
 
         loadContests(

@@ -20,7 +20,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
-import com.demich.cps.utils.mutate
+import com.demich.cps.utils.edit
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -50,7 +50,7 @@ fun LoadersPriorityListDialog(
             availableOptions = availableOptions,
             onListChange = { newList ->
                 scope.launch {
-                    settings.contestsLoadersPriorityLists.mutate {
+                    settings.contestsLoadersPriorityLists.edit {
                         this[platform] = newList
                     }
                 }

@@ -16,7 +16,7 @@ interface CPSDataStoreItem<T> {
     //setter
     suspend operator fun invoke(newValue: T)
 
-    suspend fun edit(transform: (T) -> T)
+    suspend fun updateValue(transform: (T) -> T)
 }
 
 
@@ -41,7 +41,7 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
             }
         }
 
-        override suspend fun edit(transform: (T) -> T) {
+        override suspend fun updateValue(transform: (T) -> T) {
             dataStore.edit { prefs ->
                 prefs[key] = toPrefs(transform(fromPrefs(prefs[key])))
             }
@@ -135,28 +135,28 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
 }
 
 
-@JvmName("mutateList")
-suspend fun<T> CPSDataStoreItem<List<T>>.mutate(block: MutableList<T>.() -> Unit) {
-    edit { it.toMutableList().apply(block) }
+@JvmName("editList")
+suspend fun<T> CPSDataStoreItem<List<T>>.edit(block: MutableList<T>.() -> Unit) {
+    updateValue { it.toMutableList().apply(block) }
 }
 
-@JvmName("mutateSet")
-suspend fun<T> CPSDataStoreItem<Set<T>>.mutate(block: MutableSet<T>.() -> Unit) {
-    edit { it.toMutableSet().apply(block) }
+@JvmName("editSet")
+suspend fun<T> CPSDataStoreItem<Set<T>>.edit(block: MutableSet<T>.() -> Unit) {
+    updateValue { it.toMutableSet().apply(block) }
 }
 
-@JvmName("mutateMap")
-suspend fun<K, V> CPSDataStoreItem<Map<K,V>>.mutate(block: MutableMap<K,V>.() -> Unit) {
-    edit { it.toMutableMap().apply(block) }
+@JvmName("editMap")
+suspend fun<K, V> CPSDataStoreItem<Map<K,V>>.edit(block: MutableMap<K,V>.() -> Unit) {
+    updateValue { it.toMutableMap().apply(block) }
 }
 
 
 @JvmName("addList")
 suspend fun<T> CPSDataStoreItem<List<T>>.add(value: T) {
-    mutate { this.add(element = value) }
+    edit { add(element = value) }
 }
 
 @JvmName("addSet")
 suspend fun<T> CPSDataStoreItem<Set<T>>.add(value: T) {
-    mutate { this.add(element = value) }
+    edit { add(element = value) }
 }
