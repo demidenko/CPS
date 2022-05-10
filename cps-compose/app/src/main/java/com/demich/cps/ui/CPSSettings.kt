@@ -1,9 +1,7 @@
 package com.demich.cps.ui
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.core.snap
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -145,6 +143,7 @@ fun SettingsSubtitle(
     )
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ExpandableSettingsItem(
     title: String,
@@ -162,15 +161,20 @@ fun ExpandableSettingsItem(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
                 )
-                if (expanded) {
-                    Box(
-                        content = { expandedContent() },
-                        modifier = Modifier
-                            .padding(horizontal = 10.dp)
-                            .padding(top = 8.dp)
-                    )
-                } else {
-                    collapsedContent()
+                AnimatedContent(
+                    targetState = expanded,
+                    transitionSpec = { fadeIn() with fadeOut(snap()) }
+                ) { itemExpanded ->
+                    if (itemExpanded) {
+                        Box(
+                            content = { expandedContent() },
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp)
+                                .padding(top = 8.dp)
+                        )
+                    } else {
+                        collapsedContent()
+                    }
                 }
             }
             AnimatedVisibility(
