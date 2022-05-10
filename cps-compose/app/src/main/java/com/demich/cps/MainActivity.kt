@@ -90,7 +90,7 @@ private fun CPSScaffold(
         navigator, cpsViewModels
     ) {
         {
-            cpsComposable(Screen.Accounts.routePattern) { holder ->
+            cpsComposable(ScreenTypes.accounts.route) { holder ->
                 val reorderEnabledState = rememberSaveable { mutableStateOf(false) }
                 AccountsScreen(
                     accountsViewModel = cpsViewModels.accountsViewModel,
@@ -103,7 +103,7 @@ private fun CPSScaffold(
                     reorderEnabledState = reorderEnabledState
                 )
             }
-            cpsComposable(Screen.AccountExpanded.routePattern) { holder ->
+            cpsComposable(ScreenTypes.accountExpanded.route) { holder ->
                 val type = (holder.screen as Screen.AccountExpanded).type
                 var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
                 AccountExpandedScreen(
@@ -122,21 +122,21 @@ private fun CPSScaffold(
                     onShowDeleteDialog = { showDeleteDialog = true }
                 )
             }
-            cpsComposable(Screen.AccountSettings.routePattern) { holder ->
+            cpsComposable(ScreenTypes.accountSettings.route) { holder ->
                 val type = (holder.screen as Screen.AccountSettings).type
                 AccountSettingsScreen(type)
             }
 
-            cpsComposable(Screen.News.routePattern) { holder ->
+            cpsComposable(ScreenTypes.news.route) { holder ->
                 NewsScreen(navigator = navigator)
                 holder.menu = newsMenuBuilder(navigator = navigator)
                 holder.bottomBar = newsBottomBarBuilder()
             }
-            cpsComposable(Screen.NewsSettings.routePattern) {
+            cpsComposable(ScreenTypes.newsSettings.route) {
                 NewsSettingsScreen()
             }
 
-            cpsComposable(Screen.Contests.routePattern) { holder ->
+            cpsComposable(ScreenTypes.contests.route) { holder ->
                 val searchEnabled = rememberSaveable { mutableStateOf(false) }
                 ContestsScreen(
                     contestsViewModel = cpsViewModels.contestsViewModel,
@@ -151,11 +151,11 @@ private fun CPSScaffold(
                     contestsViewModel = cpsViewModels.contestsViewModel
                 )
             }
-            cpsComposable(Screen.ContestsSettings.routePattern) {
+            cpsComposable(ScreenTypes.contestsSettings.route) {
                 ContestsSettingsScreen()
             }
 
-            cpsComposable(Screen.Development.routePattern) { holder ->
+            cpsComposable(ScreenTypes.develop.route) { holder ->
                 DevelopScreen()
                 holder.bottomBar = developAdditionalBottomBarBuilder(cpsViewModels.progressBarsViewModel)
             }

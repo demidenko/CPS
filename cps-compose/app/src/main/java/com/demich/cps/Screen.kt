@@ -3,58 +3,70 @@ package com.demich.cps
 import androidx.navigation.NavBackStackEntry
 import com.demich.cps.accounts.managers.AccountManagers
 
+enum class ScreenTypes(
+    val route: String
+) {
+    accounts("accounts"),
+    accountExpanded("account/{manager}"),
+    accountSettings("account.settings/{manager}"),
+    contests("contests"),
+    contestsSettings("contests.settings"),
+    news("news"),
+    newsSettings("news.settings"),
+    develop("develop")
+}
+
+val Screen.subtitle: String
+    get() = when (this) {
+        Screen.Accounts -> listOf("accounts")
+        is Screen.AccountExpanded -> listOf("accounts", type.name)
+        is Screen.AccountSettings -> listOf("accounts", type.name, "settings")
+        Screen.Contests -> listOf("contests")
+        Screen.ContestsSettings -> listOf("contests", "settings")
+        Screen.Development -> listOf("develop")
+        Screen.News -> listOf("news")
+        Screen.NewsSettings -> listOf("news", "settings")
+    }.joinToString(prefix = "::", separator = ".")
 
 sealed class Screen(
-    val routePattern: String,
+    val screenType: ScreenTypes,
+    val rootScreenType: ScreenTypes = screenType,
     val enableBottomBar: Boolean = true,
-    private val root: Screen? = null
 ) {
-    val rootScreen: Screen get() = root ?: this
-    open val subtitle: String get() = "::$routePattern"
 
-    open val routePath: String get() = routePattern
+    protected open fun createPath(pattern: String): String = pattern
 
-    object Accounts: Screen("accounts")
-    class AccountExpanded(val type: AccountManagers)
-        : Screen(routePattern = routePattern, root = Accounts) {
-        override val routePath: String
-            get() = routePattern.replace("{manager}", type.name)
-        override val subtitle get() = "::accounts.$type"
-        override fun equals(other: Any?) = other is AccountExpanded && other.type == type
-        override fun hashCode() = type.ordinal
-        companion object {
-            const val routePattern = "account/{manager}"
+    val routePath get() = createPath(screenType.route)
+
+    object Accounts: Screen(ScreenTypes.accounts)
+
+    data class AccountExpanded(val type: AccountManagers)
+        : Screen(ScreenTypes.accountExpanded, rootScreenType = ScreenTypes.accounts) {
+            override fun createPath(pattern: String) = pattern.replace("{manager}", type.name)
         }
-    }
-    class AccountSettings(val type: AccountManagers)
-        : Screen(routePattern = routePattern, root = Accounts, enableBottomBar = false) {
-        override val routePath: String
-            get() = routePattern.replace("{manager}", type.name)
-        override val subtitle get() = "::accounts.$type.settings"
-        override fun equals(other: Any?) = other is AccountSettings && other.type == type
-        override fun hashCode() = type.ordinal
-        companion object {
-            const val routePattern = "account_settings/{manager}"
-        }
+
+    data class AccountSettings(val type: AccountManagers)
+        : Screen(ScreenTypes.accountSettings, rootScreenType = ScreenTypes.accounts, enableBottomBar = false) {
+        override fun createPath(pattern: String) = pattern.replace("{manager}", type.name)
     }
 
-    object News: Screen("news")
-    object NewsSettings: Screen("news.settings", root = News, enableBottomBar = false)
+    object News: Screen(ScreenTypes.news)
+    object NewsSettings: Screen(ScreenTypes.newsSettings, rootScreenType = ScreenTypes.news, enableBottomBar = false)
 
-    object Contests: Screen("contests")
-    object ContestsSettings: Screen("contests.settings", root = Contests, enableBottomBar = false)
+    object Contests: Screen(ScreenTypes.contests)
+    object ContestsSettings: Screen(ScreenTypes.contestsSettings, rootScreenType = ScreenTypes.contests, enableBottomBar = false)
 
-    object Development: Screen("develop")
+    object Development: Screen(ScreenTypes.develop)
 
 }
 
 fun NavBackStackEntry.getScreen(): Screen {
     val route = destination.route
-    if (route == Screen.AccountExpanded.routePattern) {
+    if (route == ScreenTypes.accountExpanded.route) {
         val type = AccountManagers.valueOf(arguments?.getString("manager")!!)
         return Screen.AccountExpanded(type)
     }
-    if (route == Screen.AccountSettings.routePattern) {
+    if (route == ScreenTypes.accountSettings.route) {
         val type = AccountManagers.valueOf(arguments?.getString("manager")!!)
         return Screen.AccountSettings(type)
     }
@@ -65,7 +77,7 @@ fun NavBackStackEntry.getScreen(): Screen {
         Screen.Contests,
         Screen.ContestsSettings,
         Screen.Development
-    ).first { it.routePattern == route }
+    ).first { it.screenType.route == route }
 }
 
 

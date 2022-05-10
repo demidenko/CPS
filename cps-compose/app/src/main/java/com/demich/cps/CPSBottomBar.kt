@@ -79,7 +79,7 @@ private fun CPSBottomBarMain(
     CPSBottomNavigationMainItems(
         modifier = modifier.fillMaxSize(),
         rootScreens = rootScreens,
-        selectedRootScreen = navigator.currentScreen?.rootScreen,
+        selectedRootScreen = navigator.currentScreen?.rootScreenType,
         onSelect = { screen ->
             navigator.navigateTo(screen)
         },
@@ -94,7 +94,7 @@ private fun CPSBottomBarMain(
             onDismissRequest = { showChangeStartScreenDialogFor = null },
             onConfirmRequest = {
                 scope.launch {
-                    context.settingsUI.startScreenRoute(newValue = screen.routePattern)
+                    context.settingsUI.startScreenRoute(newValue = screen.screenType.route)
                     showChangeStartScreenDialogFor = null
                 }
             }
@@ -106,7 +106,7 @@ private fun CPSBottomBarMain(
 private fun CPSBottomNavigationMainItems(
     modifier: Modifier = Modifier,
     rootScreens: List<Pair<Screen, ImageVector>>,
-    selectedRootScreen: Screen?,
+    selectedRootScreen: ScreenTypes?,
     onSelect: (Screen) -> Unit,
     onLongPress: (Screen) -> Unit
 ) {
@@ -118,7 +118,7 @@ private fun CPSBottomNavigationMainItems(
         for ((screen, icon) in rootScreens) {
             CPSBottomNavigationItem(
                 icon = icon,
-                isSelected = screen == selectedRootScreen,
+                isSelected = screen.screenType == selectedRootScreen,
                 onSelect = { onSelect(screen) },
                 onLongPress = { onLongPress(screen) }
             )
@@ -164,7 +164,7 @@ private fun ChangeStartScreenDialog(
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = {
-            Text(text = "Set ${screen.routePattern.replaceFirstChar { it.uppercaseChar() }} as start page?")
+            Text(text = "Set ${screen.screenType.route.replaceFirstChar { it.uppercaseChar() }} as start page?")
         },
         dismissButton = {
             TextButton(onClick = onDismissRequest) {

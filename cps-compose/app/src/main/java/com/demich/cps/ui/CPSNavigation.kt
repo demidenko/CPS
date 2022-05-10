@@ -63,7 +63,7 @@ class CPSNavigator(
 
     fun navigateTo(screen: Screen) {
         val currentScreen = currentScreenState.value
-        if (screen.rootScreen == currentScreen?.rootScreen) {
+        if (screen.rootScreenType == currentScreen?.rootScreenType) {
             if (screen == currentScreen) {
                 //same screen
                 subtitleState.value = screen.subtitle
@@ -74,7 +74,7 @@ class CPSNavigator(
             //switch stack
             navController.navigate(route = screen.routePath) {
                 //TODO: wtf it works?
-                popUpTo(currentScreen!!.rootScreen.routePattern) {
+                popUpTo(currentScreen!!.rootScreenType.route) {
                     saveState = true
                     inclusive = true
                 }
