@@ -164,6 +164,7 @@ private fun ChangeStartScreenDialog(
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = {
+            //TODO: show icon; consider radiobuttons;
             Text(text = "Set ${screen.screenType.route.replaceFirstChar { it.uppercaseChar() }} as start page?")
         },
         dismissButton = {
