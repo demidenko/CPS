@@ -61,63 +61,34 @@ class MainActivity: ComponentActivity() {
 
 @Composable
 private fun CPSContent(
-    cpsViewModels: CPSViewModels,
-    navController: NavHostController = rememberNavController()
+    cpsViewModels: CPSViewModels
 ) {
-    val currentScreenState = remember(navController) {
-        navController.currentBackStackEntryFlow.map { it.getScreen() }
-    }.collectAsState(initial = null)
+    val navigator = rememberCPSNavigator(navController = rememberNavController())
 
     NavigationAndStatusBars(
-        currentScreen = currentScreenState.value
+        currentScreen = navigator.currentScreen
     )
 
     CPSScaffold(
         cpsViewModels = cpsViewModels,
-        navController = navController
+        navigator = navigator
     )
 }
 
-private class BuildersHolder(
-    private val currentScreenState: State<Screen?>,
-    val screen: Screen,
-
-    private val menuBuilderState: MutableState<CPSMenuBuilder?>,
-    private val bottomBarBuilderState: MutableState<AdditionalBottomBarBuilder?>
-) {
-    var menu: CPSMenuBuilder?
-        get() = menuBuilderState.value
-        set(value) { if (screen == currentScreenState.value) menuBuilderState.value = value }
-
-    var bottomBar: AdditionalBottomBarBuilder?
-        get() = bottomBarBuilderState.value
-        set(value) { if (screen == currentScreenState.value) bottomBarBuilderState.value = value }
-
-    val menuSetter get() = menuBuilderState.component2()
-    val bottomBarSetter get() = bottomBarBuilderState.component2()
-}
 
 @Composable
 private fun CPSScaffold(
     cpsViewModels: CPSViewModels,
-    navController: NavHostController
+    navigator: CPSNavigator
 ) {
-    val navigator = rememberCPSNavigator(navController = navController)
-    val menuBuilderState = remember { mutableStateOf<CPSMenuBuilder?>(null) }
-    val bottomBarBuilderState = remember { mutableStateOf<AdditionalBottomBarBuilder?>(null) }
 
-    fun NavGraphBuilder.cpsComposable(route: String, content: @Composable (BuildersHolder) -> Unit) {
+    fun NavGraphBuilder.cpsComposable(route: String, content: @Composable (CPSNavigator.DuringCompositionHolder) -> Unit) {
         composable(route) {
-            val holder: BuildersHolder = remember {
-                BuildersHolder(
-                    currentScreenState = navigator.currentScreenState,
-                    screen = it.getScreen(),
-                    menuBuilderState = menuBuilderState,
-                    bottomBarBuilderState = bottomBarBuilderState
-                )
-            }.apply {
-                menu = null
-                bottomBar = null
+            val holder = remember {
+                navigator.DuringCompositionHolder(it.getScreen()).apply {
+                    menu = null
+                    bottomBar = null
+                }
             }
             content(holder)
         }
@@ -200,27 +171,14 @@ private fun CPSScaffold(
     }
 
     Scaffold(
-        topBar = { CPSTopBar(
-            navigator = navigator,
-            additionalMenu = menuBuilderState.value
-        ) },
-        bottomBar = { CPSBottomBar(
-            navigator = navigator,
-            additionalBottomBar = bottomBarBuilderState.value
-        ) }
+        topBar = { navigator.TopBar() },
+        bottomBar = { navigator.BottomBar() }
     ) { innerPadding ->
         Box(modifier = Modifier
             .padding(innerPadding)
             .fillMaxSize()
         ) {
-            val startRoute = with(context) {
-                remember { runBlocking { settingsUI.startScreenRoute() } }
-            }
-            NavHost(
-                navController = navController,
-                startDestination = startRoute,
-                builder = navBuilder
-            )
+            navigator.NavHost(builder = navBuilder)
             CPSBottomProgressBarsColumn(
                 progressBarsViewModel = cpsViewModels.progressBarsViewModel,
                 modifier = Modifier.align(Alignment.BottomCenter)

@@ -69,17 +69,3 @@ fun NavBackStackEntry.getScreen(): Screen {
 }
 
 
-/*
-accounts
-    expanded account
-        settings
-news: tabs
-    settings
-    follow list
-        user blog
-contests
-    settings
-        ...?
-
- */
-

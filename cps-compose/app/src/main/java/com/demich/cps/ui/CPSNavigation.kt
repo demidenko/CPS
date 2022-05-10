@@ -1,37 +1,49 @@
 package com.demich.cps.ui
 
 import androidx.compose.runtime.*
-import androidx.navigation.NavController
-import com.demich.cps.Screen
-import com.demich.cps.getScreen
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
+import com.demich.cps.*
+import com.demich.cps.utils.context
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun rememberCPSNavigator(
-    navController: NavController
+    navController: NavHostController
 ): CPSNavigator {
-    val subtitleState: MutableState<String> = remember {
-        mutableStateOf("")
+    val subtitleState = remember { mutableStateOf("") }
+
+    val currentScreenState: State<Screen?>
+        = remember(key1 = navController, key2 = subtitleState) {
+            navController.currentBackStackEntryFlow
+                .map { it.getScreen() }
+                .onEach { subtitleState.value = it.subtitle }
+        }.collectAsState(initial = null)
+
+    val menuBuilderState = remember { mutableStateOf<CPSMenuBuilder?>(null) }
+    val bottomBarBuilderState = remember { mutableStateOf<AdditionalBottomBarBuilder?>(null) }
+
+    return remember(currentScreenState, menuBuilderState, bottomBarBuilderState) {
+        CPSNavigator(
+            navController = navController,
+            currentScreenState = currentScreenState,
+            subtitleState = subtitleState,
+            menuBuilderState = menuBuilderState,
+            bottomBarBuilderState = bottomBarBuilderState
+        )
     }
-    val currentScreenState: State<Screen?> = remember {
-        navController.currentBackStackEntryFlow.map { it.getScreen() }
-            .onEach {
-                subtitleState.value = it.subtitle
-            }
-    }.collectAsState(initial = null)
-    return CPSNavigator(
-        navController = navController,
-        currentScreenState = currentScreenState,
-        subtitleState = subtitleState
-    )
 }
 
 @Stable
 class CPSNavigator(
-    private val navController: NavController,
+    private val navController: NavHostController,
     private val subtitleState: MutableState<String>,
-    val currentScreenState: State<Screen?>
+    private val currentScreenState: State<Screen?>,
+    private val menuBuilderState: MutableState<CPSMenuBuilder?>,
+    private val bottomBarBuilderState: MutableState<AdditionalBottomBarBuilder?>
 ) {
 
     val subtitle: String
@@ -70,5 +82,52 @@ class CPSNavigator(
 
     fun popBack() {
         navController.popBackStack()
+    }
+
+    inner class DuringCompositionHolder(
+        val screen: Screen
+    ) {
+        var menu: CPSMenuBuilder?
+            get() = menuBuilderState.value
+            set(value) { if (screen == currentScreenState.value) menuBuilderState.value = value }
+
+        var bottomBar: AdditionalBottomBarBuilder?
+            get() = bottomBarBuilderState.value
+            set(value) { if (screen == currentScreenState.value) bottomBarBuilderState.value = value }
+
+        val menuSetter get() = menuBuilderState.component2()
+        val bottomBarSetter get() = bottomBarBuilderState.component2()
+    }
+
+    @Composable
+    fun NavHost(
+        modifier: Modifier = Modifier,
+        builder: NavGraphBuilder.() -> Unit
+    ) {
+        val startRoute = with(context) {
+            remember { runBlocking { settingsUI.startScreenRoute() } }
+        }
+        androidx.navigation.compose.NavHost(
+            navController = navController,
+            startDestination = startRoute,
+            modifier = modifier,
+            builder = builder
+        )
+    }
+
+    @Composable
+    fun TopBar() {
+        CPSTopBar(
+            navigator = this,
+            additionalMenu = menuBuilderState.value
+        )
+    }
+
+    @Composable
+    fun BottomBar() {
+        CPSBottomBar(
+            navigator = this,
+            additionalBottomBar = bottomBarBuilderState.value
+        )
     }
 }
