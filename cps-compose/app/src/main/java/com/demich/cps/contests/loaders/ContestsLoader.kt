@@ -4,6 +4,7 @@ import com.demich.cps.contests.Contest
 import com.demich.cps.contests.settings.ContestDateConstraints
 import io.ktor.client.features.*
 import io.ktor.http.*
+import io.ktor.network.sockets.*
 import java.net.SocketException
 import java.net.UnknownHostException
 
@@ -78,7 +79,7 @@ fun makeCombinedMessage(
         valueTransform = { it.first },
         keySelector = { (_, e) ->
             when {
-                e is UnknownHostException || e is SocketException
+                e is UnknownHostException || e is SocketException || e is SocketTimeoutException
                     -> "Connection failed"
                 e is ClientRequestException && e.response.status == HttpStatusCode.Unauthorized
                     -> "Unauthorized"
