@@ -2,10 +2,7 @@ package com.demich.cps.utils
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
@@ -34,9 +31,7 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         protected abstract fun toPrefs(t: T): S
 
         override val flow: Flow<T>
-            get() = dataStore.data.map { fromPrefs(it[key]) }.distinctUntilChanged()
-            //get() = dataStore.data.map { it[key] }.distinctUntilChanged().map { fromPrefs(it) }
-            //get() = dataStore.data.distinctUntilChangedBy { it[key] }.map { fromPrefs(it[key]) }
+            get() = dataStore.data.map { it[key] }.distinctUntilChanged().map { fromPrefs(it) }
 
         override suspend operator fun invoke(): T = fromPrefs(dataStore.data.first()[key])
 
