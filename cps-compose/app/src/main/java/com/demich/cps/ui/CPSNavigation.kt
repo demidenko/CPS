@@ -1,11 +1,15 @@
 package com.demich.cps.ui
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import com.demich.cps.*
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
+import com.google.accompanist.systemuicontroller.SystemUiController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
@@ -128,6 +132,22 @@ class CPSNavigator(
         CPSBottomBar(
             navigator = this,
             additionalBottomBar = bottomBarBuilderState.value
+        )
+    }
+
+
+    @Composable
+    fun ColorizeNavAndStatusBars(
+        systemUiController: SystemUiController = rememberSystemUiController()
+    ) {
+        systemUiController.setNavigationBarColor(
+            color = cpsColors.backgroundNavigation,
+            darkIcons = MaterialTheme.colors.isLight
+        )
+
+        CPSStatusBar(
+            systemUiController = systemUiController,
+            currentScreen = currentScreen
         )
     }
 }

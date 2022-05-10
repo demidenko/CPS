@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -14,8 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.demich.cps.accounts.*
@@ -28,17 +25,14 @@ import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
 import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
-import com.demich.cps.ui.*
+import com.demich.cps.ui.CPSNavigator
+import com.demich.cps.ui.LocalUseOriginalColors
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
+import com.demich.cps.ui.rememberCPSNavigator
+import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
-import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
-import com.google.accompanist.systemuicontroller.SystemUiController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,9 +59,7 @@ private fun CPSContent(
 ) {
     val navigator = rememberCPSNavigator(navController = rememberNavController())
 
-    NavigationAndStatusBars(
-        currentScreen = navigator.currentScreen
-    )
+    navigator.ColorizeNavAndStatusBars()
 
     CPSScaffold(
         cpsViewModels = cpsViewModels,
@@ -185,22 +177,6 @@ private fun CPSScaffold(
             )
         }
     }
-}
-
-@Composable
-private fun NavigationAndStatusBars(
-    currentScreen: Screen?,
-    systemUiController: SystemUiController = rememberSystemUiController()
-) {
-    systemUiController.setNavigationBarColor(
-        color = cpsColors.backgroundNavigation,
-        darkIcons = MaterialTheme.colors.isLight
-    )
-
-    CPSStatusBar(
-        systemUiController = systemUiController,
-        currentScreen = currentScreen
-    )
 }
 
 class CPSViewModels(
