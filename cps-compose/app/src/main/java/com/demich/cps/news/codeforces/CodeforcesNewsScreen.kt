@@ -45,13 +45,8 @@ fun CodeforcesNewsScreen(
 
     val pagerState = rememberPagerState()
 
-    val selectedTab: CodeforcesTitle by remember {
-        derivedStateOf {
-            tabs.value[pagerState.currentPage]
-        }
-    }
-
-    LaunchedEffect(key1 = selectedTab) {
+    LaunchedEffect(key1 = pagerState.currentPage) {
+        val selectedTab = tabs.value[pagerState.currentPage]
         navigator.setSubtitle("news", "codeforces", selectedTab.name)
     }
 
