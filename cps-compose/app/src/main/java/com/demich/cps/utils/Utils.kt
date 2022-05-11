@@ -43,6 +43,7 @@ fun cpsHttpClient(
     json: Boolean = true,
     block: HttpClientConfig<*>.() -> Unit
 ) = HttpClient {
+    expectSuccess = true
     install(HttpTimeout) {
         connectTimeoutMillis = 15.seconds.inWholeMilliseconds
         requestTimeoutMillis = 30.seconds.inWholeMilliseconds
