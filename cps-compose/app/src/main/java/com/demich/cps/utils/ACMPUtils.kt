@@ -32,10 +32,7 @@ object ACMPApi {
 
     suspend fun getUsersSearch(str: String): String {
         return client.getAs(urls.main + "/index.asp?main=rating") {
-            url {
-                //TODO: parameters.urlEncodingOption = UrlEncodingOption.KEY_ONLY
-                parameters.append("str", URLEncoder.encode(str, windows1251.name()))
-            }
+            url.encodedParameters.append("str", URLEncoder.encode(str, windows1251.name()))
         }
     }
 
