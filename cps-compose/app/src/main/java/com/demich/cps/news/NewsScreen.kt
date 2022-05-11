@@ -1,94 +1,49 @@
 package com.demich.cps.news
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.TabPosition
+import androidx.compose.material.TabRow
+import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
-import com.demich.cps.contests.Contest
-import com.demich.cps.news.codeforces.CodeforcesTitle
-import com.demich.cps.ui.*
+import com.demich.cps.news.codeforces.CodeforcesNewsScreen
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.CPSMenuBuilder
+import com.demich.cps.ui.CPSNavigator
+import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.pagerTabIndicatorOffset
 
 @Composable
 fun NewsScreen(navigator: CPSNavigator) {
-    TabsHeader(
-        navigator = navigator,
-        modifier = Modifier.fillMaxWidth()
-    )
+    CodeforcesNewsScreen(navigator = navigator)
 }
 
+
+@OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun TabsHeader(
-    navigator: CPSNavigator,
-    modifier: Modifier = Modifier
-) {
-    var selected by rememberSaveable { mutableStateOf(CodeforcesTitle.MAIN) }
-
-    LaunchedEffect(key1 = selected) {
-        navigator.setSubtitle("news", "codeforces", selected.name)
-    }
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-    ) {
-        Icon(
-            painter = platformIconPainter(platform = Contest.Platform.codeforces),
-            contentDescription = null,
-            tint = cpsColors.textColor,
-            modifier = Modifier.padding(start = 8.dp, end = 6.dp)
-        )
-        NewsTabRow(
-            modifier = Modifier.height(46.dp),
-            selectedIndex = selected.ordinal,
-        ) {
-            CodeforcesTitle.values().forEach { title ->
-                Tab(
-                    selected = title == selected,
-                    selectedContentColor = cpsColors.textColor,
-                    unselectedContentColor = cpsColors.textColorAdditional,
-                    onClick = {
-                        selected = title
-                    }
-                ) {
-                    Text(
-                        text = title.name,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.075.em
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun NewsTabRow(
+fun NewsTabRow(
     modifier: Modifier = Modifier,
-    selectedIndex: Int,
+    pagerState: PagerState,
     tabs: @Composable () -> Unit
 ) {
     TabRow(
-        modifier = modifier.fillMaxWidth(),
-        selectedTabIndex = selectedIndex,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(45.dp),
+        selectedTabIndex = pagerState.currentPage,
         backgroundColor = cpsColors.background,
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
-                modifier = Modifier.tabIndicatorOffset(tabPositions[selectedIndex]),
+                modifier = Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
                 color = cpsColors.colorAccent
             )
         },
