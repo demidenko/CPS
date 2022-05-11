@@ -16,18 +16,6 @@ enum class ScreenTypes(
     develop("develop")
 }
 
-val Screen.subtitle: String
-    get() = when (this) {
-        Screen.Accounts -> listOf("accounts")
-        is Screen.AccountExpanded -> listOf("accounts", type.name)
-        is Screen.AccountSettings -> listOf("accounts", type.name, "settings")
-        Screen.Contests -> listOf("contests")
-        Screen.ContestsSettings -> listOf("contests", "settings")
-        Screen.Development -> listOf("develop")
-        Screen.News -> listOf("news")
-        Screen.NewsSettings -> listOf("news", "settings")
-    }.joinToString(prefix = "::", separator = ".")
-
 sealed class Screen(
     val screenType: ScreenTypes,
     val rootScreenType: ScreenTypes = screenType,
@@ -47,8 +35,8 @@ sealed class Screen(
 
     data class AccountSettings(val type: AccountManagers)
         : Screen(ScreenTypes.accountSettings, rootScreenType = ScreenTypes.accounts, enableBottomBar = false) {
-        override fun createPath(pattern: String) = pattern.replace("{manager}", type.name)
-    }
+            override fun createPath(pattern: String) = pattern.replace("{manager}", type.name)
+        }
 
     object News: Screen(ScreenTypes.news)
     object NewsSettings: Screen(ScreenTypes.newsSettings, rootScreenType = ScreenTypes.news, enableBottomBar = false)

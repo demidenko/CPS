@@ -6,11 +6,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +36,10 @@ private fun TabsHeader(
     modifier: Modifier = Modifier
 ) {
     var selected by rememberSaveable { mutableStateOf(CodeforcesTitle.MAIN) }
+
+    LaunchedEffect(key1 = selected) {
+        navigator.setSubtitle("news", "codeforces", selected.name)
+    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -99,8 +100,9 @@ fun NewsSettingsScreen() {
 
 }
 
-fun newsBottomBarBuilder()
-: AdditionalBottomBarBuilder = {
+fun newsBottomBarBuilder(
+
+): AdditionalBottomBarBuilder = {
     CPSReloadingButton(loadingStatus = LoadingStatus.PENDING) {
 
     }
@@ -112,7 +114,5 @@ fun newsMenuBuilder(
     CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings) {
         navigator.navigateTo(Screen.NewsSettings)
     }
-    CPSDropdownMenuItem(title = "Follow List", icon = CPSIcons.Accounts) {
-        //TODO Open FollowList
-    }
+    //CPSDropdownMenuItem(title = "Follow List", icon = CPSIcons.Accounts) { }
 }

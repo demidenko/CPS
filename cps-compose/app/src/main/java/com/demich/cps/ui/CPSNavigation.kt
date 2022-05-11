@@ -11,7 +11,6 @@ import com.demich.cps.utils.context
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 
 @Composable
@@ -21,24 +20,20 @@ fun rememberCPSNavigator(
     val subtitleState = remember { mutableStateOf("") }
 
     val currentScreenState: State<Screen?>
-        = remember(key1 = navController, key2 = subtitleState) {
-            navController.currentBackStackEntryFlow
-                .map { it.getScreen() }
-                .onEach { subtitleState.value = it.subtitle }
+        = remember(navController) {
+            navController.currentBackStackEntryFlow.map { it.getScreen() }
         }.collectAsState(initial = null)
 
     val menuBuilderState = remember { mutableStateOf<CPSMenuBuilder?>(null) }
     val bottomBarBuilderState = remember { mutableStateOf<AdditionalBottomBarBuilder?>(null) }
 
-    return remember(currentScreenState, menuBuilderState, bottomBarBuilderState) {
-        CPSNavigator(
-            navController = navController,
-            currentScreenState = currentScreenState,
-            subtitleState = subtitleState,
-            menuBuilderState = menuBuilderState,
-            bottomBarBuilderState = bottomBarBuilderState
-        )
-    }
+    return CPSNavigator(
+        navController = navController,
+        currentScreenState = currentScreenState,
+        subtitleState = subtitleState,
+        menuBuilderState = menuBuilderState,
+        bottomBarBuilderState = bottomBarBuilderState
+    )
 }
 
 @Stable
@@ -53,6 +48,10 @@ class CPSNavigator(
     val subtitle: String
         get() = subtitleState.value
 
+    fun setSubtitle(vararg s: String) {
+        subtitleState.value = s.joinToString(prefix = "::", separator = ".") { it.lowercase() }
+    }
+
     val currentScreen: Screen?
         get() = currentScreenState.value
 
@@ -66,7 +65,7 @@ class CPSNavigator(
         if (screen.rootScreenType == currentScreen?.rootScreenType) {
             if (screen == currentScreen) {
                 //same screen
-                subtitleState.value = screen.subtitle
+                //subtitleState.value = screen.subtitle
             } else {
                 navController.navigate(route = screen.routePath)
             }
@@ -93,14 +92,14 @@ class CPSNavigator(
     ) {
         var menu: CPSMenuBuilder?
             get() = menuBuilderState.value
-            set(value) { if (screen == currentScreenState.value) menuBuilderState.value = value }
+            set(value) { if (screen == currentScreen) menuBuilderState.value = value }
 
         var bottomBar: AdditionalBottomBarBuilder?
             get() = bottomBarBuilderState.value
-            set(value) { if (screen == currentScreenState.value) bottomBarBuilderState.value = value }
+            set(value) { if (screen == currentScreen) bottomBarBuilderState.value = value }
 
-        val menuSetter get() = menuBuilderState.component2()
-        val bottomBarSetter get() = bottomBarBuilderState.component2()
+        val menuSetter: (CPSMenuBuilder) -> Unit get() = { menu = it }
+        val bottomBarSetter: (AdditionalBottomBarBuilder) -> Unit get() = { bottomBar = it }
     }
 
     @Composable

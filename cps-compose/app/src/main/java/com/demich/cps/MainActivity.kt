@@ -102,6 +102,9 @@ private fun CPSScaffold(
                     cpsViewModels = cpsViewModels,
                     reorderEnabledState = reorderEnabledState
                 )
+                LaunchedEffect(Unit) {
+                    navigator.setSubtitle("accounts")
+                }
             }
             cpsComposable(ScreenTypes.accountExpanded.route) { holder ->
                 val type = (holder.screen as Screen.AccountExpanded).type
@@ -121,10 +124,16 @@ private fun CPSScaffold(
                     navigator = navigator,
                     onShowDeleteDialog = { showDeleteDialog = true }
                 )
+                LaunchedEffect(Unit) {
+                    navigator.setSubtitle("accounts", type.name)
+                }
             }
             cpsComposable(ScreenTypes.accountSettings.route) { holder ->
                 val type = (holder.screen as Screen.AccountSettings).type
                 AccountSettingsScreen(type)
+                LaunchedEffect(Unit) {
+                    navigator.setSubtitle("accounts", type.name, "settings")
+                }
             }
 
             cpsComposable(ScreenTypes.news.route) { holder ->
@@ -134,6 +143,9 @@ private fun CPSScaffold(
             }
             cpsComposable(ScreenTypes.newsSettings.route) {
                 NewsSettingsScreen()
+                LaunchedEffect(Unit) {
+                    navigator.setSubtitle("news", "settings")
+                }
             }
 
             cpsComposable(ScreenTypes.contests.route) { holder ->
@@ -150,14 +162,23 @@ private fun CPSScaffold(
                     navigator = navigator,
                     contestsViewModel = cpsViewModels.contestsViewModel
                 )
+                LaunchedEffect(Unit) {
+                    navigator.setSubtitle("contests")
+                }
             }
             cpsComposable(ScreenTypes.contestsSettings.route) {
                 ContestsSettingsScreen()
+                LaunchedEffect(Unit) {
+                    navigator.setSubtitle("contests", "settings")
+                }
             }
 
             cpsComposable(ScreenTypes.develop.route) { holder ->
                 DevelopScreen()
                 holder.bottomBar = developAdditionalBottomBarBuilder(cpsViewModels.progressBarsViewModel)
+                LaunchedEffect(Unit) {
+                    navigator.setSubtitle("develop")
+                }
             }
         }
     }
