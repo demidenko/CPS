@@ -5,9 +5,11 @@ import android.text.format.DateFormat
 import android.widget.Toast
 import com.demich.cps.makeIntentOpenUrl
 import io.ktor.client.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
@@ -33,7 +35,9 @@ fun Context.showToast(title: String) = Toast.makeText(this, title, Toast.LENGTH_
 
 fun Context.openUrlInBrowser(url: String) = startActivity(makeIntentOpenUrl(url))
 
-val jsonCPS = Json { ignoreUnknownKeys = true }
+val jsonCPS = Json {
+    ignoreUnknownKeys = true
+}
 
 fun cpsHttpClient(
     json: Boolean = true,
@@ -44,12 +48,17 @@ fun cpsHttpClient(
         requestTimeoutMillis = 30.seconds.inWholeMilliseconds
     }
     if (json) {
-        install(JsonFeature) {
-            serializer = KotlinxSerializer(jsonCPS)
+        install(ContentNegotiation) {
+            json(json = jsonCPS)
         }
     }
     block()
 }
+
+suspend inline fun<reified T> HttpClient.getAs(
+    urlString: String,
+    block: HttpRequestBuilder.() -> Unit = {}
+): T = this.get(urlString = urlString, block = block).body()
 
 fun signedToString(x: Int): String = if (x > 0) "+$x" else "$x"
 

@@ -8,10 +8,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallRatedAccountPanel
@@ -22,7 +20,7 @@ import com.demich.cps.utils.DmojApi
 import com.demich.cps.utils.DmojRatingChange
 import com.demich.cps.utils.append
 import com.demich.cps.utils.jsonCPS
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.http.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable

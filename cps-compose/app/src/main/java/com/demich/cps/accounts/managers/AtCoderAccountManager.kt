@@ -18,7 +18,7 @@ import com.demich.cps.ui.RatingLoadButton
 import com.demich.cps.ui.SwitchSettingsItem
 import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.utils.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString

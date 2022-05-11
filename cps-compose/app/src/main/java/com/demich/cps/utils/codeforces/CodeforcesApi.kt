@@ -1,11 +1,8 @@
 package com.demich.cps.utils.codeforces
 
 import com.demich.cps.accounts.managers.NOT_RATED
-import com.demich.cps.utils.DurationAsSecondsSerializer
-import com.demich.cps.utils.InstantAsSecondsSerializer
-import com.demich.cps.utils.cpsHttpClient
-import com.demich.cps.utils.jsonCPS
-import io.ktor.client.features.*
+import com.demich.cps.utils.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -21,13 +18,13 @@ import kotlin.time.Duration
 object CodeforcesApi {
     private val client = cpsHttpClient {
         HttpResponseValidator {
-            handleResponseException { exception ->
-                if (exception !is ResponseException) return@handleResponseException
+            handleResponseExceptionWithRequest { exception, _ ->
+                if (exception !is ResponseException) return@handleResponseExceptionWithRequest
                 val response = exception.response
                 if(response.status == HttpStatusCode.ServiceUnavailable) {
                     throw CodeforcesAPICallLimitExceeded()
                 }
-                throw jsonCPS.decodeFromString<CodeforcesAPIErrorResponse>(response.readText())
+                throw jsonCPS.decodeFromString<CodeforcesAPIErrorResponse>(response.bodyAsText())
             }
         }
     }
@@ -45,7 +42,7 @@ object CodeforcesApi {
         crossinline block: HttpRequestBuilder.() -> Unit = {}
     ): T {
         val callGet = suspend {
-            client.get<CodeforcesAPIResponse<T>>(urlString = urlString, block = block)
+            client.getAs<CodeforcesAPIResponse<T>>(urlString = urlString, block = block)
         }
         (10 downTo 1).forEach { iteration ->
             kotlin.runCatching {
@@ -87,7 +84,7 @@ object CodeforcesApi {
         block: HttpRequestBuilder.() -> Unit = {}
     ): String? {
         val callGet = suspend {
-            client.get<String>(urlString) {
+            client.getAs<String>(urlString) {
                 header("Cookie", "RCPC=$RCPC")
                 block()
             }

@@ -1,7 +1,7 @@
 package com.demich.cps.utils
 
-import io.ktor.client.features.*
-import io.ktor.client.features.cookies.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.cookies.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -17,10 +17,10 @@ object CodeChefApi {
             storage = AcceptAllCookiesStorage()
         }
         HttpResponseValidator {
-            handleResponseException { exception ->
-                if (exception !is ResponseException) return@handleResponseException
+            handleResponseExceptionWithRequest { exception, _ ->
+                if (exception !is ResponseException) return@handleResponseExceptionWithRequest
                 val response = exception.response
-                val text = response.readText()
+                val text = response.bodyAsText()
                 if (response.status == HttpStatusCode.fromValue(403) && text == "{\"status\":\"apierror\",\"message\":\"Something went wrong\"}") {
                     throw CodeChefCSRFTokenExpiredException()
                 }
@@ -39,7 +39,7 @@ object CodeChefApi {
         suspend operator fun invoke(): String {
             val d = tokenDeferred ?: client.async {
                 println("codechef x-csrf-token start recalc...")
-                val page = client.get<String>("${urls.main}/ratings/all")
+                val page = client.getAs<String>("${urls.main}/ratings/all")
                 var i = page.indexOf("window.csrfToken=")
                 require(i != -1)
                 i = page.indexOf('"', i)
@@ -57,7 +57,7 @@ object CodeChefApi {
         crossinline block: HttpRequestBuilder.() -> Unit = {}
     ): T {
         val callGet = suspend {
-            client.get<T>(urlString) {
+            client.getAs<T>(urlString) {
                 header("x-csrf-token", CSRFToken())
                 block()
             }
@@ -73,7 +73,7 @@ object CodeChefApi {
     }
 
     suspend fun getUserPage(handle: String): String {
-        return client.get(urls.user(handle))
+        return client.getAs(urls.user(handle))
     }
 
     suspend fun getSuggestions(str: String): CodeChefSearchResult {

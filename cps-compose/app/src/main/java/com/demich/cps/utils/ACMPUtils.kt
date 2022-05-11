@@ -1,10 +1,8 @@
 package com.demich.cps.utils
 
 import io.ktor.client.call.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
@@ -20,22 +18,22 @@ object ACMPApi {
     class ACMPPageNotFoundException : Throwable()
 
     suspend fun getMainPage(): String {
-        return client.get(urls.main)
+        return client.getAs(urls.main)
     }
 
     suspend fun getUserPage(id: Int): String {
-        val response = client.get<HttpResponse>(urls.user(id))
+        val response = client.get(urls.user(id))
         with(response.call) {
             //acmp redirects to main page if user not found
             if (request.url.parameters.isEmpty()) throw ACMPPageNotFoundException()
-            return receive()
+            return body()
         }
     }
 
     suspend fun getUsersSearch(str: String): String {
-        return client.get(urls.main + "/index.asp?main=rating") {
+        return client.getAs(urls.main + "/index.asp?main=rating") {
             url {
-                parameters.urlEncodingOption = UrlEncodingOption.KEY_ONLY
+                //TODO: parameters.urlEncodingOption = UrlEncodingOption.KEY_ONLY
                 parameters.append("str", URLEncoder.encode(str, windows1251.name()))
             }
         }

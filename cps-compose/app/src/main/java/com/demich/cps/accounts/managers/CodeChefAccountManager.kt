@@ -11,7 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.*
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,12 +29,17 @@ import com.demich.cps.utils.CodeChefApi
 import com.demich.cps.utils.CodeChefRatingChange
 import com.demich.cps.utils.append
 import com.demich.cps.utils.jsonCPS
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.http.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import org.jsoup.Jsoup
+import kotlin.text.contains
+import kotlin.text.indexOf
+import kotlin.text.split
+import kotlin.text.substring
+import kotlin.text.toInt
 
 @Serializable
 data class CodeChefUserInfo(

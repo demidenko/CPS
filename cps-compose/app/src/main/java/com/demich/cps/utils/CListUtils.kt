@@ -2,6 +2,7 @@ package com.demich.cps.utils
 
 import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.contests.Contest
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -55,11 +56,11 @@ object CListApi {
     private val client = cpsHttpClient {  }
 
     suspend fun getUserPage(login: String): String {
-        return client.get(urls.user(login))
+        return client.getAs(urls.user(login))
     }
 
     suspend fun getUsersSearchPage(str: String): String {
-        return client.get(urls.main + "/coders") {
+        return client.getAs(urls.main + "/coders") {
             parameter("search", str)
         }
     }
@@ -78,7 +79,7 @@ object CListApi {
             }
         }
         if (resourceIds.isEmpty()) return emptyList()
-        return client.get<ClistApiResponse<ClistContest>>("https://clist.by/api/v2/contest") {
+        return client.getAs<ClistApiResponse<ClistContest>>("https://clist.by/api/v2/contest") {
             parameter("format", "json")
             parameter("username", apiAccess.login)
             parameter("api_key", apiAccess.key)
@@ -91,7 +92,7 @@ object CListApi {
     suspend fun getResources(
         apiAccess: ApiAccess
     ): List<ClistResource> {
-        return client.get<ClistApiResponse<ClistResource>>(urlString = "https://clist.by/api/v2/resource") {
+        return client.getAs<ClistApiResponse<ClistResource>>(urlString = "https://clist.by/api/v2/resource") {
             parameter("format", "json")
             parameter("username", apiAccess.login)
             parameter("api_key", apiAccess.key)

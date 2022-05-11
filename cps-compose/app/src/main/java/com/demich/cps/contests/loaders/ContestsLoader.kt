@@ -2,9 +2,9 @@ package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.settings.ContestDateConstraints
-import io.ktor.client.features.*
+import io.ktor.client.network.sockets.*
+import io.ktor.client.plugins.*
 import io.ktor.http.*
-import io.ktor.network.sockets.*
 import java.net.SocketException
 import java.net.UnknownHostException
 
