@@ -351,7 +351,7 @@ fun ContestPlatformIcon(
     color: Color
 ) {
     Icon(
-        painter = platformPainter(platform),
+        painter = platformIconPainter(platform),
         modifier = modifier.size(with(LocalDensity.current) { size.toDp() }),
         tint = color,
         contentDescription = null

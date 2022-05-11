@@ -46,21 +46,23 @@ private fun TabsHeader(
         modifier = modifier
     ) {
         Icon(
-            painter = platformPainter(platform = Contest.Platform.codeforces),
+            painter = platformIconPainter(platform = Contest.Platform.codeforces),
             contentDescription = null,
             tint = cpsColors.textColor,
             modifier = Modifier.padding(start = 8.dp, end = 6.dp)
         )
         NewsTabRow(
-            modifier = Modifier.height(48.dp),
+            modifier = Modifier.height(46.dp),
             selectedIndex = selected.ordinal,
         ) {
             CodeforcesTitle.values().forEach { title ->
                 Tab(
                     selected = title == selected,
-                    onClick = { selected = title },
                     selectedContentColor = cpsColors.textColor,
-                    unselectedContentColor = cpsColors.textColorAdditional
+                    unselectedContentColor = cpsColors.textColorAdditional,
+                    onClick = {
+                        selected = title
+                    }
                 ) {
                     Text(
                         text = title.name,

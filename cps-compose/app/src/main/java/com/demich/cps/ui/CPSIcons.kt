@@ -50,7 +50,7 @@ object CPSIcons {
 
 
 @Composable
-fun platformPainter(platform: Contest.Platform): Painter {
+fun platformIconPainter(platform: Contest.Platform): Painter {
     val iconId = when (platform) {
         Contest.Platform.codeforces -> R.drawable.ic_logo_codeforces
         Contest.Platform.atcoder -> R.drawable.ic_logo_atcoder

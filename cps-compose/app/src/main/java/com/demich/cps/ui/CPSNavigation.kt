@@ -48,8 +48,8 @@ class CPSNavigator(
     val subtitle: String
         get() = subtitleState.value
 
-    fun setSubtitle(vararg s: String) {
-        subtitleState.value = s.joinToString(prefix = "::", separator = ".") { it.lowercase() }
+    fun setSubtitle(vararg words: String) {
+        subtitleState.value = words.joinToString(prefix = "::", separator = ".") { it.lowercase() }
     }
 
     val currentScreen: Screen?
