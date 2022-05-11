@@ -3,7 +3,6 @@ package com.demich.cps.ui
 import androidx.compose.animation.*
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,13 +15,13 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CPSDataStoreItem
+import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.launch
 
@@ -152,14 +151,29 @@ fun ExpandableSettingsItem(
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     SettingsItem(
-        modifier = Modifier.clickable(enabled = !expanded) { expanded = true }
+        modifier = Modifier.clickableNoRipple(enabled = !expanded) { expanded = true }
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
+            AnimatedVisibility(
+                visible = expanded,
+                enter = fadeIn(animationSpec = snap()),
+                exit = fadeOut(),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(horizontal = 10.dp, vertical = 4.dp)
+            ) {
+                Icon(
+                    imageVector = CPSIcons.Collapse,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
             Column {
                 Text(
                     text = title,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.fillMaxWidth().clickableNoRipple { expanded = !expanded }
                 )
                 AnimatedContent(
                     targetState = expanded,
@@ -177,25 +191,7 @@ fun ExpandableSettingsItem(
                     }
                 }
             }
-            AnimatedVisibility(
-                visible = expanded,
-                enter = fadeIn(animationSpec = snap()),
-                exit = fadeOut(),
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-            ) {
-                Icon(
-                    imageVector = CPSIcons.Collapse,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .clickable(enabled = expanded) {
-                            expanded = false
-                        }
-                )
-            }
+
         }
     }
 }

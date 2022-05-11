@@ -1,8 +1,12 @@
 package com.demich.cps.utils
 
 import android.content.Context
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -79,12 +83,24 @@ fun AnnotatedString.Builder.append(
 ) {
     append(
         AnnotatedString(
-        text = text,
-        spanStyle = SpanStyle(
-            color = color,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle
+            text = text,
+            spanStyle = SpanStyle(
+                color = color,
+                fontWeight = fontWeight,
+                fontStyle = fontStyle
+            )
         )
     )
+}
+
+fun Modifier.clickableNoRipple(
+    enabled: Boolean = true,
+    onClick: () -> Unit
+) = composed {
+    this.clickable(
+        enabled = enabled,
+        indication = null,
+        interactionSource = remember { MutableInteractionSource() },
+        onClick = onClick
     )
 }
