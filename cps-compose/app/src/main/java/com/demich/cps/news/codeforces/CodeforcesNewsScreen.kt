@@ -1,13 +1,14 @@
 package com.demich.cps.news.codeforces
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
-import androidx.compose.material.Tab
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -22,6 +23,8 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
+import kotlin.math.max
+import kotlin.math.min
 
 enum class CodeforcesTitle {
     MAIN, TOP, RECENT, LOST
@@ -105,26 +108,48 @@ private fun TabsHeader(
         )
         NewsTabRow(pagerState = pagerState) {
             tabs.value.forEachIndexed { index, title ->
-                val selected = index == pagerState.currentPage
-                Tab(
-                    selected = selected,
-                    //TODO: lerp color based on pagerState.currentPageOffset
-                    selectedContentColor = selectedTextColor,
-                    unselectedContentColor = unselectedTextColor,
-                    onClick = {
-                        scope.launch {
-                            pagerState.scrollToPage(index)
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                        .clickable {
+                            scope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
                         }
-                    }
                 ) {
                     Text(
                         text = title.name,
+                        color = tabColor(
+                            index = index,
+                            selectedIndex = pagerState.currentPage,
+                            selectedOffset = pagerState.currentPageOffset,
+                            selectedTextColor = selectedTextColor,
+                            unselectedTextColor = unselectedTextColor
+                        ),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.075.em
+                        letterSpacing = 0.075.em,
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
             }
         }
     }
+}
+
+private fun tabColor(
+    index: Int,
+    selectedIndex: Int,
+    selectedOffset: Float,
+    selectedTextColor: Color,
+    unselectedTextColor: Color
+): Color {
+    val l: Float = selectedIndex + selectedOffset
+    val r: Float = l + 1
+    val i = index.toFloat()
+    if (i <= r && l <= i + 1) return lerp(
+        start = unselectedTextColor,
+        stop = selectedTextColor,
+        fraction = min(r, i+1) - max(l, i)
+    )
+    return unselectedTextColor
 }
