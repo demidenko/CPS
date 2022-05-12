@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalPagerApi::class)
+
 package com.demich.cps.news.codeforces
 
 import androidx.compose.foundation.layout.*
@@ -34,7 +36,6 @@ val LocalCodeforcesAccountManager = compositionLocalOf<CodeforcesAccountManager>
     throw IllegalAccessError()
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun CodeforcesNewsScreen(
     navigator: CPSNavigator,
@@ -43,8 +44,6 @@ fun CodeforcesNewsScreen(
 
     val context = context
     val manager = remember { CodeforcesAccountManager(context) }
-
-
     val settings = remember { context.settingsNews }
 
     val tabs = remember {
@@ -91,30 +90,28 @@ fun CodeforcesNewsScreen(
             ) { index ->
                 val modifier = Modifier.fillMaxSize()
                 when (tabs.value[index]) {
-                    CodeforcesTitle.MAIN -> CodeforcesNewsMainContent(
+                    CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(
                         modifier = modifier,
                         viewModel = viewModel,
                         locale = locale
                     )
-                    CodeforcesTitle.TOP -> CodeforcesNewsTopContent(
+                    CodeforcesTitle.TOP -> CodeforcesNewsTopPage(
                         modifier = modifier,
                         viewModel = viewModel,
                         locale = locale
                     )
-                    CodeforcesTitle.RECENT -> CodeforcesNewsRecentContent()
-                    CodeforcesTitle.LOST -> CodeforcesNewsLostContent()
+                    CodeforcesTitle.RECENT -> CodeforcesNewsRecentPage()
+                    CodeforcesTitle.LOST -> CodeforcesNewsLostPage()
                 }
             }
         }
     }
 
-
-
 }
 
 
 @Composable
-fun CodeforcesNewsMainContent(
+private fun CodeforcesNewsMainPage(
     modifier: Modifier = Modifier,
     viewModel: CodeforcesNewsViewModel,
     locale: CodeforcesLocale
@@ -136,7 +133,7 @@ fun CodeforcesNewsMainContent(
 }
 
 @Composable
-fun CodeforcesNewsTopContent(
+private fun CodeforcesNewsTopPage(
     modifier: Modifier = Modifier,
     viewModel: CodeforcesNewsViewModel,
     locale: CodeforcesLocale
@@ -158,17 +155,16 @@ fun CodeforcesNewsTopContent(
 }
 
 @Composable
-fun CodeforcesNewsRecentContent() {
+private fun CodeforcesNewsRecentPage() {
 
 }
 
 @Composable
-fun CodeforcesNewsLostContent() {
+private fun CodeforcesNewsLostPage() {
 
 }
 
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun TabsHeader(
     tabs: State<List<CodeforcesTitle>>,
