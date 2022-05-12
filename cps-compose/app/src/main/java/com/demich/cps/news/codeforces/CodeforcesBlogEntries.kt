@@ -1,5 +1,6 @@
 package com.demich.cps.news.codeforces
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,18 +17,18 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.append
+import com.demich.cps.utils.*
+import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesUtils
-import com.demich.cps.utils.timeAgo
 
 @Composable
 fun CodeforcesBlogEntries(
     blogEntriesState: State<List<CodeforcesBlogEntry>>,
     modifier: Modifier = Modifier
 ) {
+    val context = context
     LazyColumn(
         modifier = modifier
     ) {
@@ -35,6 +36,7 @@ fun CodeforcesBlogEntries(
             BlogEntryInfo(
                 blogEntry = it,
                 modifier = Modifier
+                    .clickable { context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(blogEntryId = it.id)) }
                     .padding(horizontal = 3.dp)
                     .padding(bottom = 4.dp, top = 1.dp)
                     .fillMaxWidth()

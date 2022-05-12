@@ -139,9 +139,9 @@ object CodeforcesApi {
 
         fun user(handle: String) = "$main/profile/$handle"
 
-        fun blog(blogId: Int) = "$main/blog/entry/$blogId"
+        fun blogEntry(blogEntryId: Int) = "$main/blog/entry/$blogEntryId"
 
-        fun comment(blogId: Int, commentId: Long) = blog(blogId) + "#comment-$commentId"
+        fun comment(blogEntryId: Int, commentId: Long) = blogEntry(blogEntryId) + "#comment-$commentId"
 
         fun contest(contestId: Int) = "$main/contest/$contestId"
 
@@ -176,9 +176,9 @@ data class CodeforcesAPIErrorResponse(
         return cut
     }
 
-    fun isBlogNotFound(blogId: Int): Boolean {
-        if(comment == "blogEntryId: Blog entry with id $blogId not found") return true
-        if(comment == "Blog entry with id $blogId not found") return true
+    fun isBlogEntryNotFound(blogEntryId: Int): Boolean {
+        if(comment == "blogEntryId: Blog entry with id $blogEntryId not found") return true
+        if(comment == "Blog entry with id $blogEntryId not found") return true
         return false
     }
 

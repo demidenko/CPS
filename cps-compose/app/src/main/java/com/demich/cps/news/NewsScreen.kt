@@ -15,7 +15,7 @@ import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.context
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 @Composable
 fun NewsScreen(
@@ -40,24 +40,27 @@ fun newsBottomBarBuilder(
     val context = context
     val scope = rememberCoroutineScope()
 
+    val titles = remember {
+        listOf(
+            CodeforcesTitle.MAIN,
+            CodeforcesTitle.TOP,
+            //TODO: CodeforcesTitle.RECENT
+        )
+    }
+
     val loadingStatus = remember {
         derivedStateOf {
-            listOf(
-                CodeforcesTitle.MAIN,
-                CodeforcesTitle.TOP
-            ).map {
+            titles.map {
                 newsViewModel.pageLoadingStatusState(it).value
             }.combine()
         }
     }
 
     CPSReloadingButton(loadingStatus = loadingStatus.value) {
-        newsViewModel.reload(
-            title = CodeforcesTitle.MAIN,
-            locale = runBlocking {
-                context.settingsNews.codeforcesLocale()
-            }
-        )
+        scope.launch {
+            val locale = context.settingsNews.codeforcesLocale()
+            titles.forEach { title -> newsViewModel.reload(title, locale) }
+        }
     }
 }
 

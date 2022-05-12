@@ -60,6 +60,7 @@ fun NewsTab(
     Box(
         modifier = modifier.fillMaxSize()
     ) {
+        //TODO: show error somehow
         Text(
             text = title,
             color = tabColor(
