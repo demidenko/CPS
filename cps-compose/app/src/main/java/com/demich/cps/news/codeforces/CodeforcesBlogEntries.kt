@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSIcons
@@ -29,19 +30,32 @@ fun CodeforcesBlogEntries(
     modifier: Modifier = Modifier
 ) {
     val context = context
-    LazyColumn(
-        modifier = modifier
-    ) {
-        items(items = blogEntriesState.value, key = { it.id }) {
-            BlogEntryInfo(
-                blogEntry = it,
-                modifier = Modifier
-                    .clickable { context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(blogEntryId = it.id)) }
-                    .padding(horizontal = 3.dp)
-                    .padding(bottom = 4.dp, top = 1.dp)
-                    .fillMaxWidth()
+    if (blogEntriesState.value.isEmpty()) {
+        Box(
+            modifier = modifier,
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "List is empty",
+                color = cpsColors.contentAdditional,
+                fontWeight = FontWeight.Medium
             )
-            Divider()
+        }
+    } else {
+        LazyColumn(
+            modifier = modifier
+        ) {
+            items(items = blogEntriesState.value, key = { it.id }) {
+                BlogEntryInfo(
+                    blogEntry = it,
+                    modifier = Modifier
+                        .clickable { context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(blogEntryId = it.id)) }
+                        .padding(horizontal = 3.dp)
+                        .padding(bottom = 4.dp, top = 1.dp)
+                        .fillMaxWidth()
+                )
+                Divider()
+            }
         }
     }
 }

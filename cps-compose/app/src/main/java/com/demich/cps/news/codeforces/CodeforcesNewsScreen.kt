@@ -32,7 +32,7 @@ enum class CodeforcesTitle {
 }
 
 val LocalCodeforcesAccountManager = compositionLocalOf<CodeforcesAccountManager> {
-    throw IllegalAccessError()
+    throw IllegalAccessException()
 }
 
 @Composable
@@ -82,17 +82,13 @@ fun CodeforcesNewsScreen(
             HorizontalPager(
                 count = tabs.value.size,
                 state = pagerState,
-                key = { tabs.value[it] },
-                modifier = Modifier.fillMaxSize()
+                key = { tabs.value[it] }
             ) { index ->
-                val modifier = Modifier.fillMaxSize()
                 when (tabs.value[index]) {
                     CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(
-                        modifier = modifier,
                         viewModel = viewModel
                     )
                     CodeforcesTitle.TOP -> CodeforcesNewsTopPage(
-                        modifier = modifier,
                         viewModel = viewModel
                     )
                     CodeforcesTitle.RECENT -> CodeforcesNewsRecentPage()
@@ -107,7 +103,6 @@ fun CodeforcesNewsScreen(
 
 @Composable
 private fun CodeforcesNewsMainPage(
-    modifier: Modifier = Modifier,
     viewModel: CodeforcesNewsViewModel
 ) {
     val context = context
@@ -117,18 +112,16 @@ private fun CodeforcesNewsMainPage(
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
         onRefresh = { viewModel.reload(title = CodeforcesTitle.MAIN, context = context) },
-        modifier = modifier
     ) {
         CodeforcesBlogEntries(
             blogEntriesState = blogEntriesState,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxSize()
         )
     }
 }
 
 @Composable
 private fun CodeforcesNewsTopPage(
-    modifier: Modifier = Modifier,
     viewModel: CodeforcesNewsViewModel
 ) {
     val context = context
@@ -138,11 +131,10 @@ private fun CodeforcesNewsTopPage(
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
         onRefresh = { viewModel.reload(title = CodeforcesTitle.TOP, context = context) },
-        modifier = modifier
     ) {
         CodeforcesBlogEntries(
             blogEntriesState = blogEntriesState,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxSize()
         )
     }
 }
