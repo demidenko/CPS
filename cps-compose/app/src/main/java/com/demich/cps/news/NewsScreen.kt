@@ -9,6 +9,7 @@ import com.demich.cps.Screen
 import com.demich.cps.news.codeforces.CodeforcesNewsScreen
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
 import com.demich.cps.news.codeforces.CodeforcesTitle
+import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSNavigator
@@ -28,11 +29,6 @@ fun NewsScreen(
     )
 }
 
-
-@Composable
-fun NewsSettingsScreen() {
-
-}
 
 fun newsBottomBarBuilder(
     newsViewModel: CodeforcesNewsViewModel

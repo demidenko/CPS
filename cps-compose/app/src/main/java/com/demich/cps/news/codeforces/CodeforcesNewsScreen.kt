@@ -11,7 +11,7 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.Contest
 import com.demich.cps.news.NewsTab
 import com.demich.cps.news.NewsTabRow
-import com.demich.cps.news.settingsNews
+import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors

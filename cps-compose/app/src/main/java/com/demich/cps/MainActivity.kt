@@ -22,10 +22,10 @@ import com.demich.cps.contests.contestsBottomBarBuilder
 import com.demich.cps.contests.contestsMenuBuilder
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.news.NewsScreen
-import com.demich.cps.news.NewsSettingsScreen
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
 import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
+import com.demich.cps.news.settings.NewsSettingsScreen
 import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.LocalUseOriginalColors
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn

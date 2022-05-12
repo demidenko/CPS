@@ -1,4 +1,4 @@
-package com.demich.cps.news
+package com.demich.cps.news.settings
 
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore

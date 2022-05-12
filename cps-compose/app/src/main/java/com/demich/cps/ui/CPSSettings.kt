@@ -30,12 +30,12 @@ fun SettingsColumn(
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        content = content,
         modifier = Modifier
             .padding(all = 10.dp)
             .verticalScroll(rememberScrollState())
-            .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        content = content
+            .fillMaxWidth()
     )
 }
 
@@ -56,30 +56,13 @@ fun SettingsItem(
 }
 
 @Composable
-fun SwitchSettingsItem(
-    item: CPSDataStoreItem<Boolean>,
+fun SettingsItem(
+    modifier: Modifier = Modifier,
     title: String,
     description: String = "",
+    trailerContent: @Composable () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-    val checked by rememberCollect { item.flow }
-    SwitchSettingsItem(
-        checked = checked,
-        title = title,
-        description = description
-    ) {
-        scope.launch { item(it) }
-    }
-}
-
-@Composable
-private fun SwitchSettingsItem(
-    checked: Boolean,
-    title: String,
-    description: String = "",
-    onCheckedChange: (Boolean) -> Unit
-) {
-    SettingsItem {
+    SettingsItem(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(
                 modifier = Modifier.weight(1f)
@@ -97,17 +80,50 @@ private fun SwitchSettingsItem(
                     )
                 }
             }
-            Switch(
-                checked = checked,
-                onCheckedChange = onCheckedChange,
-                modifier = Modifier.padding(start = 5.dp),
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = cpsColors.colorAccent
-                )
-            )
+            trailerContent()
         }
     }
 }
+
+@Composable
+fun SettingsSwitchItem(
+    checked: Boolean,
+    title: String,
+    description: String = "",
+    onCheckedChange: (Boolean) -> Unit
+) {
+    SettingsItem(
+        title = title,
+        description = description
+    ) {
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            modifier = Modifier.padding(start = 5.dp),
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = cpsColors.colorAccent
+            )
+        )
+    }
+}
+
+@Composable
+fun SettingsSwitchItem(
+    item: CPSDataStoreItem<Boolean>,
+    title: String,
+    description: String = "",
+) {
+    val scope = rememberCoroutineScope()
+    val checked by rememberCollect { item.flow }
+    SettingsSwitchItem(
+        checked = checked,
+        title = title,
+        description = description
+    ) {
+        scope.launch { item(it) }
+    }
+}
+
 
 @Composable
 fun<T> SettingsItemWithInfo(
@@ -173,7 +189,9 @@ fun ExpandableSettingsItem(
                     text = title,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.fillMaxWidth().clickableNoRipple { expanded = !expanded }
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickableNoRipple { expanded = !expanded }
                 )
                 AnimatedContent(
                     targetState = expanded,

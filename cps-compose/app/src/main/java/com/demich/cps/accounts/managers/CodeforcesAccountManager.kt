@@ -24,7 +24,7 @@ import com.demich.cps.R
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.ui.RatingGraph
 import com.demich.cps.ui.RatingLoadButton
-import com.demich.cps.ui.SwitchSettingsItem
+import com.demich.cps.ui.SettingsSwitchItem
 import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
@@ -226,20 +226,20 @@ class CodeforcesAccountManager(context: Context):
     @Composable
     override fun Settings() {
         val settings = remember { getSettings() }
-        SwitchSettingsItem(
+        SettingsSwitchItem(
             item = settings.observeRating,
             title = "Rating changes observer"
         )
-        SwitchSettingsItem(
+        SettingsSwitchItem(
             item = settings.contestWatchEnabled,
             title = "Contest watcher",
             description = stringResource(id = R.string.cf_contest_watcher_description)
         )
-        SwitchSettingsItem(
+        SettingsSwitchItem(
             item = settings.upsolvingSuggestionsEnabled,
             title = "Upsolving suggestions"
         )
-        SwitchSettingsItem(
+        SettingsSwitchItem(
             item = settings.observeContribution,
             title = "Contribution changes observer"
         )
