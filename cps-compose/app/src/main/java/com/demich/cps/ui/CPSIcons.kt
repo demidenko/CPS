@@ -46,6 +46,7 @@ object CPSIcons {
     val EditList get() = Icons.Default.EditNote
     val SetupLoaders get() = Icons.Default.PermDataSetting
     val Star get() = Icons.Default.Star
+    val Comments get() = Icons.Rounded.Forum
 }
 
 
