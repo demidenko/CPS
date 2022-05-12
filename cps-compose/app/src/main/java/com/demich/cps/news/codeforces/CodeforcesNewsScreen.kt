@@ -68,7 +68,7 @@ fun CodeforcesNewsScreen(
         navigator.setSubtitle("news", "codeforces", selectedTab.name)
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column {
         TabsHeader(
             tabs = tabs,
             pagerState = pagerState,
@@ -82,7 +82,8 @@ fun CodeforcesNewsScreen(
             HorizontalPager(
                 count = tabs.value.size,
                 state = pagerState,
-                key = { tabs.value[it] }
+                key = { tabs.value[it] },
+                modifier = Modifier.fillMaxSize()
             ) { index ->
                 when (tabs.value[index]) {
                     CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(
