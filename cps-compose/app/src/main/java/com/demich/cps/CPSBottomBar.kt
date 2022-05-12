@@ -140,7 +140,7 @@ private fun RowScope.CPSBottomNavigationItem(
     Icon(
         imageVector = icon,
         contentDescription = null,
-        tint = lerp(start = cpsColors.textColor, stop = cpsColors.accent, fraction),
+        tint = lerp(start = cpsColors.content, stop = cpsColors.accent, fraction),
         modifier = Modifier
             .size(lerp(start = 24.dp, stop = 28.dp, fraction))
             .weight(1f)

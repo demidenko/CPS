@@ -90,7 +90,7 @@ private fun PlatformCheckRow(
         ContestPlatformIcon(
             platform = platform,
             size = 28.sp,
-            color = cpsColors.textColor,
+            color = cpsColors.content,
             modifier = Modifier.padding(end = 8.dp)
         )
         MonospacedText(text = platform.name, modifier = Modifier.weight(1f))
@@ -139,7 +139,7 @@ private fun ClistAdditionalRow(
         ContestPlatformIcon(
             platform = Contest.Platform.unknown,
             size = 28.sp,
-            color = cpsColors.textColor,
+            color = cpsColors.content,
             modifier = Modifier.padding(end = 8.dp)
         )
         Column(modifier = Modifier.weight(1f)) {

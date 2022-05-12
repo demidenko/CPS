@@ -62,7 +62,7 @@ fun CPSTopBar(
             content = {
                 CPSIconButton(
                     icon = CPSIcons.More,
-                    color = cpsColors.textColor,
+                    color = cpsColors.content,
                     onClick = { showMenu = true },
                 )
             }
@@ -92,7 +92,7 @@ private fun CPSTitle(
 ) = Column(modifier = modifier) {
     MonospacedText(
         text = "Competitive Programming && Solving",
-        color = cpsColors.textColor,
+        color = cpsColors.content,
         fontSize = fontSize,
         maxLines = 1
     )

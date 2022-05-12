@@ -142,7 +142,7 @@ private fun DurationPickerDialog(
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             textStyle = TextStyle(
-                color = cpsColors.textColor,
+                color = cpsColors.content,
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center
             ),

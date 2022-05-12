@@ -93,7 +93,7 @@ private fun ContestColoredTitle(
             if (brackets.isNotBlank()) append(brackets, color = cpsColors.contentAdditional)
         },
         color = when (phase) {
-            Contest.Phase.BEFORE -> cpsColors.textColor
+            Contest.Phase.BEFORE -> cpsColors.content
             Contest.Phase.RUNNING -> cpsColors.success
             Contest.Phase.FINISHED -> cpsColors.contentAdditional
         },
@@ -192,7 +192,7 @@ private fun ContestExpandedItemHeader(
                 .padding(all = 5.dp)
                 .align(Alignment.Top),
             size = 30.sp,
-            color = if (phase == Contest.Phase.FINISHED) cpsColors.contentAdditional else cpsColors.textColor
+            color = if (phase == Contest.Phase.FINISHED) cpsColors.contentAdditional else cpsColors.content
         )
         ContestColoredTitle(
             contestTitle = contestTitle,

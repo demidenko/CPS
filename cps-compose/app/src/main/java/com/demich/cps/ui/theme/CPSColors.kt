@@ -18,7 +18,7 @@ object cpsColors {
         @Composable
         get() = MaterialTheme.colors.primary
 
-    val textColor: Color
+    val content: Color
         @Composable
         get() = MaterialTheme.colors.onBackground
 

@@ -238,7 +238,7 @@ fun SmallAccountPanelTypeArchive(
             Text(
                 text = title,
                 fontSize = 18.sp,
-                color = cpsColors.textColor,
+                color = cpsColors.content,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -253,7 +253,7 @@ fun SmallAccountPanelTypeArchive(
                     }
                 },
                 fontSize = 14.sp,
-                color = cpsColors.textColor,
+                color = cpsColors.content,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

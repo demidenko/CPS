@@ -21,7 +21,7 @@ fun LoadingContentBox(
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         when (loadingStatus) {
             LoadingStatus.PENDING -> content()
-            LoadingStatus.LOADING -> CircularProgressIndicator(color = cpsColors.textColor, strokeWidth = 3.dp)
+            LoadingStatus.LOADING -> CircularProgressIndicator(color = cpsColors.content, strokeWidth = 3.dp)
             LoadingStatus.FAILED -> {
                 Text(
                     text = failedText,

@@ -51,7 +51,7 @@ fun ClistApiAccessSettingsItem() {
                     if (key.isBlank()) append(" [api-key is empty]", color = cpsColors.errorColor)
                 },
                 fontFamily = FontFamily.Monospace,
-                color = cpsColors.textColor,
+                color = cpsColors.content,
                 fontSize = 13.sp
             )
         }

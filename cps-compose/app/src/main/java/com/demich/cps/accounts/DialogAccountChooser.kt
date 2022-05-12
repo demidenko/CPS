@@ -223,7 +223,7 @@ private fun TextFieldMainIcon(
         ) {
             if (loadingInProgress) {
                 CircularProgressIndicator(
-                    color = cpsColors.textColor,
+                    color = cpsColors.content,
                     modifier = Modifier.size(iconSize),
                     strokeWidth = 3.dp
                 )
@@ -341,7 +341,7 @@ private fun String.toTextFieldValue() = TextFieldValue(text = this, selection = 
 fun<U: UserInfo> makeUserInfoSpan(userInfo: U, manager: AccountManager<U>): AnnotatedString {
     if (userInfo.isEmpty()) return AnnotatedString("")
     return buildAnnotatedString {
-        withStyle(SpanStyle(color = cpsColors.textColor)) {
+        withStyle(SpanStyle(color = cpsColors.content)) {
             when (userInfo.status) {
                 STATUS.OK -> append(manager.makeOKInfoSpan(userInfo))
                 STATUS.NOT_FOUND -> append(text = "User not found", fontStyle = FontStyle.Italic)

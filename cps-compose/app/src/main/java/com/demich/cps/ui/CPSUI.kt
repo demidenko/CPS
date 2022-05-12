@@ -26,7 +26,7 @@ const val buttonOnOffDurationMillis: Int = 800
 @Composable
 fun CPSIconButton(
     icon: ImageVector,
-    color: Color = cpsColors.textColor,
+    color: Color = cpsColors.content,
     enabled: Boolean = true,
     onState: Boolean = enabled,
     modifier: Modifier = Modifier,
@@ -67,13 +67,13 @@ fun CPSReloadingButton(
         if (loadingStatus == LoadingStatus.LOADING) {
             CircularProgressIndicator(
                 modifier = Modifier.size(20.dp),
-                color = cpsColors.textColor,
+                color = cpsColors.content,
                 strokeWidth = 2.dp
             )
         } else {
             Icon(
                 imageVector = CPSIcons.Reload,
-                tint = if (loadingStatus == LoadingStatus.FAILED) cpsColors.errorColor else cpsColors.textColor,
+                tint = if (loadingStatus == LoadingStatus.FAILED) cpsColors.errorColor else cpsColors.content,
                 contentDescription = null,
                 modifier = Modifier.size(28.dp)
             )

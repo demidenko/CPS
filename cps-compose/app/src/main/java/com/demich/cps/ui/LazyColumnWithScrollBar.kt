@@ -30,7 +30,7 @@ fun LazyColumnWithScrollBar(
         modifier = modifier
             .lazyColumnScrollBar(
                 listState = state,
-                scrollBarColor = cpsColors.textColor.copy(alpha = 0.5f),
+                scrollBarColor = cpsColors.content.copy(alpha = 0.5f),
                 scrollBarWidth = 5.dp
             ),
         state = state,

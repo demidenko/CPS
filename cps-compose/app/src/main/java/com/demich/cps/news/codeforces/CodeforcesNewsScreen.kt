@@ -174,7 +174,7 @@ private fun TabsHeader(
     tabs: State<List<CodeforcesTitle>>,
     pagerState: PagerState,
     modifier: Modifier = Modifier,
-    selectedTextColor: Color = cpsColors.textColor,
+    selectedTextColor: Color = cpsColors.content,
     unselectedTextColor: Color = cpsColors.contentAdditional,
 ) {
     val scope = rememberCoroutineScope()
@@ -186,7 +186,7 @@ private fun TabsHeader(
         Icon(
             painter = platformIconPainter(platform = Contest.Platform.codeforces),
             contentDescription = null,
-            tint = cpsColors.textColor,
+            tint = cpsColors.content,
             modifier = Modifier.padding(start = 8.dp, end = 6.dp)
         )
         NewsTabRow(pagerState = pagerState) {
