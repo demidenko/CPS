@@ -1,22 +1,17 @@
 package com.demich.cps.news
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
 import com.demich.cps.news.codeforces.CodeforcesNewsScreen
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
-import com.demich.cps.news.codeforces.CodeforcesTitle
-import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.CPSReloadingButton
-import com.demich.cps.utils.combine
+import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
-import kotlinx.coroutines.launch
 
 @Composable
 fun NewsScreen(
@@ -34,37 +29,23 @@ fun newsBottomBarBuilder(
     newsViewModel: CodeforcesNewsViewModel
 ): AdditionalBottomBarBuilder = {
     val context = context
-    val scope = rememberCoroutineScope()
 
-    val titles = remember {
-        listOf(
-            CodeforcesTitle.MAIN,
-            CodeforcesTitle.TOP,
-            //TODO: CodeforcesTitle.RECENT
-        )
-    }
-
-    val loadingStatus = remember {
-        derivedStateOf {
-            titles.map {
-                newsViewModel.pageLoadingStatusState(it).value
-            }.combine()
-        }
-    }
-
+    val loadingStatus = remember { newsViewModel.combinedLoadingStatusState() }
     CPSReloadingButton(loadingStatus = loadingStatus.value) {
-        scope.launch {
-            val locale = context.settingsNews.codeforcesLocale()
-            titles.forEach { title -> newsViewModel.reload(title, locale) }
-        }
+        newsViewModel.reloadAll(context)
     }
 }
 
 fun newsMenuBuilder(
-    navigator: CPSNavigator
+    navigator: CPSNavigator,
+    newsViewModel: CodeforcesNewsViewModel
 ): CPSMenuBuilder = {
-    CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings) {
-        navigator.navigateTo(Screen.NewsSettings)
-    }
+    val loadingStatus = remember { newsViewModel.combinedLoadingStatusState() }
+    CPSDropdownMenuItem(
+        title = "Settings",
+        icon = CPSIcons.Settings,
+        enabled = loadingStatus.value != LoadingStatus.LOADING,
+        onClick = { navigator.navigateTo(Screen.NewsSettings) }
+    )
     //CPSDropdownMenuItem(title = "Follow List", icon = CPSIcons.Accounts) { }
 }

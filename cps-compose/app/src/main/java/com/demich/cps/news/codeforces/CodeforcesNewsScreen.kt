@@ -18,7 +18,6 @@ import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
-import com.demich.cps.utils.codeforces.CodeforcesLocale
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -57,8 +56,6 @@ fun CodeforcesNewsScreen(
         )
     }
 
-    val locale by rememberCollect { settings.codeforcesLocale.flow }
-
     val pagerState = rememberPagerState(
         initialPage = remember {
             val defaultTab = runBlocking { settings.codeforcesDefaultTab() }
@@ -92,13 +89,11 @@ fun CodeforcesNewsScreen(
                 when (tabs.value[index]) {
                     CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(
                         modifier = modifier,
-                        viewModel = viewModel,
-                        locale = locale
+                        viewModel = viewModel
                     )
                     CodeforcesTitle.TOP -> CodeforcesNewsTopPage(
                         modifier = modifier,
-                        viewModel = viewModel,
-                        locale = locale
+                        viewModel = viewModel
                     )
                     CodeforcesTitle.RECENT -> CodeforcesNewsRecentPage()
                     CodeforcesTitle.LOST -> CodeforcesNewsLostPage()
@@ -113,8 +108,7 @@ fun CodeforcesNewsScreen(
 @Composable
 private fun CodeforcesNewsMainPage(
     modifier: Modifier = Modifier,
-    viewModel: CodeforcesNewsViewModel,
-    locale: CodeforcesLocale
+    viewModel: CodeforcesNewsViewModel
 ) {
     val context = context
     val loadingStatus by viewModel.pageLoadingStatusState(CodeforcesTitle.MAIN)
@@ -122,7 +116,7 @@ private fun CodeforcesNewsMainPage(
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
-        onRefresh = { viewModel.reload(title = CodeforcesTitle.MAIN, locale = locale) },
+        onRefresh = { viewModel.reload(title = CodeforcesTitle.MAIN, context = context) },
         modifier = modifier
     ) {
         CodeforcesBlogEntries(
@@ -135,8 +129,7 @@ private fun CodeforcesNewsMainPage(
 @Composable
 private fun CodeforcesNewsTopPage(
     modifier: Modifier = Modifier,
-    viewModel: CodeforcesNewsViewModel,
-    locale: CodeforcesLocale
+    viewModel: CodeforcesNewsViewModel
 ) {
     val context = context
     val loadingStatus by viewModel.pageLoadingStatusState(CodeforcesTitle.TOP)
@@ -144,7 +137,7 @@ private fun CodeforcesNewsTopPage(
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
-        onRefresh = { viewModel.reload(title = CodeforcesTitle.TOP, locale = locale) },
+        onRefresh = { viewModel.reload(title = CodeforcesTitle.TOP, context = context) },
         modifier = modifier
     ) {
         CodeforcesBlogEntries(

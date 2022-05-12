@@ -147,7 +147,10 @@ private fun CPSScaffold(
                     navigator = navigator,
                     codeforcesNewsViewModel = cpsViewModels.newsViewModel
                 )
-                holder.menu = newsMenuBuilder(navigator = navigator)
+                holder.menu = newsMenuBuilder(
+                    navigator = navigator,
+                    newsViewModel = cpsViewModels.newsViewModel
+                )
                 holder.bottomBar = newsBottomBarBuilder(
                     newsViewModel = cpsViewModels.newsViewModel
                 )
