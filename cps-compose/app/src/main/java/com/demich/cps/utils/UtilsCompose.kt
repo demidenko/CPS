@@ -53,7 +53,8 @@ inline fun<reified T> jsonSaver() = remember {
 @Composable
 fun<T> rememberCollect(block: () -> Flow<T>) =
     remember { block() }.let { flow ->
-        flow.collectAsState(initial = remember(flow) { runBlocking { flow.first() } })
+        if (flow is StateFlow<T>) flow.collectAsState()
+        else flow.collectAsState(initial = remember(flow) { runBlocking { flow.first() } })
     }
 
 //following from https://proandroiddev.com/how-to-collect-flows-lifecycle-aware-in-jetpack-compose-babd53582d0b
