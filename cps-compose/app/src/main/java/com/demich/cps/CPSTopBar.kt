@@ -98,7 +98,7 @@ private fun CPSTitle(
     )
     MonospacedText(
         text = navigator.subtitle,
-        color = cpsColors.textColorAdditional,
+        color = cpsColors.contentAdditional,
         fontSize = fontSize,
         maxLines = 1
     )

@@ -81,7 +81,7 @@ fun SettingsItem(
                 if (description.isNotBlank()) {
                     Text(
                         text = description,
-                        color = cpsColors.textColorAdditional,
+                        color = cpsColors.contentAdditional,
                         fontSize = 14.sp
                     )
                 }
@@ -206,7 +206,7 @@ fun SettingsSubtitle(
     Text(
         text = text,
         fontSize = 15.sp,
-        color = cpsColors.textColorAdditional,
+        color = cpsColors.contentAdditional,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )

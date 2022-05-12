@@ -194,7 +194,7 @@ class CodeforcesAccountManager(context: Context):
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = "contribution:",
-                            color = cpsColors.textColorAdditional,
+                            color = cpsColors.contentAdditional,
                             fontSize = 18.sp,
                             modifier = Modifier.padding(end = 5.dp)
                         )

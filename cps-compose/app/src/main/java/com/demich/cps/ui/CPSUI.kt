@@ -167,7 +167,7 @@ fun<T> TextButtonsSelectRow(
             TextButton(onClick = { onSelect(value) }) {
                 Text(
                     text = text(value),
-                    color = if (value == selectedValue) cpsColors.accent else cpsColors.textColorAdditional
+                    color = if (value == selectedValue) cpsColors.accent else cpsColors.contentAdditional
                 )
             }
         }

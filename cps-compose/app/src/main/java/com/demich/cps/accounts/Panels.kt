@@ -10,10 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
@@ -217,7 +215,7 @@ fun<U: RatedUserInfo> RatedAccountManager<U>.SmallRatedAccountPanel(
             Text(
                 text = userInfo.ratingToString(),
                 fontSize = 25.sp,
-                color = if (userInfo.isRated()) colorFor(rating = userInfo.rating) else cpsColors.textColorAdditional,
+                color = if (userInfo.isRated()) colorFor(rating = userInfo.rating) else cpsColors.contentAdditional,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -250,7 +248,7 @@ fun SmallAccountPanelTypeArchive(
                 text = buildAnnotatedString {
                     infoArgs.forEachIndexed { index, (key, value) ->
                         if (index > 0) append("  ")
-                        append(text = "${key}: ", color = cpsColors.textColorAdditional)
+                        append(text = "${key}: ", color = cpsColors.contentAdditional)
                         append(value)
                     }
                 },

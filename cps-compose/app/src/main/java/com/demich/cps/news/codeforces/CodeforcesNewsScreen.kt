@@ -175,7 +175,7 @@ private fun TabsHeader(
     pagerState: PagerState,
     modifier: Modifier = Modifier,
     selectedTextColor: Color = cpsColors.textColor,
-    unselectedTextColor: Color = cpsColors.textColorAdditional,
+    unselectedTextColor: Color = cpsColors.contentAdditional,
 ) {
     val scope = rememberCoroutineScope()
 

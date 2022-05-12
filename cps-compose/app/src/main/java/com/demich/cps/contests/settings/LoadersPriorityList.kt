@@ -61,11 +61,11 @@ fun LoadersPriorityListDialog(
                 imageVector = CPSIcons.Info,
                 contentDescription = null,
                 modifier = Modifier.padding(all = 8.dp),
-                tint = cpsColors.textColorAdditional
+                tint = cpsColors.contentAdditional
             )
             Text(
                 text = "Order in which contest api-loaders are executed until success.",
-                color = cpsColors.textColorAdditional,
+                color = cpsColors.contentAdditional,
                 fontSize = 14.sp
             )
         }

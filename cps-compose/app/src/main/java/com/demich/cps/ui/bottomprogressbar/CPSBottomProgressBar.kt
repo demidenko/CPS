@@ -62,7 +62,7 @@ fun CPSBottomProgressBar(
             MonospacedText(
                 text = progressBarInfo.title,
                 fontSize = 13.sp,
-                color = cpsColors.textColorAdditional,
+                color = cpsColors.contentAdditional,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 10.dp).weight(3f)
             )

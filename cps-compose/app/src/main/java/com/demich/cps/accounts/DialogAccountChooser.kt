@@ -68,7 +68,7 @@ fun<U: UserInfo> DialogAccountChooser(
 
         AccountChooserHeader(
             text = "getUser(${manager.type.name}):",
-            color = cpsColors.textColorAdditional
+            color = cpsColors.contentAdditional
         ) {
             Icon(imageVector = CPSIcons.Account, contentDescription = null, tint = it)
         }
@@ -185,7 +185,7 @@ private fun<U: UserInfo> UserIdTextField(
                     append(manager.userIdTitle)
                     if (manager is AccountSuggestionsProvider) append(" or search query")
                 },
-                color = cpsColors.textColorAdditional
+                color = cpsColors.contentAdditional
             )
         },
         label = {
@@ -256,7 +256,7 @@ private fun SuggestionsList(
         Column(modifier = modifier) {
             AccountChooserHeader(
                 text = if (isError) "suggestions load failed" else "suggestions:",
-                color = if (isError) cpsColors.errorColor else cpsColors.textColorAdditional
+                color = if (isError) cpsColors.errorColor else cpsColors.contentAdditional
             ) { color ->
                 if (isLoading) {
                     CircularProgressIndicator(

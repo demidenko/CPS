@@ -68,7 +68,7 @@ private fun ContestItemHeader(
             platform = platform,
             modifier = Modifier.padding(end = 4.dp),
             size = 18.sp,
-            color = cpsColors.textColorAdditional
+            color = cpsColors.contentAdditional
         )
         ContestColoredTitle(
             contestTitle = contestTitle,
@@ -90,12 +90,12 @@ private fun ContestColoredTitle(
         text = buildAnnotatedString {
             val (title, brackets) = cutTrailingBrackets(contestTitle.trim())
             append(title)
-            if (brackets.isNotBlank()) append(brackets, color = cpsColors.textColorAdditional)
+            if (brackets.isNotBlank()) append(brackets, color = cpsColors.contentAdditional)
         },
         color = when (phase) {
             Contest.Phase.BEFORE -> cpsColors.textColor
             Contest.Phase.RUNNING -> cpsColors.success
-            Contest.Phase.FINISHED -> cpsColors.textColorAdditional
+            Contest.Phase.FINISHED -> cpsColors.contentAdditional
         },
         fontSize = 19.sp,
         fontWeight = FontWeight.Bold,
@@ -145,13 +145,13 @@ private fun ContestItemFooter(
         MonospacedText(
             text = date,
             fontSize = 15.sp,
-            color = cpsColors.textColorAdditional,
+            color = cpsColors.contentAdditional,
             modifier = Modifier.align(Alignment.CenterStart)
         )
         MonospacedText(
             text = counter,
             fontSize = 15.sp,
-            color = cpsColors.textColorAdditional,
+            color = cpsColors.contentAdditional,
             modifier = Modifier.align(Alignment.CenterEnd)
         )
     }
@@ -192,7 +192,7 @@ private fun ContestExpandedItemHeader(
                 .padding(all = 5.dp)
                 .align(Alignment.Top),
             size = 30.sp,
-            color = if (phase == Contest.Phase.FINISHED) cpsColors.textColorAdditional else cpsColors.textColor
+            color = if (phase == Contest.Phase.FINISHED) cpsColors.contentAdditional else cpsColors.textColor
         )
         ContestColoredTitle(
             contestTitle = contestTitle,
@@ -240,7 +240,7 @@ private fun ContestExpandedItemFooter(
             MonospacedText(
                 text = counter,
                 fontSize = 15.sp,
-                color = cpsColors.textColorAdditional
+                color = cpsColors.contentAdditional
             )
         }
     }
@@ -256,12 +256,12 @@ private fun ContestExpandedItemDatesAndMenuButton(
             MonospacedText(
                 text = contest.startTime.contestDate(),
                 fontSize = 15.sp,
-                color = cpsColors.textColorAdditional
+                color = cpsColors.contentAdditional
             )
             MonospacedText(
                 text = contest.endTime.contestDate(),
                 fontSize = 15.sp,
-                color = cpsColors.textColorAdditional
+                color = cpsColors.contentAdditional
             )
         }
         ContestItemMenuButton(
@@ -287,7 +287,7 @@ private fun ContestItemMenuButton(
         content = {
             CPSIconButton(
                 icon = CPSIcons.More,
-                color = cpsColors.textColorAdditional,
+                color = cpsColors.contentAdditional,
                 onClick = { showMenu = true },
             )
         }

@@ -42,7 +42,7 @@ fun ClistApiAccessSettingsItem() {
             Text(
                 text = "click to setup",
                 fontSize = 15.sp,
-                color = cpsColors.textColorAdditional
+                color = cpsColors.contentAdditional
             )
         } else {
             Text(

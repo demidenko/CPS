@@ -316,7 +316,7 @@ private fun ContestResult(
                     }
                 },
                 fontSize = subTitleFontSize,
-                color = cpsColors.textColorAdditional
+                color = cpsColors.contentAdditional
             )
         }
         Column(

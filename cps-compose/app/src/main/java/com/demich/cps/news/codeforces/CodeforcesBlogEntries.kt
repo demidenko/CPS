@@ -98,7 +98,7 @@ private fun BlogEntryInfo(
                     text = buildAnnotatedString {
                         append(authorHandle)
                         append("  ")
-                        append(text = timeAgo, color = cpsColors.textColorAdditional, fontSize = 11.sp)
+                        append(text = timeAgo, color = cpsColors.contentAdditional, fontSize = 11.sp)
                     },
                     fontSize = 13.sp,
                     modifier = Modifier.padding(top = 1.dp)
@@ -112,7 +112,7 @@ private fun BlogEntryInfo(
                     Icon(
                         imageVector = CPSIcons.Comments,
                         contentDescription = null,
-                        tint = cpsColors.textColorAdditional,
+                        tint = cpsColors.contentAdditional,
                         modifier = Modifier
                             .padding(end = 3.dp)
                             .size(with(LocalDensity.current) { 11.sp.toDp() })

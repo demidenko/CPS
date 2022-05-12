@@ -22,7 +22,7 @@ object cpsColors {
         @Composable
         get() = MaterialTheme.colors.onBackground
 
-    val textColorAdditional: Color
+    val contentAdditional: Color
         @Composable
         get() = if (isLight) Color(118, 118, 118) else Color(147, 147, 147)
 

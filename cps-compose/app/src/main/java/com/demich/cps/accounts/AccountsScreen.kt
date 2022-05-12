@@ -70,7 +70,7 @@ fun AccountsScreen(
         if (recordedAccounts.isEmpty()) {
             MonospacedText(
                 text = stringResource(id = R.string.accounts_welcome),
-                color = cpsColors.textColorAdditional,
+                color = cpsColors.contentAdditional,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(6.dp)
             )
@@ -153,7 +153,7 @@ fun AccountSettingsScreen(
             Column {
                 Text(
                     text = manager.userIdTitle + ":",
-                    color = cpsColors.textColorAdditional,
+                    color = cpsColors.contentAdditional,
                     fontSize = 18.sp
                 )
                 Text(

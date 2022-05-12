@@ -148,7 +148,7 @@ private fun ClistAdditionalRow(
                 Text(
                     text = resources.joinToString { it.name },
                     fontSize = 10.sp,
-                    color = cpsColors.textColorAdditional,
+                    color = cpsColors.contentAdditional,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
