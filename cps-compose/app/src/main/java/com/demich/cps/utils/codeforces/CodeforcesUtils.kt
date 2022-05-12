@@ -9,10 +9,65 @@ import com.demich.cps.accounts.managers.NOT_RATED
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.signedToString
+import kotlinx.datetime.Instant
 import org.jsoup.Jsoup
+import java.text.SimpleDateFormat
 import java.util.*
 
 object CodeforcesUtils {
+
+    private val dateFormatRU = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
+    private val dateFormatEN = SimpleDateFormat("MMM/dd/yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
+
+    private fun parseTimeString(str: String): Instant {
+        val parser = if(str.contains('.')) dateFormatRU else dateFormatEN
+        return Instant.fromEpochMilliseconds(parser.parse(str)!!.time)
+    }
+
+    fun extractBlogEntries(page: String): List<CodeforcesBlogEntry> {
+        return Jsoup.parse(page).select("div.topic").map { topic ->
+            val id: Int
+            val title: String
+            topic.selectFirst("div.title")!!.let {
+                title = it.selectFirst("p")!!.text()
+                id = it.selectFirst("a")!!.attr("href").removePrefix("/blog/entry/").toInt()
+            }
+
+            val authorHandle: String
+            val authorColorTag: ColorTag
+            val creationTime: Instant
+            topic.selectFirst("div.info")!!.let { info ->
+                info.selectFirst(".rated-user")!!.let {
+                    authorHandle = it.text()
+                    authorColorTag = ColorTag.fromString(
+                        str = it.classNames().first { name -> name.startsWith("user-") }
+                    )
+                }
+                creationTime = parseTimeString(
+                    str = info.selectFirst(".format-humantime")!!.attr("title")
+                )
+            }
+
+            val rating: Int
+            val commentsCount: Int
+            topic.selectFirst(".roundbox")!!.let { box ->
+                rating = box.selectFirst(".left-meta")!!.selectFirst("span")!!.text().toInt()
+                val commentsItem = box.selectFirst(".right-meta")!!.select("li")[2]!!
+                commentsCount = commentsItem.select("a")[1]!!.text().toInt()
+            }
+
+            CodeforcesBlogEntry(
+                id = id,
+                title = title,
+                authorHandle = authorHandle,
+                authorColorTag = authorColorTag,
+                creationTime = creationTime,
+                rating = rating,
+                commentsCount = commentsCount
+            )
+        }
+    }
+
 
     enum class ColorTag {
         BLACK,
@@ -65,8 +120,8 @@ object CodeforcesUtils {
         return realHandle to STATUS.OK
     }
 
-    private fun extractRealHandle(s: String): String? {
-        val userBox = Jsoup.parse(s).selectFirst("div.userbox") ?: return null
+    private fun extractRealHandle(page: String): String? {
+        val userBox = Jsoup.parse(page).selectFirst("div.userbox") ?: return null
         return userBox.selectFirst("a.rated-user")?.text()
     }
 
