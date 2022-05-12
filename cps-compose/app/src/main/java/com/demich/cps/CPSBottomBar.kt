@@ -197,5 +197,5 @@ private fun CPSBottomBarVerticalDivider() = Box(
     Modifier
         .fillMaxHeight(0.6f)
         .width(1.dp)
-        .background(cpsColors.dividerColor)
+        .background(cpsColors.divider)
 )

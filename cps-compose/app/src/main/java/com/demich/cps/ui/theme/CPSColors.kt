@@ -38,7 +38,7 @@ object cpsColors {
         @Composable
         get() = if (isLight) Color(255, 255, 255) else Color(0, 0, 0)
 
-    val dividerColor: Color
+    val divider: Color
         //@Composable
         get() = Color(85, 85, 85)
 

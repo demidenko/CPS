@@ -74,7 +74,7 @@ fun CPSTopBar(
                 showAbout = true
             }
             additionalMenu?.let {
-                Divider(color = cpsColors.dividerColor)
+                Divider(color = cpsColors.divider)
                 it()
             }
         }
