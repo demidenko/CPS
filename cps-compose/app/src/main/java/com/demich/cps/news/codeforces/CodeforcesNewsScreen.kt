@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.Contest
 import com.demich.cps.news.NewsTab
 import com.demich.cps.news.NewsTabRow
@@ -14,11 +15,8 @@ import com.demich.cps.news.settingsNews
 import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.clickableNoRipple
+import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesLocale
-import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -31,6 +29,9 @@ enum class CodeforcesTitle {
     MAIN, TOP, RECENT, LOST
 }
 
+val LocalCodeforcesAccountManager = compositionLocalOf<CodeforcesAccountManager> {
+    throw IllegalAccessError()
+}
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -40,6 +41,9 @@ fun CodeforcesNewsScreen(
 ) {
 
     val context = context
+    val manager = remember { CodeforcesAccountManager(context) }
+
+
     val settings = remember { context.settingsNews }
 
     val tabs = remember {
@@ -68,25 +72,32 @@ fun CodeforcesNewsScreen(
             pagerState = pagerState,
             modifier = Modifier.fillMaxWidth()
         )
-        HorizontalPager(
-            count = tabs.value.size,
-            state = pagerState,
-            key = { tabs.value[it] },
-            modifier = Modifier.fillMaxSize()
-        ) { index ->
-            val modifier = Modifier.fillMaxSize()
-            when (tabs.value[index]) {
-                CodeforcesTitle.MAIN -> CodeforcesNewsMainContent(
-                    modifier = modifier,
-                    viewModel = viewModel,
-                    locale = locale
-                )
-                CodeforcesTitle.TOP -> CodeforcesNewsTopContent()
-                CodeforcesTitle.RECENT -> CodeforcesNewsRecentContent()
-                CodeforcesTitle.LOST -> CodeforcesNewsLostContent()
+        val currentTime by collectCurrentTimeEachMinute()
+        CompositionLocalProvider(
+            LocalCodeforcesAccountManager provides manager,
+            LocalCurrentTime provides currentTime
+        ) {
+            HorizontalPager(
+                count = tabs.value.size,
+                state = pagerState,
+                key = { tabs.value[it] },
+                modifier = Modifier.fillMaxSize()
+            ) { index ->
+                val modifier = Modifier.fillMaxSize()
+                when (tabs.value[index]) {
+                    CodeforcesTitle.MAIN -> CodeforcesNewsMainContent(
+                        modifier = modifier,
+                        viewModel = viewModel,
+                        locale = locale
+                    )
+                    CodeforcesTitle.TOP -> CodeforcesNewsTopContent()
+                    CodeforcesTitle.RECENT -> CodeforcesNewsRecentContent()
+                    CodeforcesTitle.LOST -> CodeforcesNewsLostContent()
+                }
             }
         }
     }
+
 
 
 }
@@ -103,7 +114,7 @@ fun CodeforcesNewsMainContent(
 
     val loadingStatus by viewModel.pageLoadingStatusState(CodeforcesTitle.MAIN)
 
-    val blogEntries by rememberCollect { viewModel.flowOfMainBlogEntries(context) }
+    val blogEntriesState = rememberCollect { viewModel.flowOfMainBlogEntries(context) }
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
@@ -111,7 +122,7 @@ fun CodeforcesNewsMainContent(
         modifier = modifier
     ) {
         CodeforcesBlogEntries(
-            blogEntries = blogEntries,
+            blogEntriesState = blogEntriesState,
             modifier = Modifier.fillMaxWidth()
         )
     }
