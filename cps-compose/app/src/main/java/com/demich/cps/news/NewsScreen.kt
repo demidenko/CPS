@@ -2,8 +2,8 @@ package com.demich.cps.news
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
 import com.demich.cps.news.codeforces.CodeforcesNewsScreen
@@ -13,8 +13,9 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.CPSReloadingButton
-import com.demich.cps.utils.codeforces.CodeforcesLocale
 import com.demich.cps.utils.combine
+import com.demich.cps.utils.context
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun NewsScreen(
@@ -36,15 +37,27 @@ fun NewsSettingsScreen() {
 fun newsBottomBarBuilder(
     newsViewModel: CodeforcesNewsViewModel
 ): AdditionalBottomBarBuilder = {
-    val loadingStatus by remember {
+    val context = context
+    val scope = rememberCoroutineScope()
+
+    val loadingStatus = remember {
         derivedStateOf {
-            listOf(CodeforcesTitle.MAIN).map {
+            listOf(
+                CodeforcesTitle.MAIN,
+                CodeforcesTitle.TOP
+            ).map {
                 newsViewModel.pageLoadingStatusState(it).value
             }.combine()
         }
     }
-    CPSReloadingButton(loadingStatus = loadingStatus) {
-        newsViewModel.reload(CodeforcesTitle.MAIN, CodeforcesLocale.RU)
+
+    CPSReloadingButton(loadingStatus = loadingStatus.value) {
+        newsViewModel.reload(
+            title = CodeforcesTitle.MAIN,
+            locale = runBlocking {
+                context.settingsNews.codeforcesLocale()
+            }
+        )
     }
 }
 

@@ -85,7 +85,7 @@ private fun BlogEntryInfo(
             CodeforcesUtils.VotedText(
                 rating = rating,
                 fontSize = 14.sp,
-                modifier = Modifier.padding(start = 3.dp)
+                modifier = Modifier.padding(start = 3.dp, top = 3.dp)
             )
         }
         Box(modifier = Modifier.fillMaxWidth()) {

@@ -90,7 +90,11 @@ fun CodeforcesNewsScreen(
                         viewModel = viewModel,
                         locale = locale
                     )
-                    CodeforcesTitle.TOP -> CodeforcesNewsTopContent()
+                    CodeforcesTitle.TOP -> CodeforcesNewsTopContent(
+                        modifier = modifier,
+                        viewModel = viewModel,
+                        locale = locale
+                    )
                     CodeforcesTitle.RECENT -> CodeforcesNewsRecentContent()
                     CodeforcesTitle.LOST -> CodeforcesNewsLostContent()
                 }
@@ -110,10 +114,7 @@ fun CodeforcesNewsMainContent(
     locale: CodeforcesLocale
 ) {
     val context = context
-    val scope = rememberCoroutineScope()
-
     val loadingStatus by viewModel.pageLoadingStatusState(CodeforcesTitle.MAIN)
-
     val blogEntriesState = rememberCollect { viewModel.flowOfMainBlogEntries(context) }
 
     SwipeRefresh(
@@ -129,8 +130,25 @@ fun CodeforcesNewsMainContent(
 }
 
 @Composable
-fun CodeforcesNewsTopContent() {
+fun CodeforcesNewsTopContent(
+    modifier: Modifier = Modifier,
+    viewModel: CodeforcesNewsViewModel,
+    locale: CodeforcesLocale
+) {
+    val context = context
+    val loadingStatus by viewModel.pageLoadingStatusState(CodeforcesTitle.TOP)
+    val blogEntriesState = rememberCollect { viewModel.flowOfTopBlogEntries(context) }
 
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
+        onRefresh = { viewModel.reload(title = CodeforcesTitle.TOP, locale = locale) },
+        modifier = modifier
+    ) {
+        CodeforcesBlogEntries(
+            blogEntriesState = blogEntriesState,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
 }
 
 @Composable

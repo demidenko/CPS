@@ -55,6 +55,7 @@ class CodeforcesNewsViewModel: ViewModel() {
     fun pageLoadingStatusState(title: CodeforcesTitle): State<LoadingStatus> {
         return when (title) {
             CodeforcesTitle.MAIN -> mainBlogEntries.loadingStatusState
+            CodeforcesTitle.TOP -> topBlogEntries.loadingStatusState
             else -> TODO()
         }
     }
@@ -62,15 +63,17 @@ class CodeforcesNewsViewModel: ViewModel() {
     private val mainBlogEntries = DataLoader(emptyList()) { loadBlogEntriesPage("/", it) }
     fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.getDataFlow(context)
 
+    private val topBlogEntries = DataLoader(emptyList()) { loadBlogEntriesPage("/top", it) }
+    fun flowOfTopBlogEntries(context: Context) = topBlogEntries.getDataFlow(context)
 
     fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
         when(title) {
             CodeforcesTitle.MAIN -> mainBlogEntries.load(locale)
-            /*CodeforcesTitle.TOP -> {
+            CodeforcesTitle.TOP -> {
                 topBlogEntries.load(locale)
-                topComments.load(locale)
+                //topComments.load(locale)
             }
-            CodeforcesTitle.RECENT -> recentActions.load(locale)*/
+            //CodeforcesTitle.RECENT -> recentActions.load(locale)
             else -> return
         }
     }
