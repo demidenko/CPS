@@ -40,7 +40,7 @@ fun NewsTabRow(
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
                 modifier = Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
-                color = cpsColors.colorAccent
+                color = cpsColors.accent
             )
         },
         divider = { },

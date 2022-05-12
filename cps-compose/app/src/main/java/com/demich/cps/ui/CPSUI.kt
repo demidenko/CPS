@@ -94,7 +94,7 @@ fun CPSCheckBox(
         enabled = enabled,
         onCheckedChange = onCheckedChange,
         colors = CheckboxDefaults.colors(
-            checkedColor = cpsColors.colorAccent
+            checkedColor = cpsColors.accent
         )
     )
 }
@@ -110,7 +110,7 @@ fun CPSRadioButton(
         selected = selected,
         onClick = onClick,
         colors = RadioButtonDefaults.colors(
-            selectedColor = cpsColors.colorAccent
+            selectedColor = cpsColors.accent
         )
     )
 }
@@ -167,7 +167,7 @@ fun<T> TextButtonsSelectRow(
             TextButton(onClick = { onSelect(value) }) {
                 Text(
                     text = text(value),
-                    color = if (value == selectedValue) cpsColors.colorAccent else cpsColors.textColorAdditional
+                    color = if (value == selectedValue) cpsColors.accent else cpsColors.textColorAdditional
                 )
             }
         }

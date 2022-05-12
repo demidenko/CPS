@@ -14,7 +14,7 @@ object cpsColors {
         @ReadOnlyComposable
         get() = MaterialTheme.colors.isLight
 
-    val colorAccent: Color
+    val accent: Color
         @Composable
         get() = MaterialTheme.colors.primary
 

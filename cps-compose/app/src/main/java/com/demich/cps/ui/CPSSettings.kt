@@ -107,7 +107,7 @@ fun SettingsSwitchItem(
             onCheckedChange = onCheckedChange,
             modifier = Modifier.padding(start = 5.dp),
             colors = SwitchDefaults.colors(
-                checkedThumbColor = cpsColors.colorAccent
+                checkedThumbColor = cpsColors.accent
             )
         )
     }
@@ -154,7 +154,7 @@ fun<T: Enum<T>> SettingsEnumItem(
         Text(
             text = optionToString(selectedOption),
             fontSize = 18.sp,
-            color = cpsColors.colorAccent,
+            color = cpsColors.accent,
             modifier = Modifier.padding(end = 10.dp)
         )
     }
