@@ -14,17 +14,26 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Instant
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 val context: Context
     @Composable
@@ -78,6 +87,7 @@ fun <T> StateFlow<T>.collectAsStateLifecycleAware(
 fun AnnotatedString.Builder.append(
     text: String,
     color: Color = Color.Unspecified,
+    fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     fontStyle: FontStyle? = null
 ) {
@@ -86,6 +96,7 @@ fun AnnotatedString.Builder.append(
             text = text,
             spanStyle = SpanStyle(
                 color = color,
+                fontSize = fontSize,
                 fontWeight = fontWeight,
                 fontStyle = fontStyle
             )
@@ -103,4 +114,34 @@ fun Modifier.clickableNoRipple(
         interactionSource = remember { MutableInteractionSource() },
         onClick = onClick
     )
+}
+
+val LocalCurrentTime = compositionLocalOf { getCurrentTime() }
+
+private fun currentTimeFlow(period: Duration): Flow<Instant> =
+    flow {
+        val periodMillis = period.inWholeMilliseconds
+        require(periodMillis > 0)
+        while (currentCoroutineContext().isActive) {
+            val currentMillis = getCurrentTime().toEpochMilliseconds()
+            val currentTimeMillisFloored = (currentMillis / periodMillis) * periodMillis
+            emit(Instant.fromEpochMilliseconds(currentTimeMillisFloored))
+            val rem = currentMillis % periodMillis
+            delay(timeMillis = if (rem == 0L) periodMillis else periodMillis - rem)
+        }
+    }
+
+@Composable
+fun collectCurrentTimeEachSecond(): State<Instant> {
+    return remember {
+        currentTimeFlow(period = 1.seconds)
+    }.collectAsStateLifecycleAware(initial = remember { getCurrentTime() })
+}
+
+
+@Composable
+fun collectCurrentTimeEachMinute(): State<Instant> {
+    return remember {
+        currentTimeFlow(period = 1.minutes)
+    }.collectAsStateLifecycleAware(initial = remember { getCurrentTime() })
 }

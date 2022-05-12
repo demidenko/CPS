@@ -61,7 +61,9 @@ suspend inline fun<reified T> HttpClient.getAs(
     block: HttpRequestBuilder.() -> Unit = {}
 ): T = this.get(urlString = urlString, block = block).body()
 
+
 fun signedToString(x: Int): String = if (x > 0) "+$x" else "$x"
+
 
 fun Instant.format(dateFormat: String): String =
     DateFormat.format(dateFormat, toEpochMilliseconds()).toString()
@@ -82,6 +84,9 @@ fun timeDifference(fromTime: Instant, toTime: Instant): String {
         else -> "${t.inWholeDays / 365} years"
     }
 }
+
+fun timeAgo(fromTime: Instant, toTime: Instant) = timeDifference(fromTime, toTime) + " ago"
+
 
 data class ComparablePair<A: Comparable<A>, B: Comparable<B>>(
     val first: A,

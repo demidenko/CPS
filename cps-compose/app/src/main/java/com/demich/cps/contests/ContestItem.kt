@@ -19,10 +19,6 @@ import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
@@ -43,7 +39,7 @@ fun ContestItem(
 
 @Composable
 private fun ContestItemContent(contest: Contest) {
-    val currentTime = LocalCurrentTimeEachSecond.current
+    val currentTime = LocalCurrentTime.current
     ContestItemHeader(
         platform = contest.platform,
         contestTitle = contest.title,
@@ -165,7 +161,7 @@ private fun ContestItemFooter(
 
 @Composable
 private fun ContestExpandedItemContent(contest: Contest) {
-    val currentTime = LocalCurrentTimeEachSecond.current
+    val currentTime = LocalCurrentTime.current
     ContestExpandedItemHeader(
         platform = contest.platform,
         contestTitle = contest.title,
@@ -325,23 +321,6 @@ private fun contestTimeDifference(fromTime: Instant, toTime: Instant): String {
     return timeDifference(fromTime, toTime)
 }
 
-
-val LocalCurrentTimeEachSecond = compositionLocalOf { getCurrentTime() }
-
-@Composable
-fun collectCurrentTime(): State<Instant> {
-    return remember {
-        flow {
-            while (currentCoroutineContext().isActive) {
-                val currentTime = getCurrentTime()
-                emit(Instant.fromEpochSeconds(currentTime.epochSeconds))
-                println(currentTime)
-                val rem = currentTime.toEpochMilliseconds() % 1000
-                delay(timeMillis = if (rem == 0L) 1000 else 1000 - rem)
-            }
-        }
-    }.collectAsStateLifecycleAware(initial = remember { getCurrentTime() })
-}
 
 @Composable
 fun ContestPlatformIcon(

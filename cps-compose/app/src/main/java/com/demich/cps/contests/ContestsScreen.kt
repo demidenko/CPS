@@ -109,7 +109,7 @@ private fun ContestsList(
     searchText: String,
     modifier: Modifier = Modifier
 ) {
-    val currentTime by collectCurrentTime()
+    val currentTime by collectCurrentTimeEachSecond()
 
     val sortedState = remember(contestsState.value) {
         mutableStateOf(contestsState.value)
@@ -120,7 +120,7 @@ private fun ContestsList(
         }
     }
 
-    CompositionLocalProvider(LocalCurrentTimeEachSecond provides currentTime) {
+    CompositionLocalProvider(LocalCurrentTime provides currentTime) {
         ContestsSortedList(
             contestsSortedListState = sortedState,
             searchText = searchText,
