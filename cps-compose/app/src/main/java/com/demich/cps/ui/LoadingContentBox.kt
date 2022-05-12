@@ -25,7 +25,7 @@ fun LoadingContentBox(
             LoadingStatus.FAILED -> {
                 Text(
                     text = failedText,
-                    color = cpsColors.errorColor,
+                    color = cpsColors.error,
                     fontWeight = FontWeight.SemiBold
                 )
             }

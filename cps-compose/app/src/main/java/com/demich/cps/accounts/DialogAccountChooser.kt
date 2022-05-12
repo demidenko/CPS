@@ -256,7 +256,7 @@ private fun SuggestionsList(
         Column(modifier = modifier) {
             AccountChooserHeader(
                 text = if (isError) "suggestions load failed" else "suggestions:",
-                color = if (isError) cpsColors.errorColor else cpsColors.contentAdditional
+                color = if (isError) cpsColors.error else cpsColors.contentAdditional
             ) { color ->
                 if (isLoading) {
                     CircularProgressIndicator(

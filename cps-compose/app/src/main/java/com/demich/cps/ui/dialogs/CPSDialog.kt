@@ -74,7 +74,7 @@ fun CPSDeleteDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(
-                content = { Text(text = "Delete", color = cpsColors.errorColor) },
+                content = { Text(text = "Delete", color = cpsColors.error) },
                 onClick = onConfirmRequest
             )
         },

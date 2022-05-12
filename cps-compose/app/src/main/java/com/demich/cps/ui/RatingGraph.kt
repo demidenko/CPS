@@ -335,7 +335,7 @@ private fun ContestResult(
                     text = signedToString(change),
                     fontSize = subTitleFontSize,
                     fontWeight = FontWeight.Bold,
-                    color = if (change < 0) cpsColors.errorColor else cpsColors.success,
+                    color = if (change < 0) cpsColors.error else cpsColors.success,
                 )
             }
         }

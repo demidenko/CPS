@@ -46,7 +46,7 @@ object cpsColors {
         @Composable
         get() = if (isLight) Color(0, 128, 0) else Color(51, 153, 51)
 
-    val errorColor: Color
+    val error: Color
         @Composable
         get() = MaterialTheme.colors.error
 

@@ -73,7 +73,7 @@ fun CPSReloadingButton(
         } else {
             Icon(
                 imageVector = CPSIcons.Reload,
-                tint = if (loadingStatus == LoadingStatus.FAILED) cpsColors.errorColor else cpsColors.content,
+                tint = if (loadingStatus == LoadingStatus.FAILED) cpsColors.error else cpsColors.content,
                 contentDescription = null,
                 modifier = Modifier.size(28.dp)
             )

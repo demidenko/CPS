@@ -211,7 +211,7 @@ private fun ColumnScope.LoadingError(
             color = cpsColors.background,
             fontSize = 13.sp,
             modifier = modifier
-                .background(color = cpsColors.errorColor)
+                .background(color = cpsColors.error)
                 .padding(all = 2.dp)
         )
     }

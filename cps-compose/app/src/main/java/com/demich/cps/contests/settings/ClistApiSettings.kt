@@ -48,7 +48,7 @@ fun ClistApiAccessSettingsItem() {
             Text(
                 text = buildAnnotatedString {
                     append(login)
-                    if (key.isBlank()) append(" [api-key is empty]", color = cpsColors.errorColor)
+                    if (key.isBlank()) append(" [api-key is empty]", color = cpsColors.error)
                 },
                 fontFamily = FontFamily.Monospace,
                 color = cpsColors.content,
