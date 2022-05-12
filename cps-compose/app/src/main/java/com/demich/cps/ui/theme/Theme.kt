@@ -25,7 +25,7 @@ private val LightColorPalette = lightColors(
 private val DarkColorPalette = darkColors(
     background = Color(18, 18, 18),
     primary = Color(0, 153, 204),
-    onBackground = Color(214, 214, 214),
+    onBackground = Color(212, 212, 212),
     error = Color(200, 64, 64)
 )
 

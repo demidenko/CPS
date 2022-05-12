@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Color
 import com.demich.cps.accounts.managers.HandleColor
 
 object cpsColors {
-    //TODO: not optimal? view contains n colors will be recomposed n times?
+    //TODO: object with vals instead of getters
 
     private val isLight: Boolean
         @Composable

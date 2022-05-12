@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -47,7 +48,10 @@ class MainActivity: ComponentActivity() {
             )
             CPSTheme {
                 val useOriginalColors by rememberCollect { settingsUI.useOriginalColors.flow }
-                CompositionLocalProvider(LocalUseOriginalColors provides useOriginalColors) {
+                CompositionLocalProvider(
+                    LocalUseOriginalColors provides useOriginalColors,
+                    LocalContentAlpha provides 1f
+                ) {
                     CPSContent(cpsViewModels = cpsViewModels)
                 }
             }

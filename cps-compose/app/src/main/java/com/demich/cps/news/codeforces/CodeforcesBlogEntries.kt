@@ -83,7 +83,6 @@ private fun BlogEntryInfo(
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = title,
-                color = cpsColors.textColor,
                 fontSize = 18.5.sp,
                 modifier = Modifier.weight(1f)
             )
@@ -120,8 +119,7 @@ private fun BlogEntryInfo(
                     )
                     Text(
                         text = commentsCount.toString(),
-                        fontSize = 13.sp,
-                        color = cpsColors.textColor
+                        fontSize = 13.sp
                     )
                 }
             }
