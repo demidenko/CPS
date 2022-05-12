@@ -128,8 +128,8 @@ object CodeforcesApi {
         }
     }
 
-    suspend fun getPageSource(page: String, locale: CodeforcesLocale): String? {
-        return getCodeforcesWeb(urlString = page) {
+    suspend fun getPageSource(urlString: String, locale: CodeforcesLocale): String? {
+        return getCodeforcesWeb(urlString = urlString) {
             parameter("locale", locale)
         }
     }

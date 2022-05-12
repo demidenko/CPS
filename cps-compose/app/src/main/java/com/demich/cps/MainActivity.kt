@@ -23,6 +23,7 @@ import com.demich.cps.contests.contestsMenuBuilder
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.NewsSettingsScreen
+import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
 import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
 import com.demich.cps.ui.CPSNavigator
@@ -40,6 +41,7 @@ class MainActivity: ComponentActivity() {
         setContent {
             val cpsViewModels = CPSViewModels(
                 accountsViewModel = viewModel(),
+                newsViewModel = viewModel(),
                 contestsViewModel = viewModel(),
                 progressBarsViewModel = viewModel()
             )
@@ -137,9 +139,14 @@ private fun CPSScaffold(
             }
 
             cpsComposable(ScreenTypes.news.route) { holder ->
-                NewsScreen(navigator = navigator)
+                NewsScreen(
+                    navigator = navigator,
+                    codeforcesNewsViewModel = cpsViewModels.newsViewModel
+                )
                 holder.menu = newsMenuBuilder(navigator = navigator)
-                holder.bottomBar = newsBottomBarBuilder()
+                holder.bottomBar = newsBottomBarBuilder(
+                    newsViewModel = cpsViewModels.newsViewModel
+                )
             }
             cpsComposable(ScreenTypes.newsSettings.route) {
                 NewsSettingsScreen()
@@ -202,6 +209,7 @@ private fun CPSScaffold(
 
 class CPSViewModels(
     val accountsViewModel: AccountsViewModel,
+    val newsViewModel: CodeforcesNewsViewModel,
     val contestsViewModel: ContestsViewModel,
     val progressBarsViewModel: ProgressBarsViewModel
 )
