@@ -24,6 +24,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 enum class CodeforcesTitle {
     MAIN, TOP, RECENT, LOST
@@ -59,7 +60,12 @@ fun CodeforcesNewsScreen(
 
     val locale by rememberCollect { settings.codeforcesLocale.flow }
 
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(
+        initialPage = remember {
+            val defaultTab = runBlocking { settings.codeforcesDefaultTab() }
+            tabs.value.indexOf(defaultTab)
+        }
+    )
 
     LaunchedEffect(key1 = pagerState.currentPage) {
         val selectedTab = tabs.value[pagerState.currentPage]

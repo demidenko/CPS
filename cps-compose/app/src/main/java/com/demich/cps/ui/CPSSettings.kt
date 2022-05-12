@@ -3,6 +3,7 @@ package com.demich.cps.ui
 import androidx.compose.animation.*
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,10 +16,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CPSDataStoreItem
 import com.demich.cps.utils.clickableNoRipple
@@ -63,7 +66,10 @@ fun SettingsItem(
     trailerContent: @Composable () -> Unit
 ) {
     SettingsItem(modifier = modifier) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.heightIn(min = 48.dp)
+        ) {
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -111,7 +117,7 @@ fun SettingsSwitchItem(
 fun SettingsSwitchItem(
     item: CPSDataStoreItem<Boolean>,
     title: String,
-    description: String = "",
+    description: String = ""
 ) {
     val scope = rememberCoroutineScope()
     val checked by rememberCollect { item.flow }
@@ -121,6 +127,54 @@ fun SettingsSwitchItem(
         description = description
     ) {
         scope.launch { item(it) }
+    }
+}
+
+
+@Composable
+fun<T: Enum<T>> SettingsEnumItem(
+    item: CPSDataStoreItem<T>,
+    title: String,
+    description: String = "",
+    optionToString: (T) -> AnnotatedString = { AnnotatedString(it.name) },
+    options: List<T>
+) {
+    val scope = rememberCoroutineScope()
+    val selectedOption by rememberCollect { item.flow }
+
+    var showChangeDialog by remember { mutableStateOf(false) }
+
+    SettingsItem(
+        title = title,
+        description = description,
+        modifier = Modifier.clickable {
+            showChangeDialog = true
+        }
+    ) {
+        Text(
+            text = optionToString(selectedOption),
+            fontSize = 18.sp,
+            color = cpsColors.colorAccent,
+            modifier = Modifier.padding(end = 10.dp)
+        )
+    }
+
+    if (showChangeDialog) {
+        CPSDialog(onDismissRequest = { showChangeDialog = false }) {
+            Text(text = title)
+            Column(modifier = Modifier.fillMaxWidth()) {
+                options.forEach { option ->
+                    CPSRadioButtonTitled(
+                        title = { Text(text = optionToString(option)) },
+                        selected = option == selectedOption,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        scope.launch { item(newValue = option) }
+                        showChangeDialog = false
+                    }
+                }
+            }
+        }
     }
 }
 

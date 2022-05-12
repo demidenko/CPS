@@ -2,6 +2,7 @@ package com.demich.cps.ui
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -118,16 +119,16 @@ fun CPSRadioButton(
 @Composable
 fun CPSRadioButtonTitled(
     modifier: Modifier = Modifier,
-    title: String,
+    title: @Composable () -> Unit,
     selected: Boolean,
     onClick: () -> Unit
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
         CPSRadioButton(selected = selected, onClick = onClick)
-        Text(text = title)
+        title()
     }
 }
 

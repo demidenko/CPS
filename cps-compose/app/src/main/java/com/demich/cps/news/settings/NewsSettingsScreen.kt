@@ -3,7 +3,9 @@ package com.demich.cps.news.settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.ui.SettingsColumn
+import com.demich.cps.ui.SettingsEnumItem
 import com.demich.cps.ui.SettingsSwitchItem
 import com.demich.cps.utils.codeforces.CodeforcesLocale
 import com.demich.cps.utils.context
@@ -14,8 +16,23 @@ import kotlinx.coroutines.launch
 @Composable
 fun NewsSettingsScreen() {
     SettingsColumn {
+        CodeforcesDefaultTab()
         CodeforcesRuEnabledSettingsItem()
     }
+}
+
+@Composable
+private fun CodeforcesDefaultTab() {
+    val context = context
+    SettingsEnumItem(
+        item = context.settingsNews.codeforcesDefaultTab,
+        title = "Default tab",
+        options = listOf(
+            CodeforcesTitle.MAIN,
+            CodeforcesTitle.TOP,
+            CodeforcesTitle.RECENT
+        )
+    )
 }
 
 @Composable

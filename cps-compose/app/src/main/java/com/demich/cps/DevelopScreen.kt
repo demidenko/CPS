@@ -116,7 +116,7 @@ private fun TestHandles(
         ) {
             managers.forEach { manager ->
                 CPSRadioButtonTitled(
-                    title = manager.type.name,
+                    title = { Text(text = manager.type.name) },
                     selected = selectedType == manager.type
                 ) {
                     selectedType = manager.type
