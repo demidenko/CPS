@@ -12,6 +12,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.signedToString
 import kotlinx.datetime.Instant
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -20,13 +21,20 @@ object CodeforcesUtils {
     private val dateFormatRU = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
     private val dateFormatEN = SimpleDateFormat("MMM/dd/yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
 
-    private fun parseTimeString(str: String): Instant {
-        val parser = if(str.contains('.')) dateFormatRU else dateFormatEN
-        return Instant.fromEpochMilliseconds(parser.parse(str)!!.time)
+    private fun String.extractTime(): Instant {
+        val parser = if(this.contains('.')) dateFormatRU else dateFormatEN
+        return Instant.fromEpochMilliseconds(parser.parse(this)!!.time)
     }
 
-    fun extractBlogEntries(page: String): List<CodeforcesBlogEntry> {
-        return Jsoup.parse(page).select("div.topic").map { topic ->
+    private fun Element.extractRatedUser(): Pair<String, ColorTag> = Pair(
+        first = text(),
+        second = ColorTag.fromString(
+            str = classNames().first { name -> name.startsWith("user-") }
+        )
+    )
+
+    fun extractBlogEntries(source: String): List<CodeforcesBlogEntry> {
+        return Jsoup.parse(source).select("div.topic").map { topic ->
             val id: Int
             val title: String
             topic.selectFirst("div.title")!!.let {
@@ -38,15 +46,11 @@ object CodeforcesUtils {
             val authorColorTag: ColorTag
             val creationTime: Instant
             topic.selectFirst("div.info")!!.let { info ->
-                info.selectFirst(".rated-user")!!.let {
-                    authorHandle = it.text()
-                    authorColorTag = ColorTag.fromString(
-                        str = it.classNames().first { name -> name.startsWith("user-") }
-                    )
+                with(info.selectFirst(".rated-user")!!.extractRatedUser()) {
+                    authorHandle = first
+                    authorColorTag = second
                 }
-                creationTime = parseTimeString(
-                    str = info.selectFirst(".format-humantime")!!.attr("title")
-                )
+                creationTime = info.selectFirst(".format-humantime")!!.attr("title").extractTime()
             }
 
             val rating: Int
@@ -69,6 +73,64 @@ object CodeforcesUtils {
         }
     }
 
+    fun extractComments(source: String): List<CodeforcesRecentAction> {
+        return Jsoup.parse(source).select(".comment-table").map { commentBox ->
+            val commentatorHandle: String
+            val commentatorHandleColorTag: ColorTag
+            commentBox.selectFirst(".avatar")!!.let { avatarBox ->
+                with(avatarBox.selectFirst("a.rated-user")!!.extractRatedUser()) {
+                    commentatorHandle = first
+                    commentatorHandleColorTag = second
+                }
+            }
+
+            val blogEntryId: Int
+            val blogEntryTitle: String
+            val blogEntryAuthorHandle: String
+            val blogEntryAuthorHandleColorTag: ColorTag
+            val commentId: Long
+            val commentCreationTime: Instant
+            val commentRating: Int
+            commentBox.selectFirst("div.info")!!.let { info ->
+                commentCreationTime = info.selectFirst(".format-humantime")!!.attr("title").extractTime()
+                with(info.selectFirst("a.rated-user")!!.extractRatedUser()) {
+                    blogEntryAuthorHandle = first
+                    blogEntryAuthorHandleColorTag = second
+                }
+                info.getElementsByAttributeValueContaining("href", "#comment")[0]!!.let { commentLink ->
+                    with(commentLink.attr("href").split("#comment-")) {
+                        blogEntryId = this[0].removePrefix("/blog/entry/").toInt()
+                        commentId = this[1].toLong()
+                    }
+                    blogEntryTitle = commentLink.text()
+                }
+                info.getElementsByAttribute("commentid")[0]!!.let { ratingBox ->
+                    commentRating = ratingBox.text().trim().toInt()
+                }
+            }
+
+            val commentHtml = commentBox.selectFirst("div.ttypography")!!.html()
+
+            CodeforcesRecentAction(
+                time = commentCreationTime,
+                comment = CodeforcesComment(
+                    id = commentId,
+                    commentatorHandle = commentatorHandle,
+                    commentatorHandleColorTag = commentatorHandleColorTag,
+                    html = commentHtml,
+                    rating = commentRating,
+                    creationTime = commentCreationTime
+                ),
+                blogEntry = CodeforcesBlogEntry(
+                    id = blogEntryId,
+                    title = blogEntryTitle,
+                    authorHandle = blogEntryAuthorHandle,
+                    authorColorTag = blogEntryAuthorHandleColorTag,
+                    creationTime = Instant.DISTANT_PAST
+                )
+            )
+        }
+    }
 
     enum class ColorTag {
         BLACK,
