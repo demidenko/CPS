@@ -123,8 +123,6 @@ class CodeforcesNewsViewModel: ViewModel() {
         return Pair(
             first = CodeforcesUtils.extractRecentBlogEntries(s),
             second = CodeforcesUtils.extractComments(s)
-        ).also {
-            println(it.first)
-        }
+        )
     }
 }
