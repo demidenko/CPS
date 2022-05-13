@@ -13,16 +13,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.EmptyListMessageBox
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.*
+import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesUtils
+import com.demich.cps.utils.context
+import com.demich.cps.utils.openUrlInBrowser
+import com.demich.cps.utils.timeAgo
 
 @Composable
 fun CodeforcesBlogEntries(
@@ -31,16 +33,7 @@ fun CodeforcesBlogEntries(
 ) {
     val context = context
     if (blogEntriesState.value.isEmpty()) {
-        Box(
-            modifier = modifier,
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "List is empty",
-                color = cpsColors.contentAdditional,
-                fontWeight = FontWeight.Medium
-            )
-        }
+        EmptyListMessageBox(modifier = modifier)
     } else {
         LazyColumn(
             modifier = modifier
@@ -49,10 +42,12 @@ fun CodeforcesBlogEntries(
                 BlogEntryInfo(
                     blogEntry = it,
                     modifier = Modifier
-                        .clickable { context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(blogEntryId = it.id)) }
+                        .fillMaxWidth()
+                        .clickable {
+                            context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(blogEntryId = it.id))
+                        }
                         .padding(horizontal = 3.dp)
                         .padding(bottom = 4.dp, top = 1.dp)
-                        .fillMaxWidth()
                 )
                 Divider()
             }
@@ -94,48 +89,78 @@ private fun BlogEntryInfo(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        Row(modifier = Modifier.fillMaxWidth()) {
+        BlogEntryInfoHeader(
+            title = title,
+            rating = rating
+        )
+        BlogEntryInfoFooter(
+            authorHandle = authorHandle,
+            timeAgo = timeAgo,
+            commentsCount = commentsCount
+        )
+    }
+}
+
+@Composable
+private fun BlogEntryInfoHeader(
+    title: String,
+    rating: Int
+) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            fontSize = 18.5.sp,
+            modifier = Modifier.weight(1f)
+        )
+        CodeforcesUtils.VotedText(
+            rating = rating,
+            fontSize = 14.sp,
+            modifier = Modifier.padding(start = 3.dp, top = 3.dp)
+        )
+    }
+}
+
+@Composable
+private fun BlogEntryInfoFooter(
+    authorHandle: AnnotatedString,
+    timeAgo: String,
+    commentsCount: Int
+) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 1.dp)
+        ) {
             Text(
-                text = title,
-                fontSize = 18.5.sp,
-                modifier = Modifier.weight(1f)
+                text = authorHandle,
+                fontSize = 13.sp
             )
-            CodeforcesUtils.VotedText(
-                rating = rating,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(start = 3.dp, top = 3.dp)
+            Text(
+                text = timeAgo,
+                color = cpsColors.contentAdditional,
+                fontSize = 11.sp,
+                modifier = Modifier.padding(start = 4.dp)
             )
         }
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Row(modifier = Modifier.align(Alignment.TopStart)) {
-                Text(
-                    text = buildAnnotatedString {
-                        append(authorHandle)
-                        append("  ")
-                        append(text = timeAgo, color = cpsColors.contentAdditional, fontSize = 11.sp)
-                    },
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(top = 1.dp)
+        if (commentsCount > 0) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.align(Alignment.TopEnd)
+            ) {
+                Icon(
+                    imageVector = CPSIcons.Comments,
+                    contentDescription = null,
+                    tint = cpsColors.contentAdditional,
+                    modifier = Modifier
+                        .padding(end = 3.dp)
+                        .size(with(LocalDensity.current) { 11.sp.toDp() })
                 )
-            }
-            if (commentsCount > 0) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.align(Alignment.TopEnd)
-                ) {
-                    Icon(
-                        imageVector = CPSIcons.Comments,
-                        contentDescription = null,
-                        tint = cpsColors.contentAdditional,
-                        modifier = Modifier
-                            .padding(end = 3.dp)
-                            .size(with(LocalDensity.current) { 11.sp.toDp() })
-                    )
-                    Text(
-                        text = commentsCount.toString(),
-                        fontSize = 13.sp
-                    )
-                }
+                Text(
+                    text = commentsCount.toString(),
+                    fontSize = 13.sp
+                )
             }
         }
     }
