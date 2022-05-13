@@ -8,15 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.codeforces.CodeforcesApi
-import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
-import com.demich.cps.utils.codeforces.CodeforcesLocale
-import com.demich.cps.utils.codeforces.CodeforcesUtils
+import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.combine
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CodeforcesNewsViewModel: ViewModel() {
 
@@ -44,7 +43,7 @@ class CodeforcesNewsViewModel: ViewModel() {
             require(loadingStatusState.value != LoadingStatus.LOADING)
             viewModelScope.launch {
                 loadingStatusState.value = LoadingStatus.LOADING
-                val data = getData(locale)
+                val data = withContext(Dispatchers.IO) { getData(locale) }
                 if(data == null) loadingStatusState.value = LoadingStatus.FAILED
                 else {
                     dataFlow.value = data
@@ -58,7 +57,7 @@ class CodeforcesNewsViewModel: ViewModel() {
     private val reloadableTitles = listOf(
         CodeforcesTitle.MAIN,
         CodeforcesTitle.TOP,
-        //TODO: CodeforcesTitle.RECENT
+        CodeforcesTitle.RECENT
     )
 
     fun combinedLoadingStatusState() = derivedStateOf {
@@ -69,7 +68,8 @@ class CodeforcesNewsViewModel: ViewModel() {
         return when (title) {
             CodeforcesTitle.MAIN -> mainBlogEntries.loadingStatusState
             CodeforcesTitle.TOP -> topBlogEntries.loadingStatusState
-            else -> TODO()
+            CodeforcesTitle.RECENT -> recentActions.loadingStatusState
+            else -> throw IllegalArgumentException("$title is not reloadable")
         }
     }
 
@@ -79,6 +79,9 @@ class CodeforcesNewsViewModel: ViewModel() {
     private val topBlogEntries = DataLoader(emptyList()) { loadBlogEntries(page = "/top", locale = it) }
     fun flowOfTopBlogEntries(context: Context) = topBlogEntries.getDataFlow(context)
 
+    private val recentActions = DataLoader(Pair(emptyList(), emptyList())) { loadRecentActions(locale = it) }
+    fun flowOfRecentActions(context: Context) = recentActions.getDataFlow(context)
+
     private fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
         when(title) {
             CodeforcesTitle.MAIN -> mainBlogEntries.launchLoad(locale)
@@ -86,7 +89,7 @@ class CodeforcesNewsViewModel: ViewModel() {
                 topBlogEntries.launchLoad(locale)
                 //topComments.load(locale)
             }
-            //CodeforcesTitle.RECENT -> recentActions.load(locale)
+            CodeforcesTitle.RECENT -> recentActions.launchLoad(locale)
             else -> return
         }
     }
@@ -110,5 +113,18 @@ class CodeforcesNewsViewModel: ViewModel() {
         return CodeforcesUtils.extractBlogEntries(s)
     }
 
+    private suspend fun loadComments(page: String, locale: CodeforcesLocale): List<CodeforcesRecentAction>? {
+        val s = CodeforcesApi.getPageSource(urlString = CodeforcesApi.urls.main + page, locale = locale) ?: return null
+        return CodeforcesUtils.extractComments(s)
+    }
 
+    private suspend fun loadRecentActions(locale: CodeforcesLocale): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>? {
+        val s = CodeforcesApi.getPageSource(urlString = CodeforcesApi.urls.main + "/recent-actions", locale = locale) ?: return null
+        return Pair(
+            first = CodeforcesUtils.extractRecentBlogEntries(s),
+            second = CodeforcesUtils.extractComments(s)
+        ).also {
+            println(it.first)
+        }
+    }
 }
