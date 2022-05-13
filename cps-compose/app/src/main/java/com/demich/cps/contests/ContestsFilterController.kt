@@ -7,35 +7,47 @@ import com.demich.cps.utils.containsTokensAsSubsequence
 
 @Composable
 fun rememberContestsFilterController(): ContestsFilterController {
-    val enabledState = rememberSaveable { mutableStateOf(false) }
     val filterState = rememberSaveable { mutableStateOf("") }
-    return remember(enabledState, filterState) {
+    val enabledState = rememberSaveable { mutableStateOf(false) }
+    val availableState = rememberSaveable { mutableStateOf(false) }
+    return remember(enabledState, filterState, availableState) {
         ContestsFilterController(
+            filterState = filterState,
             enabledState = enabledState,
-            filterState = filterState
+            availableState = availableState
         )
     }
 }
 
 @Stable
 data class ContestsFilterController(
+    private val filterState: MutableState<String>,
     private val enabledState: MutableState<Boolean>,
-    private val filterState: MutableState<String>
+    private val availableState: MutableState<Boolean>
 ) {
+
+    var filter: String
+        get() = filterState.value
+        set(value) { filterState.value = value }
+
+    var enabled: Boolean
+        get() = enabledState.value
+        set(value) {
+            enabledState.value = value
+            if (!value) filter = ""
+        }
+
+    var available: Boolean
+        get() = availableState.value
+        set(value) {
+            availableState.value = value
+            if (!value) enabled = false
+        }
 
     fun checkContest(contest: Contest): Boolean {
         if(contest.title.containsTokensAsSubsequence(str = filter, ignoreCase = true)) return true
         if(contest.platform.name.containsTokensAsSubsequence(str = filter, ignoreCase = true)) return true
         return false
     }
-
-    var enabled: Boolean
-        get() = enabledState.value
-        set(value) { enabledState.value = value }
-
-
-    var filter: String
-        get() = filterState.value
-        set(value) { filterState.value = value }
 
 }

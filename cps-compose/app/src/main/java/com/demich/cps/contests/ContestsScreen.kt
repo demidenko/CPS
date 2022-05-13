@@ -34,13 +34,10 @@ fun ContestsScreen(
     filterController: ContestsFilterController
 ) {
     Column {
-        if (filterController.enabled) {
-            //TODO: show in bottom, imePadding, focus request
-            ContestsSearchField(
-                modifier = Modifier.fillMaxWidth(),
-                filterController = filterController
-            )
-        }
+        ContestsSearchField(
+            modifier = Modifier.fillMaxWidth(),
+            filterController = filterController
+        )
         ContestsContent(
             contestsViewModel = contestsViewModel,
             filterController = filterController
@@ -75,7 +72,7 @@ private fun ContestsContent(
                 modifier = Modifier
                     .fillMaxWidth()
             )
-            ContestsListNotEmpty(
+            ContestsListCheckEmpty(
                 contestsState = contestsState,
                 filterController = filterController,
                 modifier = Modifier
@@ -90,12 +87,18 @@ private fun ContestsContent(
 }
 
 @Composable
-private fun ContestsListNotEmpty(
+private fun ContestsListCheckEmpty(
     contestsState: State<List<Contest>>,
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
-    if (contestsState.value.isEmpty()) {
+    val isEmpty = contestsState.value.isEmpty()
+
+    LaunchedEffect(key1 = isEmpty) {
+        filterController.available = !isEmpty
+    }
+
+    if (isEmpty) {
         EmptyListMessageBox(modifier = modifier)
     } else {
         ContestsList(
@@ -183,20 +186,23 @@ private fun ContestsSearchField(
     modifier: Modifier = Modifier,
     filterController: ContestsFilterController
 ) {
-    OutlinedTextField(
-        modifier = modifier,
-        value = filterController.filter,
-        onValueChange = {
-            filterController.filter = it
-        },
-        trailingIcon = {
-            CPSIconButton(icon = CPSIcons.Close) {
-                filterController.enabled = false
-                filterController.filter = ""
-            }
-        },
-        label = { Text("Search") }
-    )
+    //TODO: show in bottom, imePadding, focus request
+    if (filterController.enabled) {
+        OutlinedTextField(
+            modifier = modifier,
+            value = filterController.filter,
+            onValueChange = {
+                filterController.filter = it
+            },
+            trailingIcon = {
+                CPSIconButton(icon = CPSIcons.Close) {
+                    filterController.enabled = false
+                    filterController.filter = ""
+                }
+            },
+            label = { Text("Search") }
+        )
+    }
 }
 
 @Composable
@@ -240,14 +246,16 @@ fun contestsBottomBarBuilder(
     filterController: ContestsFilterController
 ): AdditionalBottomBarBuilder = {
     val context = context
-    val settings = remember { context.settingsContests }
-    CPSIconButton(
-        icon = CPSIcons.Search,
-        onClick = { filterController.enabled = true }
-    )
-    CPSReloadingButton(
-        loadingStatus = contestsViewModel.loadingStatusState.value
-    ) {
-        contestsViewModel.reloadEnabledPlatforms(context)
+
+    if (filterController.available) {
+        CPSIconButton(
+            icon = CPSIcons.Search,
+            onClick = { filterController.enabled = true }
+        )
     }
+
+    CPSReloadingButton(
+        loadingStatus = contestsViewModel.loadingStatusState.value,
+        onClick = { contestsViewModel.reloadEnabledPlatforms(context) }
+    )
 }
