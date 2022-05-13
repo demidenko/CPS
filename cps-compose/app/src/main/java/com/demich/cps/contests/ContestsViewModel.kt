@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class ContestsViewModel: ViewModel() {
 
-    val loadingStatus: State<LoadingStatus>
+    val loadingStatusState: State<LoadingStatus>
         @Composable
         get() = remember {
             derivedStateOf {

@@ -129,7 +129,7 @@ object DurationAsSecondsSerializer: KSerializer<Duration> {
 }
 
 
-fun String.containsTokensAsSubsequence(str: String, ignoreCase: Boolean = true): Boolean {
+fun String.containsTokensAsSubsequence(str: String, ignoreCase: Boolean = false): Boolean {
     val tokens = str.trim().split("\\s+".toRegex())
     var i = 0
     for (token in tokens) {

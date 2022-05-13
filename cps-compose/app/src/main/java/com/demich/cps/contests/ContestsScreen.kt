@@ -3,10 +3,7 @@ package com.demich.cps.contests
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.OutlinedTextField
@@ -74,7 +71,7 @@ private fun ContestsScreen(
     }
 
     val errorsList by contestsViewModel.getErrorsListState()
-    val loadingStatus by contestsViewModel.loadingStatus
+    val loadingStatus by contestsViewModel.loadingStatusState
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
@@ -86,22 +83,36 @@ private fun ContestsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
             )
-            ContestsList(
+            ContestsListNotEmpty(
                 contestsState = contestsState,
                 searchText = searchText,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
+                    .fillMaxSize()
             )
         }
     }
 
-    //TODO: first time app on screen, what to do?
     LaunchedEffect(Unit) {
         contestsViewModel.syncEnabledAndLastReloaded(context)
     }
 }
 
+@Composable
+private fun ContestsListNotEmpty(
+    contestsState: State<List<Contest>>,
+    searchText: String,
+    modifier: Modifier = Modifier
+) {
+    if (contestsState.value.isEmpty()) {
+        EmptyListMessageBox(modifier = modifier)
+    } else {
+        ContestsList(
+            contestsState = contestsState,
+            searchText = searchText,
+            modifier = modifier
+        )
+    }
+}
 
 @Composable
 private fun ContestsList(
@@ -224,7 +235,7 @@ fun contestsMenuBuilder(
     CPSDropdownMenuItem(
         title = "Settings",
         icon = CPSIcons.Settings,
-        enabled = contestsViewModel.loadingStatus.value != LoadingStatus.LOADING
+        enabled = contestsViewModel.loadingStatusState.value != LoadingStatus.LOADING
     ) {
         navigator.navigateTo(Screen.ContestsSettings)
     }
@@ -235,12 +246,13 @@ fun contestsBottomBarBuilder(
     onEnableSearch: () -> Unit
 ): AdditionalBottomBarBuilder = {
     val context = context
+    val settings = remember { context.settingsContests }
     CPSIconButton(
         icon = CPSIcons.Search,
         onClick = onEnableSearch
     )
     CPSReloadingButton(
-        loadingStatus = contestsViewModel.loadingStatus.value
+        loadingStatus = contestsViewModel.loadingStatusState.value
     ) {
         contestsViewModel.reloadEnabledPlatforms(context)
     }
