@@ -31,35 +31,27 @@ import kotlinx.coroutines.flow.combine
 @Composable
 fun ContestsScreen(
     contestsViewModel: ContestsViewModel,
-    searchEnabledState: MutableState<Boolean>
+    filterController: ContestsFilterController
 ) {
-    var searchText by rememberSaveable { mutableStateOf("") }
     Column {
-        if (searchEnabledState.value) {
+        if (filterController.enabled) {
             //TODO: show in bottom, imePadding, focus request
             ContestsSearchField(
                 modifier = Modifier.fillMaxWidth(),
-                value = searchText,
-                onValueChange = {
-                    searchText = it
-                },
-                onClose = {
-                    searchEnabledState.value = false
-                    searchText = ""
-                }
+                filterController = filterController
             )
         }
-        ContestsScreen(
+        ContestsContent(
             contestsViewModel = contestsViewModel,
-            searchText = searchText
+            filterController = filterController
         )
     }
 }
 
 @Composable
-private fun ContestsScreen(
+private fun ContestsContent(
     contestsViewModel: ContestsViewModel,
-    searchText: String
+    filterController: ContestsFilterController
 ) {
     val context = context
 
@@ -85,7 +77,7 @@ private fun ContestsScreen(
             )
             ContestsListNotEmpty(
                 contestsState = contestsState,
-                searchText = searchText,
+                filterController = filterController,
                 modifier = Modifier
                     .fillMaxSize()
             )
@@ -100,7 +92,7 @@ private fun ContestsScreen(
 @Composable
 private fun ContestsListNotEmpty(
     contestsState: State<List<Contest>>,
-    searchText: String,
+    filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
     if (contestsState.value.isEmpty()) {
@@ -108,7 +100,7 @@ private fun ContestsListNotEmpty(
     } else {
         ContestsList(
             contestsState = contestsState,
-            searchText = searchText,
+            filterController = filterController,
             modifier = modifier
         )
     }
@@ -117,7 +109,7 @@ private fun ContestsListNotEmpty(
 @Composable
 private fun ContestsList(
     contestsState: State<List<Contest>>,
-    searchText: String,
+    filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
     val currentTime by collectCurrentTimeEachSecond()
@@ -134,7 +126,7 @@ private fun ContestsList(
     CompositionLocalProvider(LocalCurrentTime provides currentTime) {
         ContestsSortedList(
             contestsSortedListState = sortedState,
-            searchText = searchText,
+            filterController = filterController,
             modifier = modifier
         )
     }
@@ -144,18 +136,19 @@ private fun ContestsList(
 @Composable
 private fun ContestsSortedList(
     contestsSortedListState: State<List<Contest>>,
-    searchText: String,
+    filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
+    //TODO: strange each second recomposition here (even without ContestItems)
+
     var expandedItems: Set<Pair<Contest.Platform, String>>
         by rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(emptySet()) }
 
-    val filteredContests = remember(contestsSortedListState.value, searchText) {
-        contestsSortedListState.value.filter { contest ->
-            val inTitle = contest.title.containsTokensAsSubsequence(searchText, ignoreCase = true)
-            val inPlatformName = contest.platform.name.containsTokensAsSubsequence(searchText, ignoreCase = true)
-            inTitle || inPlatformName
-        }
+    val filteredContests = remember(
+        key1 = contestsSortedListState.value,
+        key2 = filterController.filter
+    ) {
+        contestsSortedListState.value.filter(filterController::checkContest)
     }
 
     LazyColumnWithScrollBar(modifier = modifier) {
@@ -188,17 +181,18 @@ private fun ContestsSortedList(
 @Composable
 private fun ContestsSearchField(
     modifier: Modifier = Modifier,
-    value: String,
-    onValueChange: (String) -> Unit,
-    onClose: () -> Unit
+    filterController: ContestsFilterController
 ) {
     OutlinedTextField(
         modifier = modifier,
-        value = value,
-        onValueChange = onValueChange,
+        value = filterController.filter,
+        onValueChange = {
+            filterController.filter = it
+        },
         trailingIcon = {
             CPSIconButton(icon = CPSIcons.Close) {
-                onClose()
+                filterController.enabled = false
+                filterController.filter = ""
             }
         },
         label = { Text("Search") }
@@ -243,13 +237,13 @@ fun contestsMenuBuilder(
 
 fun contestsBottomBarBuilder(
     contestsViewModel: ContestsViewModel,
-    onEnableSearch: () -> Unit
+    filterController: ContestsFilterController
 ): AdditionalBottomBarBuilder = {
     val context = context
     val settings = remember { context.settingsContests }
     CPSIconButton(
         icon = CPSIcons.Search,
-        onClick = onEnableSearch
+        onClick = { filterController.enabled = true }
     )
     CPSReloadingButton(
         loadingStatus = contestsViewModel.loadingStatusState.value

@@ -17,10 +17,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.demich.cps.accounts.*
-import com.demich.cps.contests.ContestsScreen
-import com.demich.cps.contests.ContestsViewModel
-import com.demich.cps.contests.contestsBottomBarBuilder
-import com.demich.cps.contests.contestsMenuBuilder
+import com.demich.cps.contests.*
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
@@ -163,14 +160,14 @@ private fun CPSScaffold(
             }
 
             cpsComposable(ScreenTypes.contests.route) { holder ->
-                val searchEnabled = rememberSaveable { mutableStateOf(false) }
+                val filterController = rememberContestsFilterController()
                 ContestsScreen(
                     contestsViewModel = cpsViewModels.contestsViewModel,
-                    searchEnabledState = searchEnabled
+                    filterController = filterController
                 )
                 holder.bottomBar = contestsBottomBarBuilder(
                     contestsViewModel = cpsViewModels.contestsViewModel,
-                    onEnableSearch = { searchEnabled.value = true }
+                    filterController = filterController
                 )
                 holder.menu = contestsMenuBuilder(
                     navigator = navigator,
