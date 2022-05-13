@@ -132,6 +132,25 @@ object CodeforcesUtils {
         }
     }
 
+    fun extractRecentBlogEntries(source: String): List<CodeforcesBlogEntry> {
+        return Jsoup.parse(source).selectFirst("div.recent-actions")?.select("li")?.map { item ->
+            val (handle, handleColorTag) = item.selectFirst("a.rated-user")!!.extractRatedUser()
+            val blogEntryId: Int
+            val blogEntryTitle: String
+            item.getElementsByAttributeValueStarting("href", "/blog/entry/")[0]!!.let {
+                blogEntryId = it.attr("href").removePrefix("/blog/entry/").toInt()
+                blogEntryTitle = it.text()
+            }
+            CodeforcesBlogEntry(
+                id = blogEntryId,
+                title = blogEntryTitle,
+                authorHandle = handle,
+                authorColorTag = handleColorTag,
+                creationTime = Instant.DISTANT_PAST
+            )
+        } ?: emptyList()
+    }
+
     enum class ColorTag {
         BLACK,
         GRAY,
