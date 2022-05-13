@@ -86,13 +86,9 @@ fun CodeforcesNewsScreen(
                 modifier = Modifier.fillMaxSize()
             ) { index ->
                 when (tabs.value[index]) {
-                    CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(
-                        viewModel = viewModel
-                    )
-                    CodeforcesTitle.TOP -> CodeforcesNewsTopPage(
-                        viewModel = viewModel
-                    )
-                    CodeforcesTitle.RECENT -> CodeforcesNewsRecentPage()
+                    CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(viewModel = viewModel)
+                    CodeforcesTitle.TOP -> CodeforcesNewsTopPage(viewModel = viewModel)
+                    CodeforcesTitle.RECENT -> CodeforcesNewsRecentPage(viewModel = viewModel)
                     CodeforcesTitle.LOST -> CodeforcesNewsLostPage()
                 }
             }
@@ -141,8 +137,22 @@ private fun CodeforcesNewsTopPage(
 }
 
 @Composable
-private fun CodeforcesNewsRecentPage() {
+private fun CodeforcesNewsRecentPage(
+    viewModel: CodeforcesNewsViewModel
+) {
+    val context = context
+    val loadingStatus by viewModel.pageLoadingStatusState(CodeforcesTitle.RECENT)
+    val recentActionsState = rememberCollect { viewModel.flowOfRecentActions(context) }
 
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
+        onRefresh = { viewModel.reload(title = CodeforcesTitle.RECENT, context = context) },
+    ) {
+        CodeforcesRecentBlogEntries(
+            recentActionsState = recentActionsState,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
 }
 
 @Composable
