@@ -1,7 +1,6 @@
 package com.demich.cps.news.codeforces
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,9 +13,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesRecentAction
 import com.demich.cps.utils.codeforces.CodeforcesUtils
@@ -48,7 +52,7 @@ fun CodeforcesRecentBlogEntries(
                 recentBlogEntryData = it,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(all = 3.dp)
+                    .padding(start = 3.dp, end = 3.dp, bottom = 2.dp)
             )
         }
     }
@@ -90,22 +94,81 @@ private fun RecentBlogEntry(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        Text(
-            text = title
+        RecentBlogEntryHeader(
+            title = title,
+            fontSize = 16.sp
         )
-        Row(modifier = Modifier.fillMaxWidth()) {
-            //Text(text = authorHandle, modifier = Modifier.weight(1f, false))
-            //Spacer(modifier = Modifier.fillMaxWidth())
-            //TODO shit auto layout
-            Text(
-                text = commentators,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.End,
-                modifier = Modifier
-                    .weight(1f, false)
-                    .padding(start = 5.dp)
-            )
-        }
+        RecentBlogEntryFooter(
+            authorHandle = authorHandle,
+            handles = commentators,
+            fontSize = 13.sp,
+            iconSize = 11.5.sp,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+private fun RecentBlogEntryHeader(
+    title: String,
+    fontSize: TextUnit
+) {
+    Text(
+        text = title,
+        fontSize = fontSize,
+        fontWeight = FontWeight.Medium
+    )
+}
+
+@Composable
+private fun RecentBlogEntryFooter(
+    authorHandle: AnnotatedString,
+    handles: AnnotatedString,
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit,
+    iconSize: TextUnit
+) {
+    //TODO: icon
+    ConstraintLayout(modifier = modifier) {
+        val (author, commentsIcon, commentators) = createRefs()
+        //val chain = createHorizontalChain(commentsIcon, commentators, chainStyle = ChainStyle.Packed(1f))
+        Text(
+            text = authorHandle,
+            fontSize = fontSize,
+            maxLines = 1,
+            fontStyle = FontStyle.Italic,
+            modifier = Modifier.constrainAs(author) {
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
+            }
+        )
+        /*Icon(
+            imageVector = CPSIcons.Comments,
+            contentDescription = null,
+            tint = cpsColors.contentAdditional,
+            modifier = Modifier
+                .size(with(LocalDensity.current) { iconSize.toDp() })
+                .constrainAs(commentsIcon) {
+                start.linkTo(author.end)
+                height = Dimension.fillToConstraints
+            }
+        )*/
+        Text(
+            text = handles,
+            fontSize = fontSize,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.constrainAs(commentators) {
+                top.linkTo(parent.top)
+                linkTo(
+                    start = author.end,
+                    end = parent.end,
+                    bias = 1f,
+                    startMargin = 10.dp
+                )
+                width = Dimension.preferredWrapContent
+            }
+        )
+
     }
 }

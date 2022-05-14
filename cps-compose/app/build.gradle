@@ -13,7 +13,7 @@ android {
         minSdk 23
         targetSdk 32
 
-        versionCode 169
+        versionCode 170
         versionName '1.7.13'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -70,6 +70,7 @@ dependencies {
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
     implementation "androidx.activity:activity-compose:1.4.0"
     implementation "androidx.navigation:navigation-compose:2.4.2"
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0"
 
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.1"
 
