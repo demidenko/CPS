@@ -51,7 +51,7 @@ fun CodeforcesNewsScreen(
                 CodeforcesTitle.MAIN,
                 CodeforcesTitle.TOP,
                 CodeforcesTitle.RECENT,
-                CodeforcesTitle.LOST
+                //TODO CodeforcesTitle.LOST
             )
         )
     }
