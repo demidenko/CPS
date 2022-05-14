@@ -34,9 +34,9 @@ fun ContestsScreen(
     filterController: ContestsFilterController
 ) {
     Column {
-        ContestsSearchField(
-            modifier = Modifier.fillMaxWidth(),
-            filterController = filterController
+        ContestsFilterTextField(
+            filterController = filterController,
+            modifier = Modifier.fillMaxWidth()
         )
         ContestsContent(
             contestsViewModel = contestsViewModel,
@@ -94,7 +94,7 @@ private fun ContestsListCheckEmpty(
 ) {
     val isEmpty = contestsState.value.isEmpty()
 
-    LaunchedEffect(key1 = isEmpty) {
+    LaunchedEffect(isEmpty) {
         filterController.available = !isEmpty
     }
 
@@ -182,9 +182,9 @@ private fun ContestsSortedList(
 }
 
 @Composable
-private fun ContestsSearchField(
-    modifier: Modifier = Modifier,
-    filterController: ContestsFilterController
+private fun ContestsFilterTextField(
+    filterController: ContestsFilterController,
+    modifier: Modifier = Modifier
 ) {
     //TODO: show in bottom, imePadding, focus request
     if (filterController.enabled) {
