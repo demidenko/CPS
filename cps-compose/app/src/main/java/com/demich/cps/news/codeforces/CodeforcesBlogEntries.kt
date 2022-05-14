@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSIcons
@@ -110,6 +111,7 @@ private fun BlogEntryInfoHeader(
         Text(
             text = title,
             fontSize = 18.5.sp,
+            fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f)
         )
         CodeforcesUtils.VotedText(
