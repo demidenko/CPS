@@ -3,24 +3,30 @@ package com.demich.cps.news.codeforces
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesRecentAction
 import com.demich.cps.utils.codeforces.CodeforcesUtils
@@ -54,6 +60,7 @@ fun CodeforcesRecentBlogEntries(
                     .fillMaxWidth()
                     .padding(start = 3.dp, end = 3.dp, bottom = 2.dp)
             )
+            Divider()
         }
     }
 }
@@ -128,47 +135,48 @@ private fun RecentBlogEntryFooter(
     fontSize: TextUnit,
     iconSize: TextUnit
 ) {
-    //TODO: icon
     ConstraintLayout(modifier = modifier) {
         val (author, commentsIcon, commentators) = createRefs()
-        //val chain = createHorizontalChain(commentsIcon, commentators, chainStyle = ChainStyle.Packed(1f))
+
         Text(
             text = authorHandle,
             fontSize = fontSize,
             maxLines = 1,
-            fontStyle = FontStyle.Italic,
             modifier = Modifier.constrainAs(author) {
                 top.linkTo(parent.top)
                 start.linkTo(parent.start)
             }
         )
-        /*Icon(
-            imageVector = CPSIcons.Comments,
-            contentDescription = null,
-            tint = cpsColors.contentAdditional,
-            modifier = Modifier
-                .size(with(LocalDensity.current) { iconSize.toDp() })
-                .constrainAs(commentsIcon) {
-                start.linkTo(author.end)
-                height = Dimension.fillToConstraints
+
+        if (handles.isNotEmpty()) {
+            constrain(createHorizontalChain(commentsIcon, commentators, chainStyle = ChainStyle.Packed(1f))) {
+                end.linkTo(parent.end)
+                start.linkTo(author.end, margin = 10.dp)
             }
-        )*/
-        Text(
-            text = handles,
-            fontSize = fontSize,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.constrainAs(commentators) {
-                top.linkTo(parent.top)
-                linkTo(
-                    start = author.end,
-                    end = parent.end,
-                    bias = 1f,
-                    startMargin = 10.dp
-                )
-                width = Dimension.preferredWrapContent
-            }
-        )
+
+            Icon(
+                imageVector = CPSIcons.Comments,
+                contentDescription = null,
+                tint = cpsColors.contentAdditional,
+                modifier = Modifier
+                    .padding(end = 1.dp)
+                    .size(with(LocalDensity.current) { iconSize.toDp() })
+                    .constrainAs(commentsIcon) {
+                        //bad solution
+                        centerVerticallyTo(commentators, 0.75f)
+                    }
+            )
+
+            Text(
+                text = handles,
+                fontSize = fontSize,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.constrainAs(commentators) {
+                    width = Dimension.preferredWrapContent
+                }
+            )
+        }
 
     }
 }
