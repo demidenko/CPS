@@ -5,19 +5,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.EmptyListMessageBox
+import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.codeforces.CodeforcesApi
@@ -151,13 +150,12 @@ private fun BlogEntryInfoFooter(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.align(Alignment.TopEnd)
             ) {
-                Icon(
+                IconSp(
                     imageVector = CPSIcons.Comments,
-                    contentDescription = null,
-                    tint = cpsColors.contentAdditional,
+                    size = 11.sp,
+                    color = cpsColors.contentAdditional,
                     modifier = Modifier
                         .padding(end = 3.dp)
-                        .size(with(LocalDensity.current) { 11.sp.toDp() })
                 )
                 Text(
                     text = commentsCount.toString(),

@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -25,6 +26,21 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 
 const val buttonOnOffDurationMillis: Int = 800
+
+@Composable
+fun IconSp(
+    imageVector: ImageVector,
+    modifier: Modifier = Modifier,
+    size: TextUnit,
+    color: Color = cpsColors.content
+) {
+    Icon(
+        imageVector = imageVector,
+        contentDescription = null,
+        tint = color,
+        modifier = modifier.size(with(LocalDensity.current) { size.toDp() })
+    )
+}
 
 @Composable
 fun CPSIconButton(
