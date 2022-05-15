@@ -23,7 +23,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.demich.cps.ui.CPSIcons
@@ -105,7 +104,8 @@ private fun RecentBlogEntry(
     Column(modifier = modifier) {
         RecentBlogEntryHeader(
             title = title,
-            fontSize = 16.sp
+            fontSize = 16.sp,
+            modifier = Modifier.fillMaxWidth()
         )
         RecentBlogEntryFooter(
             authorHandle = authorHandle,
@@ -120,9 +120,13 @@ private fun RecentBlogEntry(
 @Composable
 private fun RecentBlogEntryHeader(
     title: String,
-    fontSize: TextUnit
+    fontSize: TextUnit,
+    modifier: Modifier = Modifier
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         //TODO: arrow center vertically only to first line
         IconSp(
             imageVector = Icons.Default.ArrowRightAlt,
@@ -146,7 +150,7 @@ private fun RecentBlogEntryFooter(
     iconSize: TextUnit
 ) {
     ConstraintLayout(modifier = modifier) {
-        val (author, commentsIcon, commentators) = createRefs()
+        val (author, commentators) = createRefs()
 
         Text(
             text = authorHandle,
@@ -159,32 +163,33 @@ private fun RecentBlogEntryFooter(
         )
 
         if (handles.isNotEmpty()) {
-            constrain(createHorizontalChain(commentsIcon, commentators, chainStyle = ChainStyle.Packed(1f))) {
-                end.linkTo(parent.end)
-                start.linkTo(author.end, margin = 10.dp)
-            }
-
-            IconSp(
-                imageVector = CPSIcons.Comments,
-                size = iconSize,
-                color = cpsColors.contentAdditional,
-                modifier = Modifier
-                    .padding(end = 1.dp)
-                    .constrainAs(commentsIcon) {
-                        //bad solution
-                        centerVerticallyTo(commentators, 0.75f)
-                    }
-            )
-
-            Text(
-                text = handles,
-                fontSize = fontSize,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.constrainAs(commentators) {
+                    top.linkTo(parent.top)
+                    linkTo(
+                        start = author.end,
+                        end = parent.end,
+                        bias = 1f,
+                        startMargin = 10.dp
+                    )
                     width = Dimension.preferredWrapContent
                 }
-            )
+            ) {
+                IconSp(
+                    imageVector = CPSIcons.Comments,
+                    size = iconSize,
+                    color = cpsColors.contentAdditional,
+                    modifier = Modifier
+                        .padding(end = 1.dp)
+                )
+                Text(
+                    text = handles,
+                    fontSize = fontSize,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
 
     }
