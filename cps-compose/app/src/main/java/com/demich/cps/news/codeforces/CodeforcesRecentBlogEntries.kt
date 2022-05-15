@@ -19,13 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
@@ -109,9 +107,9 @@ private fun RecentBlogEntry(
         )
         RecentBlogEntryFooter(
             authorHandle = authorHandle,
-            handles = commentators,
+            commentators = commentators,
             fontSize = 13.sp,
-            iconSize = 11.5.sp,
+            iconSize = 11.sp,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -144,13 +142,13 @@ private fun RecentBlogEntryHeader(
 @Composable
 private fun RecentBlogEntryFooter(
     authorHandle: AnnotatedString,
-    handles: AnnotatedString,
+    commentators: AnnotatedString,
     modifier: Modifier = Modifier,
     fontSize: TextUnit,
     iconSize: TextUnit
 ) {
     ConstraintLayout(modifier = modifier) {
-        val (author, commentators) = createRefs()
+        val (author, comments) = createRefs()
 
         Text(
             text = authorHandle,
@@ -162,10 +160,13 @@ private fun RecentBlogEntryFooter(
             }
         )
 
-        if (handles.isNotEmpty()) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.constrainAs(commentators) {
+        if (commentators.isNotEmpty()) {
+            CommentsRow(
+                text = commentators,
+                fontSize = fontSize,
+                iconSize = iconSize,
+                spaceSize = 1.dp,
+                modifier = Modifier.constrainAs(comments) {
                     top.linkTo(parent.top)
                     linkTo(
                         start = author.end,
@@ -175,21 +176,7 @@ private fun RecentBlogEntryFooter(
                     )
                     width = Dimension.preferredWrapContent
                 }
-            ) {
-                IconSp(
-                    imageVector = CPSIcons.Comments,
-                    size = iconSize,
-                    color = cpsColors.contentAdditional,
-                    modifier = Modifier
-                        .padding(end = 1.dp)
-                )
-                Text(
-                    text = handles,
-                    fontSize = fontSize,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+            )
         }
 
     }
