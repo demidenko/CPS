@@ -47,6 +47,7 @@ object CPSIcons {
     val SetupLoaders get() = Icons.Default.PermDataSetting
     val Star get() = Icons.Default.Star
     val Comments get() = Icons.Rounded.Forum
+    val CommentSingle get() = Icons.Rounded.ChatBubble
 }
 
 

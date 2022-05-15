@@ -100,9 +100,10 @@ private fun RecentBlogEntry(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        RecentBlogEntryHeader(
+        BlogEntryTitleWithArrow(
             title = title,
             fontSize = 16.sp,
+            singleLine = false,
             modifier = Modifier.fillMaxWidth()
         )
         RecentBlogEntryFooter(
@@ -111,30 +112,6 @@ private fun RecentBlogEntry(
             fontSize = 13.sp,
             iconSize = 11.sp,
             modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-
-@Composable
-private fun RecentBlogEntryHeader(
-    title: String,
-    fontSize: TextUnit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        //TODO: arrow center vertically only to first line
-        IconSp(
-            imageVector = Icons.Default.ArrowRightAlt,
-            size = fontSize,
-            color = cpsColors.contentAdditional
-        )
-        Text(
-            text = title,
-            fontSize = fontSize,
-            fontWeight = FontWeight.Medium
         )
     }
 }
