@@ -1,31 +1,24 @@
 package com.demich.cps.news.codeforces
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowRightAlt
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.demich.cps.ui.IconSp
-import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesRecentAction
 import com.demich.cps.utils.codeforces.CodeforcesUtils
@@ -134,10 +127,12 @@ private fun RecentBlogEntryFooter(
             modifier = Modifier.constrainAs(author) {
                 top.linkTo(parent.top)
                 start.linkTo(parent.start)
+                width = Dimension.wrapContent
             }
         )
 
         if (commentators.isNotEmpty()) {
+            //TODO: row doesn't change width on new data [only release build] (God bless ConstraintLayout-Compose)
             CommentsRow(
                 text = commentators,
                 fontSize = fontSize,
