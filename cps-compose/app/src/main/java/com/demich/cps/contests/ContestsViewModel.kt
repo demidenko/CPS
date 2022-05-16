@@ -21,11 +21,9 @@ class ContestsViewModel: ViewModel() {
     val loadingStatusState: State<LoadingStatus>
         @Composable
         get() = remember {
-            derivedStateOf {
-                Contest.platforms
-                    .map { mutableLoadingStatusFor(platform = it).value }
-                    .combine()
-            }
+            Contest.platforms
+                .map { mutableLoadingStatusFor(platform = it) }
+                .combine()
         }
 
     @Composable

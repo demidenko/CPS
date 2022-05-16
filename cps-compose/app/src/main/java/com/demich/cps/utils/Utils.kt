@@ -3,6 +3,8 @@ package com.demich.cps.utils
 import android.content.Context
 import android.text.format.DateFormat
 import android.widget.Toast
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import com.demich.cps.makeIntentOpenUrl
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -115,6 +117,9 @@ fun Iterable<LoadingStatus>.combine(): LoadingStatus
         contains(LoadingStatus.FAILED) -> LoadingStatus.FAILED
         else -> LoadingStatus.PENDING
     }
+
+fun Iterable<State<LoadingStatus>>.combine(): State<LoadingStatus>
+    = derivedStateOf { map { it.value }.combine() }
 
 object InstantAsSecondsSerializer: KSerializer<Instant> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Instant", PrimitiveKind.LONG)

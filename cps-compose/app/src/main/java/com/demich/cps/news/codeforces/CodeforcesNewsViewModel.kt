@@ -1,9 +1,7 @@
 package com.demich.cps.news.codeforces
 
 import android.content.Context
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.news.settings.settingsNews
@@ -60,8 +58,14 @@ class CodeforcesNewsViewModel: ViewModel() {
         CodeforcesTitle.RECENT
     )
 
-    fun combinedLoadingStatusState() = derivedStateOf {
-        reloadableTitles.map { pageLoadingStatusState(it).value }.combine()
+    @Composable
+    fun combinedLoadingStatusState(): State<LoadingStatus> = remember {
+        listOf(
+            mainBlogEntries.loadingStatusState,
+            topBlogEntries.loadingStatusState,
+            topComments.loadingStatusState,
+            recentActions.loadingStatusState
+        ).combine()
     }
 
     fun pageLoadingStatusState(title: CodeforcesTitle): State<LoadingStatus> {

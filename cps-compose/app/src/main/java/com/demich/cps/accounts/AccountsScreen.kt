@@ -211,11 +211,9 @@ fun accountsBottomBarBuilder(
 private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
     val context = context
     val combinedStatus by remember {
-        derivedStateOf {
-            context.allAccountManagers
-                .map { accountsViewModel.loadingStatusFor(it).value }
-                .combine()
-        }
+        context.allAccountManagers
+            .map { accountsViewModel.loadingStatusFor(it) }
+            .combine()
     }
 
     CPSReloadingButton(loadingStatus = combinedStatus) {
