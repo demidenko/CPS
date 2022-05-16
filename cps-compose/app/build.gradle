@@ -13,7 +13,7 @@ android {
         minSdk 23
         targetSdk 32
 
-        versionCode 173
+        versionCode 174
         versionName '1.7.13'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -88,7 +88,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
 
-    implementation 'org.jsoup:jsoup:1.14.3'
+    implementation 'org.jsoup:jsoup:1.15.1'
 
     testImplementation "junit:junit:4.13.2"
     androidTestImplementation "androidx.test.ext:junit:1.1.3"
