@@ -3,6 +3,7 @@ package com.demich.cps.utils.codeforces
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.accounts.managers.HandleColor
@@ -209,7 +210,7 @@ object CodeforcesUtils {
     }
 
     @Composable
-    fun VotedText(rating: Int, fontSize: TextUnit, modifier: Modifier = Modifier) {
+    fun VoteRatingNonZero(rating: Int, fontSize: TextUnit, modifier: Modifier = Modifier) {
         if (rating != 0) {
             Text(
                 text = signedToString(rating),
@@ -219,6 +220,10 @@ object CodeforcesUtils {
                 modifier = modifier
             )
         }
+    }
+
+    fun htmlToAnnotatedString(html: String): AnnotatedString {
+        TODO()
     }
 
 }

@@ -111,7 +111,7 @@ private fun BlogEntryInfoHeader(
             fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f)
         )
-        CodeforcesUtils.VotedText(
+        CodeforcesUtils.VoteRatingNonZero(
             rating = rating,
             fontSize = 14.sp,
             modifier = Modifier.padding(start = 3.dp, top = 3.dp)

@@ -30,7 +30,7 @@ class CodeforcesNewsViewModel: ViewModel() {
             if (inactive) {
                 inactive = false
                 viewModelScope.launch {
-                    launchLoad(locale = context.settingsNews.codeforcesLocale())
+                    launchLoadIfActive(locale = context.settingsNews.codeforcesLocale())
                 }
             }
             return dataFlow.asStateFlow()
@@ -38,7 +38,7 @@ class CodeforcesNewsViewModel: ViewModel() {
 
         val loadingStatusState = mutableStateOf(LoadingStatus.PENDING)
 
-        fun launchLoad(locale: CodeforcesLocale) {
+        fun launchLoadIfActive(locale: CodeforcesLocale) {
             if (inactive) return
             require(loadingStatusState.value != LoadingStatus.LOADING)
             viewModelScope.launch {
@@ -79,17 +79,20 @@ class CodeforcesNewsViewModel: ViewModel() {
     private val topBlogEntries = DataLoader(emptyList()) { loadBlogEntries(page = "/top", locale = it) }
     fun flowOfTopBlogEntries(context: Context) = topBlogEntries.getDataFlow(context)
 
+    private val topComments = DataLoader(emptyList()) { loadComments(page = "/topComments?days=2", locale = it) }
+    fun flowOfTopComments(context: Context) = topComments.getDataFlow(context)
+
     private val recentActions = DataLoader(Pair(emptyList(), emptyList())) { loadRecentActions(locale = it) }
     fun flowOfRecentActions(context: Context) = recentActions.getDataFlow(context)
 
     private fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
         when(title) {
-            CodeforcesTitle.MAIN -> mainBlogEntries.launchLoad(locale)
+            CodeforcesTitle.MAIN -> mainBlogEntries.launchLoadIfActive(locale)
             CodeforcesTitle.TOP -> {
-                topBlogEntries.launchLoad(locale)
-                //topComments.load(locale)
+                topBlogEntries.launchLoadIfActive(locale)
+                topComments.launchLoadIfActive(locale)
             }
-            CodeforcesTitle.RECENT -> recentActions.launchLoad(locale)
+            CodeforcesTitle.RECENT -> recentActions.launchLoadIfActive(locale)
             else -> return
         }
     }

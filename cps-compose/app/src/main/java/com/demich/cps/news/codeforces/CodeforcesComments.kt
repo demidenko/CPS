@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
@@ -22,11 +23,11 @@ import com.demich.cps.utils.timeAgo
 
 @Composable
 fun CodeforcesComments(
-    commentsState: List<CodeforcesRecentAction>,
+    commentsState: State<List<CodeforcesRecentAction>>,
     modifier: Modifier = Modifier
 ) {
     LazyColumnWithScrollBar(modifier = modifier) {
-        items(items = commentsState) { recentAction ->
+        items(items = commentsState.value) { recentAction ->
             Comment(
                 comment = recentAction.comment,
                 blogEntryTitle = recentAction.blogEntry?.title ?: "",
@@ -57,7 +58,7 @@ private fun Comment(
         blogEntryTitle = blogEntryTitle,
         rating = comment.rating,
         timeAgo = timeAgo(fromTime = comment.creationTime, toTime = currentTime ),
-        commentContent = AnnotatedString("TODO") //TODO
+        commentContent = comment.html
     )
 }
 
@@ -67,7 +68,7 @@ private fun Comment(
     blogEntryTitle: String,
     rating: Int,
     timeAgo: String,
-    commentContent: AnnotatedString,
+    commentContent: String,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -81,6 +82,12 @@ private fun Comment(
             authorHandle = authorHandle,
             rating = rating,
             timeAgo = timeAgo
+        )
+        Text(
+            text = commentContent,
+            modifier = Modifier.padding(start = 10.dp, end = 8.dp),
+            maxLines = 30,
+            fontSize = 14.sp
         )
     }
 }
@@ -114,7 +121,7 @@ private fun CommentInfo(
                 modifier = Modifier.padding(start = 5.dp)
             )
         }
-        CodeforcesUtils.VotedText(
+        CodeforcesUtils.VoteRatingNonZero(
             rating = rating,
             fontSize = 13.sp,
             modifier = Modifier.align(Alignment.TopEnd)

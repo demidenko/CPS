@@ -124,13 +124,18 @@ private fun CodeforcesNewsTopPage(
     val context = context
     val loadingStatus by viewModel.pageLoadingStatusState(CodeforcesTitle.TOP)
     val blogEntriesState = rememberCollect { viewModel.flowOfTopBlogEntries(context) }
+    val commentsState = rememberCollect { viewModel.flowOfTopComments(context) }
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
         onRefresh = { viewModel.reload(title = CodeforcesTitle.TOP, context = context) },
     ) {
-        CodeforcesBlogEntries(
+        /*CodeforcesBlogEntries(
             blogEntriesState = blogEntriesState,
+            modifier = Modifier.fillMaxSize()
+        )*/
+        CodeforcesComments(
+            commentsState = commentsState,
             modifier = Modifier.fillMaxSize()
         )
     }
