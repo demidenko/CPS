@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.demich.cps.ui.EmptyListMessageBox
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesRecentAction
 import com.demich.cps.utils.codeforces.CodeforcesUtils
@@ -44,15 +45,19 @@ fun CodeforcesRecentBlogEntries(
         }
     }
 
-    LazyColumn(modifier = modifier) {
-        items(items = recent) {
-            RecentBlogEntry(
-                recentBlogEntryData = it,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 3.dp, end = 3.dp, bottom = 2.dp)
-            )
-            Divider()
+    if (recent.isEmpty()) {
+        EmptyListMessageBox(modifier = modifier)
+    } else {
+        LazyColumn(modifier = modifier) {
+            items(items = recent) {
+                RecentBlogEntry(
+                    recentBlogEntryData = it,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 3.dp, end = 3.dp, bottom = 2.dp)
+                )
+                Divider()
+            }
         }
     }
 }

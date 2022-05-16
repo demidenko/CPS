@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.EmptyListMessageBox
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
@@ -27,16 +28,20 @@ fun CodeforcesComments(
     commentsState: State<List<CodeforcesRecentAction>>,
     modifier: Modifier = Modifier
 ) {
-    LazyColumnWithScrollBar(modifier = modifier) {
-        items(items = commentsState.value) { recentAction ->
-            Comment(
-                comment = recentAction.comment,
-                blogEntryTitle = recentAction.blogEntry?.title ?: "",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 3.dp, end = 5.dp, bottom = 3.dp)
-            )
-            Divider()
+    if (commentsState.value.isEmpty()) {
+        EmptyListMessageBox(modifier = modifier)
+    } else {
+        LazyColumnWithScrollBar(modifier = modifier) {
+            items(items = commentsState.value) { recentAction ->
+                Comment(
+                    comment = recentAction.comment,
+                    blogEntryTitle = recentAction.blogEntry?.title ?: "",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 3.dp, end = 5.dp, bottom = 3.dp)
+                )
+                Divider()
+            }
         }
     }
 }
