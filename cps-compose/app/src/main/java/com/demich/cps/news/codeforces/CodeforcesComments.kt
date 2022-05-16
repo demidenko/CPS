@@ -1,14 +1,15 @@
 package com.demich.cps.news.codeforces
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSIcons
@@ -58,7 +59,7 @@ private fun Comment(
         blogEntryTitle = blogEntryTitle,
         rating = comment.rating,
         timeAgo = timeAgo(fromTime = comment.creationTime, toTime = currentTime ),
-        commentContent = comment.html
+        commentHtml = comment.html
     )
 }
 
@@ -68,7 +69,7 @@ private fun Comment(
     blogEntryTitle: String,
     rating: Int,
     timeAgo: String,
-    commentContent: String,
+    commentHtml: String,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -83,11 +84,12 @@ private fun Comment(
             rating = rating,
             timeAgo = timeAgo
         )
-        Text(
-            text = commentContent,
-            modifier = Modifier.padding(start = 10.dp, end = 8.dp),
-            maxLines = 30,
-            fontSize = 14.sp
+        CommentBox(
+            commentHtml = commentHtml,
+            fontSize = 14.sp,
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .fillMaxWidth()
         )
     }
 }
@@ -126,5 +128,35 @@ private fun CommentInfo(
             fontSize = 13.sp,
             modifier = Modifier.align(Alignment.TopEnd)
         )
+    }
+}
+
+@Composable
+private fun CommentBox(
+    commentHtml: String,
+    modifier: Modifier = Modifier,
+    maxLines: Int = 10,
+    fontSize: TextUnit
+) {
+    Box(modifier = modifier) {
+        var linesOverFlow by remember { mutableStateOf(false) }
+        Text(
+            text = CodeforcesUtils.htmlToAnnotatedString(commentHtml),
+            maxLines = maxLines,
+            fontSize = fontSize,
+            onTextLayout = { result ->
+                linesOverFlow = result.didOverflowHeight
+            }
+        )
+        if (linesOverFlow) {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(10.dp)
+                .background(cpsColors.contentAdditional.copy(alpha = 0.5f))
+                .align(Alignment.BottomCenter)
+            ) {
+
+            }
+        }
     }
 }

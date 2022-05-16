@@ -3,7 +3,7 @@ package com.demich.cps.utils.codeforces
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.accounts.managers.HandleColor
@@ -222,8 +222,8 @@ object CodeforcesUtils {
         }
     }
 
-    fun htmlToAnnotatedString(html: String): AnnotatedString {
-        TODO()
+    fun htmlToAnnotatedString(html: String) = buildAnnotatedString {
+        Jsoup.parseBodyFragment(html).body().traverse(CodeforcesHtmlParser(this))
     }
 
 }
