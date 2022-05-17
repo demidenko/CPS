@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -31,13 +30,16 @@ fun CommentsRow(
             color = cpsColors.contentAdditional,
             modifier = Modifier
                 .padding(end = spaceSize)
-                .align(BiasAlignment.Vertical(0.25f)) //not so ok solution
+                .alignBy {
+                    (it.measuredHeight * 0.77f).toInt()
+                }
         )
         Text(
             text = text,
             fontSize = fontSize,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.alignByBaseline()
         )
     }
 }

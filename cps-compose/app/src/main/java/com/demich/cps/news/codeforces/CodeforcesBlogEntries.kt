@@ -127,28 +127,30 @@ private fun BlogEntryInfoFooter(
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(top = 1.dp)
         ) {
             Text(
                 text = authorHandle,
-                fontSize = 13.sp
+                fontSize = 13.sp,
+                modifier = Modifier.alignByBaseline()
             )
             Text(
                 text = timeAgo,
                 color = cpsColors.contentAdditional,
                 fontSize = 11.sp,
-                modifier = Modifier.padding(start = 4.dp)
+                modifier = Modifier
+                    .padding(start = 4.dp)
+                    .alignByBaseline()
             )
         }
         if (commentsCount > 0) {
             CommentsRow(
                 text = AnnotatedString(commentsCount.toString()),
                 fontSize = 13.sp,
-                iconSize = 12.sp,
-                spaceSize = 3.dp,
+                iconSize = 13.5.sp,
+                spaceSize = 2.dp,
                 modifier = Modifier.align(Alignment.TopEnd)
             )
         }

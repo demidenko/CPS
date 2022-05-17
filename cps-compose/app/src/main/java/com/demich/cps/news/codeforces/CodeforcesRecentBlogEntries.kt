@@ -105,7 +105,7 @@ private fun RecentBlogEntry(
             authorHandle = authorHandle,
             commentators = commentators,
             fontSize = 13.sp,
-            iconSize = 11.sp,
+            iconSize = 12.sp,
             modifier = Modifier.fillMaxWidth()
         )
     }
