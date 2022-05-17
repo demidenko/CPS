@@ -11,7 +11,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.cpsColors
-import kotlin.math.roundToInt
 
 @Composable
 fun BlogEntryTitleWithArrow(
@@ -28,7 +27,7 @@ fun BlogEntryTitleWithArrow(
             size = fontSize,
             color = cpsColors.contentAdditional,
             modifier = Modifier.alignBy {
-                (it.measuredHeight * 0.75).roundToInt()
+                it.measuredHeight * 5 / 6
             }
         )
         Text(
