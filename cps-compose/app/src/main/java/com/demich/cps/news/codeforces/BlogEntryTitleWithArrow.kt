@@ -5,13 +5,13 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowRightAlt
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.cpsColors
+import kotlin.math.roundToInt
 
 @Composable
 fun BlogEntryTitleWithArrow(
@@ -21,21 +21,23 @@ fun BlogEntryTitleWithArrow(
     singleLine: Boolean
 ) {
     Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        modifier = modifier
     ) {
-        //TODO: arrow center vertically only to first line
         IconSp(
             imageVector = Icons.Default.ArrowRightAlt,
             size = fontSize,
-            color = cpsColors.contentAdditional
+            color = cpsColors.contentAdditional,
+            modifier = Modifier.alignBy {
+                (it.measuredHeight * 0.75).roundToInt()
+            }
         )
         Text(
             text = title,
             fontSize = fontSize,
             fontWeight = FontWeight.Medium,
             maxLines = if (singleLine) 1 else Int.MAX_VALUE,
-            overflow = if (singleLine) TextOverflow.Ellipsis else TextOverflow.Clip
+            overflow = if (singleLine) TextOverflow.Ellipsis else TextOverflow.Clip,
+            modifier = Modifier.alignByBaseline()
         )
     }
 }

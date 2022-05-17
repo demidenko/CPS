@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.cpsColors
+import kotlin.math.roundToInt
 
 @Composable
 fun CommentsRow(
@@ -31,7 +32,7 @@ fun CommentsRow(
             modifier = Modifier
                 .padding(end = spaceSize)
                 .alignBy {
-                    (it.measuredHeight * 0.77f).toInt()
+                    (it.measuredHeight * 0.77f).roundToInt()
                 }
         )
         Text(
