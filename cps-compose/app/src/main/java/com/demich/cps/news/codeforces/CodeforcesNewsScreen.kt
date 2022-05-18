@@ -13,19 +13,16 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.Contest
 import com.demich.cps.news.NewsTab
 import com.demich.cps.news.NewsTabRow
-import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.PagerScope
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 enum class CodeforcesTitle {
     MAIN, TOP, RECENT, LOST
@@ -43,35 +40,16 @@ fun CodeforcesNewsScreen(
 
     val context = context
     val manager = remember { CodeforcesAccountManager(context) }
-    val settings = remember { context.settingsNews }
 
-    val tabs = remember {
-        mutableStateOf(
-            listOf(
-                CodeforcesTitle.MAIN,
-                CodeforcesTitle.TOP,
-                CodeforcesTitle.RECENT,
-                //TODO CodeforcesTitle.LOST
-            )
-        )
-    }
+    val controller = rememberCodeforcesNewsController()
 
-    val pagerState = rememberPagerState(
-        initialPage = remember {
-            val defaultTab = runBlocking { settings.codeforcesDefaultTab() }
-            tabs.value.indexOf(defaultTab)
-        }
-    )
-
-    LaunchedEffect(key1 = pagerState.currentPage) {
-        val selectedTab = tabs.value[pagerState.currentPage]
-        navigator.setSubtitle("news", "codeforces", selectedTab.name)
+    LaunchedEffect(key1 = controller.currentTab) {
+        navigator.setSubtitle("news", "codeforces", controller.currentTab.name)
     }
 
     Column {
         TabsHeader(
-            tabs = tabs,
-            pagerState = pagerState,
+            controller = controller,
             modifier = Modifier.fillMaxWidth()
         )
         val currentTime by collectCurrentTimeEachMinute()
@@ -79,13 +57,11 @@ fun CodeforcesNewsScreen(
             LocalCodeforcesAccountManager provides manager,
             LocalCurrentTime provides currentTime
         ) {
-            HorizontalPager(
-                count = tabs.value.size,
-                state = pagerState,
-                key = { tabs.value[it] },
+            CodeforcesPager(
+                controller = controller,
                 modifier = Modifier.fillMaxSize()
-            ) { index ->
-                when (tabs.value[index]) {
+            ) { tab ->
+                when (tab) {
                     CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(viewModel = viewModel)
                     CodeforcesTitle.TOP -> CodeforcesNewsTopPage(viewModel = viewModel)
                     CodeforcesTitle.RECENT -> CodeforcesNewsRecentPage(viewModel = viewModel)
@@ -167,9 +143,24 @@ private fun CodeforcesNewsLostPage() {
 
 
 @Composable
+private fun CodeforcesPager(
+    controller: CodeforcesNewsController,
+    modifier: Modifier = Modifier,
+    content: @Composable (PagerScope.(CodeforcesTitle) -> Unit)
+) {
+    HorizontalPager(
+        count = controller.tabs.size,
+        state = controller.pagerState,
+        key = { index -> controller.tabs[index] },
+        modifier = modifier
+    ) { index ->
+        content(controller.tabs[index])
+    }
+}
+
+@Composable
 private fun TabsHeader(
-    tabs: State<List<CodeforcesTitle>>,
-    pagerState: PagerState,
+    controller: CodeforcesNewsController,
     modifier: Modifier = Modifier,
     selectedTextColor: Color = cpsColors.content,
     unselectedTextColor: Color = cpsColors.contentAdditional,
@@ -186,17 +177,17 @@ private fun TabsHeader(
             tint = cpsColors.content,
             modifier = Modifier.padding(start = 8.dp, end = 6.dp)
         )
-        NewsTabRow(pagerState = pagerState) {
-            tabs.value.forEachIndexed { index, title ->
+        NewsTabRow(pagerState = controller.pagerState) {
+            controller.tabs.forEachIndexed { index, title ->
                 NewsTab(
                     index = index,
                     title = title.name,
-                    pagerState = pagerState,
+                    pagerState = controller.pagerState,
                     selectedTextColor = selectedTextColor,
                     unselectedTextColor = unselectedTextColor,
                     modifier = Modifier.clickableNoRipple {
                         scope.launch {
-                            pagerState.animateScrollToPage(index)
+                            controller.pagerState.animateScrollToPage(index)
                         }
                     }
                 )
