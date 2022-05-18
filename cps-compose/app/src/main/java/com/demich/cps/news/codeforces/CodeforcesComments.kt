@@ -22,6 +22,7 @@ import com.demich.cps.utils.codeforces.CodeforcesComment
 import com.demich.cps.utils.codeforces.CodeforcesRecentAction
 import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.timeAgo
+import kotlin.math.roundToInt
 
 @Composable
 fun CodeforcesComments(
@@ -108,24 +109,29 @@ private fun CommentInfo(
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier.align(Alignment.TopStart),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.align(Alignment.TopStart)
         ) {
             IconSp(
                 imageVector = CPSIcons.CommentSingle,
-                size = 11.sp,
+                size = 13.sp,
                 color = cpsColors.contentAdditional,
-                modifier = Modifier.padding(start = 2.dp, end = 2.dp)
+                modifier = Modifier
+                    .padding(start = 2.dp, end = 2.dp)
+                    .alignBy { (it.measuredHeight * 0.75f).roundToInt() }
             )
             Text(
                 text = authorHandle,
-                fontSize = 13.sp
+                fontSize = 13.sp,
+                modifier = Modifier
+                    .alignByBaseline()
             )
             Text(
                 text = timeAgo,
                 color = cpsColors.contentAdditional,
                 fontSize = 11.sp,
-                modifier = Modifier.padding(start = 5.dp)
+                modifier = Modifier
+                    .padding(start = 5.dp)
+                    .alignByBaseline()
             )
         }
         CodeforcesUtils.VoteRatingNonZero(
