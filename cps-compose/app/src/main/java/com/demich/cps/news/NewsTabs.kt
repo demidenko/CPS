@@ -10,6 +10,7 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,34 +19,56 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.demich.cps.news.codeforces.CodeforcesNewsController
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.clickableNoRipple
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.pagerTabIndicatorOffset
+import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
 
 @Composable
 fun NewsTabRow(
     modifier: Modifier = Modifier,
-    pagerState: PagerState,
-    tabs: @Composable () -> Unit
+    controller: CodeforcesNewsController,
+    selectedTextColor: Color,
+    unselectedTextColor: Color
 ) {
+    val scope = rememberCoroutineScope()
     TabRow(
         modifier = modifier
             .fillMaxWidth()
             .height(45.dp),
-        selectedTabIndex = pagerState.currentPage,
+        selectedTabIndex = controller.pagerState.currentPage,
         backgroundColor = cpsColors.background,
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
-                modifier = Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
+                modifier = Modifier.pagerTabIndicatorOffset(
+                    pagerState = controller.pagerState,
+                    tabPositions = tabPositions
+                ),
                 color = cpsColors.accent
             )
         },
-        divider = { },
-        tabs = tabs
-    )
+        divider = { }
+    ) {
+        controller.tabs.forEachIndexed { index, title ->
+            NewsTab(
+                index = index,
+                title = title.name,
+                pagerState = controller.pagerState,
+                selectedTextColor = selectedTextColor,
+                unselectedTextColor = unselectedTextColor,
+                modifier = Modifier.clickableNoRipple {
+                    scope.launch {
+                        controller.pagerState.animateScrollToPage(index)
+                    }
+                }
+            )
+        }
+    }
 }
 
 @Composable
