@@ -412,7 +412,7 @@ private fun DrawRatingGraph(
             .fillMaxSize()
             .clipToBounds()
     ) {
-        translator.size = size
+        translator.canvasSize = size
         translator.borderX = circleRadius * 5
 
         val ratingPath = Path().apply {
@@ -519,13 +519,12 @@ private fun rememberCoordinateTranslator(): CoordinateTranslator =
         CoordinateTranslator(minX = 0f, maxX = 0f, minY = 0f, maxY = 0f)
     }
 
+@Stable
 private class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY: Float) {
-    private var minY: Float by mutableStateOf(minY)
-    private var maxY: Float by mutableStateOf(maxY)
-    private var minX: Float by mutableStateOf(minX)
-    private var maxX: Float by mutableStateOf(maxX)
+    private var o: Offset by mutableStateOf(Offset(x = minX, y = minY))
+    private var size: Size by mutableStateOf(Size(width = maxX - minX, height = maxY - minY))
 
-    var size: Size = Size.Unspecified
+    var canvasSize: Size = Size.Unspecified
     var borderX: Float = 0f
 
     fun setWindow(bounds: RatingGraphBounds) {
@@ -537,10 +536,11 @@ private class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY: 
             return
         }
         with(bounds) {
-            minY = minRating.toFloat() - 100f
-            maxY = maxRating.toFloat() + 100f
-            minX = startTime.epochSeconds.toFloat()
-            maxX = endTime.epochSeconds.toFloat()
+            o = Offset(x = startTime.epochSeconds.toFloat(), y = minRating.toFloat() - 100f)
+            size = Size(
+                width = (endTime - startTime).inWholeSeconds.toFloat(),
+                height = maxRating - minRating + 200f
+            )
         }
     }
 
@@ -552,11 +552,11 @@ private class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY: 
 
     fun pointToOffset(x: Long, y: Long) = Offset(
         x = transformX(
-            x = (x - minX) / (maxX - minX) * size.width,
-            fromWidth = size.width,
-            toWidth = size.width + borderX * 2
+            x = (x - o.x) / size.width * canvasSize.width,
+            fromWidth = canvasSize.width,
+            toWidth = canvasSize.width + borderX * 2
         ),
-        y = size.height - ((y - minY) / (maxY - minY) * size.height)
+        y = canvasSize.height - ((y - o.y) / size.height * canvasSize.height)
     )
 
     fun pointToOffset(point: Point) = pointToOffset(point.x, point.y)
@@ -564,26 +564,20 @@ private class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY: 
     private fun offsetToPoint(offset: Offset) = Offset(
         x = transformX(
             x = offset.x,
-            fromWidth = size.width + borderX * 2,
-            toWidth = size.width
-        ) / size.width * (maxX - minX) + minX,
-        y = (size.height - offset.y) / size.height * (maxY - minY) + minY
+            fromWidth = canvasSize.width + borderX * 2,
+            toWidth = canvasSize.width
+        ) / canvasSize.width * size.width + o.x,
+        y = (canvasSize.height - offset.y) / canvasSize.height * size.height + o.y
     )
 
     fun move(offset: Offset) {
-        val (dx, dy) = offsetToPoint(offset) - offsetToPoint(Offset.Zero)
-        minX -= dx
-        maxX -= dx
-        minY -= dy
-        maxY -= dy
+        o -= offsetToPoint(offset) - offsetToPoint(Offset.Zero)
     }
 
     fun scale(center: Offset, scale: Float) {
-        val (cx, cy) = offsetToPoint(center)
-        minX = (minX - cx) / scale + cx
-        maxX = (maxX - cx) / scale + cx
-        minY = (minY - cy) / scale + cy
-        maxY = (maxY - cy) / scale + cy
+        val c = offsetToPoint(center)
+        o = (o - c) / scale + c
+        size /= scale
     }
 
     fun getNearestRatingChange(
@@ -610,10 +604,10 @@ private class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY: 
     companion object {
         val saver: Saver<CoordinateTranslator, Any> = listSaver(
             save = {
-                listOf(it.minX, it.maxX, it.minY, it.maxY)
+                listOf(it.o.x, it.o.y, it.size.width, it.size.height)
             },
             restore = {
-                CoordinateTranslator(it[0], it[1], it[2], it[3])
+                CoordinateTranslator(minX = it[0], minY = it[1], maxX = it[0] + it[2], maxY = it[1] + it[3])
             }
         )
     }
