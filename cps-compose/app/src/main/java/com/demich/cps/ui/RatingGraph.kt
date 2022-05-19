@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -115,7 +117,12 @@ private data class RatingGraphBounds(
     val maxRating: Int,
     val startTime: Instant,
     val endTime: Instant
-)
+) {
+    init {
+        require(minRating <= maxRating)
+        require(startTime <= endTime)
+    }
+}
 
 private fun createBounds(
     ratingChanges: List<RatingChange>,
@@ -507,24 +514,16 @@ private fun DrawRatingGraph(
 
 
 @Composable
-private fun rememberCoordinateTranslator(): CoordinateTranslator {
-    val minXState = rememberSaveable { mutableStateOf(0f) }
-    val maxXState = rememberSaveable { mutableStateOf(0f) }
-    val minYState = rememberSaveable { mutableStateOf(0f) }
-    val maxYState = rememberSaveable { mutableStateOf(0f) }
-    return remember { CoordinateTranslator(minXState, maxXState, minYState, maxYState) }
-}
+private fun rememberCoordinateTranslator(): CoordinateTranslator =
+    rememberSaveable(saver = CoordinateTranslator.saver) {
+        CoordinateTranslator(minX = 0f, maxX = 0f, minY = 0f, maxY = 0f)
+    }
 
-private class CoordinateTranslator(
-    minXState: MutableState<Float>,
-    maxXState: MutableState<Float>,
-    minYState: MutableState<Float>,
-    maxYState: MutableState<Float>,
-) {
-    private var minY: Float by minYState
-    private var maxY: Float by maxYState
-    private var minX: Float by minXState
-    private var maxX: Float by maxXState
+private class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY: Float) {
+    private var minY: Float by mutableStateOf(minY)
+    private var maxY: Float by mutableStateOf(maxY)
+    private var minX: Float by mutableStateOf(minX)
+    private var maxX: Float by mutableStateOf(maxX)
 
     var size: Size = Size.Unspecified
     var borderX: Float = 0f
@@ -606,6 +605,17 @@ private class CoordinateTranslator(
         val res = ratingChanges[pos]
         if (pos == 0 || res.oldRating != null) return res
         return res.copy(oldRating = ratingChanges[pos-1].rating)
+    }
+
+    companion object {
+        val saver: Saver<CoordinateTranslator, Any> = listSaver(
+            save = {
+                listOf(it.minX, it.maxX, it.minY, it.maxY)
+            },
+            restore = {
+                CoordinateTranslator(it[0], it[1], it[2], it[3])
+            }
+        )
     }
 }
 
