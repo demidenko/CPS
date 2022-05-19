@@ -35,9 +35,6 @@ fun CodeforcesNewsScreen(
     viewModel: CodeforcesNewsViewModel
 ) {
 
-    val context = context
-    val manager = remember { CodeforcesAccountManager(context) }
-
     val controller = rememberCodeforcesNewsController()
 
     LaunchedEffect(key1 = controller.currentTab) {
@@ -49,21 +46,15 @@ fun CodeforcesNewsScreen(
             controller = controller,
             modifier = Modifier.fillMaxWidth()
         )
-        val currentTime by collectCurrentTimeEachMinute()
-        CompositionLocalProvider(
-            LocalCodeforcesAccountManager provides manager,
-            LocalCurrentTime provides currentTime
-        ) {
-            CodeforcesPager(
-                controller = controller,
-                modifier = Modifier.fillMaxSize()
-            ) { tab ->
-                when (tab) {
-                    CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(viewModel = viewModel)
-                    CodeforcesTitle.TOP -> CodeforcesNewsTopPage(viewModel = viewModel)
-                    CodeforcesTitle.RECENT -> CodeforcesNewsRecentPage(viewModel = viewModel)
-                    CodeforcesTitle.LOST -> CodeforcesNewsLostPage()
-                }
+        CodeforcesPager(
+            controller = controller,
+            modifier = Modifier.fillMaxSize()
+        ) { tab ->
+            when (tab) {
+                CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(viewModel = viewModel)
+                CodeforcesTitle.TOP -> CodeforcesNewsTopPage(viewModel = viewModel)
+                CodeforcesTitle.RECENT -> CodeforcesNewsRecentPage(viewModel = viewModel)
+                CodeforcesTitle.LOST -> CodeforcesNewsLostPage()
             }
         }
     }
@@ -145,14 +136,24 @@ private fun CodeforcesPager(
     modifier: Modifier = Modifier,
     content: @Composable (PagerScope.(CodeforcesTitle) -> Unit)
 ) {
-    HorizontalPager(
-        count = controller.tabs.size,
-        state = controller.pagerState,
-        key = { index -> controller.tabs[index] },
-        modifier = modifier
-    ) { index ->
-        content(controller.tabs[index])
+    val context = context
+    val manager = remember { CodeforcesAccountManager(context) }
+
+    val currentTime by collectCurrentTimeEachMinute()
+    CompositionLocalProvider(
+        LocalCodeforcesAccountManager provides manager,
+        LocalCurrentTime provides currentTime
+    ) {
+        HorizontalPager(
+            count = controller.tabs.size,
+            state = controller.pagerState,
+            key = { index -> controller.tabs[index] },
+            modifier = modifier
+        ) { index ->
+            content(controller.tabs[index])
+        }
     }
+
 }
 
 @Composable
