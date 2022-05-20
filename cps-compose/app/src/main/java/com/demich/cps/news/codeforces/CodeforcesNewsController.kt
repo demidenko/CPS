@@ -2,14 +2,17 @@
 
 package com.demich.cps.news.codeforces
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.utils.context
+import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
@@ -19,42 +22,67 @@ fun rememberCodeforcesNewsController(
 ): CodeforcesNewsController {
     val context = context
 
-    val (tabs, defaultTab) = remember {
-        with(context.settingsNews) {
-            runBlocking {
-                val tabs = listOf(
-                    CodeforcesTitle.MAIN,
-                    CodeforcesTitle.TOP,
-                    CodeforcesTitle.RECENT,
-                    //TODO CodeforcesTitle.LOST
-                )
-                val defaultTab = codeforcesDefaultTab()
-                tabs to defaultTab
-            }
-        }
+    val tabs by rememberCollect {
+        context.settingsNews.flowOfCodeforcesTabs()
     }
 
-    //TODO: save selected Tab instead of index
-    val pagerState = rememberPagerState(
-        initialPage = tabs.indexOf(defaultTab)
-    )
-
-    return remember(pagerState, tabs) {
+    val controller =  rememberSaveable(saver = CodeforcesNewsController.saver) {
+        val settings = context.settingsNews
+        val initTabs = runBlocking { settings.flowOfCodeforcesTabs().first() }
+        val defaultTab = runBlocking { settings.codeforcesDefaultTab() }
         CodeforcesNewsController(
-            tabs = tabs,
-            pagerState = pagerState
+            tabs = initTabs,
+            pagerState = PagerState(currentPage = initTabs.indexOf(defaultTab))
         )
     }
+
+    LaunchedEffect(key1 = tabs) {
+        controller.updateTabs(newTabs = tabs)
+    }
+
+    return controller
 }
 
 @Stable
-data class CodeforcesNewsController(
-    val tabs: List<CodeforcesTitle>,
+class CodeforcesNewsController(
+    tabs: List<CodeforcesTitle>,
     val pagerState: PagerState
 ) {
+
+    private val tabsState = mutableStateOf(tabs)
+
+    val tabs by tabsState
+
+    suspend fun updateTabs(newTabs: List<CodeforcesTitle>) {
+        val oldSelectedTab = currentTab
+        val newIndex = newTabs.indexOf(oldSelectedTab)
+        tabsState.value = newTabs
+        if (newIndex != selectedTabIndex) {
+            pagerState.scrollToPage(newIndex)
+        }
+    }
+
     val currentTab: CodeforcesTitle
-        get() = tabs[pagerState.currentPage]
+        get() = tabs[selectedTabIndex]
 
     val selectedTabIndex: Int
         get() = pagerState.currentPage
+
+    companion object {
+        val saver = listSaver<CodeforcesNewsController, String>(
+            save = {
+                buildList {
+                    add(it.selectedTabIndex.toString())
+                    addAll(it.tabs.map { tab -> tab.name })
+                }
+            },
+            restore = { list ->
+                val index = list[0].toInt()
+                CodeforcesNewsController(
+                    pagerState = PagerState(currentPage = index),
+                    tabs = list.drop(1).map { CodeforcesTitle.valueOf(it) }
+                )
+            }
+        )
+    }
 }

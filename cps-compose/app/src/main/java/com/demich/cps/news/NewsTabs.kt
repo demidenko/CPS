@@ -41,7 +41,7 @@ fun NewsTabRow(
         modifier = modifier
             .fillMaxWidth()
             .height(45.dp),
-        selectedTabIndex = controller.pagerState.currentPage,
+        selectedTabIndex = controller.selectedTabIndex,
         backgroundColor = cpsColors.background,
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
