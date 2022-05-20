@@ -31,8 +31,8 @@ fun rememberCodeforcesNewsController(
         val initTabs = runBlocking { settings.flowOfCodeforcesTabs().first() }
         val defaultTab = runBlocking { settings.codeforcesDefaultTab() }
         CodeforcesNewsController(
-            tabs = initTabs,
-            pagerState = PagerState(currentPage = initTabs.indexOf(defaultTab))
+            pagerState = PagerState(currentPage = initTabs.indexOf(defaultTab)),
+            tabs = initTabs
         )
     }
 
@@ -45,8 +45,8 @@ fun rememberCodeforcesNewsController(
 
 @Stable
 class CodeforcesNewsController(
-    tabs: List<CodeforcesTitle>,
-    val pagerState: PagerState
+    val pagerState: PagerState,
+    tabs: List<CodeforcesTitle>
 ) {
 
     private val tabsState = mutableStateOf(tabs)
@@ -55,7 +55,8 @@ class CodeforcesNewsController(
 
     suspend fun updateTabs(newTabs: List<CodeforcesTitle>) {
         val oldSelectedTab = currentTab
-        val newIndex = newTabs.indexOf(oldSelectedTab)
+        val newIndex = newTabs.indexOf(oldSelectedTab).takeIf { it != -1 }
+            ?: selectedTabIndex.coerceAtMost(newTabs.size - 1)
         tabsState.value = newTabs
         if (newIndex != selectedTabIndex) {
             pagerState.scrollToPage(newIndex)
