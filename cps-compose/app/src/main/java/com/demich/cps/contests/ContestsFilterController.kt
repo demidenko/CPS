@@ -1,34 +1,30 @@
 package com.demich.cps.contests
 
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.demich.cps.utils.containsTokensAsSubsequence
 
 
 @Composable
-fun rememberContestsFilterController(): ContestsFilterController {
-    val filterState = rememberSaveable { mutableStateOf("") }
-    val enabledState = rememberSaveable { mutableStateOf(false) }
-    val availableState = rememberSaveable { mutableStateOf(false) }
-    return remember(enabledState, filterState, availableState) {
+fun rememberContestsFilterController() =
+    rememberSaveable(saver = ContestsFilterController.saver) {
         ContestsFilterController(
-            filterState = filterState,
-            enabledState = enabledState,
-            availableState = availableState
+            filter = "",
+            enabled = false,
+            available = false
         )
     }
-}
 
 @Stable
-data class ContestsFilterController(
-    private val filterState: MutableState<String>,
-    private val enabledState: MutableState<Boolean>,
-    private val availableState: MutableState<Boolean>
+class ContestsFilterController(
+    filter: String,
+    enabled: Boolean,
+    available: Boolean
 ) {
-
-    var filter: String
-        get() = filterState.value
-        set(value) { filterState.value = value }
+    var filter by mutableStateOf(filter)
+    private val enabledState = mutableStateOf(enabled)
+    private val availableState = mutableStateOf(available)
 
     var enabled: Boolean
         get() = enabledState.value
@@ -50,4 +46,18 @@ data class ContestsFilterController(
         return false
     }
 
+    companion object {
+        val saver = listSaver<ContestsFilterController, String>(
+            save = {
+                listOf(it.filter, it.enabled.toString(), it.available.toString())
+            },
+            restore = {
+                ContestsFilterController(
+                    filter = it[0],
+                    enabled = it[1].toBooleanStrict(),
+                    available = it[2].toBooleanStrict()
+                )
+            }
+        )
+    }
 }
