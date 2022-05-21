@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
+import com.demich.cps.bottomBarHeight
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.contests.loaders.makeCombinedMessage
 import com.demich.cps.contests.settings.settingsContests
@@ -30,19 +31,26 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.flow.combine
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ContestsScreen(
     contestsViewModel: ContestsViewModel,
     filterController: ContestsFilterController
 ) {
-    Column {
+    Column(
+        modifier = Modifier
+            .consumedWindowInsets(PaddingValues(bottom = bottomBarHeight))
+            .imePadding()
+    ) {
         ContestsFilterTextField(
             filterController = filterController,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
         )
         ContestsContent(
             contestsViewModel = contestsViewModel,
-            filterController = filterController
+            filterController = filterController,
+            modifier = Modifier.weight(1f, false)
         )
     }
 }
@@ -50,7 +58,8 @@ fun ContestsScreen(
 @Composable
 private fun ContestsContent(
     contestsViewModel: ContestsViewModel,
-    filterController: ContestsFilterController
+    filterController: ContestsFilterController,
+    modifier: Modifier = Modifier
 ) {
     val context = context
 
@@ -66,7 +75,8 @@ private fun ContestsContent(
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
-        onRefresh = { contestsViewModel.reloadEnabledPlatforms(context) }
+        onRefresh = { contestsViewModel.reloadEnabledPlatforms(context) },
+        modifier = modifier
     ) {
         Column {
             LoadingError(
@@ -188,7 +198,7 @@ private fun ContestsFilterTextField(
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
-    //TODO: show in bottom, imePadding, focus request
+    //TODO: show in bottom, focus request
     if (filterController.enabled) {
         OutlinedTextField(
             modifier = modifier,

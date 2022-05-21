@@ -26,6 +26,8 @@ import kotlinx.coroutines.launch
 
 typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
 
+val bottomBarHeight = 56.dp
+
 @Composable
 fun CPSBottomBar(
     navigator: CPSNavigator,
@@ -34,7 +36,7 @@ fun CPSBottomBar(
     if (navigator.isBottomBarEnabled) {
         Row(
             modifier = Modifier
-                .height(56.dp) //as BottomNavigationHeight
+                .height(bottomBarHeight) //as BottomNavigationHeight
                 .fillMaxWidth()
                 .background(cpsColors.backgroundNavigation),
             verticalAlignment = Alignment.CenterVertically
@@ -52,7 +54,6 @@ fun CPSBottomBar(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CPSBottomBarMain(
     navigator: CPSNavigator,
