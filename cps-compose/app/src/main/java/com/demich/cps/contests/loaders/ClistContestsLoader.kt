@@ -26,14 +26,10 @@ class ClistContestsLoader(
 
 
 private fun Collection<ClistContest>.mapAndFilterResult(): List<Contest> {
-    return mapNotNull {
-        val contest = Contest(it)
+    return mapNotNull { clistContest ->
+        val contest = Contest(clistContest)
         when (contest.platform) {
-            Contest.Platform.atcoder -> {
-                if (it.host == "atcoder.jp")
-                    contest.copy(title = contest.title.replace("（", " (").replace('）',')'))
-                else null
-            }
+            Contest.Platform.atcoder -> contest.takeIf { clistContest.host == "atcoder.jp" }
             else -> contest
         }
     }

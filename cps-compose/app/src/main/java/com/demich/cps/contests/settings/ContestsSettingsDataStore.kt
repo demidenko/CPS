@@ -66,6 +66,10 @@ private val defaultLoadingPriorities by lazy {
                 ContestsLoaders.clist,
                 ContestsLoaders.codeforces
             )
+            Contest.Platform.atcoder -> listOf(
+                ContestsLoaders.clist,
+                ContestsLoaders.atcoder
+            )
             Contest.Platform.dmoj -> listOf(
                 ContestsLoaders.clist,
                 ContestsLoaders.dmoj

@@ -23,10 +23,22 @@ class ContestsReceiver(
 
     suspend fun finishSuccess(platform: Contest.Platform, contests: List<Contest>) {
         getLoadingStatusState(platform).value = LoadingStatus.PENDING
-        dao.replace(platform = platform, contests = contests)
+        dao.replace(
+            platform = platform,
+            contests = contests.map(::titleFix)
+        )
     }
 
     fun finishFailed(platform: Contest.Platform) {
         getLoadingStatusState(platform).value = LoadingStatus.FAILED
     }
+}
+
+private fun titleFix(contest: Contest): Contest {
+    val fixedTitle = contest.title
+        .replace("（", " (")
+        .replace("）",") ")
+        .trim()
+    return if (contest.title == fixedTitle) contest
+    else contest.copy(title = fixedTitle)
 }
