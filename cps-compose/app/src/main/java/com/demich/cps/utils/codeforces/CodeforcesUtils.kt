@@ -74,12 +74,8 @@ object CodeforcesUtils {
         }.getOrNull()
     }
 
-    fun extractBlogEntries(source: String): List<CodeforcesBlogEntry> {
-        return Jsoup.parse(source).select("div.topic").mapNotNull(::extractBlogEntryOrNull)
-    }
-
-    fun extractComments(source: String): List<CodeforcesRecentAction> {
-        return Jsoup.parse(source).select(".comment-table").map { commentBox ->
+    private fun extractCommentOrNull(commentBox: Element): CodeforcesRecentAction? {
+        return kotlin.runCatching {
             val commentatorHandle: String
             val commentatorHandleColorTag: ColorTag
             commentBox.selectFirst(".avatar")!!.let { avatarBox ->
@@ -135,11 +131,11 @@ object CodeforcesUtils {
                     creationTime = Instant.DISTANT_PAST
                 )
             )
-        }
+        }.getOrNull()
     }
 
-    fun extractRecentBlogEntries(source: String): List<CodeforcesBlogEntry> {
-        return Jsoup.parse(source).selectFirst("div.recent-actions")?.select("li")?.map { item ->
+    private fun extractRecentBlogEntryOrNull(item: Element): CodeforcesBlogEntry? {
+        return kotlin.runCatching {
             val (handle, handleColorTag) = item.selectFirst("a.rated-user")!!.extractRatedUser()
             val blogEntryId: Int
             val blogEntryTitle: String
@@ -154,7 +150,22 @@ object CodeforcesUtils {
                 authorColorTag = handleColorTag,
                 creationTime = Instant.DISTANT_PAST
             )
-        } ?: emptyList()
+        }.getOrNull()
+    }
+
+    fun extractBlogEntries(source: String): List<CodeforcesBlogEntry> {
+        return Jsoup.parse(source).select("div.topic").mapNotNull(::extractBlogEntryOrNull)
+    }
+
+    fun extractComments(source: String): List<CodeforcesRecentAction> {
+        return Jsoup.parse(source).select(".comment-table").mapNotNull(::extractCommentOrNull)
+    }
+
+    fun extractRecentBlogEntries(source: String): List<CodeforcesBlogEntry> {
+        return Jsoup.parse(source).selectFirst("div.recent-actions")
+            ?.select("li")
+            ?.mapNotNull(::extractRecentBlogEntryOrNull)
+            ?: emptyList()
     }
 
     enum class ColorTag {
