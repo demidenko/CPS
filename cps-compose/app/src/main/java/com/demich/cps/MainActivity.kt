@@ -6,12 +6,14 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -37,6 +39,7 @@ import com.demich.cps.utils.rememberCollect
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             val cpsViewModels = CPSViewModels(
                 accountsViewModel = viewModel(),
@@ -198,7 +201,8 @@ private fun CPSScaffold(
 
     Scaffold(
         topBar = { navigator.TopBar() },
-        bottomBar = { navigator.BottomBar() }
+        bottomBar = { navigator.BottomBar() },
+        modifier = Modifier.systemBarsPadding()
     ) { innerPadding ->
         Box(modifier = Modifier
             .padding(innerPadding)
