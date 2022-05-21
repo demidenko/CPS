@@ -21,6 +21,7 @@ import com.demich.cps.contests.*
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
+import com.demich.cps.news.codeforces.rememberCodeforcesNewsController
 import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
 import com.demich.cps.news.settings.NewsSettingsScreen
@@ -140,9 +141,10 @@ private fun CPSScaffold(
             }
 
             cpsComposable(ScreenTypes.news.route) { holder ->
+                val controller = rememberCodeforcesNewsController(cpsViewModels.newsViewModel)
                 NewsScreen(
                     navigator = navigator,
-                    codeforcesNewsViewModel = cpsViewModels.newsViewModel
+                    controller = controller
                 )
                 holder.menu = newsMenuBuilder(
                     navigator = navigator,

@@ -32,10 +32,8 @@ val LocalCodeforcesAccountManager = compositionLocalOf<CodeforcesAccountManager>
 @Composable
 fun CodeforcesNewsScreen(
     navigator: CPSNavigator,
-    viewModel: CodeforcesNewsViewModel
+    controller: CodeforcesNewsController
 ) {
-
-    val controller = rememberCodeforcesNewsController()
 
     LaunchedEffect(key1 = controller.currentTab) {
         navigator.setSubtitle("news", "codeforces", controller.currentTab.name)
@@ -51,9 +49,9 @@ fun CodeforcesNewsScreen(
             modifier = Modifier.fillMaxSize()
         ) { tab ->
             when (tab) {
-                CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(viewModel = viewModel)
-                CodeforcesTitle.TOP -> CodeforcesNewsTopPage(viewModel = viewModel)
-                CodeforcesTitle.RECENT -> CodeforcesNewsRecentPage(viewModel = viewModel)
+                CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(controller = controller)
+                CodeforcesTitle.TOP -> CodeforcesNewsTopPage(controller = controller)
+                CodeforcesTitle.RECENT -> CodeforcesNewsRecentPage(controller = controller)
                 CodeforcesTitle.LOST -> CodeforcesNewsLostPage()
             }
         }
@@ -64,15 +62,15 @@ fun CodeforcesNewsScreen(
 
 @Composable
 private fun CodeforcesNewsMainPage(
-    viewModel: CodeforcesNewsViewModel
+    controller: CodeforcesNewsController
 ) {
     val context = context
-    val loadingStatus by viewModel.pageLoadingStatusState(CodeforcesTitle.MAIN)
-    val blogEntriesState = rememberCollect { viewModel.flowOfMainBlogEntries(context) }
+    val loadingStatus by controller.pageLoadingStatusState(CodeforcesTitle.MAIN)
+    val blogEntriesState = rememberCollect { controller.flowOfMainBlogEntries(context) }
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
-        onRefresh = { viewModel.reload(title = CodeforcesTitle.MAIN, context = context) },
+        onRefresh = { controller.reload(title = CodeforcesTitle.MAIN, context = context) },
     ) {
         CodeforcesBlogEntries(
             blogEntriesState = blogEntriesState,
@@ -83,39 +81,39 @@ private fun CodeforcesNewsMainPage(
 
 @Composable
 private fun CodeforcesNewsTopPage(
-    viewModel: CodeforcesNewsViewModel
+    controller: CodeforcesNewsController
 ) {
     val context = context
-    val loadingStatus by viewModel.pageLoadingStatusState(CodeforcesTitle.TOP)
-    val blogEntriesState = rememberCollect { viewModel.flowOfTopBlogEntries(context) }
-    val commentsState = rememberCollect { viewModel.flowOfTopComments(context) }
+    val loadingStatus by controller.pageLoadingStatusState(CodeforcesTitle.TOP)
+    val blogEntriesState = rememberCollect { controller.flowOfTopBlogEntries(context) }
+    //val commentsState = rememberCollect { viewModel.flowOfTopComments(context) }
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
-        onRefresh = { viewModel.reload(title = CodeforcesTitle.TOP, context = context) },
+        onRefresh = { controller.reload(title = CodeforcesTitle.TOP, context = context) },
     ) {
-        /*CodeforcesBlogEntries(
+        CodeforcesBlogEntries(
             blogEntriesState = blogEntriesState,
             modifier = Modifier.fillMaxSize()
-        )*/
-        CodeforcesComments(
+        )
+        /*CodeforcesComments(
             commentsState = commentsState,
             modifier = Modifier.fillMaxSize()
-        )
+        )*/
     }
 }
 
 @Composable
 private fun CodeforcesNewsRecentPage(
-    viewModel: CodeforcesNewsViewModel
+    controller: CodeforcesNewsController
 ) {
     val context = context
-    val loadingStatus by viewModel.pageLoadingStatusState(CodeforcesTitle.RECENT)
-    val recentActionsState = rememberCollect { viewModel.flowOfRecentActions(context) }
+    val loadingStatus by controller.pageLoadingStatusState(CodeforcesTitle.RECENT)
+    val recentActionsState = rememberCollect { controller.flowOfRecentActions(context) }
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
-        onRefresh = { viewModel.reload(title = CodeforcesTitle.RECENT, context = context) },
+        onRefresh = { controller.reload(title = CodeforcesTitle.RECENT, context = context) },
     ) {
         CodeforcesRecentBlogEntries(
             recentActionsState = recentActionsState,

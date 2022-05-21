@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
+import com.demich.cps.news.codeforces.CodeforcesNewsController
 import com.demich.cps.news.codeforces.CodeforcesNewsScreen
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
 import com.demich.cps.ui.CPSIcons
@@ -16,11 +17,11 @@ import com.demich.cps.utils.context
 @Composable
 fun NewsScreen(
     navigator: CPSNavigator,
-    codeforcesNewsViewModel: CodeforcesNewsViewModel
+    controller: CodeforcesNewsController
 ) {
     CodeforcesNewsScreen(
         navigator = navigator,
-        viewModel = codeforcesNewsViewModel
+        controller = controller
     )
 }
 

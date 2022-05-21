@@ -2,6 +2,7 @@
 
 package com.demich.cps.news.codeforces
 
+import android.content.Context
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -10,15 +11,13 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
 @Composable
 fun rememberCodeforcesNewsController(
-
+    viewModel: CodeforcesNewsViewModel
 ): CodeforcesNewsController {
     val context = context
 
@@ -26,12 +25,21 @@ fun rememberCodeforcesNewsController(
         context.settingsNews.flowOfCodeforcesTabs()
     }
 
-    val controller =  rememberSaveable(saver = CodeforcesNewsController.saver) {
+    val controller = rememberSaveable(
+        viewModel,
+        saver = remember(viewModel) { CodeforcesNewsController.saver(viewModel) }
+    ) {
         val settings = context.settingsNews
         val initTabs = runBlocking { settings.flowOfCodeforcesTabs().first() }
         val defaultTab = runBlocking { settings.codeforcesDefaultTab() }
+        with(viewModel) {
+            flowOfMainBlogEntries(context)
+            flowOfTopBlogEntries(context)
+            flowOfRecentActions(context)
+        }
         CodeforcesNewsController(
             pagerState = PagerState(currentPage = initTabs.indexOf(defaultTab)),
+            viewModel = viewModel,
             tabs = initTabs
         )
     }
@@ -46,6 +54,7 @@ fun rememberCodeforcesNewsController(
 @Stable
 class CodeforcesNewsController(
     val pagerState: PagerState,
+    private val viewModel: CodeforcesNewsViewModel,
     tabs: List<CodeforcesTitle>
 ) {
 
@@ -69,8 +78,15 @@ class CodeforcesNewsController(
     val selectedTabIndex: Int
         get() = pagerState.currentPage
 
+
+    fun reload(title: CodeforcesTitle, context: Context) = viewModel.reload(title, context)
+    fun pageLoadingStatusState(title: CodeforcesTitle) = viewModel.pageLoadingStatusState(title)
+    fun flowOfMainBlogEntries(context: Context) = viewModel.flowOfMainBlogEntries(context)
+    fun flowOfTopBlogEntries(context: Context) = viewModel.flowOfTopBlogEntries(context)
+    fun flowOfRecentActions(context: Context) = viewModel.flowOfRecentActions(context)
+
     companion object {
-        val saver = listSaver<CodeforcesNewsController, String>(
+        fun saver(viewModel: CodeforcesNewsViewModel) = listSaver<CodeforcesNewsController, String>(
             save = {
                 buildList {
                     add(it.selectedTabIndex.toString())
@@ -81,6 +97,7 @@ class CodeforcesNewsController(
                 val index = list[0].toInt()
                 CodeforcesNewsController(
                     pagerState = PagerState(currentPage = index),
+                    viewModel = viewModel,
                     tabs = list.drop(1).map { CodeforcesTitle.valueOf(it) }
                 )
             }
