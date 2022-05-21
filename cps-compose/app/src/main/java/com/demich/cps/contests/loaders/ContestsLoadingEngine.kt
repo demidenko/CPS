@@ -49,12 +49,12 @@ private suspend fun loadUntilSuccess(
     for (loaderType in priorities) {
         val loader = loaders.getValue(loaderType)
         val result: Result<List<Contest>> = if (loader is ContestsLoaderMultiple) {
-            memorizer.get(loader = loader).map { contests ->
-                contests.filter { it.platform == platform }
-            }
+            memorizer.get(loader).map { it.getOrElse(platform) { emptyList() } }
         } else {
-            runCatching {
-                loader.getContests(platform = platform, dateConstraints = dateConstraints)
+            withContext(Dispatchers.IO) {
+                kotlin.runCatching {
+                    loader.getContests(platform = platform, dateConstraints = dateConstraints)
+                }
             }
         }
         result.onSuccess { contests ->
@@ -67,13 +67,15 @@ private suspend fun loadUntilSuccess(
     contestsReceiver.finishFailed(platform)
 }
 
+typealias ContestsLoadResult = Result<Map<Contest.Platform, List<Contest>>>
+
 private class MultipleLoadersMemorizer(
     private val setup: Map<Contest.Platform, List<ContestsLoaders>>,
     private val dateConstraints: ContestDateConstraints.Current
 ) {
     private val mutex = Mutex()
-    private val results = mutableMapOf<ContestsLoaders, Deferred<Result<List<Contest>>>>()
-    suspend fun get(loader: ContestsLoaderMultiple): Result<List<Contest>> {
+    private val results = mutableMapOf<ContestsLoaders, Deferred<ContestsLoadResult>>()
+    suspend fun get(loader: ContestsLoaderMultiple): ContestsLoadResult {
         return coroutineScope {
             mutex.withLock {
                 results.getOrPut(loader.type) {
@@ -83,15 +85,17 @@ private class MultipleLoadersMemorizer(
         }.await()
     }
 
-    private suspend fun runLoader(loader: ContestsLoaderMultiple): Result<List<Contest>> {
+    private suspend fun runLoader(loader: ContestsLoaderMultiple): ContestsLoadResult {
         val platforms = setup.mapNotNull { (platform, loaderTypes) ->
             if (loader.type in loaderTypes) platform else null
         }
-        return kotlin.runCatching {
-            loader.getContests(
-                platforms = platforms,
-                dateConstraints = dateConstraints
-            )
+        return withContext(Dispatchers.IO) {
+            kotlin.runCatching {
+                loader.getContests(
+                    platforms = platforms,
+                    dateConstraints = dateConstraints
+                ).groupBy { it.platform }
+            }
         }
     }
 }
