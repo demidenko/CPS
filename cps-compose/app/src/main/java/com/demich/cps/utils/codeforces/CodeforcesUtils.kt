@@ -34,8 +34,8 @@ object CodeforcesUtils {
         )
     )
 
-    fun extractBlogEntries(source: String): List<CodeforcesBlogEntry> {
-        return Jsoup.parse(source).select("div.topic").map { topic ->
+    private fun extractBlogEntryOrNull(topic: Element): CodeforcesBlogEntry? {
+        return kotlin.runCatching {
             val id: Int
             val title: String
             topic.selectFirst("div.title")!!.let {
@@ -71,7 +71,11 @@ object CodeforcesUtils {
                 rating = rating,
                 commentsCount = commentsCount
             )
-        }
+        }.getOrNull()
+    }
+
+    fun extractBlogEntries(source: String): List<CodeforcesBlogEntry> {
+        return Jsoup.parse(source).select("div.topic").mapNotNull(::extractBlogEntryOrNull)
     }
 
     fun extractComments(source: String): List<CodeforcesRecentAction> {
