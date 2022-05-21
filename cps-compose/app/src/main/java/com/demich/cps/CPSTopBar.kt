@@ -179,7 +179,7 @@ private fun CPSAboutDialog(onDismissRequest: () -> Unit) {
         MonospacedText("   Programming")
         MonospacedText("&& Solving")
         MonospacedText("{")
-        MonospacedText("   version = ${BuildConfig.VERSION_NAME}")
+        MonospacedText("   version = ${BuildConfig.VERSION_NAME}" + if (devModeEnabled) " (${BuildConfig.VERSION_CODE})" else "")
         if (showDevModeLine) {
             Row(
                 horizontalArrangement = Arrangement.End,
