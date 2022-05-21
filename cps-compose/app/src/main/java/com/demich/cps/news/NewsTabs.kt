@@ -53,17 +53,14 @@ fun NewsTabRow(
 
 @Composable
 fun NewsTab(
-    index: Int,
     title: String,
+    index: Int,
     pagerState: PagerState,
     modifier: Modifier = Modifier,
     selectedTextColor: Color,
     unselectedTextColor: Color
 ) {
-    Box(
-        modifier = modifier.fillMaxSize()
-    ) {
-        //TODO: show error somehow
+    Box(modifier = modifier.fillMaxSize()) {
         Text(
             text = title,
             color = tabColor(

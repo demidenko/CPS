@@ -19,6 +19,7 @@ import com.demich.cps.utils.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerScope
+import com.google.accompanist.pager.PagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
@@ -174,12 +175,10 @@ private fun TabsHeader(
         )
         NewsTabRow(pagerState = controller.pagerState) {
             controller.tabs.forEachIndexed { index, title ->
-                NewsTab(
+                CodeforcesNewsTab(
+                    title = title,
                     index = index,
-                    title = title.name,
-                    pagerState = controller.pagerState,
-                    selectedTextColor = cpsColors.content,
-                    unselectedTextColor = cpsColors.contentAdditional,
+                    controller = controller,
                     modifier = Modifier.clickableNoRipple {
                         scope.launch {
                             controller.pagerState.animateScrollToPage(index)
@@ -190,3 +189,49 @@ private fun TabsHeader(
         }
     }
 }
+
+@Composable
+private fun CodeforcesNewsTab(
+    title: CodeforcesTitle,
+    index: Int,
+    controller: CodeforcesNewsController,
+    modifier: Modifier = Modifier
+) {
+    if (title == CodeforcesTitle.LOST) {
+        CodeforcesNewsTab(
+            title = title,
+            index = index,
+            loadingStatus = LoadingStatus.PENDING,
+            pagerState = controller.pagerState,
+            modifier = modifier
+        )
+    } else {
+        val loadingStatus by controller.pageLoadingStatusState(title)
+        CodeforcesNewsTab(
+            title = title,
+            index = index,
+            loadingStatus = loadingStatus,
+            pagerState = controller.pagerState,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+private fun CodeforcesNewsTab(
+    title: CodeforcesTitle,
+    index: Int,
+    loadingStatus: LoadingStatus,
+    pagerState: PagerState,
+    modifier: Modifier = Modifier
+) {
+    NewsTab(
+        title = if (loadingStatus != LoadingStatus.LOADING) title.name else "...",
+        index = index,
+        pagerState = pagerState,
+        selectedTextColor = if (loadingStatus != LoadingStatus.FAILED) cpsColors.content else cpsColors.error,
+        unselectedTextColor = if (loadingStatus != LoadingStatus.FAILED) cpsColors.contentAdditional else cpsColors.error,
+        modifier = modifier
+    )
+}
+
