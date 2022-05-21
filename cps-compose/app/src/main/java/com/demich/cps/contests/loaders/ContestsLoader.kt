@@ -90,13 +90,7 @@ abstract class ContestsLoaderMultiple(type: ContestsLoaders): ContestsLoader(typ
 }
 
 private fun List<Contest>.filterWith(dateConstraints: ContestDateConstraints.Current) =
-    filter { contest ->
-        contest.duration <= dateConstraints.maxDuration
-        &&
-        contest.startTime <= dateConstraints.maxStartTime
-        &&
-        contest.endTime >= dateConstraints.minEndTime
-    }
+    filter { contest -> dateConstraints.check(startTime = contest.startTime, duration = contest.duration) }
 
 fun makeCombinedMessage(
     errors: List<Pair<ContestsLoaders, Throwable>>,
