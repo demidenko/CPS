@@ -132,15 +132,3 @@ object DurationAsSecondsSerializer: KSerializer<Duration> {
     override fun serialize(encoder: Encoder, value: Duration) = encoder.encodeLong(value.inWholeSeconds)
     override fun deserialize(decoder: Decoder): Duration = decoder.decodeLong().seconds
 }
-
-
-fun String.containsTokensAsSubsequence(str: String, ignoreCase: Boolean = false): Boolean {
-    val tokens = str.trim().split("\\s+".toRegex())
-    var i = 0
-    for (token in tokens) {
-        val pos = indexOf(string = token, ignoreCase = ignoreCase, startIndex = i)
-        if (pos == -1) return false
-        i = pos + token.length
-    }
-    return true
-}

@@ -3,7 +3,6 @@ package com.demich.cps.contests
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import com.demich.cps.utils.containsTokensAsSubsequence
 
 
 @Composable
@@ -40,10 +39,9 @@ class ContestsFilterController(
             if (!value) enabled = false
         }
 
-    fun checkContest(contest: Contest): Boolean {
-        if(contest.title.containsTokensAsSubsequence(str = filter, ignoreCase = true)) return true
-        if(contest.platform.name.containsTokensAsSubsequence(str = filter, ignoreCase = true)) return true
-        return false
+    fun filterContests(contests: List<Contest>): List<Contest> {
+        val tokens = filter.trim().split(whiteSpaceRegex)
+        return contests.filter { checkContest(it, tokens) }
     }
 
     companion object {
@@ -60,4 +58,26 @@ class ContestsFilterController(
             }
         )
     }
+}
+
+private val whiteSpaceRegex = "\\s+".toRegex()
+
+//can't resist to note that it be solved in O(nlogn) by suffix array + segment tree
+private fun String.containsTokensAsSubsequence(tokens: List<String>, ignoreCase: Boolean = false): Boolean {
+    var i = 0
+    for (token in tokens) {
+        val pos = indexOf(string = token, ignoreCase = ignoreCase, startIndex = i)
+        if (pos == -1) return false
+        i = pos + token.length
+    }
+    return true
+}
+
+private fun checkString(string: String, tokens: List<String>) =
+    string.containsTokensAsSubsequence(tokens = tokens, ignoreCase = true)
+
+private fun checkContest(contest: Contest, tokens: List<String>): Boolean {
+    if(checkString(contest.title, tokens)) return true
+    if(contest.platform != Contest.Platform.unknown && checkString(contest.platform.name, tokens)) return true
+    return false
 }

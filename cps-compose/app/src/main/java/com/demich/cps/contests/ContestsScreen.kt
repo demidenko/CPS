@@ -163,7 +163,7 @@ private fun ContestsSortedList(
         key1 = contestsSortedListState.value,
         key2 = filterController.filter
     ) {
-        contestsSortedListState.value.filter(filterController::checkContest)
+        filterController.filterContests(contestsSortedListState.value)
     }
 
     LazyColumnWithScrollBar(modifier = modifier) {
