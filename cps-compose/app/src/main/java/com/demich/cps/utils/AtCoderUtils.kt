@@ -24,6 +24,10 @@ object AtCoderApi {
         }
     }
 
+    suspend fun getContestsPage(): String = makeWEBCall {
+        client.getAs(urlString = urls.main + "/contests")
+    }
+
     object urls {
         const val main = "https://atcoder.jp"
         fun user(handle: String) = "$main/users/$handle"
