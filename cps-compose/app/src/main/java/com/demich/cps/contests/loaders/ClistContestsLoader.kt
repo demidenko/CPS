@@ -12,25 +12,22 @@ class ClistContestsLoader(
     override suspend fun loadContests(
         platforms: Set<Contest.Platform>,
         dateConstraints: ContestDateConstraints.Current
-    ): List<Contest> {
-        val contests = CListApi.getContests(
-            apiAccess = apiAccess,
-            platforms = platforms,
-            maxStartTime = dateConstraints.maxStartTime,
-            minEndTime = dateConstraints.minEndTime,
-            includeResourceIds = includeResourceIds
-        ).mapAndFilterResult()
-        return contests
-    }
+    ) = CListApi.getContests(
+        apiAccess = apiAccess,
+        platforms = platforms,
+        maxStartTime = dateConstraints.maxStartTime,
+        minEndTime = dateConstraints.minEndTime,
+        includeResourceIds = includeResourceIds
+    ).mapAndFilterResult(dateConstraints)
 }
 
 
-private fun Collection<ClistContest>.mapAndFilterResult(): List<Contest> {
-    return mapNotNull { clistContest ->
+private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: ContestDateConstraints.Current) =
+    mapNotNull { clistContest ->
         val contest = Contest(clistContest)
+        if (!dateConstraints.check(startTime = contest.startTime, duration = contest.duration)) return@mapNotNull null
         when (contest.platform) {
             Contest.Platform.atcoder -> contest.takeIf { clistContest.host == "atcoder.jp" }
             else -> contest
         }
     }
-}
