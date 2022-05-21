@@ -1,7 +1,6 @@
 package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
-import com.demich.cps.contests.settings.ContestDateConstraints
 import com.demich.cps.utils.AtCoderApi
 import kotlinx.datetime.Instant
 import org.jsoup.Jsoup
@@ -9,10 +8,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 class AtCoderContestsLoader: ContestsLoader(type = ContestsLoaders.atcoder) {
-    override suspend fun loadContests(
-        platform: Contest.Platform,
-        dateConstraints: ContestDateConstraints.Current
-    ): List<Contest> {
+    override suspend fun loadContests(platform: Contest.Platform): List<Contest> {
         return Jsoup.parse(AtCoderApi.getContestsPage()).select("time.fixtime-full").map { timeElement ->
             val row = timeElement.parents().find { it.normalName() == "tr" }!!
             val td = row.select("td")

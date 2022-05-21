@@ -20,10 +20,21 @@ enum class ContestsLoaders(val supportedPlatforms: Set<Contest.Platform>) {
 }
 
 abstract class ContestsLoader(val type: ContestsLoaders) {
-    abstract suspend fun loadContests(
+    protected open suspend fun loadContests(
         platform: Contest.Platform,
         dateConstraints: ContestDateConstraints.Current
-    ): List<Contest>
+    ): List<Contest> {
+        return loadContests(platform = platform).filterWith(dateConstraints)
+    }
+
+    protected open suspend fun loadContests(
+        platform: Contest.Platform
+    ): List<Contest> {
+        return loadContests(
+            platform = platform,
+            dateConstraints = ContestDateConstraints.Current()
+        )
+    }
 
     suspend fun getContests(
         platform: Contest.Platform,
@@ -33,16 +44,29 @@ abstract class ContestsLoader(val type: ContestsLoaders) {
         return loadContests(
             platform = platform,
             dateConstraints = dateConstraints
-        ).filterWith(dateConstraints)
+        ).apply {
+            require(all { it.platform == platform })
+        }
     }
 }
 
 abstract class ContestsLoaderMultiple(type: ContestsLoaders): ContestsLoader(type) {
 
-    protected abstract suspend fun loadContests(
+    protected open suspend fun loadContests(
         platforms: Set<Contest.Platform>,
         dateConstraints: ContestDateConstraints.Current
-    ): List<Contest>
+    ): List<Contest> {
+        return loadContests(platforms = platforms).filterWith(dateConstraints)
+    }
+
+    protected open suspend fun loadContests(
+        platforms: Set<Contest.Platform>
+    ): List<Contest> {
+        return loadContests(
+            platforms = platforms,
+            dateConstraints = ContestDateConstraints.Current()
+        )
+    }
 
     suspend fun getContests(
         platforms: Collection<Contest.Platform>,
@@ -50,10 +74,13 @@ abstract class ContestsLoaderMultiple(type: ContestsLoaders): ContestsLoader(typ
     ): List<Contest> {
         if (platforms.isEmpty()) return emptyList()
         require(type.supportedPlatforms.containsAll(platforms))
+        val setOfPlatforms = platforms.toSet()
         return loadContests(
-            platforms = platforms.toSet(),
+            platforms = setOfPlatforms,
             dateConstraints = dateConstraints
-        ).filterWith(dateConstraints)
+        ).apply {
+            require(all { it.platform in setOfPlatforms })
+        }
     }
 
     final override suspend fun loadContests(

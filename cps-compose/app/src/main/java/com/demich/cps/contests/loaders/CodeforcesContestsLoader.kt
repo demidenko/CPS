@@ -1,15 +1,11 @@
 package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
-import com.demich.cps.contests.settings.ContestDateConstraints
 import com.demich.cps.utils.codeforces.CodeforcesApi
 
 class CodeforcesContestsLoader: ContestsLoader(type = ContestsLoaders.codeforces) {
-    override suspend fun loadContests(
-        platform: Contest.Platform,
-        dateConstraints: ContestDateConstraints.Current
-    ): List<Contest> {
-        return CodeforcesApi.getContests().map { contest ->
+    override suspend fun loadContests(platform: Contest.Platform) =
+        CodeforcesApi.getContests().map { contest ->
             Contest(
                 platform = Contest.Platform.codeforces,
                 id = contest.id.toString(),
@@ -19,6 +15,4 @@ class CodeforcesContestsLoader: ContestsLoader(type = ContestsLoaders.codeforces
                 link = CodeforcesApi.urls.contestOuter(contestId = contest.id)
             )
         }
-    }
-
 }

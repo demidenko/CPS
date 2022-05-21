@@ -53,9 +53,9 @@ data class ContestDateConstraints(
         maxDuration = maxDuration
     )
     data class Current(
-        val maxStartTime: Instant,
-        val minEndTime: Instant,
-        val maxDuration: Duration
+        val maxStartTime: Instant = Instant.DISTANT_FUTURE,
+        val minEndTime: Instant = Instant.DISTANT_PAST,
+        val maxDuration: Duration = Duration.INFINITE
     )
 }
 
