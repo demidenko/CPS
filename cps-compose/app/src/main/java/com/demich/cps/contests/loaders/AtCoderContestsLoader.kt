@@ -5,6 +5,7 @@ import com.demich.cps.contests.settings.ContestDateConstraints
 import com.demich.cps.utils.AtCoderApi
 import kotlinx.datetime.Instant
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -13,7 +14,16 @@ class AtCoderContestsLoader: ContestsLoader(type = ContestsLoaders.atcoder) {
         platform: Contest.Platform,
         dateConstraints: ContestDateConstraints.Current
     ): List<Contest> {
-        return Jsoup.parse(AtCoderApi.getContestsPage()).select("time.fixtime-full").mapNotNull { timeElement ->
+        return Jsoup.parse(AtCoderApi.getContestsPage())
+            .select("time.fixtime-full")
+            .mapNotNull { extractContestOrNull(it, dateConstraints) }
+    }
+
+    private fun extractContestOrNull(
+        timeElement: Element,
+        dateConstraints: ContestDateConstraints.Current
+    ): Contest? {
+        return kotlin.runCatching {
             val row = timeElement.parents().find { it.normalName() == "tr" }!!
             val td = row.select("td")
 
@@ -27,7 +37,7 @@ class AtCoderContestsLoader: ContestsLoader(type = ContestsLoaders.atcoder) {
                 h.hours + m.minutes
             }
 
-            if (!dateConstraints.check(startTime, duration)) return@mapNotNull null
+            if (!dateConstraints.check(startTime, duration)) return null
 
             val title = td[1].selectFirst("a")!!
 
@@ -38,7 +48,7 @@ class AtCoderContestsLoader: ContestsLoader(type = ContestsLoaders.atcoder) {
                 startTime = startTime,
                 durationSeconds = duration.inWholeSeconds
             )
-        }
+        }.getOrNull()
     }
 
 }
