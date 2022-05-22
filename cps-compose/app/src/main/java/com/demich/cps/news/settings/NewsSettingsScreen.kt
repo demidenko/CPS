@@ -75,35 +75,29 @@ private fun CodeforcesLostAuthorSettingsItem(
 ) {
     val context = context
     val manager = remember { CodeforcesAccountManager(context) }
+    val options = remember {
+        listOf(
+            CodeforcesUtils.ColorTag.BLACK to "Exists",
+            CodeforcesUtils.ColorTag.GRAY to "Newbie",
+            CodeforcesUtils.ColorTag.GREEN to "Pupil",
+            CodeforcesUtils.ColorTag.CYAN to "Specialist",
+            CodeforcesUtils.ColorTag.BLUE to "Expert",
+            CodeforcesUtils.ColorTag.VIOLET to "Candidate Master",
+            CodeforcesUtils.ColorTag.ORANGE to "Master",
+            CodeforcesUtils.ColorTag.RED to "Grandmaster",
+            CodeforcesUtils.ColorTag.LEGENDARY to "LGM"
+        )
+    }
     Box(modifier = Modifier.padding(top = 10.dp)) {
         SettingsEnumItemContent(
             item = item,
             title = "Author at least",
-            options = listOf(
-                CodeforcesUtils.ColorTag.BLACK,
-                CodeforcesUtils.ColorTag.GRAY,
-                CodeforcesUtils.ColorTag.GREEN,
-                CodeforcesUtils.ColorTag.CYAN,
-                CodeforcesUtils.ColorTag.BLUE,
-                CodeforcesUtils.ColorTag.VIOLET,
-                CodeforcesUtils.ColorTag.ORANGE,
-                CodeforcesUtils.ColorTag.RED,
-                CodeforcesUtils.ColorTag.LEGENDARY
-            ),
-            optionToString = {
-                val name: String = when (it) {
-                    CodeforcesUtils.ColorTag.BLACK -> "Exists"
-                    CodeforcesUtils.ColorTag.GRAY -> "Newbie"
-                    CodeforcesUtils.ColorTag.GREEN -> "Pupil"
-                    CodeforcesUtils.ColorTag.CYAN -> "Specialist"
-                    CodeforcesUtils.ColorTag.BLUE -> "Expert"
-                    CodeforcesUtils.ColorTag.VIOLET -> "Candidate Master"
-                    CodeforcesUtils.ColorTag.ORANGE -> "Master"
-                    CodeforcesUtils.ColorTag.RED -> "Grandmaster"
-                    CodeforcesUtils.ColorTag.LEGENDARY -> "LGM"
-                    else -> ""
-                }
-                manager.makeHandleSpan(handle = name, tag = it)
+            options = options.map { it.first },
+            optionToString = { tag ->
+                manager.makeHandleSpan(
+                    handle = options.first { it.first == tag }.second,
+                    tag = tag
+                )
             }
         )
     }
