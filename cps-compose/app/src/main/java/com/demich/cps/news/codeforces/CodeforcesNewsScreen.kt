@@ -89,15 +89,25 @@ private fun CodeforcesNewsRecentPage(
     val context = context
     val loadingStatus by controller.rememberLoadingStatusState(CodeforcesTitle.RECENT)
     val recentActionsState = rememberCollect { controller.flowOfRecentActions(context) }
+    val commentsState = remember(recentActionsState.value) {
+        mutableStateOf(recentActionsState.value.second)
+    }
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
         onRefresh = { controller.reload(title = CodeforcesTitle.RECENT, context = context) },
     ) {
-        CodeforcesRecentBlogEntries(
-            recentActionsState = recentActionsState,
-            modifier = Modifier.fillMaxSize()
-        )
+        if (controller.recentShowComments) {
+            CodeforcesComments(
+                commentsState = commentsState,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            CodeforcesRecentBlogEntries(
+                recentActionsState = recentActionsState,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }
 

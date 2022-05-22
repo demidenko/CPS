@@ -41,7 +41,8 @@ fun rememberCodeforcesNewsController(
             data = CodeforcesNewsControllerData(
                 selectedIndex = initTabs.indexOf(defaultTab),
                 tabs = initTabs,
-                topShowComments = false
+                topShowComments = false,
+                recentShowComments = false
             )
         )
     }
@@ -65,7 +66,8 @@ fun rememberCodeforcesNewsController(
 data class CodeforcesNewsControllerData(
     val selectedIndex: Int,
     val tabs: List<CodeforcesTitle>,
-    val topShowComments: Boolean
+    val topShowComments: Boolean,
+    val recentShowComments: Boolean
 )
 
 @Stable
@@ -97,6 +99,8 @@ class CodeforcesNewsController(
 
     var topShowComments by mutableStateOf(data.topShowComments)
 
+    var recentShowComments by mutableStateOf(data.recentShowComments)
+
 
     @Composable
     fun rememberLoadingStatusState(title: CodeforcesTitle) = remember {
@@ -120,7 +124,8 @@ class CodeforcesNewsController(
                 jsonCPS.encodeToString(CodeforcesNewsControllerData(
                     selectedIndex = it.selectedTabIndex,
                     tabs = it.tabs,
-                    topShowComments = it.topShowComments
+                    topShowComments = it.topShowComments,
+                    recentShowComments = it.recentShowComments
                 ))
             },
             restore = {

@@ -14,12 +14,30 @@ fun CodeforcesNewsBottomBar(
                 controller.topShowComments = controller.topShowComments.not()
             }
         }
+        CodeforcesTitle.RECENT -> {
+            RecentSwitchButton(inCommentsMode = controller.recentShowComments) {
+                controller.recentShowComments = controller.recentShowComments.not()
+            }
+        }
         else -> Unit
     }
 }
 
 @Composable
 private fun TopSwitchButton(
+    inCommentsMode: Boolean,
+    onClick: () -> Unit
+) {
+    CPSIconButton(
+        icon = CPSIcons.Comments,
+        onState = inCommentsMode,
+        onClick = onClick
+    )
+}
+
+
+@Composable
+private fun RecentSwitchButton(
     inCommentsMode: Boolean,
     onClick: () -> Unit
 ) {
