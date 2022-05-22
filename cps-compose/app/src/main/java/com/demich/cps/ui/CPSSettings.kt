@@ -162,7 +162,7 @@ fun<T: Enum<T>> SettingsEnumItemContent(
     item: CPSDataStoreItem<T>,
     title: String,
     description: String = "",
-    optionToString: (T) -> AnnotatedString = { AnnotatedString(it.name) },
+    optionToString: @Composable (T) -> AnnotatedString = { AnnotatedString(it.name) },
     options: List<T>
 ) {
     val scope = rememberCoroutineScope()
@@ -207,7 +207,7 @@ fun<T: Enum<T>> SettingsEnumItem(
     item: CPSDataStoreItem<T>,
     title: String,
     description: String = "",
-    optionToString: (T) -> AnnotatedString = { AnnotatedString(it.name) },
+    optionToString: @Composable (T) -> AnnotatedString = { AnnotatedString(it.name) },
     options: List<T>
 ) {
     SettingsItem {

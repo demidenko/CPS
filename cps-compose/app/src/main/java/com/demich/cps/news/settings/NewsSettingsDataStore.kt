@@ -5,6 +5,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.codeforces.CodeforcesLocale
+import com.demich.cps.utils.codeforces.CodeforcesUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -20,6 +21,7 @@ class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_setting
     val codeforcesLocale = itemEnum(name = "cf_locale", defaultValue = CodeforcesLocale.EN)
 
     val codeforcesLostEnabled = itemBoolean(name = "cf_lost_enabled", defaultValue = false)
+    val codeforcesLostMinRatingTag = itemEnum(name = "cf_lost_min_rating", defaultValue = CodeforcesUtils.ColorTag.ORANGE)
 
     fun flowOfCodeforcesTabs(): Flow<List<CodeforcesTitle>> {
         return codeforcesLostEnabled.flow.map { lostEnabled ->

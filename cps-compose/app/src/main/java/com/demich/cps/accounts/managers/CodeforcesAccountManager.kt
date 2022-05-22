@@ -155,7 +155,7 @@ class CodeforcesAccountManager(context: Context):
     @Composable
     fun makeHandleSpan(handle: String, tag: CodeforcesUtils.ColorTag): AnnotatedString =
         buildAnnotatedString {
-            append(handle)
+            append(handle, color = cpsColors.content)
             CodeforcesUtils.getHandleColorByTag(tag)?.let { handleColor ->
                 addStyle(
                     style = SpanStyle(color = colorFor(handleColor)),
