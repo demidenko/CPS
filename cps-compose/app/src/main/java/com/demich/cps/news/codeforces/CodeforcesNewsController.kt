@@ -4,15 +4,19 @@ package com.demich.cps.news.codeforces
 
 import android.content.Context
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.utils.context
+import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 
 
 @Composable
@@ -38,10 +42,12 @@ fun rememberCodeforcesNewsController(
             flowOfRecentActions(context)
         }
         CodeforcesNewsController(
-            pagerState = PagerState(currentPage = initTabs.indexOf(defaultTab)),
             viewModel = viewModel,
-            topShowComments = false,
-            tabs = initTabs
+            data = CodeforcesNewsControllerData(
+                selectedIndex = initTabs.indexOf(defaultTab),
+                tabs = initTabs,
+                topShowComments = false
+            )
         )
     }
 
@@ -52,16 +58,21 @@ fun rememberCodeforcesNewsController(
     return controller
 }
 
+@Serializable
+data class CodeforcesNewsControllerData(
+    val selectedIndex: Int,
+    val tabs: List<CodeforcesTitle>,
+    val topShowComments: Boolean
+)
+
 @Stable
 class CodeforcesNewsController(
-    val pagerState: PagerState,
     private val viewModel: CodeforcesNewsViewModel,
-    tabs: List<CodeforcesTitle>,
-    topShowComments: Boolean
+    data: CodeforcesNewsControllerData
 ) {
+    val pagerState = PagerState(currentPage = data.selectedIndex)
 
-    private val tabsState = mutableStateOf(tabs)
-
+    private val tabsState = mutableStateOf(data.tabs)
     val tabs by tabsState
 
     suspend fun updateTabs(newTabs: List<CodeforcesTitle>) {
@@ -81,7 +92,7 @@ class CodeforcesNewsController(
         get() = pagerState.currentPage
 
 
-    var topShowComments by mutableStateOf(topShowComments)
+    var topShowComments by mutableStateOf(data.topShowComments)
 
 
     @Composable
@@ -101,20 +112,18 @@ class CodeforcesNewsController(
     fun flowOfRecentActions(context: Context) = viewModel.flowOfRecentActions(context)
 
     companion object {
-        fun saver(viewModel: CodeforcesNewsViewModel) = listSaver<CodeforcesNewsController, String>(
+        fun saver(viewModel: CodeforcesNewsViewModel) = Saver<CodeforcesNewsController, String>(
             save = {
-                buildList {
-                    add(it.selectedTabIndex.toString())
-                    add(it.topShowComments.toString())
-                    addAll(it.tabs.map { tab -> tab.name })
-                }
+                jsonCPS.encodeToString(CodeforcesNewsControllerData(
+                    selectedIndex = it.selectedTabIndex,
+                    tabs = it.tabs,
+                    topShowComments = it.topShowComments
+                ))
             },
-            restore = { list ->
+            restore = {
                 CodeforcesNewsController(
-                    pagerState = PagerState(currentPage = list[0].toInt()),
-                    topShowComments = list[1].toBooleanStrict(),
                     viewModel = viewModel,
-                    tabs = list.drop(2).map { CodeforcesTitle.valueOf(it) },
+                    data = jsonCPS.decodeFromString(it)
                 )
             }
         )
