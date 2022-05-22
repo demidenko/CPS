@@ -3,15 +3,11 @@ package com.demich.cps.ui
 import androidx.compose.animation.*
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.Switch
-import androidx.compose.material.SwitchDefaults
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -59,6 +55,36 @@ fun SettingsItem(
 }
 
 @Composable
+fun SettingsItemContent(
+    title: String,
+    description: String = "",
+    trailerContent: @Composable () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.heightIn(min = 48.dp)
+    ) {
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = title,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            if (description.isNotBlank()) {
+                Text(
+                    text = description,
+                    color = cpsColors.contentAdditional,
+                    fontSize = 14.sp
+                )
+            }
+        }
+        trailerContent()
+    }
+}
+
+@Composable
 fun SettingsItem(
     modifier: Modifier = Modifier,
     title: String,
@@ -66,39 +92,22 @@ fun SettingsItem(
     trailerContent: @Composable () -> Unit
 ) {
     SettingsItem(modifier = modifier) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.heightIn(min = 48.dp)
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                if (description.isNotBlank()) {
-                    Text(
-                        text = description,
-                        color = cpsColors.contentAdditional,
-                        fontSize = 14.sp
-                    )
-                }
-            }
-            trailerContent()
-        }
+        SettingsItemContent(
+            title = title,
+            description = description,
+            trailerContent = trailerContent
+        )
     }
 }
 
 @Composable
-fun SettingsSwitchItem(
+fun SettingsSwitchItemContent(
     checked: Boolean,
     title: String,
     description: String = "",
     onCheckedChange: (Boolean) -> Unit
 ) {
-    SettingsItem(
+    SettingsItemContent(
         title = title,
         description = description
     ) {
@@ -109,6 +118,23 @@ fun SettingsSwitchItem(
             colors = SwitchDefaults.colors(
                 checkedThumbColor = cpsColors.accent
             )
+        )
+    }
+}
+
+@Composable
+fun SettingsSwitchItem(
+    checked: Boolean,
+    title: String,
+    description: String = "",
+    onCheckedChange: (Boolean) -> Unit
+) {
+    SettingsItem {
+        SettingsSwitchItemContent(
+            checked = checked,
+            title = title,
+            description = description,
+            onCheckedChange = onCheckedChange
         )
     }
 }
@@ -132,7 +158,7 @@ fun SettingsSwitchItem(
 
 
 @Composable
-fun<T: Enum<T>> SettingsEnumItem(
+fun<T: Enum<T>> SettingsEnumItemContent(
     item: CPSDataStoreItem<T>,
     title: String,
     description: String = "",
@@ -144,19 +170,17 @@ fun<T: Enum<T>> SettingsEnumItem(
 
     var showChangeDialog by remember { mutableStateOf(false) }
 
-    SettingsItem(
+    SettingsItemContent(
         title = title,
-        description = description,
-        modifier = Modifier.clickable {
-            showChangeDialog = true
-        }
+        description = description
     ) {
-        Text(
-            text = optionToString(selectedOption),
-            fontSize = 18.sp,
-            color = cpsColors.accent,
-            modifier = Modifier.padding(end = 10.dp)
-        )
+        TextButton(onClick = { showChangeDialog = true }) {
+            Text(
+                text = optionToString(selectedOption),
+                fontSize = 18.sp,
+                color = cpsColors.accent
+            )
+        }
     }
 
     if (showChangeDialog) {
@@ -175,6 +199,25 @@ fun<T: Enum<T>> SettingsEnumItem(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun<T: Enum<T>> SettingsEnumItem(
+    item: CPSDataStoreItem<T>,
+    title: String,
+    description: String = "",
+    optionToString: (T) -> AnnotatedString = { AnnotatedString(it.name) },
+    options: List<T>
+) {
+    SettingsItem {
+        SettingsEnumItemContent(
+            item = item,
+            title = title,
+            description = description,
+            optionToString = optionToString,
+            options = options
+        )
     }
 }
 
