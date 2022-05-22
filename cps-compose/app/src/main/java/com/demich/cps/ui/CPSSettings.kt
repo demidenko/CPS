@@ -168,7 +168,7 @@ fun<T: Enum<T>> SettingsEnumItemContent(
     val scope = rememberCoroutineScope()
     val selectedOption by rememberCollect { item.flow }
 
-    var showChangeDialog by remember { mutableStateOf(false) }
+    var showChangeDialog by rememberSaveable { mutableStateOf(false) }
 
     SettingsItemContent(
         title = title,
@@ -186,7 +186,12 @@ fun<T: Enum<T>> SettingsEnumItemContent(
     if (showChangeDialog) {
         CPSDialog(onDismissRequest = { showChangeDialog = false }) {
             Text(text = title)
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f, false)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 options.forEach { option ->
                     CPSRadioButtonTitled(
                         title = { Text(text = optionToString(option)) },
