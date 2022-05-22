@@ -151,10 +151,10 @@ private fun CPSScaffold(
                 )
                 holder.menu = newsMenuBuilder(
                     navigator = navigator,
-                    newsViewModel = cpsViewModels.newsViewModel
+                    controller = controller
                 )
                 holder.bottomBar = newsBottomBarBuilder(
-                    newsViewModel = cpsViewModels.newsViewModel
+                    controller = controller
                 )
             }
             cpsComposable(ScreenTypes.newsSettings.route) {

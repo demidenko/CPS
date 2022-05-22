@@ -59,7 +59,7 @@ class CodeforcesNewsViewModel: ViewModel() {
     )
 
     @Composable
-    fun combinedLoadingStatusState(): State<LoadingStatus> = remember {
+    fun rememberLoadingStatusState(): State<LoadingStatus> = remember {
         listOf(
             mainBlogEntries.loadingStatusState,
             topBlogEntries.loadingStatusState,
@@ -71,7 +71,10 @@ class CodeforcesNewsViewModel: ViewModel() {
     fun pageLoadingStatusState(title: CodeforcesTitle): State<LoadingStatus> {
         return when (title) {
             CodeforcesTitle.MAIN -> mainBlogEntries.loadingStatusState
-            CodeforcesTitle.TOP -> topBlogEntries.loadingStatusState
+            CodeforcesTitle.TOP -> {
+                listOf(topBlogEntries.loadingStatusState, topComments.loadingStatusState)
+                    .combine()
+            }
             CodeforcesTitle.RECENT -> recentActions.loadingStatusState
             else -> throw IllegalArgumentException("$title is not reloadable")
         }

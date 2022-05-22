@@ -6,7 +6,6 @@ import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
 import com.demich.cps.news.codeforces.CodeforcesNewsController
 import com.demich.cps.news.codeforces.CodeforcesNewsScreen
-import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSNavigator
@@ -27,21 +26,21 @@ fun NewsScreen(
 
 
 fun newsBottomBarBuilder(
-    newsViewModel: CodeforcesNewsViewModel
+    controller: CodeforcesNewsController
 ): AdditionalBottomBarBuilder = {
     val context = context
 
-    val loadingStatus by newsViewModel.combinedLoadingStatusState()
+    val loadingStatus by controller.rememberLoadingStatusState()
     CPSReloadingButton(loadingStatus = loadingStatus) {
-        newsViewModel.reloadAll(context)
+        controller.reloadAll(context)
     }
 }
 
 fun newsMenuBuilder(
     navigator: CPSNavigator,
-    newsViewModel: CodeforcesNewsViewModel
+    controller: CodeforcesNewsController
 ): CPSMenuBuilder = {
-    val loadingStatus by newsViewModel.combinedLoadingStatusState()
+    val loadingStatus by controller.rememberLoadingStatusState()
     CPSDropdownMenuItem(
         title = "Settings",
         icon = CPSIcons.Settings,

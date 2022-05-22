@@ -40,6 +40,7 @@ fun rememberCodeforcesNewsController(
         CodeforcesNewsController(
             pagerState = PagerState(currentPage = initTabs.indexOf(defaultTab)),
             viewModel = viewModel,
+            topShowComments = false,
             tabs = initTabs
         )
     }
@@ -55,7 +56,8 @@ fun rememberCodeforcesNewsController(
 class CodeforcesNewsController(
     val pagerState: PagerState,
     private val viewModel: CodeforcesNewsViewModel,
-    tabs: List<CodeforcesTitle>
+    tabs: List<CodeforcesTitle>,
+    topShowComments: Boolean
 ) {
 
     private val tabsState = mutableStateOf(tabs)
@@ -79,10 +81,23 @@ class CodeforcesNewsController(
         get() = pagerState.currentPage
 
 
+    var topShowComments by mutableStateOf(topShowComments)
+
+
+    @Composable
+    fun rememberLoadingStatusState(title: CodeforcesTitle) = remember {
+        viewModel.pageLoadingStatusState(title)
+    }
+
+    @Composable
+    fun rememberLoadingStatusState() = viewModel.rememberLoadingStatusState()
+
     fun reload(title: CodeforcesTitle, context: Context) = viewModel.reload(title, context)
-    fun pageLoadingStatusState(title: CodeforcesTitle) = viewModel.pageLoadingStatusState(title)
+    fun reloadAll(context: Context) = viewModel.reloadAll(context)
+
     fun flowOfMainBlogEntries(context: Context) = viewModel.flowOfMainBlogEntries(context)
     fun flowOfTopBlogEntries(context: Context) = viewModel.flowOfTopBlogEntries(context)
+    fun flowOfTopComments(context: Context) = viewModel.flowOfTopComments(context)
     fun flowOfRecentActions(context: Context) = viewModel.flowOfRecentActions(context)
 
     companion object {
@@ -90,15 +105,16 @@ class CodeforcesNewsController(
             save = {
                 buildList {
                     add(it.selectedTabIndex.toString())
+                    add(it.topShowComments.toString())
                     addAll(it.tabs.map { tab -> tab.name })
                 }
             },
             restore = { list ->
-                val index = list[0].toInt()
                 CodeforcesNewsController(
-                    pagerState = PagerState(currentPage = index),
+                    pagerState = PagerState(currentPage = list[0].toInt()),
+                    topShowComments = list[1].toBooleanStrict(),
                     viewModel = viewModel,
-                    tabs = list.drop(1).map { CodeforcesTitle.valueOf(it) }
+                    tabs = list.drop(2).map { CodeforcesTitle.valueOf(it) },
                 )
             }
         )

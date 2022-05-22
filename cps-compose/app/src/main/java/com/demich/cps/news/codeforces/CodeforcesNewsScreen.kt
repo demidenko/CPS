@@ -68,7 +68,7 @@ private fun CodeforcesNewsMainPage(
     controller: CodeforcesNewsController
 ) {
     val context = context
-    val loadingStatus by controller.pageLoadingStatusState(CodeforcesTitle.MAIN)
+    val loadingStatus by controller.rememberLoadingStatusState(CodeforcesTitle.MAIN)
     val blogEntriesState = rememberCollect { controller.flowOfMainBlogEntries(context) }
 
     SwipeRefresh(
@@ -83,35 +83,11 @@ private fun CodeforcesNewsMainPage(
 }
 
 @Composable
-private fun CodeforcesNewsTopPage(
-    controller: CodeforcesNewsController
-) {
-    val context = context
-    val loadingStatus by controller.pageLoadingStatusState(CodeforcesTitle.TOP)
-    val blogEntriesState = rememberCollect { controller.flowOfTopBlogEntries(context) }
-    //val commentsState = rememberCollect { viewModel.flowOfTopComments(context) }
-
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
-        onRefresh = { controller.reload(title = CodeforcesTitle.TOP, context = context) },
-    ) {
-        CodeforcesBlogEntries(
-            blogEntriesState = blogEntriesState,
-            modifier = Modifier.fillMaxSize()
-        )
-        /*CodeforcesComments(
-            commentsState = commentsState,
-            modifier = Modifier.fillMaxSize()
-        )*/
-    }
-}
-
-@Composable
 private fun CodeforcesNewsRecentPage(
     controller: CodeforcesNewsController
 ) {
     val context = context
-    val loadingStatus by controller.pageLoadingStatusState(CodeforcesTitle.RECENT)
+    val loadingStatus by controller.rememberLoadingStatusState(CodeforcesTitle.RECENT)
     val recentActionsState = rememberCollect { controller.flowOfRecentActions(context) }
 
     SwipeRefresh(
@@ -206,7 +182,7 @@ private fun CodeforcesNewsTab(
             modifier = modifier
         )
     } else {
-        val loadingStatus by controller.pageLoadingStatusState(title)
+        val loadingStatus by controller.rememberLoadingStatusState(title)
         CodeforcesNewsTab(
             title = title,
             index = index,
