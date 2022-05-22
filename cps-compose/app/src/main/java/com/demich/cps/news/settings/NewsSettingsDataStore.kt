@@ -6,7 +6,7 @@ import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.codeforces.CodeforcesLocale
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 val Context.settingsNews: NewsSettingsDataStore
     get() = NewsSettingsDataStore(this)
@@ -19,14 +19,16 @@ class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_setting
     val codeforcesDefaultTab = itemEnum(name = "cf_default_tab", defaultValue = CodeforcesTitle.TOP)
     val codeforcesLocale = itemEnum(name = "cf_locale", defaultValue = CodeforcesLocale.EN)
 
+    val codeforcesLostEnabled = itemBoolean(name = "cf_lost_enabled", defaultValue = false)
+
     fun flowOfCodeforcesTabs(): Flow<List<CodeforcesTitle>> {
-        //TODO: merge settings
-        return flowOf(
-            listOf(
-                CodeforcesTitle.MAIN,
-                CodeforcesTitle.TOP,
-                CodeforcesTitle.RECENT,
-            )
-        )
+        return codeforcesLostEnabled.flow.map { lostEnabled ->
+            buildList {
+                add(CodeforcesTitle.MAIN)
+                add(CodeforcesTitle.TOP)
+                add(CodeforcesTitle.RECENT)
+                if (lostEnabled) add(CodeforcesTitle.LOST)
+            }
+        }
     }
 }

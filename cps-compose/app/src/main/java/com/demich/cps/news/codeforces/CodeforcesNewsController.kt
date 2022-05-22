@@ -25,10 +25,6 @@ fun rememberCodeforcesNewsController(
 ): CodeforcesNewsController {
     val context = context
 
-    val tabs by rememberCollect {
-        context.settingsNews.flowOfCodeforcesTabs()
-    }
-
     val controller = rememberSaveable(
         viewModel,
         saver = remember(viewModel) { CodeforcesNewsController.saver(viewModel) }
@@ -45,6 +41,10 @@ fun rememberCodeforcesNewsController(
                 recentShowComments = false
             )
         )
+    }
+
+    val tabs by rememberCollect {
+        context.settingsNews.flowOfCodeforcesTabs()
     }
 
     LaunchedEffect(key1 = tabs) {
@@ -80,6 +80,7 @@ class CodeforcesNewsController(
     private val tabsState = mutableStateOf(data.tabs)
     val tabs by tabsState
 
+    //TODO: lost disabled -> settings + enabled -> lost tab -> settings + disabled -> crash
     suspend fun updateTabs(newTabs: List<CodeforcesTitle>) {
         val oldSelectedTab = currentTab
         val newIndex = newTabs.indexOf(oldSelectedTab).takeIf { it != -1 }

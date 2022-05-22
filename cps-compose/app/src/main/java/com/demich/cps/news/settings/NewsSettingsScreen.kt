@@ -3,6 +3,8 @@ package com.demich.cps.news.settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.res.stringResource
+import com.demich.cps.R
 import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.ui.SettingsColumn
 import com.demich.cps.ui.SettingsEnumItem
@@ -16,13 +18,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun NewsSettingsScreen() {
     SettingsColumn {
-        CodeforcesDefaultTab()
+        CodeforcesDefaultTabSettingsItem()
+        CodeforcesLostSettingsItem()
         CodeforcesRuEnabledSettingsItem()
     }
 }
 
 @Composable
-private fun CodeforcesDefaultTab() {
+private fun CodeforcesDefaultTabSettingsItem() {
     val context = context
     SettingsEnumItem(
         item = context.settingsNews.codeforcesDefaultTab,
@@ -32,6 +35,16 @@ private fun CodeforcesDefaultTab() {
             CodeforcesTitle.TOP,
             CodeforcesTitle.RECENT
         )
+    )
+}
+
+@Composable
+private fun CodeforcesLostSettingsItem() {
+    val context = context
+    SettingsSwitchItem(
+        item = context.settingsNews.codeforcesLostEnabled,
+        title = "Lost recent blog entries",
+        description = stringResource(id = R.string.news_settings_cf_lost_description)
     )
 }
 
