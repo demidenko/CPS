@@ -1,18 +1,21 @@
 package com.demich.cps.news.settings
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.ui.*
+import com.demich.cps.utils.CPSDataStoreItem
 import com.demich.cps.utils.codeforces.CodeforcesLocale
 import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.context
@@ -46,12 +49,11 @@ private fun CodeforcesDefaultTabSettingsItem() {
 @Composable
 private fun CodeforcesLostSettingsItem() {
     val context = context
-    val manager = remember { CodeforcesAccountManager(context) }
     val scope = rememberCoroutineScope()
     val settings = remember { context.settingsNews }
     val enabled by rememberCollect { settings.codeforcesLostEnabled.flow }
     SettingsItem {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column {
             SettingsSwitchItemContent(
                 checked = enabled,
                 title = "Lost recent blog entries",
@@ -61,38 +63,49 @@ private fun CodeforcesLostSettingsItem() {
                 }
             )
             AnimatedVisibility(visible = enabled) {
-                SettingsEnumItemContent(
-                    item = settings.codeforcesLostMinRatingTag,
-                    title = "Author at least",
-                    options = listOf(
-                        CodeforcesUtils.ColorTag.BLACK,
-                        CodeforcesUtils.ColorTag.GRAY,
-                        CodeforcesUtils.ColorTag.GREEN,
-                        CodeforcesUtils.ColorTag.CYAN,
-                        CodeforcesUtils.ColorTag.BLUE,
-                        CodeforcesUtils.ColorTag.VIOLET,
-                        CodeforcesUtils.ColorTag.ORANGE,
-                        CodeforcesUtils.ColorTag.RED,
-                        CodeforcesUtils.ColorTag.LEGENDARY
-                    ),
-                    optionToString = {
-                        val name: String = when (it) {
-                            CodeforcesUtils.ColorTag.BLACK -> "Exists"
-                            CodeforcesUtils.ColorTag.GRAY -> "Newbie"
-                            CodeforcesUtils.ColorTag.GREEN -> "Pupil"
-                            CodeforcesUtils.ColorTag.CYAN -> "Specialist"
-                            CodeforcesUtils.ColorTag.BLUE -> "Expert"
-                            CodeforcesUtils.ColorTag.VIOLET -> "Candidate Master"
-                            CodeforcesUtils.ColorTag.ORANGE -> "Master"
-                            CodeforcesUtils.ColorTag.RED -> "Grandmaster"
-                            CodeforcesUtils.ColorTag.LEGENDARY -> "LGM"
-                            else -> ""
-                        }
-                        manager.makeHandleSpan(handle = name, tag = it)
-                    }
-                )
+                CodeforcesLostAuthorSettingsItem(item = settings.codeforcesLostMinRatingTag)
             }
         }
+    }
+}
+
+@Composable
+private fun CodeforcesLostAuthorSettingsItem(
+    item: CPSDataStoreItem<CodeforcesUtils.ColorTag>
+) {
+    val context = context
+    val manager = remember { CodeforcesAccountManager(context) }
+    Box(modifier = Modifier.padding(top = 10.dp)) {
+        SettingsEnumItemContent(
+            item = item,
+            title = "Author at least",
+            options = listOf(
+                CodeforcesUtils.ColorTag.BLACK,
+                CodeforcesUtils.ColorTag.GRAY,
+                CodeforcesUtils.ColorTag.GREEN,
+                CodeforcesUtils.ColorTag.CYAN,
+                CodeforcesUtils.ColorTag.BLUE,
+                CodeforcesUtils.ColorTag.VIOLET,
+                CodeforcesUtils.ColorTag.ORANGE,
+                CodeforcesUtils.ColorTag.RED,
+                CodeforcesUtils.ColorTag.LEGENDARY
+            ),
+            optionToString = {
+                val name: String = when (it) {
+                    CodeforcesUtils.ColorTag.BLACK -> "Exists"
+                    CodeforcesUtils.ColorTag.GRAY -> "Newbie"
+                    CodeforcesUtils.ColorTag.GREEN -> "Pupil"
+                    CodeforcesUtils.ColorTag.CYAN -> "Specialist"
+                    CodeforcesUtils.ColorTag.BLUE -> "Expert"
+                    CodeforcesUtils.ColorTag.VIOLET -> "Candidate Master"
+                    CodeforcesUtils.ColorTag.ORANGE -> "Master"
+                    CodeforcesUtils.ColorTag.RED -> "Grandmaster"
+                    CodeforcesUtils.ColorTag.LEGENDARY -> "LGM"
+                    else -> ""
+                }
+                manager.makeHandleSpan(handle = name, tag = it)
+            }
+        )
     }
 }
 
