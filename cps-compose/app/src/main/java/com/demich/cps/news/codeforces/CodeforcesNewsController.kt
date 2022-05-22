@@ -36,11 +36,6 @@ fun rememberCodeforcesNewsController(
         val settings = context.settingsNews
         val initTabs = runBlocking { settings.flowOfCodeforcesTabs().first() }
         val defaultTab = runBlocking { settings.codeforcesDefaultTab() }
-        with(viewModel) {
-            flowOfMainBlogEntries(context)
-            flowOfTopBlogEntries(context)
-            flowOfRecentActions(context)
-        }
         CodeforcesNewsController(
             viewModel = viewModel,
             data = CodeforcesNewsControllerData(
@@ -53,6 +48,14 @@ fun rememberCodeforcesNewsController(
 
     LaunchedEffect(key1 = tabs) {
         controller.updateTabs(newTabs = tabs)
+    }
+
+    LaunchedEffect(controller) {
+        with(controller) {
+            flowOfMainBlogEntries(context)
+            if (topShowComments) flowOfTopComments(context) else flowOfTopBlogEntries(context)
+            flowOfRecentActions(context)
+        }
     }
 
     return controller
