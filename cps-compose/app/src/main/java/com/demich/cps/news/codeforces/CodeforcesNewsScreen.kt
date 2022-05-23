@@ -176,18 +176,15 @@ private fun TabsHeader(
             painter = platformIconPainter(platform = Contest.Platform.codeforces),
             contentDescription = null,
             tint = cpsColors.content,
-            modifier = Modifier.padding(start = 8.dp, end = 6.dp)
+            modifier = Modifier.padding(start = 8.dp, end = 6.dp).size(24.dp)
         )
         NewsTabRow(pagerState = controller.pagerState) {
-            controller.tabs.forEachIndexed { index, title ->
+            controller.tabs.forEach { title ->
                 CodeforcesNewsTab(
                     title = title,
-                    index = index,
                     controller = controller,
                     modifier = Modifier.clickableNoRipple {
-                        scope.launch {
-                            controller.pagerState.animateScrollToPage(index)
-                        }
+                        scope.launch { controller.animateScrollTo(title) }
                     }
                 )
             }
@@ -198,10 +195,10 @@ private fun TabsHeader(
 @Composable
 private fun CodeforcesNewsTab(
     title: CodeforcesTitle,
-    index: Int,
     controller: CodeforcesNewsController,
     modifier: Modifier = Modifier
 ) {
+    val index = controller.tabs.indexOf(title)
     if (title == CodeforcesTitle.LOST) {
         CodeforcesNewsTab(
             title = title,
