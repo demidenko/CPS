@@ -59,25 +59,6 @@ fun CodeforcesNewsScreen(
 
 
 @Composable
-private fun CodeforcesNewsMainPage(
-    controller: CodeforcesNewsController
-) {
-    val context = context
-    val loadingStatus by controller.rememberLoadingStatusState(CodeforcesTitle.MAIN)
-    val blogEntriesState = rememberCollect { controller.flowOfMainBlogEntries(context) }
-
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
-        onRefresh = { controller.reload(title = CodeforcesTitle.MAIN, context = context) },
-    ) {
-        CodeforcesBlogEntries(
-            blogEntriesState = blogEntriesState,
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-@Composable
 private fun CodeforcesNewsRecentPage(
     controller: CodeforcesNewsController
 ) {

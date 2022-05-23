@@ -1,5 +1,6 @@
 package com.demich.cps.news.codeforces
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,8 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,41 +19,81 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.EmptyListMessageBox
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LocalCurrentTime
+import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesUtils
-import com.demich.cps.utils.context
-import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.timeAgo
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun CodeforcesBlogEntries(
     blogEntriesState: State<List<CodeforcesBlogEntry>>,
     modifier: Modifier = Modifier
 ) {
+
     val context = context
-    if (blogEntriesState.value.isEmpty()) {
+    val blogEntriesController = remember {
+        object : CodeforcesBlogEntriesController(blogEntriesState = blogEntriesState) {
+            override fun openBlogEntry(blogEntry: CodeforcesBlogEntry) {
+                context.openUrlInBrowser(url = CodeforcesApi.urls.blogEntry(blogEntryId = blogEntry.id))
+            }
+        }
+    }
+
+    CodeforcesBlogEntries(
+        blogEntriesController = blogEntriesController,
+        modifier = modifier
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun CodeforcesBlogEntries(
+    blogEntriesController: CodeforcesBlogEntriesController,
+    modifier: Modifier = Modifier
+) {
+    val scope = rememberCoroutineScope()
+    if (blogEntriesController.blogEntries.isEmpty()) {
         EmptyListMessageBox(modifier = modifier)
     } else {
-        LazyColumn(
-            modifier = modifier
-        ) {
-            items(items = blogEntriesState.value, key = { it.id }) {
+        LazyColumn(modifier = modifier) {
+            items(
+                items = blogEntriesController.blogEntries,
+                key = { it.id }
+            ) { blogEntry ->
                 BlogEntryInfo(
-                    blogEntry = it,
-                    markNew = false,
+                    blogEntry = blogEntry,
+                    markNew = blogEntriesController.isNew(blogEntry.id),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(blogEntryId = it.id))
+                            scope.launch {
+                                blogEntriesController.openBlogEntry(blogEntry)
+                            }
                         }
                         .padding(horizontal = 3.dp)
                         .padding(bottom = 4.dp, top = 1.dp)
+                        .animateItemPlacement()
                 )
                 Divider()
             }
         }
+    }
+}
+
+@Stable
+abstract class CodeforcesBlogEntriesController(
+    val blogEntriesState: State<List<CodeforcesBlogEntry>>,
+    val types: State<Map<String,NewEntryType>> = mutableStateOf(emptyMap()),
+) {
+    abstract fun openBlogEntry(blogEntry: CodeforcesBlogEntry)
+
+    val blogEntries by blogEntriesState
+
+    fun isNew(id: Int): Boolean {
+        val type = types.value[id.toString()]
+        return type == NewEntryType.UNSEEN
     }
 }
 

@@ -6,22 +6,18 @@ import kotlinx.coroutines.flow.map
 
 enum class NewEntryType {
     UNSEEN,
-    SEEN,
+    //TODO: SEEN,
     OPENED
 }
 
 class NewEntriesController(
     private val item: CPSDataStoreItem<Map<String,NewEntryType>>
 ) {
-    suspend fun apply(newEntries: Collection<String>, frontDoor: Boolean) {
+    suspend fun apply(newEntries: Collection<String>) {
         item.updateValue { old ->
             newEntries.associateWith { id ->
                 when (old[id]) {
                     NewEntryType.UNSEEN, null -> NewEntryType.UNSEEN
-                    NewEntryType.SEEN -> {
-                        if (frontDoor) NewEntryType.OPENED
-                        else NewEntryType.SEEN
-                    }
                     NewEntryType.OPENED -> NewEntryType.OPENED
                 }
             }
