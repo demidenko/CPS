@@ -10,8 +10,10 @@ enum class NewEntryType {
     OPENED
 }
 
+typealias NewEntriesTypes = Map<String, NewEntryType>
+
 class NewEntriesController(
-    private val item: CPSDataStoreItem<Map<String,NewEntryType>>
+    private val item: CPSDataStoreItem<NewEntriesTypes>
 ) {
     suspend fun apply(newEntries: Collection<String>) {
         item.updateValue { old ->

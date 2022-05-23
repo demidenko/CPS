@@ -82,20 +82,6 @@ fun CodeforcesBlogEntries(
     }
 }
 
-@Stable
-abstract class CodeforcesBlogEntriesController(
-    val blogEntriesState: State<List<CodeforcesBlogEntry>>,
-    val types: State<Map<String,NewEntryType>> = mutableStateOf(emptyMap()),
-) {
-    abstract fun openBlogEntry(blogEntry: CodeforcesBlogEntry)
-
-    val blogEntries by blogEntriesState
-
-    fun isNew(id: Int): Boolean {
-        val type = types.value[id.toString()]
-        return type == NewEntryType.UNSEEN
-    }
-}
 
 @Composable
 private fun BlogEntryInfo(
