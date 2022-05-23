@@ -16,6 +16,7 @@ class NewEntriesController(
     private val item: CPSDataStoreItem<NewEntriesTypes>
 ) {
     suspend fun apply(newEntries: Collection<String>) {
+        if (newEntries.isEmpty()) return //TODO: is this OK/enough?
         item.updateValue { old ->
             newEntries.associateWith { id ->
                 when (old[id]) {
