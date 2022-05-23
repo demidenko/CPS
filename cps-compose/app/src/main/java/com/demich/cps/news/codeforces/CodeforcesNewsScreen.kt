@@ -20,7 +20,6 @@ import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerScope
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -53,14 +52,7 @@ fun CodeforcesNewsScreen(
         CodeforcesPager(
             controller = controller,
             modifier = Modifier.fillMaxSize()
-        ) { tab ->
-            when (tab) {
-                CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(controller = controller)
-                CodeforcesTitle.TOP -> CodeforcesNewsTopPage(controller = controller)
-                CodeforcesTitle.RECENT -> CodeforcesNewsRecentPage(controller = controller)
-                CodeforcesTitle.LOST -> CodeforcesNewsLostPage()
-            }
-        }
+        )
     }
 
 }
@@ -115,7 +107,7 @@ private fun CodeforcesNewsRecentPage(
 }
 
 @Composable
-private fun CodeforcesNewsLostPage() {
+private fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
     val context = context
     val blogEntriesState = rememberCollect {
         context.lostBlogEntriesDao.flowOfLost().map { blogEntries ->
@@ -143,8 +135,7 @@ private fun CodeforcesNewsLostPage() {
 @Composable
 private fun CodeforcesPager(
     controller: CodeforcesNewsController,
-    modifier: Modifier = Modifier,
-    content: @Composable (PagerScope.(CodeforcesTitle) -> Unit)
+    modifier: Modifier = Modifier
 ) {
     val context = context
     val manager = remember { CodeforcesAccountManager(context) }
@@ -160,7 +151,12 @@ private fun CodeforcesPager(
             key = { index -> controller.tabs[index] },
             modifier = modifier
         ) { index ->
-            content(controller.tabs[index])
+            when (controller.tabs[index]) {
+                CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(controller = controller)
+                CodeforcesTitle.TOP -> CodeforcesNewsTopPage(controller = controller)
+                CodeforcesTitle.RECENT -> CodeforcesNewsRecentPage(controller = controller)
+                CodeforcesTitle.LOST -> CodeforcesNewsLostPage(controller = controller)
+            }
         }
     }
 
