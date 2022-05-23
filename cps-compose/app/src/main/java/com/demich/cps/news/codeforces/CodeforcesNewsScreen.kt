@@ -165,7 +165,7 @@ private fun TabsHeader(
                     title = title,
                     controller = controller,
                     modifier = Modifier.clickableNoRipple {
-                        scope.launch { controller.animateScrollTo(title) }
+                        scope.launch { controller.scrollTo(title) }
                     }
                 )
             }

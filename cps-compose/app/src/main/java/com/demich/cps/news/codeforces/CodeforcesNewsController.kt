@@ -96,8 +96,9 @@ class CodeforcesNewsController(
     val selectedTabIndex: Int
         get() = pagerState.currentPage
 
-    suspend fun animateScrollTo(tab: CodeforcesTitle) =
-        pagerState.animateScrollToPage(page = tabs.indexOf(tab))
+    suspend fun scrollTo(tab: CodeforcesTitle) =
+        //TODO: replace to animateScroll when lagging gone
+        pagerState.scrollToPage(page = tabs.indexOf(tab))
 
 
     var topShowComments by mutableStateOf(data.topShowComments)
