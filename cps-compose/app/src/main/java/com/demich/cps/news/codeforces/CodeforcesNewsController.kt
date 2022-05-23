@@ -80,15 +80,14 @@ class CodeforcesNewsController(
     private val tabsState = mutableStateOf(data.tabs)
     val tabs by tabsState
 
-    //TODO: lost disabled -> settings + enabled -> lost tab -> settings + disabled -> crash
     suspend fun updateTabs(newTabs: List<CodeforcesTitle>) {
         val oldSelectedTab = currentTab
         val newIndex = newTabs.indexOf(oldSelectedTab).takeIf { it != -1 }
             ?: selectedTabIndex.coerceAtMost(newTabs.size - 1)
-        tabsState.value = newTabs
         if (newIndex != selectedTabIndex) {
             pagerState.scrollToPage(newIndex)
         }
+        tabsState.value = newTabs
     }
 
     val currentTab: CodeforcesTitle
