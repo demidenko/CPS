@@ -12,10 +12,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.EmptyListMessageBox
-import com.demich.cps.ui.IconSp
-import com.demich.cps.ui.LazyColumnWithScrollBar
+import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.codeforces.CodeforcesComment
@@ -29,20 +26,16 @@ fun CodeforcesComments(
     commentsState: State<List<CodeforcesRecentAction>>,
     modifier: Modifier = Modifier
 ) {
-    if (commentsState.value.isEmpty()) {
-        EmptyListMessageBox(modifier = modifier)
-    } else {
-        LazyColumnWithScrollBar(modifier = modifier) {
-            items(items = commentsState.value) { recentAction ->
-                Comment(
-                    comment = recentAction.comment,
-                    blogEntryTitle = recentAction.blogEntry?.title ?: "",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 3.dp, end = 5.dp, bottom = 3.dp)
-                )
-                Divider()
-            }
+    LazyColumnWithScrollBar(modifier = modifier) {
+        itemsNotEmpty(items = commentsState.value) { recentAction ->
+            Comment(
+                comment = recentAction.comment,
+                blogEntryTitle = recentAction.blogEntry?.title ?: "",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 3.dp, end = 5.dp, bottom = 3.dp)
+            )
+            Divider()
         }
     }
 }

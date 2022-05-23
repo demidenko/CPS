@@ -2,7 +2,6 @@ package com.demich.cps.news.codeforces
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -16,7 +15,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.EmptyListMessageBox
+import com.demich.cps.ui.itemsNotEmpty
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesRecentAction
 import com.demich.cps.utils.codeforces.CodeforcesUtils
@@ -42,19 +41,15 @@ fun CodeforcesRecentBlogEntries(
         }
     }
 
-    if (recent.isEmpty()) {
-        EmptyListMessageBox(modifier = modifier)
-    } else {
-        LazyColumn(modifier = modifier) {
-            items(items = recent) {
-                RecentBlogEntry(
-                    recentBlogEntryData = it,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 3.dp, end = 3.dp, bottom = 2.dp)
-                )
-                Divider()
-            }
+    LazyColumn(modifier = modifier) {
+        itemsNotEmpty(items = recent) {
+            RecentBlogEntry(
+                recentBlogEntryData = it,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 3.dp, end = 3.dp, bottom = 2.dp)
+            )
+            Divider()
         }
     }
 }

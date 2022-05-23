@@ -4,6 +4,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -203,6 +206,36 @@ fun EmptyListMessageBox(modifier: Modifier = Modifier) {
             text = "List is empty",
             color = cpsColors.contentAdditional,
             fontWeight = FontWeight.Medium
+        )
+    }
+}
+
+inline fun <T> LazyListScope.itemsNotEmpty(
+    items: List<T>,
+    onEmptyMessage: String = "List is empty",
+    noinline key: ((item: T) -> Any)? = null,
+    noinline contentType: (item: T) -> Any? = { null },
+    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
+) {
+    if (items.isEmpty()) {
+        item {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillParentMaxSize()
+            ) {
+                Text(
+                    text = onEmptyMessage,
+                    color = cpsColors.contentAdditional,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    } else {
+        items(
+            items = items,
+            key = key,
+            contentType = contentType,
+            itemContent = itemContent
         )
     }
 }

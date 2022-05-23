@@ -5,11 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,12 +19,15 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.EmptyListMessageBox
+import com.demich.cps.ui.itemsNotEmpty
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.*
+import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesUtils
+import com.demich.cps.utils.context
+import com.demich.cps.utils.openUrlInBrowser
+import com.demich.cps.utils.timeAgo
 import kotlinx.coroutines.launch
 
 
@@ -54,30 +59,26 @@ fun CodeforcesBlogEntries(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    if (blogEntriesController.blogEntries.isEmpty()) {
-        EmptyListMessageBox(modifier = modifier)
-    } else {
-        LazyColumn(modifier = modifier) {
-            items(
-                items = blogEntriesController.blogEntries,
-                key = { it.id }
-            ) { blogEntry ->
-                BlogEntryInfo(
-                    blogEntry = blogEntry,
-                    markNew = blogEntriesController.isNew(blogEntry.id),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            scope.launch {
-                                blogEntriesController.openBlogEntry(blogEntry)
-                            }
+    LazyColumn(modifier = modifier) {
+        itemsNotEmpty(
+            items = blogEntriesController.blogEntries,
+            key = { it.id }
+        ) { blogEntry ->
+            BlogEntryInfo(
+                blogEntry = blogEntry,
+                markNew = blogEntriesController.isNew(blogEntry.id),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        scope.launch {
+                            blogEntriesController.openBlogEntry(blogEntry)
                         }
-                        .padding(horizontal = 3.dp)
-                        .padding(bottom = 4.dp, top = 1.dp)
-                        .animateItemPlacement()
-                )
-                Divider()
-            }
+                    }
+                    .padding(horizontal = 3.dp)
+                    .padding(bottom = 4.dp, top = 1.dp)
+                    .animateItemPlacement()
+            )
+            Divider()
         }
     }
 }
