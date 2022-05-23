@@ -1,15 +1,18 @@
 package com.demich.cps.news.codeforces
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,6 +42,7 @@ fun CodeforcesBlogEntries(
             items(items = blogEntriesState.value, key = { it.id }) {
                 BlogEntryInfo(
                     blogEntry = it,
+                    markNew = false,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
@@ -56,6 +60,7 @@ fun CodeforcesBlogEntries(
 @Composable
 private fun BlogEntryInfo(
     blogEntry: CodeforcesBlogEntry,
+    markNew: Boolean,
     modifier: Modifier = Modifier
 ) {
     val manager = LocalCodeforcesAccountManager.current
@@ -73,6 +78,7 @@ private fun BlogEntryInfo(
             fromTime = blogEntry.creationTime,
             toTime = currentTime
         ),
+        markNew = markNew,
         modifier = modifier
     )
 }
@@ -84,6 +90,7 @@ private fun BlogEntryInfo(
     rating: Int,
     commentsCount: Int,
     timeAgo: String,
+    markNew: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -94,7 +101,8 @@ private fun BlogEntryInfo(
         BlogEntryInfoFooter(
             authorHandle = authorHandle,
             timeAgo = timeAgo,
-            commentsCount = commentsCount
+            commentsCount = commentsCount,
+            markNew = markNew
         )
     }
 }
@@ -123,7 +131,8 @@ private fun BlogEntryInfoHeader(
 private fun BlogEntryInfoFooter(
     authorHandle: AnnotatedString,
     timeAgo: String,
-    commentsCount: Int
+    commentsCount: Int,
+    markNew: Boolean
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -144,6 +153,15 @@ private fun BlogEntryInfoFooter(
                     .padding(start = 4.dp)
                     .alignByBaseline()
             )
+            if (markNew) {
+                Box(modifier = Modifier
+                    .padding(start = 4.dp)
+                    .size(6.dp)
+                    .clip(CircleShape)
+                    .background(cpsColors.newEntry)
+                    .alignBy { it.measuredHeight }
+                )
+            }
         }
         if (commentsCount > 0) {
             CommentsRow(

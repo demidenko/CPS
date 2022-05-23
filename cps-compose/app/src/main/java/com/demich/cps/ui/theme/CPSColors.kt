@@ -58,6 +58,10 @@ object cpsColors {
         @Composable
         get() = if (isLight) Color(128, 128, 128) else Color(150, 150, 150)
 
+    val newEntry: Color
+        @Composable
+        get() = if (isLight) Color(0xFF669900) else Color(0xFF99CC00)
+
     @Composable
     fun handleColor(handleColor: HandleColor): Color {
         if (isLight) {
