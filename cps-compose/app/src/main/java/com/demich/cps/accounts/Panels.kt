@@ -163,27 +163,23 @@ private fun AccountMovingUI(
 @Composable
 private fun hidingState(
     lastClickMillis: Long
-): State<Float> {
-    val a = remember { mutableStateOf(0f) }
+): State<Float> = produceState(initialValue = 0f, key1 = lastClickMillis) {
     val delayMillis = 3000
     val durationMillis = 2000
-    LaunchedEffect(key1 = lastClickMillis) {
-        a.value = 1f
-        while (isActive) {
-            val dist = getCurrentTime().toEpochMilliseconds() - lastClickMillis
-            if (dist > delayMillis + durationMillis) {
-                a.value = 0f
-                break
-            }
-            if (dist < delayMillis) {
-                delay(delayMillis - dist)
-            } else {
-                a.value = (durationMillis - (dist - delayMillis)).toFloat() / durationMillis
-                delay(100)
-            }
+    value = 1f
+    while (isActive) {
+        val dist = getCurrentTime().toEpochMilliseconds() - lastClickMillis
+        if (dist > delayMillis + durationMillis) {
+            value = 0f
+            break
+        }
+        if (dist < delayMillis) {
+            delay(delayMillis - dist)
+        } else {
+            value = (durationMillis - (dist - delayMillis)).toFloat() / durationMillis
+            delay(100)
         }
     }
-    return a
 }
 
 @Composable
