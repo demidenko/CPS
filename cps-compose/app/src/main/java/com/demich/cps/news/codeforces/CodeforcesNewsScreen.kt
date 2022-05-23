@@ -12,16 +12,19 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.Contest
 import com.demich.cps.news.NewsTab
 import com.demich.cps.news.NewsTabRow
+import com.demich.cps.room.lostBlogEntriesDao
 import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
+import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerScope
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 enum class CodeforcesTitle {
@@ -113,7 +116,27 @@ private fun CodeforcesNewsRecentPage(
 
 @Composable
 private fun CodeforcesNewsLostPage() {
-
+    val context = context
+    val blogEntriesState = rememberCollect {
+        context.lostBlogEntriesDao.flowOfLost().map { blogEntries ->
+            blogEntries.sortedByDescending { it.timeStamp }
+                .map {
+                    CodeforcesBlogEntry(
+                        id = it.id,
+                        title = it.title,
+                        authorHandle = it.authorHandle,
+                        authorColorTag = it.authorColorTag,
+                        creationTime = it.creationTime,
+                        commentsCount = 0,
+                        rating = 0
+                    )
+                }
+        }
+    }
+    CodeforcesBlogEntries(
+        blogEntriesState = blogEntriesState,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 
