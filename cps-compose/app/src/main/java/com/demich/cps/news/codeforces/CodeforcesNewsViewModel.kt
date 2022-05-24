@@ -76,7 +76,7 @@ class CodeforcesNewsViewModel: ViewModel() {
                     .combine()
             }
             CodeforcesTitle.RECENT -> recentActions.loadingStatusState
-            else -> throw IllegalArgumentException("$title is not reloadable")
+            else -> mutableStateOf(LoadingStatus.PENDING)
         }
     }
 

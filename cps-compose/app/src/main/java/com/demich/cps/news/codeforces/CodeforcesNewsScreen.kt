@@ -179,25 +179,14 @@ private fun CodeforcesNewsTab(
     controller: CodeforcesNewsController,
     modifier: Modifier = Modifier
 ) {
-    val index = controller.tabs.indexOf(title)
-    if (title == CodeforcesTitle.LOST) {
-        CodeforcesNewsTab(
-            title = title,
-            index = index,
-            loadingStatus = LoadingStatus.PENDING,
-            pagerState = controller.pagerState,
-            modifier = modifier
-        )
-    } else {
-        val loadingStatus by controller.rememberLoadingStatusState(title)
-        CodeforcesNewsTab(
-            title = title,
-            index = index,
-            loadingStatus = loadingStatus,
-            pagerState = controller.pagerState,
-            modifier = modifier
-        )
-    }
+    val loadingStatus by controller.rememberLoadingStatusState(title)
+    CodeforcesNewsTab(
+        title = title,
+        index = controller.tabs.indexOf(title),
+        loadingStatus = loadingStatus,
+        pagerState = controller.pagerState,
+        modifier = modifier
+    )
 }
 
 @Composable
