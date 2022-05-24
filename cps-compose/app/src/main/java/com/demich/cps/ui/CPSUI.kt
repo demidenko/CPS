@@ -239,3 +239,16 @@ inline fun <T> LazyListScope.itemsNotEmpty(
         )
     }
 }
+
+@Composable
+fun CPSCountBadge(count: Int) {
+    require(count >= 0)
+    if (count > 0) {
+        Badge(
+            backgroundColor = cpsColors.newEntry,
+            contentColor = cpsColors.background
+        ) {
+            Text(count.toString())
+        }
+    }
+}

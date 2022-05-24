@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.demich.cps.ui.CPSCountBadge
 import com.demich.cps.ui.theme.cpsColors
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
@@ -55,26 +54,31 @@ fun NewsTabRow(
 fun NewsTab(
     title: String,
     index: Int,
+    badgeCount: Int = 0,
     pagerState: PagerState,
     modifier: Modifier = Modifier,
     selectedTextColor: Color,
     unselectedTextColor: Color
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        Text(
-            text = title,
-            color = tabColor(
-                index = index,
-                selectedIndex = pagerState.currentPage,
-                selectedOffset = pagerState.currentPageOffset,
-                selectedTextColor = selectedTextColor,
-                unselectedTextColor = unselectedTextColor
-            ),
-            fontSize = 15.sp,
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 0.075.em,
-            modifier = Modifier.align(Alignment.Center)
-        )
+        BadgedBox(
+            modifier = Modifier.align(Alignment.Center),
+            badge = { CPSCountBadge(count = badgeCount) }
+        ) {
+            Text(
+                text = title,
+                color = tabColor(
+                    index = index,
+                    selectedIndex = pagerState.currentPage,
+                    selectedOffset = pagerState.currentPageOffset,
+                    selectedTextColor = selectedTextColor,
+                    unselectedTextColor = unselectedTextColor
+                ),
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 0.075.em,
+            )
+        }
     }
 }
 
