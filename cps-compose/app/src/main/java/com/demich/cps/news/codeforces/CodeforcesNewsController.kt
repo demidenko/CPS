@@ -106,6 +106,12 @@ class CodeforcesNewsController(
     var recentShowComments by mutableStateOf(data.recentShowComments)
 
 
+    private val badges = mutableMapOf<CodeforcesTitle, MutableState<Int>>()
+    fun getBadgeCountState(tab: CodeforcesTitle): State<Int> = badges.getOrPut(tab) { mutableStateOf(0) }
+    fun setBadgeCount(tab: CodeforcesTitle, count: Int) {
+        badges.getOrPut(tab) { mutableStateOf(count) }.value = count
+    }
+
     @Composable
     fun rememberLoadingStatusState(title: CodeforcesTitle) = remember {
         viewModel.pageLoadingStatusState(title)

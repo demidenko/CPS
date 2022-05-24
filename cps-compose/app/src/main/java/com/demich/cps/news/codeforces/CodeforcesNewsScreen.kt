@@ -23,7 +23,9 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 enum class CodeforcesTitle {
@@ -171,6 +173,15 @@ private fun TabsHeader(
             }
         }
     }
+
+    val context = context
+    LaunchedEffect(controller) {
+        val newEntriesDataStore = CodeforcesNewEntriesDataStore(context)
+        NewEntriesController(newEntriesDataStore.mainNewEntries)
+            .flowOfUnopenedCount()
+            .onEach { controller.setBadgeCount(tab = CodeforcesTitle.MAIN, count = it) }
+            .collect()
+    }
 }
 
 @Composable
@@ -180,10 +191,12 @@ private fun CodeforcesNewsTab(
     modifier: Modifier = Modifier
 ) {
     val loadingStatus by controller.rememberLoadingStatusState(title)
+    val badgeCount by controller.getBadgeCountState(title)
     CodeforcesNewsTab(
         title = title,
         index = controller.tabs.indexOf(title),
         loadingStatus = loadingStatus,
+        badgeCount = badgeCount,
         pagerState = controller.pagerState,
         modifier = modifier
     )
@@ -194,12 +207,14 @@ private fun CodeforcesNewsTab(
     title: CodeforcesTitle,
     index: Int,
     loadingStatus: LoadingStatus,
+    badgeCount: Int,
     pagerState: PagerState,
     modifier: Modifier = Modifier
 ) {
     NewsTab(
         title = if (loadingStatus != LoadingStatus.LOADING) title.name else "...",
         index = index,
+        badgeCount = badgeCount,
         pagerState = pagerState,
         selectedTextColor = if (loadingStatus != LoadingStatus.FAILED) cpsColors.content else cpsColors.error,
         unselectedTextColor = if (loadingStatus != LoadingStatus.FAILED) cpsColors.contentAdditional else cpsColors.error,
