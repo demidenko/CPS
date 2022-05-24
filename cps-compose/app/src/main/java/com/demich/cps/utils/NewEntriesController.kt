@@ -1,5 +1,9 @@
 package com.demich.cps.utils
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+
 
 enum class NewEntryType {
     UNSEEN,
@@ -35,3 +39,16 @@ class NewEntriesController(
         if (type > old) this[id] = type
     }
 }
+
+data class NewEntryTypeCounters(
+    val unseenCount: Int,
+    val seenCount: Int
+)
+
+fun combineToCounters(flowOfIds: Flow<List<String>>, flowOfTypes: Flow<NewEntriesTypes>) =
+    combine(flowOfIds, flowOfTypes) { ids, types ->
+        NewEntryTypeCounters(
+            unseenCount = ids.count { types[it] == NewEntryType.UNSEEN },
+            seenCount = ids.count { types[it] == NewEntryType.SEEN }
+        )
+    }.distinctUntilChanged()

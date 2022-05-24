@@ -21,9 +21,7 @@ import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 enum class CodeforcesTitle {
@@ -146,24 +144,13 @@ private fun TabsHeader(
     }
 
     val context = context
-
-    val mainNewEntriesCount by rememberCollect {
-        CodeforcesNewEntriesDataStore(context).mainNewEntries.flow
-            .map { m ->
-                mapOf(
-                    NewEntryType.UNSEEN to m.count { it.value == NewEntryType.UNSEEN },
-                    NewEntryType.SEEN to m.count { it.value == NewEntryType.SEEN }
-                )
-            }
-    }
-
     LaunchedEffect(controller) {
-        snapshotFlow {
-            val countOfSeen = mainNewEntriesCount.getValue(NewEntryType.SEEN)
-            val countOfUnseen = mainNewEntriesCount.getValue(NewEntryType.UNSEEN)
-            if (controller.currentTab == CodeforcesTitle.MAIN)
-                countOfSeen + countOfUnseen
-            else countOfUnseen
+        combineToCounters(
+            flowOfIds = controller.flowOfMainBlogEntries(context).map { it.map { it.id.toString() } },
+            flowOfTypes = CodeforcesNewEntriesDataStore(context).mainNewEntries.flow
+        ).combine(snapshotFlow { controller.currentTab }) { counters, currentTab ->
+            if (currentTab == CodeforcesTitle.MAIN) counters.seenCount + counters.unseenCount
+            else counters.unseenCount
         }.onEach {
             controller.setBadgeCount(tab = CodeforcesTitle.MAIN, count = it)
         }.collect()
