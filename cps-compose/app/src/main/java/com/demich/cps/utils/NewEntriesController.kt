@@ -1,12 +1,9 @@
 package com.demich.cps.utils
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-
 
 enum class NewEntryType {
     UNSEEN,
-    //TODO: SEEN,
+    SEEN,
     OPENED
 }
 
@@ -18,26 +15,23 @@ class NewEntriesController(
     suspend fun apply(newEntries: Collection<String>) {
         if (newEntries.isEmpty()) return //TODO: is this OK/enough?
         item.updateValue { old ->
-            newEntries.associateWith { id ->
-                when (old[id]) {
-                    NewEntryType.UNSEEN, null -> NewEntryType.UNSEEN
-                    NewEntryType.OPENED -> NewEntryType.OPENED
-                }
-            }
+            newEntries.associateWith { id -> old[id] ?: NewEntryType.UNSEEN }
         }
     }
 
     suspend fun mark(id: String, type: NewEntryType) {
+        item.edit { this.markAtLeast(id, type) }
+    }
+
+    suspend fun markAtLeast(ids: List<String>, type: NewEntryType) {
+        if (ids.isEmpty()) return
         item.edit {
-            this[id] = type
+            for (id in ids) this.markAtLeast(id, type)
         }
     }
 
-    fun flowOfUnseenCount(): Flow<Int> = item.flow.map { m ->
-        m.count { it.value == NewEntryType.UNSEEN }
-    }
-
-    fun flowOfUnopenedCount(): Flow<Int> = item.flow.map { m ->
-        m.count { it.value != NewEntryType.OPENED }
+    private fun MutableMap<String, NewEntryType>.markAtLeast(id: String, type: NewEntryType) {
+        val old = this[id] ?: NewEntryType.UNSEEN
+        if (type > old) this[id] = type
     }
 }

@@ -128,7 +128,9 @@ private fun TabsHeader(
             painter = platformIconPainter(platform = Contest.Platform.codeforces),
             contentDescription = null,
             tint = cpsColors.content,
-            modifier = Modifier.padding(start = 8.dp, end = 6.dp).size(24.dp)
+            modifier = Modifier
+                .padding(start = 8.dp, end = 6.dp)
+                .size(24.dp)
         )
         NewsTabRow(pagerState = controller.pagerState) {
             controller.tabs.forEach { title ->
@@ -144,12 +146,27 @@ private fun TabsHeader(
     }
 
     val context = context
+
+    val mainNewEntriesCount by rememberCollect {
+        CodeforcesNewEntriesDataStore(context).mainNewEntries.flow
+            .map { m ->
+                mapOf(
+                    NewEntryType.UNSEEN to m.count { it.value == NewEntryType.UNSEEN },
+                    NewEntryType.SEEN to m.count { it.value == NewEntryType.SEEN }
+                )
+            }
+    }
+
     LaunchedEffect(controller) {
-        val newEntriesDataStore = CodeforcesNewEntriesDataStore(context)
-        NewEntriesController(newEntriesDataStore.mainNewEntries)
-            .flowOfUnopenedCount()
-            .onEach { controller.setBadgeCount(tab = CodeforcesTitle.MAIN, count = it) }
-            .collect()
+        snapshotFlow {
+            val countOfSeen = mainNewEntriesCount.getValue(NewEntryType.SEEN)
+            val countOfUnseen = mainNewEntriesCount.getValue(NewEntryType.UNSEEN)
+            if (controller.currentTab == CodeforcesTitle.MAIN)
+                countOfSeen + countOfUnseen
+            else countOfUnseen
+        }.onEach {
+            controller.setBadgeCount(tab = CodeforcesTitle.MAIN, count = it)
+        }.collect()
     }
 }
 

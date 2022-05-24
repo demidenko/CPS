@@ -58,6 +58,6 @@ abstract class CodeforcesBlogEntriesController(
 
     fun isNew(id: Int): Boolean {
         val type = types.value[id.toString()]
-        return type == NewEntryType.UNSEEN
+        return type == NewEntryType.UNSEEN || type == NewEntryType.SEEN
     }
 }

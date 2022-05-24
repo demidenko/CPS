@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
@@ -34,7 +36,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun CodeforcesBlogEntries(
     blogEntriesState: State<List<CodeforcesBlogEntry>>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState()
 ) {
 
     val context = context
@@ -48,7 +51,8 @@ fun CodeforcesBlogEntries(
 
     CodeforcesBlogEntries(
         blogEntriesController = blogEntriesController,
-        modifier = modifier
+        modifier = modifier,
+        lazyListState = lazyListState
     )
 }
 
@@ -56,10 +60,14 @@ fun CodeforcesBlogEntries(
 @Composable
 fun CodeforcesBlogEntries(
     blogEntriesController: CodeforcesBlogEntriesController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState()
 ) {
     val scope = rememberCoroutineScope()
-    LazyColumn(modifier = modifier) {
+    LazyColumn(
+        state = lazyListState,
+        modifier = modifier
+    ) {
         itemsNotEmpty(
             items = blogEntriesController.blogEntries,
             key = { it.id }
