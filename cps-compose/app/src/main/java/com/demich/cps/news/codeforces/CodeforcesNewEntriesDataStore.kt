@@ -14,14 +14,18 @@ class CodeforcesNewEntriesDataStore(context: Context): CPSDataStore(context.cf_n
         private val Context.cf_new_entries_dataStore by preferencesDataStore("cf_new_entries")
     }
 
-    val mainNewEntries = itemJsonable<NewEntriesTypes>(name = "main", defaultValue = emptyMap())
+    val mainNewEntries = itemNewEntriesTypes(name = "main")
+
+    private fun itemNewEntriesTypes(name: String) =
+        NewEntriesDataStoreItem(itemJsonable(name = name, defaultValue = emptyMap()))
 }
+
 
 
 @Composable
 fun rememberCodeforcesBlogEntriesController(
     blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
-    newEntriesItem: CPSDataStoreItem<NewEntriesTypes>
+    newEntriesItem: NewEntriesDataStoreItem
 ): CodeforcesBlogEntriesController {
     val context = context
     val scope = rememberCoroutineScope()
@@ -29,7 +33,7 @@ fun rememberCodeforcesBlogEntriesController(
     val blogEntriesState = rememberCollect { blogEntriesFlow }
     LaunchedEffect(blogEntriesState.value) {
         val ids = blogEntriesState.value.map { it.id.toString() }
-        NewEntriesController(newEntriesItem).apply(newEntries = ids)
+        newEntriesItem.apply(newEntries = ids)
     }
     return remember {
         object : CodeforcesBlogEntriesController(
@@ -38,7 +42,7 @@ fun rememberCodeforcesBlogEntriesController(
         ) {
             override fun openBlogEntry(blogEntry: CodeforcesBlogEntry) {
                 scope.launch {
-                    NewEntriesController(newEntriesItem).mark(id = blogEntry.id.toString(), type = NewEntryType.OPENED)
+                    newEntriesItem.mark(id = blogEntry.id.toString(), type = NewEntryType.OPENED)
                 }
                 context.openUrlInBrowser(url = CodeforcesApi.urls.blogEntry(blogEntryId = blogEntry.id))
             }

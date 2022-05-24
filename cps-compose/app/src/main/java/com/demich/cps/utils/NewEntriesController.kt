@@ -13,23 +13,23 @@ enum class NewEntryType {
 
 typealias NewEntriesTypes = Map<String, NewEntryType>
 
-class NewEntriesController(
-    private val item: CPSDataStoreItem<NewEntriesTypes>
-) {
+class NewEntriesDataStoreItem (
+    item: CPSDataStoreItem<NewEntriesTypes>
+): CPSDataStoreItem<NewEntriesTypes> by item {
     suspend fun apply(newEntries: Collection<String>) {
         if (newEntries.isEmpty()) return //TODO: is this OK/enough?
-        item.updateValue { old ->
+        updateValue { old ->
             newEntries.associateWith { id -> old[id] ?: NewEntryType.UNSEEN }
         }
     }
 
     suspend fun mark(id: String, type: NewEntryType) {
-        item.edit { this.markAtLeast(id, type) }
+        edit { this.markAtLeast(id, type) }
     }
 
     suspend fun markAtLeast(ids: List<String>, type: NewEntryType) {
         if (ids.isEmpty()) return
-        item.edit {
+        edit {
             for (id in ids) this.markAtLeast(id, type)
         }
     }

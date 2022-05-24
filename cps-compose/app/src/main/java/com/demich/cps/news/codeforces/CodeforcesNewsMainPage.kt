@@ -5,7 +5,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.NewEntriesController
 import com.demich.cps.utils.NewEntryType
 import com.demich.cps.utils.context
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -74,7 +73,7 @@ private fun CodeforcesNewsMainList(
 
             (firstVisible .. lastVisible).map { blogEntries[it].id }
         }.onEach {
-            NewEntriesController(newEntriesDataStore.mainNewEntries).markAtLeast(
+            newEntriesDataStore.mainNewEntries.markAtLeast(
                 ids = it.map(Int::toString),
                 type = NewEntryType.SEEN
             )
