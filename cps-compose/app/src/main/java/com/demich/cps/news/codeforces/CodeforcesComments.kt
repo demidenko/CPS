@@ -2,7 +2,8 @@ package com.demich.cps.news.codeforces
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -12,7 +13,10 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.*
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.IconSp
+import com.demich.cps.ui.LazyColumnWithScrollBar
+import com.demich.cps.ui.itemsNotEmpty
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.codeforces.CodeforcesComment
@@ -24,9 +28,13 @@ import kotlin.math.roundToInt
 @Composable
 fun CodeforcesComments(
     commentsState: State<List<CodeforcesRecentAction>>,
+    lazyListState: LazyListState = rememberLazyListState(),
     modifier: Modifier = Modifier
 ) {
-    LazyColumnWithScrollBar(modifier = modifier) {
+    LazyColumnWithScrollBar(
+        state = lazyListState,
+        modifier = modifier
+    ) {
         itemsNotEmpty(items = commentsState.value) { recentAction ->
             Comment(
                 comment = recentAction.comment,

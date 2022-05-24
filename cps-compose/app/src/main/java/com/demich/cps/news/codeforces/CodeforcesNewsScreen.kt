@@ -21,8 +21,6 @@ import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -59,35 +57,6 @@ fun CodeforcesNewsScreen(
 
 }
 
-
-@Composable
-private fun CodeforcesNewsRecentPage(
-    controller: CodeforcesNewsController
-) {
-    val context = context
-    val loadingStatus by controller.rememberLoadingStatusState(CodeforcesTitle.RECENT)
-    val recentActionsState = rememberCollect { controller.flowOfRecentActions(context) }
-    val commentsState = remember(recentActionsState.value) {
-        mutableStateOf(recentActionsState.value.second)
-    }
-
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
-        onRefresh = { controller.reload(title = CodeforcesTitle.RECENT, context = context) },
-    ) {
-        if (controller.recentShowComments) {
-            CodeforcesComments(
-                commentsState = commentsState,
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            CodeforcesRecentBlogEntries(
-                recentActionsState = recentActionsState,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
-    }
-}
 
 @Composable
 private fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
