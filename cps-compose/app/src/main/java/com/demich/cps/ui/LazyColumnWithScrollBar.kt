@@ -29,7 +29,7 @@ fun LazyColumnWithScrollBar(
     LazyColumn(
         modifier = modifier
             .lazyColumnScrollBar(
-                listState = state,
+                state = state,
                 scrollBarColor = cpsColors.content.copy(alpha = 0.5f),
                 scrollBarWidth = 5.dp
             ),
@@ -41,29 +41,30 @@ fun LazyColumnWithScrollBar(
 }
 
 fun Modifier.lazyColumnScrollBar(
-    listState: LazyListState,
+    state: LazyListState,
     scrollBarColor: Color,
     scrollBarWidth: Dp,
     minimumScrollBarHeight: Dp = 10.dp
 ): Modifier = this.drawWithContent {
     drawContent()
-    val info = listState.layoutInfo
-    val count = info.visibleItemsInfo.size
-    if (count > 0) {
+    val info = state.layoutInfo
+    val countVisible = info.visibleItemsInfo.size
+    if (countVisible > 0) {
         val windowSize = info.viewportEndOffset - info.viewportStartOffset
         val visibleItemsSize = info.visibleItemsInfo.sumOf { it.size }
         if (windowSize < visibleItemsSize) {
-            val itemSize: Float = visibleItemsSize.toFloat() / count
+            val itemSize: Float = visibleItemsSize.toFloat() / countVisible
             val totalSize: Float = info.totalItemsCount * itemSize
-            val beforeSize: Float = listState.firstVisibleItemIndex * itemSize - info.visibleItemsInfo.first().offset
-            val h = windowSize / totalSize * windowSize //real height of bar
-            val scrollBarHeight = max(h, minimumScrollBarHeight.toPx())
-            val offsetY = beforeSize / totalSize * windowSize - beforeSize / (totalSize - windowSize) * (scrollBarHeight - h)
+            val beforeSize: Float = state.firstVisibleItemIndex * itemSize - info.visibleItemsInfo.first().offset
+            val realBarHeight = windowSize / totalSize * windowSize
+            val h = max(realBarHeight, minimumScrollBarHeight.toPx())
+            val barOffset = beforeSize / totalSize * windowSize - beforeSize / (totalSize - windowSize) * (h - realBarHeight)
+            val w = scrollBarWidth.toPx()
             drawRoundRect(
                 color = scrollBarColor,
-                topLeft = Offset(x = size.width - scrollBarWidth.toPx(), y = offsetY),
-                size = Size(width = scrollBarWidth.toPx(), height = scrollBarHeight),
-                cornerRadius = CornerRadius(4.dp.toPx())
+                topLeft = Offset(x = size.width - w, y = barOffset),
+                size = Size(width = w, height = h),
+                cornerRadius = CornerRadius(w / 2)
             )
         }
     }
