@@ -63,7 +63,6 @@ fun CodeforcesBlogEntries(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState()
 ) {
-    val scope = rememberCoroutineScope()
     LazyColumn(
         state = lazyListState,
         modifier = modifier
@@ -78,9 +77,7 @@ fun CodeforcesBlogEntries(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        scope.launch {
-                            blogEntriesController.openBlogEntry(blogEntry)
-                        }
+                        blogEntriesController.openBlogEntry(blogEntry)
                     }
                     .padding(horizontal = 3.dp)
                     .padding(bottom = 4.dp, top = 1.dp)
