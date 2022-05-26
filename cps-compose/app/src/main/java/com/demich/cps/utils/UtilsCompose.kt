@@ -149,7 +149,9 @@ fun collectCurrentTimeEachMinute(): State<Instant> {
 }
 
 
-fun LazyListState.visibleRange(): IntRange {
+fun LazyListState.visibleRange(requiredVisiblePart: Float = 0.5f): IntRange {
+    require(requiredVisiblePart in 0f..1f)
+
     val visibleItems = layoutInfo.visibleItemsInfo
     if (visibleItems.isEmpty()) return IntRange.EMPTY
 
@@ -160,13 +162,16 @@ fun LazyListState.visibleRange(): IntRange {
     val firstVisible = firstVisibleItemIndex.let { index ->
         val item = visibleItems[0]
         val topHidden = (-item.offset).coerceAtLeast(0)
-        if (topHidden * 2 > item.size) index + 1 else index
+        val visiblePart = (item.size - topHidden).toFloat() / item.size
+        if (visiblePart < requiredVisiblePart) index + 1 else index
     }
+
     val lastVisible = (firstVisibleItemIndex + visibleItems.size - 1).let { index ->
         val item = visibleItems.last()
         val bottomHidden = (item.offset + item.size - layoutInfo.viewportEndOffset)
             .coerceAtLeast(0)
-        if (bottomHidden * 2 > item.size) index - 1 else index
+        val visiblePart = (item.size - bottomHidden).toFloat() / item.size
+        if (visiblePart < requiredVisiblePart) index - 1 else index
     }
 
     return firstVisible .. lastVisible
