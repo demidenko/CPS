@@ -1,6 +1,7 @@
 package com.demich.cps.news.codeforces
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -19,9 +20,12 @@ import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.itemsNotEmpty
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
+import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesComment
 import com.demich.cps.utils.codeforces.CodeforcesRecentAction
 import com.demich.cps.utils.codeforces.CodeforcesUtils
+import com.demich.cps.utils.context
+import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.timeAgo
 import kotlin.math.roundToInt
 
@@ -31,6 +35,7 @@ fun CodeforcesComments(
     lazyListState: LazyListState = rememberLazyListState(),
     modifier: Modifier = Modifier
 ) {
+    val context = context
     LazyColumnWithScrollBar(
         state = lazyListState,
         modifier = modifier
@@ -38,9 +43,15 @@ fun CodeforcesComments(
         itemsNotEmpty(items = commentsState.value) { recentAction ->
             Comment(
                 comment = recentAction.comment,
-                blogEntryTitle = recentAction.blogEntry?.title ?: "",
+                blogEntryTitle = recentAction.blogEntry!!.title,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable {
+                        context.openUrlInBrowser(CodeforcesApi.urls.comment(
+                            blogEntryId = recentAction.blogEntry!!.id,
+                            commentId = recentAction.comment.id
+                        ))
+                    }
                     .padding(start = 3.dp, end = 5.dp, bottom = 3.dp)
             )
             Divider()
