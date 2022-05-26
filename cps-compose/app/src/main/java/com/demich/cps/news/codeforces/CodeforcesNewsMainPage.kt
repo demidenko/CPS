@@ -58,16 +58,16 @@ private fun CodeforcesNewsMainList(
             val visibleItems = layoutInfo.visibleItemsInfo
             visibleItems.forEachIndexed { index, info -> require(info.index == firstVisibleItemIndex + index) }
 
-            //assume less 50% of visibility as invisible
+            //assume less 50% of visibility as not visible
             val firstVisible = firstVisibleItemIndex.let { index ->
                 val item = visibleItems[0]
-                val topHidden = item.offset.coerceAtMost(0) * -1
+                val topHidden = (-item.offset).coerceAtLeast(0)
                 if (topHidden * 2 > item.size) index + 1 else index
             }
             val lastVisible = (firstVisibleItemIndex + visibleItems.size - 1).let { index ->
                 val item = visibleItems.last()
                 val bottomHidden = (item.offset + item.size - layoutInfo.viewportEndOffset)
-                    .coerceAtMost(0)
+                    .coerceAtLeast(0)
                 if (bottomHidden * 2 > item.size) index - 1 else index
             }
 
