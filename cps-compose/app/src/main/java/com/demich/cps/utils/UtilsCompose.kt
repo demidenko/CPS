@@ -3,6 +3,7 @@ package com.demich.cps.utils
 import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.Modifier
@@ -145,4 +146,28 @@ fun collectCurrentTimeEachMinute(): State<Instant> {
     return remember {
         currentTimeFlow(period = 1.minutes)
     }.collectAsStateLifecycleAware(initial = remember { getCurrentTime() })
+}
+
+
+fun LazyListState.visibleRange(): IntRange {
+    val visibleItems = layoutInfo.visibleItemsInfo
+    if (visibleItems.isEmpty()) return IntRange.EMPTY
+
+    val firstVisibleItemIndex = firstVisibleItemIndex
+    visibleItems.forEachIndexed { index, info -> require(info.index == firstVisibleItemIndex + index) }
+
+    //assume less 50% of visibility as not visible
+    val firstVisible = firstVisibleItemIndex.let { index ->
+        val item = visibleItems[0]
+        val topHidden = (-item.offset).coerceAtLeast(0)
+        if (topHidden * 2 > item.size) index + 1 else index
+    }
+    val lastVisible = (firstVisibleItemIndex + visibleItems.size - 1).let { index ->
+        val item = visibleItems.last()
+        val bottomHidden = (item.offset + item.size - layoutInfo.viewportEndOffset)
+            .coerceAtLeast(0)
+        if (bottomHidden * 2 > item.size) index - 1 else index
+    }
+
+    return firstVisible .. lastVisible
 }
