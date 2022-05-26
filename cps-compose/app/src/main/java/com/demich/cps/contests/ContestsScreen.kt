@@ -138,13 +138,19 @@ private fun ContestsList(
         }
     }
 
-    CompositionLocalProvider(LocalCurrentTime provides currentTime) {
-        ContestsSortedList(
-            contestsSortedListState = sortedState,
-            filterController = filterController,
-            modifier = modifier
-        )
-    }
+    CompositionLocalProvider(
+        LocalCurrentTime provides currentTime,
+        //TODO: remember lambda to not recreate it each second
+        content = remember(sortedState, filterController, modifier) {
+            {
+                ContestsSortedList(
+                    contestsSortedListState = sortedState,
+                    filterController = filterController,
+                    modifier = modifier
+                )
+            }
+        }
+    )
 
 }
 
@@ -154,8 +160,6 @@ private fun ContestsSortedList(
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
-    //TODO: strange each second recomposition here (even without ContestItems)
-
     var expandedItems: Set<Pair<Contest.Platform, String>>
         by rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(emptySet()) }
 
