@@ -51,6 +51,7 @@ private fun CodeforcesNewsMainList(
         snapshotFlow<List<Int>> {
             if (!controller.isTabVisible(CodeforcesTitle.MAIN)) return@snapshotFlow emptyList()
             val blogEntries = blogEntriesController.blogEntries
+            if (blogEntries.isEmpty()) return@snapshotFlow emptyList()
             listState.visibleRange(0.75f).map { blogEntries[it].id }
         }.onEach {
             newEntriesDataStore.mainNewEntries.markAtLeast(
