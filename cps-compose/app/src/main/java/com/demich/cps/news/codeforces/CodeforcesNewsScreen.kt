@@ -21,6 +21,8 @@ import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -81,6 +83,20 @@ private fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
     )
 }
 
+@Composable
+fun CodeforcesReloadablePage(
+    controller: CodeforcesNewsController,
+    title: CodeforcesTitle,
+    content: @Composable () -> Unit
+) {
+    val context = context
+    val loadingState = controller.rememberLoadingStatusState(title = title)
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = loadingState.value == LoadingStatus.LOADING),
+        onRefresh = { controller.reload(title = title, context = context) },
+        content = content
+    )
+}
 
 @Composable
 private fun CodeforcesPager(

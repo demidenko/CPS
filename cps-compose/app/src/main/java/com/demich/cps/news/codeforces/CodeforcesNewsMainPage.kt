@@ -2,14 +2,14 @@ package com.demich.cps.news.codeforces
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntryType
 import com.demich.cps.utils.context
 import com.demich.cps.utils.visibleRange
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
@@ -17,12 +17,7 @@ import kotlinx.coroutines.flow.onEach
 fun CodeforcesNewsMainPage(
     controller: CodeforcesNewsController
 ) {
-    val context = context
-    val loadingStatus by controller.rememberLoadingStatusState(CodeforcesTitle.MAIN)
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
-        onRefresh = { controller.reload(title = CodeforcesTitle.MAIN, context = context) },
-    ) {
+    CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.MAIN) {
         CodeforcesNewsMainList(controller = controller)
     }
 }
