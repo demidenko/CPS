@@ -90,9 +90,9 @@ fun CodeforcesReloadablePage(
     content: @Composable () -> Unit
 ) {
     val context = context
-    val loadingState = controller.rememberLoadingStatusState(title = title)
+    val loadingStatus by controller.rememberLoadingStatusState(title = title)
     SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = loadingState.value == LoadingStatus.LOADING),
+        state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
         onRefresh = { controller.reload(title = title, context = context) },
         content = content
     )
