@@ -2,6 +2,7 @@ package com.demich.cps.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.DropdownMenu
@@ -58,7 +59,7 @@ fun ContentWithCPSDropdownMenu(
 class CPSDropdownMenuScope(private val menuDismissRequest: () -> Unit) {
     @Composable
     fun CPSDropdownMenuItem(
-        title: String,
+        title: @Composable () -> Unit,
         icon: ImageVector,
         enabled: Boolean = true,
         onClick: () -> Unit
@@ -68,6 +69,7 @@ class CPSDropdownMenuScope(private val menuDismissRequest: () -> Unit) {
             menuDismissRequest()
             onClick()
         },
+        contentPadding = PaddingValues(start = 16.dp, end = 26.dp),
         content = {
             Icon(
                 imageVector = icon,
@@ -76,7 +78,20 @@ class CPSDropdownMenuScope(private val menuDismissRequest: () -> Unit) {
                     .padding(end = 8.dp)
                     .size(26.dp)
             )
-            Text(text = title, modifier = Modifier.padding(end = 26.dp))
+            title()
         }
+    )
+
+    @Composable
+    fun CPSDropdownMenuItem(
+        title: String,
+        icon: ImageVector,
+        enabled: Boolean = true,
+        onClick: () -> Unit
+    ) = CPSDropdownMenuItem(
+        title = { Text(text = title) },
+        icon = icon,
+        enabled = enabled,
+        onClick = onClick
     )
 }
