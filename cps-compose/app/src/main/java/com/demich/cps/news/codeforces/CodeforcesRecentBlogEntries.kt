@@ -1,13 +1,11 @@
 package com.demich.cps.news.codeforces
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
@@ -15,39 +13,48 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.ui.CPSDropdownMenuScope
+import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.itemsNotEmpty
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
+import com.demich.cps.utils.codeforces.CodeforcesComment
 import com.demich.cps.utils.codeforces.CodeforcesRecentAction
-import com.demich.cps.utils.codeforces.CodeforcesUtils
 
 @Composable
 fun CodeforcesRecentBlogEntries(
     recentActionsState: State<Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    menuBuilder: @Composable CPSDropdownMenuScope.(CodeforcesRecentBlogEntry) -> Unit
 ) {
     val recent = remember(recentActionsState.value) {
         val (blogEntries, comments) = recentActionsState.value
         val commentsGrouped = comments.groupBy { it.blogEntry?.id }
         blogEntries.map { blogEntry ->
-            RecentBlogEntryData(
+            CodeforcesRecentBlogEntry(
                 blogEntry = blogEntry,
-                commentatorsHandles = commentsGrouped[blogEntry.id]?.map {
-                    Pair(
-                        first = it.comment.commentatorHandle,
-                        second = it.comment.commentatorHandleColorTag
-                    )
-                }?.distinctBy { it.first } ?: emptyList()
+                comments = commentsGrouped[blogEntry.id]
+                    ?.map { it.comment }
+                    ?.distinctBy { it.commentatorHandle }
+                    ?: emptyList()
             )
         }
     }
 
+    var showMenuForBlogEntryId: Int? by remember { mutableStateOf(null) }
     LazyColumn(modifier = modifier) {
         itemsNotEmpty(items = recent) {
-            RecentBlogEntry(
-                recentBlogEntryData = it,
+            ContentWithCPSDropdownMenu(
                 modifier = Modifier
+                    .clickable(enabled = it.comments.isNotEmpty()) {
+                        showMenuForBlogEntryId = it.blogEntry.id
+                    }
                     .fillMaxWidth()
-                    .padding(start = 3.dp, end = 3.dp, bottom = 2.dp)
+                    .padding(start = 3.dp, end = 3.dp, bottom = 2.dp),
+                expanded = it.blogEntry.id == showMenuForBlogEntryId,
+                menuAlignment = Alignment.CenterStart,
+                onDismissRequest = { showMenuForBlogEntryId = null },
+                menuBuilder = { menuBuilder(it) },
+                content = { RecentBlogEntry(recentBlogEntryData = it) }
             )
             Divider()
         }
@@ -55,14 +62,14 @@ fun CodeforcesRecentBlogEntries(
 }
 
 @Immutable
-private data class RecentBlogEntryData(
+data class CodeforcesRecentBlogEntry(
     val blogEntry: CodeforcesBlogEntry,
-    val commentatorsHandles: List<Pair<String, CodeforcesUtils.ColorTag>>
+    val comments: List<CodeforcesComment>
 )
 
 @Composable
 private fun RecentBlogEntry(
-    recentBlogEntryData: RecentBlogEntryData,
+    recentBlogEntryData: CodeforcesRecentBlogEntry,
     modifier: Modifier = Modifier
 ) {
     val manager = LocalCodeforcesAccountManager.current
@@ -73,9 +80,9 @@ private fun RecentBlogEntry(
             tag = recentBlogEntryData.blogEntry.authorColorTag
         ),
         commentators = buildAnnotatedString {
-            recentBlogEntryData.commentatorsHandles.forEachIndexed { index, (handle, tag) ->
+            recentBlogEntryData.comments.forEachIndexed { index, comment ->
                 if (index > 0) append(", ")
-                append(manager.makeHandleSpan(handle = handle, tag = tag))
+                append(manager.makeHandleSpan(handle = comment.commentatorHandle, tag = comment.commentatorHandleColorTag))
             }
         },
         modifier = modifier
