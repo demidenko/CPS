@@ -7,12 +7,14 @@ import com.demich.cps.Screen
 import com.demich.cps.news.codeforces.CodeforcesNewsBottomBar
 import com.demich.cps.news.codeforces.CodeforcesNewsController
 import com.demich.cps.news.codeforces.CodeforcesNewsScreen
+import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
+import com.demich.cps.utils.rememberCollect
 
 @Composable
 fun NewsScreen(
@@ -43,6 +45,8 @@ fun newsMenuBuilder(
     navigator: CPSNavigator,
     controller: CodeforcesNewsController
 ): CPSMenuBuilder = {
+    val context = context
+
     val loadingStatus by controller.rememberLoadingStatusState()
     CPSDropdownMenuItem(
         title = "Settings",
@@ -50,5 +54,11 @@ fun newsMenuBuilder(
         enabled = loadingStatus != LoadingStatus.LOADING,
         onClick = { navigator.navigateTo(Screen.NewsSettings) }
     )
-    //CPSDropdownMenuItem(title = "Follow List", icon = CPSIcons.Accounts) { }
+
+    val followEnabled by rememberCollect { context.settingsNews.codeforcesFollowEnabled.flow }
+    if (followEnabled) {
+        CPSDropdownMenuItem(title = "Follow List", icon = CPSIcons.Accounts) {
+            navigator.navigateTo(Screen.NewsFollowList)
+        }
+    }
 }

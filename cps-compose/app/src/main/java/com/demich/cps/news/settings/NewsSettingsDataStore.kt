@@ -20,6 +20,8 @@ class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_setting
     val codeforcesDefaultTab = itemEnum(name = "cf_default_tab", defaultValue = CodeforcesTitle.TOP)
     val codeforcesLocale = itemEnum(name = "cf_locale", defaultValue = CodeforcesLocale.EN)
 
+    val codeforcesFollowEnabled = itemBoolean(name = "cf_follow_enabled", defaultValue = false)
+
     val codeforcesLostEnabled = itemBoolean(name = "cf_lost_enabled", defaultValue = false)
     val codeforcesLostMinRatingTag = itemEnum(name = "cf_lost_min_rating", defaultValue = CodeforcesUtils.ColorTag.ORANGE)
 

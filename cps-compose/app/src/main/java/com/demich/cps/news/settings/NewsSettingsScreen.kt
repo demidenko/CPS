@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 fun NewsSettingsScreen() {
     SettingsColumn {
         CodeforcesDefaultTabSettingsItem()
+        CodeforcesFollowSettingsItem()
         CodeforcesLostSettingsItem()
         CodeforcesRuEnabledSettingsItem()
     }
@@ -43,6 +44,16 @@ private fun CodeforcesDefaultTabSettingsItem() {
             CodeforcesTitle.TOP,
             CodeforcesTitle.RECENT
         )
+    )
+}
+
+@Composable
+private fun CodeforcesFollowSettingsItem() {
+    val context = context
+    SettingsSwitchItem(
+        item = context.settingsNews.codeforcesFollowEnabled,
+        title = "Follow",
+        description = stringResource(id = R.string.news_settings_cf_follow_description)
     )
 }
 

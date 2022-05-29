@@ -13,6 +13,7 @@ enum class ScreenTypes(
     contestsSettings("contests.settings"),
     news("news"),
     newsSettings("news.settings"),
+    newsFollowList("news.follow"),
     develop("develop")
 }
 
@@ -40,6 +41,7 @@ sealed class Screen(
 
     object News: Screen(ScreenTypes.news)
     object NewsSettings: Screen(ScreenTypes.newsSettings, rootScreenType = ScreenTypes.news, enableBottomBar = false)
+    object NewsFollowList: Screen(ScreenTypes.newsFollowList, rootScreenType = ScreenTypes.news)
 
     object Contests: Screen(ScreenTypes.contests)
     object ContestsSettings: Screen(ScreenTypes.contestsSettings, rootScreenType = ScreenTypes.contests, enableBottomBar = false)
@@ -47,6 +49,16 @@ sealed class Screen(
     object Development: Screen(ScreenTypes.develop)
 
 }
+
+private val simpleScreens = arrayOf(
+    Screen.Contests,
+    Screen.News,
+    Screen.Accounts,
+    Screen.ContestsSettings,
+    Screen.NewsSettings,
+    Screen.NewsFollowList,
+    Screen.Development
+)
 
 fun NavBackStackEntry.getScreen(): Screen {
     val route = destination.route
@@ -58,14 +70,7 @@ fun NavBackStackEntry.getScreen(): Screen {
         val type = AccountManagers.valueOf(arguments?.getString("manager")!!)
         return Screen.AccountSettings(type)
     }
-    return listOf(
-        Screen.Accounts,
-        Screen.News,
-        Screen.NewsSettings,
-        Screen.Contests,
-        Screen.ContestsSettings,
-        Screen.Development
-    ).first { it.screenType.route == route }
+    return simpleScreens.first { it.screenType.route == route }
 }
 
 
