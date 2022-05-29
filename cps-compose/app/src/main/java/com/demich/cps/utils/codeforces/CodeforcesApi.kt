@@ -41,6 +41,7 @@ object CodeforcesApi {
         urlString: String,
         crossinline block: HttpRequestBuilder.() -> Unit = {}
     ): T {
+        require(urlString.startsWith(urls.api))
         val callGet = suspend {
             client.getAs<CodeforcesAPIResponse<T>>(urlString = urlString, block = block)
         }
@@ -129,7 +130,15 @@ object CodeforcesApi {
     }
 
     suspend fun getPageSource(urlString: String, locale: CodeforcesLocale): String? {
+        require(urlString.startsWith(urls.main))
         return getCodeforcesWeb(urlString = urlString) {
+            parameter("locale", locale)
+        }
+    }
+
+    suspend fun getUserBlogEntries(handle: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
+        return getCodeforcesApi(urlString = "${urls.api}/user.blogEntries") {
+            parameter("handle", handle)
             parameter("locale", locale)
         }
     }
