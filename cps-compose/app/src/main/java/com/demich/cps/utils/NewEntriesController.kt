@@ -48,7 +48,7 @@ data class NewEntryTypeCounters(
 fun combineToCounters(flowOfIds: Flow<List<String>>, flowOfTypes: Flow<NewEntriesTypes>) =
     combine(flowOfIds, flowOfTypes) { ids, types ->
         NewEntryTypeCounters(
-            unseenCount = ids.count { types[it] == NewEntryType.UNSEEN },
+            unseenCount = ids.count { (types[it] ?: NewEntryType.UNSEEN) == NewEntryType.UNSEEN },
             seenCount = ids.count { types[it] == NewEntryType.SEEN }
         )
     }.distinctUntilChanged()
