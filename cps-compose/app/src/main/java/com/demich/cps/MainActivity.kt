@@ -25,6 +25,7 @@ import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
 import com.demich.cps.news.codeforces.rememberCodeforcesNewsController
 import com.demich.cps.news.follow.NewsFollowList
+import com.demich.cps.news.follow.newsFollowListBottomBarBuilder
 import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
 import com.demich.cps.news.settings.NewsSettingsScreen
@@ -164,8 +165,9 @@ private fun CPSScaffold(
                     navigator.setSubtitle("news", "settings")
                 }
             }
-            cpsComposable(ScreenTypes.newsFollowList.route) {
+            cpsComposable(ScreenTypes.newsFollowList.route) { holder ->
                 NewsFollowList()
+                holder.bottomBar = newsFollowListBottomBarBuilder()
                 LaunchedEffect(Unit) {
                     navigator.setSubtitle("news", "codeforces", "follow", "list")
                 }
