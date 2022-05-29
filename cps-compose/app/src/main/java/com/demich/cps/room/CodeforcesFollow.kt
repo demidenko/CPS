@@ -106,6 +106,21 @@ interface FollowListDao {
         return blogEntries
     }
 
+    suspend fun addNewUser(userInfo: CodeforcesUserInfo, context: Context) {
+        if (getBlogEntries(userInfo.handle) != null) return
+        insert(
+            CodeforcesUserBlog(
+                handle = userInfo.handle,
+                blogEntries = null,
+                userInfo = userInfo
+            )
+        )
+        loadBlogEntries(
+            handle = userInfo.handle,
+            context = context
+        )
+    }
+
     /*suspend fun updateUsersInfo(context: Context) {
         CodeforcesUtils.getUsersInfo(getHandles(), true)
             .forEach { (handle, info) ->

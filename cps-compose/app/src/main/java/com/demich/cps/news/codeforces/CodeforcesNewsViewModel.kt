@@ -1,10 +1,15 @@
 package com.demich.cps.news.codeforces
 
 import android.content.Context
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.room.followListDao
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.combine
@@ -135,4 +140,15 @@ class CodeforcesNewsViewModel: ViewModel() {
             second = CodeforcesUtils.extractComments(s)
         )
     }
+
+
+    fun addToFollowList(userInfo: CodeforcesUserInfo, context: Context) {
+        viewModelScope.launch {
+            context.followListDao.addNewUser(
+                userInfo = userInfo,
+                context = context
+            )
+        }
+    }
+
 }

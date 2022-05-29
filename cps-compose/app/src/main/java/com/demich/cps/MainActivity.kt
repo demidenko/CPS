@@ -167,7 +167,9 @@ private fun CPSScaffold(
             }
             cpsComposable(ScreenTypes.newsFollowList.route) { holder ->
                 NewsFollowList()
-                holder.bottomBar = newsFollowListBottomBarBuilder()
+                holder.bottomBar = newsFollowListBottomBarBuilder(
+                    newsViewModel = cpsViewModels.newsViewModel
+                )
                 LaunchedEffect(Unit) {
                     navigator.setSubtitle("news", "codeforces", "follow", "list")
                 }
