@@ -15,8 +15,10 @@ fun CodeforcesNewsBottomBar(
             }
         }
         CodeforcesTitle.RECENT -> {
-            RecentSwitchButton(inCommentsMode = controller.recentShowComments) {
-                controller.recentShowComments = controller.recentShowComments.not()
+            if (controller.recentFilterByBlogEntryId == null) {
+                RecentSwitchButton(inCommentsMode = controller.recentShowComments) {
+                    controller.recentShowComments = controller.recentShowComments.not()
+                }
             }
         }
         else -> Unit

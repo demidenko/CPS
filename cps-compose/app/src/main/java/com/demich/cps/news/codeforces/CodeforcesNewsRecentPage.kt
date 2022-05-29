@@ -1,9 +1,10 @@
 package com.demich.cps.news.codeforces
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.demich.cps.ui.CPSIcons
@@ -20,11 +21,19 @@ fun CodeforcesNewsRecentPage(
 ) {
     val context = context
     val recentActionsState = rememberCollect { controller.flowOfRecentActions(context) }
-    val commentsState = remember(recentActionsState.value) {
-        mutableStateOf(recentActionsState.value.second)
+    val commentsState = remember {
+        derivedStateOf { recentActionsState.value.second }
     }
 
     CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.RECENT) {
+        val blogEntryId = controller.recentFilterByBlogEntryId
+        if (blogEntryId != null) {
+            RecentCommentsInBlogEntry(
+                controller = controller,
+                commentsState = commentsState,
+                blogEntry = recentActionsState.value.first.first { it.id == blogEntryId }
+            )
+        } else
         if (controller.recentShowComments) {
             CodeforcesComments(
                 commentsState = commentsState,
@@ -60,7 +69,33 @@ private fun RecentBlogEntriesPage(
             context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(blogEntry.id))
         }
         CPSDropdownMenuItem(title = "Show recent comments", icon = CPSIcons.Comments) {
-            //TODO
+            controller.recentFilterByBlogEntryId = blogEntry.id
         }
+    }
+}
+
+@Composable
+private fun RecentCommentsInBlogEntry(
+    controller: CodeforcesNewsController,
+    commentsState: State<List<CodeforcesRecentAction>>,
+    blogEntry: CodeforcesBlogEntry
+) {
+    val filteredCommentsState = remember(blogEntry) {
+        derivedStateOf {
+            commentsState.value.filter {
+                it.blogEntry?.id == blogEntry.id
+            }
+        }
+    }
+
+    CodeforcesComments(
+        commentsState = filteredCommentsState,
+        modifier = Modifier.fillMaxSize()
+    )
+
+    BackHandler(
+        enabled = controller.isTabVisible(CodeforcesTitle.RECENT)
+    ) {
+        controller.recentFilterByBlogEntryId = null
     }
 }

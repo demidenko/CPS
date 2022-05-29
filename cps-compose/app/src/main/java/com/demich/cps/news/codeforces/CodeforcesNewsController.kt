@@ -38,7 +38,8 @@ fun rememberCodeforcesNewsController(
                 selectedIndex = initTabs.indexOf(defaultTab),
                 tabs = initTabs,
                 topShowComments = false,
-                recentShowComments = false
+                recentShowComments = false,
+                recentFilterByBlogEntryId = null
             )
         )
     }
@@ -67,7 +68,8 @@ data class CodeforcesNewsControllerData(
     val selectedIndex: Int,
     val tabs: List<CodeforcesTitle>,
     val topShowComments: Boolean,
-    val recentShowComments: Boolean
+    val recentShowComments: Boolean,
+    val recentFilterByBlogEntryId: Int?
 )
 
 @Stable
@@ -106,6 +108,7 @@ class CodeforcesNewsController(
     var topShowComments by mutableStateOf(data.topShowComments)
 
     var recentShowComments by mutableStateOf(data.recentShowComments)
+    var recentFilterByBlogEntryId: Int? by mutableStateOf(data.recentFilterByBlogEntryId)
 
 
     private val badges = mutableMapOf<CodeforcesTitle, MutableState<Int>>()
@@ -137,7 +140,8 @@ class CodeforcesNewsController(
                     selectedIndex = it.selectedTabIndex,
                     tabs = it.tabs,
                     topShowComments = it.topShowComments,
-                    recentShowComments = it.recentShowComments
+                    recentShowComments = it.recentShowComments,
+                    recentFilterByBlogEntryId = it.recentFilterByBlogEntryId
                 ))
             },
             restore = {
