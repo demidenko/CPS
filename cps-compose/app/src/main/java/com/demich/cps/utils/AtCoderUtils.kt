@@ -1,6 +1,5 @@
 package com.demich.cps.utils
 
-import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,13 +18,13 @@ object AtCoderApi {
     }
 
     suspend fun getUserPage(handle: String): String = makeWEBCall {
-        client.getAs(urlString = urls.user(handle)) {
+        client.getText(urlString = urls.user(handle)) {
             parameter("graph", "rating")
         }
     }
 
     suspend fun getContestsPage(): String = makeWEBCall {
-        client.getAs(urlString = urls.main + "/contests")
+        client.getText(urlString = urls.main + "/contests")
     }
 
     object urls {

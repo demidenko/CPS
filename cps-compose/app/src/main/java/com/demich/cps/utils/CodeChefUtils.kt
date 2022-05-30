@@ -39,7 +39,7 @@ object CodeChefApi {
         suspend operator fun invoke(): String {
             val d = tokenDeferred ?: client.async {
                 println("codechef x-csrf-token start recalc...")
-                val page = client.getAs<String>("${urls.main}/ratings/all")
+                val page = client.getText("${urls.main}/ratings/all")
                 var i = page.indexOf("window.csrfToken=")
                 require(i != -1)
                 i = page.indexOf('"', i)
@@ -73,7 +73,7 @@ object CodeChefApi {
     }
 
     suspend fun getUserPage(handle: String): String {
-        return client.getAs(urls.user(handle))
+        return client.getText(urls.user(handle))
     }
 
     suspend fun getSuggestions(str: String): CodeChefSearchResult {

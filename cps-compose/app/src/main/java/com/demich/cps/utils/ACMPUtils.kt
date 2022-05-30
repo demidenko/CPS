@@ -18,7 +18,7 @@ object ACMPApi {
     class ACMPPageNotFoundException : Throwable()
 
     suspend fun getMainPage(): String {
-        return client.getAs(urls.main)
+        return client.getText(urls.main)
     }
 
     suspend fun getUserPage(id: Int): String {
@@ -31,7 +31,7 @@ object ACMPApi {
     }
 
     suspend fun getUsersSearch(str: String): String {
-        return client.getAs(urls.main + "/index.asp?main=rating") {
+        return client.getText(urls.main + "/index.asp?main=rating") {
             url.encodedParameters.append("str", URLEncoder.encode(str, windows1251.name()))
         }
     }

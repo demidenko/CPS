@@ -6,13 +6,13 @@ object TimusApi {
     private val client = cpsHttpClient(json = false) { }
 
     suspend fun getUserPage(id: Int): String {
-        return client.getAs(urls.user(id)) {
+        return client.getText(urls.user(id)) {
             parameter("locale", "en")
         }
     }
 
     suspend fun getSearchPage(str: String): String {
-        return client.getAs(urls.main + "/search.aspx") {
+        return client.getText(urls.main + "/search.aspx") {
             parameter("Str", str)
         }
     }

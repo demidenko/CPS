@@ -85,7 +85,7 @@ object CodeforcesApi {
         block: HttpRequestBuilder.() -> Unit = {}
     ): String? {
         val callGet = suspend {
-            client.getAs<String>(urlString) {
+            client.getText(urlString) {
                 header("Cookie", "RCPC=$RCPC")
                 block()
             }

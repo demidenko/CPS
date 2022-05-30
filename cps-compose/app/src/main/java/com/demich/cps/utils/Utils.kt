@@ -11,6 +11,7 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -62,6 +63,11 @@ suspend inline fun<reified T> HttpClient.getAs(
     urlString: String,
     block: HttpRequestBuilder.() -> Unit = {}
 ): T = this.get(urlString = urlString, block = block).body()
+
+suspend inline fun HttpClient.getText(
+    urlString: String,
+    block: HttpRequestBuilder.() -> Unit = {}
+): String = this.get(urlString = urlString, block = block).bodyAsText()
 
 
 fun signedToString(x: Int): String = if (x > 0) "+$x" else "$x"

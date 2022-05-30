@@ -10,24 +10,24 @@ object DmojApi {
     private val client = cpsHttpClient { }
 
     suspend fun getUser(handle: String): DmojUserResult {
-        val str = client.getAs<String>(urls.main + "/api/v2/user/$handle")
+        val str = client.getText(urls.main + "/api/v2/user/$handle")
         val json = Json.parseToJsonElement(str).jsonObject
         val obj = json["data"]!!.jsonObject["object"]!!
         return jsonCPS.decodeFromJsonElement(obj)
     }
 
     suspend fun getUserPage(handle: String): String {
-        return client.getAs(urls.main + "/user/$handle")
+        return client.getText(urls.main + "/user/$handle")
     }
 
     suspend fun getSuggestions(query: String): List<DmojSuggestion> {
-        val str = client.getAs<String>(urls.main + "/widgets/select2/user_search?term=$query&_type=query&q=$query")
+        val str = client.getText(urls.main + "/widgets/select2/user_search?term=$query&_type=query&q=$query")
         val json = Json.parseToJsonElement(str).jsonObject
         return jsonCPS.decodeFromJsonElement(json["results"]!!.jsonArray)
     }
 
     suspend fun getContests(): List<DmojContest> {
-        val str = client.getAs<String>(urls.main + "/api/v2/contests")
+        val str = client.getText(urls.main + "/api/v2/contests")
         val json = Json.parseToJsonElement(str).jsonObject
         val obj = json["data"]!!.jsonObject["objects"]!!
         return jsonCPS.decodeFromJsonElement(obj)

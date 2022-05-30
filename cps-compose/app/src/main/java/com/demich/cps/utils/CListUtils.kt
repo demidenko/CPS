@@ -2,7 +2,6 @@ package com.demich.cps.utils
 
 import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.contests.Contest
-import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -56,11 +55,11 @@ object CListApi {
     private val client = cpsHttpClient {  }
 
     suspend fun getUserPage(login: String): String {
-        return client.getAs(urls.user(login))
+        return client.getText(urls.user(login))
     }
 
     suspend fun getUsersSearchPage(str: String): String {
-        return client.getAs(urls.main + "/coders") {
+        return client.getText(urls.main + "/coders") {
             parameter("search", str)
         }
     }
