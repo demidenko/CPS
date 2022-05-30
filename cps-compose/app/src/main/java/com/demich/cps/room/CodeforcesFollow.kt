@@ -2,6 +2,7 @@ package com.demich.cps.room
 
 import android.content.Context
 import androidx.room.*
+import com.demich.cps.*
 import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.news.settings.settingsNews
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import org.jsoup.Jsoup
 
 
 val Context.followListDao get() = RoomSingleton.getInstance(this).followListDao()
@@ -99,7 +101,7 @@ interface FollowListDao {
         }.onSuccess { blogEntries ->
             getBlogEntries(handle)?.toSet()?.let { saved ->
                 for(blogEntry in  blogEntries) {
-                    //if(blogEntry.id !in saved) notifyNewBlogEntry(blogEntry, context)
+                    if(blogEntry.id !in saved) notifyNewBlogEntry(blogEntry, context)
                 }
             }
             setBlogEntries(handle, blogEntries.map { it.id })
@@ -185,5 +187,21 @@ class CodeforcesUserInfoConverter {
                 handle = ""
             )
         }
+    }
+}
+
+fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry, context: Context) {
+    notificationBuildAndNotify(
+        context = context,
+        channel = NotificationChannels.codeforces.follow_new_blog,
+        notificationId = NotificationIds.makeCodeforcesFollowBlogId(blogEntry.id)
+    ) {
+        setSubText("New codeforces blog entry")
+        setContentTitle(blogEntry.authorHandle)
+        setBigContent(blogEntry.title)
+        setSmallIcon(com.demich.cps.R.drawable.ic_new_post)
+        setAutoCancel(true)
+        setWhen(blogEntry.creationTime)
+        attachUrl(url = CodeforcesApi.urls.blogEntry(blogEntry.id), context = context)
     }
 }

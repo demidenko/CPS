@@ -1,11 +1,12 @@
 package com.demich.cps.utils
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.text.format.DateFormat
 import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
-import com.demich.cps.makeIntentOpenUrl
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -36,7 +37,7 @@ fun<T> T.touchLog(text: String) = also {
 
 fun Context.showToast(title: String) = Toast.makeText(this, title, Toast.LENGTH_LONG).show()
 
-fun Context.openUrlInBrowser(url: String) = startActivity(makeIntentOpenUrl(url))
+fun Context.openUrlInBrowser(url: String) = startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
 
 val jsonCPS = Json {
     ignoreUnknownKeys = true

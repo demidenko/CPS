@@ -11,6 +11,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import kotlinx.datetime.Instant
 
 
 fun notificationBuilder(
@@ -39,6 +40,22 @@ fun notificationBuildAndNotify(
 ) = notificationBuilder(context, channel, buildBody).notifyBy(NotificationManagerCompat.from(context), notificationId)
 
 fun NotificationCompat.Builder.setBigContent(str: CharSequence) = setContentText(str).setStyle(NotificationCompat.BigTextStyle().bigText(str))
+
+fun NotificationCompat.Builder.setWhen(time: Instant) {
+    setShowWhen(true)
+    setWhen(time.toEpochMilliseconds())
+}
+
+fun NotificationCompat.Builder.attachUrl(url: String, context: Context) {
+    setContentIntent(
+        PendingIntent.getActivity(
+            context,
+            0,
+            Intent(Intent.ACTION_VIEW, Uri.parse(url)),
+            PendingIntent.FLAG_IMMUTABLE
+        )
+    )
+}
 
 
 object NotificationChannels {
@@ -174,11 +191,4 @@ object NotificationIds {
 
     //test
     val testId = nextId()
-}
-
-
-fun makeIntentOpenUrl(url: String) = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-
-fun makePendingIntentOpenURL(url: String, context: Context): PendingIntent {
-    return PendingIntent.getActivity(context, 0, Intent(Intent.ACTION_VIEW, Uri.parse(url)), PendingIntent.FLAG_IMMUTABLE)
 }
