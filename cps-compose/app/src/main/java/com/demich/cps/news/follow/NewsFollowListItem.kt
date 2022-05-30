@@ -1,20 +1,22 @@
 package com.demich.cps.news.follow
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.news.codeforces.LocalCodeforcesAccountManager
+import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.append
@@ -31,7 +33,10 @@ fun NewsFollowListItem(
     val manager = LocalCodeforcesAccountManager.current
 
     Column(modifier = modifier) {
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 text = manager.makeHandleSpan(
                     handle = userInfo.handle,
@@ -43,16 +48,9 @@ fun NewsFollowListItem(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .alignByBaseline()
             )
             if (blogEntriesCount != null) {
-                Text(
-                    text = blogEntriesCount.toString(),
-                    fontSize = 15.sp,
-                    color = cpsColors.content,
-                    modifier = Modifier
-                        .alignByBaseline()
-                )
+                NewsFollowListItemBlogEntryCount(count = blogEntriesCount, fontSize = 18.sp)
             }
         }
         if (userInfo.status == STATUS.OK) {
@@ -63,6 +61,27 @@ fun NewsFollowListItem(
         }
 
     }
+}
+
+@Composable
+private fun NewsFollowListItemBlogEntryCount(
+    count: Int,
+    fontSize: TextUnit
+) {
+    Icon(
+        imageVector = CPSIcons.BlogEntry,
+        contentDescription = null,
+        tint = cpsColors.contentAdditional,
+        modifier = Modifier
+            .padding(end = 2.dp)
+            .size(with(LocalDensity.current) { fontSize.toDp() })
+    )
+    Text(
+        text = count.toString(),
+        fontSize = 15.sp,
+        color = cpsColors.content,
+        modifier = Modifier
+    )
 }
 
 @Composable

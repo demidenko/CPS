@@ -48,6 +48,7 @@ object CPSIcons {
     val Star get() = Icons.Default.Star
     val Comments get() = Icons.Rounded.Forum
     val CommentSingle get() = Icons.Rounded.ChatBubble
+    val BlogEntry get() = Icons.Filled.Wysiwyg
 }
 
 
