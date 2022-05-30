@@ -69,41 +69,41 @@ interface FollowListDao {
         ))
     }
 
-    suspend fun loadBlogEntries(handle: String, context: Context): List<CodeforcesBlogEntry> {
-        val locale = context.settingsNews.codeforcesLocale()
-        val result = kotlin.runCatching { CodeforcesApi.getUserBlogEntries(handle, locale) }
+    suspend fun reloadBlogEntries(handle: String, context: Context) {
+        kotlin.runCatching {
+            CodeforcesApi.getUserBlogEntries(
+                handle = handle,
+                locale = context.settingsNews.codeforcesLocale()
+            )
+        }.recoverCatching {
+            if (it is CodeforcesAPIErrorResponse && it.isNotAllowedToReadThatBlog()) {
+                return@recoverCatching emptyList<CodeforcesBlogEntry>()
+            }
+            throw it
+        }.onFailure {
+            if (it is CodeforcesAPIErrorResponse && it.isBlogHandleNotFound(handle)) {
+                val (realHandle, status) = CodeforcesUtils.getRealHandle(handle)
+                when(status) {
+                    STATUS.OK -> {
+                        changeHandle(handle, realHandle)
+                        reloadBlogEntries(realHandle, context)
+                    }
+                    STATUS.NOT_FOUND -> {
+                        remove(handle)
+                    }
+                    STATUS.FAILED -> {
 
-        val blogEntries: List<CodeforcesBlogEntry> = result.getOrElse {
-            val response = it as? CodeforcesAPIErrorResponse ?: return emptyList()
-            when {
-                response.isBlogHandleNotFound(handle) -> {
-                    val (realHandle, status) = CodeforcesUtils.getRealHandle(handle)
-                    return when(status) {
-                        STATUS.OK -> {
-                            changeHandle(handle, realHandle)
-                            loadBlogEntries(realHandle, context)
-                        }
-                        STATUS.NOT_FOUND -> {
-                            remove(handle)
-                            emptyList()
-                        }
-                        STATUS.FAILED -> emptyList()
                     }
                 }
-                response.isNotAllowedToReadThatBlog() -> emptyList()
-                else -> return emptyList()
             }
-        }
-
-        getBlogEntries(handle)?.toSet()?.let { saved ->
-            for(blogEntry in  blogEntries) {
-                //if(blogEntry.id !in saved) notifyNewBlogEntry(blogEntry, context)
+        }.onSuccess { blogEntries ->
+            getBlogEntries(handle)?.toSet()?.let { saved ->
+                for(blogEntry in  blogEntries) {
+                    //if(blogEntry.id !in saved) notifyNewBlogEntry(blogEntry, context)
+                }
             }
+            setBlogEntries(handle, blogEntries.map { it.id })
         }
-
-        setBlogEntries(handle, blogEntries.map { it.id })
-
-        return blogEntries
     }
 
     suspend fun addNewUser(userInfo: CodeforcesUserInfo, context: Context) {
@@ -115,7 +115,7 @@ interface FollowListDao {
                 userInfo = userInfo
             )
         )
-        loadBlogEntries(
+        reloadBlogEntries(
             handle = userInfo.handle,
             context = context
         )
