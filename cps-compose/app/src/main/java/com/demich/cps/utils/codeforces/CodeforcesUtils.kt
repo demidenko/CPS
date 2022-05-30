@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
+import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.accounts.managers.HandleColor
 import com.demich.cps.accounts.managers.NOT_RATED
 import com.demich.cps.accounts.managers.STATUS
@@ -23,7 +24,7 @@ object CodeforcesUtils {
     private val dateFormatEN = SimpleDateFormat("MMM/dd/yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
 
     private fun String.extractTime(): Instant {
-        val parser = if(this.contains('.')) dateFormatRU else dateFormatEN
+        val parser = if (this.contains('.')) dateFormatRU else dateFormatEN
         return Instant.fromEpochMilliseconds(parser.parse(this)!!.time)
     }
 
@@ -224,6 +225,10 @@ object CodeforcesUtils {
         return userBox.selectFirst("a.rated-user")?.text()
     }
 
+    suspend fun getUsersInfo(handles: List<String>, doRedirect: Boolean = false): Map<String, CodeforcesUserInfo> {
+        TODO()
+    }
+
     @Composable
     fun VoteRatingNonZero(rating: Int, fontSize: TextUnit, modifier: Modifier = Modifier) {
         if (rating != 0) {
@@ -248,7 +253,7 @@ enum class CodeforcesLocale {
     EN, RU;
 
     override fun toString(): String {
-        return when(this){
+        return when(this) {
             EN -> "en"
             RU -> "ru"
         }

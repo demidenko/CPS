@@ -44,14 +44,14 @@ interface FollowListDao {
 
     private suspend fun setBlogEntries(handle: String, blogEntries: List<Int>?) {
         val userBlog = getUserBlog(handle) ?: return
-        if(userBlog.blogEntries != blogEntries) update(userBlog.copy(blogEntries = blogEntries))
+        if (userBlog.blogEntries != blogEntries) update(userBlog.copy(blogEntries = blogEntries))
     }
 
-    private suspend fun changeHandle(fromHandle: String, toHandle: String){
-        if(fromHandle == toHandle) return
+    private suspend fun changeHandle(fromHandle: String, toHandle: String) {
+        if (fromHandle == toHandle) return
         val fromUserBlog = getUserBlog(fromHandle) ?: return
         getUserBlog(toHandle)?.let { toUserBlog ->
-            if(toUserBlog.id != fromUserBlog.id){
+            if (toUserBlog.id != fromUserBlog.id) {
                 remove(fromHandle)
                 return
             }
@@ -60,10 +60,10 @@ interface FollowListDao {
     }
 
     private suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
-        if(info.status != STATUS.OK) return
-        if(info.handle != handle) changeHandle(handle, info.handle)
+        if (info.status != STATUS.OK) return
+        if (info.handle != handle) changeHandle(handle, info.handle)
         val userBlog = getUserBlog(info.handle) ?: return
-        if(userBlog.userInfo != info) update(userBlog.copy(
+        if (userBlog.userInfo != info) update(userBlog.copy(
             handle = info.handle,
             userInfo = info
         ))
@@ -99,7 +99,7 @@ interface FollowListDao {
         }.onSuccess { blogEntries ->
             getUserBlog(handle)?.blogEntries?.toSet()?.let { saved ->
                 for(blogEntry in  blogEntries) {
-                    if(blogEntry.id !in saved) notifyNewBlogEntry(blogEntry, context)
+                    if (blogEntry.id !in saved) notifyNewBlogEntry(blogEntry, context)
                 }
             }
             setBlogEntries(handle, blogEntries.map { it.id })
@@ -121,8 +121,8 @@ interface FollowListDao {
         )
     }
 
-    /*suspend fun updateUsersInfo(context: Context) {
-        CodeforcesUtils.getUsersInfo(getHandles(), true)
+    suspend fun updateUsersInfo(context: Context) {
+        CodeforcesUtils.getUsersInfo(handles = getHandles(), doRedirect = true)
             .forEach { (handle, info) ->
                 when (info.status) {
                     STATUS.NOT_FOUND -> remove(handle)
@@ -131,9 +131,9 @@ interface FollowListDao {
                 }
             }
         getHandles().forEach { handle ->
-            if(getBlogEntries(handle) == null) loadBlogEntries(handle, context)
+            if (getUserBlog(handle)?.blogEntries == null) reloadBlogEntries(handle, context)
         }
-    }*/
+    }
 }
 
 @Entity(tableName = followListTableName)
@@ -148,7 +148,7 @@ data class CodeforcesUserBlog(
 class IntsListConverter {
     @TypeConverter
     fun intsToString(ints: List<Int>?): String? {
-        if(ints == null) return null
+        if (ints == null) return null
         return buildString {
             ints.forEach { num ->
                 var x = num
@@ -162,7 +162,7 @@ class IntsListConverter {
 
     @TypeConverter
     fun decodeToInts(s: String?): List<Int>? {
-        if(s == null) return null
+        if (s == null) return null
         return (s.indices step 4).map { i ->
             ((s[i+3].code*256 + s[i+2].code)*256 + s[i+1].code)*256 + s[i].code
         }
