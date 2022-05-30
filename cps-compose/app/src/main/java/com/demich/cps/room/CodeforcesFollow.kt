@@ -42,14 +42,12 @@ interface FollowListDao {
     @Query("SELECT * FROM $followListTableName")
     fun flowOfAll(): Flow<List<CodeforcesUserBlog>>
 
-    suspend fun getBlogEntries(handle: String) = getUserBlog(handle)?.blogEntries
-
-    suspend fun setBlogEntries(handle: String, blogEntries: List<Int>?) {
+    private suspend fun setBlogEntries(handle: String, blogEntries: List<Int>?) {
         val userBlog = getUserBlog(handle) ?: return
         if(userBlog.blogEntries != blogEntries) update(userBlog.copy(blogEntries = blogEntries))
     }
 
-    suspend fun changeHandle(fromHandle: String, toHandle: String){
+    private suspend fun changeHandle(fromHandle: String, toHandle: String){
         if(fromHandle == toHandle) return
         val fromUserBlog = getUserBlog(fromHandle) ?: return
         getUserBlog(toHandle)?.let { toUserBlog ->
@@ -61,7 +59,7 @@ interface FollowListDao {
         update(fromUserBlog.copy(handle = toHandle))
     }
 
-    suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
+    private suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
         if(info.status != STATUS.OK) return
         if(info.handle != handle) changeHandle(handle, info.handle)
         val userBlog = getUserBlog(info.handle) ?: return
@@ -99,7 +97,7 @@ interface FollowListDao {
                 }
             }
         }.onSuccess { blogEntries ->
-            getBlogEntries(handle)?.toSet()?.let { saved ->
+            getUserBlog(handle)?.blogEntries?.toSet()?.let { saved ->
                 for(blogEntry in  blogEntries) {
                     if(blogEntry.id !in saved) notifyNewBlogEntry(blogEntry, context)
                 }
@@ -109,7 +107,7 @@ interface FollowListDao {
     }
 
     suspend fun addNewUser(userInfo: CodeforcesUserInfo, context: Context) {
-        if (getBlogEntries(userInfo.handle) != null) return
+        if (getUserBlog(userInfo.handle) != null) return
         insert(
             CodeforcesUserBlog(
                 handle = userInfo.handle,
