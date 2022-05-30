@@ -7,11 +7,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import com.demich.cps.NotificationChannelLazy
-import com.demich.cps.R
+import com.demich.cps.*
 import com.demich.cps.accounts.SmallRatedAccountPanel
-import com.demich.cps.makePendingIntentOpenURL
-import com.demich.cps.notificationBuildAndNotify
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.useOriginalColors
 import com.demich.cps.utils.signedToString
@@ -147,10 +144,7 @@ fun notifyRatingChange(
         setSubText("${manager.type.name} rating changes")
         color = manager.originalColor(manager.getHandleColor(newRating))
             .toArgb() //TODO not original but cpsColors
-        if (url != null) setContentIntent(makePendingIntentOpenURL(url, manager.context))
-        if (time != null) {
-            setShowWhen(true)
-            setWhen(time.toEpochMilliseconds())
-        }
+        if (url != null) attachUrl(url, manager.context)
+        if (time != null) setWhen(time)
     }
 }
