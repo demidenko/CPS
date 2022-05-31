@@ -225,7 +225,11 @@ object CodeforcesUtils {
         return userBox.selectFirst("a.rated-user")?.text()
     }
 
-    suspend fun getUsersInfo(handles: List<String>, doRedirect: Boolean = false): Map<String, CodeforcesUserInfo> {
+
+    suspend fun getUsersInfo(handles: Collection<String>, doRedirect: Boolean = false) =
+        getUsersInfo(handles.toSet(), doRedirect)
+
+    suspend fun getUsersInfo(handles: Set<String>, doRedirect: Boolean = false): Map<String, CodeforcesUserInfo> {
         return kotlin.runCatching {
             CodeforcesApi.getUsers(handles = handles)
         }.map { infos ->
@@ -241,12 +245,11 @@ object CodeforcesUtils {
                         if (doRedirect) getRealHandle(handle = badHandle)
                         else badHandle to STATUS.NOT_FOUND
                     return@getOrElse if (status == STATUS.OK) {
-                        getUsersInfo(handles = handles - badHandle + realHandle, doRedirect = doRedirect)
-                            .toMutableMap().apply {
-                                val info = getValue(realHandle)
-                                remove(realHandle)
-                                put(realHandle, info)
-                            }
+                        val withReplaced = getUsersInfo(handles = handles - badHandle + realHandle, doRedirect = doRedirect)
+                        handles.associateWith { handle ->
+                            if (handle == badHandle) withReplaced.getValue(realHandle)
+                            else withReplaced.getValue(handle)
+                        }
                     } else {
                         getUsersInfo(handles = handles - badHandle, doRedirect = doRedirect)
                             .plus(badHandle to CodeforcesUserInfo(handle = badHandle, status = status))
