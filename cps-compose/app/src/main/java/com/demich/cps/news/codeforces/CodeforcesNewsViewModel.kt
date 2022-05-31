@@ -1,10 +1,7 @@
 package com.demich.cps.news.codeforces
 
 import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.managers.CodeforcesUserInfo
@@ -141,13 +138,23 @@ class CodeforcesNewsViewModel: ViewModel() {
         )
     }
 
-
+    var followLoadingStatus by mutableStateOf(LoadingStatus.PENDING)
     fun addToFollowList(userInfo: CodeforcesUserInfo, context: Context) {
         viewModelScope.launch {
+            followLoadingStatus = LoadingStatus.LOADING
             context.followListDao.addNewUser(
                 userInfo = userInfo,
                 context = context
             )
+            followLoadingStatus = LoadingStatus.PENDING
+        }
+    }
+
+    fun updateFollowUsersInfo(context: Context) {
+        viewModelScope.launch {
+            followLoadingStatus = LoadingStatus.LOADING
+            context.followListDao.updateUsersInfo(context)
+            followLoadingStatus = LoadingStatus.PENDING
         }
     }
 

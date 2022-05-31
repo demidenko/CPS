@@ -16,10 +16,7 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.itemsNotEmpty
-import com.demich.cps.utils.LocalCurrentTime
-import com.demich.cps.utils.collectCurrentTimeEachMinute
-import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.*
 import kotlinx.coroutines.flow.map
 
 @Composable
@@ -61,7 +58,10 @@ fun newsFollowListBottomBarBuilder(
 
     var showChooseDialog by remember { mutableStateOf(false) }
 
-    CPSIconButton(icon = CPSIcons.Add) {
+    CPSIconButton(
+        icon = CPSIcons.Add,
+        enabled = newsViewModel.followLoadingStatus != LoadingStatus.LOADING
+    ) {
         showChooseDialog = true
     }
 

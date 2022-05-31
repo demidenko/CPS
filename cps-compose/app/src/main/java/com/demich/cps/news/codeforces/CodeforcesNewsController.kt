@@ -133,6 +133,9 @@ class CodeforcesNewsController(
     fun flowOfTopComments(context: Context) = viewModel.flowOfTopComments(context)
     fun flowOfRecentActions(context: Context) = viewModel.flowOfRecentActions(context)
 
+
+    fun updateFollowUsersInfo(context: Context) = viewModel.updateFollowUsersInfo(context)
+
     companion object {
         fun saver(viewModel: CodeforcesNewsViewModel) = Saver<CodeforcesNewsController, String>(
             save = {

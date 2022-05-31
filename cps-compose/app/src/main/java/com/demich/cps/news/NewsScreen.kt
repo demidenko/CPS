@@ -58,6 +58,7 @@ fun newsMenuBuilder(
     val followEnabled by rememberCollect { context.settingsNews.codeforcesFollowEnabled.flow }
     if (followEnabled) {
         CPSDropdownMenuItem(title = "Follow List", icon = CPSIcons.Accounts) {
+            controller.updateFollowUsersInfo(context)
             navigator.navigateTo(Screen.NewsFollowList)
         }
     }
