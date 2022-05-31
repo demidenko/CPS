@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.utils.codeforces.CodeforcesApi
@@ -25,25 +26,34 @@ fun CodeforcesNewsRecentPage(
         derivedStateOf { recentActionsState.value.second }
     }
 
+    val saveableStateHolder = rememberSaveableStateHolder()
+
     CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.RECENT) {
         val blogEntryId = controller.recentFilterByBlogEntryId
         if (blogEntryId != null) {
-            RecentCommentsInBlogEntry(
-                controller = controller,
-                commentsState = commentsState,
-                blogEntry = recentActionsState.value.first.first { it.id == blogEntryId }
-            )
+            saveableStateHolder.SaveableStateProvider(key = blogEntryId) {
+                RecentCommentsInBlogEntry(
+                    controller = controller,
+                    commentsState = commentsState,
+                    blogEntry = recentActionsState.value.first.first { it.id == blogEntryId },
+                    onBackPressed = saveableStateHolder::removeState
+                )
+            }
         } else
         if (controller.recentShowComments) {
-            CodeforcesComments(
-                commentsState = commentsState,
-                modifier = Modifier.fillMaxSize()
-            )
+            saveableStateHolder.SaveableStateProvider(key = true) {
+                CodeforcesComments(
+                    commentsState = commentsState,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         } else {
-            RecentBlogEntriesPage(
-                controller = controller,
-                recentActionsState = recentActionsState
-            )
+            saveableStateHolder.SaveableStateProvider(key = false) {
+                RecentBlogEntriesPage(
+                    controller = controller,
+                    recentActionsState = recentActionsState
+                )
+            }
         }
     }
 }
@@ -78,7 +88,8 @@ private fun RecentBlogEntriesPage(
 private fun RecentCommentsInBlogEntry(
     controller: CodeforcesNewsController,
     commentsState: State<List<CodeforcesRecentAction>>,
-    blogEntry: CodeforcesBlogEntry
+    blogEntry: CodeforcesBlogEntry,
+    onBackPressed: (Int) -> Unit
 ) {
     val filteredCommentsState = remember(blogEntry) {
         derivedStateOf {
@@ -96,6 +107,7 @@ private fun RecentCommentsInBlogEntry(
     BackHandler(
         enabled = controller.isTabVisible(CodeforcesTitle.RECENT)
     ) {
+        controller.recentFilterByBlogEntryId?.let(onBackPressed)
         controller.recentFilterByBlogEntryId = null
     }
 }
