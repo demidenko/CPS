@@ -141,12 +141,10 @@ class CodeforcesNewsViewModel: ViewModel() {
     var followLoadingStatus by mutableStateOf(LoadingStatus.PENDING)
     fun addToFollowList(userInfo: CodeforcesUserInfo, context: Context) {
         viewModelScope.launch {
-            followLoadingStatus = LoadingStatus.LOADING
             context.followListDao.addNewUser(
                 userInfo = userInfo,
                 context = context
             )
-            followLoadingStatus = LoadingStatus.PENDING
         }
     }
 
