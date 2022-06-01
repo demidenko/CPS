@@ -45,7 +45,7 @@ object CodeforcesApi {
         val callGet = suspend {
             client.getAs<CodeforcesAPIResponse<T>>(urlString = urlString, block = block)
         }
-        (10 downTo 1).forEach { iteration ->
+        (9 downTo 0).forEach { remainingRuns ->
             kotlin.runCatching {
                 withContext(Dispatchers.IO) {
                     callGet()
@@ -54,7 +54,7 @@ object CodeforcesApi {
                 return it.result
             }.onFailure { exception ->
                 if (isCallLimitExceeded(exception)) {
-                    if (iteration > 1) delay(callLimitExceededWaitTimeMillis)
+                    if (remainingRuns > 0) delay(callLimitExceededWaitTimeMillis)
                 } else {
                     throw exception
                 }
@@ -104,6 +104,7 @@ object CodeforcesApi {
 
 
     suspend fun getUsers(handles: Collection<String>): List<CodeforcesUser> {
+        if (handles.isEmpty()) return emptyList()
         return getCodeforcesApi(urlString = "${urls.api}/user.info") {
             parameter("handles", handles.joinToString(separator = ";"))
         }

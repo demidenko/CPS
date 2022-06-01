@@ -84,7 +84,7 @@ private fun NewsFollowListItems() {
                             .fillMaxWidth()
                     )
                 },
-                menuAlignment = Alignment.CenterStart,
+                menuAlignment = Alignment.Center,
                 menuBuilder = {
                     CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete) {
                         showDeleteDialogForBlog = userBlog
