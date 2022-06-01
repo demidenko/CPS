@@ -1,11 +1,13 @@
 package com.demich.cps.news.follow
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.AdditionalBottomBarBuilder
@@ -14,12 +16,10 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
 import com.demich.cps.news.codeforces.LocalCodeforcesAccountManager
 import com.demich.cps.room.followListDao
-import com.demich.cps.ui.CPSIconButton
-import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.LazyColumnWithScrollBar
-import com.demich.cps.ui.itemsNotEmpty
+import com.demich.cps.ui.*
 import com.demich.cps.utils.*
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 @Composable
 fun NewsFollowList() {
@@ -40,6 +40,7 @@ fun NewsFollowList() {
 @Composable
 private fun NewsFollowListItems() {
     val context = context
+    val scope = rememberCoroutineScope()
 
     val userBlogsState = rememberCollect {
         context.followListDao.flowOfAll().map {
@@ -55,20 +56,38 @@ private fun NewsFollowListItems() {
         listState.animateScrollToItem(index = 0)
     }
 
+    var showMenuForId: Int? by remember { mutableStateOf(null) }
+
     LazyColumnWithScrollBar(
         state = listState
     ) {
         itemsNotEmpty(
             items = userBlogsState.value,
             key = { it.id }
-        ) {
-            NewsFollowListItem(
-                userInfo = it.userInfo,
-                blogEntriesCount = it.blogEntries?.size,
+        ) { userBlog ->
+            ContentWithCPSDropdownMenu(
+                expanded = userBlog.id == showMenuForId,
+                onDismissRequest = { showMenuForId = null },
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .clickable { showMenuForId = userBlog.id }
                     .padding(horizontal = 8.dp, vertical = 5.dp)
-                    .animateItemPlacement()
+                    .animateItemPlacement(),
+                content = {
+                    NewsFollowListItem(
+                        userInfo = userBlog.userInfo,
+                        blogEntriesCount = userBlog.blogEntries?.size,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                },
+                menuAlignment = Alignment.CenterStart,
+                menuBuilder = {
+                    CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete) {
+                        scope.launch {
+                            context.followListDao.remove(userBlog.handle)
+                        }
+                    }
+                }
             )
             Divider()
         }
