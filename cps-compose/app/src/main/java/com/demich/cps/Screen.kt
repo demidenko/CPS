@@ -14,6 +14,7 @@ enum class ScreenTypes(
     news("news"),
     newsSettings("news.settings"),
     newsFollowList("news.follow"),
+    newsCodeforcesBlog("codeforces.blog/{handle}"),
     develop("develop")
 }
 
@@ -42,6 +43,10 @@ sealed class Screen(
     object News: Screen(ScreenTypes.news)
     object NewsSettings: Screen(ScreenTypes.newsSettings, rootScreenType = ScreenTypes.news, enableBottomBar = false)
     object NewsFollowList: Screen(ScreenTypes.newsFollowList, rootScreenType = ScreenTypes.news)
+    data class NewsCodeforcesBlog(val handle: String)
+        : Screen(ScreenTypes.newsCodeforcesBlog, rootScreenType = ScreenTypes.news) {
+            override fun createPath(pattern: String) = pattern.replace("{handle}", handle)
+        }
 
     object Contests: Screen(ScreenTypes.contests)
     object ContestsSettings: Screen(ScreenTypes.contestsSettings, rootScreenType = ScreenTypes.contests, enableBottomBar = false)
@@ -69,6 +74,10 @@ fun NavBackStackEntry.getScreen(): Screen {
     if (route == ScreenTypes.accountSettings.route) {
         val type = AccountManagers.valueOf(arguments?.getString("manager")!!)
         return Screen.AccountSettings(type)
+    }
+    if (route == ScreenTypes.newsCodeforcesBlog.route) {
+        val handle = arguments?.getString("handle")!!
+        return Screen.NewsCodeforcesBlog(handle)
     }
     return simpleScreens.first { it.screenType.route == route }
 }

@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.demich.cps.AdditionalBottomBarBuilder
+import com.demich.cps.Screen
 import com.demich.cps.accounts.DialogAccountChooser
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
@@ -25,7 +26,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable
-fun NewsFollowList() {
+fun NewsFollowList(
+    navigator: CPSNavigator
+) {
     val context = context
 
     val manager = remember { CodeforcesAccountManager(context) }
@@ -34,14 +37,16 @@ fun NewsFollowList() {
         LocalCodeforcesAccountManager provides manager,
         LocalCurrentTime provides currentTime,
     ) {
-        NewsFollowListItems()
+        NewsFollowListItems(navigator = navigator)
     }
 
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun NewsFollowListItems() {
+private fun NewsFollowListItems(
+    navigator: CPSNavigator
+) {
     val context = context
     val scope = rememberCoroutineScope()
 
@@ -86,6 +91,9 @@ private fun NewsFollowListItems() {
                 },
                 menuAlignment = Alignment.Center,
                 menuBuilder = {
+                    CPSDropdownMenuItem(title = "Show blog", icon = CPSIcons.BlogEntry) {
+                        navigator.navigateTo(Screen.NewsCodeforcesBlog(handle = userBlog.handle))
+                    }
                     CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete) {
                         showDeleteDialogForBlog = userBlog
                     }
