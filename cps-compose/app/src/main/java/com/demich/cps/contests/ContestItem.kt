@@ -309,7 +309,6 @@ private fun ContestItemMenuButton(
                 scope.launch {
                     context.settingsContests.ignoredContests.add(contest.compositeId)
                 }
-                showDeleteDialog = false
             }
         )
     }

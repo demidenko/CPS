@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -69,13 +70,39 @@ fun CPSDeleteDialog(
     title: String,
     onDismissRequest: () -> Unit,
     onConfirmRequest: () -> Unit
+) = CPSDeleteDialog(
+    title = { Text(title) },
+    onDismissRequest = onDismissRequest,
+    onConfirmRequest = onConfirmRequest
+)
+
+
+@Composable
+fun CPSDeleteDialog(
+    title: AnnotatedString,
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
+) = CPSDeleteDialog(
+    title = { Text(title) },
+    onDismissRequest = onDismissRequest,
+    onConfirmRequest = onConfirmRequest
+)
+
+@Composable
+fun CPSDeleteDialog(
+    title: @Composable () -> Unit,
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(
                 content = { Text(text = "Delete", color = cpsColors.error) },
-                onClick = onConfirmRequest
+                onClick = {
+                    onConfirmRequest()
+                    onDismissRequest()
+                }
             )
         },
         dismissButton = {
@@ -84,9 +111,7 @@ fun CPSDeleteDialog(
                 onClick = onDismissRequest
             )
         },
-        title = {
-            Text(text = title)
-        },
+        title = title,
         backgroundColor = cpsColors.background
     )
 }

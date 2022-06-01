@@ -9,14 +9,17 @@ import androidx.compose.material.Divider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.DialogAccountChooser
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
 import com.demich.cps.news.codeforces.LocalCodeforcesAccountManager
+import com.demich.cps.room.CodeforcesUserBlog
 import com.demich.cps.room.followListDao
 import com.demich.cps.ui.*
+import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.utils.*
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -57,6 +60,7 @@ private fun NewsFollowListItems() {
     }
 
     var showMenuForId: Int? by remember { mutableStateOf(null) }
+    var showDeleteDialogForBlog: CodeforcesUserBlog? by remember { mutableStateOf(null) }
 
     LazyColumnWithScrollBar(
         state = listState
@@ -83,13 +87,26 @@ private fun NewsFollowListItems() {
                 menuAlignment = Alignment.CenterStart,
                 menuBuilder = {
                     CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete) {
-                        scope.launch {
-                            context.followListDao.remove(userBlog.handle)
-                        }
+                        showDeleteDialogForBlog = userBlog
                     }
                 }
             )
             Divider()
+        }
+    }
+
+    showDeleteDialogForBlog?.let { userBlog ->
+        CPSDeleteDialog(
+            title = buildAnnotatedString {
+                append("Delete ")
+                append(LocalCodeforcesAccountManager.current.makeHandleSpan(userInfo = userBlog.userInfo))
+                append(" from follow list?")
+            },
+            onDismissRequest = { showDeleteDialogForBlog = null }
+        ) {
+            scope.launch {
+                context.followListDao.remove(userBlog.handle)
+            }
         }
     }
 }

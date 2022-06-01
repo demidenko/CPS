@@ -114,10 +114,11 @@ fun AccountExpandedScreen(
     )
 
     if (showDeleteDialog) {
-        CPSDeleteDialog(title = "Delete $type account?", onDismissRequest = onDismissDeleteDialog) {
-            onDeleteRequest(manager)
-            onDismissDeleteDialog()
-        }
+        CPSDeleteDialog(
+            title = "Delete $type account?",
+            onConfirmRequest = { onDeleteRequest(manager) },
+            onDismissRequest = onDismissDeleteDialog
+        )
     }
 }
 
