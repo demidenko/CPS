@@ -1,7 +1,9 @@
 package com.demich.cps
 
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavBackStackEntry
 import com.demich.cps.accounts.managers.AccountManagers
+import com.demich.cps.ui.CPSIcons
 
 enum class ScreenTypes(
     val route: String
@@ -22,13 +24,14 @@ sealed class Screen(
     val screenType: ScreenTypes,
     val rootScreenType: ScreenTypes = screenType,
     val enableBottomBar: Boolean = true,
+    val icon: ImageVector? = null
 ) {
 
     protected open fun createPath(pattern: String): String = pattern
 
     val routePath get() = createPath(screenType.route)
 
-    object Accounts: Screen(ScreenTypes.accounts)
+    object Accounts: Screen(ScreenTypes.accounts, icon = CPSIcons.Account)
 
     data class AccountExpanded(val type: AccountManagers)
         : Screen(ScreenTypes.accountExpanded, rootScreenType = ScreenTypes.accounts) {
@@ -40,7 +43,7 @@ sealed class Screen(
             override fun createPath(pattern: String) = pattern.replace("{manager}", type.name)
         }
 
-    object News: Screen(ScreenTypes.news)
+    object News: Screen(ScreenTypes.news, icon = CPSIcons.News)
     object NewsSettings: Screen(ScreenTypes.newsSettings, rootScreenType = ScreenTypes.news, enableBottomBar = false)
     object NewsFollowList: Screen(ScreenTypes.newsFollowList, rootScreenType = ScreenTypes.news)
     data class NewsCodeforcesBlog(val handle: String)
@@ -48,10 +51,10 @@ sealed class Screen(
             override fun createPath(pattern: String) = pattern.replace("{handle}", handle)
         }
 
-    object Contests: Screen(ScreenTypes.contests)
+    object Contests: Screen(ScreenTypes.contests, icon = CPSIcons.Contest)
     object ContestsSettings: Screen(ScreenTypes.contestsSettings, rootScreenType = ScreenTypes.contests, enableBottomBar = false)
 
-    object Development: Screen(ScreenTypes.develop)
+    object Development: Screen(ScreenTypes.develop, icon = CPSIcons.Development)
 
 }
 

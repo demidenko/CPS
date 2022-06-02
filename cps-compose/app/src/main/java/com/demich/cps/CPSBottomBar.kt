@@ -14,12 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
-import com.demich.cps.ui.CPSDefaults
-import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.CPSNavigator
-import com.demich.cps.ui.settingsUI
+import com.demich.cps.ui.*
+import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
@@ -59,45 +58,33 @@ private fun CPSBottomBarMain(
     modifier: Modifier = Modifier
 ) {
     val context = context
-    val scope = rememberCoroutineScope()
 
     val devModeEnabled by rememberCollect { context.settingsDev.devModeEnabled.flow }
 
     val rootScreens = remember(devModeEnabled) {
         buildList {
-            add(Screen.Accounts to CPSIcons.Account)
-            add(Screen.News to CPSIcons.News)
-            add(Screen.Contests to CPSIcons.Contest)
-            if (devModeEnabled) {
-                add(Screen.Development to CPSIcons.Development)
-            }
+            add(Screen.Accounts)
+            add(Screen.News)
+            add(Screen.Contests)
+            if (devModeEnabled) add(Screen.Development)
         }
     }
 
-    var showChangeStartScreenDialogFor: Screen? by remember { mutableStateOf(null) }
+    var showChangeStartScreenDialog by remember { mutableStateOf(false) }
 
     CPSBottomNavigationMainItems(
         modifier = modifier.fillMaxSize(),
         rootScreens = rootScreens,
-        selectedRootScreen = navigator.currentScreen?.rootScreenType,
+        selectedRootScreenType = navigator.currentScreen?.rootScreenType,
         onSelect = { screen ->
             navigator.navigateTo(screen)
         },
-        onLongPress = { screen ->
-            showChangeStartScreenDialogFor = screen
-        }
+        onLongPress = { showChangeStartScreenDialog = true }
     )
 
-    showChangeStartScreenDialogFor?.let { screen ->
+    if (showChangeStartScreenDialog) {
         ChangeStartScreenDialog(
-            screen = screen,
-            onDismissRequest = { showChangeStartScreenDialogFor = null },
-            onConfirmRequest = {
-                scope.launch {
-                    context.settingsUI.startScreenRoute(newValue = screen.screenType.route)
-                    showChangeStartScreenDialogFor = null
-                }
-            }
+            onDismissRequest = { showChangeStartScreenDialog = false }
         )
     }
 }
@@ -105,22 +92,23 @@ private fun CPSBottomBarMain(
 @Composable
 private fun CPSBottomNavigationMainItems(
     modifier: Modifier = Modifier,
-    rootScreens: List<Pair<Screen, ImageVector>>,
-    selectedRootScreen: ScreenTypes?,
+    rootScreens: List<Screen>,
+    selectedRootScreenType: ScreenTypes?,
     onSelect: (Screen) -> Unit,
-    onLongPress: (Screen) -> Unit
+    onLongPress: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.clipToBounds()
     ) {
-        for ((screen, icon) in rootScreens) {
+        for (screen in rootScreens) {
             CPSBottomNavigationItem(
-                icon = icon,
-                isSelected = screen.screenType == selectedRootScreen,
+                icon = screen.icon!!,
+                isSelected = screen.screenType == selectedRootScreenType,
                 onSelect = { onSelect(screen) },
-                onLongPress = { onLongPress(screen) }
+                onLongPress = onLongPress,
+                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -129,10 +117,11 @@ private fun CPSBottomNavigationMainItems(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun RowScope.CPSBottomNavigationItem(
+private fun CPSBottomNavigationItem(
     icon: ImageVector,
     isSelected: Boolean,
-    onLongPress: () -> Unit,
+    modifier: Modifier = Modifier,
+    onLongPress: (() -> Unit)? = null,
     onSelect: () -> Unit
 ) {
     val fraction by animateFloatAsState(targetValue = if (isSelected) 1f else 0f)
@@ -141,43 +130,59 @@ private fun RowScope.CPSBottomNavigationItem(
         imageVector = icon,
         contentDescription = null,
         tint = lerp(start = cpsColors.content, stop = cpsColors.accent, fraction),
-        modifier = Modifier
-            .size(lerp(start = 24.dp, stop = 28.dp, fraction))
-            .weight(1f)
+        modifier = modifier
+            .size(lerp(start = 24.dp, stop = 28.dp, fraction = fraction))
             .combinedClickable(
                 indication = rememberRipple(bounded = false, radius = 48.dp),
                 interactionSource = remember { MutableInteractionSource() },
-                onClick = {
-                    if (!isSelected) onSelect()
-                },
-                onLongClick = onLongPress.takeIf { isSelected }
+                onClick = { if (!isSelected) onSelect() },
+                onLongClick = onLongPress
             )
     )
 }
 
 @Composable
 private fun ChangeStartScreenDialog(
-    screen: Screen,
-    onDismissRequest: () -> Unit,
-    onConfirmRequest: () -> Unit
+    onDismissRequest: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = {
-            //TODO: show icon; consider radiobuttons;
-            Text(text = "Set ${screen.screenType.route.replaceFirstChar { it.uppercaseChar() }} as start page?")
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text("No")
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirmRequest) {
-                Text("Yes")
+    val context = context
+    val scope = rememberCoroutineScope()
+
+    val startScreenRoute by rememberCollect { context.settingsUI.startScreenRoute.flow }
+
+    CPSDialog(onDismissRequest = onDismissRequest) {
+        Text(text = "Select start screen", fontWeight = FontWeight.Medium)
+        Column(
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        ) {
+            listOf(
+                Screen.Accounts,
+                Screen.News,
+                Screen.Contests
+            ).forEach { screen ->
+                val selected = screen.routePath == startScreenRoute
+                CPSRadioButtonTitled(
+                    title = {
+                        //TODO: show icon somehow
+                        Text(text = screen.screenType.route.replaceFirstChar { it.uppercaseChar() })
+                    },
+                    selected = selected,
+                    onClick = {
+                        scope.launch {
+                            context.settingsUI.startScreenRoute(newValue = screen.routePath)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
-    )
+        TextButton(
+            onClick = onDismissRequest,
+            content = { Text(text = "Close") },
+            modifier = Modifier.align(Alignment.End)
+        )
+    }
 }
 
 @Composable
@@ -193,9 +198,11 @@ private fun CPSBottomBarAdditional(
 }
 
 @Composable
-private fun CPSBottomBarVerticalDivider() = Box(
-    Modifier
-        .fillMaxHeight(0.6f)
-        .width(1.dp)
-        .background(cpsColors.divider)
-)
+private fun CPSBottomBarVerticalDivider() {
+    Box(
+        Modifier
+            .fillMaxHeight(0.6f)
+            .width(1.dp)
+            .background(cpsColors.divider)
+    )
+}
