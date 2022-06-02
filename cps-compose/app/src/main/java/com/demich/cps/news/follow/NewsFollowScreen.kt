@@ -26,8 +26,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable
-fun NewsFollowList(
-    navigator: CPSNavigator
+fun NewsFollowScreen(
+    navigator: CPSNavigator,
+    newsViewModel: CodeforcesNewsViewModel
 ) {
     val context = context
 
@@ -37,15 +38,18 @@ fun NewsFollowList(
         LocalCodeforcesAccountManager provides manager,
         LocalCurrentTime provides currentTime,
     ) {
-        NewsFollowListItems(navigator = navigator)
+        NewsFollowList { handle ->
+            newsViewModel.loadBlog(handle = handle, context = context)
+            navigator.navigateTo(Screen.NewsCodeforcesBlog(handle = handle))
+        }
     }
 
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun NewsFollowListItems(
-    navigator: CPSNavigator
+private fun NewsFollowList(
+    onOpenBlog: (String) -> Unit
 ) {
     val context = context
     val scope = rememberCoroutineScope()
@@ -92,7 +96,7 @@ private fun NewsFollowListItems(
                 menuAlignment = Alignment.Center,
                 menuBuilder = {
                     CPSDropdownMenuItem(title = "Show blog", icon = CPSIcons.BlogEntry) {
-                        navigator.navigateTo(Screen.NewsCodeforcesBlog(handle = userBlog.handle))
+                        onOpenBlog(userBlog.handle)
                     }
                     CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete) {
                         showDeleteDialogForBlog = userBlog

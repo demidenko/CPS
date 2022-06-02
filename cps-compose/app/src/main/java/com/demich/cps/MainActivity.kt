@@ -22,9 +22,10 @@ import com.demich.cps.accounts.*
 import com.demich.cps.contests.*
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.news.NewsScreen
+import com.demich.cps.news.codeforces.CodeforcesBlogScreen
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
 import com.demich.cps.news.codeforces.rememberCodeforcesNewsController
-import com.demich.cps.news.follow.NewsFollowList
+import com.demich.cps.news.follow.NewsFollowScreen
 import com.demich.cps.news.follow.newsFollowListBottomBarBuilder
 import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
@@ -166,7 +167,10 @@ private fun CPSScaffold(
                 }
             }
             cpsComposable(ScreenTypes.newsFollowList) { holder ->
-                NewsFollowList(navigator = navigator)
+                NewsFollowScreen(
+                    navigator = navigator,
+                    newsViewModel = cpsViewModels.newsViewModel
+                )
                 holder.bottomBar = newsFollowListBottomBarBuilder(
                     newsViewModel = cpsViewModels.newsViewModel
                 )
@@ -174,7 +178,12 @@ private fun CPSScaffold(
                     navigator.setSubtitle("news", "codeforces", "follow", "list")
                 }
             }
-            cpsComposable(ScreenTypes.newsCodeforcesBlog) {
+            cpsComposable(ScreenTypes.newsCodeforcesBlog) { holder ->
+                val handle = (holder.screen as Screen.NewsCodeforcesBlog).handle
+                CodeforcesBlogScreen(
+                    blogEntriesState = cpsViewModels.newsViewModel.blogEntriesState,
+                    loadingStatus = cpsViewModels.newsViewModel.blogLoadingStatus
+                )
                 LaunchedEffect(Unit) {
                     navigator.setSubtitle("news", "codeforces", "blog")
                 }

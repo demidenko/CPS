@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import org.jsoup.Jsoup
 
 
 val Context.followListDao get() = RoomSingleton.getInstance(this).followListDao()
@@ -69,8 +68,8 @@ interface FollowListDao {
         ))
     }
 
-    suspend fun reloadBlogEntries(handle: String, context: Context) {
-        kotlin.runCatching {
+    suspend fun getAndReloadBlogEntries(handle: String, context: Context): List<CodeforcesBlogEntry>? {
+        return kotlin.runCatching {
             CodeforcesApi.getUserBlogEntries(
                 handle = handle,
                 locale = context.settingsNews.codeforcesLocale()
@@ -79,14 +78,12 @@ interface FollowListDao {
             if (it is CodeforcesAPIErrorResponse && it.isNotAllowedToReadThatBlog()) {
                 return@recoverCatching emptyList<CodeforcesBlogEntry>()
             }
-            throw it
-        }.onFailure {
             if (it is CodeforcesAPIErrorResponse && it.isBlogHandleNotFound(handle)) {
                 val (realHandle, status) = CodeforcesUtils.getRealHandle(handle)
                 when(status) {
                     STATUS.OK -> {
                         changeHandle(handle, realHandle)
-                        reloadBlogEntries(realHandle, context)
+                        return@recoverCatching getAndReloadBlogEntries(realHandle, context)
                     }
                     STATUS.NOT_FOUND -> {
                         remove(handle)
@@ -96,9 +93,10 @@ interface FollowListDao {
                     }
                 }
             }
-        }.onSuccess { blogEntries ->
+            throw it
+        }.getOrNull()?.also { blogEntries ->
             getUserBlog(handle)?.blogEntries?.toSet()?.let { saved ->
-                for(blogEntry in  blogEntries) {
+                for (blogEntry in blogEntries) {
                     if (blogEntry.id !in saved) notifyNewBlogEntry(blogEntry, context)
                 }
             }
@@ -115,7 +113,7 @@ interface FollowListDao {
                 userInfo = userInfo
             )
         )
-        reloadBlogEntries(
+        getAndReloadBlogEntries(
             handle = userInfo.handle,
             context = context
         )
@@ -131,7 +129,7 @@ interface FollowListDao {
                 }
             }
         getHandles().forEach { handle ->
-            if (getUserBlog(handle)?.blogEntries == null) reloadBlogEntries(handle, context)
+            if (getUserBlog(handle)?.blogEntries == null) getAndReloadBlogEntries(handle, context)
         }
     }
 }

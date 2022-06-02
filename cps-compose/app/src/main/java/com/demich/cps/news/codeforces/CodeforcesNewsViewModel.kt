@@ -156,4 +156,21 @@ class CodeforcesNewsViewModel: ViewModel() {
         }
     }
 
+    var blogLoadingStatus by mutableStateOf(LoadingStatus.PENDING)
+    var blogEntriesState = mutableStateOf(emptyList<CodeforcesBlogEntry>())
+    fun loadBlog(handle: String, context: Context) {
+        require(blogLoadingStatus != LoadingStatus.LOADING)
+        blogEntriesState.value = emptyList()
+        viewModelScope.launch {
+            blogLoadingStatus = LoadingStatus.LOADING
+            val result = context.followListDao.getAndReloadBlogEntries(handle, context)
+            if (result == null) {
+                blogLoadingStatus = LoadingStatus.FAILED
+            } else {
+                blogLoadingStatus = LoadingStatus.PENDING
+                blogEntriesState.value = result
+            }
+        }
+    }
+
 }
