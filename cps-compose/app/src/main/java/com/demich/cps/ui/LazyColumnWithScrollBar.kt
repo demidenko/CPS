@@ -45,7 +45,7 @@ fun LazyColumnWithScrollBar(
 fun Modifier.lazyColumnScrollBar(
     state: LazyListState,
     scrollBarColor: Color,
-    scrollBarWidth: Dp = 5.dp,
+    scrollBarWidth: Dp = CPSDefaults.scrollBarWidth,
     minimumScrollBarHeight: Dp = 10.dp
 ): Modifier = this.drawWithContent {
     drawContent()

@@ -19,6 +19,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.itemsNotEmpty
 import com.demich.cps.ui.theme.cpsColors
@@ -83,7 +84,7 @@ fun CodeforcesBlogEntries(
                     }
                     .padding(horizontal = 3.dp)
                     .let {
-                        if (enableScrollBar) it.padding(end = 5.dp)
+                        if (enableScrollBar) it.padding(end = CPSDefaults.scrollBarWidth)
                         else it
                     }
                     .padding(bottom = 4.dp, top = 1.dp)

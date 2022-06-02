@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.settingsUI
@@ -26,8 +27,6 @@ import kotlinx.coroutines.launch
 
 typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
 
-val bottomBarHeight = 56.dp
-
 @Composable
 fun CPSBottomBar(
     navigator: CPSNavigator,
@@ -36,7 +35,7 @@ fun CPSBottomBar(
     if (navigator.isBottomBarEnabled) {
         Row(
             modifier = Modifier
-                .height(bottomBarHeight) //as BottomNavigationHeight
+                .height(CPSDefaults.bottomBarHeight)
                 .fillMaxWidth()
                 .background(cpsColors.backgroundNavigation),
             verticalAlignment = Alignment.CenterVertically

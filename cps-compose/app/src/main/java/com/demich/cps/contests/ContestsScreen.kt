@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
-import com.demich.cps.bottomBarHeight
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.contests.loaders.makeCombinedMessage
 import com.demich.cps.contests.settings.settingsContests
@@ -39,7 +38,7 @@ fun ContestsScreen(
 ) {
     Column(
         modifier = Modifier
-            .consumedWindowInsets(PaddingValues(bottom = bottomBarHeight))
+            .consumedWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
             .imePadding()
     ) {
         ContestsFilterTextField(

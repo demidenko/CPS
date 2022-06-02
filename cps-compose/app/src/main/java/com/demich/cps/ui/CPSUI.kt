@@ -28,8 +28,6 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 
-const val buttonOnOffDurationMillis: Int = 800
-
 @Composable
 fun IconSp(
     imageVector: ImageVector,
@@ -48,15 +46,15 @@ fun IconSp(
 @Composable
 fun CPSIconButton(
     icon: ImageVector,
+    modifier: Modifier = Modifier,
     color: Color = cpsColors.content,
     enabled: Boolean = true,
     onState: Boolean = enabled,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     val alpha by animateFloatAsState(
         targetValue = if (onState) 1f else ContentAlpha.disabled,
-        animationSpec = tween(buttonOnOffDurationMillis)
+        animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis)
     )
     IconButton(
         onClick = onClick,

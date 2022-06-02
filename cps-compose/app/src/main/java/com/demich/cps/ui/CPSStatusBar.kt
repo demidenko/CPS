@@ -134,11 +134,11 @@ private fun ColorizeStatusBar(
     */
     val koef by animateFloatAsState(
         targetValue = if (isStatusBarEnabled) 1f else 0f,
-        animationSpec = tween(buttonOnOffDurationMillis)
+        animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis)
     )
     val statusBarColor by animateColorAsState(
         targetValue = color,
-        animationSpec = tween(buttonOnOffDurationMillis)
+        animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis)
     )
     systemUiController.setStatusBarColor(
         color = lerp(offColor, statusBarColor, koef),
