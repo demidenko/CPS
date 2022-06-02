@@ -3,6 +3,7 @@ package com.demich.cps.room
 import android.content.Context
 import androidx.room.*
 import com.demich.cps.*
+import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.news.settings.settingsNews
@@ -79,11 +80,11 @@ interface FollowListDao {
                 return@recoverCatching emptyList<CodeforcesBlogEntry>()
             }
             if (it is CodeforcesAPIErrorResponse && it.isBlogHandleNotFound(handle)) {
-                val (realHandle, status) = CodeforcesUtils.getRealHandle(handle)
-                when(status) {
+                val userInfo = CodeforcesAccountManager(context).loadInfo(data = handle, flags = 1)
+                when(userInfo.status) {
                     STATUS.OK -> {
-                        changeHandle(handle, realHandle)
-                        return@recoverCatching getAndReloadBlogEntries(realHandle, context)
+                        setUserInfo(handle, userInfo)
+                        return@recoverCatching getAndReloadBlogEntries(userInfo.handle, context)
                     }
                     STATUS.NOT_FOUND -> {
                         remove(handle)
