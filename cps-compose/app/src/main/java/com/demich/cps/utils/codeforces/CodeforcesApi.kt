@@ -137,6 +137,10 @@ object CodeforcesApi {
         }
     }
 
+    suspend fun getUserPage(handle: String): String? {
+        return getPageSource(urlString = urls.user(handle), locale = CodeforcesLocale.EN)
+    }
+
     suspend fun getUserBlogEntries(handle: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
         return getCodeforcesApi(urlString = "${urls.api}/user.blogEntries") {
             parameter("handle", handle)

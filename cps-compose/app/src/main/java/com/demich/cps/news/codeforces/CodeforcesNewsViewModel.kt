@@ -8,6 +8,7 @@ import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.room.followListDao
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.asyncPair
 import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.combine
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
 
 class CodeforcesNewsViewModel: ViewModel() {
 
@@ -163,12 +165,20 @@ class CodeforcesNewsViewModel: ViewModel() {
         blogEntriesState.value = emptyList()
         viewModelScope.launch {
             blogLoadingStatus = LoadingStatus.LOADING
-            val result = context.followListDao.getAndReloadBlogEntries(handle, context)
+            val (result, colorTag) = asyncPair(
+                { context.followListDao.getAndReloadBlogEntries(handle, context) },
+                { CodeforcesUtils.getRealColorTag(handle) }
+            )
             if (result == null) {
                 blogLoadingStatus = LoadingStatus.FAILED
             } else {
                 blogLoadingStatus = LoadingStatus.PENDING
-                blogEntriesState.value = result
+                blogEntriesState.value = result.map {
+                    it.copy(
+                        title = Jsoup.parse(it.title).text(),
+                        authorColorTag = colorTag
+                    )
+                }
             }
         }
     }

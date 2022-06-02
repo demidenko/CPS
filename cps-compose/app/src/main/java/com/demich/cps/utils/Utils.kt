@@ -14,6 +14,8 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
@@ -127,6 +129,18 @@ fun Iterable<LoadingStatus>.combine(): LoadingStatus
 
 fun Iterable<State<LoadingStatus>>.combine(): State<LoadingStatus>
     = derivedStateOf { map { it.value }.combine() }
+
+
+suspend inline fun<reified A, reified B> asyncPair(
+    crossinline getA: suspend () -> A,
+    crossinline getB: suspend () -> B,
+): Pair<A, B> {
+    return coroutineScope {
+        val a = async { getA() }
+        val b = async { getB() }
+        Pair(a.await(), b.await())
+    }
+}
 
 object InstantAsSecondsSerializer: KSerializer<Instant> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Instant", PrimitiveKind.LONG)

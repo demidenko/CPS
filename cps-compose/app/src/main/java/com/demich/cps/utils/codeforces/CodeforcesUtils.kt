@@ -215,14 +215,18 @@ object CodeforcesUtils {
     }
 
     suspend fun getRealHandle(handle: String): Pair<String, STATUS> {
-        val page = CodeforcesApi.getPageSource(CodeforcesApi.urls.user(handle), CodeforcesLocale.EN) ?: return handle to STATUS.FAILED
-        val realHandle = extractRealHandle(page) ?: return handle to STATUS.NOT_FOUND
+        val page = CodeforcesApi.getUserPage(handle) ?: return handle to STATUS.FAILED
+        val realHandle = extractRealHandle(page)?.first ?: return handle to STATUS.NOT_FOUND
         return realHandle to STATUS.OK
     }
 
-    private fun extractRealHandle(page: String): String? {
+    suspend fun getRealColorTag(handle: String): ColorTag {
+        return CodeforcesApi.getUserPage(handle)?.let { extractRealHandle(it)?.second } ?: ColorTag.BLACK
+    }
+
+    private fun extractRealHandle(page: String): Pair<String, ColorTag>? {
         val userBox = Jsoup.parse(page).selectFirst("div.userbox") ?: return null
-        return userBox.selectFirst("a.rated-user")?.text()
+        return userBox.selectFirst("a.rated-user")?.extractRatedUser()
     }
 
 
