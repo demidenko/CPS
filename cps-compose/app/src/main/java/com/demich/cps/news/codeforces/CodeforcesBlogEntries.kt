@@ -4,7 +4,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -13,7 +12,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,6 +19,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.itemsNotEmpty
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
@@ -30,14 +29,14 @@ import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.timeAgo
-import kotlinx.coroutines.launch
 
 
 @Composable
 fun CodeforcesBlogEntries(
     blogEntriesState: State<List<CodeforcesBlogEntry>>,
     modifier: Modifier = Modifier,
-    lazyListState: LazyListState = rememberLazyListState()
+    lazyListState: LazyListState = rememberLazyListState(),
+    enableScrollBar: Boolean = false
 ) {
 
     val context = context
@@ -52,7 +51,8 @@ fun CodeforcesBlogEntries(
     CodeforcesBlogEntries(
         blogEntriesController = blogEntriesController,
         modifier = modifier,
-        lazyListState = lazyListState
+        lazyListState = lazyListState,
+        enableScrollBar = enableScrollBar
     )
 }
 
@@ -61,11 +61,13 @@ fun CodeforcesBlogEntries(
 fun CodeforcesBlogEntries(
     blogEntriesController: CodeforcesBlogEntriesController,
     modifier: Modifier = Modifier,
-    lazyListState: LazyListState = rememberLazyListState()
+    lazyListState: LazyListState = rememberLazyListState(),
+    enableScrollBar: Boolean = false
 ) {
-    LazyColumn(
+    LazyColumnWithScrollBar(
         state = lazyListState,
-        modifier = modifier
+        modifier = modifier,
+        enableScrollBar = enableScrollBar
     ) {
         itemsNotEmpty(
             items = blogEntriesController.blogEntries,
@@ -80,6 +82,10 @@ fun CodeforcesBlogEntries(
                         blogEntriesController.openBlogEntry(blogEntry)
                     }
                     .padding(horizontal = 3.dp)
+                    .let {
+                        if (enableScrollBar) it.padding(end = 5.dp)
+                        else it
+                    }
                     .padding(bottom = 4.dp, top = 1.dp)
                     .animateItemPlacement()
             )

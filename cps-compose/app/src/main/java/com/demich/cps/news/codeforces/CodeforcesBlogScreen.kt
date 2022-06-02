@@ -19,14 +19,15 @@ fun CodeforcesBlogScreen(
 ) {
     val context = context
     val manager = remember { CodeforcesAccountManager(context) }
-    CompositionLocalProvider(LocalCodeforcesAccountManager provides manager) {
-        LoadingContentBox(
-            loadingStatus = loadingStatus,
-            failedText = "Blog load error",
-            modifier = Modifier.fillMaxSize()
-        ) {
+    LoadingContentBox(
+        loadingStatus = loadingStatus,
+        failedText = "Blog load error",
+        modifier = Modifier.fillMaxSize()
+    ) {
+        CompositionLocalProvider(LocalCodeforcesAccountManager provides manager) {
             CodeforcesBlogEntries(
                 blogEntriesState = blogEntriesState,
+                enableScrollBar = true
             )
         }
     }

@@ -24,15 +24,17 @@ fun LazyColumnWithScrollBar(
     state: LazyListState = rememberLazyListState(),
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    enableScrollBar: Boolean = true,
     content: LazyListScope.() -> Unit
 ) {
     LazyColumn(
         modifier = modifier
-            .lazyColumnScrollBar(
-                state = state,
-                scrollBarColor = cpsColors.content.copy(alpha = 0.5f),
-                scrollBarWidth = 5.dp
-            ),
+            .let {
+                if (enableScrollBar) it.lazyColumnScrollBar(
+                    state = state,
+                    scrollBarColor = cpsColors.content.copy(alpha = 0.5f)
+                ) else it
+            },
         state = state,
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
@@ -43,7 +45,7 @@ fun LazyColumnWithScrollBar(
 fun Modifier.lazyColumnScrollBar(
     state: LazyListState,
     scrollBarColor: Color,
-    scrollBarWidth: Dp,
+    scrollBarWidth: Dp = 5.dp,
     minimumScrollBarHeight: Dp = 10.dp
 ): Modifier = this.drawWithContent {
     drawContent()
