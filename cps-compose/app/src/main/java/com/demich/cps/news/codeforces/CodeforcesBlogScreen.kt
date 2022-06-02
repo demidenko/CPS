@@ -1,6 +1,7 @@
 package com.demich.cps.news.codeforces
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.State
@@ -22,7 +23,10 @@ fun CodeforcesBlogScreen(
     LoadingContentBox(
         loadingStatus = loadingStatus,
         failedText = "Blog load error",
-        modifier = Modifier.fillMaxSize()
+        modifier = when (loadingStatus) {
+            LoadingStatus.PENDING -> Modifier.fillMaxWidth()
+            else -> Modifier.fillMaxSize()
+        }
     ) {
         CompositionLocalProvider(LocalCodeforcesAccountManager provides manager) {
             CodeforcesBlogEntries(
