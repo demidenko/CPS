@@ -134,6 +134,7 @@ class CodeforcesNewsController(
     fun flowOfRecentActions(context: Context) = viewModel.flowOfRecentActions(context)
 
 
+    fun addToFollow(handle: String, context: Context) = viewModel.addToFollowList(handle, context)
     fun updateFollowUsersInfo(context: Context) = viewModel.updateFollowUsersInfo(context)
 
     companion object {

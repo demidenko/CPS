@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
+import com.demich.cps.news.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 
@@ -32,7 +33,8 @@ private fun CodeforcesNewsTopBlogEntries(
 ) {
     val context = context
     val blogEntriesState = rememberCollect { controller.flowOfTopBlogEntries(context) }
-    CodeforcesBlogEntries(
+    CodeforcesBlogEntriesFollowAddable(
+        controller = controller,
         blogEntriesController = rememberCodeforcesBlogEntriesController(blogEntriesState = blogEntriesState),
         modifier = Modifier.fillMaxSize()
     )

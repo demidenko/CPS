@@ -150,6 +150,10 @@ class CodeforcesNewsViewModel: ViewModel() {
         }
     }
 
+    fun addToFollowList(handle: String, context: Context) {
+        TODO()
+    }
+
     fun updateFollowUsersInfo(context: Context) {
         viewModelScope.launch {
             followLoadingStatus = LoadingStatus.LOADING
