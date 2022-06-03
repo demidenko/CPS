@@ -20,7 +20,19 @@ class CodeforcesNewEntriesDataStore(context: Context): CPSDataStore(context.cf_n
         NewEntriesDataStoreItem(itemJsonable(name = name, defaultValue = emptyMap()))
 }
 
-
+@Composable
+fun rememberCodeforcesBlogEntriesController(
+    blogEntriesState: State<List<CodeforcesBlogEntry>>,
+): CodeforcesBlogEntriesController {
+    val context = context
+    return remember(blogEntriesState) {
+        object : CodeforcesBlogEntriesController(blogEntriesState = blogEntriesState) {
+            override fun openBlogEntry(blogEntry: CodeforcesBlogEntry) {
+                context.openUrlInBrowser(url = CodeforcesApi.urls.blogEntry(blogEntryId = blogEntry.id))
+            }
+        }
+    }
+}
 
 @Composable
 fun rememberCodeforcesBlogEntriesController(

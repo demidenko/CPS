@@ -2,7 +2,7 @@ package com.demich.cps.news.codeforces
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -10,8 +10,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,38 +22,10 @@ import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.itemsNotEmpty
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
-import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesUtils
-import com.demich.cps.utils.context
-import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.timeAgo
 
-
-@Composable
-fun CodeforcesBlogEntries(
-    blogEntriesState: State<List<CodeforcesBlogEntry>>,
-    modifier: Modifier = Modifier,
-    lazyListState: LazyListState = rememberLazyListState(),
-    enableScrollBar: Boolean = false
-) {
-
-    val context = context
-    val blogEntriesController = remember {
-        object : CodeforcesBlogEntriesController(blogEntriesState = blogEntriesState) {
-            override fun openBlogEntry(blogEntry: CodeforcesBlogEntry) {
-                context.openUrlInBrowser(url = CodeforcesApi.urls.blogEntry(blogEntryId = blogEntry.id))
-            }
-        }
-    }
-
-    CodeforcesBlogEntries(
-        blogEntriesController = blogEntriesController,
-        modifier = modifier,
-        lazyListState = lazyListState,
-        enableScrollBar = enableScrollBar
-    )
-}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -63,7 +33,8 @@ fun CodeforcesBlogEntries(
     blogEntriesController: CodeforcesBlogEntriesController,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
-    enableScrollBar: Boolean = false
+    enableScrollBar: Boolean = false,
+    onLongClick: ((CodeforcesBlogEntry) -> Unit)? = null
 ) {
     LazyColumnWithScrollBar(
         state = lazyListState,
@@ -79,7 +50,9 @@ fun CodeforcesBlogEntries(
                 markNew = blogEntriesController.isNew(blogEntry.id),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {
+                    .combinedClickable(
+                        onLongClick = onLongClick?.let { { it(blogEntry) } }
+                    ) {
                         blogEntriesController.openBlogEntry(blogEntry)
                     }
                     .padding(horizontal = 3.dp)

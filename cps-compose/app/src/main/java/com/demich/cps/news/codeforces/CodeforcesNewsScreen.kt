@@ -78,7 +78,7 @@ private fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
         }
     }
     CodeforcesBlogEntries(
-        blogEntriesState = blogEntriesState,
+        blogEntriesController = rememberCodeforcesBlogEntriesController(blogEntriesState = blogEntriesState),
         modifier = Modifier.fillMaxWidth()
     )
 }

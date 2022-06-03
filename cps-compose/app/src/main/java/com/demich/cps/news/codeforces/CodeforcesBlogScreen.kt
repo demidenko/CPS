@@ -30,7 +30,7 @@ fun CodeforcesBlogScreen(
     ) {
         CompositionLocalProvider(LocalCodeforcesAccountManager provides manager) {
             CodeforcesBlogEntries(
-                blogEntriesState = blogEntriesState,
+                blogEntriesController = rememberCodeforcesBlogEntriesController(blogEntriesState = blogEntriesState),
                 enableScrollBar = true
             )
         }

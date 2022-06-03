@@ -33,7 +33,7 @@ private fun CodeforcesNewsTopBlogEntries(
     val context = context
     val blogEntriesState = rememberCollect { controller.flowOfTopBlogEntries(context) }
     CodeforcesBlogEntries(
-        blogEntriesState = blogEntriesState,
+        blogEntriesController = rememberCodeforcesBlogEntriesController(blogEntriesState = blogEntriesState),
         modifier = Modifier.fillMaxSize()
     )
 }

@@ -94,11 +94,43 @@ fun CPSDeleteDialog(
     onDismissRequest: () -> Unit,
     onConfirmRequest: () -> Unit
 ) {
+    CPSAskDialog(
+        title = title,
+        dismissButtonContent = { Text(text = "Cancel") },
+        confirmButtonContent = { Text(text = "Delete", color = cpsColors.error) },
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = onConfirmRequest
+    )
+}
+
+@Composable
+fun CPSYesNoDialog(
+    title: @Composable () -> Unit,
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
+) {
+    CPSAskDialog(
+        title = title,
+        dismissButtonContent = { Text(text = "No") },
+        confirmButtonContent = { Text(text = "Yes") },
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = onConfirmRequest
+    )
+}
+
+@Composable
+fun CPSAskDialog(
+    title: @Composable () -> Unit,
+    dismissButtonContent: @Composable RowScope.() -> Unit,
+    confirmButtonContent: @Composable RowScope.() -> Unit,
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
+) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(
-                content = { Text(text = "Delete", color = cpsColors.error) },
+                content = confirmButtonContent,
                 onClick = {
                     onConfirmRequest()
                     onDismissRequest()
@@ -107,7 +139,7 @@ fun CPSDeleteDialog(
         },
         dismissButton = {
             TextButton(
-                content = { Text("Cancel") },
+                content = dismissButtonContent,
                 onClick = onDismissRequest
             )
         },
