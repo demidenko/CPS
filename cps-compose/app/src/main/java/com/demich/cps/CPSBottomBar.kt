@@ -136,7 +136,7 @@ private fun CPSBottomNavigationItem(
                 indication = rememberRipple(bounded = false, radius = 48.dp),
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = { if (!isSelected) onSelect() },
-                onLongClick = onLongPress
+                onLongClick = onLongPress?.withVibration()
             )
     )
 }

@@ -21,6 +21,7 @@ import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.itemsNotEmpty
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.ui.withVibration
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesUtils
@@ -51,7 +52,7 @@ fun CodeforcesBlogEntries(
                 modifier = Modifier
                     .fillMaxWidth()
                     .combinedClickable(
-                        onLongClick = onLongClick?.let { { it(blogEntry) } }
+                        onLongClick = onLongClick?.let { { it(blogEntry) } }?.withVibration()
                     ) {
                         blogEntriesController.openBlogEntry(blogEntry)
                     }
