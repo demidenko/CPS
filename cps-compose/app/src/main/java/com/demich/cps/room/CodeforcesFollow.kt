@@ -120,6 +120,19 @@ interface FollowListDao {
         )
     }
 
+    suspend fun addNewUser(handle: String, context: Context) {
+        if (getUserBlog(handle) != null) return
+        //TODO: sync?? parallel?
+        addNewUser(
+            userInfo = CodeforcesUserInfo(handle = handle, status = STATUS.FAILED),
+            context = context
+        )
+        setUserInfo(
+            handle = handle,
+            info = CodeforcesAccountManager(context).loadInfo(handle, flags = 1)
+        )
+    }
+
     suspend fun updateUsersInfo(context: Context) {
         CodeforcesUtils.getUsersInfo(handles = getHandles(), doRedirect = true)
             .forEach { (handle, info) ->
@@ -129,9 +142,12 @@ interface FollowListDao {
                     STATUS.FAILED -> {}
                 }
             }
-        getHandles().forEach { handle ->
-            if (getUserBlog(handle)?.blogEntries == null) getAndReloadBlogEntries(handle, context)
-        }
+
+        getHandles()
+            .mapNotNull { getUserBlog(handle = it) }
+            .forEach {
+                if (it.blogEntries == null) getAndReloadBlogEntries(handle = it.handle, context = context)
+            }
     }
 }
 

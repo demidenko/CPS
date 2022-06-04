@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import com.demich.cps.news.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.NewEntryType
 import com.demich.cps.utils.context
 import com.demich.cps.utils.visibleRange
@@ -36,7 +37,8 @@ private fun CodeforcesNewsMainList(
         newEntriesItem = newEntriesDataStore.mainNewEntries
     )
 
-    CodeforcesBlogEntries(
+    CodeforcesBlogEntriesFollowAddable(
+        controller = controller,
         blogEntriesController = blogEntriesController,
         lazyListState = listState,
         modifier = Modifier.fillMaxSize()

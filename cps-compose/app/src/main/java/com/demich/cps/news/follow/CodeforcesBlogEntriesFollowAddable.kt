@@ -1,5 +1,7 @@
 package com.demich.cps.news.follow
 
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -18,7 +20,9 @@ import com.demich.cps.utils.rememberCollect
 fun CodeforcesBlogEntriesFollowAddable(
     controller: CodeforcesNewsController,
     blogEntriesController: CodeforcesBlogEntriesController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState(),
+    enableScrollBar: Boolean = false,
 ) {
     val context = context
     val followEnabled by rememberCollect { context.settingsNews.codeforcesFollowEnabled.flow }
@@ -28,6 +32,8 @@ fun CodeforcesBlogEntriesFollowAddable(
     CodeforcesBlogEntries(
         blogEntriesController = blogEntriesController,
         modifier = modifier,
+        lazyListState = lazyListState,
+        enableScrollBar = enableScrollBar,
         onLongClick = { blogEntry: CodeforcesBlogEntry -> showAddToFollowDialogFor = blogEntry }.takeIf { followEnabled }
     )
 
