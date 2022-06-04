@@ -1,14 +1,10 @@
 package com.demich.cps.ui.bottomprogressbar
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 
@@ -26,19 +22,19 @@ data class ProgressBarInfo(
 class ProgressBarsViewModel: ViewModel() {
     val progressBars = mutableStateListOf<String>()
 
-    private val states = mutableMapOf<String, MutableStateFlow<ProgressBarInfo>>()
+    private val states = mutableMapOf<String, MutableState<ProgressBarInfo>>()
 
     @Composable
-    fun collectProgress(id: String) = states.getValue(id).collectAsState()
+    fun collectProgress(id: String) = states.getValue(id)
 
     fun doJob(
         id: String,
         coroutineScope: CoroutineScope = viewModelScope,
-        block: suspend CoroutineScope.(MutableStateFlow<ProgressBarInfo>) -> Unit
+        block: suspend CoroutineScope.(MutableState<ProgressBarInfo>) -> Unit
     ) {
         coroutineScope.launch {
             require(id !in states) { "progress bar with id=$id is already started" }
-            val progressStateFlow = states.getOrPut(id) { MutableStateFlow(ProgressBarInfo(total = 0)) }
+            val progressStateFlow = states.getOrPut(id) { mutableStateOf(ProgressBarInfo(total = 0)) }
             progressBars.add(id)
             block(progressStateFlow)
             if (progressStateFlow.value.total > 0) delay(1000)

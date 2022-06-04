@@ -32,7 +32,10 @@ fun CPSBottomProgressBarsColumn(
     LazyColumn(
         modifier = modifier
     ) {
-        this.items(items = progressBarsViewModel.progressBars, key = { it }) {
+        items(
+            items = progressBarsViewModel.progressBars,
+            key = { it }
+        ) {
             val progress by progressBarsViewModel.collectProgress(id = it)
             CPSBottomProgressBar(
                 progressBarInfo = progress,
