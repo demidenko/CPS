@@ -29,9 +29,9 @@ fun CPSDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Card(
-            elevation = 8.dp,
+            elevation = 0.dp,
             shape = RoundedCornerShape(12.dp),
-            backgroundColor = cpsColors.background,
+            backgroundColor = cpsColors.backgroundAdditional,
             modifier = Modifier.padding(horizontal = 26.dp, vertical = 12.dp)
         ) {
             Column(
@@ -144,6 +144,7 @@ fun CPSAskDialog(
             )
         },
         title = title,
-        backgroundColor = cpsColors.background
+        backgroundColor = cpsColors.backgroundAdditional,
+        shape = RoundedCornerShape(12.dp)
     )
 }
