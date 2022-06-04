@@ -88,6 +88,9 @@ object CodeforcesApi {
             client.getText(urlString) {
                 header("Cookie", "RCPC=$RCPC")
                 block()
+            }.also {
+                //TODO: check this for api requests too
+                require(!isTemporarilyUnavailable(it))
             }
         }
         return kotlin.runCatching {
@@ -399,16 +402,24 @@ enum class CodeforcesTestset {
 }
 
 
-/*
-TODO: code 200, text:
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Codeforces</title>
-</head>
-<body>
-    <p>Codeforces is temporarily unavailable. Please, return in several minutes. Please try <a href="https://m1.codeforces.com/">m1.codeforces.com</a>, <a href="https://m2.codeforces.com/">m2.codeforces.com</a> or <a href="https://m3.codeforces.com/">m3.codeforces.com</a></p>
-</body>
-</html>
- */
+
+
+private fun isTemporarilyUnavailable(str: String): Boolean {
+    val i = str.indexOf("<body>")
+    val j = str.indexOf("</body>")
+    if (i == -1 || j == -1 || i >= j) return false
+    val body = str.substring(i + 6, j).trim().removeSurrounding("<p>", "</p>")
+    return body == "Codeforces is temporarily unavailable. Please, return in several minutes. Please try <a href=\"https://m1.codeforces.com/\">m1.codeforces.com</a>, <a href=\"https://m2.codeforces.com/\">m2.codeforces.com</a> or <a href=\"https://m3.codeforces.com/\">m3.codeforces.com</a>"
+    /* full message:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Codeforces</title>
+    </head>
+    <body>
+        <p>Codeforces is temporarily unavailable. Please, return in several minutes. Please try <a href="https://m1.codeforces.com/">m1.codeforces.com</a>, <a href="https://m2.codeforces.com/">m2.codeforces.com</a> or <a href="https://m3.codeforces.com/">m3.codeforces.com</a></p>
+    </body>
+    </html>
+     */
+}
