@@ -32,7 +32,7 @@ object cpsColors {
 
     val backgroundAdditional: Color
         @Composable
-        get() = if (isLight) Color(230, 230, 230) else Color(34, 34, 34)
+        get() = if (isLight) Color(234, 234, 234) else Color(36, 36, 36)
 
     val backgroundNavigation: Color
         @Composable
