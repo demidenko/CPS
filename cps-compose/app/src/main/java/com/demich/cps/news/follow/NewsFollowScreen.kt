@@ -22,6 +22,7 @@ import com.demich.cps.room.followListDao
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.utils.*
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -61,11 +62,13 @@ private fun NewsFollowList(
     }
 
     val listState = rememberLazyListState()
-    val firstId by remember {
-        derivedStateOf { userBlogsState.value.firstOrNull()?.id }
-    }
-    LaunchedEffect(firstId) {
-        listState.animateScrollToItem(index = 0)
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { userBlogsState.value.firstOrNull()?.id }
+            .drop(1)
+            .collect {
+                listState.animateScrollToItem(index = 0)
+            }
     }
 
     var showMenuForId: Int? by remember { mutableStateOf(null) }

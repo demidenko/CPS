@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import org.jsoup.Jsoup
 
 
 val Context.followListDao get() = RoomSingleton.getInstance(this).followListDao()
@@ -211,7 +212,7 @@ fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry, context: Context) {
     ) {
         setSubText("New codeforces blog entry")
         setContentTitle(blogEntry.authorHandle)
-        setBigContent(blogEntry.title)
+        setBigContent(Jsoup.parse(blogEntry.title).text())
         setSmallIcon(com.demich.cps.R.drawable.ic_new_post)
         setAutoCancel(true)
         setWhen(blogEntry.creationTime)
