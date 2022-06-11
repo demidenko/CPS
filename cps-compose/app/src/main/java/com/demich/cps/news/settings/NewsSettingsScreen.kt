@@ -56,7 +56,7 @@ private fun CodeforcesFollowSettingsItem() {
         title = "Follow",
         description = stringResource(id = R.string.news_settings_cf_follow_description)
     ) { checked ->
-        with(CodeforcesNewsFollowWorker.getCarrier(context)) {
+        with(CodeforcesNewsFollowWorker.getWork(context)) {
             if (checked) startImmediate() else stop()
         }
     }

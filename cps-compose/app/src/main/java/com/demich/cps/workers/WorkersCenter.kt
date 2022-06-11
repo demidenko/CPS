@@ -9,9 +9,9 @@ private val Context.workManager get() = WorkManager.getInstance(this)
 
 private const val commonTag = "cps_worker"
 
-abstract class WorkerCarrier(
-    val context: Context,
-    val name: String
+abstract class CPSWork(
+    val name: String,
+    val context: Context
 ) {
     abstract suspend fun isEnabled(): Boolean
 
@@ -28,8 +28,11 @@ abstract class WorkerCarrier(
         )
     }
 
-    fun enqueue() = start(restart = false)
     fun startImmediate() = start(restart = true)
+    fun enqueue() = start(restart = false)
+    suspend fun enqueueIfEnabled() {
+        if (isEnabled()) enqueue()
+    }
 }
 
 inline fun<reified W: CPSWorker> PeriodicWorkRequestBuilder(
@@ -51,7 +54,7 @@ inline fun<reified W: CPSWorker> PeriodicWorkRequestBuilder(
     )
 }
 
-private fun WorkerCarrier.enqueuePeriodicWork(
+private fun CPSWork.enqueuePeriodicWork(
     restart: Boolean,
     builder: PeriodicWorkRequest.Builder
 ) {
@@ -79,9 +82,7 @@ private fun WorkerCarrier.enqueuePeriodicWork(
 */
 
 suspend fun Context.startWorkers() {
-    with(CodeforcesNewsFollowWorker.getCarrier(this)) {
-        if (isEnabled()) enqueue()
-    }
+    CodeforcesNewsFollowWorker.getWork(this).enqueueIfEnabled()
 }
 
 /*

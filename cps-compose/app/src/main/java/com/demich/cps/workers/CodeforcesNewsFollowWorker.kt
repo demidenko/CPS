@@ -14,11 +14,11 @@ class CodeforcesNewsFollowWorker(
     context: Context,
     parameters: WorkerParameters
 ): CPSWorker(
-    carrier = getCarrier(context),
+    work = getWork(context),
     parameters = parameters
 ) {
     companion object {
-        fun getCarrier(context: Context) = object : WorkerCarrier(name = "cf_follow", context = context) {
+        fun getWork(context: Context) = object : CPSWork(name = "cf_follow", context = context) {
             override suspend fun isEnabled() = context.settingsNews.codeforcesFollowEnabled()
             override val requestBuilder get() =
                 PeriodicWorkRequestBuilder<CodeforcesNewsFollowWorker>(
