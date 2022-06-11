@@ -64,7 +64,7 @@ fun CodeforcesBlogEntries(
                     .padding(bottom = 4.dp, top = 1.dp)
                     .animateItemPlacement()
             )
-            Divider()
+            Divider(modifier = Modifier.animateItemPlacement())
         }
     }
 }
