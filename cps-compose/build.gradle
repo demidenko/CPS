@@ -3,8 +3,8 @@ buildscript {
         gradle_version = '7.2.1'
         kotlin_version = '1.6.21'
         ktor_version = '2.0.2'
-        compose_version = '1.2.0-beta02'
-        accompanist_version = '0.24.9-beta'
+        compose_version = '1.2.0-beta03'
+        accompanist_version = '0.24.10-beta'
         room_version = '2.4.2'
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
