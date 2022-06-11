@@ -5,11 +5,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
-import com.demich.cps.NotificationChannels
-import com.demich.cps.NotificationIds
-import com.demich.cps.R
+import com.demich.cps.*
 import com.demich.cps.news.settings.settingsNews
-import com.demich.cps.notificationBuilder
 import com.demich.cps.room.followListDao
 
 
@@ -26,7 +23,7 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
 
         setForeground(ForegroundInfo(
             NotificationIds.codeforces_follow_progress,
-            createProgressNotificationBuilder().setProgress(100,0,true).build()
+            createProgressNotificationBuilder(total = 0, done = 0).build()
         ))
 
         val dao = context.followListDao
@@ -35,20 +32,19 @@ class CodeforcesNewsFollowWorker(private val context: Context, val params: Worke
         val savedHandles = dao.getHandles().shuffled()
         savedHandles.forEachIndexed { index, handle ->
             dao.getAndReloadBlogEntries(handle, context)
-            notificationManagerCompat.notify(
-                NotificationIds.codeforces_follow_progress,
-                createProgressNotificationBuilder().setProgress(savedHandles.size, index+1, false).build()
-            )
+            createProgressNotificationBuilder(total = savedHandles.size, done = index+1)
+                .notifyBy(notificationManagerCompat, NotificationIds.codeforces_follow_progress)
         }
 
         return Result.success()
     }
 
-    private fun createProgressNotificationBuilder() =
+    private fun createProgressNotificationBuilder(total: Int, done: Int) =
         notificationBuilder(context, NotificationChannels.codeforces.follow_progress) {
             setContentTitle("Codeforces Follow Update...")
             setSmallIcon(R.drawable.ic_logo_codeforces)
             setSilent(true)
             setShowWhen(false)
+            setProgress(total, done, total == 0)
         }
 }

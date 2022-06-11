@@ -1,8 +1,12 @@
 package com.demich.cps.workers
 
 import android.content.Context
+import androidx.lifecycle.asFlow
 import androidx.work.*
 import com.demich.cps.news.settings.settingsNews
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -24,8 +28,10 @@ private val Context.workManager get() = WorkManager.getInstance(this)
 object WorkersCenter {
 
     private const val commonTag = "cps"
-    //fun getWorksLiveData(context: Context) = context.workManager.getWorkInfosByTagLiveData(commonTag)
-    //fun getWorkInfo(context: Context, name: String) = context.workManager.getWorkInfosForUniqueWork(name)
+
+    fun flowOfWorkInfo(context: Context, name: String): Flow<WorkInfo> =
+        context.workManager.getWorkInfosForUniqueWorkLiveData(name).asFlow()
+            .map { it?.getOrNull(0) }.filterNotNull()
 
     private inline fun<reified T: CoroutineWorker> makeAndEnqueueWork(
         context: Context,
@@ -97,7 +103,7 @@ object WorkersCenter {
             name = WorkersNames.codeforces_news_follow,
             restart = restart,
             repeatInterval = 6.hours,
-            //flex = 3.hours,
+            flex = 3.hours,
             batteryNotLow = true
         )
     }

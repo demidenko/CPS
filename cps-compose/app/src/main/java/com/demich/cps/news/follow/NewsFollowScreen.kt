@@ -47,6 +47,8 @@ fun NewsFollowScreen(
         }
     }
 
+    //TODO: block if worker in progress
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)
