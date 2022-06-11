@@ -39,7 +39,9 @@ fun NewsFollowScreen(
         LocalCodeforcesAccountManager provides manager,
         LocalCurrentTime provides currentTime,
     ) {
-        NewsFollowList { handle ->
+        NewsFollowList(
+            updateUserInfosInProgress = newsViewModel.followLoadingStatus == LoadingStatus.LOADING
+        ) { handle ->
             newsViewModel.loadBlog(handle = handle, context = context)
             navigator.navigateTo(Screen.NewsCodeforcesBlog(handle = handle))
         }
@@ -50,6 +52,7 @@ fun NewsFollowScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun NewsFollowList(
+    updateUserInfosInProgress: Boolean,
     onOpenBlog: (String) -> Unit
 ) {
     val context = context
@@ -98,15 +101,21 @@ private fun NewsFollowList(
                 },
                 menuAlignment = Alignment.Center,
                 menuBuilder = {
-                    CPSDropdownMenuItem(title = "Show blog", icon = CPSIcons.BlogEntry) {
-                        onOpenBlog(userBlog.handle)
-                    }
-                    CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete) {
-                        showDeleteDialogForBlog = userBlog
-                    }
+                    CPSDropdownMenuItem(
+                        title = "Show blog",
+                        icon = CPSIcons.BlogEntry,
+                        enabled = !updateUserInfosInProgress,
+                        onClick = { onOpenBlog(userBlog.handle) }
+                    )
+                    CPSDropdownMenuItem(
+                        title = "Delete",
+                        icon = CPSIcons.Delete,
+                        enabled = !updateUserInfosInProgress,
+                        onClick = { showDeleteDialogForBlog = userBlog }
+                    )
                 }
             )
-            Divider()
+            Divider(modifier = Modifier.animateItemPlacement())
         }
     }
 
@@ -133,10 +142,7 @@ fun newsFollowListBottomBarBuilder(
 
     var showChooseDialog by remember { mutableStateOf(false) }
 
-    CPSIconButton(
-        icon = CPSIcons.Add,
-        enabled = newsViewModel.followLoadingStatus != LoadingStatus.LOADING
-    ) {
+    CPSIconButton(icon = CPSIcons.Add) {
         showChooseDialog = true
     }
 
