@@ -143,7 +143,8 @@ fun SettingsSwitchItem(
 fun SettingsSwitchItem(
     item: CPSDataStoreItem<Boolean>,
     title: String,
-    description: String = ""
+    description: String = "",
+    onCheckedChange: (Boolean) -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     val checked by rememberCollect { item.flow }
@@ -152,7 +153,10 @@ fun SettingsSwitchItem(
         title = title,
         description = description
     ) {
-        scope.launch { item(it) }
+        scope.launch {
+            item(it)
+            onCheckedChange(it)
+        }
     }
 }
 

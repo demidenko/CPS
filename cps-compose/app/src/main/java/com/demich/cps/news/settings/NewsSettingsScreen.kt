@@ -20,6 +20,8 @@ import com.demich.cps.utils.codeforces.CodeforcesLocale
 import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
+import com.demich.cps.workers.WorkersCenter
+import com.demich.cps.workers.WorkersNames
 import kotlinx.coroutines.launch
 
 
@@ -54,7 +56,10 @@ private fun CodeforcesFollowSettingsItem() {
         item = context.settingsNews.codeforcesFollowEnabled,
         title = "Follow",
         description = stringResource(id = R.string.news_settings_cf_follow_description)
-    )
+    ) { checked ->
+        if (checked) WorkersCenter.startCodeforcesNewsFollowWorker(context = context, restart = true)
+        else WorkersCenter.stopWorker(context = context, workName = WorkersNames.codeforces_news_follow)
+    }
 }
 
 @Composable

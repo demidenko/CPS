@@ -14,6 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -38,11 +39,18 @@ import com.demich.cps.ui.rememberCPSNavigator
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.rememberCollect
+import com.demich.cps.workers.WorkersCenter
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        lifecycleScope.launchWhenCreated {
+            WorkersCenter.startWorkers(context = this@MainActivity)
+        }
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContent {
             val cpsViewModels = CPSViewModels(
                 accountsViewModel = viewModel(),
