@@ -7,12 +7,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.room.lostBlogEntriesDao
+import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -132,6 +135,22 @@ class CodeforcesNewsController(
     fun flowOfTopBlogEntries(context: Context) = viewModel.flowOfTopBlogEntries(context)
     fun flowOfTopComments(context: Context) = viewModel.flowOfTopComments(context)
     fun flowOfRecentActions(context: Context) = viewModel.flowOfRecentActions(context)
+
+    fun flowOfLostBlogEntries(context: Context) =
+        context.lostBlogEntriesDao.flowOfLost().map { blogEntries ->
+            blogEntries.sortedByDescending { it.timeStamp }
+                .map {
+                    CodeforcesBlogEntry(
+                        id = it.id,
+                        title = it.title,
+                        authorHandle = it.authorHandle,
+                        authorColorTag = it.authorColorTag,
+                        creationTime = it.creationTime,
+                        commentsCount = 0,
+                        rating = 0
+                    )
+                }
+        }
 
 
     fun addToFollow(handle: String, context: Context) = viewModel.addToFollowList(handle, context)

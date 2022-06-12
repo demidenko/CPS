@@ -12,7 +12,6 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.Contest
 import com.demich.cps.news.NewsTab
 import com.demich.cps.news.NewsTabRow
-import com.demich.cps.room.lostBlogEntriesDao
 import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
@@ -57,31 +56,6 @@ fun CodeforcesNewsScreen(
 
 }
 
-
-@Composable
-private fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
-    val context = context
-    val blogEntriesState = rememberCollect {
-        context.lostBlogEntriesDao.flowOfLost().map { blogEntries ->
-            blogEntries.sortedByDescending { it.timeStamp }
-                .map {
-                    CodeforcesBlogEntry(
-                        id = it.id,
-                        title = it.title,
-                        authorHandle = it.authorHandle,
-                        authorColorTag = it.authorColorTag,
-                        creationTime = it.creationTime,
-                        commentsCount = 0,
-                        rating = 0
-                    )
-                }
-        }
-    }
-    CodeforcesBlogEntries(
-        blogEntriesController = rememberCodeforcesBlogEntriesController(blogEntriesState = blogEntriesState),
-        modifier = Modifier.fillMaxWidth()
-    )
-}
 
 @Composable
 fun CodeforcesReloadablePage(
@@ -161,15 +135,39 @@ private fun TabsHeader(
 
     val context = context
     LaunchedEffect(controller) {
-        combineToCounters(
-            flowOfIds = controller.flowOfMainBlogEntries(context).map { it.map { it.id.toString() } },
-            flowOfTypes = CodeforcesNewEntriesDataStore(context).mainNewEntries.flow
-        ).combine(snapshotFlow { controller.currentTab }) { counters, currentTab ->
-            if (currentTab == CodeforcesTitle.MAIN) counters.seenCount + counters.unseenCount
-            else counters.unseenCount
-        }.onEach {
-            controller.setBadgeCount(tab = CodeforcesTitle.MAIN, count = it)
-        }.collect()
+        launch {
+            makeAndCollectBadgeCount(
+                tab = CodeforcesTitle.MAIN,
+                controller = controller,
+                blogEntriesFlow = controller.flowOfMainBlogEntries(context),
+                newEntriesItem = CodeforcesNewEntriesDataStore(context).mainNewEntries
+            )
+        }
+        launch {
+            makeAndCollectBadgeCount(
+                tab = CodeforcesTitle.LOST,
+                controller = controller,
+                blogEntriesFlow = controller.flowOfLostBlogEntries(context),
+                newEntriesItem = CodeforcesNewEntriesDataStore(context).lostNewEntries
+            )
+        }
+    }
+}
+
+private suspend fun makeAndCollectBadgeCount(
+    tab: CodeforcesTitle,
+    controller: CodeforcesNewsController,
+    blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
+    newEntriesItem: NewEntriesDataStoreItem
+) {
+    combineToCounters(
+        flowOfIds = blogEntriesFlow.map { it.map { it.id.toString() } },
+        flowOfTypes = newEntriesItem.flow
+    ).combine(snapshotFlow { controller.currentTab }) { counters, currentTab ->
+        if (currentTab == tab) counters.seenCount + counters.unseenCount
+        else counters.unseenCount
+    }.collect { count ->
+        controller.setBadgeCount(tab = tab, count = count)
     }
 }
 

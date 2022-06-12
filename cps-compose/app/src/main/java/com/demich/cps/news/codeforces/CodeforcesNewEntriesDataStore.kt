@@ -15,6 +15,7 @@ class CodeforcesNewEntriesDataStore(context: Context): CPSDataStore(context.cf_n
     }
 
     val mainNewEntries = itemNewEntriesTypes(name = "main")
+    val lostNewEntries = itemNewEntriesTypes(name = "lost")
 
     private fun itemNewEntriesTypes(name: String) =
         NewEntriesDataStoreItem(itemJsonable(name = name, defaultValue = emptyMap()))
