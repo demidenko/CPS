@@ -198,7 +198,7 @@ class CodeforcesAccountManager(context: Context):
                             fontSize = 18.sp,
                             modifier = Modifier.padding(end = 5.dp)
                         )
-                        CodeforcesUtils.VoteRatingNonZero(
+                        CodeforcesUtils.VotedRating(
                             rating = userInfo.contribution,
                             fontSize = 20.sp
                         )

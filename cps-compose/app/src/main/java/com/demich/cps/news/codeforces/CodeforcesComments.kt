@@ -146,7 +146,7 @@ private fun CommentInfo(
                     .alignByBaseline()
             )
         }
-        CodeforcesUtils.VoteRatingNonZero(
+        CodeforcesUtils.VotedRating(
             rating = rating,
             fontSize = 13.sp,
             modifier = Modifier.align(Alignment.TopEnd)

@@ -98,20 +98,17 @@ private fun NewsFollowListItemInfo(
             modifier = Modifier
                 .align(Alignment.CenterStart)
         )
-        Text(
-            text = buildAnnotatedString {
-                append(
-                    text = "cont.: ",
-                    color = cpsColors.contentAdditional
-                )
-                append(
-                    text = userInfo.contribution.toSignedString(),
-                    color = if(userInfo.contribution > 0) cpsColors.votedRatingPositive else cpsColors.votedRatingNegative,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            fontSize = 13.sp,
-            modifier = Modifier.align(Alignment.CenterEnd)
-        )
+        Row(modifier = Modifier.align(Alignment.CenterEnd)) {
+            Text(
+                text = "cont.: ",
+                color = cpsColors.contentAdditional,
+                fontSize = 13.sp
+            )
+            CodeforcesUtils.VotedRating(
+                rating = userInfo.contribution,
+                fontSize = 13.sp,
+                showZero = true
+            )
+        }
     }
 }

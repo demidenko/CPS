@@ -267,8 +267,13 @@ object CodeforcesUtils {
     }
 
     @Composable
-    fun VoteRatingNonZero(rating: Int, fontSize: TextUnit, modifier: Modifier = Modifier) {
-        if (rating != 0) {
+    fun VotedRating(
+        rating: Int,
+        fontSize: TextUnit,
+        modifier: Modifier = Modifier,
+        showZero: Boolean = false
+    ) {
+        if (showZero || rating != 0) {
             Text(
                 text = rating.toSignedString(),
                 color = if (rating > 0) cpsColors.votedRatingPositive else cpsColors.votedRatingNegative,
