@@ -31,6 +31,7 @@ import com.demich.cps.utils.*
 import com.demich.cps.workers.CPSWork
 import com.demich.cps.workers.CPSWorkersDataStore
 import com.demich.cps.workers.getCPSWorks
+import com.demich.cps.workers.workInfoState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -187,20 +188,14 @@ private fun WorkerItem(
     modifier: Modifier = Modifier
 ) {
 
-    val workState by produceState<WorkInfo.State?>(initialValue = null) {
-        work.flowOfInfo().collect {
-            value = it.state
-        }
-    }
+    val workState by work.workInfoState()
 
     WorkerItem(
         name = work.name,
-        workState = workState,
-        lastRunTimeAgo = if (lastExecutionTime == null) {
-            "never"
-        } else {
-            timeAgo(fromTime = lastExecutionTime, toTime = LocalCurrentTime.current)
-        },
+        workState = workState?.state,
+        lastRunTimeAgo = lastExecutionTime?.let {
+            timeAgo(fromTime = it, toTime = LocalCurrentTime.current)
+        } ?: "never",
         modifier = modifier
     )
 }
