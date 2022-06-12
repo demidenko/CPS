@@ -5,12 +5,20 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
+import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.accounts.managers.RatedAccountManager
@@ -21,11 +29,15 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSRadioButtonTitled
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
-import com.demich.cps.utils.CPSDataStore
-import com.demich.cps.utils.context
+import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.*
+import com.demich.cps.workers.CPSWork
+import com.demich.cps.workers.CPSWorkersDataStore
+import com.demich.cps.workers.getCPSWorks
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import kotlin.random.Random
 
 
@@ -48,9 +60,9 @@ fun DevelopScreen() {
 
     val context = context
 
-    TestHandles(
-        modifier = Modifier.fillMaxWidth()
-    )
+    //TestHandles(modifier = Modifier.fillMaxWidth())
+
+    WorkersList(modifier = Modifier.fillMaxWidth())
 }
 
 
@@ -143,3 +155,66 @@ private fun HandlesList(
     }
 }
 
+@Composable
+private fun WorkersList(
+    modifier: Modifier = Modifier
+) {
+    val context = context
+    val works = remember { context.getCPSWorks() }
+
+    val lastExecutionTime by rememberCollect {
+        CPSWorkersDataStore(context).lastExecutionTime.flow
+    }
+
+    val currentTime by collectCurrentTimeEachSecond()
+    CompositionLocalProvider(LocalCurrentTime provides currentTime) {
+        LazyColumn(modifier = modifier) {
+            items(items = works, key = { it.name }) { work ->
+                WorkerItem(
+                    work = work,
+                    lastExecutionTime = lastExecutionTime[work.name],
+                    modifier = Modifier.fillMaxWidth().padding(all = 4.dp)
+                )
+                Divider()
+            }
+        }
+    }
+}
+
+@Composable
+private fun WorkerItem(
+    work: CPSWork,
+    lastExecutionTime: Instant?,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = work.name,
+                fontSize = 22.sp
+            )
+            Text(
+                text = buildAnnotatedString {
+                    append("last run: ", color = cpsColors.contentAdditional)
+                    if (lastExecutionTime == null) {
+                        append("never")
+                    } else {
+                        append(timeAgo(fromTime = lastExecutionTime, toTime = LocalCurrentTime.current))
+                    }
+                },
+                fontSize = 14.sp,
+                modifier = Modifier.padding(top = 3.dp)
+            )
+        }
+
+        Text(
+            text = "TODO State",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}
