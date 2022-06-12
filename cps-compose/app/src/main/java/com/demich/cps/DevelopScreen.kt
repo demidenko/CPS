@@ -15,19 +15,16 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.work.WorkInfo
 import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatedUserInfo
 import com.demich.cps.accounts.managers.allAccountManagers
-import com.demich.cps.ui.CPSIconButton
-import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.CPSRadioButtonTitled
-import com.demich.cps.ui.LazyColumnWithScrollBar
+import com.demich.cps.ui.*
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
@@ -173,7 +170,9 @@ private fun WorkersList(
                 WorkerItem(
                     work = work,
                     lastExecutionTime = lastExecutionTime[work.name],
-                    modifier = Modifier.fillMaxWidth().padding(all = 4.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(all = 4.dp)
                 )
                 Divider()
             }
@@ -187,34 +186,60 @@ private fun WorkerItem(
     lastExecutionTime: Instant?,
     modifier: Modifier = Modifier
 ) {
+
+    val workState by produceState<WorkInfo.State?>(initialValue = null) {
+        work.flowOfInfo().collect {
+            value = it.state
+        }
+    }
+
+    WorkerItem(
+        name = work.name,
+        workState = workState,
+        lastRunTimeAgo = if (lastExecutionTime == null) {
+            "never"
+        } else {
+            timeAgo(fromTime = lastExecutionTime, toTime = LocalCurrentTime.current)
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun WorkerItem(
+    name: String,
+    workState: WorkInfo.State?,
+    lastRunTimeAgo: String,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = work.name,
-                fontSize = 22.sp
+            MonospacedText(
+                text = name,
+                fontSize = 20.sp
             )
             Text(
-                text = buildAnnotatedString {
-                    append("last run: ", color = cpsColors.contentAdditional)
-                    if (lastExecutionTime == null) {
-                        append("never")
-                    } else {
-                        append(timeAgo(fromTime = lastExecutionTime, toTime = LocalCurrentTime.current))
-                    }
-                },
+                text = "last run: $lastRunTimeAgo",
                 fontSize = 14.sp,
+                color = cpsColors.contentAdditional,
                 modifier = Modifier.padding(top = 3.dp)
             )
         }
 
         Text(
-            text = "TODO State",
-            fontSize = 22.sp,
+            text = workState?.name ?: "???",
+            modifier = Modifier.padding(start = 8.dp),
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 8.dp)
+            color = when (workState) {
+                WorkInfo.State.ENQUEUED, WorkInfo.State.FAILED, WorkInfo.State.SUCCEEDED -> cpsColors.content
+                WorkInfo.State.RUNNING -> cpsColors.success
+                WorkInfo.State.BLOCKED -> cpsColors.error
+                WorkInfo.State.CANCELLED, null -> cpsColors.contentAdditional
+            }
         )
     }
 }
