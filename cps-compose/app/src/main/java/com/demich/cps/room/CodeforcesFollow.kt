@@ -71,8 +71,8 @@ interface FollowListDao {
     }
 
     suspend fun getAndReloadBlogEntries(handle: String, context: Context): List<CodeforcesBlogEntry>? {
-        return kotlin.runCatching {
-            CodeforcesApi.getUserBlogEntries(
+        return CodeforcesApi.runCatching {
+            getUserBlogEntries(
                 handle = handle,
                 locale = context.settingsNews.codeforcesLocale()
             )

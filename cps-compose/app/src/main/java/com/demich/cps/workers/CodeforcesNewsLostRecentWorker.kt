@@ -126,8 +126,8 @@ class CodeforcesNewsLostRecentWorker(
             if (blogEntry.authorColorTag < minRatingColorTag) continue
             if (suspects.none { it.id == blogEntry.id }) continue
 
-            val creationTime = kotlin.runCatching {
-                CodeforcesApi.getBlogEntry(
+            val creationTime = CodeforcesApi.runCatching {
+                getBlogEntry(
                     blogEntryId = blogEntry.id,
                     locale = locale
                 ).creationTime
