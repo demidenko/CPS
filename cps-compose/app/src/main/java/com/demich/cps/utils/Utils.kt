@@ -43,6 +43,7 @@ fun Context.openUrlInBrowser(url: String) = startActivity(Intent(Intent.ACTION_V
 
 val jsonCPS = Json {
     ignoreUnknownKeys = true
+    allowStructuredMapKeys = true
 }
 
 fun cpsHttpClient(

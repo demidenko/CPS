@@ -307,7 +307,9 @@ private fun ContestItemMenuButton(
             onDismissRequest = { showDeleteDialog = false },
             onConfirmRequest = {
                 scope.launch {
-                    context.settingsContests.ignoredContests.add(contest.compositeId)
+                    context.settingsContests.ignoredContests.edit {
+                        put(contest.compositeId, getCurrentTime())
+                    }
                 }
             }
         )

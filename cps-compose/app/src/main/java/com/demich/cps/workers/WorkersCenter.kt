@@ -74,8 +74,11 @@ inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
 
 
 suspend fun Context.enqueueEnabledWorkers() {
-    CodeforcesNewsFollowWorker.getWork(this).enqueueIfEnabled()
-    CodeforcesNewsLostRecentWorker.getWork(this).enqueueIfEnabled()
+    listOf(
+        ContestsWorker.getWork(this),
+        CodeforcesNewsFollowWorker.getWork(this),
+        CodeforcesNewsLostRecentWorker.getWork(this)
+    ).forEach { it.enqueueIfEnabled() }
 }
 
 /*
