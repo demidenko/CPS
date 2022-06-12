@@ -124,7 +124,7 @@ class CodeforcesNewsLostRecentWorker(
         //catch new suspects from recent actions
         for (blogEntry in recentBlogEntries) {
             if (blogEntry.authorColorTag < minRatingColorTag) continue
-            if (suspects.none { it.id == blogEntry.id }) continue
+            if (suspects.any { it.id == blogEntry.id }) continue
 
             val creationTime = CodeforcesApi.runCatching {
                 getBlogEntry(
