@@ -21,7 +21,7 @@ class CodeforcesNewsFollowWorker(
         fun getWork(context: Context) = object : CPSWork(name = "cf_follow", context = context) {
             override suspend fun isEnabled() = context.settingsNews.codeforcesFollowEnabled()
             override val requestBuilder get() =
-                PeriodicWorkRequestBuilder<CodeforcesNewsFollowWorker>(
+                CPSPeriodicWorkRequestBuilder<CodeforcesNewsFollowWorker>(
                     repeatInterval = 6.hours,
                     //flex = 3.hours,
                     batteryNotLow = true

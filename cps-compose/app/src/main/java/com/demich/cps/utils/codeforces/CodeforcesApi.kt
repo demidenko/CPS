@@ -151,6 +151,13 @@ object CodeforcesApi {
         }
     }
 
+    suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale): CodeforcesBlogEntry {
+        return getCodeforcesApi(urlString = "${urls.api}/blogEntry.view") {
+            parameter("blogEntryId", blogEntryId)
+            parameter("locale", locale)
+        }
+    }
+
     object urls {
         const val main = "https://codeforces.com"
 

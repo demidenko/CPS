@@ -21,6 +21,7 @@ import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.workers.CodeforcesNewsFollowWorker
+import com.demich.cps.workers.CodeforcesNewsLostRecentWorker
 import kotlinx.coroutines.launch
 
 
@@ -75,7 +76,12 @@ private fun CodeforcesLostSettingsItem() {
                 title = "Lost recent blog entries",
                 description = stringResource(id = R.string.news_settings_cf_lost_description),
                 onCheckedChange = { checked ->
-                    scope.launch { settings.codeforcesLostEnabled(newValue = checked) }
+                    scope.launch {
+                        settings.codeforcesLostEnabled(newValue = checked)
+                        with(CodeforcesNewsLostRecentWorker.getWork(context)) {
+                            if (checked) startImmediate() else stop()
+                        }
+                    }
                 }
             )
             AnimatedVisibility(visible = enabled) {
@@ -104,6 +110,7 @@ private fun CodeforcesLostAuthorSettingsItem(
             CodeforcesUtils.ColorTag.LEGENDARY to "LGM"
         )
     }
+    //TODO: restart worker on change?
     Box(modifier = Modifier.padding(top = 10.dp)) {
         SettingsEnumItemContent(
             item = item,

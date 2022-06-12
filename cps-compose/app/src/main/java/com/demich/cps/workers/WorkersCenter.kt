@@ -55,7 +55,7 @@ abstract class CPSWork(
             .filterNotNull()
 }
 
-inline fun<reified W: CPSWorker> PeriodicWorkRequestBuilder(
+inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
     repeatInterval: Duration,
     flex: Duration = repeatInterval,
     batteryNotLow: Boolean = false
@@ -75,6 +75,7 @@ inline fun<reified W: CPSWorker> PeriodicWorkRequestBuilder(
 
 suspend fun Context.enqueueEnabledWorkers() {
     CodeforcesNewsFollowWorker.getWork(this).enqueueIfEnabled()
+    CodeforcesNewsLostRecentWorker.getWork(this).enqueueIfEnabled()
 }
 
 /*
