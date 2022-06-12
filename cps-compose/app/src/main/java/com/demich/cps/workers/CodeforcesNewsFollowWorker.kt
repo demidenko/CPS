@@ -23,7 +23,7 @@ class CodeforcesNewsFollowWorker(
             override val requestBuilder get() =
                 PeriodicWorkRequestBuilder<CodeforcesNewsFollowWorker>(
                     repeatInterval = 6.hours,
-                    flex = 3.hours,
+                    //flex = 3.hours,
                     batteryNotLow = true
                 )
 
@@ -33,7 +33,7 @@ class CodeforcesNewsFollowWorker(
     override suspend fun runWork(): Result {
         setForeground(ForegroundInfo(
             NotificationIds.codeforces_follow_progress,
-            progressNotificationBuilder(total = 0, done = 0).build()
+            progressNotificationBuilder().build()
         ))
 
         val dao = context.followListDao
@@ -41,20 +41,21 @@ class CodeforcesNewsFollowWorker(
 
         val savedHandles = dao.getHandles().shuffled()
         savedHandles.forEachIndexed { index, handle ->
-            dao.getAndReloadBlogEntries(handle, context)
-            progressNotificationBuilder(total = savedHandles.size, done = index+1)
+            if (dao.getAndReloadBlogEntries(handle, context) == null) return Result.retry()
+
+            progressNotificationBuilder()
+                .setProgress(savedHandles.size, index+1, false)
                 .notifyBy(notificationManagerCompat, NotificationIds.codeforces_follow_progress)
         }
 
         return Result.success()
     }
 
-    private fun progressNotificationBuilder(total: Int, done: Int) =
+    private fun progressNotificationBuilder() =
         notificationBuilder(context, NotificationChannels.codeforces.follow_progress) {
-            setContentTitle("Codeforces Follow Update...")
+            setContentTitle("Codeforces follow update...")
             setSmallIcon(R.drawable.ic_logo_codeforces)
             setSilent(true)
             setShowWhen(false)
-            setProgress(total, done, total == 0)
         }
 }

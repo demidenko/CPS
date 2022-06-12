@@ -39,14 +39,14 @@ import com.demich.cps.ui.rememberCPSNavigator
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.rememberCollect
-import com.demich.cps.workers.startWorkers
+import com.demich.cps.workers.enqueueEnabledWorkers
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         lifecycleScope.launchWhenCreated {
-            this@MainActivity.startWorkers()
+            this@MainActivity.enqueueEnabledWorkers()
         }
 
         WindowCompat.setDecorFitsSystemWindows(window, false)

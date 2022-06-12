@@ -1,7 +1,11 @@
 package com.demich.cps.workers
 
 import android.content.Context
+import androidx.lifecycle.asFlow
 import androidx.work.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
@@ -21,10 +25,20 @@ abstract class CPSWork(
         context.workManager.cancelUniqueWork(name)
     }
 
-    protected fun start(restart: Boolean) {
-        enqueuePeriodicWork(
-            restart = restart,
-            builder = requestBuilder
+    private fun start(restart: Boolean) {
+        val request = requestBuilder.apply {
+            addTag(commonTag)
+            setBackoffCriteria(
+                BackoffPolicy.LINEAR,
+                PeriodicWorkRequest.MIN_BACKOFF_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
+        }.build()
+
+        context.workManager.enqueueUniquePeriodicWork(
+            name,
+            if (restart) ExistingPeriodicWorkPolicy.REPLACE else ExistingPeriodicWorkPolicy.KEEP,
+            request
         )
     }
 
@@ -33,6 +47,12 @@ abstract class CPSWork(
     suspend fun enqueueIfEnabled() {
         if (isEnabled()) enqueue()
     }
+
+    fun flowOfInfo(): Flow<WorkInfo> =
+        context.workManager.getWorkInfosForUniqueWorkLiveData(name)
+            .asFlow()
+            .map { it?.getOrNull(0) }
+            .filterNotNull()
 }
 
 inline fun<reified W: CPSWorker> PeriodicWorkRequestBuilder(
@@ -44,44 +64,16 @@ inline fun<reified W: CPSWorker> PeriodicWorkRequestBuilder(
     repeatIntervalTimeUnit = TimeUnit.MILLISECONDS,
     flexTimeInterval = flex.inWholeMilliseconds,
     flexTimeIntervalUnit = TimeUnit.MILLISECONDS
-).apply {
-    setConstraints(
-        Constraints(
-            requiredNetworkType = NetworkType.CONNECTED,
-            requiresBatteryNotLow = batteryNotLow,
-            requiresCharging = false
-        )
+).setConstraints(
+    Constraints(
+        requiredNetworkType = NetworkType.CONNECTED,
+        requiresBatteryNotLow = batteryNotLow,
+        requiresCharging = false
     )
-}
-
-private fun CPSWork.enqueuePeriodicWork(
-    restart: Boolean,
-    builder: PeriodicWorkRequest.Builder
-) {
-    val request = builder.apply {
-        addTag(commonTag)
-        setBackoffCriteria(
-            BackoffPolicy.LINEAR,
-            PeriodicWorkRequest.MIN_BACKOFF_MILLIS,
-            TimeUnit.MILLISECONDS
-        )
-    }.build()
-
-    context.workManager.enqueueUniquePeriodicWork(
-        name,
-        if (restart) ExistingPeriodicWorkPolicy.REPLACE else ExistingPeriodicWorkPolicy.KEEP,
-        request
-    )
-}
+)
 
 
-
-/*fun flowOfWorkInfo(context: Context, name: String): Flow<WorkInfo> =
-    context.workManager.getWorkInfosForUniqueWorkLiveData(name).asFlow()
-        .map { it?.getOrNull(0) }.filterNotNull()
-*/
-
-suspend fun Context.startWorkers() {
+suspend fun Context.enqueueEnabledWorkers() {
     CodeforcesNewsFollowWorker.getWork(this).enqueueIfEnabled()
 }
 
