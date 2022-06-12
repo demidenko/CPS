@@ -11,7 +11,7 @@ import com.demich.cps.*
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.useOriginalColors
-import com.demich.cps.utils.signedToString
+import com.demich.cps.utils.toSignedString
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
@@ -139,7 +139,7 @@ fun notifyRatingChange(
         val decreased = newRating < oldRating
         setSmallIcon(if (decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
         setContentTitle("$handle new rating: $newRating")
-        val difference = signedToString(newRating - oldRating)
+        val difference = (newRating - oldRating).toSignedString()
         setContentText("$difference (rank: $rank)")
         setSubText("${manager.type.name} rating changes")
         color = manager.originalColor(manager.getHandleColor(newRating))

@@ -21,7 +21,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.append
 import com.demich.cps.utils.codeforces.CodeforcesUtils
-import com.demich.cps.utils.signedToString
+import com.demich.cps.utils.toSignedString
 import com.demich.cps.utils.timeAgo
 
 @Composable
@@ -105,7 +105,7 @@ private fun NewsFollowListItemInfo(
                     color = cpsColors.contentAdditional
                 )
                 append(
-                    text = signedToString(userInfo.contribution),
+                    text = userInfo.contribution.toSignedString(),
                     color = if(userInfo.contribution > 0) cpsColors.votedRatingPositive else cpsColors.votedRatingNegative,
                     fontWeight = FontWeight.Bold
                 )

@@ -339,7 +339,7 @@ private fun ContestResult(
             if (ratingChange.oldRating != null) {
                 val change = ratingChange.rating - ratingChange.oldRating
                 Text(
-                    text = signedToString(change),
+                    text = change.toSignedString(),
                     fontSize = subTitleFontSize,
                     fontWeight = FontWeight.Bold,
                     color = if (change < 0) cpsColors.error else cpsColors.success,

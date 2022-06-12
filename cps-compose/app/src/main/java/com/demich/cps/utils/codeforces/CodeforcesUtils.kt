@@ -11,7 +11,7 @@ import com.demich.cps.accounts.managers.HandleColor
 import com.demich.cps.accounts.managers.NOT_RATED
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.signedToString
+import com.demich.cps.utils.toSignedString
 import kotlinx.datetime.Instant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -270,7 +270,7 @@ object CodeforcesUtils {
     fun VoteRatingNonZero(rating: Int, fontSize: TextUnit, modifier: Modifier = Modifier) {
         if (rating != 0) {
             Text(
-                text = signedToString(rating),
+                text = rating.toSignedString(),
                 color = if (rating > 0) cpsColors.votedRatingPositive else cpsColors.votedRatingNegative,
                 fontWeight = FontWeight.Bold,
                 fontSize = fontSize,

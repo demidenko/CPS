@@ -74,7 +74,7 @@ suspend inline fun HttpClient.getText(
 ): String = this.get(urlString = urlString, block = block).bodyAsText()
 
 
-fun signedToString(x: Int): String = if (x > 0) "+$x" else "$x"
+fun Int.toSignedString(): String = if (this > 0) "+${this}" else "$this"
 
 
 fun Instant.format(dateFormat: String): String =
