@@ -82,6 +82,7 @@ inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
 )
 
 fun Context.getCPSWorks() = listOf(
+    AccountsWorker::getWork,
     ContestsWorker::getWork,
     CodeforcesNewsFollowWorker::getWork,
     CodeforcesNewsLostRecentWorker::getWork,
@@ -101,15 +102,6 @@ object WorkersCenter {
             WorkersNames.codeforces_contest_watch_launcher,
             restart,
             45.minutes
-        )
-    }
-
-    fun startAccountsWorker(context: Context, restart: Boolean = true) {
-        makeAndEnqueueWork<AccountsWorker>(
-            context,
-            WorkersNames.accounts_parsers,
-            restart,
-            15.minutes
         )
     }
 

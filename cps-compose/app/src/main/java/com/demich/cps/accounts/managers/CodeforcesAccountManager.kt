@@ -27,6 +27,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.InstantAsSecondsSerializer
 import com.demich.cps.utils.append
 import com.demich.cps.utils.codeforces.*
+import com.demich.cps.workers.AccountsWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -84,7 +85,7 @@ class CodeforcesAccountManager(context: Context):
             return CodeforcesUserInfo(CodeforcesApi.getUser(handle = data))
         } catch (e: Throwable) {
             if (e is CodeforcesAPIErrorResponse && e.isHandleNotFound() == data) {
-                if((flags and 1) != 0) {
+                if ((flags and 1) != 0) {
                     val (realHandle, status) = CodeforcesUtils.getRealHandle(handle = data)
                     return when(status) {
                         STATUS.OK -> downloadInfo(data = realHandle, flags = 0)
@@ -158,7 +159,7 @@ class CodeforcesAccountManager(context: Context):
             CodeforcesUtils.getHandleColorByTag(tag)?.let { handleColor ->
                 addStyle(
                     style = SpanStyle(color = colorFor(handleColor)),
-                    start = if(tag == CodeforcesUtils.ColorTag.LEGENDARY) 1 else 0,
+                    start = if (tag == CodeforcesUtils.ColorTag.LEGENDARY) 1 else 0,
                     end = handle.length
                 )
             }
@@ -227,7 +228,8 @@ class CodeforcesAccountManager(context: Context):
         val settings = remember { getSettings() }
         SettingsSwitchItem(
             item = settings.observeRating,
-            title = "Rating changes observer"
+            title = "Rating changes observer",
+            onCheckedChange = { if (it) AccountsWorker.getWork(context).startImmediate() }
         )
         SettingsSwitchItem(
             item = settings.contestWatchEnabled,
@@ -241,7 +243,8 @@ class CodeforcesAccountManager(context: Context):
         )
         SettingsSwitchItem(
             item = settings.observeContribution,
-            title = "Contribution changes observer"
+            title = "Contribution changes observer",
+            onCheckedChange = { if (it) AccountsWorker.getWork(context).startImmediate() }
         )
     }
 
@@ -263,14 +266,14 @@ class CodeforcesAccountManager(context: Context):
         val settings = getSettings()
         val prevRatingChangeContestId = settings.lastRatedContestId()
 
-        if(prevRatingChangeContestId == ratingChange.contestId && info.rating == ratingChange.newRating) return
+        if (prevRatingChangeContestId == ratingChange.contestId && info.rating == ratingChange.newRating) return
 
         settings.lastRatedContestId(ratingChange.contestId)
 
-        if(prevRatingChangeContestId != null) {
+        if (prevRatingChangeContestId != null) {
             notifyRatingChange(ratingChange)
             val newInfo = loadInfo(info.handle)
-            if(newInfo.status!= STATUS.FAILED) {
+            if (newInfo.status != STATUS.FAILED) {
                 setSavedInfo(newInfo)
             } else {
                 setSavedInfo(info.copy(rating = ratingChange.newRating))

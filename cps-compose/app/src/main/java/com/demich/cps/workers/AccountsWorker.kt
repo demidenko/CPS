@@ -1,0 +1,101 @@
+package com.demich.cps.workers
+
+import android.app.NotificationManager
+import android.content.Context
+import android.content.Context.NOTIFICATION_SERVICE
+import androidx.core.os.bundleOf
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkerParameters
+import com.demich.cps.*
+import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.accounts.managers.STATUS
+import com.demich.cps.utils.codeforces.CodeforcesApi
+import com.demich.cps.utils.toSignedString
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.minutes
+
+class AccountsWorker(
+    context: Context,
+    parameters: WorkerParameters
+): CPSWorker(
+    work = getWork(context),
+    parameters = parameters
+) {
+    companion object {
+        fun getWork(context: Context) = object : CPSWork(name = "accounts", context = context) {
+            override suspend fun isEnabled() = true //TODO something proper
+            override val requestBuilder: PeriodicWorkRequest.Builder
+                get() = CPSPeriodicWorkRequestBuilder<AccountsWorker>(
+                    repeatInterval = 15.minutes
+                )
+        }
+    }
+
+    override suspend fun runWork(): Result {
+        val jobs = buildList {
+            with(CodeforcesAccountManager(context).getSettings()) {
+                if (observeRating()) add(::codeforcesRating)
+                if (observeContribution()) add(::codeforcesContribution)
+            }
+        }
+
+        withContext(Dispatchers.IO) {
+            jobs.map { f -> launch { f() } }
+        }.joinAll()
+
+        return Result.success()
+    }
+
+    private val notificationManager by lazy { context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
+    private val codeforcesAccountManager by lazy { CodeforcesAccountManager(context) }
+
+    private suspend fun codeforcesRating() {
+        val userInfo = codeforcesAccountManager.getSavedInfo()
+        if (userInfo.status != STATUS.OK) return
+
+        val lastRatingChange = CodeforcesApi.runCatching {
+            getUserRatingChanges(handle = userInfo.handle)
+        }.getOrNull()?.lastOrNull() ?: return
+
+        codeforcesAccountManager.applyRatingChange(lastRatingChange)
+    }
+
+    private suspend fun codeforcesContribution() {
+        val userInfo = codeforcesAccountManager.getSavedInfo()
+        if (userInfo.status != STATUS.OK) return
+
+        val handle = userInfo.handle
+        val newContribution = codeforcesAccountManager.loadInfo(handle)
+            .also {
+                if (it.status != STATUS.OK) return
+            }.contribution
+
+        if (newContribution == userInfo.contribution) return
+
+        codeforcesAccountManager.setSavedInfo(userInfo.copy(contribution = newContribution))
+
+        val oldContribution = getNotifiedCodeforcesContribution() ?: userInfo.contribution
+
+        notificationBuilder(context, NotificationChannels.codeforces.contribution_changes) {
+            setSubText(handle)
+            setContentTitle("Contribution change: ${oldContribution.toSignedString()} → ${newContribution.toSignedString()}")
+            setSmallIcon(R.drawable.ic_person)
+            setSilent(true)
+            setAutoCancel(true)
+            setShowWhen(false)
+            attachUrl(url = userInfo.link(), context = context)
+            addExtras(bundleOf(KEY_CF_CONTRIBUTION to oldContribution))
+        }.notifyBy(notificationManager, NotificationIds.codeforces_contribution_changes)
+    }
+
+
+    private val KEY_CF_CONTRIBUTION = "cf_contribution"
+    private fun getNotifiedCodeforcesContribution(): Int? {
+        return notificationManager.activeNotifications.find {
+            it.id == NotificationIds.codeforces_contribution_changes
+        }?.notification?.extras?.getInt(KEY_CF_CONTRIBUTION)
+    }
+}
