@@ -1,7 +1,7 @@
 package com.demich.cps.news.codeforces
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -19,11 +19,17 @@ fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
         CodeforcesNewEntriesDataStore(context).lostNewEntries
     }
 
+    val listState = rememberLazyListState()
+
     CodeforcesBlogEntries(
         blogEntriesController = rememberCodeforcesBlogEntriesController(
+            tab = CodeforcesTitle.LOST,
+            controller = controller,
             blogEntriesFlow = blogEntriesFlow,
-            newEntriesItem = newEntriesItem
+            newEntriesItem = newEntriesItem,
+            listState = listState
         ),
+        lazyListState = listState,
         modifier = Modifier.fillMaxSize()
     )
 }

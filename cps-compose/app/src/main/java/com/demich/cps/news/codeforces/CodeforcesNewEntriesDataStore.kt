@@ -1,12 +1,15 @@
 package com.demich.cps.news.codeforces
 
 import android.content.Context
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class CodeforcesNewEntriesDataStore(context: Context): CPSDataStore(context.cf_new_entries_dataStore) {
@@ -37,18 +40,23 @@ fun rememberCodeforcesBlogEntriesController(
 
 @Composable
 fun rememberCodeforcesBlogEntriesController(
+    tab: CodeforcesTitle,
     blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
-    newEntriesItem: NewEntriesDataStoreItem
+    newEntriesItem: NewEntriesDataStoreItem,
+    listState: LazyListState,
+    controller: CodeforcesNewsController
 ): CodeforcesBlogEntriesController {
     val context = context
     val scope = rememberCoroutineScope()
     val types = rememberCollect { newEntriesItem.flow }
     val blogEntriesState = rememberCollect { blogEntriesFlow }
+
     LaunchedEffect(blogEntriesState.value) {
         val ids = blogEntriesState.value.map { it.id.toString() }
         newEntriesItem.apply(newEntries = ids)
     }
-    return remember {
+
+    val blogEntriesController =  remember {
         object : CodeforcesBlogEntriesController(
             blogEntriesState = blogEntriesState,
             types = types
@@ -61,6 +69,22 @@ fun rememberCodeforcesBlogEntriesController(
             }
         }
     }
+
+    LaunchedEffect(controller, listState) {
+        snapshotFlow<List<Int>> {
+            if (!controller.isTabVisible(tab)) return@snapshotFlow emptyList()
+            val blogEntries = blogEntriesController.blogEntries
+            if (blogEntries.isEmpty()) return@snapshotFlow emptyList()
+            listState.visibleRange(0.75f).map { blogEntries[it].id }
+        }.collect {
+            newEntriesItem.markAtLeast(
+                ids = it.map(Int::toString),
+                type = NewEntryType.SEEN
+            )
+        }
+    }
+
+    return blogEntriesController
 }
 
 
