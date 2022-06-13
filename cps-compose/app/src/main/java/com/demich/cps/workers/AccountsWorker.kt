@@ -7,8 +7,10 @@ import androidx.core.os.bundleOf
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.*
+import com.demich.cps.accounts.managers.AtCoderAccountManager
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.STATUS
+import com.demich.cps.utils.AtCoderApi
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.toSignedString
 import kotlinx.coroutines.Dispatchers
@@ -34,11 +36,19 @@ class AccountsWorker(
         }
     }
 
+
+    private val notificationManager by lazy { context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
+    private val codeforcesAccountManager by lazy { CodeforcesAccountManager(context) }
+    private val atcoderAccountManager by lazy { AtCoderAccountManager(context) }
+
     override suspend fun runWork(): Result {
         val jobs = buildList {
-            with(CodeforcesAccountManager(context).getSettings()) {
+            with(codeforcesAccountManager.getSettings()) {
                 if (observeRating()) add(::codeforcesRating)
                 if (observeContribution()) add(::codeforcesContribution)
+            }
+            with(atcoderAccountManager.getSettings()) {
+                if (observeRating()) add(::atcoderRating)
             }
         }
 
@@ -48,9 +58,6 @@ class AccountsWorker(
 
         return Result.success()
     }
-
-    private val notificationManager by lazy { context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
-    private val codeforcesAccountManager by lazy { CodeforcesAccountManager(context) }
 
     private suspend fun codeforcesRating() {
         val userInfo = codeforcesAccountManager.getSavedInfo()
@@ -91,6 +98,33 @@ class AccountsWorker(
         }.notifyBy(notificationManager, NotificationIds.codeforces_contribution_changes)
     }
 
+    private suspend fun atcoderRating() {
+        val userInfo = atcoderAccountManager.getSavedInfo()
+        if (userInfo.status != STATUS.OK) return
+
+        val lastRatingChange = AtCoderApi.runCatching {
+            getRatingChanges(handle = userInfo.handle)
+        }.getOrNull()?.lastOrNull() ?: return
+
+        val lastRatingChangeContestId = lastRatingChange.getContestId()
+
+        val settings = atcoderAccountManager.getSettings()
+        val prevRatingChangeContestId = settings.lastRatedContestId()
+
+        if (prevRatingChangeContestId == lastRatingChangeContestId && userInfo.rating == lastRatingChange.NewRating) return
+
+        settings.lastRatedContestId(lastRatingChangeContestId)
+
+        if (prevRatingChangeContestId != null) {
+            atcoderAccountManager.notifyRatingChange(userInfo.handle, lastRatingChange)
+            val newInfo = atcoderAccountManager.loadInfo(userInfo.handle)
+            if (newInfo.status != STATUS.FAILED) {
+                atcoderAccountManager.setSavedInfo(newInfo)
+            } else {
+                atcoderAccountManager.setSavedInfo(userInfo.copy(rating = lastRatingChange.NewRating))
+            }
+        }
+    }
 
     private val KEY_CF_CONTRIBUTION = "cf_contribution"
     private fun getNotifiedCodeforcesContribution(): Int? {

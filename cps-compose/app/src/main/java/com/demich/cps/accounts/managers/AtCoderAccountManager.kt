@@ -17,11 +17,12 @@ import com.demich.cps.ui.RatingGraph
 import com.demich.cps.ui.RatingLoadButton
 import com.demich.cps.ui.SettingsSwitchItem
 import com.demich.cps.ui.rememberRatingGraphUIStates
-import com.demich.cps.utils.*
+import com.demich.cps.utils.AtCoderApi
+import com.demich.cps.utils.AtCoderRatingChange
+import com.demich.cps.workers.AccountsWorker
 import io.ktor.client.plugins.*
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import org.jsoup.Jsoup
 
 @Serializable
@@ -69,13 +70,8 @@ class AtCoderAccountManager(context: Context):
     }
 
     override suspend fun loadRatingHistory(info: AtCoderUserInfo): List<RatingChange>? {
-        try {
-            val s = AtCoderApi.getUserPage(handle = info.handle)
-            val i = s.lastIndexOf("<script>var rating_history=[{")
-            if (i == -1) return emptyList()
-            val j = s.indexOf("];</script>", i)
-            val str = s.substring(s.indexOf('[', i), j+1)
-            return jsonCPS.decodeFromString<List<AtCoderRatingChange>>(str).map {
+        return AtCoderApi.runCatching {
+            getRatingChanges(handle = info.handle).map {
                 RatingChange(
                     rating = it.NewRating,
                     oldRating = it.OldRating,
@@ -84,9 +80,7 @@ class AtCoderAccountManager(context: Context):
                     rank = it.Place
                 )
             }
-        } catch (e: Throwable) {
-            return null
-        }
+        }.getOrNull()
     }
 
     override val ratingsUpperBounds = arrayOf(
@@ -145,7 +139,8 @@ class AtCoderAccountManager(context: Context):
         val settings = remember { getSettings() }
         SettingsSwitchItem(
             item = settings.observeRating,
-            title = "Rating changes observer"
+            title = "Rating changes observer",
+            onCheckedChange = { if (it) AccountsWorker.getWork(context).startImmediate() }
         )
     }
 

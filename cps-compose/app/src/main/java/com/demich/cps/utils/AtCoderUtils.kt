@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 
 object AtCoderApi {
     private val client = cpsHttpClient(json = false) { }
@@ -25,6 +26,15 @@ object AtCoderApi {
 
     suspend fun getContestsPage(): String = makeWEBCall {
         client.getText(urlString = urls.main + "/contests")
+    }
+
+    suspend fun getRatingChanges(handle: String): List<AtCoderRatingChange> {
+        val s = getUserPage(handle)
+        val i = s.lastIndexOf("<script>var rating_history=[{")
+        if (i == -1) return emptyList()
+        val j = s.indexOf("];</script>", i)
+        val str = s.substring(s.indexOf('[', i), j+1)
+        return jsonCPS.decodeFromString(str)
     }
 
     object urls {
