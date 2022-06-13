@@ -82,10 +82,11 @@ inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
 )
 
 fun Context.getCPSWorks() = listOf(
-    ContestsWorker.getWork(this),
-    CodeforcesNewsFollowWorker.getWork(this),
-    CodeforcesNewsLostRecentWorker.getWork(this)
-)
+    ContestsWorker::getWork,
+    CodeforcesNewsFollowWorker::getWork,
+    CodeforcesNewsLostRecentWorker::getWork,
+    CodeforcesUpsolvingSuggestionsWorker::getWork
+).map { it(this) }
 
 suspend fun Context.enqueueEnabledWorkers() {
     getCPSWorks().forEach { it.enqueueIfEnabled() }
@@ -94,31 +95,12 @@ suspend fun Context.enqueueEnabledWorkers() {
 /*
 object WorkersCenter {
 
-    fun startCodeforcesNewsLostRecentWorker(context: Context, restart: Boolean = true) {
-        makeAndEnqueueWork<CodeforcesNewsLostRecentWorker>(
-            context,
-            WorkersNames.codeforces_news_lost_recent,
-            restart,
-            1.hours
-        )
-    }
-
     fun startCodeforcesContestWatchLauncherWorker(context: Context, restart: Boolean = true) {
         makeAndEnqueueWork<CodeforcesContestWatchLauncherWorker>(
             context,
             WorkersNames.codeforces_contest_watch_launcher,
             restart,
             45.minutes
-        )
-    }
-
-    fun startCodeforcesUpsolveSuggestionsWorker(context: Context, restart: Boolean = true) {
-        makeAndEnqueueWork<CodeforcesUpsolvingSuggestionsWorker>(
-            context,
-            WorkersNames.codeforces_upsolving_suggestions,
-            restart,
-            12.hours,
-            batteryNotLow = true
         )
     }
 
