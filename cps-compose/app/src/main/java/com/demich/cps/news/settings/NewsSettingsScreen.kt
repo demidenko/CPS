@@ -52,15 +52,12 @@ private fun CodeforcesDefaultTabSettingsItem() {
 @Composable
 private fun CodeforcesFollowSettingsItem() {
     val context = context
-    SettingsSwitchItem(
+    SettingsSwitchItemWithWork(
         item = context.settingsNews.codeforcesFollowEnabled,
         title = "Follow",
-        description = stringResource(id = R.string.news_settings_cf_follow_description)
-    ) { checked ->
-        with(CodeforcesNewsFollowWorker.getWork(context)) {
-            if (checked) startImmediate() else stop()
-        }
-    }
+        description = stringResource(id = R.string.news_settings_cf_follow_description),
+        workGetter = CodeforcesNewsFollowWorker::getWork
+    )
 }
 
 @Composable
