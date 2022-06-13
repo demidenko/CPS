@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.demich.cps.news.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.context
 
 @Composable
@@ -21,7 +22,8 @@ fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
 
     val listState = rememberLazyListState()
 
-    CodeforcesBlogEntries(
+    CodeforcesBlogEntriesFollowAddable(
+        controller = controller,
         blogEntriesController = rememberCodeforcesBlogEntriesController(
             tab = CodeforcesTitle.LOST,
             controller = controller,
