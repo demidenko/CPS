@@ -1,5 +1,6 @@
 package com.demich.cps.news.codeforces
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -23,6 +24,6 @@ fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
             blogEntriesFlow = blogEntriesFlow,
             newEntriesItem = newEntriesItem
         ),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxSize()
     )
 }
