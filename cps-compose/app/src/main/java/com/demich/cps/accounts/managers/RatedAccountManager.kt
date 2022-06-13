@@ -126,25 +126,26 @@ data class RatingChange(
     val date: Instant,
     val title: String = "",
     val oldRating: Int? = null,
-    val rank: Int? = null
+    val rank: Int? = null,
+    val url: String? = null
 )
 
 fun notifyRatingChange(
     manager: RatedAccountManager<out RatedUserInfo>,
     notificationChannel: NotificationChannelLazy,
     notificationId: Int,
-    handle: String, newRating: Int, oldRating: Int, rank: Int, url: String? = null, time: Instant? = null
+    handle: String,
+    ratingChange: RatingChange
 ) {
     notificationBuildAndNotify(manager.context, notificationChannel, notificationId) {
-        val decreased = newRating < oldRating
-        setSmallIcon(if (decreased) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
-        setContentTitle("$handle new rating: $newRating")
-        val difference = (newRating - oldRating).toSignedString()
-        setContentText("$difference (rank: $rank)")
+        val difference = ratingChange.rating - (ratingChange.oldRating ?: 0)
+        setSmallIcon(if (difference < 0) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
+        setContentTitle("$handle new rating: ${ratingChange.rating}")
+        setContentText("${difference.toSignedString()} (rank: ${ratingChange.rank})")
         setSubText("${manager.type.name} rating changes")
-        color = manager.originalColor(manager.getHandleColor(newRating))
+        color = manager.originalColor(manager.getHandleColor(ratingChange.rating))
             .toArgb() //TODO not original but cpsColors
-        if (url != null) attachUrl(url, manager.context)
-        if (time != null) setWhen(time)
+        ratingChange.url?.let { attachUrl(it, manager.context) }
+        setWhen(ratingChange.date)
     }
 }

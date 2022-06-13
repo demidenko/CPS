@@ -1,6 +1,7 @@
 package com.demich.cps.utils.codeforces
 
 import com.demich.cps.accounts.managers.NOT_RATED
+import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.utils.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
@@ -349,7 +350,17 @@ data class CodeforcesRatingChange(
     @SerialName("ratingUpdateTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val ratingUpdateTime: Instant
-)
+) {
+    fun toRatingChange() =
+        RatingChange(
+            rating = newRating,
+            oldRating = oldRating,
+            date = ratingUpdateTime,
+            title = contestName,
+            rank = rank,
+            url = CodeforcesApi.urls.contestsWith(handle)
+        )
+}
 
 @Serializable
 data class CodeforcesComment(

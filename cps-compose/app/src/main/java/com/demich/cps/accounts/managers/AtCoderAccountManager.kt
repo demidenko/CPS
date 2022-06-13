@@ -72,13 +72,7 @@ class AtCoderAccountManager(context: Context):
     override suspend fun loadRatingHistory(info: AtCoderUserInfo): List<RatingChange>? {
         return AtCoderApi.runCatching {
             getRatingChanges(handle = info.handle).map {
-                RatingChange(
-                    rating = it.NewRating,
-                    oldRating = it.OldRating,
-                    date = it.EndTime,
-                    title = it.ContestName,
-                    rank = it.Place
-                )
+                it.toRatingChange(handle = info.handle)
             }
         }.getOrNull()
     }
@@ -149,11 +143,7 @@ class AtCoderAccountManager(context: Context):
         notificationChannel = NotificationChannels.atcoder.rating_changes,
         notificationId = NotificationIds.atcoder_rating_changes,
         handle = handle,
-        newRating = ratingChange.NewRating,
-        oldRating = ratingChange.OldRating,
-        rank = ratingChange.Place,
-        url = AtCoderApi.urls.userContestResult(handle, ratingChange.getContestId()),
-        time = ratingChange.EndTime
+        ratingChange = ratingChange.toRatingChange(handle)
     )
 }
 

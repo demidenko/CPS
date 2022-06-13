@@ -116,17 +116,10 @@ class CodeforcesAccountManager(context: Context):
     }
 
     override suspend fun loadRatingHistory(info: CodeforcesUserInfo): List<RatingChange>? =
-        kotlin.runCatching {
-            CodeforcesApi.getUserRatingChanges(info.handle)
-        }.getOrNull()?.map {
-            RatingChange(
-                rating = it.newRating,
-                oldRating = it.oldRating,
-                date = it.ratingUpdateTime,
-                title = it.contestName,
-                rank = it.rank
-            )
-        }
+        CodeforcesApi.runCatching {
+            getUserRatingChanges(info.handle)
+                .map(CodeforcesRatingChange::toRatingChange)
+        }.getOrNull()
 
     override val ratingsUpperBounds = arrayOf(
         HandleColor.GRAY to 1200,
@@ -248,17 +241,14 @@ class CodeforcesAccountManager(context: Context):
         )
     }
 
-    fun notifyRatingChange(ratingChange: CodeforcesRatingChange) = notifyRatingChange(
-        manager = this,
-        notificationChannel = NotificationChannels.codeforces.rating_changes,
-        notificationId = NotificationIds.codeforces_rating_changes,
-        handle = ratingChange.handle,
-        newRating = ratingChange.newRating,
-        oldRating = ratingChange.oldRating,
-        rank = ratingChange.rank,
-        url = CodeforcesApi.urls.contestsWith(ratingChange.handle),
-        time = ratingChange.ratingUpdateTime
-    )
+    fun notifyRatingChange(ratingChange: CodeforcesRatingChange) =
+        notifyRatingChange(
+            manager = this,
+            notificationChannel = NotificationChannels.codeforces.rating_changes,
+            notificationId = NotificationIds.codeforces_rating_changes,
+            handle = ratingChange.handle,
+            ratingChange = ratingChange.toRatingChange()
+        )
 
     suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange) {
         val info = getSavedInfo()
