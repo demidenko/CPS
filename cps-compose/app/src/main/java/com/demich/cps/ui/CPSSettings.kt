@@ -1,5 +1,6 @@
 package com.demich.cps.ui
 
+import android.content.Context
 import androidx.compose.animation.*
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.background
@@ -21,7 +22,9 @@ import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CPSDataStoreItem
 import com.demich.cps.utils.clickableNoRipple
+import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
+import com.demich.cps.workers.CPSWork
 import kotlinx.coroutines.launch
 
 @Composable
@@ -160,6 +163,24 @@ fun SettingsSwitchItem(
     }
 }
 
+@Composable
+fun SettingsSwitchItemWithWork(
+    item: CPSDataStoreItem<Boolean>,
+    title: String,
+    description: String = "",
+    workGetter: (Context) -> CPSWork
+) {
+    val context = context
+    SettingsSwitchItem(
+        item = item,
+        title = title,
+        description = description
+    ) { checked ->
+        with(workGetter(context)) {
+            if (checked) startImmediate() else stop()
+        }
+    }
+}
 
 @Composable
 fun<T: Enum<T>> SettingsEnumItemContent(

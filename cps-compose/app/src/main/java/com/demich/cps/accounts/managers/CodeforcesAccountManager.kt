@@ -22,13 +22,12 @@ import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
 import com.demich.cps.R
 import com.demich.cps.accounts.SmallRatedAccountPanel
-import com.demich.cps.ui.RatingGraph
-import com.demich.cps.ui.RatingLoadButton
-import com.demich.cps.ui.SettingsSwitchItem
-import com.demich.cps.ui.rememberRatingGraphUIStates
+import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.*
+import com.demich.cps.utils.InstantAsSecondsSerializer
+import com.demich.cps.utils.append
 import com.demich.cps.utils.codeforces.*
+import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
@@ -235,9 +234,10 @@ class CodeforcesAccountManager(context: Context):
             title = "Contest watcher",
             description = stringResource(id = R.string.cf_contest_watcher_description)
         )
-        SettingsSwitchItem(
+        SettingsSwitchItemWithWork(
             item = settings.upsolvingSuggestionsEnabled,
-            title = "Upsolving suggestions"
+            title = "Upsolving suggestions",
+            workGetter = CodeforcesUpsolvingSuggestionsWorker::getWork
         )
         SettingsSwitchItem(
             item = settings.observeContribution,

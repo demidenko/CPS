@@ -127,6 +127,14 @@ object CodeforcesApi {
         }
     }
 
+    suspend fun getContestSubmissions(contestId: Int, handle: String): List<CodeforcesSubmission> {
+        return getCodeforcesApi(urlString = "${urls.api}/contest.status") {
+            parameter("contestId", contestId)
+            parameter("handle", handle)
+            parameter("count", 1e9.toInt())
+        }
+    }
+
     suspend fun getHandleSuggestions(str: String): String? {
         return getCodeforcesWeb(urlString = "${urls.main}/data/handles") {
             parameter("q", str)
@@ -169,7 +177,7 @@ object CodeforcesApi {
 
         fun contest(contestId: Int) = "$main/contest/$contestId"
 
-        fun contestOuter(contestId: Int) = "$main/contests/$contestId"
+        fun contestWaiting(contestId: Int) = "$main/contests/$contestId"
 
         fun contestsWith(handle: String) = "$main/contests/with/$handle"
 

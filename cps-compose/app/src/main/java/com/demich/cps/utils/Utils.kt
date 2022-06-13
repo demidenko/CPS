@@ -133,13 +133,13 @@ fun Iterable<State<LoadingStatus>>.combine(): State<LoadingStatus>
 
 
 suspend inline fun<reified A, reified B> asyncPair(
-    crossinline getA: suspend () -> A,
-    crossinline getB: suspend () -> B,
+    crossinline getFirst: suspend () -> A,
+    crossinline getSecond: suspend () -> B,
 ): Pair<A, B> {
     return coroutineScope {
-        val a = async { getA() }
-        val b = async { getB() }
-        Pair(a.await(), b.await())
+        val first = async { getFirst() }
+        val second = async { getSecond() }
+        Pair(first.await(), second.await())
     }
 }
 

@@ -12,7 +12,7 @@ class CodeforcesContestsLoader: ContestsLoader(type = ContestsLoaders.codeforces
                 title = contest.name,
                 startTime = contest.startTime,
                 durationSeconds = contest.duration.inWholeSeconds,
-                link = CodeforcesApi.urls.contestOuter(contestId = contest.id)
+                link = CodeforcesApi.urls.contestWaiting(contestId = contest.id)
             )
         }
 }

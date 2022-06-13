@@ -266,6 +266,30 @@ object CodeforcesUtils {
         }
     }
 
+    private fun extractProblemWithAccepteds(problemRow: Element, contestId: Int): Pair<CodeforcesProblem, Int>? {
+        return kotlin.runCatching {
+            val td = problemRow.select("td")
+            val acceptedCount = td[3].text().trim().removePrefix("x").toInt()
+            val problem = CodeforcesProblem(
+                index = td[0].text().trim(),
+                name = td[1].selectFirst("a")!!.text(),
+                contestId = contestId
+            )
+            problem to acceptedCount
+        }.getOrNull()
+    }
+
+    suspend fun getContestAcceptedStatistics(contestId: Int): Map<CodeforcesProblem, Int>? {
+        val src = CodeforcesApi.getPageSource(
+            urlString = CodeforcesApi.urls.contest(contestId),
+            locale = CodeforcesLocale.EN
+        ) ?: return null
+        return Jsoup.parse(src).selectFirst("table.problems")
+            ?.select("tr")
+            ?.mapNotNull { extractProblemWithAccepteds(it, contestId) }
+            ?.toMap()
+    }
+
     @Composable
     fun VotedRating(
         rating: Int,
