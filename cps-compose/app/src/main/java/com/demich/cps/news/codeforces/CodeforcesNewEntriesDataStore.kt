@@ -8,8 +8,6 @@ import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class CodeforcesNewEntriesDataStore(context: Context): CPSDataStore(context.cf_new_entries_dataStore) {
@@ -51,12 +49,30 @@ fun rememberCodeforcesBlogEntriesController(
     val types = rememberCollect { newEntriesItem.flow }
     val blogEntriesState = rememberCollect { blogEntriesFlow }
 
-    LaunchedEffect(blogEntriesState.value) {
-        val ids = blogEntriesState.value.map { it.id.toString() }
-        newEntriesItem.apply(newEntries = ids)
+    //TODO: merge this flows
+    LaunchedEffect(Unit) {
+        snapshotFlow {
+            blogEntriesState.value.map { it.id }
+        }.collect { ids ->
+            newEntriesItem.apply(newEntries = ids.map(Int::toString))
+        }
     }
 
-    val blogEntriesController =  remember {
+    LaunchedEffect(controller, listState) {
+        snapshotFlow<List<Int>> {
+            if (!controller.isTabVisible(tab)) return@snapshotFlow emptyList()
+            val ids = blogEntriesState.value.map { it.id }
+            if (ids.isEmpty()) return@snapshotFlow emptyList()
+            listState.visibleRange(0.75f).map { ids[it] }
+        }.collect { visibleIds ->
+            newEntriesItem.markAtLeast(
+                ids = visibleIds.map(Int::toString),
+                type = NewEntryType.SEEN
+            )
+        }
+    }
+
+    return remember {
         object : CodeforcesBlogEntriesController(
             blogEntriesState = blogEntriesState,
             types = types
@@ -69,22 +85,6 @@ fun rememberCodeforcesBlogEntriesController(
             }
         }
     }
-
-    LaunchedEffect(controller, listState) {
-        snapshotFlow<List<Int>> {
-            if (!controller.isTabVisible(tab)) return@snapshotFlow emptyList()
-            val blogEntries = blogEntriesController.blogEntries
-            if (blogEntries.isEmpty()) return@snapshotFlow emptyList()
-            listState.visibleRange(0.75f).map { blogEntries[it].id }
-        }.collect {
-            newEntriesItem.markAtLeast(
-                ids = it.map(Int::toString),
-                type = NewEntryType.SEEN
-            )
-        }
-    }
-
-    return blogEntriesController
 }
 
 
