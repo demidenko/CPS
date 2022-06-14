@@ -68,12 +68,9 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
 
     abstract val rankedHandleColorsList: Array<HandleColor>
 
-    protected open suspend fun loadRatingHistory(info: U): List<RatingChange>? = null
-    suspend fun getRatingHistory(info: U): List<RatingChange>? {
-        return kotlin.runCatching {
-            loadRatingHistory(info)?.sortedBy { it.date }
-        }.getOrNull()
-    }
+    protected abstract suspend fun loadRatingHistory(info: U): List<RatingChange>
+    suspend fun getRatingHistory(info: U): List<RatingChange>? =
+        runCatching { loadRatingHistory(info).sortedBy { it.date } }.getOrNull()
 }
 
 const val NOT_RATED = Int.MIN_VALUE
@@ -102,6 +99,7 @@ enum class HandleColor {
     RED;
 
     companion object {
+        //TODO atcoder::orange == cf::red
         val rankedCodeforces    = arrayOf(GRAY, GRAY, GREEN, CYAN, BLUE, VIOLET, VIOLET, ORANGE, ORANGE, RED)
         val rankedAtCoder       = arrayOf(GRAY, BROWN, GREEN, CYAN, BLUE, YELLOW, YELLOW, ORANGE, ORANGE, RED)
         val rankedTopCoder      = arrayOf(GRAY, GRAY, GREEN, GREEN, BLUE, YELLOW, YELLOW, YELLOW, YELLOW, RED)

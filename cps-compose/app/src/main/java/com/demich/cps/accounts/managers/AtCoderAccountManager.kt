@@ -69,13 +69,10 @@ class AtCoderAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadRatingHistory(info: AtCoderUserInfo): List<RatingChange>? {
-        return AtCoderApi.runCatching {
-            getRatingChanges(handle = info.handle).map {
-                it.toRatingChange(handle = info.handle)
-            }
-        }.getOrNull()
-    }
+    override suspend fun loadRatingHistory(info: AtCoderUserInfo): List<RatingChange> =
+        AtCoderApi.getRatingChanges(handle = info.handle).map {
+            it.toRatingChange(handle = info.handle)
+        }
 
     override val ratingsUpperBounds = arrayOf(
         HandleColor.GRAY to 400,

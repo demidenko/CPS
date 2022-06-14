@@ -115,11 +115,9 @@ class CodeforcesAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadRatingHistory(info: CodeforcesUserInfo): List<RatingChange>? =
-        CodeforcesApi.runCatching {
-            getUserRatingChanges(info.handle)
-                .map(CodeforcesRatingChange::toRatingChange)
-        }.getOrNull()
+    override suspend fun loadRatingHistory(info: CodeforcesUserInfo): List<RatingChange> =
+        CodeforcesApi.getUserRatingChanges(info.handle)
+            .map(CodeforcesRatingChange::toRatingChange)
 
     override val ratingsUpperBounds = arrayOf(
         HandleColor.GRAY to 1200,

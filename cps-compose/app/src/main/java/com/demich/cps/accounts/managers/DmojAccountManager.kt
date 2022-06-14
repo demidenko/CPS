@@ -80,23 +80,19 @@ class DmojAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadRatingHistory(info: DmojUserInfo): List<RatingChange>? {
-        try {
-            val s = DmojApi.getUserPage(handle = info.handle)
-            val i = s.indexOf("var rating_history = [")
-            if (i == -1) return emptyList()
-            val j = s.indexOf("];", i)
-            val str = s.substring(s.indexOf('[', i), j+1)
-            return jsonCPS.decodeFromString<List<DmojRatingChange>>(str).map {
-                RatingChange(
-                    rating = it.rating,
-                    date = Instant.fromEpochMilliseconds(it.timestamp.toLong()),
-                    title = it.label,
-                    rank = it.ranking
-                )
-            }
-        } catch (e: Throwable) {
-            return null
+    override suspend fun loadRatingHistory(info: DmojUserInfo): List<RatingChange> {
+        val s = DmojApi.getUserPage(handle = info.handle)
+        val i = s.indexOf("var rating_history = [")
+        if (i == -1) return emptyList()
+        val j = s.indexOf("];", i)
+        val str = s.substring(s.indexOf('[', i), j+1)
+        return jsonCPS.decodeFromString<List<DmojRatingChange>>(str).map {
+            RatingChange(
+                rating = it.rating,
+                date = Instant.fromEpochMilliseconds(it.timestamp.toLong()),
+                title = it.label,
+                rank = it.ranking
+            )
         }
     }
 

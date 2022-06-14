@@ -107,22 +107,18 @@ class CodeChefAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadRatingHistory(info: CodeChefUserInfo): List<RatingChange>? {
-        try {
-            val s = CodeChefApi.getUserPage(handle = info.handle)
-            val i = s.indexOf("var all_rating = ")
-            if (i == -1) return emptyList()
-            val ar = s.substring(s.indexOf("[", i), s.indexOf("];", i) + 1)
-            return jsonCPS.decodeFromString<List<CodeChefRatingChange>>(ar).map {
-                RatingChange(
-                    rating = it.rating.toInt(),
-                    rank = it.rank.toInt(),
-                    title = it.name,
-                    date = Instant.parse(it.end_date.split(' ').run { "${get(0)}T${get(1)}Z" })
-                )
-            }
-        } catch (e: Throwable) {
-            return null
+    override suspend fun loadRatingHistory(info: CodeChefUserInfo): List<RatingChange> {
+        val s = CodeChefApi.getUserPage(handle = info.handle)
+        val i = s.indexOf("var all_rating = ")
+        if (i == -1) return emptyList()
+        val ar = s.substring(s.indexOf("[", i), s.indexOf("];", i) + 1)
+        return jsonCPS.decodeFromString<List<CodeChefRatingChange>>(ar).map {
+            RatingChange(
+                rating = it.rating.toInt(),
+                rank = it.rank.toInt(),
+                title = it.name,
+                date = Instant.parse(it.end_date.split(' ').run { "${get(0)}T${get(1)}Z" })
+            )
         }
     }
 
