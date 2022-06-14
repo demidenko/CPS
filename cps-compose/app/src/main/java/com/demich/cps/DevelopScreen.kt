@@ -22,7 +22,7 @@ import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatedUserInfo
 import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.ui.*
-import com.demich.cps.ui.bottomprogressbar.LinearProgressIndicatorRounded
+import com.demich.cps.ui.bottomprogressbar.CPSProgressIndicator
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.ui.theme.cpsColors
@@ -239,8 +239,8 @@ private fun WorkerItem(
                 }
             )
             if (progressInfo != null) {
-                LinearProgressIndicatorRounded(
-                    progress = progressInfo.fraction,
+                CPSProgressIndicator(
+                    progressBarInfo = progressInfo,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 2.dp)

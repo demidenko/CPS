@@ -51,7 +51,6 @@ fun CPSBottomProgressBar(
     modifier: Modifier = Modifier
 ) {
     if (progressBarInfo.total > 0) {
-        val progress by animateFloatAsState(targetValue = progressBarInfo.fraction)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
@@ -69,8 +68,8 @@ fun CPSBottomProgressBar(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 10.dp).weight(3f)
             )
-            LinearProgressIndicatorRounded(
-                progress = progress,
+            CPSProgressIndicator(
+                progressBarInfo = progressBarInfo,
                 modifier = Modifier.padding(end = 10.dp).weight(5f)
             )
         }
@@ -78,7 +77,21 @@ fun CPSBottomProgressBar(
 }
 
 @Composable
-fun LinearProgressIndicatorRounded(
+fun CPSProgressIndicator(
+    progressBarInfo: ProgressBarInfo,
+    modifier: Modifier = Modifier
+) {
+    if (progressBarInfo.total > 0) {
+        val progress by animateFloatAsState(targetValue = progressBarInfo.fraction)
+        LinearProgressIndicatorRounded(
+            progress = progress,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+private fun LinearProgressIndicatorRounded(
     progress: Float,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.primary,

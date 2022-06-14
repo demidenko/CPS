@@ -35,6 +35,7 @@ abstract class CPSWorker(
     abstract suspend fun runWork(): Result
 
     protected suspend fun setProgressInfo(progressInfo: ProgressBarInfo) {
+        if (progressInfo.total == 0) return
         setProgress(workDataOf(
             KEY_PROGRESS to arrayOf(progressInfo.current, progressInfo.total)
         ))

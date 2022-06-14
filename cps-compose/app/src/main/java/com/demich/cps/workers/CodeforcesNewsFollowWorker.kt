@@ -41,16 +41,20 @@ class CodeforcesNewsFollowWorker(
         val notificationManagerCompat = NotificationManagerCompat.from(context)
 
         val savedHandles = dao.getHandles().shuffled()
+
+        var progressInfo = ProgressBarInfo(total = savedHandles.size)
+        setProgressInfo(progressInfo)
+
         savedHandles.forEachIndexed { index, handle ->
             if (dao.getAndReloadBlogEntries(handle, context) == null) return Result.retry()
 
-            val progressDone = index + 1
+            progressInfo++
 
             progressNotificationBuilder()
-                .setProgress(savedHandles.size, progressDone, false)
+                .setProgress(progressInfo)
                 .notifyBy(notificationManagerCompat, NotificationIds.codeforces_follow_progress)
 
-            setProgressInfo(ProgressBarInfo(total = savedHandles.size, current = progressDone))
+            setProgressInfo(progressInfo)
         }
 
         return Result.success()
