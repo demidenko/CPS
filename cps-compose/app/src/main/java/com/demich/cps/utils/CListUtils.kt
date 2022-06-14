@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 object CListUtils {
     fun getManager(resource: String, userName: String, link: String): Pair<AccountManagers, String>? {
-        return when(resource) {
+        return when (resource) {
             "codeforces.com" -> AccountManagers.codeforces to userName
             "atcoder.jp" -> AccountManagers.atcoder to userName
             "codechef.com" -> AccountManagers.codechef to userName
@@ -22,7 +22,7 @@ object CListUtils {
     }
 
     fun getClistApiResourceId(platform: Contest.Platform): Int =
-        when(platform) {
+        when (platform) {
             Contest.Platform.unknown -> throw IllegalArgumentException("unknown not allowed")
             Contest.Platform.codeforces -> 1
             Contest.Platform.atcoder -> 93
@@ -78,7 +78,7 @@ object CListApi {
             }
         }
         if (resourceIds.isEmpty()) return emptyList()
-        return client.getAs<ClistApiResponse<ClistContest>>("https://clist.by/api/v2/contest") {
+        return client.getAs<ClistApiResponse<ClistContest>>("${urls.api}/contest") {
             parameter("format", "json")
             parameter("username", apiAccess.login)
             parameter("api_key", apiAccess.key)
@@ -91,7 +91,7 @@ object CListApi {
     suspend fun getResources(
         apiAccess: ApiAccess
     ): List<ClistResource> {
-        return client.getAs<ClistApiResponse<ClistResource>>(urlString = "https://clist.by/api/v2/resource") {
+        return client.getAs<ClistApiResponse<ClistResource>>(urlString = "${urls.api}/resource") {
             parameter("format", "json")
             parameter("username", apiAccess.login)
             parameter("api_key", apiAccess.key)
@@ -103,7 +103,8 @@ object CListApi {
         const val main = "https://clist.by"
         fun user(login: String) = "$main/coder/$login"
 
-        val apiHelp get() = "$main/api/v2/doc/"
+        const val api = "$main/api/v2"
+        val apiHelp get() = "$api/doc/"
     }
 
     @Serializable

@@ -2,8 +2,6 @@ package com.demich.cps.utils
 
 import com.demich.cps.accounts.managers.RatingChange
 import io.ktor.client.request.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -11,22 +9,14 @@ import kotlinx.serialization.decodeFromString
 object AtCoderApi {
     private val client = cpsHttpClient(json = false) { }
 
-    private suspend fun makeWEBCall(block: suspend () -> String): String {
-        return kotlin.runCatching {
-            withContext(Dispatchers.IO) {
-                block()
-            }
-        }.getOrThrow()
-    }
-
-    suspend fun getUserPage(handle: String): String = makeWEBCall {
-        client.getText(urlString = urls.user(handle)) {
+    suspend fun getUserPage(handle: String): String  {
+        return client.getText(urlString = urls.user(handle)) {
             parameter("graph", "rating")
         }
     }
 
-    suspend fun getContestsPage(): String = makeWEBCall {
-        client.getText(urlString = urls.main + "/contests")
+    suspend fun getContestsPage(): String {
+        return client.getText(urlString = urls.main + "/contests")
     }
 
     suspend fun getRatingChanges(handle: String): List<AtCoderRatingChange> {

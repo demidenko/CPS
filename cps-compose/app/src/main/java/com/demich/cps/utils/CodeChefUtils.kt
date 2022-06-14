@@ -24,12 +24,14 @@ object CodeChefApi {
                 if (exception !is ResponseException) return@handleResponseExceptionWithRequest
                 val response = exception.response
                 val text = response.bodyAsText()
-                if (response.status == HttpStatusCode.fromValue(403) && text == "{\"status\":\"apierror\",\"message\":\"Something went wrong\"}") {
+                if (response.status == HttpStatusCode.fromValue(403) && text == somethingWentWrongMessage) {
                     throw CodeChefCSRFTokenExpiredException()
                 }
             }
         }
     }
+
+    private val somethingWentWrongMessage get() = "{\"status\":\"apierror\",\"message\":\"Something went wrong\"}"
 
     private class CodeChefCSRFTokenExpiredException: Throwable()
 

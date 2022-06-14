@@ -1,6 +1,7 @@
 package com.demich.cps.utils
 
 import com.demich.cps.accounts.managers.RatingChange
+import io.ktor.client.request.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -13,24 +14,28 @@ object DmojApi {
     private val client = cpsHttpClient { }
 
     suspend fun getUser(handle: String): DmojUserResult {
-        val str = client.getText(urls.main + "/api/v2/user/$handle")
+        val str = client.getText(urlString = "${urls.main}/api/v2/user/$handle")
         val json = Json.parseToJsonElement(str).jsonObject
         val obj = json["data"]!!.jsonObject["object"]!!
         return jsonCPS.decodeFromJsonElement(obj)
     }
 
     suspend fun getUserPage(handle: String): String {
-        return client.getText(urls.main + "/user/$handle")
+        return client.getText(urlString = "${urls.main}/user/$handle")
     }
 
-    suspend fun getSuggestions(query: String): List<DmojSuggestion> {
-        val str = client.getText(urls.main + "/widgets/select2/user_search?term=$query&_type=query&q=$query")
-        val json = Json.parseToJsonElement(str).jsonObject
+    suspend fun getSuggestions(str: String): List<DmojSuggestion> {
+        val src = client.getText(urlString = "${urls.main}/widgets/select2/user_search") {
+            parameter("_type", "query")
+            parameter("term", str)
+            parameter("q", str)
+        }
+        val json = Json.parseToJsonElement(src).jsonObject
         return jsonCPS.decodeFromJsonElement(json["results"]!!.jsonArray)
     }
 
     suspend fun getContests(): List<DmojContest> {
-        val str = client.getText(urls.main + "/api/v2/contests")
+        val str = client.getText(urlString = "${urls.main}/api/v2/contests")
         val json = Json.parseToJsonElement(str).jsonObject
         val obj = json["data"]!!.jsonObject["objects"]!!
         return jsonCPS.decodeFromJsonElement(obj)

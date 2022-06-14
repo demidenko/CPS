@@ -68,7 +68,7 @@ class DmojAccountManager(context: Context):
     }
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
-        return DmojApi.getSuggestions(query = str).map {
+        return DmojApi.getSuggestions(str).map {
             AccountSuggestion(title = it.text, userId = it.id)
         }
     }
