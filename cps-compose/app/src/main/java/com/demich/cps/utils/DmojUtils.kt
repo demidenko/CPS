@@ -1,6 +1,9 @@
 package com.demich.cps.utils
 
+import com.demich.cps.accounts.managers.RatingChange
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonArray
@@ -33,6 +36,15 @@ object DmojApi {
         return jsonCPS.decodeFromJsonElement(obj)
     }
 
+    suspend fun getRatingChanges(handle: String): List<DmojRatingChange> {
+        val s = getUserPage(handle = handle)
+        val i = s.indexOf("var rating_history = [")
+        if (i == -1) return emptyList()
+        val j = s.indexOf("];", i)
+        val str = s.substring(s.indexOf('[', i), j+1)
+        return jsonCPS.decodeFromString(str)
+    }
+
     object urls {
         const val main = "https://dmoj.ca"
         fun user(username: String) = "$main/user/$username"
@@ -59,7 +71,15 @@ data class DmojRatingChange(
     val ranking: Int,
     val link: String,
     val timestamp: Double
-)
+) {
+    fun toRatingChange() =
+        RatingChange(
+            rating = rating,
+            date = Instant.fromEpochMilliseconds(timestamp.toLong()),
+            title = label,
+            rank = ranking
+        )
+}
 
 @Serializable
 data class DmojContest(

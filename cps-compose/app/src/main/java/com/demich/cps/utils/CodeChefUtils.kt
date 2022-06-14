@@ -1,5 +1,6 @@
 package com.demich.cps.utils
 
+import com.demich.cps.accounts.managers.RatingChange
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.request.*
@@ -7,7 +8,9 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 
 object CodeChefApi {
     private val client = cpsHttpClient {
@@ -86,6 +89,14 @@ object CodeChefApi {
         }
     }
 
+    suspend fun getRatingChanges(handle: String): List<CodeChefRatingChange> {
+        val s = getUserPage(handle = handle)
+        val i = s.indexOf("var all_rating = ")
+        if (i == -1) return emptyList()
+        val ar = s.substring(s.indexOf("[", i), s.indexOf("];", i) + 1)
+        return jsonCPS.decodeFromString(ar)
+    }
+
     object urls {
         const val main = "https://www.codechef.com"
         fun user(username: String) = "$main/users/$username"
@@ -112,4 +123,12 @@ data class CodeChefRatingChange(
     val rating: String,
     val rank: String,
     val end_date: String
-)
+) {
+    fun toRatingChange() =
+        RatingChange(
+            rating = rating.toInt(),
+            rank = rank.toInt(),
+            title = name,
+            date = Instant.parse(end_date.split(' ').run { "${get(0)}T${get(1)}Z" })
+        )
+}

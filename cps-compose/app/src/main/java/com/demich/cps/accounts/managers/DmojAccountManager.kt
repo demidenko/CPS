@@ -19,12 +19,9 @@ import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.utils.DmojApi
 import com.demich.cps.utils.DmojRatingChange
 import com.demich.cps.utils.append
-import com.demich.cps.utils.jsonCPS
 import io.ktor.client.plugins.*
 import io.ktor.http.*
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 
 @Serializable
 data class DmojUserInfo(
@@ -80,21 +77,9 @@ class DmojAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadRatingHistory(info: DmojUserInfo): List<RatingChange> {
-        val s = DmojApi.getUserPage(handle = info.handle)
-        val i = s.indexOf("var rating_history = [")
-        if (i == -1) return emptyList()
-        val j = s.indexOf("];", i)
-        val str = s.substring(s.indexOf('[', i), j+1)
-        return jsonCPS.decodeFromString<List<DmojRatingChange>>(str).map {
-            RatingChange(
-                rating = it.rating,
-                date = Instant.fromEpochMilliseconds(it.timestamp.toLong()),
-                title = it.label,
-                rank = it.ranking
-            )
-        }
-    }
+    override suspend fun loadRatingHistory(info: DmojUserInfo): List<RatingChange>
+        = DmojApi.getRatingChanges(handle = info.handle)
+            .map(DmojRatingChange::toRatingChange)
 
     override val ratingsUpperBounds = arrayOf(
         HandleColor.GRAY to 1000,

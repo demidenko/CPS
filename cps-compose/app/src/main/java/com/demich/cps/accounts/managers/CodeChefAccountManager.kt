@@ -28,18 +28,11 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CodeChefApi
 import com.demich.cps.utils.CodeChefRatingChange
 import com.demich.cps.utils.append
-import com.demich.cps.utils.jsonCPS
 import io.ktor.client.plugins.*
 import io.ktor.http.*
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import org.jsoup.Jsoup
 import kotlin.text.contains
-import kotlin.text.indexOf
-import kotlin.text.split
-import kotlin.text.substring
-import kotlin.text.toInt
 
 @Serializable
 data class CodeChefUserInfo(
@@ -107,20 +100,9 @@ class CodeChefAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadRatingHistory(info: CodeChefUserInfo): List<RatingChange> {
-        val s = CodeChefApi.getUserPage(handle = info.handle)
-        val i = s.indexOf("var all_rating = ")
-        if (i == -1) return emptyList()
-        val ar = s.substring(s.indexOf("[", i), s.indexOf("];", i) + 1)
-        return jsonCPS.decodeFromString<List<CodeChefRatingChange>>(ar).map {
-            RatingChange(
-                rating = it.rating.toInt(),
-                rank = it.rank.toInt(),
-                title = it.name,
-                date = Instant.parse(it.end_date.split(' ').run { "${get(0)}T${get(1)}Z" })
-            )
-        }
-    }
+    override suspend fun loadRatingHistory(info: CodeChefUserInfo): List<RatingChange> =
+        CodeChefApi.getRatingChanges(handle = info.handle)
+            .map(CodeChefRatingChange::toRatingChange)
 
     override val ratingsUpperBounds = arrayOf(
         HandleColor.GRAY to 1400,
