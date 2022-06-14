@@ -41,6 +41,18 @@ abstract class CPSWorker(
         ))
     }
 
+    protected suspend inline fun<reified T> List<T>.forEachWithProgress(
+        action: (T) -> Unit
+    ) {
+        var progressInfo = ProgressBarInfo(total = size)
+        setProgressInfo(progressInfo)
+        forEach {
+            action(it)
+            progressInfo++
+            setProgressInfo(progressInfo)
+        }
+    }
+
 }
 
 private val KEY_PROGRESS get() = "cpsworker_progress"

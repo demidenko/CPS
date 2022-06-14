@@ -51,7 +51,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
 
         ratingChanges
             .filter { it.ratingUpdateTime > deadLine }
-            .forEach { ratingChange ->
+            .forEachWithProgress { ratingChange ->
                 val contestId = ratingChange.contestId
                 val data = asyncPair(
                     getFirst = {

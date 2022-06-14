@@ -122,31 +122,31 @@ class CodeforcesNewsLostRecentWorker(
             }.first
 
         //catch new suspects from recent actions
-        for (blogEntry in recentBlogEntries) {
-            if (blogEntry.authorColorTag < minRatingColorTag) continue
-            if (suspects.any { it.id == blogEntry.id }) continue
+        recentBlogEntries
+            .filter { it.authorColorTag >= minRatingColorTag }
+            .filter { blogEntry -> suspects.none { it.id == blogEntry.id } }
+            .forEachWithProgress { blogEntry ->
+                val creationTime = CodeforcesApi.runCatching {
+                    getBlogEntry(
+                        blogEntryId = blogEntry.id,
+                        locale = locale
+                    ).creationTime
+                }.getOrNull() ?: return@forEachWithProgress //TODO: set distant_future and try to know later?
 
-            val creationTime = CodeforcesApi.runCatching {
-                getBlogEntry(
-                    blogEntryId = blogEntry.id,
-                    locale = locale
-                ).creationTime
-            }.getOrNull() ?: continue //TODO: set distant_future and try to know later?
-
-            if (isNew(creationTime)) {
-                dao.insert(
-                    CodeforcesLostBlogEntry(
-                        id = blogEntry.id,
-                        title = blogEntry.title,
-                        authorHandle = blogEntry.authorHandle,
-                        authorColorTag = blogEntry.authorColorTag,
-                        creationTime = creationTime,
-                        isSuspect = true,
-                        timeStamp = Instant.DISTANT_PAST
+                if (isNew(creationTime)) {
+                    dao.insert(
+                        CodeforcesLostBlogEntry(
+                            id = blogEntry.id,
+                            title = blogEntry.title,
+                            authorHandle = blogEntry.authorHandle,
+                            authorColorTag = blogEntry.authorColorTag,
+                            creationTime = creationTime,
+                            isSuspect = true,
+                            timeStamp = Instant.DISTANT_PAST
+                        )
                     )
-                )
+                }
             }
-        }
 
         val recentIds = recentBlogEntries.map { it.id }.toSet()
 

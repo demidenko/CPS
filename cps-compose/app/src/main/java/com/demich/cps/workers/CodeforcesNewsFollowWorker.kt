@@ -42,19 +42,13 @@ class CodeforcesNewsFollowWorker(
 
         val savedHandles = dao.getHandles().shuffled()
 
-        var progressInfo = ProgressBarInfo(total = savedHandles.size)
-        setProgressInfo(progressInfo)
-
-        savedHandles.forEachIndexed { index, handle ->
+        var done = 0
+        savedHandles.forEachWithProgress { handle ->
             if (dao.getAndReloadBlogEntries(handle, context) == null) return Result.retry()
-
-            progressInfo++
-
+            ++done
             progressNotificationBuilder()
-                .setProgress(progressInfo)
+                .setProgress(ProgressBarInfo(total = savedHandles.size, current = done))
                 .notifyBy(notificationManagerCompat, NotificationIds.codeforces_follow_progress)
-
-            setProgressInfo(progressInfo)
         }
 
         return Result.success()
