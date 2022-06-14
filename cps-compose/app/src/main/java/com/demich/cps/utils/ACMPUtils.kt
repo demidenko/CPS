@@ -1,8 +1,9 @@
 package com.demich.cps.utils
 
-import io.ktor.client.call.*
+import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
@@ -17,16 +18,24 @@ object ACMPApi {
 
     class ACMPPageNotFoundException : Throwable()
 
+    //TODO: ktor can't get charset from client
+    private suspend fun HttpResponse.bodyAsText() = bodyAsText(fallbackCharset = windows1251)
+
+    //TODO: this function is copy of top level
+    private suspend inline fun HttpClient.getText(
+        urlString: String,
+        block: HttpRequestBuilder.() -> Unit = {}
+    ): String = this.get(urlString = urlString, block = block).bodyAsText()
+
     suspend fun getMainPage(): String {
         return client.getText(urls.main)
     }
 
     suspend fun getUserPage(id: Int): String {
-        val response = client.get(urls.user(id))
-        with(response.call) {
+        with(client.get(urls.user(id))) {
             //acmp redirects to main page if user not found
             if (request.url.parameters.isEmpty()) throw ACMPPageNotFoundException()
-            return body()
+            return bodyAsText()
         }
     }
 
