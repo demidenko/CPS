@@ -77,15 +77,10 @@ class CListAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
-        try {
-            val s = CListApi.getUsersSearchPage(str)
-            return Jsoup.parse(s).select("td.username").map {
-                val login = it.text()
-                AccountSuggestion(title = login, userId = login)
-            }
-        } catch (e: Throwable) {
-            return null
+    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
+        val s = CListApi.getUsersSearchPage(str)
+        return Jsoup.parse(s).select("td.username").map {
+            AccountSuggestion(userId = it.text())
         }
     }
 

@@ -86,17 +86,12 @@ class CodeChefAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
-        try {
-            return CodeChefApi.getSuggestions(str).list.map {
-                AccountSuggestion(
-                    title = it.username,
-                    info = it.rating.toString(),
-                    userId = it.username
-                )
-            }
-        } catch (e: Throwable) {
-            return null
+    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
+        return CodeChefApi.getSuggestions(str).list.map {
+            AccountSuggestion(
+                userId = it.username,
+                info = it.rating.toString()
+            )
         }
     }
 

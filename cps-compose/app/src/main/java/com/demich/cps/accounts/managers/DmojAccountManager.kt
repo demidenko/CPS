@@ -67,13 +67,9 @@ class DmojAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
-        try {
-            return DmojApi.getSuggestions(query = str).map {
-                AccountSuggestion(title = it.text, userId = it.id)
-            }
-        } catch (e: Throwable) {
-            return null
+    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
+        return DmojApi.getSuggestions(query = str).map {
+            AccountSuggestion(title = it.text, userId = it.id)
         }
     }
 

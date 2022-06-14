@@ -73,24 +73,20 @@ class ACMPAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
+    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
-        try {
-            val s = ACMPApi.getUsersSearch(str)
-            return Jsoup.parse(s).selectFirst("table.main")?.select("tr.white")?.mapNotNull { row ->
-                val cols = row.select("td")
-                val userId = cols[1].selectFirst("a")?.attr("href")
-                    ?.removePrefix("/?main=user&id=") ?: return@mapNotNull null
-                val userName = cols[1].text()
-                val tasks = cols[3].text()
-                AccountSuggestion(
-                    title = userName,
-                    userId = userId,
-                    info = tasks
-                )
-            }
-        } catch (e: Throwable) {
-            return null
+        val s = ACMPApi.getUsersSearch(str)
+        return Jsoup.parse(s).selectFirst("table.main")!!.select("tr.white").mapNotNull { row ->
+            val cols = row.select("td")
+            val userId = cols[1].selectFirst("a")!!
+                .attr("href").removePrefix("/?main=user&id=")
+            val userName = cols[1].text()
+            val tasks = cols[3].text()
+            AccountSuggestion(
+                userId = userId,
+                title = userName,
+                info = tasks
+            )
         }
     }
 

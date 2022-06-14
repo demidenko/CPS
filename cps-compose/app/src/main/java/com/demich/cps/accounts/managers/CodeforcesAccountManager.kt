@@ -100,9 +100,9 @@ class CodeforcesAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion>? {
-        val s = CodeforcesApi.getHandleSuggestions(str) ?: return null
+    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
         return withContext(Dispatchers.IO) {
+            val s = CodeforcesApi.getHandleSuggestions(str)!!
             buildList {
                 s.splitToSequence('\n').filter { !it.contains('=') }.forEach {
                     val i = it.indexOf('|')
@@ -111,7 +111,7 @@ class CodeforcesAccountManager(context: Context):
                         add(AccountSuggestion(title = handle, userId = handle))
                     }
                 }
-            }
+            }.reversed()
         }
     }
 

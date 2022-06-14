@@ -136,11 +136,11 @@ fun<U: UserInfo> DialogAccountChooser(
                 if (!blockSuggestionsReload) {
                     launch(Dispatchers.IO) {
                         loadingSuggestionsInProgress = true
-                        val result = manager.loadSuggestions(userId)
+                        val result = manager.runCatching { loadSuggestions(userId) }
                         loadingSuggestionsInProgress = false
                         if (isActive) { //Because of "StandaloneCoroutine was cancelled" exception during cancelling LaunchedEffect
-                            suggestionsList = result ?: emptyList()
-                            suggestionsLoadError = result == null
+                            suggestionsList = result.getOrDefault(emptyList())
+                            suggestionsLoadError = result.isFailure
                         }
                     }
                 } else {

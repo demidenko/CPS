@@ -99,13 +99,13 @@ data class UserInfoWithManager<U: UserInfo>(
 }
 
 data class AccountSuggestion(
-    val title: String,
     val userId: String,
+    val title: String = userId,
     val info: String = ""
 )
 
 interface AccountSuggestionsProvider {
-    suspend fun loadSuggestions(str: String): List<AccountSuggestion>? = null
+    suspend fun loadSuggestions(str: String): List<AccountSuggestion>
     fun isValidForSearch(char: Char): Boolean = true
 }
 
