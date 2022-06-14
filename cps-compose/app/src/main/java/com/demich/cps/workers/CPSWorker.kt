@@ -3,7 +3,10 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.work.CoroutineWorker
+import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
+import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.getCurrentTime
@@ -31,6 +34,21 @@ abstract class CPSWorker(
 
     abstract suspend fun runWork(): Result
 
+    protected suspend fun setProgressInfo(progressInfo: ProgressBarInfo) {
+        setProgress(workDataOf(
+            KEY_PROGRESS to arrayOf(progressInfo.current, progressInfo.total)
+        ))
+    }
+
+}
+
+private val KEY_PROGRESS get() = "cpsworker_progress"
+fun WorkInfo.getProgressInfo(): ProgressBarInfo? {
+    val arr = progress.getIntArray(KEY_PROGRESS)?.takeIf { it.size == 2 } ?: return null
+    return ProgressBarInfo(
+        current = arr[0],
+        total = arr[1]
+    )
 }
 
 

@@ -2,10 +2,7 @@ package com.demich.cps
 
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
@@ -25,13 +22,12 @@ import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatedUserInfo
 import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.ui.*
+import com.demich.cps.ui.bottomprogressbar.LinearProgressIndicatorRounded
+import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
-import com.demich.cps.workers.CPSWork
-import com.demich.cps.workers.CPSWorkersDataStore
-import com.demich.cps.workers.getCPSWorks
-import com.demich.cps.workers.workInfoState
+import com.demich.cps.workers.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -193,6 +189,7 @@ private fun WorkerItem(
     WorkerItem(
         name = work.name,
         workState = workState?.state,
+        progressInfo = workState?.takeIf { it.state == WorkInfo.State.RUNNING }?.getProgressInfo(),
         lastRunTimeAgo = lastExecutionTime?.let {
             timeAgo(fromTime = it, toTime = LocalCurrentTime.current)
         } ?: "never",
@@ -204,6 +201,7 @@ private fun WorkerItem(
 private fun WorkerItem(
     name: String,
     workState: WorkInfo.State?,
+    progressInfo: ProgressBarInfo?,
     lastRunTimeAgo: String,
     modifier: Modifier = Modifier
 ) {
@@ -224,17 +222,30 @@ private fun WorkerItem(
             )
         }
 
-        Text(
-            text = workState?.name ?: "???",
-            modifier = Modifier.padding(start = 8.dp),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = when (workState) {
-                WorkInfo.State.ENQUEUED, WorkInfo.State.FAILED, WorkInfo.State.SUCCEEDED -> cpsColors.content
-                WorkInfo.State.RUNNING -> cpsColors.success
-                WorkInfo.State.BLOCKED -> cpsColors.error
-                WorkInfo.State.CANCELLED, null -> cpsColors.contentAdditional
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .width(IntrinsicSize.Min)
+        ) {
+            Text(
+                text = workState?.name ?: "???",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = when (workState) {
+                    WorkInfo.State.ENQUEUED, WorkInfo.State.FAILED, WorkInfo.State.SUCCEEDED -> cpsColors.content
+                    WorkInfo.State.RUNNING -> cpsColors.success
+                    WorkInfo.State.BLOCKED -> cpsColors.error
+                    WorkInfo.State.CANCELLED, null -> cpsColors.contentAdditional
+                }
+            )
+            if (progressInfo != null) {
+                LinearProgressIndicatorRounded(
+                    progress = progressInfo.fraction,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 2.dp)
+                )
             }
-        )
+        }
     }
 }

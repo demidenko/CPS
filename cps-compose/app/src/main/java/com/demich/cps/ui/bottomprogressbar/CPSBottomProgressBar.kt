@@ -87,7 +87,6 @@ fun LinearProgressIndicatorRounded(
     Canvas(
         modifier = modifier
             .height(4.dp)
-            .width(240.dp)
     ) {
         drawRoundRect(
             color = backgroundColor,
