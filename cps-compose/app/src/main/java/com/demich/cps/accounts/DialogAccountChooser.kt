@@ -134,8 +134,8 @@ fun<U: UserInfo> DialogAccountChooser(
             }
             if (manager is AccountSuggestionsProvider && userId.length >= suggestionTextLimit) {
                 if (!blockSuggestionsReload) {
+                    loadingSuggestionsInProgress = true
                     launch(Dispatchers.IO) {
-                        loadingSuggestionsInProgress = true
                         val result = manager.runCatching { loadSuggestions(userId) }
                         loadingSuggestionsInProgress = false
                         if (isActive) { //Because of "StandaloneCoroutine was cancelled" exception during cancelling LaunchedEffect

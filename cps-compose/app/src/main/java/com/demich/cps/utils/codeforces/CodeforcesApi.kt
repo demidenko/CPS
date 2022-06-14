@@ -136,7 +136,7 @@ object CodeforcesApi {
         }
     }
 
-    suspend fun getHandleSuggestions(str: String): String? {
+    suspend fun getHandleSuggestionsPage(str: String): String? {
         return getCodeforcesWeb(urlString = "${urls.main}/data/handles") {
             parameter("q", str)
         }
