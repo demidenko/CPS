@@ -18,9 +18,8 @@ import kotlinx.coroutines.launch
 
 class ContestsViewModel: ViewModel() {
 
-    val loadingStatusState: State<LoadingStatus>
-        @Composable
-        get() = remember {
+    @Composable
+    fun rememberLoadingStatusState(): State<LoadingStatus> = remember {
             Contest.platforms
                 .map { mutableLoadingStatusFor(platform = it) }
                 .combine()

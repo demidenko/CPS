@@ -48,6 +48,25 @@ fun IconSp(
 }
 
 @Composable
+private fun CPSIcon(
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    color: Color,
+    onState: Boolean = true
+) {
+    val alpha by animateFloatAsState(
+        targetValue = if (onState) 1f else ContentAlpha.disabled,
+        animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis)
+    )
+    Icon(
+        imageVector = icon,
+        tint = color,
+        contentDescription = null,
+        modifier = modifier.alpha(alpha)
+    )
+}
+
+@Composable
 fun CPSIconButton(
     icon: ImageVector,
     modifier: Modifier = Modifier,
@@ -56,22 +75,16 @@ fun CPSIconButton(
     onState: Boolean = enabled,
     onClick: () -> Unit
 ) {
-    val alpha by animateFloatAsState(
-        targetValue = if (onState) 1f else ContentAlpha.disabled,
-        animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis)
-    )
     IconButton(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier
     ) {
-        Icon(
-            imageVector = icon,
-            tint = color,
-            contentDescription = null,
-            modifier = Modifier
-                .size(26.dp)
-                .alpha(alpha)
+        CPSIcon(
+            icon = icon,
+            color = color,
+            onState = onState,
+            modifier = Modifier.size(26.dp)
         )
     }
 }
@@ -81,10 +94,11 @@ fun CPSIconButton(
 fun CPSReloadingButton(
     loadingStatus: LoadingStatus,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     IconButton(
-        enabled = loadingStatus != LoadingStatus.LOADING,
+        enabled = enabled && loadingStatus != LoadingStatus.LOADING,
         modifier = modifier,
         onClick = onClick
     ) {
@@ -95,10 +109,10 @@ fun CPSReloadingButton(
                 strokeWidth = 2.dp
             )
         } else {
-            Icon(
-                imageVector = CPSIcons.Reload,
-                tint = if (loadingStatus == LoadingStatus.FAILED) cpsColors.error else cpsColors.content,
-                contentDescription = null,
+            CPSIcon(
+                icon = CPSIcons.Reload,
+                color = if (loadingStatus == LoadingStatus.FAILED) cpsColors.error else cpsColors.content,
+                onState = enabled,
                 modifier = Modifier.size(28.dp)
             )
         }

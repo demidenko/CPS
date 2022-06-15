@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -29,6 +28,7 @@ import com.demich.cps.utils.*
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -52,6 +52,11 @@ fun ContestsScreen(
             modifier = Modifier.weight(1f, false)
         )
     }
+
+    val context = context
+    LaunchedEffect(Unit) {
+        contestsViewModel.syncEnabledAndLastReloaded(context)
+    }
 }
 
 @Composable
@@ -70,7 +75,7 @@ private fun ContestsContent(
     }
 
     val errorsList by contestsViewModel.getErrorsListState()
-    val loadingStatus by contestsViewModel.loadingStatusState
+    val loadingStatus by contestsViewModel.rememberLoadingStatusState()
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
@@ -90,10 +95,6 @@ private fun ContestsContent(
                     .fillMaxSize()
             )
         }
-    }
-
-    LaunchedEffect(Unit) {
-        contestsViewModel.syncEnabledAndLastReloaded(context)
     }
 }
 
@@ -246,10 +247,12 @@ fun contestsMenuBuilder(
     navigator: CPSNavigator,
     contestsViewModel: ContestsViewModel
 ): CPSMenuBuilder = {
+    val loadingStatus by contestsViewModel.rememberLoadingStatusState()
+    
     CPSDropdownMenuItem(
         title = "Settings",
         icon = CPSIcons.Settings,
-        enabled = contestsViewModel.loadingStatusState.value != LoadingStatus.LOADING
+        enabled = loadingStatus != LoadingStatus.LOADING
     ) {
         navigator.navigateTo(Screen.ContestsSettings)
     }
@@ -260,8 +263,10 @@ fun contestsBottomBarBuilder(
     filterController: ContestsFilterController
 ): AdditionalBottomBarBuilder = {
     val context = context
+    val loadingStatus by contestsViewModel.rememberLoadingStatusState()
+    val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
 
-    if (filterController.available) {
+    if (isAnyPlatformEnabled && filterController.available) {
         CPSIconButton(
             icon = CPSIcons.Search,
             onClick = { filterController.enabled = true }
@@ -269,7 +274,22 @@ fun contestsBottomBarBuilder(
     }
 
     CPSReloadingButton(
-        loadingStatus = contestsViewModel.loadingStatusState.value,
+        loadingStatus = loadingStatus,
+        enabled = isAnyPlatformEnabled,
         onClick = { contestsViewModel.reloadEnabledPlatforms(context) }
     )
+}
+
+@Composable
+private fun rememberIsAnyPlatformEnabled(): State<Boolean> {
+    val context = context
+    return rememberCollect {
+        val settings = context.settingsContests
+        combine(
+            flow = settings.enabledPlatforms.flow.map { it.count { it != Contest.Platform.unknown } },
+            flow2 = settings.clistAdditionalResources.flow.map { it.size }
+        ) { size1, size2 ->
+            size1 > 0 || size2 > 0
+        }
+    }
 }
