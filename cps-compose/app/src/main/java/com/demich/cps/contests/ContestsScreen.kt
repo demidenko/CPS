@@ -21,8 +21,8 @@ import com.demich.cps.Screen
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.contests.loaders.makeCombinedMessage
 import com.demich.cps.contests.settings.settingsContests
+import com.demich.cps.develop.settingsDev
 import com.demich.cps.room.contestsListDao
-import com.demich.cps.settingsDev
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
