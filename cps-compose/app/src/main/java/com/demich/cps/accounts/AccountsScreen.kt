@@ -38,18 +38,7 @@ fun AccountsScreen(
     onSetAdditionalMenu: (CPSMenuBuilder) -> Unit,
     reorderEnabledState: MutableState<Boolean>
 ) {
-    val context = context
-
-    val recordedAccounts by rememberCollect {
-        combine(
-            flows = context.allAccountManagers
-                .map { it.flowOfInfoWithManager() }
-        ) { it }.combine(context.settingsUI.flowOfAccountsOrder()) { accountsArray, order ->
-            order.mapNotNull { type ->
-                accountsArray.find { it.type == type }?.takeIf { !it.userInfo.isEmpty() }
-            }
-        }
-    }
+    val recordedAccounts by rememberRecorderAccounts()
 
     val visibleOrder by remember {
         derivedStateOf { if (reorderEnabledState.value) recordedAccounts.map { it.type } else null }
@@ -87,6 +76,20 @@ fun AccountsScreen(
         }
     }
 
+}
+
+@Composable
+private fun rememberRecorderAccounts() = with(context) {
+    rememberCollect {
+        combine(
+            flows = allAccountManagers
+                .map { it.flowOfInfoWithManager() }
+        ) { it }.combine(settingsUI.flowOfAccountsOrder()) { accountsArray, order ->
+            order.mapNotNull { type ->
+                accountsArray.find { it.type == type }?.takeIf { !it.userInfo.isEmpty() }
+            }
+        }
+    }
 }
 
 @Composable
@@ -202,13 +205,19 @@ fun accountsBottomBarBuilder(
 @Composable
 private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
     val context = context
-    val combinedStatus by remember {
+
+    val loadingStatus by remember(accountsViewModel) {
         context.allAccountManagers
             .map { accountsViewModel.loadingStatusFor(it) }
             .combine()
     }
 
-    CPSReloadingButton(loadingStatus = combinedStatus) {
+    val recordedAccounts by rememberRecorderAccounts()
+
+    CPSReloadingButton(
+        loadingStatus = loadingStatus,
+        enabled = recordedAccounts.isNotEmpty()
+    ) {
         context.allAccountManagers.forEach { accountsViewModel.reload(it) }
     }
 }
