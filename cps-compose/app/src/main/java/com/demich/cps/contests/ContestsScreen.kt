@@ -306,7 +306,7 @@ private fun rememberIsAnyPlatformEnabled(): State<Boolean> {
 private fun NoneEnabledMessage(modifier: Modifier = Modifier) {
     EmptyMessageBox(modifier = modifier) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Platforms are not enabled")
+            Text("Platforms are not selected")
             Row(
                 modifier = Modifier.padding(top = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)

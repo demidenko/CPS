@@ -62,7 +62,7 @@ fun AccountsScreen(
         itemsNotEmpty(
             items = recordedAccounts,
             key = { it.type },
-            onEmptyMessage = { Text(text = "Accounts is not defined") }
+            onEmptyMessage = { Text(text = "Accounts are not defined") }
         ) { userInfoWithManager ->
             PanelWithUI(
                 userInfoWithManager = userInfoWithManager,
