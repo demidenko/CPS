@@ -29,7 +29,7 @@ enum class CodeforcesTitle {
     MAIN, TOP, RECENT, LOST
 }
 
-val LocalCodeforcesAccountManager = compositionLocalOf<CodeforcesAccountManager> {
+val LocalCodeforcesAccountManager = staticCompositionLocalOf<CodeforcesAccountManager> {
     throw IllegalAccessException()
 }
 
@@ -77,14 +77,8 @@ private fun CodeforcesPager(
     controller: CodeforcesNewsController,
     modifier: Modifier = Modifier
 ) {
-    val context = context
-    val manager = remember { CodeforcesAccountManager(context) }
-
     val currentTime by collectCurrentTimeEachMinute()
-    CompositionLocalProvider(
-        LocalCodeforcesAccountManager provides manager,
-        LocalCurrentTime provides currentTime
-    ) {
+    CompositionLocalProvider(LocalCurrentTime provides currentTime) {
         HorizontalPager(
             count = controller.tabs.size,
             state = controller.pagerState,

@@ -20,6 +20,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.demich.cps.accounts.*
+import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.*
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.develop.DevelopScreen
@@ -27,6 +28,7 @@ import com.demich.cps.develop.developAdditionalBottomBarBuilder
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.codeforces.CodeforcesBlogScreen
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
+import com.demich.cps.news.codeforces.LocalCodeforcesAccountManager
 import com.demich.cps.news.codeforces.rememberCodeforcesNewsController
 import com.demich.cps.news.follow.NewsFollowScreen
 import com.demich.cps.news.follow.newsFollowListBottomBarBuilder
@@ -40,6 +42,7 @@ import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.ui.rememberCPSNavigator
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
+import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.workers.enqueueEnabledWorkers
 
@@ -54,6 +57,7 @@ class MainActivity: ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
+            val context = context
             val cpsViewModels = CPSViewModels(
                 accountsViewModel = viewModel(),
                 newsViewModel = viewModel(),
@@ -64,7 +68,8 @@ class MainActivity: ComponentActivity() {
                 val useOriginalColors by rememberCollect { settingsUI.useOriginalColors.flow }
                 CompositionLocalProvider(
                     LocalUseOriginalColors provides useOriginalColors,
-                    LocalContentAlpha provides 1f
+                    LocalContentAlpha provides 1f,
+                    LocalCodeforcesAccountManager provides remember { CodeforcesAccountManager(context) }
                 ) {
                     CPSContent(cpsViewModels = cpsViewModels)
                 }
