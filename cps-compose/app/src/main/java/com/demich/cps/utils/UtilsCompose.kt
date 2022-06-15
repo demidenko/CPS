@@ -170,7 +170,6 @@ fun LazyListState.visibleRange(requiredVisiblePart: Float = 0.5f): IntRange {
     val firstVisibleItemIndex = firstVisibleItemIndex
     visibleItems.forEachIndexed { index, info -> require(info.index == firstVisibleItemIndex + index) }
 
-    //assume less 50% of visibility as not visible
     val firstVisible = firstVisibleItemIndex.let { index ->
         val item = visibleItems[0]
         val topHidden = (-item.offset).coerceAtLeast(0)
