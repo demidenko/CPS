@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.work.WorkInfo
@@ -62,7 +63,7 @@ private fun WorkerItem(
 
     WorkerItem(
         name = work.name,
-        workState = workState?.state,
+        workState = workState?.state ?: WorkInfo.State.CANCELLED,
         progressInfo = workState?.takeIf { it.state == WorkInfo.State.RUNNING }?.getProgressInfo(),
         lastRunTimeAgo = lastExecutionTime?.let {
             timeAgo(fromTime = it, toTime = LocalCurrentTime.current)
@@ -74,7 +75,7 @@ private fun WorkerItem(
 @Composable
 private fun WorkerItem(
     name: String,
-    workState: WorkInfo.State?,
+    workState: WorkInfo.State,
     progressInfo: ProgressBarInfo?,
     lastRunTimeAgo: String,
     modifier: Modifier = Modifier
@@ -86,7 +87,9 @@ private fun WorkerItem(
         Column(modifier = Modifier.weight(1f)) {
             MonospacedText(
                 text = name,
-                fontSize = 20.sp
+                fontSize = 18.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = "last run: $lastRunTimeAgo",
@@ -102,14 +105,14 @@ private fun WorkerItem(
                 .width(IntrinsicSize.Min)
         ) {
             Text(
-                text = workState?.name ?: "???",
-                fontSize = 20.sp,
+                text = workState.name,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = when (workState) {
                     WorkInfo.State.ENQUEUED, WorkInfo.State.FAILED, WorkInfo.State.SUCCEEDED -> cpsColors.content
                     WorkInfo.State.RUNNING -> cpsColors.success
                     WorkInfo.State.BLOCKED -> cpsColors.error
-                    WorkInfo.State.CANCELLED, null -> cpsColors.contentAdditional
+                    WorkInfo.State.CANCELLED -> cpsColors.contentAdditional
                 }
             )
             if (progressInfo != null) {
@@ -117,7 +120,7 @@ private fun WorkerItem(
                     progressBarInfo = progressInfo,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 2.dp)
+                        .padding(top = 3.dp)
                 )
             }
         }
