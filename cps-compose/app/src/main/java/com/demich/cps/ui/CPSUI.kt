@@ -3,7 +3,9 @@ package com.demich.cps.ui
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -11,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +21,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -210,7 +214,7 @@ fun EmptyListMessageBox(modifier: Modifier = Modifier) {
 
 inline fun <T> LazyListScope.itemsNotEmpty(
     items: List<T>,
-    onEmptyMessage: String = "List is empty",
+    noinline onEmptyMessage: @Composable () -> Unit = { Text(text = "List is empty") },
     noinline key: ((item: T) -> Any)? = null,
     noinline contentType: (item: T) -> Any? = { null },
     crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
@@ -221,11 +225,12 @@ inline fun <T> LazyListScope.itemsNotEmpty(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillParentMaxSize()
             ) {
-                Text(
-                    text = onEmptyMessage,
-                    color = cpsColors.contentAdditional,
-                    fontWeight = FontWeight.Medium
-                )
+                CompositionLocalProvider(LocalContentColor provides cpsColors.contentAdditional) {
+                    ProvideTextStyle(
+                        value = TextStyle(fontWeight = FontWeight.Medium),
+                        content = onEmptyMessage
+                    )
+                }
             }
         }
     } else {
