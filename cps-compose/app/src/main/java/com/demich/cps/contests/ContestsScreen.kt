@@ -139,7 +139,7 @@ private fun ContestsList(
 
     CompositionLocalProvider(
         LocalCurrentTime provides currentTime,
-        //TODO: remember lambda to not recreate it each second
+        //TODO: remember lambda to not recreate it each second, ProvideTimeEachSeconds doesn't helps
         content = remember(sortedState, filterController, modifier) {
             {
                 ContestsSortedList(

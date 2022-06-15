@@ -35,8 +35,7 @@ fun WorkersList(
         CPSWorkersDataStore(context).lastExecutionTime.flow
     }
 
-    val currentTime by collectCurrentTimeEachSecond()
-    CompositionLocalProvider(LocalCurrentTime provides currentTime) {
+    ProvideTimeEachSecond {
         LazyColumn(modifier = modifier) {
             items(items = works, key = { it.name }) { work ->
                 WorkerItem(
