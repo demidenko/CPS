@@ -77,8 +77,7 @@ private fun CodeforcesPager(
     controller: CodeforcesNewsController,
     modifier: Modifier = Modifier
 ) {
-    val currentTime by collectCurrentTimeEachMinute()
-    CompositionLocalProvider(LocalCurrentTime provides currentTime) {
+    ProvideTimeEachMinute {
         HorizontalPager(
             count = controller.tabs.size,
             state = controller.pagerState,

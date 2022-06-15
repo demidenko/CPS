@@ -32,8 +32,7 @@ fun NewsFollowScreen(
     newsViewModel: CodeforcesNewsViewModel
 ) {
     val context = context
-    val currentTime by collectCurrentTimeEachMinute()
-    CompositionLocalProvider(LocalCurrentTime provides currentTime,) {
+    ProvideTimeEachMinute {
         NewsFollowList(
             updateUserInfosInProgress = newsViewModel.followLoadingStatus == LoadingStatus.LOADING
         ) { handle ->

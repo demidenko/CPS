@@ -148,6 +148,18 @@ fun collectCurrentTimeEachMinute(): State<Instant> {
     }.collectAsStateLifecycleAware(initial = remember { getCurrentTime() })
 }
 
+@Composable
+fun ProvideTimeEachSecond(content: @Composable () -> Unit) {
+    val currentTime by collectCurrentTimeEachSecond()
+    CompositionLocalProvider(LocalCurrentTime provides currentTime, content = content)
+}
+
+@Composable
+fun ProvideTimeEachMinute(content: @Composable () -> Unit) {
+    val currentTime by collectCurrentTimeEachMinute()
+    CompositionLocalProvider(LocalCurrentTime provides currentTime, content = content)
+}
+
 
 fun LazyListState.visibleRange(requiredVisiblePart: Float = 0.5f): IntRange {
     require(requiredVisiblePart in 0f..1f)
