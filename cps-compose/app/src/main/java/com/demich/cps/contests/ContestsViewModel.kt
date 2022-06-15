@@ -58,7 +58,7 @@ class ContestsViewModel: ViewModel() {
         viewModelScope.launch {
             val settings = context.settingsContests
             val enabledPlatforms = settings.enabledPlatforms()
-            settings.lastReloadedPlatforms(newValue = emptySet())
+            settings.lastReloadedPlatforms.edit { clear() }
             reload(platforms = enabledPlatforms, context = context)
         }
     }
@@ -93,15 +93,15 @@ class ContestsViewModel: ViewModel() {
             val enabled = settings.enabledPlatforms()
             val lastReloaded = settings.lastReloadedPlatforms()
             (lastReloaded - enabled).takeIf { it.isNotEmpty() }?.let { toRemove ->
-                settings.lastReloadedPlatforms(newValue = lastReloaded - toRemove)
+                settings.lastReloadedPlatforms.edit { removeAll(toRemove) }
                 val dao = context.contestsListDao
                 toRemove.forEach { platform -> removePlatform(platform, dao) }
             }
 
             val toReload = (enabled - lastReloaded).toMutableSet()
 
-            if (needToReloadClistAdditional(settings)) {
-                settings.clistLastReloadedAdditionalResources(newValue = emptySet())
+            if (settings.needToReloadClistAdditional()) {
+                settings.clistLastReloadedAdditionalResources.edit { clear() }
                 toReload.add(Contest.Platform.unknown)
             }
 
@@ -109,9 +109,9 @@ class ContestsViewModel: ViewModel() {
         }
     }
 
-    private suspend fun needToReloadClistAdditional(settings: ContestsSettingsDataStore): Boolean {
-        val enabled = settings.clistAdditionalResources().map { it.id }.toSet()
-        val lastReloaded = settings.clistLastReloadedAdditionalResources()
+    private suspend fun ContestsSettingsDataStore.needToReloadClistAdditional(): Boolean {
+        val enabled: Set<Int> = clistAdditionalResources().map { it.id }.toSet()
+        val lastReloaded: Set<Int> = clistLastReloadedAdditionalResources()
         return enabled != lastReloaded //hope it is proper equals
     }
 }
