@@ -22,6 +22,7 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
         private val Context.contests_settings_dataStore by preferencesDataStore("contests_settings")
     }
 
+    //This set will always contains Platform.unknown
     val enabledPlatforms = itemEnumSet(name = "enabled_platforms", defaultValue = setOf(Contest.Platform.unknown))
     val lastReloadedPlatforms = itemEnumSet<Contest.Platform>(name = "last_reloaded_platforms", defaultValue = emptySet())
     val ignoredContests = itemJsonable<Map<Pair<Contest.Platform, String>, Instant>>(name = "ignored_contests", defaultValue = emptyMap())

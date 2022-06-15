@@ -83,7 +83,7 @@ private fun ContestsContent(
                 modifier = Modifier
                     .fillMaxWidth()
             )
-            ContestsListCheckEmpty(
+            ContestsList(
                 contestsState = contestsState,
                 filterController = filterController,
                 modifier = Modifier
@@ -98,30 +98,27 @@ private fun ContestsContent(
 }
 
 @Composable
-private fun ContestsListCheckEmpty(
+private fun ContestsList(
     contestsState: State<List<Contest>>,
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
-    val isEmpty = contestsState.value.isEmpty()
-
-    LaunchedEffect(isEmpty) {
-        filterController.available = !isEmpty
+    LaunchedEffect(contestsState, filterController) {
+        snapshotFlow { contestsState.value.isEmpty() }
+            .collect {
+                filterController.available = !it
+            }
     }
 
-    if (isEmpty) {
-        EmptyListMessageBox(modifier = modifier)
-    } else {
-        ContestsList(
-            contestsState = contestsState,
-            filterController = filterController,
-            modifier = modifier
-        )
-    }
+    ContestsListSorted(
+        contestsState = contestsState,
+        filterController = filterController,
+        modifier = modifier
+    )
 }
 
 @Composable
-private fun ContestsList(
+private fun ContestsListSorted(
     contestsState: State<List<Contest>>,
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
@@ -170,7 +167,7 @@ private fun ContestsSortedList(
     }
 
     LazyColumnWithScrollBar(modifier = modifier) {
-        items(
+        itemsNotEmpty(
             items = filteredContests,
             /*key = { it.compositeId }*/ //TODO: key effects jumping on reorder
         ) { contest ->

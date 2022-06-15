@@ -35,6 +35,7 @@ fun ContestPlatformsSettingsItem() {
             ContestPlatformsSettingsItemExpandedContent(
                 enabledPlatforms = enabledPlatforms,
                 onCheckedChange = { platform, checked ->
+                    require(platform != Contest.Platform.unknown)
                     scope.launch {
                         context.settingsContests.enabledPlatforms.edit {
                             if (checked) add(platform) else remove(platform)
@@ -126,9 +127,7 @@ private fun LoadersSetupButton(
 }
 
 @Composable
-private fun ClistAdditionalRow(
-
-) {
+private fun ClistAdditionalRow() {
     val context = context
     val settings = remember(context) { context.settingsContests }
     val resources by rememberCollect { settings.clistAdditionalResources.flow }

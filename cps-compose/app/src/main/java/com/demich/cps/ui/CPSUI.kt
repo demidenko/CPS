@@ -198,19 +198,6 @@ fun<T> TextButtonsSelectRow(
     }
 }
 
-@Composable
-fun EmptyListMessageBox(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.verticalScroll(rememberScrollState()),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "List is empty",
-            color = cpsColors.contentAdditional,
-            fontWeight = FontWeight.Medium
-        )
-    }
-}
 
 inline fun <T> LazyListScope.itemsNotEmpty(
     items: List<T>,
