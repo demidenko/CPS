@@ -2,13 +2,12 @@ package com.demich.cps.news.codeforces
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowRightAlt
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
+import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.cpsColors
 
@@ -23,7 +22,7 @@ fun BlogEntryTitleWithArrow(
         modifier = modifier
     ) {
         IconSp(
-            imageVector = Icons.Default.ArrowRightAlt,
+            imageVector = CPSIcons.ArrowRight,
             size = fontSize,
             color = cpsColors.contentAdditional,
             modifier = Modifier.alignBy {

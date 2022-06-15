@@ -5,10 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,21 +38,27 @@ fun ContestsScreen(
     contestsViewModel: ContestsViewModel,
     filterController: ContestsFilterController
 ) {
-    Column(
-        modifier = Modifier
-            .consumedWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
-            .imePadding()
-    ) {
-        ContestsFilterTextField(
-            filterController = filterController,
+    val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
+
+    if (isAnyPlatformEnabled) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-        )
-        ContestsContent(
-            contestsViewModel = contestsViewModel,
-            filterController = filterController,
-            modifier = Modifier.weight(1f, false)
-        )
+                .consumedWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
+                .imePadding()
+        ) {
+            ContestsFilterTextField(
+                filterController = filterController,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+            ContestsContent(
+                contestsViewModel = contestsViewModel,
+                filterController = filterController,
+                modifier = Modifier.weight(1f, false)
+            )
+        }
+    } else {
+        NoneEnabledMessage(modifier = Modifier.fillMaxSize())
     }
 
     val context = context
@@ -290,6 +298,24 @@ private fun rememberIsAnyPlatformEnabled(): State<Boolean> {
             flow2 = settings.clistAdditionalResources.flow.map { it.size }
         ) { size1, size2 ->
             size1 > 0 || size2 > 0
+        }
+    }
+}
+
+@Composable
+private fun NoneEnabledMessage(modifier: Modifier = Modifier) {
+    EmptyMessageBox(modifier = modifier) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Platforms are not enabled")
+            Row(
+                modifier = Modifier.padding(top = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text("goto ")
+                Icon(imageVector = CPSIcons.More, contentDescription = null)
+                Icon(imageVector = CPSIcons.ArrowRight, contentDescription = null)
+                Icon(imageVector = CPSIcons.Settings, contentDescription = null)
+            }
         }
     }
 }

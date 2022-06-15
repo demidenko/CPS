@@ -213,6 +213,24 @@ fun<T> TextButtonsSelectRow(
 }
 
 
+@Composable
+fun EmptyMessageBox(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+    ) {
+        CompositionLocalProvider(LocalContentColor provides cpsColors.contentAdditional) {
+            ProvideTextStyle(
+                value = TextStyle(fontWeight = FontWeight.Medium),
+                content = content
+            )
+        }
+    }
+}
+
 inline fun <T> LazyListScope.itemsNotEmpty(
     items: List<T>,
     noinline onEmptyMessage: @Composable () -> Unit = { Text(text = "List is empty") },
@@ -222,17 +240,10 @@ inline fun <T> LazyListScope.itemsNotEmpty(
 ) {
     if (items.isEmpty()) {
         item {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillParentMaxSize()
-            ) {
-                CompositionLocalProvider(LocalContentColor provides cpsColors.contentAdditional) {
-                    ProvideTextStyle(
-                        value = TextStyle(fontWeight = FontWeight.Medium),
-                        content = onEmptyMessage
-                    )
-                }
-            }
+            EmptyMessageBox(
+                modifier = Modifier.fillParentMaxSize(),
+                content = onEmptyMessage
+            )
         }
     } else {
         items(
