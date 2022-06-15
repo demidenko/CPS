@@ -5,20 +5,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.CPSViewModels
-import com.demich.cps.R
 import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.*
@@ -65,37 +62,31 @@ fun AccountsScreen(
         }
     }
 
-
-    Box(modifier = Modifier.fillMaxHeight()) {
-        if (recordedAccounts.isEmpty()) {
-            MonospacedText(
-                text = stringResource(id = R.string.accounts_welcome),
-                color = cpsColors.contentAdditional,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(6.dp)
-            )
-        } else {
-            LazyColumn(
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+    LazyColumn(
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 10.dp)
+            .background(cpsColors.background)
+    ) {
+        itemsNotEmpty(
+            items = recordedAccounts,
+            key = { it.type },
+            onEmptyMessage = "Accounts is not defined"
+        ) { userInfoWithManager ->
+            PanelWithUI(
+                userInfoWithManager = userInfoWithManager,
+                onExpandRequest = { onExpandAccount(userInfoWithManager.type) },
+                accountsViewModel = accountsViewModel,
+                visibleOrder = visibleOrder,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 10.dp)
                     .padding(start = 10.dp)
-                    .background(cpsColors.background)
-            ) {
-                items(recordedAccounts, key = { it.type }) { userInfoWithManager ->
-                    PanelWithUI(
-                        userInfoWithManager = userInfoWithManager,
-                        onExpandRequest = { onExpandAccount(userInfoWithManager.type) },
-                        accountsViewModel = accountsViewModel,
-                        visibleOrder = visibleOrder,
-                        modifier = Modifier.animateItemPlacement()
-                    )
-                }
-            }
+                    .animateItemPlacement()
+            )
         }
     }
+
 }
 
 @Composable
