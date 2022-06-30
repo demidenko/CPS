@@ -99,7 +99,10 @@ private fun CPSScaffold(
     navigator: CPSNavigator
 ) {
 
-    fun NavGraphBuilder.cpsComposable(screenType: ScreenTypes, content: @Composable (CPSNavigator.DuringCompositionHolder) -> Unit) {
+    fun NavGraphBuilder.cpsComposable(
+        screenType: ScreenTypes,
+        content: @Composable (CPSNavigator.DuringCompositionHolder) -> Unit
+    ) {
         composable(screenType.route) {
             val holder = remember {
                 navigator.DuringCompositionHolder(it.getScreen()).apply {
