@@ -16,7 +16,7 @@ interface CPSDataStoreItem<T> {
     //setter
     suspend operator fun invoke(newValue: T)
 
-    suspend fun updateValue(transform: (T) -> T & Any)
+    suspend fun updateValue(transform: (T) -> T)
 }
 
 
@@ -35,15 +35,15 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         override suspend operator fun invoke(): T = fromPrefs(dataStore.data.first()[key])
 
         override suspend operator fun invoke(newValue: T) {
-            dataStore.edit { prefs ->
-                newValue?.let { prefs[key] = toPrefs(it) } ?: prefs.remove(key)
-            }
+            dataStore.edit { prefs -> prefs.setValue(newValue) }
         }
 
-        override suspend fun updateValue(transform: (T) -> T & Any) {
-            dataStore.edit { prefs ->
-                prefs[key] = toPrefs(transform(fromPrefs(prefs[key])))
-            }
+        override suspend fun updateValue(transform: (T) -> T) {
+            dataStore.edit { prefs -> prefs.setValue(transform(fromPrefs(prefs[key]))) }
+        }
+
+        private fun MutablePreferences.setValue(newValue: T) {
+            newValue?.let { set(key, toPrefs(it)) } ?: remove(key)
         }
     }
 
