@@ -48,6 +48,7 @@ class CPSNavigator(
     val subtitle: String
         get() = subtitleState.value
 
+    //TODO: each LaunchEffect with this is slow shit
     fun setSubtitle(vararg words: String) {
         subtitleState.value = words.joinToString(prefix = "::", separator = ".") { it.lowercase() }
     }
