@@ -16,19 +16,18 @@ interface CPSDataStoreItem<T> {
     //setter
     suspend operator fun invoke(newValue: T)
 
-    suspend fun updateValue(transform: (T) -> T)
+    suspend fun updateValue(transform: (T) -> T & Any)
 }
 
 
 abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
 
-    protected abstract class DataStoreItem<T, S>(
+    protected abstract class DataStoreItem<T, S: Any>(
         private val dataStore: DataStore<Preferences>
     ): CPSDataStoreItem<T> {
         abstract override val key: Preferences.Key<S>
         protected abstract fun fromPrefs(s: S?): T
-        //TODO [toPrefs(t: T & Any): S] in kotlin 1.7??
-        protected abstract fun toPrefs(t: T): S
+        protected abstract fun toPrefs(t: T & Any): S
 
         override val flow: Flow<T>
             get() = dataStore.data.map { it[key] }.distinctUntilChanged().map { fromPrefs(it) }
@@ -41,14 +40,14 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
             }
         }
 
-        override suspend fun updateValue(transform: (T) -> T) {
+        override suspend fun updateValue(transform: (T) -> T & Any) {
             dataStore.edit { prefs ->
                 prefs[key] = toPrefs(transform(fromPrefs(prefs[key])))
             }
         }
     }
 
-    private class Item<T> (
+    private class Item<T: Any> (
         dataStore: DataStore<Preferences>,
         override val key: Preferences.Key<T>,
         private val defaultValue: T
@@ -57,12 +56,12 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         override fun toPrefs(t: T): T = t
     }
 
-    private class ItemNullable<T> (
+    private class ItemNullable<T: Any> (
         dataStore: DataStore<Preferences>,
         override val key: Preferences.Key<T>
     ): DataStoreItem<T?, T>(dataStore) {
         override fun fromPrefs(s: T?): T? = s
-        override fun toPrefs(t: T?): T = t!!
+        override fun toPrefs(t: T): T = t
     }
 
     private class ItemStringConvertible<T> (
@@ -74,13 +73,13 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
     ): DataStoreItem<T, String>(dataStore) {
         override val key = stringPreferencesKey(name)
         override fun fromPrefs(s: String?): T = s?.let(decode) ?: defaultValue
-        override fun toPrefs(t: T): String = encode(t)
+        override fun toPrefs(t: T & Any): String = encode(t)
     }
 
-    private fun<T> item(key: Preferences.Key<T>, defaultValue: T): CPSDataStoreItem<T> =
+    private fun<T: Any> item(key: Preferences.Key<T>, defaultValue: T): CPSDataStoreItem<T> =
         Item(key = key, defaultValue = defaultValue, dataStore = dataStore)
 
-    private fun<T> itemNullable(key: Preferences.Key<T>): CPSDataStoreItem<T?> =
+    private fun<T: Any> itemNullable(key: Preferences.Key<T>): CPSDataStoreItem<T?> =
         ItemNullable(key = key, dataStore = dataStore)
 
     protected fun<T> itemStringConvertible(name: String, defaultValue: T, encode: (T) -> String, decode: (String) -> T): CPSDataStoreItem<T> =
