@@ -39,27 +39,27 @@ object CodeforcesUtils {
         return kotlin.runCatching {
             val id: Int
             val title: String
-            topic.selectFirst("div.title")!!.let {
-                title = it.selectFirst("p")!!.text()
-                id = it.selectFirst("a")!!.attr("href").removePrefix("/blog/entry/").toInt()
+            topic.expectFirst("div.title").let {
+                title = it.expectFirst("p").text()
+                id = it.expectFirst("a").attr("href").removePrefix("/blog/entry/").toInt()
             }
 
             val authorHandle: String
             val authorColorTag: ColorTag
             val creationTime: Instant
-            topic.selectFirst("div.info")!!.let { info ->
-                with(info.selectFirst(".rated-user")!!.extractRatedUser()) {
+            topic.expectFirst("div.info").let { info ->
+                with(info.expectFirst(".rated-user").extractRatedUser()) {
                     authorHandle = first
                     authorColorTag = second
                 }
-                creationTime = info.selectFirst(".format-humantime")!!.attr("title").extractTime()
+                creationTime = info.expectFirst(".format-humantime").attr("title").extractTime()
             }
 
             val rating: Int
             val commentsCount: Int
-            topic.selectFirst(".roundbox")!!.let { box ->
-                rating = box.selectFirst(".left-meta")!!.selectFirst("span")!!.text().toInt()
-                val commentsItem = box.selectFirst(".right-meta")!!.select("li")[2]!!
+            topic.expectFirst(".roundbox").let { box ->
+                rating = box.expectFirst(".left-meta").expectFirst("span").text().toInt()
+                val commentsItem = box.expectFirst(".right-meta").select("li")[2]!!
                 commentsCount = commentsItem.select("a")[1]!!.text().toInt()
             }
 
@@ -79,8 +79,8 @@ object CodeforcesUtils {
         return kotlin.runCatching {
             val commentatorHandle: String
             val commentatorHandleColorTag: ColorTag
-            commentBox.selectFirst(".avatar")!!.let { avatarBox ->
-                with(avatarBox.selectFirst("a.rated-user")!!.extractRatedUser()) {
+            commentBox.expectFirst(".avatar").let { avatarBox ->
+                with(avatarBox.expectFirst("a.rated-user").extractRatedUser()) {
                     commentatorHandle = first
                     commentatorHandleColorTag = second
                 }
@@ -93,9 +93,9 @@ object CodeforcesUtils {
             val commentId: Long
             val commentCreationTime: Instant
             val commentRating: Int
-            commentBox.selectFirst("div.info")!!.let { info ->
-                commentCreationTime = info.selectFirst(".format-humantime")!!.attr("title").extractTime()
-                with(info.selectFirst("a.rated-user")!!.extractRatedUser()) {
+            commentBox.expectFirst("div.info").let { info ->
+                commentCreationTime = info.expectFirst(".format-humantime").attr("title").extractTime()
+                with(info.expectFirst("a.rated-user").extractRatedUser()) {
                     blogEntryAuthorHandle = first
                     blogEntryAuthorHandleColorTag = second
                 }
@@ -137,7 +137,7 @@ object CodeforcesUtils {
 
     private fun extractRecentBlogEntryOrNull(item: Element): CodeforcesBlogEntry? {
         return kotlin.runCatching {
-            val (handle, handleColorTag) = item.selectFirst("a.rated-user")!!.extractRatedUser()
+            val (handle, handleColorTag) = item.expectFirst("a.rated-user").extractRatedUser()
             val blogEntryId: Int
             val blogEntryTitle: String
             item.getElementsByAttributeValueStarting("href", "/blog/entry/")[0]!!.let {
@@ -272,7 +272,7 @@ object CodeforcesUtils {
             val acceptedCount = td[3].text().trim().removePrefix("x").toInt()
             val problem = CodeforcesProblem(
                 index = td[0].text().trim(),
-                name = td[1].selectFirst("a")!!.text(),
+                name = td[1].expectFirst("a").text(),
                 contestId = contestId
             )
             problem to acceptedCount
