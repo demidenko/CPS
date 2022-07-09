@@ -2,7 +2,7 @@ buildscript {
     ext {
         gradle_version = '7.2.1'
         kotlin_version = '1.7.0'
-        ktor_version = '2.0.2'
+        ktor_version = '2.0.3'
         compose_version = '1.2.0-rc03'
         accompanist_version = '0.24.13-rc'
         room_version = '2.5.0-alpha02'
