@@ -69,7 +69,7 @@ class TimusAccountManager(context: Context):
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
         return Jsoup.parse(TimusApi.getSearchPage(str))
-            .selectFirst("table.ranklist")!!
+            .expectFirst("table.ranklist")
             .select("td.name")
             .mapNotNull { nameColumn ->
                 val userId = nameColumn.selectFirst("a")

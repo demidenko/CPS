@@ -39,7 +39,7 @@ class AtCoderContestsLoader: ContestsLoader(type = ContestsLoaders.atcoder) {
 
             if (!dateConstraints.check(startTime, duration)) return null
 
-            val title = td[1].selectFirst("a")!!
+            val title = td[1].expectFirst("a")
 
             Contest(
                 platform = Contest.Platform.atcoder,

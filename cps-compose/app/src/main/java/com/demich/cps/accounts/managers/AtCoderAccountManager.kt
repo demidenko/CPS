@@ -55,7 +55,7 @@ class AtCoderAccountManager(context: Context):
         try {
             val s = AtCoderApi.getUserPage(handle = data)
             return with(Jsoup.parse(s)) {
-                val handle = selectFirst("a.username")!!.text()
+                val handle = expectFirst("a.username").text()
                 val rating = select("th.no-break").find { it.text() == "Rating" }
                     ?.nextElementSibling()
                     ?.text()?.toInt() ?: NOT_RATED

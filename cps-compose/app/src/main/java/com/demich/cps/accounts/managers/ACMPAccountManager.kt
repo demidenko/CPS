@@ -76,9 +76,9 @@ class ACMPAccountManager(context: Context):
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
         val s = ACMPApi.getUsersSearch(str)
-        return Jsoup.parse(s).selectFirst("table.main")!!.select("tr.white").mapNotNull { row ->
+        return Jsoup.parse(s).expectFirst("table.main").select("tr.white").mapNotNull { row ->
             val cols = row.select("td")
-            val userId = cols[1].selectFirst("a")!!
+            val userId = cols[1].expectFirst("a")
                 .attr("href").removePrefix("/?main=user&id=")
             val userName = cols[1].text()
             val tasks = cols[3].text()
