@@ -14,9 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.develop.settingsDev
 import com.demich.cps.ui.*
-import com.demich.cps.ui.dialogs.CPSDialog
+import com.demich.cps.ui.dialogs.CPSAboutDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
@@ -162,36 +161,3 @@ private fun DarkLightModeButton(
     )
 }
 
-@Composable
-private fun CPSAboutDialog(onDismissRequest: () -> Unit) {
-    val scope = rememberCoroutineScope()
-
-    val settingsDev = context.settingsDev
-    val devModeEnabled by rememberCollect { settingsDev.devModeEnabled.flow }
-    var showDevModeLine by remember { mutableStateOf(devModeEnabled) }
-
-    showDevModeLine = true //TODO enable by click pattern
-
-    CPSDialog(
-        horizontalAlignment = Alignment.Start,
-        onDismissRequest = onDismissRequest
-    ) {
-        MonospacedText("   Competitive")
-        MonospacedText("   Programming")
-        MonospacedText("&& Solving")
-        MonospacedText("{")
-        MonospacedText("   version = ${BuildConfig.VERSION_NAME}" + if (devModeEnabled) " (${BuildConfig.VERSION_CODE})" else "")
-        if (showDevModeLine) {
-            Row(
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                MonospacedText("   dev_mode = $devModeEnabled", Modifier.weight(1f))
-                CPSCheckBox(checked = devModeEnabled) { checked ->
-                    scope.launch { settingsDev.devModeEnabled(checked) }
-                }
-            }
-        }
-        MonospacedText("}")
-    }
-}
