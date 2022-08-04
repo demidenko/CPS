@@ -24,20 +24,11 @@ import com.demich.cps.utils.codeforces.CodeforcesRecentAction
 fun CodeforcesRecentBlogEntries(
     recentActionsState: State<Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>>,
     modifier: Modifier = Modifier,
-    menuBuilder: @Composable CPSDropdownMenuScope.(CodeforcesRecentBlogEntry) -> Unit
+    menuBuilder: @Composable CPSDropdownMenuScope.(CodeforcesBlogEntry, List<CodeforcesComment>) -> Unit
 ) {
     val recent = remember(recentActionsState.value) {
         val (blogEntries, comments) = recentActionsState.value
-        val commentsGrouped = comments.groupBy { it.blogEntry?.id }
-        blogEntries.map { blogEntry ->
-            CodeforcesRecentBlogEntry(
-                blogEntry = blogEntry,
-                comments = commentsGrouped[blogEntry.id]
-                    ?.map { it.comment }
-                    ?.distinctBy { it.commentatorHandle }
-                    ?: emptyList()
-            )
-        }
+        makeRecentBlogEntries(blogEntries, comments)
     }
 
     var showMenuForBlogEntryId: Int? by remember { mutableStateOf(null) }
@@ -46,6 +37,7 @@ fun CodeforcesRecentBlogEntries(
             ContentWithCPSDropdownMenu(
                 modifier = Modifier
                     .clickable(enabled = it.comments.isNotEmpty()) {
+                        //TODO: just open blog entry on empty
                         showMenuForBlogEntryId = it.blogEntry.id
                     }
                     .fillMaxWidth()
@@ -53,7 +45,7 @@ fun CodeforcesRecentBlogEntries(
                 expanded = it.blogEntry.id == showMenuForBlogEntryId,
                 menuAlignment = Alignment.CenterStart,
                 onDismissRequest = { showMenuForBlogEntryId = null },
-                menuBuilder = { menuBuilder(it) },
+                menuBuilder = { menuBuilder(it.blogEntry, it.comments) },
                 content = { RecentBlogEntry(recentBlogEntryData = it) }
             )
             Divider()
@@ -62,10 +54,27 @@ fun CodeforcesRecentBlogEntries(
 }
 
 @Immutable
-data class CodeforcesRecentBlogEntry(
+private data class CodeforcesRecentBlogEntry(
     val blogEntry: CodeforcesBlogEntry,
     val comments: List<CodeforcesComment>
 )
+
+private fun makeRecentBlogEntries(
+    blogEntries: List<CodeforcesBlogEntry>,
+    comments: List<CodeforcesRecentAction>
+): List<CodeforcesRecentBlogEntry> {
+    val commentsGrouped = comments.groupBy { it.blogEntry!!.id }
+    //TODO: blog entry with negative rating disappeared from blogEntries but has comments
+    return blogEntries.map { blogEntry ->
+        CodeforcesRecentBlogEntry(
+            blogEntry = blogEntry,
+            comments = commentsGrouped[blogEntry.id]
+                ?.map { it.comment }
+                ?.distinctBy { it.commentatorHandle }
+                ?: emptyList()
+        )
+    }
+}
 
 @Composable
 private fun RecentBlogEntry(

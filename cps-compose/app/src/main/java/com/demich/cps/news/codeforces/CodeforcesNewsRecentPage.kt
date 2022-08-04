@@ -68,7 +68,7 @@ private fun RecentBlogEntriesPage(
     CodeforcesRecentBlogEntries(
         recentActionsState = recentActionsState,
         modifier = Modifier.fillMaxSize()
-    ) { (blogEntry, comments) ->
+    ) { blogEntry, comments ->
         CPSDropdownMenuItem(title = "Open recent comment", icon = CPSIcons.OpenInBrowser) {
             context.openUrlInBrowser(CodeforcesApi.urls.comment(
                 blogEntryId = blogEntry.id,
