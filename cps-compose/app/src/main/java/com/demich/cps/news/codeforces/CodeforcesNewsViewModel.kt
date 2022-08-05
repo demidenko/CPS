@@ -138,17 +138,18 @@ class CodeforcesNewsViewModel: ViewModel() {
         //blog entry with negative rating disappeared from blogEntries but has comments, need to merge
         val blogEntries = CodeforcesUtils.extractRecentBlogEntries(s).toMutableList()
         val commentsGrouped = blogEntries.associate { it.id to mutableListOf<CodeforcesRecentAction>() }.toMutableMap()
-        var prevId = -1
+        var index = 0
         for (comment in comments) {
             val id = comment.blogEntry!!.id
+            while (index < blogEntries.size && blogEntries[index].id == id) index += 1
             commentsGrouped.getOrPut(id) {
                 blogEntries.add(
-                    index = if (prevId == -1) 0 else blogEntries.indexOfFirst { it.id == prevId } + 1,
-                    element = comment.blogEntry.copy(rating = -1) //mark blogEntry
+                    index = index,
+                    element = comment.blogEntry.copy(rating = -1) //mark low rated
                 )
+                index += 1
                 mutableListOf()
             }.add(comment)
-            prevId = id
         }
         return Pair(blogEntries, comments)
     }

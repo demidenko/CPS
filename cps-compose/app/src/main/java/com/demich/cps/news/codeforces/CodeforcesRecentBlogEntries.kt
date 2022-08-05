@@ -58,7 +58,7 @@ fun CodeforcesRecentBlogEntries(
 private data class CodeforcesRecentBlogEntry(
     val blogEntry: CodeforcesBlogEntry,
     val comments: List<CodeforcesComment>,
-    val isNegativeRated: Boolean
+    val isLowRated: Boolean
 )
 
 private fun makeRecentBlogEntries(
@@ -73,7 +73,7 @@ private fun makeRecentBlogEntries(
                 ?.map { it.comment }
                 ?.distinctBy { it.commentatorHandle }
                 ?: emptyList(),
-            isNegativeRated = blogEntry.rating < 0
+            isLowRated = blogEntry.rating < 0
         )
     }
 }
@@ -96,7 +96,7 @@ private fun RecentBlogEntry(
                 append(manager.makeHandleSpan(handle = comment.commentatorHandle, tag = comment.commentatorHandleColorTag))
             }
         },
-        isNegativeRated = recentBlogEntryData.isNegativeRated,
+        isLowRated = recentBlogEntryData.isLowRated,
         modifier = modifier
     )
 }
@@ -106,13 +106,13 @@ private fun RecentBlogEntry(
     title: String,
     authorHandle: AnnotatedString,
     commentators: AnnotatedString,
-    isNegativeRated: Boolean,
+    isLowRated: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         BlogEntryTitleWithArrow(
             title = title,
-            titleColor = if (isNegativeRated) cpsColors.contentAdditional else cpsColors.content,
+            titleColor = if (isLowRated) cpsColors.contentAdditional else cpsColors.content,
             singleLine = false,
             modifier = Modifier.fillMaxWidth()
         )
