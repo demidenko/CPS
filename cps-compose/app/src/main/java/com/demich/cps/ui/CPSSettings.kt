@@ -306,7 +306,7 @@ fun ExpandableSettingsItem(
                     .padding(horizontal = 10.dp, vertical = 4.dp)
             ) {
                 Icon(
-                    imageVector = CPSIcons.Collapse,
+                    imageVector = CPSIcons.CollapseUp,
                     contentDescription = null,
                     modifier = Modifier.size(24.dp)
                 )

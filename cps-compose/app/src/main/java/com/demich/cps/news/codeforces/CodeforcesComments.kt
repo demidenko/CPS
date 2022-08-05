@@ -1,23 +1,23 @@
 package com.demich.cps.news.codeforces
 
-import androidx.compose.foundation.background
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.IconSp
-import com.demich.cps.ui.LazyColumnWithScrollBar
-import com.demich.cps.ui.itemsNotEmpty
+import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.codeforces.CodeforcesApi
@@ -41,7 +41,10 @@ fun CodeforcesComments(
         state = lazyListState,
         modifier = modifier
     ) {
-        itemsNotEmpty(items = commentsState.value) { recentAction ->
+        itemsNotEmpty(
+            items = commentsState.value,
+            key = { it.comment.id }
+        ) { recentAction ->
             val blogEntry = recentAction.blogEntry!!
             val comment = recentAction.comment
             Comment(
@@ -56,6 +59,7 @@ fun CodeforcesComments(
                         ))
                     }
                     .padding(start = 3.dp, end = 5.dp, bottom = 3.dp)
+                    .animateContentSize()
             )
             Divider()
         }
@@ -166,24 +170,33 @@ private fun CommentBox(
     fontSize: TextUnit
 ) {
     Box(modifier = modifier) {
-        var linesOverFlow by remember { mutableStateOf(false) }
+        var expanded by rememberSaveable { mutableStateOf(false) }
+        var linesOverflow by remember { mutableStateOf(false) }
         Text(
             text = CodeforcesUtils.htmlToAnnotatedString(commentHtml),
-            maxLines = maxLines,
+            maxLines = if (expanded) Int.MAX_VALUE else maxLines,
             fontSize = fontSize,
             onTextLayout = { result ->
-                linesOverFlow = result.didOverflowHeight
+                linesOverflow = result.didOverflowHeight
             }
         )
-        if (linesOverFlow) {
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .height(10.dp)
-                .background(cpsColors.contentAdditional.copy(alpha = 0.5f))
-                .align(Alignment.BottomCenter)
-            ) {
-
-            }
+        if (!expanded && linesOverflow) {
+            ExpandCommentButton(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                onClick = { expanded = true }
+            )
         }
     }
+}
+
+@Composable
+private fun ExpandCommentButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    CPSIconButton(
+        icon = CPSIcons.ExpandDown,
+        onClick = onClick,
+        modifier = modifier.border(width = 1.dp, color = cpsColors.content, shape = CircleShape)
+    )
 }
