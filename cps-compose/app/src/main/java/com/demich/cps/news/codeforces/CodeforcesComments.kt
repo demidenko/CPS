@@ -33,7 +33,8 @@ import kotlin.math.roundToInt
 fun CodeforcesComments(
     commentsState: State<List<CodeforcesRecentAction>>,
     lazyListState: LazyListState = rememberLazyListState(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showTitle: Boolean = true
 ) {
     val context = context
     LazyColumnWithScrollBar(
@@ -41,15 +42,17 @@ fun CodeforcesComments(
         modifier = modifier
     ) {
         itemsNotEmpty(items = commentsState.value) { recentAction ->
+            val blogEntry = recentAction.blogEntry!!
+            val comment = recentAction.comment
             Comment(
-                comment = recentAction.comment,
-                blogEntryTitle = recentAction.blogEntry!!.title,
+                comment = comment,
+                blogEntryTitle = blogEntry.title.takeIf { showTitle },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
                         context.openUrlInBrowser(CodeforcesApi.urls.comment(
-                            blogEntryId = recentAction.blogEntry!!.id,
-                            commentId = recentAction.comment.id
+                            blogEntryId = blogEntry.id,
+                            commentId = comment.id
                         ))
                     }
                     .padding(start = 3.dp, end = 5.dp, bottom = 3.dp)
@@ -62,7 +65,7 @@ fun CodeforcesComments(
 @Composable
 private fun Comment(
     comment: CodeforcesComment,
-    blogEntryTitle: String,
+    blogEntryTitle: String?,
     modifier: Modifier = Modifier
 ) {
     val manager = LocalCodeforcesAccountManager.current
@@ -84,18 +87,20 @@ private fun Comment(
 @Composable
 private fun Comment(
     authorHandle: AnnotatedString,
-    blogEntryTitle: String,
+    blogEntryTitle: String?,
     rating: Int,
     timeAgo: String,
     commentHtml: String,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        BlogEntryTitleWithArrow(
-            title = blogEntryTitle,
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
+        if (blogEntryTitle != null) {
+            BlogEntryTitleWithArrow(
+                title = blogEntryTitle,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         CommentInfo(
             authorHandle = authorHandle,
             rating = rating,

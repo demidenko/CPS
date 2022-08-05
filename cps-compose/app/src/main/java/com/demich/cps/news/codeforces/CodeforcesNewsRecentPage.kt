@@ -101,6 +101,7 @@ private fun RecentCommentsInBlogEntry(
 
     CodeforcesComments(
         commentsState = filteredCommentsState,
+        showTitle = false,
         modifier = Modifier.fillMaxSize()
     )
 
