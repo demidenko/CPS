@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.itemsNotEmpty
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesComment
 import com.demich.cps.utils.codeforces.CodeforcesRecentAction
@@ -56,7 +57,8 @@ fun CodeforcesRecentBlogEntries(
 @Immutable
 private data class CodeforcesRecentBlogEntry(
     val blogEntry: CodeforcesBlogEntry,
-    val comments: List<CodeforcesComment>
+    val comments: List<CodeforcesComment>,
+    val isNegativeRated: Boolean
 )
 
 private fun makeRecentBlogEntries(
@@ -64,14 +66,14 @@ private fun makeRecentBlogEntries(
     comments: List<CodeforcesRecentAction>
 ): List<CodeforcesRecentBlogEntry> {
     val commentsGrouped = comments.groupBy { it.blogEntry!!.id }
-    //TODO: blog entry with negative rating disappeared from blogEntries but has comments
     return blogEntries.map { blogEntry ->
         CodeforcesRecentBlogEntry(
             blogEntry = blogEntry,
             comments = commentsGrouped[blogEntry.id]
                 ?.map { it.comment }
                 ?.distinctBy { it.commentatorHandle }
-                ?: emptyList()
+                ?: emptyList(),
+            isNegativeRated = blogEntry.rating < 0
         )
     }
 }
@@ -94,6 +96,7 @@ private fun RecentBlogEntry(
                 append(manager.makeHandleSpan(handle = comment.commentatorHandle, tag = comment.commentatorHandleColorTag))
             }
         },
+        isNegativeRated = recentBlogEntryData.isNegativeRated,
         modifier = modifier
     )
 }
@@ -103,12 +106,13 @@ private fun RecentBlogEntry(
     title: String,
     authorHandle: AnnotatedString,
     commentators: AnnotatedString,
+    isNegativeRated: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         BlogEntryTitleWithArrow(
             title = title,
-            fontSize = 16.sp,
+            titleColor = if (isNegativeRated) cpsColors.contentAdditional else cpsColors.content,
             singleLine = false,
             modifier = Modifier.fillMaxWidth()
         )

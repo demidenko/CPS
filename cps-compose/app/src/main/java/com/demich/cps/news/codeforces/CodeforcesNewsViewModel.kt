@@ -134,10 +134,23 @@ class CodeforcesNewsViewModel: ViewModel() {
 
     private suspend fun loadRecentActions(locale: CodeforcesLocale): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>? {
         val s = CodeforcesApi.getPageSource(urlString = CodeforcesApi.urls.main + "/recent-actions", locale = locale) ?: return null
-        return Pair(
-            first = CodeforcesUtils.extractRecentBlogEntries(s),
-            second = CodeforcesUtils.extractComments(s)
-        )
+        val comments = CodeforcesUtils.extractComments(s)
+        //blog entry with negative rating disappeared from blogEntries but has comments, need to merge
+        val blogEntries = CodeforcesUtils.extractRecentBlogEntries(s).toMutableList()
+        val commentsGrouped = blogEntries.associate { it.id to mutableListOf<CodeforcesRecentAction>() }.toMutableMap()
+        var prevId = -1
+        for (comment in comments) {
+            val id = comment.blogEntry!!.id
+            commentsGrouped.getOrPut(id) {
+                blogEntries.add(
+                    index = if (prevId == -1) 0 else blogEntries.indexOfFirst { it.id == prevId } + 1,
+                    element = comment.blogEntry.copy(rating = -1) //mark blogEntry
+                )
+                mutableListOf()
+            }.add(comment)
+            prevId = id
+        }
+        return Pair(blogEntries, comments)
     }
 
     var followLoadingStatus by mutableStateOf(LoadingStatus.PENDING)

@@ -93,7 +93,6 @@ private fun Comment(
     Column(modifier = modifier) {
         BlogEntryTitleWithArrow(
             title = blogEntryTitle,
-            fontSize = 16.sp,
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
