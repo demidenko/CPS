@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
+import kotlin.math.max
 
 class CodeforcesNewsViewModel: ViewModel() {
 
@@ -135,21 +136,25 @@ class CodeforcesNewsViewModel: ViewModel() {
     private suspend fun loadRecentActions(locale: CodeforcesLocale): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>? {
         val s = CodeforcesApi.getPageSource(urlString = CodeforcesApi.urls.main + "/recent-actions", locale = locale) ?: return null
         val comments = CodeforcesUtils.extractComments(s)
-        //blog entry with negative rating disappeared from blogEntries but has comments, need to merge
+        //blog entry with low rating disappeared from blogEntries but has comments, need to merge
         val blogEntries = CodeforcesUtils.extractRecentBlogEntries(s).toMutableList()
         val commentsGrouped = blogEntries.associate { it.id to mutableListOf<CodeforcesRecentAction>() }.toMutableMap()
         var index = 0
+        val usedIds = mutableSetOf<Int>()
         for (comment in comments) {
             val id = comment.blogEntry!!.id
-            while (index < blogEntries.size && blogEntries[index].id == id) index += 1
             commentsGrouped.getOrPut(id) {
                 blogEntries.add(
                     index = index,
                     element = comment.blogEntry.copy(rating = -1) //mark low rated
                 )
-                index += 1
                 mutableListOf()
             }.add(comment)
+            if (id !in usedIds) {
+                usedIds.add(id)
+                val curIndex = blogEntries.indexOfFirst { it.id == id }
+                index = max(index, curIndex + 1)
+            }
         }
         return Pair(blogEntries, comments)
     }

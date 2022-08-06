@@ -111,8 +111,10 @@ object CodeforcesUtils {
                 }
             }
 
+            //<span class="notice">Пользователь создал или обновил текст</span>
+            //<span class="notice">Комментарий удален по причине нарушения правил Codeforces</span>
             val commentHtml = commentBox.selectFirst("div.ttypography")?.html()
-                ?: "" //<span class="notice">Комментарий удален по причине нарушения правил Codeforces</span>
+                ?: ""
 
             CodeforcesRecentAction(
                 time = commentCreationTime,
