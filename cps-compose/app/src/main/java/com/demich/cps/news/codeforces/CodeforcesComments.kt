@@ -1,23 +1,27 @@
 package com.demich.cps.news.codeforces
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.*
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.IconSp
+import com.demich.cps.ui.LazyColumnWithScrollBar
+import com.demich.cps.ui.itemsNotEmpty
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.codeforces.CodeforcesApi
@@ -182,8 +186,11 @@ private fun CommentBox(
         )
         if (!expanded && linesOverflow) {
             ExpandCommentButton(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                onClick = { expanded = true }
+                onClick = { expanded = true },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(48.dp)
             )
         }
     }
@@ -194,9 +201,18 @@ private fun ExpandCommentButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    CPSIconButton(
-        icon = CPSIcons.ExpandDown,
-        onClick = onClick,
-        modifier = modifier.border(width = 1.dp, color = cpsColors.content, shape = CircleShape)
-    )
+    Box(modifier
+        .background(
+            brush = Brush.verticalGradient(listOf(
+                cpsColors.background.copy(alpha = 0f),
+                cpsColors.background.copy(alpha = 1f)
+            ))
+        ).clickable(onClick = onClick),
+    ) {
+        Icon(
+            imageVector = CPSIcons.ExpandDown,
+            contentDescription = null,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
 }
