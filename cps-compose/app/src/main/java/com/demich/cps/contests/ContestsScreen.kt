@@ -31,6 +31,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -132,7 +133,7 @@ private fun ContestsListSorted(
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
-    val currentTime by collectCurrentTimeEachSecond()
+    val currentTime by collectCurrentTimeAsState(1.seconds)
 
     val sortedState = remember(contestsState.value) {
         mutableStateOf(contestsState.value)

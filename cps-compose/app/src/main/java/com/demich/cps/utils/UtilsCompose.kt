@@ -134,31 +134,25 @@ private fun currentTimeFlow(period: Duration): Flow<Instant> =
     }
 
 @Composable
-fun collectCurrentTimeEachSecond(): State<Instant> {
+fun collectCurrentTimeAsState(period: Duration): State<Instant> {
     return remember {
-        currentTimeFlow(period = 1.seconds)
-    }.collectAsStateLifecycleAware(initial = remember { getCurrentTime() })
-}
-
-
-@Composable
-fun collectCurrentTimeEachMinute(): State<Instant> {
-    return remember {
-        currentTimeFlow(period = 1.minutes)
+        currentTimeFlow(period = period)
     }.collectAsStateLifecycleAware(initial = remember { getCurrentTime() })
 }
 
 @Composable
-fun ProvideTimeEachSecond(content: @Composable () -> Unit) {
-    val currentTime by collectCurrentTimeEachSecond()
+fun ProvideCurrentTime(period: Duration, content: @Composable () -> Unit) {
+    val currentTime by collectCurrentTimeAsState(period)
     CompositionLocalProvider(LocalCurrentTime provides currentTime, content = content)
 }
 
 @Composable
-fun ProvideTimeEachMinute(content: @Composable () -> Unit) {
-    val currentTime by collectCurrentTimeEachMinute()
-    CompositionLocalProvider(LocalCurrentTime provides currentTime, content = content)
-}
+fun ProvideTimeEachSecond(content: @Composable () -> Unit) =
+    ProvideCurrentTime(period = 1.seconds, content = content)
+
+@Composable
+fun ProvideTimeEachMinute(content: @Composable () -> Unit) =
+    ProvideCurrentTime(period = 1.minutes, content = content)
 
 
 fun LazyListState.visibleRange(requiredVisiblePart: Float = 0.5f): IntRange {
