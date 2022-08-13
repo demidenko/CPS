@@ -1,6 +1,6 @@
 package com.demich.cps.news.codeforces
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -171,11 +172,15 @@ private fun CommentBox(
     commentHtml: String,
     modifier: Modifier = Modifier,
     maxLines: Int = 10,
-    fontSize: TextUnit
+    fontSize: TextUnit,
+    backgroundColor: Color = cpsColors.background
 ) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier.background(backgroundColor)) {
         var expanded by rememberSaveable { mutableStateOf(false) }
         var linesOverflow by remember { mutableStateOf(false) }
+        val visible = rememberSaveable(expanded, linesOverflow) {
+            !expanded && linesOverflow
+        }
         Text(
             text = CodeforcesUtils.htmlToAnnotatedString(commentHtml),
             maxLines = if (expanded) Int.MAX_VALUE else maxLines,
@@ -184,13 +189,16 @@ private fun CommentBox(
                 linesOverflow = result.didOverflowHeight
             }
         )
-        if (!expanded && linesOverflow) {
+        AnimatedVisibility(
+            visible = visible,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            enter = EnterTransition.None,
+            exit = fadeOut()
+        ) {
             ExpandCommentButton(
-                onClick = { expanded = true },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .height(48.dp)
+                backgroundColor = backgroundColor,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { expanded = true }
             )
         }
     }
@@ -199,15 +207,18 @@ private fun CommentBox(
 @Composable
 private fun ExpandCommentButton(
     modifier: Modifier = Modifier,
+    backgroundColor: Color,
     onClick: () -> Unit
 ) {
-    Box(modifier
-        .background(
-            brush = Brush.verticalGradient(listOf(
-                cpsColors.background.copy(alpha = 0f),
-                cpsColors.background.copy(alpha = 1f)
-            ))
-        ).clickable(onClick = onClick),
+    Box(
+        modifier = modifier
+            .height(48.dp)
+            .clickable(onClick = onClick)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(backgroundColor.copy(alpha = 0f), backgroundColor)
+                )
+            )
     ) {
         Icon(
             imageVector = CPSIcons.ExpandDown,
