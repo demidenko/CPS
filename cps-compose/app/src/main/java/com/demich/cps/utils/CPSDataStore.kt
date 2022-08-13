@@ -43,7 +43,8 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         }
 
         private fun MutablePreferences.setValue(newValue: T) {
-            newValue?.let { set(key, toPrefs(it)) } ?: remove(key)
+            if (newValue == null) remove(key)
+            else set(key, toPrefs(newValue))
         }
     }
 

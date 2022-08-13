@@ -28,9 +28,8 @@ import com.demich.cps.utils.InstantAsSecondsSerializer
 import com.demich.cps.utils.append
 import com.demich.cps.utils.codeforces.*
 import com.demich.cps.workers.AccountsWorker
+import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.text.contains
@@ -220,10 +219,11 @@ class CodeforcesAccountManager(context: Context):
             title = "Rating changes observer",
             onCheckedChange = { if (it) AccountsWorker.getWork(context).startImmediate() }
         )
-        SettingsSwitchItem(
-            item = settings.contestWatchEnabled,
+        SettingsSwitchItemWithWork(
+            item = settings.monitorEnabled,
             title = "Contest watcher",
-            description = stringResource(id = R.string.cf_contest_watcher_description)
+            description = stringResource(id = R.string.cf_contest_watcher_description),
+            workGetter = CodeforcesMonitorLauncherWorker::getWork
         )
         SettingsSwitchItemWithWork(
             item = settings.upsolvingSuggestionsEnabled,
@@ -318,19 +318,17 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
 
     val observeContribution = itemBoolean(name = "observe_contribution", defaultValue = false)
 
-    val contestWatchEnabled = itemBoolean(name = "contest_watch", defaultValue = false)
-    val contestWatchLastSubmissionId = itemLongNullable(name = "contest_watch_last_submission")
-    val contestWatchStartedContestId = itemIntNullable(name = "contest_watch_started_contest")
-    val contestWatchCanceled = itemJsonable<List<Pair<Int,Instant>>>(name = "contest_watch_canceled", defaultValue = emptyList())
+    val monitorEnabled = itemBoolean(name = "monitor_enabled", defaultValue = false)
+    val monitorLastSubmissionId = itemLongNullable(name = "monitor_last_submission")
+    val monitorCanceledContests = itemJsonable<List<Pair<Int,Instant>>>(name = "monitor_canceled", defaultValue = emptyList())
 
     val upsolvingSuggestionsEnabled = itemBoolean(name = "upsolving_suggestions", defaultValue = false)
     val upsolvingSuggestedProblems = itemJsonable<List<CodeforcesProblem>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
 
-    override val keysForReset get() = listOf(
+    override fun keysForReset() = listOf(
         lastRatedContestId,
-        contestWatchLastSubmissionId,
-        contestWatchStartedContestId,
-        contestWatchCanceled,
+        monitorLastSubmissionId,
+        monitorCanceledContests,
         upsolvingSuggestedProblems
     )
 

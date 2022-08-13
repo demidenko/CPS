@@ -136,6 +136,14 @@ object CodeforcesApi {
         }
     }
 
+    suspend fun getUserSubmissions(handle: String, count: Long, from: Long): List<CodeforcesSubmission> {
+        return getCodeforcesApi(urlString = "${urls.api}/user.status") {
+            parameter("handle", handle)
+            parameter("count", count)
+            parameter("from", from)
+        }
+    }
+
     suspend fun getHandleSuggestionsPage(str: String): String? {
         return getCodeforcesWeb(urlString = "${urls.main}/data/handles") {
             parameter("q", str)
