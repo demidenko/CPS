@@ -50,12 +50,17 @@ class CodeforcesMonitorLauncherWorker(
             monitorCanceledContests.updateValue { list ->
                 list.filter { !isOld(it.second) }
             }
-            val canceledContests = monitorCanceledContests().map { it.first }
 
             newSubmissions.firstOrNull { submission ->
                 submission.author.participantType.participatedInContest()
             }?.let { submission ->
-                //TODO try start monitor
+                if (monitorCanceledContests().none { it.first == submission.contestId }) {
+                    CodeforcesMonitorWorker.startMonitor(
+                        context = context,
+                        contestId = submission.contestId,
+                        handle = info.handle
+                    )
+                }
             }
         }
 
