@@ -15,7 +15,6 @@ import kotlin.time.Duration
 
 private val Context.workManager get() = WorkManager.getInstance(this)
 
-private const val commonTag = "cps_worker"
 
 abstract class CPSWork(
     val name: String,
@@ -31,7 +30,6 @@ abstract class CPSWork(
 
     private fun start(restart: Boolean) {
         val request = requestBuilder.apply {
-            addTag(commonTag)
             setBackoffCriteria(
                 BackoffPolicy.LINEAR,
                 PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS,

@@ -67,7 +67,7 @@ object NotificationChannels {
     object codeforces: NotificationChannelGroupLazy("codeforces", "CodeForces") {
         val rating_changes = channel("cf_rating_changes", "Rating changes", Importance.HIGH)
         val contribution_changes = channel("cf_contribution_changes", "Contribution changes", Importance.MIN)
-        val contest_watcher = channel("cf_contest_watcher", "Contest watch")
+        val contest_monitor = channel("cf_contest_monitor", "Contest monitor")
         val follow_new_blog = channel("cf_follow_new_blog", "Follow: new blog entries")
         val follow_progress = channel("cf_follow_progress", "Follow: update progress", Importance.MIN)
         val upsolving_suggestion = channel("cf_upsolving_suggestion", "Upsolving suggestions")
@@ -100,7 +100,6 @@ object NotificationChannels {
         DEFAULT,
         HIGH;
 
-        @RequiresApi(Build.VERSION_CODES.N)
         fun convert(): Int =
             when(this) {
                 DEFAULT -> NotificationManager.IMPORTANCE_DEFAULT
@@ -118,7 +117,6 @@ object NotificationChannels {
 
 abstract class NotificationChannelGroupLazy(private val id: String, val name: String) {
     private var created = false
-    @RequiresApi(Build.VERSION_CODES.O)
     fun getId(m: NotificationManagerCompat): String {
         if (!created) {
             m.createNotificationChannelGroup(NotificationChannelGroup(id, name))
@@ -137,13 +135,11 @@ class NotificationChannelLazy(
     private var created = false
     fun getId(context: Context): String {
         if (!created) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                val m = NotificationManagerCompat.from(context)
-                val channel = NotificationChannel(id, name, importance.convert()).apply {
-                    group = groupLazy.getId(m)
-                }
-                m.createNotificationChannel(channel)
+            val m = NotificationManagerCompat.from(context)
+            val channel = NotificationChannel(id, name, importance.convert()).apply {
+                group = groupLazy.getId(m)
             }
+            m.createNotificationChannel(channel)
             created = true
         }
         return id
@@ -172,7 +168,7 @@ object NotificationIds {
     }
 
     //codeforces
-    val codeforces_contest_watcher = nextId()
+    val codeforces_contest_monitor = nextId()
     val codeforces_rating_changes = nextId()
     val codeforces_contribution_changes = nextId()
     val makeCodeforcesSystestSubmissionId = nextIdInterval()
