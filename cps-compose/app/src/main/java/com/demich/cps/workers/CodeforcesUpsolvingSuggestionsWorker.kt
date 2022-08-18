@@ -11,7 +11,6 @@ import com.demich.cps.utils.codeforces.CodeforcesProblem
 import com.demich.cps.utils.codeforces.CodeforcesProblemVerdict
 import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.edit
-import com.demich.cps.utils.getCurrentTime
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
@@ -43,7 +42,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
             ?.handle
             ?: return Result.success()
 
-        val deadLine = getCurrentTime() - 90.days
+        val deadLine = currentTime - 90.days
 
         val ratingChanges = CodeforcesApi.runCatching {
             getUserRatingChanges(handle)

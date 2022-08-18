@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.contests.settings.settingsContests
-import com.demich.cps.utils.getCurrentTime
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
@@ -25,8 +24,6 @@ class ContestsWorker(
         }
     }
     override suspend fun runWork(): Result {
-
-        val currentTime = getCurrentTime()
 
         //remove old ignored items
         context.settingsContests.ignoredContests.updateValue {

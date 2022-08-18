@@ -10,7 +10,6 @@ import com.demich.cps.room.lostBlogEntriesDao
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesUtils
-import com.demich.cps.utils.getCurrentTime
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -103,8 +102,6 @@ class CodeforcesNewsLostRecentWorker(
             = CodeforcesUtils.extractRecentBlogEntries(source).fixHandleColors()
 
         if(recentBlogEntries.isEmpty()) return Result.failure()
-
-        val currentTime = getCurrentTime()
 
         fun isNew(blogCreationTime: Instant) = currentTime - blogCreationTime < 24.hours
         fun isOldLost(blogCreationTime: Instant) = currentTime - blogCreationTime > 7.days
