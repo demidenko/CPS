@@ -86,7 +86,8 @@ fun Context.getCPSWorks() = listOf(
     ContestsWorker::getWork,
     CodeforcesNewsFollowWorker::getWork,
     CodeforcesNewsLostRecentWorker::getWork,
-    CodeforcesUpsolvingSuggestionsWorker::getWork
+    CodeforcesUpsolvingSuggestionsWorker::getWork,
+    CodeforcesMonitorLauncherWorker::getWork
 ).map { it(this) }
 
 suspend fun Context.enqueueEnabledWorkers() {
@@ -95,15 +96,6 @@ suspend fun Context.enqueueEnabledWorkers() {
 
 /*
 object WorkersCenter {
-
-    fun startCodeforcesContestWatchLauncherWorker(context: Context, restart: Boolean = true) {
-        makeAndEnqueueWork<CodeforcesContestWatchLauncherWorker>(
-            context,
-            WorkersNames.codeforces_contest_watch_launcher,
-            restart,
-            45.minutes
-        )
-    }
 
     fun startNewsWorker(context: Context, restart: Boolean = true) {
         makeAndEnqueueWork<NewsWorker>(

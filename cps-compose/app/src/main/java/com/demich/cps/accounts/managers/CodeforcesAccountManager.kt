@@ -221,7 +221,7 @@ class CodeforcesAccountManager(context: Context):
         )
         SettingsSwitchItemWithWork(
             item = settings.monitorEnabled,
-            title = "Contest watcher",
+            title = "Contest monitor",
             description = stringResource(id = R.string.cf_contest_watcher_description),
             workGetter = CodeforcesMonitorLauncherWorker::getWork
         )
