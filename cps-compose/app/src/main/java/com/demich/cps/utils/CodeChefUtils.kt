@@ -45,8 +45,9 @@ object CodeChefApi {
             val d = tokenDeferred ?: client.async {
                 println("codechef x-csrf-token start recalc...")
                 val page = client.getText("${urls.main}/ratings/all")
-                var i = page.indexOf("window.csrfToken=")
+                var i = page.indexOf("window.csrfToken")
                 require(i != -1)
+                i = page.indexOf('=', i + 1)
                 i = page.indexOf('"', i)
                 page.substring(i+1, page.indexOf('"', i+1)).also {
                     println("codechef x-csrf-token = $it")
