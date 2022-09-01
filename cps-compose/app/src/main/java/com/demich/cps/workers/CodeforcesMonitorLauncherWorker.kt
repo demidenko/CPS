@@ -26,7 +26,7 @@ class CodeforcesMonitorLauncherWorker(
         }
     }
 
-    private fun isOld(time: Instant) = currentTime - time > 24.hours
+    private fun isActual(time: Instant) = currentTime - time < 24.hours
 
     override suspend fun runWork(): Result {
         val manager = CodeforcesAccountManager(context)
@@ -48,7 +48,7 @@ class CodeforcesMonitorLauncherWorker(
             }
 
             monitorCanceledContests.updateValue { list ->
-                list.filter { !isOld(it.second) }
+                list.filter { isActual(it.second) }
             }
 
             newSubmissions.firstOrNull { submission ->
@@ -72,19 +72,13 @@ class CodeforcesMonitorLauncherWorker(
             var from = 1L
             var step = 1L
             while (true) {
-                val submissions = CodeforcesApi.getUserSubmissions(
-                    handle = handle,
-                    from = from,
-                    count = step
-                )
-                var added = false
-                for (submission in submissions) {
-                    if (isOld(submission.creationTime)) break
-                    if (lastSubmissionId != null && submission.id <= lastSubmissionId) break
-                    add(submission)
-                    added = true
-                }
-                if (!added) break
+                val items = CodeforcesApi.getUserSubmissions(handle = handle, from = from, count = step)
+                    .filter { isActual(it.creationTime) }
+                    .filter { lastSubmissionId == null || it.id > lastSubmissionId }
+
+                if (items.isEmpty()) break
+                addAll(items)
+
                 from += step
                 step += 10
             }
