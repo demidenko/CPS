@@ -27,8 +27,6 @@ import com.demich.cps.room.contestsListDao
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlin.time.Duration.Companion.seconds
@@ -86,8 +84,8 @@ private fun ContestsContent(
     val errorsList by contestsViewModel.getErrorsListState()
     val loadingStatus by contestsViewModel.rememberLoadingStatusState()
 
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
+    CPSSwipeRefresh(
+        isRefreshing = loadingStatus == LoadingStatus.LOADING,
         onRefresh = { contestsViewModel.reloadEnabledPlatforms(context) },
         modifier = modifier
     ) {

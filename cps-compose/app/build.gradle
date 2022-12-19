@@ -13,7 +13,7 @@ android {
         minSdk 26
         targetSdk 33
 
-        versionCode 259
+        versionCode 260
         versionName '1.8.5'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -64,7 +64,7 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.9.0'
 
-    implementation platform('androidx.compose:compose-bom:2022.10.00')
+    implementation platform('androidx.compose:compose-bom:2022.12.00')
     implementation "androidx.compose.ui:ui"
     implementation "androidx.compose.ui:ui-tooling-preview"
     implementation "androidx.compose.material:material"
@@ -89,7 +89,6 @@ dependencies {
     implementation "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
 
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
-    implementation "com.google.accompanist:accompanist-swiperefresh:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
 

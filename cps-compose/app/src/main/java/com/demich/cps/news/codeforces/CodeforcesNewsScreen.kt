@@ -13,6 +13,7 @@ import com.demich.cps.contests.Contest
 import com.demich.cps.news.NewsTab
 import com.demich.cps.news.NewsTabRow
 import com.demich.cps.ui.CPSNavigator
+import com.demich.cps.ui.CPSSwipeRefresh
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
@@ -20,8 +21,6 @@ import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -65,8 +64,8 @@ fun CodeforcesReloadablePage(
 ) {
     val context = context
     val loadingStatus by controller.rememberLoadingStatusState(title = title)
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = loadingStatus == LoadingStatus.LOADING),
+    CPSSwipeRefresh(
+        isRefreshing = loadingStatus == LoadingStatus.LOADING,
         onRefresh = { controller.reload(title = title, context = context) },
         content = content
     )

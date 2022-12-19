@@ -9,15 +9,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
@@ -265,5 +267,27 @@ fun CPSCountBadge(count: Int) {
         ) {
             Text(count.toString())
         }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun CPSSwipeRefresh(
+    isRefreshing: Boolean,
+    modifier: Modifier = Modifier,
+    onRefresh: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    val state = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = onRefresh
+    )
+    Box(modifier = modifier.pullRefresh(state).clipToBounds()) {
+        content()
+        PullRefreshIndicator(
+            refreshing = isRefreshing,
+            state = state,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
