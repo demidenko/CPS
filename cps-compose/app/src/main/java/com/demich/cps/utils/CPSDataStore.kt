@@ -73,7 +73,7 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         private val decode: (String) -> T,
     ): DataStoreItem<T, String>(dataStore) {
         override val key = stringPreferencesKey(name)
-        override fun fromPrefs(s: String?): T = s?.let(decode) ?: defaultValue
+        override fun fromPrefs(s: String?): T = s?.runCatching(decode)?.getOrNull() ?: defaultValue
         override fun toPrefs(t: T & Any): String = encode(t)
     }
 
