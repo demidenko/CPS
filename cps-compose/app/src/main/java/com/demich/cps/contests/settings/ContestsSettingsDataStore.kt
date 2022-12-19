@@ -7,7 +7,6 @@ import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.utils.CListApi
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.ClistResource
-import com.demich.cps.utils.DurationAsSecondsSerializer
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -39,13 +38,8 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
 
 @Serializable
 data class ContestDateConstraints(
-    @Serializable(with = DurationAsSecondsSerializer::class)
     val maxDuration: Duration = 30.days,
-
-    @Serializable(with = DurationAsSecondsSerializer::class)
     val nowToStartTimeMaxDuration: Duration = 120.days,
-
-    @Serializable(with = DurationAsSecondsSerializer::class)
     val endTimeToNowMaxDuration: Duration = 7.days,
 ) {
     fun makeFor(currentTime: Instant) = Current(
