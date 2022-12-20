@@ -52,13 +52,9 @@ private fun ContestPlatformsSettingsItemContent(
     enabledPlatforms: Set<Contest.Platform>
 ) {
     val platforms = enabledPlatforms - Contest.Platform.unknown
-    val text = when {
-        platforms.isEmpty() -> "none selected"
-        platforms.size == Contest.platformsExceptUnknown.size -> "all selected"
-        platforms.size < 4 -> platforms.joinToString()
-        else -> platforms.toList().let { "${it[0]}, ${it[1]} and ${it.size - 2} more" }
-    }
-    SettingsSubtitle(text = text)
+    if (platforms.isEmpty()) SettingsSubtitle("none selected")
+    else if (platforms.size == Contest.platformsExceptUnknown.size) SettingsSubtitle("all selected")
+    else WordsWithCounterOnOverflow(words = platforms.sortedBy { it.ordinal }.map { it.name }, fontSize = 15.sp)
 }
 
 @Composable
@@ -144,12 +140,9 @@ private fun ClistAdditionalRow() {
         Column(modifier = Modifier.weight(1f)) {
             MonospacedText(text = "clist additional")
             if (resources.isNotEmpty()) {
-                Text(
-                    text = resources.joinToString { it.name },
-                    fontSize = 10.sp,
-                    color = cpsColors.contentAdditional,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                WordsWithCounterOnOverflow(
+                    words = resources.map { it.name },
+                    fontSize = 10.sp
                 )
             }
         }

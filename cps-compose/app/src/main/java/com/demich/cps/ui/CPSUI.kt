@@ -13,9 +13,7 @@ import androidx.compose.material.*
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -288,6 +286,35 @@ fun CPSSwipeRefresh(
             refreshing = isRefreshing,
             state = state,
             modifier = Modifier.align(Alignment.TopCenter)
+        )
+    }
+}
+
+@Composable
+fun WordsWithCounterOnOverflow(
+    words: Collection<String>,
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit,
+    color: Color = cpsColors.contentAdditional
+) {
+    Row(modifier = modifier) {
+        var counter by remember { mutableStateOf("") }
+        Text(
+            text = words.joinToString(),
+            modifier = Modifier.weight(1f),
+            maxLines = 1,
+            fontSize = fontSize,
+            color = color,
+            overflow = TextOverflow.Ellipsis,
+            onTextLayout = {
+                counter = if (it.hasVisualOverflow) "(${words.size})" else ""
+            }
+        )
+        Text(
+            text = counter,
+            maxLines = 1,
+            fontSize = fontSize,
+            color = color,
         )
     }
 }
