@@ -38,7 +38,7 @@ fun AccountsScreen(
     onSetAdditionalMenu: (CPSMenuBuilder) -> Unit,
     reorderEnabledState: MutableState<Boolean>
 ) {
-    val recordedAccounts by rememberRecorderAccounts()
+    val recordedAccounts by rememberRecordedAccounts()
 
     val visibleOrder by remember {
         derivedStateOf { if (reorderEnabledState.value) recordedAccounts.map { it.type } else null }
@@ -79,7 +79,7 @@ fun AccountsScreen(
 }
 
 @Composable
-private fun rememberRecorderAccounts() = with(context) {
+private fun rememberRecordedAccounts() = with(context) {
     rememberCollect {
         combine(
             flows = allAccountManagers
@@ -212,7 +212,7 @@ private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
             .combine()
     }
 
-    val recordedAccounts by rememberRecorderAccounts()
+    val recordedAccounts by rememberRecordedAccounts()
 
     CPSReloadingButton(
         loadingStatus = loadingStatus,
