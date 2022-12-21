@@ -3,16 +3,16 @@ package com.demich.cps.news.settings
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.news.codeforces.CodeforcesTitle
-import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.codeforces.CodeforcesLocale
 import com.demich.cps.utils.codeforces.CodeforcesUtils
+import com.demich.datastore_itemized.ItemizedDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 val Context.settingsNews: NewsSettingsDataStore
     get() = NewsSettingsDataStore(this)
 
-class NewsSettingsDataStore(context: Context): CPSDataStore(context.news_settings_dataStore) {
+class NewsSettingsDataStore(context: Context): ItemizedDataStore(context.news_settings_dataStore) {
     companion object {
         private val Context.news_settings_dataStore by preferencesDataStore("news_settings")
     }

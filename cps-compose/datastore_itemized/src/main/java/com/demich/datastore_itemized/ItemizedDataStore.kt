@@ -1,4 +1,4 @@
-package com.demich.cps.utils
+package com.demich.datastore_itemized
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
@@ -7,7 +7,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-interface CPSDataStoreItem<T> {
+interface DataStoreItem<T> {
     val key: Preferences.Key<*>
     val flow: Flow<T>
 
@@ -21,11 +21,11 @@ interface CPSDataStoreItem<T> {
 }
 
 
-abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
+abstract class ItemizedDataStore(protected val dataStore: DataStore<Preferences>) {
 
-    protected abstract class DataStoreItem<T, S: Any>(
+    protected abstract class DataStoreBaseItem<T, S: Any>(
         private val dataStore: DataStore<Preferences>
-    ): CPSDataStoreItem<T> {
+    ): DataStoreItem<T> {
         abstract override val key: Preferences.Key<S>
         protected abstract fun fromPrefs(s: S?): T
         protected abstract fun toPrefs(t: T & Any): S
@@ -53,7 +53,7 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         dataStore: DataStore<Preferences>,
         override val key: Preferences.Key<T>,
         private val defaultValue: T
-    ): DataStoreItem<T, T>(dataStore) {
+    ): DataStoreBaseItem<T, T>(dataStore) {
         override fun fromPrefs(s: T?): T = s ?: defaultValue
         override fun toPrefs(t: T): T = t
     }
@@ -61,7 +61,7 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
     private class ItemNullable<T: Any> (
         dataStore: DataStore<Preferences>,
         override val key: Preferences.Key<T>
-    ): DataStoreItem<T?, T>(dataStore) {
+    ): DataStoreBaseItem<T?, T>(dataStore) {
         override fun fromPrefs(s: T?): T? = s
         override fun toPrefs(t: T): T = t
     }
@@ -72,45 +72,45 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
         private val defaultValue: T,
         private val encode: (T) -> String,
         private val decode: (String) -> T,
-    ): DataStoreItem<T, String>(dataStore) {
+    ): DataStoreBaseItem<T, String>(dataStore) {
         override val key = stringPreferencesKey(name)
         override fun fromPrefs(s: String?): T = s?.runCatching(decode)?.getOrNull() ?: defaultValue
         override fun toPrefs(t: T & Any): String = encode(t)
     }
 
-    private fun<T: Any> item(key: Preferences.Key<T>, defaultValue: T): CPSDataStoreItem<T> =
+    private fun<T: Any> item(key: Preferences.Key<T>, defaultValue: T): DataStoreItem<T> =
         Item(key = key, defaultValue = defaultValue, dataStore = dataStore)
 
-    private fun<T: Any> itemNullable(key: Preferences.Key<T>): CPSDataStoreItem<T?> =
+    private fun<T: Any> itemNullable(key: Preferences.Key<T>): DataStoreItem<T?> =
         ItemNullable(key = key, dataStore = dataStore)
 
-    protected fun<T> itemStringConvertible(name: String, defaultValue: T, encode: (T) -> String, decode: (String) -> T): CPSDataStoreItem<T> =
+    protected fun<T> itemStringConvertible(name: String, defaultValue: T, encode: (T) -> String, decode: (String) -> T): DataStoreItem<T> =
         ItemStringConvertible(name = name, defaultValue = defaultValue, encode = encode, decode = decode, dataStore = dataStore)
 
 
 
-    protected fun itemBoolean(name: String, defaultValue: Boolean): CPSDataStoreItem<Boolean> =
+    protected fun itemBoolean(name: String, defaultValue: Boolean): DataStoreItem<Boolean> =
         item(booleanPreferencesKey(name), defaultValue)
 
-    protected fun itemInt(name: String, defaultValue: Int): CPSDataStoreItem<Int> =
+    protected fun itemInt(name: String, defaultValue: Int): DataStoreItem<Int> =
         item(intPreferencesKey(name), defaultValue)
 
-    protected fun itemIntNullable(name: String): CPSDataStoreItem<Int?> =
+    protected fun itemIntNullable(name: String): DataStoreItem<Int?> =
         itemNullable(intPreferencesKey(name))
 
-    protected fun itemLong(name: String, defaultValue: Long): CPSDataStoreItem<Long> =
+    protected fun itemLong(name: String, defaultValue: Long): DataStoreItem<Long> =
         item(longPreferencesKey(name), defaultValue)
 
-    protected fun itemLongNullable(name: String): CPSDataStoreItem<Long?> =
+    protected fun itemLongNullable(name: String): DataStoreItem<Long?> =
         itemNullable(longPreferencesKey(name))
 
-    protected fun itemString(name: String, defaultValue: String): CPSDataStoreItem<String> =
+    protected fun itemString(name: String, defaultValue: String): DataStoreItem<String> =
         item(stringPreferencesKey(name), defaultValue)
 
-    protected fun itemStringNullable(name: String): CPSDataStoreItem<String?> =
+    protected fun itemStringNullable(name: String): DataStoreItem<String?> =
         itemNullable(stringPreferencesKey(name))
 
-    protected inline fun<reified T: Enum<T>> itemEnum(name: String, defaultValue: T): CPSDataStoreItem<T> =
+    protected inline fun<reified T: Enum<T>> itemEnum(name: String, defaultValue: T): DataStoreItem<T> =
         itemStringConvertible(
             name = name,
             defaultValue = defaultValue,
@@ -118,14 +118,14 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
             decode = ::enumValueOf
         )
 
-    protected inline fun<reified T: Enum<T>> itemEnumSet(name: String, defaultValue: Set<T> = emptySet()): CPSDataStoreItem<Set<T>> =
-        object : DataStoreItem<Set<T>, Set<String>>(dataStore) {
+    protected inline fun<reified T: Enum<T>> itemEnumSet(name: String, defaultValue: Set<T> = emptySet()): DataStoreItem<Set<T>> =
+        object : DataStoreBaseItem<Set<T>, Set<String>>(dataStore) {
             override val key = stringSetPreferencesKey(name)
             override fun fromPrefs(s: Set<String>?) = s?.mapTo(mutableSetOf()) { enumValueOf(it) } ?: defaultValue
             override fun toPrefs(t: Set<T>) = t.mapTo(mutableSetOf()) { it.name }
         }
 
-    protected inline fun<reified T> Json.item(name: String, defaultValue: T): CPSDataStoreItem<T> =
+    protected inline fun<reified T> Json.item(name: String, defaultValue: T): DataStoreItem<T> =
         itemStringConvertible(
             name = name,
             defaultValue = defaultValue,
@@ -137,27 +137,27 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
 
 
 @JvmName("editList")
-suspend fun<T> CPSDataStoreItem<List<T>>.edit(block: MutableList<T>.() -> Unit) {
+suspend fun<T> DataStoreItem<List<T>>.edit(block: MutableList<T>.() -> Unit) {
     updateValue { it.toMutableList().apply(block) }
 }
 
 @JvmName("editSet")
-suspend fun<T> CPSDataStoreItem<Set<T>>.edit(block: MutableSet<T>.() -> Unit) {
+suspend fun<T> DataStoreItem<Set<T>>.edit(block: MutableSet<T>.() -> Unit) {
     updateValue { it.toMutableSet().apply(block) }
 }
 
 @JvmName("editMap")
-suspend fun<K, V> CPSDataStoreItem<Map<K,V>>.edit(block: MutableMap<K,V>.() -> Unit) {
+suspend fun<K, V> DataStoreItem<Map<K,V>>.edit(block: MutableMap<K,V>.() -> Unit) {
     updateValue { it.toMutableMap().apply(block) }
 }
 
 
 @JvmName("addList")
-suspend fun<T> CPSDataStoreItem<List<T>>.add(value: T) {
+suspend fun<T> DataStoreItem<List<T>>.add(value: T) {
     edit { add(element = value) }
 }
 
 @JvmName("addSet")
-suspend fun<T> CPSDataStoreItem<Set<T>>.add(value: T) {
+suspend fun<T> DataStoreItem<Set<T>>.add(value: T) {
     edit { add(element = value) }
 }

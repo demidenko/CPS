@@ -21,8 +21,8 @@ import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
-import com.demich.cps.utils.edit
 import com.demich.cps.utils.rememberCollect
+import com.demich.datastore_itemized.edit
 import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

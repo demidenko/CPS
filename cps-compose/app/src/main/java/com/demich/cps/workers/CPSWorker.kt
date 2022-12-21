@@ -7,10 +7,10 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
-import com.demich.cps.utils.CPSDataStore
-import com.demich.cps.utils.edit
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.jsonCPS
+import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.edit
 import kotlinx.datetime.Instant
 
 abstract class CPSWorker(
@@ -67,7 +67,7 @@ fun WorkInfo.getProgressInfo(): ProgressBarInfo? {
 }
 
 
-class CPSWorkersDataStore(context: Context): CPSDataStore(context.workersDataStore) {
+class CPSWorkersDataStore(context: Context): ItemizedDataStore(context.workersDataStore) {
     companion object {
         private val Context.workersDataStore by preferencesDataStore(name = "workers_info")
     }

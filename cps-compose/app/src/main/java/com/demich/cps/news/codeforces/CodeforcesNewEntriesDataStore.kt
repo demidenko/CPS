@@ -7,10 +7,11 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
+import com.demich.datastore_itemized.ItemizedDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-class CodeforcesNewEntriesDataStore(context: Context): CPSDataStore(context.cf_new_entries_dataStore) {
+class CodeforcesNewEntriesDataStore(context: Context): ItemizedDataStore(context.cf_new_entries_dataStore) {
     companion object {
         private val Context.cf_new_entries_dataStore by preferencesDataStore("cf_new_entries")
     }

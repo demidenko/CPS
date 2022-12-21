@@ -5,9 +5,9 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.utils.CListApi
-import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.ClistResource
 import com.demich.cps.utils.jsonCPS
+import com.demich.datastore_itemized.ItemizedDataStore
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -16,7 +16,7 @@ import kotlin.time.Duration.Companion.days
 val Context.settingsContests: ContestsSettingsDataStore
     get() = ContestsSettingsDataStore(this)
 
-class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests_settings_dataStore) {
+class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.contests_settings_dataStore) {
 
     companion object {
         private val Context.contests_settings_dataStore by preferencesDataStore("contests_settings")

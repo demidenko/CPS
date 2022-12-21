@@ -15,13 +15,13 @@ import com.demich.cps.R
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.ui.*
-import com.demich.cps.utils.CPSDataStoreItem
 import com.demich.cps.utils.codeforces.CodeforcesLocale
 import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.workers.CodeforcesNewsFollowWorker
 import com.demich.cps.workers.CodeforcesNewsLostRecentWorker
+import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.launch
 
 
@@ -90,7 +90,7 @@ private fun CodeforcesLostSettingsItem() {
 
 @Composable
 private fun CodeforcesLostAuthorSettingsItem(
-    item: CPSDataStoreItem<CodeforcesUtils.ColorTag>
+    item: DataStoreItem<CodeforcesUtils.ColorTag>
 ) {
     val context = context
     val manager = remember { CodeforcesAccountManager(context) }

@@ -3,11 +3,9 @@ package com.demich.cps.contests.settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.Contest
@@ -16,8 +14,8 @@ import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
-import com.demich.cps.utils.edit
 import com.demich.cps.utils.rememberCollect
+import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
 
 @Composable

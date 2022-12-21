@@ -4,14 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import com.demich.cps.utils.CPSDataStore
-import com.demich.cps.utils.CPSDataStoreItem
 import com.demich.cps.utils.jsonCPS
+import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.ItemizedDataStore
 
 abstract class AccountDataStore<U: UserInfo>(
     dataStore: DataStore<Preferences>
-): CPSDataStore(dataStore) {
-    abstract val userInfo: CPSDataStoreItem<U>
+): ItemizedDataStore(dataStore) {
+    abstract val userInfo: DataStoreItem<U>
 }
 
 inline fun<reified U: UserInfo> AccountManager<U>.accountDataStore(
@@ -24,8 +24,8 @@ inline fun<reified U: UserInfo> AccountManager<U>.accountDataStore(
     }
 
 
-open class AccountSettingsDataStore(dataStore: DataStore<Preferences>): CPSDataStore(dataStore) {
-    protected open fun keysForReset(): List<CPSDataStoreItem<*>> = emptyList()
+open class AccountSettingsDataStore(dataStore: DataStore<Preferences>): ItemizedDataStore(dataStore) {
+    protected open fun keysForReset(): List<DataStoreItem<*>> = emptyList()
     suspend fun resetRelatedItems() {
         val keys = keysForReset().takeIf { it.isNotEmpty() } ?: return
         dataStore.edit { prefs ->

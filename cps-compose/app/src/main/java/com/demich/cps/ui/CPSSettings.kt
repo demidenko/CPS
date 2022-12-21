@@ -20,11 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.CPSDataStoreItem
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.workers.CPSWork
+import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.launch
 
 @Composable
@@ -144,7 +144,7 @@ fun SettingsSwitchItem(
 
 @Composable
 fun SettingsSwitchItem(
-    item: CPSDataStoreItem<Boolean>,
+    item: DataStoreItem<Boolean>,
     title: String,
     description: String = "",
     onCheckedChange: (Boolean) -> Unit = {}
@@ -165,7 +165,7 @@ fun SettingsSwitchItem(
 
 @Composable
 fun SettingsSwitchItemWithWork(
-    item: CPSDataStoreItem<Boolean>,
+    item: DataStoreItem<Boolean>,
     title: String,
     description: String = "",
     workGetter: (Context) -> CPSWork
@@ -184,7 +184,7 @@ fun SettingsSwitchItemWithWork(
 
 @Composable
 fun<T: Enum<T>> SettingsEnumItemContent(
-    item: CPSDataStoreItem<T>,
+    item: DataStoreItem<T>,
     title: String,
     description: String = "",
     optionToString: @Composable (T) -> AnnotatedString = { AnnotatedString(it.name) },
@@ -234,7 +234,7 @@ fun<T: Enum<T>> SettingsEnumItemContent(
 
 @Composable
 fun<T: Enum<T>> SettingsEnumItem(
-    item: CPSDataStoreItem<T>,
+    item: DataStoreItem<T>,
     title: String,
     description: String = "",
     optionToString: @Composable (T) -> AnnotatedString = { AnnotatedString(it.name) },
@@ -255,7 +255,7 @@ fun<T: Enum<T>> SettingsEnumItem(
 @Composable
 fun<T> SettingsItemWithInfo(
     modifier: Modifier = Modifier,
-    item: CPSDataStoreItem<T>,
+    item: DataStoreItem<T>,
     title: String,
     infoContent: @Composable (T) -> Unit
 ) {

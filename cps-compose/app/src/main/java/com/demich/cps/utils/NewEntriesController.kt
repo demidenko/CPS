@@ -1,5 +1,7 @@
 package com.demich.cps.utils
 
+import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -14,8 +16,8 @@ enum class NewEntryType {
 typealias NewEntriesTypes = Map<String, NewEntryType>
 
 class NewEntriesDataStoreItem (
-    item: CPSDataStoreItem<NewEntriesTypes>
-): CPSDataStoreItem<NewEntriesTypes> by item {
+    item: DataStoreItem<NewEntriesTypes>
+): DataStoreItem<NewEntriesTypes> by item {
     suspend fun apply(newEntries: Collection<String>) {
         if (newEntries.isEmpty()) return //TODO: is this OK/enough?
         updateValue { old ->

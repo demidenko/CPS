@@ -13,7 +13,7 @@ import com.demich.cps.room.ContestsListDao
 import com.demich.cps.room.contestsListDao
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
-import com.demich.cps.utils.edit
+import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
 
 class ContestsViewModel: ViewModel() {

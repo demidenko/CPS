@@ -10,7 +10,7 @@ import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesProblem
 import com.demich.cps.utils.codeforces.CodeforcesProblemVerdict
 import com.demich.cps.utils.codeforces.CodeforcesUtils
-import com.demich.cps.utils.edit
+import com.demich.datastore_itemized.edit
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 

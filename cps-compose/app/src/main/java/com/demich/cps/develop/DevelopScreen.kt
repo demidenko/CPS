@@ -18,13 +18,14 @@ import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.ui.*
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.utils.*
+import com.demich.datastore_itemized.ItemizedDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 
-class SettingsDev(context: Context): CPSDataStore(context.settings_dev_dataStore) {
+class SettingsDev(context: Context): ItemizedDataStore(context.settings_dev_dataStore) {
     companion object {
         private val Context.settings_dev_dataStore by preferencesDataStore("settings_develop")
     }

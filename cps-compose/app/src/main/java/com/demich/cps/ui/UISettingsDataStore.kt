@@ -8,12 +8,12 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.ScreenTypes
 import com.demich.cps.accounts.managers.AccountManagers
-import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.jsonCPS
+import com.demich.datastore_itemized.ItemizedDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class UISettingsDataStore(context: Context): CPSDataStore(context.settingsUI_dataStore) {
+class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsUI_dataStore) {
     companion object {
         private val Context.settingsUI_dataStore by preferencesDataStore("settings_ui")
     }

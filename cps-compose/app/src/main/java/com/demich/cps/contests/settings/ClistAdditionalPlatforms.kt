@@ -17,11 +17,13 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.utils.*
+import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
 
 @Composable
 fun ClistAdditionalResourcesDialog(
-    item: CPSDataStoreItem<List<ClistResource>>,
+    item: DataStoreItem<List<ClistResource>>,
     onDismissRequest: () -> Unit
 ) {
     val context = context
