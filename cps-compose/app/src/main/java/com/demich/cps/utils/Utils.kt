@@ -16,6 +16,9 @@ import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
@@ -121,16 +124,22 @@ enum class LoadingStatus {
     PENDING, LOADING, FAILED;
 }
 
-fun Iterable<LoadingStatus>.combine(): LoadingStatus
-    = when {
+fun Iterable<LoadingStatus>.combine(): LoadingStatus =
+    when {
         contains(LoadingStatus.LOADING) -> LoadingStatus.LOADING
         contains(LoadingStatus.FAILED) -> LoadingStatus.FAILED
         else -> LoadingStatus.PENDING
     }
 
-fun Iterable<State<LoadingStatus>>.combine(): State<LoadingStatus>
-    = derivedStateOf { map { it.value }.combine() }
+fun Iterable<State<LoadingStatus>>.combine(): State<LoadingStatus> =
+    derivedStateOf { map { it.value }.combine() }
 
+fun Iterable<Flow<LoadingStatus>>.combine(): Flow<LoadingStatus> =
+    combine(this) { it.asIterable().combine() }
+
+
+fun<K, V> Map<K, Flow<V>>.combine(): Flow<Map<K, V>> =
+    combine(entries.map { (key, value) -> value.map { key to it } }) { it.toMap() }
 
 suspend inline fun<reified A, reified B> asyncPair(
     crossinline getFirst: suspend () -> A,
@@ -150,7 +159,7 @@ object InstantAsSecondsSerializer: KSerializer<Instant> {
 }
 
 object DurationAsSecondsSerializer: KSerializer<Duration> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Duration", PrimitiveKind.LONG)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Duration_Seconds", PrimitiveKind.LONG)
     override fun serialize(encoder: Encoder, value: Duration) = encoder.encodeLong(value.inWholeSeconds)
     override fun deserialize(decoder: Decoder): Duration = decoder.decodeLong().seconds
 }

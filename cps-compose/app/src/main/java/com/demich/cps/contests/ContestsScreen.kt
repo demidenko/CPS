@@ -81,8 +81,8 @@ private fun ContestsContent(
             }
     }
 
-    val errorsList by contestsViewModel.getErrorsListState()
-    val loadingStatus by contestsViewModel.rememberLoadingStatusState()
+    val errorsList by rememberCollect { contestsViewModel.flowOfLoadingErrors() }
+    val loadingStatus by rememberCollect { contestsViewModel.flowOfLoadingStatus() }
 
     CPSSwipeRefresh(
         isRefreshing = loadingStatus == LoadingStatus.LOADING,
@@ -254,7 +254,7 @@ fun contestsMenuBuilder(
     navigator: CPSNavigator,
     contestsViewModel: ContestsViewModel
 ): CPSMenuBuilder = {
-    val loadingStatus by contestsViewModel.rememberLoadingStatusState()
+    val loadingStatus by rememberCollect { contestsViewModel.flowOfLoadingStatus() }
     
     CPSDropdownMenuItem(
         title = "Settings",
@@ -270,7 +270,7 @@ fun contestsBottomBarBuilder(
     filterController: ContestsFilterController
 ): AdditionalBottomBarBuilder = {
     val context = context
-    val loadingStatus by contestsViewModel.rememberLoadingStatusState()
+    val loadingStatus by rememberCollect { contestsViewModel.flowOfLoadingStatus() }
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
 
     if (isAnyPlatformEnabled && filterController.available) {

@@ -1,19 +1,19 @@
 package com.demich.cps.contests.loaders
 
-import androidx.compose.runtime.*
 import com.demich.cps.contests.Contest
 import com.demich.cps.room.ContestsListDao
 import com.demich.cps.utils.LoadingStatus
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class ContestsReceiver(
     private val dao: ContestsListDao,
-    private val getLoadingStatusState: (Contest.Platform) -> MutableState<LoadingStatus>,
-    private val getErrorsListState: (Contest.Platform) -> MutableState<List<Pair<ContestsLoaders, Throwable>>>,
+    private val getLoadingStatusState: (Contest.Platform) -> MutableStateFlow<LoadingStatus>,
+    private val getErrorsListState: (Contest.Platform) -> MutableStateFlow<List<Pair<ContestsLoaders, Throwable>>>,
 ) {
     fun startLoading(platform: Contest.Platform) {
-        var loadingStatus by getLoadingStatusState(platform)
-        require(loadingStatus != LoadingStatus.LOADING)
-        loadingStatus = LoadingStatus.LOADING
+        val loadingStatusState = getLoadingStatusState(platform)
+        require(loadingStatusState.value != LoadingStatus.LOADING)
+        loadingStatusState.value = LoadingStatus.LOADING
         getErrorsListState(platform).value = emptyList()
     }
 
@@ -35,10 +35,14 @@ class ContestsReceiver(
 }
 
 private fun titleFix(contest: Contest): Contest {
-    val fixedTitle = contest.title
-        .replace("（", " (")
-        .replace("）",") ")
-        .trim()
+    val fixedTitle = when (contest.platform) {
+        Contest.Platform.atcoder -> {
+            contest.title
+                .replace("（", " (")
+                .replace("）",") ")
+        }
+        else -> contest.title
+    }.trim()
     return if (contest.title == fixedTitle) contest
     else contest.copy(title = fixedTitle)
 }

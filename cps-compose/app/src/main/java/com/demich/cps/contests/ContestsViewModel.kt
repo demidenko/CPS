@@ -1,7 +1,6 @@
 package com.demich.cps.contests
 
 import android.content.Context
-import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.loaders.ContestsLoaders
@@ -14,38 +13,34 @@ import com.demich.cps.room.contestsListDao
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
 import com.demich.datastore_itemized.edit
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class ContestsViewModel: ViewModel() {
 
-    @Composable
-    fun rememberLoadingStatusState(): State<LoadingStatus> = remember {
-            Contest.platforms
-                .map { mutableLoadingStatusFor(platform = it) }
-                .combine()
+    fun flowOfLoadingStatus(): Flow<LoadingStatus> =
+            Contest.platforms.map { mutableLoadingStatusFor(it) }.combine()
+
+    fun flowOfLoadingErrors(): Flow<List<Pair<ContestsLoaders,Throwable>>> =
+        combine(
+            flow = Contest.platforms.associateWith { mutableLoadingStatusFor(it) }.combine(),
+            flow2 = Contest.platforms.associateWith { mutableErrorsList(it) }.combine()
+        ) { loadingStatuses, errors ->
+            loadingStatuses
+                .filter { it.value == LoadingStatus.FAILED }
+                .flatMap { errors[it.key] ?: emptyList() }
+                .distinct()
         }
 
-    @Composable
-    fun getErrorsListState(): State<List<Pair<ContestsLoaders,Throwable>>>
-         = remember {
-            derivedStateOf {
-                Contest.platforms
-                    .flatMap { platform ->
-                        if (mutableLoadingStatusFor(platform).value == LoadingStatus.FAILED)
-                            mutableErrorsList(platform).value
-                        else emptyList()
-                    }
-                    .distinct()
-            }
-        }
-
-    private val loadingStatuses: MutableMap<Contest.Platform, MutableState<LoadingStatus>> = mutableMapOf()
+    private val loadingStatuses: MutableMap<Contest.Platform, MutableStateFlow<LoadingStatus>> = mutableMapOf()
     private fun mutableLoadingStatusFor(platform: Contest.Platform) =
-        loadingStatuses.getOrPut(platform) { mutableStateOf(LoadingStatus.PENDING) }
+        loadingStatuses.getOrPut(platform) { MutableStateFlow(LoadingStatus.PENDING) }
 
-    private val errors: MutableMap<Contest.Platform, MutableState<List<Pair<ContestsLoaders,Throwable>>>> = mutableMapOf()
+    private val errors: MutableMap<Contest.Platform, MutableStateFlow<List<Pair<ContestsLoaders,Throwable>>>> = mutableMapOf()
     private fun mutableErrorsList(platform: Contest.Platform) =
-        errors.getOrPut(platform) { mutableStateOf(emptyList()) }
+        errors.getOrPut(platform) { MutableStateFlow(emptyList()) }
 
     private suspend fun removePlatform(platform: Contest.Platform, dao: ContestsListDao) {
         dao.remove(platform)
@@ -80,8 +75,8 @@ class ContestsViewModel: ViewModel() {
             settings = settings,
             contestsReceiver = ContestsReceiver(
                 dao = context.contestsListDao,
-                getLoadingStatusState = { mutableLoadingStatusFor(it) },
-                getErrorsListState = { mutableErrorsList(it) }
+                getLoadingStatusState = ::mutableLoadingStatusFor,
+                getErrorsListState = ::mutableErrorsList
             )
         )
     }
