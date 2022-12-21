@@ -27,6 +27,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.InstantAsSecondsSerializer
 import com.demich.cps.utils.append
 import com.demich.cps.utils.codeforces.*
+import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.AccountsWorker
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
@@ -320,10 +321,10 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
 
     val monitorEnabled = itemBoolean(name = "monitor_enabled", defaultValue = false)
     val monitorLastSubmissionId = itemLongNullable(name = "monitor_last_submission")
-    val monitorCanceledContests = itemJsonable<List<Pair<Int,Instant>>>(name = "monitor_canceled", defaultValue = emptyList())
+    val monitorCanceledContests = jsonCPS.item<List<Pair<Int,Instant>>>(name = "monitor_canceled", defaultValue = emptyList())
 
     val upsolvingSuggestionsEnabled = itemBoolean(name = "upsolving_suggestions", defaultValue = false)
-    val upsolvingSuggestedProblems = itemJsonable<List<CodeforcesProblem>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
+    val upsolvingSuggestedProblems = jsonCPS.item<List<CodeforcesProblem>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
 
     override fun keysForReset() = listOf(
         lastRatedContestId,

@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 interface CPSDataStoreItem<T> {
     val key: Preferences.Key<*>
@@ -120,16 +121,16 @@ abstract class CPSDataStore(protected val dataStore: DataStore<Preferences>) {
     protected inline fun<reified T: Enum<T>> itemEnumSet(name: String, defaultValue: Set<T> = emptySet()): CPSDataStoreItem<Set<T>> =
         object : DataStoreItem<Set<T>, Set<String>>(dataStore) {
             override val key = stringSetPreferencesKey(name)
-            override fun fromPrefs(s: Set<String>?) = s?.mapTo(mutableSetOf()) { enumValueOf<T>(it) } ?: defaultValue
+            override fun fromPrefs(s: Set<String>?) = s?.mapTo(mutableSetOf()) { enumValueOf(it) } ?: defaultValue
             override fun toPrefs(t: Set<T>) = t.mapTo(mutableSetOf()) { it.name }
         }
 
-    protected inline fun<reified T> itemJsonable(name: String, defaultValue: T): CPSDataStoreItem<T> =
+    protected inline fun<reified T> Json.item(name: String, defaultValue: T): CPSDataStoreItem<T> =
         itemStringConvertible(
             name = name,
             defaultValue = defaultValue,
-            encode = jsonCPS::encodeToString,
-            decode = jsonCPS::decodeFromString
+            encode = ::encodeToString,
+            decode = ::decodeFromString
         )
 
 }

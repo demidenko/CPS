@@ -10,6 +10,7 @@ import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.jsonCPS
 import kotlinx.datetime.Instant
 
 abstract class CPSWorker(
@@ -71,5 +72,5 @@ class CPSWorkersDataStore(context: Context): CPSDataStore(context.workersDataSto
         private val Context.workersDataStore by preferencesDataStore(name = "workers_info")
     }
 
-    val lastExecutionTime = itemJsonable<Map<String, Instant>>(name = "last_execution_time", defaultValue = emptyMap())
+    val lastExecutionTime = jsonCPS.item<Map<String, Instant>>(name = "last_execution_time", defaultValue = emptyMap())
 }

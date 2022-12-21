@@ -9,6 +9,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.ScreenTypes
 import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.utils.CPSDataStore
+import com.demich.cps.utils.jsonCPS
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -25,7 +26,7 @@ class UISettingsDataStore(context: Context): CPSDataStore(context.settingsUI_dat
     val statusBarDisabledManagers = itemEnumSet<AccountManagers>(name = "status_bar_disabled_managers")
     val statusBarResultByMaximum = itemBoolean(name = "status_bar_result_by_max", defaultValue = true)
 
-    private val accountsOrder = itemJsonable<List<AccountManagers>>(name = "accounts_order", defaultValue = emptyList())
+    private val accountsOrder = jsonCPS.item<List<AccountManagers>>(name = "accounts_order", defaultValue = emptyList())
     suspend fun saveAccountsOrder(order: List<AccountManagers>) = accountsOrder(order)
     fun flowOfAccountsOrder(): Flow<List<AccountManagers>> = accountsOrder.flow.map { order ->
         order + AccountManagers.values().filter { it !in order }

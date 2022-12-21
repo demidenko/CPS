@@ -7,6 +7,7 @@ import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.utils.CListApi
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.ClistResource
+import com.demich.cps.utils.jsonCPS
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -24,15 +25,15 @@ class ContestsSettingsDataStore(context: Context): CPSDataStore(context.contests
     //This set will always contains Platform.unknown
     val enabledPlatforms = itemEnumSet(name = "enabled_platforms", defaultValue = setOf(Contest.Platform.unknown))
     val lastReloadedPlatforms = itemEnumSet<Contest.Platform>(name = "last_reloaded_platforms", defaultValue = emptySet())
-    val ignoredContests = itemJsonable<Map<Pair<Contest.Platform, String>, Instant>>(name = "ignored_contests", defaultValue = emptyMap())
+    val ignoredContests = jsonCPS.item<Map<Pair<Contest.Platform, String>, Instant>>(name = "ignored_contests", defaultValue = emptyMap())
 
-    val clistApiAccess = itemJsonable(name = "clist_api_access", defaultValue = CListApi.ApiAccess("", ""))
-    val clistAdditionalResources = itemJsonable<List<ClistResource>>(name = "clist_additional_resources", defaultValue = emptyList())
-    val clistLastReloadedAdditionalResources = itemJsonable<Set<Int>>(name = "clist_additional_last_reloaded", defaultValue = emptySet())
+    val clistApiAccess = jsonCPS.item(name = "clist_api_access", defaultValue = CListApi.ApiAccess("", ""))
+    val clistAdditionalResources = jsonCPS.item<List<ClistResource>>(name = "clist_additional_resources", defaultValue = emptyList())
+    val clistLastReloadedAdditionalResources = jsonCPS.item<Set<Int>>(name = "clist_additional_last_reloaded", defaultValue = emptySet())
 
-    val contestsDateConstraints = itemJsonable(name = "contests_date_constraints", defaultValue = ContestDateConstraints())
+    val contestsDateConstraints = jsonCPS.item(name = "contests_date_constraints", defaultValue = ContestDateConstraints())
 
-    val contestsLoadersPriorityLists = itemJsonable(name = "loading_priorities", defaultValue = defaultLoadingPriorities)
+    val contestsLoadersPriorityLists = jsonCPS.item(name = "loading_priorities", defaultValue = defaultLoadingPriorities)
 
 }
 

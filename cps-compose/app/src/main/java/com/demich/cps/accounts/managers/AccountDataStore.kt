@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.demich.cps.utils.CPSDataStore
 import com.demich.cps.utils.CPSDataStoreItem
+import com.demich.cps.utils.jsonCPS
 
 abstract class AccountDataStore<U: UserInfo>(
     dataStore: DataStore<Preferences>
@@ -16,7 +17,7 @@ abstract class AccountDataStore<U: UserInfo>(
 inline fun<reified U: UserInfo> AccountManager<U>.accountDataStore(
     dataStore: DataStore<Preferences>
 ): AccountDataStore<U> = object : AccountDataStore<U>(dataStore = dataStore) {
-        override val userInfo = itemJsonable(
+        override val userInfo = jsonCPS.item(
             name = "user_info",
             defaultValue = emptyInfo()
         )
