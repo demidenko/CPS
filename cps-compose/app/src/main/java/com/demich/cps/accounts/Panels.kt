@@ -20,10 +20,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.append
-import com.demich.cps.utils.context
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -37,7 +34,7 @@ fun<U: UserInfo> PanelWithUI(
     onExpandRequest: () -> Unit
 ) {
     val (userInfo, manager) = userInfoWithManager
-    val loadingStatus by remember { accountsViewModel.loadingStatusFor(manager) }
+    val loadingStatus by rememberCollect { accountsViewModel.flowOfLoadingStatus(manager) }
 
     var lastClickMillis by remember { mutableStateOf(0L) }
 

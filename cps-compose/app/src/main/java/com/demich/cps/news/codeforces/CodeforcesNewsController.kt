@@ -121,12 +121,10 @@ class CodeforcesNewsController(
     }
 
     @Composable
-    fun rememberLoadingStatusState(title: CodeforcesTitle) = remember {
-        viewModel.pageLoadingStatusState(title)
-    }
+    fun rememberLoadingStatusState(title: CodeforcesTitle) = rememberCollect { viewModel.flowOfLoadingStatus(title) }
 
     @Composable
-    fun rememberLoadingStatusState() = viewModel.rememberLoadingStatusState()
+    fun rememberLoadingStatusState() = rememberCollect { viewModel.flowOfLoadingStatus() }
 
     fun reload(title: CodeforcesTitle, context: Context) = viewModel.reload(title, context)
     fun reloadAll(context: Context) = viewModel.reloadAll(context)

@@ -12,9 +12,7 @@ import com.demich.cps.utils.asyncPair
 import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.combine
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
@@ -39,7 +37,7 @@ class CodeforcesNewsViewModel: ViewModel() {
             return dataFlow.asStateFlow()
         }
 
-        val loadingStatusState = mutableStateOf(LoadingStatus.PENDING)
+        val loadingStatusState = MutableStateFlow(LoadingStatus.PENDING)
 
         fun launchLoadIfActive(locale: CodeforcesLocale) {
             if (inactive) return
@@ -63,17 +61,15 @@ class CodeforcesNewsViewModel: ViewModel() {
         CodeforcesTitle.RECENT
     )
 
-    @Composable
-    fun rememberLoadingStatusState(): State<LoadingStatus> = remember {
+    fun flowOfLoadingStatus(): Flow<LoadingStatus> =
         listOf(
             mainBlogEntries.loadingStatusState,
             topBlogEntries.loadingStatusState,
             topComments.loadingStatusState,
             recentActions.loadingStatusState
         ).combine()
-    }
 
-    fun pageLoadingStatusState(title: CodeforcesTitle): State<LoadingStatus> {
+    fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus> {
         return when (title) {
             CodeforcesTitle.MAIN -> mainBlogEntries.loadingStatusState
             CodeforcesTitle.TOP -> {
@@ -81,7 +77,7 @@ class CodeforcesNewsViewModel: ViewModel() {
                     .combine()
             }
             CodeforcesTitle.RECENT -> recentActions.loadingStatusState
-            else -> mutableStateOf(LoadingStatus.PENDING)
+            else -> flowOf(LoadingStatus.PENDING)
         }
     }
 
@@ -179,6 +175,7 @@ class CodeforcesNewsViewModel: ViewModel() {
     }
 
     fun updateFollowUsersInfo(context: Context) {
+        //TODO: call while already updating??
         viewModelScope.launch {
             followLoadingStatus = LoadingStatus.LOADING
             context.followListDao.updateUsersInfo(context)

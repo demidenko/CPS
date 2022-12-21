@@ -206,9 +206,9 @@ fun accountsBottomBarBuilder(
 private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
     val context = context
 
-    val loadingStatus by remember(accountsViewModel) {
+    val loadingStatus by rememberCollect {
         context.allAccountManagers
-            .map { accountsViewModel.loadingStatusFor(it) }
+            .map { accountsViewModel.flowOfLoadingStatus(it) }
             .combine()
     }
 
