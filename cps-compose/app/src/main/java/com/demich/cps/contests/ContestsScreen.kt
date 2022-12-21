@@ -45,15 +45,14 @@ fun ContestsScreen(
                 .consumedWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
                 .imePadding()
         ) {
-            ContestsFilterTextField(
-                filterController = filterController,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
             ContestsContent(
                 contestsViewModel = contestsViewModel,
                 filterController = filterController,
                 modifier = Modifier.weight(1f, false)
+            )
+            ContestsFilterTextField(
+                filterController = filterController,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     } else {
@@ -206,7 +205,7 @@ private fun ContestsFilterTextField(
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
-    //TODO: show in bottom, focus request
+    //TODO: focus request
     if (filterController.enabled) {
         OutlinedTextField(
             modifier = modifier,
