@@ -92,6 +92,14 @@ suspend fun Context.enqueueEnabledWorkers() {
     getCPSWorks().forEach { it.enqueueIfEnabled() }
 }
 
+fun enqueueCodeforcesMonitorWorker(context: Context, replace: Boolean) {
+    context.workManager.enqueueUniqueWork(
+        "cf_monitor",
+        if (replace) ExistingWorkPolicy.REPLACE else ExistingWorkPolicy.KEEP,
+        OneTimeWorkRequestBuilder<CodeforcesMonitorWorker>().build()
+    )
+}
+
 /*
 object WorkersCenter {
 
@@ -111,14 +119,6 @@ object WorkersCenter {
             WorkersNames.project_euler_recent_problems,
             restart,
             1.hours
-        )
-    }
-
-    fun startCodeforcesContestWatcher(context: Context, request: OneTimeWorkRequest.Builder) {
-        getWorkManager(context).enqueueUniqueWork(
-            WorkersNames.codeforces_contest_watcher,
-            ExistingWorkPolicy.REPLACE,
-            request.addTag(commonTag).build()
         )
     }
 }*/
