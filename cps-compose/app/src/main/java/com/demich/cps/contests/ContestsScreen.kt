@@ -215,13 +215,20 @@ private fun ContestsFilterTextField(
             onValueChange = {
                 filterController.filter = it
             },
+            label = { Text("filter") },
+            leadingIcon = {
+                Icon(
+                    imageVector = CPSIcons.Search,
+                    tint = cpsColors.content,
+                    contentDescription = null
+                )
+            },
             trailingIcon = {
                 CPSIconButton(icon = CPSIcons.Close) {
                     filterController.enabled = false
                     filterController.filter = ""
                 }
-            },
-            label = { Text("Search") }
+            }
         )
     }
 }
@@ -272,7 +279,7 @@ fun contestsBottomBarBuilder(
     val loadingStatus by rememberCollect { contestsViewModel.flowOfLoadingStatus() }
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
 
-    if (isAnyPlatformEnabled && filterController.available) {
+    if (isAnyPlatformEnabled && filterController.available && !filterController.enabled) {
         CPSIconButton(
             icon = CPSIcons.Search,
             onClick = { filterController.enabled = true }
