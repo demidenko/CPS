@@ -1,13 +1,13 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import androidx.core.app.NotificationCompat
-import androidx.datastore.preferences.preferencesDataStore
-import androidx.work.*
-import com.demich.cps.NotificationChannels
-import com.demich.cps.R
-import com.demich.cps.notificationBuilder
-import com.demich.datastore_itemized.ItemizedDataStore
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
+import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
+import com.demich.cps.contests.monitors.runMonitor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): CoroutineWorker(context, params) {
 
@@ -16,36 +16,14 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         val handle = monitor.handle()
         val contestId = monitor.contestId()
 
-        //start monitor (launch)
+        withContext(Dispatchers.IO) {
+            launch {
+                monitor.runMonitor()
+            }
+        }
 
         //subscribe to monitor data store
 
         return Result.success()
     }
-
-    companion object {
-        suspend fun startMonitor(context: Context, contestId: Int, handle: String) {
-            val monitor = CodeforcesMonitorDataStore(context)
-
-            val replace: Boolean
-            if (contestId == monitor.contestId() && handle == monitor.handle()) {
-                replace = false
-            } else {
-                replace = true
-                monitor.handle(handle)
-                monitor.contestId(contestId)
-            }
-
-            enqueueCodeforcesMonitorWorker(context, replace)
-        }
-    }
-}
-
-class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf_monitor_dataStore) {
-    companion object {
-        private val Context.cf_monitor_dataStore by preferencesDataStore(name = "cf_monitor")
-    }
-
-    val contestId = itemIntNullable(name = "contest_id")
-    val handle = itemString(name = "handle", defaultValue = "")
 }

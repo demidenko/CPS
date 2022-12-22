@@ -177,6 +177,18 @@ object CodeforcesApi {
         }
     }
 
+    suspend fun getContestStandings(contestId: Int, handles: Collection<String>, includeUnofficial: Boolean): CodeforcesContestStandings {
+        return getCodeforcesApi(urlString = "${urls.api}/contest.standings") {
+            parameter("contestId", contestId)
+            parameter("handles", handles.joinToString())
+            parameter("showUnofficial", includeUnofficial)
+        }
+    }
+
+    suspend fun getContestStandings(contestId: Int, handle: String, includeUnofficial: Boolean) =
+        getContestStandings(contestId, listOf(handle), includeUnofficial)
+
+
     object urls {
         const val main = "https://codeforces.com"
 

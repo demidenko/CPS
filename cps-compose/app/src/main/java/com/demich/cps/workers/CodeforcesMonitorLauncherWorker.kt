@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.STATUS
+import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.hours
@@ -55,8 +56,7 @@ class CodeforcesMonitorLauncherWorker(
                 submission.author.participantType.participatedInContest()
             }?.let { submission ->
                 if (monitorCanceledContests().none { it.first == submission.contestId }) {
-                    CodeforcesMonitorWorker.startMonitor(
-                        context = context,
+                    startMonitor(
                         contestId = submission.contestId,
                         handle = info.handle
                     )
@@ -83,4 +83,20 @@ class CodeforcesMonitorLauncherWorker(
                 step += 10
             }
         }
+
+    private suspend fun startMonitor(contestId: Int, handle: String) {
+        val monitor = CodeforcesMonitorDataStore(context)
+
+        val replace: Boolean
+        if (contestId == monitor.contestId() && handle == monitor.handle()) {
+            replace = false
+        } else {
+            replace = true
+            monitor.reset()
+            monitor.handle(handle)
+            monitor.contestId(contestId)
+        }
+
+        enqueueCodeforcesMonitorWorker(context, replace)
+    }
 }
