@@ -15,6 +15,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 object CodeforcesApi {
     private val client = cpsHttpClient {
@@ -30,7 +31,8 @@ object CodeforcesApi {
         }
     }
 
-    private const val callLimitExceededWaitTimeMillis: Long = 500
+    private val callLimitExceededWaitTime: Duration = 500.milliseconds
+    private val redirectWaitTime: Duration = 300.milliseconds
     private class CodeforcesAPICallLimitExceeded: Throwable()
     private fun isCallLimitExceeded(e: Throwable): Boolean {
         if (e is CodeforcesAPIErrorResponse) return e.isCallLimitExceeded()
@@ -55,7 +57,7 @@ object CodeforcesApi {
                 return it.result
             }.onFailure { exception ->
                 if (isCallLimitExceeded(exception)) {
-                    if (remainingRuns > 0) delay(callLimitExceededWaitTimeMillis)
+                    if (remainingRuns > 0) delay(callLimitExceededWaitTime)
                 } else {
                     throw exception
                 }
@@ -99,7 +101,7 @@ object CodeforcesApi {
                 val s = callGet()
                 if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
                     RCPC.recalc(s)
-                    delay(300)
+                    delay(redirectWaitTime)
                     callGet()
                 } else s
             }

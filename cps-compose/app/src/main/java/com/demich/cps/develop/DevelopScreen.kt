@@ -23,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.seconds
 
 
 class SettingsDev(context: Context): ItemizedDataStore(context.settings_dev_dataStore) {
@@ -60,7 +61,7 @@ fun developAdditionalBottomBarBuilder(
             val total = Random.nextInt(5, 15)
             state.value = state.value.copy(total = total, title = total.toString())
             repeat(total) {
-                delay(1000)
+                delay(1.seconds)
                 state.value++
             }
         }

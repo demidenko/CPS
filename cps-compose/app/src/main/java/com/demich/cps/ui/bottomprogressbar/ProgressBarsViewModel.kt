@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 
 @Immutable
@@ -37,7 +38,7 @@ class ProgressBarsViewModel: ViewModel() {
             val progressStateFlow = states.getOrPut(id) { mutableStateOf(ProgressBarInfo(total = 0)) }
             progressBars.add(id)
             block(progressStateFlow)
-            if (progressStateFlow.value.total > 0) delay(1000)
+            if (progressStateFlow.value.total > 0) delay(1.seconds)
             progressBars.remove(id)
             states.remove(id)
         }
