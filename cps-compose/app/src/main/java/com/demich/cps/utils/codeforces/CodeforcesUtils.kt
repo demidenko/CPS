@@ -292,6 +292,17 @@ object CodeforcesUtils {
             ?.toMap()
     }
 
+    suspend fun getContestSystemTestingPercentage(contestId: Int): Int? {
+        val src = CodeforcesApi.getPageSource(
+            urlString = CodeforcesApi.urls.contest(contestId),
+            locale = CodeforcesLocale.EN
+        ) ?: return null
+        return Jsoup.parse(src).selectFirst("span.contest-state-regular")
+            ?.text()
+            ?.removePrefix("%")
+            ?.toIntOrNull()
+    }
+
     @Composable
     fun VotedRating(
         rating: Int,
