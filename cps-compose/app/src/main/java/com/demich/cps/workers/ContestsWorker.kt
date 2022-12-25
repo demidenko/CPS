@@ -19,7 +19,8 @@ class ContestsWorker(
             override suspend fun isEnabled() = true //TODO: manage in settings
             override val requestBuilder: PeriodicWorkRequest.Builder
                 get() = CPSPeriodicWorkRequestBuilder<ContestsWorker>(
-                    repeatInterval = 24.hours
+                    repeatInterval = 24.hours,
+                    batteryNotLow = true
                 )
         }
     }
@@ -28,7 +29,7 @@ class ContestsWorker(
         //remove old ignored items
         context.settingsContests.ignoredContests.updateValue {
             it.filterValues { ignoredAtTime ->
-                currentTime - ignoredAtTime > 30.days
+                currentTime - ignoredAtTime < 30.days
             }
         }
 
