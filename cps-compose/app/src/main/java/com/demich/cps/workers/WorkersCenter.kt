@@ -45,7 +45,7 @@ abstract class CPSWork(
     }
 
     fun startImmediate() = start(restart = true)
-    fun enqueue() = start(restart = false)
+    private fun enqueue() = start(restart = false)
     suspend fun enqueueIfEnabled() {
         if (isEnabled()) enqueue()
     }

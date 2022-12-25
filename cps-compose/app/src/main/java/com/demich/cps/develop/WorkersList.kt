@@ -1,14 +1,12 @@
 package com.demich.cps.develop
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -19,6 +17,7 @@ import androidx.work.WorkInfo
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.bottomprogressbar.CPSProgressIndicator
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
+import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.demich.cps.workers.*
@@ -35,6 +34,8 @@ fun WorkersList(
         CPSWorkersDataStore(context).lastExecutionTime.flow
     }
 
+    var showRestartDialogFor: CPSWork? by remember { mutableStateOf(null) }
+
     ProvideTimeEachSecond {
         LazyColumn(modifier = modifier) {
             items(items = works, key = { it.name }) { work ->
@@ -43,11 +44,22 @@ fun WorkersList(
                     lastExecutionTime = lastExecutionTime[work.name],
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(all = 4.dp)
+                        .padding(all = 4.dp),
+                    onClick = {
+                        showRestartDialogFor = work
+                    }
                 )
                 Divider()
             }
         }
+    }
+
+    showRestartDialogFor?.let { work ->
+        CPSYesNoDialog(
+            title = { MonospacedText("restart ${work.name}?") },
+            onDismissRequest = { showRestartDialogFor = null },
+            onConfirmRequest = { work.startImmediate() }
+        )
     }
 }
 
@@ -55,7 +67,8 @@ fun WorkersList(
 private fun WorkerItem(
     work: CPSWork,
     lastExecutionTime: Instant?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
 
     val workState by work.workInfoState()
@@ -67,7 +80,8 @@ private fun WorkerItem(
         lastRunTimeAgo = lastExecutionTime?.let {
             timeAgo(fromTime = it, toTime = LocalCurrentTime.current)
         } ?: "never",
-        modifier = modifier
+        modifier = modifier,
+        onClick = onClick
     )
 }
 
@@ -77,11 +91,12 @@ private fun WorkerItem(
     workState: WorkInfo.State,
     progressInfo: ProgressBarInfo?,
     lastRunTimeAgo: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
     Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.clickable { onClick() },
     ) {
         Column(modifier = Modifier.weight(1f)) {
             MonospacedText(
