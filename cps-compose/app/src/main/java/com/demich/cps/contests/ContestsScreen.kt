@@ -299,11 +299,9 @@ private fun rememberIsAnyPlatformEnabled(): State<Boolean> {
     return rememberCollect {
         val settings = context.settingsContests
         combine(
-            flow = settings.enabledPlatforms.flow.map { it.count { it != Contest.Platform.unknown } },
-            flow2 = settings.clistAdditionalResources.flow.map { it.size }
-        ) { size1, size2 ->
-            size1 > 0 || size2 > 0
-        }
+            flow = settings.enabledPlatforms.flow.map { it.any { it != Contest.Platform.unknown } },
+            flow2 = settings.clistAdditionalResources.flow.map { it.isNotEmpty() }
+        ) { any1, any2 -> any1 || any2 }
     }
 }
 
