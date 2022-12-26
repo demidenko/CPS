@@ -124,12 +124,14 @@ enum class LoadingStatus {
     PENDING, LOADING, FAILED;
 }
 
-fun Iterable<LoadingStatus>.combine(): LoadingStatus =
-    when {
-        contains(LoadingStatus.LOADING) -> LoadingStatus.LOADING
-        contains(LoadingStatus.FAILED) -> LoadingStatus.FAILED
-        else -> LoadingStatus.PENDING
+fun Iterable<LoadingStatus>.combine(): LoadingStatus {
+    var result = LoadingStatus.PENDING
+    forEach {
+        if (it == LoadingStatus.LOADING) return LoadingStatus.LOADING
+        if (it == LoadingStatus.FAILED) result = LoadingStatus.FAILED
     }
+    return result
+}
 
 fun Iterable<State<LoadingStatus>>.combine(): State<LoadingStatus> =
     derivedStateOf { map { it.value }.combine() }

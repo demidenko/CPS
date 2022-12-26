@@ -21,9 +21,8 @@ private fun currentTimeFlow(period: Duration): Flow<Instant> =
         require(periodMillis > 0)
         while (currentCoroutineContext().isActive) {
             val currentMillis = getCurrentTime().toEpochMilliseconds()
-            val currentTimeMillisFloored = (currentMillis / periodMillis) * periodMillis
-            emit(Instant.fromEpochMilliseconds(currentTimeMillisFloored))
             val rem = currentMillis % periodMillis
+            emit(Instant.fromEpochMilliseconds(currentMillis - rem))
             delay(timeMillis = if (rem == 0L) periodMillis else periodMillis - rem)
         }
     }
