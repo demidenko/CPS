@@ -42,8 +42,8 @@ class ContestsViewModel: ViewModel() {
     private fun mutableErrorsList(platform: Contest.Platform) =
         errors.getOrPut(platform) { MutableStateFlow(emptyList()) }
 
-    private suspend fun removePlatform(platform: Contest.Platform, dao: ContestsListDao) {
-        dao.remove(platform)
+    private suspend fun ContestsListDao.removePlatform(platform: Contest.Platform) {
+        remove(platform)
         mutableErrorsList(platform).value = emptyList()
         mutableLoadingStatusFor(platform).value = LoadingStatus.PENDING
     }
@@ -75,8 +75,15 @@ class ContestsViewModel: ViewModel() {
             settings = settings,
             contestsReceiver = ContestsReceiver(
                 dao = context.contestsListDao,
-                getLoadingStatusState = ::mutableLoadingStatusFor,
-                getErrorsListState = ::mutableErrorsList
+                setLoadingStatus = { platform, loadingStatus ->
+                    val loadingStatusState = mutableLoadingStatusFor(platform)
+                    if (loadingStatus == LoadingStatus.LOADING) require(loadingStatusState.value != LoadingStatus.LOADING)
+                    loadingStatusState.value = loadingStatus
+                },
+                consumeError = { platform, loaderType, e ->
+                    mutableErrorsList(platform).value += loaderType to e
+                },
+                clearErrors = { mutableErrorsList(it).value = emptyList() }
             )
         )
     }
@@ -89,7 +96,7 @@ class ContestsViewModel: ViewModel() {
             (lastReloaded - enabled).takeIf { it.isNotEmpty() }?.let { toRemove ->
                 settings.lastReloadedPlatforms.edit { removeAll(toRemove) }
                 val dao = context.contestsListDao
-                toRemove.forEach { platform -> removePlatform(platform, dao) }
+                toRemove.forEach { platform -> dao.removePlatform(platform) }
             }
 
             val toReload = (enabled - lastReloaded).toMutableSet()
