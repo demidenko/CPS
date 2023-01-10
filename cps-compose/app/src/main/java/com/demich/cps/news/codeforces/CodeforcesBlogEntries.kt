@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,7 +36,8 @@ fun CodeforcesBlogEntries(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     enableScrollBar: Boolean = false,
-    onLongClick: ((CodeforcesBlogEntry) -> Unit)? = null
+    onLongClick: ((CodeforcesBlogEntry) -> Unit)? = null,
+    topBlogEntriesIdsState: State<Set<Int>>? = null
 ) {
     LazyColumnWithScrollBar(
         state = lazyListState,
@@ -49,6 +51,7 @@ fun CodeforcesBlogEntries(
             BlogEntryInfo(
                 blogEntry = blogEntry,
                 markNew = blogEntriesController.isNew(blogEntry.id),
+                markInTop = topBlogEntriesIdsState?.value?.contains(blogEntry.id) ?: false,
                 modifier = Modifier
                     .fillMaxWidth()
                     .combinedClickable(
@@ -74,6 +77,7 @@ fun CodeforcesBlogEntries(
 private fun BlogEntryInfo(
     blogEntry: CodeforcesBlogEntry,
     markNew: Boolean,
+    markInTop: Boolean,
     modifier: Modifier = Modifier
 ) {
     val manager = LocalCodeforcesAccountManager.current
@@ -92,6 +96,7 @@ private fun BlogEntryInfo(
             toTime = currentTime
         ),
         markNew = markNew,
+        markInTop = markInTop,
         modifier = modifier
     )
 }
@@ -104,6 +109,7 @@ private fun BlogEntryInfo(
     commentsCount: Int,
     timeAgo: String,
     markNew: Boolean,
+    markInTop: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -115,7 +121,8 @@ private fun BlogEntryInfo(
             authorHandle = authorHandle,
             timeAgo = timeAgo,
             commentsCount = commentsCount,
-            markNew = markNew
+            markNew = markNew,
+            markInTop = markInTop
         )
     }
 }
@@ -145,7 +152,8 @@ private fun BlogEntryInfoFooter(
     authorHandle: AnnotatedString,
     timeAgo: String,
     commentsCount: Int,
-    markNew: Boolean
+    markNew: Boolean,
+    markInTop: Boolean
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -167,23 +175,36 @@ private fun BlogEntryInfoFooter(
                     .alignByBaseline()
             )
             if (markNew) {
-                Box(modifier = Modifier
-                    .padding(start = 4.dp)
-                    .size(6.dp)
-                    .clip(CircleShape)
-                    .background(cpsColors.newEntry)
-                    .alignBy { it.measuredHeight }
+                NewEntryCircle(Modifier.alignBy { it.measuredHeight })
+            }
+        }
+        Row(modifier = Modifier.align(Alignment.TopEnd)) {
+            if (markInTop) {
+                Text(
+                    text = "top",
+                    color = cpsColors.contentAdditional,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            if (commentsCount > 0) {
+                CommentsRow(
+                    text = AnnotatedString(commentsCount.toString()),
+                    fontSize = 13.sp,
+                    iconSize = 13.5.sp,
+                    spaceSize = 2.dp
                 )
             }
         }
-        if (commentsCount > 0) {
-            CommentsRow(
-                text = AnnotatedString(commentsCount.toString()),
-                fontSize = 13.sp,
-                iconSize = 13.5.sp,
-                spaceSize = 2.dp,
-                modifier = Modifier.align(Alignment.TopEnd)
-            )
-        }
     }
+}
+
+@Composable
+private fun NewEntryCircle(modifier: Modifier = Modifier) {
+    Box(modifier = modifier
+        .padding(start = 4.dp)
+        .size(6.dp)
+        .clip(CircleShape)
+        .background(cpsColors.newEntry)
+    )
 }

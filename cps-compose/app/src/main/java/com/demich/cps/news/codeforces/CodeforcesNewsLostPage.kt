@@ -3,10 +3,12 @@ package com.demich.cps.news.codeforces
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.demich.cps.news.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.context
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
@@ -15,6 +17,12 @@ fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
     val blogEntriesFlow = remember {
         controller.flowOfLostBlogEntries(context)
     }
+
+    val topIdsState = remember {
+        controller.flowOfTopBlogEntries(context).map { blogEntries ->
+            blogEntries.map { it.id }.toSet()
+        }
+    }.collectAsState(initial = emptySet())
 
     val newEntriesItem = remember {
         CodeforcesNewEntriesDataStore(context).lostNewEntries
@@ -31,6 +39,7 @@ fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
             newEntriesItem = newEntriesItem,
             listState = listState
         ),
+        topBlogEntriesIdsState = topIdsState,
         lazyListState = listState,
         modifier = Modifier.fillMaxSize()
     )

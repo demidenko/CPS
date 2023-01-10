@@ -20,6 +20,7 @@ import com.demich.cps.utils.rememberCollect
 fun CodeforcesBlogEntriesFollowAddable(
     controller: CodeforcesNewsController,
     blogEntriesController: CodeforcesBlogEntriesController,
+    topBlogEntriesIdsState: State<Set<Int>>? = null,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     enableScrollBar: Boolean = false,
@@ -34,7 +35,8 @@ fun CodeforcesBlogEntriesFollowAddable(
         modifier = modifier,
         lazyListState = lazyListState,
         enableScrollBar = enableScrollBar,
-        onLongClick = { blogEntry: CodeforcesBlogEntry -> showAddToFollowDialogFor = blogEntry }.takeIf { followEnabled }
+        onLongClick = { blogEntry: CodeforcesBlogEntry -> showAddToFollowDialogFor = blogEntry }.takeIf { followEnabled },
+        topBlogEntriesIdsState = topBlogEntriesIdsState
     )
 
     showAddToFollowDialogFor?.let { blogEntry ->
