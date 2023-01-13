@@ -31,7 +31,7 @@ abstract class ItemizedDataStore(protected val dataStore: DataStore<Preferences>
         protected abstract fun toPrefs(t: T & Any): S
 
         override val flow: Flow<T>
-            get() = dataStore.data.map { it[key] }.distinctUntilChanged().map { fromPrefs(it) }
+            get() = dataStore.data.map { it[key] }.distinctUntilChanged().map(::fromPrefs)
 
         override suspend operator fun invoke(): T = fromPrefs(dataStore.data.first()[key])
 
