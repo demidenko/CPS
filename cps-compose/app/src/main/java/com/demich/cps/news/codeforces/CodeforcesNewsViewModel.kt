@@ -134,18 +134,25 @@ class CodeforcesNewsViewModel: ViewModel() {
         val comments = CodeforcesUtils.extractComments(s)
         //blog entry with low rating disappeared from blogEntries but has comments, need to merge
         val blogEntries = CodeforcesUtils.extractRecentBlogEntries(s).toMutableList()
-        val commentsGrouped = blogEntries.associate { it.id to mutableListOf<CodeforcesRecentAction>() }.toMutableMap()
-        var index = 0
+        val blogEntriesIds = blogEntries.mapTo(mutableSetOf()) { it.id }
         val usedIds = mutableSetOf<Int>()
+        var index = 0
         for (comment in comments) {
             val id = comment.blogEntry!!.id
-            commentsGrouped.getOrPut(id) {
-                blogEntries.add(
-                    index = index,
-                    element = comment.blogEntry.copy(rating = -1) //mark low rated
-                )
-                mutableListOf()
-            }.add(comment)
+            if (id !in blogEntriesIds) {
+                blogEntriesIds.add(id)
+                if (index < blogEntries.size) {
+                    //mark low rated
+                    blogEntries.add(
+                        index = index,
+                        element = comment.blogEntry.copy(rating = -1)
+                    )
+                } else {
+                    //latest recent comments has no blog entries in recent action, so most likely not low rated
+                    require(index == blogEntries.size)
+                    blogEntries.add(comment.blogEntry)
+                }
+            }
             if (id !in usedIds) {
                 usedIds.add(id)
                 val curIndex = blogEntries.indexOfFirst { it.id == id }
