@@ -3,7 +3,6 @@ package com.demich.cps.accounts.managers
 import androidx.compose.runtime.Composable
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.ItemizedDataStore
@@ -26,12 +25,7 @@ inline fun<reified U: UserInfo> AccountManager<U>.accountDataStore(
 
 open class AccountSettingsDataStore(dataStore: DataStore<Preferences>): ItemizedDataStore(dataStore) {
     protected open fun keysForReset(): List<DataStoreItem<*>> = emptyList()
-    suspend fun resetRelatedItems() {
-        val keys = keysForReset().takeIf { it.isNotEmpty() } ?: return
-        dataStore.edit { prefs ->
-            keys.forEach { prefs.remove(it.key) }
-        }
-    }
+    suspend fun resetRelatedItems() = resetKeys(keysForReset())
 }
 
 interface AccountSettingsProvider {

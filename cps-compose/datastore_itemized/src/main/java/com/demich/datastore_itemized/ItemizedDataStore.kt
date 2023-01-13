@@ -121,7 +121,7 @@ abstract class ItemizedDataStore(protected val dataStore: DataStore<Preferences>
     protected inline fun<reified T: Enum<T>> itemEnumSet(name: String, defaultValue: Set<T> = emptySet()): DataStoreItem<Set<T>> =
         object : DataStoreBaseItem<Set<T>, Set<String>>(dataStore) {
             override val key = stringSetPreferencesKey(name)
-            override fun fromPrefs(s: Set<String>?) = s?.mapTo(mutableSetOf()) { enumValueOf(it) } ?: defaultValue
+            override fun fromPrefs(s: Set<String>?) = s?.mapTo(mutableSetOf(), ::enumValueOf) ?: defaultValue
             override fun toPrefs(t: Set<T>) = t.mapTo(mutableSetOf()) { it.name }
         }
 
@@ -133,6 +133,13 @@ abstract class ItemizedDataStore(protected val dataStore: DataStore<Preferences>
             decode = ::decodeFromString
         )
 
+
+    protected suspend fun resetKeys(keys: Collection<DataStoreItem<*>>) {
+        if (keys.isEmpty()) return
+        dataStore.edit { prefs ->
+            keys.forEach { prefs.remove(it.key) }
+        }
+    }
 }
 
 

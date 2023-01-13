@@ -1,7 +1,6 @@
 package com.demich.cps.contests.monitors
 
 import android.content.Context
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.jsonCPS
@@ -90,8 +89,8 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     val sysTestPercentage = itemIntNullable("sys_test_percentage")
 
-    suspend fun reset() {
-        val items = listOf(
+    suspend fun reset() =
+        resetKeys(keys = listOf(
             contestId,
             handle,
             contestInfo,
@@ -100,9 +99,5 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
             contestantRank,
             problemResults,
             sysTestPercentage
-        )
-        dataStore.edit { prefs ->
-            items.forEach { prefs.remove(it.key) }
-        }
-    }
+        ))
 }
