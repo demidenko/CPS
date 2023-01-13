@@ -43,11 +43,9 @@ fun WorkersList(
                     work = work,
                     lastExecutionTime = lastExecutionTime[work.name],
                     modifier = Modifier
+                        .clickable { showRestartDialogFor = work }
                         .fillMaxWidth()
-                        .padding(all = 4.dp),
-                    onClick = {
-                        showRestartDialogFor = work
-                    }
+                        .padding(all = 4.dp)
                 )
                 Divider()
             }
@@ -67,8 +65,7 @@ fun WorkersList(
 private fun WorkerItem(
     work: CPSWork,
     lastExecutionTime: Instant?,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    modifier: Modifier = Modifier
 ) {
 
     val workState by work.workInfoState()
@@ -80,8 +77,7 @@ private fun WorkerItem(
         lastRunTimeAgo = lastExecutionTime?.let {
             timeAgo(fromTime = it, toTime = LocalCurrentTime.current)
         } ?: "never",
-        modifier = modifier,
-        onClick = onClick
+        modifier = modifier
     )
 }
 
@@ -91,12 +87,11 @@ private fun WorkerItem(
     workState: WorkInfo.State,
     progressInfo: ProgressBarInfo?,
     lastRunTimeAgo: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    modifier: Modifier = Modifier
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.clickable { onClick() },
+        modifier = modifier,
     ) {
         Column(modifier = Modifier.weight(1f)) {
             MonospacedText(

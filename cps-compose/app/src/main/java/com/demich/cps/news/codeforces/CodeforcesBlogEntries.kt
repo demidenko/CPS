@@ -181,7 +181,7 @@ private fun BlogEntryInfoFooter(
         Row(modifier = Modifier.align(Alignment.TopEnd)) {
             if (markInTop) {
                 Text(
-                    text = "top",
+                    text = "TOP",
                     color = cpsColors.contentAdditional,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold
