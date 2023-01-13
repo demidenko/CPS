@@ -44,7 +44,9 @@ class CodeforcesNewsViewModel: ViewModel() {
             require(loadingStatusState.value != LoadingStatus.LOADING)
             viewModelScope.launch {
                 loadingStatusState.value = LoadingStatus.LOADING
-                val data = withContext(Dispatchers.IO) { getData(locale) }
+                val data = withContext(Dispatchers.IO) {
+                    kotlin.runCatching { getData(locale) }.getOrNull()
+                }
                 if(data == null) loadingStatusState.value = LoadingStatus.FAILED
                 else {
                     dataFlow.value = data
@@ -98,6 +100,7 @@ class CodeforcesNewsViewModel: ViewModel() {
             CodeforcesTitle.MAIN -> mainBlogEntries.launchLoadIfActive(locale)
             CodeforcesTitle.TOP -> {
                 topBlogEntries.launchLoadIfActive(locale)
+                //TODO: set comments inactive after many reloads without showing them
                 topComments.launchLoadIfActive(locale)
             }
             CodeforcesTitle.RECENT -> recentActions.launchLoadIfActive(locale)
