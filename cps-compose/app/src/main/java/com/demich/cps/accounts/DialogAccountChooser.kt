@@ -10,7 +10,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.*
@@ -24,13 +23,14 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
-import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.MonospacedText
+import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
 import com.demich.cps.utils.context
+import com.demich.cps.utils.rememberFocusOnCreationRequester
 import com.demich.cps.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -63,7 +63,7 @@ fun<U: UserInfo> DialogAccountChooser(
         var suggestionsLoadError by remember { mutableStateOf(false) }
         var blockSuggestionsReload by remember { mutableStateOf(false) }
 
-        val focusRequester = remember { FocusRequester() }
+        val focusRequester = rememberFocusOnCreationRequester()
         var ignoreLaunch by remember { mutableStateOf(true) }
 
         AccountChooserHeader(
@@ -147,11 +147,6 @@ fun<U: UserInfo> DialogAccountChooser(
                     blockSuggestionsReload = false
                 }
             }
-        }
-
-        LaunchedEffect(Unit) {
-            delay(100) //TODO fix this shit: keyboard not showed without it
-            focusRequester.requestFocus()
         }
     }
 }

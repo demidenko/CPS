@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -205,10 +206,10 @@ private fun ContestsFilterTextField(
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
-    //TODO: focus request
     if (filterController.enabled) {
+        val focusRequester = rememberFocusOnCreationRequester(true)
         OutlinedTextField(
-            modifier = modifier,
+            modifier = modifier.focusRequester(focusRequester),
             singleLine = true,
             textStyle = TextStyle(fontSize = 19.sp, fontWeight = FontWeight.Bold),
             value = filterController.filter,

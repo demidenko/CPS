@@ -6,8 +6,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
@@ -15,12 +17,14 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import kotlin.time.Duration.Companion.milliseconds
 
 val context: Context
     @Composable
@@ -103,4 +107,18 @@ fun LazyListState.visibleRange(requiredVisiblePart: Float = 0.5f): IntRange {
     }
 
     return firstVisible .. lastVisible
+}
+
+@Composable
+fun rememberFocusOnCreationRequester(focusImmediately: Boolean = false): FocusRequester {
+    val requester = remember { FocusRequester() }
+    var focusedOnCreation by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(requester) {
+        if (!focusedOnCreation) {
+            if (focusImmediately) delay(100.milliseconds) //TODO fix this shit: keyboard not showed without it
+            requester.requestFocus()
+            focusedOnCreation = true
+        }
+    }
+    return requester
 }
