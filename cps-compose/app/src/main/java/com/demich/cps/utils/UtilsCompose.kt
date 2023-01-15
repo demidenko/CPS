@@ -115,7 +115,7 @@ fun rememberFocusOnCreationRequester(focusImmediately: Boolean = false): FocusRe
     var focusedOnCreation by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(requester) {
         if (!focusedOnCreation) {
-            if (focusImmediately) delay(100.milliseconds) //TODO fix this shit: keyboard not showed without it
+            if (!focusImmediately) delay(100.milliseconds) //TODO fix this shit: keyboard not showed without it
             requester.requestFocus()
             focusedOnCreation = true
         }
