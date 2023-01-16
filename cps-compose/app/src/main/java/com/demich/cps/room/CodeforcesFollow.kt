@@ -21,7 +21,7 @@ import org.jsoup.Jsoup
 
 val Context.followListDao get() = RoomSingleton.getInstance(this).followListDao()
 
-const val followListTableName = "cf_follow_list"
+private const val followListTableName = "cf_follow_list"
 
 @Dao
 interface FollowListDao {

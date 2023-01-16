@@ -10,7 +10,7 @@ val Context.contestsListDao: ContestsListDao
 
 @Dao
 interface ContestsListDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insert(contests: List<Contest>)
 
     @Delete

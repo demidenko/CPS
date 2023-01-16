@@ -21,7 +21,7 @@ class CodeforcesNewsLostRecentWorker(
 ): CPSWorker(
     work = getWork(context),
     parameters = parameters
-){
+) {
     companion object {
         fun getWork(context: Context) = object : CPSWork(name = "cf_lost", context = context) {
             override suspend fun isEnabled() = context.settingsNews.codeforcesLostEnabled()
@@ -78,7 +78,7 @@ class CodeforcesNewsLostRecentWorker(
     }
 
     //Required against new year color chaos
-    private suspend fun List<CodeforcesBlogEntry>.fixHandleColors(): List<CodeforcesBlogEntry> {
+    private suspend fun List<CodeforcesBlogEntry>.fixedHandleColors(): List<CodeforcesBlogEntry> {
         val authors = CodeforcesUtils.getUsersInfo(map { blog -> blog.authorHandle })
         //TODO: if api load failed?..
         return map { blogEntry ->
@@ -90,7 +90,6 @@ class CodeforcesNewsLostRecentWorker(
     }
 
     override suspend fun runWork(): Result {
-
         val locale = context.settingsNews.codeforcesLocale()
 
         val source = CodeforcesApi.getPageSource(
@@ -99,9 +98,9 @@ class CodeforcesNewsLostRecentWorker(
         ) ?: return Result.retry()
 
         val recentBlogEntries: List<CodeforcesBlogEntry>
-            = CodeforcesUtils.extractRecentBlogEntries(source).fixHandleColors()
+            = CodeforcesUtils.extractRecentBlogEntries(source).fixedHandleColors()
 
-        if(recentBlogEntries.isEmpty()) return Result.failure()
+        if (recentBlogEntries.isEmpty()) return Result.failure()
 
         fun isNew(blogCreationTime: Instant) = currentTime - blogCreationTime < 24.hours
         fun isOldLost(blogCreationTime: Instant) = currentTime - blogCreationTime > 7.days
@@ -157,7 +156,7 @@ class CodeforcesNewsLostRecentWorker(
         //suspect become lost
         suspects.forEach { blogEntry ->
             if (blogEntry.id !in recentIds) {
-                dao.update(blogEntry.copy(
+                dao.insert(blogEntry.copy(
                     isSuspect = false,
                     timeStamp = currentTime
                 ))

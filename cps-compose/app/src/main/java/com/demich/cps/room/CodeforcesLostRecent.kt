@@ -13,20 +13,11 @@ private const val lostBlogEntriesTableName = "cf_lost_blog_entries"
 
 @Dao
 interface LostBlogEntriesDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(blogEntries: List<CodeforcesLostBlogEntry>)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insert(blogEntry: CodeforcesLostBlogEntry)
-
-    @Update
-    suspend fun update(blogEntry: CodeforcesLostBlogEntry)
 
     @Delete
     suspend fun remove(blogEntries: List<CodeforcesLostBlogEntry>)
-
-    @Delete
-    suspend fun remove(blogEntry: CodeforcesLostBlogEntry)
 
     @Query("SELECT * FROM $lostBlogEntriesTableName where isSuspect = 0")
     suspend fun getLost(): List<CodeforcesLostBlogEntry>
