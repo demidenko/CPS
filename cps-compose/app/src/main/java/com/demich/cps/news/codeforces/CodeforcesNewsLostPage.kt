@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.demich.cps.news.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.context
+import com.demich.cps.utils.mapToSet
 import kotlinx.coroutines.flow.map
 
 @Composable
@@ -20,7 +21,7 @@ fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
 
     val topIdsState = remember {
         controller.flowOfTopBlogEntries(context).map { blogEntries ->
-            blogEntries.map { it.id }.toSet()
+            blogEntries.mapToSet { it.id }
         }
     }.collectAsState(initial = emptySet())
 

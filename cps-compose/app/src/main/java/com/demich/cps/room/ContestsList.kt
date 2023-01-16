@@ -3,6 +3,7 @@ package com.demich.cps.room
 import android.content.Context
 import androidx.room.*
 import com.demich.cps.contests.Contest
+import com.demich.cps.utils.mapToSet
 import kotlinx.coroutines.flow.Flow
 
 val Context.contestsListDao: ContestsListDao
@@ -21,7 +22,7 @@ interface ContestsListDao {
 
     suspend fun replace(platform: Contest.Platform, contests: List<Contest>) {
         require(contests.all { it.platform == platform })
-        val ids = contests.map { it.id }.toSet()
+        val ids = contests.mapToSet { it.id }
         getContests(platform)
             .filter { it.id !in ids }
             .takeIf { it.isNotEmpty() }

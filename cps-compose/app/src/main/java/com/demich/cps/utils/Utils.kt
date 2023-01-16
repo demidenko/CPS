@@ -120,6 +120,8 @@ fun <T> List<T>.isSortedWith(comparator: Comparator<in T>): Boolean {
     return true
 }
 
+inline fun <T, R> Iterable<T>.mapToSet(transform: (T) -> R): Set<R> = mapTo(mutableSetOf(), transform)
+
 enum class LoadingStatus {
     PENDING, LOADING, FAILED;
 }

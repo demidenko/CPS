@@ -10,6 +10,7 @@ import com.demich.cps.room.lostBlogEntriesDao
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesUtils
+import com.demich.cps.utils.mapToSet
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -144,7 +145,7 @@ class CodeforcesNewsLostRecentWorker(
                 }
             }
 
-        val recentIds = recentBlogEntries.map { it.id }.toSet()
+        val recentIds = recentBlogEntries.mapToSet { it.id }
 
         //remove from lost
         dao.remove(

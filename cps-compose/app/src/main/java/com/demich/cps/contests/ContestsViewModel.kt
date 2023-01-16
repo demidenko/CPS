@@ -12,6 +12,7 @@ import com.demich.cps.room.ContestsListDao
 import com.demich.cps.room.contestsListDao
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
+import com.demich.cps.utils.mapToSet
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -111,7 +112,7 @@ class ContestsViewModel: ViewModel() {
     }
 
     private suspend fun ContestsSettingsDataStore.needToReloadClistAdditional(): Boolean {
-        val enabled: Set<Int> = clistAdditionalResources().map { it.id }.toSet()
+        val enabled: Set<Int> = clistAdditionalResources().mapToSet { it.id }
         val lastReloaded: Set<Int> = clistLastReloadedAdditionalResources()
         return enabled != lastReloaded //hope it is proper equals
     }
