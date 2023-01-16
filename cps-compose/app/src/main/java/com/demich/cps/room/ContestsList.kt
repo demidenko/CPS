@@ -23,10 +23,7 @@ interface ContestsListDao {
     suspend fun replace(platform: Contest.Platform, contests: List<Contest>) {
         require(contests.all { it.platform == platform })
         val ids = contests.mapToSet { it.id }
-        getContests(platform)
-            .filter { it.id !in ids }
-            .takeIf { it.isNotEmpty() }
-            ?.let { remove(it) }
+        remove(getContests(platform).filter { it.id !in ids })
         insert(contests)
     }
 
