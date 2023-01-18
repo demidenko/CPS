@@ -74,15 +74,15 @@ private fun ContestsContent(
 ) {
     val context = context
 
-    val contestsState = rememberCollect {
+    val contestsToShowState = rememberCollect {
         context.contestsListDao.flowOfContests()
             .combine(context.settingsContests.ignoredContests.flow) { list, ignoreList ->
                 list.filter { contest -> contest.compositeId !in ignoreList }
             }
     }
 
-    LaunchedEffect(contestsState, filterController) {
-        snapshotFlow { contestsState.value.isEmpty() }
+    LaunchedEffect(contestsToShowState, filterController) {
+        snapshotFlow { contestsToShowState.value.isEmpty() }
             .collect {
                 filterController.available = !it
             }
@@ -102,8 +102,8 @@ private fun ContestsContent(
                 modifier = Modifier
                     .fillMaxWidth()
             )
-            ContestsListSorted(
-                contestsState = contestsState,
+            ContestsList(
+                contestsState = contestsToShowState,
                 filterController = filterController,
                 modifier = Modifier
                     .fillMaxSize()
@@ -113,7 +113,7 @@ private fun ContestsContent(
 }
 
 @Composable
-private fun ContestsListSorted(
+private fun ContestsList(
     contestsState: State<List<Contest>>,
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
