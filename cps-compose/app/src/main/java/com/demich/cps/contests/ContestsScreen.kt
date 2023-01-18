@@ -81,6 +81,13 @@ private fun ContestsContent(
             }
     }
 
+    LaunchedEffect(contestsState, filterController) {
+        snapshotFlow { contestsState.value.isEmpty() }
+            .collect {
+                filterController.available = !it
+            }
+    }
+
     val errorsList by rememberCollect { contestsViewModel.flowOfLoadingErrors() }
     val loadingStatus by rememberCollect { contestsViewModel.flowOfLoadingStatus() }
 
@@ -95,7 +102,7 @@ private fun ContestsContent(
                 modifier = Modifier
                     .fillMaxWidth()
             )
-            ContestsList(
+            ContestsListSorted(
                 contestsState = contestsState,
                 filterController = filterController,
                 modifier = Modifier
@@ -103,26 +110,6 @@ private fun ContestsContent(
             )
         }
     }
-}
-
-@Composable
-private fun ContestsList(
-    contestsState: State<List<Contest>>,
-    filterController: ContestsFilterController,
-    modifier: Modifier = Modifier
-) {
-    LaunchedEffect(contestsState, filterController) {
-        snapshotFlow { contestsState.value.isEmpty() }
-            .collect {
-                filterController.available = !it
-            }
-    }
-
-    ContestsListSorted(
-        contestsState = contestsState,
-        filterController = filterController,
-        modifier = modifier
-    )
 }
 
 @Composable
