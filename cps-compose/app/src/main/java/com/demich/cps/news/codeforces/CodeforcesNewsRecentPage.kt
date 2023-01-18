@@ -65,9 +65,15 @@ private fun RecentBlogEntriesPage(
     recentActionsState: State<Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>>,
 ) {
     val context = context
+
+    fun openBlogEntry(blogEntry: CodeforcesBlogEntry) {
+        context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(blogEntry.id))
+    }
+
     CodeforcesRecentBlogEntries(
         recentActionsState = recentActionsState,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        onOpenBlogEntry = ::openBlogEntry,
     ) { blogEntry, comments ->
         CPSDropdownMenuItem(title = "Open recent comment", icon = CPSIcons.OpenInBrowser) {
             context.openUrlInBrowser(CodeforcesApi.urls.comment(
@@ -76,7 +82,7 @@ private fun RecentBlogEntriesPage(
             ))
         }
         CPSDropdownMenuItem(title = "Open blog entry", icon = CPSIcons.OpenInBrowser) {
-            context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(blogEntry.id))
+            openBlogEntry(blogEntry)
         }
         CPSDropdownMenuItem(title = "Show recent comments", icon = CPSIcons.Comments) {
             controller.recentFilterByBlogEntryId = blogEntry.id

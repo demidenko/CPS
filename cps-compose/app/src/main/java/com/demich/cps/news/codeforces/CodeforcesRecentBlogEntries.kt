@@ -25,6 +25,7 @@ import com.demich.cps.utils.codeforces.CodeforcesRecentAction
 fun CodeforcesRecentBlogEntries(
     recentActionsState: State<Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>>,
     modifier: Modifier = Modifier,
+    onOpenBlogEntry: (CodeforcesBlogEntry) -> Unit,
     menuBuilder: @Composable CPSDropdownMenuScope.(CodeforcesBlogEntry, List<CodeforcesComment>) -> Unit
 ) {
     val recent = remember(recentActionsState.value) {
@@ -37,9 +38,9 @@ fun CodeforcesRecentBlogEntries(
         itemsNotEmpty(items = recent) {
             ContentWithCPSDropdownMenu(
                 modifier = Modifier
-                    .clickable(enabled = it.comments.isNotEmpty()) {
-                        //TODO: just open blog entry on empty
-                        showMenuForBlogEntryId = it.blogEntry.id
+                    .clickable {
+                        if (it.comments.isEmpty()) onOpenBlogEntry(it.blogEntry)
+                        else showMenuForBlogEntryId = it.blogEntry.id
                     }
                     .fillMaxWidth()
                     .padding(start = 3.dp, end = 3.dp, bottom = 2.dp),
@@ -57,23 +58,23 @@ fun CodeforcesRecentBlogEntries(
 @Immutable
 private data class CodeforcesRecentBlogEntry(
     val blogEntry: CodeforcesBlogEntry,
-    val comments: List<CodeforcesComment>,
-    val isLowRated: Boolean
-)
+    val comments: List<CodeforcesComment>, //only first comment per each commentator
+) {
+    val isLowRated: Boolean get() = blogEntry.rating < 0
+}
 
 private fun makeRecentBlogEntries(
     blogEntries: List<CodeforcesBlogEntry>,
     comments: List<CodeforcesRecentAction>
 ): List<CodeforcesRecentBlogEntry> {
-    val commentsGrouped = comments.groupBy { it.blogEntry!!.id }
+    val commentsGrouped = comments.groupBy { it.blogEntry?.id }
     return blogEntries.map { blogEntry ->
         CodeforcesRecentBlogEntry(
             blogEntry = blogEntry,
             comments = commentsGrouped[blogEntry.id]
                 ?.map { it.comment }
                 ?.distinctBy { it.commentatorHandle }
-                ?: emptyList(),
-            isLowRated = blogEntry.rating < 0
+                ?: emptyList()
         )
     }
 }
