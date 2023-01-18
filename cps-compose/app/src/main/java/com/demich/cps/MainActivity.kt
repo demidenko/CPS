@@ -14,7 +14,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -45,13 +47,16 @@ import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.workers.enqueueEnabledWorkers
+import kotlinx.coroutines.launch
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        lifecycleScope.launchWhenCreated {
-            this@MainActivity.enqueueEnabledWorkers()
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                this@MainActivity.enqueueEnabledWorkers()
+            }
         }
 
         WindowCompat.setDecorFitsSystemWindows(window, false)

@@ -1,7 +1,6 @@
 package com.demich.cps.utils
 
 import androidx.compose.runtime.*
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -27,7 +26,6 @@ private fun currentTimeFlow(period: Duration): Flow<Instant> =
         }
     }
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun collectCurrentTimeAsState(period: Duration): State<Instant> {
     return remember(key1 = period) {
