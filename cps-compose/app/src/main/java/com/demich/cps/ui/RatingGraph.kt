@@ -50,7 +50,7 @@ data class RatingGraphUIStates (
 fun rememberRatingGraphUIStates(): RatingGraphUIStates {
     val showRatingGraph = rememberSaveable { mutableStateOf(false) }
     val ratingLoadingStatus = rememberSaveable { mutableStateOf(LoadingStatus.PENDING) }
-    val ratingChanges = rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(emptyList<RatingChange>()) }
+    val ratingChanges = rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(emptyList<RatingChange>()) }
     return remember { RatingGraphUIStates(showRatingGraph, ratingLoadingStatus, ratingChanges) }
 }
 
@@ -175,7 +175,7 @@ private fun RatingGraph(
     }
 
     var selectedRatingChange: RatingChange?
-        by rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(null) }
+        by rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(null) }
 
     val rectangles = remember(manager.type) { RatingGraphRectangles(manager) }
 

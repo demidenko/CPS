@@ -152,7 +152,7 @@ private fun ContestsSortedList(
     modifier: Modifier = Modifier
 ) {
     var expandedItems: Set<Pair<Contest.Platform, String>>
-        by rememberSaveable(stateSaver = jsonSaver()) { mutableStateOf(emptySet()) }
+        by rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(emptySet()) }
 
     val filteredContests = remember(
         key1 = contestsSortedListState.value,

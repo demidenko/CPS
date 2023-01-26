@@ -67,7 +67,7 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
     val context = context
     val scope = rememberCoroutineScope()
 
-    var apiAccess by rememberSaveable(stateSaver = jsonSaver()) {
+    var apiAccess by rememberSaveable(stateSaver = jsonCPS.saver()) {
         mutableStateOf(runBlocking { context.settingsContests.clistApiAccess() })
     }
 

@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.milliseconds
 
 val context: Context
@@ -33,17 +34,17 @@ val context: Context
 
 
 @Composable
-inline fun<reified T> jsonSaver() = remember {
+inline fun<reified T> Json.saver() = remember(this) {
     Saver<T, String>(
-        restore = jsonCPS::decodeFromString,
-        save = { jsonCPS.encodeToString(it) }
+        restore = ::decodeFromString,
+        save = { encodeToString(it) }
     )
 }
 
 
 @Composable
-fun<T> rememberCollect(block: () -> Flow<T>) =
-    remember { block() }.let { flow ->
+inline fun<T> rememberCollect(crossinline block: () -> Flow<T>) =
+    remember(block).let { flow ->
         if (flow is StateFlow<T>) flow.collectAsState()
         else flow.collectAsState(initial = remember(flow) { runBlocking { flow.first() } })
     }
