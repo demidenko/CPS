@@ -23,7 +23,7 @@ object CodeforcesApi {
             handleResponseExceptionWithRequest { exception, _ ->
                 if (exception !is ResponseException) return@handleResponseExceptionWithRequest
                 val response = exception.response
-                if(response.status == HttpStatusCode.ServiceUnavailable) {
+                if (response.status == HttpStatusCode.ServiceUnavailable) {
                     throw CodeforcesAPICallLimitExceeded()
                 }
                 throw jsonCPS.decodeFromString<CodeforcesAPIErrorResponse>(response.bodyAsText())
@@ -76,7 +76,7 @@ object CodeforcesApi {
         fun recalc(source: String) {
             val i = source.indexOf("c=toNumbers(")
             val c = source.substring(source.indexOf("(\"",i)+2, source.indexOf("\")",i))
-            if(c == last_c) return
+            if (c == last_c) return
             rcpc_value = decodeAES(c)
             last_c = c
             println("$c: $rcpc_value")
@@ -227,35 +227,35 @@ data class CodeforcesAPIErrorResponse(
 
     fun isHandleNotFound(): String? {
         val cut = comment.removeSurrounding("handles: User with handle ", " not found")
-        if(cut == comment) return null
+        if (cut == comment) return null
         return cut
     }
 
     fun isBlogEntryNotFound(blogEntryId: Int): Boolean {
-        if(comment == "blogEntryId: Blog entry with id $blogEntryId not found") return true
-        if(comment == "Blog entry with id $blogEntryId not found") return true
+        if (comment == "blogEntryId: Blog entry with id $blogEntryId not found") return true
+        if (comment == "Blog entry with id $blogEntryId not found") return true
         return false
     }
 
     fun isBlogHandleNotFound(handle: String): Boolean {
-        if(comment == "handle: User with handle $handle not found") return true
-        if(comment == "handle: Field should contain between 3 and 24 characters, inclusive") return true
-        if(comment == "handle: Поле должно содержать от 3 до 24 символов, включительно") return true
+        if (comment == "handle: User with handle $handle not found") return true
+        if (comment == "handle: Field should contain between 3 and 24 characters, inclusive") return true
+        if (comment == "handle: Поле должно содержать от 3 до 24 символов, включительно") return true
         return false
     }
 
     fun isNotAllowedToReadThatBlog(): Boolean {
-        if(comment == "handle: You are not allowed to read that blog") return true
+        if (comment == "handle: You are not allowed to read that blog") return true
         return false
     }
 
     fun isContestRatingUnavailable(): Boolean {
-        if(comment == "contestId: Rating changes are unavailable for this contest") return true
+        if (comment == "contestId: Rating changes are unavailable for this contest") return true
         return false
     }
 
     fun isContestNotStarted(contestId: Int): Boolean {
-        if(comment == "contestId: Contest with id $contestId has not started") return true
+        if (comment == "contestId: Contest with id $contestId has not started") return true
         return false
     }
 }
@@ -342,7 +342,7 @@ data class CodeforcesSubmission(
     val testset: CodeforcesTestset
 ) {
     fun makeVerdict(): String {
-        if(verdict == CodeforcesProblemVerdict.OK) return "OK"
+        if (verdict == CodeforcesProblemVerdict.OK) return "OK"
         return "${verdict.name} #${passedTestCount+1}"
     }
 }
