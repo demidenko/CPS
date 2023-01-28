@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
-import com.demich.cps.contests.monitors.runMonitor
+import com.demich.cps.contests.monitors.runIn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -13,16 +13,14 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
 
     override suspend fun doWork(): Result {
         val monitor = CodeforcesMonitorDataStore(context)
-        val handle = monitor.handle()
-        val contestId = monitor.contestId()
 
         withContext(Dispatchers.IO) {
             launch {
-                monitor.runMonitor()
+                monitor.runIn(scope = this)
             }
         }
 
-        //subscribe to monitor data store
+        //TODO: subscribe to monitor data store
 
         return Result.success()
     }
