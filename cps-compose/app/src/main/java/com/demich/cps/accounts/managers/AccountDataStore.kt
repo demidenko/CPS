@@ -24,8 +24,8 @@ inline fun<reified U: UserInfo> AccountManager<U>.accountDataStore(
 
 
 open class AccountSettingsDataStore(dataStore: DataStore<Preferences>): ItemizedDataStore(dataStore) {
-    protected open fun keysForReset(): List<DataStoreItem<*>> = emptyList()
-    suspend fun resetRelatedItems() = resetKeys(keysForReset())
+    protected open fun itemsForReset(): List<DataStoreItem<*>> = emptyList()
+    suspend fun resetRelatedItems() = resetItems(itemsForReset())
 }
 
 interface AccountSettingsProvider {

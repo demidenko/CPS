@@ -132,7 +132,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
     val sysTestPercentage = itemIntNullable("sys_test_percentage")
 
     suspend fun reset() =
-        resetKeys(keys = listOf(
+        resetItems(items = listOf(
             contestId,
             handle,
             contestInfo,

@@ -326,7 +326,7 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
     val upsolvingSuggestionsEnabled = itemBoolean(name = "upsolving_suggestions", defaultValue = false)
     val upsolvingSuggestedProblems = jsonCPS.item<List<CodeforcesProblem>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
 
-    override fun keysForReset() = listOf(
+    override fun itemsForReset() = listOf(
         lastRatedContestId,
         monitorLastSubmissionId,
         monitorCanceledContests,

@@ -134,10 +134,10 @@ abstract class ItemizedDataStore(protected val dataStore: DataStore<Preferences>
         )
 
 
-    protected suspend fun resetKeys(keys: Collection<DataStoreItem<*>>) {
-        if (keys.isEmpty()) return
+    protected suspend fun resetItems(items: Collection<DataStoreItem<*>>) {
+        if (items.isEmpty()) return
         dataStore.edit { prefs ->
-            keys.forEach { prefs.remove(it.key) }
+            items.forEach { prefs.remove(it.key) }
         }
     }
 }

@@ -155,6 +155,6 @@ class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager):
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)
     val lastRatedContestId = itemStringNullable(name = "last_rated_contest")
 
-    override fun keysForReset() = listOf(lastRatedContestId)
+    override fun itemsForReset() = listOf(lastRatedContestId)
 
 }
