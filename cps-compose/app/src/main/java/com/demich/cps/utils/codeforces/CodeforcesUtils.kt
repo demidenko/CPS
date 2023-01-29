@@ -299,7 +299,7 @@ object CodeforcesUtils {
         ) ?: return null
         return Jsoup.parse(src).selectFirst("span.contest-state-regular")
             ?.text()
-            ?.removePrefix("%")
+            ?.removeSuffix("%")
             ?.toIntOrNull()
     }
 
