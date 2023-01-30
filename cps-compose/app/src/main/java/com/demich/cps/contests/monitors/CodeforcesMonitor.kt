@@ -11,7 +11,7 @@ import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-suspend fun CodeforcesMonitorDataStore.runIn(scope: CoroutineScope) {
+suspend fun CodeforcesMonitorDataStore.launchIn(scope: CoroutineScope) {
     val contestId = contestId() ?: return
 
     val mainJob = scope.launchWhileActive {
@@ -55,12 +55,14 @@ private suspend fun CodeforcesMonitorDataStore.getStandingsData(contestId: Int) 
             includeUnofficial = participationType() != CodeforcesParticipationType.CONTESTANT
         )
     }.onFailure { e ->
+        lastRequest(false)
         if (e is CodeforcesAPIErrorResponse) {
             if (e.isContestNotStarted(contestId)) {
                 contestInfo.updateValue { it.copy(phase = CodeforcesContestPhase.BEFORE) }
             }
         }
     }.onSuccess { standings ->
+        lastRequest(true)
         problemIndices(standings.problems.map { it.index })
         contestInfo(standings.contest)
         standings.rows.find { row -> row.party.participantType.participatedInContest() }
@@ -134,6 +136,8 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
     val contestId = itemIntNullable(name = "contest_id")
     val handle = itemString(name = "handle", defaultValue = "")
 
+    val lastRequest = jsonCPS.item<Boolean?>(name = "last_request", defaultValue = null)
+
     val contestInfo = jsonCPS.item(name = "contest_info", defaultValue = CodeforcesContest(
         id = -1,
         name = "",
@@ -155,6 +159,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
         resetItems(items = listOf(
             contestId,
             handle,
+            lastRequest,
             contestInfo,
             problemIndices,
             participationType,

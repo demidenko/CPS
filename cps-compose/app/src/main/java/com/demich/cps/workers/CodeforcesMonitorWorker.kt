@@ -4,9 +4,8 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
-import com.demich.cps.contests.monitors.runIn
+import com.demich.cps.contests.monitors.launchIn
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): CoroutineWorker(context, params) {
@@ -15,9 +14,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         val monitor = CodeforcesMonitorDataStore(context)
 
         withContext(Dispatchers.IO) {
-            launch {
-                monitor.runIn(scope = this)
-            }
+            monitor.launchIn(scope = this)
         }
 
         //TODO: subscribe to monitor data store
