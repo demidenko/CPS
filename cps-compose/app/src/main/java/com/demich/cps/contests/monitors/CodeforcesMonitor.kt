@@ -6,34 +6,45 @@ import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 suspend fun CodeforcesMonitorDataStore.runIn(scope: CoroutineScope) {
-    collectSystemTestPercentage(scope = scope, delay = 5.seconds)
-    while (true) {
-        val contestId = contestId() ?: return
+    val contestId = contestId() ?: return
+
+    val mainJob = scope.launchWhileActive {
         val prevParticipationType = participationType()
 
         getStandingsData(contestId)
 
         if (prevParticipationType != CodeforcesParticipationType.CONTESTANT && participationType() == CodeforcesParticipationType.CONTESTANT) {
-            continue
+            return@launchWhileActive Duration.ZERO
         }
 
         val currentPhase = contestInfo().phase
         //TODO submissions result check
 
-        when (val delayTime = getDelay(currentPhase, participationType())) {
-            Duration.INFINITE -> return
-            else -> delay(delayTime)
-        }
+        getDelay(currentPhase, participationType())
     }
+
+    val percentageJob = contestInfo.flow.map { it.phase }
+        .collectSystemTestPercentage(
+            contestId = contestId,
+            scope = scope,
+            delay = 5.seconds
+        ) {
+            sysTestPercentage(it)
+        }
+
+    this.contestId.flow
+        .takeWhile { it == contestId }
+        .onCompletion {
+            percentageJob.cancel()
+            mainJob.cancel()
+        }
+        .launchIn(scope)
 }
 
 private suspend fun CodeforcesMonitorDataStore.getStandingsData(contestId: Int) {
@@ -82,29 +93,38 @@ private fun getDelay(
     }
 }
 
-private fun CodeforcesMonitorDataStore.collectSystemTestPercentage(
+private fun Flow<CodeforcesContestPhase>.collectSystemTestPercentage(
+    contestId: Int,
     scope: CoroutineScope,
-    delay: Duration
-) {
-    suspend fun percentageChecker() {
-        while (scope.isActive) {
-            contestId()?.let { contestId ->
-                CodeforcesUtils.getContestSystemTestingPercentage(contestId)?.let {
-                    sysTestPercentage(it)
-                }
-            }
-            delay(delay)
-        }
-    }
+    delay: Duration,
+    onSetPercentage: suspend (Int) -> Unit
+): Job {
     var job: Job? = null
-    contestInfo.flow.map { it.phase }.distinctUntilChanged().onEach { phase ->
+    return distinctUntilChanged().onEach { phase ->
         if (phase == CodeforcesContestPhase.SYSTEM_TEST) {
-            job = scope.launch { percentageChecker() }
+            job = scope.launchWhileActive {
+                CodeforcesUtils.getContestSystemTestingPercentage(contestId)?.let {
+                    if (isActive) onSetPercentage(it)
+                }
+                delay
+            }
         } else {
             job?.cancel()
         }
     }.launchIn(scope)
 }
+
+
+private fun CoroutineScope.launchWhileActive(block: suspend CoroutineScope.() -> Duration) =
+    launch {
+        while (isActive) {
+            val delayNext = block()
+            if (delayNext == Duration.INFINITE) break
+            if (delayNext > Duration.ZERO) delay(delayNext)
+        }
+    }
+
+
 
 class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf_monitor_dataStore) {
     companion object {
