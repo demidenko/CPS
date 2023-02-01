@@ -125,7 +125,7 @@ private fun PhaseTitle(
             PhaseTitle(
                 phase = contestPhase.phase,
                 modifier = modifier,
-                info = contestPhase.percentage?.let { "%$it" } ?: ""
+                info = contestPhase.percentage?.let { "$it%" } ?: ""
             )
         }
         else -> {
