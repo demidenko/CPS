@@ -105,6 +105,7 @@ private fun getDelay(
         CodeforcesContestPhase.CODING -> return 3.seconds
         CodeforcesContestPhase.SYSTEM_TEST -> return 3.seconds
         CodeforcesContestPhase.PENDING_SYSTEM_TEST -> return 15.seconds
+        CodeforcesContestPhase.UNDEFINED -> return 5.seconds
         //CodeforcesContestPhase.FINISHED -> //TODO
         else -> return 30.seconds
     }

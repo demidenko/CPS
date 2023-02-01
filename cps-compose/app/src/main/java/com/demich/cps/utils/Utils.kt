@@ -87,6 +87,10 @@ fun Duration.toHHMMSS(): String = toComponents { hours, minutes, seconds, _ ->
     String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }
 
+fun Duration.toMMSS(): String = toComponents { minutes, seconds, _ ->
+    String.format("%02d:%02d", minutes, seconds)
+}
+
 fun timeDifference(fromTime: Instant, toTime: Instant): String {
     val t: Duration = toTime - fromTime
     return when {

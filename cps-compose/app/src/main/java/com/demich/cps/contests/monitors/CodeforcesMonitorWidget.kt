@@ -14,21 +14,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesContestPhase
 import com.demich.cps.utils.codeforces.CodeforcesParticipationType
-import com.demich.cps.utils.codeforces.CodeforcesProblemStatus
-import com.demich.cps.utils.collectCurrentTimeAsState
-import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
-import com.demich.cps.utils.toHHMMSS
 import kotlinx.coroutines.flow.combine
 import kotlinx.datetime.Instant
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 
 @Composable
-fun CodeforcesMonitorWidget() {
-    CompositionLocalProvider(LocalTextStyle provides TextStyle.Default.copy(fontSize = 14.sp)) {
+fun CodeforcesMonitorWidget(modifier: Modifier = Modifier) {
+    CompositionLocalProvider(LocalTextStyle provides TextStyle.Default.copy(fontSize = 16.sp)) {
         val context = context
 
         val monitor = CodeforcesMonitorDataStore(context)
@@ -62,7 +60,7 @@ fun CodeforcesMonitorWidget() {
             monitor.participationType.flow
         }
 
-        Column {
+        Column(modifier) {
             Title(
                 contestPhase = phase,
                 requestFailed = lastRequest == false,
@@ -112,19 +110,41 @@ private fun PhaseTitle(
     contestPhase: ContestPhase,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier = modifier) {
-        Text(text = contestPhase.phase.getTitle())
-        when (contestPhase) {
-            is ContestPhase.SystemTesting -> {
-                contestPhase.percentage?.let { Text(text = " %$it") }
-            }
-            is ContestPhase.Coding -> {
-                val currentTime by collectCurrentTimeAsState(period = 1.seconds)
-                Text(text = (contestPhase.endTime - currentTime).toHHMMSS())
-            }
-            else -> {}
+    when (contestPhase) {
+        is ContestPhase.Coding -> {
+            val currentTime by collectCurrentTimeAsState(period = 1.seconds)
+            PhaseTitle(
+                phase = contestPhase.phase,
+                modifier = modifier,
+                info = (contestPhase.endTime - currentTime).coerceAtLeast(Duration.ZERO).let {
+                    if (it < 1.hours) it.toMMSS() else it.toHHMMSS()
+                }
+            )
+        }
+        is ContestPhase.SystemTesting -> {
+            PhaseTitle(
+                phase = contestPhase.phase,
+                modifier = modifier,
+                info = contestPhase.percentage?.let { "%$it" } ?: ""
+            )
+        }
+        else -> {
+            PhaseTitle(phase = contestPhase.phase, modifier = modifier)
         }
     }
+}
+
+@Composable
+private fun PhaseTitle(
+    phase: CodeforcesContestPhase,
+    modifier: Modifier = Modifier,
+    info: String = ""
+) {
+    Text(
+        text = phase.getTitle() + " " + info,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier
+    )
 }
 
 
@@ -180,7 +200,7 @@ private fun ProblemPointsCell(
 ) {
     Text(
         text = problemResult.pointsToNiceString(),
-        fontWeight = if (problemResult.type == CodeforcesProblemStatus.FINAL) FontWeight.Bold else FontWeight.Normal,
+        fontWeight = FontWeight.Bold,
         color = if (phase == CodeforcesContestPhase.SYSTEM_TEST || phase == CodeforcesContestPhase.FINISHED) cpsColors.success else cpsColors.content,
         modifier = modifier
     )
