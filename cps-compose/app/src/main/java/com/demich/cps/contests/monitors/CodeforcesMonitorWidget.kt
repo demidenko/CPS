@@ -47,16 +47,7 @@ fun CodeforcesMonitorWidget() {
         }
 
         val problems by rememberCollect {
-            monitor.problemResults.flow.combine(monitor.problemIndices.flow) { results, names ->
-                names.mapIndexed { index, name ->
-                    val result = results.getOrNull(index)
-                    ProblemResult(
-                        problemIndex = name,
-                        points = result?.points ?: 0.0,
-                        type = result?.type ?: CodeforcesProblemStatus.FINAL
-                    )
-                }
-            }
+            monitor.problemResults.flow
         }
 
         val lastRequest by rememberCollect {
@@ -136,18 +127,10 @@ private fun PhaseTitle(
     }
 }
 
-private data class ProblemResult(
-    val problemIndex: String,
-    val points: Double,
-    val type: CodeforcesProblemStatus
-) {
-    fun pointsToNiceString() =
-        if (points != 0.0) points.toString().removeSuffix(".0") else ""
-}
 
 @Composable
 private fun StandingsRow(
-    problems: List<ProblemResult>,
+    problems: List<CodeforcesMonitorProblemResult>,
     phase: CodeforcesContestPhase,
     rank: Int,
     participationType: CodeforcesParticipationType,
@@ -172,7 +155,7 @@ private fun StandingsRow(
 
 @Composable
 private fun ProblemColumn(
-    problemResult: ProblemResult,
+    problemResult: CodeforcesMonitorProblemResult,
     phase: CodeforcesContestPhase,
     modifier: Modifier = Modifier
 ) {
@@ -191,7 +174,7 @@ private fun ProblemColumn(
 
 @Composable
 private fun ProblemPointsCell(
-    problemResult: ProblemResult,
+    problemResult: CodeforcesMonitorProblemResult,
     phase: CodeforcesContestPhase,
     modifier: Modifier = Modifier
 ) {
