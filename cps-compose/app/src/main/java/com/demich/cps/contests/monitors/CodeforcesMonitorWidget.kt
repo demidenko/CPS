@@ -1,7 +1,9 @@
 package com.demich.cps.contests.monitors
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -11,8 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesContestPhase
@@ -28,7 +32,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun CodeforcesMonitorWidget(modifier: Modifier = Modifier) {
-    CompositionLocalProvider(LocalTextStyle provides TextStyle.Default.copy(fontSize = 16.sp)) {
         val context = context
 
         val monitor = CodeforcesMonitorDataStore(context)
@@ -81,8 +84,6 @@ fun CodeforcesMonitorWidget(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth()
             )
         }
-    }
-
 }
 
 private sealed class ContestPhase(val phase: CodeforcesContestPhase) {
@@ -99,10 +100,11 @@ private fun Title(
 ) {
     Box(modifier = modifier) {
         if (requestFailed) {
-            Box(modifier = Modifier
-                .size(width = 16.dp, height = 16.dp)
-                .background(color = cpsColors.error)
-                .align(Alignment.CenterStart)
+            IconSp(
+                imageVector = CPSIcons.Error,
+                size = 16.sp,
+                color = cpsColors.error,
+                modifier = Modifier.align(Alignment.CenterStart)
             )
         }
         PhaseTitle(
@@ -162,21 +164,24 @@ private fun StandingsRow(
     rank: Int,
     participationType: CodeforcesParticipationType,
     contestType: CodeforcesContestType,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = 16.sp
 ) {
     if (problems.isNotEmpty()) {
-        Row(modifier = modifier) {
-            RankColumn(
-                rank = rank,
-                participationType = participationType
-            )
-            problems.forEach {
-                ProblemColumn(
-                    problemResult = it,
-                    phase = phase,
-                    contestType = contestType,
-                    modifier = Modifier.weight(1f)
+        CompositionLocalProvider(LocalTextStyle provides TextStyle.Default.copy(fontSize = fontSize)) {
+            Row(modifier = modifier) {
+                RankColumn(
+                    rank = rank,
+                    participationType = participationType
                 )
+                problems.forEach {
+                    ProblemColumn(
+                        problemResult = it,
+                        phase = phase,
+                        contestType = contestType,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
     }

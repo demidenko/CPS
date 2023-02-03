@@ -51,6 +51,7 @@ object CPSIcons {
     val CommentSingle get() = Icons.Rounded.ChatBubble
     val BlogEntry get() = Icons.Filled.Wysiwyg
     val ArrowRight get() = Icons.Default.ArrowRightAlt
+    val Error get() = Icons.Default.Error
 }
 
 
