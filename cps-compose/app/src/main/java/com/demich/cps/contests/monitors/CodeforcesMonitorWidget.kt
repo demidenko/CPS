@@ -16,8 +16,10 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesContestPhase
+import com.demich.cps.utils.codeforces.CodeforcesContestType
 import com.demich.cps.utils.codeforces.CodeforcesParticipationType
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -60,6 +62,10 @@ fun CodeforcesMonitorWidget(modifier: Modifier = Modifier) {
             monitor.participationType.flow
         }
 
+        val contestType by rememberCollect {
+            monitor.contestInfo.flow.map { it.type }
+        }
+
         Column(modifier) {
             Title(
                 contestPhase = phase,
@@ -71,6 +77,7 @@ fun CodeforcesMonitorWidget(modifier: Modifier = Modifier) {
                 phase = phase.phase,
                 rank = rank,
                 participationType = participationType,
+                contestType = contestType,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -154,6 +161,7 @@ private fun StandingsRow(
     phase: CodeforcesContestPhase,
     rank: Int,
     participationType: CodeforcesParticipationType,
+    contestType: CodeforcesContestType,
     modifier: Modifier = Modifier
 ) {
     if (problems.isNotEmpty()) {
@@ -166,6 +174,7 @@ private fun StandingsRow(
                 ProblemColumn(
                     problemResult = it,
                     phase = phase,
+                    contestType = contestType,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -177,6 +186,7 @@ private fun StandingsRow(
 private fun ProblemColumn(
     problemResult: CodeforcesMonitorProblemResult,
     phase: CodeforcesContestPhase,
+    contestType: CodeforcesContestType,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -184,10 +194,34 @@ private fun ProblemColumn(
             text = problemResult.problemIndex,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
+        ProblemResultCell(
+            problemResult = problemResult,
+            phase = phase,
+            contestType = contestType,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+    }
+}
+
+@Composable
+private fun ProblemResultCell(
+    problemResult: CodeforcesMonitorProblemResult,
+    phase: CodeforcesContestPhase,
+    contestType: CodeforcesContestType,
+    modifier: Modifier
+) {
+    if (contestType == CodeforcesContestType.ICPC) {
+        Text(
+            text = if (problemResult.points == 0.0) "" else "+",
+            color = cpsColors.success,
+            fontWeight = FontWeight.Bold,
+            modifier = modifier
+        )
+    } else {
         ProblemPointsCell(
             problemResult = problemResult,
             phase = phase,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = modifier
         )
     }
 }
@@ -214,6 +248,11 @@ private fun RankColumn(
 ) {
     Column(modifier = modifier) {
         Text(text = "rank")
-        Text(text = if (participationType == CodeforcesParticipationType.CONTESTANT) "$rank" else "*$rank")
+        Text(text = when {
+                rank <= 0 -> ""
+                participationType == CodeforcesParticipationType.CONTESTANT -> "$rank"
+                else -> "*$rank"
+            }
+        )
     }
 }
