@@ -148,7 +148,4 @@ data class CodeforcesMonitorProblemResult(
     val problemIndex: String,
     val points: Double,
     val type: CodeforcesProblemStatus
-) {
-    fun pointsToNiceString() =
-        if (points != 0.0) points.toString().removeSuffix(".0") else ""
-}
+)

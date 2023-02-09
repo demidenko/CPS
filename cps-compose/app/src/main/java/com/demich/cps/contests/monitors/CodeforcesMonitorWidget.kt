@@ -11,6 +11,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
@@ -22,6 +23,7 @@ import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesContestPhase
 import com.demich.cps.utils.codeforces.CodeforcesContestType
 import com.demich.cps.utils.codeforces.CodeforcesParticipationType
+import com.demich.cps.utils.codeforces.CodeforcesProblemStatus
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
@@ -216,31 +218,51 @@ private fun ProblemResultCell(
     modifier: Modifier
 ) {
     if (contestType == CodeforcesContestType.ICPC) {
-        Text(
+        ProblemResultCell(
             text = if (problemResult.points == 0.0) "" else "+",
             color = cpsColors.success,
-            fontWeight = FontWeight.Bold,
             modifier = modifier
         )
     } else {
-        ProblemPointsCell(
-            problemResult = problemResult,
-            phase = phase,
-            modifier = modifier
-        )
+        if ((phase == CodeforcesContestPhase.SYSTEM_TEST || phase == CodeforcesContestPhase.FINISHED) && problemResult.type == CodeforcesProblemStatus.PRELIMINARY) {
+            ProblemResultCell(
+                text = "?",
+                color = cpsColors.contentAdditional,
+                modifier = modifier
+            )
+        } else {
+            ProblemPointsCell(
+                points = problemResult.points,
+                phase = phase,
+                modifier = modifier
+            )
+        }
     }
 }
 
 @Composable
 private fun ProblemPointsCell(
-    problemResult: CodeforcesMonitorProblemResult,
+    points: Double,
     phase: CodeforcesContestPhase,
     modifier: Modifier = Modifier
 ) {
-    Text(
-        text = problemResult.pointsToNiceString(),
-        fontWeight = FontWeight.Bold,
+    ProblemResultCell(
+        text = if (points != 0.0) points.toString().removeSuffix(".0") else "",
         color = if (phase == CodeforcesContestPhase.SYSTEM_TEST || phase == CodeforcesContestPhase.FINISHED) cpsColors.success else cpsColors.content,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun ProblemResultCell(
+    text: String,
+    color: Color,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        color = color,
+        fontWeight = FontWeight.Bold,
         modifier = modifier
     )
 }
