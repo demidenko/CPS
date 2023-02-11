@@ -4,27 +4,20 @@ import kotlin.math.min
 
 
 fun decodeAES(raw_cipher: String): String {
-    val cipherArray = hexToBytes(raw_cipher)
-    val decoded = cipherDecode(cipherArray)!!
+    val decoded = decrypt(
+        cipherIn = hexToBytes(raw_cipher),
+        key = intArrayOf(233,238,75,3,193,208,130,41,135,24,93,39,188,162,51,120),
+        size = 16,
+        IV = intArrayOf(24,143,175,219,224,248,126,240,252,40,16,213,179,227,71,5)
+    )
     return decoded.joinToString(separator = "") { "%02x".format(it) }
 }
 
-private fun hexToBytes(hexIn: String): IntArray {
-    val cipher = arrayListOf<Int>()
-    for(i in 0..15) {
-        val byte = hexIn.substring(i*2, i*2+2).toInt(16)
-        cipher.add(byte)
+private fun hexToBytes(hexIn: String): IntArray =
+    IntArray(16) { i ->
+        hexIn.substring(i*2, i*2+2).toInt(16)
     }
-    return cipher.toIntArray()
-}
 
-
-private fun cipherDecode(cipherIn: IntArray): IntArray? {
-    val cypherKey = intArrayOf(233,238,75,3,193,208,130,41,135,24,93,39,188,162,51,120)
-    val iv = intArrayOf(24,143,175,219,224,248,126,240,252,40,16,213,179,227,71,5)
-    val aes = AESModeOfOperation()
-    return aes.decrypt(cipherIn, cypherKey, 16, iv)
-}
 
 private class AES {
 
@@ -109,10 +102,8 @@ private class AES {
         0xe8, 0xcb
     )
 
-    private fun IntArray.rotate() = sliceArray(1 until size) + sliceArray(0 until 1)
-
     private fun IntArray.core(iteration: Int): IntArray {
-        val word = rotate()
+        val word = IntArray(size) { get((it + 1) % size) }
         for (i in 0 until 4) word[i] = sbox[word[i]]
         word[0] = word[0] xor Rcon[iteration]
         return word
@@ -146,8 +137,8 @@ private class AES {
 
     private fun createRoundKey(expandedKey: IntArray, roundKeyPointer: Int): IntArray {
         val roundKey = IntArray(16)
-        for(i in 0 until 4)
-            for(j in 0 until 4) roundKey[j*4+i] = expandedKey[roundKeyPointer + i*4 + j]
+        for (i in 0 until 4)
+            for (j in 0 until 4) roundKey[j*4+i] = expandedKey[roundKeyPointer + i*4 + j]
         return roundKey
     }
 
@@ -156,38 +147,35 @@ private class AES {
         var b = _b
         var p = 0
         for (counter in 0 until 8) {
-            if((b and 1) != 0) p = p xor a
+            if ((b and 1) != 0) p = p xor a
             val hi_bit_set = a and 0x80
             a = a shl 1
             a = a and 0xFF
-            if(hi_bit_set!=0) a = a xor 0x1b
+            if (hi_bit_set!=0) a = a xor 0x1b
             b = b shr 1
         }
         return p
     }
 
-    private fun subBytes(state: IntArray, isInv: Boolean) {
-        for (i in 0 until 16)
-            state[i] = if(isInv) rsbox[state[i]] else sbox[state[i]]
+    private fun subBytes(state: IntArray) {
+        for (i in 0 until 16) state[i] = rsbox[state[i]]
     }
 
-    private fun shiftRows(state: IntArray, isInv: Boolean) {
-        for (i in 0 until 4) shiftRow(state, i*4, i, isInv)
+    private fun shiftRows(state: IntArray) {
+        for (i in 0 until 4) shiftRow(state, i*4, i)
     }
 
-    private fun shiftRow(state: IntArray, statePointer: Int, nbr: Int, isInv: Boolean) {
-        for( i in 0 until nbr) {
-            val tmp =
-                if (isInv) state.sliceArray(statePointer+3 until statePointer+4) + state.sliceArray(statePointer until statePointer+3)
-                else state.sliceArray(statePointer+1 until statePointer+4) + state.sliceArray(statePointer until statePointer+1)
+    private fun shiftRow(state: IntArray, statePointer: Int, nbr: Int) {
+        for (i in 0 until nbr) {
+            val tmp = state.sliceArray(statePointer+3 until statePointer+4) + state.sliceArray(statePointer until statePointer+3)
             for (k in 0 until 4) state[statePointer+k] = tmp[k]
         }
     }
 
-    private fun mixColumns(state: IntArray, isInv: Boolean) {
+    private fun mixColumns(state: IntArray) {
         for (i in 0 until 4) {
             val column = intArrayOf(state[i],state[i+4],state[i+8],state[i+12])
-            mixColumn(column, isInv)
+            mixColumn(column)
             state[i] = column[0]
             state[i+4] = column[1]
             state[i+8] = column[2]
@@ -195,8 +183,8 @@ private class AES {
         }
     }
 
-    private fun mixColumn(column: IntArray, isInv: Boolean) {
-        val m = if(isInv) intArrayOf(14,9,13,11) else intArrayOf(2,1,1,3)
+    private fun mixColumn(column: IntArray) {
+        val m = intArrayOf(14, 9, 13, 11)
         val t = column.toList()
         column[0] = g(t[0], m[0]) xor g(t[3], m[1]) xor g(t[2], m[2]) xor g(t[1], m[3])
         column[1] = g(t[1], m[0]) xor g(t[0], m[1]) xor g(t[3], m[2]) xor g(t[2], m[3])
@@ -205,17 +193,17 @@ private class AES {
     }
 
     fun aes_invRound(state: IntArray, roundKey: IntArray) {
-        shiftRows(state, true)
-        subBytes(state, true)
+        shiftRows(state)
+        subBytes(state)
         addRoundKey(state, roundKey)
-        mixColumns(state, true)
+        mixColumns(state)
     }
 
     fun aes_invMain(state: IntArray, expandedKey: IntArray, nbrRounds: Int): IntArray {
         addRoundKey(state, createRoundKey(expandedKey, 16*nbrRounds))
         for (i in nbrRounds-1 downTo 1) aes_invRound(state, createRoundKey(expandedKey, 16*i))
-        shiftRows(state, true)
-        subBytes(state, true)
+        shiftRows(state)
+        subBytes(state)
         addRoundKey(state, createRoundKey(expandedKey, 0))
         return state
     }
@@ -231,34 +219,30 @@ private class AES {
         val expandedKey = expandKey(key, size, expandedKeySize)
         block = aes_invMain(block, expandedKey, nbrRounds)
         for (k in 0 until 4) {
-            for(l in 0 until 4) output[k*4+l] = block[k+l*4]
+            for (l in 0 until 4) output[k*4+l] = block[k+l*4]
         }
         return output
     }
 }
 
-private class AESModeOfOperation {
-    private val aes = AES()
+private fun decrypt(cipherIn: IntArray, key: IntArray, size: Int, IV: IntArray): IntArray {
+    require(key.size % size == 0)
+    require(IV.size % 16 == 0)
+    val aes = AES()
+    var iput = intArrayOf()
+    val plaintext = IntArray(16)
+    var firstRound = true
+    for (j in 0 until (cipherIn.size+15)/16) {
+        val start = j*16
+        val end = min(start+16, cipherIn.size)
+        val ciphertext = cipherIn.sliceArray(start until end)
 
-    fun decrypt(cipherIn: IntArray, key: IntArray, size: Int, IV: IntArray): IntArray? {
-        if(key.size % size != 0) return null
-        if(IV.size % 16 != 0) return null
-        var ciphertext: IntArray
-        var iput = intArrayOf()
-        val plaintext = IntArray(16)
-        var firstRound = true
-        for(j in 0 until (cipherIn.size+15)/16) {
-            val start = j*16
-            val end = min(start+16, cipherIn.size)
-            ciphertext = cipherIn.sliceArray(start until end)
-
-            aes.decrypt(ciphertext, key, size).forEachIndexed { i, value ->
-                plaintext[i] = value xor (if(firstRound) IV[i] else iput[i])
-            }
-
-            firstRound = false
-            iput = ciphertext
+        aes.decrypt(ciphertext, key, size).forEachIndexed { i, value ->
+            plaintext[i] = value xor (if (firstRound) IV[i] else iput[i])
         }
-        return plaintext
+
+        firstRound = false
+        iput = ciphertext
     }
+    return plaintext
 }
