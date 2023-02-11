@@ -85,16 +85,14 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
         )
     })
 
-    if (row == null) return
-
-    row.party.participantType.let {
-        if (isBecomeContestant(old = participationType(), new = it)) {
+    if (row != null) {
+        row.party.participantType.let {
+            val old = participationType()
             participationType(it)
-            return
+            if (isBecomeContestant(old = old, new = it)) return
         }
+        contestantRank(row.rank)
     }
-    participationType(row.party.participantType)
-    contestantRank(row.rank)
 }
 
 private fun getDelay(
