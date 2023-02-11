@@ -4,12 +4,7 @@ import kotlin.math.min
 
 
 fun decodeAES(raw_cipher: String): String {
-    val decoded = decrypt(
-        cipherIn = hexToBytes(raw_cipher),
-        key = intArrayOf(233,238,75,3,193,208,130,41,135,24,93,39,188,162,51,120),
-        size = 16,
-        IV = intArrayOf(24,143,175,219,224,248,126,240,252,40,16,213,179,227,71,5)
-    )
+    val decoded = decrypt(cipherIn = hexToBytes(raw_cipher))
     return decoded.joinToString(separator = "") { "%02x".format(it) }
 }
 
@@ -146,12 +141,12 @@ private class AES {
         var a = _a
         var b = _b
         var p = 0
-        for (counter in 0 until 8) {
+        repeat(8) {
             if ((b and 1) != 0) p = p xor a
             val hi_bit_set = a and 0x80
             a = a shl 1
             a = a and 0xFF
-            if (hi_bit_set!=0) a = a xor 0x1b
+            if (hi_bit_set != 0) a = a xor 0x1b
             b = b shr 1
         }
         return p
@@ -225,23 +220,17 @@ private class AES {
     }
 }
 
-private fun decrypt(cipherIn: IntArray, key: IntArray, size: Int, IV: IntArray): IntArray {
-    require(key.size % size == 0)
-    require(IV.size % 16 == 0)
+private fun decrypt(cipherIn: IntArray): IntArray {
     val aes = AES()
-    var iput = intArrayOf()
+    val key = intArrayOf(233,238,75,3,193,208,130,41,135,24,93,39,188,162,51,120)
+    var iput = intArrayOf(24,143,175,219,224,248,126,240,252,40,16,213,179,227,71,5)
     val plaintext = IntArray(16)
-    var firstRound = true
-    for (j in 0 until (cipherIn.size+15)/16) {
-        val start = j*16
+    for (start in cipherIn.indices step 16) {
         val end = min(start+16, cipherIn.size)
         val ciphertext = cipherIn.sliceArray(start until end)
-
-        aes.decrypt(ciphertext, key, size).forEachIndexed { i, value ->
-            plaintext[i] = value xor (if (firstRound) IV[i] else iput[i])
+        aes.decrypt(ciphertext, key, 16).forEachIndexed { i, value ->
+            plaintext[i] = value xor iput[i]
         }
-
-        firstRound = false
         iput = ciphertext
     }
     return plaintext
