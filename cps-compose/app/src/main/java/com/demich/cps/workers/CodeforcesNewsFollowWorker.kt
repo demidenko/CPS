@@ -7,7 +7,6 @@ import androidx.work.WorkerParameters
 import com.demich.cps.*
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.room.followListDao
-import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import kotlin.time.Duration.Companion.hours
 
 
@@ -47,7 +46,7 @@ class CodeforcesNewsFollowWorker(
             if (dao.getAndReloadBlogEntries(handle, context) == null) return Result.retry()
             ++done
             progressNotificationBuilder()
-                .setProgress(ProgressBarInfo(total = savedHandles.size, current = done))
+                .setProgress(total = savedHandles.size, current = done)
                 .notifyBy(notificationManagerCompat, NotificationIds.codeforces_follow_progress)
         }
 
