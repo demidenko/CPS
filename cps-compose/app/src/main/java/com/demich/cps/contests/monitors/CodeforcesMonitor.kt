@@ -21,7 +21,13 @@ suspend fun CodeforcesMonitorDataStore.launchIn(scope: CoroutineScope) {
         val currentPhase = contestInfo().phase
         //TODO submissions result check
 
-        getDelay(currentPhase, participationType())
+        getDelay(contestPhase = currentPhase) {
+            isRatingChangeDone(
+                contestId = contestId,
+                handle = handle(),
+                participationType = participationType()
+            )
+        }
     }
 
     val percentageJob = contestInfo.flow.map { it.phase }
@@ -95,17 +101,41 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
     }
 }
 
-private fun getDelay(
+private suspend fun getDelay(
     contestPhase: CodeforcesContestPhase,
-    participationType: CodeforcesParticipationType
+    isRatingChangeDone: suspend () -> Boolean
 ): Duration {
     when (contestPhase) {
         CodeforcesContestPhase.CODING -> return 3.seconds
-        CodeforcesContestPhase.SYSTEM_TEST -> return 3.seconds
         CodeforcesContestPhase.PENDING_SYSTEM_TEST -> return 15.seconds
-        CodeforcesContestPhase.UNDEFINED -> return 5.seconds
-        //CodeforcesContestPhase.FINISHED -> //TODO
+        CodeforcesContestPhase.SYSTEM_TEST -> return 3.seconds
+        CodeforcesContestPhase.FINISHED -> {
+            if (isRatingChangeDone()) return Duration.INFINITE
+            //TODO scale delay
+            return 15.seconds
+        }
         else -> return 30.seconds
+    }
+}
+
+private suspend fun isRatingChangeDone(
+    contestId: Int,
+    handle: String,
+    participationType: CodeforcesParticipationType
+): Boolean {
+    if (participationType != CodeforcesParticipationType.CONTESTANT) return true
+
+    CodeforcesApi.runCatching {
+        getContestRatingChanges(contestId)
+    }.getOrElse {
+        if (it is CodeforcesAPIErrorResponse && it.isContestRatingUnavailable()) {
+            return true
+        }
+        return false
+    }.let { ratingChanges ->
+        val change = ratingChanges.find { it.handle == handle } ?: return false
+        //TODO onRatingChange(change)
+        return true
     }
 }
 

@@ -146,6 +146,12 @@ object CodeforcesApi {
         }
     }
 
+    suspend fun getContestRatingChanges(contestId: Int): List<CodeforcesRatingChange> {
+        return getCodeforcesApi(urlString ="${urls.api}/contest.ratingChanges" ) {
+            parameter("contestId", contestId)
+        }
+    }
+
     suspend fun getHandleSuggestionsPage(str: String): String? {
         return getCodeforcesWeb(urlString = "${urls.main}/data/handles") {
             parameter("q", str)
