@@ -220,7 +220,7 @@ object CodeforcesApi {
 
 
 
-enum class CodeforcesAPIStatus{
+enum class CodeforcesAPIStatus {
     OK, FAILED
 }
 
@@ -411,15 +411,20 @@ data class CodeforcesRecentAction(
     val comment: CodeforcesComment
 )
 
-enum class CodeforcesContestPhase(private val title: String? = null) {
+enum class CodeforcesContestPhase {
     UNDEFINED,
     BEFORE,
     CODING,
-    PENDING_SYSTEM_TEST("PENDING SYSTEM TESTING"),
-    SYSTEM_TEST("SYSTEM TESTING"),
+    PENDING_SYSTEM_TEST,
+    SYSTEM_TEST,
     FINISHED;
 
-    fun getTitle(): String = title ?: name
+    val title: String
+        get() = when (this) {
+            PENDING_SYSTEM_TEST -> "PENDING SYSTEM TESTING"
+            SYSTEM_TEST -> "SYSTEM TESTING"
+            else -> name
+        }
 
     fun isFutureOrRunning(): Boolean {
         return this != UNDEFINED && this != FINISHED

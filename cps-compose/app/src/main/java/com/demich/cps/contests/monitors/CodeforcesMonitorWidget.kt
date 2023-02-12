@@ -152,7 +152,7 @@ private fun PhaseTitle(
     info: String = ""
 ) {
     Text(
-        text = phase.getTitle() + " " + info,
+        text = phase.title + " " + info,
         fontWeight = FontWeight.Bold,
         modifier = modifier
     )
