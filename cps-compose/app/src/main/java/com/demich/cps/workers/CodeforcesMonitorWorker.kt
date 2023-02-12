@@ -14,7 +14,9 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         val monitor = CodeforcesMonitorDataStore(context)
 
         withContext(Dispatchers.IO) {
-            monitor.launchIn(scope = this)
+            monitor.launchIn(scope = this) {
+                //TODO notify
+            }
         }
 
         //TODO: subscribe to monitor data store

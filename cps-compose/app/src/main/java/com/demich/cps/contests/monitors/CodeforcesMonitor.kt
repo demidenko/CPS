@@ -1,13 +1,21 @@
 package com.demich.cps.contests.monitors
 
 import com.demich.cps.utils.codeforces.*
+import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-suspend fun CodeforcesMonitorDataStore.launchIn(scope: CoroutineScope) {
+suspend fun CodeforcesMonitorDataStore.launchIn(
+    scope: CoroutineScope,
+    onRatingChange: (CodeforcesRatingChange) -> Unit
+) {
     val contestId = contestId() ?: return
+
+    val ratingChangeWaiter = RatingChangeWaiter(contestId, handle(), onRatingChange)
 
     val mainJob = scope.launchWhileActive {
         val prevParticipationType = participationType()
@@ -19,15 +27,13 @@ suspend fun CodeforcesMonitorDataStore.launchIn(scope: CoroutineScope) {
         }
 
         val currentPhase = contestInfo().phase
-        //TODO submissions result check
+        //TODO submissions final result check
 
-        getDelay(contestPhase = currentPhase) {
-            isRatingChangeDone(
-                contestId = contestId,
-                handle = handle(),
-                participationType = participationType()
-            )
-        }
+        getDelay(
+            contestPhase = currentPhase,
+            participationType = participationType(),
+            ratingChangeWaiter = ratingChangeWaiter
+        )
     }
 
     val percentageJob = contestInfo.flow.map { it.phase }
@@ -91,53 +97,67 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
         )
     })
 
-    if (row != null) {
-        row.party.participantType.let {
+    row?.run {
+        party.participantType.let {
             val old = participationType()
             participationType(it)
             if (isBecomeContestant(old = old, new = it)) return
         }
-        contestantRank(row.rank)
+        contestantRank(rank)
     }
 }
 
 private suspend fun getDelay(
     contestPhase: CodeforcesContestPhase,
-    isRatingChangeDone: suspend () -> Boolean
+    participationType: CodeforcesParticipationType,
+    ratingChangeWaiter: RatingChangeWaiter
 ): Duration {
-    when (contestPhase) {
-        CodeforcesContestPhase.CODING -> return 3.seconds
-        CodeforcesContestPhase.PENDING_SYSTEM_TEST -> return 15.seconds
-        CodeforcesContestPhase.SYSTEM_TEST -> return 3.seconds
-        CodeforcesContestPhase.FINISHED -> {
-            if (isRatingChangeDone()) return Duration.INFINITE
-            //TODO scale delay
-            return 15.seconds
-        }
-        else -> return 30.seconds
+    return when (contestPhase) {
+        CodeforcesContestPhase.CODING -> 3.seconds
+        CodeforcesContestPhase.PENDING_SYSTEM_TEST -> 15.seconds
+        CodeforcesContestPhase.SYSTEM_TEST -> 3.seconds
+        CodeforcesContestPhase.FINISHED -> ratingChangeWaiter.getDelayOnFinished(participationType)
+        else -> 30.seconds
     }
 }
 
-private suspend fun isRatingChangeDone(
-    contestId: Int,
-    handle: String,
-    participationType: CodeforcesParticipationType
-): Boolean {
-    if (participationType != CodeforcesParticipationType.CONTESTANT) return true
 
-    CodeforcesApi.runCatching {
-        getContestRatingChanges(contestId)
-    }.getOrElse {
-        if (it is CodeforcesAPIErrorResponse && it.isContestRatingUnavailable()) {
+private class RatingChangeWaiter(
+    val contestId: Int,
+    val handle: String,
+    val onRatingChange: (CodeforcesRatingChange) -> Unit
+) {
+    private val waitingStartTime by lazy { getCurrentTime() }
+
+    suspend fun getDelayOnFinished(participationType: CodeforcesParticipationType): Duration {
+        if (isRatingChangeDone(participationType)) return Duration.INFINITE
+        val waitingTime = getCurrentTime() - waitingStartTime
+        return when {
+            waitingTime < 30.minutes -> 10.seconds
+            waitingTime < 1.hours -> 30.seconds
+            waitingTime < 4.hours -> 1.minutes
+            else -> Duration.INFINITE
+        }
+    }
+
+    private suspend fun isRatingChangeDone(participationType: CodeforcesParticipationType): Boolean {
+        if (participationType != CodeforcesParticipationType.CONTESTANT) return true
+
+        CodeforcesApi.runCatching {
+            getContestRatingChanges(contestId)
+        }.getOrElse {
+            if (it is CodeforcesAPIErrorResponse && it.isContestRatingUnavailable()) {
+                return true
+            }
+            return false
+        }.let { ratingChanges ->
+            val change = ratingChanges.find { it.handle == handle } ?: return false
+            onRatingChange(change)
             return true
         }
-        return false
-    }.let { ratingChanges ->
-        val change = ratingChanges.find { it.handle == handle } ?: return false
-        //TODO onRatingChange(change)
-        return true
     }
 }
+
 
 private fun Flow<CodeforcesContestPhase>.collectSystemTestPercentage(
     contestId: Int,
