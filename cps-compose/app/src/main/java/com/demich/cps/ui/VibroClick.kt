@@ -29,5 +29,5 @@ private fun View.reallyPerformHapticFeedback(feedbackConstant: Int) {
 
     // Most of the constants are off by default: for example, clicking on a button doesn't cause the phone to vibrate anymore
     // if we still want to access this vibration, we'll have to ignore the global settings on that.
-    performHapticFeedback(feedbackConstant, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING)
+    performHapticFeedback(feedbackConstant, HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING)
 }
