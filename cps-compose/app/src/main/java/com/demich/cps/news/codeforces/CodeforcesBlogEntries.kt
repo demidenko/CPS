@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,7 +36,7 @@ fun CodeforcesBlogEntries(
     lazyListState: LazyListState = rememberLazyListState(),
     enableScrollBar: Boolean = false,
     onLongClick: ((CodeforcesBlogEntry) -> Unit)? = null,
-    topBlogEntriesIdsState: State<Set<Int>>? = null
+    label: (@Composable (CodeforcesBlogEntry) -> Unit)? = null
 ) {
     LazyColumnWithScrollBar(
         state = lazyListState,
@@ -51,7 +50,7 @@ fun CodeforcesBlogEntries(
             BlogEntryInfo(
                 blogEntry = blogEntry,
                 markNew = blogEntriesController.isNew(blogEntry.id),
-                markInTop = topBlogEntriesIdsState?.value?.contains(blogEntry.id) ?: false,
+                label = label,
                 modifier = Modifier
                     .fillMaxWidth()
                     .combinedClickable(
@@ -77,8 +76,8 @@ fun CodeforcesBlogEntries(
 private fun BlogEntryInfo(
     blogEntry: CodeforcesBlogEntry,
     markNew: Boolean,
-    markInTop: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    label: (@Composable (CodeforcesBlogEntry) -> Unit)?
 ) {
     val manager = LocalCodeforcesAccountManager.current
     val currentTime = LocalCurrentTime.current
@@ -96,7 +95,7 @@ private fun BlogEntryInfo(
             toTime = currentTime
         ),
         markNew = markNew,
-        markInTop = markInTop,
+        label = label?.let { { it(blogEntry) } },
         modifier = modifier
     )
 }
@@ -109,8 +108,8 @@ private fun BlogEntryInfo(
     commentsCount: Int,
     timeAgo: String,
     markNew: Boolean,
-    markInTop: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    label: (@Composable () -> Unit)?
 ) {
     Column(modifier = modifier) {
         BlogEntryInfoHeader(
@@ -122,7 +121,7 @@ private fun BlogEntryInfo(
             timeAgo = timeAgo,
             commentsCount = commentsCount,
             markNew = markNew,
-            markInTop = markInTop
+            label = label
         )
     }
 }
@@ -153,7 +152,7 @@ private fun BlogEntryInfoFooter(
     timeAgo: String,
     commentsCount: Int,
     markNew: Boolean,
-    markInTop: Boolean
+    label: (@Composable () -> Unit)?
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -179,14 +178,7 @@ private fun BlogEntryInfoFooter(
             }
         }
         Row(modifier = Modifier.align(Alignment.TopEnd)) {
-            if (markInTop) {
-                Text(
-                    text = "TOP",
-                    color = cpsColors.contentAdditional,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            if (label != null) label()
             if (commentsCount > 0) {
                 CommentsRow(
                     text = AnnotatedString(commentsCount.toString()),
