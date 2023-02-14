@@ -14,10 +14,17 @@ import kotlinx.coroutines.flow.map
 @Composable
 fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
     val context = context
+    val newEntriesItem = remember { CodeforcesNewEntriesDataStore(context).lostNewEntries }
 
-    val blogEntriesFlow = remember {
-        controller.flowOfLostBlogEntries(context)
-    }
+    val listState = rememberLazyListState()
+
+    val blogEntriesController = rememberCodeforcesBlogEntriesController(
+        tab = CodeforcesTitle.LOST,
+        blogEntriesFlow = controller.flowOfLostBlogEntries(context),
+        newEntriesItem = newEntriesItem,
+        listState = listState,
+        controller = controller
+    )
 
     val topIdsState = remember {
         controller.flowOfTopBlogEntries(context).map { blogEntries ->
@@ -25,21 +32,9 @@ fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
         }
     }.collectAsState(initial = emptySet())
 
-    val newEntriesItem = remember {
-        CodeforcesNewEntriesDataStore(context).lostNewEntries
-    }
-
-    val listState = rememberLazyListState()
-
     CodeforcesBlogEntriesFollowAddable(
         controller = controller,
-        blogEntriesController = rememberCodeforcesBlogEntriesController(
-            tab = CodeforcesTitle.LOST,
-            controller = controller,
-            blogEntriesFlow = blogEntriesFlow,
-            newEntriesItem = newEntriesItem,
-            listState = listState
-        ),
+        blogEntriesController = blogEntriesController,
         topBlogEntriesIdsState = topIdsState,
         lazyListState = listState,
         modifier = Modifier.fillMaxSize()

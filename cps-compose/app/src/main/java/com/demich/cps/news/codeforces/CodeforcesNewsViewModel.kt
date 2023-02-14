@@ -34,7 +34,7 @@ class CodeforcesNewsViewModel: ViewModel() {
                     launchLoadIfActive(locale = context.settingsNews.codeforcesLocale())
                 }
             }
-            return dataFlow.asStateFlow()
+            return dataFlow
         }
 
         val loadingStatusState = MutableStateFlow(LoadingStatus.PENDING)

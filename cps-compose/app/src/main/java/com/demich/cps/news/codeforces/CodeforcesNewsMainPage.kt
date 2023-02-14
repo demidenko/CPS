@@ -22,14 +22,14 @@ private fun CodeforcesNewsMainList(
     controller: CodeforcesNewsController
 ) {
     val context = context
-    val newEntriesDataStore = remember { CodeforcesNewEntriesDataStore(context) }
+    val newEntriesItem = remember { CodeforcesNewEntriesDataStore(context).mainNewEntries }
 
     val listState = rememberLazyListState()
 
     val blogEntriesController = rememberCodeforcesBlogEntriesController(
         tab = CodeforcesTitle.MAIN,
         blogEntriesFlow = controller.flowOfMainBlogEntries(context),
-        newEntriesItem = newEntriesDataStore.mainNewEntries,
+        newEntriesItem = newEntriesItem,
         listState = listState,
         controller = controller
     )
