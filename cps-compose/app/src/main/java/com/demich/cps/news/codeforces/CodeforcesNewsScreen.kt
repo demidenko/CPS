@@ -151,7 +151,7 @@ private fun CoroutineScope.collectBadgeCount(
     newEntriesItem: NewEntriesDataStoreItem
 ) {
     combineToCounters(
-        flowOfIds = blogEntriesFlow.map { it.map { it.id.toString() } },
+        flowOfIds = blogEntriesFlow.map { it.map { it.id } },
         flowOfTypes = newEntriesItem.flow
     ).combine(snapshotFlow { controller.currentTab }) { counters, currentTab ->
         if (currentTab == tab) counters.seenCount + counters.unseenCount

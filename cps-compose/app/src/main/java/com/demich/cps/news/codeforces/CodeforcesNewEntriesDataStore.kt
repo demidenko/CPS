@@ -51,15 +51,15 @@ fun rememberCodeforcesBlogEntriesController(
         val flowOfIds = blogEntriesFlow.map {
             it.map { it.id }
         }.distinctUntilChanged().onEach { ids ->
-            newEntriesItem.apply(newEntries = ids.map(Int::toString))
+            newEntriesItem.apply(newEntries = ids)
         }
 
         snapshotFlow {
             if (!controller.isTabVisible(tab)) return@snapshotFlow IntRange.EMPTY
             listState.visibleRange(0.75f)
-        }.combine(flowOfIds) { visible, ids ->
+        }.combine(flowOfIds) { visibleRange, ids ->
             newEntriesItem.markAtLeast(
-                ids = visible.map { ids[it].toString() },
+                ids = visibleRange.map { ids[it] },
                 type = NewEntryType.SEEN
             )
         }.launchIn(this)
@@ -75,7 +75,7 @@ fun rememberCodeforcesBlogEntriesController(
         ) {
             override fun openBlogEntry(blogEntry: CodeforcesBlogEntry) {
                 scope.launch {
-                    newEntriesItem.mark(id = blogEntry.id.toString(), type = NewEntryType.OPENED)
+                    newEntriesItem.mark(id = blogEntry.id, type = NewEntryType.OPENED)
                 }
                 context.openUrlInBrowser(url = CodeforcesApi.urls.blogEntry(blogEntryId = blogEntry.id))
             }
@@ -87,14 +87,14 @@ fun rememberCodeforcesBlogEntriesController(
 @Stable
 abstract class CodeforcesBlogEntriesController(
     val blogEntriesState: State<List<CodeforcesBlogEntry>>,
-    val types: State<Map<String, NewEntryType>> = mutableStateOf(emptyMap()),
+    val types: State<NewEntriesTypes> = mutableStateOf(emptyMap()),
 ) {
     abstract fun openBlogEntry(blogEntry: CodeforcesBlogEntry)
 
     val blogEntries by blogEntriesState
 
     fun isNew(id: Int): Boolean {
-        val type = types.value[id.toString()]
+        val type = types.value[id]
         return type == NewEntryType.UNSEEN || type == NewEntryType.SEEN
     }
 }
