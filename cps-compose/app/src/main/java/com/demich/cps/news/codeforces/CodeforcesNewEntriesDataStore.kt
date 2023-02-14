@@ -8,7 +8,7 @@ import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.datastore_itemized.ItemizedDataStore
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CodeforcesNewEntriesDataStore(context: Context): ItemizedDataStore(context.cf_new_entries_dataStore) {
@@ -46,33 +46,28 @@ fun rememberCodeforcesBlogEntriesController(
     controller: CodeforcesNewsController
 ): CodeforcesBlogEntriesController {
     val context = context
+
+    LaunchedEffect(tab, blogEntriesFlow, newEntriesItem, listState, controller) {
+        val flowOfIds = blogEntriesFlow.map {
+            it.map { it.id }
+        }.distinctUntilChanged().onEach { ids ->
+            newEntriesItem.apply(newEntries = ids.map(Int::toString))
+        }
+
+        snapshotFlow {
+            if (!controller.isTabVisible(tab)) return@snapshotFlow IntRange.EMPTY
+            listState.visibleRange(0.75f)
+        }.combine(flowOfIds) { visible, ids ->
+            newEntriesItem.markAtLeast(
+                ids = visible.map { ids[it].toString() },
+                type = NewEntryType.SEEN
+            )
+        }.launchIn(this)
+    }
+
     val scope = rememberCoroutineScope()
     val types = rememberCollect { newEntriesItem.flow }
     val blogEntriesState = rememberCollect { blogEntriesFlow }
-
-    //TODO: merge this flows
-    LaunchedEffect(Unit) {
-        snapshotFlow {
-            blogEntriesState.value.map { it.id }
-        }.collect { ids ->
-            newEntriesItem.apply(newEntries = ids.map(Int::toString))
-        }
-    }
-
-    LaunchedEffect(controller, listState) {
-        snapshotFlow<List<Int>> {
-            if (!controller.isTabVisible(tab)) return@snapshotFlow emptyList()
-            val ids = blogEntriesState.value.map { it.id } //TODO: list creates on each scroll move
-            if (ids.isEmpty()) return@snapshotFlow emptyList()
-            listState.visibleRange(0.75f).map { ids[it] }
-        }.collect { visibleIds ->
-            newEntriesItem.markAtLeast(
-                ids = visibleIds.map(Int::toString),
-                type = NewEntryType.SEEN
-            )
-        }
-    }
-
     return remember {
         object : CodeforcesBlogEntriesController(
             blogEntriesState = blogEntriesState,
