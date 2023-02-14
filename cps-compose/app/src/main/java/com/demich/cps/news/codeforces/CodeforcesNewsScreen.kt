@@ -21,6 +21,7 @@ import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -127,26 +128,23 @@ private fun TabsHeader(
 
     val context = context
     LaunchedEffect(controller) {
-        launch {
-            makeAndCollectBadgeCount(
-                tab = CodeforcesTitle.MAIN,
-                controller = controller,
-                blogEntriesFlow = controller.flowOfMainBlogEntries(context),
-                newEntriesItem = CodeforcesNewEntriesDataStore(context).mainNewEntries
-            )
-        }
-        launch {
-            makeAndCollectBadgeCount(
-                tab = CodeforcesTitle.LOST,
-                controller = controller,
-                blogEntriesFlow = controller.flowOfLostBlogEntries(context),
-                newEntriesItem = CodeforcesNewEntriesDataStore(context).lostNewEntries
-            )
-        }
+        val newEntriesDataStore = CodeforcesNewEntriesDataStore(context)
+        collectBadgeCount(
+            tab = CodeforcesTitle.MAIN,
+            controller = controller,
+            blogEntriesFlow = controller.flowOfMainBlogEntries(context),
+            newEntriesItem = newEntriesDataStore.mainNewEntries
+        )
+        collectBadgeCount(
+            tab = CodeforcesTitle.LOST,
+            controller = controller,
+            blogEntriesFlow = controller.flowOfLostBlogEntries(context),
+            newEntriesItem = newEntriesDataStore.lostNewEntries
+        )
     }
 }
 
-private suspend fun makeAndCollectBadgeCount(
+private fun CoroutineScope.collectBadgeCount(
     tab: CodeforcesTitle,
     controller: CodeforcesNewsController,
     blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
@@ -158,9 +156,9 @@ private suspend fun makeAndCollectBadgeCount(
     ).combine(snapshotFlow { controller.currentTab }) { counters, currentTab ->
         if (currentTab == tab) counters.seenCount + counters.unseenCount
         else counters.unseenCount
-    }.collect { count ->
+    }.onEach { count ->
         controller.setBadgeCount(tab = tab, count = count)
-    }
+    }.launchIn(this)
 }
 
 @Composable

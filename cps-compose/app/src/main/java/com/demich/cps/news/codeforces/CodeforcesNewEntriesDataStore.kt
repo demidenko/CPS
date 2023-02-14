@@ -62,7 +62,7 @@ fun rememberCodeforcesBlogEntriesController(
     LaunchedEffect(controller, listState) {
         snapshotFlow<List<Int>> {
             if (!controller.isTabVisible(tab)) return@snapshotFlow emptyList()
-            val ids = blogEntriesState.value.map { it.id }
+            val ids = blogEntriesState.value.map { it.id } //TODO: list creates on each scroll move
             if (ids.isEmpty()) return@snapshotFlow emptyList()
             listState.visibleRange(0.75f).map { ids[it] }
         }.collect { visibleIds ->
