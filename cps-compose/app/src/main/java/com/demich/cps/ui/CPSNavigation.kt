@@ -94,7 +94,9 @@ class CPSNavigator(
         val bottomBarSetter: (AdditionalBottomBarBuilder) -> Unit get() = { bottomBar = it }
 
         fun setSubtitle(vararg words: String) {
-            subtitleState.value = words.joinToString(prefix = "::", separator = ".") { it.lowercase() }
+            if (screen == currentScreen) {
+                subtitleState.value = words.joinToString(prefix = "::", separator = ".") { it.lowercase() }
+            }
         }
     }
 
