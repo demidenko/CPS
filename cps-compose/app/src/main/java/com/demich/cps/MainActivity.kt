@@ -135,9 +135,7 @@ private fun CPSScaffold(
                     cpsViewModels = cpsViewModels,
                     reorderEnabledState = reorderEnabledState
                 )
-                LaunchedEffect(Unit) {
-                    navigator.setSubtitle("accounts")
-                }
+                holder.setSubtitle("accounts")
             }
             cpsComposable(ScreenTypes.accountExpanded) { holder ->
                 val type = (holder.screen as Screen.AccountExpanded).type
@@ -157,24 +155,17 @@ private fun CPSScaffold(
                     navigator = navigator,
                     onShowDeleteDialog = { showDeleteDialog = true }
                 )
-                LaunchedEffect(Unit) {
-                    navigator.setSubtitle("accounts", type.name)
-                }
+                holder.setSubtitle("accounts", type.name)
             }
             cpsComposable(ScreenTypes.accountSettings) { holder ->
                 val type = (holder.screen as Screen.AccountSettings).type
                 AccountSettingsScreen(type)
-                LaunchedEffect(Unit) {
-                    navigator.setSubtitle("accounts", type.name, "settings")
-                }
+                holder.setSubtitle("accounts", type.name, "settings")
             }
 
             cpsComposable(ScreenTypes.news) { holder ->
                 val controller = rememberCodeforcesNewsController(cpsViewModels.newsViewModel)
-                NewsScreen(
-                    navigator = navigator,
-                    controller = controller
-                )
+                NewsScreen(controller = controller)
                 holder.menu = newsMenuBuilder(
                     navigator = navigator,
                     controller = controller
@@ -182,12 +173,11 @@ private fun CPSScaffold(
                 holder.bottomBar = newsBottomBarBuilder(
                     controller = controller
                 )
+                holder.setSubtitle("news", "codeforces", controller.currentTab.name)
             }
-            cpsComposable(ScreenTypes.newsSettings) {
+            cpsComposable(ScreenTypes.newsSettings) { holder ->
                 NewsSettingsScreen()
-                LaunchedEffect(Unit) {
-                    navigator.setSubtitle("news", "settings")
-                }
+                holder.setSubtitle("news", "settings")
             }
             cpsComposable(ScreenTypes.newsFollowList) { holder ->
                 NewsFollowScreen(
@@ -197,9 +187,7 @@ private fun CPSScaffold(
                 holder.bottomBar = newsFollowListBottomBarBuilder(
                     newsViewModel = cpsViewModels.newsViewModel
                 )
-                LaunchedEffect(Unit) {
-                    navigator.setSubtitle("news", "codeforces", "follow", "list")
-                }
+                holder.setSubtitle("news", "codeforces", "follow", "list")
             }
             cpsComposable(ScreenTypes.newsCodeforcesBlog) { holder ->
                 val handle = (holder.screen as Screen.NewsCodeforcesBlog).handle
@@ -207,9 +195,7 @@ private fun CPSScaffold(
                     blogEntriesState = cpsViewModels.newsViewModel.blogEntriesState,
                     loadingStatus = cpsViewModels.newsViewModel.blogLoadingStatus
                 )
-                LaunchedEffect(Unit) {
-                    navigator.setSubtitle("news", "codeforces", "blog")
-                }
+                holder.setSubtitle("news", "codeforces", "blog")
             }
 
             cpsComposable(ScreenTypes.contests) { holder ->
@@ -226,23 +212,17 @@ private fun CPSScaffold(
                     navigator = navigator,
                     contestsViewModel = cpsViewModels.contestsViewModel
                 )
-                LaunchedEffect(Unit) {
-                    navigator.setSubtitle("contests")
-                }
+                holder.setSubtitle("contests")
             }
-            cpsComposable(ScreenTypes.contestsSettings) {
+            cpsComposable(ScreenTypes.contestsSettings) { holder ->
                 ContestsSettingsScreen()
-                LaunchedEffect(Unit) {
-                    navigator.setSubtitle("contests", "settings")
-                }
+                holder.setSubtitle("contests", "settings")
             }
 
             cpsComposable(ScreenTypes.develop) { holder ->
                 DevelopScreen()
                 holder.bottomBar = developAdditionalBottomBarBuilder(cpsViewModels.progressBarsViewModel)
-                LaunchedEffect(Unit) {
-                    navigator.setSubtitle("develop")
-                }
+                holder.setSubtitle("develop")
             }
         }
     }

@@ -18,11 +18,9 @@ import com.demich.cps.utils.rememberCollect
 
 @Composable
 fun NewsScreen(
-    navigator: CPSNavigator,
     controller: CodeforcesNewsController
 ) {
     CodeforcesNewsScreen(
-        navigator = navigator,
         controller = controller
     )
 }

@@ -12,7 +12,6 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.Contest
 import com.demich.cps.news.NewsTab
 import com.demich.cps.news.NewsTabRow
-import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.CPSSwipeRefresh
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
@@ -35,14 +34,8 @@ val LocalCodeforcesAccountManager = staticCompositionLocalOf<CodeforcesAccountMa
 
 @Composable
 fun CodeforcesNewsScreen(
-    navigator: CPSNavigator,
     controller: CodeforcesNewsController
 ) {
-
-    LaunchedEffect(key1 = controller.currentTab) {
-        navigator.setSubtitle("news", "codeforces", controller.currentTab.name)
-    }
-
     Column {
         TabsHeader(
             controller = controller,
@@ -53,7 +46,6 @@ fun CodeforcesNewsScreen(
             modifier = Modifier.fillMaxSize()
         )
     }
-
 }
 
 

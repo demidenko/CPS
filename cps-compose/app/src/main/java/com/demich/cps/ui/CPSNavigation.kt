@@ -48,11 +48,6 @@ class CPSNavigator(
     val subtitle: String
         get() = subtitleState.value
 
-    //TODO: each LaunchEffect with this is slow shit
-    fun setSubtitle(vararg words: String) {
-        subtitleState.value = words.joinToString(prefix = "::", separator = ".") { it.lowercase() }
-    }
-
     val currentScreen: Screen?
         get() = currentScreenState.value
 
@@ -97,6 +92,10 @@ class CPSNavigator(
 
         val menuSetter: (CPSMenuBuilder) -> Unit get() = { menu = it }
         val bottomBarSetter: (AdditionalBottomBarBuilder) -> Unit get() = { bottomBar = it }
+
+        fun setSubtitle(vararg words: String) {
+            subtitleState.value = words.joinToString(prefix = "::", separator = ".") { it.lowercase() }
+        }
     }
 
     @Composable
