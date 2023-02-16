@@ -47,15 +47,17 @@ fun NotificationCompat.Builder.setWhen(time: Instant) {
 fun NotificationCompat.Builder.setProgress(total: Int, current: Int) =
     setProgress(total, current, false)
 
-fun NotificationCompat.Builder.attachUrl(url: String, context: Context) {
-    setContentIntent(
-        PendingIntent.getActivity(
-            context,
-            0,
-            Intent(Intent.ACTION_VIEW, Uri.parse(url)),
-            PendingIntent.FLAG_IMMUTABLE
-        )
+fun makePendingIntentOpenUrl(url: String, context: Context): PendingIntent {
+    return PendingIntent.getActivity(
+        context,
+        0,
+        Intent(Intent.ACTION_VIEW, Uri.parse(url)),
+        PendingIntent.FLAG_IMMUTABLE
     )
+}
+
+fun NotificationCompat.Builder.attachUrl(url: String, context: Context) {
+    setContentIntent(makePendingIntentOpenUrl(url, context))
 }
 
 

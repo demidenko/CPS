@@ -25,6 +25,22 @@ class CodeforcesMonitorLauncherWorker(
                     repeatInterval = 45.minutes
                 )
         }
+
+        suspend fun startMonitor(contestId: Int, handle: String, context: Context) {
+            val monitor = CodeforcesMonitorDataStore(context)
+
+            val replace: Boolean
+            if (contestId == monitor.contestId() && handle == monitor.handle()) {
+                replace = false
+            } else {
+                replace = true
+                monitor.reset()
+                monitor.handle(handle)
+                monitor.contestId(contestId)
+            }
+
+            enqueueCodeforcesMonitorWorker(context, replace)
+        }
     }
 
     private fun isActual(time: Instant) = currentTime - time < 24.hours
@@ -58,7 +74,8 @@ class CodeforcesMonitorLauncherWorker(
                 if (monitorCanceledContests().none { it.first == submission.contestId }) {
                     startMonitor(
                         contestId = submission.contestId,
-                        handle = info.handle
+                        handle = info.handle,
+                        context = context
                     )
                 }
             }
@@ -83,20 +100,4 @@ class CodeforcesMonitorLauncherWorker(
                 step += 10
             }
         }
-
-    private suspend fun startMonitor(contestId: Int, handle: String) {
-        val monitor = CodeforcesMonitorDataStore(context)
-
-        val replace: Boolean
-        if (contestId == monitor.contestId() && handle == monitor.handle()) {
-            replace = false
-        } else {
-            replace = true
-            monitor.reset()
-            monitor.handle(handle)
-            monitor.contestId(contestId)
-        }
-
-        enqueueCodeforcesMonitorWorker(context, replace)
-    }
 }

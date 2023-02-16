@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.map
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
-private val Context.workManager get() = WorkManager.getInstance(this)
+internal val Context.workManager get() = WorkManager.getInstance(this)
 
 
 abstract class CPSWork(
