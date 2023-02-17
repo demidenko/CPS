@@ -4,15 +4,19 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
-import com.demich.cps.*
+import com.demich.cps.NotificationChannels
+import com.demich.cps.NotificationIds
+import com.demich.cps.R
+import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.launchIn
-import com.demich.cps.utils.codeforces.CodeforcesApi
+import com.demich.cps.notificationBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): CoroutineWorker(context, params) {
@@ -26,21 +30,17 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         val notificationBuilder = createNotificationBuilder(handle, contestId)
         setForeground(ForegroundInfo(NotificationIds.codeforces_contest_monitor, notificationBuilder.build()))
 
-        try {
-            withContext(Dispatchers.IO) {
-                monitor.launchIn(
-                    scope = this,
-                    onRatingChange = { ratingChange ->
-                        //launch { CodeforcesAccountManager(context).applyRatingChange(ratingChange) }
-                    }
-                )
-            }
-            //TODO: subscribe to monitor data store
-            monitor.contestId.flow.takeWhile { it == contestId }.collect()
-        } catch (e: java.util.concurrent.CancellationException) {
-            //not works, too fast kill
-            monitor.reset()
+        withContext(Dispatchers.IO) {
+            monitor.launchIn(
+                scope = this,
+                onRatingChange = { ratingChange ->
+                    launch { CodeforcesAccountManager(context).applyRatingChange(ratingChange) }
+                }
+            )
         }
+
+        //TODO: subscribe to monitor data store
+        monitor.contestId.flow.takeWhile { it == contestId }.collect()
 
         return Result.success()
     }
@@ -52,20 +52,6 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
             setShowWhen(false)
             setSilent(true)
             //setStyle(NotificationCompat.DecoratedCustomViewStyle())
-
-            addAction(
-                0,
-                "Close",
-                context.workManager.createCancelPendingIntent(id)
-            )
-
-            addAction(
-                0,
-                "Browse",
-                makePendingIntentOpenUrl(
-                    url = CodeforcesApi.urls.contest(contestId),
-                    context = context
-                )
-            )
+            //TODO intent open contest screen
         }
 }

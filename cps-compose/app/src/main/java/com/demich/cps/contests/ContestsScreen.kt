@@ -20,16 +20,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
+import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.contests.loaders.makeCombinedMessage
+import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
+import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.develop.settingsDev
 import com.demich.cps.room.contestsListDao
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
+import com.demich.cps.utils.codeforces.CodeforcesApi
+import com.demich.datastore_itemized.add
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -46,6 +52,7 @@ fun ContestsScreen(
                 .consumedWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
                 .imePadding()
         ) {
+            CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
             ContestsContent(
                 contestsViewModel = contestsViewModel,
                 filterController = filterController,
@@ -308,5 +315,30 @@ private fun NoneEnabledMessage(modifier: Modifier = Modifier) {
                 Icon(imageVector = CPSIcons.Settings, contentDescription = null)
             }
         }
+    }
+}
+
+
+@Composable
+private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
+    val context = context
+    val scope = rememberCoroutineScope()
+    val monitor = remember { CodeforcesMonitorDataStore(context) }
+
+    val contestIdState = rememberCollect { monitor.contestId.flow }
+
+    contestIdState.value?.let { contestId ->
+        CodeforcesMonitorWidget(
+            modifier = modifier,
+            onOpenInBrowser = {
+                context.openUrlInBrowser(url = CodeforcesApi.urls.contest(contestId))
+            },
+            onStop = {
+                scope.launch {
+                    monitor.reset()
+                    CodeforcesAccountManager(context).getSettings().monitorCanceledContests.add(contestId to getCurrentTime())
+                }
+            }
+        )
     }
 }

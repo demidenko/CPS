@@ -1,14 +1,14 @@
 package com.demich.cps.contests.monitors
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
@@ -25,7 +26,6 @@ import com.demich.cps.utils.codeforces.CodeforcesContestType
 import com.demich.cps.utils.codeforces.CodeforcesParticipationType
 import com.demich.cps.utils.codeforces.CodeforcesProblemStatus
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -33,65 +33,87 @@ import kotlin.time.Duration.Companion.seconds
 
 
 @Composable
-fun CodeforcesMonitorWidget(modifier: Modifier = Modifier) {
-        val context = context
+fun CodeforcesMonitorWidget(
+    modifier: Modifier = Modifier,
+    onOpenInBrowser: () -> Unit,
+    onStop: () -> Unit
+) {
+    var showMenu by rememberSaveable { mutableStateOf(false) }
 
-        val monitor = CodeforcesMonitorDataStore(context)
-
-        val phase by rememberCollect {
-            combine(
-                flow = monitor.contestInfo.flow,
-                flow2 = monitor.sysTestPercentage.flow
-            ) { contestInfo, sysTestPercentage ->
-                when (contestInfo.phase) {
-                    CodeforcesContestPhase.CODING -> ContestPhase.Coding(contestInfo.startTime + contestInfo.duration)
-                    CodeforcesContestPhase.SYSTEM_TEST -> ContestPhase.SystemTesting(sysTestPercentage)
-                    else -> ContestPhase.Other(contestInfo.phase)
-                }
-            }
+    ContentWithCPSDropdownMenu(
+        expanded = showMenu,
+        onDismissRequest = { showMenu = false },
+        content = {
+            CodeforcesMonitor(modifier = modifier.clickable { showMenu = true })
         }
-
-        val problems by rememberCollect {
-            monitor.problemResults.flow
-        }
-
-        val lastRequest by rememberCollect {
-            monitor.lastRequest.flow
-        }
-
-        val rank by rememberCollect {
-            monitor.contestantRank.flow
-        }
-
-        val participationType by rememberCollect {
-            monitor.participationType.flow
-        }
-
-        val contestType by rememberCollect {
-            monitor.contestInfo.flow.map { it.type }
-        }
-
-        Column(modifier) {
-            Title(
-                contestPhase = phase,
-                requestFailed = lastRequest == false,
-                modifier = Modifier.fillMaxWidth()
-            )
-            StandingsRow(
-                problems = problems,
-                phase = phase.phase,
-                rank = rank,
-                participationType = participationType,
-                contestType = contestType,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+    ) {
+        CPSDropdownMenuItem(title = "Browse", icon = CPSIcons.OpenInBrowser, onClick = onOpenInBrowser)
+        CPSDropdownMenuItem(title = "Close", icon = CPSIcons.Close, onClick = onStop)
+    }
 }
 
 private sealed class ContestPhase(val phase: CodeforcesContestPhase) {
     data class Coding(val endTime: Instant): ContestPhase(CodeforcesContestPhase.CODING)
     data class SystemTesting(val percentage: Int?): ContestPhase(CodeforcesContestPhase.SYSTEM_TEST)
     class Other(phase: CodeforcesContestPhase): ContestPhase(phase)
+}
+
+@Composable
+private fun CodeforcesMonitor(
+    modifier: Modifier
+) {
+    val context = context
+
+    val monitor = CodeforcesMonitorDataStore(context)
+
+    val phase by rememberCollect {
+        combine(
+            flow = monitor.contestInfo.flow,
+            flow2 = monitor.sysTestPercentage.flow
+        ) { contestInfo, sysTestPercentage ->
+            when (contestInfo.phase) {
+                CodeforcesContestPhase.CODING -> ContestPhase.Coding(contestInfo.startTime + contestInfo.duration)
+                CodeforcesContestPhase.SYSTEM_TEST -> ContestPhase.SystemTesting(sysTestPercentage)
+                else -> ContestPhase.Other(contestInfo.phase)
+            }
+        }
+    }
+
+    val problems by rememberCollect {
+        monitor.problemResults.flow
+    }
+
+    val lastRequest by rememberCollect {
+        monitor.lastRequest.flow
+    }
+
+    val rank by rememberCollect {
+        monitor.contestantRank.flow
+    }
+
+    val participationType by rememberCollect {
+        monitor.participationType.flow
+    }
+
+    val contestInfo by rememberCollect {
+        monitor.contestInfo.flow
+    }
+
+    Column(modifier) {
+        Title(
+            contestPhase = phase,
+            requestFailed = lastRequest == false,
+            modifier = Modifier.fillMaxWidth()
+        )
+        StandingsRow(
+            problems = problems,
+            phase = phase.phase,
+            rank = rank,
+            participationType = participationType,
+            contestType = contestInfo.type,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
 }
 
 @Composable
