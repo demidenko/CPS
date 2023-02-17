@@ -11,6 +11,8 @@ import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.edit
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Instant
 
 abstract class CPSWorker(
@@ -52,6 +54,25 @@ abstract class CPSWorker(
             action(it)
             progressInfo++
             setProgressInfo(progressInfo)
+        }
+    }
+
+    protected suspend fun List<suspend () -> Unit>.joinAllWithProgress() {
+        val progressStateFlow = MutableStateFlow(ProgressBarInfo(total = size))
+        withContext(Dispatchers.IO) {
+            progressStateFlow
+                .take(size + 1)
+                .onEach { setProgressInfo(it) }
+                .launchIn(this)
+            map { job ->
+                launch {
+                    try {
+                        job()
+                    } finally {
+                        progressStateFlow.update { it.inc() }
+                    }
+                }
+            }.joinAll()
         }
     }
 

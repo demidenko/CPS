@@ -13,10 +13,6 @@ import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.utils.AtCoderApi
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.toSignedString
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.minutes
 
 class AccountsWorker(
@@ -52,9 +48,7 @@ class AccountsWorker(
             }
         }
 
-        withContext(Dispatchers.IO) {
-            jobs.map { f -> launch { f() } }
-        }.joinAll()
+        jobs.joinAllWithProgress()
 
         return Result.success()
     }
@@ -76,9 +70,8 @@ class AccountsWorker(
 
         val handle = userInfo.handle
         val newContribution = codeforcesAccountManager.loadInfo(handle)
-            .also {
-                if (it.status != STATUS.OK) return
-            }.contribution
+            .takeIf { it.status == STATUS.OK }
+            ?.contribution ?: return
 
         if (newContribution == userInfo.contribution) return
 
