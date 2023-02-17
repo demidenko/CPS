@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
+import kotlin.time.toJavaDuration
 
 internal val Context.workManager get() = WorkManager.getInstance(this)
 
@@ -62,15 +63,13 @@ fun CPSWork.workInfoState(): State<WorkInfo?> = remember(this) {
             .map { it?.getOrNull(0) }
     }.observeAsState()
 
-inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
+internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
     repeatInterval: Duration,
     flex: Duration = repeatInterval,
     batteryNotLow: Boolean = false
 ) = PeriodicWorkRequestBuilder<W>(
-    repeatInterval = repeatInterval.inWholeMilliseconds,
-    repeatIntervalTimeUnit = TimeUnit.MILLISECONDS,
-    flexTimeInterval = flex.inWholeMilliseconds,
-    flexTimeIntervalUnit = TimeUnit.MILLISECONDS
+    repeatInterval = repeatInterval.toJavaDuration(),
+    flexTimeInterval = flex.toJavaDuration()
 ).setConstraints(
     Constraints(
         requiredNetworkType = NetworkType.CONNECTED,
@@ -92,8 +91,8 @@ suspend fun Context.enqueueEnabledWorkers() {
     getCPSWorks().forEach { it.enqueueIfEnabled() }
 }
 
-fun enqueueCodeforcesMonitorWorker(context: Context, replace: Boolean) {
-    context.workManager.enqueueUniqueWork(
+internal fun WorkManager.enqueueCodeforcesMonitorWorker(replace: Boolean) {
+    enqueueUniqueWork(
         "cf_monitor",
         if (replace) ExistingWorkPolicy.REPLACE else ExistingWorkPolicy.KEEP,
         OneTimeWorkRequestBuilder<CodeforcesMonitorWorker>().build()

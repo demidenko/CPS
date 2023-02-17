@@ -39,7 +39,7 @@ class CodeforcesMonitorLauncherWorker(
                 monitor.contestId(contestId)
             }
 
-            enqueueCodeforcesMonitorWorker(context, replace)
+            context.workManager.enqueueCodeforcesMonitorWorker(replace)
         }
     }
 
