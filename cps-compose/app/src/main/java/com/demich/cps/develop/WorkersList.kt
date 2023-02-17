@@ -24,8 +24,24 @@ import com.demich.cps.workers.*
 import kotlinx.datetime.Instant
 
 @Composable
-fun WorkersList(
-    modifier: Modifier = Modifier
+fun WorkersList(modifier: Modifier = Modifier) {
+    var showRestartDialogFor: CPSWork? by remember { mutableStateOf(null) }
+
+    WorkersList(modifier = modifier, onClick = { showRestartDialogFor = it })
+
+    showRestartDialogFor?.let { work ->
+        CPSYesNoDialog(
+            title = { MonospacedText("restart ${work.name}?") },
+            onDismissRequest = { showRestartDialogFor = null },
+            onConfirmRequest = { work.startImmediate() }
+        )
+    }
+}
+
+@Composable
+private fun WorkersList(
+    modifier: Modifier,
+    onClick: (CPSWork) -> Unit
 ) {
     val context = context
     val works = remember { context.getCPSWorks() }
@@ -34,8 +50,6 @@ fun WorkersList(
         CPSWorkersDataStore(context).lastExecutionTime.flow
     }
 
-    var showRestartDialogFor: CPSWork? by remember { mutableStateOf(null) }
-
     ProvideTimeEachSecond {
         LazyColumn(modifier = modifier) {
             items(items = works, key = { it.name }) { work ->
@@ -43,21 +57,13 @@ fun WorkersList(
                     work = work,
                     lastExecutionTime = lastExecutionTime[work.name],
                     modifier = Modifier
-                        .clickable { showRestartDialogFor = work }
+                        .clickable { onClick(work) }
                         .fillMaxWidth()
                         .padding(all = 4.dp)
                 )
                 Divider()
             }
         }
-    }
-
-    showRestartDialogFor?.let { work ->
-        CPSYesNoDialog(
-            title = { MonospacedText("restart ${work.name}?") },
-            onDismissRequest = { showRestartDialogFor = null },
-            onConfirmRequest = { work.startImmediate() }
-        )
     }
 }
 
@@ -124,6 +130,7 @@ private fun WorkerItem(
                     WorkInfo.State.CANCELLED -> cpsColors.contentAdditional
                 }
             )
+            //TODO: fadeIn / fadeOut
             if (progressInfo != null) {
                 CPSProgressIndicator(
                     progressBarInfo = progressInfo,
