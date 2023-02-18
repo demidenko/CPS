@@ -181,8 +181,8 @@ object NotificationIds {
     val makeAtCoderNewsId = nextIdInterval()
 
     //project euler
-    val makeProjectEulerRecentProblemNotificationId = nextIdInterval()
-    val makeProjectEulerNewsNotificationId = nextIdInterval()
+    val makeProjectEulerRecentProblemId = nextIdInterval()
+    val makeProjectEulerNewsId = nextIdInterval()
 
     //acmp
     val makeACMPNewsNotificationId = nextIdInterval()

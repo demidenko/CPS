@@ -8,9 +8,12 @@ import com.demich.cps.news.settings.NewsSettingsDataStore
 import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.atcoder_news
 import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.project_euler_news
 import com.demich.cps.utils.AtCoderApi
+import com.demich.cps.utils.ProjectEulerApi
 import com.demich.datastore_itemized.edit
 import kotlinx.datetime.Instant
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
+import org.jsoup.select.Elements
 import kotlin.time.Duration.Companion.hours
 
 class NewsWorker(
@@ -46,60 +49,117 @@ class NewsWorker(
     }
 
     private suspend fun atcoderNews() {
-        val panels = Jsoup.parse(AtCoderApi.getMainPage())
-            .select("div.panel.panel-default")
-
         data class Post(
             val title: String,
             val time: Instant,
-            val id: String
-        )
+            override val id: String
+        ): PostEntry
 
-        val lastPostId = settings.newsFeedsLastIds()[atcoder_news]
-
-        val newPosts = buildList {
-            for (panel in panels) {
+        getPosts(
+            newsFeed = atcoder_news,
+            elements = Jsoup.parse(AtCoderApi.getMainPage()).select("div.panel.panel-default"),
+            extractPost = { panel ->
                 val header = panel.expectFirst("div.panel-heading")
                 val titleElement = header.expectFirst("h3.panel-title")
                 val timeElement = header.expectFirst("span.tooltip-unix")
                 val id = titleElement.expectFirst("a").attr("href").removePrefix("/posts/")
-
-                if (id == lastPostId) break
-
-                add(Post(
+                Post(
                     title = titleElement.text(),
                     time = Instant.fromEpochSeconds(timeElement.attr("title").toLong()),
                     id = id
-                ))
+                )
             }
-        }
-
-        if (lastPostId != null) {
-            newPosts.forEach {
-                notificationBuildAndNotify(
-                    context = context,
-                    channel = NotificationChannels.atcoder.news,
-                    notificationId = NotificationIds.makeAtCoderNewsId(it.id.toInt())
-                ) {
-                    setSubText("atcoder news")
-                    setBigContent(it.title.trim())
-                    setSmallIcon(R.drawable.ic_news)
-                    setWhen(it.time)
-                    attachUrl(url = AtCoderApi.urls.post(it.id.toInt()), context = context)
-                    //setColor
-                    setAutoCancel(true)
-                }
-            }
-        }
-
-        newPosts.firstOrNull()?.let {
-            settings.newsFeedsLastIds.edit {
-                this[atcoder_news] = it.id
+        ) {
+            notificationBuildAndNotify(
+                context = context,
+                channel = NotificationChannels.atcoder.news,
+                notificationId = NotificationIds.makeAtCoderNewsId(it.id.toInt())
+            ) {
+                setSubText("atcoder news")
+                setBigContent(it.title.trim())
+                setSmallIcon(R.drawable.ic_news)
+                setWhen(it.time)
+                attachUrl(url = AtCoderApi.urls.post(it.id.toInt()), context = context)
+                //setColor
+                setAutoCancel(true)
             }
         }
     }
 
     private suspend fun projectEulerNews() {
-        //TODO
+        data class Post(
+            val title: String,
+            val descriptionHtml: String,
+            override val id: String
+        ): PostEntry
+
+        getPosts(
+            newsFeed = project_euler_news,
+            elements = Jsoup.parse(ProjectEulerApi.getRSSPage()).select("item"),
+            extractPost = { item ->
+                val idFull = item.expectFirst("guid").text()
+                val id = idFull.removePrefix("news_id_")
+                if (id != idFull) {
+                    Post(
+                        title = item.expectFirst("title").text(),
+                        descriptionHtml = item.expectFirst("description").html(),
+                        id = id
+                    )
+                } else {
+                    null
+                }
+            }
+        ) {
+            notificationBuildAndNotify(
+                context = context,
+                channel = NotificationChannels.project_euler.news,
+                notificationId = NotificationIds.makeProjectEulerNewsId(it.id.toInt())
+            ) {
+                setSubText("Project Euler news")
+                setContentTitle(it.title)
+                setBigContent(
+                    Jsoup.parse(it.descriptionHtml).text()
+                        .replace("\n", "")
+                        .replace("<p>", "")
+                        .replace("</p>", "\n\n")
+                )
+                setSmallIcon(R.drawable.ic_news)
+                setColor(context.getColor(R.color.project_euler_main))
+                setShowWhen(false)
+                setAutoCancel(true)
+                attachUrl(url = ProjectEulerApi.urls.news, context = context)
+            }
+        }
+    }
+
+    private suspend fun<T: PostEntry> getPosts(
+        newsFeed: NewsSettingsDataStore.NewsFeed,
+        elements: Elements,
+        extractPost: (Element) -> T?,
+        onNewPost: (T) -> Unit
+    ) {
+        val lastId = settings.newsFeedsLastIds()[newsFeed]
+
+        val newEntries = buildList {
+            for (element in elements) {
+                val post = extractPost(element) ?: continue
+                if (post.id == lastId) break
+                add(post)
+            }
+        }
+
+        if (newEntries.isEmpty()) return
+
+        if (lastId != null) {
+            newEntries.forEach(onNewPost)
+        }
+
+        settings.newsFeedsLastIds.edit {
+            this[newsFeed] = newEntries.first().id
+        }
+    }
+
+    private interface PostEntry {
+        val id: String
     }
 }
