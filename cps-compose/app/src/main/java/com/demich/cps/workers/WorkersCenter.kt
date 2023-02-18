@@ -80,6 +80,7 @@ internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
 
 fun Context.getCPSWorks() = listOf(
     AccountsWorker::getWork,
+    NewsWorker::getWork,
     ContestsWorker::getWork,
     CodeforcesNewsFollowWorker::getWork,
     CodeforcesNewsLostRecentWorker::getWork,
@@ -101,16 +102,6 @@ internal fun WorkManager.enqueueCodeforcesMonitorWorker(replace: Boolean) {
 
 /*
 object WorkersCenter {
-
-    fun startNewsWorker(context: Context, restart: Boolean = true) {
-        makeAndEnqueueWork<NewsWorker>(
-            context,
-            WorkersNames.news_parsers,
-            restart,
-            6.hours,
-            batteryNotLow = true
-        )
-    }
 
     fun startProjectEulerRecentProblemsWorker(context: Context, restart: Boolean = true) {
         makeAndEnqueueWork<ProjectEulerRecentProblemsWorker>(
