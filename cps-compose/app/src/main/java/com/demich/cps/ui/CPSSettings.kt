@@ -288,11 +288,12 @@ fun SettingsSubtitle(
 @Composable
 fun<T: Enum<T>> SettingsSubtitleOfEnabled(
     enabled: Set<T>,
-    allSize: Int? = null
+    allSize: Int? = null,
+    name: (T) -> String = { it.name }
 ) {
     if (enabled.isEmpty()) SettingsSubtitle("none selected")
     else if (enabled.size == allSize) SettingsSubtitle("all selected")
-    else WordsWithCounterOnOverflow(words = enabled.sortedBy { it.ordinal }.map { it.name }, fontSize = 15.sp)
+    else WordsWithCounterOnOverflow(words = enabled.sortedBy { it.ordinal }.map(name), fontSize = 15.sp)
 }
 
 @OptIn(ExperimentalAnimationApi::class)

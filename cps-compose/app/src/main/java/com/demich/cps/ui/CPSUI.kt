@@ -124,7 +124,7 @@ fun CPSCheckBox(
     modifier: Modifier = Modifier,
     checked: Boolean,
     enabled: Boolean = true,
-    onCheckedChange: ((Boolean) -> Unit)? = null,
+    onCheckedChange: ((Boolean) -> Unit)? = null
 ) {
     Checkbox(
         modifier = modifier,
@@ -135,6 +135,27 @@ fun CPSCheckBox(
             checkedColor = cpsColors.accent
         )
     )
+}
+
+@Composable
+fun CPSCheckBoxTitled(
+    modifier: Modifier = Modifier,
+    checked: Boolean,
+    title: @Composable () -> Unit,
+    enabled: Boolean = true,
+    onCheckedChange: ((Boolean) -> Unit)? = null
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        CPSCheckBox(
+            checked = checked,
+            enabled = enabled,
+            onCheckedChange = onCheckedChange
+        )
+        title()
+    }
 }
 
 @Composable
@@ -280,7 +301,9 @@ fun CPSSwipeRefresh(
         refreshing = isRefreshing,
         onRefresh = onRefresh
     )
-    Box(modifier = modifier.pullRefresh(state).clipToBounds()) {
+    Box(modifier = modifier
+        .pullRefresh(state)
+        .clipToBounds()) {
         content()
         PullRefreshIndicator(
             refreshing = isRefreshing,
