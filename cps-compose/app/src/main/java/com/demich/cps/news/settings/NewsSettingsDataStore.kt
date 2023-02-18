@@ -5,6 +5,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.utils.codeforces.CodeforcesLocale
 import com.demich.cps.utils.codeforces.CodeforcesUtils
+import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -35,4 +36,12 @@ class NewsSettingsDataStore(context: Context): ItemizedDataStore(context.news_se
             }
         }
     }
+
+    enum class NewsFeed {
+        ATCODER,
+        PROJECTEULER
+    }
+
+    val enabledNewsFeeds = itemEnumSet<NewsFeed>(name = "news_feeds", defaultValue = emptySet())
+    val newsFeedsLastIds = jsonCPS.item<Map<NewsFeed,String>>(name = "news_feeds_last_id", defaultValue = emptyMap())
 }

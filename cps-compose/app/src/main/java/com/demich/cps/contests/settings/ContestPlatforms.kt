@@ -49,10 +49,10 @@ fun ContestPlatformsSettingsItem() {
 private fun ContestPlatformsSettingsItemContent(
     enabledPlatforms: Set<Contest.Platform>
 ) {
-    val platforms = enabledPlatforms - Contest.Platform.unknown
-    if (platforms.isEmpty()) SettingsSubtitle("none selected")
-    else if (platforms.size == Contest.platformsExceptUnknown.size) SettingsSubtitle("all selected")
-    else WordsWithCounterOnOverflow(words = platforms.sortedBy { it.ordinal }.map { it.name }, fontSize = 15.sp)
+    SettingsSubtitleOfEnabled(
+        enabled = enabledPlatforms - Contest.Platform.unknown,
+        allSize = Contest.platformsExceptUnknown.size
+    )
 }
 
 @Composable
