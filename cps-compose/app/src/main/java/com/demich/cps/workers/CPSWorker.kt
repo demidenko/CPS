@@ -60,10 +60,11 @@ abstract class CPSWorker(
     protected suspend fun List<suspend () -> Unit>.joinAllWithProgress() {
         val progressStateFlow = MutableStateFlow(ProgressBarInfo(total = size))
         withContext(Dispatchers.IO) {
-            progressStateFlow
-                .take(size + 1)
-                .onEach { setProgressInfo(it) }
-                .launchIn(this)
+            progressStateFlow.transformWhile {
+                emit(it)
+                it.current != it.total
+            }.onEach(::setProgressInfo).launchIn(this)
+
             map { job ->
                 launch {
                     try {
