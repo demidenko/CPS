@@ -28,8 +28,8 @@ class NewsWorker(
     override suspend fun runWork(): Result {
         val jobs = buildList {
             NewsSettingsDataStore(context).enabledNewsFeeds().let { enabled ->
-                if (ATCODER in enabled) add(::atcoderNews)
-                if (PROJECTEULER in enabled) add(::projectEulerNews)
+                if (atcoder_news in enabled) add(::atcoderNews)
+                if (project_euler_news in enabled) add(::projectEulerNews)
             }
         }
 

@@ -151,8 +151,10 @@ private fun ChangeStartScreenDialog(
 
     val startScreenRoute by rememberCollect { context.settingsUI.startScreenRoute.flow }
 
-    CPSDialog(onDismissRequest = onDismissRequest) {
-        Text(text = "Select start screen", fontWeight = FontWeight.Medium)
+    CPSDialog(
+        title = "Select start screen",
+        onDismissRequest = onDismissRequest
+    ) {
         Column(
             horizontalAlignment = Alignment.Start,
             modifier = Modifier.padding(horizontal = 8.dp)

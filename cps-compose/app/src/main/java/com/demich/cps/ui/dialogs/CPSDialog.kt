@@ -1,19 +1,24 @@
 package com.demich.cps.ui.dialogs
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.demich.cps.ui.CPSCheckBoxTitled
+import com.demich.cps.ui.CPSRadioButtonTitled
 import com.demich.cps.ui.theme.cpsColors
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -41,6 +46,24 @@ fun CPSDialog(
             )
         }
     }
+}
+
+@Composable
+fun CPSDialog(
+    modifier: Modifier = Modifier,
+    title: String,
+    onDismissRequest: () -> Unit,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    CPSDialog(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        onDismissRequest = onDismissRequest,
+        content = {
+            Text(text = title, fontWeight = FontWeight.SemiBold)
+            content()
+        }
+    )
 }
 
 @Composable
@@ -147,4 +170,80 @@ fun CPSAskDialog(
         backgroundColor = cpsColors.backgroundAdditional,
         shape = RoundedCornerShape(12.dp)
     )
+}
+
+@Composable
+fun<T: Enum<T>> CPSDialogSelectEnum(
+    title: String,
+    options: Iterable<T>,
+    selectedOption: T,
+    optionTitle: @Composable (T) -> Unit,
+    onDismissRequest: () -> Unit,
+    onSelectOption: (T) -> Unit
+) {
+    CPSDialog(
+        title = title,
+        onDismissRequest = onDismissRequest
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f, false)
+                .verticalScroll(rememberScrollState())
+        ) {
+            options.forEach { option ->
+                CPSRadioButtonTitled(
+                    title = { optionTitle(option) },
+                    selected = option == selectedOption,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    onSelectOption(option)
+                    onDismissRequest()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun<T: Enum<T>> CPSDialogMultiSelectEnum(
+    title: String,
+    options: Iterable<T>,
+    selectedOptions: Set<T>,
+    optionTitle: @Composable (T) -> Unit,
+    onDismissRequest: () -> Unit,
+    onSaveSelected: (Set<T>) -> Unit
+) {
+    var currentlySelected: Set<T> by remember { mutableStateOf(selectedOptions) }
+
+    CPSDialog(
+        title = title,
+        onDismissRequest = onDismissRequest
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f, false)
+                .verticalScroll(rememberScrollState())
+        ) {
+            options.forEach { option ->
+                CPSCheckBoxTitled(
+                    title = { optionTitle(option) },
+                    checked = option in currentlySelected,
+                    modifier = Modifier.fillMaxWidth()
+                ) { checked ->
+                    if (checked) currentlySelected += option
+                    else currentlySelected -= option
+                }
+            }
+            CPSDialogCancelAcceptButtons(
+                acceptTitle = "Save",
+                onCancelClick = onDismissRequest,
+                onAcceptClick = {
+                    onSaveSelected(currentlySelected)
+                    onDismissRequest()
+                }
+            )
+        }
+    }
 }

@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.dialogs.CPSDialog
+import com.demich.cps.ui.dialogs.CPSDialogSelectEnum
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.context
@@ -209,26 +209,16 @@ fun<T: Enum<T>> SettingsEnumItemContent(
     }
 
     if (showChangeDialog) {
-        CPSDialog(onDismissRequest = { showChangeDialog = false }) {
-            Text(text = title)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f, false)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                options.forEach { option ->
-                    CPSRadioButtonTitled(
-                        title = { Text(text = optionToString(option)) },
-                        selected = option == selectedOption,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        scope.launch { item(newValue = option) }
-                        showChangeDialog = false
-                    }
-                }
+        CPSDialogSelectEnum(
+            title = title,
+            options = options,
+            selectedOption = selectedOption,
+            optionTitle = { Text(text = optionToString(it)) },
+            onDismissRequest = { showChangeDialog = false },
+            onSelectOption = {
+                scope.launch { item(newValue = it) }
             }
-        }
+        )
     }
 }
 

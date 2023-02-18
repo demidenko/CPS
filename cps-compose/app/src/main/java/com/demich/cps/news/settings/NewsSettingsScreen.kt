@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -14,14 +15,17 @@ import com.demich.cps.R
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.ui.*
+import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
 import com.demich.cps.utils.codeforces.CodeforcesLocale
 import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.workers.CodeforcesNewsFollowWorker
 import com.demich.cps.workers.CodeforcesNewsLostRecentWorker
+import com.demich.cps.workers.NewsWorker
 import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 @Composable
@@ -146,16 +150,42 @@ private fun CodeforcesRuEnabledSettingsItem() {
 @Composable
 private fun NewsFeedsSettingsItem() {
     val context = context
+    val enabledSettingsItem = remember { NewsSettingsDataStore(context).enabledNewsFeeds }
 
+    val title = "News feeds"
     var showDialog by rememberSaveable { mutableStateOf(false) }
 
     SettingsItemWithInfo(
-        item = NewsSettingsDataStore(context).enabledNewsFeeds,
-        title = "News feeds",
+        item = enabledSettingsItem,
+        title = title,
         modifier = Modifier.clickable { showDialog = true }
-    ) {
-        SettingsSubtitleOfEnabled(enabled = it)
+    ) { newsFeeds ->
+        SettingsSubtitleOfEnabled(
+            enabled = newsFeeds,
+            name = { it.shortName }
+        )
     }
 
-
+    val scope = rememberCoroutineScope()
+    if (showDialog) {
+        CPSDialogMultiSelectEnum(
+            title = title,
+            options = NewsSettingsDataStore.NewsFeed.values().asIterable(),
+            selectedOptions = remember { runBlocking { enabledSettingsItem() } },
+            optionTitle = { Text(it.link) },
+            onDismissRequest = { showDialog = false },
+            onSaveSelected = { current ->
+                scope.launch {
+                    val newSelectedFeeds = current.toMutableSet().apply {
+                        removeAll(enabledSettingsItem())
+                        remove(NewsSettingsDataStore.NewsFeed.project_euler_problems)
+                    }
+                    enabledSettingsItem(newValue = current)
+                    if (newSelectedFeeds.isNotEmpty()) {
+                        NewsWorker.getWork(context).startImmediate()
+                    }
+                }
+            }
+        )
+    }
 }
