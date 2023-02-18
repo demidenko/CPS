@@ -74,11 +74,12 @@ object NotificationChannels {
 
     object atcoder: NotificationChannelGroupLazy("atcoder", "AtCoder") {
         val rating_changes = channel("atcoder_rating_changes", "Rating changes", Importance.HIGH)
+        val news = channel("atcoder_news", "News")
     }
 
     object project_euler: NotificationChannelGroupLazy("project_euler", "Project Euler") {
-        val news = channel("pe_news", "Recent Problems")
-        val problems = channel("pe_problems", "News")
+        val news = channel("pe_news", "News")
+        val problems = channel("pe_problems", "Recent Problems")
     }
 
     object acmp: NotificationChannelGroupLazy("acmp", "ACMP") {
@@ -177,6 +178,7 @@ object NotificationIds {
 
     //atcoder
     val atcoder_rating_changes = nextId()
+    val makeAtCoderNewsId = nextIdInterval()
 
     //project euler
     val makeProjectEulerRecentProblemNotificationId = nextIdInterval()

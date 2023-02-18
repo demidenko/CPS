@@ -15,6 +15,10 @@ object AtCoderApi {
         }
     }
 
+    suspend fun getMainPage(): String  {
+        return client.getText(urlString = urls.main)
+    }
+
     suspend fun getContestsPage(): String {
         return client.getText(urlString = urls.main + "/contests")
     }
@@ -32,6 +36,7 @@ object AtCoderApi {
         const val main = "https://atcoder.jp"
         fun user(handle: String) = "$main/users/$handle"
         fun userContestResult(handle: String, contestId: String) = "$main/users/$handle/history/share/$contestId"
+        fun post(id: Int) = "$main/posts/$id"
     }
 }
 
