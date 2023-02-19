@@ -7,6 +7,7 @@ import com.demich.cps.*
 import com.demich.cps.news.settings.NewsSettingsDataStore
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.utils.ProjectEulerApi
+import com.demich.datastore_itemized.edit
 import org.jsoup.Jsoup
 import kotlin.time.Duration.Companion.hours
 
@@ -32,40 +33,43 @@ class ProjectEulerRecentProblemsWorker(
     override suspend fun runWork(): Result {
         class RecentProblem(
             val name: String,
-            override val id: Int
-        ): PostEntry<Int>
+            override val id: String
+        ): PostEntry
 
         val settings = context.settingsNews
         getPosts(
             elements = Jsoup.parse(ProjectEulerApi.getRecentPage()).expectFirst("#problems_table").select("td.id_column"),
             getLastId = {
-                settings.projectEulerLastRecentProblemId()
+                settings.newsFeedsLastIds()[NewsSettingsDataStore.NewsFeed.project_euler_problems]
             },
             setLastId = {
-                settings.projectEulerLastRecentProblemId(it)
+                settings.newsFeedsLastIds.edit {
+                    this[NewsSettingsDataStore.NewsFeed.project_euler_problems] = it
+                }
             },
             extractPost = { idCell ->
                 idCell.nextElementSibling()?.let { nameCell ->
                     RecentProblem(
                         name = nameCell.text(),
-                        id = idCell.text().toInt()
+                        id = idCell.text()
                     )
                 }
             }
         ) {
+            val problemId = it.id.toInt()
             notificationBuildAndNotify(
                 context = context,
                 channel = NotificationChannels.project_euler.problems,
-                notificationId = NotificationIds.makeProjectEulerRecentProblemId(it.id)
+                notificationId = NotificationIds.makeProjectEulerRecentProblemId(problemId)
             ) {
                 setSubText("Project Euler • New problem published!")
-                setContentTitle("Problem ${it.id}")
+                setContentTitle("Problem $problemId")
                 setBigContent(it.name)
                 setSmallIcon(R.drawable.ic_logo_projecteuler)
                 setColor(context.getColor(R.color.project_euler_main))
                 setShowWhen(true)
                 setAutoCancel(true)
-                attachUrl(url = ProjectEulerApi.urls.problem(it.id), context = context)
+                attachUrl(url = ProjectEulerApi.urls.problem(problemId), context = context)
             }
         }
 

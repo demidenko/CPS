@@ -23,6 +23,7 @@ import com.demich.cps.utils.rememberCollect
 import com.demich.cps.workers.CodeforcesNewsFollowWorker
 import com.demich.cps.workers.CodeforcesNewsLostRecentWorker
 import com.demich.cps.workers.NewsWorker
+import com.demich.cps.workers.ProjectEulerRecentProblemsWorker
 import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -176,13 +177,14 @@ private fun NewsFeedsSettingsItem() {
             onDismissRequest = { showDialog = false },
             onSaveSelected = { current ->
                 scope.launch {
-                    val newSelectedFeeds = current.toMutableSet().apply {
-                        removeAll(enabledSettingsItem())
-                        remove(NewsSettingsDataStore.NewsFeed.project_euler_problems)
-                    }
+                    val newSelectedFeeds = current - enabledSettingsItem()
                     enabledSettingsItem(newValue = current)
-                    if (newSelectedFeeds.isNotEmpty()) {
+                    val pe_recent = NewsSettingsDataStore.NewsFeed.project_euler_problems
+                    if ((newSelectedFeeds - pe_recent).isNotEmpty()) {
                         NewsWorker.getWork(context).startImmediate()
+                    }
+                    if (pe_recent in newSelectedFeeds) {
+                        ProjectEulerRecentProblemsWorker.getWork(context).startImmediate()
                     }
                 }
             }

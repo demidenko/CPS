@@ -54,7 +54,7 @@ class NewsWorker(
             val title: String,
             val time: Instant,
             override val id: String
-        ): PostEntry<String>
+        ): PostEntry
 
         getPosts(
             newsFeed = atcoder_news,
@@ -92,7 +92,7 @@ class NewsWorker(
             val title: String,
             val descriptionHtml: String,
             override val id: String
-        ): PostEntry<String>
+        ): PostEntry
 
         getPosts(
             newsFeed = project_euler_news,
@@ -133,7 +133,7 @@ class NewsWorker(
         }
     }
 
-    private suspend fun<T: PostEntry<String>> getPosts(
+    private suspend fun<T: PostEntry> getPosts(
         newsFeed: NewsSettingsDataStore.NewsFeed,
         elements: Elements,
         extractPost: (Element) -> T?,

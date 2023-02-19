@@ -3,14 +3,14 @@ package com.demich.cps.workers
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 
-internal interface PostEntry<K> {
-    val id: K
+internal interface PostEntry {
+    val id: String
 }
 
-internal suspend fun<K, T: PostEntry<K>> getPosts(
+internal suspend fun<T: PostEntry> getPosts(
     elements: Elements,
-    getLastId: suspend () -> K?,
-    setLastId: suspend (K) -> Unit,
+    getLastId: suspend () -> String?,
+    setLastId: suspend (String) -> Unit,
     extractPost: (Element) -> T?,
     onNewPost: (T) -> Unit
 ) {
