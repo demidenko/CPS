@@ -56,14 +56,15 @@ fun SettingsSectionHeader(
     ) {
         IconSp(
             painter = painter,
-            size = 16.sp,
+            size = 18.sp,
             color = color,
             modifier = Modifier.padding(horizontal = 6.dp)
         )
         Text(
             text = title,
             fontSize = 14.sp,
-            color = color
+            color = color,
+            fontWeight = FontWeight.SemiBold,
         )
     }
 }
