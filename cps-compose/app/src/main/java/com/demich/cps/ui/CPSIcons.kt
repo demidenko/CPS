@@ -52,6 +52,7 @@ object CPSIcons {
     val BlogEntry get() = Icons.Filled.Wysiwyg
     val ArrowRight get() = Icons.Default.ArrowRightAlt
     val Error get() = Icons.Default.Error
+    val NewsFeeds get() = Icons.Default.RssFeed
 }
 
 

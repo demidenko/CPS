@@ -9,10 +9,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.contests.Contest
 import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
@@ -32,10 +34,19 @@ import kotlinx.coroutines.runBlocking
 @Composable
 fun NewsSettingsScreen() {
     SettingsColumn {
+        SettingsSectionHeader(
+            title = "codeforces",
+            painter = platformIconPainter(platform = Contest.Platform.codeforces)
+        )
         CodeforcesDefaultTabSettingsItem()
         CodeforcesFollowSettingsItem()
         CodeforcesLostSettingsItem()
         CodeforcesRuEnabledSettingsItem()
+
+        SettingsSectionHeader(
+            title = "news feeds",
+            painter = rememberVectorPainter(image = CPSIcons.NewsFeeds)
+        )
         NewsFeedsSettingsItem()
     }
 }
@@ -153,7 +164,7 @@ private fun NewsFeedsSettingsItem() {
     val context = context
     val enabledSettingsItem = remember { context.settingsNews.enabledNewsFeeds }
 
-    val title = "News feeds"
+    val title = "Subscriptions"
     var showDialog by rememberSaveable { mutableStateOf(false) }
 
     SettingsItemWithInfo(
