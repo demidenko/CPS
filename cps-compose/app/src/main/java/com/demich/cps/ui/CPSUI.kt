@@ -19,7 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -34,16 +36,31 @@ import com.demich.cps.utils.LoadingStatus
 
 @Composable
 fun IconSp(
-    imageVector: ImageVector,
+    painter: Painter,
     modifier: Modifier = Modifier,
     size: TextUnit,
     color: Color = cpsColors.content
 ) {
     Icon(
-        imageVector = imageVector,
+        painter = painter,
         contentDescription = null,
         tint = color,
         modifier = modifier.size(with(LocalDensity.current) { size.toDp() })
+    )
+}
+
+@Composable
+fun IconSp(
+    imageVector: ImageVector,
+    modifier: Modifier = Modifier,
+    size: TextUnit,
+    color: Color = cpsColors.content
+) {
+    IconSp(
+        painter = rememberVectorPainter(image = imageVector),
+        modifier = modifier,
+        size = size,
+        color = color
     )
 }
 

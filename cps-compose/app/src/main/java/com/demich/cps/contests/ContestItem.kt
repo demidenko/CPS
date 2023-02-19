@@ -1,13 +1,11 @@
 package com.demich.cps.contests
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -331,11 +329,11 @@ fun ContestPlatformIcon(
     size: TextUnit,
     color: Color
 ) {
-    Icon(
+    IconSp(
         painter = platformIconPainter(platform),
-        modifier = modifier.size(with(LocalDensity.current) { size.toDp() }),
-        tint = color,
-        contentDescription = null
+        size = size,
+        modifier = modifier,
+        color = color
     )
 }
 
