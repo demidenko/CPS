@@ -84,8 +84,9 @@ fun Context.getCPSWorks() = listOf(
     ContestsWorker::getWork,
     CodeforcesNewsFollowWorker::getWork,
     CodeforcesNewsLostRecentWorker::getWork,
+    CodeforcesMonitorLauncherWorker::getWork,
     CodeforcesUpsolvingSuggestionsWorker::getWork,
-    CodeforcesMonitorLauncherWorker::getWork
+    ProjectEulerRecentProblemsWorker::getWork
 ).map { it(this) }
 
 suspend fun Context.enqueueEnabledWorkers() {
@@ -99,16 +100,3 @@ internal fun WorkManager.enqueueCodeforcesMonitorWorker(replace: Boolean) {
         OneTimeWorkRequestBuilder<CodeforcesMonitorWorker>().build()
     )
 }
-
-/*
-object WorkersCenter {
-
-    fun startProjectEulerRecentProblemsWorker(context: Context, restart: Boolean = true) {
-        makeAndEnqueueWork<ProjectEulerRecentProblemsWorker>(
-            context,
-            WorkersNames.project_euler_recent_problems,
-            restart,
-            1.hours
-        )
-    }
-}*/

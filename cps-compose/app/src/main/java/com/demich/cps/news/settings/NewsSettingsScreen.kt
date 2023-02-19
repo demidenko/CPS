@@ -150,7 +150,7 @@ private fun CodeforcesRuEnabledSettingsItem() {
 @Composable
 private fun NewsFeedsSettingsItem() {
     val context = context
-    val enabledSettingsItem = remember { NewsSettingsDataStore(context).enabledNewsFeeds }
+    val enabledSettingsItem = remember { context.settingsNews.enabledNewsFeeds }
 
     val title = "News feeds"
     var showDialog by rememberSaveable { mutableStateOf(false) }

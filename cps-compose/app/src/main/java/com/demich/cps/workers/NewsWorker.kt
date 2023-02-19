@@ -7,6 +7,7 @@ import com.demich.cps.*
 import com.demich.cps.news.settings.NewsSettingsDataStore
 import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.atcoder_news
 import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.project_euler_news
+import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.utils.AtCoderApi
 import com.demich.cps.utils.ProjectEulerApi
 import com.demich.datastore_itemized.edit
@@ -25,7 +26,7 @@ class NewsWorker(
 ) {
     companion object {
         fun getWork(context: Context) = object : CPSWork(name = "news", context = context) {
-            override suspend fun isEnabled() = NewsSettingsDataStore(context).enabledNewsFeeds().isNotEmpty()
+            override suspend fun isEnabled() = context.settingsNews.enabledNewsFeeds().isNotEmpty()
             override val requestBuilder: PeriodicWorkRequest.Builder
                 get() = CPSPeriodicWorkRequestBuilder<NewsWorker>(
                     repeatInterval = 6.hours,
@@ -34,7 +35,7 @@ class NewsWorker(
         }
     }
 
-    val settings by lazy { NewsSettingsDataStore(context) }
+    val settings by lazy { context.settingsNews }
     override suspend fun runWork(): Result {
         val jobs = buildList {
             settings.enabledNewsFeeds().let { enabled ->
@@ -49,11 +50,11 @@ class NewsWorker(
     }
 
     private suspend fun atcoderNews() {
-        data class Post(
+        class Post(
             val title: String,
             val time: Instant,
             override val id: String
-        ): PostEntry
+        ): PostEntry<String>
 
         getPosts(
             newsFeed = atcoder_news,
@@ -87,11 +88,11 @@ class NewsWorker(
     }
 
     private suspend fun projectEulerNews() {
-        data class Post(
+        class Post(
             val title: String,
             val descriptionHtml: String,
             override val id: String
-        ): PostEntry
+        ): PostEntry<String>
 
         getPosts(
             newsFeed = project_euler_news,
@@ -132,34 +133,22 @@ class NewsWorker(
         }
     }
 
-    private suspend fun<T: PostEntry> getPosts(
+    private suspend fun<T: PostEntry<String>> getPosts(
         newsFeed: NewsSettingsDataStore.NewsFeed,
         elements: Elements,
         extractPost: (Element) -> T?,
         onNewPost: (T) -> Unit
     ) {
-        val lastId = settings.newsFeedsLastIds()[newsFeed]
-
-        val newEntries = buildList {
-            for (element in elements) {
-                val post = extractPost(element) ?: continue
-                if (post.id == lastId) break
-                add(post)
+        getPosts(
+            elements = elements,
+            extractPost = extractPost,
+            onNewPost = onNewPost,
+            getLastId = {
+                settings.newsFeedsLastIds()[newsFeed]
+            },
+            setLastId = {
+                settings.newsFeedsLastIds.edit { this[newsFeed] = it }
             }
-        }
-
-        if (newEntries.isEmpty()) return
-
-        if (lastId != null) {
-            newEntries.forEach(onNewPost)
-        }
-
-        settings.newsFeedsLastIds.edit {
-            this[newsFeed] = newEntries.first().id
-        }
-    }
-
-    private interface PostEntry {
-        val id: String
+        )
     }
 }

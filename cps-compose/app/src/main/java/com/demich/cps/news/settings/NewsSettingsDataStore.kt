@@ -58,4 +58,6 @@ class NewsSettingsDataStore(context: Context): ItemizedDataStore(context.news_se
 
     val enabledNewsFeeds = itemEnumSet<NewsFeed>(name = "news_feeds", defaultValue = emptySet())
     val newsFeedsLastIds = jsonCPS.item<Map<NewsFeed,String>>(name = "news_feeds_last_id", defaultValue = emptyMap())
+
+    val projectEulerLastRecentProblemId = itemIntNullable(name = "pe_last_recent_id")
 }
