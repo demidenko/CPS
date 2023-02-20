@@ -40,11 +40,13 @@ class AtCoderContestsLoader: ContestsLoader(type = ContestsLoaders.atcoder) {
             if (!dateConstraints.check(startTime, duration)) return null
 
             val title = td[1].expectFirst("a")
+            val id = title.attr("href").removePrefix("/contests/")
 
             Contest(
                 platform = Contest.Platform.atcoder,
                 title = title.text().trim(),
-                id = title.attr("href").removePrefix("/contests/"),
+                id = id,
+                link = AtCoderApi.urls.contest(id),
                 startTime = startTime,
                 durationSeconds = duration.inWholeSeconds
             )
