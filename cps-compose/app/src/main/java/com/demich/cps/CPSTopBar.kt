@@ -28,7 +28,6 @@ fun CPSTopBar(
 ) {
     var showUIPanel by rememberSaveable { mutableStateOf(false) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
-    var showMenu by remember { mutableStateOf(false) }
 
     TopAppBar(
         backgroundColor = cpsColors.background,
@@ -56,16 +55,9 @@ fun CPSTopBar(
             }
         }
 
-        ContentWithCPSDropdownMenu(
-            expanded = showMenu,
-            onDismissRequest = { showMenu = false },
-            content = {
-                CPSIconButton(
-                    icon = CPSIcons.More,
-                    color = cpsColors.content,
-                    onClick = { showMenu = true },
-                )
-            }
+        CPSDropdownMenuButton(
+            icon = CPSIcons.More,
+            color = cpsColors.content,
         ) {
             CPSDropdownMenuItem(title = "UI", icon = CPSIcons.SettingsUI) {
                 showUIPanel = true

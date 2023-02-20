@@ -277,19 +277,11 @@ private fun ContestItemMenuButton(
 ) {
     val context = context
     val scope = rememberCoroutineScope()
-    var showMenu by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
-    ContentWithCPSDropdownMenu(
-        expanded = showMenu,
-        onDismissRequest = { showMenu = false },
-        modifier = modifier,
-        content = {
-            CPSIconButton(
-                icon = CPSIcons.More,
-                color = cpsColors.contentAdditional,
-                onClick = { showMenu = true },
-            )
-        }
+    CPSDropdownMenuButton(
+        icon = CPSIcons.More,
+        color = cpsColors.contentAdditional,
+        modifier = modifier
     ) {
         if (contest.link != null) {
             CPSDropdownMenuItem(title = "Open in browser", icon = CPSIcons.OpenInBrowser) {
