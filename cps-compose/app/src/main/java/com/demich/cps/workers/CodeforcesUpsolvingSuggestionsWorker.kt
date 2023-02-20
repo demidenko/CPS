@@ -5,7 +5,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.*
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
-import com.demich.cps.utils.asyncPair
+import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesProblem
 import com.demich.cps.utils.codeforces.CodeforcesProblemVerdict
@@ -52,8 +52,8 @@ class CodeforcesUpsolvingSuggestionsWorker(
             .filter { it.ratingUpdateTime > deadLine }
             .forEachWithProgress { ratingChange ->
                 val contestId = ratingChange.contestId
-                val data = asyncPair(
-                    getFirst = {
+                val data = awaitPair(
+                    blockFirst = {
                         CodeforcesApi.runCatching {
                             getContestSubmissions(
                                 contestId = contestId,
@@ -61,7 +61,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
                             )
                         }.getOrNull()
                     },
-                    getSecond = {
+                    blockSecond = {
                         CodeforcesUtils.getContestAcceptedStatistics(contestId)
                     }
                 )

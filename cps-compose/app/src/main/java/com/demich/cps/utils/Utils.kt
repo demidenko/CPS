@@ -14,8 +14,7 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -28,6 +27,8 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -149,13 +150,14 @@ fun Iterable<Flow<LoadingStatus>>.combine(): Flow<LoadingStatus> =
 fun<K, V> Map<K, Flow<V>>.combine(): Flow<Map<K, V>> =
     combine(entries.map { (key, value) -> value.map { key to it } }) { it.toMap() }
 
-suspend inline fun<reified A, reified B> asyncPair(
-    crossinline getFirst: suspend () -> A,
-    crossinline getSecond: suspend () -> B,
+suspend fun<A, B> awaitPair(
+    context: CoroutineContext = EmptyCoroutineContext,
+    blockFirst: suspend CoroutineScope.() -> A,
+    blockSecond: suspend CoroutineScope.() -> B,
 ): Pair<A, B> {
     return coroutineScope {
-        val first = async { getFirst() }
-        val second = async { getSecond() }
+        val first = async(context = context, block = blockFirst)
+        val second = async(context = context, block = blockSecond)
         Pair(first.await(), second.await())
     }
 }

@@ -8,7 +8,7 @@ import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.room.followListDao
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.asyncPair
+import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.combine
 import kotlinx.coroutines.Dispatchers
@@ -200,9 +200,10 @@ class CodeforcesNewsViewModel: ViewModel() {
         blogEntriesState.value = emptyList()
         viewModelScope.launch {
             blogLoadingStatus = LoadingStatus.LOADING
-            val (result, colorTag) = asyncPair(
-                { context.followListDao.getAndReloadBlogEntries(handle, context) },
-                { CodeforcesUtils.getRealColorTag(handle) }
+            val (result, colorTag) = awaitPair(
+                context = Dispatchers.IO,
+                blockFirst = { context.followListDao.getAndReloadBlogEntries(handle, context) },
+                blockSecond = { CodeforcesUtils.getRealColorTag(handle) }
             )
             if (result == null) {
                 blogLoadingStatus = LoadingStatus.FAILED
