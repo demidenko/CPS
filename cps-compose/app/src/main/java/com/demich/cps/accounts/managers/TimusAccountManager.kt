@@ -23,7 +23,8 @@ data class TimusUserInfo(
     override val userId: String
         get() = id
 
-    override fun link(): String = TimusApi.urls.user(id.toInt())
+    override val userPageUrl: String
+        get() = TimusApi.urls.user(id.toInt())
 }
 
 class TimusAccountManager(context: Context):

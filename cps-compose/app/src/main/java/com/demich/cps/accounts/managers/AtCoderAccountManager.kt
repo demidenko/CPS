@@ -31,7 +31,8 @@ data class AtCoderUserInfo(
     override val handle: String,
     override val rating: Int = NOT_RATED
 ): RatedUserInfo() {
-    override fun link(): String = AtCoderApi.urls.user(handle)
+    override val userPageUrl: String
+        get() = AtCoderApi.urls.user(handle)
 }
 
 class AtCoderAccountManager(context: Context):

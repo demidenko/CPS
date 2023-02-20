@@ -40,7 +40,7 @@ data class CodeChefUserInfo(
     override val handle: String,
     override val rating: Int = NOT_RATED
 ): RatedUserInfo() {
-    override fun link() = CodeChefApi.urls.user(handle)
+    override val userPageUrl get() = CodeChefApi.urls.user(handle)
 }
 
 class CodeChefAccountManager(context: Context):

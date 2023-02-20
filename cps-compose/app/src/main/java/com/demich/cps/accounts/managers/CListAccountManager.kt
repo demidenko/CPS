@@ -17,7 +17,8 @@ data class CListUserInfo(
     override val userId: String
         get() = login
 
-    override fun link(): String = CListApi.urls.user(login)
+    override val userPageUrl: String
+        get() = CListApi.urls.user(login)
 }
 
 class CListAccountManager(context: Context):

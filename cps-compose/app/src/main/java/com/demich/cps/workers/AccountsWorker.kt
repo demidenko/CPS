@@ -86,7 +86,7 @@ class AccountsWorker(
             setSilent(true)
             setAutoCancel(true)
             setShowWhen(false)
-            attachUrl(url = userInfo.link(), context = context)
+            attachUrl(url = userInfo.userPageUrl, context = context)
             addExtras(bundleOf(KEY_CF_CONTRIBUTION to oldContribution))
         }.notifyBy(notificationManager, NotificationIds.codeforces_contribution_changes)
     }

@@ -29,7 +29,7 @@ data class DmojUserInfo(
     override val handle: String,
     override val rating: Int = NOT_RATED
 ): RatedUserInfo() {
-    override fun link() = DmojApi.urls.user(handle)
+    override val userPageUrl get() = DmojApi.urls.user(handle)
 }
 
 class DmojAccountManager(context: Context):

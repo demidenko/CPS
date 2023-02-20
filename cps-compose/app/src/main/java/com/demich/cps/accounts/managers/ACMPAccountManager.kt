@@ -22,7 +22,8 @@ data class ACMPUserInfo(
     override val userId: String
         get() = id
 
-    override fun link(): String = ACMPApi.urls.user(id.toInt())
+    override val userPageUrl: String
+        get() = ACMPApi.urls.user(id.toInt())
 }
 
 

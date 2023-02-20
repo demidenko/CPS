@@ -181,7 +181,7 @@ fun accountExpandedMenuBuilder(
     }
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         val url = context.allAccountManagers.first { it.type == type }.run {
-            runBlocking { getSavedInfo().link() }
+            runBlocking { getSavedInfo().userPageUrl }
         }
         context.openUrlInBrowser(url)
     }

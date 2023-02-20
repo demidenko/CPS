@@ -86,7 +86,7 @@ abstract class UserInfo {
     abstract val userId: String
     abstract val status: STATUS
 
-    abstract fun link(): String
+    abstract val userPageUrl: String
 
     fun isEmpty() = userId.isBlank()
 }

@@ -54,7 +54,8 @@ data class CodeforcesUserInfo(
         lastOnlineTime = codeforcesUser.lastOnlineTime
     )
 
-    override fun link(): String = CodeforcesApi.urls.user(handle)
+    override val userPageUrl: String
+        get() = CodeforcesApi.urls.user(handle)
 }
 
 
