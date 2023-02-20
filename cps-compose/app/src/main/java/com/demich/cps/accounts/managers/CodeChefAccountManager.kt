@@ -188,14 +188,6 @@ class CodeChefAccountManager(context: Context):
                         fontSize = 30.sp
                     )
                 }
-            },
-            additionalTitle = {
-                if (userInfo.status == STATUS.OK) {
-                    Text(
-                        text = userInfo.ratingToString(),
-                        fontSize = 25.sp
-                    )
-                }
             }
         )
     }
