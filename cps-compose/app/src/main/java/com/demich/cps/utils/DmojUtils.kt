@@ -1,8 +1,6 @@
 package com.demich.cps.utils
 
-import com.demich.cps.accounts.managers.RatingChange
 import io.ktor.client.request.*
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -76,15 +74,7 @@ data class DmojRatingChange(
     val ranking: Int,
     val link: String,
     val timestamp: Double
-) {
-    fun toRatingChange() =
-        RatingChange(
-            rating = rating,
-            date = Instant.fromEpochMilliseconds(timestamp.toLong()),
-            title = label,
-            rank = ranking
-        )
-}
+)
 
 @Serializable
 data class DmojContest(

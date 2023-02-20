@@ -1,6 +1,5 @@
 package com.demich.cps.utils
 
-import com.demich.cps.accounts.managers.RatingChange
 import io.ktor.client.request.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -55,14 +54,4 @@ data class AtCoderRatingChange(
         val s = StandingsUrl.removePrefix("/contests/")
         return s.substring(0, s.indexOf('/'))
     }
-
-    fun toRatingChange(handle: String) =
-        RatingChange(
-            rating = NewRating,
-            oldRating = OldRating,
-            rank = Place,
-            date = EndTime,
-            title = ContestName,
-            url = AtCoderApi.urls.userContestResult(handle, getContestId())
-        )
 }

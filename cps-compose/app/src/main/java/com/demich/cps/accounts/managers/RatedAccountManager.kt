@@ -3,17 +3,13 @@ package com.demich.cps.accounts.managers
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import com.demich.cps.*
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.useOriginalColors
-import com.demich.cps.utils.toSignedString
 import kotlinx.datetime.Instant
-import kotlinx.serialization.Serializable
 
 abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: AccountManagers):
     AccountManager<U>(context, type)
@@ -115,35 +111,4 @@ enum class HandleColor {
 interface RatingRevolutionsProvider {
     //list of (last time, bounds)
     val ratingUpperBoundRevolutions: List<Pair<Instant, Array<Pair<HandleColor, Int>>>>
-}
-
-
-@Serializable
-data class RatingChange(
-    val rating: Int,
-    val date: Instant,
-    val title: String = "",
-    val oldRating: Int? = null,
-    val rank: Int? = null,
-    val url: String? = null
-)
-
-fun notifyRatingChange(
-    manager: RatedAccountManager<out RatedUserInfo>,
-    notificationChannel: NotificationChannelLazy,
-    notificationId: Int,
-    handle: String,
-    ratingChange: RatingChange
-) {
-    notificationBuildAndNotify(manager.context, notificationChannel, notificationId) {
-        val difference = ratingChange.rating - (ratingChange.oldRating ?: 0)
-        setSmallIcon(if (difference < 0) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
-        setContentTitle("$handle new rating: ${ratingChange.rating}")
-        setContentText("${difference.toSignedString()} (rank: ${ratingChange.rank})")
-        setSubText("${manager.type.name} rating changes")
-        color = manager.originalColor(manager.getHandleColor(ratingChange.rating))
-            .toArgb() //TODO not original but cpsColors
-        ratingChange.url?.let { attachUrl(it, manager.context) }
-        setWhen(ratingChange.date)
-    }
 }
