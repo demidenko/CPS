@@ -1,6 +1,5 @@
 package com.demich.cps.utils.codeforces
 
-import com.demich.cps.accounts.managers.NOT_RATED
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.utils.*
 import io.ktor.client.plugins.*
@@ -275,7 +274,7 @@ data class CodeforcesAPIResponse<T>(
 @Serializable
 data class CodeforcesUser(
     val handle: String,
-    val rating: Int = NOT_RATED,
+    val rating: Int? = null,
     val contribution: Int = 0,
     @SerialName("lastOnlineTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)

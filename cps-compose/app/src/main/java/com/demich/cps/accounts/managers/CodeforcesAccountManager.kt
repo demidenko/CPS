@@ -49,7 +49,7 @@ data class CodeforcesUserInfo(
     constructor(codeforcesUser: CodeforcesUser): this(
         status = STATUS.OK,
         handle = codeforcesUser.handle,
-        rating = codeforcesUser.rating,
+        rating = codeforcesUser.rating ?: NOT_RATED,
         contribution = codeforcesUser.contribution,
         lastOnlineTime = codeforcesUser.lastOnlineTime
     )
