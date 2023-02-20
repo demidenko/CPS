@@ -321,8 +321,13 @@ object CodeforcesUtils {
         }
     }
 
+    @Composable
     fun htmlToAnnotatedString(html: String) = buildAnnotatedString {
-        Jsoup.parseBodyFragment(html).body().traverse(CodeforcesHtmlParser(this))
+        val parser = CodeforcesHtmlParser(
+            builder = this,
+            quoteColor = cpsColors.contentAdditional
+        )
+        Jsoup.parseBodyFragment(html).body().traverse(parser)
     }
 
 }
