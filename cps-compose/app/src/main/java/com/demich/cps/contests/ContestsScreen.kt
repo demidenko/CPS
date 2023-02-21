@@ -353,9 +353,8 @@ private fun rememberCombinedLoadingStatusState(contestsViewModel: ContestsViewMo
     val workInfo by remember { ContestsWorker.getWork(context) }.workInfoState()
     return remember {
         derivedStateOf {
-            val workerStatus = if (workInfo?.state == WorkInfo.State.RUNNING) LoadingStatus.LOADING
-            else LoadingStatus.PENDING
-            listOf(loadingStatus, workerStatus).combine()
+            if (workInfo?.state == WorkInfo.State.RUNNING) LoadingStatus.LOADING
+            else loadingStatus
         }
     }
 }
