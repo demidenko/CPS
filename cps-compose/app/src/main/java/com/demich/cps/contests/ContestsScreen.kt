@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.work.WorkInfo
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
@@ -32,6 +33,8 @@ import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesApi
+import com.demich.cps.workers.ContestsWorker
+import com.demich.cps.workers.workInfoState
 import com.demich.datastore_itemized.add
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -96,7 +99,7 @@ private fun ContestsContent(
     }
 
     val errorsList by rememberCollect { contestsViewModel.flowOfLoadingErrors() }
-    val loadingStatus by rememberCollect { contestsViewModel.flowOfLoadingStatus() }
+    val loadingStatus by rememberCombinedLoadingStatusState(contestsViewModel)
 
     CPSSwipeRefresh(
         isRefreshing = loadingStatus == LoadingStatus.LOADING,
@@ -255,7 +258,7 @@ fun contestsMenuBuilder(
     navigator: CPSNavigator,
     contestsViewModel: ContestsViewModel
 ): CPSMenuBuilder = {
-    val loadingStatus by rememberCollect { contestsViewModel.flowOfLoadingStatus() }
+    val loadingStatus by rememberCombinedLoadingStatusState(contestsViewModel)
     
     CPSDropdownMenuItem(
         title = "Settings",
@@ -271,7 +274,7 @@ fun contestsBottomBarBuilder(
     filterController: ContestsFilterController
 ): AdditionalBottomBarBuilder = {
     val context = context
-    val loadingStatus by rememberCollect { contestsViewModel.flowOfLoadingStatus() }
+    val loadingStatus by rememberCombinedLoadingStatusState(contestsViewModel)
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
 
     if (isAnyPlatformEnabled && filterController.available && !filterController.enabled) {
@@ -340,5 +343,19 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun rememberCombinedLoadingStatusState(contestsViewModel: ContestsViewModel): State<LoadingStatus> {
+    val context = context
+    val loadingStatus by rememberCollect { contestsViewModel.flowOfLoadingStatus() }
+    val workInfo by remember { ContestsWorker.getWork(context) }.workInfoState()
+    return remember {
+        derivedStateOf {
+            val workerStatus = if (workInfo?.state == WorkInfo.State.RUNNING) LoadingStatus.LOADING
+            else LoadingStatus.PENDING
+            listOf(loadingStatus, workerStatus).combine()
+        }
     }
 }
