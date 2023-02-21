@@ -41,6 +41,13 @@ inline fun<reified T> Json.saver() = remember(this) {
     )
 }
 
+@Composable
+inline fun<T, K> rememberWith(
+    key: K,
+    crossinline calculation: @DisallowComposableCalls K.() -> T
+): T = remember(key1 = key) {
+        with(receiver = key, block = calculation)
+    }
 
 @Composable
 inline fun<T> rememberCollect(crossinline block: () -> Flow<T>) =
