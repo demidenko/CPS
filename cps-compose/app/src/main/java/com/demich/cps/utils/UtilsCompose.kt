@@ -50,7 +50,7 @@ inline fun<T, K> rememberWith(
     }
 
 @Composable
-inline fun<T> rememberCollect(crossinline block: () -> Flow<T>) =
+inline fun<T> rememberCollect(crossinline block: () -> Flow<T>): State<T> =
     remember(block).let { flow ->
         if (flow is StateFlow<T>) flow.collectAsState()
         else flow.collectAsState(initial = remember(flow) { runBlocking { flow.first() } })

@@ -38,13 +38,12 @@ fun rememberCodeforcesNewsController(
         }
     ) {
         val settings = context.settingsNews
-        val initTabs = tabsState.value
         val defaultTab = runBlocking { settings.codeforcesDefaultTab() }
         CodeforcesNewsController(
             viewModel = viewModel,
             tabsState = tabsState,
             data = CodeforcesNewsControllerData(
-                selectedIndex = initTabs.indexOf(defaultTab),
+                selectedTab = defaultTab,
                 topShowComments = false,
                 recentShowComments = false,
                 recentFilterByBlogEntryId = null
@@ -65,7 +64,7 @@ fun rememberCodeforcesNewsController(
 
 @Serializable
 data class CodeforcesNewsControllerData(
-    val selectedIndex: Int,
+    val selectedTab: CodeforcesTitle,
     val topShowComments: Boolean,
     val recentShowComments: Boolean,
     val recentFilterByBlogEntryId: Int?
@@ -80,13 +79,13 @@ class CodeforcesNewsController(
     val tabs by tabsState
 
     //TODO: future support for dynamic tabs (selectedIndex can be out of bounds)
-    val pagerState = PagerState(currentPage = data.selectedIndex.coerceAtMost(tabs.size - 1))
+    val pagerState = PagerState(
+        currentPage = tabs.indexOf(data.selectedTab)
+            .takeIf { it != -1 } ?: 0
+    )
 
     val currentTab: CodeforcesTitle
-        get() = tabs[selectedTabIndex]
-
-    private val selectedTabIndex: Int
-        get() = pagerState.currentPage
+        get() = tabs[pagerState.currentPage]
 
     fun isTabVisible(tab: CodeforcesTitle) = tab == currentTab && !pagerState.isScrollInProgress
 
@@ -148,7 +147,7 @@ class CodeforcesNewsController(
         ) = Saver<CodeforcesNewsController, String>(
             save = {
                 jsonCPS.encodeToString(CodeforcesNewsControllerData(
-                    selectedIndex = it.selectedTabIndex,
+                    selectedTab = it.currentTab,
                     topShowComments = it.topShowComments,
                     recentShowComments = it.recentShowComments,
                     recentFilterByBlogEntryId = it.recentFilterByBlogEntryId
