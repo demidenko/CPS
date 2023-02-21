@@ -123,7 +123,7 @@ private fun LoadersSetupButton(
 @Composable
 private fun ClistAdditionalRow() {
     val context = context
-    val settings = remember(context) { context.settingsContests }
+    val settings = remember { context.settingsContests }
     val resources by rememberCollect { settings.clistAdditionalResources.flow }
 
     var showDialog by remember { mutableStateOf(false) }

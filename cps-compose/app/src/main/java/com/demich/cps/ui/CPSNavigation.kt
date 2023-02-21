@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import com.demich.cps.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
+import com.demich.cps.utils.rememberWith
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.map
@@ -20,8 +21,8 @@ fun rememberCPSNavigator(
     val subtitleState = remember { mutableStateOf("") }
 
     val currentScreenState: State<Screen?>
-        = remember(navController) {
-            navController.currentBackStackEntryFlow.map { it.getScreen() }
+        = rememberWith(navController) {
+            currentBackStackEntryFlow.map { it.getScreen() }
         }.collectAsState(initial = null)
 
     val menuBuilderState = remember { mutableStateOf<CPSMenuBuilder?>(null) }

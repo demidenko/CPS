@@ -28,8 +28,8 @@ fun rememberCodeforcesBlogEntriesController(
     blogEntriesState: State<List<CodeforcesBlogEntry>>,
 ): CodeforcesBlogEntriesController {
     val context = context
-    return remember(blogEntriesState) {
-        object : CodeforcesBlogEntriesController(blogEntriesState = blogEntriesState) {
+    return rememberWith(blogEntriesState) {
+        object : CodeforcesBlogEntriesController(blogEntriesState = this) {
             override fun openBlogEntry(blogEntry: CodeforcesBlogEntry) {
                 context.openUrlInBrowser(url = CodeforcesApi.urls.blogEntry(blogEntryId = blogEntry.id))
             }

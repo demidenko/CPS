@@ -20,6 +20,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.codeforces.CodeforcesComment
 import com.demich.cps.utils.codeforces.CodeforcesRecentAction
+import com.demich.cps.utils.rememberWith
 
 @Composable
 fun CodeforcesRecentBlogEntries(
@@ -28,9 +29,8 @@ fun CodeforcesRecentBlogEntries(
     onOpenBlogEntry: (CodeforcesBlogEntry) -> Unit,
     menuBuilder: @Composable CPSDropdownMenuScope.(CodeforcesBlogEntry, List<CodeforcesComment>) -> Unit
 ) {
-    val recent = remember(recentActionsState.value) {
-        val (blogEntries, comments) = recentActionsState.value
-        makeRecentBlogEntries(blogEntries, comments)
+    val recent = rememberWith(recentActionsState.value) {
+        makeRecentBlogEntries(blogEntries = first, comments = second)
     }
 
     var showMenuForBlogEntryId: Int? by remember { mutableStateOf(null) }

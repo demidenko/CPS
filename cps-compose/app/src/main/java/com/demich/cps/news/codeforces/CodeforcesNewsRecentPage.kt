@@ -15,6 +15,7 @@ import com.demich.cps.utils.codeforces.CodeforcesRecentAction
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.rememberWith
 
 @Composable
 fun CodeforcesNewsRecentPage(
@@ -97,10 +98,10 @@ private fun RecentCommentsInBlogEntry(
     blogEntry: CodeforcesBlogEntry,
     onBackPressed: (Int) -> Unit
 ) {
-    val filteredCommentsState = remember(blogEntry) {
+    val filteredCommentsState = rememberWith(blogEntry) {
         derivedStateOf {
             commentsState.value.filter {
-                it.blogEntry?.id == blogEntry.id
+                it.blogEntry?.id == id
             }
         }
     }

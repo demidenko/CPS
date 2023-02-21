@@ -12,6 +12,7 @@ import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.rememberWith
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.flow.first
@@ -30,7 +31,7 @@ fun rememberCodeforcesNewsController(
 
     val controller = rememberSaveable(
         viewModel,
-        saver = remember(viewModel) { CodeforcesNewsController.saver(viewModel) }
+        saver = rememberWith(viewModel) { CodeforcesNewsController.saver(this) }
     ) {
         val settings = context.settingsNews
         val initTabs = runBlocking { settings.flowOfCodeforcesTabs().first() }

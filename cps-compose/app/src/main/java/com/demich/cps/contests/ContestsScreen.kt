@@ -127,8 +127,8 @@ private fun ContestsList(
 ) {
     val currentTime by collectCurrentTimeAsState(1.seconds)
 
-    val sortedState = remember(contestsState.value) {
-        mutableStateOf(contestsState.value)
+    val sortedState = rememberWith(contestsState.value) {
+        mutableStateOf(this)
     }.apply {
         value.let {
             val comparator = Contest.getComparator(currentTime)
