@@ -81,21 +81,22 @@ private fun NewsFollowList(
             key = { it.id }
         ) { userBlog ->
             ContentWithCPSDropdownMenu(
-                expanded = userBlog.id == showMenuForId,
-                onDismissRequest = { showMenuForId = null },
+                //expanded = userBlog.id == showMenuForId,
+                //onDismissRequest = { showMenuForId = null },
                 modifier = Modifier
-                    .clickable { showMenuForId = userBlog.id }
-                    .padding(horizontal = 8.dp, vertical = 5.dp)
+                    //.clickable { showMenuForId = userBlog.id }
+
                     .animateItemPlacement(),
                 content = {
                     NewsFollowListItem(
                         userInfo = userBlog.userInfo,
                         blogEntriesCount = userBlog.blogEntries?.size,
                         modifier = Modifier
+                            .padding(horizontal = 8.dp, vertical = 5.dp)
                             .fillMaxWidth()
                     )
                 },
-                menuAlignment = Alignment.Center,
+                //menuAlignment = Alignment.Center,
                 menuBuilder = {
                     CPSDropdownMenuItem(
                         title = "Show blog",

@@ -1,7 +1,11 @@
 package com.demich.cps.ui
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -11,19 +15,18 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.rememberWith
 
 typealias CPSMenuBuilder = @Composable CPSDropdownMenuScope.() -> Unit
 
@@ -65,38 +68,49 @@ fun ContentWithCPSDropdownMenu(
     }
 }
 
+//experimental
 @Composable
 fun ContentWithCPSDropdownMenu(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
     menuBuilder: CPSMenuBuilder
 ) {
-    var tapOffset by remember { mutableStateOf(Offset.Zero) }
-    var size by remember { mutableStateOf(IntSize.Zero) }
-
+    val interactionSource = remember { MutableInteractionSource() }
+    var menuOffset by remember { mutableStateOf(DpOffset.Zero) }
     var expanded by remember { mutableStateOf(false) }
+
+    val convert by rememberWith(LocalDensity.current) {
+        mutableStateOf({ s: IntSize, o: Offset ->
+            DpOffset(
+                x = o.x.toDp(),
+                y = (o.y - s.height).toDp()
+            )
+        })
+    }
+
     Box(
         modifier = modifier
-            .onSizeChanged {
-                size = it
-            }
-            .pointerInput(Unit) {
-                detectTapGestures {
-                    tapOffset = it
-                    expanded = true
-                }
+            .indication(interactionSource, LocalIndication.current)
+            .pointerInput(convert) {
+                detectTapGestures(
+                    onTap = {
+                        menuOffset = convert(size, it)
+                        expanded = true
+                    },
+                    onPress = { offset ->
+                        val press = PressInteraction.Press(offset)
+                        interactionSource.emit(press)
+                        tryAwaitRelease()
+                        interactionSource.emit(PressInteraction.Release(press))
+                    }
+                )
             }
     ) {
         content()
         CPSDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            offset = with(LocalDensity.current) {
-                DpOffset(
-                    x = tapOffset.x.toDp(),
-                    y = (tapOffset.y - size.height).toDp()
-                )
-            },
+            offset = menuOffset,
             menuBuilder = menuBuilder
         )
     }
