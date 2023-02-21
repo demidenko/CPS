@@ -12,10 +12,8 @@ import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.rememberCollect
-import com.demich.cps.utils.rememberWith
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
@@ -29,31 +27,29 @@ fun rememberCodeforcesNewsController(
 ): CodeforcesNewsController {
     val context = context
 
+    val tabsState = rememberCollect {
+        context.settingsNews.flowOfCodeforcesTabs()
+    }
+
     val controller = rememberSaveable(
         viewModel,
-        saver = rememberWith(viewModel) { CodeforcesNewsController.saver(this) }
+        saver = remember(viewModel, tabsState) {
+            CodeforcesNewsController.saver(viewModel, tabsState)
+        }
     ) {
         val settings = context.settingsNews
-        val initTabs = runBlocking { settings.flowOfCodeforcesTabs().first() }
+        val initTabs = tabsState.value
         val defaultTab = runBlocking { settings.codeforcesDefaultTab() }
         CodeforcesNewsController(
             viewModel = viewModel,
+            tabsState = tabsState,
             data = CodeforcesNewsControllerData(
                 selectedIndex = initTabs.indexOf(defaultTab),
-                tabs = initTabs,
                 topShowComments = false,
                 recentShowComments = false,
                 recentFilterByBlogEntryId = null
             )
         )
-    }
-
-    val tabs by rememberCollect {
-        context.settingsNews.flowOfCodeforcesTabs()
-    }
-
-    LaunchedEffect(key1 = tabs) {
-        controller.updateTabs(newTabs = tabs)
     }
 
     LaunchedEffect(controller) {
@@ -70,7 +66,6 @@ fun rememberCodeforcesNewsController(
 @Serializable
 data class CodeforcesNewsControllerData(
     val selectedIndex: Int,
-    val tabs: List<CodeforcesTitle>,
     val topShowComments: Boolean,
     val recentShowComments: Boolean,
     val recentFilterByBlogEntryId: Int?
@@ -79,27 +74,18 @@ data class CodeforcesNewsControllerData(
 @Stable
 class CodeforcesNewsController(
     private val viewModel: CodeforcesNewsViewModel,
+    private val tabsState: State<List<CodeforcesTitle>>,
     data: CodeforcesNewsControllerData
 ) {
-    val pagerState = PagerState(currentPage = data.selectedIndex)
-
-    private val tabsState = mutableStateOf(data.tabs)
     val tabs by tabsState
 
-    suspend fun updateTabs(newTabs: List<CodeforcesTitle>) {
-        val oldSelectedTab = currentTab
-        val newIndex = newTabs.indexOf(oldSelectedTab).takeIf { it != -1 }
-            ?: selectedTabIndex.coerceAtMost(newTabs.size - 1)
-        if (newIndex != selectedTabIndex) {
-            pagerState.scrollToPage(newIndex)
-        }
-        tabsState.value = newTabs
-    }
+    //TODO: future support for dynamic tabs (selectedIndex can be out of bounds)
+    val pagerState = PagerState(currentPage = data.selectedIndex.coerceAtMost(tabs.size - 1))
 
     val currentTab: CodeforcesTitle
         get() = tabs[selectedTabIndex]
 
-    val selectedTabIndex: Int
+    private val selectedTabIndex: Int
         get() = pagerState.currentPage
 
     fun isTabVisible(tab: CodeforcesTitle) = tab == currentTab && !pagerState.isScrollInProgress
@@ -156,11 +142,13 @@ class CodeforcesNewsController(
     fun updateFollowUsersInfo(context: Context) = viewModel.updateFollowUsersInfo(context)
 
     companion object {
-        fun saver(viewModel: CodeforcesNewsViewModel) = Saver<CodeforcesNewsController, String>(
+        fun saver(
+            viewModel: CodeforcesNewsViewModel,
+            tabsState: State<List<CodeforcesTitle>>
+        ) = Saver<CodeforcesNewsController, String>(
             save = {
                 jsonCPS.encodeToString(CodeforcesNewsControllerData(
                     selectedIndex = it.selectedTabIndex,
-                    tabs = it.tabs,
                     topShowComments = it.topShowComments,
                     recentShowComments = it.recentShowComments,
                     recentFilterByBlogEntryId = it.recentFilterByBlogEntryId
@@ -169,6 +157,7 @@ class CodeforcesNewsController(
             restore = {
                 CodeforcesNewsController(
                     viewModel = viewModel,
+                    tabsState = tabsState,
                     data = jsonCPS.decodeFromString(it)
                 )
             }
