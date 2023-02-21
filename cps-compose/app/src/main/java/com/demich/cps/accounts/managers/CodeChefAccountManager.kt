@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -186,6 +187,18 @@ class CodeChefAccountManager(context: Context):
                     Text(
                         text = userInfo.handle,
                         fontSize = 30.sp
+                    )
+                }
+            },
+            additionalTitle = {
+                //TODO: code copied from default (except rated color)
+                if (userInfo.status == STATUS.OK) {
+                    Text(
+                        text = userInfo.ratingToString(),
+                        fontSize = 25.sp,
+                        color = if (userInfo.isRated()) cpsColors.content else cpsColors.contentAdditional,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
