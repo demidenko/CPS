@@ -10,6 +10,7 @@ import com.demich.cps.utils.CListUtils
 import com.demich.cps.utils.LoadingStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
@@ -46,9 +47,10 @@ class AccountsViewModel: ViewModel() {
 
     fun<U: UserInfo> delete(manager: AccountManager<U>) {
         viewModelScope.launch {
-            val loadingStatusState = mutableLoadingStatusFor(manager)
-            require(loadingStatusState.value != LoadingStatus.LOADING)
-            loadingStatusState.value = LoadingStatus.PENDING
+            mutableLoadingStatusFor(manager).update {
+                require(it != LoadingStatus.LOADING)
+                LoadingStatus.PENDING
+            }
             manager.setSavedInfo(manager.emptyInfo())
         }
     }

@@ -41,9 +41,11 @@ class CodeforcesNewsViewModel: ViewModel() {
 
         fun launchLoadIfActive(locale: CodeforcesLocale) {
             if (inactive) return
-            require(loadingStatusState.value != LoadingStatus.LOADING)
+            loadingStatusState.update {
+                require(it != LoadingStatus.LOADING)
+                LoadingStatus.LOADING
+            }
             viewModelScope.launch {
-                loadingStatusState.value = LoadingStatus.LOADING
                 val data = withContext(Dispatchers.IO) {
                     kotlin.runCatching { getData(locale) }.getOrNull()
                 }

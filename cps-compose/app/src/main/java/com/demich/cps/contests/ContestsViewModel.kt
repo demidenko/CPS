@@ -17,6 +17,7 @@ import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ContestsViewModel: ViewModel() {
@@ -77,9 +78,10 @@ class ContestsViewModel: ViewModel() {
             contestsReceiver = ContestsReceiver(
                 dao = context.contestsListDao,
                 setLoadingStatus = { platform, loadingStatus ->
-                    val loadingStatusState = mutableLoadingStatusFor(platform)
-                    if (loadingStatus == LoadingStatus.LOADING) require(loadingStatusState.value != LoadingStatus.LOADING)
-                    loadingStatusState.value = loadingStatus
+                    mutableLoadingStatusFor(platform).update {
+                        if (loadingStatus == LoadingStatus.LOADING) require(it != LoadingStatus.LOADING)
+                        loadingStatus
+                    }
                 },
                 consumeError = { platform, loaderType, e ->
                     mutableErrorsList(platform).value += loaderType to e
