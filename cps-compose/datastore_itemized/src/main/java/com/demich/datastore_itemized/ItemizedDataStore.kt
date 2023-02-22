@@ -22,9 +22,9 @@ interface DataStoreItem<T> {
 
 
 private abstract class DataStoreBaseItem<T, S: Any>(
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    override val key: Preferences.Key<S>
 ): DataStoreItem<T> {
-    abstract override val key: Preferences.Key<S>
     protected abstract fun fromPrefs(s: S?): T
     protected abstract fun toPrefs(t: T & Any): S
 
@@ -49,28 +49,28 @@ private abstract class DataStoreBaseItem<T, S: Any>(
 
 private class Item<T: Any> (
     dataStore: DataStore<Preferences>,
-    override val key: Preferences.Key<T>,
+    key: Preferences.Key<T>,
     private val defaultValue: T
-): DataStoreBaseItem<T, T>(dataStore) {
+): DataStoreBaseItem<T, T>(dataStore, key) {
     override fun fromPrefs(s: T?): T = s ?: defaultValue
     override fun toPrefs(t: T): T = t
 }
 
 private class ItemNullable<T: Any> (
     dataStore: DataStore<Preferences>,
-    override val key: Preferences.Key<T>
-): DataStoreBaseItem<T?, T>(dataStore) {
+    key: Preferences.Key<T>
+): DataStoreBaseItem<T?, T>(dataStore, key) {
     override fun fromPrefs(s: T?): T? = s
     override fun toPrefs(t: T): T = t
 }
 
 private class ItemConvertible<S: Any, T> (
     dataStore: DataStore<Preferences>,
-    override val key: Preferences.Key<S>,
+    key: Preferences.Key<S>,
     private val defaultValue: T,
     private val encode: (T) -> S,
     private val decode: (S) -> T
-): DataStoreBaseItem<T, S>(dataStore) {
+): DataStoreBaseItem<T, S>(dataStore, key) {
     override fun fromPrefs(s: S?): T = s?.runCatching(decode)?.getOrNull() ?: defaultValue
     override fun toPrefs(t: T & Any): S = encode(t)
 }
