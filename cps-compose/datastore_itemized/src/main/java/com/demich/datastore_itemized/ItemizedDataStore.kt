@@ -93,9 +93,8 @@ private class ItemConvertible<S: Any, T> (
 }
 
 
-abstract class ItemizedDataStore(private val dataStore: DataStore<Preferences>) {
-
-    constructor(wrapper: DataStoreWrapper): this(wrapper.dataStore)
+abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
+    private val dataStore: DataStore<Preferences> = wrapper.dataStore
 
     protected suspend fun resetItems(items: Collection<DataStoreItem<*>>) {
         if (items.isEmpty()) return

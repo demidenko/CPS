@@ -16,7 +16,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
@@ -31,6 +30,7 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.AccountsWorker
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
+import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.text.contains
@@ -67,7 +67,7 @@ class CodeforcesAccountManager(context: Context):
 {
 
     companion object {
-        private val Context.account_codeforces_dataStore by preferencesDataStore(AccountManagers.codeforces.name)
+        private val Context.account_codeforces_dataStore by dataStoreWrapper(AccountManagers.codeforces.name)
     }
 
     override val urlHomePage get() = CodeforcesApi.urls.main
@@ -312,7 +312,7 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
 {
     companion object {
         private val Context.account_settings_codeforces_dataStore
-            by preferencesDataStore(AccountManagers.codeforces.name + "_account_settings")
+            by dataStoreWrapper(AccountManagers.codeforces.name + "_account_settings")
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)

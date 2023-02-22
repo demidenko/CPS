@@ -18,7 +18,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.ui.CPSIcons
@@ -29,6 +28,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CodeChefApi
 import com.demich.cps.utils.CodeChefRatingChange
 import com.demich.cps.utils.append
+import com.demich.datastore_itemized.dataStoreWrapper
 import io.ktor.client.plugins.*
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
@@ -49,7 +49,7 @@ class CodeChefAccountManager(context: Context):
     AccountSuggestionsProvider
 {
     companion object {
-        private val Context.account_codechef_dataStore by preferencesDataStore(AccountManagers.codechef.name)
+        private val Context.account_codechef_dataStore by dataStoreWrapper(AccountManagers.codechef.name)
 
         private const val star = "★"
     }

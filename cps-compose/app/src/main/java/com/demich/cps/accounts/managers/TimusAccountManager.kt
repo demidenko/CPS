@@ -3,9 +3,9 @@ package com.demich.cps.accounts.managers
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
-import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.utils.TimusApi
+import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.serialization.Serializable
 import org.jsoup.Jsoup
 
@@ -32,7 +32,7 @@ class TimusAccountManager(context: Context):
     AccountSuggestionsProvider
 {
     companion object {
-        private val Context.account_timus_dataStore by preferencesDataStore(AccountManagers.timus.name)
+        private val Context.account_timus_dataStore by dataStoreWrapper(AccountManagers.timus.name)
     }
 
     override val userIdTitle get() = "id"

@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.ui.RatingGraph
@@ -19,6 +18,7 @@ import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.utils.DmojApi
 import com.demich.cps.utils.DmojRatingChange
 import com.demich.cps.utils.append
+import com.demich.datastore_itemized.dataStoreWrapper
 import io.ktor.client.plugins.*
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
@@ -37,7 +37,7 @@ class DmojAccountManager(context: Context):
     AccountSuggestionsProvider
 {
     companion object {
-        private val Context.account_dmoj_dataStore by preferencesDataStore(AccountManagers.dmoj.name)
+        private val Context.account_dmoj_dataStore by dataStoreWrapper(AccountManagers.dmoj.name)
     }
 
     override val urlHomePage get() = DmojApi.urls.main

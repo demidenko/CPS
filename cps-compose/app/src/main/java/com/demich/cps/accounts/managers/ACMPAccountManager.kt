@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.utils.ACMPApi
+import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.serialization.Serializable
 import org.jsoup.Jsoup
 
@@ -33,7 +33,7 @@ class ACMPAccountManager(context: Context):
 {
 
     companion object {
-        private val Context.account_acmp_dataStore by preferencesDataStore(AccountManagers.acmp.name)
+        private val Context.account_acmp_dataStore by dataStoreWrapper(AccountManagers.acmp.name)
     }
 
     override val userIdTitle get() = "id"

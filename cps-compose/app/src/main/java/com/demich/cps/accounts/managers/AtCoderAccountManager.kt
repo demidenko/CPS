@@ -8,7 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.NotificationChannels
 import com.demich.cps.NotificationIds
@@ -20,6 +19,7 @@ import com.demich.cps.ui.rememberRatingGraphUIStates
 import com.demich.cps.utils.AtCoderApi
 import com.demich.cps.utils.AtCoderRatingChange
 import com.demich.cps.workers.AccountsWorker
+import com.demich.datastore_itemized.dataStoreWrapper
 import io.ktor.client.plugins.*
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
@@ -40,7 +40,7 @@ class AtCoderAccountManager(context: Context):
     AccountSettingsProvider
 {
     companion object {
-        private val Context.account_atcoder_dataStore by preferencesDataStore(AccountManagers.atcoder.name)
+        private val Context.account_atcoder_dataStore by dataStoreWrapper(AccountManagers.atcoder.name)
     }
 
     override val urlHomePage get() = AtCoderApi.urls.main
@@ -150,7 +150,7 @@ class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager):
 {
     companion object {
         private val Context.account_settings_atcoder_dataStore
-            by preferencesDataStore(AccountManagers.atcoder.name + "_account_settings")
+            by dataStoreWrapper(AccountManagers.atcoder.name + "_account_settings")
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)
