@@ -114,7 +114,7 @@ abstract class ItemizedDataStore(protected val dataStore: DataStore<Preferences>
         itemStringConvertible(
             name = name,
             defaultValue = defaultValue,
-            encode = { it.name },
+            encode = Enum<T>::name,
             decode = ::enumValueOf
         )
 
@@ -122,7 +122,7 @@ abstract class ItemizedDataStore(protected val dataStore: DataStore<Preferences>
         object : DataStoreBaseItem<Set<T>, Set<String>>(dataStore) {
             override val key = stringSetPreferencesKey(name)
             override fun fromPrefs(s: Set<String>?) = s?.mapTo(mutableSetOf(), ::enumValueOf) ?: defaultValue
-            override fun toPrefs(t: Set<T>) = t.mapTo(mutableSetOf()) { it.name }
+            override fun toPrefs(t: Set<T>) = t.mapTo(mutableSetOf(), Enum<T>::name)
         }
 
     protected inline fun<reified T> Json.item(name: String, defaultValue: T): DataStoreItem<T> =
@@ -161,10 +161,10 @@ suspend fun<K, V> DataStoreItem<Map<K,V>>.edit(block: MutableMap<K,V>.() -> Unit
 
 @JvmName("addList")
 suspend fun<T> DataStoreItem<List<T>>.add(value: T) {
-    edit { add(element = value) }
+    update { it + value }
 }
 
 @JvmName("addSet")
 suspend fun<T> DataStoreItem<Set<T>>.add(value: T) {
-    edit { add(element = value) }
+    update { it + value }
 }
