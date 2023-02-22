@@ -1,12 +1,12 @@
 package com.demich.cps.news.settings
 
 import android.content.Context
-import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.utils.codeforces.CodeforcesLocale
 import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -15,7 +15,7 @@ val Context.settingsNews: NewsSettingsDataStore
 
 class NewsSettingsDataStore(context: Context): ItemizedDataStore(context.news_settings_dataStore) {
     companion object {
-        private val Context.news_settings_dataStore by preferencesDataStore("news_settings")
+        private val Context.news_settings_dataStore by dataStoreWrapper("news_settings")
     }
 
     val codeforcesDefaultTab = itemEnum(name = "cf_default_tab", defaultValue = CodeforcesTitle.TOP)

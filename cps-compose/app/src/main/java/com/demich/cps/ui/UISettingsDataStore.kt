@@ -5,17 +5,17 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
-import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.ScreenTypes
 import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsUI_dataStore) {
     companion object {
-        private val Context.settingsUI_dataStore by preferencesDataStore("settings_ui")
+        private val Context.settingsUI_dataStore by dataStoreWrapper("settings_ui")
     }
 
     val darkLightMode = itemEnum(name = "dark_light_mode", defaultValue = DarkLightMode.SYSTEM)

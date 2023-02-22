@@ -1,16 +1,19 @@
 package com.demich.cps.contests.monitors
 
 import android.content.Context
-import androidx.datastore.preferences.preferencesDataStore
-import com.demich.cps.utils.codeforces.*
+import com.demich.cps.utils.codeforces.CodeforcesContest
+import com.demich.cps.utils.codeforces.CodeforcesContestPhase
+import com.demich.cps.utils.codeforces.CodeforcesContestType
+import com.demich.cps.utils.codeforces.CodeforcesParticipationType
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 
 class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf_monitor_dataStore) {
     companion object {
-        private val Context.cf_monitor_dataStore by preferencesDataStore(name = "cf_monitor")
+        private val Context.cf_monitor_dataStore by dataStoreWrapper(name = "cf_monitor")
     }
 
     val contestId = itemIntNullable(name = "contest_id")

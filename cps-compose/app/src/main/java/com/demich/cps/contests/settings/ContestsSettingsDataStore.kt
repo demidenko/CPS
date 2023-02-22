@@ -1,13 +1,13 @@
 package com.demich.cps.contests.settings
 
 import android.content.Context
-import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.utils.CListApi
 import com.demich.cps.utils.ClistResource
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -19,7 +19,7 @@ val Context.settingsContests: ContestsSettingsDataStore
 class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.contests_settings_dataStore) {
 
     companion object {
-        private val Context.contests_settings_dataStore by preferencesDataStore("contests_settings")
+        private val Context.contests_settings_dataStore by dataStoreWrapper("contests_settings")
     }
 
     //This set will always contains Platform.unknown

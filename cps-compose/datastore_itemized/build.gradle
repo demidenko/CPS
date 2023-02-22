@@ -11,6 +11,8 @@ android {
         minSdk 22
         targetSdk 33
 
+        versionCode 2
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }

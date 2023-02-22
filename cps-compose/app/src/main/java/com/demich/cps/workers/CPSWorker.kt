@@ -1,7 +1,6 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.work.CoroutineWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
@@ -10,9 +9,13 @@ import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 
 abstract class CPSWorker(
@@ -91,7 +94,7 @@ fun WorkInfo.getProgressInfo(): ProgressBarInfo? {
 
 class CPSWorkersDataStore(context: Context): ItemizedDataStore(context.workersDataStore) {
     companion object {
-        private val Context.workersDataStore by preferencesDataStore(name = "workers_info")
+        private val Context.workersDataStore by dataStoreWrapper(name = "workers_info")
     }
 
     val lastExecutionTime = jsonCPS.item<Map<String, Instant>>(name = "last_execution_time", defaultValue = emptyMap())

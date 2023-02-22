@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.datastore.preferences.preferencesDataStore
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.accounts.managers.RatedAccountManager
@@ -22,6 +21,7 @@ import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.utils.*
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
@@ -32,7 +32,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class SettingsDev(context: Context): ItemizedDataStore(context.settings_dev_dataStore) {
     companion object {
-        private val Context.settings_dev_dataStore by preferencesDataStore("settings_develop")
+        private val Context.settings_dev_dataStore by dataStoreWrapper("settings_develop")
     }
 
     val devModeEnabled = itemBoolean(name = "develop_enabled", defaultValue = false)
