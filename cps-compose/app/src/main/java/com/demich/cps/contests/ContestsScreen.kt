@@ -34,7 +34,6 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.workers.ContestsWorker
-import com.demich.cps.workers.workInfoState
 import com.demich.datastore_itemized.add
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -45,7 +44,8 @@ import kotlin.time.Duration.Companion.seconds
 @Composable
 fun ContestsScreen(
     contestsViewModel: ContestsViewModel,
-    filterController: ContestsFilterController
+    filterController: ContestsFilterController,
+    loadingStatusState: State<LoadingStatus>
 ) {
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
 
@@ -55,10 +55,13 @@ fun ContestsScreen(
                 .consumedWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
                 .imePadding()
         ) {
-            CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
+            CodeforcesMonitor(
+                modifier = Modifier.fillMaxWidth()
+            )
             ContestsContent(
                 contestsViewModel = contestsViewModel,
                 filterController = filterController,
+                loadingStatusState = loadingStatusState,
                 modifier = Modifier.weight(1f, false)
             )
             ContestsFilterTextField(
@@ -80,6 +83,7 @@ fun ContestsScreen(
 private fun ContestsContent(
     contestsViewModel: ContestsViewModel,
     filterController: ContestsFilterController,
+    loadingStatusState: State<LoadingStatus>,
     modifier: Modifier = Modifier
 ) {
     val context = context
@@ -99,7 +103,7 @@ private fun ContestsContent(
     }
 
     val errorsList by rememberCollect { contestsViewModel.flowOfLoadingErrors() }
-    val loadingStatus by rememberCombinedLoadingStatusState(contestsViewModel)
+    val loadingStatus by loadingStatusState
 
     CPSSwipeRefresh(
         isRefreshing = loadingStatus == LoadingStatus.LOADING,
@@ -256,9 +260,9 @@ private fun ColumnScope.LoadingError(
 
 fun contestsMenuBuilder(
     navigator: CPSNavigator,
-    contestsViewModel: ContestsViewModel
+    loadingStatusState: State<LoadingStatus>
 ): CPSMenuBuilder = {
-    val loadingStatus by rememberCombinedLoadingStatusState(contestsViewModel)
+    val loadingStatus by loadingStatusState
     
     CPSDropdownMenuItem(
         title = "Settings",
@@ -270,11 +274,11 @@ fun contestsMenuBuilder(
 }
 
 fun contestsBottomBarBuilder(
-    contestsViewModel: ContestsViewModel,
-    filterController: ContestsFilterController
+    loadingStatusState: State<LoadingStatus>,
+    filterController: ContestsFilterController,
+    onReloadClick: () -> Unit
 ): AdditionalBottomBarBuilder = {
-    val context = context
-    val loadingStatus by rememberCombinedLoadingStatusState(contestsViewModel)
+    val loadingStatus by loadingStatusState
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
 
     if (isAnyPlatformEnabled && filterController.available && !filterController.enabled) {
@@ -287,7 +291,7 @@ fun contestsBottomBarBuilder(
     CPSReloadingButton(
         loadingStatus = loadingStatus,
         enabled = isAnyPlatformEnabled,
-        onClick = { contestsViewModel.reloadEnabledPlatforms(context) }
+        onClick = onReloadClick
     )
 }
 
@@ -301,6 +305,36 @@ private fun rememberIsAnyPlatformEnabled(): State<Boolean> {
             flow2 = settings.clistAdditionalResources.flow.map { it.isNotEmpty() }
         ) { any1, any2 -> any1 || any2 }
     }
+}
+
+
+@Composable
+fun rememberCombinedLoadingStatusState(contestsViewModel: ContestsViewModel): State<LoadingStatus> {
+    val context = context
+
+    return produceState(
+        initialValue = LoadingStatus.PENDING,
+        key1 = contestsViewModel
+    ) {
+        contestsViewModel.flowOfLoadingStatus()
+            .combine(
+                ContestsWorker.getWork(context).flowOfInfo()
+            ) { loadingStatus, workInfo ->
+                if (workInfo?.state == WorkInfo.State.RUNNING) LoadingStatus.LOADING
+                else loadingStatus
+            }.collect {
+                value = it
+            }
+    }
+
+    /*val loadingStatus by rememberCollect { contestsViewModel.flowOfLoadingStatus() }
+    val workInfo by remember { ContestsWorker.getWork(context) }.workInfoState()
+    return remember {
+        derivedStateOf {
+            if (workInfo?.state == WorkInfo.State.RUNNING) LoadingStatus.LOADING
+            else loadingStatus
+        }
+    }*/
 }
 
 @Composable
@@ -343,18 +377,5 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
                 }
             }
         )
-    }
-}
-
-@Composable
-private fun rememberCombinedLoadingStatusState(contestsViewModel: ContestsViewModel): State<LoadingStatus> {
-    val context = context
-    val loadingStatus by rememberCollect { contestsViewModel.flowOfLoadingStatus() }
-    val workInfo by remember { ContestsWorker.getWork(context) }.workInfoState()
-    return remember {
-        derivedStateOf {
-            if (workInfo?.state == WorkInfo.State.RUNNING) LoadingStatus.LOADING
-            else loadingStatus
-        }
     }
 }

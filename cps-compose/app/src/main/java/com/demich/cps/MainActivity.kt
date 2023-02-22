@@ -199,18 +199,24 @@ private fun CPSScaffold(
             }
 
             cpsComposable(ScreenTypes.contests) { holder ->
+                val context = context
                 val filterController = rememberContestsFilterController()
+                val loadingStatusState = rememberCombinedLoadingStatusState(cpsViewModels.contestsViewModel)
                 ContestsScreen(
                     contestsViewModel = cpsViewModels.contestsViewModel,
-                    filterController = filterController
+                    filterController = filterController,
+                    loadingStatusState = loadingStatusState
                 )
                 holder.bottomBar = contestsBottomBarBuilder(
-                    contestsViewModel = cpsViewModels.contestsViewModel,
-                    filterController = filterController
+                    loadingStatusState = loadingStatusState,
+                    filterController = filterController,
+                    onReloadClick = {
+                        cpsViewModels.contestsViewModel.reloadEnabledPlatforms(context)
+                    }
                 )
                 holder.menu = contestsMenuBuilder(
                     navigator = navigator,
-                    contestsViewModel = cpsViewModels.contestsViewModel
+                    loadingStatusState = loadingStatusState
                 )
                 holder.setSubtitle("contests")
             }
