@@ -17,7 +17,7 @@ interface DataStoreItem<T> {
     //setter
     suspend operator fun invoke(newValue: T)
 
-    suspend fun updateValue(transform: (T) -> T)
+    suspend fun update(transform: (T) -> T)
 }
 
 
@@ -39,7 +39,7 @@ abstract class ItemizedDataStore(protected val dataStore: DataStore<Preferences>
             dataStore.edit { prefs -> prefs.setValue(newValue) }
         }
 
-        override suspend fun updateValue(transform: (T) -> T) {
+        override suspend fun update(transform: (T) -> T) {
             dataStore.edit { prefs -> prefs.setValue(transform(fromPrefs(prefs[key]))) }
         }
 
@@ -145,17 +145,17 @@ abstract class ItemizedDataStore(protected val dataStore: DataStore<Preferences>
 
 @JvmName("editList")
 suspend fun<T> DataStoreItem<List<T>>.edit(block: MutableList<T>.() -> Unit) {
-    updateValue { it.toMutableList().apply(block) }
+    update { it.toMutableList().apply(block) }
 }
 
 @JvmName("editSet")
 suspend fun<T> DataStoreItem<Set<T>>.edit(block: MutableSet<T>.() -> Unit) {
-    updateValue { it.toMutableSet().apply(block) }
+    update { it.toMutableSet().apply(block) }
 }
 
 @JvmName("editMap")
 suspend fun<K, V> DataStoreItem<Map<K,V>>.edit(block: MutableMap<K,V>.() -> Unit) {
-    updateValue { it.toMutableMap().apply(block) }
+    update { it.toMutableMap().apply(block) }
 }
 
 

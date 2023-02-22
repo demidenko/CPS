@@ -11,7 +11,7 @@ interface ContestsReloader {
         contestsReceiver: ContestsReceiver
     ) {
         val enabledPlatforms = settings.enabledPlatforms()
-        settings.lastReloadedPlatforms.updateValue { emptySet() }
+        settings.lastReloadedPlatforms.update { emptySet() }
         reload(
             platforms = enabledPlatforms,
             settings = settings,

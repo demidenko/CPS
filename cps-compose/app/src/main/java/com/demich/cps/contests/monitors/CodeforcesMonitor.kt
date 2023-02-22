@@ -65,7 +65,7 @@ private suspend fun CodeforcesMonitorDataStore.getStandingsData(contestId: Int) 
         lastRequest(false)
         if (e is CodeforcesAPIErrorResponse) {
             if (e.isContestNotStarted(contestId)) {
-                contestInfo.updateValue { it.copy(phase = CodeforcesContestPhase.BEFORE) }
+                contestInfo.update { it.copy(phase = CodeforcesContestPhase.BEFORE) }
             }
         }
     }.onSuccess { standings ->

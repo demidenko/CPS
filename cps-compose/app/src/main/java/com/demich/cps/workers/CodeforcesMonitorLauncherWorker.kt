@@ -64,7 +64,7 @@ class CodeforcesMonitorLauncherWorker(
                 monitorLastSubmissionId(it.id)
             }
 
-            monitorCanceledContests.updateValue { list ->
+            monitorCanceledContests.update { list ->
                 list.filter { isActual(it.second) }
             }
 

@@ -20,7 +20,7 @@ class NewEntriesDataStoreItem (
 ): DataStoreItem<NewEntriesTypes> by item {
     suspend fun apply(newEntries: Collection<Int>) {
         if (newEntries.isEmpty()) return //TODO: is this OK/enough?
-        updateValue { old ->
+        update { old ->
             newEntries.associateWith { id -> old[id] ?: NewEntryType.UNSEEN }
         }
     }

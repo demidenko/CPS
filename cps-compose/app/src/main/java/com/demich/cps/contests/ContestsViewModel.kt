@@ -87,7 +87,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
             val toReload = (enabled - lastReloaded).toMutableSet()
 
             if (settings.needToReloadClistAdditional()) {
-                settings.clistLastReloadedAdditionalResources.updateValue { emptySet() }
+                settings.clistLastReloadedAdditionalResources.update { emptySet() }
                 toReload.add(Contest.Platform.unknown)
             }
 

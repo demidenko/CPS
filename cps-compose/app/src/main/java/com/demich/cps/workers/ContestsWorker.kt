@@ -31,7 +31,7 @@ class ContestsWorker(
         val settings = context.settingsContests
 
         //remove old ignored items
-        settings.ignoredContests.updateValue {
+        settings.ignoredContests.update {
             it.filterValues { ignoredAtTime ->
                 currentTime - ignoredAtTime < 30.days
             }
