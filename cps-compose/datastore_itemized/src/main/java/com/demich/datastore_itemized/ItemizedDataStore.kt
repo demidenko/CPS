@@ -21,7 +21,7 @@ interface DataStoreItem<T> {
 }
 
 
-abstract class ItemizedDataStore(protected val dataStore: DataStore<Preferences>) {
+abstract class ItemizedDataStore(private val dataStore: DataStore<Preferences>) {
 
     protected abstract class DataStoreBaseItem<T, S: Any>(
         private val dataStore: DataStore<Preferences>
@@ -66,17 +66,17 @@ abstract class ItemizedDataStore(protected val dataStore: DataStore<Preferences>
         override fun toPrefs(t: T): T = t
     }
 
-    private class ItemStringConvertible<T> (
+    private class ItemConvertible<S: Any, T> (
         dataStore: DataStore<Preferences>,
-        name: String,
+        override val key: Preferences.Key<S>,
         private val defaultValue: T,
-        private val encode: (T) -> String,
-        private val decode: (String) -> T,
-    ): DataStoreBaseItem<T, String>(dataStore) {
-        override val key = stringPreferencesKey(name)
-        override fun fromPrefs(s: String?): T = s?.runCatching(decode)?.getOrNull() ?: defaultValue
-        override fun toPrefs(t: T & Any): String = encode(t)
+        private val encode: (T) -> S,
+        private val decode: (S) -> T
+    ): DataStoreBaseItem<T, S>(dataStore) {
+        override fun fromPrefs(s: S?): T = s?.runCatching(decode)?.getOrNull() ?: defaultValue
+        override fun toPrefs(t: T & Any): S = encode(t)
     }
+
 
     private fun<T: Any> item(key: Preferences.Key<T>, defaultValue: T): DataStoreItem<T> =
         Item(key = key, defaultValue = defaultValue, dataStore = dataStore)
@@ -85,7 +85,10 @@ abstract class ItemizedDataStore(protected val dataStore: DataStore<Preferences>
         ItemNullable(key = key, dataStore = dataStore)
 
     protected fun<T> itemStringConvertible(name: String, defaultValue: T, encode: (T) -> String, decode: (String) -> T): DataStoreItem<T> =
-        ItemStringConvertible(name = name, defaultValue = defaultValue, encode = encode, decode = decode, dataStore = dataStore)
+        ItemConvertible(key = stringPreferencesKey(name), defaultValue = defaultValue, encode = encode, decode = decode, dataStore = dataStore)
+
+    protected fun<T> itemStringSetConvertible(name: String, defaultValue: T, encode: (T) -> Set<String>, decode: (Set<String>) -> T): DataStoreItem<T> =
+        ItemConvertible(key = stringSetPreferencesKey(name), defaultValue = defaultValue, encode = encode, decode = decode, dataStore = dataStore)
 
 
 
@@ -119,11 +122,12 @@ abstract class ItemizedDataStore(protected val dataStore: DataStore<Preferences>
         )
 
     protected inline fun<reified T: Enum<T>> itemEnumSet(name: String, defaultValue: Set<T> = emptySet()): DataStoreItem<Set<T>> =
-        object : DataStoreBaseItem<Set<T>, Set<String>>(dataStore) {
-            override val key = stringSetPreferencesKey(name)
-            override fun fromPrefs(s: Set<String>?) = s?.mapTo(mutableSetOf(), ::enumValueOf) ?: defaultValue
-            override fun toPrefs(t: Set<T>) = t.mapTo(mutableSetOf(), Enum<T>::name)
-        }
+        itemStringSetConvertible(
+            name = name,
+            defaultValue = defaultValue,
+            encode = { it.mapTo(mutableSetOf(), Enum<T>::name) },
+            decode = { it.mapTo(mutableSetOf(), ::enumValueOf) }
+        )
 
     protected inline fun<reified T> Json.item(name: String, defaultValue: T): DataStoreItem<T> =
         itemStringConvertible(
