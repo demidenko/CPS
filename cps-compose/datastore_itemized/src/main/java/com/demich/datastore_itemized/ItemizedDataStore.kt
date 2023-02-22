@@ -25,7 +25,6 @@ fun dataStoreWrapper(
 }
 
 interface DataStoreItem<T> {
-    val key: Preferences.Key<*>
     val flow: Flow<T>
 
     //getter
@@ -40,7 +39,7 @@ interface DataStoreItem<T> {
 
 private abstract class DataStoreBaseItem<T, S: Any>(
     private val dataStore: DataStore<Preferences>,
-    override val key: Preferences.Key<S>
+    val key: Preferences.Key<S>
 ): DataStoreItem<T> {
     protected abstract fun fromPrefs(s: S?): T
     protected abstract fun toPrefs(t: T & Any): S
@@ -99,7 +98,7 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
     protected suspend fun resetItems(items: Collection<DataStoreItem<*>>) {
         if (items.isEmpty()) return
         dataStore.edit { prefs ->
-            items.forEach { prefs.remove(it.key) }
+            items.forEach { prefs.remove((it as DataStoreBaseItem<*,*>).key) }
         }
     }
 
