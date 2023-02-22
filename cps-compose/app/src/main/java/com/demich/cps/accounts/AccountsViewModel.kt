@@ -8,9 +8,7 @@ import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.utils.CListUtils
 import com.demich.cps.utils.LoadingStatus
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
@@ -70,7 +68,8 @@ class AccountsViewModel: ViewModel() {
                 val manager = managers.first { it.type == type }
                 val loadingStatusState = mutableLoadingStatusFor(manager)
                 launch {
-                    //TODO: what if already loading??
+                    //wait for loading stops
+                    loadingStatusState.takeWhile { it == LoadingStatus.LOADING }.collect()
                     loadingStatusState.value = LoadingStatus.LOADING
                     loadAndSave(manager, userId)
                     loadingStatusState.value = LoadingStatus.PENDING
