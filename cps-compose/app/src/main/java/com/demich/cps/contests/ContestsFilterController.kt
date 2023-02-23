@@ -40,7 +40,9 @@ class ContestsFilterController(
         }
 
     fun filterContests(contests: List<Contest>): List<Contest> {
-        val tokens = filter.trim().split(whiteSpaceRegex)
+        val tokens = filter.trim().also {
+            if (it.isEmpty()) return contests
+        }.split(whiteSpaceRegex)
         return contests.filter { checkContest(it, tokens) }
     }
 

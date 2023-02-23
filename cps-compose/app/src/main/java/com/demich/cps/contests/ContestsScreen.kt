@@ -90,8 +90,9 @@ private fun ContestsContent(
 
     val contestsToShowState = rememberCollect {
         context.contestsListDao.flowOfContests()
-            .combine(context.settingsContests.ignoredContests.flow) { list, ignoreList ->
-                list.filter { contest -> contest.compositeId !in ignoreList }
+            .combine(context.settingsContests.ignoredContests.flow) { list, ignored ->
+                if (ignored.isEmpty()) list
+                else list.filter { contest -> contest.compositeId !in ignored }
             }
     }
 
@@ -165,14 +166,13 @@ private fun ContestsSortedList(
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
-    var expandedItems: Set<Pair<Contest.Platform, String>>
-        by rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(emptySet()) }
+    var expandedItems: List<Pair<Contest.Platform, String>>
+        by rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(emptyList()) }
 
-    val filteredContests = remember(
-        key1 = contestsSortedListState.value,
-        key2 = filterController.filter
-    ) {
-        filterController.filterContests(contestsSortedListState.value)
+    val filteredContests by remember(contestsSortedListState, filterController) {
+        derivedStateOf {
+            filterController.filterContests(contestsSortedListState.value)
+        }
     }
 
     LazyColumnWithScrollBar(modifier = modifier) {
@@ -228,7 +228,6 @@ private fun ContestsFilterTextField(
             trailingIcon = {
                 CPSIconButton(icon = CPSIcons.Close) {
                     filterController.enabled = false
-                    filterController.filter = ""
                 }
             }
         )
