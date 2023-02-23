@@ -9,11 +9,16 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 
 object CodeChefApi: ResourceApi() {
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     override val client = cpsHttpClient(
-        json = jsonCPS,
+        json = json,
         connectionTimeout = 30.seconds,
         requestTimeout = 60.seconds
     ) {
@@ -100,7 +105,7 @@ object CodeChefApi: ResourceApi() {
         val i = s.indexOf("var all_rating = ")
         if (i == -1) return emptyList()
         val ar = s.substring(s.indexOf("[", i), s.indexOf("];", i) + 1)
-        return jsonCPS.decodeFromString(ar)
+        return json.decodeFromString(ar)
     }
 
     object urls {

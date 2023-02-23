@@ -4,8 +4,10 @@ import io.ktor.client.request.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 object AtCoderApi: ResourceApi() {
+    private val json = Json { ignoreUnknownKeys = false }
 
     suspend fun getUserPage(handle: String): String  {
         return client.getText(urlString = urls.user(handle)) {
@@ -22,12 +24,12 @@ object AtCoderApi: ResourceApi() {
     }
 
     suspend fun getRatingChanges(handle: String): List<AtCoderRatingChange> {
-        val s = getUserPage(handle)
-        val i = s.lastIndexOf("<script>var rating_history=[{")
+        val src = getUserPage(handle)
+        val i = src.lastIndexOf("<script>var rating_history=[{")
         if (i == -1) return emptyList()
-        val j = s.indexOf("];</script>", i)
-        val str = s.substring(s.indexOf('[', i), j+1)
-        return jsonCPS.decodeFromString(str)
+        val j = src.indexOf("];</script>", i)
+        val str = src.substring(src.indexOf('[', i), j+1)
+        return json.decodeFromString(str)
     }
 
     object urls {

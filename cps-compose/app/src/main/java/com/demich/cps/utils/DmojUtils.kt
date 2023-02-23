@@ -6,12 +6,14 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
 
 object DmojApi {
-    private val client = cpsHttpClient(json = jsonCPS) { }
+    private val json = Json { ignoreUnknownKeys = true }
+    private val client = cpsHttpClient(json = json) { }
 
     suspend fun getUser(handle: String): DmojUserResult {
-        val json = client.getAs<JsonObject>(urlString = "${urls.main}/api/v2/user/$handle")
-        val obj = json["data"]!!.jsonObject["object"]!!
-        return jsonCPS.decodeFromJsonElement(obj)
+        val obj = client.getAs<JsonObject>(urlString = "${urls.main}/api/v2/user/$handle")
+            .getValue("data").jsonObject
+            .getValue("object")
+        return json.decodeFromJsonElement(obj)
     }
 
     suspend fun getUserPage(handle: String): String {
@@ -19,18 +21,19 @@ object DmojApi {
     }
 
     suspend fun getSuggestions(str: String): List<DmojSuggestion> {
-        val json = client.getAs<JsonObject>(urlString = "${urls.main}/widgets/select2/user_search") {
+        val obj = client.getAs<JsonObject>(urlString = "${urls.main}/widgets/select2/user_search") {
             parameter("_type", "query")
             parameter("term", str)
             parameter("q", str)
         }
-        return jsonCPS.decodeFromJsonElement(json["results"]!!)
+        return json.decodeFromJsonElement(obj.getValue("results"))
     }
 
     suspend fun getContests(): List<DmojContest> {
-        val json = client.getAs<JsonObject>(urlString = "${urls.main}/api/v2/contests")
-        val obj = json["data"]!!.jsonObject["objects"]!!
-        return jsonCPS.decodeFromJsonElement(obj)
+        val obj = client.getAs<JsonObject>(urlString = "${urls.main}/api/v2/contests")
+            .getValue("data").jsonObject
+            .getValue("objects")
+        return json.decodeFromJsonElement(obj)
     }
 
     suspend fun getRatingChanges(handle: String): List<DmojRatingChange> {
@@ -39,7 +42,7 @@ object DmojApi {
         if (i == -1) return emptyList()
         val j = s.indexOf("];", i)
         val str = s.substring(s.indexOf('[', i), j+1)
-        return jsonCPS.decodeFromString(str)
+        return json.decodeFromString(str)
     }
 
     object urls {
