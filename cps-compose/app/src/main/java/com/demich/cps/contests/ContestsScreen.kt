@@ -38,7 +38,6 @@ import com.demich.datastore_itemized.add
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -133,21 +132,18 @@ private fun ContestsList(
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
-    val currentTime by collectCurrentTimeAsState(1.seconds)
-
-    val sortedState = rememberWith(contestsState.value) {
-        mutableStateOf(this)
-    }.apply {
-        value.let {
-            val comparator = Contest.getComparator(currentTime)
-            if (!it.isSortedWith(comparator)) value = it.sortedWith(comparator)
+    ProvideTimeEachSecond {
+        val sortedState = rememberWith(contestsState.value) {
+            mutableStateOf(this)
+        }.apply {
+            value.let {
+                val comparator = Contest.getComparator(LocalCurrentTime.current)
+                if (!it.isSortedWith(comparator)) value = it.sortedWith(comparator)
+            }
         }
-    }
 
-    CompositionLocalProvider(
-        LocalCurrentTime provides currentTime,
-        //TODO: remember lambda to not recreate it each second, ProvideTimeEachSeconds doesn't helps
-        content = remember(sortedState, filterController, modifier) {
+        //TODO: without remember ContestsSortedList called each seconds (no skip!)
+        remember<@Composable () -> Unit>(sortedState, filterController, modifier) {
             {
                 ContestsSortedList(
                     contestsSortedListState = sortedState,
@@ -155,9 +151,8 @@ private fun ContestsList(
                     modifier = modifier
                 )
             }
-        }
-    )
-
+        }()
+    }
 }
 
 @Composable
