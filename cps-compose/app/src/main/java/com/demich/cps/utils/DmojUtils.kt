@@ -6,7 +6,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
 
 object DmojApi {
-    private val client = cpsHttpClient { }
+    private val client = cpsHttpClient(json = jsonCPS) { }
 
     suspend fun getUser(handle: String): DmojUserResult {
         val json = client.getAs<JsonObject>(urlString = "${urls.main}/api/v2/user/$handle")

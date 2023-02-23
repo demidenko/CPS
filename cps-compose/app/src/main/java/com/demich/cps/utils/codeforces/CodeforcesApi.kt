@@ -12,11 +12,16 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-object CodeforcesApi {
-    private val client = cpsHttpClient {
+object CodeforcesApi: ResourceApi() {
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
+    override val client = cpsHttpClient(json = json) {
         HttpResponseValidator {
             handleResponseExceptionWithRequest { exception, _ ->
                 if (exception !is ResponseException) return@handleResponseExceptionWithRequest
@@ -24,7 +29,7 @@ object CodeforcesApi {
                 if (response.status == HttpStatusCode.ServiceUnavailable) {
                     throw CodeforcesAPICallLimitExceeded()
                 }
-                throw jsonCPS.decodeFromString<CodeforcesAPIErrorResponse>(response.bodyAsText())
+                throw json.decodeFromString<CodeforcesAPIErrorResponse>(response.bodyAsText())
             }
         }
     }
@@ -266,7 +271,7 @@ data class CodeforcesAPIErrorResponse(
 }
 
 @Serializable
-data class CodeforcesAPIResponse<T>(
+private data class CodeforcesAPIResponse<T>(
     val status: CodeforcesAPIStatus,
     val result: T
 )

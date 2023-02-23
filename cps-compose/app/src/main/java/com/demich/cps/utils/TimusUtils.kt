@@ -2,8 +2,7 @@ package com.demich.cps.utils
 
 import io.ktor.client.request.*
 
-object TimusApi {
-    private val client = cpsHttpClient(json = false) { }
+object TimusApi: ResourceApi() {
 
     suspend fun getUserPage(id: Int): String {
         return client.getText(urlString = urls.user(id)) {

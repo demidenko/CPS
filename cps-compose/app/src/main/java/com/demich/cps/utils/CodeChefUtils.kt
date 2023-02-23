@@ -9,9 +9,14 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import kotlin.time.Duration.Companion.seconds
 
-object CodeChefApi {
-    private val client = cpsHttpClient {
+object CodeChefApi: ResourceApi() {
+    override val client = cpsHttpClient(
+        json = jsonCPS,
+        connectionTimeout = 30.seconds,
+        requestTimeout = 60.seconds
+    ) {
         followRedirects = false
         //BrowserUserAgent()
         install(HttpCookies) {

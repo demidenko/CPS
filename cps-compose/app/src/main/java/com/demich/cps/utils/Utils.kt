@@ -4,21 +4,15 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.time.Duration.Companion.seconds
 
 fun<T> T.touchLog(text: String) = also {
     println("${getCurrentTime().epochSeconds}: $text")
@@ -33,32 +27,6 @@ val jsonCPS = Json {
     allowStructuredMapKeys = true
 }
 
-fun cpsHttpClient(
-    json: Boolean = true,
-    block: HttpClientConfig<*>.() -> Unit
-) = HttpClient {
-    expectSuccess = true
-    install(HttpTimeout) {
-        connectTimeoutMillis = 15.seconds.inWholeMilliseconds
-        requestTimeoutMillis = 30.seconds.inWholeMilliseconds
-    }
-    if (json) {
-        install(ContentNegotiation) {
-            json(json = jsonCPS)
-        }
-    }
-    block()
-}
-
-suspend inline fun<reified T> HttpClient.getAs(
-    urlString: String,
-    block: HttpRequestBuilder.() -> Unit = {}
-): T = this.get(urlString = urlString, block = block).body()
-
-suspend inline fun HttpClient.getText(
-    urlString: String,
-    block: HttpRequestBuilder.() -> Unit = {}
-): String = this.get(urlString = urlString, block = block).bodyAsText()
 
 
 fun Int.toSignedString(): String = if (this > 0) "+${this}" else "$this"

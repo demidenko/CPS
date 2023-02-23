@@ -1,7 +1,6 @@
 package com.demich.cps.utils
 
-object ProjectEulerApi {
-    private val client = cpsHttpClient {  }
+object ProjectEulerApi: ResourceApi() {
 
     suspend fun getRSSPage(): String {
         return client.getText(urlString = "${urls.main}/rss2_euler.xml")
