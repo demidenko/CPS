@@ -9,13 +9,9 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 
 object CodeChefApi: ResourceApi() {
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
 
     override val client = cpsHttpClient(
         json = json,

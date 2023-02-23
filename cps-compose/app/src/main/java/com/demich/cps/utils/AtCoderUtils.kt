@@ -4,10 +4,8 @@ import io.ktor.client.request.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 object AtCoderApi: ResourceApi() {
-    private val json = Json { ignoreUnknownKeys = false }
 
     suspend fun getUserPage(handle: String): String  {
         return client.getText(urlString = urls.user(handle)) {

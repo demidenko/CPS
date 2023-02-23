@@ -12,14 +12,10 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 object CodeforcesApi: ResourceApi() {
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
 
     override val client = cpsHttpClient(json = json) {
         HttpResponseValidator {

@@ -13,6 +13,7 @@ import kotlin.time.Duration.Companion.seconds
 
 abstract class ResourceApi {
     protected open val client: HttpClient = defaultHttpClient
+    protected val json = Json { ignoreUnknownKeys = true }
 
 }
 

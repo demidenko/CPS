@@ -52,7 +52,7 @@ object CListUtils {
 }
 
 object CListApi: ResourceApi() {
-    override val client = cpsHttpClient(json = jsonCPS) { }
+    override val client = cpsHttpClient(json = json) { }
 
     suspend fun getUserPage(login: String): String {
         return client.getText(urls.user(login))
