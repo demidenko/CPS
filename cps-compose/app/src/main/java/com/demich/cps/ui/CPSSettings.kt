@@ -196,7 +196,8 @@ fun SettingsSwitchItemWithWork(
     item: DataStoreItem<Boolean>,
     title: String,
     description: String = "",
-    workGetter: (Context) -> CPSWork
+    workGetter: (Context) -> CPSWork,
+    stopWorkOnUnchecked: Boolean = true
 ) {
     val context = context
     SettingsSwitchItem(
@@ -205,7 +206,8 @@ fun SettingsSwitchItemWithWork(
         description = description
     ) { checked ->
         with(workGetter(context)) {
-            if (checked) startImmediate() else stop()
+            if (checked) startImmediate()
+            else if (stopWorkOnUnchecked) stop()
         }
     }
 }

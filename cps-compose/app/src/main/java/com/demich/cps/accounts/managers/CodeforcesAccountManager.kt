@@ -214,12 +214,13 @@ class CodeforcesAccountManager(context: Context):
     override fun getSettings() = CodeforcesAccountSettingsDataStore(this)
 
     @Composable
-    override fun Settings() {
+    override fun SettingsContent() {
         val settings = remember { getSettings() }
-        SettingsSwitchItem(
+        SettingsSwitchItemWithWork(
             item = settings.observeRating,
             title = "Rating changes observer",
-            onCheckedChange = { if (it) AccountsWorker.getWork(context).startImmediate() }
+            workGetter = AccountsWorker::getWork,
+            stopWorkOnUnchecked = false
         )
         SettingsSwitchItemWithWork(
             item = settings.monitorEnabled,
@@ -232,10 +233,11 @@ class CodeforcesAccountManager(context: Context):
             title = "Upsolving suggestions",
             workGetter = CodeforcesUpsolvingSuggestionsWorker::getWork
         )
-        SettingsSwitchItem(
+        SettingsSwitchItemWithWork(
             item = settings.observeContribution,
             title = "Contribution changes observer",
-            onCheckedChange = { if (it) AccountsWorker.getWork(context).startImmediate() }
+            workGetter = AccountsWorker::getWork,
+            stopWorkOnUnchecked = false
         )
     }
 

@@ -160,7 +160,7 @@ fun AccountSettingsScreen(
             }
         }
         if (manager is AccountSettingsProvider) {
-            manager.Settings()
+            manager.SettingsContent()
         }
     }
 
