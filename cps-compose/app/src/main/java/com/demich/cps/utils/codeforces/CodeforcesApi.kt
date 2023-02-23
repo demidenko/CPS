@@ -122,6 +122,7 @@ object CodeforcesApi {
         }
     }
 
+    //TODO: Sequence instead of List?
     suspend fun getContests(): List<CodeforcesContest> {
         return getCodeforcesApi(urlString = "${urls.api}/contest.list") {
             parameter("gym", false)
