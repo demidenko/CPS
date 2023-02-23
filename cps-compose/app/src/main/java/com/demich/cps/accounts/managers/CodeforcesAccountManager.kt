@@ -111,7 +111,8 @@ class CodeforcesAccountManager(context: Context):
                     add(AccountSuggestion(title = handle, userId = handle))
                 }
             }
-        }.reversed()
+            reverse()
+        }
     }
 
     override suspend fun loadRatingHistory(info: CodeforcesUserInfo): List<RatingChange> =
