@@ -61,11 +61,8 @@ private fun ContestResult(
                     .wrapContentHeight(align = Alignment.CenterVertically)
             )
             Text(
-                text = buildString {
-                    append(ratingChange.date.format("dd.MM.yyyy HH:mm"))
-                    ratingChange.rank?.let {
-                        append("  rank: $it")
-                    }
+                text = ratingChange.run {
+                    date.format("dd.MM.yyyy HH:mm") + "  rank: $rank"
                 },
                 fontSize = subTitleFontSize,
                 color = cpsColors.contentAdditional
@@ -115,7 +112,6 @@ private fun RatingChange(
 
 @Composable
 private fun ContestResultTest(
-    hasRank: Boolean,
     change: Int?,
     longTitle: Boolean = false,
     handleColor: HandleColor = HandleColor.ORANGE
@@ -126,7 +122,7 @@ private fun ContestResultTest(
             title = "Contest " + "very long ".repeat(if (longTitle) 10 else 0) + "title",
             date = Instant.fromEpochSeconds(1e9.toLong()),
             rating = rating,
-            rank = 345.takeIf { hasRank },
+            rank = 345,
             oldRating = when  {
                 change == null -> null
                 change > 0 -> rating - 150
@@ -149,20 +145,10 @@ private fun ContestResults() {
             verticalArrangement = Arrangement.spacedBy(5.dp),
             modifier = Modifier.padding(5.dp)
         ) {
+            ContestResultTest(change = +1)
+            ContestResultTest(change = -1)
+            ContestResultTest(change = null)
             ContestResultTest(
-                hasRank = true,
-                change = +1
-            )
-            ContestResultTest(
-                hasRank = false,
-                change = -1
-            )
-            ContestResultTest(
-                hasRank = true,
-                change = null
-            )
-            ContestResultTest(
-                hasRank = true,
                 change = 0,
                 longTitle = true
             )

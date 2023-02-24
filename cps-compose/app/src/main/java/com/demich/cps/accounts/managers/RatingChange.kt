@@ -14,7 +14,7 @@ data class RatingChange(
     val date: Instant,
     val title: String = "",
     val oldRating: Int? = null,
-    val rank: Int? = null,
+    val rank: Int,
     val url: String? = null
 )
 
