@@ -1,4 +1,4 @@
-package com.demich.cps.ui
+package com.demich.cps.accounts.rating_graph
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -31,6 +31,10 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
+import com.demich.cps.ui.CPSIconButton
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.LoadingContentBox
+import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import kotlinx.coroutines.launch
@@ -172,11 +176,13 @@ private fun RatingGraph(
     val currentTime = remember(ratingChanges) { getCurrentTime() }
     var filterType by rememberSaveable(ratingChanges) {
         if (ratingChanges.isNotEmpty()) {
-            translator.setWindow(createBounds(
+            translator.setWindow(
+                createBounds(
                 ratingChanges = ratingChanges,
                 filterType = RatingFilterType.ALL,
                 now = currentTime
-            ))
+            )
+            )
         }
         mutableStateOf(RatingFilterType.ALL)
     }
@@ -197,11 +203,13 @@ private fun RatingGraph(
             currentTime = currentTime,
             selectedFilterType = filterType,
             onSelectFilterType = {
-                translator.setWindow(createBounds(
+                translator.setWindow(
+                    createBounds(
                     ratingChanges = ratingChanges,
                     filterType = it,
                     now = currentTime
-                ))
+                )
+                )
                 filterType = it
             },
             selectedRatingChange = selectedRatingChange,

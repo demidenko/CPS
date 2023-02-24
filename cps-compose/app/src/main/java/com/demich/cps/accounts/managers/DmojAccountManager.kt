@@ -12,9 +12,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallRatedAccountPanel
-import com.demich.cps.ui.RatingGraph
-import com.demich.cps.ui.RatingLoadButton
-import com.demich.cps.ui.rememberRatingGraphUIStates
+import com.demich.cps.accounts.rating_graph.RatingGraph
+import com.demich.cps.accounts.rating_graph.RatingLoadButton
+import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
 import com.demich.cps.utils.DmojApi
 import com.demich.cps.utils.DmojRatingChange
 import com.demich.cps.utils.append

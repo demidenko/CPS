@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.RatingGraph
-import com.demich.cps.ui.RatingLoadButton
-import com.demich.cps.ui.rememberRatingGraphUIStates
+import com.demich.cps.accounts.rating_graph.RatingGraph
+import com.demich.cps.accounts.rating_graph.RatingLoadButton
+import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.CodeChefApi
 import com.demich.cps.utils.CodeChefRatingChange
