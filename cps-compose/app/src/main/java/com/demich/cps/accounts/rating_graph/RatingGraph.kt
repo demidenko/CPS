@@ -23,10 +23,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import com.demich.cps.accounts.managers.HandleColor
-import com.demich.cps.accounts.managers.RatedAccountManager
-import com.demich.cps.accounts.managers.RatedUserInfo
-import com.demich.cps.accounts.managers.RatingChange
+import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LoadingContentBox
@@ -42,41 +39,24 @@ import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 
 
-@Stable
-data class RatingGraphUIStates (
-    val showRatingGraphState: MutableState<Boolean>,
-    val loadingStatusState: MutableState<LoadingStatus>,
-    val ratingChangesState: MutableState<List<RatingChange>>
-)
-
-@Composable
-fun rememberRatingGraphUIStates(): RatingGraphUIStates {
-    val showRatingGraph = rememberSaveable { mutableStateOf(false) }
-    val ratingLoadingStatus = rememberSaveable { mutableStateOf(LoadingStatus.PENDING) }
-    val ratingChanges = rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(emptyList<RatingChange>()) }
-    return remember { RatingGraphUIStates(showRatingGraph, ratingLoadingStatus, ratingChanges) }
-}
-
 @Composable
 fun<U: RatedUserInfo> RatedAccountManager<U>.RatingLoadButton(
     ratingGraphUIStates: RatingGraphUIStates
 ) {
     val scope = rememberCoroutineScope()
-    var showRatingGraph by ratingGraphUIStates.showRatingGraphState
-    var loadingStatus by ratingGraphUIStates.loadingStatusState
     CPSIconButton(
         icon = CPSIcons.RatingGraph,
-        enabled = !showRatingGraph || loadingStatus == LoadingStatus.FAILED
+        enabled = !ratingGraphUIStates.showRatingGraph || ratingGraphUIStates.loadingStatus == LoadingStatus.FAILED
     ) {
-        loadingStatus = LoadingStatus.LOADING
-        showRatingGraph = true
+        ratingGraphUIStates.loadingStatus = LoadingStatus.LOADING
+        ratingGraphUIStates.showRatingGraph = true
         scope.launch {
             val ratingChanges = getRatingHistory(getSavedInfo())
             if (ratingChanges == null) {
-                loadingStatus = LoadingStatus.FAILED
+                ratingGraphUIStates.loadingStatus = LoadingStatus.FAILED
             } else {
-                loadingStatus = LoadingStatus.PENDING
-                ratingGraphUIStates.ratingChangesState.value = ratingChanges
+                ratingGraphUIStates.loadingStatus = LoadingStatus.PENDING
+                ratingGraphUIStates.ratingChanges = ratingChanges
             }
         }
     }
@@ -98,17 +78,17 @@ fun RatingGraph(
     manager: RatedAccountManager<out RatedUserInfo>,
     modifier: Modifier = Modifier
 ) {
-    if (ratingGraphUIStates.showRatingGraphState.value) {
+    if (ratingGraphUIStates.showRatingGraph) {
         RatingGraph(
-            loadingStatus = ratingGraphUIStates.loadingStatusState.value,
-            ratingChanges = ratingGraphUIStates.ratingChangesState.value,
+            loadingStatus = ratingGraphUIStates.loadingStatus,
+            ratingChanges = ratingGraphUIStates.ratingChanges,
             manager = manager,
             modifier = modifier
         )
     }
 }
 
-private enum class RatingFilterType {
+internal enum class RatingFilterType {
     ALL,
     LAST_10,
     LAST_MONTH,
@@ -119,46 +99,6 @@ private enum class RatingFilterType {
         LAST_10 -> "last 10"
         LAST_MONTH -> "last month"
         LAST_YEAR -> "last year"
-    }
-}
-
-internal data class RatingGraphBounds(
-    val minRating: Int,
-    val maxRating: Int,
-    val startTime: Instant,
-    val endTime: Instant
-) {
-    init {
-        require(minRating <= maxRating)
-        require(startTime <= endTime)
-    }
-}
-
-private fun createBounds(
-    ratingChanges: List<RatingChange>,
-    startTime: Instant = ratingChanges.first().date,
-    endTime: Instant = ratingChanges.last().date
-) = RatingGraphBounds(
-    minRating = ratingChanges.minOf { it.rating },
-    maxRating = ratingChanges.maxOf { it.rating },
-    startTime = startTime,
-    endTime = endTime
-)
-
-private fun createBounds(
-    ratingChanges: List<RatingChange>,
-    filterType: RatingFilterType,
-    now: Instant
-) = when (filterType) {
-    RatingFilterType.ALL -> createBounds(ratingChanges)
-    RatingFilterType.LAST_10 -> createBounds(ratingChanges.takeLast(10))
-    RatingFilterType.LAST_MONTH, RatingFilterType.LAST_YEAR -> {
-        val startTime = now - (if (filterType == RatingFilterType.LAST_MONTH) 30.days else 365.days)
-        createBounds(
-            ratingChanges = ratingChanges.filter { it.date >= startTime },
-            startTime = startTime,
-            endTime = now
-        )
     }
 }
 
@@ -297,9 +237,9 @@ private fun RatingGraphHeader(
 }
 
 @Composable
-private fun<U: RatedUserInfo> DrawRatingGraph(
+private fun DrawRatingGraph(
     ratingChanges: List<RatingChange>,
-    manager: RatedAccountManager<U>,
+    manager: RatedAccountManager<out RatedUserInfo>,
     rectangles: RatingGraphRectangles,
     translator: CoordinateTranslator,
     currentTime: Instant,
