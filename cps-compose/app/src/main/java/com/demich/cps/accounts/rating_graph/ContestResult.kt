@@ -123,12 +123,7 @@ private fun ContestResultTest(
             date = Instant.fromEpochSeconds(1e9.toLong()),
             rating = rating,
             rank = 345,
-            oldRating = when  {
-                change == null -> null
-                change > 0 -> rating - 150
-                change < 0 -> rating + 150
-                else -> rating
-            }
+            oldRating = if (change != null) rating - change else null
         ),
         ratingColor = cpsColors.handleColor(handleColor = handleColor),
         modifier = Modifier
@@ -145,13 +140,10 @@ private fun ContestResults() {
             verticalArrangement = Arrangement.spacedBy(5.dp),
             modifier = Modifier.padding(5.dp)
         ) {
-            ContestResultTest(change = +1)
-            ContestResultTest(change = -1)
+            ContestResultTest(change = +150)
+            ContestResultTest(change = -150)
             ContestResultTest(change = null)
-            ContestResultTest(
-                change = 0,
-                longTitle = true
-            )
+            ContestResultTest(change = 0, longTitle = true)
         }
     }
 }
