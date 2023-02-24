@@ -44,7 +44,7 @@ import kotlin.text.contains
 data class CodeforcesUserInfo(
     override val status: STATUS,
     override val handle: String,
-    override val rating: Int = NOT_RATED,
+    override val rating: Int? = null,
     val contribution: Int = 0,
     @Serializable(with = InstantAsSecondsSerializer::class)
     val lastOnlineTime: Instant = Instant.DISTANT_PAST
@@ -52,7 +52,7 @@ data class CodeforcesUserInfo(
     constructor(codeforcesUser: CodeforcesUser): this(
         status = STATUS.OK,
         handle = codeforcesUser.handle,
-        rating = codeforcesUser.rating ?: NOT_RATED,
+        rating = codeforcesUser.rating,
         contribution = codeforcesUser.contribution,
         lastOnlineTime = codeforcesUser.lastOnlineTime
     )

@@ -39,7 +39,7 @@ import kotlin.text.contains
 data class CodeChefUserInfo(
     override val status: STATUS,
     override val handle: String,
-    override val rating: Int = NOT_RATED
+    override val rating: Int? = null
 ): RatedUserInfo() {
     override val userPageUrl get() = CodeChefApi.urls.user(handle)
 }
@@ -69,9 +69,8 @@ class CodeChefAccountManager(context: Context):
             Jsoup.parse(CodeChefApi.getUserPage(handle = data)).run {
                 val rating = selectFirst("div.rating-ranks")
                     ?.select("a")
-                    ?.takeIf { !it.all { it.text() == "Inactive" } }
+                    ?.takeIf { it.any { it.text() != "Inactive" } }
                     ?.let { selectFirst("div.rating-header > div.rating-number")?.text()?.toInt() }
-                    ?: NOT_RATED
                 val userName = selectFirst("section.user-details")?.selectFirst("span.m-username--link")
                 return CodeChefUserInfo(
                     status = STATUS.OK,
@@ -176,9 +175,9 @@ class CodeChefAccountManager(context: Context):
             userInfo = userInfo,
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (userInfo.hasRating()) {
+                    userInfo.rating?.let {
                         StarBox(
-                            rating = userInfo.rating,
+                            rating = it,
                             textColor = cpsColors.background,
                             fontSize = 20.sp,
                             modifier = Modifier.padding(end = 8.dp)

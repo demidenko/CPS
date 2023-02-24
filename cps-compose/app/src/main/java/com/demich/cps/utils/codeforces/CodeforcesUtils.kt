@@ -8,7 +8,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.accounts.managers.HandleColor
-import com.demich.cps.accounts.managers.NOT_RATED
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.toSignedString
@@ -189,9 +188,9 @@ object CodeforcesUtils {
         }
     }
 
-    fun getTagByRating(rating: Int): ColorTag {
+    fun getTagByRating(rating: Int?): ColorTag {
         return when {
-            rating == NOT_RATED -> ColorTag.BLACK
+            rating == null -> ColorTag.BLACK
             rating < 1200 -> ColorTag.GRAY
             rating < 1400 -> ColorTag.GREEN
             rating < 1600 -> ColorTag.CYAN

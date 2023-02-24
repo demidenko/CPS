@@ -29,7 +29,7 @@ import org.jsoup.Jsoup
 data class AtCoderUserInfo(
     override val status: STATUS,
     override val handle: String,
-    override val rating: Int = NOT_RATED
+    override val rating: Int? = null
 ): RatedUserInfo() {
     override val userPageUrl: String
         get() = AtCoderApi.urls.user(handle)
@@ -56,11 +56,13 @@ class AtCoderAccountManager(context: Context):
         try {
             val s = AtCoderApi.getUserPage(handle = data)
             return with(Jsoup.parse(s)) {
-                val handle = expectFirst("a.username").text()
-                val rating = select("th.no-break").find { it.text() == "Rating" }
-                    ?.nextElementSibling()
-                    ?.text()?.toInt() ?: NOT_RATED
-                AtCoderUserInfo(status = STATUS.OK, handle = handle, rating = rating)
+                AtCoderUserInfo(
+                    status = STATUS.OK,
+                    handle = expectFirst("a.username").text(),
+                    rating = select("th.no-break").find { it.text() == "Rating" }
+                        ?.nextElementSibling()
+                        ?.text()?.toInt()
+                )
             }
         } catch (e: Throwable) {
             if (e is ClientRequestException && e.response.status == HttpStatusCode.NotFound) {

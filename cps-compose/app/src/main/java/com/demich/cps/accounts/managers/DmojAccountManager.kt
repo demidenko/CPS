@@ -27,7 +27,7 @@ import kotlinx.serialization.Serializable
 data class DmojUserInfo(
     override val status: STATUS,
     override val handle: String,
-    override val rating: Int = NOT_RATED
+    override val rating: Int? = null
 ): RatedUserInfo() {
     override val userPageUrl get() = DmojApi.urls.user(handle)
 }
@@ -55,7 +55,7 @@ class DmojAccountManager(context: Context):
             return DmojUserInfo(
                 status = STATUS.OK,
                 handle = res.username,
-                rating = res.rating ?: NOT_RATED
+                rating = res.rating
             )
         } catch (e: Throwable) {
             if (e is ClientRequestException) {

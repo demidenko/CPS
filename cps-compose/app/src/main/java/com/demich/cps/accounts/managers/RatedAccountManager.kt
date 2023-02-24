@@ -45,8 +45,8 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
     )
 
     @Composable
-    fun makeOKSpan(text: String, rating: Int): AnnotatedString {
-        return if (rating == NOT_RATED) AnnotatedString(text = text)
+    fun makeOKSpan(text: String, rating: Int?): AnnotatedString {
+        return if (rating == null) AnnotatedString(text = text)
         else makeRatedSpan(text, rating)
     }
 
@@ -69,18 +69,16 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
         runCatching { loadRatingHistory(info).sortedBy { it.date } }.getOrNull()
 }
 
-const val NOT_RATED = Int.MIN_VALUE
-
 abstract class RatedUserInfo: UserInfo() {
     abstract val handle: String
-    abstract val rating: Int
+    abstract val rating: Int?
 
     final override val userId: String
         get() = handle
 
-    fun hasRating() = status == STATUS.OK && rating != NOT_RATED
+    fun hasRating() = status == STATUS.OK && rating != null
 
-    fun ratingToString() = if (rating == NOT_RATED) "[not rated]" else rating.toString()
+    fun ratingToString() = rating?.toString() ?: "[not rated]"
 }
 
 enum class HandleColor {
