@@ -35,14 +35,16 @@ class CodeforcesUpsolvingSuggestionsWorker(
     }
 
     override suspend fun runWork(): Result {
-        //TODO: clean old suggestions
         val codeforcesAccountManager = CodeforcesAccountManager(context)
+        val suggestedItem = codeforcesAccountManager.getSettings().upsolvingSuggestedProblems
+
+        val deadLine = currentTime - 90.days
+        suggestedItem.edit { filter { it.second > deadLine } }
+
         val handle = codeforcesAccountManager.getSavedInfo()
             .takeIf { it.hasRating() }
             ?.handle
             ?: return Result.success()
-
-        val deadLine = currentTime - 90.days
 
         val ratingChanges = CodeforcesApi.runCatching {
             getUserRatingChanges(handle)
@@ -77,11 +79,11 @@ class CodeforcesUpsolvingSuggestionsWorker(
                     return Result.failure()
                 }
 
-                acceptedStats.forEach { (problem, countOfAccepted) ->
-                    if (problem.index !in solvedProblems && countOfAccepted >= ratingChange.rank) {
-                        codeforcesAccountManager.getSettings().upsolvingSuggestedProblems.edit {
-                            if (none { it.contestId == contestId && it.index == problem.index }) {
-                                add(problem)
+                acceptedStats.forEach { (problem, solvers) ->
+                    if (solvers >= ratingChange.rank && problem.index !in solvedProblems) {
+                        suggestedItem.edit {
+                            if (none { sameProblems(it.first, problem) }) {
+                                add(problem to currentTime)
                                 notifyProblemForUpsolve(problem)
                             }
                         }
@@ -91,6 +93,9 @@ class CodeforcesUpsolvingSuggestionsWorker(
 
         return Result.success()
     }
+
+    private fun sameProblems(a: CodeforcesProblem, b: CodeforcesProblem) =
+        a.contestId == b.contestId && a.index == b.index
 
     private fun notifyProblemForUpsolve(problem: CodeforcesProblem) {
         val problemId = "${problem.contestId}${problem.index}"
