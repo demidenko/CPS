@@ -28,6 +28,7 @@ fun LoadingContentBox(
                     color = cpsColors.error,
                     fontWeight = FontWeight.SemiBold
                 )
+                //TODO: try again request button
             }
         }
     }

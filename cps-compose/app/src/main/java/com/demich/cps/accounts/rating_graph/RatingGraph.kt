@@ -614,7 +614,7 @@ private class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY: 
 }
 
 @Immutable
-private class RatingGraphRectangles(
+internal class RatingGraphRectangles(
     manager: RatedAccountManager<out RatedUserInfo>
 ) {
     private val rectangles: List<Pair<Point,HandleColor>> = buildList {
@@ -670,6 +670,6 @@ private class RatingGraphRectangles(
     }
 }
 
-private data class Point(val x: Long, val y: Long)
+internal data class Point(val x: Long, val y: Long)
 
 private fun RatingChange.toPoint() = Point(x = date.epochSeconds, y = rating.toLong())
