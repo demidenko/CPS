@@ -7,7 +7,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -27,7 +27,26 @@ internal fun ContestResult(
     modifier: Modifier = Modifier,
     titleFontSize: TextUnit = 16.sp,
     subTitleFontSize: TextUnit = 12.sp,
-    majorFontSize: TextUnit = 30.sp,
+    ratingFontSize: TextUnit = 30.sp
+) {
+    ContestResult(
+        ratingChange = ratingChange,
+        ratingColor = manager.colorFor(handleColor = rectangles.getHandleColor(ratingChange.toPoint())),
+        titleFontSize = titleFontSize,
+        subTitleFontSize = subTitleFontSize,
+        ratingFontSize = ratingFontSize,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun ContestResult(
+    ratingChange: RatingChange,
+    ratingColor: Color,
+    titleFontSize: TextUnit,
+    subTitleFontSize: TextUnit,
+    ratingFontSize: TextUnit,
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
@@ -38,7 +57,7 @@ internal fun ContestResult(
         ) {
             Text(text = ratingChange.title, fontSize = titleFontSize)
             Text(
-                text = buildAnnotatedString {
+                text = buildString {
                     append(ratingChange.date.format("dd.MM.yyyy HH:mm"))
                     ratingChange.rank?.let {
                         append("  rank: $it")
@@ -54,9 +73,9 @@ internal fun ContestResult(
         ) {
             Text(
                 text = ratingChange.rating.toString(),
-                fontSize = majorFontSize,
+                fontSize = ratingFontSize,
                 fontWeight = FontWeight.Bold,
-                color = manager.colorFor(handleColor = rectangles.getHandleColor(ratingChange.toPoint())),
+                color = ratingColor,
             )
             if (ratingChange.oldRating != null) {
                 val change = ratingChange.rating - ratingChange.oldRating
@@ -68,6 +87,5 @@ internal fun ContestResult(
                 )
             }
         }
-
     }
 }
