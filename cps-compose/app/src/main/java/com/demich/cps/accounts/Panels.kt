@@ -24,6 +24,7 @@ import com.demich.cps.utils.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.util.Collections
 
 @Composable
 fun<U: UserInfo> PanelWithUI(
@@ -71,7 +72,7 @@ fun<U: UserInfo> PanelWithUI(
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
         } else {
-            AccountMovingUI(
+            PanelMovingButtons(
                 type = manager.type,
                 visibleOrder = visibleOrder,
                 modifier = Modifier.align(Alignment.CenterEnd)
@@ -108,50 +109,57 @@ private fun AccountPanelUI(
     }
 }
 
-
 @Composable
-private fun AccountMovingUI(
+private fun PanelMovingButtons(
     type: AccountManagers,
     visibleOrder: List<AccountManagers>,
     modifier: Modifier = Modifier
 ) {
     val context = context
     val scope = rememberCoroutineScope()
-    fun saveOrder(newVisibleOrder: List<AccountManagers>) {
+    fun swapAndSave(i: Int, j: Int) {
         scope.launch {
-            context.settingsUI.saveAccountsOrder(newVisibleOrder)
+            val newOrder = visibleOrder.toMutableList().apply {
+                Collections.swap(this, i, j)
+            }
+            context.settingsUI.saveAccountsOrder(newOrder)
         }
     }
+    val index = visibleOrder.indexOf(type)
+    PanelMovingButtons(
+        modifier = modifier,
+        onUpClick = {
+            swapAndSave(index - 1, index)
+        }.takeIf { index > 0 },
+        onDownClick = {
+            swapAndSave(index, index + 1)
+        }.takeIf { index + 1 < visibleOrder.size }
+    )
+}
 
+@Composable
+private fun PanelMovingButtons(
+    modifier: Modifier = Modifier,
+    onUpClick: (() -> Unit)? = null,
+    onDownClick: (() -> Unit)? = null
+) {
     Column(modifier = modifier) {
-        if (visibleOrder.first() != type) {
+        if (onUpClick != null) {
             Icon(
                 imageVector = CPSIcons.MoveUp,
                 contentDescription = null,
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
-                    .clickable {
-                        val index = visibleOrder.indexOf(type)
-                        saveOrder(visibleOrder.toMutableList().apply {
-                            this[index] = this[index - 1]
-                            this[index - 1] = type
-                        })
-                    }
+                    .clickable(onClick = onUpClick)
             )
         }
-        if (visibleOrder.last() != type) {
+        if (onDownClick != null) {
             Icon(
                 imageVector = CPSIcons.MoveDown,
                 contentDescription = null,
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
-                    .clickable {
-                        val index = visibleOrder.indexOf(type)
-                        saveOrder(visibleOrder.toMutableList().apply {
-                            this[index] = this[index + 1]
-                            this[index + 1] = type
-                        })
-                    }
+                    .clickable(onClick = onDownClick)
             )
         }
     }
