@@ -65,7 +65,7 @@ fun<U: RatedUserInfo> RatedAccountManager<U>.RatingLoadButton(
         icon = CPSIcons.RatingGraph,
         enabled = !showRatingGraph || loadingStatus == LoadingStatus.FAILED
     ) {
-        ratingGraphUIStates.loadingStatusState.value = LoadingStatus.LOADING
+        loadingStatus = LoadingStatus.LOADING
         showRatingGraph = true
         scope.launch {
             val ratingChanges = getRatingHistory(getSavedInfo())
@@ -106,10 +106,17 @@ fun RatingGraph(
 }
 
 private enum class RatingFilterType {
-    all,
-    last10,
-    lastMonth,
-    lastYear
+    ALL,
+    LAST_10,
+    LAST_MONTH,
+    LAST_YEAR;
+
+    val title: String get() = when (this) {
+        ALL -> "all"
+        LAST_10 -> "last 10"
+        LAST_MONTH -> "last month"
+        LAST_YEAR -> "last year"
+    }
 }
 
 private data class RatingGraphBounds(
@@ -140,10 +147,10 @@ private fun createBounds(
     filterType: RatingFilterType,
     now: Instant
 ) = when (filterType) {
-    RatingFilterType.all -> createBounds(ratingChanges)
-    RatingFilterType.last10 -> createBounds(ratingChanges.takeLast(10))
-    RatingFilterType.lastMonth, RatingFilterType.lastYear -> {
-        val startTime = now - (if (filterType == RatingFilterType.lastMonth) 30.days else 365.days)
+    RatingFilterType.ALL -> createBounds(ratingChanges)
+    RatingFilterType.LAST_10 -> createBounds(ratingChanges.takeLast(10))
+    RatingFilterType.LAST_MONTH, RatingFilterType.LAST_YEAR -> {
+        val startTime = now - (if (filterType == RatingFilterType.LAST_MONTH) 30.days else 365.days)
         createBounds(
             ratingChanges = ratingChanges.filter { it.date >= startTime },
             startTime = startTime,
@@ -167,11 +174,11 @@ private fun RatingGraph(
         if (ratingChanges.isNotEmpty()) {
             translator.setWindow(createBounds(
                 ratingChanges = ratingChanges,
-                filterType = RatingFilterType.all,
+                filterType = RatingFilterType.ALL,
                 now = currentTime
             ))
         }
-        mutableStateOf(RatingFilterType.all)
+        mutableStateOf(RatingFilterType.ALL)
     }
 
     var selectedRatingChange: RatingChange?
@@ -270,27 +277,20 @@ private fun RatingGraphHeader(
         TextButtonsSelectRow(
             values = remember(ratingChanges, currentTime) {
                 buildList {
-                    if (ratingChanges.size > 10) add(RatingFilterType.last10)
+                    if (ratingChanges.size > 10) add(RatingFilterType.LAST_10)
                     val firstInMonth = ratingChanges.indexOfFirst { it.date >= currentTime - 30.days }
                     val firstInYear = ratingChanges.indexOfFirst { it.date >= currentTime - 365.days }
-                    if (firstInMonth > 0 && firstInMonth != -1) {
-                        add(RatingFilterType.lastMonth)
+                    if (firstInMonth != -1 && firstInMonth > 0) {
+                        add(RatingFilterType.LAST_MONTH)
                     }
-                    if (firstInYear > 0 && firstInYear != -1 && firstInYear != firstInMonth) {
-                        add(RatingFilterType.lastYear)
+                    if (firstInYear != -1 && firstInYear > 0 && firstInYear != firstInMonth) {
+                        add(RatingFilterType.LAST_YEAR)
                     }
-                    if (isNotEmpty()) add(index = 0, RatingFilterType.all)
+                    if (isNotEmpty()) add(index = 0, RatingFilterType.ALL)
                 }
             },
             selectedValue = selectedFilterType,
-            text = {
-                when (it) {
-                    RatingFilterType.all -> "all"
-                    RatingFilterType.last10 -> "last 10"
-                    RatingFilterType.lastMonth -> "last month"
-                    RatingFilterType.lastYear -> "last year"
-                }
-            },
+            text = RatingFilterType::title,
             onSelect = onSelectFilterType,
             modifier = Modifier.background(cpsColors.background)
         )
@@ -368,7 +368,7 @@ private fun<U: RatedUserInfo> DrawRatingGraph(
     }
 
     val timeMarkers: List<Instant> = remember(key1 = filterType, key2 = ratingChanges) {
-        if (filterType == RatingFilterType.all || ratingChanges.size < 2) emptyList()
+        if (filterType == RatingFilterType.ALL || ratingChanges.size < 2) emptyList()
         else {
             createBounds(ratingChanges, filterType, currentTime).run {
                 listOf(startTime, endTime)
@@ -639,7 +639,7 @@ private class RatingGraphRectangles(
         require(isSortedWith(compareByDescending<Pair<Point, HandleColor>> { it.first.x }.thenBy { it.first.y }))
     }
 
-    fun forEach(block: (Point, HandleColor) -> Unit) =
+    inline fun forEach(block: (Point, HandleColor) -> Unit) =
         rectangles.forEach { block(it.first, it.second) }
 
     fun getHandleColor(point: Point): HandleColor =
