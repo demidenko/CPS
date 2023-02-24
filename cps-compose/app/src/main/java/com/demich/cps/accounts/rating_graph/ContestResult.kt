@@ -1,10 +1,7 @@
 package com.demich.cps.accounts.rating_graph
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +16,8 @@ import com.demich.cps.accounts.managers.HandleColor
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatedUserInfo
 import com.demich.cps.accounts.managers.RatingChange
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.format
@@ -49,13 +48,18 @@ private fun ContestResult(
     ratingFontSize: TextUnit = 30.sp
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(text = ratingChange.title, fontSize = titleFontSize)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = ratingChange.title,
+                fontSize = titleFontSize,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier
+                    .weight(1f)
+                    .wrapContentHeight(align = Alignment.CenterVertically)
+            )
             Text(
                 text = buildString {
                     append(ratingChange.date.format("dd.MM.yyyy HH:mm"))
@@ -78,18 +82,36 @@ private fun ContestResult(
                 color = ratingColor,
             )
             if (ratingChange.oldRating != null) {
-                val change = ratingChange.rating - ratingChange.oldRating
-                Text(
-                    text = change.toSignedString(),
-                    fontSize = subTitleFontSize,
-                    fontWeight = FontWeight.Bold,
-                    color = if (change < 0) cpsColors.error else cpsColors.success,
+                RatingChange(
+                    change = ratingChange.rating - ratingChange.oldRating,
+                    fontSize = subTitleFontSize
                 )
             }
         }
     }
 }
 
+@Composable
+private fun RatingChange(
+    change: Int,
+    fontSize: TextUnit
+) {
+    val color = if (change < 0) cpsColors.error else cpsColors.success
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconSp(
+            imageVector = if (change < 0) CPSIcons.RatingDown else CPSIcons.RatingUp,
+            size = fontSize,
+            color = color
+        )
+        Text(
+            text = change.toSignedString(zeroAsPositive = true),
+            fontSize = fontSize,
+            fontWeight = FontWeight.Bold,
+            color = color,
+            modifier = Modifier.padding(start = 3.dp)
+        )
+    }
+}
 
 @Composable
 private fun ContestResultTest(

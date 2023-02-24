@@ -43,6 +43,8 @@ object CPSIcons {
     val MoveUp get() = Icons.Default.ArrowDropUp
     val MoveDown get() = Icons.Default.ArrowDropDown
     val RatingGraph get() = Icons.Default.Timeline
+    val RatingUp get() = Icons.Default.TrendingUp
+    val RatingDown get() = Icons.Default.TrendingDown
     val Insert get() = Icons.Rounded.ReadMore
     val EditList get() = Icons.Default.EditNote
     val SetupLoaders get() = Icons.Default.PermDataSetting

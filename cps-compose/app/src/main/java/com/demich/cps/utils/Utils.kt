@@ -29,7 +29,8 @@ val jsonCPS = Json {
 
 
 
-fun Int.toSignedString(): String = if (this > 0) "+${this}" else "$this"
+fun Int.toSignedString(zeroAsPositive: Boolean = false): String =
+    if (this > 0 || this == 0 && zeroAsPositive) "+${this}" else "$this"
 
 
 data class ComparablePair<A: Comparable<A>, B: Comparable<B>>(
