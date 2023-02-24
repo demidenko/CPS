@@ -78,7 +78,7 @@ abstract class RatedUserInfo: UserInfo() {
     final override val userId: String
         get() = handle
 
-    fun isRated() = status == STATUS.OK && rating != NOT_RATED
+    fun hasRating() = status == STATUS.OK && rating != NOT_RATED
 
     fun ratingToString() = if (rating == NOT_RATED) "[not rated]" else rating.toString()
 }

@@ -68,7 +68,7 @@ private data class RatedRank(
 )
 
 private fun<U: RatedUserInfo> RatedAccountManager<U>.getRank(userInfo: U): RatedRank? {
-    if (!userInfo.isRated()) return null
+    if (!userInfo.hasRating()) return null
     val rating = userInfo.rating
     val handleColor = getHandleColor(rating)
     if(handleColor == HandleColor.RED) return RatedRank(rank = 1e9, handleColor = handleColor, manager = this)

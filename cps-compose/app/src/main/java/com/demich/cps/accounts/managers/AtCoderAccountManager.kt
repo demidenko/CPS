@@ -117,7 +117,7 @@ class AtCoderAccountManager(context: Context):
             )
         }
         setBottomBarContent {
-            if (userInfo.isRated()) {
+            if (userInfo.hasRating()) {
                 RatingLoadButton(ratingGraphUIStates)
             }
         }

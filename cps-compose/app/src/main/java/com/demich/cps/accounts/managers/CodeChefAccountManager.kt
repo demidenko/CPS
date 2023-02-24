@@ -176,7 +176,7 @@ class CodeChefAccountManager(context: Context):
             userInfo = userInfo,
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (userInfo.isRated()) {
+                    if (userInfo.hasRating()) {
                         StarBox(
                             rating = userInfo.rating,
                             textColor = cpsColors.background,
@@ -196,7 +196,7 @@ class CodeChefAccountManager(context: Context):
                     Text(
                         text = userInfo.ratingToString(),
                         fontSize = 25.sp,
-                        color = if (userInfo.isRated()) cpsColors.content else cpsColors.contentAdditional,
+                        color = if (userInfo.hasRating()) cpsColors.content else cpsColors.contentAdditional,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -222,7 +222,7 @@ class CodeChefAccountManager(context: Context):
             )
         }
         setBottomBarContent {
-            if (userInfo.isRated()) {
+            if (userInfo.hasRating()) {
                 RatingLoadButton(ratingGraphUIStates)
             }
         }

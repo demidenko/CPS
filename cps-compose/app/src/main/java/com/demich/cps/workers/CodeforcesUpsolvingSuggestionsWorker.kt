@@ -38,7 +38,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
         //TODO: clean old suggestions
         val codeforcesAccountManager = CodeforcesAccountManager(context)
         val handle = codeforcesAccountManager.getSavedInfo()
-            .takeIf { it.isRated() }
+            .takeIf { it.hasRating() }
             ?.handle
             ?: return Result.success()
 
