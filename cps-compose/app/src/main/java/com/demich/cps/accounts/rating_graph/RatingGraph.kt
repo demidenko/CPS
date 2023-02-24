@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
@@ -25,18 +22,20 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.demich.cps.accounts.managers.*
+import com.demich.cps.accounts.managers.HandleColor
+import com.demich.cps.accounts.managers.RatedAccountManager
+import com.demich.cps.accounts.managers.RatedUserInfo
+import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.*
+import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.jsonCPS
+import com.demich.cps.utils.saver
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.math.round
@@ -123,7 +122,7 @@ private enum class RatingFilterType {
     }
 }
 
-private data class RatingGraphBounds(
+internal data class RatingGraphBounds(
     val minRating: Int,
     val maxRating: Int,
     val startTime: Instant,
@@ -177,11 +176,7 @@ private fun RatingGraph(
     var filterType by rememberSaveable(ratingChanges) {
         if (ratingChanges.isNotEmpty()) {
             translator.setWindow(
-                createBounds(
-                ratingChanges = ratingChanges,
-                filterType = RatingFilterType.ALL,
-                now = currentTime
-            )
+                createBounds(ratingChanges = ratingChanges, filterType = RatingFilterType.ALL, now = currentTime)
             )
         }
         mutableStateOf(RatingFilterType.ALL)
@@ -204,11 +199,7 @@ private fun RatingGraph(
             selectedFilterType = filterType,
             onSelectFilterType = {
                 translator.setWindow(
-                    createBounds(
-                    ratingChanges = ratingChanges,
-                    filterType = it,
-                    now = currentTime
-                )
+                    createBounds(ratingChanges = ratingChanges, filterType = it, now = currentTime)
                 )
                 filterType = it
             },
@@ -302,59 +293,6 @@ private fun RatingGraphHeader(
             onSelect = onSelectFilterType,
             modifier = Modifier.background(cpsColors.background)
         )
-    }
-}
-
-@Composable
-private fun ContestResult(
-    ratingChange: RatingChange,
-    manager: RatedAccountManager<out RatedUserInfo>,
-    rectangles: RatingGraphRectangles,
-    modifier: Modifier = Modifier,
-    titleFontSize: TextUnit = 16.sp,
-    subTitleFontSize: TextUnit = 12.sp,
-    majorFontSize: TextUnit = 30.sp,
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(text = ratingChange.title, fontSize = titleFontSize)
-            Text(
-                text = buildAnnotatedString {
-                    append(ratingChange.date.format("dd.MM.yyyy HH:mm"))
-                    ratingChange.rank?.let {
-                        append("  rank: $it")
-                    }
-                },
-                fontSize = subTitleFontSize,
-                color = cpsColors.contentAdditional
-            )
-        }
-        Column(
-            modifier = Modifier.padding(start = 5.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = ratingChange.rating.toString(),
-                fontSize = majorFontSize,
-                fontWeight = FontWeight.Bold,
-                color = manager.colorFor(handleColor = rectangles.getHandleColor(ratingChange.toPoint())),
-            )
-            if (ratingChange.oldRating != null) {
-                val change = ratingChange.rating - ratingChange.oldRating
-                Text(
-                    text = change.toSignedString(),
-                    fontSize = subTitleFontSize,
-                    fontWeight = FontWeight.Bold,
-                    color = if (change < 0) cpsColors.error else cpsColors.success,
-                )
-            }
-        }
-
     }
 }
 
@@ -521,163 +459,6 @@ private fun DrawRatingGraph(
 }
 
 
-@Composable
-private fun rememberCoordinateTranslator(): CoordinateTranslator =
-    rememberSaveable(saver = CoordinateTranslator.saver) {
-        CoordinateTranslator(minX = 0f, maxX = 0f, minY = 0f, maxY = 0f)
-    }
-
-@Stable
-private class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY: Float) {
-    private var o: Offset by mutableStateOf(Offset(x = minX, y = minY))
-    private var size: Size by mutableStateOf(Size(width = maxX - minX, height = maxY - minY))
-
-    var canvasSize: Size = Size.Unspecified
-    var borderX: Float = 0f
-
-    fun setWindow(bounds: RatingGraphBounds) {
-        if (bounds.startTime == bounds.endTime) {
-            setWindow(bounds.copy(
-                startTime = bounds.startTime - 1.days,
-                endTime = bounds.endTime + 1.days
-            ))
-            return
-        }
-        with(bounds) {
-            o = Offset(x = startTime.epochSeconds.toFloat(), y = minRating.toFloat() - 100f)
-            size = Size(
-                width = (endTime - startTime).inWholeSeconds.toFloat(),
-                height = maxRating - minRating + 200f
-            )
-        }
-    }
-
-    private fun transformX(
-        x: Float,
-        fromWidth: Float,
-        toWidth: Float
-    ) = (x - fromWidth/2) * (fromWidth / toWidth) + (fromWidth / 2)
-
-    fun pointToOffset(x: Long, y: Long) = Offset(
-        x = transformX(
-            x = (x - o.x) / size.width * canvasSize.width,
-            fromWidth = canvasSize.width,
-            toWidth = canvasSize.width + borderX * 2
-        ),
-        y = canvasSize.height - ((y - o.y) / size.height * canvasSize.height)
-    )
-
-    fun pointToOffset(point: Point) = pointToOffset(point.x, point.y)
-
-    private fun offsetToPoint(offset: Offset) = Offset(
-        x = transformX(
-            x = offset.x,
-            fromWidth = canvasSize.width + borderX * 2,
-            toWidth = canvasSize.width
-        ) / canvasSize.width * size.width + o.x,
-        y = (canvasSize.height - offset.y) / canvasSize.height * size.height + o.y
-    )
-
-    fun move(offset: Offset) {
-        o -= offsetToPoint(offset) - offsetToPoint(Offset.Zero)
-    }
-
-    fun scale(center: Offset, scale: Float) {
-        val c = offsetToPoint(center)
-        o = (o - c) / scale + c
-        size /= scale
-    }
-
-    fun getNearestRatingChange(
-        ratingChanges: List<RatingChange>,
-        tap: Offset,
-        tapRadius: Float = 50f
-    ): RatingChange? {
-        var pos = -1
-        var minDist = Float.POSITIVE_INFINITY
-        for (i in ratingChanges.indices) {
-            val o = pointToOffset(ratingChanges[i].toPoint())
-            val dist = (o - tap).getDistance()
-            if (dist <= tapRadius && dist < minDist) {
-                pos = i
-                minDist = dist
-            }
-        }
-        if (pos == -1) return null
-        val res = ratingChanges[pos]
-        if (pos == 0 || res.oldRating != null) return res
-        return res.copy(oldRating = ratingChanges[pos-1].rating)
-    }
-
-    companion object {
-        val saver: Saver<CoordinateTranslator, Any> = listSaver(
-            save = {
-                listOf(it.o.x, it.o.y, it.size.width, it.size.height)
-            },
-            restore = {
-                CoordinateTranslator(minX = it[0], minY = it[1], maxX = it[0] + it[2], maxY = it[1] + it[3])
-            }
-        )
-    }
-}
-
-@Immutable
-internal class RatingGraphRectangles(
-    manager: RatedAccountManager<out RatedUserInfo>
-) {
-    private val rectangles: List<Pair<Point,HandleColor>> = buildList {
-        fun addBounds(bounds: Array<Pair<HandleColor, Int>>, x: Long) {
-            bounds.sortedBy { it.second }.let { list ->
-                for (i in list.indices) {
-                    val y = if (i == 0) Int.MIN_VALUE else list[i-1].second
-                    add(Point(x = x, y = y.toLong()) to list[i].first)
-                }
-                add(Point(x = x, y = list.last().second.toLong()) to HandleColor.RED)
-            }
-        }
-        addBounds(x = Long.MAX_VALUE, bounds = manager.ratingsUpperBounds)
-        if (manager is RatingRevolutionsProvider) {
-            manager.ratingUpperBoundRevolutions
-                .sortedByDescending { it.first }
-                .forEach { (time, bounds) ->
-                    addBounds(x = time.epochSeconds, bounds = bounds)
-                }
-        }
-    }.apply {
-        require(isSortedWith(compareByDescending<Pair<Point, HandleColor>> { it.first.x }.thenBy { it.first.y }))
-    }
-
-    inline fun forEach(block: (Point, HandleColor) -> Unit) =
-        rectangles.forEach { block(it.first, it.second) }
-
-    fun getHandleColor(point: Point): HandleColor =
-        rectangles.last { (r, _) -> point.x < r.x && point.y >= r.y }.second
-
-    fun iterateWithHandleColor(points: List<Point>, block: (Point, HandleColor) -> Unit) {
-        /*
-        fast version of
-        points.forEach { point -> block(point, getHandleColor(point)) }
-         */
-        require(points.isSortedWith(compareBy { it.x }))
-        var r = rectangles.size
-        var l = r
-        points.forEach { point ->
-            val (x, y) = point
-            while (l == rectangles.size || x >= rectangles[l].first.x) {
-                r = l
-                do --l while (l > 0 && rectangles[l-1].first.x == rectangles[r-1].first.x)
-            }
-            var sl = l
-            var sr = r
-            while (sl < sr) {
-                val mid = (sl + sr) / 2
-                if (rectangles[mid].first.y <= y) sl = mid+1 else sr = mid
-            }
-            block(point, rectangles[sl-1].second)
-        }
-    }
-}
-
 internal data class Point(val x: Long, val y: Long)
 
-private fun RatingChange.toPoint() = Point(x = date.epochSeconds, y = rating.toLong())
+internal fun RatingChange.toPoint() = Point(x = date.epochSeconds, y = rating.toLong())
