@@ -111,7 +111,7 @@ private fun CodeforcesMonitor(
         Title(
             contestPhase = phase,
             requestFailed = lastRequest == false,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth()
         )
         StandingsRow(
             problems = problems,
