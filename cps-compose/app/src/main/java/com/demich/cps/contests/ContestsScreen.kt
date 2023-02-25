@@ -55,7 +55,7 @@ fun ContestsScreen(
                 .imePadding()
         ) {
             CodeforcesMonitor(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.padding(horizontal = 3.dp).fillMaxWidth()
             )
             ContestsContent(
                 contestsViewModel = contestsViewModel,

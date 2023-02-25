@@ -1,20 +1,22 @@
 package com.demich.cps.contests.monitors
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
@@ -44,7 +46,13 @@ fun CodeforcesMonitorWidget(
         expanded = showMenu,
         onDismissRequest = { showMenu = false },
         content = {
-            CodeforcesMonitor(modifier = modifier.clickable { showMenu = true })
+            CodeforcesMonitor(
+                modifier = modifier
+                    .clip(shape = RoundedCornerShape(6.dp))
+                    .clickable { showMenu = true }
+                    .background(color = cpsColors.backgroundAdditional)
+                    .padding(vertical = 8.dp)
+            )
         }
     ) {
         CPSDropdownMenuItem(title = "Browse", icon = CPSIcons.OpenInBrowser, onClick = onOpenInBrowser)
@@ -196,7 +204,8 @@ private fun StandingsRow(
             Row(modifier = modifier) {
                 RankColumn(
                     rank = rank,
-                    participationType = participationType
+                    participationType = participationType,
+                    modifier = Modifier.padding(horizontal = 4.dp)
                 )
                 problems.forEach {
                     ProblemColumn(
