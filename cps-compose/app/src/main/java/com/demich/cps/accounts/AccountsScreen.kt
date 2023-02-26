@@ -161,7 +161,7 @@ fun AccountSettingsScreen(
             }
         }
         if (manager is AccountSettingsProvider) {
-            manager.SettingsContent()
+            manager.SettingsItems()
         }
     }
 
@@ -213,11 +213,15 @@ private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
             .combine()
     }
 
-    val recordedAccounts by rememberRecordedAccounts()
+    val anyRecordedAccount by rememberCollect {
+        combine(flows = context.allAccountManagers.map { it.flowOfInfo() }) {
+            it.any { manager -> !manager.isEmpty() }
+        }
+    }
 
     CPSReloadingButton(
         loadingStatus = loadingStatus,
-        enabled = recordedAccounts.isNotEmpty()
+        enabled = anyRecordedAccount
     ) {
         context.allAccountManagers.forEach { accountsViewModel.reload(it) }
     }
@@ -283,6 +287,7 @@ private fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
         manager = this,
         initialUserInfo = runBlocking { getSavedInfo() },
         onDismissRequest = onDismissRequest,
+        //TODO: saving in dying scope!
         onResult = { userInfo -> scope.launch { setSavedInfo(userInfo) } }
     )
 }

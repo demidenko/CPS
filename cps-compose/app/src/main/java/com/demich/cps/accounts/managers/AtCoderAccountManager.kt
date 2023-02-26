@@ -129,7 +129,7 @@ class AtCoderAccountManager(context: Context):
     override fun getSettings() = AtCoderAccountSettingsDataStore(this)
 
     @Composable
-    override fun SettingsContent() {
+    override fun SettingsItems() {
         val settings = remember { getSettings() }
         SettingsSwitchItemWithWork(
             item = settings.observeRating,

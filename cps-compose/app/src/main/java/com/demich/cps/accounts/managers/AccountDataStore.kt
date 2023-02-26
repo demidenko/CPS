@@ -31,5 +31,5 @@ interface AccountSettingsProvider {
     fun getSettings(): AccountSettingsDataStore
 
     @Composable
-    fun SettingsContent() {}
+    fun SettingsItems() {}
 }

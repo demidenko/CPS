@@ -218,7 +218,7 @@ class CodeforcesAccountManager(context: Context):
     override fun getSettings() = CodeforcesAccountSettingsDataStore(this)
 
     @Composable
-    override fun SettingsContent() {
+    override fun SettingsItems() {
         val settings = remember { getSettings() }
         SettingsSwitchItemWithWork(
             item = settings.observeRating,
