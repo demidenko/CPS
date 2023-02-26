@@ -97,14 +97,12 @@ fun makeCombinedMessage(
     developEnabled: Boolean
 ): String {
     if (errors.isEmpty()) return ""
-    val g = errors.groupBy(
-        valueTransform = { it.first },
+    return errors.groupBy(
         keySelector = { (_, e) ->
             e.niceMessage ?: if (developEnabled) "$e" else "Some error..."
-        }
-    )
-
-    return g.entries.joinToString { (msg, list) -> "${list.distinct()}: $msg" }
+        },
+        valueTransform = { it.first }
+    ).entries.joinToString(separator = "; ") { (msg, list) -> "${list.distinct()}: $msg" }
 }
 
 private val Throwable.niceMessage: String? get() =
@@ -113,9 +111,9 @@ private val Throwable.niceMessage: String? get() =
             -> "Connection failed"
         this is ClientRequestException && response.status == HttpStatusCode.Unauthorized
             -> "Unauthorized"
-        this  is ClientRequestException && response.status == HttpStatusCode.TooManyRequests
+        this is ClientRequestException && response.status == HttpStatusCode.TooManyRequests
             -> "Too many requests"
-        this  is kotlinx.serialization.SerializationException
+        this is kotlinx.serialization.SerializationException
             -> "Parse error"
         else -> null
     }
