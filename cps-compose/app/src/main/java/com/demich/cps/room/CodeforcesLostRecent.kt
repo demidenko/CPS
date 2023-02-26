@@ -2,7 +2,7 @@ package com.demich.cps.room
 
 import android.content.Context
 import androidx.room.*
-import com.demich.cps.utils.codeforces.CodeforcesUtils
+import com.demich.cps.utils.codeforces.CodeforcesColorTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 
@@ -38,7 +38,7 @@ data class CodeforcesLostBlogEntry(
     val title: String,
     val authorHandle: String,
     val creationTime: Instant,
-    val authorColorTag: CodeforcesUtils.ColorTag = CodeforcesUtils.ColorTag.BLACK,
+    val authorColorTag: CodeforcesColorTag = CodeforcesColorTag.BLACK,
     val isSuspect: Boolean,
     val timeStamp: Instant
 )

@@ -364,7 +364,7 @@ data class CodeforcesBlogEntry(
     val creationTime: Instant,
     val rating: Int = 0,
     val commentsCount: Int = 0,
-    val authorColorTag: CodeforcesUtils.ColorTag = CodeforcesUtils.ColorTag.BLACK
+    val authorColorTag: CodeforcesColorTag = CodeforcesColorTag.BLACK
 )
 
 @Serializable
@@ -389,7 +389,7 @@ data class CodeforcesComment(
     val commentatorHandle: String,
     val html: String,
     val rating: Int,
-    val commentatorHandleColorTag: CodeforcesUtils.ColorTag = CodeforcesUtils.ColorTag.BLACK
+    val commentatorHandleColorTag: CodeforcesColorTag = CodeforcesColorTag.BLACK
 )
 
 @Serializable

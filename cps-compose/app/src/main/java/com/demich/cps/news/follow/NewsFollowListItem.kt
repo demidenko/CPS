@@ -17,7 +17,7 @@ import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
-import com.demich.cps.utils.codeforces.CodeforcesUtils
+import com.demich.cps.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.utils.timeAgo
 
 @Composable
@@ -34,7 +34,7 @@ fun NewsFollowListItem(
             Text(
                 text = LocalCodeforcesAccountManager.current.makeHandleSpan(
                     handle = userInfo.handle,
-                    tag = CodeforcesUtils.getTagByRating(userInfo.rating)
+                    tag = CodeforcesColorTag.fromRating(userInfo.rating)
                 ),
                 fontSize = 18.sp,
                 maxLines = 1,

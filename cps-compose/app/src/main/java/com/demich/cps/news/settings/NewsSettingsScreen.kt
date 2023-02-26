@@ -18,8 +18,8 @@ import com.demich.cps.contests.Contest
 import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
+import com.demich.cps.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.utils.codeforces.CodeforcesLocale
-import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.workers.CodeforcesNewsFollowWorker
@@ -106,21 +106,21 @@ private fun CodeforcesLostSettingsItem() {
 
 @Composable
 private fun CodeforcesLostAuthorSettingsItem(
-    item: DataStoreItem<CodeforcesUtils.ColorTag>
+    item: DataStoreItem<CodeforcesColorTag>
 ) {
     val context = context
     val manager = remember { CodeforcesAccountManager(context) }
     val options = remember {
         listOf(
-            CodeforcesUtils.ColorTag.BLACK to "Exists",
-            CodeforcesUtils.ColorTag.GRAY to "Newbie",
-            CodeforcesUtils.ColorTag.GREEN to "Pupil",
-            CodeforcesUtils.ColorTag.CYAN to "Specialist",
-            CodeforcesUtils.ColorTag.BLUE to "Expert",
-            CodeforcesUtils.ColorTag.VIOLET to "Candidate Master",
-            CodeforcesUtils.ColorTag.ORANGE to "Master",
-            CodeforcesUtils.ColorTag.RED to "Grandmaster",
-            CodeforcesUtils.ColorTag.LEGENDARY to "LGM"
+            CodeforcesColorTag.BLACK to "Exists",
+            CodeforcesColorTag.GRAY to "Newbie",
+            CodeforcesColorTag.GREEN to "Pupil",
+            CodeforcesColorTag.CYAN to "Specialist",
+            CodeforcesColorTag.BLUE to "Expert",
+            CodeforcesColorTag.VIOLET to "Candidate Master",
+            CodeforcesColorTag.ORANGE to "Master",
+            CodeforcesColorTag.RED to "Grandmaster",
+            CodeforcesColorTag.LEGENDARY to "LGM"
         )
     }
     //TODO: restart worker on change?

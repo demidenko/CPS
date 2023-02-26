@@ -2,8 +2,8 @@ package com.demich.cps.news.settings
 
 import android.content.Context
 import com.demich.cps.news.codeforces.CodeforcesTitle
+import com.demich.cps.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.utils.codeforces.CodeforcesLocale
-import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
@@ -24,7 +24,7 @@ class NewsSettingsDataStore(context: Context): ItemizedDataStore(context.news_se
     val codeforcesFollowEnabled = itemBoolean(name = "cf_follow_enabled", defaultValue = false)
 
     val codeforcesLostEnabled = itemBoolean(name = "cf_lost_enabled", defaultValue = false)
-    val codeforcesLostMinRatingTag = itemEnum(name = "cf_lost_min_rating", defaultValue = CodeforcesUtils.ColorTag.ORANGE)
+    val codeforcesLostMinRatingTag = itemEnum(name = "cf_lost_min_rating", defaultValue = CodeforcesColorTag.ORANGE)
 
     fun flowOfCodeforcesTabs(): Flow<List<CodeforcesTitle>> {
         return codeforcesLostEnabled.flow.map { lostEnabled ->

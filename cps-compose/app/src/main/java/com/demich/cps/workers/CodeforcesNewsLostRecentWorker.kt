@@ -9,6 +9,7 @@ import com.demich.cps.room.CodeforcesLostBlogEntry
 import com.demich.cps.room.lostBlogEntriesDao
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
+import com.demich.cps.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.mapToSet
 import kotlinx.datetime.Instant
@@ -86,7 +87,7 @@ class CodeforcesNewsLostRecentWorker(
             val userInfo = authors[blogEntry.authorHandle]
                 ?.takeIf { it.status == STATUS.OK }
             if (userInfo == null) blogEntry
-            else blogEntry.copy(authorColorTag = CodeforcesUtils.getTagByRating(rating = userInfo.rating))
+            else blogEntry.copy(authorColorTag = CodeforcesColorTag.fromRating(rating = userInfo.rating))
         }
     }
 

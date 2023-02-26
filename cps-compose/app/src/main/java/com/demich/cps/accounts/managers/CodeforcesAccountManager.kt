@@ -147,17 +147,17 @@ class CodeforcesAccountManager(context: Context):
         }
 
     @Composable
-    fun makeHandleSpan(handle: String, tag: CodeforcesUtils.ColorTag): AnnotatedString =
+    fun makeHandleSpan(handle: String, tag: CodeforcesColorTag): AnnotatedString =
         buildAnnotatedString {
             append(handle, color = cpsColors.content)
-            CodeforcesUtils.getHandleColorByTag(tag)?.let { handleColor ->
+            tag.toHandleColor()?.let { handleColor ->
                 addStyle(
                     style = SpanStyle(color = colorFor(handleColor)),
-                    start = if (tag == CodeforcesUtils.ColorTag.LEGENDARY) 1 else 0,
+                    start = if (tag == CodeforcesColorTag.LEGENDARY) 1 else 0,
                     end = handle.length
                 )
             }
-            if (tag != CodeforcesUtils.ColorTag.BLACK) {
+            if (tag != CodeforcesColorTag.BLACK) {
                 addStyle(
                     style = SpanStyle(fontWeight = FontWeight.Bold),
                     start = 0,
@@ -170,7 +170,7 @@ class CodeforcesAccountManager(context: Context):
     override fun makeRatedSpan(text: String, rating: Int): AnnotatedString =
         makeHandleSpan(
             handle = text,
-            tag = CodeforcesUtils.getTagByRating(rating)
+            tag = CodeforcesColorTag.fromRating(rating)
         )
 
 
