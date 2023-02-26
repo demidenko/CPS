@@ -1,16 +1,11 @@
 package com.demich.cps.utils.codeforces
 
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.accounts.managers.HandleColor
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.toSignedString
 import kotlinx.datetime.Instant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -305,24 +300,6 @@ object CodeforcesUtils {
             ?.text()
             ?.removeSuffix("%")
             ?.toIntOrNull()
-    }
-
-    @Composable
-    fun VotedRating(
-        rating: Int,
-        fontSize: TextUnit,
-        modifier: Modifier = Modifier,
-        showZero: Boolean = false
-    ) {
-        if (showZero || rating != 0) {
-            Text(
-                text = rating.toSignedString(),
-                color = if (rating > 0) cpsColors.votedRatingPositive else cpsColors.votedRatingNegative,
-                fontWeight = FontWeight.Bold,
-                fontSize = fontSize,
-                modifier = modifier
-            )
-        }
     }
 
     @Composable

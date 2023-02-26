@@ -14,6 +14,7 @@ import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.news.codeforces.LocalCodeforcesAccountManager
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
+import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.codeforces.CodeforcesUtils
@@ -101,7 +102,7 @@ private fun NewsFollowListItemInfo(
                 color = cpsColors.contentAdditional,
                 fontSize = fontSize
             )
-            CodeforcesUtils.VotedRating(
+            VotedRating(
                 rating = userInfo.contribution,
                 fontSize = fontSize,
                 showZero = true

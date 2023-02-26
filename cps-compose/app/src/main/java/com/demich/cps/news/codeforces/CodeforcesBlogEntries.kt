@@ -17,14 +17,10 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.CPSDefaults
-import com.demich.cps.ui.LazyColumnWithScrollBar
-import com.demich.cps.ui.itemsNotEmpty
+import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.ui.withVibration
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
-import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.timeAgo
 
 
@@ -138,7 +134,7 @@ private fun BlogEntryInfoHeader(
             fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f)
         )
-        CodeforcesUtils.VotedRating(
+        VotedRating(
             rating = rating,
             fontSize = 14.sp,
             modifier = Modifier.padding(start = 3.dp, top = 3.dp)

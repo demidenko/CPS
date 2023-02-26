@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.toSignedString
 
 @Composable
 fun IconSp(
@@ -355,6 +356,24 @@ fun WordsWithCounterOnOverflow(
             maxLines = 1,
             fontSize = fontSize,
             color = color,
+        )
+    }
+}
+
+@Composable
+fun VotedRating(
+    rating: Int,
+    fontSize: TextUnit,
+    modifier: Modifier = Modifier,
+    showZero: Boolean = false
+) {
+    if (rating != 0 || showZero) {
+        Text(
+            text = rating.toSignedString(),
+            color = if (rating > 0) cpsColors.votedRatingPositive else cpsColors.votedRatingNegative,
+            fontWeight = FontWeight.Bold,
+            fontSize = fontSize,
+            modifier = modifier
         )
     }
 }
