@@ -155,16 +155,21 @@ object CodeforcesUtils {
         }.getOrNull()
     }
 
+    private fun Element.expectContent(): Element = expectFirst("div.content-with-sidebar")
+    private fun Element.expectSidebar(): Element = expectFirst("div#sidebar")
+
     fun extractBlogEntries(source: String): List<CodeforcesBlogEntry> {
-        return Jsoup.parse(source).select("div.topic").mapNotNull(::extractBlogEntryOrNull)
+        return Jsoup.parse(source).expectContent().select("div.topic")
+            .mapNotNull(::extractBlogEntryOrNull)
     }
 
     fun extractComments(source: String): List<CodeforcesRecentAction> {
-        return Jsoup.parse(source).select(".comment-table").mapNotNull(::extractCommentOrNull)
+        return Jsoup.parse(source).expectContent().select(".comment-table")
+            .mapNotNull(::extractCommentOrNull)
     }
 
     fun extractRecentBlogEntries(source: String): List<CodeforcesBlogEntry> {
-        return Jsoup.parse(source).selectFirst("div.recent-actions")
+        return Jsoup.parse(source).expectSidebar().selectFirst("div.recent-actions")
             ?.select("li")
             ?.mapNotNull(::extractRecentBlogEntryOrNull)
             ?: emptyList()
