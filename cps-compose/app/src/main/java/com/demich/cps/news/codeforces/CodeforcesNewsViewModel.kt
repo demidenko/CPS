@@ -126,7 +126,7 @@ class CodeforcesNewsViewModel: ViewModel() {
 
     private suspend fun loadBlogEntries(page: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry>? {
         val s = CodeforcesApi.getPageSource(urlString = CodeforcesApi.urls.main + page, locale = locale) ?: return null
-        return CodeforcesUtils.extractBlogEntries(s)
+        return CodeforcesUtils.extractBlogEntries(s) //TODO null on bad page instead of empty
     }
 
     private suspend fun loadComments(page: String, locale: CodeforcesLocale): List<CodeforcesRecentAction>? {

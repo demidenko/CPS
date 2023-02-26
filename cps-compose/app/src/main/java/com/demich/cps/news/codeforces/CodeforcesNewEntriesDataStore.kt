@@ -58,10 +58,13 @@ fun rememberCodeforcesBlogEntriesController(
             if (!controller.isTabVisible(tab)) return@snapshotFlow IntRange.EMPTY
             listState.visibleRange(0.75f)
         }.combine(flowOfIds) { visibleRange, ids ->
-            newEntriesItem.markAtLeast(
-                ids = visibleRange.map { ids[it] },
-                type = NewEntryType.SEEN
-            )
+            //empty ids can create Empty message item!!
+            if (ids.isNotEmpty()) {
+                newEntriesItem.markAtLeast(
+                    ids = visibleRange.map { ids[it] },
+                    type = NewEntryType.SEEN
+                )
+            }
         }.launchIn(this)
     }
 
