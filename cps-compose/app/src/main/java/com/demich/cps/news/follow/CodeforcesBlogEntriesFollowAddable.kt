@@ -6,10 +6,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
+import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.news.codeforces.CodeforcesBlogEntries
 import com.demich.cps.news.codeforces.CodeforcesBlogEntriesController
 import com.demich.cps.news.codeforces.CodeforcesNewsController
-import com.demich.cps.news.codeforces.LocalCodeforcesAccountManager
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry

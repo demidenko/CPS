@@ -30,7 +30,6 @@ import com.demich.cps.develop.developAdditionalBottomBarBuilder
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.codeforces.CodeforcesBlogScreen
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
-import com.demich.cps.news.codeforces.LocalCodeforcesAccountManager
 import com.demich.cps.news.codeforces.rememberCodeforcesNewsController
 import com.demich.cps.news.follow.NewsFollowScreen
 import com.demich.cps.news.follow.newsFollowListBottomBarBuilder
@@ -258,4 +257,6 @@ class CPSViewModels(
     val progressBarsViewModel: ProgressBarsViewModel
 )
 
-
+val LocalCodeforcesAccountManager = staticCompositionLocalOf<CodeforcesAccountManager> {
+    throw IllegalAccessException()
+}

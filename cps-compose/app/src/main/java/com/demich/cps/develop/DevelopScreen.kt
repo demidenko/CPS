@@ -11,11 +11,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.demich.cps.AdditionalBottomBarBuilder
+import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatedUserInfo
 import com.demich.cps.accounts.managers.allAccountManagers
-import com.demich.cps.news.codeforces.LocalCodeforcesAccountManager
 import com.demich.cps.ui.*
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.utils.*
