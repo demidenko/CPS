@@ -100,19 +100,22 @@ fun makeCombinedMessage(
     val g = errors.groupBy(
         valueTransform = { it.first },
         keySelector = { (_, e) ->
-            when {
-                e is UnknownHostException || e is SocketException || e is SocketTimeoutException
-                    -> "Connection failed"
-                e is ClientRequestException && e.response.status == HttpStatusCode.Unauthorized
-                    -> "Unauthorized"
-                e is ClientRequestException && e.response.status == HttpStatusCode.TooManyRequests
-                    -> "Too many requests"
-                else -> {
-                    if (developEnabled) "$e" else "Some kind of error..."
-                }
-            }
+            e.niceMessage ?: if (developEnabled) "$e" else "Some error..."
         }
     )
 
     return g.entries.joinToString { (msg, list) -> "${list.distinct()}: $msg" }
 }
+
+private val Throwable.niceMessage: String? get() =
+    when {
+        this is UnknownHostException || this is SocketException || this is SocketTimeoutException
+            -> "Connection failed"
+        this is ClientRequestException && response.status == HttpStatusCode.Unauthorized
+            -> "Unauthorized"
+        this  is ClientRequestException && response.status == HttpStatusCode.TooManyRequests
+            -> "Too many requests"
+        this  is kotlinx.serialization.SerializationException
+            -> "Parse error"
+        else -> null
+    }

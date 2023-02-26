@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
@@ -55,7 +57,9 @@ fun ContestsScreen(
                 .imePadding()
         ) {
             CodeforcesMonitor(
-                modifier = Modifier.padding(horizontal = 3.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(horizontal = 3.dp)
+                    .fillMaxWidth()
             )
             ContestsContent(
                 contestsViewModel = contestsViewModel,
@@ -248,6 +252,8 @@ private fun ColumnScope.LoadingError(
             modifier = modifier
                 .background(color = cpsColors.error)
                 .padding(all = 2.dp)
+                .heightIn(max = 200.dp)
+                .verticalScroll(rememberScrollState())
         )
     }
 }
