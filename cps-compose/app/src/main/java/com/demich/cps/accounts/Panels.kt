@@ -22,24 +22,31 @@ import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import java.util.Collections
 
 @Composable
-fun<U: UserInfo> PanelWithUI(
+fun<U: UserInfo> AccountPanel(
     userInfoWithManager: UserInfoWithManager<U>,
     accountsViewModel: AccountsViewModel,
     modifier: Modifier = Modifier,
     visibleOrder: List<AccountManagers>? = null,
+    onReloadRequest: () -> Unit,
     onExpandRequest: () -> Unit
 ) {
     val (userInfo, manager) = userInfoWithManager
-    val loadingStatus by rememberCollect { accountsViewModel.flowOfLoadingStatus(manager) }
 
-    var lastClickMillis by remember { mutableStateOf(0L) }
+    var lastClick by remember { mutableStateOf(Instant.DISTANT_PAST) }
 
-    if (loadingStatus == LoadingStatus.LOADING) lastClickMillis = 0
+    val loadingStatus by rememberCollect {
+        accountsViewModel.flowOfLoadingStatus(manager)
+            .onEach {
+                if (it == LoadingStatus.LOADING) lastClick = Instant.DISTANT_PAST
+            }
+    }
 
     val clickEnabled = loadingStatus != LoadingStatus.LOADING && visibleOrder == null
 
@@ -51,7 +58,7 @@ fun<U: UserInfo> PanelWithUI(
                 detectTapGestures(
                     onPress = {
                         if (tryAwaitRelease()) {
-                            lastClickMillis = getCurrentTime().toEpochMilliseconds()
+                            lastClick = getCurrentTime()
                         }
                     },
                     onDoubleTap = {
@@ -61,13 +68,13 @@ fun<U: UserInfo> PanelWithUI(
             }
         }
     ) {
-        manager.Panel(userInfo)
+        manager.PanelContent(userInfo)
 
         if (visibleOrder == null) {
-            AccountPanelUI(
+            PanelUIButtons(
                 loadingStatus = loadingStatus,
-                lastClickMillis = lastClickMillis,
-                onReloadRequest = { accountsViewModel.reload(manager) },
+                lastClickMillis = lastClick.toEpochMilliseconds(),
+                onReloadRequest = onReloadRequest,
                 onExpandRequest = onExpandRequest,
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
@@ -83,7 +90,7 @@ fun<U: UserInfo> PanelWithUI(
 }
 
 @Composable
-private fun AccountPanelUI(
+private fun PanelUIButtons(
     loadingStatus: LoadingStatus,
     lastClickMillis: Long,
     modifier: Modifier = Modifier,

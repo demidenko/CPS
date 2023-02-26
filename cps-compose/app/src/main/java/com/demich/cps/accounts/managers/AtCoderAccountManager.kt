@@ -103,7 +103,7 @@ class AtCoderAccountManager(context: Context):
         }
 
     @Composable
-    override fun BigView(
+    override fun ExpandedContent(
         userInfo: AtCoderUserInfo,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier

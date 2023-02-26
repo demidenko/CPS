@@ -108,7 +108,7 @@ class DmojAccountManager(context: Context):
     }
 
     @Composable
-    override fun BigView(
+    override fun ExpandedContent(
         userInfo: DmojUserInfo,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier

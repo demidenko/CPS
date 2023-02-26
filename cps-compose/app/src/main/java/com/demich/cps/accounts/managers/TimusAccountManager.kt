@@ -93,7 +93,7 @@ class TimusAccountManager(context: Context):
     }
 
     @Composable
-    override fun Panel(userInfo: TimusUserInfo) {
+    override fun PanelContent(userInfo: TimusUserInfo) {
         if (userInfo.status == STATUS.OK) {
             SmallAccountPanelTypeArchive(
                 title = userInfo.userName,

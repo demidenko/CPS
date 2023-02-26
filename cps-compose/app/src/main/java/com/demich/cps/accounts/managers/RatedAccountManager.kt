@@ -60,7 +60,7 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
     }
 
     @Composable
-    override fun Panel(userInfo: U) = SmallRatedAccountPanel(userInfo)
+    override fun PanelContent(userInfo: U) = SmallRatedAccountPanel(userInfo)
 
     abstract val rankedHandleColorsList: Array<HandleColor>
 

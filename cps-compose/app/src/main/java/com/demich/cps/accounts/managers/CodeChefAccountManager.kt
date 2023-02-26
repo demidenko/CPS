@@ -170,7 +170,7 @@ class CodeChefAccountManager(context: Context):
     }
 
     @Composable
-    override fun Panel(userInfo: CodeChefUserInfo) {
+    override fun PanelContent(userInfo: CodeChefUserInfo) {
         SmallRatedAccountPanel(
             userInfo = userInfo,
             title = {
@@ -205,14 +205,14 @@ class CodeChefAccountManager(context: Context):
     }
 
     @Composable
-    override fun BigView(
+    override fun ExpandedContent(
         userInfo: CodeChefUserInfo,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier
     ) {
         val ratingGraphUIStates = rememberRatingGraphUIStates()
         Box(modifier = modifier) {
-            Panel(userInfo)
+            PanelContent(userInfo)
             RatingGraph(
                 ratingGraphUIStates = ratingGraphUIStates,
                 modifier = Modifier

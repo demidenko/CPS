@@ -64,15 +64,15 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     abstract fun makeOKInfoSpan(userInfo: U): AnnotatedString
 
     @Composable
-    open fun Panel(userInfo: U) {}
+    open fun PanelContent(userInfo: U) {}
 
     @Composable
-    open fun BigView(
+    open fun ExpandedContent(
         userInfo: U,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier = Modifier
      ) = Box(modifier) {
-        Panel(userInfo)
+        PanelContent(userInfo)
     }
 }
 

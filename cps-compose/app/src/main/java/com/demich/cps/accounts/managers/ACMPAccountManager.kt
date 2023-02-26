@@ -104,7 +104,7 @@ class ACMPAccountManager(context: Context):
         }
 
     @Composable
-    override fun Panel(userInfo: ACMPUserInfo) {
+    override fun PanelContent(userInfo: ACMPUserInfo) {
         if (userInfo.status == STATUS.OK) {
             SmallAccountPanelTypeArchive(
                 title = userInfo.userName,

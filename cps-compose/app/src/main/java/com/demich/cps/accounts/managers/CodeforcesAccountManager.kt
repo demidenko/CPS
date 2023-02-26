@@ -175,7 +175,7 @@ class CodeforcesAccountManager(context: Context):
 
 
     @Composable
-    override fun BigView(
+    override fun ExpandedContent(
         userInfo: CodeforcesUserInfo,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier

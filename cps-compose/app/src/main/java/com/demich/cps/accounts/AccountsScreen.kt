@@ -64,8 +64,9 @@ fun AccountsScreen(
             key = { it.type },
             onEmptyMessage = { Text(text = "Accounts are not defined") }
         ) { userInfoWithManager ->
-            PanelWithUI(
+            AccountPanel(
                 userInfoWithManager = userInfoWithManager,
+                onReloadRequest = { accountsViewModel.reload(userInfoWithManager.manager) },
                 onExpandRequest = { onExpandAccount(userInfoWithManager.type) },
                 accountsViewModel = accountsViewModel,
                 visibleOrder = visibleOrder,
@@ -102,7 +103,7 @@ fun AccountExpandedScreen(
 ) {
     val context = context
     val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
-    AccountExpandedPanel(
+    AccountExpandedContent(
         manager = manager,
         setBottomBarContent = setBottomBarContent
     )
@@ -117,12 +118,12 @@ fun AccountExpandedScreen(
 }
 
 @Composable
-private fun<U: UserInfo> AccountExpandedPanel(
+private fun<U: UserInfo> AccountExpandedContent(
     manager: AccountManager<U>,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
     val userInfo by rememberCollect { manager.flowOfInfo() }
-    manager.BigView(
+    manager.ExpandedContent(
         userInfo = userInfo,
         setBottomBarContent = setBottomBarContent,
         modifier = Modifier
