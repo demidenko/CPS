@@ -50,7 +50,7 @@ private fun WorkersList(
         CPSWorkersDataStore(context).lastExecutionTime.flow
     }
 
-    ProvideTimeEachSecond {
+    ProvideTimeEachMinute {
         LazyColumn(modifier = modifier) {
             items(items = works, key = { it.name }) { work ->
                 WorkerItem(
