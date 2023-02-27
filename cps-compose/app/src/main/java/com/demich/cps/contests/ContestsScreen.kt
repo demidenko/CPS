@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.asFlow
 import androidx.work.WorkInfo
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
@@ -318,7 +319,7 @@ fun rememberCombinedLoadingStatusState(contestsViewModel: ContestsViewModel): St
     ) {
         contestsViewModel.flowOfLoadingStatus()
             .combine(
-                ContestsWorker.getWork(context).flowOfInfo()
+                ContestsWorker.getWork(context).workInfoLiveData().asFlow()
             ) { loadingStatus, workInfo ->
                 if (workInfo?.state == WorkInfo.State.RUNNING) LoadingStatus.LOADING
                 else loadingStatus

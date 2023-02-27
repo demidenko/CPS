@@ -1,15 +1,9 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
-import androidx.lifecycle.asFlow
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.work.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.toJavaDuration
@@ -51,17 +45,10 @@ abstract class CPSWork(
         if (isEnabled()) enqueue()
     }
 
-    fun flowOfInfo(): Flow<WorkInfo?> =
+    fun workInfoLiveData(): LiveData<WorkInfo?> =
         context.workManager.getWorkInfosForUniqueWorkLiveData(name)
-            .asFlow()
             .map { it?.getOrNull(0) }
 }
-
-@Composable
-fun CPSWork.workInfoState(): State<WorkInfo?> = remember(this) {
-        context.workManager.getWorkInfosForUniqueWorkLiveData(name)
-            .map { it?.getOrNull(0) }
-    }.observeAsState()
 
 internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
     repeatInterval: Duration,

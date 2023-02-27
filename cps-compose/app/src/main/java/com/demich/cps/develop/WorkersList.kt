@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -74,7 +75,7 @@ private fun WorkerItem(
     modifier: Modifier = Modifier
 ) {
 
-    val workState by work.workInfoState()
+    val workState by work.workInfoLiveData().observeAsState()
 
     WorkerItem(
         name = work.name,
