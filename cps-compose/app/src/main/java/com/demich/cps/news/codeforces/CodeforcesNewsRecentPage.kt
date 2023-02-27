@@ -36,6 +36,7 @@ fun CodeforcesNewsRecentPage(
                 RecentCommentsInBlogEntry(
                     controller = controller,
                     commentsState = commentsState,
+                    //TODO: NoSuchElement crash
                     blogEntry = recentActionsState.value.first.first { it.id == blogEntryId },
                     onBackPressed = saveableStateHolder::removeState
                 )
