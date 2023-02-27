@@ -1,7 +1,6 @@
 package com.demich.cps.accounts.rating_graph
 
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.geometry.Offset
@@ -98,7 +97,7 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
     }
 
     companion object {
-        val saver: Saver<CoordinateTranslator, Any> = listSaver(
+        val saver = listSaver<CoordinateTranslator, Float>(
             save = {
                 listOf(it.o.x, it.o.y, it.size.width, it.size.height)
             },
