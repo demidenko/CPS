@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSIcons
@@ -21,11 +22,9 @@ import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
-import com.demich.cps.utils.codeforces.CodeforcesContestPhase
-import com.demich.cps.utils.codeforces.CodeforcesContestType
-import com.demich.cps.utils.codeforces.CodeforcesParticipationType
-import com.demich.cps.utils.codeforces.CodeforcesProblemStatus
+import com.demich.cps.utils.codeforces.*
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -89,6 +88,18 @@ private fun CodeforcesMonitor(
         monitor.problemResults.flow
     }
 
+    val problemsFailedSysTest by rememberCollect {
+        monitor.submissionsInfo.flow.map { info ->
+            info.mapNotNull { (index, list) ->
+                if (list.any { it.testset == CodeforcesTestset.TESTS && it.verdict.isResult() && it.verdict != CodeforcesProblemVerdict.OK }) {
+                    index
+                } else {
+                    null
+                }
+            }.toSet()
+        }
+    }
+
     val lastRequest by rememberCollect {
         monitor.lastRequest.flow
     }
@@ -109,10 +120,13 @@ private fun CodeforcesMonitor(
         Title(
             contestPhase = phase,
             requestFailed = lastRequest == false,
-            modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(horizontal = 4.dp)
+                .fillMaxWidth()
         )
         StandingsRow(
             problems = problems,
+            problemsFailedSysTest = problemsFailedSysTest,
             phase = phase.phase,
             rank = rank,
             participationType = participationType,
@@ -190,6 +204,7 @@ private fun PhaseTitle(
 @Composable
 private fun StandingsRow(
     problems: List<CodeforcesMonitorProblemResult>,
+    problemsFailedSysTest: Set<String>,
     phase: CodeforcesContestPhase,
     rank: Int,
     participationType: CodeforcesParticipationType,
@@ -217,6 +232,7 @@ private fun StandingsRow(
                 problems.forEach {
                     ProblemColumn(
                         problemResult = it,
+                        isFailedSysTest = it.problemIndex in problemsFailedSysTest,
                         phase = phase,
                         contestType = contestType,
                         modifier = Modifier.weight(1f)
@@ -230,6 +246,7 @@ private fun StandingsRow(
 @Composable
 private fun ProblemColumn(
     problemResult: CodeforcesMonitorProblemResult,
+    isFailedSysTest: Boolean,
     phase: CodeforcesContestPhase,
     contestType: CodeforcesContestType,
     modifier: Modifier = Modifier
@@ -239,12 +256,19 @@ private fun ProblemColumn(
             text = problemResult.problemIndex,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-        ProblemResultCell(
-            problemResult = problemResult,
-            phase = phase,
-            contestType = contestType,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+        if (isFailedSysTest) {
+            ProblemFailedCell(
+                iconSize = 18.sp,
+                Modifier.align(Alignment.CenterHorizontally)
+            )
+        } else {
+            ProblemResultCell(
+                problemResult = problemResult,
+                phase = phase,
+                contestType = contestType,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }
     }
 }
 
@@ -286,7 +310,7 @@ private fun ProblemPointsCell(
 ) {
     ProblemResultCell(
         text = if (points != 0.0) points.toString().removeSuffix(".0") else "",
-        color = if (phase == CodeforcesContestPhase.SYSTEM_TEST || phase == CodeforcesContestPhase.FINISHED) cpsColors.success else cpsColors.content,
+        color = if (phase.isSystemTestOrFinished()) cpsColors.success else cpsColors.content,
         modifier = modifier
     )
 }
@@ -301,6 +325,19 @@ private fun ProblemResultCell(
         text = text,
         color = color,
         fontWeight = FontWeight.Bold,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun ProblemFailedCell(
+    iconSize: TextUnit,
+    modifier: Modifier = Modifier
+) {
+    IconSp(
+        imageVector = CPSIcons.FailedSystemTest,
+        color = cpsColors.error,
+        size = iconSize,
         modifier = modifier
     )
 }

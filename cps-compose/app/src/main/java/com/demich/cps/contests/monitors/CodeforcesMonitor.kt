@@ -218,7 +218,7 @@ private fun needCheckSubmissions(
     participationType: CodeforcesParticipationType
 ): Boolean {
     if (!participationType.contestParticipant()) return false
-    return phase == CodeforcesContestPhase.SYSTEM_TEST || phase == CodeforcesContestPhase.FINISHED
+    return phase.isSystemTestOrFinished()
 }
 
 private fun needCheckSubmissions(

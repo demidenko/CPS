@@ -419,6 +419,9 @@ enum class CodeforcesContestPhase {
     fun isFutureOrRunning(): Boolean {
         return this != UNDEFINED && this != FINISHED
     }
+
+    fun isSystemTestOrFinished() =
+        this == SYSTEM_TEST || this == FINISHED
 }
 
 enum class CodeforcesContestType {
