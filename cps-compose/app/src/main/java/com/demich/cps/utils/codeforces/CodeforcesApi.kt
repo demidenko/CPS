@@ -430,7 +430,7 @@ enum class CodeforcesParticipationType {
     NOT_PARTICIPATED,
     CONTESTANT, PRACTICE, VIRTUAL, MANAGER, OUT_OF_COMPETITION;
 
-    fun participatedInContest(): Boolean = (this == CONTESTANT || this == OUT_OF_COMPETITION)
+    fun contestParticipant(): Boolean = (this == CONTESTANT || this == OUT_OF_COMPETITION)
 }
 
 enum class CodeforcesProblemStatus {
@@ -439,10 +439,11 @@ enum class CodeforcesProblemStatus {
 
 enum class CodeforcesProblemVerdict {
     WAITING,
-    FAILED, OK, PARTIAL, COMPILATION_ERROR, RUNTIME_ERROR, WRONG_ANSWER, PRESENTATION_ERROR, TIME_LIMIT_EXCEEDED, MEMORY_LIMIT_EXCEEDED, IDLENESS_LIMIT_EXCEEDED, SECURITY_VIOLATED, CRASHED, INPUT_PREPARATION_CRASHED, CHALLENGED, SKIPPED, TESTING, REJECTED
+    FAILED, OK, PARTIAL, COMPILATION_ERROR, RUNTIME_ERROR, WRONG_ANSWER, PRESENTATION_ERROR, TIME_LIMIT_EXCEEDED, MEMORY_LIMIT_EXCEEDED, IDLENESS_LIMIT_EXCEEDED, SECURITY_VIOLATED, CRASHED, INPUT_PREPARATION_CRASHED, CHALLENGED,
+    SKIPPED, TESTING, REJECTED
     ;
 
-    fun isTested(): Boolean = (this != WAITING && this != TESTING && this != SKIPPED)
+    fun isResult(): Boolean = (this != WAITING && this != TESTING && this != SKIPPED)
 }
 
 enum class CodeforcesTestset {

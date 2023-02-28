@@ -1,10 +1,7 @@
 package com.demich.cps.contests.monitors
 
 import android.content.Context
-import com.demich.cps.utils.codeforces.CodeforcesContest
-import com.demich.cps.utils.codeforces.CodeforcesContestPhase
-import com.demich.cps.utils.codeforces.CodeforcesContestType
-import com.demich.cps.utils.codeforces.CodeforcesParticipationType
+import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
@@ -36,7 +33,16 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     val participationType = itemEnum(name = "participation_type", defaultValue = CodeforcesParticipationType.NOT_PARTICIPATED)
     val contestantRank = itemInt(name = "contestant_rank", defaultValue = -1)
-    val problemResults = jsonCPS.item(name = "problem_results", defaultValue = emptyList<CodeforcesMonitorProblemResult>())
+
+    val problemResults = jsonCPS.item<List<CodeforcesMonitorProblemResult>>(
+        name = "problem_results",
+        defaultValue = emptyList()
+    )
+
+    val submissionsInfo = jsonCPS.item<Map<String, List<CodeforcesMonitorSubmissionInfo>>> (
+        name = "problems_submissions_info",
+        defaultValue = emptyMap()
+    )
 
     val sysTestPercentage = itemIntNullable("sys_test_percentage")
 
@@ -49,6 +55,34 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
             participationType,
             contestantRank,
             problemResults,
+            submissionsInfo,
             sysTestPercentage
         ))
+}
+
+@kotlinx.serialization.Serializable
+data class CodeforcesMonitorProblemResult(
+    val problemIndex: String,
+    val points: Double,
+    val type: CodeforcesProblemStatus
+)
+
+@kotlinx.serialization.Serializable
+data class CodeforcesMonitorSubmissionInfo(
+    val testset: CodeforcesTestset,
+    val verdict: CodeforcesProblemVerdict
+) {
+    constructor(submission: CodeforcesSubmission): this(
+        testset = submission.testset,
+        verdict = submission.verdict
+    )
+
+    fun isPreliminary(): Boolean {
+        if (verdict == CodeforcesProblemVerdict.WAITING) return true
+        if (verdict == CodeforcesProblemVerdict.TESTING) return true
+        if (testset == CodeforcesTestset.PRETESTS) {
+            return verdict == CodeforcesProblemVerdict.OK
+        }
+        return false
+    }
 }

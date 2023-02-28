@@ -69,7 +69,7 @@ class CodeforcesMonitorLauncherWorker(
             }
 
             newSubmissions.firstOrNull { submission ->
-                submission.author.participantType.participatedInContest()
+                submission.author.participantType.contestParticipant()
             }?.let { submission ->
                 if (monitorCanceledContests().none { it.first == submission.contestId }) {
                     startMonitor(

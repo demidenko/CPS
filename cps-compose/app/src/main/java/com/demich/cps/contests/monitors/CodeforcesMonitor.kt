@@ -11,7 +11,8 @@ import kotlin.time.Duration.Companion.seconds
 
 suspend fun CodeforcesMonitorDataStore.launchIn(
     scope: CoroutineScope,
-    onRatingChange: (CodeforcesRatingChange) -> Unit
+    onRatingChange: (CodeforcesRatingChange) -> Unit,
+    onSubmissionFinalResult: (CodeforcesSubmission) -> Unit
 ) {
     val contestId = contestId() ?: return
 
@@ -27,7 +28,28 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
         }
 
         val currentPhase = contestInfo().phase
-        //TODO submissions final result check
+
+        if (needCheckSubmissions(currentPhase, participationType())) {
+            val info = submissionsInfo()
+            if (problemResults().any { needCheckSubmissions(it, info) }) {
+                CodeforcesApi.runCatching {
+                    getContestSubmissions(contestId = contestId, handle = handle())
+                }.map { submissions ->
+                    submissions.filter {
+                           it.author.participantType.contestParticipant()
+                        && it.verdict != CodeforcesProblemVerdict.SKIPPED
+                    }
+                }.onSuccess { submissions ->
+                    submissions.forEach {
+                        if (it.testset == CodeforcesTestset.TESTS && it.verdict.isResult()) {
+                            onSubmissionFinalResult(it)
+                        }
+                    }
+                    val newInfo = problemResults().makeMapWith(submissions)
+                    submissionsInfo.update { newInfo }
+                }
+            }
+        }
 
         getDelay(
             contestPhase = currentPhase,
@@ -86,7 +108,7 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
 ) {
     contestInfo(standings.contest)
 
-    val row = standings.rows.find { row -> row.party.participantType.participatedInContest() }
+    val row = standings.rows.find { row -> row.party.participantType.contestParticipant() }
     val results = row?.problemResults ?: emptyList()
     problemResults(standings.problems.mapIndexed { index, problem ->
         val result = results.getOrNull(index)
@@ -191,9 +213,30 @@ private fun CoroutineScope.launchWhileActive(block: suspend CoroutineScope.() ->
     }
 
 
-@kotlinx.serialization.Serializable
-data class CodeforcesMonitorProblemResult(
-    val problemIndex: String,
-    val points: Double,
-    val type: CodeforcesProblemStatus
-)
+private fun needCheckSubmissions(
+    phase: CodeforcesContestPhase,
+    participationType: CodeforcesParticipationType
+): Boolean {
+    if (!participationType.contestParticipant()) return false
+    return phase == CodeforcesContestPhase.SYSTEM_TEST || phase == CodeforcesContestPhase.FINISHED
+}
+
+private fun needCheckSubmissions(
+    problemResult: CodeforcesMonitorProblemResult,
+    submissionsInfo: Map<String, List<CodeforcesMonitorSubmissionInfo>>
+): Boolean {
+    if (problemResult.type != CodeforcesProblemStatus.FINAL) return false
+    val list = submissionsInfo[problemResult.problemIndex] ?: return true
+    return list.any { it.isPreliminary() }
+}
+
+private fun List<CodeforcesMonitorProblemResult>.makeMapWith(submissions: List<CodeforcesSubmission>) =
+    submissions.groupBy(
+        keySelector = { it.problem.index },
+        valueTransform = { CodeforcesMonitorSubmissionInfo(it) }
+    ).let { grouped ->
+        associateBy(
+            keySelector = { it.problemIndex },
+            valueTransform = { grouped[it.problemIndex] ?: emptyList() }
+        ).mapValues { it.value.distinct() }
+    }
