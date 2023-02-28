@@ -25,6 +25,7 @@ import com.demich.cps.utils.combine
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.rememberCollect
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -137,6 +138,8 @@ fun AccountSettingsScreen(
     type: AccountManagers
 ) {
     val context = context
+    val scope = rememberCoroutineScope()
+
     val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
     val userInfo by rememberCollect { manager.flowOfInfo() }
 
@@ -166,7 +169,10 @@ fun AccountSettingsScreen(
     }
 
     if (showChangeDialog) {
-        manager.ChangeSavedInfoDialog { showChangeDialog = false }
+        manager.ChangeSavedInfoDialog(
+            scope = scope,
+            onDismissRequest = { showChangeDialog = false }
+        )
     }
 }
 
@@ -233,6 +239,7 @@ private fun AddAccountButton(cpsViewModels: CPSViewModels) {
     var chosenManager: AccountManagers? by remember { mutableStateOf(null) }
 
     val context = context
+    val scope = rememberCoroutineScope()
 
     Box {
         CPSIconButton(
@@ -272,7 +279,10 @@ private fun AddAccountButton(cpsViewModels: CPSViewModels) {
             } else {
                 context.allAccountManagers
                     .first { it.type == type }
-                    .ChangeSavedInfoDialog { chosenManager = null }
+                    .ChangeSavedInfoDialog(
+                        scope = scope,
+                        onDismissRequest = { chosenManager = null }
+                    )
             }
         }
     }
@@ -280,14 +290,13 @@ private fun AddAccountButton(cpsViewModels: CPSViewModels) {
 
 @Composable
 private fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
+    scope: CoroutineScope,
     onDismissRequest: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
     DialogAccountChooser(
         manager = this,
         initialUserInfo = runBlocking { getSavedInfo() },
         onDismissRequest = onDismissRequest,
-        //TODO: saving in dying scope!
         onResult = { userInfo -> scope.launch { setSavedInfo(userInfo) } }
     )
 }
