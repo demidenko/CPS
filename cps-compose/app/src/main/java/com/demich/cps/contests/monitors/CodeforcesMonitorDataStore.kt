@@ -46,6 +46,8 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     val sysTestPercentage = itemIntNullable("sys_test_percentage")
 
+    internal val notifiedSubmissionsIds = jsonCPS.item<Set<Long>>(name = "submissions_notified", defaultValue = emptySet())
+
     suspend fun reset() =
         resetItems(items = listOf(
             contestId,
@@ -56,7 +58,8 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
             contestantRank,
             problemResults,
             submissionsInfo,
-            sysTestPercentage
+            sysTestPercentage,
+            notifiedSubmissionsIds
         ))
 }
 

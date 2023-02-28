@@ -261,6 +261,11 @@ private fun ProblemColumn(
                 iconSize = 18.sp,
                 Modifier.align(Alignment.CenterHorizontally)
             )
+            /*ProblemResultCell(
+                text = "✖",
+                color = cpsColors.error,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )*/
         } else {
             ProblemResultCell(
                 problemResult = problemResult,
@@ -286,7 +291,7 @@ private fun ProblemResultCell(
             modifier = modifier
         )
     } else {
-        if ((phase == CodeforcesContestPhase.SYSTEM_TEST || phase == CodeforcesContestPhase.FINISHED) && problemResult.type == CodeforcesProblemStatus.PRELIMINARY) {
+        if (phase.isSystemTestOrFinished() && problemResult.type == CodeforcesProblemStatus.PRELIMINARY) {
             ProblemResultCell(
                 text = "?",
                 color = cpsColors.contentAdditional,

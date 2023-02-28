@@ -2,6 +2,7 @@ package com.demich.cps.contests.monitors
 
 import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.getCurrentTime
+import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlin.time.Duration
@@ -27,32 +28,34 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
             return@launchWhileActive Duration.ZERO
         }
 
-        val currentPhase = contestInfo().phase
+        val contestInfo = contestInfo()
 
-        if (needCheckSubmissions(currentPhase, participationType())) {
+        if (needCheckSubmissions(contestInfo.phase, participationType())) {
+            val problemResults = problemResults()
             val info = submissionsInfo()
-            if (problemResults().any { needCheckSubmissions(it, info) }) {
-                CodeforcesApi.runCatching {
-                    getContestSubmissions(contestId = contestId, handle = handle())
-                }.map { submissions ->
-                    submissions.filter {
-                           it.author.participantType.contestParticipant()
-                        && it.verdict != CodeforcesProblemVerdict.SKIPPED
-                    }
-                }.onSuccess { submissions ->
-                    submissions.forEach {
-                        if (it.testset == CodeforcesTestset.TESTS && it.verdict.isResult()) {
+            if (problemResults.any { needCheckSubmissions(it, info) }) {
+                getSubmissions(
+                    contestId = contestId,
+                    handle = handle()
+                )?.let { submissions ->
+                    if (contestInfo.type != CodeforcesContestType.ICPC) {
+                        val notified = notifiedSubmissionsIds()
+                        submissions.filter {
+                            it.testset == CodeforcesTestset.TESTS
+                            && it.verdict.isResult()
+                            && it.id !in notified
+                        }.forEach {
                             onSubmissionFinalResult(it)
+                            notifiedSubmissionsIds.edit { add(it.id) }
                         }
                     }
-                    val newInfo = problemResults().makeMapWith(submissions)
-                    submissionsInfo.update { newInfo }
+                    submissionsInfo.update { problemResults.makeMapWith(submissions) }
                 }
             }
         }
 
         getDelay(
-            contestPhase = currentPhase,
+            contestPhase = contestInfo.phase,
             participationType = participationType(),
             ratingChangeWaiter = ratingChangeWaiter
         )
@@ -229,6 +232,16 @@ private fun needCheckSubmissions(
     val list = submissionsInfo[problemResult.problemIndex] ?: return true
     return list.any { it.isPreliminary() }
 }
+
+private suspend fun getSubmissions(contestId: Int, handle: String) =
+    CodeforcesApi.runCatching {
+        getContestSubmissions(contestId = contestId, handle = handle)
+    }.map { submissions ->
+        submissions.filter {
+               it.author.participantType.contestParticipant()
+            && it.verdict != CodeforcesProblemVerdict.SKIPPED
+        }
+    }.getOrNull()
 
 private fun List<CodeforcesMonitorProblemResult>.makeMapWith(submissions: List<CodeforcesSubmission>) =
     submissions.groupBy(
