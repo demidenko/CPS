@@ -1,95 +1,11 @@
 package com.demich.datastore_itemized
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
-import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
-
-class DataStoreWrapper(
-    internal val dataStore: DataStore<Preferences>
-)
-
-fun dataStoreWrapper(
-    name: String
-) = object : ReadOnlyProperty<Context, DataStoreWrapper> {
-    val delegate = preferencesDataStore(name)
-    override fun getValue(thisRef: Context, property: KProperty<*>): DataStoreWrapper {
-        return DataStoreWrapper(delegate.getValue(thisRef, property))
-    }
-}
-
-interface DataStoreItem<T> {
-    val flow: Flow<T>
-
-    //getter
-    suspend operator fun invoke(): T
-
-    //setter
-    suspend operator fun invoke(newValue: T)
-
-    suspend fun update(transform: (T) -> T)
-}
-
-
-private abstract class DataStoreBaseItem<T, S: Any>(
-    private val dataStore: DataStore<Preferences>,
-    val key: Preferences.Key<S>
-): DataStoreItem<T> {
-    protected abstract fun fromPrefs(s: S?): T
-    protected abstract fun toPrefs(t: T & Any): S
-
-    override val flow: Flow<T>
-        get() = dataStore.data.map { it[key] }.distinctUntilChanged().map(::fromPrefs)
-
-    override suspend operator fun invoke(): T = fromPrefs(dataStore.data.first()[key])
-
-    override suspend operator fun invoke(newValue: T) {
-        dataStore.edit { prefs -> prefs.setValue(newValue) }
-    }
-
-    override suspend fun update(transform: (T) -> T) {
-        dataStore.edit { prefs -> prefs.setValue(transform(fromPrefs(prefs[key]))) }
-    }
-
-    private fun MutablePreferences.setValue(newValue: T) {
-        if (newValue == null) remove(key)
-        else set(key, toPrefs(newValue))
-    }
-}
-
-private class Item<T: Any> (
-    dataStore: DataStore<Preferences>,
-    key: Preferences.Key<T>,
-    private val defaultValue: T
-): DataStoreBaseItem<T, T>(dataStore, key) {
-    override fun fromPrefs(s: T?): T = s ?: defaultValue
-    override fun toPrefs(t: T): T = t
-}
-
-private class ItemNullable<T: Any> (
-    dataStore: DataStore<Preferences>,
-    key: Preferences.Key<T>
-): DataStoreBaseItem<T?, T>(dataStore, key) {
-    override fun fromPrefs(s: T?): T? = s
-    override fun toPrefs(t: T): T = t
-}
-
-private class ItemConvertible<S: Any, T> (
-    dataStore: DataStore<Preferences>,
-    key: Preferences.Key<S>,
-    private val defaultValue: T,
-    private val encode: (T) -> S,
-    private val decode: (S) -> T
-): DataStoreBaseItem<T, S>(dataStore, key) {
-    override fun fromPrefs(s: S?): T = s?.runCatching(decode)?.getOrNull() ?: defaultValue
-    override fun toPrefs(t: T & Any): S = encode(t)
-}
 
 
 abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
@@ -160,31 +76,4 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
             encode = ::encodeToString,
             decode = ::decodeFromString
         )
-}
-
-
-@JvmName("editList")
-suspend fun<T> DataStoreItem<List<T>>.edit(block: MutableList<T>.() -> Unit) {
-    update { it.toMutableList().apply(block) }
-}
-
-@JvmName("editSet")
-suspend fun<T> DataStoreItem<Set<T>>.edit(block: MutableSet<T>.() -> Unit) {
-    update { it.toMutableSet().apply(block) }
-}
-
-@JvmName("editMap")
-suspend fun<K, V> DataStoreItem<Map<K,V>>.edit(block: MutableMap<K,V>.() -> Unit) {
-    update { it.toMutableMap().apply(block) }
-}
-
-
-@JvmName("addList")
-suspend fun<T> DataStoreItem<List<T>>.add(value: T) {
-    update { it + value }
-}
-
-@JvmName("addSet")
-suspend fun<T> DataStoreItem<Set<T>>.add(value: T) {
-    update { it + value }
 }

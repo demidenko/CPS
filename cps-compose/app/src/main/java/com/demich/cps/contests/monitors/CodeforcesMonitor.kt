@@ -2,7 +2,7 @@ package com.demich.cps.contests.monitors
 
 import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.getCurrentTime
-import com.demich.datastore_itemized.edit
+import com.demich.datastore_itemized.add
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlin.time.Duration
@@ -45,7 +45,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
                         && it.id !in notified
                     }.forEach {
                         onSubmissionFinalResult(it)
-                        notifiedSubmissionsIds.edit { add(it.id) }
+                        notifiedSubmissionsIds.add(it.id)
                     }
                     submissionsInfo.update { problemResults.makeMapWith(submissions) }
                 }
