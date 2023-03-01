@@ -23,9 +23,8 @@ import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.*
-import kotlinx.coroutines.flow.combine
+import com.demich.datastore_itemized.flowBy
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -57,11 +56,7 @@ fun CodeforcesMonitorWidget(
     }
 }
 
-private sealed class ContestPhase(val phase: CodeforcesContestPhase) {
-    data class Coding(val endTime: Instant): ContestPhase(CodeforcesContestPhase.CODING)
-    data class SystemTesting(val percentage: Int?): ContestPhase(CodeforcesContestPhase.SYSTEM_TEST)
-    class Other(phase: CodeforcesContestPhase): ContestPhase(phase)
-}
+
 
 @Composable
 private fun CodeforcesMonitor(
@@ -71,16 +66,24 @@ private fun CodeforcesMonitor(
 
     val monitor = CodeforcesMonitorDataStore(context)
 
-    val phase by rememberCollect {
-        combine(
-            flow = monitor.contestInfo.flow,
-            flow2 = monitor.sysTestPercentage.flow
-        ) { contestInfo, sysTestPercentage ->
-            when (contestInfo.phase) {
-                CodeforcesContestPhase.CODING -> ContestPhase.Coding(contestInfo.startTime + contestInfo.duration)
-                CodeforcesContestPhase.SYSTEM_TEST -> ContestPhase.SystemTesting(sysTestPercentage)
-                else -> ContestPhase.Other(contestInfo.phase)
+    val contestData by rememberCollect {
+        monitor.flowBy { prefs ->
+            val contest = prefs[contestInfo]
+            val phase = when (contest.phase) {
+                CodeforcesContestPhase.CODING -> CodeforcesMonitorData.ContestPhase.Coding(contest.startTime + contest.duration)
+                CodeforcesContestPhase.SYSTEM_TEST -> CodeforcesMonitorData.ContestPhase.SystemTesting(prefs[sysTestPercentage])
+                else -> CodeforcesMonitorData.ContestPhase.Other(contest.phase)
             }
+            val contestantRank = CodeforcesMonitorData.ContestRank(
+                rank = prefs[contestantRank],
+                participationType = prefs[participationType]
+            )
+            CodeforcesMonitorData(
+                contestInfo = contest,
+                contestPhase = phase,
+                contestantRank = contestantRank,
+                lastRequest = prefs[lastRequest]
+            )
         }
     }
 
@@ -100,26 +103,9 @@ private fun CodeforcesMonitor(
         }
     }
 
-    val lastRequest by rememberCollect {
-        monitor.lastRequest.flow
-    }
-
-    val rank by rememberCollect {
-        monitor.contestantRank.flow
-    }
-
-    val participationType by rememberCollect {
-        monitor.participationType.flow
-    }
-
-    val contestInfo by rememberCollect {
-        monitor.contestInfo.flow
-    }
-
     Column(modifier) {
         Title(
-            contestPhase = phase,
-            requestFailed = lastRequest == false,
+            contestData = contestData,
             modifier = Modifier
                 .padding(horizontal = 4.dp)
                 .fillMaxWidth()
@@ -127,10 +113,7 @@ private fun CodeforcesMonitor(
         StandingsRow(
             problems = problems,
             problemsFailedSysTest = problemsFailedSysTest,
-            phase = phase.phase,
-            rank = rank,
-            participationType = participationType,
-            contestType = contestInfo.type,
+            contestData = contestData,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -138,12 +121,11 @@ private fun CodeforcesMonitor(
 
 @Composable
 private fun Title(
-    contestPhase: ContestPhase,
-    requestFailed: Boolean,
+    contestData: CodeforcesMonitorData,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
-        if (requestFailed) {
+        if (contestData.lastRequest == false) {
             IconSp(
                 imageVector = CPSIcons.Error,
                 size = 16.sp,
@@ -152,7 +134,7 @@ private fun Title(
             )
         }
         PhaseTitle(
-            contestPhase = contestPhase,
+            contestPhase = contestData.contestPhase,
             modifier = Modifier.align(Alignment.Center)
         )
     }
@@ -160,11 +142,11 @@ private fun Title(
 
 @Composable
 private fun PhaseTitle(
-    contestPhase: ContestPhase,
+    contestPhase: CodeforcesMonitorData.ContestPhase,
     modifier: Modifier = Modifier
 ) {
     when (contestPhase) {
-        is ContestPhase.Coding -> {
+        is CodeforcesMonitorData.ContestPhase.Coding -> {
             val currentTime by collectCurrentTimeAsState(period = 1.seconds)
             PhaseTitle(
                 phase = contestPhase.phase,
@@ -174,7 +156,7 @@ private fun PhaseTitle(
                 }
             )
         }
-        is ContestPhase.SystemTesting -> {
+        is CodeforcesMonitorData.ContestPhase.SystemTesting -> {
             PhaseTitle(
                 phase = contestPhase.phase,
                 modifier = modifier,
@@ -205,10 +187,7 @@ private fun PhaseTitle(
 private fun StandingsRow(
     problems: List<CodeforcesMonitorProblemResult>,
     problemsFailedSysTest: Set<String>,
-    phase: CodeforcesContestPhase,
-    rank: Int,
-    participationType: CodeforcesParticipationType,
-    contestType: CodeforcesContestType,
+    contestData: CodeforcesMonitorData,
     modifier: Modifier = Modifier
 ) {
     val textStyle = rememberWith(problems.size) {
@@ -225,16 +204,16 @@ private fun StandingsRow(
         CompositionLocalProvider(LocalTextStyle provides textStyle) {
             Row(modifier = modifier) {
                 RankColumn(
-                    rank = rank,
-                    participationType = participationType,
+                    rank = contestData.contestantRank.rank,
+                    participationType = contestData.contestantRank.participationType,
                     modifier = Modifier.padding(horizontal = 4.dp)
                 )
                 problems.forEach {
                     ProblemColumn(
                         problemResult = it,
                         isFailedSysTest = it.problemIndex in problemsFailedSysTest,
-                        phase = phase,
-                        contestType = contestType,
+                        phase = contestData.contestPhase.phase,
+                        contestType = contestData.contestInfo.type,
                         modifier = Modifier.weight(1f)
                     )
                 }
