@@ -136,11 +136,11 @@ private suspend fun getDelay(
     ratingChangeWaiter: RatingChangeWaiter
 ): Duration {
     return when (contestPhase) {
-        CodeforcesContestPhase.CODING -> 3.seconds
+        CodeforcesContestPhase.CODING -> 10.seconds
         CodeforcesContestPhase.PENDING_SYSTEM_TEST -> 15.seconds
         CodeforcesContestPhase.SYSTEM_TEST -> 3.seconds
         CodeforcesContestPhase.FINISHED -> ratingChangeWaiter.getDelayOnFinished(participationType)
-        else -> 30.seconds
+        else -> 5.seconds
     }
 }
 
