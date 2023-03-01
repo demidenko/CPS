@@ -38,8 +38,8 @@ import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.workers.ContestsWorker
 import com.demich.datastore_itemized.add
+import com.demich.datastore_itemized.flowBy
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -300,11 +300,11 @@ fun contestsBottomBarBuilder(
 private fun rememberIsAnyPlatformEnabled(): State<Boolean> {
     val context = context
     return rememberCollect {
-        val settings = context.settingsContests
-        combine(
-            flow = settings.enabledPlatforms.flow.map { it.any { it != Contest.Platform.unknown } },
-            flow2 = settings.clistAdditionalResources.flow.map { it.isNotEmpty() }
-        ) { any1, any2 -> any1 || any2 }
+        context.settingsContests.flowBy { prefs ->
+            val any1 = prefs[enabledPlatforms].any { it != Contest.Platform.unknown }
+            val any2 = prefs[clistAdditionalResources].isNotEmpty()
+            any1 || any2
+        }
     }
 }
 
