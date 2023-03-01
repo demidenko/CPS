@@ -233,27 +233,22 @@ private fun ProblemColumn(
     contestType: CodeforcesContestType,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
-        Text(
-            text = problemResult.problemIndex,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = problemResult.problemIndex)
         if (isFailedSysTest) {
-            ProblemFailedCell(
-                iconSize = 18.sp,
-                Modifier.align(Alignment.CenterHorizontally)
-            )
+            ProblemFailedCell(iconSize = 18.sp)
             /*ProblemResultCell(
                 text = "✖",
-                color = cpsColors.error,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                color = cpsColors.error
             )*/
         } else {
             ProblemResultCell(
                 problemResult = problemResult,
                 phase = phase,
-                contestType = contestType,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                contestType = contestType
             )
         }
     }
@@ -264,7 +259,7 @@ private fun ProblemResultCell(
     problemResult: CodeforcesMonitorProblemResult,
     phase: CodeforcesContestPhase,
     contestType: CodeforcesContestType,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     if (contestType == CodeforcesContestType.ICPC) {
         ProblemResultCell(
