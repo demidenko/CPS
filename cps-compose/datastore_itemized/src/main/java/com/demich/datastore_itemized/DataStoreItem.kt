@@ -31,14 +31,16 @@ internal abstract class DataStoreBaseItem<T, S: Any>(
     override val flow: Flow<T>
         get() = dataStore.data.map { it[key] }.distinctUntilChanged().map(::fromPrefs)
 
-    override suspend operator fun invoke(): T = fromPrefs(dataStore.data.first()[key])
+    internal fun getValueFrom(prefs: Preferences): T = fromPrefs(prefs[key])
+
+    override suspend operator fun invoke(): T = getValueFrom(dataStore.data.first())
 
     override suspend operator fun invoke(newValue: T) {
         dataStore.edit { prefs -> prefs.setValue(newValue) }
     }
 
     override suspend fun update(transform: (T) -> T) {
-        dataStore.edit { prefs -> prefs.setValue(transform(fromPrefs(prefs[key]))) }
+        dataStore.edit { prefs -> prefs.setValue(transform(getValueFrom(prefs))) }
     }
 
     private fun MutablePreferences.setValue(newValue: T) {
