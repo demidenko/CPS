@@ -54,7 +54,6 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
 
         getDelay(
             contestPhase = contestInfo.phase,
-            participationType = participationType(),
             ratingChangeWaiter = ratingChangeWaiter
         )
     }
@@ -132,14 +131,13 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
 
 private suspend fun getDelay(
     contestPhase: CodeforcesContestPhase,
-    participationType: CodeforcesParticipationType,
     ratingChangeWaiter: RatingChangeWaiter
 ): Duration {
     return when (contestPhase) {
         CodeforcesContestPhase.CODING -> 10.seconds
         CodeforcesContestPhase.PENDING_SYSTEM_TEST -> 15.seconds
         CodeforcesContestPhase.SYSTEM_TEST -> 3.seconds
-        CodeforcesContestPhase.FINISHED -> ratingChangeWaiter.getDelayOnFinished(participationType)
+        CodeforcesContestPhase.FINISHED -> ratingChangeWaiter.getDelayOnFinished()
         else -> 5.seconds
     }
 }
@@ -152,8 +150,8 @@ private class RatingChangeWaiter(
 ) {
     private val waitingStartTime by lazy { getCurrentTime() }
 
-    suspend fun getDelayOnFinished(participationType: CodeforcesParticipationType): Duration {
-        if (isRatingChangeDone(participationType)) return Duration.INFINITE
+    suspend fun getDelayOnFinished(): Duration {
+        if (isRatingChangeDone()) return Duration.INFINITE
         val waitingTime = getCurrentTime() - waitingStartTime
         return when {
             waitingTime < 30.minutes -> 10.seconds
@@ -163,19 +161,18 @@ private class RatingChangeWaiter(
         }
     }
 
-    private suspend fun isRatingChangeDone(participationType: CodeforcesParticipationType): Boolean {
-        if (participationType != CodeforcesParticipationType.CONTESTANT) return true
-
+    private suspend fun isRatingChangeDone(): Boolean {
         CodeforcesApi.runCatching {
             getContestRatingChanges(contestId)
         }.getOrElse {
             if (it is CodeforcesAPIErrorResponse && it.isContestRatingUnavailable()) {
+                //unrated contest
                 return true
             }
             return false
         }.let { ratingChanges ->
-            val change = ratingChanges.find { it.handle == handle } ?: return false
-            onRatingChange(change)
+            if (ratingChanges.isEmpty()) return false
+            ratingChanges.find { it.handle == handle }?.let(onRatingChange)
             return true
         }
     }

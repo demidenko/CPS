@@ -146,6 +146,7 @@ object CodeforcesApi: ResourceApi() {
         }
     }
 
+    //TODO: Sequence instead of List
     suspend fun getContestRatingChanges(contestId: Int): List<CodeforcesRatingChange> {
         return getCodeforcesApi(urlString ="${urls.api}/contest.ratingChanges" ) {
             parameter("contestId", contestId)
