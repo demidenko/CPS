@@ -30,7 +30,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
 
         val contestInfo = contestInfo()
 
-        if (needCheckSubmissions(contestInfo.phase, participationType())) {
+        if (needCheckSubmissions(contestInfo, participationType())) {
             val problemResults = problemResults()
             val info = submissionsInfo()
             if (problemResults.any { needCheckSubmissions(it, info) }) {
@@ -38,16 +38,14 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
                     contestId = contestId,
                     handle = handle()
                 )?.let { submissions ->
-                    if (contestInfo.type != CodeforcesContestType.ICPC) {
-                        val notified = notifiedSubmissionsIds()
-                        submissions.filter {
-                            it.testset == CodeforcesTestset.TESTS
-                            && it.verdict.isResult()
-                            && it.id !in notified
-                        }.forEach {
-                            onSubmissionFinalResult(it)
-                            notifiedSubmissionsIds.edit { add(it.id) }
-                        }
+                    val notified = notifiedSubmissionsIds()
+                    submissions.filter {
+                           it.testset == CodeforcesTestset.TESTS
+                        && it.verdict.isResult()
+                        && it.id !in notified
+                    }.forEach {
+                        onSubmissionFinalResult(it)
+                        notifiedSubmissionsIds.edit { add(it.id) }
                     }
                     submissionsInfo.update { problemResults.makeMapWith(submissions) }
                 }
@@ -217,11 +215,12 @@ private fun CoroutineScope.launchWhileActive(block: suspend CoroutineScope.() ->
 
 
 private fun needCheckSubmissions(
-    phase: CodeforcesContestPhase,
+    contestInfo: CodeforcesContest,
     participationType: CodeforcesParticipationType
 ): Boolean {
     if (!participationType.contestParticipant()) return false
-    return phase.isSystemTestOrFinished()
+    if (contestInfo.type == CodeforcesContestType.ICPC) return false
+    return contestInfo.phase.isSystemTestOrFinished()
 }
 
 private fun needCheckSubmissions(
