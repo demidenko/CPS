@@ -81,8 +81,7 @@ private fun CodeforcesMonitor(
             CodeforcesMonitorData(
                 contestInfo = contest,
                 contestPhase = phase,
-                contestantRank = contestantRank,
-                lastRequest = prefs[lastRequest]
+                contestantRank = contestantRank
             )
         }
     }
@@ -103,9 +102,12 @@ private fun CodeforcesMonitor(
         }
     }
 
+    val lastRequest by rememberCollect { monitor.lastRequest.flow }
+
     Column(modifier) {
         Title(
             contestData = contestData,
+            requestFailed = lastRequest == false,
             modifier = Modifier
                 .padding(horizontal = 4.dp)
                 .fillMaxWidth()
@@ -122,10 +124,11 @@ private fun CodeforcesMonitor(
 @Composable
 private fun Title(
     contestData: CodeforcesMonitorData,
+    requestFailed: Boolean,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
-        if (contestData.lastRequest == false) {
+        if (requestFailed) {
             IconSp(
                 imageVector = CPSIcons.Error,
                 size = 16.sp,
