@@ -236,10 +236,7 @@ object CodeforcesUtils {
     }
 
     suspend fun getContestAcceptedStatistics(contestId: Int): Map<CodeforcesProblem, Int>? {
-        val src = CodeforcesApi.getPageSource(
-            urlString = CodeforcesApi.urls.contest(contestId),
-            locale = CodeforcesLocale.EN
-        ) ?: return null
+        val src = CodeforcesApi.getContestPage(contestId) ?: return null
         return Jsoup.parse(src).selectFirst("table.problems")
             ?.select("tr")
             ?.mapNotNull { extractProblemWithAccepteds(it, contestId) }
@@ -247,10 +244,7 @@ object CodeforcesUtils {
     }
 
     suspend fun getContestSystemTestingPercentage(contestId: Int): Int? {
-        val src = CodeforcesApi.getPageSource(
-            urlString = CodeforcesApi.urls.contest(contestId),
-            locale = CodeforcesLocale.EN
-        ) ?: return null
+        val src = CodeforcesApi.getContestPage(contestId) ?: return null
         return Jsoup.parse(src).selectFirst("span.contest-state-regular")
             ?.text()
             ?.removeSuffix("%")

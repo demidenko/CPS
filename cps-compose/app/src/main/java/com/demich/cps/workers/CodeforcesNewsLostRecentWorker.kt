@@ -95,7 +95,7 @@ class CodeforcesNewsLostRecentWorker(
         val locale = context.settingsNews.codeforcesLocale()
 
         val source = CodeforcesApi.getPageSource(
-            urlString = CodeforcesApi.urls.main + "/recent-actions",
+            path = "/recent-actions",
             locale = locale
         ) ?: return Result.retry()
 

@@ -18,6 +18,9 @@ import kotlin.time.Duration.Companion.milliseconds
 object CodeforcesApi: ResourceApi() {
 
     override val client = cpsHttpClient(json = json) {
+        defaultRequest {
+            url(urls.main)
+        }
         HttpResponseValidator {
             handleResponseExceptionWithRequest { exception, _ ->
                 if (exception !is ResponseException) return@handleResponseExceptionWithRequest
@@ -40,17 +43,13 @@ object CodeforcesApi: ResourceApi() {
     }
 
     private suspend inline fun<reified T> getCodeforcesApi(
-        urlString: String,
+        path: String,
         crossinline block: HttpRequestBuilder.() -> Unit = {}
     ): T {
-        require(urlString.startsWith(urls.api))
-        val callGet = suspend {
-            client.getAs<CodeforcesAPIResponse<T>>(urlString = urlString, block = block)
-        }
         (9 downTo 0).forEach { remainingRuns ->
             kotlin.runCatching {
                 withContext(Dispatchers.IO) {
-                    callGet()
+                    client.getAs<CodeforcesAPIResponse<T>>(urlString = "/api/$path", block = block)
                 }
             }.onSuccess {
                 return it.result
@@ -83,11 +82,11 @@ object CodeforcesApi: ResourceApi() {
     }
 
     private suspend fun getCodeforcesWeb(
-        urlString: String,
+        path: String,
         block: HttpRequestBuilder.() -> Unit = {}
     ): String? {
         val callGet = suspend {
-            client.getText(urlString) {
+            client.getText(path) {
                 header("Cookie", "RCPC=$RCPC")
                 block()
             }.also {
@@ -110,7 +109,7 @@ object CodeforcesApi: ResourceApi() {
 
     suspend fun getUsers(handles: Collection<String>): List<CodeforcesUser> {
         if (handles.isEmpty()) return emptyList()
-        return getCodeforcesApi(urlString = "${urls.api}/user.info") {
+        return getCodeforcesApi(path = "user.info") {
             parameter("handles", handles.joinToString(separator = ";"))
         }
     }
@@ -118,20 +117,20 @@ object CodeforcesApi: ResourceApi() {
     suspend fun getUser(handle: String) = getUsers(listOf(handle)).first()
 
     suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange> {
-        return getCodeforcesApi(urlString = "${urls.api}/user.rating") {
+        return getCodeforcesApi(path = "user.rating") {
             parameter("handle", handle)
         }
     }
 
     //TODO: Sequence instead of List?
     suspend fun getContests(): List<CodeforcesContest> {
-        return getCodeforcesApi(urlString = "${urls.api}/contest.list") {
+        return getCodeforcesApi(path = "contest.list") {
             parameter("gym", false)
         }
     }
 
     suspend fun getContestSubmissions(contestId: Int, handle: String): List<CodeforcesSubmission> {
-        return getCodeforcesApi(urlString = "${urls.api}/contest.status") {
+        return getCodeforcesApi(path = "contest.status") {
             parameter("contestId", contestId)
             parameter("handle", handle)
             parameter("count", 1e9.toInt())
@@ -139,7 +138,7 @@ object CodeforcesApi: ResourceApi() {
     }
 
     suspend fun getUserSubmissions(handle: String, count: Long, from: Long): List<CodeforcesSubmission> {
-        return getCodeforcesApi(urlString = "${urls.api}/user.status") {
+        return getCodeforcesApi(path = "user.status") {
             parameter("handle", handle)
             parameter("count", count)
             parameter("from", from)
@@ -148,44 +147,47 @@ object CodeforcesApi: ResourceApi() {
 
     //TODO: Sequence instead of List
     suspend fun getContestRatingChanges(contestId: Int): List<CodeforcesRatingChange> {
-        return getCodeforcesApi(urlString ="${urls.api}/contest.ratingChanges" ) {
+        return getCodeforcesApi(path ="contest.ratingChanges" ) {
             parameter("contestId", contestId)
         }
     }
 
     suspend fun getHandleSuggestionsPage(str: String): String? {
-        return getCodeforcesWeb(urlString = "${urls.main}/data/handles") {
+        return getCodeforcesWeb(path = "data/handles") {
             parameter("q", str)
         }
     }
 
-    suspend fun getPageSource(urlString: String, locale: CodeforcesLocale): String? {
-        require(urlString.startsWith(urls.main))
-        return getCodeforcesWeb(urlString = urlString) {
+    suspend fun getPageSource(path: String, locale: CodeforcesLocale): String? {
+        return getCodeforcesWeb(path = path) {
             parameter("locale", locale)
         }
     }
 
     suspend fun getUserPage(handle: String): String? {
-        return getPageSource(urlString = urls.user(handle), locale = CodeforcesLocale.EN)
+        return getPageSource(path = urls.user(handle), locale = CodeforcesLocale.EN)
+    }
+
+    suspend fun getContestPage(contestId: Int): String? {
+        return getPageSource(path = urls.contest(contestId), locale = CodeforcesLocale.EN)
     }
 
     suspend fun getUserBlogEntries(handle: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
-        return getCodeforcesApi(urlString = "${urls.api}/user.blogEntries") {
+        return getCodeforcesApi(path = "user.blogEntries") {
             parameter("handle", handle)
             parameter("locale", locale)
         }
     }
 
     suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale): CodeforcesBlogEntry {
-        return getCodeforcesApi(urlString = "${urls.api}/blogEntry.view") {
+        return getCodeforcesApi(path = "blogEntry.view") {
             parameter("blogEntryId", blogEntryId)
             parameter("locale", locale)
         }
     }
 
     suspend fun getContestStandings(contestId: Int, handles: Collection<String>, includeUnofficial: Boolean): CodeforcesContestStandings {
-        return getCodeforcesApi(urlString = "${urls.api}/contest.standings") {
+        return getCodeforcesApi(path = "contest.standings") {
             parameter("contestId", contestId)
             parameter("handles", handles.joinToString())
             parameter("showUnofficial", includeUnofficial)
@@ -207,15 +209,13 @@ object CodeforcesApi: ResourceApi() {
 
         fun contest(contestId: Int) = "$main/contest/$contestId"
 
-        fun contestWaiting(contestId: Int) = "$main/contests/$contestId"
+        fun contestPending(contestId: Int) = "$main/contests/$contestId"
 
         fun contestsWith(handle: String) = "$main/contests/with/$handle"
 
         fun submission(submission: CodeforcesSubmission) = "$main/contest/${submission.contestId}/submission/${submission.id}"
 
         fun problem(contestId: Int, problemIndex: String) = "$main/contest/$contestId/problem/$problemIndex"
-
-        const val api = "$main/api"
     }
 }
 
