@@ -17,6 +17,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -54,6 +55,13 @@ inline fun<T> rememberCollect(crossinline block: () -> Flow<T>): State<T> =
     remember(block).let { flow ->
         if (flow is StateFlow<T>) flow.collectAsState()
         else flow.collectAsState(initial = remember(flow) { runBlocking { flow.first() } })
+    }
+
+@Composable
+inline fun<T> rememberCollectWithLifecycle(crossinline block: () -> Flow<T>): State<T> =
+    remember(block).let { flow ->
+        if (flow is StateFlow<T>) flow.collectAsStateWithLifecycle()
+        else flow.collectAsStateWithLifecycle(initialValue = remember(flow) { runBlocking { flow.first() } })
     }
 
 

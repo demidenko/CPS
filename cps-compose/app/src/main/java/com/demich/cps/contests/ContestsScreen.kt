@@ -365,10 +365,10 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val monitor = remember { CodeforcesMonitorDataStore(context) }
 
-    val contestDataState = rememberCollect { monitor.flowOfContestData() }
+    val contestDataState = rememberCollectWithLifecycle { monitor.flowOfContestData() }
 
     contestDataState.value?.let { contestData ->
-        val requestFailed by rememberCollect { monitor.lastRequest.flow.map { it == false } }
+        val requestFailed by rememberCollectWithLifecycle { monitor.lastRequest.flow.map { it == false } }
         CodeforcesMonitorWidget(
             contestData = contestData,
             requestFailed = requestFailed,
