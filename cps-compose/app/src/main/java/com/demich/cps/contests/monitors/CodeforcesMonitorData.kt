@@ -11,6 +11,7 @@ data class CodeforcesMonitorData(
     val contestInfo: CodeforcesContest,
     val contestPhase: ContestPhase,
     val contestantRank: ContestRank,
+    val problems: List<Pair<String, ProblemResult>>
 ) {
     sealed class ContestPhase(open val phase: CodeforcesContestPhase) {
         data class Coding(val endTime: Instant): ContestPhase(CodeforcesContestPhase.CODING)
@@ -22,4 +23,11 @@ data class CodeforcesMonitorData(
         val rank: Int,
         val participationType: CodeforcesParticipationType
     )
+
+    sealed interface ProblemResult {
+        object Empty: ProblemResult
+        object Pending: ProblemResult
+        object FailedSystemTest: ProblemResult
+        data class Points(val points: Double, val isFinal: Boolean): ProblemResult
+    }
 }

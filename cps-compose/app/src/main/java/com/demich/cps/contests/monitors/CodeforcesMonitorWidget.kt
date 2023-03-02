@@ -4,10 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,7 +27,6 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.*
 import com.demich.datastore_itemized.flowBy
-import kotlinx.coroutines.flow.map
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -81,24 +83,26 @@ private fun CodeforcesMonitor(
             CodeforcesMonitorData(
                 contestInfo = contest,
                 contestPhase = phase,
-                contestantRank = contestantRank
-            )
-        }
-    }
-
-    val problems by rememberCollect {
-        monitor.problemResults.flow
-    }
-
-    val problemsFailedSysTest by rememberCollect {
-        monitor.submissionsInfo.flow.map { info ->
-            info.mapNotNull { (index, list) ->
-                if (list.any { it.testset == CodeforcesTestset.TESTS && it.verdict.isResult() && it.verdict != CodeforcesProblemVerdict.OK }) {
-                    index
-                } else {
-                    null
+                contestantRank = contestantRank,
+                problems = prefs[problemResults].map { problem ->
+                    val index = problem.problemIndex
+                    val submissions = prefs[submissionsInfo][index] ?: emptyList()
+                    val result: CodeforcesMonitorData.ProblemResult = when {
+                        contest.phase.isSystemTestOrFinished() && problem.type == CodeforcesProblemStatus.PRELIMINARY
+                            -> CodeforcesMonitorData.ProblemResult.Pending
+                        problem.points != 0.0
+                            -> CodeforcesMonitorData.ProblemResult.Points(
+                                points = problem.points,
+                                isFinal = problem.type == CodeforcesProblemStatus.FINAL
+                            )
+                        submissions.any { it.testset == CodeforcesTestset.TESTS && it.verdict.isResult() && it.verdict != CodeforcesProblemVerdict.OK }
+                            -> CodeforcesMonitorData.ProblemResult.FailedSystemTest
+                        else
+                            -> CodeforcesMonitorData.ProblemResult.Empty
+                    }
+                    index to result
                 }
-            }.toSet()
+            )
         }
     }
 
@@ -113,8 +117,6 @@ private fun CodeforcesMonitor(
                 .fillMaxWidth()
         )
         StandingsRow(
-            problems = problems,
-            problemsFailedSysTest = problemsFailedSysTest,
             contestData = contestData,
             modifier = Modifier.fillMaxWidth()
         )
@@ -188,34 +190,32 @@ private fun PhaseTitle(
 
 @Composable
 private fun StandingsRow(
-    problems: List<CodeforcesMonitorProblemResult>,
-    problemsFailedSysTest: Set<String>,
     contestData: CodeforcesMonitorData,
     modifier: Modifier = Modifier
 ) {
-    val textStyle = rememberWith(problems.size) {
+    val textStyle = rememberWith(contestData.problems.size) {
         //TODO: horizontal scroll??
         TextStyle.Default.copy(
             fontSize = when {
                 this < 9 -> 16.sp
-                this < 12 -> 15.sp
+                this < 10 -> 15.sp
                 else -> 14.sp
             }
         )
     }
-    if (problems.isNotEmpty()) {
-        CompositionLocalProvider(LocalTextStyle provides textStyle) {
+
+    ProvideTextStyle(value = textStyle) {
+        if (contestData.problems.isNotEmpty()) {
             Row(modifier = modifier) {
                 RankColumn(
                     rank = contestData.contestantRank.rank,
                     participationType = contestData.contestantRank.participationType,
                     modifier = Modifier.padding(horizontal = 4.dp)
                 )
-                problems.forEach {
+                contestData.problems.forEach {
                     ProblemColumn(
-                        problemResult = it,
-                        isFailedSysTest = it.problemIndex in problemsFailedSysTest,
-                        phase = contestData.contestPhase.phase,
+                        problemName = it.first,
+                        problemResult = it.second,
                         contestType = contestData.contestInfo.type,
                         modifier = Modifier.weight(1f)
                     )
@@ -227,9 +227,8 @@ private fun StandingsRow(
 
 @Composable
 private fun ProblemColumn(
-    problemResult: CodeforcesMonitorProblemResult,
-    isFailedSysTest: Boolean,
-    phase: CodeforcesContestPhase,
+    problemName: String,
+    problemResult: CodeforcesMonitorData.ProblemResult,
     contestType: CodeforcesContestType,
     modifier: Modifier = Modifier
 ) {
@@ -237,64 +236,50 @@ private fun ProblemColumn(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = problemResult.problemIndex)
-        if (isFailedSysTest) {
-            ProblemFailedCell(iconSize = 18.sp)
-            /*ProblemResultCell(
-                text = "✖",
-                color = cpsColors.error
-            )*/
-        } else {
-            ProblemResultCell(
-                problemResult = problemResult,
-                phase = phase,
-                contestType = contestType
-            )
-        }
+        Text(text = problemName)
+        ProblemResultCell(
+            problemResult = problemResult,
+            contestType = contestType
+        )
     }
 }
 
 @Composable
 private fun ProblemResultCell(
-    problemResult: CodeforcesMonitorProblemResult,
-    phase: CodeforcesContestPhase,
+    problemResult: CodeforcesMonitorData.ProblemResult,
     contestType: CodeforcesContestType,
     modifier: Modifier = Modifier
 ) {
-    if (contestType == CodeforcesContestType.ICPC) {
-        ProblemResultCell(
-            text = if (problemResult.points == 0.0) "" else "+",
-            color = cpsColors.success,
-            modifier = modifier
-        )
-    } else {
-        if (phase.isSystemTestOrFinished() && problemResult.type == CodeforcesProblemStatus.PRELIMINARY) {
+    when (problemResult) {
+        is CodeforcesMonitorData.ProblemResult.FailedSystemTest -> {
+            ProblemFailedCell(
+                iconSize = 18.sp,
+                modifier = modifier
+            )
+        }
+        is CodeforcesMonitorData.ProblemResult.Pending -> {
             ProblemResultCell(
                 text = "?",
                 color = cpsColors.contentAdditional,
                 modifier = modifier
             )
-        } else {
-            ProblemPointsCell(
-                points = problemResult.points,
-                phase = phase,
+        }
+        is CodeforcesMonitorData.ProblemResult.Empty -> {
+            Text(
+                text = "",
+                modifier = modifier
+            )
+        }
+        is CodeforcesMonitorData.ProblemResult.Points -> {
+            ProblemResultCell(
+                text = if (contestType == CodeforcesContestType.ICPC) "+" else {
+                    problemResult.points.toString().removeSuffix(".0")
+                },
+                color = if (problemResult.isFinal) cpsColors.success else cpsColors.content,
                 modifier = modifier
             )
         }
     }
-}
-
-@Composable
-private fun ProblemPointsCell(
-    points: Double,
-    phase: CodeforcesContestPhase,
-    modifier: Modifier = Modifier
-) {
-    ProblemResultCell(
-        text = if (points != 0.0) points.toString().removeSuffix(".0") else "",
-        color = if (phase.isSystemTestOrFinished()) cpsColors.success else cpsColors.content,
-        modifier = modifier
-    )
 }
 
 @Composable
