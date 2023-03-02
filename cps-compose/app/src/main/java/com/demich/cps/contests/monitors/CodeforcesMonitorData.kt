@@ -13,6 +13,8 @@ data class CodeforcesMonitorData(
     val contestantRank: ContestRank,
     val problems: List<Pair<String, ProblemResult>>
 ) {
+    val contestId: Int get() = contestInfo.id
+
     sealed class ContestPhase(open val phase: CodeforcesContestPhase) {
         data class Coding(val endTime: Instant): ContestPhase(CodeforcesContestPhase.CODING)
         data class SystemTesting(val percentage: Int?): ContestPhase(CodeforcesContestPhase.SYSTEM_TEST)

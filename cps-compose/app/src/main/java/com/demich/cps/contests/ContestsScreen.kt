@@ -365,22 +365,23 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val monitor = remember { CodeforcesMonitorDataStore(context) }
 
-    val contestIdState = rememberCollect { monitor.contestId.flow }
+    val contestDataState = rememberCollect { monitor.flowOfContestData() }
 
-    contestIdState.value?.let { contestId ->
-        val contestData by rememberCollect { monitor.flowOfContestData() }
+    contestDataState.value?.let { contestData ->
         val requestFailed by rememberCollect { monitor.lastRequest.flow.map { it == false } }
         CodeforcesMonitorWidget(
             contestData = contestData,
             requestFailed = requestFailed,
             modifier = modifier,
             onOpenInBrowser = {
-                context.openUrlInBrowser(url = CodeforcesApi.urls.contest(contestId))
+                context.openUrlInBrowser(url = CodeforcesApi.urls.contest(contestData.contestId))
             },
             onStop = {
                 scope.launch {
                     monitor.reset()
-                    CodeforcesAccountManager(context).getSettings().monitorCanceledContests.add(contestId to getCurrentTime())
+                    CodeforcesAccountManager(context).getSettings().monitorCanceledContests.add(
+                        contestData.contestId to getCurrentTime()
+                    )
                 }
             }
         )

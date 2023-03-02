@@ -20,7 +20,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     val lastRequest = jsonCPS.item<Boolean?>(name = "last_request", defaultValue = null)
 
-    val contestInfo = jsonCPS.item(
+    internal val contestInfo = jsonCPS.item(
         name = "contest_info",
         defaultValue = CodeforcesContest(
             id = -1,
@@ -33,8 +33,8 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
         )
     )
 
-    val participationType = itemEnum(name = "participation_type", defaultValue = CodeforcesParticipationType.NOT_PARTICIPATED)
-    val contestantRank = itemInt(name = "contestant_rank", defaultValue = -1)
+    internal val participationType = itemEnum(name = "participation_type", defaultValue = CodeforcesParticipationType.NOT_PARTICIPATED)
+    internal val contestantRank = itemInt(name = "contestant_rank", defaultValue = -1)
 
     internal val problemResults = jsonCPS.item<List<CodeforcesMonitorProblemResult>>(
         name = "problem_results",
@@ -46,7 +46,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
         defaultValue = emptyMap()
     )
 
-    val sysTestPercentage = itemIntNullable("sys_test_percentage")
+    internal val sysTestPercentage = itemIntNullable("sys_test_percentage")
 
     internal val notifiedSubmissionsIds = jsonCPS.item<Set<Long>>(name = "submissions_notified", defaultValue = emptySet())
 
@@ -95,9 +95,10 @@ internal data class CodeforcesMonitorSubmissionInfo(
         testset == CodeforcesTestset.TESTS && verdict.isResult() && verdict != CodeforcesProblemVerdict.OK
 }
 
-fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData> =
+fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?> =
     flowBy { prefs ->
-        val contest = prefs[contestInfo]
+        val contestId = prefs[contestId] ?: return@flowBy null
+        val contest = prefs[contestInfo].copy(id = contestId)
         val phase = when (contest.phase) {
             CodeforcesContestPhase.CODING -> CodeforcesMonitorData.ContestPhase.Coding(contest.startTime + contest.duration)
             CodeforcesContestPhase.SYSTEM_TEST -> CodeforcesMonitorData.ContestPhase.SystemTesting(prefs[sysTestPercentage])
