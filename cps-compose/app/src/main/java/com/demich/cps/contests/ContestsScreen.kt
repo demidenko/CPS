@@ -66,7 +66,7 @@ fun ContestsScreen(
                     .padding(horizontal = 3.dp)
                     .fillMaxWidth()
             )
-            ContestsReloadableList(
+            ContestsReloadableContent(
                 errorsState = errorsState,
                 filterController = filterController,
                 isRefreshing = loadingStatusState.value == LoadingStatus.LOADING,
@@ -88,7 +88,7 @@ fun ContestsScreen(
 }
 
 @Composable
-private fun ContestsReloadableList(
+private fun ContestsReloadableContent(
     filterController: ContestsFilterController,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
