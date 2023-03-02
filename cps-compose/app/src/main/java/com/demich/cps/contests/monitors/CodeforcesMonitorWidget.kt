@@ -25,8 +25,9 @@ import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
-import com.demich.cps.utils.codeforces.*
-import com.demich.datastore_itemized.flowBy
+import com.demich.cps.utils.codeforces.CodeforcesContestPhase
+import com.demich.cps.utils.codeforces.CodeforcesContestType
+import com.demich.cps.utils.codeforces.CodeforcesParticipationType
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -68,44 +69,7 @@ private fun CodeforcesMonitor(
 
     val monitor = CodeforcesMonitorDataStore(context)
 
-    val contestData by rememberCollect {
-        monitor.flowBy { prefs ->
-            val contest = prefs[contestInfo]
-            val phase = when (contest.phase) {
-                CodeforcesContestPhase.CODING -> CodeforcesMonitorData.ContestPhase.Coding(contest.startTime + contest.duration)
-                CodeforcesContestPhase.SYSTEM_TEST -> CodeforcesMonitorData.ContestPhase.SystemTesting(prefs[sysTestPercentage])
-                else -> CodeforcesMonitorData.ContestPhase.Other(contest.phase)
-            }
-            val contestantRank = CodeforcesMonitorData.ContestRank(
-                rank = prefs[contestantRank],
-                participationType = prefs[participationType]
-            )
-            CodeforcesMonitorData(
-                contestInfo = contest,
-                contestPhase = phase,
-                contestantRank = contestantRank,
-                problems = prefs[problemResults].map { problem ->
-                    val index = problem.problemIndex
-                    val submissions = prefs[submissionsInfo][index] ?: emptyList()
-                    val result: CodeforcesMonitorData.ProblemResult = when {
-                        contest.phase.isSystemTestOrFinished() && problem.type == CodeforcesProblemStatus.PRELIMINARY
-                            -> CodeforcesMonitorData.ProblemResult.Pending
-                        problem.points != 0.0
-                            -> CodeforcesMonitorData.ProblemResult.Points(
-                                points = problem.points,
-                                isFinal = problem.type == CodeforcesProblemStatus.FINAL
-                            )
-                        submissions.any { it.testset == CodeforcesTestset.TESTS && it.verdict.isResult() && it.verdict != CodeforcesProblemVerdict.OK }
-                            -> CodeforcesMonitorData.ProblemResult.FailedSystemTest
-                        else
-                            -> CodeforcesMonitorData.ProblemResult.Empty
-                    }
-                    index to result
-                }
-            )
-        }
-    }
-
+    val contestData by rememberCollect { monitor.flowOfContestData() }
     val lastRequest by rememberCollect { monitor.lastRequest.flow }
 
     Column(modifier) {

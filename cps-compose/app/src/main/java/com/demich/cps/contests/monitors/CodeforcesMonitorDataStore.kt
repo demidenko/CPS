@@ -5,6 +5,8 @@ import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
+import com.demich.datastore_itemized.flowBy
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 
@@ -34,12 +36,12 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
     val participationType = itemEnum(name = "participation_type", defaultValue = CodeforcesParticipationType.NOT_PARTICIPATED)
     val contestantRank = itemInt(name = "contestant_rank", defaultValue = -1)
 
-    val problemResults = jsonCPS.item<List<CodeforcesMonitorProblemResult>>(
+    internal val problemResults = jsonCPS.item<List<CodeforcesMonitorProblemResult>>(
         name = "problem_results",
         defaultValue = emptyList()
     )
 
-    val submissionsInfo = jsonCPS.item<Map<String, List<CodeforcesMonitorSubmissionInfo>>> (
+    internal val submissionsInfo = jsonCPS.item<Map<String, List<CodeforcesMonitorSubmissionInfo>>> (
         name = "problems_submissions_info",
         defaultValue = emptyMap()
     )
@@ -64,14 +66,14 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 }
 
 @kotlinx.serialization.Serializable
-data class CodeforcesMonitorProblemResult(
+internal data class CodeforcesMonitorProblemResult(
     val problemIndex: String,
     val points: Double,
     val type: CodeforcesProblemStatus
 )
 
 @kotlinx.serialization.Serializable
-data class CodeforcesMonitorSubmissionInfo(
+internal data class CodeforcesMonitorSubmissionInfo(
     val testset: CodeforcesTestset,
     val verdict: CodeforcesProblemVerdict
 ) {
@@ -88,4 +90,43 @@ data class CodeforcesMonitorSubmissionInfo(
         }
         return false
     }
+
+    fun isFailedSystemTest(): Boolean =
+        testset == CodeforcesTestset.TESTS && verdict.isResult() && verdict != CodeforcesProblemVerdict.OK
 }
+
+fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData> =
+    flowBy { prefs ->
+        val contest = prefs[contestInfo]
+        val phase = when (contest.phase) {
+            CodeforcesContestPhase.CODING -> CodeforcesMonitorData.ContestPhase.Coding(contest.startTime + contest.duration)
+            CodeforcesContestPhase.SYSTEM_TEST -> CodeforcesMonitorData.ContestPhase.SystemTesting(prefs[sysTestPercentage])
+            else -> CodeforcesMonitorData.ContestPhase.Other(contest.phase)
+        }
+        val contestantRank = CodeforcesMonitorData.ContestRank(
+            rank = prefs[contestantRank],
+            participationType = prefs[participationType]
+        )
+        CodeforcesMonitorData(
+            contestInfo = contest,
+            contestPhase = phase,
+            contestantRank = contestantRank,
+            problems = prefs[problemResults].map { problem ->
+                val index = problem.problemIndex
+                val result: CodeforcesMonitorData.ProblemResult = when {
+                    contest.phase.isSystemTestOrFinished() && problem.type == CodeforcesProblemStatus.PRELIMINARY
+                        -> CodeforcesMonitorData.ProblemResult.Pending
+                    problem.points != 0.0
+                        -> CodeforcesMonitorData.ProblemResult.Points(
+                            points = problem.points,
+                            isFinal = problem.type == CodeforcesProblemStatus.FINAL
+                        )
+                    prefs[submissionsInfo][index]?.any { it.isFailedSystemTest() } == true
+                        -> CodeforcesMonitorData.ProblemResult.FailedSystemTest
+                    else
+                        -> CodeforcesMonitorData.ProblemResult.Empty
+                }
+                index to result
+            }
+        )
+    }
