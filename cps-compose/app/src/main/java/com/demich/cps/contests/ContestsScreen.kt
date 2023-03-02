@@ -29,6 +29,7 @@ import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.contests.loaders.makeCombinedMessage
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
+import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.develop.settingsDev
 import com.demich.cps.room.contestsListDao
@@ -40,6 +41,7 @@ import com.demich.cps.workers.ContestsWorker
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.flowBy
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -366,7 +368,11 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     val contestIdState = rememberCollect { monitor.contestId.flow }
 
     contestIdState.value?.let { contestId ->
+        val contestData by rememberCollect { monitor.flowOfContestData() }
+        val requestFailed by rememberCollect { monitor.lastRequest.flow.map { it == false } }
         CodeforcesMonitorWidget(
+            contestData = contestData,
+            requestFailed = requestFailed,
             modifier = modifier,
             onOpenInBrowser = {
                 context.openUrlInBrowser(url = CodeforcesApi.urls.contest(contestId))

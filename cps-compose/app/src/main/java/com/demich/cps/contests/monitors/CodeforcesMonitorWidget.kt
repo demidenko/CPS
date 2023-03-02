@@ -35,6 +35,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun CodeforcesMonitorWidget(
+    contestData: CodeforcesMonitorData,
+    requestFailed: Boolean,
     modifier: Modifier = Modifier,
     onOpenInBrowser: () -> Unit,
     onStop: () -> Unit
@@ -46,6 +48,8 @@ fun CodeforcesMonitorWidget(
         onDismissRequest = { showMenu = false },
         content = {
             CodeforcesMonitor(
+                contestData = contestData,
+                requestFailed = requestFailed,
                 modifier = modifier
                     .clip(shape = RoundedCornerShape(6.dp))
                     .clickable { showMenu = true }
@@ -63,19 +67,14 @@ fun CodeforcesMonitorWidget(
 
 @Composable
 private fun CodeforcesMonitor(
+    contestData: CodeforcesMonitorData,
+    requestFailed: Boolean,
     modifier: Modifier
 ) {
-    val context = context
-
-    val monitor = CodeforcesMonitorDataStore(context)
-
-    val contestData by rememberCollect { monitor.flowOfContestData() }
-    val lastRequest by rememberCollect { monitor.lastRequest.flow }
-
     Column(modifier) {
         Title(
             contestData = contestData,
-            requestFailed = lastRequest == false,
+            requestFailed = requestFailed,
             modifier = Modifier
                 .padding(horizontal = 4.dp)
                 .fillMaxWidth()
