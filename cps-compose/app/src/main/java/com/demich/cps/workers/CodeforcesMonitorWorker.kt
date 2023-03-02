@@ -7,15 +7,13 @@ import androidx.work.WorkerParameters
 import com.demich.cps.*
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
+import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.monitors.launchIn
 import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.utils.codeforces.CodeforcesProblemVerdict
 import com.demich.cps.utils.codeforces.CodeforcesSubmission
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -25,9 +23,8 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         val monitor = CodeforcesMonitorDataStore(context)
 
         val contestId = monitor.contestId.flow.filterNotNull().first()
-        val handle = monitor.handle()
 
-        val notificationBuilder = createNotificationBuilder(handle, contestId)
+        val notificationBuilder = createNotificationBuilder(handle = monitor.handle())
         setForeground(ForegroundInfo(NotificationIds.codeforces_contest_monitor, notificationBuilder.build()))
 
         withContext(Dispatchers.IO) {
@@ -40,15 +37,23 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                     launch { notify(submission) }
                 }
             )
+            monitor.flowOfContestData()
+                .transformWhile {
+                    if (it != null && it.contestId == contestId) {
+                        emit(it)
+                        true
+                    } else {
+                        false
+                    }
+                }.distinctUntilChanged().collect {
+                    //TODO send to notification
+                }
         }
-
-        //TODO: subscribe to monitor data store
-        monitor.contestId.flow.takeWhile { it == contestId }.collect()
 
         return Result.success()
     }
 
-    private fun createNotificationBuilder(handle: String, contestId: Int) =
+    private fun createNotificationBuilder(handle: String) =
         notificationBuilder(context, NotificationChannels.codeforces.contest_monitor) {
             setSmallIcon(R.drawable.ic_contest)
             setSubText(handle)
