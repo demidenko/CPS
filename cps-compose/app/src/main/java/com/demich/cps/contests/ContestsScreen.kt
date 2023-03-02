@@ -51,7 +51,9 @@ fun ContestsScreen(
     filterController: ContestsFilterController,
     loadingStatusState: State<LoadingStatus>
 ) {
+    val context = context
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
+    val errorsState = rememberCollect { contestsViewModel.flowOfLoadingErrors() }
 
     if (isAnyPlatformEnabled) {
         Column(
@@ -64,10 +66,11 @@ fun ContestsScreen(
                     .padding(horizontal = 3.dp)
                     .fillMaxWidth()
             )
-            ContestsContent(
-                contestsViewModel = contestsViewModel,
+            ContestsReloadableList(
+                errorsState = errorsState,
                 filterController = filterController,
-                loadingStatusState = loadingStatusState,
+                isRefreshing = loadingStatusState.value == LoadingStatus.LOADING,
+                onRefresh = { contestsViewModel.reloadEnabledPlatforms(context) },
                 modifier = Modifier.weight(1f, false)
             )
             ContestsFilterTextField(
@@ -79,21 +82,38 @@ fun ContestsScreen(
         NoneEnabledMessage(modifier = Modifier.fillMaxSize())
     }
 
-    val context = context
     LaunchedEffect(Unit) {
         contestsViewModel.syncEnabledAndLastReloaded(context)
     }
 }
 
 @Composable
-private fun ContestsContent(
-    contestsViewModel: ContestsViewModel,
+private fun ContestsReloadableList(
     filterController: ContestsFilterController,
-    loadingStatusState: State<LoadingStatus>,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    errorsState: State<List<Pair<ContestsLoaders, Throwable>>>,
     modifier: Modifier = Modifier
 ) {
-    val context = context
+    CPSSwipeRefresh(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        modifier = modifier
+    ) {
+        ContestsContent(
+            filterController = filterController,
+            errorsState = errorsState
+        )
+    }
+}
 
+
+@Composable
+private fun ContestsContent(
+    filterController: ContestsFilterController,
+    errorsState: State<List<Pair<ContestsLoaders, Throwable>>>
+) {
+    val context = context
     val contestsToShowState = rememberCollect {
         context.contestsListDao.flowOfContests()
             .combine(context.settingsContests.ignoredContests.flow) { list, ignored ->
@@ -109,27 +129,18 @@ private fun ContestsContent(
             }
     }
 
-    val errorsList by rememberCollect { contestsViewModel.flowOfLoadingErrors() }
-    val loadingStatus by loadingStatusState
-
-    CPSSwipeRefresh(
-        isRefreshing = loadingStatus == LoadingStatus.LOADING,
-        onRefresh = { contestsViewModel.reloadEnabledPlatforms(context) },
-        modifier = modifier
-    ) {
-        Column {
-            LoadingError(
-                errors = errorsList,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-            ContestsList(
-                contestsState = contestsToShowState,
-                filterController = filterController,
-                modifier = Modifier
-                    .fillMaxSize()
-            )
-        }
+    Column {
+        LoadingError(
+            errors = errorsState.value,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        ContestsList(
+            contestsState = contestsToShowState,
+            filterController = filterController,
+            modifier = Modifier
+                .fillMaxSize()
+        )
     }
 }
 
