@@ -50,19 +50,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     internal val notifiedSubmissionsIds = jsonCPS.item<Set<Long>>(name = "submissions_notified", defaultValue = emptySet())
 
-    suspend fun reset() =
-        resetItems(items = listOf(
-            contestId,
-            handle,
-            lastRequest,
-            contestInfo,
-            participationType,
-            contestantRank,
-            problemResults,
-            submissionsInfo,
-            sysTestPercentage,
-            notifiedSubmissionsIds
-        ))
+    suspend fun reset() = resetAll()
 }
 
 @kotlinx.serialization.Serializable

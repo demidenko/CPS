@@ -11,6 +11,10 @@ import kotlinx.serialization.json.Json
 abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
     internal val dataStore: DataStore<Preferences> = wrapper.dataStore
 
+    protected suspend fun resetAll() {
+        dataStore.updateData { emptyPreferences() }
+    }
+
     protected suspend fun resetItems(items: Collection<DataStoreItem<*>>) {
         if (items.isEmpty()) return
         dataStore.edit { prefs ->
