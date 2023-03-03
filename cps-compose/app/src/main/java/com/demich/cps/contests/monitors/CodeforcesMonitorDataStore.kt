@@ -28,8 +28,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
             phase = CodeforcesContestPhase.UNDEFINED,
             type = CodeforcesContestType.UNDEFINED,
             duration = Duration.ZERO,
-            startTime = Instant.DISTANT_PAST,
-            relativeTimeSeconds = 0
+            startTime = Instant.DISTANT_PAST
         )
     )
 

@@ -294,8 +294,7 @@ data class CodeforcesContest(
     val duration: Duration,
     @SerialName("startTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
-    val startTime: Instant,
-    val relativeTimeSeconds: Long
+    val startTime: Instant
 )
 
 @Serializable
