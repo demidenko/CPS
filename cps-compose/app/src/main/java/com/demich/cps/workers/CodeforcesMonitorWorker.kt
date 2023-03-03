@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import com.demich.cps.*
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
+import com.demich.cps.contests.monitors.CodeforcesMonitorNotifier
 import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.monitors.launchIn
 import com.demich.cps.utils.codeforces.CodeforcesApi
@@ -23,8 +24,9 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         val monitor = CodeforcesMonitorDataStore(context)
 
         val contestId = monitor.contestId.flow.filterNotNull().first()
+        val handle = monitor.handle()
 
-        val notificationBuilder = createNotificationBuilder(handle = monitor.handle())
+        val notificationBuilder = createNotificationBuilder(handle)
         setForeground(ForegroundInfo(NotificationIds.codeforces_contest_monitor, notificationBuilder.build()))
 
         withContext(Dispatchers.IO) {
@@ -37,18 +39,21 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                     launch { notify(submission) }
                 }
             )
-            monitor.flowOfContestData()
-                .transformWhile {
-                    if (it != null && it.contestId == contestId) {
-                        emit(it)
-                        true
-                    } else {
-                        false
-                    }
-                }.distinctUntilChanged().collect {
-                    //TODO send to notification
-                }
         }
+
+        val notifier = CodeforcesMonitorNotifier(
+            context = context,
+            notificationBuilder = notificationBuilder,
+            handle = handle
+        )
+
+        monitor.flowOfContestData()
+            .takeWhile { it?.contestId == contestId }
+            .filterNotNull()
+            .distinctUntilChanged()
+            .collect {
+                notifier.apply(it)
+            }
 
         return Result.success()
     }
