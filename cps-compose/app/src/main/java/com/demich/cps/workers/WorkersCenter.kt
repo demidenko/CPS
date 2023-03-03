@@ -73,7 +73,8 @@ fun Context.getCPSWorks() = listOf(
     CodeforcesNewsLostRecentWorker::getWork,
     CodeforcesMonitorLauncherWorker::getWork,
     CodeforcesUpsolvingSuggestionsWorker::getWork,
-    ProjectEulerRecentProblemsWorker::getWork
+    ProjectEulerRecentProblemsWorker::getWork,
+    UtilityWorker::getWork
 ).map { it(this) }
 
 suspend fun Context.enqueueEnabledWorkers() {

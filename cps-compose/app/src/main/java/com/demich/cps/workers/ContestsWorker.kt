@@ -7,7 +7,6 @@ import com.demich.cps.contests.ContestsReloader
 import com.demich.cps.contests.loaders.ContestsReceiver
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.room.contestsListDao
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
 class ContestsWorker(
@@ -28,18 +27,9 @@ class ContestsWorker(
         }
     }
     override suspend fun runWork(): Result {
-        val settings = context.settingsContests
-
-        //remove old ignored items
-        settings.ignoredContests.update {
-            it.filterValues { ignoredAtTime ->
-                currentTime - ignoredAtTime < 30.days
-            }
-        }
-
         //usual reload
         reloadEnabledPlatforms(
-            settings = settings,
+            settings = context.settingsContests,
             contestsReceiver = ContestsReceiver(
                 dao = context.contestsListDao,
                 setLoadingStatus = { _, _ -> },
