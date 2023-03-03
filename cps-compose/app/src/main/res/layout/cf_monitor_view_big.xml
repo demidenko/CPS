@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <LinearLayout
+        android:id="@+id/cf_monitor_phase_and_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="1dp"
+        >
+
+        <TextView
+            android:id="@+id/cf_monitor_phase"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Compat.Notification.Title"
+            />
+
+        <Chronometer
+            android:id="@+id/cf_monitor_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Compat.Notification.Title"
+            android:layout_marginStart="5dp"
+            android:countDown="true"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/cf_monitor_rank_header"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cf_monitor_phase_and_progress"
+        android:layout_marginEnd="4dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Compat.Notification.Line2"
+            android:layout_marginBottom="1dp"
+            android:text="rank"
+            />
+
+        <TextView
+            android:id="@+id/cf_monitor_rank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Compat.Notification.Line2"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/cf_monitor_problems_table"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignTop="@id/cf_monitor_rank_header"
+        android:layout_toEndOf="@id/cf_monitor_rank_header"
+        android:layout_alignParentEnd="true"
+        >
+
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>

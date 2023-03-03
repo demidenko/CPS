@@ -1,6 +1,7 @@
 package com.demich.cps.workers
 
 import android.content.Context
+import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
@@ -39,21 +40,21 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                     launch { notify(submission) }
                 }
             )
+
+            val notifier = CodeforcesMonitorNotifier(
+                context = context,
+                notificationBuilder = notificationBuilder,
+                handle = handle
+            )
+
+            monitor.flowOfContestData()
+                .takeWhile { it?.contestId == contestId }
+                .filterNotNull()
+                .distinctUntilChanged()
+                .collect {
+                    notifier.apply(it)
+                }
         }
-
-        val notifier = CodeforcesMonitorNotifier(
-            context = context,
-            notificationBuilder = notificationBuilder,
-            handle = handle
-        )
-
-        monitor.flowOfContestData()
-            .takeWhile { it?.contestId == contestId }
-            .filterNotNull()
-            .distinctUntilChanged()
-            .collect {
-                notifier.apply(it)
-            }
 
         return Result.success()
     }
@@ -64,7 +65,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
             setSubText(handle)
             setShowWhen(false)
             setSilent(true)
-            //setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            setStyle(NotificationCompat.DecoratedCustomViewStyle())
             //TODO intent open contest screen
         }
 

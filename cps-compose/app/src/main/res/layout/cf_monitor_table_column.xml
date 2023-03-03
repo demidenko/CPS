@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    >
+
+    <TextView
+        android:id="@+id/cf_monitor_table_column_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="1dp"
+        style="@style/TextAppearance.Compat.Notification.Line2"
+        />
+
+    <TextView
+        android:id="@+id/cf_monitor_table_column_cell"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        style="@style/TextAppearance.Compat.Notification.Line2"
+        />
+
+</LinearLayout>
