@@ -236,7 +236,7 @@ private fun ProblemResultCell(
         is CodeforcesMonitorData.ProblemResult.Points -> {
             ProblemResultCell(
                 text = if (contestType == CodeforcesContestType.ICPC) "+" else {
-                    problemResult.points.toString().removeSuffix(".0")
+                    problemResult.pointsToNiceString()
                 },
                 color = if (problemResult.isFinal) cpsColors.success else cpsColors.content,
                 modifier = modifier

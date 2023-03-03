@@ -30,6 +30,8 @@ data class CodeforcesMonitorData(
         object Empty: ProblemResult
         object Pending: ProblemResult
         object FailedSystemTest: ProblemResult
-        data class Points(val points: Double, val isFinal: Boolean): ProblemResult
+        data class Points(val points: Double, val isFinal: Boolean): ProblemResult {
+            fun pointsToNiceString() = points.toString().removeSuffix(".0")
+        }
     }
 }
