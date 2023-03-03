@@ -189,7 +189,7 @@ object CodeforcesApi: ResourceApi() {
     suspend fun getContestStandings(contestId: Int, handles: Collection<String>, includeUnofficial: Boolean): CodeforcesContestStandings {
         return getCodeforcesApi(path = "contest.standings") {
             parameter("contestId", contestId)
-            parameter("handles", handles.joinToString())
+            parameter("handles", handles.joinToString(separator = ";"))
             parameter("showUnofficial", includeUnofficial)
         }
     }
