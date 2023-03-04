@@ -96,7 +96,7 @@ private fun MonitorDialog(onDismissRequest: () -> Unit, onStart: (Int) -> Unit) 
     var contestId by rememberSaveable { mutableStateOf("") }
     CPSYesNoDialog(
         onDismissRequest = onDismissRequest,
-        onConfirmRequest = { onStart(contestId.toInt()) },
+        onConfirmRequest = { contestId.toIntOrNull()?.let(onStart) },
         title = {
             TextField(
                 value = contestId,
