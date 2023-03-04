@@ -10,14 +10,13 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewModelScope
 import com.demich.cps.AdditionalBottomBarBuilder
+import com.demich.cps.CPSViewModels
 import com.demich.cps.LocalCodeforcesAccountManager
-import com.demich.cps.accounts.managers.AccountManagers
-import com.demich.cps.accounts.managers.RatedAccountManager
-import com.demich.cps.accounts.managers.RatedUserInfo
-import com.demich.cps.accounts.managers.allAccountManagers
+import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.*
-import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
+import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.utils.*
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.datastore_itemized.ItemizedDataStore
@@ -53,51 +52,17 @@ fun DevelopScreen() {
 
     Column {
         WorkersList(modifier = Modifier.fillMaxWidth())
-        MonitorFields(modifier = Modifier.fillMaxWidth())
-    }
-}
-
-
-@Composable
-private fun MonitorFields(modifier: Modifier = Modifier) {
-    val context = context
-    val scope = rememberCoroutineScope()
-
-    val handle by with(LocalCodeforcesAccountManager.current) {
-        rememberCollect {
-            flowOfInfo().map { it.handle }
-        }
-    }
-
-    var contestId by rememberSaveable { mutableStateOf("") }
-
-    Row(modifier = modifier) {
-        TextField(
-            value = contestId,
-            onValueChange = { contestId = it },
-            label = { Text("contestId") }
-        )
-        Button(
-            content = { Text("start") },
-            onClick = {
-                scope.launch {
-                    CodeforcesMonitorLauncherWorker.startMonitor(
-                        contestId = contestId.toIntOrNull() ?: return@launch,
-                        handle = handle,
-                        context = context
-                    )
-                }
-            }
-        )
     }
 }
 
 
 fun developAdditionalBottomBarBuilder(
-    progressBarsViewModel: ProgressBarsViewModel
+    cpsViewModels: CPSViewModels
 ): AdditionalBottomBarBuilder = {
+    val context = context
+
     CPSIconButton(icon = CPSIcons.Add) {
-        progressBarsViewModel.doJob(
+        cpsViewModels.progressBarsViewModel.doJob(
             id = Random.nextLong().toString()
         ) { state ->
             val total = Random.nextInt(5, 15)
@@ -108,6 +73,39 @@ fun developAdditionalBottomBarBuilder(
             }
         }
     }
+
+    var showMonitorDialog by remember { mutableStateOf(false) }
+    CPSIconButton(icon = CPSIcons.Monitor) {
+        showMonitorDialog = true
+    }
+    if (showMonitorDialog) {
+        MonitorDialog(onDismissRequest = { showMonitorDialog = false }) {
+            cpsViewModels.contestsViewModel.viewModelScope.launch {
+                CodeforcesMonitorLauncherWorker.startMonitor(
+                    contestId = it,
+                    handle = CodeforcesAccountManager(context).getSavedInfo().handle,
+                    context = context
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MonitorDialog(onDismissRequest: () -> Unit, onStart: (Int) -> Unit) {
+    var contestId by rememberSaveable { mutableStateOf("") }
+    CPSYesNoDialog(
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = { onStart(contestId.toInt()) },
+        title = {
+            TextField(
+                value = contestId,
+                onValueChange = { contestId = it },
+                label = { Text("contestId") },
+                isError = contestId.toIntOrNull() == null
+            )
+        }
+    )
 }
 
 @Composable

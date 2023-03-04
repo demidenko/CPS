@@ -61,7 +61,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
 
     private fun createNotificationBuilder(handle: String) =
         notificationBuilder(context, NotificationChannels.codeforces.contest_monitor) {
-            setSmallIcon(R.drawable.ic_contest)
+            setSmallIcon(R.drawable.ic_monitor)
             setSubText(handle)
             setShowWhen(false)
             setSilent(true)

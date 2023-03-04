@@ -226,7 +226,7 @@ private fun CPSScaffold(
 
             cpsComposable(ScreenTypes.develop) { holder ->
                 DevelopScreen()
-                holder.bottomBar = developAdditionalBottomBarBuilder(cpsViewModels.progressBarsViewModel)
+                holder.bottomBar = developAdditionalBottomBarBuilder(cpsViewModels)
                 holder.setSubtitle("develop")
             }
         }
