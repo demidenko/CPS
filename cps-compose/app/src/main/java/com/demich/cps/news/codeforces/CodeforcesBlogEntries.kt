@@ -22,6 +22,7 @@ import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
+import com.demich.cps.utils.context
 import com.demich.cps.utils.timeAgo
 
 
@@ -35,6 +36,7 @@ fun CodeforcesBlogEntries(
     onLongClick: ((CodeforcesBlogEntry) -> Unit)? = null,
     label: (@Composable (CodeforcesBlogEntry) -> Unit)? = null
 ) {
+    val context = context
     LazyColumnWithScrollBar(
         state = lazyListState,
         modifier = modifier,
@@ -51,10 +53,9 @@ fun CodeforcesBlogEntries(
                 modifier = Modifier
                     .fillMaxWidth()
                     .combinedClickable(
+                        onClick = { blogEntriesController.openBlogEntry(blogEntry, context) },
                         onLongClick = onLongClick?.let { { it(blogEntry) } }?.withVibration()
-                    ) {
-                        blogEntriesController.openBlogEntry(blogEntry)
-                    }
+                    )
                     .padding(horizontal = 3.dp)
                     .let {
                         if (enableScrollBar) it.padding(end = CPSDefaults.scrollBarWidth)

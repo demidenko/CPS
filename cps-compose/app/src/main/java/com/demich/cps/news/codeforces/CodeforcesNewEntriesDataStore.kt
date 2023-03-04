@@ -27,13 +27,8 @@ class CodeforcesNewEntriesDataStore(context: Context): ItemizedDataStore(context
 fun rememberCodeforcesBlogEntriesController(
     blogEntriesState: State<List<CodeforcesBlogEntry>>,
 ): CodeforcesBlogEntriesController {
-    val context = context
     return rememberWith(blogEntriesState) {
-        object : CodeforcesBlogEntriesController(blogEntriesState = this) {
-            override fun openBlogEntry(blogEntry: CodeforcesBlogEntry) {
-                context.openUrlInBrowser(url = CodeforcesApi.urls.blogEntry(blogEntryId = blogEntry.id))
-            }
-        }
+        CodeforcesBlogEntriesController(blogEntriesState = this)
     }
 }
 
@@ -45,7 +40,6 @@ fun rememberCodeforcesBlogEntriesController(
     listState: LazyListState,
     controller: CodeforcesNewsController
 ): CodeforcesBlogEntriesController {
-    val context = context
 
     LaunchedEffect(tab, blogEntriesFlow, newEntriesItem, listState, controller) {
         val flowOfIds = blogEntriesFlow.map {
@@ -76,11 +70,10 @@ fun rememberCodeforcesBlogEntriesController(
             blogEntriesState = blogEntriesState,
             types = types
         ) {
-            override fun openBlogEntry(blogEntry: CodeforcesBlogEntry) {
+            override fun onOpenBlogEntry(blogEntry: CodeforcesBlogEntry) {
                 scope.launch {
                     newEntriesItem.mark(id = blogEntry.id, type = NewEntryType.OPENED)
                 }
-                context.openUrlInBrowser(url = CodeforcesApi.urls.blogEntry(blogEntryId = blogEntry.id))
             }
         }
     }
@@ -88,15 +81,20 @@ fun rememberCodeforcesBlogEntriesController(
 
 
 @Stable
-abstract class CodeforcesBlogEntriesController(
-    val blogEntriesState: State<List<CodeforcesBlogEntry>>,
-    val types: State<NewEntriesTypes> = mutableStateOf(emptyMap()),
+open class CodeforcesBlogEntriesController(
+    blogEntriesState: State<List<CodeforcesBlogEntry>>,
+    private val types: State<NewEntriesTypes>? = null
 ) {
-    abstract fun openBlogEntry(blogEntry: CodeforcesBlogEntry)
+    protected open fun onOpenBlogEntry(blogEntry: CodeforcesBlogEntry) = Unit
+    fun openBlogEntry(blogEntry: CodeforcesBlogEntry, context: Context) {
+        onOpenBlogEntry(blogEntry)
+        context.openUrlInBrowser(url = CodeforcesApi.urls.blogEntry(blogEntryId = blogEntry.id))
+    }
 
     val blogEntries by blogEntriesState
 
     fun isNew(id: Int): Boolean {
+        if (types == null) return false
         val type = types.value[id]
         return type == NewEntryType.UNSEEN || type == NewEntryType.SEEN
     }
