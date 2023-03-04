@@ -104,22 +104,17 @@ fun LazyListState.visibleRange(requiredVisiblePart: Float = 0.5f): IntRange {
     val visibleItems = layoutInfo.visibleItemsInfo
     if (visibleItems.isEmpty()) return IntRange.EMPTY
 
-    val firstVisibleItemIndex = firstVisibleItemIndex
-    visibleItems.forEachIndexed { index, info -> require(info.index == firstVisibleItemIndex + index) }
-
-    val firstVisible = firstVisibleItemIndex.let { index ->
-        val item = visibleItems[0]
+    val firstVisible = visibleItems.first().let { item ->
         val topHidden = (-item.offset).coerceAtLeast(0)
         val visiblePart = (item.size - topHidden).toFloat() / item.size
-        if (visiblePart < requiredVisiblePart) index + 1 else index
+        if (visiblePart < requiredVisiblePart) item.index + 1 else item.index
     }
 
-    val lastVisible = (firstVisibleItemIndex + visibleItems.size - 1).let { index ->
-        val item = visibleItems.last()
+    val lastVisible = visibleItems.last().let { item ->
         val bottomHidden = (item.offset + item.size - layoutInfo.viewportEndOffset)
             .coerceAtLeast(0)
         val visiblePart = (item.size - bottomHidden).toFloat() / item.size
-        if (visiblePart < requiredVisiblePart) index - 1 else index
+        if (visiblePart < requiredVisiblePart) item.index - 1 else item.index
     }
 
     return firstVisible .. lastVisible
