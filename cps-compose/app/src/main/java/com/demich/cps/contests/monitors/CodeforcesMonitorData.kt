@@ -33,5 +33,9 @@ data class CodeforcesMonitorData(
         data class Points(val points: Double, val isFinal: Boolean): ProblemResult {
             fun pointsToNiceString() = points.toString().removeSuffix(".0")
         }
+
+        companion object {
+            val failedSystemTestSymbol get() = "⨯" //alternatives: × ✖
+        }
     }
 }

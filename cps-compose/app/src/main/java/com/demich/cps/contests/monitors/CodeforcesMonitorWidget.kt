@@ -17,17 +17,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.IconSp
+import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.*
 import com.demich.cps.utils.codeforces.CodeforcesContestPhase
 import com.demich.cps.utils.codeforces.CodeforcesContestType
 import com.demich.cps.utils.codeforces.CodeforcesParticipationType
+import com.demich.cps.utils.collectCurrentTimeAsState
+import com.demich.cps.utils.rememberWith
+import com.demich.cps.utils.toHHMMSS
+import com.demich.cps.utils.toMMSS
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -215,8 +219,9 @@ private fun ProblemResultCell(
 ) {
     when (problemResult) {
         is CodeforcesMonitorData.ProblemResult.FailedSystemTest -> {
-            ProblemFailedCell(
-                iconSize = 18.sp,
+            ProblemResultCell(
+                text = CodeforcesMonitorData.ProblemResult.failedSystemTestSymbol,
+                color = cpsColors.error,
                 modifier = modifier
             )
         }
@@ -260,19 +265,6 @@ private fun ProblemResultCell(
 }
 
 @Composable
-private fun ProblemFailedCell(
-    iconSize: TextUnit,
-    modifier: Modifier = Modifier
-) {
-    IconSp(
-        imageVector = CPSIcons.FailedSystemTest,
-        color = cpsColors.error,
-        size = iconSize,
-        modifier = modifier
-    )
-}
-
-@Composable
 private fun RankColumn(
     rank: Int,
     participationType: CodeforcesParticipationType,
@@ -286,5 +278,50 @@ private fun RankColumn(
                 else -> "*$rank"
             }
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TestProblemColumns() {
+    CPSTheme {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            ProblemColumn(
+                problemName = "A",
+                problemResult = CodeforcesMonitorData.ProblemResult.Points(1.0, true),
+                contestType = CodeforcesContestType.ICPC,
+                modifier = Modifier.weight(1f)
+            )
+            ProblemColumn(
+                problemName = "A1",
+                problemResult = CodeforcesMonitorData.ProblemResult.Points(500.0, false),
+                contestType = CodeforcesContestType.CF,
+                modifier = Modifier.weight(1f)
+            )
+            ProblemColumn(
+                problemName = "A2",
+                problemResult = CodeforcesMonitorData.ProblemResult.Points(500.0, true),
+                contestType = CodeforcesContestType.CF,
+                modifier = Modifier.weight(1f)
+            )
+            ProblemColumn(
+                problemName = "F",
+                problemResult = CodeforcesMonitorData.ProblemResult.FailedSystemTest,
+                contestType = CodeforcesContestType.CF,
+                modifier = Modifier.weight(1f)
+            )
+            ProblemColumn(
+                problemName = "P",
+                problemResult = CodeforcesMonitorData.ProblemResult.Pending,
+                contestType = CodeforcesContestType.CF,
+                modifier = Modifier.weight(1f)
+            )
+            ProblemColumn(
+                problemName = "E",
+                problemResult = CodeforcesMonitorData.ProblemResult.Empty,
+                contestType = CodeforcesContestType.CF,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }

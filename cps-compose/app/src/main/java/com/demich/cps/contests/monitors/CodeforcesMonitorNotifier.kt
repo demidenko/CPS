@@ -124,7 +124,7 @@ class CodeforcesMonitorNotifier(
                 }
                 CodeforcesMonitorData.ProblemResult.FailedSystemTest -> {
                     color(color = failColor) {
-                        append("✖")
+                        append(CodeforcesMonitorData.ProblemResult.failedSystemTestSymbol)
                     }
                 }
                 is CodeforcesMonitorData.ProblemResult.Points -> {
