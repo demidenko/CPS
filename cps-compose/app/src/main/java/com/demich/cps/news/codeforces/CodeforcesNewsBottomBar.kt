@@ -10,14 +10,14 @@ fun CodeforcesNewsBottomBar(
 ) {
     when (controller.currentTab) {
         CodeforcesTitle.TOP -> {
-            TopSwitchButton(inCommentsMode = controller.topShowComments) {
-                controller.topShowComments = controller.topShowComments.not()
+            CommentsModeButton(isOn = controller.topShowComments) {
+                controller.topShowComments = it
             }
         }
         CodeforcesTitle.RECENT -> {
             if (controller.recentFilterByBlogEntryId == null) {
-                RecentSwitchButton(inCommentsMode = controller.recentShowComments) {
-                    controller.recentShowComments = controller.recentShowComments.not()
+                CommentsModeButton(isOn = controller.recentShowComments) {
+                    controller.recentShowComments = it
                 }
             }
         }
@@ -26,26 +26,14 @@ fun CodeforcesNewsBottomBar(
 }
 
 @Composable
-private fun TopSwitchButton(
-    inCommentsMode: Boolean,
-    onClick: () -> Unit
+private fun CommentsModeButton(
+    isOn: Boolean,
+    onModeChange: (Boolean) -> Unit
 ) {
     CPSIconButton(
         icon = CPSIcons.Comments,
-        onState = inCommentsMode,
-        onClick = onClick
-    )
-}
-
-
-@Composable
-private fun RecentSwitchButton(
-    inCommentsMode: Boolean,
-    onClick: () -> Unit
-) {
-    CPSIconButton(
-        icon = CPSIcons.Comments,
-        onState = inCommentsMode,
-        onClick = onClick
-    )
+        onState = isOn
+    ) {
+        onModeChange(!isOn)
+    }
 }
