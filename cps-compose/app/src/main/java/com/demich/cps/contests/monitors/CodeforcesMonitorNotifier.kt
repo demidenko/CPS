@@ -1,6 +1,7 @@
 package com.demich.cps.contests.monitors
 
 import android.content.Context
+import android.os.SystemClock
 import android.text.SpannableStringBuilder
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
@@ -13,6 +14,8 @@ import com.demich.cps.notifyBy
 import com.demich.cps.utils.codeforces.CodeforcesContestPhase
 import com.demich.cps.utils.codeforces.CodeforcesContestType
 import com.demich.cps.utils.codeforces.CodeforcesParticipationType
+import com.demich.cps.utils.getCurrentTime
+import kotlin.time.Duration.Companion.milliseconds
 
 class CodeforcesMonitorNotifier(
     val context: Context,
@@ -69,7 +72,9 @@ class CodeforcesMonitorNotifier(
         _phase = phase
         views.forEach { it.setTextViewText(R.id.cf_monitor_phase, phase.phase.title) }
         if (phase is CodeforcesMonitorData.ContestPhase.Coding) {
-            views.forEach { it.setChronometer(R.id.cf_monitor_progress, phase.endTime.toEpochMilliseconds(), null, true) }
+            val remaining = phase.endTime - getCurrentTime()
+            val elapsed = SystemClock.elapsedRealtime().milliseconds
+            views.forEach { it.setChronometer(R.id.cf_monitor_progress, (elapsed + remaining).inWholeMilliseconds, null, true) }
         } else {
             if (phaseChanged) {
                 views.forEach { it.setChronometer(R.id.cf_monitor_progress, 0, null, false) }
