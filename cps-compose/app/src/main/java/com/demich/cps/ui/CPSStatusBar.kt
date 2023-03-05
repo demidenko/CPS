@@ -192,7 +192,17 @@ fun StatusBarButtonsForUIPanel() {
             StatusBarAccountsPopup(
                 expanded = showPopup,
                 resultByMaximum = resultByMaximum,
+                setResultByMaximum = {
+                    scope.launch { settingsUI.statusBarResultByMaximum(it) }
+                },
                 disabledManagers = disabledManagers,
+                onCheckedChange = { type, checked ->
+                    scope.launch {
+                        settingsUI.statusBarDisabledManagers.edit {
+                            if (checked) remove(type) else add(type)
+                        }
+                    }
+                },
                 recordedAccounts = recordedAccounts,
                 onDismissRequest = { showPopup = false }
             )
@@ -206,13 +216,12 @@ fun StatusBarButtonsForUIPanel() {
 private fun StatusBarAccountsPopup(
     expanded: Boolean,
     resultByMaximum: Boolean,
+    setResultByMaximum: (Boolean) -> Unit,
     disabledManagers: Set<AccountManagers>,
+    onCheckedChange: (AccountManagers, Boolean) -> Unit,
     recordedAccounts: List<UserInfoWithManager<out UserInfo>>,
     onDismissRequest: () -> Unit
 ) {
-    val settingsUI = with(context) { remember { settingsUI } }
-    val scope = rememberCoroutineScope()
-
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
@@ -220,13 +229,10 @@ private fun StatusBarAccountsPopup(
     ) {
         recordedAccounts.forEach { (_, manager) ->
             Row(modifier = Modifier.padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                CPSCheckBox(checked = manager.type !in disabledManagers) { checked ->
-                    scope.launch {
-                        settingsUI.statusBarDisabledManagers.edit {
-                            if (checked) remove(manager.type) else add(manager.type)
-                        }
-                    }
-                }
+                CPSCheckBox(
+                    checked = manager.type !in disabledManagers,
+                    onCheckedChange = { checked -> onCheckedChange(manager.type, checked) }
+                )
                 MonospacedText(text = manager.type.name)
             }
         }
@@ -236,9 +242,7 @@ private fun StatusBarAccountsPopup(
             text = { value ->
                 if (value) "best" else "worst"
             },
-            onSelect = { value ->
-                scope.launch { settingsUI.statusBarResultByMaximum(value) }
-            },
+            onSelect = setResultByMaximum,
             modifier = Modifier
                 .padding(horizontal = 10.dp)
                 .align(Alignment.CenterHorizontally)
