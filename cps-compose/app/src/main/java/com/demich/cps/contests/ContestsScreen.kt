@@ -25,7 +25,6 @@ import androidx.work.WorkInfo
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
-import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.contests.loaders.makeCombinedMessage
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
@@ -53,7 +52,13 @@ fun ContestsScreen(
 ) {
     val context = context
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
-    val errorsState = rememberCollect { contestsViewModel.flowOfLoadingErrors() }
+    val errorsMessage by rememberCollect {
+        combine(
+            flow = contestsViewModel.flowOfLoadingErrors(),
+            flow2 = context.settingsDev.devModeEnabled.flow,
+            transform = ::makeCombinedMessage
+        )
+    }
 
     if (isAnyPlatformEnabled) {
         Column(
@@ -67,10 +72,10 @@ fun ContestsScreen(
                     .fillMaxWidth()
             )
             ContestsReloadableContent(
-                errorsState = errorsState,
                 filterController = filterController,
                 isRefreshing = loadingStatusState.value == LoadingStatus.LOADING,
                 onRefresh = { contestsViewModel.reloadEnabledPlatforms(context) },
+                errorsMessage = { errorsMessage },
                 modifier = Modifier.weight(1f, false)
             )
             ContestsFilterTextField(
@@ -92,7 +97,7 @@ private fun ContestsReloadableContent(
     filterController: ContestsFilterController,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
-    errorsState: State<List<Pair<ContestsLoaders, Throwable>>>,
+    errorsMessage: () -> String,
     modifier: Modifier = Modifier
 ) {
     CPSSwipeRefresh(
@@ -102,7 +107,7 @@ private fun ContestsReloadableContent(
     ) {
         ContestsContent(
             filterController = filterController,
-            errorsState = errorsState
+            errorsMessage = errorsMessage
         )
     }
 }
@@ -111,7 +116,7 @@ private fun ContestsReloadableContent(
 @Composable
 private fun ContestsContent(
     filterController: ContestsFilterController,
-    errorsState: State<List<Pair<ContestsLoaders, Throwable>>>
+    errorsMessage: () -> String
 ) {
     val context = context
     val contestsToShowState = rememberCollect {
@@ -131,7 +136,7 @@ private fun ContestsContent(
 
     Column {
         LoadingError(
-            errors = errorsState.value,
+            errorsMessage = errorsMessage,
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -249,17 +254,13 @@ private fun ContestsFilterTextField(
 
 @Composable
 private fun ColumnScope.LoadingError(
-    errors: List<Pair<ContestsLoaders,Throwable>>,
+    errorsMessage: () -> String,
     modifier: Modifier = Modifier
 ) {
-    val context = context
-    val devModeEnabled by rememberCollect { context.settingsDev.devModeEnabled.flow }
-    AnimatedVisibility(visible = errors.isNotEmpty()) {
+    val message = errorsMessage()
+    AnimatedVisibility(visible = message.isNotBlank()) {
         Text(
-            text = makeCombinedMessage(
-                errors = errors,
-                developEnabled = devModeEnabled
-            ),
+            text = message,
             textAlign = TextAlign.Center,
             color = cpsColors.background,
             fontSize = 13.sp,
