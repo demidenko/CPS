@@ -1,16 +1,15 @@
 package com.demich.cps.ui.theme
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Typography
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.demich.cps.ui.LocalUseOriginalColors
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
@@ -34,6 +33,7 @@ private val DarkColorPalette = darkColors(
 fun CPSTheme(content: @Composable () -> Unit) {
     val context = context
     val darkLightMode by rememberCollect { context.settingsUI.darkLightMode.flow }
+    val useOriginalColors by rememberCollect { context.settingsUI.useOriginalColors.flow }
     MaterialTheme(
         colors = if (darkLightMode.isDarkMode()) DarkColorPalette else LightColorPalette,
         typography = Typography(
@@ -43,7 +43,12 @@ fun CPSTheme(content: @Composable () -> Unit) {
                 fontSize = 16.sp,
                 letterSpacing = 0.3.sp
             )
-        ),
-        content = content
-    )
+        )
+    ) {
+        CompositionLocalProvider(
+            LocalUseOriginalColors provides useOriginalColors,
+            LocalContentAlpha provides 1f,
+            content = content
+        )
+    }
 }

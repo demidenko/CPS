@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,15 +36,12 @@ import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
 import com.demich.cps.news.settings.NewsSettingsScreen
 import com.demich.cps.ui.CPSNavigator
-import com.demich.cps.ui.LocalUseOriginalColors
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.ui.rememberCPSNavigator
-import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
 import com.demich.cps.workers.enqueueEnabledWorkers
 import kotlinx.coroutines.launch
 
@@ -62,20 +58,14 @@ class MainActivity: ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val context = context
             val cpsViewModels = CPSViewModels(
                 accountsViewModel = viewModel(),
                 newsViewModel = viewModel(),
                 contestsViewModel = viewModel(),
                 progressBarsViewModel = viewModel()
             )
-            CPSTheme {
-                val useOriginalColors by rememberCollect { settingsUI.useOriginalColors.flow }
-                CompositionLocalProvider(
-                    LocalUseOriginalColors provides useOriginalColors,
-                    LocalContentAlpha provides 1f,
-                    LocalCodeforcesAccountManager provides remember { CodeforcesAccountManager(context) }
-                ) {
+            CompositionLocalProvider(LocalCodeforcesAccountManager provides CodeforcesAccountManager(context)) {
+                CPSTheme {
                     CPSContent(cpsViewModels = cpsViewModels)
                 }
             }
@@ -87,6 +77,7 @@ class MainActivity: ComponentActivity() {
 private fun CPSContent(
     cpsViewModels: CPSViewModels
 ) {
+    println("#1")
     val navigator = rememberCPSNavigator(navController = rememberNavController())
 
     navigator.ColorizeNavAndStatusBars()
@@ -103,7 +94,7 @@ private fun CPSScaffold(
     cpsViewModels: CPSViewModels,
     navigator: CPSNavigator
 ) {
-
+    println("#2")
     fun NavGraphBuilder.cpsComposable(
         screenType: ScreenTypes,
         content: @Composable (CPSNavigator.DuringCompositionHolder) -> Unit
