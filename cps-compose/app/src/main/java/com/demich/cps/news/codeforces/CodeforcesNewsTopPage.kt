@@ -2,6 +2,7 @@ package com.demich.cps.news.codeforces
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import com.demich.cps.news.follow.CodeforcesBlogEntriesFollowAddable
@@ -45,9 +46,9 @@ private fun CodeforcesNewsTopComments(
     controller: CodeforcesNewsController
 ) {
     val context = context
-    val commentsState = rememberCollect { controller.flowOfTopComments(context) }
+    val comments by rememberCollect { controller.flowOfTopComments(context) }
     CodeforcesComments(
-        commentsState = commentsState,
+        comments = { comments },
         modifier = Modifier.fillMaxSize()
     )
 }

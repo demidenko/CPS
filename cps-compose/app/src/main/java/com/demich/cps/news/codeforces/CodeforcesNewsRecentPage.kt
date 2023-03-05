@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import com.demich.cps.ui.CPSIcons
@@ -45,7 +46,7 @@ fun CodeforcesNewsRecentPage(
         if (controller.recentShowComments) {
             saveableStateHolder.SaveableStateProvider(key = true) {
                 CodeforcesComments(
-                    commentsState = commentsState,
+                    comments = { commentsState.value },
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -99,7 +100,7 @@ private fun RecentCommentsInBlogEntry(
     blogEntry: CodeforcesBlogEntry,
     onBackPressed: (Int) -> Unit
 ) {
-    val filteredCommentsState = rememberWith(blogEntry) {
+    val filteredComments by rememberWith(blogEntry) {
         derivedStateOf {
             commentsState.value.filter {
                 it.blogEntry?.id == id
@@ -108,7 +109,7 @@ private fun RecentCommentsInBlogEntry(
     }
 
     CodeforcesComments(
-        commentsState = filteredCommentsState,
+        comments = { filteredComments },
         showTitle = false,
         modifier = Modifier.fillMaxSize()
     )

@@ -34,9 +34,9 @@ import kotlin.math.roundToInt
 
 @Composable
 fun CodeforcesComments(
-    commentsState: State<List<CodeforcesRecentAction>>,
-    lazyListState: LazyListState = rememberLazyListState(),
+    comments: () -> List<CodeforcesRecentAction>,
     modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState(),
     showTitle: Boolean = true
 ) {
     val context = context
@@ -45,7 +45,7 @@ fun CodeforcesComments(
         modifier = modifier
     ) {
         itemsNotEmpty(
-            items = commentsState.value,
+            items = comments(),
             key = { it.comment.id }
         ) { recentAction ->
             val blogEntry = recentAction.blogEntry!!
