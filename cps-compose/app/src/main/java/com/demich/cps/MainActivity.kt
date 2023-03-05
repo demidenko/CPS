@@ -43,6 +43,7 @@ import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.ui.rememberCPSNavigator
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
+import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.workers.enqueueEnabledWorkers
@@ -200,22 +201,23 @@ private fun CPSScaffold(
             cpsComposable(ScreenTypes.contests) { holder ->
                 val context = context
                 val filterController = rememberContestsFilterController()
-                val loadingStatusState = rememberCombinedLoadingStatusState(cpsViewModels.contestsViewModel)
+                val loadingStatus by rememberCombinedLoadingStatusState(cpsViewModels.contestsViewModel)
+                val isReloading = { loadingStatus == LoadingStatus.LOADING }
+                val onReload = { cpsViewModels.contestsViewModel.reloadEnabledPlatforms(context) }
                 ContestsScreen(
                     contestsViewModel = cpsViewModels.contestsViewModel,
                     filterController = filterController,
-                    loadingStatusState = loadingStatusState
+                    isReloading = isReloading,
+                    onReload = onReload
                 )
                 holder.bottomBar = contestsBottomBarBuilder(
-                    loadingStatusState = loadingStatusState,
                     filterController = filterController,
-                    onReloadClick = {
-                        cpsViewModels.contestsViewModel.reloadEnabledPlatforms(context)
-                    }
+                    loadingStatus = { loadingStatus },
+                    onReloadClick = onReload
                 )
                 holder.menu = contestsMenuBuilder(
-                    navigator = navigator,
-                    loadingStatusState = loadingStatusState
+                    onOpenSettings = { navigator.navigateTo(Screen.ContestsSettings) },
+                    isReloading = isReloading
                 )
                 holder.setSubtitle("contests")
             }

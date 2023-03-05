@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import androidx.work.WorkInfo
 import com.demich.cps.AdditionalBottomBarBuilder
-import com.demich.cps.Screen
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.loaders.makeCombinedMessage
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
@@ -48,7 +47,8 @@ import kotlinx.coroutines.launch
 fun ContestsScreen(
     contestsViewModel: ContestsViewModel,
     filterController: ContestsFilterController,
-    loadingStatusState: State<LoadingStatus>
+    isReloading: () -> Boolean,
+    onReload: () -> Unit
 ) {
     val context = context
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
@@ -73,8 +73,8 @@ fun ContestsScreen(
             )
             ContestsReloadableContent(
                 filterController = filterController,
-                isRefreshing = { loadingStatusState.value == LoadingStatus.LOADING },
-                onRefresh = { contestsViewModel.reloadEnabledPlatforms(context) },
+                isReloading = isReloading,
+                onReload = onReload,
                 errorsMessage = { errorsMessage },
                 modifier = Modifier.weight(1f, false)
             )
@@ -95,14 +95,14 @@ fun ContestsScreen(
 @Composable
 private fun ContestsReloadableContent(
     filterController: ContestsFilterController,
-    isRefreshing: () -> Boolean,
-    onRefresh: () -> Unit,
+    isReloading: () -> Boolean,
+    onReload: () -> Unit,
     errorsMessage: () -> String,
     modifier: Modifier = Modifier
 ) {
     CPSSwipeRefreshBox(
-        isRefreshing = isRefreshing,
-        onRefresh = onRefresh,
+        isRefreshing = isReloading,
+        onRefresh = onReload,
         modifier = modifier
     ) {
         ContestsContent(
@@ -274,26 +274,22 @@ private fun ColumnScope.LoadingError(
 }
 
 fun contestsMenuBuilder(
-    navigator: CPSNavigator,
-    loadingStatusState: State<LoadingStatus>
+    onOpenSettings: () -> Unit,
+    isReloading: () -> Boolean
 ): CPSMenuBuilder = {
-    val loadingStatus by loadingStatusState
-    
     CPSDropdownMenuItem(
         title = "Settings",
         icon = CPSIcons.Settings,
-        enabled = loadingStatus != LoadingStatus.LOADING
-    ) {
-        navigator.navigateTo(Screen.ContestsSettings)
-    }
+        enabled = !isReloading(),
+        onClick = onOpenSettings
+    )
 }
 
 fun contestsBottomBarBuilder(
-    loadingStatusState: State<LoadingStatus>,
     filterController: ContestsFilterController,
+    loadingStatus: () -> LoadingStatus,
     onReloadClick: () -> Unit
 ): AdditionalBottomBarBuilder = {
-    val loadingStatus by loadingStatusState
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
 
     if (isAnyPlatformEnabled && filterController.available && !filterController.enabled) {
@@ -304,7 +300,7 @@ fun contestsBottomBarBuilder(
     }
 
     CPSReloadingButton(
-        loadingStatus = loadingStatus,
+        loadingStatus = loadingStatus(),
         enabled = isAnyPlatformEnabled,
         onClick = onReloadClick
     )
