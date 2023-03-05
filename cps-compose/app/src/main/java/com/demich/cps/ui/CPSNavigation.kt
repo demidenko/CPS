@@ -40,17 +40,14 @@ fun rememberCPSNavigator(
 @Stable
 class CPSNavigator(
     private val navController: NavHostController,
+    currentScreenState: State<Screen?>,
     private val subtitleState: MutableState<String>,
-    private val currentScreenState: State<Screen?>,
     private val menuBuilderState: MutableState<CPSMenuBuilder?>,
     private val bottomBarBuilderState: MutableState<AdditionalBottomBarBuilder?>
 ) {
 
-    val subtitle: String
-        get() = subtitleState.value
-
-    val currentScreen: Screen?
-        get() = currentScreenState.value
+    val subtitle by subtitleState
+    val currentScreen by currentScreenState
 
     val isBottomBarEnabled: Boolean
         get() = currentScreen.let {
@@ -58,7 +55,7 @@ class CPSNavigator(
         }
 
     fun navigateTo(screen: Screen) {
-        val currentScreen = currentScreenState.value ?: return
+        val currentScreen = currentScreen ?: return
         if (screen.rootScreenType != currentScreen.rootScreenType) {
             //switch stack
             navController.navigate(route = screen.routePath) {
@@ -106,8 +103,8 @@ class CPSNavigator(
         modifier: Modifier = Modifier,
         builder: NavGraphBuilder.() -> Unit
     ) {
-        val startRoute = with(context) {
-            remember { runBlocking { settingsUI.startScreenRoute() } }
+        val startRoute = rememberWith(context) {
+            runBlocking { settingsUI.startScreenRoute() }
         }
         androidx.navigation.compose.NavHost(
             navController = navController,
