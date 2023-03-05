@@ -77,7 +77,6 @@ class MainActivity: ComponentActivity() {
 private fun CPSContent(
     cpsViewModels: CPSViewModels
 ) {
-    println("#1")
     val navigator = rememberCPSNavigator(navController = rememberNavController())
 
     navigator.ColorizeNavAndStatusBars()
@@ -94,7 +93,6 @@ private fun CPSScaffold(
     cpsViewModels: CPSViewModels,
     navigator: CPSNavigator
 ) {
-    println("#2")
     fun NavGraphBuilder.cpsComposable(
         screenType: ScreenTypes,
         content: @Composable (CPSNavigator.DuringCompositionHolder) -> Unit
