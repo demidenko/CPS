@@ -73,7 +73,7 @@ fun ContestsScreen(
             )
             ContestsReloadableContent(
                 filterController = filterController,
-                isRefreshing = loadingStatusState.value == LoadingStatus.LOADING,
+                isRefreshing = { loadingStatusState.value == LoadingStatus.LOADING },
                 onRefresh = { contestsViewModel.reloadEnabledPlatforms(context) },
                 errorsMessage = { errorsMessage },
                 modifier = Modifier.weight(1f, false)
@@ -95,12 +95,12 @@ fun ContestsScreen(
 @Composable
 private fun ContestsReloadableContent(
     filterController: ContestsFilterController,
-    isRefreshing: Boolean,
+    isRefreshing: () -> Boolean,
     onRefresh: () -> Unit,
     errorsMessage: () -> String,
     modifier: Modifier = Modifier
 ) {
-    CPSSwipeRefresh(
+    CPSSwipeRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = onRefresh,
         modifier = modifier

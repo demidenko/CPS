@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.contests.Contest
 import com.demich.cps.news.NewsTab
 import com.demich.cps.news.NewsTabRow
-import com.demich.cps.ui.CPSSwipeRefresh
+import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
@@ -52,8 +52,8 @@ fun CodeforcesReloadablePage(
 ) {
     val context = context
     val loadingStatus by controller.rememberLoadingStatusState(title = title)
-    CPSSwipeRefresh(
-        isRefreshing = loadingStatus == LoadingStatus.LOADING,
+    CPSSwipeRefreshBox(
+        isRefreshing = { loadingStatus == LoadingStatus.LOADING },
         onRefresh = { controller.reload(title = title, context = context) },
         content = content
     )
