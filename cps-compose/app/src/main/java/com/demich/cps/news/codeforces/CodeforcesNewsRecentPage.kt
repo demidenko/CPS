@@ -3,10 +3,9 @@ package com.demich.cps.news.codeforces
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import com.demich.cps.ui.CPSIcons
@@ -23,9 +22,10 @@ fun CodeforcesNewsRecentPage(
     controller: CodeforcesNewsController
 ) {
     val context = context
-    val recentActionsState = rememberCollect { controller.flowOfRecentActions(context) }
-    val commentsState = remember {
-        derivedStateOf { recentActionsState.value.second }
+
+    val recentActions by rememberCollect { controller.flowOfRecentActions(context) }
+    val comments by remember {
+        derivedStateOf { recentActions.second }
     }
 
     val saveableStateHolder = rememberSaveableStateHolder()
@@ -36,17 +36,19 @@ fun CodeforcesNewsRecentPage(
             saveableStateHolder.SaveableStateProvider(key = blogEntryId) {
                 RecentCommentsInBlogEntry(
                     controller = controller,
-                    commentsState = commentsState,
+                    comments = { comments },
                     //TODO: NoSuchElement crash
-                    blogEntry = recentActionsState.value.first.first { it.id == blogEntryId },
-                    onBackPressed = saveableStateHolder::removeState
+                    blogEntry = recentActions.first.first { it.id == blogEntryId },
+                    onBackPressed = {
+                        saveableStateHolder.removeState(blogEntryId)
+                    }
                 )
             }
         } else
         if (controller.recentShowComments) {
             saveableStateHolder.SaveableStateProvider(key = true) {
                 CodeforcesComments(
-                    comments = { commentsState.value },
+                    comments = { comments },
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -54,7 +56,7 @@ fun CodeforcesNewsRecentPage(
             saveableStateHolder.SaveableStateProvider(key = false) {
                 RecentBlogEntriesPage(
                     controller = controller,
-                    recentActionsState = recentActionsState
+                    recentActions = { recentActions }
                 )
             }
         }
@@ -65,7 +67,7 @@ fun CodeforcesNewsRecentPage(
 @Composable
 private fun RecentBlogEntriesPage(
     controller: CodeforcesNewsController,
-    recentActionsState: State<Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>>,
+    recentActions: () -> Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>,
 ) {
     val context = context
 
@@ -74,7 +76,7 @@ private fun RecentBlogEntriesPage(
     }
 
     CodeforcesRecentBlogEntries(
-        recentActionsState = recentActionsState,
+        recentActions = recentActions,
         modifier = Modifier.fillMaxSize(),
         onOpenBlogEntry = ::openBlogEntry,
     ) { blogEntry, comments ->
@@ -96,13 +98,13 @@ private fun RecentBlogEntriesPage(
 @Composable
 private fun RecentCommentsInBlogEntry(
     controller: CodeforcesNewsController,
-    commentsState: State<List<CodeforcesRecentAction>>,
+    comments: () -> List<CodeforcesRecentAction>,
     blogEntry: CodeforcesBlogEntry,
-    onBackPressed: (Int) -> Unit
+    onBackPressed: () -> Unit
 ) {
     val filteredComments by rememberWith(blogEntry) {
         derivedStateOf {
-            commentsState.value.filter {
+            comments().filter {
                 it.blogEntry?.id == id
             }
         }
@@ -117,7 +119,7 @@ private fun RecentCommentsInBlogEntry(
     BackHandler(
         enabled = controller.isTabVisible(CodeforcesTitle.RECENT)
     ) {
-        controller.recentFilterByBlogEntryId?.let(onBackPressed)
+        onBackPressed()
         controller.recentFilterByBlogEntryId = null
     }
 }

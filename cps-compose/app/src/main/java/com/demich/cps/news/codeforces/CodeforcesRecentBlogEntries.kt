@@ -25,12 +25,12 @@ import com.demich.cps.utils.rememberWith
 
 @Composable
 fun CodeforcesRecentBlogEntries(
-    recentActionsState: State<Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>>,
+    recentActions: () -> Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>,
     modifier: Modifier = Modifier,
     onOpenBlogEntry: (CodeforcesBlogEntry) -> Unit,
     menuBuilder: @Composable CPSDropdownMenuScope.(CodeforcesBlogEntry, List<CodeforcesComment>) -> Unit
 ) {
-    val recent = rememberWith(recentActionsState.value) {
+    val recent = rememberWith(recentActions()) {
         makeRecentBlogEntries(blogEntries = first, comments = second)
     }
 
