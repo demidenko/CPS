@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import com.demich.cps.ui.CPSIcons
@@ -24,9 +23,6 @@ fun CodeforcesNewsRecentPage(
     val context = context
 
     val recentActions by rememberCollect { controller.flowOfRecentActions(context) }
-    val comments by remember {
-        derivedStateOf { recentActions.second }
-    }
 
     val saveableStateHolder = rememberSaveableStateHolder()
 
@@ -36,19 +32,21 @@ fun CodeforcesNewsRecentPage(
             saveableStateHolder.SaveableStateProvider(key = blogEntryId) {
                 RecentCommentsInBlogEntry(
                     controller = controller,
-                    comments = { comments },
+                    comments = { recentActions.second },
                     //TODO: NoSuchElement crash
                     blogEntry = recentActions.first.first { it.id == blogEntryId },
                     onBackPressed = {
                         saveableStateHolder.removeState(blogEntryId)
-                    }
+                        controller.recentFilterByBlogEntryId = null
+                    },
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         } else
         if (controller.recentShowComments) {
             saveableStateHolder.SaveableStateProvider(key = true) {
                 CodeforcesComments(
-                    comments = { comments },
+                    comments = { recentActions.second },
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -56,7 +54,8 @@ fun CodeforcesNewsRecentPage(
             saveableStateHolder.SaveableStateProvider(key = false) {
                 RecentBlogEntriesPage(
                     controller = controller,
-                    recentActions = { recentActions }
+                    recentActions = { recentActions },
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         }
@@ -68,6 +67,7 @@ fun CodeforcesNewsRecentPage(
 private fun RecentBlogEntriesPage(
     controller: CodeforcesNewsController,
     recentActions: () -> Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>,
+    modifier: Modifier = Modifier
 ) {
     val context = context
 
@@ -77,7 +77,7 @@ private fun RecentBlogEntriesPage(
 
     CodeforcesRecentBlogEntries(
         recentActions = recentActions,
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         onOpenBlogEntry = ::openBlogEntry,
     ) { blogEntry, comments ->
         CPSDropdownMenuItem(title = "Open recent comment", icon = CPSIcons.OpenInBrowser) {
@@ -100,7 +100,8 @@ private fun RecentCommentsInBlogEntry(
     controller: CodeforcesNewsController,
     comments: () -> List<CodeforcesRecentAction>,
     blogEntry: CodeforcesBlogEntry,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val filteredComments by rememberWith(blogEntry) {
         derivedStateOf {
@@ -113,13 +114,11 @@ private fun RecentCommentsInBlogEntry(
     CodeforcesComments(
         comments = { filteredComments },
         showTitle = false,
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier
     )
 
     BackHandler(
-        enabled = controller.isTabVisible(CodeforcesTitle.RECENT)
-    ) {
-        onBackPressed()
-        controller.recentFilterByBlogEntryId = null
-    }
+        enabled = controller.isTabVisible(CodeforcesTitle.RECENT),
+        onBack = onBackPressed
+    )
 }
