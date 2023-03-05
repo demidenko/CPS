@@ -106,14 +106,9 @@ fun makeCombinedMessage(
 }
 
 private val Throwable.niceMessage: String? get() =
-    when {
-        this is UnknownHostException || this is SocketException || this is SocketTimeoutException
-            -> "Connection failed"
-        this is ClientRequestException && response.status == HttpStatusCode.Unauthorized
-            -> "Unauthorized"
-        this is ClientRequestException && response.status == HttpStatusCode.TooManyRequests
-            -> "Too many requests"
-        this is kotlinx.serialization.SerializationException
-            -> "Parse error"
+    when (this) {
+        is UnknownHostException, is SocketException, is SocketTimeoutException -> "Connection failed"
+        is ClientRequestException -> response.status.toString()
+        is kotlinx.serialization.SerializationException -> "Parse error"
         else -> null
     }

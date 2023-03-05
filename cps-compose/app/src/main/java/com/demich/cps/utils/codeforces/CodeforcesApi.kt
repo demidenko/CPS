@@ -28,7 +28,9 @@ object CodeforcesApi: ResourceApi() {
                 if (response.status == HttpStatusCode.ServiceUnavailable) {
                     throw CodeforcesAPICallLimitExceeded()
                 }
-                throw json.decodeFromString<CodeforcesAPIErrorResponse>(response.bodyAsText())
+                json.runCatching { decodeFromString<CodeforcesAPIErrorResponse>(response.bodyAsText()) }
+                    .onSuccess { throw it }
+                    .onFailure { throw exception }
             }
         }
     }
