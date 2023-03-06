@@ -6,7 +6,6 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.demich.cps.contests.settings.settingsContests
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.hours
 import kotlin.time.toJavaDuration
 
 class UtilityWorker(
@@ -21,11 +20,10 @@ class UtilityWorker(
             override suspend fun isEnabled() = true
             override val requestBuilder get() =
                 PeriodicWorkRequestBuilder<UtilityWorker>(
-                    repeatInterval = 24.hours.toJavaDuration()
+                    repeatInterval = 7.days.toJavaDuration()
                 ).setConstraints(
                     Constraints(
-                        requiresBatteryNotLow = true,
-                        //TODO: requiresDeviceIdle = true
+                        requiresCharging = true
                     )
                 )
         }
