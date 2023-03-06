@@ -155,12 +155,15 @@ fun StatusBarButtonsForUIPanel() {
 
     val coloredStatusBar by rememberCollect { settingsUI.coloredStatusBar.flow }
 
-    val recordedAccounts by rememberCollect {
-        combine(
-            flows = context.allAccountManagers
-                .filterIsInstance<RatedAccountManager<*>>()
-                .map { it.flowOfInfoWithManager() }
-        ) { array -> array.filterNot { it.userInfo.isEmpty() } }
+    val recordedAccountManagers by rememberCollect {
+        combine(flows = context.allAccountManagers
+            .filterIsInstance<RatedAccountManager<*>>()
+            .map { it.flowOfInfoWithManager() }
+        ) { array ->
+            array.filterNot { it.userInfo.isEmpty() }.map { it.manager }
+        }.combine(settingsUI.flowOfAccountsOrder()) { managers, order ->
+            managers.sortedBy { order.indexOf(it.type) }
+        }
     }
 
     var showPopup by rememberSaveable { mutableStateOf(false) }
@@ -169,11 +172,11 @@ fun StatusBarButtonsForUIPanel() {
 
     val noneEnabled by remember {
         derivedStateOf {
-            recordedAccounts.all { it.type in disabledManagers }
+            recordedAccountManagers.all { it.type in disabledManagers }
         }
     }
 
-    if (recordedAccounts.isNotEmpty()) {
+    if (recordedAccountManagers.isNotEmpty()) {
         CPSIconButton(
             icon = CPSIcons.StatusBar,
             onState = coloredStatusBar && !noneEnabled,
@@ -203,7 +206,7 @@ fun StatusBarButtonsForUIPanel() {
                         }
                     }
                 },
-                recordedAccounts = recordedAccounts,
+                accountManagers = recordedAccountManagers,
                 onDismissRequest = { showPopup = false }
             )
         }
@@ -219,7 +222,7 @@ private fun StatusBarAccountsPopup(
     setResultByMaximum: (Boolean) -> Unit,
     disabledManagers: Set<AccountManagers>,
     onCheckedChange: (AccountManagers, Boolean) -> Unit,
-    recordedAccounts: List<UserInfoWithManager<out UserInfo>>,
+    accountManagers: List<AccountManager<out UserInfo>>,
     onDismissRequest: () -> Unit
 ) {
     DropdownMenu(
@@ -227,7 +230,7 @@ private fun StatusBarAccountsPopup(
         onDismissRequest = onDismissRequest,
         modifier = Modifier.background(cpsColors.backgroundAdditional)
     ) {
-        recordedAccounts.forEach { (_, manager) ->
+        accountManagers.forEach { manager ->
             Row(modifier = Modifier.padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                 CPSCheckBox(
                     checked = manager.type !in disabledManagers,
