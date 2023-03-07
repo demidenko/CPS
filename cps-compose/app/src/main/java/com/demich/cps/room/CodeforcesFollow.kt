@@ -24,6 +24,16 @@ private const val followListTableName = "cf_follow_list"
 
 @Dao
 interface FollowListDao {
+
+    @Query("SELECT * FROM $followListTableName")
+    suspend fun getAllBlogs(): List<CodeforcesUserBlog>
+
+    @Query("SELECT * FROM $followListTableName")
+    fun flowOfAllBlogs(): Flow<List<CodeforcesUserBlog>>
+
+    @Query("SELECT handle FROM $followListTableName")
+    suspend fun getHandles(): List<String>
+
     @Query("SELECT * FROM $followListTableName WHERE handle LIKE :handle")
     suspend fun getUserBlog(handle: String): CodeforcesUserBlog?
 
@@ -36,11 +46,6 @@ interface FollowListDao {
     @Query("DELETE FROM $followListTableName WHERE handle LIKE :handle")
     suspend fun remove(handle: String)
 
-    @Query("SELECT handle FROM $followListTableName")
-    suspend fun getHandles(): List<String>
-
-    @Query("SELECT * FROM $followListTableName")
-    fun flowOfAll(): Flow<List<CodeforcesUserBlog>>
 
     private suspend fun setBlogEntries(handle: String, blogEntries: List<Int>?) {
         val userBlog = getUserBlog(handle) ?: return
@@ -122,7 +127,7 @@ interface FollowListDao {
 
     suspend fun addNewUser(handle: String, context: Context) {
         if (getUserBlog(handle) != null) return
-        //TODO: sync?? parallel?
+        //TODO: sync?? parallel? (addNewUser loads blog without info)
         addNewUser(
             userInfo = CodeforcesUserInfo(handle = handle, status = STATUS.FAILED),
             context = context
@@ -143,11 +148,9 @@ interface FollowListDao {
                 }
             }
 
-        getHandles()
-            .mapNotNull { getUserBlog(handle = it) }
-            .forEach {
-                if (it.blogEntries == null) getAndReloadBlogEntries(handle = it.handle, context = context)
-            }
+        getAllBlogs().forEach {
+            if (it.blogEntries == null) getAndReloadBlogEntries(handle = it.handle, context = context)
+        }
     }
 }
 
@@ -203,7 +206,7 @@ class CodeforcesUserInfoConverter {
     }
 }
 
-fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry, context: Context) {
+private fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry, context: Context) {
     notificationBuildAndNotify(
         context = context,
         channel = NotificationChannels.codeforces.follow_new_blog,

@@ -53,7 +53,7 @@ private fun CodeforcesFollowList(
     val scope = rememberCoroutineScope()
 
     val userBlogs by rememberCollect {
-        context.followListDao.flowOfAll().map {
+        context.followListDao.flowOfAllBlogs().map {
             it.sortedByDescending { it.id }
         }
     }
