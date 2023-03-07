@@ -44,7 +44,7 @@ interface FollowListDao {
     suspend fun remove(handle: String)
 
 
-    private suspend fun setBlogEntries(handle: String, blogEntries: List<Int>?) {
+    private suspend fun setBlogEntries(handle: String, blogEntries: List<Int>) {
         val userBlog = getUserBlog(handle) ?: return
         if (userBlog.blogEntries != blogEntries) update(userBlog.copy(blogEntries = blogEntries))
     }
