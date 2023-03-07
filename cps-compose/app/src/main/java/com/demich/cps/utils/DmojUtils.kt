@@ -5,7 +5,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
 
-object DmojApi: ResourceApi() {
+object DmojApi: ResourceApi {
+    private val json get() = defaultJson
     override val client = cpsHttpClient(json = json) { }
 
     suspend fun getUser(handle: String): DmojUserResult {

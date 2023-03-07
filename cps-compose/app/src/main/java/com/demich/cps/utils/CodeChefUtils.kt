@@ -11,7 +11,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlin.time.Duration.Companion.seconds
 
-object CodeChefApi: ResourceApi() {
+object CodeChefApi: ResourceApi {
+    private val json get() = defaultJson
 
     override val client = cpsHttpClient(
         json = json,

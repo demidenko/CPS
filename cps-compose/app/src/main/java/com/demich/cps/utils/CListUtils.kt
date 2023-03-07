@@ -51,8 +51,8 @@ object CListUtils {
         } ?: contest.id.toString()
 }
 
-object CListApi: ResourceApi() {
-    override val client = cpsHttpClient(json = json) { }
+object CListApi: ResourceApi {
+    override val client = cpsHttpClient(json = defaultJson) { }
 
     suspend fun getUserPage(login: String): String {
         return client.getText(urls.user(login))

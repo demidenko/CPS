@@ -16,7 +16,8 @@ import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-object CodeforcesApi: ResourceApi() {
+object CodeforcesApi: ResourceApi {
+    private val json get() = defaultJson
 
     override val client = cpsHttpClient(json = json) {
         defaultRequest {

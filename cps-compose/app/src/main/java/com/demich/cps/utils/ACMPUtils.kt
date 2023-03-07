@@ -7,7 +7,7 @@ import io.ktor.client.statement.*
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
-object ACMPApi: ResourceApi() {
+object ACMPApi: ResourceApi {
     private val windows1251 = Charset.forName("windows-1251")
     override val client = cpsHttpClient {
         Charsets {

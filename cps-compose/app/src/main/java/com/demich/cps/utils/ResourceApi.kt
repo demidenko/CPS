@@ -15,12 +15,9 @@ import java.net.UnknownHostException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-abstract class ResourceApi {
-    protected open val client: HttpClient = defaultHttpClient
-    protected val json = Json { ignoreUnknownKeys = true }
-
+internal interface ResourceApi {
+    val client: HttpClient get() = defaultHttpClient
 }
-
 
 internal fun cpsHttpClient(
     json: Json? = null,
@@ -41,15 +38,16 @@ internal fun cpsHttpClient(
     block()
 }
 
-internal val defaultHttpClient = cpsHttpClient { }
+private val defaultHttpClient = cpsHttpClient { }
+internal val defaultJson = Json { ignoreUnknownKeys = true }
 
 
-suspend inline fun<reified T> HttpClient.getAs(
+internal suspend inline fun<reified T> HttpClient.getAs(
     urlString: String,
     block: HttpRequestBuilder.() -> Unit = {}
 ): T = this.get(urlString = urlString, block = block).body()
 
-suspend inline fun HttpClient.getText(
+internal suspend inline fun HttpClient.getText(
     urlString: String,
     block: HttpRequestBuilder.() -> Unit = {}
 ): String = this.get(urlString = urlString, block = block).bodyAsText()

@@ -5,7 +5,8 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 
-object AtCoderApi: ResourceApi() {
+object AtCoderApi: ResourceApi {
+    private val json get() = defaultJson
 
     suspend fun getUserPage(handle: String): String  {
         return client.getText(urlString = urls.user(handle)) {

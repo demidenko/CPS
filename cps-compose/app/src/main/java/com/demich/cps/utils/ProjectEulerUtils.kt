@@ -1,6 +1,6 @@
 package com.demich.cps.utils
 
-object ProjectEulerApi: ResourceApi() {
+object ProjectEulerApi: ResourceApi {
 
     suspend fun getRSSPage(): String {
         return client.getText(urlString = "${urls.main}/rss2_euler.xml")
