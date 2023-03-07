@@ -2,11 +2,7 @@ package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.settings.ContestDateConstraints
-import io.ktor.client.network.sockets.*
-import io.ktor.client.plugins.*
-import io.ktor.http.*
-import java.net.SocketException
-import java.net.UnknownHostException
+import com.demich.cps.utils.niceMessage
 
 
 enum class ContestsLoaders(val supportedPlatforms: Set<Contest.Platform>) {
@@ -94,21 +90,13 @@ private fun List<Contest>.filterWith(dateConstraints: ContestDateConstraints.Cur
 
 fun makeCombinedMessage(
     errors: List<Pair<ContestsLoaders, Throwable>>,
-    developEnabled: Boolean
+    exposeAll: Boolean
 ): String {
     if (errors.isEmpty()) return ""
     return errors.groupBy(
         keySelector = { (_, e) ->
-            e.niceMessage ?: if (developEnabled) "$e" else "Some error..."
+            e.niceMessage ?: if (exposeAll) "$e" else "Some error..."
         },
         valueTransform = { it.first }
     ).entries.joinToString(separator = "; ") { (msg, list) -> "${list.distinct()}: $msg" }
 }
-
-private val Throwable.niceMessage: String? get() =
-    when (this) {
-        is UnknownHostException, is SocketException, is SocketTimeoutException -> "Connection failed"
-        is ClientRequestException -> HttpStatusCode.fromValue(response.status.value).toString()
-        is kotlinx.serialization.SerializationException -> "Parse error"
-        else -> null
-    }
