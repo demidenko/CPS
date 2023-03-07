@@ -168,7 +168,6 @@ class CodeforcesNewsViewModel: ViewModel() {
         return Pair(blogEntries, comments)
     }
 
-    var followLoadingStatus by mutableStateOf(LoadingStatus.PENDING)
     fun addToFollowList(userInfo: CodeforcesUserInfo, context: Context) {
         viewModelScope.launch {
             context.followListDao.addNewUser(
@@ -187,17 +186,19 @@ class CodeforcesNewsViewModel: ViewModel() {
         }
     }
 
+    private val followLoadingStatus = MutableStateFlow(LoadingStatus.PENDING)
+    fun flowOfFollowUpdateLoadingStatus(): StateFlow<LoadingStatus> = followLoadingStatus
     fun updateFollowUsersInfo(context: Context) {
-        //TODO: call while already updating??
+        if (!followLoadingStatus.compareAndSet(LoadingStatus.PENDING, LoadingStatus.LOADING)) return
         viewModelScope.launch {
-            followLoadingStatus = LoadingStatus.LOADING
             context.followListDao.updateUsersInfo(context)
-            followLoadingStatus = LoadingStatus.PENDING
+            followLoadingStatus.value = LoadingStatus.PENDING
         }
     }
 
+    //TODO: no mutableState
     var blogLoadingStatus by mutableStateOf(LoadingStatus.PENDING)
-    var blogEntriesState = mutableStateOf(emptyList<CodeforcesBlogEntry>())
+    val blogEntriesState = mutableStateOf(emptyList<CodeforcesBlogEntry>())
     fun loadBlog(handle: String, context: Context) {
         require(blogLoadingStatus != LoadingStatus.LOADING)
         blogEntriesState.value = emptyList()

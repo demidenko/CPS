@@ -29,9 +29,10 @@ fun NewsFollowScreen(
     newsViewModel: CodeforcesNewsViewModel
 ) {
     val context = context
+    val followLoadingStatus by rememberCollect { newsViewModel.flowOfFollowUpdateLoadingStatus() }
     ProvideTimeEachMinute {
-        NewsFollowList(
-            updateUserInfosInProgress = newsViewModel.followLoadingStatus == LoadingStatus.LOADING
+        CodeforcesFollowList(
+            isRefreshing = { followLoadingStatus == LoadingStatus.LOADING }
         ) { handle ->
             newsViewModel.loadBlog(handle = handle, context = context)
             navigator.navigateTo(Screen.NewsCodeforcesBlog(handle = handle))
@@ -44,14 +45,14 @@ fun NewsFollowScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun NewsFollowList(
-    updateUserInfosInProgress: Boolean,
+private fun CodeforcesFollowList(
+    isRefreshing: () -> Boolean,
     onOpenBlog: (String) -> Unit
 ) {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val userBlogsState = rememberCollect {
+    val userBlogs by rememberCollect {
         context.followListDao.flowOfAll().map {
             it.sortedByDescending { it.id }
         }
@@ -60,30 +61,24 @@ private fun NewsFollowList(
     val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
-        snapshotFlow { userBlogsState.value.firstOrNull()?.id }
+        snapshotFlow { userBlogs.firstOrNull()?.id }
             .drop(1)
             .collect {
                 listState.animateScrollToItem(index = 0)
             }
     }
 
-    var showMenuForId: Int? by remember { mutableStateOf(null) }
     var showDeleteDialogForBlog: CodeforcesUserBlog? by remember { mutableStateOf(null) }
 
     LazyColumnWithScrollBar(
         state = listState
     ) {
         itemsNotEmpty(
-            items = userBlogsState.value,
+            items = userBlogs,
             key = { it.id }
         ) { userBlog ->
             ContentWithCPSDropdownMenu(
-                //expanded = userBlog.id == showMenuForId,
-                //onDismissRequest = { showMenuForId = null },
-                modifier = Modifier
-                    //.clickable { showMenuForId = userBlog.id }
-
-                    .animateItemPlacement(),
+                modifier = Modifier.animateItemPlacement(),
                 content = {
                     NewsFollowListItem(
                         userInfo = userBlog.userInfo,
@@ -93,18 +88,18 @@ private fun NewsFollowList(
                             .fillMaxWidth()
                     )
                 },
-                //menuAlignment = Alignment.Center,
                 menuBuilder = {
+                    val enabled = !isRefreshing()
                     CPSDropdownMenuItem(
                         title = "Show blog",
                         icon = CPSIcons.BlogEntry,
-                        enabled = !updateUserInfosInProgress,
+                        enabled = enabled,
                         onClick = { onOpenBlog(userBlog.handle) }
                     )
                     CPSDropdownMenuItem(
                         title = "Delete",
                         icon = CPSIcons.Delete,
-                        enabled = !updateUserInfosInProgress,
+                        enabled = enabled,
                         onClick = { showDeleteDialogForBlog = userBlog }
                     )
                 }
