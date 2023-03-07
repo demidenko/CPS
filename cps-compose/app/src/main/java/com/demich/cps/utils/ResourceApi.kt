@@ -62,3 +62,6 @@ val Throwable.niceMessage: String? get() =
         is kotlinx.serialization.SerializationException -> "Parse error"
         else -> null
     }
+
+val Throwable.isPageNotFound get() =
+    this is ClientRequestException && response.status == HttpStatusCode.NotFound

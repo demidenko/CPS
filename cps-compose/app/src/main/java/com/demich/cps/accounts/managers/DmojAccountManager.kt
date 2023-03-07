@@ -18,9 +18,8 @@ import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
 import com.demich.cps.utils.DmojApi
 import com.demich.cps.utils.DmojRatingChange
 import com.demich.cps.utils.append
+import com.demich.cps.utils.isPageNotFound
 import com.demich.datastore_itemized.dataStoreWrapper
-import io.ktor.client.plugins.*
-import io.ktor.http.*
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -58,10 +57,8 @@ class DmojAccountManager(context: Context):
                 rating = res.rating
             )
         } catch (e: Throwable) {
-            if (e is ClientRequestException) {
-                if (e.response.status == HttpStatusCode.NotFound) {
-                    return DmojUserInfo(status = STATUS.NOT_FOUND, handle = data)
-                }
+            if (e.isPageNotFound) {
+                return DmojUserInfo(status = STATUS.NOT_FOUND, handle = data)
             }
             return DmojUserInfo(status = STATUS.FAILED, handle = data)
         }

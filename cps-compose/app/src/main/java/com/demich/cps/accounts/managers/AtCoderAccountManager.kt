@@ -15,13 +15,12 @@ import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
-import com.demich.cps.ui.*
+import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.utils.AtCoderApi
 import com.demich.cps.utils.AtCoderRatingChange
+import com.demich.cps.utils.isPageNotFound
 import com.demich.cps.workers.AccountsWorker
 import com.demich.datastore_itemized.dataStoreWrapper
-import io.ktor.client.plugins.*
-import io.ktor.http.*
 import kotlinx.serialization.Serializable
 import org.jsoup.Jsoup
 
@@ -65,7 +64,7 @@ class AtCoderAccountManager(context: Context):
                 )
             }
         } catch (e: Throwable) {
-            if (e is ClientRequestException && e.response.status == HttpStatusCode.NotFound) {
+            if (e.isPageNotFound) {
                 return AtCoderUserInfo(status = STATUS.NOT_FOUND, handle = data)
             }
             return AtCoderUserInfo(status = STATUS.FAILED, handle = data)

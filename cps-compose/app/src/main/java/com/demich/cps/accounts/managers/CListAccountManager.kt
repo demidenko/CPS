@@ -4,9 +4,16 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.utils.CListApi
-import io.ktor.client.plugins.*
-import io.ktor.http.*
+import com.demich.cps.utils.isPageNotFound
 import org.jsoup.Jsoup
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.emptyMap
+import kotlin.collections.firstOrNull
+import kotlin.collections.forEach
+import kotlin.collections.map
+import kotlin.collections.mutableMapOf
+import kotlin.collections.set
 
 
 data class CListUserInfo(
@@ -71,7 +78,7 @@ class CListAccountManager(context: Context):
                 accounts = accounts
             )
         } catch (e: Throwable) {
-            if (e is ClientRequestException && e.response.status == HttpStatusCode.NotFound) {
+            if (e.isPageNotFound) {
                 return CListUserInfo(status = STATUS.NOT_FOUND, login = data)
             }
             return CListUserInfo(status = STATUS.FAILED, login = data)
