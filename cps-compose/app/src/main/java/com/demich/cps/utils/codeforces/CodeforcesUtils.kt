@@ -166,10 +166,9 @@ object CodeforcesUtils {
     }
 
     fun extractRecentBlogEntries(source: String): List<CodeforcesBlogEntry> {
-        return Jsoup.parse(source).expectSidebar().selectFirst("div.recent-actions")
-            ?.select("li")
-            ?.mapNotNull(::extractRecentBlogEntryOrNull)
-            ?: emptyList()
+        return Jsoup.parse(source).expectSidebar().expectFirst("div.recent-actions")
+            .select("li")
+            .mapNotNull(::extractRecentBlogEntryOrNull)
     }
 
     inline fun extractHandleSuggestions(source: String, block: (String) -> Unit) {

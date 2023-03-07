@@ -81,7 +81,7 @@ class CodeforcesNewsLostRecentWorker(
 
     //Required against new year color chaos
     private suspend fun List<CodeforcesBlogEntry>.fixedHandleColors(): List<CodeforcesBlogEntry> {
-        val authors = CodeforcesUtils.getUsersInfo(map { blog -> blog.authorHandle })
+        val authors = CodeforcesUtils.getUsersInfo(handles = map { it.authorHandle })
         //TODO: if api load failed?..
         return map { blogEntry ->
             val userInfo = authors[blogEntry.authorHandle]
@@ -99,10 +99,10 @@ class CodeforcesNewsLostRecentWorker(
             locale = locale
         ) ?: return Result.retry()
 
-        val recentBlogEntries: List<CodeforcesBlogEntry>
-            = CodeforcesUtils.extractRecentBlogEntries(source).fixedHandleColors()
-
-        if (recentBlogEntries.isEmpty()) return Result.failure()
+        val recentBlogEntries: List<CodeforcesBlogEntry> =
+            CodeforcesUtils.runCatching {
+                extractRecentBlogEntries(source).fixedHandleColors()
+            }.getOrNull() ?: return Result.failure()
 
         fun isNew(blogCreationTime: Instant) = currentTime - blogCreationTime < 24.hours
         fun isOldLost(blogCreationTime: Instant) = currentTime - blogCreationTime > 7.days
