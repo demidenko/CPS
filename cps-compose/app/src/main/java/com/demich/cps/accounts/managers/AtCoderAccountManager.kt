@@ -18,11 +18,11 @@ import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
 import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.utils.AtCoderApi
 import com.demich.cps.utils.AtCoderRatingChange
+import com.demich.cps.utils.AtCoderUtils
 import com.demich.cps.utils.isPageNotFound
 import com.demich.cps.workers.AccountsWorker
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.serialization.Serializable
-import org.jsoup.Jsoup
 
 @Serializable
 data class AtCoderUserInfo(
@@ -52,22 +52,11 @@ class AtCoderAccountManager(context: Context):
     override fun emptyInfo() = AtCoderUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String, flags: Int): AtCoderUserInfo {
-        try {
-            val s = AtCoderApi.getUserPage(handle = data)
-            return with(Jsoup.parse(s)) {
-                AtCoderUserInfo(
-                    status = STATUS.OK,
-                    handle = expectFirst("a.username").text(),
-                    rating = select("th.no-break").find { it.text() == "Rating" }
-                        ?.nextElementSibling()
-                        ?.text()?.toInt()
-                )
-            }
-        } catch (e: Throwable) {
-            if (e.isPageNotFound) {
-                return AtCoderUserInfo(status = STATUS.NOT_FOUND, handle = data)
-            }
-            return AtCoderUserInfo(status = STATUS.FAILED, handle = data)
+        return AtCoderUtils.runCatching {
+            extractUserInfo(source = AtCoderApi.getUserPage(handle = data))
+        }.getOrElse { e ->
+            if (e.isPageNotFound) AtCoderUserInfo(status = STATUS.NOT_FOUND, handle = data)
+            else AtCoderUserInfo(status = STATUS.FAILED, handle = data)
         }
     }
 
