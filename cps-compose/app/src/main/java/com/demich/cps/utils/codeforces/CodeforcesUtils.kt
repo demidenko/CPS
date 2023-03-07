@@ -152,6 +152,9 @@ object CodeforcesUtils {
     private fun Element.expectContent(): Element = expectFirst("div.content-with-sidebar")
     private fun Element.expectSidebar(): Element = expectFirst("div#sidebar")
 
+    fun extractTitle(blogEntry: CodeforcesBlogEntry): String =
+        Jsoup.parse(blogEntry.title).text()
+
     fun extractBlogEntries(source: String): List<CodeforcesBlogEntry> {
         return Jsoup.parse(source).expectContent().select("div.topic")
             .mapNotNull(::extractBlogEntryOrNull)

@@ -1,7 +1,9 @@
 package com.demich.cps.news.codeforces
 
 import android.content.Context
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.managers.CodeforcesUserInfo
@@ -15,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jsoup.Jsoup
 import kotlin.math.max
 
 class CodeforcesNewsViewModel: ViewModel() {
@@ -213,7 +214,7 @@ class CodeforcesNewsViewModel: ViewModel() {
                 blogLoadingStatus = LoadingStatus.PENDING
                 blogEntriesState.value = result.map {
                     it.copy(
-                        title = Jsoup.parse(it.title).text(),
+                        title = CodeforcesUtils.extractTitle(it),
                         authorColorTag = colorTag
                     )
                 }
