@@ -12,6 +12,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -222,6 +223,46 @@ object CodeforcesApi: ResourceApi() {
 }
 
 
+enum class CodeforcesLocale {
+    EN, RU;
+
+    override fun toString(): String =
+        when(this) {
+            EN -> "en"
+            RU -> "ru"
+        }
+}
+
+enum class CodeforcesColorTag {
+    BLACK,
+    GRAY,
+    GREEN,
+    CYAN,
+    BLUE,
+    VIOLET,
+    ORANGE,
+    RED,
+    LEGENDARY,
+    ADMIN;
+
+    companion object {
+        fun fromRating(rating: Int?): CodeforcesColorTag =
+            when {
+                rating == null -> BLACK
+                rating < 1200 -> GRAY
+                rating < 1400 -> GREEN
+                rating < 1600 -> CYAN
+                rating < 1900 -> BLUE
+                rating < 2100 -> VIOLET
+                rating < 2400 -> ORANGE
+                rating < 3000 -> RED
+                else -> LEGENDARY
+            }
+
+        internal fun fromString(str: String): CodeforcesColorTag =
+            valueOf(str.removePrefix("user-").uppercase(Locale.ENGLISH))
+    }
+}
 
 enum class CodeforcesAPIStatus {
     OK, FAILED
@@ -229,8 +270,8 @@ enum class CodeforcesAPIStatus {
 
 @Serializable
 data class CodeforcesAPIErrorResponse(
-    val status: CodeforcesAPIStatus,
-    val comment: String
+    private val status: CodeforcesAPIStatus,
+    private val comment: String
 ): Throwable(comment) {
     fun isCallLimitExceeded() = comment == "Call limit exceeded"
 
@@ -417,10 +458,6 @@ enum class CodeforcesContestPhase {
             SYSTEM_TEST -> "SYSTEM TESTING"
             else -> name
         }
-
-    fun isFutureOrRunning(): Boolean {
-        return this != UNDEFINED && this != FINISHED
-    }
 
     fun isSystemTestOrFinished() =
         this == SYSTEM_TEST || this == FINISHED

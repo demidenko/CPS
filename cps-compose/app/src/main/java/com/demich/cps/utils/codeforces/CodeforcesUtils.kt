@@ -3,7 +3,6 @@ package com.demich.cps.utils.codeforces
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.buildAnnotatedString
 import com.demich.cps.accounts.managers.CodeforcesUserInfo
-import com.demich.cps.accounts.managers.HandleColor
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.ui.theme.cpsColors
 import kotlinx.datetime.Instant
@@ -260,60 +259,4 @@ object CodeforcesUtils {
         Jsoup.parseBodyFragment(html).body().traverse(parser)
     }
 
-}
-
-enum class CodeforcesColorTag {
-    BLACK,
-    GRAY,
-    GREEN,
-    CYAN,
-    BLUE,
-    VIOLET,
-    ORANGE,
-    RED,
-    LEGENDARY,
-    ADMIN;
-
-    fun toHandleColor(): HandleColor? {
-        return when (this) {
-            GRAY -> HandleColor.GRAY
-            GREEN -> HandleColor.GREEN
-            CYAN -> HandleColor.CYAN
-            BLUE -> HandleColor.BLUE
-            VIOLET -> HandleColor.VIOLET
-            ORANGE -> HandleColor.ORANGE
-            RED, LEGENDARY -> HandleColor.RED
-            else -> null
-        }
-    }
-
-    companion object {
-        fun fromRating(rating: Int?): CodeforcesColorTag {
-            return when {
-                rating == null -> BLACK
-                rating < 1200 -> GRAY
-                rating < 1400 -> GREEN
-                rating < 1600 -> CYAN
-                rating < 1900 -> BLUE
-                rating < 2100 -> VIOLET
-                rating < 2400 -> ORANGE
-                rating < 3000 -> RED
-                else -> LEGENDARY
-            }
-        }
-
-        internal fun fromString(str: String): CodeforcesColorTag =
-            valueOf(str.removePrefix("user-").uppercase(Locale.ENGLISH))
-    }
-}
-
-enum class CodeforcesLocale {
-    EN, RU;
-
-    override fun toString(): String {
-        return when(this) {
-            EN -> "en"
-            RU -> "ru"
-        }
-    }
 }

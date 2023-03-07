@@ -146,6 +146,19 @@ class CodeforcesAccountManager(context: Context):
             else -> throw HandleColor.UnknownHandleColorException(handleColor, this)
         }
 
+    private fun CodeforcesColorTag.toHandleColor(): HandleColor? {
+        return when (this) {
+            CodeforcesColorTag.GRAY -> HandleColor.GRAY
+            CodeforcesColorTag.GREEN -> HandleColor.GREEN
+            CodeforcesColorTag.CYAN -> HandleColor.CYAN
+            CodeforcesColorTag.BLUE -> HandleColor.BLUE
+            CodeforcesColorTag.VIOLET -> HandleColor.VIOLET
+            CodeforcesColorTag.ORANGE -> HandleColor.ORANGE
+            CodeforcesColorTag.RED, CodeforcesColorTag.LEGENDARY -> HandleColor.RED
+            else -> null
+        }
+    }
+
     @Composable
     fun makeHandleSpan(handle: String, tag: CodeforcesColorTag): AnnotatedString =
         buildAnnotatedString {
