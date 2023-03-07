@@ -7,10 +7,7 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.news.settings.settingsNews
-import com.demich.cps.utils.codeforces.CodeforcesAPIErrorResponse
-import com.demich.cps.utils.codeforces.CodeforcesApi
-import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
-import com.demich.cps.utils.codeforces.CodeforcesUtils
+import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.jsonCPS
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.SerializationException
@@ -74,40 +71,60 @@ interface FollowListDao {
         ))
     }
 
-    suspend fun getAndReloadBlogEntries(handle: String, context: Context): List<CodeforcesBlogEntry>? {
+    private suspend fun getAndReloadBlogEntries(
+        handle: String,
+        locale: CodeforcesLocale,
+        loadUserInfo: suspend (String) -> CodeforcesUserInfo,
+        onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
+    ): List<CodeforcesBlogEntry>? {
         return CodeforcesApi.runCatching {
-            getUserBlogEntries(
-                handle = handle,
-                locale = context.settingsNews.codeforcesLocale()
-            )
+            getUserBlogEntries(handle = handle, locale = locale)
         }.recoverCatching {
             if (it is CodeforcesAPIErrorResponse && it.isNotAllowedToReadThatBlog()) {
-                return@recoverCatching emptyList<CodeforcesBlogEntry>()
+                return@recoverCatching emptyList()
             }
             if (it is CodeforcesAPIErrorResponse && it.isBlogHandleNotFound(handle)) {
-                val userInfo = CodeforcesAccountManager(context).loadInfo(data = handle, flags = 1)
-                when(userInfo.status) {
+                val userInfo = loadUserInfo(handle)
+                when (userInfo.status) {
                     STATUS.OK -> {
                         setUserInfo(handle, userInfo)
-                        return@recoverCatching getAndReloadBlogEntries(userInfo.handle, context)
+                        return@recoverCatching getAndReloadBlogEntries(
+                            handle = userInfo.handle,
+                            locale = locale,
+                            loadUserInfo = loadUserInfo,
+                            onNewBlogEntry = onNewBlogEntry
+                        )
                     }
                     STATUS.NOT_FOUND -> {
                         remove(handle)
                     }
-                    STATUS.FAILED -> {
-
-                    }
+                    STATUS.FAILED -> Unit
                 }
             }
             throw it
         }.getOrNull()?.also { blogEntries ->
             getUserBlog(handle)?.blogEntries?.toSet()?.let { saved ->
                 for (blogEntry in blogEntries) {
-                    if (blogEntry.id !in saved) notifyNewBlogEntry(blogEntry, context)
+                    if (blogEntry.id !in saved) onNewBlogEntry(blogEntry)
                 }
             }
             setBlogEntries(handle, blogEntries.map { it.id })
         }
+    }
+
+    suspend fun getAndReloadBlogEntries(
+        handle: String,
+        context: Context
+    ): List<CodeforcesBlogEntry>? {
+        val settingsNews = context.settingsNews
+        val blogEntries = getAndReloadBlogEntries(
+            handle = handle,
+            locale = settingsNews.codeforcesLocale(),
+            loadUserInfo = { CodeforcesAccountManager(context).loadInfo(data = it, flags = 1) },
+            onNewBlogEntry = { notifyNewBlogEntry(it, context) }
+        )
+
+        return blogEntries
     }
 
     suspend fun addNewUser(userInfo: CodeforcesUserInfo, context: Context) {
