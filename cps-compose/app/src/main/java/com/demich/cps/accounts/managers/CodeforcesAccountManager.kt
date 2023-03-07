@@ -107,12 +107,8 @@ class CodeforcesAccountManager(context: Context):
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
         val s = CodeforcesApi.getHandleSuggestionsPage(str)!!
         return buildList {
-            s.splitToSequence('\n').filter { !it.contains('=') }.forEach {
-                val i = it.indexOf('|')
-                if (i != -1) {
-                    val handle = it.substring(i + 1)
-                    add(AccountSuggestion(title = handle, userId = handle))
-                }
+            CodeforcesUtils.extractHandleSuggestions(source = s) { handle ->
+                add(AccountSuggestion(title = handle, userId = handle))
             }
             reverse()
         }

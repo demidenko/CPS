@@ -172,6 +172,13 @@ object CodeforcesUtils {
             ?: emptyList()
     }
 
+    inline fun extractHandleSuggestions(source: String, block: (String) -> Unit) {
+        source.splitToSequence('\n').filter { !it.contains('=') }.forEach {
+            val i = it.indexOf('|')
+            if (i != -1) block(it.substring(i + 1))
+        }
+    }
+
     suspend fun getRealHandle(handle: String): Pair<String, STATUS> {
         val page = CodeforcesApi.getUserPage(handle) ?: return handle to STATUS.FAILED
         val realHandle = extractRealHandle(page)?.first ?: return handle to STATUS.NOT_FOUND
