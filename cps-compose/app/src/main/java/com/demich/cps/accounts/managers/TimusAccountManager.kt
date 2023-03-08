@@ -5,9 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.utils.TimusApi
+import com.demich.cps.utils.TimusUtils
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.serialization.Serializable
-import org.jsoup.Jsoup
 
 
 @Serializable
@@ -43,48 +43,19 @@ class TimusAccountManager(context: Context):
 
     override fun emptyInfo() = TimusUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String): TimusUserInfo {
-        try {
-            val s = TimusApi.getUserPage(data.toInt())
-            with(Jsoup.parse(s)) {
-                val userName = selectFirst("h2.author_name")?.text()
-                    ?: return TimusUserInfo(status = STATUS.NOT_FOUND, id = data)
-                val rows = select("td.author_stats_value").map { row ->
-                    row.text().let { it.substring(0, it.indexOf(" out of ")) }
-                }
-                return TimusUserInfo(
-                    status = STATUS.OK,
-                    id = data,
-                    userName = userName,
-                    rating = rows[3].toInt(),
-                    solvedTasks = rows[1].toInt(),
-                    rankTasks = rows[0].toInt(),
-                    rankRating = rows[2].toInt()
-                )
-            }
-        } catch (e: Throwable) {
-            return TimusUserInfo(status = STATUS.FAILED, id = data)
+    override suspend fun downloadInfo(data: String): TimusUserInfo =
+        TimusUtils.runCatching {
+            extractUserInfo(
+                source = TimusApi.getUserPage(data.toInt()),
+                handle = data
+            )
+        }.getOrElse {
+            TimusUserInfo(status = STATUS.FAILED, id = data)
         }
-    }
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
-        return Jsoup.parse(TimusApi.getSearchPage(str))
-            .expectFirst("table.ranklist")
-            .select("td.name")
-            .mapNotNull { nameColumn ->
-                val userId = nameColumn.selectFirst("a")
-                    ?.attr("href")
-                    ?.let {
-                        it.substring(it.indexOf("id=")+3)
-                    } ?: return@mapNotNull null
-                val tasks = nameColumn.nextElementSibling()?.nextElementSibling()?.text() ?: ""
-                AccountSuggestion(
-                    userId = userId,
-                    title = nameColumn.text(),
-                    info = tasks
-                )
-            }
+        return TimusUtils.extractUsersSuggestions(source = TimusApi.getSearchPage(str))
     }
 
     @Composable
