@@ -6,9 +6,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.utils.ACMPApi
+import com.demich.cps.utils.ACMPUtils
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.serialization.Serializable
-import org.jsoup.Jsoup
 
 @Serializable
 data class ACMPUserInfo(
@@ -44,51 +44,22 @@ class ACMPAccountManager(context: Context):
     override fun emptyInfo() = ACMPUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String): ACMPUserInfo {
-        try {
-            return with(Jsoup.parse(ACMPApi.getUserPage(id = data.toInt()))) {
-                val userName = title().trim()
-                val box = body().select("h4").firstOrNull { it.text() == "Общая статистика" }?.parent()!!
-                val bs = box.select("b.btext").map { it.text() }
-                val solvedTasks = bs.first { it.startsWith("Решенные задачи") }.let {
-                    it.substring(it.indexOf('(')+1, it.indexOf(')')).toInt()
-                }
-                val rating = bs.first { it.startsWith("Рейтинг:") }.let {
-                    it.substring(it.indexOf(':')+2, it.indexOf('/')-1).toInt()
-                }
-                val rank = bs.first { it.startsWith("Место:") }.let {
-                    it.substring(it.indexOf(':')+2, it.indexOf('/')-1).toInt()
-                }
-                ACMPUserInfo(
-                    status = STATUS.OK,
-                    id = data,
-                    userName = userName,
-                    rating = rating,
-                    solvedTasks = solvedTasks,
-                    rank = rank
-                )
+        return ACMPUtils.runCatching {
+            extractUserInfo(
+                source = ACMPApi.getUserPage(id = data.toInt()),
+                id = data
+            )
+        }.getOrElse { e ->
+            when (e) {
+                is ACMPApi.ACMPPageNotFoundException -> ACMPUserInfo(status = STATUS.NOT_FOUND, id = data)
+                else -> ACMPUserInfo(status = STATUS.FAILED, id = data)
             }
-        } catch (e: ACMPApi.ACMPPageNotFoundException) {
-            return ACMPUserInfo(status = STATUS.NOT_FOUND, id = data)
-        } catch (e: Throwable) {
-            return ACMPUserInfo(status = STATUS.FAILED, id = data)
         }
     }
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
-        val s = ACMPApi.getUsersSearch(str)
-        return Jsoup.parse(s).expectFirst("table.main").select("tr.white").mapNotNull { row ->
-            val cols = row.select("td")
-            val userId = cols[1].expectFirst("a")
-                .attr("href").removePrefix("/?main=user&id=")
-            val userName = cols[1].text()
-            val tasks = cols[3].text()
-            AccountSuggestion(
-                userId = userId,
-                title = userName,
-                info = tasks
-            )
-        }
+        return ACMPUtils.extractUsersSuggestions(source = ACMPApi.getUsersSearch(str))
     }
 
     @Composable

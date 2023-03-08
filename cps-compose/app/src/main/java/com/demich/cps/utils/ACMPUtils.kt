@@ -1,9 +1,13 @@
 package com.demich.cps.utils
 
+import com.demich.cps.accounts.managers.ACMPUserInfo
+import com.demich.cps.accounts.managers.AccountSuggestion
+import com.demich.cps.accounts.managers.STATUS
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import org.jsoup.Jsoup
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
@@ -49,4 +53,47 @@ object ACMPApi: ResourceApi {
         const val main = "https://acmp.ru"
         fun user(id: Int) = "$main/index.asp?main=user&id=$id"
     }
+}
+
+
+object ACMPUtils {
+    fun extractUserInfo(source: String, id: String): ACMPUserInfo =
+        with(Jsoup.parse(source)) {
+            val userName = title().trim()
+            val box = body().select("h4").firstOrNull { it.text() == "Общая статистика" }?.parent()!!
+            val bs = box.select("b.btext").map { it.text() }
+            val solvedTasks = bs.first { it.startsWith("Решенные задачи") }.let {
+                it.substring(it.indexOf('(')+1, it.indexOf(')')).toInt()
+            }
+            val rating = bs.first { it.startsWith("Рейтинг:") }.let {
+                it.substring(it.indexOf(':')+2, it.indexOf('/')-1).toInt()
+            }
+            val rank = bs.first { it.startsWith("Место:") }.let {
+                it.substring(it.indexOf(':')+2, it.indexOf('/')-1).toInt()
+            }
+            ACMPUserInfo(
+                status = STATUS.OK,
+                id = id,
+                userName = userName,
+                rating = rating,
+                solvedTasks = solvedTasks,
+                rank = rank
+            )
+        }
+
+    fun extractUsersSuggestions(source: String): List<AccountSuggestion> =
+        Jsoup.parse(source).expectFirst("table.main")
+            .select("tr.white")
+            .map { row ->
+                val cols = row.select("td")
+                val userId = cols[1].expectFirst("a")
+                    .attr("href").removePrefix("/?main=user&id=")
+                val userName = cols[1].text()
+                val tasks = cols[3].text()
+                AccountSuggestion(
+                    userId = userId,
+                    title = userName,
+                    info = tasks
+                )
+            }
 }
