@@ -24,9 +24,9 @@ import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
-import com.demich.cps.ui.*
+import com.demich.cps.ui.SettingsSwitchItemWithWork
+import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.InstantAsSecondsSerializer
 import com.demich.cps.utils.append
 import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.jsonCPS
@@ -46,7 +46,6 @@ data class CodeforcesUserInfo(
     override val handle: String,
     override val rating: Int? = null,
     val contribution: Int = 0,
-    @Serializable(with = InstantAsSecondsSerializer::class)
     val lastOnlineTime: Instant = Instant.DISTANT_PAST
 ): RatedUserInfo() {
     constructor(codeforcesUser: CodeforcesUser): this(
