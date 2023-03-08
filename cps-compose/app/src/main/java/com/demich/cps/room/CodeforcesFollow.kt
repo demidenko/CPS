@@ -3,16 +3,11 @@ package com.demich.cps.room
 import android.content.Context
 import androidx.room.*
 import com.demich.cps.*
-import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.utils.codeforces.*
-import com.demich.cps.utils.jsonCPS
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 
 
 val Context.followListDao get() = RoomSingleton.getInstance(this).followListDao()
@@ -179,49 +174,6 @@ data class CodeforcesUserBlog(
     val blogEntries: List<Int>?,
     val userInfo: CodeforcesUserInfo
 )
-
-class IntsListConverter {
-    @TypeConverter
-    fun intsToString(ints: List<Int>?): String? {
-        if (ints == null) return null
-        return buildString {
-            ints.forEach { num ->
-                var x = num
-                repeat(4) {
-                    append((x%256).toChar())
-                    x/=256
-                }
-            }
-        }
-    }
-
-    @TypeConverter
-    fun decodeToInts(s: String?): List<Int>? {
-        if (s == null) return null
-        return (s.indices step 4).map { i ->
-            ((s[i+3].code*256 + s[i+2].code)*256 + s[i+1].code)*256 + s[i].code
-        }
-    }
-}
-
-class CodeforcesUserInfoConverter {
-    @TypeConverter
-    fun userInfoToString(info: CodeforcesUserInfo): String {
-        return jsonCPS.encodeToString(info)
-    }
-
-    @TypeConverter
-    fun stringToUserInfo(str: String): CodeforcesUserInfo {
-        return try {
-            jsonCPS.decodeFromString(str)
-        } catch (e: SerializationException) {
-            CodeforcesUserInfo(
-                status = STATUS.FAILED,
-                handle = ""
-            )
-        }
-    }
-}
 
 private fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry, context: Context) {
     notificationBuildAndNotify(

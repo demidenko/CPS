@@ -3,7 +3,6 @@ package com.demich.cps.room
 import android.content.Context
 import androidx.room.*
 import com.demich.cps.contests.Contest
-import kotlinx.datetime.Instant
 
 @Database(
     entities = [
@@ -34,10 +33,3 @@ abstract class RoomSingleton: RoomDatabase() {
     }
 }
 
-class InstantSecondsConverter {
-    @TypeConverter
-    fun instantToSeconds(time: Instant): Long = time.epochSeconds
-
-    @TypeConverter
-    fun secondsToInstant(seconds: Long): Instant = Instant.fromEpochSeconds(seconds)
-}
