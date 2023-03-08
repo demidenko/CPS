@@ -1,10 +1,13 @@
 package com.demich.cps.utils
 
 import com.demich.cps.accounts.managers.AccountManagers
+import com.demich.cps.accounts.managers.CListUserInfo
+import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.contests.Contest
 import io.ktor.client.request.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import org.jsoup.Jsoup
 
 object CListUtils {
     fun getManager(resource: String, userName: String, link: String): Pair<AccountManagers, String>? {
@@ -49,6 +52,49 @@ object CListUtils {
             }
             else -> null
         } ?: contest.id.toString()
+
+    fun extractLoginSuggestions(source: String): List<String> =
+        Jsoup.parse(source).select("td.username").map { it.text() }
+
+    fun extractUserInfo(source: String, login: String): CListUserInfo {
+        val accounts = mutableMapOf<String, Pair<String, String>>()
+
+        val body = Jsoup.parse(source).body()
+        //rated table
+        body.getElementById("table-accounts")
+            ?.select("tr")
+            ?.forEach { row ->
+                val cols = row.select("td")
+                val href = cols[0].getElementsByAttribute("href").attr("href")
+                val resource = href.removePrefix("/resource/").removeSuffix("/")
+                val link = cols[3].getElementsByAttribute("href").attr("href")
+                val userName = cols[2].select("span").map { it.text() }.firstOrNull { it.isNotBlank() } ?: return@forEach
+                accounts[resource] = userName to link
+            }
+
+        //buttons
+        body.getElementsByClass("account btn-group btn-group-sm").forEach { button ->
+            val a = button.select("a")
+            if (a.isEmpty()) return@forEach
+            val href = a[0].attr("href")
+            val resource = href.removePrefix("/resource/").removeSuffix("/")
+            val link = button.getElementsByClass("fas fa-external-link-alt").first()?.parent()?.attr("href") ?: ""
+            val span = a[1].selectFirst("span") ?: return@forEach
+            val userName = span.run {
+                val attr = "title"
+                val withAttr = getElementsByAttribute(attr).first()
+                if (withAttr == null) text()
+                else withAttr.attr(attr)
+            }
+            accounts[resource] = userName to link
+        }
+
+        return CListUserInfo(
+            status = STATUS.OK,
+            login = login,
+            accounts = accounts
+        )
+    }
 }
 
 object CListApi: ResourceApi {

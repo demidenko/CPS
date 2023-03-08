@@ -4,16 +4,8 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.utils.CListApi
+import com.demich.cps.utils.CListUtils
 import com.demich.cps.utils.isPageNotFound
-import org.jsoup.Jsoup
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.emptyMap
-import kotlin.collections.firstOrNull
-import kotlin.collections.forEach
-import kotlin.collections.map
-import kotlin.collections.mutableMapOf
-import kotlin.collections.set
 
 
 data class CListUserInfo(
@@ -37,60 +29,20 @@ class CListAccountManager(context: Context):
 
     override fun emptyInfo() = CListUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String): CListUserInfo {
-        try {
-            val s = CListApi.getUserPage(login = data)
-            val accounts = mutableMapOf<String, Pair<String, String>>()
-
-            val body = Jsoup.parse(s).body()
-            //rated table
-            body.getElementById("table-accounts")
-                ?.select("tr")
-                ?.forEach { row ->
-                    val cols = row.select("td")
-                    val href = cols[0].getElementsByAttribute("href").attr("href")
-                    val resource = href.removePrefix("/resource/").removeSuffix("/")
-                    val link = cols[3].getElementsByAttribute("href").attr("href")
-                    val userName = cols[2].select("span").map { it.text() }.firstOrNull { it.isNotBlank() } ?: return@forEach
-                    accounts[resource] = userName to link
-                }
-
-            //buttons
-            body.getElementsByClass("account btn-group btn-group-sm").forEach { button ->
-                val a = button.select("a")
-                if (a.isEmpty()) return@forEach
-                val href = a[0].attr("href")
-                val resource = href.removePrefix("/resource/").removeSuffix("/")
-                val link = button.getElementsByClass("fas fa-external-link-alt").first()?.parent()?.attr("href") ?: ""
-                val span = a[1].selectFirst("span") ?: return@forEach
-                val userName = span.run {
-                    val attr = "title"
-                    val withAttr = getElementsByAttribute(attr).first()
-                    if (withAttr == null) text()
-                    else withAttr.attr(attr)
-                }
-                accounts[resource] = userName to link
-            }
-
-            return CListUserInfo(
-                status = STATUS.OK,
-                login = data,
-                accounts = accounts
+    override suspend fun downloadInfo(data: String): CListUserInfo =
+        CListUtils.runCatching {
+            extractUserInfo(
+                source = CListApi.getUserPage(login = data),
+                login = data
             )
-        } catch (e: Throwable) {
-            if (e.isPageNotFound) {
-                return CListUserInfo(status = STATUS.NOT_FOUND, login = data)
-            }
-            return CListUserInfo(status = STATUS.FAILED, login = data)
+        }.getOrElse { e ->
+            if (e.isPageNotFound) CListUserInfo(status = STATUS.NOT_FOUND, login = data)
+            else CListUserInfo(status = STATUS.FAILED, login = data)
         }
-    }
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
-        val s = CListApi.getUsersSearchPage(str)
-        return Jsoup.parse(s).select("td.username").map {
-            AccountSuggestion(userId = it.text())
-        }
-    }
+    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> =
+        CListUtils.extractLoginSuggestions(source = CListApi.getUsersSearchPage(str))
+            .map { AccountSuggestion(userId = it) }
 
     @Composable
     override fun makeOKInfoSpan(userInfo: CListUserInfo) = with(userInfo) {
