@@ -84,25 +84,8 @@ class CodeforcesAccountManager(context: Context):
 
     override fun emptyInfo() = CodeforcesUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String, flags: Int): CodeforcesUserInfo {
-        try {
-            return CodeforcesUserInfo(CodeforcesApi.getUser(handle = data))
-        } catch (e: Throwable) {
-            if (e is CodeforcesAPIErrorResponse && e.isHandleNotFound() == data) {
-                if ((flags and 1) != 0) {
-                    val (realHandle, status) = CodeforcesUtils.getRealHandle(handle = data)
-                    return when(status) {
-                        STATUS.OK -> downloadInfo(data = realHandle, flags = 0)
-                        else -> CodeforcesUserInfo(status = status, handle = data)
-                    }
-                } else {
-                    return CodeforcesUserInfo(status = STATUS.NOT_FOUND, handle = data)
-                }
-            } else {
-                return CodeforcesUserInfo(status = STATUS.FAILED, handle = data)
-            }
-        }
-    }
+    override suspend fun downloadInfo(data: String, flags: Int): CodeforcesUserInfo =
+        CodeforcesUtils.getUserInfo(handle = data, doRedirect = (flags and 1) != 0)
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion> =
         buildList {

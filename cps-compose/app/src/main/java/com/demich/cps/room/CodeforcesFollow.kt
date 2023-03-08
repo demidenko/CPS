@@ -120,7 +120,7 @@ interface FollowListDao {
         val blogEntries = getAndReloadBlogEntries(
             handle = handle,
             locale = settingsNews.codeforcesLocale(),
-            loadUserInfo = { CodeforcesAccountManager(context).loadInfo(data = it, flags = 1) },
+            loadUserInfo = { CodeforcesUtils.getUserInfo(handle = it, doRedirect = true) },
             onNewBlogEntry = { notifyNewBlogEntry(it, context) }
         )
 
@@ -151,7 +151,7 @@ interface FollowListDao {
         )
         setUserInfo(
             handle = handle,
-            info = CodeforcesAccountManager(context).loadInfo(handle, flags = 1)
+            info = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
         )
     }
 

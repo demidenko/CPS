@@ -198,8 +198,8 @@ object CodeforcesUtils {
         getUsersInfo(handles.toSet(), doRedirect)
 
     suspend fun getUsersInfo(handles: Set<String>, doRedirect: Boolean = false): Map<String, CodeforcesUserInfo> {
-        return kotlin.runCatching {
-            CodeforcesApi.getUsers(handles = handles)
+        return CodeforcesApi.runCatching {
+            getUsers(handles = handles)
         }.map { infos ->
             handles.associateWith { handle ->
                 infos.find { handle.equals(it.handle, ignoreCase = true) }
@@ -227,6 +227,25 @@ object CodeforcesUtils {
             handles.associateWith { handle -> CodeforcesUserInfo(handle = handle, status = STATUS.FAILED) }
         }.apply {
             require(handles.all { it in this })
+        }
+    }
+
+    suspend fun getUserInfo(handle: String, doRedirect: Boolean = false): CodeforcesUserInfo {
+        //return getUsersInfo(setOf(handle), doRedirect).getValue(handle)
+        return CodeforcesApi.runCatching {
+            CodeforcesUserInfo(getUser(handle = handle))
+        }.getOrElse { e ->
+            if (e is CodeforcesAPIErrorResponse && e.isHandleNotFound() == handle) {
+                if (doRedirect) {
+                    val (realHandle, status) = getRealHandle(handle = handle)
+                    if (status == STATUS.OK) getUserInfo(handle = realHandle, doRedirect = false)
+                    else CodeforcesUserInfo(handle = handle, status = status)
+                } else {
+                    CodeforcesUserInfo(handle = handle, status = STATUS.NOT_FOUND)
+                }
+            } else {
+                CodeforcesUserInfo(handle = handle, status = STATUS.FAILED)
+            }
         }
     }
 
