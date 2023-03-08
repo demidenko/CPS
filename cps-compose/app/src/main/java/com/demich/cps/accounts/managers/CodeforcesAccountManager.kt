@@ -104,15 +104,13 @@ class CodeforcesAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
-        val s = CodeforcesApi.getHandleSuggestionsPage(str)!!
-        return buildList {
+    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> =
+        buildList {
+            val s = CodeforcesApi.getHandleSuggestionsPage(str)!!
             CodeforcesUtils.extractHandleSuggestions(source = s) { handle ->
                 add(AccountSuggestion(title = handle, userId = handle))
             }
-            reverse()
-        }
-    }
+        }.asReversed()
 
     override suspend fun loadRatingHistory(info: CodeforcesUserInfo): List<RatingChange> =
         CodeforcesApi.getUserRatingChanges(info.handle)
