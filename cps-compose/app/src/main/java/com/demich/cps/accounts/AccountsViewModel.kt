@@ -32,7 +32,7 @@ class AccountsViewModel: ViewModel() {
             if (loadingStatusState.value == LoadingStatus.LOADING) return@launch
 
             loadingStatusState.value = LoadingStatus.LOADING
-            val info = manager.loadInfo(savedInfo.userId, 1)
+            val info = manager.loadInfo(savedInfo.userId)
 
             if (info.status == STATUS.FAILED) {
                 loadingStatusState.value = LoadingStatus.FAILED

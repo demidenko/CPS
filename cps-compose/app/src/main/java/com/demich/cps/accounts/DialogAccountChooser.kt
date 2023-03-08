@@ -131,7 +131,7 @@ fun<U: UserInfo> DialogAccountChooser(
             delay(300)
             launch {
                 loadingInProgress = true
-                userInfo = manager.loadInfo(userId, 1)
+                userInfo = manager.loadInfo(userId)
                 loadingInProgress = false
             }
             if (manager is AccountSuggestionsProvider && userId.length >= suggestionTextLimit) {

@@ -194,10 +194,10 @@ object CodeforcesUtils {
     }
 
 
-    suspend fun getUsersInfo(handles: Collection<String>, doRedirect: Boolean = false) =
+    suspend fun getUsersInfo(handles: Collection<String>, doRedirect: Boolean) =
         getUsersInfo(handles.toSet(), doRedirect)
 
-    suspend fun getUsersInfo(handles: Set<String>, doRedirect: Boolean = false): Map<String, CodeforcesUserInfo> {
+    suspend fun getUsersInfo(handles: Set<String>, doRedirect: Boolean): Map<String, CodeforcesUserInfo> {
         return CodeforcesApi.runCatching {
             getUsers(handles = handles)
         }.map { infos ->
@@ -230,7 +230,7 @@ object CodeforcesUtils {
         }
     }
 
-    suspend fun getUserInfo(handle: String, doRedirect: Boolean = false): CodeforcesUserInfo {
+    suspend fun getUserInfo(handle: String, doRedirect: Boolean): CodeforcesUserInfo {
         //return getUsersInfo(setOf(handle), doRedirect).getValue(handle)
         return CodeforcesApi.runCatching {
             CodeforcesUserInfo(getUser(handle = handle))

@@ -12,6 +12,7 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.utils.AtCoderApi
 import com.demich.cps.utils.codeforces.CodeforcesApi
+import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.toSignedString
 import kotlin.time.Duration.Companion.minutes
 
@@ -69,7 +70,7 @@ class AccountsWorker(
         if (userInfo.status != STATUS.OK) return
 
         val handle = userInfo.handle
-        val newContribution = codeforcesAccountManager.loadInfo(handle)
+        val newContribution = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = false)
             .takeIf { it.status == STATUS.OK }
             ?.contribution ?: return
 

@@ -84,8 +84,8 @@ class CodeforcesAccountManager(context: Context):
 
     override fun emptyInfo() = CodeforcesUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String, flags: Int): CodeforcesUserInfo =
-        CodeforcesUtils.getUserInfo(handle = data, doRedirect = (flags and 1) != 0)
+    override suspend fun downloadInfo(data: String): CodeforcesUserInfo =
+        CodeforcesUtils.getUserInfo(handle = data, doRedirect = true)
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion> =
         buildList {
@@ -256,7 +256,7 @@ class CodeforcesAccountManager(context: Context):
 
         if (prevRatingChangeContestId != null) {
             notifyRatingChange(ratingChange)
-            val newInfo = loadInfo(info.handle)
+            val newInfo = CodeforcesUtils.getUserInfo(handle = info.handle, doRedirect = false)
             if (newInfo.status != STATUS.FAILED) {
                 setSavedInfo(newInfo)
             } else {

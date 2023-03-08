@@ -37,7 +37,7 @@ class CListAccountManager(context: Context):
 
     override fun emptyInfo() = CListUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String, flags: Int): CListUserInfo {
+    override suspend fun downloadInfo(data: String): CListUserInfo {
         try {
             val s = CListApi.getUserPage(login = data)
             val accounts = mutableMapOf<String, Pair<String, String>>()

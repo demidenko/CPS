@@ -64,7 +64,7 @@ class CodeChefAccountManager(context: Context):
 
     override fun emptyInfo(): CodeChefUserInfo = CodeChefUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String, flags: Int): CodeChefUserInfo {
+    override suspend fun downloadInfo(data: String): CodeChefUserInfo {
         try {
             Jsoup.parse(CodeChefApi.getUserPage(handle = data)).run {
                 val rating = selectFirst("div.rating-ranks")

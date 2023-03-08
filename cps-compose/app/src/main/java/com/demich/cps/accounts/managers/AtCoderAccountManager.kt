@@ -51,7 +51,7 @@ class AtCoderAccountManager(context: Context):
 
     override fun emptyInfo() = AtCoderUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String, flags: Int): AtCoderUserInfo {
+    override suspend fun downloadInfo(data: String): AtCoderUserInfo {
         return AtCoderUtils.runCatching {
             extractUserInfo(source = AtCoderApi.getUserPage(handle = data))
         }.getOrElse { e ->

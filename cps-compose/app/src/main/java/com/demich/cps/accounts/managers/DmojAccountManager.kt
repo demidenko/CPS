@@ -48,7 +48,7 @@ class DmojAccountManager(context: Context):
 
     override fun emptyInfo() = DmojUserInfo(status = STATUS.NOT_FOUND, handle = "")
 
-    override suspend fun downloadInfo(data: String, flags: Int): DmojUserInfo {
+    override suspend fun downloadInfo(data: String): DmojUserInfo {
         try {
             val res = DmojApi.getUser(handle = data)
             return DmojUserInfo(

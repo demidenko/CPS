@@ -43,7 +43,7 @@ class TimusAccountManager(context: Context):
 
     override fun emptyInfo() = TimusUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String, flags: Int): TimusUserInfo {
+    override suspend fun downloadInfo(data: String): TimusUserInfo {
         try {
             val s = TimusApi.getUserPage(data.toInt())
             with(Jsoup.parse(s)) {

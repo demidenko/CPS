@@ -43,7 +43,7 @@ class ACMPAccountManager(context: Context):
 
     override fun emptyInfo() = ACMPUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String, flags: Int): ACMPUserInfo {
+    override suspend fun downloadInfo(data: String): ACMPUserInfo {
         try {
             return with(Jsoup.parse(ACMPApi.getUserPage(id = data.toInt()))) {
                 val userName = title().trim()

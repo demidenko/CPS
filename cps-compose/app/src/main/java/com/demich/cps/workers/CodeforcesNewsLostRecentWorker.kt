@@ -81,7 +81,7 @@ class CodeforcesNewsLostRecentWorker(
 
     //Required against new year color chaos
     private suspend fun List<CodeforcesBlogEntry>.fixedHandleColors(): List<CodeforcesBlogEntry> {
-        val authors = CodeforcesUtils.getUsersInfo(handles = map { it.authorHandle })
+        val authors = CodeforcesUtils.getUsersInfo(handles = map { it.authorHandle }, doRedirect = false)
         //TODO: if api load failed?..
         return map { blogEntry ->
             val userInfo = authors[blogEntry.authorHandle]
