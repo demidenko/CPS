@@ -63,3 +63,6 @@ val Throwable.niceMessage: String? get() =
 
 val Throwable.isPageNotFound get() =
     this is ClientRequestException && response.status == HttpStatusCode.NotFound
+
+val Throwable.isRedirect get() =
+    this is RedirectResponseException

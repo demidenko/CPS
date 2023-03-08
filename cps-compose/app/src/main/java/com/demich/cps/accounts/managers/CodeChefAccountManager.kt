@@ -20,19 +20,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallRatedAccountPanel
-import com.demich.cps.ui.CPSIcons
 import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
+import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.CodeChefApi
-import com.demich.cps.utils.CodeChefRatingChange
-import com.demich.cps.utils.append
+import com.demich.cps.utils.*
 import com.demich.datastore_itemized.dataStoreWrapper
-import io.ktor.client.plugins.*
-import io.ktor.http.*
 import kotlinx.serialization.Serializable
-import org.jsoup.Jsoup
 import kotlin.text.contains
 
 @Serializable
@@ -51,7 +46,7 @@ class CodeChefAccountManager(context: Context):
     companion object {
         private val Context.account_codechef_dataStore by dataStoreWrapper(AccountManagers.codechef.name)
 
-        private const val star = "★"
+        private val star get() = "★"
     }
 
     override val urlHomePage get() = CodeChefApi.urls.main
@@ -64,36 +59,24 @@ class CodeChefAccountManager(context: Context):
 
     override fun emptyInfo(): CodeChefUserInfo = CodeChefUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String): CodeChefUserInfo {
-        try {
-            Jsoup.parse(CodeChefApi.getUserPage(handle = data)).run {
-                val rating = selectFirst("div.rating-ranks")
-                    ?.select("a")
-                    ?.takeIf { it.any { it.text() != "Inactive" } }
-                    ?.let { selectFirst("div.rating-header > div.rating-number")?.text()?.toInt() }
-                val userName = selectFirst("section.user-details")?.selectFirst("span.m-username--link")
-                return CodeChefUserInfo(
-                    status = STATUS.OK,
-                    handle = userName?.text() ?: data,
-                    rating = rating
-                )
-            }
-        } catch (e: Throwable) {
-            if (e is RedirectResponseException && e.response.status == HttpStatusCode.fromValue(302)) {
-                return CodeChefUserInfo(status = STATUS.NOT_FOUND, handle = data)
-            }
-            return CodeChefUserInfo(status = STATUS.FAILED, handle = data)
+    override suspend fun downloadInfo(data: String): CodeChefUserInfo =
+        CodeChefUtils.runCatching {
+            extractUserInfo(
+                source = CodeChefApi.getUserPage(handle = data),
+                handle = data
+            )
+        }.getOrElse { e ->
+            if (e.isRedirect) CodeChefUserInfo(status = STATUS.NOT_FOUND, handle = data)
+            else CodeChefUserInfo(status = STATUS.FAILED, handle = data)
         }
-    }
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
-        return CodeChefApi.getSuggestions(str).list.map {
+    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> =
+        CodeChefApi.getSuggestions(str).list.map {
             AccountSuggestion(
                 userId = it.username,
                 info = it.rating.toString()
             )
         }
-    }
 
     override suspend fun loadRatingHistory(info: CodeChefUserInfo): List<RatingChange> =
         CodeChefApi.getRatingChanges(handle = info.handle)

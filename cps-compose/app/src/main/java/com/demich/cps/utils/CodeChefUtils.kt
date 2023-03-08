@@ -1,14 +1,16 @@
 package com.demich.cps.utils
 
+import com.demich.cps.accounts.managers.CodeChefUserInfo
+import com.demich.cps.accounts.managers.STATUS
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.http.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import org.jsoup.Jsoup
 import kotlin.time.Duration.Companion.seconds
 
 object CodeChefApi: ResourceApi {
@@ -29,7 +31,7 @@ object CodeChefApi: ResourceApi {
                 if (exception !is ResponseException) return@handleResponseExceptionWithRequest
                 val response = exception.response
                 val text = response.bodyAsText()
-                if (response.status == HttpStatusCode.fromValue(403) && text == somethingWentWrongMessage) {
+                if (response.status.value == 403 && text == somethingWentWrongMessage) {
                     throw CodeChefCSRFTokenExpiredException()
                 }
             }
@@ -49,12 +51,7 @@ object CodeChefApi: ResourceApi {
         suspend operator fun invoke(): String {
             val d = tokenDeferred ?: client.async {
                 println("codechef x-csrf-token start recalc...")
-                val page = client.getText("${urls.main}/ratings/all")
-                var i = page.indexOf("window.csrfToken")
-                require(i != -1)
-                i = page.indexOf('=', i + 1)
-                i = page.indexOf('"', i)
-                page.substring(i+1, page.indexOf('"', i+1)).also {
+                CodeChefUtils.extractCSRFToken(source = client.getText("${urls.main}/ratings/all")).also {
                     println("codechef x-csrf-token = $it")
                     require(it.length == 64)
                 }
@@ -132,3 +129,30 @@ data class CodeChefRatingChange(
     val rank: String,
     val end_date: String
 )
+
+
+object CodeChefUtils {
+    internal fun extractCSRFToken(source: String): String {
+        var i = source.indexOf("window.csrfToken")
+        require(i != -1)
+        i = source.indexOf('=', i + 1)
+        i = source.indexOf('"', i)
+        return source.substring(i+1, source.indexOf('"', i+1))
+    }
+
+    fun extractUserInfo(source: String, handle: String): CodeChefUserInfo =
+        Jsoup.parse(source).run {
+            val rating = expectFirst("div.rating-ranks")
+                .select("a")
+                .takeIf { it.any { it.text() != "Inactive" } }
+                ?.let { selectFirst("div.rating-header > div.rating-number")?.text()?.toInt() }
+            val userName = expectFirst("section.user-details")
+                .selectFirst("span.m-username--link")
+                ?.text() ?: handle
+            return CodeChefUserInfo(
+                status = STATUS.OK,
+                handle = userName,
+                rating = rating
+            )
+        }
+}
