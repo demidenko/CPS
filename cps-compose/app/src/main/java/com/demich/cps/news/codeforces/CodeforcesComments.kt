@@ -1,6 +1,9 @@
 package com.demich.cps.news.codeforces
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,13 +26,13 @@ import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
-import com.demich.cps.utils.codeforces.CodeforcesApi
-import com.demich.cps.utils.codeforces.CodeforcesComment
-import com.demich.cps.utils.codeforces.CodeforcesRecentAction
 import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.timeAgo
+import com.demich.cps.data.api.CodeforcesApi
+import com.demich.cps.data.api.CodeforcesComment
+import com.demich.cps.data.api.CodeforcesRecentAction
 import kotlin.math.roundToInt
 
 @Composable

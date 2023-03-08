@@ -1,4 +1,4 @@
-package com.demich.cps.utils
+package com.demich.cps.data.api
 
 import io.ktor.client.request.*
 import kotlinx.serialization.Serializable

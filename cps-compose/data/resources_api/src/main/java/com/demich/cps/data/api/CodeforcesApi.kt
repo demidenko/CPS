@@ -1,6 +1,5 @@
-package com.demich.cps.utils.codeforces
+package com.demich.cps.data.api
 
-import com.demich.cps.utils.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -260,7 +259,7 @@ enum class CodeforcesColorTag {
                 else -> LEGENDARY
             }
 
-        internal fun fromString(str: String): CodeforcesColorTag =
+        fun fromString(str: String): CodeforcesColorTag =
             valueOf(str.removePrefix("user-").uppercase(Locale.ENGLISH))
     }
 }

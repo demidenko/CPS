@@ -21,9 +21,9 @@ import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
-import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.context
 import com.demich.cps.utils.timeAgo
+import com.demich.cps.data.api.CodeforcesBlogEntry
 
 
 @OptIn(ExperimentalFoundationApi::class)

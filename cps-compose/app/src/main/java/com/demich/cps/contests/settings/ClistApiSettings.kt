@@ -24,6 +24,7 @@ import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
+import com.demich.cps.data.api.ClistApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -79,7 +80,7 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
                     .padding(start = 4.dp)
             )
             CPSIconButton(icon = CPSIcons.Help) {
-                context.openUrlInBrowser(CListApi.urls.apiHelp)
+                context.openUrlInBrowser(ClistApi.urls.apiHelp)
             }
         }
 

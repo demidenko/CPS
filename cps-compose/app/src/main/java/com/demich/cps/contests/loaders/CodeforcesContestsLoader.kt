@@ -2,7 +2,7 @@ package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.settings.ContestDateConstraints
-import com.demich.cps.utils.codeforces.CodeforcesApi
+import com.demich.cps.data.api.CodeforcesApi
 
 class CodeforcesContestsLoader: ContestsLoader(type = ContestsLoaders.codeforces) {
     override suspend fun loadContests(

@@ -2,9 +2,9 @@ package com.demich.cps.accounts.managers
 
 import androidx.compose.ui.graphics.toArgb
 import com.demich.cps.*
-import com.demich.cps.utils.*
-import com.demich.cps.utils.codeforces.CodeforcesApi
-import com.demich.cps.utils.codeforces.CodeforcesRatingChange
+import com.demich.cps.R
+import com.demich.cps.data.api.*
+import com.demich.cps.utils.toSignedString
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 

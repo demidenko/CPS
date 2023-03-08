@@ -18,14 +18,14 @@ import com.demich.cps.contests.Contest
 import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
-import com.demich.cps.utils.codeforces.CodeforcesColorTag
-import com.demich.cps.utils.codeforces.CodeforcesLocale
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.workers.CodeforcesNewsFollowWorker
 import com.demich.cps.workers.CodeforcesNewsLostRecentWorker
 import com.demich.cps.workers.NewsWorker
 import com.demich.cps.workers.ProjectEulerRecentProblemsWorker
+import com.demich.cps.data.api.CodeforcesColorTag
+import com.demich.cps.data.api.CodeforcesLocale
 import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

@@ -17,8 +17,8 @@ import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
-import com.demich.cps.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.utils.timeAgo
+import com.demich.cps.data.api.CodeforcesColorTag
 
 @Composable
 fun NewsFollowListItem(

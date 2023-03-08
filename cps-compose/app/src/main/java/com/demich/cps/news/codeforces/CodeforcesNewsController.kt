@@ -8,10 +8,10 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.room.lostBlogEntriesDao
-import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.rememberCollect
+import com.demich.cps.data.api.CodeforcesBlogEntry
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.flow.map

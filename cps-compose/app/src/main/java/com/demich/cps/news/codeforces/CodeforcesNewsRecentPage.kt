@@ -8,13 +8,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.utils.codeforces.CodeforcesApi
-import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
-import com.demich.cps.utils.codeforces.CodeforcesRecentAction
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.rememberWith
+import com.demich.cps.data.api.CodeforcesApi
+import com.demich.cps.data.api.CodeforcesBlogEntry
+import com.demich.cps.data.api.CodeforcesRecentAction
 
 @Composable
 fun CodeforcesNewsRecentPage(
@@ -81,7 +81,8 @@ private fun RecentBlogEntriesPage(
         onOpenBlogEntry = ::openBlogEntry,
     ) { blogEntry, comments ->
         CPSDropdownMenuItem(title = "Open recent comment", icon = CPSIcons.OpenInBrowser) {
-            context.openUrlInBrowser(CodeforcesApi.urls.comment(
+            context.openUrlInBrowser(
+                CodeforcesApi.urls.comment(
                 blogEntryId = blogEntry.id,
                 commentId = comments.first().id
             ))

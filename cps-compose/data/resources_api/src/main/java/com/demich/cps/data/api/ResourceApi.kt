@@ -1,4 +1,4 @@
-package com.demich.cps.utils
+package com.demich.cps.data.api
 
 import io.ktor.client.*
 import io.ktor.client.call.*

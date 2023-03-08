@@ -3,29 +3,7 @@ package com.demich.cps.utils
 import com.demich.cps.accounts.managers.AccountSuggestion
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.accounts.managers.TimusUserInfo
-import io.ktor.client.request.*
 import org.jsoup.Jsoup
-
-object TimusApi: ResourceApi {
-
-    suspend fun getUserPage(id: Int): String {
-        return client.getText(urlString = urls.user(id)) {
-            parameter("locale", "en")
-        }
-    }
-
-    suspend fun getSearchPage(str: String): String {
-        return client.getText(urlString = "${urls.main}/search.aspx") {
-            parameter("Str", str)
-        }
-    }
-
-    object urls {
-        const val main = "https://timus.online"
-        fun user(id: Int) = "$main/author.aspx?id=$id"
-    }
-}
-
 
 object TimusUtils {
     fun extractUserInfo(source: String, handle: String): TimusUserInfo {

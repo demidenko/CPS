@@ -1,9 +1,9 @@
 package com.demich.cps.contests.monitors
 
 import androidx.compose.runtime.Immutable
-import com.demich.cps.utils.codeforces.CodeforcesContest
-import com.demich.cps.utils.codeforces.CodeforcesContestPhase
-import com.demich.cps.utils.codeforces.CodeforcesParticipationType
+import com.demich.cps.data.api.CodeforcesContest
+import com.demich.cps.data.api.CodeforcesContestPhase
+import com.demich.cps.data.api.CodeforcesParticipationType
 import kotlinx.datetime.Instant
 
 @Immutable

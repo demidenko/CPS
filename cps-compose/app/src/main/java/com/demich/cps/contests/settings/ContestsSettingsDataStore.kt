@@ -3,9 +3,9 @@ package com.demich.cps.contests.settings
 import android.content.Context
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.loaders.ContestsLoaders
-import com.demich.cps.utils.CListApi
-import com.demich.cps.utils.ClistResource
 import com.demich.cps.utils.jsonCPS
+import com.demich.cps.data.api.ClistApi
+import com.demich.cps.data.api.ClistResource
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.datetime.Instant
@@ -27,7 +27,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
     val lastReloadedPlatforms = itemEnumSet<Contest.Platform>(name = "last_reloaded_platforms", defaultValue = emptySet())
     val ignoredContests = jsonCPS.item<Map<Pair<Contest.Platform, String>, Instant>>(name = "ignored_contests", defaultValue = emptyMap())
 
-    val clistApiAccess = jsonCPS.item(name = "clist_api_access", defaultValue = CListApi.ApiAccess("", ""))
+    val clistApiAccess = jsonCPS.item(name = "clist_api_access", defaultValue = ClistApi.ApiAccess("", ""))
     val clistAdditionalResources = jsonCPS.item<List<ClistResource>>(name = "clist_additional_resources", defaultValue = emptyList())
     val clistLastReloadedAdditionalResources = jsonCPS.item<Set<Int>>(name = "clist_additional_last_reloaded", defaultValue = emptySet())
 

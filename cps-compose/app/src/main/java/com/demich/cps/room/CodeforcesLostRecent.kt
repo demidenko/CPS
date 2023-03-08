@@ -2,7 +2,7 @@ package com.demich.cps.room
 
 import android.content.Context
 import androidx.room.*
-import com.demich.cps.utils.codeforces.CodeforcesColorTag
+import com.demich.cps.data.api.CodeforcesColorTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 

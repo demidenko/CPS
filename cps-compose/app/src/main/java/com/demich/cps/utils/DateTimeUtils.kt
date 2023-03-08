@@ -42,18 +42,3 @@ fun timeDifference(fromTime: Instant, toTime: Instant): String {
 }
 
 fun timeAgo(fromTime: Instant, toTime: Instant) = timeDifference(fromTime, toTime) + " ago"
-
-object InstantAsSecondsSerializer: KSerializer<Instant> {
-    override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("Instant", PrimitiveKind.LONG)
-    override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeLong(value.epochSeconds)
-    override fun deserialize(decoder: Decoder): Instant =
-        Instant.fromEpochSeconds(decoder.decodeLong())
-}
-
-object DurationAsSecondsSerializer: KSerializer<Duration> {
-    override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("Duration_Seconds", PrimitiveKind.LONG)
-    override fun serialize(encoder: Encoder, value: Duration) = encoder.encodeLong(value.inWholeSeconds)
-    override fun deserialize(decoder: Decoder): Duration = decoder.decodeLong().seconds
-}

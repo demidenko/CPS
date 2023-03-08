@@ -7,6 +7,10 @@ import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.utils.codeforces.*
+import com.demich.cps.data.api.CodeforcesAPIErrorResponse
+import com.demich.cps.data.api.CodeforcesApi
+import com.demich.cps.data.api.CodeforcesBlogEntry
+import com.demich.cps.data.api.CodeforcesLocale
 import kotlinx.coroutines.flow.Flow
 
 

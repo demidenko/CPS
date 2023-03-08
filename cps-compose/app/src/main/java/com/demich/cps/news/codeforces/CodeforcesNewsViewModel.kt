@@ -13,6 +13,10 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.combine
+import com.demich.cps.data.api.CodeforcesApi
+import com.demich.cps.data.api.CodeforcesBlogEntry
+import com.demich.cps.data.api.CodeforcesLocale
+import com.demich.cps.data.api.CodeforcesRecentAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -144,19 +148,20 @@ class CodeforcesNewsViewModel: ViewModel() {
         val usedIds = mutableSetOf<Int>()
         var index = 0
         for (comment in comments) {
-            val id = comment.blogEntry!!.id
+            val blogEntry = comment.blogEntry!!
+            val id = blogEntry.id
             if (id !in blogEntriesIds) {
                 blogEntriesIds.add(id)
                 if (index < blogEntries.size) {
                     //mark low rated
                     blogEntries.add(
                         index = index,
-                        element = comment.blogEntry.copy(rating = -1)
+                        element = blogEntry.copy(rating = -1)
                     )
                 } else {
                     //latest recent comments has no blog entries in recent action, so most likely not low rated
                     require(index == blogEntries.size)
-                    blogEntries.add(comment.blogEntry)
+                    blogEntries.add(blogEntry)
                 }
             }
             if (id !in usedIds) {

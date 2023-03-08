@@ -16,11 +16,11 @@ import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
 import com.demich.cps.ui.SettingsSwitchItemWithWork
-import com.demich.cps.utils.AtCoderApi
-import com.demich.cps.utils.AtCoderRatingChange
 import com.demich.cps.utils.AtCoderUtils
-import com.demich.cps.utils.isPageNotFound
 import com.demich.cps.workers.AccountsWorker
+import com.demich.cps.data.api.AtCoderApi
+import com.demich.cps.data.api.AtCoderRatingChange
+import com.demich.cps.data.api.isPageNotFound
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.serialization.Serializable
 

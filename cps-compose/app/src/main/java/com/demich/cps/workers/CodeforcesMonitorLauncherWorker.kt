@@ -5,7 +5,7 @@ import androidx.work.WorkerParameters
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
-import com.demich.cps.utils.codeforces.CodeforcesApi
+import com.demich.cps.data.api.CodeforcesApi
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes

@@ -1,4 +1,4 @@
-package com.demich.cps.utils.codeforces
+package com.demich.cps.data.api
 
 import kotlin.math.min
 

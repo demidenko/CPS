@@ -17,6 +17,8 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.utils.*
+import com.demich.cps.data.api.ClistApi
+import com.demich.cps.data.api.ClistResource
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
@@ -37,7 +39,7 @@ fun ClistAdditionalResourcesDialog(
     LaunchedEffect(Unit) {
         loadingStatus = LoadingStatus.LOADING
         kotlin.runCatching {
-            CListApi.getResources(apiAccess = context.settingsContests.clistApiAccess())
+            ClistApi.getResources(apiAccess = context.settingsContests.clistApiAccess())
         }.onFailure {
             loadingStatus = LoadingStatus.FAILED
         }.onSuccess { resources ->

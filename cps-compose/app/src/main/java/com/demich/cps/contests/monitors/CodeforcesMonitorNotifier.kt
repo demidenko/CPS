@@ -11,10 +11,10 @@ import androidx.core.text.color
 import com.demich.cps.NotificationIds
 import com.demich.cps.R
 import com.demich.cps.notifyBy
-import com.demich.cps.utils.codeforces.CodeforcesContestPhase
-import com.demich.cps.utils.codeforces.CodeforcesContestType
-import com.demich.cps.utils.codeforces.CodeforcesParticipationType
 import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.data.api.CodeforcesContestPhase
+import com.demich.cps.data.api.CodeforcesContestType
+import com.demich.cps.data.api.CodeforcesParticipationType
 import kotlin.time.Duration.Companion.milliseconds
 
 class CodeforcesMonitorNotifier(

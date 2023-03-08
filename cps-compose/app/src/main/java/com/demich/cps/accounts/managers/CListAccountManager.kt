@@ -3,9 +3,9 @@ package com.demich.cps.accounts.managers
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
-import com.demich.cps.utils.CListApi
 import com.demich.cps.utils.CListUtils
-import com.demich.cps.utils.isPageNotFound
+import com.demich.cps.data.api.ClistApi
+import com.demich.cps.data.api.isPageNotFound
 
 
 data class CListUserInfo(
@@ -17,7 +17,7 @@ data class CListUserInfo(
         get() = login
 
     override val userPageUrl: String
-        get() = CListApi.urls.user(login)
+        get() = ClistApi.urls.user(login)
 }
 
 class CListAccountManager(context: Context):
@@ -25,14 +25,14 @@ class CListAccountManager(context: Context):
     AccountSuggestionsProvider
 {
     override val userIdTitle = "login"
-    override val urlHomePage = CListApi.urls.main
+    override val urlHomePage = ClistApi.urls.main
 
     override fun emptyInfo() = CListUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String): CListUserInfo =
         CListUtils.runCatching {
             extractUserInfo(
-                source = CListApi.getUserPage(login = data),
+                source = ClistApi.getUserPage(login = data),
                 login = data
             )
         }.getOrElse { e ->
@@ -41,7 +41,7 @@ class CListAccountManager(context: Context):
         }
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion> =
-        CListUtils.extractLoginSuggestions(source = CListApi.getUsersSearchPage(str))
+        CListUtils.extractLoginSuggestions(source = ClistApi.getUsersSearchPage(str))
             .map { AccountSuggestion(userId = it) }
 
     @Composable

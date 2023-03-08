@@ -7,11 +7,11 @@ import com.demich.cps.accounts.managers.STATUS
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.room.CodeforcesLostBlogEntry
 import com.demich.cps.room.lostBlogEntriesDao
-import com.demich.cps.utils.codeforces.CodeforcesApi
-import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
-import com.demich.cps.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.mapToSet
+import com.demich.cps.data.api.CodeforcesApi
+import com.demich.cps.data.api.CodeforcesBlogEntry
+import com.demich.cps.data.api.CodeforcesColorTag
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours

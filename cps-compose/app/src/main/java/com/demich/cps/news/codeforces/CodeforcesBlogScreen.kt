@@ -7,7 +7,7 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
+import com.demich.cps.data.api.CodeforcesBlogEntry
 
 @Composable
 fun CodeforcesBlogScreen(

@@ -6,10 +6,10 @@ import androidx.work.WorkerParameters
 import com.demich.cps.*
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.utils.awaitPair
-import com.demich.cps.utils.codeforces.CodeforcesApi
-import com.demich.cps.utils.codeforces.CodeforcesProblem
-import com.demich.cps.utils.codeforces.CodeforcesProblemVerdict
 import com.demich.cps.utils.codeforces.CodeforcesUtils
+import com.demich.cps.data.api.CodeforcesApi
+import com.demich.cps.data.api.CodeforcesProblem
+import com.demich.cps.data.api.CodeforcesProblemVerdict
 import com.demich.datastore_itemized.edit
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours

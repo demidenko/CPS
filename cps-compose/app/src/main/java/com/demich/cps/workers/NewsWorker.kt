@@ -8,8 +8,8 @@ import com.demich.cps.news.settings.NewsSettingsDataStore
 import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.atcoder_news
 import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.project_euler_news
 import com.demich.cps.news.settings.settingsNews
-import com.demich.cps.utils.AtCoderApi
-import com.demich.cps.utils.ProjectEulerApi
+import com.demich.cps.data.api.AtCoderApi
+import com.demich.cps.data.api.ProjectEulerApi
 import com.demich.datastore_itemized.edit
 import kotlinx.datetime.Instant
 import org.jsoup.Jsoup

@@ -4,8 +4,8 @@ import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import com.demich.cps.room.ContestsListDao
 import com.demich.cps.utils.CListUtils
-import com.demich.cps.utils.ClistContest
 import com.demich.cps.utils.ComparablePair
+import com.demich.cps.data.api.ClistContest
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds

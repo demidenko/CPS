@@ -11,11 +11,14 @@ import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorNotifier
 import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.monitors.launchIn
-import com.demich.cps.utils.codeforces.CodeforcesApi
-import com.demich.cps.utils.codeforces.CodeforcesProblemVerdict
-import com.demich.cps.utils.codeforces.CodeforcesSubmission
+import com.demich.cps.data.api.CodeforcesApi
+import com.demich.cps.data.api.CodeforcesProblemVerdict
+import com.demich.cps.data.api.CodeforcesSubmission
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

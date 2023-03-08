@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
-import com.demich.cps.utils.TimusApi
 import com.demich.cps.utils.TimusUtils
+import com.demich.cps.data.api.TimusApi
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.serialization.Serializable
 

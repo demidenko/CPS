@@ -34,8 +34,8 @@ import com.demich.cps.room.contestsListDao
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
-import com.demich.cps.utils.codeforces.CodeforcesApi
 import com.demich.cps.workers.ContestsWorker
+import com.demich.cps.data.api.CodeforcesApi
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.flowBy
 import kotlinx.coroutines.flow.combine

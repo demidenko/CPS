@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.*
 import com.demich.cps.utils.*
-import com.demich.cps.utils.codeforces.CodeforcesApi
-import com.demich.cps.utils.codeforces.CodeforcesBlogEntry
+import com.demich.cps.data.api.CodeforcesApi
+import com.demich.cps.data.api.CodeforcesBlogEntry
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.coroutines.flow.*
