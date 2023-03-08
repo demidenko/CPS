@@ -10,9 +10,12 @@ object TimusUtils {
         with(Jsoup.parse(source)) {
             val userName = selectFirst("h2.author_name")?.text()
                 ?: return TimusUserInfo(status = STATUS.NOT_FOUND, id = handle)
-            val rows = select("td.author_stats_value").map { row ->
-                row.text().let { it.substring(0, it.indexOf(" out of ")) }
-            }
+            val rows =
+                if (selectFirst("div.author_none_solved") != null)
+                    listOf("0", "0", "0", "0")
+                else select("td.author_stats_value").map { row ->
+                    row.text().let { it.substring(0, it.indexOf(" out of ")) }
+                }
             return TimusUserInfo(
                 status = STATUS.OK,
                 id = handle,
