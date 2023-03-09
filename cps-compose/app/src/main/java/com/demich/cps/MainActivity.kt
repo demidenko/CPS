@@ -181,8 +181,8 @@ private fun CPSScaffold(
             cpsComposable(ScreenTypes.newsCodeforcesBlog) { holder ->
                 val handle = (holder.screen as Screen.NewsCodeforcesBlog).handle
                 CodeforcesBlogScreen(
-                    blogEntriesState = cpsViewModels.newsViewModel.blogEntriesState,
-                    loadingStatus = cpsViewModels.newsViewModel.blogLoadingStatus
+                    blogEntries = { cpsViewModels.newsViewModel.blogEntries },
+                    loadingStatus = { cpsViewModels.newsViewModel.blogLoadingStatus }
                 )
                 holder.setSubtitle("news", "codeforces", "blog")
             }

@@ -203,10 +203,10 @@ class CodeforcesNewsViewModel: ViewModel() {
 
     //TODO: no mutableState
     var blogLoadingStatus by mutableStateOf(LoadingStatus.PENDING)
-    val blogEntriesState = mutableStateOf(emptyList<CodeforcesBlogEntry>())
+    var blogEntries by mutableStateOf(emptyList<CodeforcesBlogEntry>())
     fun loadBlog(handle: String, context: Context) {
         require(blogLoadingStatus != LoadingStatus.LOADING)
-        blogEntriesState.value = emptyList()
+        blogEntries = emptyList()
         viewModelScope.launch {
             blogLoadingStatus = LoadingStatus.LOADING
             val (result, colorTag) = awaitPair(
@@ -218,7 +218,7 @@ class CodeforcesNewsViewModel: ViewModel() {
                 blogLoadingStatus = LoadingStatus.FAILED
             } else {
                 blogLoadingStatus = LoadingStatus.PENDING
-                blogEntriesState.value = result.map {
+                blogEntries = result.map {
                     it.copy(
                         title = CodeforcesUtils.extractTitle(it),
                         authorColorTag = colorTag
