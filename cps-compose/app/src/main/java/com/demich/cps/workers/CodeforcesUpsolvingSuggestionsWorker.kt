@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.demich.cps.*
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.utils.awaitPair
-import com.demich.cps.utils.codeforces.CodeforcesUtils
+import com.demich.cps.utils.CodeforcesUtils
 import com.demich.cps.data.api.CodeforcesApi
 import com.demich.cps.data.api.CodeforcesProblem
 import com.demich.cps.data.api.CodeforcesProblemVerdict

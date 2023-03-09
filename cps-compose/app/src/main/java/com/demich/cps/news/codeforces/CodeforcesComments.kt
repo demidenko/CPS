@@ -26,7 +26,7 @@ import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
-import com.demich.cps.utils.codeforces.CodeforcesUtils
+import com.demich.cps.utils.CodeforcesUtils
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.timeAgo

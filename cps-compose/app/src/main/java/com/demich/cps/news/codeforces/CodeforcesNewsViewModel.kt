@@ -11,12 +11,12 @@ import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.room.followListDao
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
-import com.demich.cps.utils.codeforces.*
 import com.demich.cps.utils.combine
 import com.demich.cps.data.api.CodeforcesApi
 import com.demich.cps.data.api.CodeforcesBlogEntry
 import com.demich.cps.data.api.CodeforcesLocale
 import com.demich.cps.data.api.CodeforcesRecentAction
+import com.demich.cps.utils.CodeforcesUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

@@ -1,4 +1,4 @@
-package com.demich.cps.utils.codeforces
+package com.demich.cps.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.buildAnnotatedString
