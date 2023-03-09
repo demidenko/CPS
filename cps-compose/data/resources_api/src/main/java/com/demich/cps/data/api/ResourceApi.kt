@@ -10,8 +10,6 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
-import java.net.SocketException
-import java.net.UnknownHostException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -55,9 +53,15 @@ internal suspend inline fun HttpClient.getText(
 
 val Throwable.niceMessage: String? get() =
     when (this) {
-        is UnknownHostException, is SocketException, is SocketTimeoutException -> "Connection failed"
-        is ClientRequestException -> HttpStatusCode.fromValue(response.status.value).toString()
-        is kotlinx.serialization.SerializationException -> "Parse error"
+        is java.net.UnknownHostException,
+        is java.net.SocketException,
+        is SocketTimeoutException,
+        is ConnectTimeoutException -> "Connection failed"
+
+        is ResponseException -> HttpStatusCode.fromValue(response.status.value).toString()
+
+        is kotlinx.serialization.SerializationException -> "Parse failed"
+
         else -> null
     }
 
