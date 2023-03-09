@@ -22,16 +22,15 @@ enum class ScreenTypes(
 
 sealed class Screen(
     val screenType: ScreenTypes,
-    val rootScreenType: ScreenTypes = screenType,
-    val enableBottomBar: Boolean = true,
-    val icon: ImageVector? = null
+    val rootScreenType: ScreenTypes,
+    val enableBottomBar: Boolean = true
 ) {
 
     protected open fun createPath(pattern: String): String = pattern
 
     val routePath get() = createPath(screenType.route)
 
-    object Accounts: Screen(ScreenTypes.accounts, icon = CPSIcons.Account)
+    object Accounts: RootScreen(ScreenTypes.accounts, icon = CPSIcons.Account)
 
     data class AccountExpanded(val type: AccountManagers)
         : Screen(ScreenTypes.accountExpanded, rootScreenType = ScreenTypes.accounts) {
@@ -43,7 +42,7 @@ sealed class Screen(
             override fun createPath(pattern: String) = pattern.replace("{manager}", type.name)
         }
 
-    object News: Screen(ScreenTypes.news, icon = CPSIcons.News)
+    object News: RootScreen(ScreenTypes.news, icon = CPSIcons.News)
     object NewsSettings: Screen(ScreenTypes.newsSettings, rootScreenType = ScreenTypes.news, enableBottomBar = false)
     object NewsFollowList: Screen(ScreenTypes.newsFollowList, rootScreenType = ScreenTypes.news)
     data class NewsCodeforcesBlog(val handle: String)
@@ -51,12 +50,20 @@ sealed class Screen(
             override fun createPath(pattern: String) = pattern.replace("{handle}", handle)
         }
 
-    object Contests: Screen(ScreenTypes.contests, icon = CPSIcons.Contest)
+    object Contests: RootScreen(ScreenTypes.contests, icon = CPSIcons.Contest)
     object ContestsSettings: Screen(ScreenTypes.contestsSettings, rootScreenType = ScreenTypes.contests, enableBottomBar = false)
 
-    object Development: Screen(ScreenTypes.develop, icon = CPSIcons.Development)
+    object Development: RootScreen(ScreenTypes.develop, icon = CPSIcons.Development)
 
 }
+
+sealed class RootScreen(
+    screenType: ScreenTypes,
+    val icon: ImageVector
+): Screen(
+    screenType = screenType,
+    rootScreenType = screenType
+)
 
 private val simpleScreens = arrayOf(
     Screen.Contests,

@@ -14,12 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import com.demich.cps.develop.settingsDev
 import com.demich.cps.ui.*
-import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
@@ -58,6 +56,7 @@ private fun CPSBottomBarMain(
     navigator: CPSNavigator,
     modifier: Modifier = Modifier
 ) {
+    val scope = rememberCoroutineScope()
     val context = context
 
     val devModeEnabled by rememberCollect { context.settingsDev.devModeEnabled.flow }
@@ -71,31 +70,28 @@ private fun CPSBottomBarMain(
         }
     }
 
-    var showChangeStartScreenDialog by remember { mutableStateOf(false) }
-
     CPSBottomNavigationMainItems(
         modifier = modifier.fillMaxSize(),
         rootScreens = rootScreens,
         selectedRootScreenType = navigator.currentScreen?.rootScreenType,
         onSelect = { screen ->
+            if (screen !is Screen.Development) {
+                scope.launch { context.settingsUI.startScreenRoute(screen.routePath) }
+            }
             navigator.navigateTo(screen)
         },
-        onLongPress = { showChangeStartScreenDialog = true }
+        onLongPress = {
+            //TODO: change layout
+        }
     )
-
-    if (showChangeStartScreenDialog) {
-        ChangeStartScreenDialog(
-            onDismissRequest = { showChangeStartScreenDialog = false }
-        )
-    }
 }
 
 @Composable
 private fun CPSBottomNavigationMainItems(
     modifier: Modifier = Modifier,
-    rootScreens: List<Screen>,
+    rootScreens: List<RootScreen>,
     selectedRootScreenType: ScreenTypes?,
-    onSelect: (Screen) -> Unit,
+    onSelect: (RootScreen) -> Unit,
     onLongPress: () -> Unit
 ) {
     Row(
@@ -105,7 +101,7 @@ private fun CPSBottomNavigationMainItems(
     ) {
         for (screen in rootScreens) {
             CPSBottomNavigationItem(
-                icon = screen.icon!!,
+                icon = screen.icon,
                 isSelected = screen.screenType == selectedRootScreenType,
                 onSelect = { onSelect(screen) },
                 onLongPress = onLongPress,
@@ -140,52 +136,6 @@ private fun CPSBottomNavigationItem(
                 onLongClick = onLongPress?.withVibration()
             )
     )
-}
-
-@Composable
-private fun ChangeStartScreenDialog(
-    onDismissRequest: () -> Unit
-) {
-    val context = context
-    val scope = rememberCoroutineScope()
-
-    val startScreenRoute by rememberCollect { context.settingsUI.startScreenRoute.flow }
-
-    CPSDialog(
-        title = "Select start screen",
-        onDismissRequest = onDismissRequest
-    ) {
-        Column(
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        ) {
-            listOf(
-                Screen.Accounts,
-                Screen.News,
-                Screen.Contests
-            ).forEach { screen ->
-                val selected = screen.routePath == startScreenRoute
-                CPSRadioButtonTitled(
-                    title = {
-                        //TODO: show icon somehow
-                        Text(text = screen.screenType.route.replaceFirstChar { it.uppercaseChar() })
-                    },
-                    selected = selected,
-                    onClick = {
-                        scope.launch {
-                            context.settingsUI.startScreenRoute(newValue = screen.routePath)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-        TextButton(
-            onClick = onDismissRequest,
-            content = { Text(text = "Close") },
-            modifier = Modifier.align(Alignment.End)
-        )
-    }
 }
 
 @Composable
