@@ -65,8 +65,8 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
     abstract val rankedHandleColorsList: Array<HandleColor>
 
     protected abstract suspend fun loadRatingHistory(info: U): List<RatingChange>
-    suspend fun getRatingHistory(info: U): List<RatingChange>? =
-        runCatching { loadRatingHistory(info).sortedBy { it.date } }.getOrNull()
+    suspend fun getRatingHistory(info: U): List<RatingChange> =
+        loadRatingHistory(info).sortedBy { it.date }
 }
 
 abstract class RatedUserInfo: UserInfo() {

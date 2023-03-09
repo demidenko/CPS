@@ -51,12 +51,13 @@ fun<U: RatedUserInfo> RatedAccountManager<U>.RatingLoadButton(
         ratingGraphUIStates.loadingStatus = LoadingStatus.LOADING
         ratingGraphUIStates.showRatingGraph = true
         scope.launch {
-            val ratingChanges = getRatingHistory(getSavedInfo())
-            if (ratingChanges == null) {
+            this@RatingLoadButton.runCatching {
+                getRatingHistory(getSavedInfo())
+            }.onFailure {
                 ratingGraphUIStates.loadingStatus = LoadingStatus.FAILED
-            } else {
+            }.onSuccess {
+                ratingGraphUIStates.ratingChanges = it
                 ratingGraphUIStates.loadingStatus = LoadingStatus.PENDING
-                ratingGraphUIStates.ratingChanges = ratingChanges
             }
         }
     }
