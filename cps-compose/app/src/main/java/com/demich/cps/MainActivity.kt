@@ -129,7 +129,6 @@ private fun CPSScaffold(
                     reorderEnabled = { reorderEnabled },
                     onReorderDone = { reorderEnabled = false }
                 )
-                println("!!!")
                 holder.setSubtitle("accounts")
             }
             cpsComposable(ScreenTypes.accountExpanded) { holder ->
