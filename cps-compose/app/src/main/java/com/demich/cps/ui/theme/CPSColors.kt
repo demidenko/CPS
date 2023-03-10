@@ -36,7 +36,7 @@ class CPSColors(
     private val handleColors = HandleColor.values().map(handleColor)
     fun handleColor(handleColor: HandleColor): Color = handleColors[handleColor.ordinal]
 
-    fun materialColors() = materialInitColors().copy(
+    fun toMaterialColors() = materialInitColors().copy(
         background = background,
         primary = accent,
         onBackground = content,
@@ -55,7 +55,7 @@ internal val CPSLightColors = CPSColors(
     success = Color(0, 128, 0),
     error = Color(221, 34, 34),
     votedRatingNegative = Color(128, 128, 128),
-    newEntry = Color(0xFF669900),
+    newEntry = Color(0xFF669900), //android:color/holo_green_dark
     materialInitColors = ::lightColors
 ) {
     when (it) {
@@ -72,7 +72,7 @@ internal val CPSLightColors = CPSColors(
 }
 
 internal val CPSDarkColors = CPSColors(
-    accent = Color(0, 153, 204),
+    accent = Color(0, 153, 204), //android:color/holo_blue_dark
     content = Color(212, 212, 212),
     contentAdditional = Color(147, 147, 147),
     background = Color(18, 18, 18),
@@ -82,7 +82,7 @@ internal val CPSDarkColors = CPSColors(
     success = Color(51, 153, 51),
     error = Color(200, 64, 64),
     votedRatingNegative = Color(150, 150, 150),
-    newEntry = Color(0xFF99CC00),
+    newEntry = Color(0xFF99CC00), //android:color/holo_green_light
     materialInitColors = ::darkColors
 ) {
     when (it) {
