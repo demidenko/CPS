@@ -113,17 +113,20 @@ private fun CPSScaffold(
     ) {
         {
             cpsComposable(ScreenTypes.accounts) { holder ->
-                val reorderEnabledState = rememberSaveable { mutableStateOf(false) }
+                var reorderEnabled by rememberSaveable { mutableStateOf(false) }
                 AccountsScreen(
                     accountsViewModel = cpsViewModels.accountsViewModel,
                     onExpandAccount = { type -> navigator.navigateTo(Screen.AccountExpanded(type)) },
                     onSetAdditionalMenu = holder.menuSetter,
-                    reorderEnabledState = reorderEnabledState
+                    reorderEnabled = { reorderEnabled },
+                    enableReorder = { reorderEnabled = true }
                 )
                 holder.bottomBar = accountsBottomBarBuilder(
                     cpsViewModels = cpsViewModels,
-                    reorderEnabledState = reorderEnabledState
+                    reorderEnabled = { reorderEnabled },
+                    onReorderDone = { reorderEnabled = false }
                 )
+                println("!!!")
                 holder.setSubtitle("accounts")
             }
             cpsComposable(ScreenTypes.accountExpanded) { holder ->

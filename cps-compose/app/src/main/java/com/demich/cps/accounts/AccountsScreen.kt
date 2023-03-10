@@ -37,18 +37,21 @@ fun AccountsScreen(
     accountsViewModel: AccountsViewModel,
     onExpandAccount: (AccountManagers) -> Unit,
     onSetAdditionalMenu: (CPSMenuBuilder) -> Unit,
-    reorderEnabledState: MutableState<Boolean>
+    reorderEnabled: () -> Boolean,
+    enableReorder: () -> Unit
 ) {
     val recordedAccounts by rememberRecordedAccounts()
 
     val visibleOrder by remember {
-        derivedStateOf { if (reorderEnabledState.value) recordedAccounts.map { it.type } else null }
+        derivedStateOf { if (reorderEnabled()) recordedAccounts.map { it.type } else null }
     }
     if (recordedAccounts.size > 1) {
         onSetAdditionalMenu {
-            CPSDropdownMenuItem(title = "Reorder", icon = CPSIcons.Reorder) {
-                reorderEnabledState.value = true
-            }
+            CPSDropdownMenuItem(
+                title = "Reorder",
+                icon = CPSIcons.Reorder,
+                onClick = enableReorder
+            )
         }
     }
 
@@ -196,12 +199,13 @@ fun accountExpandedMenuBuilder(
 
 fun accountsBottomBarBuilder(
     cpsViewModels: CPSViewModels,
-    reorderEnabledState: MutableState<Boolean>
+    reorderEnabled: () -> Boolean,
+    onReorderDone: () -> Unit
 ): AdditionalBottomBarBuilder = {
-    if (reorderEnabledState.value) {
+    if (reorderEnabled()) {
         CPSIconButton(
             icon = CPSIcons.ReorderDone,
-            onClick = { reorderEnabledState.value = false }
+            onClick = onReorderDone
         )
     } else {
         AddAccountButton(cpsViewModels)
