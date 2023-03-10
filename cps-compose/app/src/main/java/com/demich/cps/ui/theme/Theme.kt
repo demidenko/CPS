@@ -32,7 +32,7 @@ fun CPSTheme(content: @Composable () -> Unit) {
     val context = context
     val darkLightMode by rememberCollect { context.settingsUI.darkLightMode.flow }
     val useOriginalColors by rememberCollect { context.settingsUI.useOriginalColors.flow }
-    val colors = if (darkLightMode.isDarkMode()) CPSDarkColors else CPSLightColors
+    val colors = if (darkLightMode.isDarkMode()) darkCPSColors else lightCPSColors
     MaterialTheme(
         colors = colors.toMaterialColors(),
         typography = Typography(

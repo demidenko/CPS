@@ -44,7 +44,7 @@ class CPSColors(
     )
 }
 
-internal val CPSLightColors = CPSColors(
+internal val lightCPSColors = CPSColors(
     accent = Color(21, 101, 192),
     content = Color(36, 36, 36),
     contentAdditional = Color(118, 118, 118),
@@ -71,7 +71,7 @@ internal val CPSLightColors = CPSColors(
     }
 }
 
-internal val CPSDarkColors = CPSColors(
+internal val darkCPSColors = CPSColors(
     accent = Color(0, 153, 204), //android:color/holo_blue_dark
     content = Color(212, 212, 212),
     contentAdditional = Color(147, 147, 147),
