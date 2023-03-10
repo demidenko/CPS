@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSAboutDialog
+import com.demich.cps.ui.theme.DarkLightMode
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect

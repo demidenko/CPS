@@ -7,8 +7,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.accounts.SmallRatedAccountPanel
+import com.demich.cps.ui.theme.LocalUseOriginalColors
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.ui.useOriginalColors
 import kotlinx.datetime.Instant
 
 abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: AccountManagers):
@@ -26,7 +26,7 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
 
     @Composable
     fun colorFor(handleColor: HandleColor): Color =
-        if (useOriginalColors) originalColor(handleColor)
+        if (LocalUseOriginalColors.current) originalColor(handleColor)
         else cpsColors.handleColor(handleColor)
 
     @Composable

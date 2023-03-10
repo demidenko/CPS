@@ -1,17 +1,18 @@
 package com.demich.cps.ui
 
 import android.content.Context
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.compositionLocalOf
-import com.demich.cps.navigation.ScreenTypes
 import com.demich.cps.accounts.managers.AccountManagers
+import com.demich.cps.navigation.ScreenTypes
+import com.demich.cps.ui.theme.DarkLightMode
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+
+
+val Context.settingsUI: UISettingsDataStore
+    get() = UISettingsDataStore(this)
 
 class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsUI_dataStore) {
     companion object {
@@ -34,21 +35,3 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
 
     val startScreenRoute = itemString(name = "start_screen_route", defaultValue = ScreenTypes.accounts.route)
 }
-
-enum class DarkLightMode {
-    DARK, LIGHT, SYSTEM;
-
-    @Composable
-    fun isDarkMode(): Boolean = if(this == SYSTEM) isSystemInDarkTheme() else this == DARK
-}
-
-
-val Context.settingsUI: UISettingsDataStore
-    get() = UISettingsDataStore(this)
-
-
-val LocalUseOriginalColors = compositionLocalOf { false }
-val useOriginalColors: Boolean
-    @Composable
-    @ReadOnlyComposable
-    get() = LocalUseOriginalColors.current
