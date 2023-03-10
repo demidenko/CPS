@@ -26,6 +26,9 @@ import com.demich.cps.contests.*
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.develop.DevelopScreen
 import com.demich.cps.develop.developAdditionalBottomBarBuilder
+import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.ScreenTypes
+import com.demich.cps.navigation.getScreen
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.codeforces.CodeforcesBlogScreen
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel

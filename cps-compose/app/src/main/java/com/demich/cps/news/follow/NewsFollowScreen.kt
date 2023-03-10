@@ -11,7 +11,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.LocalCodeforcesAccountManager
-import com.demich.cps.Screen
+import com.demich.cps.navigation.Screen
 import com.demich.cps.accounts.DialogAccountChooser
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
 import com.demich.cps.room.CodeforcesUserBlog

@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.CPSViewModels
-import com.demich.cps.Screen
+import com.demich.cps.navigation.Screen
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSDeleteDialog

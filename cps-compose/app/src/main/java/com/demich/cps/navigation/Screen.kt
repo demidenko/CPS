@@ -1,4 +1,4 @@
-package com.demich.cps
+package com.demich.cps.navigation
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavBackStackEntry

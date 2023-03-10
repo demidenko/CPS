@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
-import com.demich.cps.Screen
+import com.demich.cps.navigation.Screen
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
