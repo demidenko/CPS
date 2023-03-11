@@ -16,22 +16,24 @@ enum class NewEntryType {
 typealias NewEntriesTypes = Map<Int, NewEntryType>
 
 class NewEntriesDataStoreItem (
-    item: DataStoreItem<NewEntriesTypes>
-): DataStoreItem<NewEntriesTypes> by item {
+    private val item: DataStoreItem<NewEntriesTypes>
+) {
+    val flow get() = item.flow
+
     suspend fun apply(newEntries: Collection<Int>) {
         if (newEntries.isEmpty()) return //TODO: is this OK/enough?
-        update { old ->
+        item.update { old ->
             newEntries.associateWith { id -> old[id] ?: NewEntryType.UNSEEN }
         }
     }
 
     suspend fun mark(id: Int, type: NewEntryType) {
-        edit { this.markAtLeast(id, type) }
+        item.edit { this.markAtLeast(id, type) }
     }
 
     suspend fun markAtLeast(ids: List<Int>, type: NewEntryType) {
         if (ids.isEmpty()) return
-        edit {
+        item.edit {
             for (id in ids) this.markAtLeast(id, type)
         }
     }
