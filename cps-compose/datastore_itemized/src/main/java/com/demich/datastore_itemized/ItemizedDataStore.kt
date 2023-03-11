@@ -18,21 +18,21 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
     protected suspend fun resetItems(items: Collection<DataStoreItem<*>>) {
         if (items.isEmpty()) return
         dataStore.edit { prefs ->
-            items.forEach { prefs.remove((it as DataStoreBaseItem<*,*>).key) }
+            items.forEach { prefs.remove(it.converter.key) }
         }
     }
 
     private fun<T: Any> item(key: Preferences.Key<T>, defaultValue: T): DataStoreItem<T> =
-        Item(key = key, defaultValue = defaultValue, dataStore = dataStore)
+        DataStoreItem(converter = ValueWithDefault(key, defaultValue), dataStore = dataStore)
 
     private fun<T: Any> itemNullable(key: Preferences.Key<T>): DataStoreItem<T?> =
-        ItemNullable(key = key, dataStore = dataStore)
+        DataStoreItem(converter = ValueNullable(key), dataStore = dataStore)
 
     protected fun<T> itemStringConvertible(name: String, defaultValue: T, encode: (T) -> String, decode: (String) -> T): DataStoreItem<T> =
-        ItemConvertible(key = stringPreferencesKey(name), defaultValue = defaultValue, encode = encode, decode = decode, dataStore = dataStore)
+        DataStoreItem(converter = ValueConvertible(stringPreferencesKey(name), defaultValue, encode, decode), dataStore = dataStore)
 
     protected fun<T> itemStringSetConvertible(name: String, defaultValue: T, encode: (T) -> Set<String>, decode: (Set<String>) -> T): DataStoreItem<T> =
-        ItemConvertible(key = stringSetPreferencesKey(name), defaultValue = defaultValue, encode = encode, decode = decode, dataStore = dataStore)
+        DataStoreItem(converter = ValueConvertible(stringSetPreferencesKey(name), defaultValue, encode,  decode), dataStore = dataStore)
 
 
 

@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.map
 
 class ItemizedPreferences(private val preferences: Preferences) {
     operator fun<T> get(item: DataStoreItem<T>): T =
-        (item as DataStoreBaseItem<T, *>).getValueFrom(preferences)
+        item.converter.getFrom(preferences)
 }
 
 fun<D: ItemizedDataStore, R> D.flowBy(transform: suspend D.(ItemizedPreferences) -> R): Flow<R> =
