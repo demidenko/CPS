@@ -28,7 +28,11 @@ class NewsWorker(
 ) {
     companion object {
         fun getWork(context: Context) = object : CPSWork(name = "news", context = context) {
-            override suspend fun isEnabled() = context.settingsNews.enabledNewsFeeds().isNotEmpty()
+            override suspend fun isEnabled(): Boolean {
+                val enabledFeeds = context.settingsNews.enabledNewsFeeds() - NewsSettingsDataStore.NewsFeed.project_euler_problems
+                return enabledFeeds.isNotEmpty()
+            }
+
             override val requestBuilder: PeriodicWorkRequest.Builder
                 get() = CPSPeriodicWorkRequestBuilder<NewsWorker>(
                     repeatInterval = 6.hours,
