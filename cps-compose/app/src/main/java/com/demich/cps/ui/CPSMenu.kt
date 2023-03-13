@@ -79,19 +79,19 @@ fun ContentWithCPSDropdownMenu(
     var menuOffset by remember { mutableStateOf(DpOffset.Zero) }
     var expanded by remember { mutableStateOf(false) }
 
-    val convert by rememberWith(LocalDensity.current) {
-        mutableStateOf({ s: IntSize, o: Offset ->
+    val convert = rememberWith(LocalDensity.current) {
+        { s: IntSize, o: Offset ->
             DpOffset(
                 x = o.x.toDp(),
                 y = (o.y - s.height).toDp()
             )
-        })
+        }
     }
 
     Box(
         modifier = modifier
             .indication(interactionSource, LocalIndication.current)
-            .pointerInput(convert) {
+            .pointerInput(interactionSource, convert) {
                 detectTapGestures(
                     onTap = {
                         menuOffset = convert(size, it)
