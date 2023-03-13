@@ -36,7 +36,11 @@ abstract class CPSWorker(
             this[work.name] = currentTime
         }
 
-        return runWork()
+        val result = withContext(Dispatchers.IO) {
+            runWork()
+        }
+
+        return result
     }
 
     abstract suspend fun runWork(): Result
