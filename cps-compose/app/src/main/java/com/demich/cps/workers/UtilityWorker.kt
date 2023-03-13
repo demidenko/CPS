@@ -1,12 +1,9 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import androidx.work.Constraints
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.demich.cps.contests.settings.settingsContests
 import kotlin.time.Duration.Companion.days
-import kotlin.time.toJavaDuration
 
 class UtilityWorker(
     context: Context,
@@ -19,12 +16,10 @@ class UtilityWorker(
         fun getWork(context: Context) = object : CPSWork(name = "utility", context = context) {
             override suspend fun isEnabled() = true
             override val requestBuilder get() =
-                PeriodicWorkRequestBuilder<UtilityWorker>(
-                    repeatInterval = 7.days.toJavaDuration()
-                ).setConstraints(
-                    Constraints(
-                        requiresCharging = true
-                    )
+                CPSPeriodicWorkRequestBuilder<UtilityWorker>(
+                    repeatInterval = 7.days,
+                    requiresCharging = true,
+                    requireNetwork = false
                 )
         }
     }

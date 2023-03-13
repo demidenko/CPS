@@ -53,15 +53,17 @@ abstract class CPSWork(
 internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
     repeatInterval: Duration,
     flex: Duration = repeatInterval,
-    batteryNotLow: Boolean = false
+    batteryNotLow: Boolean = false,
+    requiresCharging: Boolean = false,
+    requireNetwork: Boolean = true
 ) = PeriodicWorkRequestBuilder<W>(
     repeatInterval = repeatInterval.toJavaDuration(),
     flexTimeInterval = flex.toJavaDuration()
 ).setConstraints(
     Constraints(
-        requiredNetworkType = NetworkType.CONNECTED,
+        requiredNetworkType = if (requireNetwork) NetworkType.CONNECTED else NetworkType.NOT_REQUIRED,
         requiresBatteryNotLow = batteryNotLow,
-        requiresCharging = false
+        requiresCharging = requiresCharging
     )
 )
 
