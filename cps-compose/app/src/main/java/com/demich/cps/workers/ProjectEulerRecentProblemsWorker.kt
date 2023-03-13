@@ -7,6 +7,8 @@ import com.demich.cps.*
 import com.demich.cps.news.settings.NewsSettingsDataStore
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.data.api.ProjectEulerApi
+import com.demich.cps.utils.NewsPostEntry
+import com.demich.cps.utils.scanNewsPostEntries
 import com.demich.datastore_itemized.edit
 import org.jsoup.Jsoup
 import kotlin.time.Duration.Companion.hours
@@ -34,10 +36,10 @@ class ProjectEulerRecentProblemsWorker(
         class RecentProblem(
             val name: String,
             override val id: String
-        ): PostEntry
+        ): NewsPostEntry
 
         val settings = context.settingsNews
-        getPosts(
+        scanNewsPostEntries(
             elements = Jsoup.parse(ProjectEulerApi.getRecentPage()).expectFirst("#problems_table").select("td.id_column"),
             getLastId = {
                 settings.newsFeedsLastIds()[NewsSettingsDataStore.NewsFeed.project_euler_problems]

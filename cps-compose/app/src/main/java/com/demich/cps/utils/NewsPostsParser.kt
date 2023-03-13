@@ -1,17 +1,14 @@
-package com.demich.cps.workers
+package com.demich.cps.utils
 
-import org.jsoup.nodes.Element
-import org.jsoup.select.Elements
-
-internal interface PostEntry {
+interface NewsPostEntry {
     val id: String
 }
 
-internal suspend fun<T: PostEntry> getPosts(
-    elements: Elements,
+suspend fun<T: NewsPostEntry, E> scanNewsPostEntries(
+    elements: List<E>,
     getLastId: suspend () -> String?,
     setLastId: suspend (String) -> Unit,
-    extractPost: (Element) -> T?,
+    extractPost: (E) -> T?,
     onNewPost: (T) -> Unit
 ) {
     val lastId = getLastId()

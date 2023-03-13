@@ -10,6 +10,8 @@ import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.project_euler
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.data.api.AtCoderApi
 import com.demich.cps.data.api.ProjectEulerApi
+import com.demich.cps.utils.NewsPostEntry
+import com.demich.cps.utils.scanNewsPostEntries
 import com.demich.datastore_itemized.edit
 import kotlinx.datetime.Instant
 import org.jsoup.Jsoup
@@ -54,7 +56,7 @@ class NewsWorker(
             val title: String,
             val time: Instant,
             override val id: String
-        ): PostEntry
+        ): NewsPostEntry
 
         getPosts(
             newsFeed = atcoder_news,
@@ -92,7 +94,7 @@ class NewsWorker(
             val title: String,
             val descriptionHtml: String,
             override val id: String
-        ): PostEntry
+        ): NewsPostEntry
 
         getPosts(
             newsFeed = project_euler_news,
@@ -133,13 +135,13 @@ class NewsWorker(
         }
     }
 
-    private suspend fun<T: PostEntry> getPosts(
+    private suspend fun<T: NewsPostEntry> getPosts(
         newsFeed: NewsSettingsDataStore.NewsFeed,
         elements: Elements,
         extractPost: (Element) -> T?,
         onNewPost: (T) -> Unit
     ) {
-        getPosts(
+        scanNewsPostEntries(
             elements = elements,
             extractPost = extractPost,
             onNewPost = onNewPost,
