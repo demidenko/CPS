@@ -4,14 +4,14 @@ import android.content.Context
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.accounts.managers.STATUS
-import com.demich.cps.news.settings.settingsNews
-import com.demich.cps.room.CodeforcesLostBlogEntry
-import com.demich.cps.room.lostBlogEntriesDao
-import com.demich.cps.utils.CodeforcesUtils
-import com.demich.cps.utils.mapToSet
 import com.demich.cps.data.api.CodeforcesApi
 import com.demich.cps.data.api.CodeforcesBlogEntry
 import com.demich.cps.data.api.CodeforcesColorTag
+import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
+import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
+import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.utils.CodeforcesUtils
+import com.demich.cps.utils.mapToSet
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -113,8 +113,8 @@ class CodeforcesNewsLostRecentWorker(
         //get current suspects with removing old ones
         //TODO: glorious code
         val suspects = dao.getSuspects()
-            .partition { blogEntry ->
-                isNew(blogEntry.creationTime) && blogEntry.authorColorTag >= minRatingColorTag
+            .partition {
+                isNew(it.blogEntry.creationTime) && it.blogEntry.authorColorTag >= minRatingColorTag
             }.also {
                 dao.remove(it.second)
             }.first
@@ -134,11 +134,11 @@ class CodeforcesNewsLostRecentWorker(
                 if (isNew(creationTime)) {
                     dao.insert(
                         CodeforcesLostBlogEntry(
-                            id = blogEntry.id,
-                            title = blogEntry.title,
-                            authorHandle = blogEntry.authorHandle,
-                            authorColorTag = blogEntry.authorColorTag,
-                            creationTime = creationTime,
+                            blogEntry = blogEntry.copy(
+                                creationTime = creationTime,
+                                rating = 0,
+                                commentsCount = 0
+                            ),
                             isSuspect = true,
                             timeStamp = Instant.DISTANT_PAST
                         )
@@ -150,8 +150,8 @@ class CodeforcesNewsLostRecentWorker(
 
         //remove from lost
         dao.remove(
-            dao.getLost().filter { blogEntry ->
-                isOldLost(blogEntry.creationTime) || blogEntry.id in recentIds
+            dao.getLost().filter {
+                isOldLost(it.blogEntry.creationTime) || it.blogEntry.id in recentIds
             }
         )
 

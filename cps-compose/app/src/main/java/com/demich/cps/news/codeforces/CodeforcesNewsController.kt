@@ -6,12 +6,11 @@ import android.content.Context
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.news.settings.settingsNews
-import com.demich.cps.room.lostBlogEntriesDao
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.rememberCollect
-import com.demich.cps.data.api.CodeforcesBlogEntry
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.flow.map
@@ -123,17 +122,7 @@ class CodeforcesNewsController(
     fun flowOfLostBlogEntries(context: Context) =
         context.lostBlogEntriesDao.flowOfLost().map { blogEntries ->
             blogEntries.sortedByDescending { it.timeStamp }
-                .map {
-                    CodeforcesBlogEntry(
-                        id = it.id,
-                        title = it.title,
-                        authorHandle = it.authorHandle,
-                        authorColorTag = it.authorColorTag,
-                        creationTime = it.creationTime,
-                        commentsCount = 0,
-                        rating = 0
-                    )
-                }
+                .map { it.blogEntry }
         }
 
 

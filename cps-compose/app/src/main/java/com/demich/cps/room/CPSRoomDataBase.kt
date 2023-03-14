@@ -18,7 +18,6 @@ import com.demich.cps.contests.Contest
     InstantSecondsConverter::class
 )
 abstract class RoomSingleton: RoomDatabase() {
-    abstract fun lostBlogEntriesDao(): LostBlogEntriesDao
     abstract fun followListDao(): FollowListDao
     abstract fun contestsListDao(): ContestsListDao
 

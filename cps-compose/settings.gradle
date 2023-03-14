@@ -16,3 +16,4 @@ rootProject.name = "CPS"
 include ':app'
 include ':datastore_itemized'
 include ':data:resources_api'
+include ':features:codeforces_lost:database'

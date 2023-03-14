@@ -1,18 +1,15 @@
 package com.demich.cps.room
 
-import android.content.Context
 import androidx.room.*
 import com.demich.cps.data.api.CodeforcesColorTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 
 
-val Context.lostBlogEntriesDao get() = RoomSingleton.getInstance(this).lostBlogEntriesDao()
-
 private const val lostBlogEntriesTableName = "cf_lost_blog_entries"
 
 @Dao
-interface LostBlogEntriesDao {
+internal interface LostBlogEntriesDao {
     @Upsert
     suspend fun insert(blogEntry: CodeforcesLostBlogEntry)
 
@@ -33,7 +30,7 @@ interface LostBlogEntriesDao {
 }
 
 @Entity(tableName = lostBlogEntriesTableName)
-data class CodeforcesLostBlogEntry(
+internal data class CodeforcesLostBlogEntry(
     @PrimaryKey val id: Int,
     val title: String,
     val authorHandle: String,
