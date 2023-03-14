@@ -3,7 +3,6 @@ package com.demich.cps.contests
 import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import com.demich.cps.room.ContestsListDao
-import com.demich.cps.utils.ComparablePair
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -69,11 +68,20 @@ data class Contest (
         val platforms: List<Platform> by lazy { Platform.values().toList() }
         val platformsExceptUnknown: List<Platform> by lazy { Platform.values().filter { it != Platform.unknown } }
 
-        fun getComparator(currentTime: Instant) = compareBy<Contest> { contest ->
-            when(contest.getPhase(currentTime)) {
-                Phase.BEFORE -> ComparablePair(1, contest.startTime.epochSeconds)
-                Phase.RUNNING -> ComparablePair(0, contest.endTime.epochSeconds)
-                Phase.FINISHED -> ComparablePair(2, -contest.endTime.epochSeconds)
+        fun getComparator(currentTime: Instant) = Comparator<Contest> { c1, c2 ->
+            val phase1 = c1.getPhase(currentTime)
+            val phase2 = c2.getPhase(currentTime)
+            if (phase1 != phase2) compareValuesBy(phase1, phase2) {
+                when (it) {
+                    Phase.RUNNING -> 0
+                    Phase.BEFORE -> 1
+                    Phase.FINISHED -> 2
+                }
+            }
+            else when (phase1) {
+                Phase.RUNNING -> compareValues(c1.endTime, c2.endTime)
+                Phase.BEFORE -> compareValues(c1.startTime, c2.startTime)
+                Phase.FINISHED -> -compareValues(c1.endTime, c2.endTime)
             }
         }.thenBy { it.durationSeconds }.thenBy { it.platform }.thenBy { it.id }
     }

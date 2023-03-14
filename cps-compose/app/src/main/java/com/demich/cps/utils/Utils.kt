@@ -33,17 +33,6 @@ fun Int.toSignedString(zeroAsPositive: Boolean = false): String =
     if (this > 0 || this == 0 && zeroAsPositive) "+${this}" else "$this"
 
 
-data class ComparablePair<A: Comparable<A>, B: Comparable<B>>(
-    val first: A,
-    val second: B
-): Comparable<ComparablePair<A, B>> {
-    override fun compareTo(other: ComparablePair<A, B>): Int =
-        when (val c = first compareTo other.first) {
-            0 -> second compareTo other.second
-            else -> c
-        }
-}
-
 fun <T> List<T>.isSortedWith(comparator: Comparator<in T>): Boolean {
     if (size < 2) return true
     for (i in 1 until size) if (comparator.compare(get(i-1),get(i)) > 0) return false
