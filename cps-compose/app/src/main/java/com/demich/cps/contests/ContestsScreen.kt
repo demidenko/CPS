@@ -39,6 +39,7 @@ import com.demich.cps.data.api.CodeforcesApi
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.flowBy
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -119,8 +120,9 @@ private fun ContestsContent(
     errorsMessage: () -> String
 ) {
     val context = context
-    val contestsToShowState = rememberCollect {
+    val contestsToShowState = rememberCollectWithLifecycle {
         context.contestsListDao.flowOfContests()
+            .distinctUntilChanged()
             .combine(context.settingsContests.ignoredContests.flow) { list, ignored ->
                 if (ignored.isEmpty()) list
                 else list.filter { contest -> contest.compositeId !in ignored }
