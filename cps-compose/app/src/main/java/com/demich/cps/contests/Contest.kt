@@ -3,9 +3,7 @@ package com.demich.cps.contests
 import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import com.demich.cps.room.ContestsListDao
-import com.demich.cps.utils.CListUtils
 import com.demich.cps.utils.ComparablePair
-import com.demich.cps.data.api.ClistContest
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -48,21 +46,6 @@ data class Contest (
         startTime = startTime,
         durationSeconds = (endTime - startTime).inWholeSeconds,
         link = link
-    )
-
-    constructor(contest: ClistContest): this(
-        contest = contest,
-        platform = platformsExceptUnknown
-            .find { CListUtils.getClistApiResourceId(it) == contest.resource_id }
-            ?: Platform.unknown
-    )
-    private constructor(contest: ClistContest, platform: Platform): this(
-        platform = platform,
-        id = CListUtils.extractContestId(contest, platform),
-        title = contest.event,
-        startTime = Instant.parse(contest.start+"Z"),
-        endTime = Instant.parse(contest.end+"Z"),
-        link = contest.href
     )
 
     enum class Phase {

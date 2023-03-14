@@ -5,6 +5,7 @@ import com.demich.cps.contests.settings.ContestDateConstraints
 import com.demich.cps.utils.CListUtils
 import com.demich.cps.data.api.ClistApi
 import com.demich.cps.data.api.ClistContest
+import kotlinx.datetime.Instant
 
 class ClistContestsLoader(
     val apiAccess: ClistApi.ApiAccess,
@@ -24,10 +25,25 @@ class ClistContestsLoader(
 
 private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: ContestDateConstraints.Current) =
     mapNotNull { clistContest ->
-        val contest = Contest(clistContest)
+        val contest = clistContest.toContest()
         if (!dateConstraints.check(startTime = contest.startTime, duration = contest.duration)) return@mapNotNull null
         when (contest.platform) {
             Contest.Platform.atcoder -> contest.takeIf { clistContest.host == "atcoder.jp" }
             else -> contest
         }
     }
+
+private fun ClistContest.toContest(): Contest {
+    val platform = Contest.platformsExceptUnknown
+        .find { CListUtils.getClistApiResourceId(it) == resource_id }
+        ?: Contest.Platform.unknown
+
+    return Contest(
+        platform = platform,
+        id = CListUtils.extractContestId(this, platform),
+        title = event,
+        startTime = Instant.parse(start+"Z"),
+        endTime = Instant.parse(end+"Z"),
+        link = href
+    )
+}
