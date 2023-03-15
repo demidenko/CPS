@@ -37,9 +37,17 @@ fun ContestItem(
 @Immutable
 private data class ContestData(
     val contest: Contest,
-    val currentTime: Instant,
-    val phase: Contest.Phase = contest.getPhase(currentTime)
-)
+    val phase: Contest.Phase,
+    val startsIn: String,
+    val endsIn: String
+) {
+    constructor(contest: Contest, currentTime: Instant): this(
+        contest = contest,
+        phase = contest.getPhase(currentTime),
+        startsIn = contestTimeDifference(currentTime, contest.startTime),
+        endsIn = contestTimeDifference(currentTime, contest.endTime)
+    )
+}
 
 @Composable
 private fun ContestItemContent(contest: Contest) {
@@ -122,11 +130,11 @@ private fun ContestItemFooter(
     when (data.phase) {
         Contest.Phase.BEFORE -> {
             date = data.contest.dateRange()
-            counter = "in " + contestTimeDifference(data.currentTime, data.contest.startTime)
+            counter = "in " + data.startsIn
         }
         Contest.Phase.RUNNING -> {
             date = "ends " + data.contest.endTime.contestDate()
-            counter = "left " + contestTimeDifference(data.currentTime, data.contest.endTime)
+            counter = "left " + data.endsIn
         }
         Contest.Phase.FINISHED -> {
             date = data.contest.startTime.contestDate() + " - " + data.contest.endTime.contestDate()
@@ -229,10 +237,10 @@ private fun ContestExpandedItemFooter(
         contestLink = data.contest.link,
         counter = when (data.phase) {
             Contest.Phase.BEFORE -> {
-                "starts in " + contestTimeDifference(data.currentTime, data.contest.startTime)
+                "starts in " + data.startsIn
             }
             Contest.Phase.RUNNING -> {
-                "ends in " + contestTimeDifference(data.currentTime, data.contest.endTime)
+                "ends in " + data.endsIn
             }
             Contest.Phase.FINISHED -> ""
         },
