@@ -73,7 +73,6 @@ interface FollowListDao {
     private suspend fun getAndReloadBlogEntries(
         handle: String,
         locale: CodeforcesLocale,
-        loadUserInfo: suspend (String) -> CodeforcesUserInfo,
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
     ): List<CodeforcesBlogEntry>? {
         return CodeforcesApi.runCatching {
@@ -83,14 +82,13 @@ interface FollowListDao {
                 return@recoverCatching emptyList()
             }
             if (it is CodeforcesAPIErrorResponse && it.isBlogHandleNotFound(handle)) {
-                val userInfo = loadUserInfo(handle)
+                val userInfo = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
                 when (userInfo.status) {
                     STATUS.OK -> {
                         setUserInfo(handle, userInfo)
                         return@recoverCatching getAndReloadBlogEntries(
                             handle = userInfo.handle,
                             locale = locale,
-                            loadUserInfo = loadUserInfo,
                             onNewBlogEntry = onNewBlogEntry
                         )
                     }
@@ -119,7 +117,6 @@ interface FollowListDao {
         val blogEntries = getAndReloadBlogEntries(
             handle = handle,
             locale = settingsNews.codeforcesLocale(),
-            loadUserInfo = { CodeforcesUtils.getUserInfo(handle = it, doRedirect = true) },
             onNewBlogEntry = { notifyNewBlogEntry(it, context) }
         )
 
