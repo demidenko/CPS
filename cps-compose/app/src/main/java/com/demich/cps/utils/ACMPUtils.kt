@@ -1,8 +1,8 @@
 package com.demich.cps.utils
 
-import com.demich.cps.accounts.managers.UserSuggestion
 import com.demich.cps.accounts.userinfo.ACMPUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.UserSuggestion
 import org.jsoup.Jsoup
 
 object ACMPUtils {

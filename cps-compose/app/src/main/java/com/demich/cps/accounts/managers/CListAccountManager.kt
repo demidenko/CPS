@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.userinfo.ClistUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.utils.CListUtils
 import com.demich.cps.platforms.api.ClistApi
 import com.demich.cps.platforms.api.isPageNotFound

@@ -25,6 +25,7 @@ import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.CodeChefApi
 import com.demich.cps.platforms.api.CodeChefRatingChange
 import com.demich.cps.platforms.api.isRedirect

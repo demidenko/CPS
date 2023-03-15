@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserInfo
+import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.MonospacedText

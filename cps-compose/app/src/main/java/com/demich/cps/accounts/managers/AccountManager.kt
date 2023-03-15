@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.*
 import com.demich.cps.accounts.userinfo.UserInfo
+import com.demich.cps.accounts.userinfo.UserSuggestion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -83,12 +84,6 @@ data class UserInfoWithManager<U: UserInfo>(
 ) {
     val type: AccountManagers get() = manager.type
 }
-
-data class UserSuggestion(
-    val userId: String,
-    val title: String = userId,
-    val info: String = ""
-)
 
 interface UserSuggestionsProvider {
     suspend fun loadSuggestions(str: String): List<UserSuggestion>
