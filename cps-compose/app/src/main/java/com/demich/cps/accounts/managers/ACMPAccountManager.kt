@@ -9,7 +9,7 @@ import com.demich.cps.accounts.userinfo.ACMPUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.ACMPApi
-import com.demich.cps.utils.ACMPUtils
+import com.demich.cps.platforms.utils.ACMPUtils
 import com.demich.datastore_itemized.dataStoreWrapper
 
 

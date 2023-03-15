@@ -8,7 +8,7 @@ import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.TimusApi
-import com.demich.cps.utils.TimusUtils
+import com.demich.cps.platforms.utils.TimusUtils
 import com.demich.datastore_itemized.dataStoreWrapper
 
 

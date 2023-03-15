@@ -31,7 +31,7 @@ import com.demich.cps.platforms.api.CodeChefRatingChange
 import com.demich.cps.platforms.api.isRedirect
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.CodeChefUtils
+import com.demich.cps.platforms.utils.CodeChefUtils
 import com.demich.cps.utils.append
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlin.text.contains

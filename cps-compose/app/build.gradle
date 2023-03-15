@@ -70,6 +70,7 @@ android {
 dependencies {
     implementation project(":datastore_itemized")
     implementation project(":data:platforms:api")
+    implementation project(":data:platforms:utils")
     implementation project(":data:accounts:userinfo")
     implementation project(":features:room_base")
     implementation project(":features:codeforces_lost:database")
