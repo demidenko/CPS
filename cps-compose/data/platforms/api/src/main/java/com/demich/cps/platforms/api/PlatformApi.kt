@@ -1,4 +1,4 @@
-package com.demich.cps.data.api
+package com.demich.cps.platforms.api
 
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -13,7 +13,7 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-internal interface ResourceApi {
+internal interface PlatformApi {
     val client: HttpClient get() = defaultHttpClient
 }
 

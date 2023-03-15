@@ -1,6 +1,6 @@
 package com.demich.cps.accounts.userinfo
 
-import com.demich.cps.data.api.ClistApi
+import com.demich.cps.platforms.api.ClistApi
 
 data class ClistUserInfo(
     override val status: STATUS,

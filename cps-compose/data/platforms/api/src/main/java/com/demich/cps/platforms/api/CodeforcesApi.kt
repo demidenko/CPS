@@ -1,4 +1,4 @@
-package com.demich.cps.data.api
+package com.demich.cps.platforms.api
 
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
@@ -15,7 +15,7 @@ import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-object CodeforcesApi: ResourceApi {
+object CodeforcesApi: PlatformApi {
     private val json get() = defaultJson
 
     override val client = cpsHttpClient(json = json) {

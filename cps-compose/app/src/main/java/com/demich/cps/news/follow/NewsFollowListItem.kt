@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.data.api.CodeforcesColorTag
+import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating

@@ -15,7 +15,7 @@ import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
-import com.demich.cps.data.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState

@@ -19,9 +19,9 @@ import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.itemsNotEmpty
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.rememberWith
-import com.demich.cps.data.api.CodeforcesBlogEntry
-import com.demich.cps.data.api.CodeforcesComment
-import com.demich.cps.data.api.CodeforcesRecentAction
+import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.CodeforcesComment
+import com.demich.cps.platforms.api.CodeforcesRecentAction
 
 @Composable
 fun CodeforcesRecentBlogEntries(

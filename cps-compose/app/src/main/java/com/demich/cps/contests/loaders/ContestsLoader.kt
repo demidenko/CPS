@@ -2,7 +2,7 @@ package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.settings.ContestDateConstraints
-import com.demich.cps.data.api.niceMessage
+import com.demich.cps.platforms.api.niceMessage
 
 
 enum class ContestsLoaders(val supportedPlatforms: Set<Contest.Platform>) {

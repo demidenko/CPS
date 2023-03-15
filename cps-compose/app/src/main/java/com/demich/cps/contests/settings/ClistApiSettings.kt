@@ -24,7 +24,7 @@ import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
-import com.demich.cps.data.api.ClistApi
+import com.demich.cps.platforms.api.ClistApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 

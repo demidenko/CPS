@@ -12,9 +12,9 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.rememberWith
-import com.demich.cps.data.api.CodeforcesApi
-import com.demich.cps.data.api.CodeforcesBlogEntry
-import com.demich.cps.data.api.CodeforcesRecentAction
+import com.demich.cps.platforms.api.CodeforcesApi
+import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.CodeforcesRecentAction
 
 @Composable
 fun CodeforcesNewsRecentPage(

@@ -1,10 +1,10 @@
-package com.demich.cps.data.api
+package com.demich.cps.platforms.api
 
 import io.ktor.client.request.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
-object ClistApi: ResourceApi {
+object ClistApi: PlatformApi {
     override val client = cpsHttpClient(json = defaultJson) { }
 
     suspend fun getUserPage(login: String): String {

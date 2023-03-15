@@ -1,7 +1,7 @@
 package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.Contest
-import com.demich.cps.data.api.DmojApi
+import com.demich.cps.platforms.api.DmojApi
 import kotlinx.datetime.Instant
 
 class DmojContestsLoader: ContestsLoader(ContestsLoaders.dmoj) {

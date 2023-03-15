@@ -24,8 +24,8 @@ import com.demich.cps.workers.CodeforcesNewsFollowWorker
 import com.demich.cps.workers.CodeforcesNewsLostRecentWorker
 import com.demich.cps.workers.NewsWorker
 import com.demich.cps.workers.ProjectEulerRecentProblemsWorker
-import com.demich.cps.data.api.CodeforcesColorTag
-import com.demich.cps.data.api.CodeforcesLocale
+import com.demich.cps.platforms.api.CodeforcesColorTag
+import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

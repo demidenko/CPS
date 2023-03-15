@@ -6,7 +6,7 @@ import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.TimusUserInfo
-import com.demich.cps.data.api.TimusApi
+import com.demich.cps.platforms.api.TimusApi
 import com.demich.cps.utils.TimusUtils
 import com.demich.datastore_itemized.dataStoreWrapper
 

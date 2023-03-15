@@ -1,7 +1,7 @@
 package com.demich.cps.accounts.userinfo
 
-import com.demich.cps.data.api.CodeforcesApi
-import com.demich.cps.data.api.CodeforcesUser
+import com.demich.cps.platforms.api.CodeforcesApi
+import com.demich.cps.platforms.api.CodeforcesUser
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 

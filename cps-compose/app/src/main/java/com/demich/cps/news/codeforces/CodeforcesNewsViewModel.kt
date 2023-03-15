@@ -7,10 +7,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
-import com.demich.cps.data.api.CodeforcesApi
-import com.demich.cps.data.api.CodeforcesBlogEntry
-import com.demich.cps.data.api.CodeforcesLocale
-import com.demich.cps.data.api.CodeforcesRecentAction
+import com.demich.cps.platforms.api.CodeforcesApi
+import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.CodeforcesLocale
+import com.demich.cps.platforms.api.CodeforcesRecentAction
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.room.followListDao
 import com.demich.cps.utils.CodeforcesUtils

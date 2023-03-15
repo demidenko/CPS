@@ -29,9 +29,9 @@ import com.demich.cps.utils.collectCurrentTimeAsState
 import com.demich.cps.utils.rememberWith
 import com.demich.cps.utils.toHHMMSS
 import com.demich.cps.utils.toMMSS
-import com.demich.cps.data.api.CodeforcesContestPhase
-import com.demich.cps.data.api.CodeforcesContestType
-import com.demich.cps.data.api.CodeforcesParticipationType
+import com.demich.cps.platforms.api.CodeforcesContestPhase
+import com.demich.cps.platforms.api.CodeforcesContestType
+import com.demich.cps.platforms.api.CodeforcesParticipationType
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds

@@ -2,7 +2,7 @@ package com.demich.cps.features.codeforces.lost.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.demich.cps.data.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import kotlinx.datetime.Instant
 
 @Entity(tableName = cfLostTableName)

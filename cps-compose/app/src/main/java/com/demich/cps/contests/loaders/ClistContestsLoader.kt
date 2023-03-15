@@ -3,8 +3,8 @@ package com.demich.cps.contests.loaders
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.settings.ContestDateConstraints
 import com.demich.cps.utils.CListUtils
-import com.demich.cps.data.api.ClistApi
-import com.demich.cps.data.api.ClistContest
+import com.demich.cps.platforms.api.ClistApi
+import com.demich.cps.platforms.api.ClistContest
 import kotlinx.datetime.Instant
 
 class ClistContestsLoader(

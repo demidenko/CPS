@@ -6,8 +6,8 @@ import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.userinfo.ClistUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.utils.CListUtils
-import com.demich.cps.data.api.ClistApi
-import com.demich.cps.data.api.isPageNotFound
+import com.demich.cps.platforms.api.ClistApi
+import com.demich.cps.platforms.api.isPageNotFound
 
 
 class CListAccountManager(context: Context):

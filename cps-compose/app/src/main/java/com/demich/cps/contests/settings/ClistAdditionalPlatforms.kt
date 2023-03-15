@@ -17,8 +17,8 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.utils.*
-import com.demich.cps.data.api.ClistApi
-import com.demich.cps.data.api.ClistResource
+import com.demich.cps.platforms.api.ClistApi
+import com.demich.cps.platforms.api.ClistResource
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch

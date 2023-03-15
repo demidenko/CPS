@@ -1,4 +1,4 @@
-package com.demich.cps.data.api
+package com.demich.cps.platforms.api
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer

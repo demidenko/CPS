@@ -1,11 +1,11 @@
-package com.demich.cps.data.api
+package com.demich.cps.platforms.api
 
 import io.ktor.client.request.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 
-object AtCoderApi: ResourceApi {
+object AtCoderApi: PlatformApi {
     private val json get() = defaultJson
 
     suspend fun getUserPage(handle: String): String  {

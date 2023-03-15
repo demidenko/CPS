@@ -14,7 +14,7 @@ import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
-import com.demich.cps.data.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.CodeforcesBlogEntry
 
 @Composable
 fun CodeforcesBlogEntriesFollowAddable(

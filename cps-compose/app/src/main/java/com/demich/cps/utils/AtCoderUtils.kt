@@ -3,7 +3,7 @@ package com.demich.cps.utils
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.contests.Contest
-import com.demich.cps.data.api.AtCoderApi
+import com.demich.cps.platforms.api.AtCoderApi
 import kotlinx.datetime.Instant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element

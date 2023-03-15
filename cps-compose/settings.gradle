@@ -15,7 +15,7 @@ dependencyResolutionManagement {
 rootProject.name = "CPS"
 include ':app'
 include ':datastore_itemized'
-include ':data:resources_api'
-include ':features:codeforces_lost:database'
-include ':features:room_base'
+include ':data:platforms:api'
 include ':data:accounts:userinfo'
+include ':features:room_base'
+include ':features:codeforces_lost:database'

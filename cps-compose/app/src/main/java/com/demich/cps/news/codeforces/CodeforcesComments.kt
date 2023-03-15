@@ -30,9 +30,9 @@ import com.demich.cps.utils.CodeforcesUtils
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.timeAgo
-import com.demich.cps.data.api.CodeforcesApi
-import com.demich.cps.data.api.CodeforcesComment
-import com.demich.cps.data.api.CodeforcesRecentAction
+import com.demich.cps.platforms.api.CodeforcesApi
+import com.demich.cps.platforms.api.CodeforcesComment
+import com.demich.cps.platforms.api.CodeforcesRecentAction
 import kotlin.math.roundToInt
 
 @Composable

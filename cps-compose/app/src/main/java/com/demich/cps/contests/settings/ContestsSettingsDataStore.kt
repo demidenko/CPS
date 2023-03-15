@@ -4,8 +4,8 @@ import android.content.Context
 import com.demich.cps.contests.Contest
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.utils.jsonCPS
-import com.demich.cps.data.api.ClistApi
-import com.demich.cps.data.api.ClistResource
+import com.demich.cps.platforms.api.ClistApi
+import com.demich.cps.platforms.api.ClistResource
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.datetime.Instant

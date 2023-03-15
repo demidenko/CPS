@@ -3,8 +3,8 @@ package com.demich.cps.news.settings
 import android.content.Context
 import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.utils.jsonCPS
-import com.demich.cps.data.api.CodeforcesColorTag
-import com.demich.cps.data.api.CodeforcesLocale
+import com.demich.cps.platforms.api.CodeforcesColorTag
+import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.coroutines.flow.Flow

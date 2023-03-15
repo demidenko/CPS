@@ -23,7 +23,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.context
 import com.demich.cps.utils.timeAgo
-import com.demich.cps.data.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.CodeforcesBlogEntry
 
 
 @OptIn(ExperimentalFoundationApi::class)

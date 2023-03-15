@@ -25,7 +25,7 @@ import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.data.api.*
+import com.demich.cps.platforms.api.*
 import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.theme.cpsColors

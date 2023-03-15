@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.demich.cps.*
 import com.demich.cps.news.settings.NewsSettingsDataStore
 import com.demich.cps.news.settings.settingsNews
-import com.demich.cps.data.api.ProjectEulerApi
+import com.demich.cps.platforms.api.ProjectEulerApi
 import com.demich.cps.utils.NewsPostEntry
 import com.demich.cps.utils.scanNewsPostEntries
 import com.demich.datastore_itemized.edit

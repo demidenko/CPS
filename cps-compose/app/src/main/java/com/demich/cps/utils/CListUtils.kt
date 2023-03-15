@@ -4,7 +4,7 @@ import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.accounts.userinfo.ClistUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.contests.Contest
-import com.demich.cps.data.api.ClistContest
+import com.demich.cps.platforms.api.ClistContest
 import org.jsoup.Jsoup
 import kotlin.collections.set
 

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.buildAnnotatedString
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.data.api.*
+import com.demich.cps.platforms.api.*
 import com.demich.cps.ui.theme.cpsColors
 import kotlinx.datetime.Instant
 import org.jsoup.Jsoup

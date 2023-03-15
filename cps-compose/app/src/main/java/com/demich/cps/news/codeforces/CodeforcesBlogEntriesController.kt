@@ -3,8 +3,8 @@ package com.demich.cps.news.codeforces
 import android.content.Context
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.*
-import com.demich.cps.data.api.CodeforcesApi
-import com.demich.cps.data.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.CodeforcesApi
+import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.utils.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

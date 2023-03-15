@@ -1,7 +1,7 @@
 package com.demich.cps.contests.monitors
 
 import android.content.Context
-import com.demich.cps.data.api.*
+import com.demich.cps.platforms.api.*
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper

@@ -1,4 +1,4 @@
-package com.demich.cps.data.api
+package com.demich.cps.platforms.api
 
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.cookies.*
@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlin.time.Duration.Companion.seconds
 
-object CodeChefApi: ResourceApi {
+object CodeChefApi: PlatformApi {
     private val json get() = defaultJson
 
     override val client = cpsHttpClient(
