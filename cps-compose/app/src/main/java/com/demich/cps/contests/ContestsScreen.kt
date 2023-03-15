@@ -37,6 +37,7 @@ import com.demich.cps.utils.*
 import com.demich.cps.workers.ContestsWorker
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.datastore_itemized.add
+import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.flowBy
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -186,6 +187,9 @@ private fun ContestsSortedList(
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
+    val context = context
+    val scope = rememberCoroutineScope()
+
     var expandedItems: List<Pair<Contest.Platform, String>>
         by rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(emptyList()) }
 
@@ -203,6 +207,13 @@ private fun ContestsSortedList(
             ContestItem(
                 contest = contest,
                 expanded = contest.compositeId in expandedItems,
+                onDeleteRequest = {
+                    scope.launch {
+                        context.settingsContests.ignoredContests.edit {
+                            put(contest.compositeId, getCurrentTime())
+                        }
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {

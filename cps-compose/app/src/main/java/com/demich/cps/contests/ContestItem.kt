@@ -12,13 +12,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
-import com.demich.datastore_itemized.edit
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -28,26 +25,37 @@ import kotlin.time.Duration.Companion.hours
 fun ContestItem(
     contest: Contest,
     expanded: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDeleteRequest: () -> Unit
 ) {
     Column(modifier = modifier) {
         if (!expanded) ContestItemContent(contest = contest)
-        else ContestExpandedItemContent(contest = contest)
+        else ContestExpandedItemContent(contest = contest, onDeleteRequest = onDeleteRequest)
     }
 }
 
+@Immutable
+private data class ContestData(
+    val contest: Contest,
+    val currentTime: Instant,
+    val phase: Contest.Phase = contest.getPhase(currentTime)
+)
+
 @Composable
 private fun ContestItemContent(contest: Contest) {
-    val currentTime = LocalCurrentTime.current
+    //TODO: recompose twice per second! (wtf?)
+    val data = ContestData(
+        contest = contest,
+        currentTime = LocalCurrentTime.current
+    )
     ContestItemHeader(
         platform = contest.platform,
         contestTitle = contest.title,
-        phase = contest.getPhase(currentTime),
+        phase = data.phase,
         modifier = Modifier.fillMaxWidth()
     )
     ContestItemFooter(
-        contest = contest,
-        currentTime = currentTime,
+        data = data,
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -106,23 +114,22 @@ private fun ContestColoredTitle(
 
 @Composable
 private fun ContestItemFooter(
-    contest: Contest,
-    currentTime: Instant,
+    data: ContestData,
     modifier: Modifier = Modifier
 ) {
     val date: String
     val counter: String
-    when (contest.getPhase(currentTime)) {
+    when (data.phase) {
         Contest.Phase.BEFORE -> {
-            date = contest.dateRange()
-            counter = "in " + contestTimeDifference(currentTime, contest.startTime)
+            date = data.contest.dateRange()
+            counter = "in " + contestTimeDifference(data.currentTime, data.contest.startTime)
         }
         Contest.Phase.RUNNING -> {
-            date = "ends " + contest.endTime.contestDate()
-            counter = "left " + contestTimeDifference(currentTime, contest.endTime)
+            date = "ends " + data.contest.endTime.contestDate()
+            counter = "left " + contestTimeDifference(data.currentTime, data.contest.endTime)
         }
         Contest.Phase.FINISHED -> {
-            date = contest.startTime.contestDate() + " - " + contest.endTime.contestDate()
+            date = data.contest.startTime.contestDate() + " - " + data.contest.endTime.contestDate()
             counter = ""
         }
     }
@@ -159,18 +166,24 @@ private fun ContestItemFooter(
 
 
 @Composable
-private fun ContestExpandedItemContent(contest: Contest) {
-    val currentTime = LocalCurrentTime.current
+private fun ContestExpandedItemContent(
+    contest: Contest,
+    onDeleteRequest: () -> Unit
+) {
+    val data = ContestData(
+        contest = contest,
+        currentTime = LocalCurrentTime.current
+    )
     ContestExpandedItemHeader(
         platform = contest.platform,
         contestTitle = contest.title,
-        phase = contest.getPhase(currentTime),
+        phase = data.phase,
         modifier = Modifier.fillMaxWidth()
     )
     ContestExpandedItemFooter(
-        contest = contest,
-        currentTime = currentTime,
-        modifier = Modifier.fillMaxWidth()
+        data = data,
+        modifier = Modifier.fillMaxWidth(),
+        onDeleteRequest = onDeleteRequest
     )
 }
 
@@ -206,34 +219,47 @@ private fun ContestExpandedItemHeader(
 
 @Composable
 private fun ContestExpandedItemFooter(
-    contest: Contest,
-    currentTime: Instant,
-    modifier: Modifier = Modifier
+    data: ContestData,
+    modifier: Modifier = Modifier,
+    onDeleteRequest: () -> Unit
 ) {
     ContestExpandedItemFooter(
-        contest = contest,
-        counter = when (contest.getPhase(currentTime)) {
-            Contest.Phase.BEFORE -> "starts in " + contestTimeDifference(currentTime, contest.startTime)
-            Contest.Phase.RUNNING -> "ends in " + contestTimeDifference(currentTime, contest.endTime)
+        startTime = data.contest.startTime.contestDate(),
+        endTime = data.contest.endTime.contestDate(),
+        contestLink = data.contest.link,
+        counter = when (data.phase) {
+            Contest.Phase.BEFORE -> {
+                "starts in " + contestTimeDifference(data.currentTime, data.contest.startTime)
+            }
+            Contest.Phase.RUNNING -> {
+                "ends in " + contestTimeDifference(data.currentTime, data.contest.endTime)
+            }
             Contest.Phase.FINISHED -> ""
         },
-        modifier = modifier
+        modifier = modifier,
+        onDeleteRequest = onDeleteRequest
     )
 }
 
 @Composable
 private fun ContestExpandedItemFooter(
-    contest: Contest,
+    startTime: String,
+    endTime: String,
+    contestLink: String?,
     counter: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDeleteRequest: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
         ContestExpandedItemDatesAndMenuButton(
-            contest = contest,
-            modifier = Modifier.fillMaxWidth()
+            startTime = startTime,
+            endTime = endTime,
+            contestLink = contestLink,
+            modifier = Modifier.fillMaxWidth(),
+            onDeleteRequest = onDeleteRequest
         )
         if (counter.isNotBlank()) {
             MonospacedText(
@@ -247,45 +273,49 @@ private fun ContestExpandedItemFooter(
 
 @Composable
 private fun ContestExpandedItemDatesAndMenuButton(
-    contest: Contest,
-    modifier: Modifier = Modifier
+    startTime: String,
+    endTime: String,
+    contestLink: String?,
+    modifier: Modifier = Modifier,
+    onDeleteRequest: () -> Unit
 ) {
     Box(modifier = modifier) {
         Column(modifier = Modifier.align(Alignment.CenterStart)) {
             MonospacedText(
-                text = contest.startTime.contestDate(),
+                text = startTime,
                 fontSize = 15.sp,
                 color = cpsColors.contentAdditional
             )
             MonospacedText(
-                text = contest.endTime.contestDate(),
+                text = endTime,
                 fontSize = 15.sp,
                 color = cpsColors.contentAdditional
             )
         }
         ContestItemMenuButton(
-            contest = contest,
-            modifier = Modifier.align(Alignment.CenterEnd)
+            contestLink = contestLink,
+            modifier = Modifier.align(Alignment.CenterEnd),
+            onDeleteRequest = onDeleteRequest
         )
     }
 }
 
 @Composable
 private fun ContestItemMenuButton(
-    contest: Contest,
-    modifier: Modifier = Modifier
+    contestLink: String?,
+    modifier: Modifier = Modifier,
+    onDeleteRequest: () -> Unit
 ) {
     val context = context
-    val scope = rememberCoroutineScope()
     var showDeleteDialog by remember { mutableStateOf(false) }
     CPSDropdownMenuButton(
         icon = CPSIcons.More,
         color = cpsColors.contentAdditional,
         modifier = modifier
     ) {
-        if (contest.link != null) {
+        if (contestLink != null) {
             CPSDropdownMenuItem(title = "Open in browser", icon = CPSIcons.OpenInBrowser) {
-                context.openUrlInBrowser(contest.link)
+                context.openUrlInBrowser(contestLink)
             }
         }
         CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete) {
@@ -296,13 +326,7 @@ private fun ContestItemMenuButton(
         CPSDeleteDialog(
             title = "Delete contest from list?",
             onDismissRequest = { showDeleteDialog = false },
-            onConfirmRequest = {
-                scope.launch {
-                    context.settingsContests.ignoredContests.edit {
-                        put(contest.compositeId, getCurrentTime())
-                    }
-                }
-            }
+            onConfirmRequest = onDeleteRequest
         )
     }
 }

@@ -1,6 +1,5 @@
 package com.demich.cps.contests
 
-import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import com.demich.cps.room.ContestsListDao
 import kotlinx.datetime.Instant
@@ -11,7 +10,6 @@ import kotlin.time.Duration.Companion.seconds
     tableName = ContestsListDao.contestsListTableName,
     primaryKeys = ["platform", "id"]
 )
-@Immutable
 data class Contest (
     val platform: Platform,
     val id: String,
