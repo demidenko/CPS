@@ -1,7 +1,7 @@
 package com.demich.cps.contests.monitors
 
 import com.demich.cps.platforms.api.*
-import com.demich.cps.utils.CodeforcesUtils
+import com.demich.cps.platforms.utils.CodeforcesUtils
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.add
 import kotlinx.coroutines.*

@@ -10,7 +10,7 @@ import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.news.settings.settingsNews
-import com.demich.cps.utils.CodeforcesUtils
+import com.demich.cps.platforms.utils.CodeforcesUtils
 import com.demich.cps.utils.mapToSet
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days

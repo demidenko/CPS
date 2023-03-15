@@ -10,7 +10,7 @@ import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.news.settings.settingsNews
-import com.demich.cps.utils.CodeforcesUtils
+import com.demich.cps.platforms.utils.CodeforcesUtils
 import kotlinx.coroutines.flow.Flow
 
 

@@ -25,14 +25,10 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LocalCurrentTime
-import com.demich.cps.utils.CodeforcesUtils
-import com.demich.cps.utils.context
-import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.timeAgo
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesComment
 import com.demich.cps.platforms.api.CodeforcesRecentAction
+import com.demich.cps.utils.*
 import kotlin.math.roundToInt
 
 @Composable
@@ -183,7 +179,7 @@ private fun CommentBox(
             !expanded && linesOverflow
         }
         Text(
-            text = CodeforcesUtils.htmlToAnnotatedString(commentHtml),
+            text = htmlToAnnotatedString(commentHtml),
             maxLines = if (expanded) Int.MAX_VALUE else maxLines,
             fontSize = fontSize,
             onTextLayout = { result ->

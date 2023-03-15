@@ -1,16 +1,29 @@
 package com.demich.cps.utils
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import com.demich.cps.ui.theme.cpsColors
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import org.jsoup.select.NodeVisitor
+
+@Composable
+fun htmlToAnnotatedString(html: String) = buildAnnotatedString {
+    val parser = CodeforcesHtmlParser(
+        builder = this,
+        quoteColor = cpsColors.contentAdditional
+    )
+    Jsoup.parseBodyFragment(html).body().traverse(parser)
+}
 
 class CodeforcesHtmlParser(
     private val builder: AnnotatedString.Builder,

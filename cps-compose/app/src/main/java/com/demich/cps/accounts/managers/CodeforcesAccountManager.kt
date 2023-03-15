@@ -30,7 +30,7 @@ import com.demich.cps.platforms.api.*
 import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.CodeforcesUtils
+import com.demich.cps.platforms.utils.CodeforcesUtils
 import com.demich.cps.utils.append
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.AccountsWorker

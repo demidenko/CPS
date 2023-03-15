@@ -1,11 +1,8 @@
-package com.demich.cps.utils
+package com.demich.cps.platforms.utils
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.buildAnnotatedString
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.platforms.api.*
-import com.demich.cps.ui.theme.cpsColors
 import kotlinx.datetime.Instant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -278,14 +275,4 @@ object CodeforcesUtils {
             ?.removeSuffix("%")
             ?.toIntOrNull()
     }
-
-    @Composable
-    fun htmlToAnnotatedString(html: String) = buildAnnotatedString {
-        val parser = CodeforcesHtmlParser(
-            builder = this,
-            quoteColor = cpsColors.contentAdditional
-        )
-        Jsoup.parseBodyFragment(html).body().traverse(parser)
-    }
-
 }
