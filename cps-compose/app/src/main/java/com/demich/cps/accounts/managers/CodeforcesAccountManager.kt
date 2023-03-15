@@ -43,7 +43,7 @@ import kotlin.text.contains
 class CodeforcesAccountManager(context: Context):
     RatedAccountManager<CodeforcesUserInfo>(context, AccountManagers.codeforces),
     AccountSettingsProvider,
-    AccountSuggestionsProvider,
+    UserSuggestionsProvider,
     RatingRevolutionsProvider
 {
 
@@ -65,11 +65,11 @@ class CodeforcesAccountManager(context: Context):
     override suspend fun downloadInfo(data: String): CodeforcesUserInfo =
         CodeforcesUtils.getUserInfo(handle = data, doRedirect = true)
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> =
+    override suspend fun loadSuggestions(str: String): List<UserSuggestion> =
         buildList {
             val s = CodeforcesApi.getHandleSuggestionsPage(str)!!
             CodeforcesUtils.extractHandleSuggestions(source = s) { handle ->
-                add(AccountSuggestion(title = handle, userId = handle))
+                add(UserSuggestion(title = handle, userId = handle))
             }
         }.asReversed()
 

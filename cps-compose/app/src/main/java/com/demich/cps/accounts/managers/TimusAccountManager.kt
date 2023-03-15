@@ -13,7 +13,7 @@ import com.demich.datastore_itemized.dataStoreWrapper
 
 class TimusAccountManager(context: Context):
     AccountManager<TimusUserInfo>(context, AccountManagers.timus),
-    AccountSuggestionsProvider
+    UserSuggestionsProvider
 {
     companion object {
         private val Context.account_timus_dataStore by dataStoreWrapper(AccountManagers.timus.name)
@@ -37,7 +37,7 @@ class TimusAccountManager(context: Context):
             TimusUserInfo(status = STATUS.FAILED, id = data)
         }
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
+    override suspend fun loadSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
         return TimusUtils.extractUsersSuggestions(source = TimusApi.getSearchPage(str))
     }

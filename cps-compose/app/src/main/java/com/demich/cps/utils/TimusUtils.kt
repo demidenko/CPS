@@ -1,6 +1,6 @@
 package com.demich.cps.utils
 
-import com.demich.cps.accounts.managers.AccountSuggestion
+import com.demich.cps.accounts.managers.UserSuggestion
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.TimusUserInfo
 import org.jsoup.Jsoup
@@ -28,7 +28,7 @@ object TimusUtils {
         }
     }
 
-    fun extractUsersSuggestions(source: String): List<AccountSuggestion> =
+    fun extractUsersSuggestions(source: String): List<UserSuggestion> =
         Jsoup.parse(source).expectFirst("table.ranklist")
             .select("td.name")
             .mapNotNull { nameColumn ->
@@ -38,7 +38,7 @@ object TimusUtils {
                         it.substring(it.indexOf("id=")+3)
                     } ?: return@mapNotNull null
                 val tasks = nameColumn.nextElementSibling()?.nextElementSibling()?.text() ?: ""
-                AccountSuggestion(
+                UserSuggestion(
                     userId = userId,
                     title = nameColumn.text(),
                     info = tasks

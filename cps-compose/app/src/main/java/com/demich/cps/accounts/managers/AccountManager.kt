@@ -84,14 +84,14 @@ data class UserInfoWithManager<U: UserInfo>(
     val type: AccountManagers get() = manager.type
 }
 
-data class AccountSuggestion(
+data class UserSuggestion(
     val userId: String,
     val title: String = userId,
     val info: String = ""
 )
 
-interface AccountSuggestionsProvider {
-    suspend fun loadSuggestions(str: String): List<AccountSuggestion>
+interface UserSuggestionsProvider {
+    suspend fun loadSuggestions(str: String): List<UserSuggestion>
     fun isValidForSearch(char: Char): Boolean = true
 }
 

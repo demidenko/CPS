@@ -47,7 +47,7 @@ fun<U: UserInfo> DialogAccountChooser(
     onResult: (U) -> Unit
 ) {
     val charValidator = remember(manager) {
-        if (manager is AccountSuggestionsProvider) manager::isValidForSearch
+        if (manager is UserSuggestionsProvider) manager::isValidForSearch
         else manager::isValidForUserId
     }
 
@@ -60,7 +60,7 @@ fun<U: UserInfo> DialogAccountChooser(
         var userInfo by remember { mutableStateOf(initialUserInfo) }
         var loadingInProgress by remember { mutableStateOf(false) }
 
-        val suggestionsListState = remember { mutableStateOf(emptyList<AccountSuggestion>()) }
+        val suggestionsListState = remember { mutableStateOf(emptyList<UserSuggestion>()) }
         var loadingSuggestionsInProgress by remember { mutableStateOf(false) }
         var suggestionsLoadError by remember { mutableStateOf(false) }
         var blockSuggestionsReload by remember { mutableStateOf(false) }
@@ -99,7 +99,7 @@ fun<U: UserInfo> DialogAccountChooser(
             }
         }
 
-        if (manager is AccountSuggestionsProvider) {
+        if (manager is UserSuggestionsProvider) {
             SuggestionsList(
                 suggestionsState = suggestionsListState,
                 isLoading = loadingSuggestionsInProgress,
@@ -136,7 +136,7 @@ fun<U: UserInfo> DialogAccountChooser(
                 userInfo = manager.loadInfo(userId)
                 loadingInProgress = false
             }
-            if (manager is AccountSuggestionsProvider && userId.length >= suggestionTextLimit) {
+            if (manager is UserSuggestionsProvider && userId.length >= suggestionTextLimit) {
                 if (!blockSuggestionsReload) {
                     loadingSuggestionsInProgress = true
                     launch(Dispatchers.IO) {
@@ -180,7 +180,7 @@ private fun<U: UserInfo> UserIdTextField(
             Text(
                 text = buildString {
                     append(manager.userIdTitle)
-                    if (manager is AccountSuggestionsProvider) append(" or search query")
+                    if (manager is UserSuggestionsProvider) append(" or search query")
                 },
                 color = cpsColors.contentAdditional
             )
@@ -243,11 +243,11 @@ private fun TextFieldMainIcon(
 
 @Composable
 private fun SuggestionsList(
-    suggestionsState: State<List<AccountSuggestion>>,
+    suggestionsState: State<List<UserSuggestion>>,
     isLoading: Boolean,
     isError: Boolean,
     modifier: Modifier = Modifier,
-    onClick: (AccountSuggestion) -> Unit
+    onClick: (UserSuggestion) -> Unit
 ) {
     val suggestions by suggestionsState
     if (suggestions.isNotEmpty() || isLoading || isError) {
@@ -289,7 +289,7 @@ private fun SuggestionsList(
 
 @Composable
 private fun SuggestionItem(
-    suggestion: AccountSuggestion,
+    suggestion: UserSuggestion,
     modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier) {

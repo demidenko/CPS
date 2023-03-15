@@ -14,7 +14,7 @@ import com.demich.datastore_itemized.dataStoreWrapper
 
 class ACMPAccountManager(context: Context):
     AccountManager<ACMPUserInfo>(context, AccountManagers.acmp),
-    AccountSuggestionsProvider
+    UserSuggestionsProvider
 {
 
     companion object {
@@ -42,7 +42,7 @@ class ACMPAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
+    override suspend fun loadSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
         return ACMPUtils.extractUsersSuggestions(source = ACMPApi.getUsersSearch(str))
     }

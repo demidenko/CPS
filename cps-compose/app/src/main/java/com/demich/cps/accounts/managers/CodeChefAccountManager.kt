@@ -38,7 +38,7 @@ import kotlin.text.contains
 
 class CodeChefAccountManager(context: Context):
     RatedAccountManager<CodeChefUserInfo>(context, AccountManagers.codechef),
-    AccountSuggestionsProvider
+    UserSuggestionsProvider
 {
     companion object {
         private val Context.account_codechef_dataStore by dataStoreWrapper(AccountManagers.codechef.name)
@@ -67,9 +67,9 @@ class CodeChefAccountManager(context: Context):
             else CodeChefUserInfo(status = STATUS.FAILED, handle = data)
         }
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> =
+    override suspend fun loadSuggestions(str: String): List<UserSuggestion> =
         CodeChefApi.getSuggestions(str).list.map {
-            AccountSuggestion(
+            UserSuggestion(
                 userId = it.username,
                 info = it.rating.toString()
             )

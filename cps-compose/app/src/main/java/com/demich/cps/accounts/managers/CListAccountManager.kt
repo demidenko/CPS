@@ -12,7 +12,7 @@ import com.demich.cps.data.api.isPageNotFound
 
 class CListAccountManager(context: Context):
     AccountManager<ClistUserInfo>(context, AccountManagers.clist),
-    AccountSuggestionsProvider
+    UserSuggestionsProvider
 {
     override val userIdTitle = "login"
     override val urlHomePage = ClistApi.urls.main
@@ -30,9 +30,9 @@ class CListAccountManager(context: Context):
             else ClistUserInfo(status = STATUS.FAILED, login = data)
         }
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> =
+    override suspend fun loadSuggestions(str: String): List<UserSuggestion> =
         CListUtils.extractLoginSuggestions(source = ClistApi.getUsersSearchPage(str))
-            .map { AccountSuggestion(userId = it) }
+            .map { UserSuggestion(userId = it) }
 
     @Composable
     override fun makeOKInfoSpan(userInfo: ClistUserInfo) = with(userInfo) {

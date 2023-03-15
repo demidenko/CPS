@@ -26,7 +26,7 @@ import com.demich.datastore_itemized.dataStoreWrapper
 
 class DmojAccountManager(context: Context):
     RatedAccountManager<DmojUserInfo>(context, AccountManagers.dmoj),
-    AccountSuggestionsProvider
+    UserSuggestionsProvider
 {
     companion object {
         private val Context.account_dmoj_dataStore by dataStoreWrapper(AccountManagers.dmoj.name)
@@ -57,9 +57,9 @@ class DmojAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadSuggestions(str: String): List<AccountSuggestion> {
+    override suspend fun loadSuggestions(str: String): List<UserSuggestion> {
         return DmojApi.getSuggestions(str).map {
-            AccountSuggestion(title = it.text, userId = it.id)
+            UserSuggestion(title = it.text, userId = it.id)
         }
     }
 

@@ -1,6 +1,6 @@
 package com.demich.cps.utils
 
-import com.demich.cps.accounts.managers.AccountSuggestion
+import com.demich.cps.accounts.managers.UserSuggestion
 import com.demich.cps.accounts.userinfo.ACMPUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import org.jsoup.Jsoup
@@ -30,7 +30,7 @@ object ACMPUtils {
             )
         }
 
-    fun extractUsersSuggestions(source: String): List<AccountSuggestion> =
+    fun extractUsersSuggestions(source: String): List<UserSuggestion> =
         Jsoup.parse(source).expectFirst("table.main")
             .select("tr.white")
             .map { row ->
@@ -39,7 +39,7 @@ object ACMPUtils {
                     .attr("href").removePrefix("/?main=user&id=")
                 val userName = cols[1].text()
                 val tasks = cols[3].text()
-                AccountSuggestion(
+                UserSuggestion(
                     userId = userId,
                     title = userName,
                     info = tasks
