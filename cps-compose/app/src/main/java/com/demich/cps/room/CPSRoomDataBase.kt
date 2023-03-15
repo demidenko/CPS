@@ -1,8 +1,12 @@
 package com.demich.cps.room
 
-import android.content.Context
-import androidx.room.*
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.demich.cps.contests.Contest
+import com.demich.cps.features.room.InstanceProvider
+import com.demich.cps.features.room.InstantSecondsConverter
 
 @Database(
     entities = [
@@ -21,14 +25,12 @@ abstract class RoomSingleton: RoomDatabase() {
     abstract fun followListDao(): FollowListDao
     abstract fun contestsListDao(): ContestsListDao
 
-    companion object {
-        private var instance: RoomSingleton? = null
-        fun getInstance(context: Context): RoomSingleton {
-            return instance
-                ?: Room.databaseBuilder(context, RoomSingleton::class.java, "CPSdb")
-                    .build()
-                    .also { instance = it }
-        }
-    }
+    companion object: InstanceProvider<RoomSingleton>({
+        Room.databaseBuilder(
+            name = "CPSdb",
+            klass = RoomSingleton::class.java,
+            context = it
+        )
+    })
 }
 

@@ -1,12 +1,13 @@
 package com.demich.cps.features.codeforces.lost.database
 
-import android.content.Context
 import androidx.room.*
 import com.demich.cps.data.api.CodeforcesBlogEntry
-import kotlinx.datetime.Instant
+import com.demich.cps.features.room.InstanceProvider
+import com.demich.cps.features.room.InstantSecondsConverter
+import com.demich.cps.features.room.RoomJsonConverter
+import com.demich.cps.features.room.jsonRoom
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 
 @Database(
@@ -20,40 +21,19 @@ import kotlinx.serialization.json.Json
 internal abstract class CodeforcesLostDataBase: RoomDatabase() {
     abstract fun lostBlogEntriesDao(): CodeforcesLostDao
 
-    companion object {
-        private var instance: CodeforcesLostDataBase? = null
-        fun getInstance(context: Context): CodeforcesLostDataBase {
-            return instance ?: Room.databaseBuilder(
-                name = "codeforces_lost_db",
-                klass = CodeforcesLostDataBase::class.java,
-                context = context
-            ).build().also { instance = it }
-        }
-    }
+    companion object: InstanceProvider<CodeforcesLostDataBase>({
+        Room.databaseBuilder(
+            name = "codeforces_lost_db",
+            klass = CodeforcesLostDataBase::class.java,
+            context = it
+        )
+    })
 }
 
-internal class InstantSecondsConverter {
+internal class CodeforcesBlogEntryConverter: RoomJsonConverter<CodeforcesBlogEntry> {
     @TypeConverter
-    fun instantToSeconds(time: Instant): Long = time.epochSeconds
-
-    @TypeConverter
-    fun secondsToInstant(seconds: Long): Instant = Instant.fromEpochSeconds(seconds)
-}
-
-
-private val jsonRoom = Json {
-    encodeDefaults = true
-    allowStructuredMapKeys = true
-}
-
-internal class CodeforcesBlogEntryConverter {
-    @TypeConverter
-    fun toString(blogEntry: CodeforcesBlogEntry): String {
-        return jsonRoom.encodeToString(blogEntry)
-    }
+    override fun decode(str: String) = jsonRoom.decodeFromString<CodeforcesBlogEntry>(str)
 
     @TypeConverter
-    fun toBlogEntry(str: String): CodeforcesBlogEntry {
-        return jsonRoom.decodeFromString(str)
-    }
+    override fun encode(value: CodeforcesBlogEntry) = jsonRoom.encodeToString(value)
 }

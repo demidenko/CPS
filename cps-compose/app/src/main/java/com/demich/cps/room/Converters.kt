@@ -3,19 +3,11 @@ package com.demich.cps.room
 import androidx.room.TypeConverter
 import com.demich.cps.accounts.managers.CodeforcesUserInfo
 import com.demich.cps.accounts.managers.STATUS
-import com.demich.cps.utils.jsonCPS
-import kotlinx.datetime.Instant
+import com.demich.cps.features.room.RoomJsonConverter
+import com.demich.cps.features.room.jsonRoom
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-
-class InstantSecondsConverter {
-    @TypeConverter
-    fun instantToSeconds(time: Instant): Long = time.epochSeconds
-
-    @TypeConverter
-    fun secondsToInstant(seconds: Long): Instant = Instant.fromEpochSeconds(seconds)
-}
 
 class IntsListConverter {
     @TypeConverter
@@ -41,16 +33,16 @@ class IntsListConverter {
     }
 }
 
-class CodeforcesUserInfoConverter {
+class CodeforcesUserInfoConverter: RoomJsonConverter<CodeforcesUserInfo> {
     @TypeConverter
-    fun userInfoToString(info: CodeforcesUserInfo): String {
-        return jsonCPS.encodeToString(info)
+    override fun encode(value: CodeforcesUserInfo): String {
+        return jsonRoom.encodeToString(value)
     }
 
     @TypeConverter
-    fun stringToUserInfo(str: String): CodeforcesUserInfo {
+    override fun decode(str: String): CodeforcesUserInfo {
         return try {
-            jsonCPS.decodeFromString(str)
+            jsonRoom.decodeFromString(str)
         } catch (e: SerializationException) {
             CodeforcesUserInfo(
                 status = STATUS.FAILED,

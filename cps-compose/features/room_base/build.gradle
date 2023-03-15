@@ -1,11 +1,10 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
 }
 
 android {
-    namespace 'com.demich.cps.features.codeforces.lost.database'
+    namespace 'com.demich.cps.features.room'
     compileSdk 33
 
     defaultConfig {
@@ -32,12 +31,8 @@ android {
 }
 
 dependencies {
-    implementation project(":features:room_base")
-    implementation project(":data:resources_api")
-
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.4.0'
 
     implementation "androidx.room:room-ktx:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
 }
