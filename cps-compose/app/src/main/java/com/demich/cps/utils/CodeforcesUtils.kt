@@ -2,8 +2,8 @@ package com.demich.cps.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.buildAnnotatedString
-import com.demich.cps.accounts.managers.CodeforcesUserInfo
-import com.demich.cps.accounts.managers.STATUS
+import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.data.api.*
 import com.demich.cps.ui.theme.cpsColors
 import kotlinx.datetime.Instant

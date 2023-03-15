@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.*
+import com.demich.cps.accounts.userinfo.UserInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -74,21 +75,6 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
      ) = Box(modifier) {
         PanelContent(userInfo)
     }
-}
-
-enum class STATUS {
-    OK,
-    NOT_FOUND,
-    FAILED
-}
-
-abstract class UserInfo {
-    abstract val userId: String
-    abstract val status: STATUS
-
-    abstract val userPageUrl: String
-
-    fun isEmpty() = userId.isBlank()
 }
 
 data class UserInfoWithManager<U: UserInfo>(

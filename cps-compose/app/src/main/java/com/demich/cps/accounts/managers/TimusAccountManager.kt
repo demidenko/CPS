@@ -4,28 +4,12 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
-import com.demich.cps.utils.TimusUtils
+import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.data.api.TimusApi
+import com.demich.cps.utils.TimusUtils
 import com.demich.datastore_itemized.dataStoreWrapper
-import kotlinx.serialization.Serializable
 
-
-@Serializable
-data class TimusUserInfo(
-    override val status: STATUS,
-    val id: String,
-    val userName: String = "",
-    val rating: Int = 0,
-    val solvedTasks: Int = 0,
-    val rankTasks: Int = 0,
-    val rankRating: Int = 0
-): UserInfo() {
-    override val userId: String
-        get() = id
-
-    override val userPageUrl: String
-        get() = TimusApi.urls.user(id.toInt())
-}
 
 class TimusAccountManager(context: Context):
     AccountManager<TimusUserInfo>(context, AccountManagers.timus),

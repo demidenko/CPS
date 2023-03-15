@@ -3,7 +3,7 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
-import com.demich.cps.accounts.managers.STATUS
+import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.data.api.CodeforcesApi
 import kotlinx.datetime.Instant

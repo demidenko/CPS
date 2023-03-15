@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.CPSViewModels
-import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.managers.*
+import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.utils.*
@@ -23,7 +23,6 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds

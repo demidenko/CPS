@@ -5,26 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
-import com.demich.cps.utils.ACMPUtils
+import com.demich.cps.accounts.userinfo.ACMPUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.data.api.ACMPApi
+import com.demich.cps.utils.ACMPUtils
 import com.demich.datastore_itemized.dataStoreWrapper
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class ACMPUserInfo(
-    override val status: STATUS,
-    val id: String,
-    val userName: String = "",
-    val rating: Int = 0,
-    val solvedTasks: Int = 0,
-    val rank: Int = 0
-): UserInfo() {
-    override val userId: String
-        get() = id
-
-    override val userPageUrl: String
-        get() = ACMPApi.urls.user(id.toInt())
-}
 
 
 class ACMPAccountManager(context: Context):

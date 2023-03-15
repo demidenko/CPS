@@ -3,41 +3,31 @@ package com.demich.cps.accounts.managers
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
+import com.demich.cps.accounts.userinfo.ClistUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.utils.CListUtils
 import com.demich.cps.data.api.ClistApi
 import com.demich.cps.data.api.isPageNotFound
 
 
-data class CListUserInfo(
-    override val status: STATUS,
-    val login: String,
-    val accounts: Map<String, Pair<String, String>> = emptyMap()
-): UserInfo() {
-    override val userId: String
-        get() = login
-
-    override val userPageUrl: String
-        get() = ClistApi.urls.user(login)
-}
-
 class CListAccountManager(context: Context):
-    AccountManager<CListUserInfo>(context, AccountManagers.clist),
+    AccountManager<ClistUserInfo>(context, AccountManagers.clist),
     AccountSuggestionsProvider
 {
     override val userIdTitle = "login"
     override val urlHomePage = ClistApi.urls.main
 
-    override fun emptyInfo() = CListUserInfo(STATUS.NOT_FOUND, "")
+    override fun emptyInfo() = ClistUserInfo(STATUS.NOT_FOUND, "")
 
-    override suspend fun downloadInfo(data: String): CListUserInfo =
+    override suspend fun downloadInfo(data: String): ClistUserInfo =
         CListUtils.runCatching {
             extractUserInfo(
                 source = ClistApi.getUserPage(login = data),
                 login = data
             )
         }.getOrElse { e ->
-            if (e.isPageNotFound) CListUserInfo(status = STATUS.NOT_FOUND, login = data)
-            else CListUserInfo(status = STATUS.FAILED, login = data)
+            if (e.isPageNotFound) ClistUserInfo(status = STATUS.NOT_FOUND, login = data)
+            else ClistUserInfo(status = STATUS.FAILED, login = data)
         }
 
     override suspend fun loadSuggestions(str: String): List<AccountSuggestion> =
@@ -45,11 +35,11 @@ class CListAccountManager(context: Context):
             .map { AccountSuggestion(userId = it) }
 
     @Composable
-    override fun makeOKInfoSpan(userInfo: CListUserInfo) = with(userInfo) {
+    override fun makeOKInfoSpan(userInfo: ClistUserInfo) = with(userInfo) {
         AnnotatedString("$login (${accounts.size})")
     }
 
-    override fun getDataStore(): AccountDataStore<CListUserInfo> {
+    override fun getDataStore(): AccountDataStore<ClistUserInfo> {
         throw IllegalAccessException("CList account manager can not provide data store")
     }
 

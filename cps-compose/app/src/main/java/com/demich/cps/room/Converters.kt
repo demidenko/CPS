@@ -1,8 +1,8 @@
 package com.demich.cps.room
 
 import androidx.room.TypeConverter
-import com.demich.cps.accounts.managers.CodeforcesUserInfo
-import com.demich.cps.accounts.managers.STATUS
+import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.features.room.RoomJsonConverter
 import com.demich.cps.features.room.jsonRoom
 import kotlinx.serialization.SerializationException

@@ -1,7 +1,7 @@
 package com.demich.cps.utils
 
-import com.demich.cps.accounts.managers.CodeChefUserInfo
-import com.demich.cps.accounts.managers.STATUS
+import com.demich.cps.accounts.userinfo.CodeChefUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
 import org.jsoup.Jsoup
 
 object CodeChefUtils {

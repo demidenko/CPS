@@ -9,11 +9,11 @@ import androidx.work.WorkerParameters
 import com.demich.cps.*
 import com.demich.cps.accounts.managers.AtCoderAccountManager
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
-import com.demich.cps.accounts.managers.STATUS
-import com.demich.cps.utils.CodeforcesUtils
-import com.demich.cps.utils.toSignedString
+import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.data.api.AtCoderApi
 import com.demich.cps.data.api.CodeforcesApi
+import com.demich.cps.utils.CodeforcesUtils
+import com.demich.cps.utils.toSignedString
 import kotlin.time.Duration.Companion.minutes
 
 class AccountsWorker(

@@ -17,8 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
-import com.demich.cps.navigation.Screen
 import com.demich.cps.accounts.managers.*
+import com.demich.cps.accounts.userinfo.RatedUserInfo
+import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
@@ -222,7 +223,7 @@ private fun StatusBarAccountsPopup(
     setResultByMaximum: (Boolean) -> Unit,
     disabledManagers: Set<AccountManagers>,
     onCheckedChange: (AccountManagers, Boolean) -> Unit,
-    accountManagers: List<AccountManager<out UserInfo>>,
+    accountManagers: List<AccountManager<out RatedUserInfo>>,
     onDismissRequest: () -> Unit
 ) {
     DropdownMenu(

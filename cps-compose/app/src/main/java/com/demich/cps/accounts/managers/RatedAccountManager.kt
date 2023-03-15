@@ -7,6 +7,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.accounts.SmallRatedAccountPanel
+import com.demich.cps.accounts.userinfo.RatedUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.ui.theme.LocalUseOriginalColors
 import com.demich.cps.ui.theme.cpsColors
 import kotlinx.datetime.Instant
@@ -67,18 +69,6 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
     protected abstract suspend fun loadRatingHistory(info: U): List<RatingChange>
     suspend fun getRatingHistory(info: U): List<RatingChange> =
         loadRatingHistory(info).sortedBy { it.date }
-}
-
-abstract class RatedUserInfo: UserInfo() {
-    abstract val handle: String
-    abstract val rating: Int?
-
-    final override val userId: String
-        get() = handle
-
-    fun hasRating() = status == STATUS.OK && rating != null
-
-    fun ratingToString() = rating?.toString() ?: "[not rated]"
 }
 
 enum class HandleColor {

@@ -15,21 +15,14 @@ import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
-import com.demich.cps.utils.append
+import com.demich.cps.accounts.userinfo.DmojUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.data.api.DmojApi
 import com.demich.cps.data.api.DmojRatingChange
 import com.demich.cps.data.api.isPageNotFound
+import com.demich.cps.utils.append
 import com.demich.datastore_itemized.dataStoreWrapper
-import kotlinx.serialization.Serializable
 
-@Serializable
-data class DmojUserInfo(
-    override val status: STATUS,
-    override val handle: String,
-    override val rating: Int? = null
-): RatedUserInfo() {
-    override val userPageUrl get() = DmojApi.urls.user(handle)
-}
 
 class DmojAccountManager(context: Context):
     RatedAccountManager<DmojUserInfo>(context, AccountManagers.dmoj),

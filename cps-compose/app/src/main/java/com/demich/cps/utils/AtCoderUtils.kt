@@ -1,7 +1,7 @@
 package com.demich.cps.utils
 
-import com.demich.cps.accounts.managers.AtCoderUserInfo
-import com.demich.cps.accounts.managers.STATUS
+import com.demich.cps.accounts.userinfo.AtCoderUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.contests.Contest
 import com.demich.cps.data.api.AtCoderApi
 import kotlinx.datetime.Instant

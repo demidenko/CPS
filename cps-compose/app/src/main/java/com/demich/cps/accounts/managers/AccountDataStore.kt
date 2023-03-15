@@ -1,6 +1,7 @@
 package com.demich.cps.accounts.managers
 
 import androidx.compose.runtime.Composable
+import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreWrapper

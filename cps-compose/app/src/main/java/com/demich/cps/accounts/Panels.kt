@@ -15,6 +15,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.*
+import com.demich.cps.accounts.userinfo.RatedUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSReloadingButton

@@ -10,15 +10,15 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.LocalCodeforcesAccountManager
-import com.demich.cps.accounts.managers.CodeforcesUserInfo
-import com.demich.cps.accounts.managers.STATUS
+import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.data.api.CodeforcesColorTag
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.timeAgo
-import com.demich.cps.data.api.CodeforcesColorTag
 
 @Composable
 fun NewsFollowListItem(

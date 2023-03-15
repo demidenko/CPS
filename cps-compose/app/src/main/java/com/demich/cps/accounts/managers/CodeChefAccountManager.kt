@@ -23,24 +23,18 @@ import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
-import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.*
+import com.demich.cps.accounts.userinfo.CodeChefUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.data.api.CodeChefApi
 import com.demich.cps.data.api.CodeChefRatingChange
 import com.demich.cps.data.api.isRedirect
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.CodeChefUtils
+import com.demich.cps.utils.append
 import com.demich.datastore_itemized.dataStoreWrapper
-import kotlinx.serialization.Serializable
 import kotlin.text.contains
 
-@Serializable
-data class CodeChefUserInfo(
-    override val status: STATUS,
-    override val handle: String,
-    override val rating: Int? = null
-): RatedUserInfo() {
-    override val userPageUrl get() = CodeChefApi.urls.user(handle)
-}
 
 class CodeChefAccountManager(context: Context):
     RatedAccountManager<CodeChefUserInfo>(context, AccountManagers.codechef),

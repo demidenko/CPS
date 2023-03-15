@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.managers.*
+import com.demich.cps.accounts.userinfo.ClistUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.utils.CListUtils
@@ -54,7 +57,7 @@ class AccountsViewModel: ViewModel() {
     }
 
     fun runClistImport(
-        cListUserInfo: CListUserInfo,
+        cListUserInfo: ClistUserInfo,
         progressBarsViewModel: ProgressBarsViewModel,
         context: Context
     ) {

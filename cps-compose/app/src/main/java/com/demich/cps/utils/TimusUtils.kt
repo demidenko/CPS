@@ -1,8 +1,8 @@
 package com.demich.cps.utils
 
 import com.demich.cps.accounts.managers.AccountSuggestion
-import com.demich.cps.accounts.managers.STATUS
-import com.demich.cps.accounts.managers.TimusUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.TimusUserInfo
 import org.jsoup.Jsoup
 
 object TimusUtils {

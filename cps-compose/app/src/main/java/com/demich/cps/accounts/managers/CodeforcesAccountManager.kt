@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +23,8 @@ import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
+import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.data.api.*
 import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.VotedRating
@@ -36,30 +37,7 @@ import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.datetime.Instant
-import kotlinx.serialization.Serializable
 import kotlin.text.contains
-
-
-@Serializable
-@Immutable
-data class CodeforcesUserInfo(
-    override val status: STATUS,
-    override val handle: String,
-    override val rating: Int? = null,
-    val contribution: Int = 0,
-    val lastOnlineTime: Instant = Instant.DISTANT_PAST
-): RatedUserInfo() {
-    constructor(codeforcesUser: CodeforcesUser): this(
-        status = STATUS.OK,
-        handle = codeforcesUser.handle,
-        rating = codeforcesUser.rating,
-        contribution = codeforcesUser.contribution,
-        lastOnlineTime = codeforcesUser.lastOnlineTime
-    )
-
-    override val userPageUrl: String
-        get() = CodeforcesApi.urls.user(handle)
-}
 
 
 class CodeforcesAccountManager(context: Context):

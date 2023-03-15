@@ -1,16 +1,11 @@
 package com.demich.cps.utils
 
 import com.demich.cps.accounts.managers.AccountManagers
-import com.demich.cps.accounts.managers.CListUserInfo
-import com.demich.cps.accounts.managers.STATUS
+import com.demich.cps.accounts.userinfo.ClistUserInfo
+import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.contests.Contest
 import com.demich.cps.data.api.ClistContest
 import org.jsoup.Jsoup
-import kotlin.collections.List
-import kotlin.collections.firstOrNull
-import kotlin.collections.forEach
-import kotlin.collections.map
-import kotlin.collections.mutableMapOf
 import kotlin.collections.set
 
 object CListUtils {
@@ -70,7 +65,7 @@ object CListUtils {
     fun extractLoginSuggestions(source: String): List<String> =
         Jsoup.parse(source).select("td.username").map { it.text() }
 
-    fun extractUserInfo(source: String, login: String): CListUserInfo {
+    fun extractUserInfo(source: String, login: String): ClistUserInfo {
         val accounts = mutableMapOf<String, Pair<String, String>>()
 
         val body = Jsoup.parse(source).body()
@@ -103,7 +98,7 @@ object CListUtils {
             accounts[resource] = userName to link
         }
 
-        return CListUserInfo(
+        return ClistUserInfo(
             status = STATUS.OK,
             login = login,
             accounts = accounts
