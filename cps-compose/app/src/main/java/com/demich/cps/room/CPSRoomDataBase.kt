@@ -1,9 +1,7 @@
 package com.demich.cps.room
 
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import androidx.room.*
+import androidx.room.migration.AutoMigrationSpec
 import com.demich.cps.contests.Contest
 import com.demich.cps.features.room.InstanceProvider
 import com.demich.cps.features.room.InstantSecondsConverter
@@ -11,17 +9,19 @@ import com.demich.cps.features.room.InstantSecondsConverter
 @Database(
     entities = [
         Contest::class,
-        CodeforcesUserBlog::class,
-        CodeforcesLostBlogEntry::class,
+        CodeforcesUserBlog::class
     ],
-    version = 1
+    version = 2,
+    autoMigrations = [
+        AutoMigration(from = 1, to = 2, spec = RoomSingleton.DeleteLostMigration::class)
+    ]
 )
 @TypeConverters(
     IntsListConverter::class,
     CodeforcesUserInfoConverter::class,
     InstantSecondsConverter::class
 )
-abstract class RoomSingleton: RoomDatabase() {
+internal abstract class RoomSingleton: RoomDatabase() {
     abstract fun followListDao(): FollowListDao
     abstract fun contestsListDao(): ContestsListDao
 
@@ -32,5 +32,9 @@ abstract class RoomSingleton: RoomDatabase() {
             context = it
         )
     })
+
+    @DeleteTable(tableName = "cf_lost_blog_entries")
+    class DeleteLostMigration : AutoMigrationSpec
+
 }
 
