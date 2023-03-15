@@ -4,6 +4,10 @@ plugins {
     id 'kotlin-kapt'
 }
 
+kotlin {
+    jvmToolchain(java_version)
+}
+
 android {
     namespace 'com.demich.cps.features.codeforces.lost.database'
     compileSdk 33
@@ -14,6 +18,12 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
+        }
     }
 
     buildTypes {
