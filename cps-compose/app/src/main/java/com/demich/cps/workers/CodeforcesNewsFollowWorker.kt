@@ -43,7 +43,7 @@ class CodeforcesNewsFollowWorker(
 
         var done = 0
         savedHandles.forEachWithProgress { handle ->
-            if (dao.getAndReloadBlogEntries(handle, context) == null) return Result.retry()
+            if (dao.getAndReloadBlogEntries(handle) == null) return Result.retry()
             ++done
             progressNotificationBuilder()
                 .setProgress(total = savedHandles.size, current = done)

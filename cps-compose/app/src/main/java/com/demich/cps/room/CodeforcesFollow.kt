@@ -13,13 +13,90 @@ import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.platforms.utils.CodeforcesUtils
 import kotlinx.coroutines.flow.Flow
 
-
-val Context.followListDao get() = RoomSingleton.getInstance(this).followListDao()
+val Context.followListDao: CodeforcesFollowDao
+    get() = CodeforcesFollowDao(
+        context = this,
+        dao = RoomSingleton.getInstance(this).followListDao()
+    )
 
 private const val followListTableName = "cf_follow_list"
 
+class CodeforcesFollowDao internal constructor(
+    private val context: Context,
+    private val dao: FollowListDao
+) {
+    suspend fun remove(handle: String) = dao.remove(handle)
+
+    fun flowOfAllBlogs() = dao.flowOfAllBlogs()
+
+    suspend fun getHandles() = dao.getHandles()
+
+    suspend fun getAndReloadBlogEntries(handle: String): List<CodeforcesBlogEntry>? {
+        val settingsNews = context.settingsNews
+        val blogEntries = dao.getAndReloadBlogEntries(
+            handle = handle,
+            locale = settingsNews.codeforcesLocale(),
+            onNewBlogEntry = ::notifyNewBlogEntry
+        )
+
+        return blogEntries
+    }
+
+    suspend fun addNewUser(userInfo: CodeforcesUserInfo) {
+        if (dao.getUserBlog(userInfo.handle) != null) return
+        dao.insert(
+            CodeforcesUserBlog(
+                handle = userInfo.handle,
+                blogEntries = null,
+                userInfo = userInfo
+            )
+        )
+        getAndReloadBlogEntries(handle = userInfo.handle)
+    }
+
+    suspend fun addNewUser(handle: String) {
+        if (dao.getUserBlog(handle) != null) return
+        //TODO: sync?? parallel? (addNewUser loads blog without info)
+        addNewUser(userInfo = CodeforcesUserInfo(handle = handle, status = STATUS.FAILED))
+        dao.setUserInfo(
+            handle = handle,
+            info = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
+        )
+    }
+
+    suspend fun updateUsersInfo() {
+        CodeforcesUtils.getUsersInfo(handles = dao.getHandles(), doRedirect = true)
+            .forEach { (handle, info) ->
+                when (info.status) {
+                    STATUS.NOT_FOUND -> dao.remove(handle)
+                    STATUS.OK -> dao.setUserInfo(handle, info)
+                    STATUS.FAILED -> {}
+                }
+            }
+
+        dao.getAllBlogs().forEach {
+            if (it.blogEntries == null) getAndReloadBlogEntries(handle = it.handle)
+        }
+    }
+
+    private fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry) =
+        notificationBuildAndNotify(
+            context = context,
+            channel = NotificationChannels.codeforces.follow_new_blog,
+            notificationId = NotificationIds.makeCodeforcesFollowBlogId(blogEntry.id)
+        ) {
+            setSubText("New codeforces blog entry")
+            setContentTitle(blogEntry.authorHandle)
+            setBigContent(CodeforcesUtils.extractTitle(blogEntry))
+            setSmallIcon(com.demich.cps.R.drawable.ic_new_post)
+            setAutoCancel(true)
+            setWhen(blogEntry.creationTime)
+            attachUrl(url = CodeforcesApi.urls.blogEntry(blogEntry.id), context = context)
+        }
+}
+
 @Dao
-interface FollowListDao {
+internal interface FollowListDao {
 
     @Query("SELECT * FROM $followListTableName")
     suspend fun getAllBlogs(): List<CodeforcesUserBlog>
@@ -60,7 +137,7 @@ interface FollowListDao {
         update(fromUserBlog.copy(handle = toHandle))
     }
 
-    private suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
+    suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
         if (info.status != STATUS.OK) return
         if (info.handle != handle) changeHandle(handle, info.handle)
         val userBlog = getUserBlog(info.handle) ?: return
@@ -70,7 +147,7 @@ interface FollowListDao {
         ))
     }
 
-    private suspend fun getAndReloadBlogEntries(
+    suspend fun getAndReloadBlogEntries(
         handle: String,
         locale: CodeforcesLocale,
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
@@ -108,63 +185,6 @@ interface FollowListDao {
             setBlogEntries(handle, blogEntries.map { it.id })
         }
     }
-
-    suspend fun getAndReloadBlogEntries(
-        handle: String,
-        context: Context
-    ): List<CodeforcesBlogEntry>? {
-        val settingsNews = context.settingsNews
-        val blogEntries = getAndReloadBlogEntries(
-            handle = handle,
-            locale = settingsNews.codeforcesLocale(),
-            onNewBlogEntry = { notifyNewBlogEntry(it, context) }
-        )
-
-        return blogEntries
-    }
-
-    suspend fun addNewUser(userInfo: CodeforcesUserInfo, context: Context) {
-        if (getUserBlog(userInfo.handle) != null) return
-        insert(
-            CodeforcesUserBlog(
-                handle = userInfo.handle,
-                blogEntries = null,
-                userInfo = userInfo
-            )
-        )
-        getAndReloadBlogEntries(
-            handle = userInfo.handle,
-            context = context
-        )
-    }
-
-    suspend fun addNewUser(handle: String, context: Context) {
-        if (getUserBlog(handle) != null) return
-        //TODO: sync?? parallel? (addNewUser loads blog without info)
-        addNewUser(
-            userInfo = CodeforcesUserInfo(handle = handle, status = STATUS.FAILED),
-            context = context
-        )
-        setUserInfo(
-            handle = handle,
-            info = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
-        )
-    }
-
-    suspend fun updateUsersInfo(context: Context) {
-        CodeforcesUtils.getUsersInfo(handles = getHandles(), doRedirect = true)
-            .forEach { (handle, info) ->
-                when (info.status) {
-                    STATUS.NOT_FOUND -> remove(handle)
-                    STATUS.OK -> setUserInfo(handle, info)
-                    STATUS.FAILED -> {}
-                }
-            }
-
-        getAllBlogs().forEach {
-            if (it.blogEntries == null) getAndReloadBlogEntries(handle = it.handle, context = context)
-        }
-    }
 }
 
 @Entity(tableName = followListTableName)
@@ -175,19 +195,3 @@ data class CodeforcesUserBlog(
     val blogEntries: List<Int>?,
     val userInfo: CodeforcesUserInfo
 )
-
-private fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry, context: Context) {
-    notificationBuildAndNotify(
-        context = context,
-        channel = NotificationChannels.codeforces.follow_new_blog,
-        notificationId = NotificationIds.makeCodeforcesFollowBlogId(blogEntry.id)
-    ) {
-        setSubText("New codeforces blog entry")
-        setContentTitle(blogEntry.authorHandle)
-        setBigContent(CodeforcesUtils.extractTitle(blogEntry))
-        setSmallIcon(com.demich.cps.R.drawable.ic_new_post)
-        setAutoCancel(true)
-        setWhen(blogEntry.creationTime)
-        attachUrl(url = CodeforcesApi.urls.blogEntry(blogEntry.id), context = context)
-    }
-}

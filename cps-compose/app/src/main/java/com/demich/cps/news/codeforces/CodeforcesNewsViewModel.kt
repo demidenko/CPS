@@ -175,19 +175,13 @@ class CodeforcesNewsViewModel: ViewModel() {
 
     fun addToFollowList(userInfo: CodeforcesUserInfo, context: Context) {
         viewModelScope.launch {
-            context.followListDao.addNewUser(
-                userInfo = userInfo,
-                context = context
-            )
+            context.followListDao.addNewUser(userInfo)
         }
     }
 
     fun addToFollowList(handle: String, context: Context) {
         viewModelScope.launch {
-            context.followListDao.addNewUser(
-                handle = handle,
-                context = context
-            )
+            context.followListDao.addNewUser(handle)
         }
     }
 
@@ -196,7 +190,7 @@ class CodeforcesNewsViewModel: ViewModel() {
     fun updateFollowUsersInfo(context: Context) {
         if (!followLoadingStatus.compareAndSet(LoadingStatus.PENDING, LoadingStatus.LOADING)) return
         viewModelScope.launch {
-            context.followListDao.updateUsersInfo(context)
+            context.followListDao.updateUsersInfo()
             followLoadingStatus.value = LoadingStatus.PENDING
         }
     }
@@ -211,7 +205,7 @@ class CodeforcesNewsViewModel: ViewModel() {
             blogLoadingStatus = LoadingStatus.LOADING
             val (result, colorTag) = awaitPair(
                 context = Dispatchers.IO,
-                blockFirst = { context.followListDao.getAndReloadBlogEntries(handle, context) },
+                blockFirst = { context.followListDao.getAndReloadBlogEntries(handle) },
                 blockSecond = { CodeforcesUtils.getRealColorTag(handle) }
             )
             if (result == null) {
