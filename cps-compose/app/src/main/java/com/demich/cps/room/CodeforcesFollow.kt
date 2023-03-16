@@ -178,7 +178,7 @@ internal interface FollowListDao {
         }
     }
 
-    @Transaction
+    //TODO: @Transaction block ui with rememberCollect
     suspend fun updateUsersInfo() {
         CodeforcesUtils.getUsersInfo(handles = getHandles(), doRedirect = true)
             .forEach { (handle, info) ->
