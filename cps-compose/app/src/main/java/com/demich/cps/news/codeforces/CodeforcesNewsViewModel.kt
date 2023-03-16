@@ -188,8 +188,8 @@ class CodeforcesNewsViewModel: ViewModel() {
     private val followLoadingStatus = MutableStateFlow(LoadingStatus.PENDING)
     fun flowOfFollowUpdateLoadingStatus(): StateFlow<LoadingStatus> = followLoadingStatus
     fun updateFollowUsersInfo(context: Context) {
-        if (!followLoadingStatus.compareAndSet(LoadingStatus.PENDING, LoadingStatus.LOADING)) return
         viewModelScope.launch {
+            if (!followLoadingStatus.compareAndSet(LoadingStatus.PENDING, LoadingStatus.LOADING)) return@launch
             context.followListDao.updateUsers()
             followLoadingStatus.value = LoadingStatus.PENDING
         }
