@@ -69,6 +69,7 @@ fun ContentWithCPSDropdownMenu(
 }
 
 //experimental
+//TODO: shows ripple when scrolling list
 @Composable
 fun ContentWithCPSDropdownMenu(
     modifier: Modifier = Modifier,

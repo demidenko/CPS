@@ -190,7 +190,7 @@ class CodeforcesNewsViewModel: ViewModel() {
     fun updateFollowUsersInfo(context: Context) {
         if (!followLoadingStatus.compareAndSet(LoadingStatus.PENDING, LoadingStatus.LOADING)) return
         viewModelScope.launch {
-            context.followListDao.updateUsersInfo()
+            context.followListDao.updateUsers()
             followLoadingStatus.value = LoadingStatus.PENDING
         }
     }

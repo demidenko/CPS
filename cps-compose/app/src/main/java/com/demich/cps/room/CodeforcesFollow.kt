@@ -64,16 +64,8 @@ class CodeforcesFollowDao internal constructor(
         )
     }
 
-    suspend fun updateUsersInfo() {
-        CodeforcesUtils.getUsersInfo(handles = dao.getHandles(), doRedirect = true)
-            .forEach { (handle, info) ->
-                when (info.status) {
-                    STATUS.NOT_FOUND -> dao.remove(handle)
-                    STATUS.OK -> dao.setUserInfo(handle, info)
-                    STATUS.FAILED -> {}
-                }
-            }
-
+    suspend fun updateUsers() {
+        dao.updateUsersInfo()
         dao.getAllBlogs().forEach {
             if (it.blogEntries == null) getAndReloadBlogEntries(handle = it.handle)
         }
@@ -184,6 +176,18 @@ internal interface FollowListDao {
             }
             setBlogEntries(handle, blogEntries.map { it.id })
         }
+    }
+
+    @Transaction
+    suspend fun updateUsersInfo() {
+        CodeforcesUtils.getUsersInfo(handles = getHandles(), doRedirect = true)
+            .forEach { (handle, info) ->
+                when (info.status) {
+                    STATUS.NOT_FOUND -> remove(handle)
+                    STATUS.OK -> setUserInfo(handle, info)
+                    STATUS.FAILED -> {}
+                }
+            }
     }
 }
 

@@ -29,14 +29,30 @@ fun NewsFollowScreen(
     newsViewModel: CodeforcesNewsViewModel
 ) {
     val context = context
+    val scope = rememberCoroutineScope()
+
     val followLoadingStatus by rememberCollect { newsViewModel.flowOfFollowUpdateLoadingStatus() }
+
+    val userBlogs by rememberCollect {
+        context.followListDao.flowOfAllBlogs().map {
+            it.sortedByDescending { it.id }
+        }
+    }
+
     ProvideTimeEachMinute {
         CodeforcesFollowList(
-            isRefreshing = { followLoadingStatus == LoadingStatus.LOADING }
-        ) { handle ->
-            newsViewModel.loadBlog(handle = handle, context = context)
-            navigator.navigateTo(Screen.NewsCodeforcesBlog(handle = handle))
-        }
+            userBlogs = { userBlogs },
+            isRefreshing = { followLoadingStatus == LoadingStatus.LOADING },
+            onOpenBlog = { handle ->
+                newsViewModel.loadBlog(handle = handle, context = context)
+                navigator.navigateTo(Screen.NewsCodeforcesBlog(handle = handle))
+            },
+            onDeleteUser = { handle ->
+                scope.launch {
+                    context.followListDao.remove(handle)
+                }
+            }
+        )
     }
 
     //TODO: block if worker in progress
@@ -46,22 +62,16 @@ fun NewsFollowScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CodeforcesFollowList(
+    userBlogs: () -> List<CodeforcesUserBlog>,
     isRefreshing: () -> Boolean,
-    onOpenBlog: (String) -> Unit
+    onOpenBlog: (String) -> Unit,
+    onDeleteUser: (String) -> Unit
 ) {
-    val context = context
-    val scope = rememberCoroutineScope()
-
-    val userBlogs by rememberCollect {
-        context.followListDao.flowOfAllBlogs().map {
-            it.sortedByDescending { it.id }
-        }
-    }
-
     val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
-        snapshotFlow { userBlogs.firstOrNull()?.id }
+        //TODO no animation when delete first
+        snapshotFlow { userBlogs().firstOrNull()?.id }
             .drop(1)
             .collect {
                 listState.animateScrollToItem(index = 0)
@@ -74,7 +84,7 @@ private fun CodeforcesFollowList(
         state = listState
     ) {
         itemsNotEmpty(
-            items = userBlogs,
+            items = userBlogs(),
             key = { it.id }
         ) { userBlog ->
             ContentWithCPSDropdownMenu(
@@ -115,12 +125,9 @@ private fun CodeforcesFollowList(
                 append(LocalCodeforcesAccountManager.current.makeHandleSpan(userInfo = userBlog.userInfo))
                 append(" from follow list?")
             },
-            onDismissRequest = { showDeleteDialogForBlog = null }
-        ) {
-            scope.launch {
-                context.followListDao.remove(userBlog.handle)
-            }
-        }
+            onDismissRequest = { showDeleteDialogForBlog = null },
+            onConfirmRequest = { onDeleteUser(userBlog.handle) }
+        )
     }
 }
 
