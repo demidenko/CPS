@@ -5,11 +5,11 @@ import androidx.room.*
 import com.demich.cps.*
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.platforms.api.CodeforcesAPIErrorResponse
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesLocale
-import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.platforms.utils.CodeforcesUtils
 import kotlinx.coroutines.flow.Flow
 
@@ -178,16 +178,19 @@ internal interface FollowListDao {
         }
     }
 
-    //TODO: @Transaction block ui with rememberCollect
     suspend fun updateUsersInfo() {
-        CodeforcesUtils.getUsersInfo(handles = getHandles(), doRedirect = true)
-            .forEach { (handle, info) ->
-                when (info.status) {
-                    STATUS.NOT_FOUND -> remove(handle)
-                    STATUS.OK -> setUserInfo(handle, info)
-                    STATUS.FAILED -> {}
-                }
+        applyUsersInfo(CodeforcesUtils.getUsersInfo(handles = getHandles(), doRedirect = true))
+    }
+
+    @Transaction
+    suspend fun applyUsersInfo(result: Map<String, CodeforcesUserInfo>) {
+        result.forEach { (handle, info) ->
+            when (info.status) {
+                STATUS.NOT_FOUND -> remove(handle)
+                STATUS.OK -> setUserInfo(handle, info)
+                STATUS.FAILED -> {}
             }
+        }
     }
 }
 
