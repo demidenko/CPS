@@ -7,18 +7,14 @@ import com.demich.cps.features.room.InstanceProvider
 import com.demich.cps.features.room.InstantSecondsConverter
 
 @Database(
-    entities = [
-        Contest::class,
-        DeprecatedCodeforcesUserBlog::class
-    ],
-    version = 2,
+    entities = [Contest::class],
+    version = 3,
     autoMigrations = [
-        AutoMigration(from = 1, to = 2, spec = RoomSingleton.DeleteLostMigration::class)
+        AutoMigration(from = 1, to = 2, spec = RoomSingleton.DeleteLostMigration::class),
+        AutoMigration(from = 2, to = 3, spec = RoomSingleton.DeleteFollowMigration::class)
     ]
 )
 @TypeConverters(
-    IntsListConverter::class,
-    CodeforcesUserInfoConverter::class,
     InstantSecondsConverter::class
 )
 internal abstract class RoomSingleton: RoomDatabase() {
@@ -35,5 +31,7 @@ internal abstract class RoomSingleton: RoomDatabase() {
     @DeleteTable(tableName = "cf_lost_blog_entries")
     class DeleteLostMigration : AutoMigrationSpec
 
+    @DeleteTable(tableName = "cf_follow_list")
+    class DeleteFollowMigration : AutoMigrationSpec
 }
 

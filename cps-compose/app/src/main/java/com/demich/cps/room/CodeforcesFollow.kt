@@ -1,8 +1,6 @@
 package com.demich.cps.room
 
 import android.content.Context
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.demich.cps.*
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
@@ -19,8 +17,6 @@ val Context.followListDao: FollowListDao
         context = this,
         dao = this.cfFollowDao
     )
-
-private const val followListTableName = "cf_follow_list"
 
 class FollowListDao internal constructor(
     private val context: Context,
@@ -87,12 +83,3 @@ class FollowListDao internal constructor(
             attachUrl(url = CodeforcesApi.urls.blogEntry(blogEntry.id), context = context)
         }
 }
-
-@Entity(tableName = followListTableName)
-internal data class DeprecatedCodeforcesUserBlog(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val handle: String,
-    val blogEntries: List<Int>?,
-    val userInfo: CodeforcesUserInfo
-)
