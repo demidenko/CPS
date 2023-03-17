@@ -58,7 +58,7 @@ class CodeforcesFollowDao internal constructor(
         if (dao.getUserBlog(handle) != null) return
         //TODO: sync?? parallel? (addNewUser loads blog without info)
         addNewUser(userInfo = CodeforcesUserInfo(handle = handle, status = STATUS.FAILED))
-        dao.setUserInfo(
+        dao.applyUserInfo(
             handle = handle,
             info = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
         )
@@ -129,7 +129,7 @@ internal interface FollowListDao {
         update(fromUserBlog.copy(handle = toHandle))
     }
 
-    suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
+    private suspend fun setOKUserInfo(handle: String, info: CodeforcesUserInfo) {
         if (info.status != STATUS.OK) return
         if (info.handle != handle) changeHandle(handle, info.handle)
         val userBlog = getUserBlog(info.handle) ?: return
@@ -152,19 +152,13 @@ internal interface FollowListDao {
             }
             if (it is CodeforcesAPIErrorResponse && it.isBlogHandleNotFound(handle)) {
                 val userInfo = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
-                when (userInfo.status) {
-                    STATUS.OK -> {
-                        setUserInfo(handle, userInfo)
-                        return@recoverCatching getAndReloadBlogEntries(
-                            handle = userInfo.handle,
-                            locale = locale,
-                            onNewBlogEntry = onNewBlogEntry
-                        )
-                    }
-                    STATUS.NOT_FOUND -> {
-                        remove(handle)
-                    }
-                    STATUS.FAILED -> Unit
+                applyUserInfo(handle, userInfo)
+                if (userInfo.status == STATUS.OK) {
+                    return@recoverCatching getAndReloadBlogEntries(
+                        handle = userInfo.handle,
+                        locale = locale,
+                        onNewBlogEntry = onNewBlogEntry
+                    )
                 }
             }
             throw it
@@ -182,15 +176,17 @@ internal interface FollowListDao {
         applyUsersInfo(CodeforcesUtils.getUsersInfo(handles = getHandles(), doRedirect = true))
     }
 
+    suspend fun applyUserInfo(handle: String, info: CodeforcesUserInfo) {
+        when (info.status) {
+            STATUS.OK -> setOKUserInfo(handle, info)
+            STATUS.NOT_FOUND -> remove(handle)
+            STATUS.FAILED -> Unit
+        }
+    }
+
     @Transaction
     suspend fun applyUsersInfo(result: Map<String, CodeforcesUserInfo>) {
-        result.forEach { (handle, info) ->
-            when (info.status) {
-                STATUS.NOT_FOUND -> remove(handle)
-                STATUS.OK -> setUserInfo(handle, info)
-                STATUS.FAILED -> {}
-            }
-        }
+        result.forEach { (handle, info) -> applyUserInfo(handle, info) }
     }
 }
 
