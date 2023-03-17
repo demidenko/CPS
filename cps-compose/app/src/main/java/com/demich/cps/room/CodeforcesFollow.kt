@@ -1,29 +1,30 @@
 package com.demich.cps.room
 
 import android.content.Context
-import androidx.room.*
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.demich.cps.*
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowDao
+import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
+import com.demich.cps.features.codeforces.follow.database.cfFollowDao
 import com.demich.cps.news.settings.settingsNews
-import com.demich.cps.platforms.api.CodeforcesAPIErrorResponse
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.CodeforcesUtils
-import kotlinx.coroutines.flow.Flow
 
-val Context.followListDao: CodeforcesFollowDao
-    get() = CodeforcesFollowDao(
+val Context.followListDao: FollowListDao
+    get() = FollowListDao(
         context = this,
-        dao = RoomSingleton.getInstance(this).followListDao()
+        dao = this.cfFollowDao
     )
 
 private const val followListTableName = "cf_follow_list"
 
-class CodeforcesFollowDao internal constructor(
+class FollowListDao internal constructor(
     private val context: Context,
-    private val dao: FollowListDao
+    private val dao: CodeforcesFollowDao
 ) {
     suspend fun remove(handle: String) = dao.remove(handle)
 
@@ -80,118 +81,15 @@ class CodeforcesFollowDao internal constructor(
             setSubText("New codeforces blog entry")
             setContentTitle(blogEntry.authorHandle)
             setBigContent(CodeforcesUtils.extractTitle(blogEntry))
-            setSmallIcon(com.demich.cps.R.drawable.ic_new_post)
+            setSmallIcon(R.drawable.ic_new_post)
             setAutoCancel(true)
             setWhen(blogEntry.creationTime)
             attachUrl(url = CodeforcesApi.urls.blogEntry(blogEntry.id), context = context)
         }
 }
 
-@Dao
-internal interface FollowListDao {
-
-    @Query("SELECT * FROM $followListTableName")
-    suspend fun getAllBlogs(): List<CodeforcesUserBlog>
-
-    @Query("SELECT * FROM $followListTableName")
-    fun flowOfAllBlogs(): Flow<List<CodeforcesUserBlog>>
-
-    @Query("SELECT handle FROM $followListTableName")
-    suspend fun getHandles(): List<String>
-
-    @Query("SELECT * FROM $followListTableName WHERE handle LIKE :handle")
-    suspend fun getUserBlog(handle: String): CodeforcesUserBlog?
-
-    @Insert
-    suspend fun insert(blog: CodeforcesUserBlog)
-
-    @Update
-    suspend fun update(blog: CodeforcesUserBlog)
-
-    @Query("DELETE FROM $followListTableName WHERE handle LIKE :handle")
-    suspend fun remove(handle: String)
-
-
-    private suspend fun setBlogEntries(handle: String, blogEntries: List<Int>) {
-        val userBlog = getUserBlog(handle) ?: return
-        if (userBlog.blogEntries != blogEntries) update(userBlog.copy(blogEntries = blogEntries))
-    }
-
-    private suspend fun changeHandle(fromHandle: String, toHandle: String) {
-        if (fromHandle == toHandle) return
-        val fromUserBlog = getUserBlog(fromHandle) ?: return
-        getUserBlog(toHandle)?.let { toUserBlog ->
-            if (toUserBlog.id != fromUserBlog.id) {
-                remove(fromHandle)
-                return
-            }
-        }
-        update(fromUserBlog.copy(handle = toHandle))
-    }
-
-    private suspend fun setOKUserInfo(handle: String, info: CodeforcesUserInfo) {
-        if (info.status != STATUS.OK) return
-        if (info.handle != handle) changeHandle(handle, info.handle)
-        val userBlog = getUserBlog(info.handle) ?: return
-        if (userBlog.userInfo != info) update(userBlog.copy(
-            handle = info.handle,
-            userInfo = info
-        ))
-    }
-
-    suspend fun getAndReloadBlogEntries(
-        handle: String,
-        locale: CodeforcesLocale,
-        onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
-    ): List<CodeforcesBlogEntry>? {
-        return CodeforcesApi.runCatching {
-            getUserBlogEntries(handle = handle, locale = locale)
-        }.recoverCatching {
-            if (it is CodeforcesAPIErrorResponse && it.isNotAllowedToReadThatBlog()) {
-                return@recoverCatching emptyList()
-            }
-            if (it is CodeforcesAPIErrorResponse && it.isBlogHandleNotFound(handle)) {
-                val userInfo = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
-                applyUserInfo(handle, userInfo)
-                if (userInfo.status == STATUS.OK) {
-                    return@recoverCatching getAndReloadBlogEntries(
-                        handle = userInfo.handle,
-                        locale = locale,
-                        onNewBlogEntry = onNewBlogEntry
-                    )
-                }
-            }
-            throw it
-        }.getOrNull()?.also { blogEntries ->
-            getUserBlog(handle)?.blogEntries?.toSet()?.let { saved ->
-                for (blogEntry in blogEntries) {
-                    if (blogEntry.id !in saved) onNewBlogEntry(blogEntry)
-                }
-            }
-            setBlogEntries(handle, blogEntries.map { it.id })
-        }
-    }
-
-    suspend fun updateUsersInfo() {
-        applyUsersInfo(CodeforcesUtils.getUsersInfo(handles = getHandles(), doRedirect = true))
-    }
-
-    suspend fun applyUserInfo(handle: String, info: CodeforcesUserInfo) {
-        when (info.status) {
-            STATUS.OK -> setOKUserInfo(handle, info)
-            STATUS.NOT_FOUND -> remove(handle)
-            STATUS.FAILED -> Unit
-        }
-    }
-
-    @Transaction
-    suspend fun applyUsersInfo(result: Map<String, CodeforcesUserInfo>) {
-        result.forEach { (handle, info) -> applyUserInfo(handle, info) }
-    }
-}
-
 @Entity(tableName = followListTableName)
-data class CodeforcesUserBlog(
+internal data class DeprecatedCodeforcesUserBlog(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val handle: String,

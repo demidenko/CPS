@@ -13,8 +13,8 @@ import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.navigation.Screen
 import com.demich.cps.accounts.DialogAccountChooser
+import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
-import com.demich.cps.room.CodeforcesUserBlog
 import com.demich.cps.room.followListDao
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSDeleteDialog

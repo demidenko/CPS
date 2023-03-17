@@ -9,7 +9,7 @@ import com.demich.cps.features.room.InstantSecondsConverter
 @Database(
     entities = [
         Contest::class,
-        CodeforcesUserBlog::class
+        DeprecatedCodeforcesUserBlog::class
     ],
     version = 2,
     autoMigrations = [
@@ -22,7 +22,6 @@ import com.demich.cps.features.room.InstantSecondsConverter
     InstantSecondsConverter::class
 )
 internal abstract class RoomSingleton: RoomDatabase() {
-    abstract fun followListDao(): FollowListDao
     abstract fun contestsListDao(): ContestsListDao
 
     companion object: InstanceProvider<RoomSingleton>({

@@ -72,6 +72,7 @@ dependencies {
     implementation project(":data:accounts:userinfo")
     implementation project(":features:room_base")
     implementation project(":features:codeforces_lost:database")
+    implementation project(":features:codeforces_follow:database")
 
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'

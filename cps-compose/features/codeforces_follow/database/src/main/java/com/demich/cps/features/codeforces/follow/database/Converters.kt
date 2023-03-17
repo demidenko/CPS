@@ -1,4 +1,4 @@
-package com.demich.cps.room
+package com.demich.cps.features.codeforces.follow.database
 
 import androidx.room.TypeConverter
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
@@ -8,6 +8,7 @@ import com.demich.cps.features.room.jsonRoom
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+
 
 internal class IntsListConverter {
     @TypeConverter
@@ -35,9 +36,7 @@ internal class IntsListConverter {
 
 internal class CodeforcesUserInfoConverter: RoomJsonConverter<CodeforcesUserInfo> {
     @TypeConverter
-    override fun encode(value: CodeforcesUserInfo): String {
-        return jsonRoom.encodeToString(value)
-    }
+    override fun encode(value: CodeforcesUserInfo) = jsonRoom.encodeToString(value)
 
     @TypeConverter
     override fun decode(str: String): CodeforcesUserInfo {
