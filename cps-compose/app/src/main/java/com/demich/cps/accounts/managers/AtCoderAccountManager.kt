@@ -21,7 +21,7 @@ import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.AtCoderRatingChange
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.ui.SettingsSwitchItemWithWork
-import com.demich.cps.utils.AtCoderUtils
+import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.workers.AccountsWorker
 import com.demich.datastore_itemized.dataStoreWrapper
 

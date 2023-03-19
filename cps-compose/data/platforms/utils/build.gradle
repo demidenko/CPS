@@ -33,6 +33,7 @@ android {
 dependencies {
     implementation project(":data:platforms:api")
     implementation project(":data:accounts:userinfo")
+    implementation project(":data:contests:database")
 
     implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.4.0'
 

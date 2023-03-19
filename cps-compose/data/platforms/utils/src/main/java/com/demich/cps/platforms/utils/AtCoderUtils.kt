@@ -1,4 +1,4 @@
-package com.demich.cps.utils
+package com.demich.cps.platforms.utils
 
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
