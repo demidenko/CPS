@@ -3,6 +3,7 @@ package com.demich.cps.contests
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.demich.cps.contests.database.Contest
 
 
 @Composable

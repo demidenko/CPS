@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.contests.Contest
+import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIcons

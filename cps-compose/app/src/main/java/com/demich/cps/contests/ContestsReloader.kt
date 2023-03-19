@@ -1,5 +1,6 @@
 package com.demich.cps.contests
 
+import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loaders.ContestsReceiver
 import com.demich.cps.contests.loaders.getContests
 import com.demich.cps.contests.settings.ContestsSettingsDataStore

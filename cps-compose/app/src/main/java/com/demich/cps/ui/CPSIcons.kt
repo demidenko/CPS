@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import com.demich.cps.R
-import com.demich.cps.contests.Contest
+import com.demich.cps.contests.database.Contest
 
 object CPSIcons {
     val Account get() = Icons.Rounded.Person

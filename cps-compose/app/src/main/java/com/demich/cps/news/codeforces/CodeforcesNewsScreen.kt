@@ -8,7 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.demich.cps.contests.Contest
+import com.demich.cps.contests.database.Contest
 import com.demich.cps.news.NewsTab
 import com.demich.cps.news.NewsTabRow
 import com.demich.cps.ui.CPSSwipeRefreshBox

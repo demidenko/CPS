@@ -1,13 +1,12 @@
-package com.demich.cps.contests
+package com.demich.cps.contests.database
 
 import androidx.room.Entity
-import com.demich.cps.room.ContestsListDao
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @Entity(
-    tableName = ContestsListDao.contestsListTableName,
+    tableName = contestsTableName,
     primaryKeys = ["platform", "id"]
 )
 data class Contest (
@@ -15,7 +14,7 @@ data class Contest (
     val id: String,
     val title: String,
     val startTime: Instant,
-    val durationSeconds: Long,
+    val durationSeconds: Long, //TODO: change to Duration (https://issuetracker.google.com/issues/124624218)
     val link: String? = null
 ) {
     val compositeId get() = platform to id

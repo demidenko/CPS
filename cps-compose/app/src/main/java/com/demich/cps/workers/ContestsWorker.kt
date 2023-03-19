@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.contests.ContestsReloader
+import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.loaders.ContestsReceiver
 import com.demich.cps.contests.settings.settingsContests
-import com.demich.cps.room.contestsListDao
 import kotlin.time.Duration.Companion.hours
 
 class ContestsWorker(

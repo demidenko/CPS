@@ -1,7 +1,7 @@
 package com.demich.cps.contests.settings
 
 import android.content.Context
-import com.demich.cps.contests.Contest
+import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.platforms.api.ClistApi

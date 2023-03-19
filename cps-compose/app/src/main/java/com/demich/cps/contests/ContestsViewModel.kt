@@ -3,12 +3,13 @@ package com.demich.cps.contests
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestsListDao
+import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.contests.loaders.ContestsReceiver
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
-import com.demich.cps.room.ContestsListDao
-import com.demich.cps.room.contestsListDao
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.mapToSet
@@ -44,7 +45,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
         errors.getOrPut(platform) { MutableStateFlow(emptyList()) }
 
     private suspend fun ContestsListDao.removePlatform(platform: Contest.Platform) {
-        remove(platform)
+        replace(platform, emptyList())
         mutableErrorsList(platform).value = emptyList()
         mutableLoadingStatusFor(platform).value = LoadingStatus.PENDING
     }

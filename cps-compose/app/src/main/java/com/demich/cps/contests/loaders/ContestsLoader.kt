@@ -1,6 +1,6 @@
 package com.demich.cps.contests.loaders
 
-import com.demich.cps.contests.Contest
+import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.settings.ContestDateConstraints
 import com.demich.cps.platforms.api.niceMessage
 

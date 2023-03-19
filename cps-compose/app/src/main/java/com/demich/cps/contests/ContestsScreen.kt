@@ -24,13 +24,14 @@ import androidx.lifecycle.asFlow
 import androidx.work.WorkInfo
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.loaders.makeCombinedMessage
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
 import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.develop.settingsDev
-import com.demich.cps.room.contestsListDao
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
