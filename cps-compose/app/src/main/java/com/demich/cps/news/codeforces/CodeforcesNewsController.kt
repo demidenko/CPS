@@ -89,8 +89,7 @@ class CodeforcesNewsController(
     fun isTabVisible(tab: CodeforcesTitle) = tab == currentTab && !pagerState.isScrollInProgress
 
     suspend fun scrollTo(tab: CodeforcesTitle) =
-        //TODO: replace to animateScroll when lagging gone
-        pagerState.scrollToPage(page = tabs.indexOf(tab))
+        pagerState.animateScrollToPage(page = tabs.indexOf(tab))
 
 
     var topShowComments by mutableStateOf(data.topShowComments)

@@ -67,6 +67,7 @@ private fun CodeforcesPager(
     ProvideTimeEachMinute {
         HorizontalPager(
             pageCount = controller.tabs.size,
+            beyondBoundsPageCount = controller.tabs.size,
             state = controller.pagerState,
             key = { index -> controller.tabs[index] },
             modifier = modifier
