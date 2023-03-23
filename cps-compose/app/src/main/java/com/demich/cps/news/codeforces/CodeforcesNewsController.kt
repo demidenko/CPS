@@ -1,8 +1,10 @@
-@file:OptIn(ExperimentalPagerApi::class)
+@file:OptIn(ExperimentalFoundationApi::class)
 
 package com.demich.cps.news.codeforces
 
 import android.content.Context
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -11,8 +13,6 @@ import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.rememberCollect
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
@@ -79,7 +79,7 @@ class CodeforcesNewsController(
 
     //TODO: future support for dynamic tabs (selectedIndex can be out of bounds)
     val pagerState = PagerState(
-        currentPage = tabs.indexOf(data.selectedTab)
+        initialPage = tabs.indexOf(data.selectedTab)
             .takeIf { it != -1 } ?: 0
     )
 

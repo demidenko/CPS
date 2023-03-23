@@ -1,11 +1,13 @@
-@file:OptIn(ExperimentalPagerApi::class)
+@file:OptIn(ExperimentalFoundationApi::class)
 
 package com.demich.cps.news
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,11 +21,11 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSCountBadge
 import com.demich.cps.ui.theme.cpsColors
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import kotlin.math.max
 import kotlin.math.min
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun NewsTabRow(
     modifier: Modifier = Modifier,
@@ -70,7 +72,7 @@ fun NewsTab(
                 color = tabColor(
                     index = index,
                     selectedIndex = pagerState.currentPage,
-                    selectedOffset = pagerState.currentPageOffset,
+                    selectedOffset = pagerState.currentPageOffsetFraction,
                     selectedTextColor = selectedTextColor,
                     unselectedTextColor = unselectedTextColor
                 ),

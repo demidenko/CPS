@@ -1,8 +1,11 @@
-@file:OptIn(ExperimentalPagerApi::class)
+@file:OptIn(ExperimentalFoundationApi::class)
 
 package com.demich.cps.news.codeforces
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,9 +19,6 @@ import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -66,7 +66,7 @@ private fun CodeforcesPager(
 ) {
     ProvideTimeEachMinute {
         HorizontalPager(
-            count = controller.tabs.size,
+            pageCount = controller.tabs.size,
             state = controller.pagerState,
             key = { index -> controller.tabs[index] },
             modifier = modifier
