@@ -5,8 +5,8 @@ buildscript {
         java_version = 11
         ktor_version = '2.2.4'
         accompanist_version = '0.30.0'
-        room_version = '2.5.0'
-        lifecycle_version = '2.6.0'
+        room_version = '2.5.1'
+        lifecycle_version = '2.6.1'
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
