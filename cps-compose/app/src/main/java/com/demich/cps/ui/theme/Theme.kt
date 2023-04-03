@@ -34,7 +34,7 @@ fun CPSTheme(content: @Composable () -> Unit) {
     val useOriginalColors by rememberCollect { context.settingsUI.useOriginalColors.flow }
     val colors = if (darkLightMode.isDarkMode()) darkCPSColors else lightCPSColors
     MaterialTheme(
-        colors = colors.toMaterialColors(),
+        colors = colors.materialColors,
         typography = Typography(
             body1 = TextStyle(
                 fontFamily = FontFamily.Default,
