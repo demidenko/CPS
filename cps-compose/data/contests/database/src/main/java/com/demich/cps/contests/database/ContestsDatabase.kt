@@ -1,19 +1,22 @@
 package com.demich.cps.contests.database
 
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import androidx.room.*
+import androidx.room.migration.AutoMigrationSpec
+import com.demich.cps.features.room.DurationSecondsConverter
 import com.demich.cps.features.room.InstanceProvider
 import com.demich.cps.features.room.InstantSecondsConverter
 
 
 @Database(
     entities = [Contest::class],
-    version = 1
+    version = 2,
+    autoMigrations = [
+        AutoMigration(from = 1, to = 2, spec = ContestsDatabase.DurationRenameMigration::class)
+    ]
 )
 @TypeConverters(
-    InstantSecondsConverter::class
+    InstantSecondsConverter::class,
+    DurationSecondsConverter::class
 )
 internal abstract class ContestsDatabase: RoomDatabase() {
     abstract fun contestsDao(): ContestsListDao
@@ -25,4 +28,7 @@ internal abstract class ContestsDatabase: RoomDatabase() {
             context = it
         )
     })
+
+    @RenameColumn(tableName = contestsTableName, fromColumnName = "durationSeconds", toColumnName = "duration")
+    class DurationRenameMigration: AutoMigrationSpec
 }

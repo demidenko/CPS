@@ -3,7 +3,6 @@ package com.demich.cps.contests.database
 import androidx.room.Entity
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 @Entity(
     tableName = contestsTableName,
@@ -14,12 +13,11 @@ data class Contest (
     val id: String,
     val title: String,
     val startTime: Instant,
-    val durationSeconds: Long, //TODO: change to Duration (https://issuetracker.google.com/issues/124624218)
+    val duration: Duration,
     val link: String? = null
 ) {
     val compositeId get() = platform to id
 
-    val duration: Duration get() = durationSeconds.seconds
     val endTime: Instant get() = startTime + duration
 
     fun getPhase(currentTime: Instant): Phase {
@@ -40,7 +38,7 @@ data class Contest (
         id = id,
         title = title,
         startTime = startTime,
-        durationSeconds = (endTime - startTime).inWholeSeconds,
+        duration = endTime - startTime,
         link = link
     )
 
@@ -80,6 +78,6 @@ data class Contest (
                 Phase.BEFORE -> compareValues(c1.startTime, c2.startTime)
                 Phase.FINISHED -> -compareValues(c1.endTime, c2.endTime)
             }
-        }.thenBy { it.durationSeconds }.thenBy { it.platform }.thenBy { it.id }
+        }.thenBy { it.duration }.thenBy { it.platform }.thenBy { it.id }
     }
 }

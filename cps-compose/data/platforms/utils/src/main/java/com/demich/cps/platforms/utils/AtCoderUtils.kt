@@ -46,7 +46,7 @@ object AtCoderUtils {
                 id = id,
                 link = AtCoderApi.urls.contest(id),
                 startTime = startTime,
-                durationSeconds = duration.inWholeSeconds
+                duration = duration
             )
         }.getOrNull()
     }
