@@ -62,7 +62,7 @@ fun rememberCodeforcesNewsController(
 }
 
 @Serializable
-data class CodeforcesNewsControllerData(
+internal data class CodeforcesNewsControllerData(
     val selectedTab: CodeforcesTitle,
     val topShowComments: Boolean,
     val recentShowComments: Boolean,
@@ -70,7 +70,7 @@ data class CodeforcesNewsControllerData(
 )
 
 @Stable
-class CodeforcesNewsController(
+class CodeforcesNewsController internal constructor(
     private val viewModel: CodeforcesNewsViewModel,
     private val tabsState: State<List<CodeforcesTitle>>,
     data: CodeforcesNewsControllerData
