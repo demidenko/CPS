@@ -54,4 +54,25 @@ object AtCoderUtils {
     fun extractContests(source: String): List<Contest> =
         Jsoup.parse(source).select("time.fixtime-full")
             .mapNotNull(::extractContestOrNull)
+
+    class NewsPost(
+        val title: String,
+        val time: Instant,
+        override val id: String
+    ): NewsPostEntry
+
+    fun extractNews(source: String): Sequence<NewsPost?> =
+        Jsoup.parse(source).select("div.panel.panel-default")
+            .asSequence()
+            .map { panel ->
+                val header = panel.expectFirst("div.panel-heading")
+                val titleElement = header.expectFirst("h3.panel-title")
+                val timeElement = header.expectFirst("span.tooltip-unix")
+                val id = titleElement.expectFirst("a").attr("href").removePrefix("/posts/")
+                NewsPost(
+                    title = titleElement.text(),
+                    time = Instant.fromEpochSeconds(timeElement.attr("title").toLong()),
+                    id = id
+                )
+            }
 }

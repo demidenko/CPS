@@ -1,4 +1,4 @@
-package com.demich.cps.utils
+package com.demich.cps.platforms.utils
 
 interface NewsPostEntry {
     val id: String
