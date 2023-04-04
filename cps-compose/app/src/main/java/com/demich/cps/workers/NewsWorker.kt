@@ -146,8 +146,7 @@ class NewsWorker(
         onNewPost: (T) -> Unit
     ) {
         scanNewsPostEntries(
-            elements = elements,
-            extractPost = extractPost,
+            posts = elements.asSequence().map(extractPost),
             onNewPost = onNewPost,
             getLastId = {
                 settings.newsFeedsLastIds()[newsFeed]

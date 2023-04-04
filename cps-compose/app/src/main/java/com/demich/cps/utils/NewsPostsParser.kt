@@ -4,22 +4,17 @@ interface NewsPostEntry {
     val id: String
 }
 
-suspend fun<T: NewsPostEntry, E> scanNewsPostEntries(
-    elements: List<E>,
+suspend fun<T: NewsPostEntry> scanNewsPostEntries(
+    posts: Sequence<T?>,
     getLastId: suspend () -> String?,
     setLastId: suspend (String) -> Unit,
-    extractPost: (E) -> T?,
     onNewPost: (T) -> Unit
 ) {
     val lastId = getLastId()
 
-    val newEntries = buildList {
-        for (element in elements) {
-            val post = extractPost(element) ?: continue
-            if (post.id == lastId) break
-            add(post)
-        }
-    }
+    val newEntries = posts.filterNotNull()
+        .takeWhile { it.id != lastId }
+        .toList()
 
     if (newEntries.isEmpty()) return
 

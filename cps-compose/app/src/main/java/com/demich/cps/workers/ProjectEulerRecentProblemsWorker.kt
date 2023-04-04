@@ -39,22 +39,22 @@ class ProjectEulerRecentProblemsWorker(
         ): NewsPostEntry
 
         val settings = context.settingsNews
+        val elements = Jsoup.parse(ProjectEulerApi.getRecentPage()).expectFirst("#problems_table").select("td.id_column")
         scanNewsPostEntries(
-            elements = Jsoup.parse(ProjectEulerApi.getRecentPage()).expectFirst("#problems_table").select("td.id_column"),
+            posts = elements.asSequence().map { idCell ->
+                idCell.nextElementSibling()?.let { nameCell ->
+                    RecentProblem(
+                        name = nameCell.text(),
+                        id = idCell.text()
+                    )
+                }
+            },
             getLastId = {
                 settings.newsFeedsLastIds()[NewsSettingsDataStore.NewsFeed.project_euler_problems]
             },
             setLastId = {
                 settings.newsFeedsLastIds.edit {
                     this[NewsSettingsDataStore.NewsFeed.project_euler_problems] = it
-                }
-            },
-            extractPost = { idCell ->
-                idCell.nextElementSibling()?.let { nameCell ->
-                    RecentProblem(
-                        name = nameCell.text(),
-                        id = idCell.text()
-                    )
                 }
             }
         ) {
