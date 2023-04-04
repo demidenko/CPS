@@ -8,8 +8,6 @@ import com.demich.cps.news.settings.NewsSettingsDataStore
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.platforms.api.ProjectEulerApi
 import com.demich.cps.platforms.utils.ProjectEulerUtils
-import com.demich.cps.platforms.utils.scanNewsPostEntries
-import com.demich.datastore_itemized.edit
 import kotlin.time.Duration.Companion.hours
 
 class ProjectEulerRecentProblemsWorker(
@@ -32,18 +30,9 @@ class ProjectEulerRecentProblemsWorker(
     }
 
     override suspend fun runWork(): Result {
-        val settings = context.settingsNews
-
-        scanNewsPostEntries(
-            posts = ProjectEulerUtils.extractRecentProblems(ProjectEulerApi.getRecentPage()),
-            getLastId = {
-                settings.newsFeedsLastIds()[NewsSettingsDataStore.NewsFeed.project_euler_problems]
-            },
-            setLastId = {
-                settings.newsFeedsLastIds.edit {
-                    this[NewsSettingsDataStore.NewsFeed.project_euler_problems] = it
-                }
-            }
+        context.settingsNews.scanNewsFeed(
+            newsFeed = NewsSettingsDataStore.NewsFeed.project_euler_problems,
+            posts = ProjectEulerUtils.extractRecentProblems(ProjectEulerApi.getRecentPage())
         ) {
             val problemId = it.id.toInt()
             notificationBuildAndNotify(

@@ -5,8 +5,11 @@ import com.demich.cps.news.codeforces.CodeforcesTitle
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesLocale
+import com.demich.cps.platforms.utils.NewsPostEntry
+import com.demich.cps.platforms.utils.scanNewsPostEntries
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
+import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -58,4 +61,21 @@ class NewsSettingsDataStore(context: Context): ItemizedDataStore(context.news_se
 
     val enabledNewsFeeds = itemEnumSet<NewsFeed>(name = "news_feeds", defaultValue = emptySet())
     val newsFeedsLastIds = jsonCPS.item<Map<NewsFeed,String>>(name = "news_feeds_last_id", defaultValue = emptyMap())
+
+    suspend fun<T: NewsPostEntry> scanNewsFeed(
+        newsFeed: NewsFeed,
+        posts: Sequence<T?>,
+        onNewPost: (T) -> Unit
+    ) {
+        scanNewsPostEntries(
+            posts = posts,
+            onNewPost = onNewPost,
+            getLastId = {
+                newsFeedsLastIds()[newsFeed]
+            },
+            setLastId = {
+                newsFeedsLastIds.edit { this[newsFeed] = it }
+            }
+        )
+    }
 }

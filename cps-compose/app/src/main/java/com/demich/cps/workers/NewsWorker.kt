@@ -11,10 +11,7 @@ import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.ProjectEulerApi
 import com.demich.cps.platforms.utils.AtCoderUtils
-import com.demich.cps.platforms.utils.NewsPostEntry
 import com.demich.cps.platforms.utils.ProjectEulerUtils
-import com.demich.cps.platforms.utils.scanNewsPostEntries
-import com.demich.datastore_itemized.edit
 import org.jsoup.Jsoup
 import kotlin.time.Duration.Companion.hours
 
@@ -55,7 +52,7 @@ class NewsWorker(
     }
 
     private suspend fun atcoderNews() {
-        getPosts(
+        settings.scanNewsFeed(
             newsFeed = atcoder_news,
             posts = AtCoderUtils.extractNews(source = AtCoderApi.getMainPage())
         ) {
@@ -76,7 +73,7 @@ class NewsWorker(
     }
 
     private suspend fun projectEulerNews() {
-        getPosts(
+        settings.scanNewsFeed(
             newsFeed = project_euler_news,
             posts = ProjectEulerUtils.extractNews(source = ProjectEulerApi.getRSSPage())
         ) {
@@ -100,22 +97,5 @@ class NewsWorker(
                 attachUrl(url = ProjectEulerApi.urls.news, context = context)
             }
         }
-    }
-
-    private suspend fun<T: NewsPostEntry> getPosts(
-        newsFeed: NewsSettingsDataStore.NewsFeed,
-        posts: Sequence<T?>,
-        onNewPost: (T) -> Unit
-    ) {
-        scanNewsPostEntries(
-            posts = posts,
-            onNewPost = onNewPost,
-            getLastId = {
-                settings.newsFeedsLastIds()[newsFeed]
-            },
-            setLastId = {
-                settings.newsFeedsLastIds.edit { this[newsFeed] = it }
-            }
-        )
     }
 }
