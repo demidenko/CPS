@@ -91,6 +91,4 @@ object ClistUtils {
     }
 }
 
-
-
-fun String.removePrefixHttp() = removePrefix("http://").removePrefix("https://")
+private fun String.removePrefixHttp() = removePrefix("http://").removePrefix("https://")
