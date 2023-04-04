@@ -6,9 +6,9 @@ import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.userinfo.ClistUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.utils.CListUtils
 import com.demich.cps.platforms.api.ClistApi
 import com.demich.cps.platforms.api.isPageNotFound
+import com.demich.cps.platforms.utils.ClistUtils
 
 
 class CListAccountManager(context: Context):
@@ -21,7 +21,7 @@ class CListAccountManager(context: Context):
     override fun emptyInfo() = ClistUserInfo(STATUS.NOT_FOUND, "")
 
     override suspend fun downloadInfo(data: String): ClistUserInfo =
-        CListUtils.runCatching {
+        ClistUtils.runCatching {
             extractUserInfo(
                 source = ClistApi.getUserPage(login = data),
                 login = data
@@ -32,7 +32,7 @@ class CListAccountManager(context: Context):
         }
 
     override suspend fun loadSuggestions(str: String): List<UserSuggestion> =
-        CListUtils.extractLoginSuggestions(source = ClistApi.getUsersSearchPage(str))
+        ClistUtils.extractLoginSuggestions(source = ClistApi.getUsersSearchPage(str))
             .map { UserSuggestion(userId = it) }
 
     @Composable

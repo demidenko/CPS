@@ -9,7 +9,6 @@ import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
-import com.demich.cps.utils.CListUtils
 import com.demich.cps.utils.LoadingStatus
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.joinAll
@@ -63,7 +62,7 @@ class AccountsViewModel: ViewModel() {
     ) {
         progressBarsViewModel.doJob(id = ProgressBarsViewModel.clistImportId, coroutineScope = viewModelScope) { progress ->
             val supported = cListUserInfo.accounts.mapNotNull { (resource, userData) ->
-                CListUtils.getManager(resource, userData.first, userData.second)
+                getManager(resource, userData.first, userData.second)
             }
             progress.value = ProgressBarInfo(title = "clist import", total = supported.size)
             val managers = context.allAccountManagers
@@ -86,3 +85,16 @@ class AccountsViewModel: ViewModel() {
         manager.setSavedInfo(manager.loadInfo(userId))
     }
 }
+
+private fun getManager(resource: String, userName: String, link: String): Pair<AccountManagers, String>? =
+    when (resource) {
+        "codeforces.com" -> AccountManagers.codeforces to userName
+        "atcoder.jp" -> AccountManagers.atcoder to userName
+        "codechef.com" -> AccountManagers.codechef to userName
+        "dmoj.ca" -> AccountManagers.dmoj to userName
+        "acm.timus.ru", "timus.online" -> {
+            val userId = link.substring(link.lastIndexOf('=')+1)
+            AccountManagers.timus to userId
+        }
+        else -> null
+    }

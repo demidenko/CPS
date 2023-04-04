@@ -19,6 +19,7 @@ import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.utils.*
 import com.demich.cps.platforms.api.ClistApi
 import com.demich.cps.platforms.api.ClistResource
+import com.demich.cps.platforms.utils.ClistUtils
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
@@ -44,7 +45,7 @@ fun ClistAdditionalResourcesDialog(
             loadingStatus = LoadingStatus.FAILED
         }.onSuccess { resources ->
             val alreadySupported =
-                Contest.platformsExceptUnknown.map { CListUtils.getClistApiResourceId(it) }
+                Contest.platformsExceptUnknown.map { ClistUtils.getClistApiResourceId(it) }
             unselectedItems = resources
                 .filter { it.id !in alreadySupported }
                 .sortedBy { it.name }

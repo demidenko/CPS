@@ -2,7 +2,7 @@ package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.settings.ContestDateConstraints
-import com.demich.cps.utils.CListUtils
+import com.demich.cps.platforms.utils.ClistUtils
 import com.demich.cps.platforms.api.ClistApi
 import com.demich.cps.platforms.api.ClistContest
 import kotlinx.datetime.Instant
@@ -18,7 +18,7 @@ class ClistContestsLoader(
         apiAccess = apiAccess,
         maxStartTime = dateConstraints.maxStartTime,
         minEndTime = dateConstraints.minEndTime,
-        resourceIds = CListUtils.makeResourceIds(platforms, includeResourceIds)
+        resourceIds = ClistUtils.makeResourceIds(platforms, includeResourceIds)
     ).mapAndFilterResult(dateConstraints)
 }
 
@@ -35,12 +35,12 @@ private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: Contest
 
 private fun ClistContest.toContest(): Contest {
     val platform = Contest.platformsExceptUnknown
-        .find { CListUtils.getClistApiResourceId(it) == resource_id }
+        .find { ClistUtils.getClistApiResourceId(it) == resource_id }
         ?: Contest.Platform.unknown
 
     return Contest(
         platform = platform,
-        id = CListUtils.extractContestId(this, platform),
+        id = ClistUtils.extractContestId(this, platform),
         title = event,
         startTime = Instant.parse(start+"Z"),
         endTime = Instant.parse(end+"Z"),

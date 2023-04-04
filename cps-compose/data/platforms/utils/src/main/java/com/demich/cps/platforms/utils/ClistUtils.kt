@@ -1,6 +1,5 @@
-package com.demich.cps.utils
+package com.demich.cps.platforms.utils
 
-import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.accounts.userinfo.ClistUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.contests.database.Contest
@@ -8,7 +7,7 @@ import com.demich.cps.platforms.api.ClistContest
 import org.jsoup.Jsoup
 import kotlin.collections.set
 
-object CListUtils {
+object ClistUtils {
     suspend fun makeResourceIds(
         platforms: Collection<Contest.Platform>,
         includeResourceIds: suspend () -> Collection<Int> = { emptyList() }
@@ -16,20 +15,6 @@ object CListUtils {
         for (platform in platforms) {
             if (platform == Contest.Platform.unknown) addAll(includeResourceIds())
             else add(getClistApiResourceId(platform))
-        }
-    }
-
-    fun getManager(resource: String, userName: String, link: String): Pair<AccountManagers, String>? {
-        return when (resource) {
-            "codeforces.com" -> AccountManagers.codeforces to userName
-            "atcoder.jp" -> AccountManagers.atcoder to userName
-            "codechef.com" -> AccountManagers.codechef to userName
-            "dmoj.ca" -> AccountManagers.dmoj to userName
-            "acm.timus.ru", "timus.online" -> {
-                val userId = link.substring(link.lastIndexOf('=')+1)
-                AccountManagers.timus to userId
-            }
-            else -> null
         }
     }
 
@@ -108,4 +93,4 @@ object CListUtils {
 
 
 
-private fun String.removePrefixHttp() = removePrefix("http://").removePrefix("https://")
+fun String.removePrefixHttp() = removePrefix("http://").removePrefix("https://")
