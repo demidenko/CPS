@@ -27,7 +27,7 @@ class AccountsViewModel: ViewModel() {
 
     fun<U: UserInfo> reload(manager: AccountManager<U>) {
         viewModelScope.launch {
-            val savedInfo = manager.getSavedInfoOrNull() ?: return@launch
+            val savedInfo = manager.getSavedInfo() ?: return@launch
 
             val loadingStatusState = mutableLoadingStatusFor(manager)
             if (loadingStatusState.value == LoadingStatus.LOADING) return@launch

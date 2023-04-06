@@ -198,7 +198,7 @@ fun accountExpandedMenuBuilder(
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         scope.launch {
             context.allAccountManagers.first { it.type == type }
-                .getSavedInfoOrNull()
+                .getSavedInfo()
                 ?.userPageUrl
                 ?.let { url -> context.openUrlInBrowser(url) }
         }
@@ -266,7 +266,7 @@ private fun AddAccountButton(cpsViewModels: CPSViewModels) {
             modifier = Modifier.background(cpsColors.backgroundAdditional)
         ) {
             runBlocking {
-                context.allAccountManagers.filter { it.getSavedInfoOrNull() == null }
+                context.allAccountManagers.filter { it.getSavedInfo() == null }
             }.forEach { manager ->
                 DropdownMenuItem(
                     onClick = {
@@ -307,7 +307,7 @@ private fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
 ) {
     DialogAccountChooser(
         manager = this,
-        initialUserInfo = runBlocking { getSavedInfoOrNull() },
+        initialUserInfo = runBlocking { getSavedInfo() },
         onDismissRequest = onDismissRequest,
         onResult = { userInfo -> scope.launch { setSavedInfo(userInfo) } }
     )

@@ -60,13 +60,12 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
 
     open fun isValidForUserId(char: Char): Boolean = true
 
-    suspend fun getSavedInfo(): U = getDataStore().userInfo()
-    suspend fun getSavedInfoOrNull(): U? = flowOfInfo().first()
+    suspend fun getSavedInfo(): U? = flowOfInfo().first()
 
     suspend fun setSavedInfo(info: U) {
-        val old = getSavedInfo()
+        val oldUserId = getSavedInfo()?.userId ?: ""
         getDataStore().userInfo(info)
-        if (info.userId != old.userId && this is AccountSettingsProvider) getSettings().resetRelatedItems()
+        if (info.userId != oldUserId && this is AccountSettingsProvider) getSettings().resetRelatedItems()
     }
 
     @Composable
