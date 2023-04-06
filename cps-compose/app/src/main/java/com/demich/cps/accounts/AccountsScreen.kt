@@ -88,8 +88,7 @@ fun AccountsScreen(
 private fun rememberRecordedAccounts() = with(context) {
     rememberCollect {
         combine(
-            flows = allAccountManagers
-                .map { it.flowOfInfoWithManager() }
+            flows = allAccountManagers.map { it.flowOfInfoWithManager() }
         ) { it }.combine(settingsUI.flowOfAccountsOrder()) { accountsArray, order ->
             order.mapNotNull { type ->
                 accountsArray.find { it.type == type }?.takeIf { !it.userInfo.isEmpty() }
@@ -226,7 +225,7 @@ private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
 
     val anyRecordedAccount by rememberCollect {
         combine(flows = context.allAccountManagers.map { it.flowOfInfo() }) {
-            it.any { manager -> !manager.isEmpty() }
+            it.any { userInfo -> !userInfo.isEmpty() }
         }
     }
 
