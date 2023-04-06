@@ -55,7 +55,7 @@ class AccountsWorker(
     }
 
     private suspend fun codeforcesRating() {
-        val userInfo = codeforcesAccountManager.getSavedInfo()
+        val userInfo = codeforcesAccountManager.getSavedInfoOrNull() ?: return
         if (userInfo.status != STATUS.OK) return
 
         val lastRatingChange = CodeforcesApi.runCatching {
@@ -66,7 +66,7 @@ class AccountsWorker(
     }
 
     private suspend fun codeforcesContribution() {
-        val userInfo = codeforcesAccountManager.getSavedInfo()
+        val userInfo = codeforcesAccountManager.getSavedInfoOrNull() ?: return
         if (userInfo.status != STATUS.OK) return
 
         val handle = userInfo.handle
@@ -93,7 +93,7 @@ class AccountsWorker(
     }
 
     private suspend fun atcoderRating() {
-        val userInfo = atcoderAccountManager.getSavedInfo()
+        val userInfo = atcoderAccountManager.getSavedInfoOrNull() ?: return
         if (userInfo.status != STATUS.OK) return
 
         val lastRatingChange = AtCoderApi.runCatching {

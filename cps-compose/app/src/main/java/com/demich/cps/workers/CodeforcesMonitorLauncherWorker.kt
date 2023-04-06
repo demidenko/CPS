@@ -48,7 +48,7 @@ class CodeforcesMonitorLauncherWorker(
     override suspend fun runWork(): Result {
         val manager = CodeforcesAccountManager(context)
 
-        val info = manager.getSavedInfo()
+        val info = manager.getSavedInfoOrNull() ?: return Result.success()
         if (info.status != STATUS.OK) return Result.success()
 
         val lastSubmissionId = manager.getSettings().monitorLastSubmissionId()

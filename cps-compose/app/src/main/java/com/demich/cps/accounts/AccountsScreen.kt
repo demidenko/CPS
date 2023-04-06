@@ -261,17 +261,17 @@ private fun AddAccountButton(cpsViewModels: CPSViewModels) {
             onDismissRequest = { showMenu = false },
             modifier = Modifier.background(cpsColors.backgroundAdditional)
         ) {
-            context.allAccountManagers
-                .filter { runBlocking { it.getSavedInfo() }.isEmpty() }
-                .forEach { manager ->
-                    DropdownMenuItem(
-                        onClick = {
-                            showMenu = false
-                            chosenManager = manager.type
-                        },
-                        content = { MonospacedText(text = manager.type.name) }
-                    )
-                }
+            runBlocking {
+                context.allAccountManagers.filter { it.getSavedInfoOrNull() == null }
+            }.forEach { manager ->
+                DropdownMenuItem(
+                    onClick = {
+                        showMenu = false
+                        chosenManager = manager.type
+                    },
+                    content = { MonospacedText(text = manager.type.name) }
+                )
+            }
             DropdownMenuItem(
                 onClick = {
                     showMenu = false

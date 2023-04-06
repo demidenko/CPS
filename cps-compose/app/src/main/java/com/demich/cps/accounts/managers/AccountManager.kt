@@ -10,6 +10,7 @@ import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -60,6 +61,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     open fun isValidForUserId(char: Char): Boolean = true
 
     suspend fun getSavedInfo(): U = getDataStore().userInfo()
+    suspend fun getSavedInfoOrNull(): U? = flowOfInfo().first()
 
     suspend fun setSavedInfo(info: U) {
         val old = getSavedInfo()

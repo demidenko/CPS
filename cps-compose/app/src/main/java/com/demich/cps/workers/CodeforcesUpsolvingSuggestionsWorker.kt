@@ -41,8 +41,8 @@ class CodeforcesUpsolvingSuggestionsWorker(
         val deadLine = currentTime - 90.days
         suggestedItem.edit { filter { it.second > deadLine } }
 
-        val handle = codeforcesAccountManager.getSavedInfo()
-            .takeIf { it.hasRating() }
+        val handle = codeforcesAccountManager.getSavedInfoOrNull()
+            ?.takeIf { it.hasRating() }
             ?.handle
             ?: return Result.success()
 
