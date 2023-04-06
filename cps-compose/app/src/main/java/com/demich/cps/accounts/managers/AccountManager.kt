@@ -41,9 +41,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     abstract val urlHomePage: String
 
     protected abstract fun getDataStore(): AccountDataStore<U>
-    fun flowOfInfo(): Flow<U?> = getDataStore().userInfo.flow.map { info ->
-        info.takeIf { !it.isEmpty() }
-    }
+    fun flowOfInfo() = getDataStore().userInfo.flow
     fun flowOfInfoWithManager(): Flow<UserInfoWithManager<U>?> = flowOfInfo().map { info ->
         if (info != null) UserInfoWithManager(info, this) else null
     }
@@ -69,7 +67,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     }
 
     suspend fun deleteUserInfo() {
-        getDataStore().userInfo(emptyInfo())
+        getDataStore().userInfo(null)
     }
 
     @Composable
@@ -92,10 +90,6 @@ data class UserInfoWithManager<U: UserInfo>(
     val userInfo: U,
     val manager: AccountManager<U>
 ) {
-    init {
-        require(!userInfo.isEmpty())
-    }
-
     val type: AccountManagers get() = manager.type
 }
 
