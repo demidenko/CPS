@@ -89,9 +89,11 @@ private fun rememberRecordedAccounts() = with(context) {
     rememberCollect {
         combine(
             flows = allAccountManagers.map { it.flowOfInfoWithManager() }
-        ) { it }.combine(settingsUI.flowOfAccountsOrder()) { accountsArray, order ->
+        ) {
+            it.filterNotNull()
+        }.combine(settingsUI.flowOfAccountsOrder()) { accounts, order ->
             order.mapNotNull { type ->
-                accountsArray.find { it.type == type }?.takeIf { !it.userInfo.isEmpty() }
+                accounts.find { it.type == type }
             }
         }
     }

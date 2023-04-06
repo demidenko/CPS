@@ -9,6 +9,7 @@ import com.demich.cps.*
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -40,7 +41,10 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
 
     protected abstract fun getDataStore(): AccountDataStore<U>
     fun flowOfInfo() = getDataStore().userInfo.flow
-    fun flowOfInfoWithManager() = getDataStore().userInfo.flow.map { info -> UserInfoWithManager(info, this) }
+    fun flowOfInfoWithManager(): Flow<UserInfoWithManager<U>?> = flowOfInfo().map { info ->
+        if (info.isEmpty()) null
+        else UserInfoWithManager(info, this)
+    }
 
     abstract fun emptyInfo(): U
 
@@ -82,6 +86,10 @@ data class UserInfoWithManager<U: UserInfo>(
     val userInfo: U,
     val manager: AccountManager<U>
 ) {
+    init {
+        require(!userInfo.isEmpty())
+    }
+
     val type: AccountManagers get() = manager.type
 }
 

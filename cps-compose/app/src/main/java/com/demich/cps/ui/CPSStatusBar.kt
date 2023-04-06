@@ -161,7 +161,7 @@ fun StatusBarButtonsForUIPanel() {
             .filterIsInstance<RatedAccountManager<*>>()
             .map { it.flowOfInfoWithManager() }
         ) { array ->
-            array.filterNot { it.userInfo.isEmpty() }.map { it.manager }
+            array.mapNotNull { it?.manager }
         }.combine(settingsUI.flowOfAccountsOrder()) { managers, order ->
             managers.sortedBy { order.indexOf(it.type) }
         }
