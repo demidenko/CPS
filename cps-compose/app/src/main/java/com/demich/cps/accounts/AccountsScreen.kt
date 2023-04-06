@@ -129,13 +129,15 @@ private fun<U: UserInfo> AccountExpandedContent(
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
     val userInfo by rememberCollect { manager.flowOfInfo() }
-    manager.ExpandedContent(
-        userInfo = userInfo,
-        setBottomBarContent = setBottomBarContent,
-        modifier = Modifier
-            .padding(all = 10.dp)
-            .fillMaxSize()
-    )
+    userInfo?.let {
+        manager.ExpandedContent(
+            userInfo = it,
+            setBottomBarContent = setBottomBarContent,
+            modifier = Modifier
+                .padding(all = 10.dp)
+                .fillMaxSize()
+        )
+    }
 }
 
 @Composable
@@ -161,7 +163,7 @@ fun AccountSettingsScreen(
                     fontSize = 18.sp
                 )
                 Text(
-                    text = userInfo.userId,
+                    text = userInfo?.userId ?: "", //TODO show nothing if null
                     fontSize = 26.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -227,7 +229,7 @@ private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
 
     val anyRecordedAccount by rememberCollect {
         combine(flows = context.allAccountManagers.map { it.flowOfInfo() }) {
-            it.any { userInfo -> !userInfo.isEmpty() }
+            it.any { userInfo -> userInfo != null }
         }
     }
 

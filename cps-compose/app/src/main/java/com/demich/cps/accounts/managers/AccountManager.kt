@@ -40,10 +40,11 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     abstract val urlHomePage: String
 
     protected abstract fun getDataStore(): AccountDataStore<U>
-    fun flowOfInfo() = getDataStore().userInfo.flow
+    fun flowOfInfo(): Flow<U?> = getDataStore().userInfo.flow.map { info ->
+        info.takeIf { !it.isEmpty() }
+    }
     fun flowOfInfoWithManager(): Flow<UserInfoWithManager<U>?> = flowOfInfo().map { info ->
-        if (info.isEmpty()) null
-        else UserInfoWithManager(info, this)
+        if (info != null) UserInfoWithManager(info, this) else null
     }
 
     abstract fun emptyInfo(): U

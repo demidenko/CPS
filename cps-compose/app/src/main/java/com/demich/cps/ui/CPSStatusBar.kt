@@ -68,8 +68,8 @@ private data class RatedRank(
     val manager: RatedAccountManager<out RatedUserInfo>
 )
 
-private fun<U: RatedUserInfo> RatedAccountManager<U>.getRank(userInfo: U): RatedRank? {
-    val rating = userInfo.rating ?: return null
+private fun<U: RatedUserInfo> RatedAccountManager<U>.getRank(userInfo: U?): RatedRank? {
+    val rating = userInfo?.rating ?: return null
     val handleColor = getHandleColor(rating)
     if(handleColor == HandleColor.RED) return RatedRank(rank = 1e9, handleColor = handleColor, manager = this)
     val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
