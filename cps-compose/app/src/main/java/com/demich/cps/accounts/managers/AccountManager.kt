@@ -46,8 +46,6 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
         if (info != null) UserInfoWithManager(info, this) else null
     }
 
-    abstract fun emptyInfo(): U
-
     protected abstract suspend fun downloadInfo(data: String): U
     suspend fun loadInfo(data: String): U {
         require(data.isNotBlank())

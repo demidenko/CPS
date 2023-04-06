@@ -55,8 +55,6 @@ class CodeChefAccountManager(context: Context):
         else -> false
     }
 
-    override fun emptyInfo(): CodeChefUserInfo = CodeChefUserInfo(STATUS.NOT_FOUND, "")
-
     override suspend fun downloadInfo(data: String): CodeChefUserInfo =
         CodeChefUtils.runCatching {
             extractUserInfo(

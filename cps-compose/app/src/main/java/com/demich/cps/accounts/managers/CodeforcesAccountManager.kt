@@ -61,8 +61,6 @@ class CodeforcesAccountManager(context: Context):
     }
 
 
-    override fun emptyInfo() = CodeforcesUserInfo(STATUS.NOT_FOUND, "")
-
     override suspend fun downloadInfo(data: String): CodeforcesUserInfo =
         CodeforcesUtils.getUserInfo(handle = data, doRedirect = true)
 
