@@ -90,13 +90,11 @@ fun<U: UserInfo> DialogAccountChooser(
             inputTextSize = 18.sp,
             resultTextSize = 14.sp
         ) {
-            if (userInfo.status != STATUS.NOT_FOUND && !loadingInProgress) {
-                if (userId.all(manager::isValidForUserId)) {
-                    onResult(userInfo)
-                    onDismissRequest()
-                } else {
-                    context.showToast("${manager.userIdTitle} contains unacceptable symbols")
-                }
+            if (userId.all(manager::isValidForUserId)) {
+                onResult(it)
+                onDismissRequest()
+            } else {
+                context.showToast("${manager.userIdTitle} contains unacceptable symbols")
             }
         }
 
@@ -166,8 +164,13 @@ private fun<U: UserInfo> UserIdTextField(
     modifier: Modifier,
     inputTextSize: TextUnit,
     resultTextSize: TextUnit,
-    onDoneRequest: () -> Unit
+    onDoneRequest: (U) -> Unit
 ) {
+    val onDoneRequestWithCheck = {
+        if (userInfo.status != STATUS.NOT_FOUND && !loadingInProgress) {
+            onDoneRequest(userInfo)
+        }
+    }
     TextField(
         value = textFieldValue,
         modifier = modifier,
@@ -199,11 +202,11 @@ private fun<U: UserInfo> UserIdTextField(
                 loadingInProgress = loadingInProgress,
                 userInfoStatus = userInfo.status,
                 iconSize = 32.dp,
-                onDoneClick = onDoneRequest
+                onDoneClick = onDoneRequestWithCheck
             )
         },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { onDoneRequest() }),
+        keyboardActions = KeyboardActions(onDone = { onDoneRequestWithCheck() }),
     )
 }
 
@@ -338,7 +341,7 @@ private fun AccountChooserHeader(
 private fun String.toTextFieldValue() = TextFieldValue(text = this, selection = TextRange(length))
 
 @Composable
-fun<U: UserInfo> makeUserInfoSpan(userInfo: U, manager: AccountManager<U>): AnnotatedString {
+private fun<U: UserInfo> makeUserInfoSpan(userInfo: U, manager: AccountManager<U>): AnnotatedString {
     if (userInfo.isEmpty()) return AnnotatedString("")
     return buildAnnotatedString {
         withStyle(SpanStyle(color = cpsColors.content)) {
