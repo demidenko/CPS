@@ -52,7 +52,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
 
     protected abstract suspend fun downloadInfo(data: String): U
     suspend fun loadInfo(data: String): U {
-        if (data.isBlank()) return emptyInfo()
+        require(data.isNotBlank())
         return withContext(Dispatchers.IO) {
             downloadInfo(data)
         }
