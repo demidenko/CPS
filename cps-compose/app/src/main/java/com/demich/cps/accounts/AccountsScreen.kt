@@ -189,15 +189,19 @@ fun accountExpandedMenuBuilder(
     onShowDeleteDialog: () -> Unit
 ): CPSMenuBuilder = {
     val context = context
+    val scope = rememberCoroutineScope()
+
     CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete, onClick = onShowDeleteDialog)
     CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings) {
         navigator.navigateTo(Screen.AccountSettings(type))
     }
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
-        val url = context.allAccountManagers.first { it.type == type }.run {
-            runBlocking { getSavedInfo().userPageUrl }
+        scope.launch {
+            context.allAccountManagers.first { it.type == type }
+                .getSavedInfoOrNull()
+                ?.userPageUrl
+                ?.let { url -> context.openUrlInBrowser(url) }
         }
-        context.openUrlInBrowser(url)
     }
 }
 
