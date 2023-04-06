@@ -307,7 +307,7 @@ private fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
 ) {
     DialogAccountChooser(
         manager = this,
-        initialUserInfo = runBlocking { getSavedInfo() },
+        initialUserInfo = runBlocking { getSavedInfoOrNull() },
         onDismissRequest = onDismissRequest,
         onResult = { userInfo -> scope.launch { setSavedInfo(userInfo) } }
     )
@@ -322,7 +322,7 @@ private fun CListImportDialog(
     val cListAccountManager = remember { CListAccountManager(context) }
     DialogAccountChooser(
         manager = cListAccountManager,
-        initialUserInfo = cListAccountManager.emptyInfo(),
+        initialUserInfo = null,
         onDismissRequest = onDismissRequest,
         onResult = { userInfo ->
             cpsViewModels.accountsViewModel.runClistImport(

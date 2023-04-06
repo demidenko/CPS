@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun<U: UserInfo> DialogAccountChooser(
     manager: AccountManager<U>,
-    initialUserInfo: U = manager.emptyInfo(),
+    initialUserInfo: U? = null,
     onDismissRequest: () -> Unit,
     onResult: (U) -> Unit
 ) {
@@ -55,7 +55,9 @@ fun<U: UserInfo> DialogAccountChooser(
     CPSDialog(onDismissRequest = onDismissRequest) {
         val context = context
 
-        var textFieldValue by remember { mutableStateOf(initialUserInfo.userId.toTextFieldValue()) }
+        var textFieldValue by remember {
+            mutableStateOf((initialUserInfo?.userId ?: "").toTextFieldValue())
+        }
         val userId by remember { derivedStateOf { textFieldValue.text } }
 
         var userInfo by remember { mutableStateOf(initialUserInfo) }
@@ -117,7 +119,7 @@ fun<U: UserInfo> DialogAccountChooser(
                 return@LaunchedEffect
             }
             val suggestionTextLimit = 3
-            userInfo = manager.emptyInfo()
+            userInfo = null
             if (userId.length < suggestionTextLimit) {
                 suggestionsListState.value = emptyList()
                 loadingSuggestionsInProgress = false
@@ -157,7 +159,7 @@ fun<U: UserInfo> DialogAccountChooser(
 @Composable
 private fun<U: UserInfo> UserIdTextField(
     manager: AccountManager<U>,
-    userInfo: U,
+    userInfo: U?,
     textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     loadingInProgress: Boolean,
@@ -167,7 +169,7 @@ private fun<U: UserInfo> UserIdTextField(
     onDoneRequest: (U) -> Unit
 ) {
     val onDoneRequestWithCheck = {
-        if (userInfo.status != STATUS.NOT_FOUND && !loadingInProgress) {
+        if (userInfo != null && userInfo.status != STATUS.NOT_FOUND && !loadingInProgress) {
             onDoneRequest(userInfo)
         }
     }
@@ -200,7 +202,7 @@ private fun<U: UserInfo> UserIdTextField(
         trailingIcon = {
             TextFieldMainIcon(
                 loadingInProgress = loadingInProgress,
-                userInfoStatus = userInfo.status,
+                userInfoStatus = userInfo?.status ?: STATUS.NOT_FOUND,
                 iconSize = 32.dp,
                 onDoneClick = onDoneRequestWithCheck
             )
@@ -341,8 +343,8 @@ private fun AccountChooserHeader(
 private fun String.toTextFieldValue() = TextFieldValue(text = this, selection = TextRange(length))
 
 @Composable
-private fun<U: UserInfo> makeUserInfoSpan(userInfo: U, manager: AccountManager<U>): AnnotatedString {
-    if (userInfo.isEmpty()) return AnnotatedString("")
+private fun<U: UserInfo> makeUserInfoSpan(userInfo: U?, manager: AccountManager<U>): AnnotatedString {
+    if (userInfo == null) return AnnotatedString("")
     return buildAnnotatedString {
         withStyle(SpanStyle(color = cpsColors.content)) {
             when (userInfo.status) {
