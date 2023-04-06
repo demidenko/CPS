@@ -82,7 +82,7 @@ fun developAdditionalBottomBarBuilder(
             cpsViewModels.contestsViewModel.viewModelScope.launch {
                 CodeforcesMonitorLauncherWorker.startMonitor(
                     contestId = it,
-                    handle = CodeforcesAccountManager(context).getSavedInfo().handle,
+                    handle = CodeforcesAccountManager(context).getSavedInfoOrNull()?.handle ?: return@launch,
                     context = context
                 )
             }

@@ -224,7 +224,7 @@ class CodeforcesAccountManager(context: Context):
         )
 
     suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange) {
-        val info = getSavedInfo()
+        val info = getSavedInfoOrNull() ?: return
 
         val settings = getSettings()
         val prevRatingChangeContestId = settings.lastRatedContestId()
