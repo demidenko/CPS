@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun<U: UserInfo> DialogAccountChooser(
     manager: AccountManager<U>,
-    initialUserInfo: U? = null,
+    initialUserInfo: U?,
     onDismissRequest: () -> Unit,
     onResult: (U) -> Unit
 ) {

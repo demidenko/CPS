@@ -145,6 +145,7 @@ fun newsFollowListBottomBarBuilder(
     if (showChooseDialog) {
         DialogAccountChooser(
             manager = LocalCodeforcesAccountManager.current,
+            initialUserInfo = null,
             onDismissRequest = { showChooseDialog = false },
             onResult = { newsViewModel.addToFollowList(userInfo = it, context = context) }
         )
