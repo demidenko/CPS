@@ -68,6 +68,10 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
         if (info.userId != oldUserId && this is AccountSettingsProvider) getSettings().resetRelatedItems()
     }
 
+    suspend fun deleteUserInfo() {
+        getDataStore().userInfo(emptyInfo())
+    }
+
     @Composable
     abstract fun makeOKInfoSpan(userInfo: U): AnnotatedString
 
