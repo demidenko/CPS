@@ -42,6 +42,7 @@ import kotlin.time.Duration.Companion.days
 
 @Composable
 fun<U: RatedUserInfo> RatedAccountManager<U>.RatingLoadButton(
+    userInfo: U,
     ratingGraphUIStates: RatingGraphUIStates
 ) {
     val scope = rememberCoroutineScope()
@@ -53,7 +54,7 @@ fun<U: RatedUserInfo> RatedAccountManager<U>.RatingLoadButton(
         ratingGraphUIStates.showRatingGraph = true
         scope.launch {
             this@RatingLoadButton.runCatching {
-                getRatingHistory(getSavedInfo())
+                getRatingHistory(userInfo)
             }.onFailure {
                 ratingGraphUIStates.loadingStatus = LoadingStatus.FAILED
             }.onSuccess {

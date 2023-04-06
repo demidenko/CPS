@@ -116,7 +116,7 @@ class DmojAccountManager(context: Context):
         }
         setBottomBarContent {
             if (userInfo.hasRating()) {
-                RatingLoadButton(ratingGraphUIStates)
+                RatingLoadButton(userInfo, ratingGraphUIStates)
             }
         }
     }
