@@ -50,7 +50,7 @@ class AccountsViewModel: ViewModel() {
                 require(it != LoadingStatus.LOADING)
                 LoadingStatus.PENDING
             }
-            manager.deleteUserInfo()
+            manager.deleteSavedInfo()
         }
     }
 

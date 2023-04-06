@@ -64,7 +64,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
         if (info.userId != oldUserId && this is AccountSettingsProvider) getSettings().resetRelatedItems()
     }
 
-    suspend fun deleteUserInfo() {
+    suspend fun deleteSavedInfo() {
         getDataStore().userInfo(null)
     }
 
