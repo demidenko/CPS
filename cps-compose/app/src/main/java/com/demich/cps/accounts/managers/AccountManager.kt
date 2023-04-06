@@ -5,11 +5,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
-import com.demich.cps.*
+import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -42,9 +41,7 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
 
     protected abstract fun getDataStore(): AccountDataStore<U>
     fun flowOfInfo() = getDataStore().userInfo.flow
-    fun flowOfInfoWithManager(): Flow<UserInfoWithManager<U>?> = flowOfInfo().map { info ->
-        if (info != null) UserInfoWithManager(info, this) else null
-    }
+    fun flowOfInfoWithManager() = flowOfInfo().map { info -> info?.let { UserInfoWithManager(it, this) } }
 
     protected abstract suspend fun downloadInfo(data: String): U
     suspend fun loadInfo(data: String): U {
