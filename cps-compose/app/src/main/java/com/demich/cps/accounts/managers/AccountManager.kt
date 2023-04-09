@@ -43,16 +43,6 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     fun flowOfInfo() = getDataStore().userInfo.flow
     fun flowOfInfoWithManager() = flowOfInfo().map { info -> info?.let { UserInfoWithManager(it, this) } }
 
-    protected abstract suspend fun downloadInfo(data: String): U
-    suspend fun loadInfo(data: String): U {
-        require(data.isNotBlank())
-        return withContext(Dispatchers.IO) {
-            downloadInfo(data)
-        }
-    }
-
-    open fun isValidForUserId(char: Char): Boolean = true
-
     suspend fun getSavedInfo(): U? = flowOfInfo().first()
 
     suspend fun setSavedInfo(info: U) {
@@ -63,6 +53,16 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
 
     suspend fun deleteSavedInfo() {
         getDataStore().userInfo(null)
+    }
+
+    open fun isValidForUserId(char: Char): Boolean = true
+
+    protected abstract suspend fun downloadInfo(data: String): U
+    suspend fun loadInfo(data: String): U {
+        require(data.isNotBlank())
+        return withContext(Dispatchers.IO) {
+            downloadInfo(data)
+        }
     }
 
     @Composable
