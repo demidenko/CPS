@@ -2,7 +2,6 @@ package com.demich.cps.accounts
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.DropdownMenu
@@ -11,20 +10,15 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.CPSViewModels
-import com.demich.cps.navigation.Screen
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.*
-import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.context
-import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
@@ -95,112 +89,6 @@ private fun rememberRecordedAccounts() = with(context) {
             order.mapNotNull { type ->
                 accounts.find { it.type == type }
             }
-        }
-    }
-}
-
-@Composable
-fun AccountExpandedScreen(
-    type: AccountManagers,
-    showDeleteDialog: Boolean,
-    onDeleteRequest: (AccountManager<out UserInfo>) -> Unit,
-    onDismissDeleteDialog: () -> Unit,
-    setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
-) {
-    val context = context
-    val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
-    AccountExpandedContent(
-        manager = manager,
-        setBottomBarContent = setBottomBarContent
-    )
-
-    if (showDeleteDialog) {
-        CPSDeleteDialog(
-            title = "Delete $type account?",
-            onConfirmRequest = { onDeleteRequest(manager) },
-            onDismissRequest = onDismissDeleteDialog
-        )
-    }
-}
-
-@Composable
-private fun<U: UserInfo> AccountExpandedContent(
-    manager: AccountManager<U>,
-    setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
-) {
-    val userInfo by rememberCollect { manager.flowOfInfo() }
-    userInfo?.let {
-        manager.ExpandedContent(
-            userInfo = it,
-            setBottomBarContent = setBottomBarContent,
-            modifier = Modifier
-                .padding(all = 10.dp)
-                .fillMaxSize()
-        )
-    }
-}
-
-@Composable
-fun AccountSettingsScreen(
-    type: AccountManagers
-) {
-    val context = context
-    val scope = rememberCoroutineScope()
-
-    val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
-    val userInfo by rememberCollect { manager.flowOfInfo() }
-
-    var showChangeDialog by remember { mutableStateOf(false) }
-
-    SettingsColumn {
-        SettingsItem(
-            modifier = Modifier.clickable { showChangeDialog = true }
-        ) {
-            Column {
-                Text(
-                    text = manager.userIdTitle + ":",
-                    color = cpsColors.contentAdditional,
-                    fontSize = 18.sp
-                )
-                Text(
-                    text = userInfo?.userId ?: "", //TODO show nothing if null
-                    fontSize = 26.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
-        if (manager is AccountSettingsProvider) {
-            manager.SettingsItems()
-        }
-    }
-
-    if (showChangeDialog) {
-        manager.ChangeSavedInfoDialog(
-            scope = scope,
-            onDismissRequest = { showChangeDialog = false }
-        )
-    }
-}
-
-fun accountExpandedMenuBuilder(
-    type: AccountManagers,
-    navigator: CPSNavigator,
-    onShowDeleteDialog: () -> Unit
-): CPSMenuBuilder = {
-    val context = context
-    val scope = rememberCoroutineScope()
-
-    CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete, onClick = onShowDeleteDialog)
-    CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings) {
-        navigator.navigateTo(Screen.AccountSettings(type))
-    }
-    CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
-        scope.launch {
-            context.allAccountManagers.first { it.type == type }
-                .getSavedInfo()
-                ?.userPageUrl
-                ?.let { url -> context.openUrlInBrowser(url) }
         }
     }
 }
@@ -301,7 +189,7 @@ private fun AddAccountButton(cpsViewModels: CPSViewModels) {
 }
 
 @Composable
-private fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
+internal fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
     scope: CoroutineScope,
     onDismissRequest: () -> Unit
 ) {
