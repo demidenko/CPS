@@ -59,14 +59,11 @@ object AtCoderUtils {
 
     fun extractUserSuggestions(source: String): List<UserSuggestion> {
         val table = Jsoup.parse(source).expectFirst("table.table")
-        val thead = table.select("thead > tr > th")
-        val userIndex = thead.indexOfFirst { it.text() == "User" }
-        val ratingIndex = thead.indexOfFirst { it.text() == "Rating" }
+        val ratingIndex = table.select("thead > tr > th").indexOfFirst { it.text() == "Rating" }
         return table.select("tbody > tr").map { row ->
-            val tds = row.select("td")
             UserSuggestion(
-                userId = tds[userIndex].expectFirst("a.username").text(),
-                info = tds[ratingIndex].text()
+                userId = row.expectFirst("a.username").text(),
+                info = row.select("td")[ratingIndex].text()
             )
         }
     }
