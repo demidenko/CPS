@@ -17,6 +17,7 @@ import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.AtCoderRatingChange
 import com.demich.cps.platforms.api.isPageNotFound
@@ -28,7 +29,8 @@ import com.demich.datastore_itemized.dataStoreWrapper
 
 class AtCoderAccountManager(context: Context):
     RatedAccountManager<AtCoderUserInfo>(context, AccountManagers.atcoder),
-    AccountSettingsProvider
+    AccountSettingsProvider,
+    UserSuggestionsProvider
 {
     companion object {
         private val Context.account_atcoder_dataStore by dataStoreWrapper(AccountManagers.atcoder.name)
@@ -49,6 +51,9 @@ class AtCoderAccountManager(context: Context):
             else AtCoderUserInfo(status = STATUS.FAILED, handle = data)
         }
     }
+
+    override suspend fun loadSuggestions(str: String): List<UserSuggestion> =
+        AtCoderUtils.extractUserSuggestions(source = AtCoderApi.getSuggestionsPage(str))
 
     override suspend fun loadRatingHistory(info: AtCoderUserInfo): List<RatingChange> =
         AtCoderApi.getRatingChanges(handle = info.handle).map {

@@ -31,6 +31,15 @@ object AtCoderApi: PlatformApi {
         return json.decodeFromString(str)
     }
 
+    suspend fun getSuggestionsPage(str: String): String {
+        return client.getText(urlString = urls.main + "/ranking/all") {
+            parameter("f.UserScreenName", str)
+            parameter("contestType", "algo")
+            parameter("orderBy", "rating")
+            parameter("desc", true)
+        }
+    }
+
     object urls {
         const val main = "https://atcoder.jp"
         fun user(handle: String) = "$main/users/$handle"

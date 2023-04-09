@@ -2,6 +2,7 @@ package com.demich.cps.platforms.utils
 
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.AtCoderApi
 import kotlinx.datetime.Instant
@@ -55,6 +56,20 @@ object AtCoderUtils {
     fun extractContests(source: String): List<Contest> =
         Jsoup.parse(source).select("time.fixtime-full")
             .mapNotNull(::extractContestOrNull)
+
+    fun extractUserSuggestions(source: String): List<UserSuggestion> {
+        val table = Jsoup.parse(source).expectFirst("table.table")
+        val thead = table.select("thead > tr > th")
+        val userIndex = thead.indexOfFirst { it.text() == "User" }
+        val ratingIndex = thead.indexOfFirst { it.text() == "Rating" }
+        return table.select("tbody > tr").map { row ->
+            val tds = row.select("td")
+            UserSuggestion(
+                userId = tds[userIndex].expectFirst("a.username").text(),
+                info = tds[ratingIndex].text()
+            )
+        }
+    }
 
     class NewsPost(
         val title: String,
