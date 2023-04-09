@@ -18,6 +18,7 @@ object AtCoderUtils {
                 handle = expectFirst("a.username").text(),
                 rating = select("th.no-break").find { it.text() == "Rating" }
                     ?.nextElementSibling()
+                    ?.selectFirst("span")
                     ?.text()?.toInt()
             )
         }
