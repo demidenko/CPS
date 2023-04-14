@@ -40,15 +40,9 @@ val Context.settingsDev: SettingsDev
     get() = SettingsDev(this)
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DevelopScreen() {
-    val scope = rememberCoroutineScope()
-
-    val context = context
-
     //TestHandles(modifier = Modifier.fillMaxWidth())
-
     Column {
         WorkersList(modifier = Modifier.fillMaxWidth())
     }
@@ -110,15 +104,15 @@ private fun MonitorDialog(onDismissRequest: () -> Unit, onStart: (Int) -> Unit) 
 @Composable
 fun ContentLoadingButton(
     text: String,
-    coroutineScope: CoroutineScope,
     block: suspend () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     var enabled by rememberSaveable { mutableStateOf(true) }
     Button(
         enabled = enabled,
         onClick = {
             enabled = false
-            coroutineScope.launch {
+            scope.launch {
                 block()
                 enabled = true
             }

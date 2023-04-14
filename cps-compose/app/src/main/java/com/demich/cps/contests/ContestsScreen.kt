@@ -66,7 +66,7 @@ fun ContestsScreen(
     if (isAnyPlatformEnabled) {
         Column(
             modifier = Modifier
-                .consumedWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
+                .consumeWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
                 .imePadding()
         ) {
             CodeforcesMonitor(
