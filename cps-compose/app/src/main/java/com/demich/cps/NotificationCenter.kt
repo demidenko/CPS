@@ -59,22 +59,22 @@ fun NotificationCompat.Builder.attachUrl(url: String, context: Context) {
 object NotificationChannels {
 
     object codeforces: NotificationChannelGroupLazy("codeforces", "CodeForces") {
-        val rating_changes = channel("cf_rating_changes", "Rating changes", Importance.HIGH)
-        val contribution_changes = channel("cf_contribution_changes", "Contribution changes", Importance.MIN)
-        val contest_monitor = channel("cf_contest_monitor", "Contest monitor")
-        val follow_new_blog = channel("cf_follow_new_blog", "Follow: new blog entries")
-        val follow_progress = channel("cf_follow_progress", "Follow: update progress", Importance.MIN)
-        val upsolving_suggestion = channel("cf_upsolving_suggestion", "Upsolving suggestions")
+        val rating_changes get() = channel("cf_rating_changes", "Rating changes", Importance.HIGH)
+        val contribution_changes get() = channel("cf_contribution_changes", "Contribution changes", Importance.MIN)
+        val contest_monitor get() = channel("cf_contest_monitor", "Contest monitor")
+        val follow_new_blog get() = channel("cf_follow_new_blog", "Follow: new blog entries")
+        val follow_progress get() = channel("cf_follow_progress", "Follow: update progress", Importance.MIN)
+        val upsolving_suggestion get() = channel("cf_upsolving_suggestion", "Upsolving suggestions")
     }
 
     object atcoder: NotificationChannelGroupLazy("atcoder", "AtCoder") {
-        val rating_changes = channel("atcoder_rating_changes", "Rating changes", Importance.HIGH)
-        val news = channel("atcoder_news", "News")
+        val rating_changes get() = channel("atcoder_rating_changes", "Rating changes", Importance.HIGH)
+        val news get() = channel("atcoder_news", "News")
     }
 
     object project_euler: NotificationChannelGroupLazy("project_euler", "Project Euler") {
-        val news = channel("pe_news", "News")
-        val problems = channel("pe_problems", "Recent Problems")
+        val news get() = channel("pe_news", "News")
+        val problems get() = channel("pe_problems", "Recent Problems")
     }
 
 
@@ -83,8 +83,8 @@ object NotificationChannels {
         DEFAULT,
         HIGH;
 
-        fun convert(): Int =
-            when(this) {
+        fun toAndroidImportance(): Int =
+            when (this) {
                 DEFAULT -> NotificationManager.IMPORTANCE_DEFAULT
                 MIN -> NotificationManager.IMPORTANCE_MIN
                 HIGH -> NotificationManager.IMPORTANCE_HIGH
@@ -99,12 +99,8 @@ object NotificationChannels {
 }
 
 abstract class NotificationChannelGroupLazy(private val id: String, val name: String) {
-    private var created = false
     fun getId(m: NotificationManagerCompat): String {
-        if (!created) {
-            m.createNotificationChannelGroup(NotificationChannelGroup(id, name))
-            created = true
-        }
+        m.createNotificationChannelGroup(NotificationChannelGroup(id, name))
         return id
     }
 }
@@ -115,16 +111,12 @@ class NotificationChannelLazy(
     private val importance: NotificationChannels.Importance,
     private val groupLazy: NotificationChannelGroupLazy
 ) {
-    private var created = false
     fun getId(context: Context): String {
-        if (!created) {
-            val m = NotificationManagerCompat.from(context)
-            val channel = NotificationChannel(id, name, importance.convert()).apply {
-                group = groupLazy.getId(m)
-            }
-            m.createNotificationChannel(channel)
-            created = true
+        val m = NotificationManagerCompat.from(context)
+        val channel = NotificationChannel(id, name, importance.toAndroidImportance()).apply {
+            group = groupLazy.getId(m)
         }
+        m.createNotificationChannel(channel)
         return id
     }
 }
