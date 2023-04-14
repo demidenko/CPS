@@ -6,10 +6,14 @@ import android.content.Context.NOTIFICATION_SERVICE
 import androidx.core.os.bundleOf
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
-import com.demich.cps.*
+import com.demich.cps.NotificationChannels
+import com.demich.cps.NotificationIds
+import com.demich.cps.R
 import com.demich.cps.accounts.managers.AtCoderAccountManager
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.attachUrl
+import com.demich.cps.notificationBuildAndNotify
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.utils.CodeforcesUtils
@@ -33,8 +37,6 @@ class AccountsWorker(
         }
     }
 
-
-    private val notificationManager by lazy { context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
     private val codeforcesAccountManager by lazy { CodeforcesAccountManager(context) }
     private val atcoderAccountManager by lazy { AtCoderAccountManager(context) }
 
@@ -80,7 +82,7 @@ class AccountsWorker(
 
         val oldContribution = getNotifiedCodeforcesContribution() ?: userInfo.contribution
 
-        notificationBuilder(context, NotificationChannels.codeforces.contribution_changes) {
+        notificationBuildAndNotify(context, NotificationChannels.codeforces.contribution_changes, NotificationIds.codeforces_contribution_changes) {
             setSubText(handle)
             setContentTitle("Contribution change: ${oldContribution.toSignedString()} → ${newContribution.toSignedString()}")
             setSmallIcon(R.drawable.ic_person)
@@ -89,7 +91,7 @@ class AccountsWorker(
             setShowWhen(false)
             attachUrl(url = userInfo.userPageUrl, context = context)
             addExtras(bundleOf(KEY_CF_CONTRIBUTION to oldContribution))
-        }.notifyBy(notificationManager, NotificationIds.codeforces_contribution_changes)
+        }
     }
 
     private suspend fun atcoderRating() {
@@ -120,8 +122,9 @@ class AccountsWorker(
         }
     }
 
-    private val KEY_CF_CONTRIBUTION = "cf_contribution"
+    private val KEY_CF_CONTRIBUTION get() = "cf_contribution"
     private fun getNotifiedCodeforcesContribution(): Int? {
+        val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         return notificationManager.activeNotifications.find {
             it.id == NotificationIds.codeforces_contribution_changes
         }?.notification?.extras?.getInt(KEY_CF_CONTRIBUTION)

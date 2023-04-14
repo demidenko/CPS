@@ -25,11 +25,6 @@ fun NotificationCompat.Builder.notifyBy(
     notificationId: Int,
 ) = notificationManager.notify(notificationId, build())
 
-fun NotificationCompat.Builder.notifyBy(
-    notificationManager: NotificationManager,
-    notificationId: Int,
-) = notificationManager.notify(notificationId, build())
-
 fun notificationBuildAndNotify(
     context: Context,
     channel: NotificationChannelLazy,
@@ -80,18 +75,6 @@ object NotificationChannels {
     object project_euler: NotificationChannelGroupLazy("project_euler", "Project Euler") {
         val news = channel("pe_news", "News")
         val problems = channel("pe_problems", "Recent Problems")
-    }
-
-    object acmp: NotificationChannelGroupLazy("acmp", "ACMP") {
-        val news = channel("acmp_news", "News")
-    }
-
-    object olympiads_zaoch: NotificationChannelGroupLazy("olympiads_zaoch", "olympiads.ru/zaoch") {
-        val news = channel("olympiads_zaoch_news", "News")
-    }
-
-    object test: NotificationChannelGroupLazy("test", "Test group") {
-        val test = channel("test", "test channel")
     }
 
 
@@ -184,12 +167,4 @@ object NotificationIds {
     val makeProjectEulerRecentProblemId = nextIdInterval()
     val makeProjectEulerNewsId = nextIdInterval()
 
-    //acmp
-    val makeACMPNewsNotificationId = nextIdInterval()
-
-    //zaoch
-    val makeZaochNewsNotificationId = nextIdInterval()
-
-    //test
-    val testId = nextId()
 }
