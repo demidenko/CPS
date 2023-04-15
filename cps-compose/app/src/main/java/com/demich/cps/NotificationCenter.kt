@@ -62,7 +62,8 @@ object NotificationChannels {
         val rating_changes get() = channel("cf_rating_changes", "Rating changes", Importance.HIGH)
         val contribution_changes get() = channel("cf_contribution_changes", "Contribution changes", Importance.MIN)
         val contest_monitor get() = channel("cf_contest_monitor", "Contest monitor")
-        val follow_new_blog get() = channel("cf_follow_new_blog", "Follow: new blog entries")
+        val submission_result get() = channel("cf_submission_result", "Submissions results")
+        val new_blog_entry get() = channel("cf_new_blog_entry", "New blog entries")
         val follow_progress get() = channel("cf_follow_progress", "Follow: update progress", Importance.MIN)
         val upsolving_suggestion get() = channel("cf_upsolving_suggestion", "Upsolving suggestions")
     }
@@ -74,7 +75,7 @@ object NotificationChannels {
 
     object project_euler: NotificationChannelGroupLazy("project_euler", "Project Euler") {
         val news get() = channel("pe_news", "News")
-        val problems get() = channel("pe_problems", "Recent Problems")
+        val problems get() = channel("pe_problems", "Recent problems")
     }
 
 

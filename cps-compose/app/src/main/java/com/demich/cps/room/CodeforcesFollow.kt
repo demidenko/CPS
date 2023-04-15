@@ -71,7 +71,7 @@ class FollowListDao internal constructor(
     private fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry) =
         notificationBuildAndNotify(
             context = context,
-            channel = NotificationChannels.codeforces.follow_new_blog,
+            channel = NotificationChannels.codeforces.new_blog_entry,
             notificationId = NotificationIds.makeCodeforcesFollowBlogId(blogEntry.id)
         ) {
             setSubText("New codeforces blog entry")

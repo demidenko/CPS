@@ -75,7 +75,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
     private fun notify(submission: CodeforcesSubmission) =
         notificationBuildAndNotify(
             context = context,
-            channel = NotificationChannels.codeforces.contest_monitor,
+            channel = NotificationChannels.codeforces.submission_result,
             notificationId = NotificationIds.makeCodeforcesSystestSubmissionId(submission.id)
         ) {
             if (submission.verdict == CodeforcesProblemVerdict.OK) {
