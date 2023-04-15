@@ -123,23 +123,16 @@ class NotificationChannelLazy(
 }
 
 object NotificationIds {
-    private object nextId {
-        private var id = 0
-        operator fun invoke() = ++id
-    }
+    private var firstUnused = 0
+    private const val intervalLength = 1 shl 20
 
-    private object nextIdInterval {
-        private var start = 1_000_000
-        private val step = 1_000_000
-        operator fun invoke() = IntervalId(start, step).also { start += step }
-    }
+    private fun nextId() = ++firstUnused
+    private fun nextIdInterval() = IntervalId(firstUnused).also { firstUnused += intervalLength }
 
-    data class IntervalId(val from: Int, val length: Int) {
-        init {
-            require(length > 0) { "illegal interval length: $length" }
-        }
-        operator fun invoke(int: Int) = from + int.mod(length)
-        operator fun invoke(long: Long) = from + long.mod(length)
+    @JvmInline
+    value class IntervalId(private val start: Int) {
+        operator fun invoke(int: Int) = start + int.mod(intervalLength)
+        operator fun invoke(long: Long) = start + long.mod(intervalLength)
         operator fun invoke(str: String) = invoke(str.hashCode())
     }
 
