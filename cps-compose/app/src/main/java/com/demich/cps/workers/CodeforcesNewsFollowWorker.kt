@@ -6,6 +6,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.demich.cps.*
 import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.notifications.notifyBy
 import com.demich.cps.notifications.setProgress
 import com.demich.cps.room.followListDao
 import kotlin.time.Duration.Companion.hours

@@ -7,6 +7,7 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.demich.cps.notifications.NotificationIdProvider
+import com.demich.cps.notifications.notifyBy
 
 
 fun notificationBuilder(
@@ -16,11 +17,6 @@ fun notificationBuilder(
 ): NotificationCompat.Builder {
     return NotificationCompat.Builder(context, channel.getId(context)).apply(buildBody)
 }
-
-fun NotificationCompat.Builder.notifyBy(
-    notificationManager: NotificationManagerCompat,
-    notificationId: Int,
-) = notificationManager.notify(notificationId, build())
 
 fun notificationBuildAndNotify(
     context: Context,

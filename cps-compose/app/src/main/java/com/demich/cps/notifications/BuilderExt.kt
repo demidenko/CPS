@@ -2,6 +2,7 @@ package com.demich.cps.notifications
 
 import android.content.Context
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.demich.cps.utils.makePendingIntentOpenUrl
 import kotlinx.datetime.Instant
 
@@ -21,3 +22,8 @@ fun NotificationCompat.Builder.setProgress(total: Int, current: Int) =
 fun NotificationCompat.Builder.attachUrl(url: String, context: Context) {
     setContentIntent(makePendingIntentOpenUrl(url, context))
 }
+
+fun NotificationCompat.Builder.notifyBy(
+    notificationManager: NotificationManagerCompat,
+    notificationId: Int,
+) = notificationManager.notify(notificationId, build())
