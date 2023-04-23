@@ -6,6 +6,8 @@ import androidx.work.WorkerParameters
 import com.demich.cps.*
 import com.demich.cps.news.settings.NewsSettingsDataStore
 import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.notifications.attachUrl
+import com.demich.cps.notifications.setBigContent
 import com.demich.cps.platforms.api.ProjectEulerApi
 import com.demich.cps.platforms.utils.ProjectEulerUtils
 import kotlin.time.Duration.Companion.hours

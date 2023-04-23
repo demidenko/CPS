@@ -8,6 +8,9 @@ import com.demich.cps.news.settings.NewsSettingsDataStore
 import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.atcoder_news
 import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.project_euler_news
 import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.notifications.attachUrl
+import com.demich.cps.notifications.setBigContent
+import com.demich.cps.notifications.setWhen
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.ProjectEulerApi
 import com.demich.cps.platforms.utils.AtCoderUtils

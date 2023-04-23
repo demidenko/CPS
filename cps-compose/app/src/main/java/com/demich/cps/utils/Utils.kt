@@ -1,9 +1,5 @@
 package com.demich.cps.utils
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.widget.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -14,13 +10,6 @@ import kotlinx.serialization.json.Json
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-fun<T> T.touchLog(text: String) = also {
-    println("${getCurrentTime().epochSeconds}: $text")
-}
-
-fun Context.showToast(title: String) = Toast.makeText(this, title, Toast.LENGTH_LONG).show()
-
-fun Context.openUrlInBrowser(url: String) = startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
 
 val jsonCPS = Json {
     ignoreUnknownKeys = true

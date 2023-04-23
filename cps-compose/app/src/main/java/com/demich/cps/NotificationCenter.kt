@@ -3,13 +3,10 @@ package com.demich.cps
 import android.app.NotificationChannel
 import android.app.NotificationChannelGroup
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import kotlinx.datetime.Instant
+import com.demich.cps.notifications.NotificationIdProvider
 
 
 fun notificationBuilder(
@@ -31,29 +28,6 @@ fun notificationBuildAndNotify(
     notificationId: Int,
     buildBody: NotificationCompat.Builder.() -> Unit
 ) = notificationBuilder(context, channel, buildBody).notifyBy(NotificationManagerCompat.from(context), notificationId)
-
-fun NotificationCompat.Builder.setBigContent(str: CharSequence) = setContentText(str).setStyle(NotificationCompat.BigTextStyle().bigText(str))
-
-fun NotificationCompat.Builder.setWhen(time: Instant) {
-    setShowWhen(true)
-    setWhen(time.toEpochMilliseconds())
-}
-
-fun NotificationCompat.Builder.setProgress(total: Int, current: Int) =
-    setProgress(total, current, false)
-
-fun makePendingIntentOpenUrl(url: String, context: Context): PendingIntent {
-    return PendingIntent.getActivity(
-        context,
-        0,
-        Intent(Intent.ACTION_VIEW, Uri.parse(url)),
-        PendingIntent.FLAG_IMMUTABLE
-    )
-}
-
-fun NotificationCompat.Builder.attachUrl(url: String, context: Context) {
-    setContentIntent(makePendingIntentOpenUrl(url, context))
-}
 
 
 object NotificationChannels {
@@ -91,51 +65,36 @@ object NotificationChannels {
                 HIGH -> NotificationManager.IMPORTANCE_HIGH
             }
     }
-
-    private fun NotificationChannelGroupLazy.channel(
-        id: String,
-        name: String,
-        importance: Importance = Importance.DEFAULT
-    ) = NotificationChannelLazy(id, name, importance, this)
 }
 
-abstract class NotificationChannelGroupLazy(private val id: String, val name: String) {
-    fun getId(m: NotificationManagerCompat): String {
-        m.createNotificationChannelGroup(NotificationChannelGroup(id, name))
-        return id
-    }
+abstract class NotificationChannelGroupLazy(id: String, name: String) {
+    private val group = NotificationChannelGroup(id, name)
+    protected fun channel(
+        id: String,
+        name: String,
+        importance: NotificationChannels.Importance = NotificationChannels.Importance.DEFAULT
+    ) = NotificationChannelLazy(id, name, importance, group)
 }
 
 class NotificationChannelLazy(
     private val id: String,
     val name: String,
     private val importance: NotificationChannels.Importance,
-    private val groupLazy: NotificationChannelGroupLazy
+    private val group: NotificationChannelGroup
 ) {
     fun getId(context: Context): String {
         val m = NotificationManagerCompat.from(context)
-        val channel = NotificationChannel(id, name, importance.toAndroidImportance()).apply {
-            group = groupLazy.getId(m)
-        }
-        m.createNotificationChannel(channel)
+        m.createNotificationChannelGroup(group)
+        m.createNotificationChannel(
+            NotificationChannel(id, name, importance.toAndroidImportance()).also {
+                it.group = group.id
+            }
+        )
         return id
     }
 }
 
-object NotificationIds {
-    private var firstUnused = 0
-    private const val intervalLength = 1 shl 20
-
-    private fun nextId() = ++firstUnused
-    private fun nextIdInterval() = IntervalId(firstUnused).also { firstUnused += intervalLength }
-
-    @JvmInline
-    value class IntervalId(private val start: Int) {
-        operator fun invoke(int: Int) = start + int.mod(intervalLength)
-        operator fun invoke(long: Long) = start + long.mod(intervalLength)
-        operator fun invoke(str: String) = invoke(str.hashCode())
-    }
-
+object NotificationIds: NotificationIdProvider() {
     //codeforces
     val codeforces_contest_monitor = nextId()
     val codeforces_rating_changes = nextId()

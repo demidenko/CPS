@@ -12,8 +12,8 @@ import com.demich.cps.R
 import com.demich.cps.accounts.managers.AtCoderAccountManager
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.attachUrl
 import com.demich.cps.notificationBuildAndNotify
+import com.demich.cps.notifications.attachUrl
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.utils.CodeforcesUtils

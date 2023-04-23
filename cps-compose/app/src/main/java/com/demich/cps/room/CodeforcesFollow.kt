@@ -8,6 +8,9 @@ import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowDao
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.features.codeforces.follow.database.cfFollowDao
 import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.notifications.attachUrl
+import com.demich.cps.notifications.setBigContent
+import com.demich.cps.notifications.setWhen
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.CodeforcesUtils
