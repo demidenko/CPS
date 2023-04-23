@@ -1,11 +1,11 @@
 package com.demich.cps
 
-import android.app.NotificationChannel
 import android.app.NotificationChannelGroup
-import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.demich.cps.notifications.Importance
+import com.demich.cps.notifications.NotificationChannelInfo
 import com.demich.cps.notifications.NotificationIdProvider
 import com.demich.cps.notifications.notifyBy
 
@@ -49,18 +49,7 @@ object NotificationChannels {
     }
 
 
-    enum class Importance {
-        MIN,
-        DEFAULT,
-        HIGH;
 
-        fun toAndroidImportance(): Int =
-            when (this) {
-                DEFAULT -> NotificationManager.IMPORTANCE_DEFAULT
-                MIN -> NotificationManager.IMPORTANCE_MIN
-                HIGH -> NotificationManager.IMPORTANCE_HIGH
-            }
-    }
 }
 
 abstract class NotificationChannelGroupLazy(id: String, name: String) {
@@ -68,25 +57,21 @@ abstract class NotificationChannelGroupLazy(id: String, name: String) {
     protected fun channel(
         id: String,
         name: String,
-        importance: NotificationChannels.Importance = NotificationChannels.Importance.DEFAULT
-    ) = NotificationChannelLazy(id, name, importance, group)
+        importance: Importance = Importance.DEFAULT
+    ) = NotificationChannelLazy(NotificationChannelInfo(id, name, importance), group)
 }
 
 class NotificationChannelLazy(
-    private val id: String,
-    val name: String,
-    private val importance: NotificationChannels.Importance,
+    private val channelInfo: NotificationChannelInfo,
     private val group: NotificationChannelGroup
 ) {
     fun getId(context: Context): String {
         val m = NotificationManagerCompat.from(context)
         m.createNotificationChannelGroup(group)
         m.createNotificationChannel(
-            NotificationChannel(id, name, importance.toAndroidImportance()).also {
-                it.group = group.id
-            }
+            channelInfo.toAndroidChannel().also { it.group = group.id }
         )
-        return id
+        return channelInfo.id
     }
 }
 
