@@ -6,14 +6,12 @@ import android.content.Context.NOTIFICATION_SERVICE
 import androidx.core.os.bundleOf
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
-import com.demich.cps.NotificationChannels
-import com.demich.cps.NotificationIds
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.AtCoderAccountManager
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.notificationBuildAndNotify
 import com.demich.cps.notifications.attachUrl
+import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.utils.CodeforcesUtils
@@ -82,7 +80,7 @@ class AccountsWorker(
 
         val oldContribution = getNotifiedCodeforcesContribution() ?: userInfo.contribution
 
-        notificationBuildAndNotify(context, NotificationChannels.codeforces.contribution_changes, NotificationIds.codeforces_contribution_changes) {
+        notificationChannels.codeforces.contribution_changes.notify(context) {
             setSubText(handle)
             setContentTitle("Contribution change: ${oldContribution.toSignedString()} → ${newContribution.toSignedString()}")
             setSmallIcon(R.drawable.ic_person)
@@ -125,8 +123,9 @@ class AccountsWorker(
     private val KEY_CF_CONTRIBUTION get() = "cf_contribution"
     private fun getNotifiedCodeforcesContribution(): Int? {
         val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        return notificationManager.activeNotifications.find {
-            it.id == NotificationIds.codeforces_contribution_changes
-        }?.notification?.extras?.getInt(KEY_CF_CONTRIBUTION)
+        val notificationId = notificationChannels.codeforces.contribution_changes.notificationId
+        return notificationManager.activeNotifications
+            .find { it.id == notificationId }
+            ?.notification?.extras?.getInt(KEY_CF_CONTRIBUTION)
     }
 }

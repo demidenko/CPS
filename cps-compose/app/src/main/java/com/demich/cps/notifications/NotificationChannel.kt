@@ -18,12 +18,12 @@ class NotificationBuilder(
 }
 
 class NotificationChannelSingleId(
-    val id: Int,
+    val notificationId: Int,
     val channelInfo: NotificationChannelInfo
 ) {
     fun builder(context: Context, buildBody: NotificationCompat.Builder.() -> Unit): NotificationBuilder {
         NotificationManagerCompat.from(context).createNotificationChannel(channelInfo)
-        return NotificationBuilder(NotificationCompat.Builder(context, channelInfo.id).apply(buildBody), id)
+        return NotificationBuilder(NotificationCompat.Builder(context, channelInfo.id).apply(buildBody), notificationId)
     }
 
     fun notify(context: Context, buildBody: NotificationCompat.Builder.() -> Unit) {
