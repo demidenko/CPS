@@ -7,6 +7,7 @@ import com.demich.cps.*
 import com.demich.cps.news.settings.NewsSettingsDataStore
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.notifications.attachUrl
+import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.notifications.setBigContent
 import com.demich.cps.platforms.api.ProjectEulerApi
 import com.demich.cps.platforms.utils.ProjectEulerUtils
@@ -37,11 +38,7 @@ class ProjectEulerRecentProblemsWorker(
             posts = ProjectEulerUtils.extractRecentProblems(ProjectEulerApi.getRecentPage())
         ) {
             val problemId = it.id.toInt()
-            notificationBuildAndNotify(
-                context = context,
-                channel = NotificationChannels.project_euler.problems,
-                notificationId = NotificationIds.makeProjectEulerRecentProblemId(problemId)
-            ) {
+            notificationChannels.project_euler.problems(problemId).notify(context) {
                 setSubText("Project Euler • New problem published!")
                 setContentTitle("Problem $problemId")
                 setBigContent(it.name)

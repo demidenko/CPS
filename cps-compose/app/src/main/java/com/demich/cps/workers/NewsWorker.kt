@@ -77,11 +77,7 @@ class NewsWorker(
             newsFeed = project_euler_news,
             posts = ProjectEulerUtils.extractNews(source = ProjectEulerApi.getRSSPage())
         ) {
-            notificationBuildAndNotify(
-                context = context,
-                channel = NotificationChannels.project_euler.news,
-                notificationId = NotificationIds.makeProjectEulerNewsId(it.id.toInt())
-            ) {
+            notificationChannels.project_euler.news(it.id.toInt()).notify(context) {
                 setSubText("Project Euler news")
                 setContentTitle(it.title)
                 setBigContent(
