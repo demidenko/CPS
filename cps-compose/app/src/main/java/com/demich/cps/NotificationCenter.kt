@@ -7,6 +7,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.demich.cps.notifications.Importance
 import com.demich.cps.notifications.NotificationChannelInfo
 import com.demich.cps.notifications.NotificationIdProvider
+import com.demich.cps.notifications.createNotificationChannel
 import com.demich.cps.notifications.notifyBy
 
 
@@ -58,19 +59,14 @@ abstract class NotificationChannelGroupLazy(id: String, name: String) {
         id: String,
         name: String,
         importance: Importance = Importance.DEFAULT
-    ) = NotificationChannelLazy(NotificationChannelInfo(id, name, importance), group)
+    ) = NotificationChannelLazy(NotificationChannelInfo(id, name, importance, group))
 }
 
 class NotificationChannelLazy(
-    private val channelInfo: NotificationChannelInfo,
-    private val group: NotificationChannelGroup
+    private val channelInfo: NotificationChannelInfo
 ) {
     fun getId(context: Context): String {
-        val m = NotificationManagerCompat.from(context)
-        m.createNotificationChannelGroup(group)
-        m.createNotificationChannel(
-            channelInfo.toAndroidChannel().also { it.group = group.id }
-        )
+        NotificationManagerCompat.from(context).createNotificationChannel(channelInfo)
         return channelInfo.id
     }
 }

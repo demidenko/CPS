@@ -1,12 +1,17 @@
 package com.demich.cps.accounts.managers
 
 import androidx.compose.ui.graphics.toArgb
-import com.demich.cps.*
 import com.demich.cps.R
 import com.demich.cps.accounts.userinfo.RatedUserInfo
+import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.setWhen
-import com.demich.cps.platforms.api.*
+import com.demich.cps.platforms.api.AtCoderApi
+import com.demich.cps.platforms.api.AtCoderRatingChange
+import com.demich.cps.platforms.api.CodeChefRatingChange
+import com.demich.cps.platforms.api.CodeforcesApi
+import com.demich.cps.platforms.api.CodeforcesRatingChange
+import com.demich.cps.platforms.api.DmojRatingChange
 import com.demich.cps.utils.toSignedString
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -60,12 +65,11 @@ internal fun DmojRatingChange.toRatingChange() =
 
 fun notifyRatingChange(
     manager: RatedAccountManager<out RatedUserInfo>,
-    notificationChannel: NotificationChannelLazy,
-    notificationId: Int,
+    channel: NotificationChannelSingleId,
     handle: String,
     ratingChange: RatingChange
 ) {
-    notificationBuildAndNotify(manager.context, notificationChannel, notificationId) {
+    channel.notify(manager.context) {
         val difference = ratingChange.rating - (ratingChange.oldRating ?: 0)
         setSmallIcon(if (difference < 0) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
         setContentTitle("$handle new rating: ${ratingChange.rating}")

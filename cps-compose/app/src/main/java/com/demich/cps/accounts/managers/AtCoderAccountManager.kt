@@ -9,8 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.AdditionalBottomBarBuilder
-import com.demich.cps.NotificationChannels
-import com.demich.cps.NotificationIds
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.rating_graph.RatingLoadButton
@@ -18,11 +16,12 @@ import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.AtCoderRatingChange
 import com.demich.cps.platforms.api.isPageNotFound
-import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.platforms.utils.AtCoderUtils
+import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.workers.AccountsWorker
 import com.demich.datastore_itemized.dataStoreWrapper
 
@@ -122,13 +121,13 @@ class AtCoderAccountManager(context: Context):
         )
     }
 
-    fun notifyRatingChange(handle: String, ratingChange: AtCoderRatingChange) = notifyRatingChange(
-        manager = this,
-        notificationChannel = NotificationChannels.atcoder.rating_changes,
-        notificationId = NotificationIds.atcoder_rating_changes,
-        handle = handle,
-        ratingChange = ratingChange.toRatingChange(handle)
-    )
+    fun notifyRatingChange(handle: String, ratingChange: AtCoderRatingChange) =
+        notifyRatingChange(
+            manager = this,
+            channel = notificationChannels.atcoder.rating_changes,
+            handle = handle,
+            ratingChange = ratingChange.toRatingChange(handle)
+        )
 }
 
 class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager):

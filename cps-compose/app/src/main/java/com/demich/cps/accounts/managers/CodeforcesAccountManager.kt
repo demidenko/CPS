@@ -1,7 +1,11 @@
 package com.demich.cps.accounts.managers
 
 import android.content.Context
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -16,8 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.AdditionalBottomBarBuilder
-import com.demich.cps.NotificationChannels
-import com.demich.cps.NotificationIds
 import com.demich.cps.R
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.rating_graph.RatingGraph
@@ -26,11 +28,15 @@ import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.platforms.api.*
+import com.demich.cps.notifications.notificationChannels
+import com.demich.cps.platforms.api.CodeforcesApi
+import com.demich.cps.platforms.api.CodeforcesColorTag
+import com.demich.cps.platforms.api.CodeforcesProblem
+import com.demich.cps.platforms.api.CodeforcesRatingChange
+import com.demich.cps.platforms.utils.CodeforcesUtils
 import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.platforms.utils.CodeforcesUtils
 import com.demich.cps.utils.append
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.AccountsWorker
@@ -215,8 +221,7 @@ class CodeforcesAccountManager(context: Context):
     fun notifyRatingChange(ratingChange: CodeforcesRatingChange) =
         notifyRatingChange(
             manager = this,
-            notificationChannel = NotificationChannels.codeforces.rating_changes,
-            notificationId = NotificationIds.codeforces_rating_changes,
+            channel = notificationChannels.codeforces.rating_changes,
             handle = ratingChange.handle,
             ratingChange = ratingChange.toRatingChange()
         )
