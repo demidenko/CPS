@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
-import com.demich.cps.*
+import com.demich.cps.R
 import com.demich.cps.news.settings.settingsNews
-import com.demich.cps.notifications.notifyBy
+import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.notifications.setProgress
 import com.demich.cps.room.followListDao
 import kotlin.time.Duration.Companion.hours
@@ -33,10 +33,9 @@ class CodeforcesNewsFollowWorker(
     }
 
     override suspend fun runWork(): Result {
-        setForeground(ForegroundInfo(
-            NotificationIds.codeforces_follow_progress,
-            progressNotificationBuilder().build()
-        ))
+        progressNotificationBuilder().build { notification, id ->
+            setForeground(ForegroundInfo(id, notification))
+        }
 
         val dao = context.followListDao
         val notificationManagerCompat = NotificationManagerCompat.from(context)
@@ -47,16 +46,16 @@ class CodeforcesNewsFollowWorker(
         savedHandles.forEachWithProgress { handle ->
             if (dao.getAndReloadBlogEntries(handle) == null) return Result.retry()
             ++done
-            progressNotificationBuilder()
-                .setProgress(total = savedHandles.size, current = done)
-                .notifyBy(notificationManagerCompat, NotificationIds.codeforces_follow_progress)
+            progressNotificationBuilder().apply {
+                builder.setProgress(total = savedHandles.size, current = done)
+            }.notifyBy(notificationManagerCompat)
         }
 
         return Result.success()
     }
 
     private fun progressNotificationBuilder() =
-        notificationBuilder(context, NotificationChannels.codeforces.follow_progress) {
+        notificationChannels.codeforces.follow_progress.builder(context) {
             setContentTitle("Codeforces follow update...")
             setSmallIcon(R.drawable.ic_logo_codeforces)
             setSilent(true)

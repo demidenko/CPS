@@ -9,7 +9,7 @@ class NotificationBuilder(
     val builder: NotificationCompat.Builder,
     val notificationId: Int
 ) {
-    fun build(block: (Notification, Int) -> Unit) {
+    inline fun build(block: (Notification, Int) -> Unit) {
         block(builder.build(), notificationId)
     }
 
