@@ -4,13 +4,11 @@ import android.content.Context
 import android.os.SystemClock
 import android.text.SpannableStringBuilder
 import android.widget.RemoteViews
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.text.bold
 import androidx.core.text.color
-import com.demich.cps.NotificationIds
 import com.demich.cps.R
-import com.demich.cps.notifications.notifyBy
+import com.demich.cps.notifications.NotificationBuilder
 import com.demich.cps.platforms.api.CodeforcesContestPhase
 import com.demich.cps.platforms.api.CodeforcesContestType
 import com.demich.cps.platforms.api.CodeforcesParticipationType
@@ -19,7 +17,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class CodeforcesMonitorNotifier(
     val context: Context,
-    val notificationBuilder: NotificationCompat.Builder,
+    val notificationBuilder: NotificationBuilder,
     val handle: String
 ) {
     private val notificationManager = NotificationManagerCompat.from(context)
@@ -61,7 +59,7 @@ class CodeforcesMonitorNotifier(
     private fun setContestName(contestName: String): Boolean {
         if (_contestName == contestName) return false
         _contestName = contestName
-        notificationBuilder.setSubText("$contestName • $handle")
+        notificationBuilder.builder.setSubText("$contestName • $handle")
         return true
     }
 
@@ -148,22 +146,22 @@ class CodeforcesMonitorNotifier(
         }
 
     private fun submitNotification() {
-        val notParticipated = _contestantRank.participationType == CodeforcesParticipationType.NOT_PARTICIPATED
-        notificationBuilder.setCustomContentView(viewSmall.apply {
-            setTextViewText(
-                R.id.cf_monitor_rank,
-                if (notParticipated) "not participated"
-                else "rank: ${_contestantRank.rank}"
+        notificationBuilder.builder.apply {
+            val notParticipated = _contestantRank.participationType == CodeforcesParticipationType.NOT_PARTICIPATED
+
+            setCustomContentView(viewSmall.apply {
+                setTextViewText(
+                    R.id.cf_monitor_rank,
+                    if (notParticipated) "not participated"
+                    else "rank: ${_contestantRank.rank}"
+                )
+            })
+
+            setCustomBigContentView(
+                if (notParticipated) null else viewBig
             )
-        })
+        }
 
-        notificationBuilder.setCustomBigContentView(
-            if (notParticipated) null else viewBig
-        )
-
-        notificationBuilder.notifyBy(
-            notificationManager = notificationManager,
-            notificationId = NotificationIds.codeforces_contest_monitor
-        )
+        notificationBuilder.notifyBy(notificationManager)
     }
 }

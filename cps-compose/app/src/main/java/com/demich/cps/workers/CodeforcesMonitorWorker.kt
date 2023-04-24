@@ -12,6 +12,7 @@ import com.demich.cps.contests.monitors.CodeforcesMonitorNotifier
 import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.monitors.launchIn
 import com.demich.cps.notifications.attachUrl
+import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.CodeforcesSubmission
@@ -31,8 +32,9 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         val contestId = monitor.contestId.flow.filterNotNull().first()
         val handle = monitor.handle()
 
-        val notificationBuilder = createNotificationBuilder(handle)
-        setForeground(ForegroundInfo(NotificationIds.codeforces_contest_monitor, notificationBuilder.build()))
+        val notificationBuilder = createNotificationBuilder(handle).apply {
+            build { notification, id -> setForeground(ForegroundInfo(id, notification)) }
+        }
 
         withContext(Dispatchers.IO) {
             monitor.launchIn(
@@ -64,7 +66,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
     }
 
     private fun createNotificationBuilder(handle: String) =
-        notificationBuilder(context, NotificationChannels.codeforces.contest_monitor) {
+        notificationChannels.codeforces.contest_monitor.builder(context) {
             setSmallIcon(R.drawable.ic_monitor)
             setSubText(handle)
             setShowWhen(false)
