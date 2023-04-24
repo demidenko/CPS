@@ -6,6 +6,7 @@ import androidx.work.WorkerParameters
 import com.demich.cps.*
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.notifications.attachUrl
+import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.platforms.utils.CodeforcesUtils
 import com.demich.cps.platforms.api.CodeforcesApi
@@ -100,11 +101,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
 
     private fun notifyProblemForUpsolve(problem: CodeforcesProblem) {
         val problemId = "${problem.contestId}${problem.index}"
-        notificationBuildAndNotify(
-            context,
-            NotificationChannels.codeforces.upsolving_suggestion,
-            NotificationIds.makeCodeforcesUpsolveProblemId(problemId)
-        ) {
+        notificationChannels.codeforces.upsolving_suggestion(problemId).notify(context) {
             setSmallIcon(R.drawable.ic_training)
             setContentTitle("Consider to upsolve problem $problemId")
             setSubText("codeforces upsolving suggestion")

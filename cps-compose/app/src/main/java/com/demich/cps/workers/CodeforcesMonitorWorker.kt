@@ -76,11 +76,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         }
 
     private fun notify(submission: CodeforcesSubmission) =
-        notificationBuildAndNotify(
-            context = context,
-            channel = NotificationChannels.codeforces.submission_result,
-            notificationId = NotificationIds.makeCodeforcesSystestSubmissionId(submission.id)
-        ) {
+        notificationChannels.codeforces.submission_result(submission.id).notify(context) {
             if (submission.verdict == CodeforcesProblemVerdict.OK) {
                 setSmallIcon(R.drawable.ic_problem_ok)
                 color = context.getColor(R.color.success)

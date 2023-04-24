@@ -9,6 +9,7 @@ import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.features.codeforces.follow.database.cfFollowDao
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.notifications.attachUrl
+import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.notifications.setBigContent
 import com.demich.cps.notifications.setWhen
 import com.demich.cps.platforms.api.CodeforcesApi
@@ -72,11 +73,7 @@ class FollowListDao internal constructor(
     }
 
     private fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry) =
-        notificationBuildAndNotify(
-            context = context,
-            channel = NotificationChannels.codeforces.new_blog_entry,
-            notificationId = NotificationIds.makeCodeforcesFollowBlogId(blogEntry.id)
-        ) {
+        notificationChannels.codeforces.new_blog_entry(blogEntry.id).notify(context) {
             setSubText("New codeforces blog entry")
             setContentTitle(blogEntry.authorHandle)
             setBigContent(CodeforcesUtils.extractTitle(blogEntry))
