@@ -35,7 +35,9 @@ class NotificationChannelRangeId(
     val idRange: IntRange,
     val channelInfo: NotificationChannelInfo
 ) {
-    fun notify(context: Context, key: Any, build: NotificationCompat.Builder.() -> Unit) {
-        // = NotificationChannelSingleId(...).notify
-    }
+    operator fun invoke(key: Any): NotificationChannelSingleId =
+        NotificationChannelSingleId(
+            notificationId = key.hashCode().mod(idRange.last - idRange.first + 1) + idRange.first,
+            channelInfo = channelInfo
+        )
 }

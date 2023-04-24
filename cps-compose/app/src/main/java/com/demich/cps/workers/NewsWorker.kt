@@ -9,6 +9,7 @@ import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.atcoder_news
 import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.project_euler_news
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.notifications.attachUrl
+import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.notifications.setBigContent
 import com.demich.cps.notifications.setWhen
 import com.demich.cps.platforms.api.AtCoderApi
@@ -59,11 +60,7 @@ class NewsWorker(
             newsFeed = atcoder_news,
             posts = AtCoderUtils.extractNews(source = AtCoderApi.getMainPage())
         ) {
-            notificationBuildAndNotify(
-                context = context,
-                channel = NotificationChannels.atcoder.news,
-                notificationId = NotificationIds.makeAtCoderNewsId(it.id.toInt())
-            ) {
+            notificationChannels.atcoder.news(it.id.toInt()).notify(context) {
                 setSubText("atcoder news")
                 setBigContent(it.title.trim())
                 setSmallIcon(R.drawable.ic_news)

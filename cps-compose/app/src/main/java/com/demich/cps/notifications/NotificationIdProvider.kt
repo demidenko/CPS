@@ -13,8 +13,8 @@ abstract class NotificationIdProvider {
 
     protected fun nextId() = alloc(1)
     protected fun nextIdInterval() = IntervalId(alloc(intervalLength))
-    protected fun nextRangeId() = alloc(intervalLength).let { start ->
-        IntRange(start, start + intervalLength)
+    protected fun nextIdRange() = alloc(intervalLength).let { start ->
+        start until start + intervalLength
     }
 
     @JvmInline

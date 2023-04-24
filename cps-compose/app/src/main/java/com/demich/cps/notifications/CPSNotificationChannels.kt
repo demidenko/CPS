@@ -11,7 +11,7 @@ class CPSNotificationChannels: NotificationIdProvider() {
 
     inner class AtCoderNotificationGroup: NotificationChannelGroupInfo("atcoder", "AtCoder") {
         val rating_changes = channel(nextId(), "rating_changes", "Rating changes", Importance.HIGH)
-        val news = channel(nextRangeId(), "news", "News")
+        val news = channel(nextIdRange(), "news", "News")
     }
 
     val codeforces = CodeforcesNotificationsGroup()
