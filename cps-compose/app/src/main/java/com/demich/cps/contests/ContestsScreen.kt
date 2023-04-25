@@ -63,17 +63,17 @@ fun ContestsScreen(
         )
     }
 
-    if (isAnyPlatformEnabled) {
-        Column(
+    Column(
+        modifier = Modifier
+            .consumeWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
+            .imePadding()
+    ) {
+        CodeforcesMonitor(
             modifier = Modifier
-                .consumeWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
-                .imePadding()
-        ) {
-            CodeforcesMonitor(
-                modifier = Modifier
-                    .padding(horizontal = 3.dp)
-                    .fillMaxWidth()
-            )
+                .padding(horizontal = 3.dp)
+                .fillMaxWidth()
+        )
+        if (isAnyPlatformEnabled) {
             ContestsReloadableContent(
                 filterController = filterController,
                 isReloading = isReloading,
@@ -85,9 +85,9 @@ fun ContestsScreen(
                 filterController = filterController,
                 modifier = Modifier.fillMaxWidth()
             )
+        } else {
+            NoneEnabledMessage(modifier = Modifier.fillMaxSize())
         }
-    } else {
-        NoneEnabledMessage(modifier = Modifier.fillMaxSize())
     }
 
     LaunchedEffect(Unit) {
