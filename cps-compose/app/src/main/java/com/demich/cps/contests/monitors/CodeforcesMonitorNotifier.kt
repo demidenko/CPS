@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.SystemClock
 import android.text.SpannableStringBuilder
 import android.widget.RemoteViews
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.text.bold
 import androidx.core.text.color
 import com.demich.cps.R
@@ -20,8 +19,6 @@ class CodeforcesMonitorNotifier(
     val notificationBuilder: NotificationBuilder,
     val handle: String
 ) {
-    private val notificationManager = NotificationManagerCompat.from(context)
-
     private val viewSmall = RemoteViews(context.packageName, R.layout.cf_monitor_view_small)
     private val viewBig = RemoteViews(context.packageName, R.layout.cf_monitor_view_big)
     private val views = arrayOf(viewSmall, viewBig)
@@ -162,6 +159,6 @@ class CodeforcesMonitorNotifier(
             )
         }
 
-        notificationBuilder.notifyBy(notificationManager)
+        notificationBuilder.notify()
     }
 }

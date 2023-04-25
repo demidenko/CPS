@@ -1,7 +1,6 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.demich.cps.R
@@ -38,8 +37,6 @@ class CodeforcesNewsFollowWorker(
         }
 
         val dao = context.followListDao
-        val notificationManagerCompat = NotificationManagerCompat.from(context)
-
         val savedHandles = dao.getHandles().shuffled()
 
         var done = 0
@@ -48,7 +45,7 @@ class CodeforcesNewsFollowWorker(
             ++done
             progressNotificationBuilder().apply {
                 builder.setProgress(total = savedHandles.size, current = done)
-            }.notifyBy(notificationManagerCompat)
+            }.notify()
         }
 
         return Result.success()

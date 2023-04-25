@@ -7,14 +7,15 @@ import androidx.core.app.NotificationManagerCompat
 
 class NotificationBuilder(
     val builder: NotificationCompat.Builder,
-    val notificationId: Int
+    val notificationId: Int,
+    private val notificationManager: NotificationManagerCompat
 ) {
     inline fun build(block: (Int, Notification) -> Unit) {
         block(notificationId, builder.build())
     }
 
-    fun notifyBy(notificationManager: NotificationManagerCompat): Unit =
-        build(notificationManager::notify)
+    @JvmName("notifyCustom")
+    fun notify() = build(notificationManager::notify)
 }
 
 class NotificationChannelSingleId(
@@ -22,13 +23,18 @@ class NotificationChannelSingleId(
     val channelInfo: NotificationChannelInfo
 ) {
     fun builder(context: Context, buildBody: NotificationCompat.Builder.() -> Unit): NotificationBuilder {
-        NotificationManagerCompat.from(context).createNotificationChannel(channelInfo)
-        return NotificationBuilder(NotificationCompat.Builder(context, channelInfo.id).apply(buildBody), notificationId)
+        val notificationManager = NotificationManagerCompat.from(context).apply {
+            createNotificationChannel(channelInfo)
+        }
+        return NotificationBuilder(
+            builder = NotificationCompat.Builder(context, channelInfo.id).apply(buildBody),
+            notificationId = notificationId,
+            notificationManager = notificationManager
+        )
     }
 
-    fun notify(context: Context, buildBody: NotificationCompat.Builder.() -> Unit) {
-        builder(context, buildBody).notifyBy(NotificationManagerCompat.from(context))
-    }
+    fun notify(context: Context, buildBody: NotificationCompat.Builder.() -> Unit) =
+        builder(context, buildBody).notify()
 }
 
 class NotificationChannelRangeId(
