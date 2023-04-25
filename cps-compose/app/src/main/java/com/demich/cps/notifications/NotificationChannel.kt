@@ -9,12 +9,12 @@ class NotificationBuilder(
     val builder: NotificationCompat.Builder,
     val notificationId: Int
 ) {
-    inline fun build(block: (Notification, Int) -> Unit) {
-        block(builder.build(), notificationId)
+    inline fun build(block: (Int, Notification) -> Unit) {
+        block(notificationId, builder.build())
     }
 
-    fun notifyBy(notificationManager: NotificationManagerCompat) =
-        builder.notifyBy(notificationManager, notificationId)
+    fun notifyBy(notificationManager: NotificationManagerCompat): Unit =
+        build(notificationManager::notify)
 }
 
 class NotificationChannelSingleId(

@@ -1,6 +1,6 @@
 package com.demich.cps.notifications
 
-abstract class NotificationIdProvider(val intervalLength: Int) {
+abstract class NotificationIdProvider(val rangeLength: Int) {
     private var firstUnused = 0
 
     private fun alloc(size: Int) =
@@ -11,7 +11,7 @@ abstract class NotificationIdProvider(val intervalLength: Int) {
         }
 
     protected fun nextId() = alloc(1)
-    protected fun nextIdRange() = alloc(intervalLength).let { start ->
-        start until start + intervalLength
+    protected fun nextIdRange() = alloc(rangeLength).let { start ->
+        start until start + rangeLength
     }
 }

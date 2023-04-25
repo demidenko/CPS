@@ -33,7 +33,7 @@ class CodeforcesNewsFollowWorker(
     }
 
     override suspend fun runWork(): Result {
-        progressNotificationBuilder().build { notification, id ->
+        progressNotificationBuilder().build { id, notification ->
             setForeground(ForegroundInfo(id, notification))
         }
 

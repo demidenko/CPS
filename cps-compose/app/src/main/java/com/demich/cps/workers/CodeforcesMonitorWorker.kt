@@ -33,7 +33,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         val handle = monitor.handle()
 
         val notificationBuilder = createNotificationBuilder(handle).apply {
-            build { notification, id -> setForeground(ForegroundInfo(id, notification)) }
+            build { id, notification -> setForeground(ForegroundInfo(id, notification)) }
         }
 
         withContext(Dispatchers.IO) {

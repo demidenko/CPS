@@ -9,14 +9,11 @@ class NotificationChannelInfo(
     val name: String,
     val importance: Importance,
     val group: NotificationChannelGroup
-) {
-    internal fun toAndroidChannel(): NotificationChannel =
-        NotificationChannel(id, name, importance.toAndroidImportance()).also {
-            it.group = group.id
-        }
-}
+)
 
 fun NotificationManagerCompat.createNotificationChannel(channelInfo: NotificationChannelInfo) {
-    createNotificationChannelGroup(channelInfo.group)
-    createNotificationChannel(channelInfo.toAndroidChannel())
+    with(channelInfo) {
+        createNotificationChannelGroup(group)
+        createNotificationChannel(NotificationChannel(id, name, importance.toAndroidImportance()).also { it.group = group.id })
+    }
 }
