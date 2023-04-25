@@ -7,15 +7,16 @@ import androidx.core.app.NotificationManagerCompat
 
 class NotificationBuilder(
     private val builder: NotificationCompat.Builder,
-    private val notificationId: Int,
+    val notificationId: Int,
     private val notificationManager: NotificationManagerCompat
 ) {
     fun edit(buildBody: NotificationCompat.Builder.() -> Unit) = builder.buildBody()
 
-    fun<T> build(block: (Int, Notification) -> T): T = block(notificationId, builder.build())
+    fun build(): Notification = builder.build()
 
     @JvmName("notifyCustom")
-    fun notify() = build(notificationManager::notify)
+    //TODO: android 14 permissions
+    fun notify() = notificationManager.notify(notificationId, build())
 }
 
 class NotificationChannelSingleId(

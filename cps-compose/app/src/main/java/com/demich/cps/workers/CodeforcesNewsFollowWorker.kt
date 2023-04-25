@@ -37,9 +37,9 @@ class CodeforcesNewsFollowWorker(
             setSmallIcon(R.drawable.ic_logo_codeforces)
             setSilent(true)
             setShowWhen(false)
+        }.apply {
+            setForeground(ForegroundInfo(notificationId, build()))
         }
-
-        setForeground(builder.build(::ForegroundInfo))
 
         val dao = context.followListDao
         val savedHandles = dao.getHandles().shuffled()
