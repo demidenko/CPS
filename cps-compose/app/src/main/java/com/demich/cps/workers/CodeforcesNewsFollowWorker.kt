@@ -32,9 +32,14 @@ class CodeforcesNewsFollowWorker(
     }
 
     override suspend fun runWork(): Result {
-        progressNotificationBuilder().build { id, notification ->
-            setForeground(ForegroundInfo(id, notification))
+        val builder = notificationChannels.codeforces.follow_progress.builder(context) {
+            setContentTitle("Codeforces follow update...")
+            setSmallIcon(R.drawable.ic_logo_codeforces)
+            setSilent(true)
+            setShowWhen(false)
         }
+
+        setForeground(builder.build(::ForegroundInfo))
 
         val dao = context.followListDao
         val savedHandles = dao.getHandles().shuffled()
@@ -43,19 +48,12 @@ class CodeforcesNewsFollowWorker(
         savedHandles.forEachWithProgress { handle ->
             if (dao.getAndReloadBlogEntries(handle) == null) return Result.retry()
             ++done
-            progressNotificationBuilder().apply {
-                builder.setProgress(total = savedHandles.size, current = done)
-            }.notify()
+            builder.apply {
+                edit { setProgress(total = savedHandles.size, current = done) }
+                notify()
+            }
         }
 
         return Result.success()
     }
-
-    private fun progressNotificationBuilder() =
-        notificationChannels.codeforces.follow_progress.builder(context) {
-            setContentTitle("Codeforces follow update...")
-            setSmallIcon(R.drawable.ic_logo_codeforces)
-            setSilent(true)
-            setShowWhen(false)
-        }
 }

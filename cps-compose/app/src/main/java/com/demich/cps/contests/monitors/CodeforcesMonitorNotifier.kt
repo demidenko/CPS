@@ -56,7 +56,7 @@ class CodeforcesMonitorNotifier(
     private fun setContestName(contestName: String): Boolean {
         if (_contestName == contestName) return false
         _contestName = contestName
-        notificationBuilder.builder.setSubText("$contestName • $handle")
+        notificationBuilder.edit { setSubText("$contestName • $handle") }
         return true
     }
 
@@ -143,7 +143,7 @@ class CodeforcesMonitorNotifier(
         }
 
     private fun submitNotification() {
-        notificationBuilder.builder.apply {
+        notificationBuilder.edit {
             val notParticipated = _contestantRank.participationType == CodeforcesParticipationType.NOT_PARTICIPATED
 
             setCustomContentView(viewSmall.apply {

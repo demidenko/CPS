@@ -6,13 +6,13 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
 class NotificationBuilder(
-    val builder: NotificationCompat.Builder,
-    val notificationId: Int,
+    private val builder: NotificationCompat.Builder,
+    private val notificationId: Int,
     private val notificationManager: NotificationManagerCompat
 ) {
-    inline fun build(block: (Int, Notification) -> Unit) {
-        block(notificationId, builder.build())
-    }
+    fun edit(buildBody: NotificationCompat.Builder.() -> Unit) = builder.buildBody()
+
+    fun<T> build(block: (Int, Notification) -> T): T = block(notificationId, builder.build())
 
     @JvmName("notifyCustom")
     fun notify() = build(notificationManager::notify)
