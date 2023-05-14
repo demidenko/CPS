@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -26,7 +26,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.time.Duration.Companion.milliseconds
 
 val context: Context
     @Composable
@@ -121,12 +120,12 @@ fun LazyListState.visibleRange(requiredVisiblePart: Float = 0.5f): IntRange {
 }
 
 @Composable
-fun rememberFocusOnCreationRequester(focusImmediately: Boolean = false): FocusRequester {
+fun rememberFocusOnCreationRequester(): FocusRequester {
     val requester = remember { FocusRequester() }
     var focusedOnCreation by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(requester) {
         if (!focusedOnCreation) {
-            if (!focusImmediately) delay(100.milliseconds) //TODO fix this shit: keyboard not showed without it
+            awaitFrame() //TODO is this ok? instead of [if (!focusImmediately) delay(100.milliseconds)]
             requester.requestFocus()
             focusedOnCreation = true
         }

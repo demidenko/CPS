@@ -240,7 +240,7 @@ private fun ContestsFilterTextField(
     modifier: Modifier = Modifier
 ) {
     if (filterController.enabled) {
-        val focusRequester = rememberFocusOnCreationRequester(true)
+        val focusRequester = rememberFocusOnCreationRequester()
         OutlinedTextField(
             modifier = modifier.focusRequester(focusRequester),
             singleLine = true,
