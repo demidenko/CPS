@@ -69,7 +69,7 @@ dependencies {
     implementation project(":features:codeforces_lost:database")
     implementation project(":features:codeforces_follow:database")
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0'
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kt_serialization_version"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.4.0'
 
