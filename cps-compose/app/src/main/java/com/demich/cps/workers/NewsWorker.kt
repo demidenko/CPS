@@ -16,7 +16,7 @@ import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.ProjectEulerApi
 import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.platforms.utils.ProjectEulerUtils
-import org.jsoup.Jsoup
+import com.demich.cps.utils.asHtmlToSpanned
 import kotlin.time.Duration.Companion.hours
 
 class NewsWorker(
@@ -62,7 +62,7 @@ class NewsWorker(
         ) {
             notificationChannels.atcoder.news(it.id.toInt()).notify(context) {
                 setSubText("atcoder news")
-                setBigContent(it.title.trim())
+                setBigContent(it.title.trim()) //TODO: title + content html
                 setSmallIcon(R.drawable.ic_news)
                 setWhen(it.time)
                 attachUrl(url = AtCoderApi.urls.post(it.id.toInt()), context = context)
@@ -80,12 +80,7 @@ class NewsWorker(
             notificationChannels.project_euler.news(it.id.toInt()).notify(context) {
                 setSubText("Project Euler news")
                 setContentTitle(it.title)
-                setBigContent(
-                    Jsoup.parse(it.descriptionHtml).text()
-                        .replace("\n", "")
-                        .replace("<p>", "")
-                        .replace("</p>", "\n\n")
-                )
+                setBigContent(it.descriptionHtml.asHtmlToSpanned())
                 setSmallIcon(R.drawable.ic_news)
                 setColor(context.getColor(R.color.project_euler_main))
                 setShowWhen(false)

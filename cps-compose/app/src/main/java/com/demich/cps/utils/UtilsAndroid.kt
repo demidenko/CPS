@@ -4,7 +4,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.text.Html
+import android.text.Spanned
 import android.widget.Toast
+import androidx.core.text.HtmlCompat
 
 fun Context.showToast(title: String) = Toast.makeText(this, title, Toast.LENGTH_LONG).show()
 
@@ -19,3 +22,6 @@ fun makePendingIntentOpenUrl(url: String, context: Context): PendingIntent =
         intentActionView(url),
         PendingIntent.FLAG_IMMUTABLE
     )
+
+fun String.asHtmlToSpanned(): Spanned =
+    Html.fromHtml(this, HtmlCompat.FROM_HTML_MODE_LEGACY)
