@@ -80,6 +80,7 @@ class NewsWorker(
             notificationChannels.project_euler.news(it.id.toInt()).notify(context) {
                 setSubText("Project Euler news")
                 setContentTitle(it.title)
+                //TODO: still <p> .. </p>
                 setBigContent(it.descriptionHtml.asHtmlToSpanned())
                 setSmallIcon(R.drawable.ic_news)
                 setColor(context.getColor(R.color.project_euler_main))

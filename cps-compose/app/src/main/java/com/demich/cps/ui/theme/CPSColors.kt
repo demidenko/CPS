@@ -26,12 +26,13 @@ class CPSColors(
     val divider: Color,
     val success: Color,
     val error: Color,
-    val votedRatingNegative: Color,
+    private val votedRatingNegative: Color,
     val newEntry: Color,
     materialInitColors: () -> Colors,
     handleColor: (HandleColor) -> Color
 ) {
-    val votedRatingPositive: Color get() = success
+    fun votedRating(rating: Int): Color =
+        if (rating > 0) success else votedRatingNegative
 
     private val handleColors = HandleColor.values().map(handleColor)
     fun handleColor(handleColor: HandleColor): Color = handleColors[handleColor.ordinal]

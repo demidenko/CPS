@@ -372,7 +372,7 @@ fun VotedRating(
     if (rating != 0 || showZero) {
         Text(
             text = rating.toSignedString(),
-            color = if (rating > 0) cpsColors.votedRatingPositive else cpsColors.votedRatingNegative,
+            color = cpsColors.votedRating(rating),
             fontWeight = FontWeight.Bold,
             fontSize = fontSize,
             modifier = modifier
