@@ -11,10 +11,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.LocalCodeforcesAccountManager
-import com.demich.cps.navigation.Screen
 import com.demich.cps.accounts.DialogAccountChooser
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
-import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
+import com.demich.cps.navigation.Screen
+import com.demich.cps.news.codeforces.codeforcesNewsViewModel
 import com.demich.cps.room.followListDao
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
@@ -24,12 +24,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable
-fun NewsFollowScreen(
-    navigator: CPSNavigator,
-    newsViewModel: CodeforcesNewsViewModel
-) {
+fun NewsFollowScreen(navigator: CPSNavigator) {
     val context = context
     val scope = rememberCoroutineScope()
+
+    val newsViewModel = codeforcesNewsViewModel()
 
     val followLoadingStatus by rememberCollect { newsViewModel.flowOfFollowUpdateLoadingStatus() }
 
@@ -131,10 +130,9 @@ private fun CodeforcesFollowList(
     }
 }
 
-fun newsFollowListBottomBarBuilder(
-    newsViewModel: CodeforcesNewsViewModel
-): AdditionalBottomBarBuilder = {
+fun newsFollowListBottomBarBuilder(): AdditionalBottomBarBuilder = {
     val context = context
+    val newsViewModel = codeforcesNewsViewModel()
 
     var showChooseDialog by remember { mutableStateOf(false) }
 

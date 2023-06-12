@@ -8,8 +8,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
@@ -20,9 +26,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.demich.cps.accounts.*
+import com.demich.cps.accounts.AccountExpandedScreen
+import com.demich.cps.accounts.AccountSettingsScreen
+import com.demich.cps.accounts.AccountsScreen
+import com.demich.cps.accounts.AccountsViewModel
+import com.demich.cps.accounts.accountExpandedMenuBuilder
+import com.demich.cps.accounts.accountsBottomBarBuilder
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
-import com.demich.cps.contests.*
+import com.demich.cps.contests.ContestsScreen
+import com.demich.cps.contests.ContestsViewModel
+import com.demich.cps.contests.contestsBottomBarBuilder
+import com.demich.cps.contests.contestsMenuBuilder
+import com.demich.cps.contests.rememberCombinedLoadingStatusState
+import com.demich.cps.contests.rememberContestsFilterController
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.develop.DevelopScreen
 import com.demich.cps.develop.developAdditionalBottomBarBuilder
@@ -31,7 +47,7 @@ import com.demich.cps.navigation.ScreenTypes
 import com.demich.cps.navigation.getScreen
 import com.demich.cps.news.NewsScreen
 import com.demich.cps.news.codeforces.CodeforcesBlogScreen
-import com.demich.cps.news.codeforces.CodeforcesNewsViewModel
+import com.demich.cps.news.codeforces.codeforcesNewsViewModel
 import com.demich.cps.news.codeforces.rememberCodeforcesNewsController
 import com.demich.cps.news.follow.NewsFollowScreen
 import com.demich.cps.news.follow.newsFollowListBottomBarBuilder
@@ -63,7 +79,6 @@ class MainActivity: ComponentActivity() {
         setContent {
             val cpsViewModels = CPSViewModels(
                 accountsViewModel = viewModel(),
-                newsViewModel = viewModel(),
                 contestsViewModel = viewModel(),
                 progressBarsViewModel = viewModel()
             )
@@ -158,7 +173,7 @@ private fun CPSScaffold(
             }
 
             cpsComposable(ScreenTypes.news) { holder ->
-                val controller = rememberCodeforcesNewsController(cpsViewModels.newsViewModel)
+                val controller = rememberCodeforcesNewsController()
                 NewsScreen(controller = controller)
                 holder.menu = newsMenuBuilder(
                     navigator = navigator,
@@ -174,20 +189,16 @@ private fun CPSScaffold(
                 holder.setSubtitle("news", "settings")
             }
             cpsComposable(ScreenTypes.newsFollowList) { holder ->
-                NewsFollowScreen(
-                    navigator = navigator,
-                    newsViewModel = cpsViewModels.newsViewModel
-                )
-                holder.bottomBar = newsFollowListBottomBarBuilder(
-                    newsViewModel = cpsViewModels.newsViewModel
-                )
+                NewsFollowScreen(navigator = navigator)
+                holder.bottomBar = newsFollowListBottomBarBuilder()
                 holder.setSubtitle("news", "codeforces", "follow", "list")
             }
             cpsComposable(ScreenTypes.newsCodeforcesBlog) { holder ->
                 val handle = (holder.screen as Screen.NewsCodeforcesBlog).handle
+                val newsViewModel = codeforcesNewsViewModel()
                 CodeforcesBlogScreen(
-                    blogEntries = { cpsViewModels.newsViewModel.blogEntries },
-                    loadingStatus = { cpsViewModels.newsViewModel.blogLoadingStatus }
+                    blogEntries = { newsViewModel.blogEntries },
+                    loadingStatus = { newsViewModel.blogLoadingStatus }
                 )
                 holder.setSubtitle("news", "codeforces", "blog")
             }
@@ -248,7 +259,6 @@ private fun CPSScaffold(
 
 class CPSViewModels(
     val accountsViewModel: AccountsViewModel,
-    val newsViewModel: CodeforcesNewsViewModel,
     val contestsViewModel: ContestsViewModel,
     val progressBarsViewModel: ProgressBarsViewModel
 )

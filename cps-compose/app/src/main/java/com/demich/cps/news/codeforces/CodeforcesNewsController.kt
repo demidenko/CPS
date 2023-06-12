@@ -16,15 +16,13 @@ import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
 
 @Composable
-fun rememberCodeforcesNewsController(
-    viewModel: CodeforcesNewsViewModel
-): CodeforcesNewsController {
+fun rememberCodeforcesNewsController(): CodeforcesNewsController {
     val context = context
+    val viewModel = codeforcesNewsViewModel()
 
     val tabsState = rememberCollect {
         context.settingsNews.flowOfCodeforcesTabs()

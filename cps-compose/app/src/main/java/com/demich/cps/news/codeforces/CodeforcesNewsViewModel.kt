@@ -1,11 +1,14 @@
 package com.demich.cps.news.codeforces
 
 import android.content.Context
+import androidx.activity.ComponentActivity
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
@@ -17,11 +20,16 @@ import com.demich.cps.platforms.utils.CodeforcesUtils
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.combine
+import com.demich.cps.utils.context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.max
+
+@Composable
+fun codeforcesNewsViewModel(): CodeforcesNewsViewModel =
+    viewModel(context as ComponentActivity)
 
 class CodeforcesNewsViewModel: ViewModel() {
 
