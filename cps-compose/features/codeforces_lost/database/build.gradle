@@ -5,7 +5,7 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(java_version)
+    jvmToolchain(java_toolchain_version)
 }
 
 android {

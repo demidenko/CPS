@@ -48,3 +48,5 @@
 # @Serializable and @Polymorphic are used at runtime for polymorphic serialization.
 -keepattributes RuntimeVisibleAnnotations,AnnotationDefault
 # END https://github.com/Kotlin/kotlinx.serialization#android
+
+-dontwarn org.slf4j.impl.StaticLoggerBinder
