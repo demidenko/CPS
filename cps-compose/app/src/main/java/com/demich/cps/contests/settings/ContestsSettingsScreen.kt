@@ -10,5 +10,6 @@ fun ContestsSettingsScreen() {
         ContestPlatformsSettingsItem()
         ClistApiAccessSettingsItem()
         DateConstraintsSettingsItem()
+        AutoUpdateSettingsItem()
     }
 }

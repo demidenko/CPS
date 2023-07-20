@@ -19,7 +19,7 @@ import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
 
 @Composable
-fun ContestPlatformsSettingsItem() {
+internal fun ContestPlatformsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 

@@ -35,6 +35,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
 
     val contestsLoadersPriorityLists = jsonCPS.item(name = "loading_priorities", defaultValue = defaultLoadingPriorities)
 
+    val enabledAutoUpdate = itemBoolean(name = "auto_update", defaultValue = true)
 }
 
 @Serializable

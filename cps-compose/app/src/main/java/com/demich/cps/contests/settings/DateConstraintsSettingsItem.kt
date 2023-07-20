@@ -30,7 +30,7 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
 @Composable
-fun DateConstraintsSettingsItem() {
+internal fun DateConstraintsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
