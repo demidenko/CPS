@@ -60,8 +60,8 @@ data class Contest (
     }
 
     companion object {
-        val platforms: List<Platform> by lazy { Platform.values().toList() }
-        val platformsExceptUnknown: List<Platform> by lazy { Platform.values().filter { it != Platform.unknown } }
+        val platforms: List<Platform> get() = Platform.entries
+        val platformsExceptUnknown: List<Platform> = platforms - Platform.unknown
 
         fun getComparator(currentTime: Instant) = Comparator<Contest> { c1, c2 ->
             val phase1 = c1.getPhase(currentTime)

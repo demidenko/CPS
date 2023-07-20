@@ -181,7 +181,7 @@ private fun NewsFeedsSettingsItem() {
     if (showDialog) {
         CPSDialogMultiSelectEnum(
             title = title,
-            options = NewsSettingsDataStore.NewsFeed.values().asIterable(),
+            options = NewsSettingsDataStore.NewsFeed.entries,
             selectedOptions = remember { runBlocking { enabledSettingsItem() } },
             optionTitle = { Text(it.link) },
             onDismissRequest = { showDialog = false },

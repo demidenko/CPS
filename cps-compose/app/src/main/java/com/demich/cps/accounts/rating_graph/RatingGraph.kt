@@ -251,7 +251,7 @@ private fun DrawRatingGraph(
     modifier: Modifier = Modifier
 ) {
     val managerSupportedColors = remember(manager.type) {
-        HandleColor.values().filter {
+        HandleColor.entries.filter {
             runCatching { manager.originalColor(it) }.isSuccess
         }
     }

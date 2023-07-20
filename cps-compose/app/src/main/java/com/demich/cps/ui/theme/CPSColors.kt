@@ -34,7 +34,7 @@ class CPSColors(
     fun votedRating(rating: Int): Color =
         if (rating > 0) success else votedRatingNegative
 
-    private val handleColors = HandleColor.values().map(handleColor)
+    private val handleColors = HandleColor.entries.map(handleColor)
     fun handleColor(handleColor: HandleColor): Color = handleColors[handleColor.ordinal]
 
     internal val materialColors = materialInitColors().copy(

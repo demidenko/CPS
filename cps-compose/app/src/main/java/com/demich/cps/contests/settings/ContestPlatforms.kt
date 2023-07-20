@@ -62,10 +62,9 @@ private fun ContestPlatformsSettingsItemExpandedContent(
 ) {
     Column {
         Contest.platformsExceptUnknown.forEach { platform ->
-            val availableLoaders = ContestsLoaders.values().filter { platform in it.supportedPlatforms }.toSet()
             PlatformCheckRow(
                 platform = platform,
-                availableLoaders = availableLoaders,
+                availableLoaders = ContestsLoaders.entries.filter { platform in it.supportedPlatforms }.toSet(),
                 isChecked = platform in enabledPlatforms,
                 onCheckedChange = { onCheckedChange(platform, it) }
             )

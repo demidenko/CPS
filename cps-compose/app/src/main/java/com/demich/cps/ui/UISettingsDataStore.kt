@@ -30,7 +30,7 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
     private val accountsOrder = jsonCPS.item<List<AccountManagers>>(name = "accounts_order", defaultValue = emptyList())
     suspend fun saveAccountsOrder(order: List<AccountManagers>) = accountsOrder(order)
     fun flowOfAccountsOrder(): Flow<List<AccountManagers>> = accountsOrder.flow.map { order ->
-        order + AccountManagers.values().filter { it !in order }
+        order + AccountManagers.entries.filter { it !in order }
     }
 
     val startScreenRoute = itemString(name = "start_screen_route", defaultValue = ScreenTypes.accounts.route)
