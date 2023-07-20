@@ -30,11 +30,8 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-    }
-
-    applicationVariants.all { variant ->
-        if (variant.name.contains("debug")) {
-            variant.mergedFlavor.applicationId += ".debug"
+        debug {
+            applicationIdSuffix ".debug"
         }
     }
 
