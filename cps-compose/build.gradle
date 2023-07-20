@@ -1,7 +1,7 @@
 buildscript {
     ext {
         gradle_version = '7.4.1' //TODO: 8.0.0 cant build release
-        kotlin_version = '1.8.20'
+        kotlin_version = '1.9.0'
         java_version = 17
         ktor_version = '2.3.0'
         accompanist_version = '0.30.0'
