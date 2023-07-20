@@ -3,7 +3,7 @@ buildscript {
         gradle_version = '7.4.1' //TODO: 8.0.0 cant build release
         kotlin_version = '1.9.0'
         java_version = 17
-        ktor_version = '2.3.0'
+        ktor_version = '2.3.2'
         accompanist_version = '0.30.0'
         room_version = '2.6.0-alpha01'
         lifecycle_version = '2.6.1'
