@@ -14,7 +14,7 @@ import com.demich.cps.notifications.setBigContent
 import com.demich.cps.notifications.setWhen
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
-import com.demich.cps.platforms.utils.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 
 val Context.followListDao: FollowListDao
     get() = FollowListDao(

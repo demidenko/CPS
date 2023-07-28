@@ -16,7 +16,7 @@ import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.api.CodeforcesRecentAction
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.room.followListDao
-import com.demich.cps.platforms.utils.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.combine

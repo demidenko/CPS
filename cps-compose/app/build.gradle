@@ -16,7 +16,7 @@ android {
         minSdk 26
         targetSdk 33
 
-        versionCode 330
+        versionCode 331
         versionName '1.9.0'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -88,8 +88,6 @@ dependencies {
 
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
-
-    implementation 'org.jsoup:jsoup:1.15.4'
 
     testImplementation "junit:junit:4.13.2"
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

@@ -8,7 +8,7 @@ import com.demich.cps.platforms.api.CodeforcesAPIErrorResponse
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesLocale
-import com.demich.cps.platforms.utils.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import kotlinx.coroutines.flow.Flow
 
 val Context.cfFollowDao: CodeforcesFollowDao

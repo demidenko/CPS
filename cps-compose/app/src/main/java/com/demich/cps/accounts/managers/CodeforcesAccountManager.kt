@@ -33,7 +33,7 @@ import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesProblem
 import com.demich.cps.platforms.api.CodeforcesRatingChange
-import com.demich.cps.platforms.utils.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.theme.cpsColors

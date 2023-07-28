@@ -8,7 +8,7 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.utils.awaitPair
-import com.demich.cps.platforms.utils.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesProblem
 import com.demich.cps.platforms.api.CodeforcesProblemVerdict

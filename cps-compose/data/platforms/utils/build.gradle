@@ -37,5 +37,5 @@ dependencies {
 
     implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.4.0'
 
-    implementation 'org.jsoup:jsoup:1.15.4'
+    implementation 'org.jsoup:jsoup:1.16.1'
 }

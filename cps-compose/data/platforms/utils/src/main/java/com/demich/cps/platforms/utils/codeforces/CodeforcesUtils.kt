@@ -1,4 +1,4 @@
-package com.demich.cps.platforms.utils
+package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
@@ -9,6 +9,13 @@ import org.jsoup.nodes.Element
 import java.text.SimpleDateFormat
 import java.util.*
 
+internal fun Element.extractRatedUser(): Pair<String, CodeforcesColorTag> = Pair(
+    first = text(),
+    second = CodeforcesColorTag.fromString(
+        str = classNames().first { name -> name.startsWith("user-") }
+    )
+)
+
 object CodeforcesUtils {
 
     private val dateFormatRU = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
@@ -18,13 +25,6 @@ object CodeforcesUtils {
         val parser = if (this.contains('.')) dateFormatRU else dateFormatEN
         return Instant.fromEpochMilliseconds(parser.parse(this)!!.time)
     }
-
-    private fun Element.extractRatedUser(): Pair<String, CodeforcesColorTag> = Pair(
-        first = text(),
-        second = CodeforcesColorTag.fromString(
-            str = classNames().first { name -> name.startsWith("user-") }
-        )
-    )
 
     private fun extractBlogEntryOrNull(topic: Element): CodeforcesBlogEntry? {
         return kotlin.runCatching {
