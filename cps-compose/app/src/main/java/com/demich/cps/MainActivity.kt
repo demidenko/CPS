@@ -34,9 +34,9 @@ import com.demich.cps.accounts.accountExpandedMenuBuilder
 import com.demich.cps.accounts.accountsBottomBarBuilder
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.ContestsScreen
-import com.demich.cps.contests.ContestsViewModel
 import com.demich.cps.contests.contestsBottomBarBuilder
 import com.demich.cps.contests.contestsMenuBuilder
+import com.demich.cps.contests.contestsViewModel
 import com.demich.cps.contests.rememberCombinedLoadingStatusState
 import com.demich.cps.contests.rememberContestsFilterController
 import com.demich.cps.contests.settings.ContestsSettingsScreen
@@ -79,7 +79,6 @@ class MainActivity: ComponentActivity() {
         setContent {
             val cpsViewModels = CPSViewModels(
                 accountsViewModel = viewModel(),
-                contestsViewModel = viewModel(),
                 progressBarsViewModel = viewModel()
             )
             CompositionLocalProvider(LocalCodeforcesAccountManager provides CodeforcesAccountManager(context)) {
@@ -205,12 +204,12 @@ private fun CPSScaffold(
 
             cpsComposable(ScreenTypes.contests) { holder ->
                 val context = context
+                val contestsViewModel = contestsViewModel()
                 val filterController = rememberContestsFilterController()
-                val loadingStatus by rememberCombinedLoadingStatusState(cpsViewModels.contestsViewModel)
+                val loadingStatus by rememberCombinedLoadingStatusState()
                 val isReloading = { loadingStatus == LoadingStatus.LOADING }
-                val onReload = { cpsViewModels.contestsViewModel.reloadEnabledPlatforms(context) }
+                val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
                 ContestsScreen(
-                    contestsViewModel = cpsViewModels.contestsViewModel,
                     filterController = filterController,
                     isReloading = isReloading,
                     onReload = onReload
@@ -259,7 +258,6 @@ private fun CPSScaffold(
 
 class CPSViewModels(
     val accountsViewModel: AccountsViewModel,
-    val contestsViewModel: ContestsViewModel,
     val progressBarsViewModel: ProgressBarsViewModel
 )
 

@@ -1,6 +1,7 @@
 package com.demich.cps.contests
 
 import android.content.Context
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.database.Contest
@@ -13,12 +14,16 @@ import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.mapToSet
+import com.demich.cps.utils.sharedViewModel
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+@Composable
+fun contestsViewModel(): ContestsViewModel = sharedViewModel()
 
 class ContestsViewModel: ViewModel(), ContestsReloader {
 

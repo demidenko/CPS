@@ -48,12 +48,13 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ContestsScreen(
-    contestsViewModel: ContestsViewModel,
     filterController: ContestsFilterController,
     isReloading: () -> Boolean,
     onReload: () -> Unit
 ) {
     val context = context
+    val contestsViewModel = contestsViewModel()
+
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
     val errorsMessage by rememberCollect {
         combine(
@@ -334,8 +335,9 @@ private fun rememberIsAnyPlatformEnabled(): State<Boolean> {
 
 
 @Composable
-fun rememberCombinedLoadingStatusState(contestsViewModel: ContestsViewModel): State<LoadingStatus> {
+fun rememberCombinedLoadingStatusState(): State<LoadingStatus> {
     val context = context
+    val contestsViewModel = contestsViewModel()
 
     return produceState(
         initialValue = LoadingStatus.PENDING,

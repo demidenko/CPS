@@ -15,6 +15,7 @@ import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.CPSViewModels
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.accounts.userinfo.RatedUserInfo
+import com.demich.cps.contests.contestsViewModel
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.utils.*
@@ -71,9 +72,11 @@ fun developAdditionalBottomBarBuilder(
     CPSIconButton(icon = CPSIcons.Monitor) {
         showMonitorDialog = true
     }
+
+    val contestsViewModel = contestsViewModel()
     if (showMonitorDialog) {
         MonitorDialog(onDismissRequest = { showMonitorDialog = false }) {
-            cpsViewModels.contestsViewModel.viewModelScope.launch {
+            contestsViewModel.viewModelScope.launch {
                 CodeforcesMonitorLauncherWorker.startMonitor(
                     contestId = it,
                     handle = CodeforcesAccountManager(context).getSavedInfo()?.handle ?: return@launch,

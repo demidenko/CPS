@@ -1,35 +1,36 @@
 package com.demich.cps.news.codeforces
 
 import android.content.Context
-import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
+import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.api.CodeforcesRecentAction
-import com.demich.cps.news.settings.settingsNews
-import com.demich.cps.room.followListDao
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.room.followListDao
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.combine
-import com.demich.cps.utils.context
+import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.max
 
 @Composable
-fun codeforcesNewsViewModel(): CodeforcesNewsViewModel =
-    viewModel(context as ComponentActivity)
+fun codeforcesNewsViewModel(): CodeforcesNewsViewModel = sharedViewModel()
 
 class CodeforcesNewsViewModel: ViewModel() {
 
