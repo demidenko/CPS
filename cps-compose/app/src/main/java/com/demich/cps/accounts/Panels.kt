@@ -34,12 +34,12 @@ import java.util.Collections
 @Composable
 fun<U: UserInfo> AccountPanel(
     userInfoWithManager: UserInfoWithManager<U>,
-    accountsViewModel: AccountsViewModel,
     modifier: Modifier = Modifier,
     visibleOrder: List<AccountManagers>? = null,
     onReloadRequest: () -> Unit,
     onExpandRequest: () -> Unit
 ) {
+    val accountsViewModel = accountsViewModel()
     val (userInfo, manager) = userInfoWithManager
 
     var lastClick by remember { mutableStateOf(Instant.DISTANT_PAST) }

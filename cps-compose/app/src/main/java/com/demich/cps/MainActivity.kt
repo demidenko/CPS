@@ -29,9 +29,9 @@ import androidx.navigation.compose.rememberNavController
 import com.demich.cps.accounts.AccountExpandedScreen
 import com.demich.cps.accounts.AccountSettingsScreen
 import com.demich.cps.accounts.AccountsScreen
-import com.demich.cps.accounts.AccountsViewModel
 import com.demich.cps.accounts.accountExpandedMenuBuilder
 import com.demich.cps.accounts.accountsBottomBarBuilder
+import com.demich.cps.accounts.accountsViewModel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.contestsBottomBarBuilder
@@ -78,7 +78,6 @@ class MainActivity: ComponentActivity() {
 
         setContent {
             val cpsViewModels = CPSViewModels(
-                accountsViewModel = viewModel(),
                 progressBarsViewModel = viewModel()
             )
             CompositionLocalProvider(LocalCodeforcesAccountManager provides CodeforcesAccountManager(context)) {
@@ -132,7 +131,6 @@ private fun CPSScaffold(
             cpsComposable(ScreenTypes.accounts) { holder ->
                 var reorderEnabled by rememberSaveable { mutableStateOf(false) }
                 AccountsScreen(
-                    accountsViewModel = cpsViewModels.accountsViewModel,
                     onExpandAccount = { type -> navigator.navigateTo(Screen.AccountExpanded(type)) },
                     onSetAdditionalMenu = holder.menuSetter,
                     reorderEnabled = { reorderEnabled },
@@ -146,6 +144,7 @@ private fun CPSScaffold(
                 holder.setSubtitle("accounts")
             }
             cpsComposable(ScreenTypes.accountExpanded) { holder ->
+                val accountsViewModel = accountsViewModel()
                 val type = (holder.screen as Screen.AccountExpanded).type
                 var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
                 AccountExpandedScreen(
@@ -153,7 +152,7 @@ private fun CPSScaffold(
                     showDeleteDialog = showDeleteDialog,
                     onDeleteRequest = { manager ->
                         navigator.popBack()
-                        cpsViewModels.accountsViewModel.delete(manager)
+                        accountsViewModel.delete(manager)
                     },
                     onDismissDeleteDialog = { showDeleteDialog = false },
                     setBottomBarContent = holder.bottomBarSetter
@@ -257,7 +256,6 @@ private fun CPSScaffold(
 }
 
 class CPSViewModels(
-    val accountsViewModel: AccountsViewModel,
     val progressBarsViewModel: ProgressBarsViewModel
 )
 

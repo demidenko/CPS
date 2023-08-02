@@ -29,12 +29,12 @@ import kotlinx.coroutines.runBlocking
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AccountsScreen(
-    accountsViewModel: AccountsViewModel,
     onExpandAccount: (AccountManagers) -> Unit,
     onSetAdditionalMenu: (CPSMenuBuilder) -> Unit,
     reorderEnabled: () -> Boolean,
     enableReorder: () -> Unit
 ) {
+    val accountsViewModel = accountsViewModel()
     val recordedAccounts by rememberRecordedAccounts()
 
     val visibleOrder by remember {
@@ -67,7 +67,6 @@ fun AccountsScreen(
                 userInfoWithManager = userInfoWithManager,
                 onReloadRequest = { accountsViewModel.reload(userInfoWithManager.manager) },
                 onExpandRequest = { onExpandAccount(userInfoWithManager.type) },
-                accountsViewModel = accountsViewModel,
                 visibleOrder = visibleOrder,
                 modifier = Modifier
                     .padding(start = 10.dp)
@@ -105,13 +104,14 @@ fun accountsBottomBarBuilder(
         )
     } else {
         AddAccountButton(cpsViewModels)
-        ReloadAccountsButton(cpsViewModels.accountsViewModel)
+        ReloadAccountsButton()
     }
 }
 
 @Composable
-private fun ReloadAccountsButton(accountsViewModel: AccountsViewModel) {
+private fun ReloadAccountsButton() {
     val context = context
+    val accountsViewModel = accountsViewModel()
 
     val loadingStatus by rememberCollect {
         context.allAccountManagers
@@ -207,13 +207,14 @@ private fun CListImportDialog(
     onDismissRequest: () -> Unit
 ) {
     val context = context
+    val accountsViewModel = accountsViewModel()
     val cListAccountManager = remember { CListAccountManager(context) }
     DialogAccountChooser(
         manager = cListAccountManager,
         initialUserInfo = null,
         onDismissRequest = onDismissRequest,
         onResult = { userInfo ->
-            cpsViewModels.accountsViewModel.runClistImport(
+            accountsViewModel.runClistImport(
                 cListUserInfo = userInfo,
                 progressBarsViewModel = cpsViewModels.progressBarsViewModel,
                 context = context

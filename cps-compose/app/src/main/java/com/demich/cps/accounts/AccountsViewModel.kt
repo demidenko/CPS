@@ -1,6 +1,7 @@
 package com.demich.cps.accounts
 
 import android.content.Context
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.managers.*
@@ -10,10 +11,13 @@ import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
+@Composable
+fun accountsViewModel(): AccountsViewModel = sharedViewModel()
 
 class AccountsViewModel: ViewModel() {
     private val loadingStatuses = mutableMapOf<AccountManagers, MutableStateFlow<LoadingStatus>>()
