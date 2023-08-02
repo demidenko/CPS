@@ -12,10 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.AdditionalBottomBarBuilder
-import com.demich.cps.CPSViewModels
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.*
+import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.context
@@ -93,7 +93,6 @@ private fun rememberRecordedAccounts() = with(context) {
 }
 
 fun accountsBottomBarBuilder(
-    cpsViewModels: CPSViewModels,
     reorderEnabled: () -> Boolean,
     onReorderDone: () -> Unit
 ): AdditionalBottomBarBuilder = {
@@ -103,7 +102,7 @@ fun accountsBottomBarBuilder(
             onClick = onReorderDone
         )
     } else {
-        AddAccountButton(cpsViewModels)
+        AddAccountButton()
         ReloadAccountsButton()
     }
 }
@@ -134,17 +133,18 @@ private fun ReloadAccountsButton() {
 }
 
 @Composable
-private fun AddAccountButton(cpsViewModels: CPSViewModels) {
+private fun AddAccountButton() {
     var showMenu by remember { mutableStateOf(false) }
     var chosenManager: AccountManagers? by remember { mutableStateOf(null) }
 
     val context = context
     val scope = rememberCoroutineScope()
+    val progressBarsViewModel = progressBarsViewModel()
 
     Box {
         CPSIconButton(
             icon = CPSIcons.Add,
-            enabled = cpsViewModels.progressBarsViewModel.clistImportIsRunning.not(),
+            enabled = progressBarsViewModel.clistImportIsRunning.not(),
             onClick = { showMenu = true }
         )
 
@@ -175,7 +175,7 @@ private fun AddAccountButton(cpsViewModels: CPSViewModels) {
         
         chosenManager?.let { type -> 
             if (type == AccountManagers.clist) {
-                CListImportDialog(cpsViewModels) { chosenManager = null }
+                CListImportDialog { chosenManager = null }
             } else {
                 context.allAccountManagers
                     .first { it.type == type }
@@ -203,11 +203,11 @@ internal fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
 
 @Composable
 private fun CListImportDialog(
-    cpsViewModels: CPSViewModels,
     onDismissRequest: () -> Unit
 ) {
     val context = context
     val accountsViewModel = accountsViewModel()
+    val progressBarsViewModel = progressBarsViewModel()
     val cListAccountManager = remember { CListAccountManager(context) }
     DialogAccountChooser(
         manager = cListAccountManager,
@@ -216,7 +216,7 @@ private fun CListImportDialog(
         onResult = { userInfo ->
             accountsViewModel.runClistImport(
                 cListUserInfo = userInfo,
-                progressBarsViewModel = cpsViewModels.progressBarsViewModel,
+                progressBarsViewModel = progressBarsViewModel,
                 context = context
             )
         }

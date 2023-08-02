@@ -26,9 +26,9 @@ import com.demich.cps.ui.theme.cpsColors
 
 @Composable
 fun CPSBottomProgressBarsColumn(
-    progressBarsViewModel: ProgressBarsViewModel,
     modifier: Modifier = Modifier
 ) {
+    val progressBarsViewModel = progressBarsViewModel()
     LazyColumn(
         modifier = modifier
     ) {

@@ -3,6 +3,7 @@ package com.demich.cps.ui.bottomprogressbar
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -19,6 +20,9 @@ data class ProgressBarInfo(
 
     operator fun inc(): ProgressBarInfo = copy(current = current + 1)
 }
+
+@Composable
+fun progressBarsViewModel(): ProgressBarsViewModel = sharedViewModel()
 
 class ProgressBarsViewModel: ViewModel() {
     val progressBars = mutableStateListOf<String>()

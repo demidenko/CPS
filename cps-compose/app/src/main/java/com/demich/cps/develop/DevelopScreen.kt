@@ -1,28 +1,39 @@
 package com.demich.cps.develop
 
 import android.content.Context
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.AdditionalBottomBarBuilder
-import com.demich.cps.CPSViewModels
-import com.demich.cps.accounts.managers.*
+import com.demich.cps.accounts.managers.AccountManagers
+import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.accounts.managers.RatedAccountManager
+import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.contests.contestsViewModel
-import com.demich.cps.ui.*
+import com.demich.cps.ui.CPSIconButton
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.CPSRadioButtonTitled
+import com.demich.cps.ui.LazyColumnWithScrollBar
+import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
-import com.demich.cps.utils.*
+import com.demich.cps.utils.context
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -50,13 +61,12 @@ fun DevelopScreen() {
 }
 
 
-fun developAdditionalBottomBarBuilder(
-    cpsViewModels: CPSViewModels
-): AdditionalBottomBarBuilder = {
+fun developAdditionalBottomBarBuilder(): AdditionalBottomBarBuilder = {
     val context = context
+    val progressBarsViewModel = progressBarsViewModel()
 
     CPSIconButton(icon = CPSIcons.Add) {
-        cpsViewModels.progressBarsViewModel.doJob(
+        progressBarsViewModel.doJob(
             id = Random.nextLong().toString()
         ) { state ->
             val total = Random.nextInt(5, 15)

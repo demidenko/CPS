@@ -22,7 +22,6 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -56,7 +55,6 @@ import com.demich.cps.news.newsMenuBuilder
 import com.demich.cps.news.settings.NewsSettingsScreen
 import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
-import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.ui.rememberCPSNavigator
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.LoadingStatus
@@ -77,12 +75,9 @@ class MainActivity: ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val cpsViewModels = CPSViewModels(
-                progressBarsViewModel = viewModel()
-            )
             CompositionLocalProvider(LocalCodeforcesAccountManager provides CodeforcesAccountManager(context)) {
                 CPSTheme {
-                    CPSContent(cpsViewModels = cpsViewModels)
+                    CPSContent()
                 }
             }
         }
@@ -90,23 +85,17 @@ class MainActivity: ComponentActivity() {
 }
 
 @Composable
-private fun CPSContent(
-    cpsViewModels: CPSViewModels
-) {
+private fun CPSContent() {
     val navigator = rememberCPSNavigator(navController = rememberNavController())
 
     navigator.ColorizeNavAndStatusBars()
 
-    CPSScaffold(
-        cpsViewModels = cpsViewModels,
-        navigator = navigator
-    )
+    CPSScaffold(navigator = navigator)
 }
 
 
 @Composable
 private fun CPSScaffold(
-    cpsViewModels: CPSViewModels,
     navigator: CPSNavigator
 ) {
     fun NavGraphBuilder.cpsComposable(
@@ -124,9 +113,7 @@ private fun CPSScaffold(
         }
     }
 
-    val navBuilder: NavGraphBuilder.() -> Unit = remember(
-        navigator, cpsViewModels
-    ) {
+    val navBuilder: NavGraphBuilder.() -> Unit = remember(key1 = navigator) {
         {
             cpsComposable(ScreenTypes.accounts) { holder ->
                 var reorderEnabled by rememberSaveable { mutableStateOf(false) }
@@ -137,7 +124,6 @@ private fun CPSScaffold(
                     enableReorder = { reorderEnabled = true }
                 )
                 holder.bottomBar = accountsBottomBarBuilder(
-                    cpsViewModels = cpsViewModels,
                     reorderEnabled = { reorderEnabled },
                     onReorderDone = { reorderEnabled = false }
                 )
@@ -231,7 +217,7 @@ private fun CPSScaffold(
 
             cpsComposable(ScreenTypes.develop) { holder ->
                 DevelopScreen()
-                holder.bottomBar = developAdditionalBottomBarBuilder(cpsViewModels)
+                holder.bottomBar = developAdditionalBottomBarBuilder()
                 holder.setSubtitle("develop")
             }
         }
@@ -248,16 +234,11 @@ private fun CPSScaffold(
         ) {
             navigator.NavHost(builder = navBuilder)
             CPSBottomProgressBarsColumn(
-                progressBarsViewModel = cpsViewModels.progressBarsViewModel,
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
     }
 }
-
-class CPSViewModels(
-    val progressBarsViewModel: ProgressBarsViewModel
-)
 
 val LocalCodeforcesAccountManager = staticCompositionLocalOf<CodeforcesAccountManager> {
     throw IllegalAccessException()
