@@ -25,14 +25,12 @@ enum class DarkLightMode {
 private fun DarkLightMode.isDarkMode(): Boolean =
     if (this == DarkLightMode.SYSTEM) isSystemInDarkTheme() else this == DarkLightMode.DARK
 
-val LocalUseOriginalColors = compositionLocalOf { false }
-
 @Composable
 fun CPSTheme(content: @Composable () -> Unit) {
     val context = context
     val darkLightMode by rememberCollect { context.settingsUI.darkLightMode.flow }
     val useOriginalColors by rememberCollect { context.settingsUI.useOriginalColors.flow }
-    val colors = if (darkLightMode.isDarkMode()) darkCPSColors else lightCPSColors
+    val colors = if (darkLightMode.isDarkMode()) darkCPSColors(useOriginalColors) else lightCPSColors(useOriginalColors)
     MaterialTheme(
         colors = colors.materialColors,
         typography = Typography(
@@ -46,7 +44,6 @@ fun CPSTheme(content: @Composable () -> Unit) {
     ) {
         CompositionLocalProvider(
             LocalCPSColors provides colors,
-            LocalUseOriginalColors provides useOriginalColors,
             LocalContentAlpha provides 1f,
             content = content
         )

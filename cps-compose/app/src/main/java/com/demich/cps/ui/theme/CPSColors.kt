@@ -28,6 +28,7 @@ class CPSColors(
     val error: Color,
     private val votedRatingNegative: Color,
     val newEntry: Color,
+    val useOriginalHandleColors: Boolean,
     materialInitColors: () -> Colors,
     handleColor: (HandleColor) -> Color
 ) {
@@ -45,7 +46,7 @@ class CPSColors(
     )
 }
 
-internal val lightCPSColors = CPSColors(
+internal fun lightCPSColors(useOriginalHandleColors: Boolean) = CPSColors(
     accent = Color(21, 101, 192),
     content = Color(36, 36, 36),
     contentAdditional = Color(118, 118, 118),
@@ -56,7 +57,8 @@ internal val lightCPSColors = CPSColors(
     success = Color(0, 128, 0),
     error = Color(221, 34, 34),
     votedRatingNegative = Color(128, 128, 128),
-    newEntry = Color(0xFF669900), //android:color/holo_green_dark
+    newEntry = Color(0xFF669900), //android:color/holo_green_dark,
+    useOriginalHandleColors = useOriginalHandleColors,
     materialInitColors = ::lightColors
 ) {
     when (it) {
@@ -72,7 +74,7 @@ internal val lightCPSColors = CPSColors(
     }
 }
 
-internal val darkCPSColors = CPSColors(
+internal fun darkCPSColors(useOriginalHandleColors: Boolean) = CPSColors(
     accent = Color(0, 153, 204), //android:color/holo_blue_dark
     content = Color(212, 212, 212),
     contentAdditional = Color(147, 147, 147),
@@ -84,6 +86,7 @@ internal val darkCPSColors = CPSColors(
     error = Color(200, 64, 64),
     votedRatingNegative = Color(150, 150, 150),
     newEntry = Color(0xFF99CC00), //android:color/holo_green_light
+    useOriginalHandleColors = useOriginalHandleColors,
     materialInitColors = ::darkColors
 ) {
     when (it) {
