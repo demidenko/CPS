@@ -53,6 +53,11 @@ class CodeforcesHtmlParser(val builder: CodeforcesHtmlStringBuilder): NodeVisito
             return
         }
 
+        if (name == "br") {
+            builder.append("\n")
+            return
+        }
+
         //TODO: bad
         if (name == "p" && builder.length > 0) {
             builder.append("\n\n")
