@@ -41,14 +41,14 @@ class CodeforcesHtmlParser(val builder: CodeforcesHtmlStringBuilder): NodeVisito
         <li>: ul - circles; ol - 1, 2, 3...
          */
 
-        if (name == "a" && e.hasClass("rated-user")) {
+        if (name.isLink() && e.hasClass("rated-user")) {
             val (handle, tag) = e.extractRatedUser()
             builder.appendRatedSpan(handle = handle, tag = tag)
             e.remove()
             return
         }
 
-        if (name == "a") {
+        if (name.isLink()) {
             builder.pushLink()
             return
         }
@@ -64,22 +64,22 @@ class CodeforcesHtmlParser(val builder: CodeforcesHtmlStringBuilder): NodeVisito
             return
         }
 
-        if (name == "b" || name == "strong") {
+        if (name.isBold()) {
             builder.pushBold()
             return
         }
 
-        if (name == "i" || name == "em") {
+        if (name.isItalic()) {
             builder.pushItalic()
             return
         }
 
-        if (name == "code") {
+        if (name.isCode()) {
             builder.pushMono()
             return
         }
 
-        if (name == "blockquote") {
+        if (name.isQuote()) {
             builder.pushQuote()
             return
         }
@@ -92,16 +92,18 @@ class CodeforcesHtmlParser(val builder: CodeforcesHtmlStringBuilder): NodeVisito
 
     override fun tail(node: Node, depth: Int) {
         val e = node as? Element ?: return
+        val name = e.normalName()
 
-        when (e.normalName()) {
-            "a" -> {
-                builder.pop()
-            }
-            "b", "strong" -> builder.pop()
-            "i", "em" -> builder.pop()
-            "code" -> builder.pop()
-            "blockquote" -> builder.pop()
+        if (name.isLink() || name.isBold() || name.isItalic() || name.isCode() || name.isQuote()) {
+            builder.pop()
+            return
         }
     }
 
 }
+
+private fun String.isLink() = this == "a"
+private fun String.isBold() = this == "b" || this == "strong"
+private fun String.isItalic() = this == "i" || this == "em"
+private fun String.isCode() = this == "code"
+private fun String.isQuote() = this == "blockquote"
