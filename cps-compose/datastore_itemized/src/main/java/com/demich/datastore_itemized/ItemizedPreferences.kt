@@ -9,5 +9,5 @@ class ItemizedPreferences(private val preferences: Preferences) {
         item.converter.getFrom(preferences)
 }
 
-fun<D: ItemizedDataStore, R> D.flowBy(transform: suspend D.(ItemizedPreferences) -> R): Flow<R> =
+fun<D: ItemizedDataStore, R> D.flowBy(transform: D.(ItemizedPreferences) -> R): Flow<R> =
     dataStore.data.map { transform(ItemizedPreferences(it)) }

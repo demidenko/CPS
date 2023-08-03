@@ -95,26 +95,27 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
             rank = prefs[contestantRank],
             participationType = prefs[participationType]
         )
+        val problems = prefs[problemResults].map { problem ->
+            val index = problem.problemIndex
+            val result: CodeforcesMonitorData.ProblemResult = when {
+                contest.phase.isSystemTestOrFinished() && problem.type == CodeforcesProblemStatus.PRELIMINARY
+                    -> CodeforcesMonitorData.ProblemResult.Pending
+                problem.points != 0.0
+                    -> CodeforcesMonitorData.ProblemResult.Points(
+                        points = problem.points,
+                        isFinal = problem.type == CodeforcesProblemStatus.FINAL
+                    )
+                prefs[submissionsInfo][index]?.any { it.isFailedSystemTest() } == true
+                    -> CodeforcesMonitorData.ProblemResult.FailedSystemTest
+                else
+                    -> CodeforcesMonitorData.ProblemResult.Empty
+            }
+            index to result
+        }
         CodeforcesMonitorData(
             contestInfo = contest,
             contestPhase = phase,
             contestantRank = contestantRank,
-            problems = prefs[problemResults].map { problem ->
-                val index = problem.problemIndex
-                val result: CodeforcesMonitorData.ProblemResult = when {
-                    contest.phase.isSystemTestOrFinished() && problem.type == CodeforcesProblemStatus.PRELIMINARY
-                        -> CodeforcesMonitorData.ProblemResult.Pending
-                    problem.points != 0.0
-                        -> CodeforcesMonitorData.ProblemResult.Points(
-                            points = problem.points,
-                            isFinal = problem.type == CodeforcesProblemStatus.FINAL
-                        )
-                    prefs[submissionsInfo][index]?.any { it.isFailedSystemTest() } == true
-                        -> CodeforcesMonitorData.ProblemResult.FailedSystemTest
-                    else
-                        -> CodeforcesMonitorData.ProblemResult.Empty
-                }
-                index to result
-            }
+            problems = problems
         )
     }
