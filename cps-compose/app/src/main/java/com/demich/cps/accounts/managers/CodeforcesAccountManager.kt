@@ -36,6 +36,7 @@ import com.demich.cps.platforms.api.CodeforcesRatingChange
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.VotedRating
+import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
 import com.demich.cps.utils.jsonCPS
@@ -119,13 +120,12 @@ class CodeforcesAccountManager(context: Context):
         }
     }
 
-    @Composable
-    fun makeHandleSpan(handle: String, tag: CodeforcesColorTag): AnnotatedString =
+    fun makeHandleSpan(handle: String, tag: CodeforcesColorTag, cpsColors: CPSColors): AnnotatedString =
         buildAnnotatedString {
             append(handle, color = cpsColors.content)
             tag.toHandleColor()?.let { handleColor ->
                 addStyle(
-                    style = SpanStyle(color = colorFor(handleColor)),
+                    style = SpanStyle(color = colorFor(handleColor, cpsColors)),
                     start = if (tag == CodeforcesColorTag.LEGENDARY) 1 else 0,
                     end = handle.length
                 )
@@ -138,6 +138,10 @@ class CodeforcesAccountManager(context: Context):
                 )
             }
         }
+
+    @Composable
+    fun makeHandleSpan(handle: String, tag: CodeforcesColorTag): AnnotatedString =
+        makeHandleSpan(handle = handle, tag = tag, cpsColors = cpsColors)
 
     @Composable
     override fun makeRatedSpan(text: String, rating: Int): AnnotatedString =

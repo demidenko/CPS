@@ -9,6 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import kotlinx.datetime.Instant
 
@@ -25,10 +26,13 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
 
     abstract fun originalColor(handleColor: HandleColor): Color
 
-    @Composable
-    fun colorFor(handleColor: HandleColor): Color =
+    fun colorFor(handleColor: HandleColor, cpsColors: CPSColors): Color =
         if (cpsColors.useOriginalHandleColors) originalColor(handleColor)
         else cpsColors.handleColor(handleColor)
+
+    @Composable
+    fun colorFor(handleColor: HandleColor): Color =
+        colorFor(handleColor = handleColor, cpsColors = cpsColors)
 
     @Composable
     fun colorFor(rating: Int): Color = colorFor(handleColor = getHandleColor(rating))
