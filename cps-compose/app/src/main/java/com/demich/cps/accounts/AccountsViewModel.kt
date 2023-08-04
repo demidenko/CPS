@@ -6,10 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.accounts.userinfo.ClistUserInfo
+import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
+import com.demich.cps.utils.BackgroundDataLoader
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.flow.*
@@ -86,6 +88,14 @@ class AccountsViewModel: ViewModel() {
 
     private suspend fun<U: UserInfo> loadAndSave(manager: AccountManager<U>, userId: String) {
         manager.setSavedInfo(manager.loadInfo(userId))
+    }
+
+    private val ratingLoader = BackgroundDataLoader<List<RatingChange>>(viewModelScope)
+    fun flowOfRatingResult() = ratingLoader.flowOfResult()
+    fun<U: RatedUserInfo> loadRating(manager: RatedAccountManager<U>, userInfo: U, id: Long) {
+        ratingLoader.execute(id = "${userInfo.userId}#$id") {
+            manager.getRatingHistory(userInfo)
+        }
     }
 }
 

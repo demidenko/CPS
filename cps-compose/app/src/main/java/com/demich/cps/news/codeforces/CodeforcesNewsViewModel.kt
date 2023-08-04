@@ -203,7 +203,7 @@ class CodeforcesNewsViewModel: ViewModel() {
     }
 
     private val blogEntriesLoader = BackgroundDataLoader<List<CodeforcesBlogEntry>>(viewModelScope)
-    val blogEntriesResult get() = blogEntriesLoader.flowOfResult()
+    fun flowOfBlogEntriesResult() = blogEntriesLoader.flowOfResult()
     fun loadBlog(handle: String, context: Context, id: Long) {
         blogEntriesLoader.execute(id = "$handle#$id") {
             val (result, colorTag) = awaitPair(

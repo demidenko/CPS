@@ -184,7 +184,7 @@ private fun CPSScaffold(
                 val handle = (holder.screen as Screen.NewsCodeforcesBlog).handle
                 val context = context
                 val newsViewModel = codeforcesNewsViewModel()
-                val blogEntriesResult by newsViewModel.blogEntriesResult.collectAsState()
+                val blogEntriesResult by newsViewModel.flowOfBlogEntriesResult().collectAsState()
 
                 val loadingDataId = rememberSaveable(key = handle) {
                     Random.nextLong().also {

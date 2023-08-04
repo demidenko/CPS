@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class BackgroundDataLoader<T> (val scope: CoroutineScope) {
+class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
     private var currentId: Any? = null
     private val flow = MutableStateFlow<Result<T>?>(null)
     private var job: Job? = null
