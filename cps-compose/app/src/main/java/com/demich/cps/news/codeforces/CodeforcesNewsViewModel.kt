@@ -2,9 +2,6 @@ package com.demich.cps.news.codeforces
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
@@ -15,6 +12,7 @@ import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.api.CodeforcesRecentAction
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.room.followListDao
+import com.demich.cps.utils.BackgroundDataLoader
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.combine
@@ -204,30 +202,21 @@ class CodeforcesNewsViewModel: ViewModel() {
         }
     }
 
-    //TODO: no mutableState
-    var blogLoadingStatus by mutableStateOf(LoadingStatus.PENDING)
-    var blogEntries by mutableStateOf(emptyList<CodeforcesBlogEntry>())
-    fun loadBlog(handle: String, context: Context) {
-        require(blogLoadingStatus != LoadingStatus.LOADING)
-        blogEntries = emptyList()
-        viewModelScope.launch {
-            blogLoadingStatus = LoadingStatus.LOADING
+    private val blogEntriesLoader = BackgroundDataLoader<List<CodeforcesBlogEntry>>(viewModelScope)
+    val blogEntriesResult get() = blogEntriesLoader.flowOfResult()
+    fun loadBlog(handle: String, context: Context, id: Long) {
+        blogEntriesLoader.execute(id = "$handle#$id") {
             val (result, colorTag) = awaitPair(
                 context = Dispatchers.IO,
                 blockFirst = { context.followListDao.getAndReloadBlogEntries(handle) },
                 blockSecond = { CodeforcesUtils.getRealColorTag(handle) }
             )
-            if (result == null) {
-                blogLoadingStatus = LoadingStatus.FAILED
-            } else {
-                blogLoadingStatus = LoadingStatus.PENDING
-                blogEntries = result.map {
-                    it.copy(
-                        title = CodeforcesUtils.extractTitle(it),
-                        authorColorTag = colorTag
-                    )
-                }
-            }
+            result?.map {
+                it.copy(
+                    title = CodeforcesUtils.extractTitle(it),
+                    authorColorTag = colorTag
+                )
+            } ?: throw Error()
         }
     }
 

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,8 +60,10 @@ import com.demich.cps.ui.rememberCPSNavigator
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
+import com.demich.cps.utils.toLoadingStatus
 import com.demich.cps.workers.enqueueEnabledWorkers
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -179,10 +182,19 @@ private fun CPSScaffold(
             }
             cpsComposable(ScreenTypes.newsCodeforcesBlog) { holder ->
                 val handle = (holder.screen as Screen.NewsCodeforcesBlog).handle
+                val context = context
                 val newsViewModel = codeforcesNewsViewModel()
+                val blogEntriesResult by newsViewModel.blogEntriesResult.collectAsState()
+
+                val loadingDataId = rememberSaveable(key = handle) {
+                    Random.nextLong().also {
+                        newsViewModel.loadBlog(handle = handle, context = context, id = it)
+                    }
+                }
+
                 CodeforcesBlogScreen(
-                    blogEntries = { newsViewModel.blogEntries },
-                    loadingStatus = { newsViewModel.blogLoadingStatus }
+                    blogEntries = { blogEntriesResult?.getOrNull() ?: emptyList() },
+                    loadingStatus = { blogEntriesResult.toLoadingStatus() }
                 )
                 holder.setSubtitle("news", "codeforces", "blog")
             }

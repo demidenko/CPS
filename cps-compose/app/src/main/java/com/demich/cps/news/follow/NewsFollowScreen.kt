@@ -43,7 +43,6 @@ fun NewsFollowScreen(navigator: CPSNavigator) {
             userBlogs = { userBlogs },
             isRefreshing = { followLoadingStatus == LoadingStatus.LOADING },
             onOpenBlog = { handle ->
-                newsViewModel.loadBlog(handle = handle, context = context)
                 navigator.navigateTo(Screen.NewsCodeforcesBlog(handle = handle))
             },
             onDeleteUser = { handle ->
