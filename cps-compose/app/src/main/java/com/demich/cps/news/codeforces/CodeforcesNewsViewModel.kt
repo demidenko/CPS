@@ -17,6 +17,7 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.sharedViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,45 +32,6 @@ import kotlin.math.max
 fun codeforcesNewsViewModel(): CodeforcesNewsViewModel = sharedViewModel()
 
 class CodeforcesNewsViewModel: ViewModel() {
-
-    private inner class DataLoader<T>(
-        init: T,
-        val getData: suspend (CodeforcesLocale) -> T?
-    ) {
-        private val dataFlow: MutableStateFlow<T> = MutableStateFlow(init)
-
-        private var inactive = true
-        fun getDataFlow(context: Context): StateFlow<T> {
-            if (inactive) {
-                inactive = false
-                viewModelScope.launch {
-                    launchLoadIfActive(locale = context.settingsNews.codeforcesLocale())
-                }
-            }
-            return dataFlow
-        }
-
-        val loadingStatusState = MutableStateFlow(LoadingStatus.PENDING)
-
-        fun launchLoadIfActive(locale: CodeforcesLocale) {
-            if (inactive) return
-            loadingStatusState.update {
-                require(it != LoadingStatus.LOADING)
-                LoadingStatus.LOADING
-            }
-            viewModelScope.launch {
-                val data = withContext(Dispatchers.IO) {
-                    kotlin.runCatching { getData(locale) }.getOrNull()
-                }
-                if(data == null) loadingStatusState.value = LoadingStatus.FAILED
-                else {
-                    dataFlow.value = data
-                    loadingStatusState.value = LoadingStatus.PENDING
-                }
-            }
-        }
-    }
-
 
     private val reloadableTitles = listOf(
         CodeforcesTitle.MAIN,
@@ -97,16 +59,16 @@ class CodeforcesNewsViewModel: ViewModel() {
         }
     }
 
-    private val mainBlogEntries = DataLoader(emptyList()) { loadBlogEntries(page = "/", locale = it) }
+    private val mainBlogEntries = dataLoader(emptyList()) { loadBlogEntries(page = "/", locale = it) }
     fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.getDataFlow(context)
 
-    private val topBlogEntries = DataLoader(emptyList()) { loadBlogEntries(page = "/top", locale = it) }
+    private val topBlogEntries = dataLoader(emptyList()) { loadBlogEntries(page = "/top", locale = it) }
     fun flowOfTopBlogEntries(context: Context) = topBlogEntries.getDataFlow(context)
 
-    private val topComments = DataLoader(emptyList()) { loadComments(page = "/topComments?days=2", locale = it) }
+    private val topComments = dataLoader(emptyList()) { loadComments(page = "/topComments?days=2", locale = it) }
     fun flowOfTopComments(context: Context) = topComments.getDataFlow(context)
 
-    private val recentActions = DataLoader(Pair(emptyList(), emptyList())) { loadRecentActions(locale = it) }
+    private val recentActions = dataLoader(Pair(emptyList(), emptyList())) { loadRecentActions(locale = it) }
     fun flowOfRecentActions(context: Context) = recentActions.getDataFlow(context)
 
     private fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
@@ -221,3 +183,45 @@ class CodeforcesNewsViewModel: ViewModel() {
     }
 
 }
+
+private class CodeforcesDataLoader<T>(
+    val scope: CoroutineScope,
+    init: T,
+    val getData: suspend (CodeforcesLocale) -> T?
+) {
+    private val dataFlow: MutableStateFlow<T> = MutableStateFlow(init)
+
+    private var inactive = true
+    fun getDataFlow(context: Context): StateFlow<T> {
+        if (inactive) {
+            inactive = false
+            scope.launch {
+                launchLoadIfActive(locale = context.settingsNews.codeforcesLocale())
+            }
+        }
+        return dataFlow
+    }
+
+    val loadingStatusState = MutableStateFlow(LoadingStatus.PENDING)
+
+    fun launchLoadIfActive(locale: CodeforcesLocale) {
+        if (inactive) return
+        loadingStatusState.update {
+            require(it != LoadingStatus.LOADING)
+            LoadingStatus.LOADING
+        }
+        scope.launch {
+            val data = withContext(Dispatchers.IO) {
+                kotlin.runCatching { getData(locale) }.getOrNull()
+            }
+            if(data == null) loadingStatusState.value = LoadingStatus.FAILED
+            else {
+                dataFlow.value = data
+                loadingStatusState.value = LoadingStatus.PENDING
+            }
+        }
+    }
+}
+
+private fun<T> ViewModel.dataLoader(init: T, getData: suspend (CodeforcesLocale) -> T?) =
+    CodeforcesDataLoader(scope = viewModelScope, init = init, getData = getData)
