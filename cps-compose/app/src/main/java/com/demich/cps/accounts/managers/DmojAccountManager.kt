@@ -62,8 +62,8 @@ class DmojAccountManager(context: Context):
         }
     }
 
-    override suspend fun loadRatingHistory(info: DmojUserInfo): List<RatingChange>
-        = DmojApi.getRatingChanges(handle = info.handle)
+    override suspend fun loadRatingHistory(userId: String): List<RatingChange>
+        = DmojApi.getRatingChanges(handle = userId)
             .map(DmojRatingChange::toRatingChange)
 
     override val ratingsUpperBounds = arrayOf(

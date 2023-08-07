@@ -54,9 +54,9 @@ class AtCoderAccountManager(context: Context):
     override suspend fun loadSuggestions(str: String): List<UserSuggestion> =
         AtCoderUtils.extractUserSuggestions(source = AtCoderApi.getSuggestionsPage(str))
 
-    override suspend fun loadRatingHistory(info: AtCoderUserInfo): List<RatingChange> =
-        AtCoderApi.getRatingChanges(handle = info.handle).map {
-            it.toRatingChange(handle = info.handle)
+    override suspend fun loadRatingHistory(userId: String): List<RatingChange> =
+        AtCoderApi.getRatingChanges(handle = userId).map {
+            it.toRatingChange(handle = userId)
         }
 
     override val ratingsUpperBounds = arrayOf(

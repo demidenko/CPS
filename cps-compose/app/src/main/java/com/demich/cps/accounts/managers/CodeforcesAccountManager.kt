@@ -79,8 +79,8 @@ class CodeforcesAccountManager(context: Context):
             }
         }.asReversed()
 
-    override suspend fun loadRatingHistory(info: CodeforcesUserInfo): List<RatingChange> =
-        CodeforcesApi.getUserRatingChanges(info.handle)
+    override suspend fun loadRatingHistory(userId: String): List<RatingChange> =
+        CodeforcesApi.getUserRatingChanges(handle = userId)
             .map(CodeforcesRatingChange::toRatingChange)
 
     override val ratingsUpperBounds = arrayOf(

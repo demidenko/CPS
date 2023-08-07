@@ -74,8 +74,8 @@ class CodeChefAccountManager(context: Context):
             )
         }
 
-    override suspend fun loadRatingHistory(info: CodeChefUserInfo): List<RatingChange> =
-        CodeChefApi.getRatingChanges(handle = info.handle)
+    override suspend fun loadRatingHistory(userId: String): List<RatingChange> =
+        CodeChefApi.getRatingChanges(handle = userId)
             .map(CodeChefRatingChange::toRatingChange)
 
     override val ratingsUpperBounds = arrayOf(

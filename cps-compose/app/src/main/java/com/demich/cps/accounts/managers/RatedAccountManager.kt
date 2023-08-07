@@ -69,9 +69,9 @@ abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: Acc
 
     abstract val rankedHandleColorsList: Array<HandleColor>
 
-    protected abstract suspend fun loadRatingHistory(info: U): List<RatingChange>
-    suspend fun getRatingHistory(info: U): List<RatingChange> =
-        loadRatingHistory(info).sortedBy { it.date }
+    protected abstract suspend fun loadRatingHistory(userId: String): List<RatingChange>
+    suspend fun getRatingHistory(userId: String): List<RatingChange> =
+        loadRatingHistory(userId).sortedBy { it.date }
 }
 
 enum class HandleColor {

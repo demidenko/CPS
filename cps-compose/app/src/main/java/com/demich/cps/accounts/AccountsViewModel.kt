@@ -4,9 +4,12 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.demich.cps.accounts.managers.*
+import com.demich.cps.accounts.managers.AccountManager
+import com.demich.cps.accounts.managers.AccountManagers
+import com.demich.cps.accounts.managers.RatedAccountManager
+import com.demich.cps.accounts.managers.RatingChange
+import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.accounts.userinfo.ClistUserInfo
-import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
@@ -14,7 +17,11 @@ import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.utils.BackgroundDataLoader
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.sharedViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
@@ -92,9 +99,9 @@ class AccountsViewModel: ViewModel() {
 
     private val ratingLoader = BackgroundDataLoader<List<RatingChange>>(viewModelScope)
     fun flowOfRatingResult() = ratingLoader.flowOfResult()
-    fun<U: RatedUserInfo> loadRating(manager: RatedAccountManager<U>, userInfo: U, id: Long) {
-        ratingLoader.execute(id = "${userInfo.userId}#$id") {
-            manager.getRatingHistory(userInfo)
+    fun loadRating(manager: RatedAccountManager<*>, userId: String, dataId: Long) {
+        ratingLoader.execute(id = "$userId#$dataId") {
+            manager.getRatingHistory(userId)
         }
     }
 }

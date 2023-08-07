@@ -54,7 +54,7 @@ fun<U: RatedUserInfo> RatedAccountManager<U>.RatingLoadButton(
         ratingGraphUIStates.showRatingGraph = true
         scope.launch {
             this@RatingLoadButton.runCatching {
-                getRatingHistory(userInfo)
+                getRatingHistory(userInfo.handle)
             }.onFailure {
                 ratingGraphUIStates.loadingStatus = LoadingStatus.FAILED
             }.onSuccess {
