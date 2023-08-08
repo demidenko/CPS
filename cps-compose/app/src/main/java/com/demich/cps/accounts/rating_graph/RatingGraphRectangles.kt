@@ -5,6 +5,7 @@ import com.demich.cps.accounts.managers.HandleColor
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingRevolutionsProvider
 import com.demich.cps.accounts.userinfo.RatedUserInfo
+import com.demich.cps.utils.firstFalse
 import com.demich.cps.utils.isSortedWith
 
 @Immutable
@@ -48,18 +49,12 @@ internal class RatingGraphRectangles(
         var r = rectangles.size
         var l = r
         points.forEach { point ->
-            val (x, y) = point
-            while (l == rectangles.size || x >= rectangles[l].first.x) {
+            while (l == rectangles.size || point.x >= rectangles[l].first.x) {
                 r = l
                 do --l while (l > 0 && rectangles[l-1].first.x == rectangles[r-1].first.x)
             }
-            var sl = l
-            var sr = r
-            while (sl < sr) {
-                val mid = (sl + sr) / 2
-                if (rectangles[mid].first.y <= y) sl = mid+1 else sr = mid
-            }
-            block(point, rectangles[sl-1].second)
+            val i = firstFalse(l, r) { rectangles[it].first.y <= point.y }
+            block(point, rectangles[i-1].second)
         }
     }
 }
