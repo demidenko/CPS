@@ -165,23 +165,23 @@ class CodeforcesNewsViewModel: ViewModel() {
     }
 
     private val blogEntriesLoader = BackgroundDataLoader<List<CodeforcesBlogEntry>>(viewModelScope)
-    fun flowOfBlogEntriesResult() = blogEntriesLoader.flowOfResult()
-    fun loadBlog(handle: String, context: Context, id: Long) {
-        blogEntriesLoader.execute(id = "$handle#$id") {
-            val (result, colorTag) = awaitPair(
-                context = Dispatchers.IO,
-                blockFirst = { context.followListDao.getAndReloadBlogEntries(handle) },
-                blockSecond = { CodeforcesUtils.getRealColorTag(handle) }
-            )
-            result?.map {
-                it.copy(
-                    title = CodeforcesUtils.extractTitle(it),
-                    authorColorTag = colorTag
+    fun flowOfBlogEntriesResult(handle: String, context: Context, id: Long) =
+        blogEntriesLoader.run {
+            execute(id = "$handle#$id") {
+                val (result, colorTag) = awaitPair(
+                    context = Dispatchers.IO,
+                    blockFirst = { context.followListDao.getAndReloadBlogEntries(handle) },
+                    blockSecond = { CodeforcesUtils.getRealColorTag(handle) }
                 )
-            } ?: throw Error()
+                result?.map {
+                    it.copy(
+                        title = CodeforcesUtils.extractTitle(it),
+                        authorColorTag = colorTag
+                    )
+                } ?: throw Error()
+            }
+            flowOfResult()
         }
-    }
-
 }
 
 private class CodeforcesDataLoader<T>(

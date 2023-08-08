@@ -5,20 +5,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.ui.LoadingContentBox
-import com.demich.cps.utils.LoadingStatus
 
 @Composable
 fun CodeforcesBlogScreen(
-    blogEntries: () -> List<CodeforcesBlogEntry>,
-    loadingStatus: () -> LoadingStatus
+    blogEntriesResult: () -> Result<List<CodeforcesBlogEntry>>?
 ) {
     LoadingContentBox(
-        loadingStatus = loadingStatus(),
-        failedText = "Blog load error",
+        dataResult = blogEntriesResult,
+        failedText = { "Blog load error" },
         modifier = Modifier.fillMaxSize()
-    ) {
+    ) { blogEntries ->
         CodeforcesBlogEntries(
-            blogEntriesController = rememberCodeforcesBlogEntriesController(blogEntries),
+            blogEntriesController = rememberCodeforcesBlogEntriesController { blogEntries },
             enableScrollBar = true,
             modifier = Modifier.fillMaxSize()
         )

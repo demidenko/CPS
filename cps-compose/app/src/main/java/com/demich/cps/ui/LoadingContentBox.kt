@@ -34,20 +34,18 @@ fun LoadingContentBox(
 @Composable
 fun<T> LoadingContentBox(
     modifier: Modifier = Modifier,
-    data: Result<T>?,
+    dataResult: () -> Result<T>?,
     failedText: (Throwable) -> String,
     content: @Composable (T) -> Unit
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        if (data == null) {
-            LoadingIndicator()
-        } else {
-            data.onSuccess {
+        dataResult()?.run {
+            onSuccess {
                 content(it)
             }.onFailure {
                 FailedText(failedText(it))
             }
-        }
+        } ?: LoadingIndicator()
     }
 }
 

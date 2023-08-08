@@ -182,20 +182,10 @@ private fun CPSScaffold(
             }
             cpsComposable(ScreenTypes.newsCodeforcesBlog) { holder ->
                 val handle = (holder.screen as Screen.NewsCodeforcesBlog).handle
-                val context = context
                 val newsViewModel = codeforcesNewsViewModel()
-                val blogEntriesResult by newsViewModel.flowOfBlogEntriesResult().collectAsState()
-
-                val loadingDataId = rememberSaveable(key = handle) {
-                    Random.nextLong().also {
-                        newsViewModel.loadBlog(handle = handle, context = context, id = it)
-                    }
-                }
-
-                CodeforcesBlogScreen(
-                    blogEntries = { blogEntriesResult?.getOrNull() ?: emptyList() },
-                    loadingStatus = { blogEntriesResult.toLoadingStatus() }
-                )
+                val loadingDataId = rememberSaveable { Random.nextLong() }
+                val blogEntriesResult by newsViewModel.flowOfBlogEntriesResult(handle, context, loadingDataId).collectAsState()
+                CodeforcesBlogScreen(blogEntriesResult = { blogEntriesResult })
                 holder.setSubtitle("news", "codeforces", "blog")
             }
 
