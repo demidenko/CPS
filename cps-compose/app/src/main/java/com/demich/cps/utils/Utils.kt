@@ -6,10 +6,22 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.measureTimedValue
+
+
+inline fun<T> debugDuration(block: () -> T): T =
+    measureTimedValue(block).apply {
+        println("duration = $duration")
+    }.value
+
+fun<T> debugRunBlocking(block: suspend CoroutineScope.() -> T): T =
+    measureTimedValue { runBlocking(block = block) }.apply {
+        println("!!! ($duration) $value")
+    }.value
 
 
 val jsonCPS = Json {
@@ -56,8 +68,3 @@ suspend fun<A, B> awaitPair(
         Pair(first.await(), second.await())
     }
 }
-
-inline fun<reified T> debugDuration(block: () -> T): T =
-    measureTimedValue(block).apply {
-        println("duration = $duration")
-    }.value
