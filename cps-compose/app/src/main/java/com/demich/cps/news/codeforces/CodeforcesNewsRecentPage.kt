@@ -14,6 +14,7 @@ import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.rememberWith
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.CodeforcesComment
 import com.demich.cps.platforms.api.CodeforcesRecentAction
 
 @Composable
@@ -52,9 +53,16 @@ fun CodeforcesNewsRecentPage(
         } else {
             saveableStateHolder.SaveableStateProvider(key = false) {
                 RecentBlogEntriesPage(
-                    controller = controller,
                     recentActions = { recentActions },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    onBrowseComment = { blogEntry, comment ->
+                        context.openUrlInBrowser(CodeforcesApi.urls.comment(
+                            blogEntryId = blogEntry.id,
+                            commentId = comment.id
+                        ))
+                    },
+                    onBrowseBlogEntry = { context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(it.id)) },
+                    onOpenComments = { controller.recentFilterByBlogEntry = it }
                 )
             }
         }
@@ -64,33 +72,25 @@ fun CodeforcesNewsRecentPage(
 
 @Composable
 private fun RecentBlogEntriesPage(
-    controller: CodeforcesNewsController,
     recentActions: () -> Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBrowseComment: (CodeforcesBlogEntry, CodeforcesComment) -> Unit,
+    onBrowseBlogEntry: (CodeforcesBlogEntry) -> Unit,
+    onOpenComments: (CodeforcesBlogEntry) -> Unit
 ) {
-    val context = context
-
-    fun openBlogEntry(blogEntry: CodeforcesBlogEntry) {
-        context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(blogEntry.id))
-    }
-
     CodeforcesRecentBlogEntries(
         recentActions = recentActions,
         modifier = modifier,
-        onOpenBlogEntry = ::openBlogEntry,
+        onBrowseBlogEntry = onBrowseBlogEntry,
     ) { blogEntry, comments ->
         CPSDropdownMenuItem(title = "Open recent comment", icon = CPSIcons.OpenInBrowser) {
-            context.openUrlInBrowser(
-                CodeforcesApi.urls.comment(
-                blogEntryId = blogEntry.id,
-                commentId = comments.first().id
-            ))
+            onBrowseComment(blogEntry, comments.first())
         }
         CPSDropdownMenuItem(title = "Open blog entry", icon = CPSIcons.OpenInBrowser) {
-            openBlogEntry(blogEntry)
+            onBrowseBlogEntry(blogEntry)
         }
         CPSDropdownMenuItem(title = "Show recent comments", icon = CPSIcons.Comments) {
-            controller.recentFilterByBlogEntry = blogEntry
+            onOpenComments(blogEntry)
         }
     }
 }

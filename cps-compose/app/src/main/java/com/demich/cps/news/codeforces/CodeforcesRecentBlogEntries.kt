@@ -27,7 +27,7 @@ import com.demich.cps.platforms.api.CodeforcesRecentAction
 fun CodeforcesRecentBlogEntries(
     recentActions: () -> Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>,
     modifier: Modifier = Modifier,
-    onOpenBlogEntry: (CodeforcesBlogEntry) -> Unit,
+    onBrowseBlogEntry: (CodeforcesBlogEntry) -> Unit,
     menuBuilder: @Composable CPSDropdownMenuScope.(CodeforcesBlogEntry, List<CodeforcesComment>) -> Unit
 ) {
     val recent = rememberWith(recentActions()) {
@@ -40,7 +40,7 @@ fun CodeforcesRecentBlogEntries(
             ContentWithCPSDropdownMenu(
                 modifier = Modifier
                     .clickable {
-                        if (it.comments.isEmpty()) onOpenBlogEntry(it.blogEntry)
+                        if (it.comments.isEmpty()) onBrowseBlogEntry(it.blogEntry)
                         else showMenuForBlogEntryId = it.blogEntry.id
                     }
                     .fillMaxWidth()
