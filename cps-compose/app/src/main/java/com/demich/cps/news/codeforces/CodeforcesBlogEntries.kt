@@ -56,12 +56,12 @@ fun CodeforcesBlogEntries(
                         onClick = { blogEntriesController.openBlogEntry(blogEntry, context) },
                         onLongClick = onLongClick?.let { { it(blogEntry) } }?.withVibration()
                     )
-                    .padding(horizontal = 3.dp)
-                    .let {
-                        if (enableScrollBar) it.padding(end = CPSDefaults.scrollBarWidth)
-                        else it
-                    }
-                    .padding(bottom = 4.dp, top = 1.dp)
+                    .padding(
+                        start = 5.dp,
+                        end = 4.dp + (if (enableScrollBar) CPSDefaults.scrollBarWidth else 0.dp),
+                        top = 1.dp,
+                        bottom = 4.dp
+                    )
                     .animateItemPlacement()
             )
             Divider(modifier = Modifier.animateItemPlacement())
