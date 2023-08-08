@@ -175,6 +175,7 @@ private fun CommentBox(
     Box(modifier = modifier.background(backgroundColor)) {
         var expanded by rememberSaveable { mutableStateOf(false) }
         var linesOverflow by remember { mutableStateOf(false) }
+        //TODO: remove glitch on first draw
         val visible = rememberSaveable(expanded, linesOverflow) {
             !expanded && linesOverflow
         }
