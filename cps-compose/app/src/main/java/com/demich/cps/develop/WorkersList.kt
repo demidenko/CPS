@@ -75,7 +75,7 @@ private fun WorkerItem(
     modifier: Modifier = Modifier
 ) {
 
-    val workState by work.workInfoLiveData().observeAsState()
+    val workState by remember(key1 = work, calculation = work::workInfoLiveData).observeAsState()
 
     WorkerItem(
         name = work.name,

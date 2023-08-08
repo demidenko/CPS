@@ -135,6 +135,7 @@ fun newsFollowListBottomBarBuilder(): AdditionalBottomBarBuilder = {
 
     var showChooseDialog by remember { mutableStateOf(false) }
 
+    //TODO: block if worker in progress (dialog?)
     CPSIconButton(icon = CPSIcons.Add) {
         showChooseDialog = true
     }

@@ -30,7 +30,7 @@ private fun currentTimeFlow(period: Duration): Flow<Instant> =
 fun collectCurrentTimeAsState(period: Duration): State<Instant> {
     return remember(key1 = period) {
         currentTimeFlow(period = period)
-    }.collectAsStateWithLifecycle(initialValue = remember { getCurrentTime() })
+    }.collectAsStateWithLifecycle(initialValue = remember(::getCurrentTime))
 }
 
 @Composable
