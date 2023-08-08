@@ -10,6 +10,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.rememberCollect
@@ -43,7 +44,7 @@ fun rememberCodeforcesNewsController(): CodeforcesNewsController {
                 selectedTab = defaultTab,
                 topShowComments = false,
                 recentShowComments = false,
-                recentFilterByBlogEntryId = null
+                recentFilterByBlogEntry = null
             )
         )
     }
@@ -64,7 +65,7 @@ internal data class CodeforcesNewsControllerData(
     val selectedTab: CodeforcesTitle,
     val topShowComments: Boolean,
     val recentShowComments: Boolean,
-    val recentFilterByBlogEntryId: Int?
+    val recentFilterByBlogEntry: CodeforcesBlogEntry?
 )
 
 @Stable
@@ -93,7 +94,7 @@ class CodeforcesNewsController internal constructor(
     var topShowComments by mutableStateOf(data.topShowComments)
 
     var recentShowComments by mutableStateOf(data.recentShowComments)
-    var recentFilterByBlogEntryId: Int? by mutableStateOf(data.recentFilterByBlogEntryId)
+    var recentFilterByBlogEntry: CodeforcesBlogEntry? by mutableStateOf(data.recentFilterByBlogEntry)
 
 
     private val badges = mutableMapOf<CodeforcesTitle, MutableState<Int>>()
@@ -136,7 +137,7 @@ class CodeforcesNewsController internal constructor(
                     selectedTab = it.currentTab,
                     topShowComments = it.topShowComments,
                     recentShowComments = it.recentShowComments,
-                    recentFilterByBlogEntryId = it.recentFilterByBlogEntryId
+                    recentFilterByBlogEntry = it.recentFilterByBlogEntry
                 ))
             },
             restore = {

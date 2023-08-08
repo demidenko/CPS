@@ -27,17 +27,16 @@ fun CodeforcesNewsRecentPage(
     val saveableStateHolder = rememberSaveableStateHolder()
 
     CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.RECENT) {
-        val blogEntryId = controller.recentFilterByBlogEntryId
-        if (blogEntryId != null) {
-            saveableStateHolder.SaveableStateProvider(key = blogEntryId) {
+        val blogEntry = controller.recentFilterByBlogEntry
+        if (blogEntry != null) {
+            saveableStateHolder.SaveableStateProvider(key = blogEntry.id) {
                 RecentCommentsInBlogEntry(
                     controller = controller,
                     comments = { recentActions.second },
-                    //TODO: NoSuchElement crash
-                    blogEntry = recentActions.first.first { it.id == blogEntryId },
+                    blogEntry = recentActions.first.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
                     onBackPressed = {
-                        saveableStateHolder.removeState(blogEntryId)
-                        controller.recentFilterByBlogEntryId = null
+                        saveableStateHolder.removeState(blogEntry.id)
+                        controller.recentFilterByBlogEntry = null
                     },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -91,7 +90,7 @@ private fun RecentBlogEntriesPage(
             openBlogEntry(blogEntry)
         }
         CPSDropdownMenuItem(title = "Show recent comments", icon = CPSIcons.Comments) {
-            controller.recentFilterByBlogEntryId = blogEntry.id
+            controller.recentFilterByBlogEntry = blogEntry
         }
     }
 }

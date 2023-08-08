@@ -15,7 +15,7 @@ fun CodeforcesNewsBottomBar(
             }
         }
         CodeforcesTitle.RECENT -> {
-            if (controller.recentFilterByBlogEntryId == null) {
+            if (controller.recentFilterByBlogEntry == null) {
                 CommentsModeButton(isOn = controller.recentShowComments) {
                     controller.recentShowComments = it
                 }

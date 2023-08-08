@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.time.measureTimedValue
 
 
 val jsonCPS = Json {
@@ -55,3 +56,8 @@ suspend fun<A, B> awaitPair(
         Pair(first.await(), second.await())
     }
 }
+
+inline fun<reified T> debugDuration(block: () -> T): T =
+    measureTimedValue(block).apply {
+        println("duration = $duration")
+    }.value
