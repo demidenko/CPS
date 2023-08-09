@@ -39,9 +39,7 @@ fun CPSTheme(content: @Composable () -> Unit) {
                 fontFamily = FontFamily.Default,
                 fontWeight = FontWeight.Normal,
                 fontSize = 16.sp,
-                letterSpacing = 0.3.sp,
-                color = colors.content, //need for instant change of color in Text(...)
-                //background = colors.background TODO: strange glitch on last items in lazyLists
+                letterSpacing = 0.3.sp
             )
         )
     ) {
