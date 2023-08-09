@@ -3,18 +3,20 @@ package com.demich.cps.news.follow
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.news.codeforces.CodeforcesBlogEntries
 import com.demich.cps.news.codeforces.CodeforcesBlogEntriesController
 import com.demich.cps.news.codeforces.CodeforcesNewsController
-import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
-import com.demich.cps.platforms.api.CodeforcesBlogEntry
 
 @Composable
 fun CodeforcesBlogEntriesFollowAddable(
@@ -26,7 +28,6 @@ fun CodeforcesBlogEntriesFollowAddable(
     label: (@Composable (CodeforcesBlogEntry) -> Unit)? = null
 ) {
     val context = context
-    val followEnabled by rememberCollect { context.settingsNews.codeforcesFollowEnabled.flow }
 
     var showAddToFollowDialogFor: CodeforcesBlogEntry? by remember { mutableStateOf(null) }
 
@@ -35,11 +36,17 @@ fun CodeforcesBlogEntriesFollowAddable(
         modifier = modifier,
         lazyListState = lazyListState,
         enableScrollBar = enableScrollBar,
-        onLongClick = { blogEntry: CodeforcesBlogEntry -> showAddToFollowDialogFor = blogEntry }.takeIf { followEnabled },
+        onLongClick = { showAddToFollowDialogFor = it },
         label = label
     )
 
     showAddToFollowDialogFor?.let { blogEntry ->
+        /*
+            TODO:
+            - user already in follow
+            - note if follow disabled
+            - show user blog
+         */
         CPSYesNoDialog(
             title = {
                 Text(text = buildAnnotatedString {

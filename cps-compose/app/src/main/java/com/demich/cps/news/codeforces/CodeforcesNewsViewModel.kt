@@ -150,6 +150,7 @@ class CodeforcesNewsViewModel: ViewModel() {
 
     fun addToFollowList(handle: String, context: Context) {
         viewModelScope.launch {
+            context.settingsNews.codeforcesFollowEnabled(newValue = true)
             context.followListDao.addNewUser(handle)
         }
     }
