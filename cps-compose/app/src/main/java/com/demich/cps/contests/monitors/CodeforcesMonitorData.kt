@@ -27,9 +27,9 @@ data class CodeforcesMonitorData(
     )
 
     sealed interface ProblemResult {
-        object Empty: ProblemResult
-        object Pending: ProblemResult
-        object FailedSystemTest: ProblemResult
+        data object Empty: ProblemResult
+        data object Pending: ProblemResult
+        data object FailedSystemTest: ProblemResult
         data class Points(val points: Double, val isFinal: Boolean): ProblemResult {
             fun pointsToNiceString() = points.toString().removeSuffix(".0")
         }

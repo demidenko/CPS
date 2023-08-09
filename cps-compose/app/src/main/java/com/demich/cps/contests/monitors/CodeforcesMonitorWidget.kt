@@ -77,7 +77,7 @@ private fun CodeforcesMonitor(
 ) {
     Column(modifier) {
         Title(
-            contestData = contestData,
+            contestPhase = contestData.contestPhase,
             requestFailed = requestFailed,
             modifier = Modifier
                 .padding(horizontal = 4.dp)
@@ -92,7 +92,7 @@ private fun CodeforcesMonitor(
 
 @Composable
 private fun Title(
-    contestData: CodeforcesMonitorData,
+    contestPhase: CodeforcesMonitorData.ContestPhase,
     requestFailed: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -106,7 +106,7 @@ private fun Title(
             )
         }
         PhaseTitle(
-            contestPhase = contestData.contestPhase,
+            contestPhase = contestPhase,
             modifier = Modifier.align(Alignment.Center)
         )
     }
