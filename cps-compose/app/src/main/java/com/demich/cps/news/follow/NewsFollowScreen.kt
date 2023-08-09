@@ -1,6 +1,7 @@
 package com.demich.cps.news.follow
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -49,7 +50,8 @@ fun NewsFollowScreen(navigator: CPSNavigator) {
                 scope.launch {
                     context.followListDao.remove(handle)
                 }
-            }
+            },
+            modifier = Modifier.fillMaxSize()
         )
     }
 
@@ -63,11 +65,12 @@ private fun CodeforcesFollowList(
     userBlogs: () -> List<CodeforcesUserBlog>,
     isRefreshing: () -> Boolean,
     onOpenBlog: (String) -> Unit,
-    onDeleteUser: (String) -> Unit
+    onDeleteUser: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(key1 = listState) {
         //TODO no animation when delete first
         snapshotFlow { userBlogs().firstOrNull()?.id }
             .drop(1)
@@ -79,7 +82,8 @@ private fun CodeforcesFollowList(
     var showDeleteDialogForBlog: CodeforcesUserBlog? by remember { mutableStateOf(null) }
 
     LazyColumnWithScrollBar(
-        state = listState
+        state = listState,
+        modifier = modifier
     ) {
         itemsNotEmpty(
             items = userBlogs(),
