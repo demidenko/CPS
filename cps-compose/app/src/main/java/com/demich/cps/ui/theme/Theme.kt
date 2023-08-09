@@ -6,7 +6,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -38,7 +37,9 @@ fun CPSTheme(content: @Composable () -> Unit) {
                 fontFamily = FontFamily.Default,
                 fontWeight = FontWeight.Normal,
                 fontSize = 16.sp,
-                letterSpacing = 0.3.sp
+                letterSpacing = 0.3.sp,
+                color = colors.content, //need for instant change of color in Text(...)
+                //background = colors.background TODO: strange glitch on last items in lazyLists
             )
         )
     ) {
