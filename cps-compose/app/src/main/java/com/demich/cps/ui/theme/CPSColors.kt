@@ -29,7 +29,7 @@ class CPSColors(
     private val votedRatingNegative: Color,
     val newEntry: Color,
     val useOriginalHandleColors: Boolean,
-    materialInitColors: () -> Colors,
+    private val materialInitColors: () -> Colors,
     handleColor: (HandleColor) -> Color
 ) {
     fun votedRating(rating: Int): Color =
@@ -38,7 +38,7 @@ class CPSColors(
     private val handleColors = HandleColor.entries.map(handleColor)
     fun handleColor(handleColor: HandleColor): Color = handleColors[handleColor.ordinal]
 
-    internal val materialColors = materialInitColors().copy(
+    internal fun materialColors() = materialInitColors().copy(
         background = background,
         primary = accent,
         onBackground = content,
