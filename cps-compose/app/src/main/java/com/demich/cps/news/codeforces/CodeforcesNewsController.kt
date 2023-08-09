@@ -77,10 +77,13 @@ class CodeforcesNewsController internal constructor(
     val tabs by tabsState
 
     //TODO: future support for dynamic tabs (selectedIndex can be out of bounds)
-    val pagerState = PagerState(
+    val pagerState = object : PagerState(
         initialPage = tabs.indexOf(data.selectedTab)
             .takeIf { it != -1 } ?: 0
-    )
+    ) {
+        override val pageCount: Int
+            get() = tabs.size
+    }
 
     val currentTab: CodeforcesTitle
         get() = tabs[pagerState.currentPage]
