@@ -20,8 +20,11 @@ import com.demich.cps.room.followListDao
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.utils.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 
 @Composable
@@ -71,11 +74,22 @@ private fun CodeforcesFollowList(
     val listState = rememberLazyListState()
 
     LaunchedEffect(key1 = listState) {
-        //TODO no animation when delete first
-        snapshotFlow { userBlogs().firstOrNull()?.id }
-            .drop(1)
-            .collect {
-                listState.animateScrollToItem(index = 0)
+        /* Cases:
+            1) delete not first -> removing animation
+            2) delete first + scroll on top -> removing animation
+            3) delete first + scroll not top -> ?? (whatever)
+            4) add new + scroll on top -> adding animation + scroll to top
+            5) add new + scroll not top -> adding animation + scroll to top
+         */
+        snapshotFlow { userBlogs().let { it.size to it.firstOrNull()?.id } }
+            .distinctUntilChangedBy { it.second } //wait for first id changed
+            .drop(1) //ignore first because of first composition
+            .collect { (listSize, _) ->
+                snapshotFlow { listState.layoutInfo.totalItemsCount }
+                    .takeWhile { it != listSize }.collect() //wait for listState have same size
+                with(listState) {
+                    if (firstVisibleItemIndex > 0) animateScrollToItem(index = 0)
+                }
             }
     }
 
