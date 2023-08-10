@@ -8,6 +8,7 @@ import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.utils.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @Stable
@@ -56,13 +57,12 @@ fun rememberCodeforcesBlogEntriesController(
         }.combine(flowOfIds) { visibleRange, ids ->
             //empty ids can create Empty message item!!
             if (ids.isNotEmpty()) {
-                //TODO: crash / trash
                 newEntriesItem.markAtLeast(
                     ids = visibleRange.map { ids[it] },
                     type = NewEntryType.SEEN
                 )
             }
-        }.launchIn(this)
+        }.debounce(250.milliseconds).launchIn(this)
     }
 
     val scope = rememberCoroutineScope()
