@@ -56,6 +56,7 @@ fun rememberCodeforcesBlogEntriesController(
         }.combine(flowOfIds) { visibleRange, ids ->
             //empty ids can create Empty message item!!
             if (ids.isNotEmpty()) {
+                //TODO: crash / trash
                 newEntriesItem.markAtLeast(
                     ids = visibleRange.map { ids[it] },
                     type = NewEntryType.SEEN
