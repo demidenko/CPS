@@ -31,12 +31,11 @@ import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
 import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.settings.settingsContests
-import com.demich.cps.develop.settingsDev
+import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.demich.cps.workers.ContestsWorker
-import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.flowBy
@@ -59,7 +58,7 @@ fun ContestsScreen(
     val errorsMessage by rememberCollect {
         combine(
             flow = contestsViewModel.flowOfLoadingErrors(),
-            flow2 = context.settingsDev.devModeEnabled.flow,
+            flow2 = context.settingsUI.devModeEnabled.flow,
             transform = ::makeCombinedMessage
         )
     }

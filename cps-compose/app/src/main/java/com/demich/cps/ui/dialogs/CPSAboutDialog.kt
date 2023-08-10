@@ -7,9 +7,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.demich.cps.BuildConfig
-import com.demich.cps.develop.settingsDev
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.MonospacedText
+import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getCurrentTime
@@ -24,13 +24,13 @@ fun CPSAboutDialog(onDismissRequest: () -> Unit) {
     val scope = rememberCoroutineScope()
 
     val context = context
-    val devModeEnabled by rememberCollect { context.settingsDev.devModeEnabled.flow }
+    val devModeEnabled by rememberCollect { context.settingsUI.devModeEnabled.flow }
     var showDevModeLine by remember { mutableStateOf(devModeEnabled) }
 
     val onClick = remember {
         patternClickListener("._.._...") {
             showDevModeLine = true
-            scope.launch { context.settingsDev.devModeEnabled(true) }
+            scope.launch { context.settingsUI.devModeEnabled(true) }
         }
     }
 
@@ -53,7 +53,7 @@ fun CPSAboutDialog(onDismissRequest: () -> Unit) {
             ) {
                 MonospacedText("   dev_mode = $devModeEnabled", Modifier.weight(1f))
                 CPSCheckBox(checked = devModeEnabled) { checked ->
-                    scope.launch { context.settingsDev.devModeEnabled(checked) }
+                    scope.launch { context.settingsUI.devModeEnabled(checked) }
                 }
             }
         }

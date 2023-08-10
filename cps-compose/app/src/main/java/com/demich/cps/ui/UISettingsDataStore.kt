@@ -19,6 +19,8 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
         private val Context.settingsUI_dataStore by dataStoreWrapper("settings_ui")
     }
 
+    val devModeEnabled = itemBoolean(name = "develop_enabled", defaultValue = false)
+
     val darkLightMode = itemEnum(name = "dark_light_mode", defaultValue = DarkLightMode.SYSTEM)
 
     val useOriginalColors = itemBoolean(name = "use_original_colors", defaultValue = false)

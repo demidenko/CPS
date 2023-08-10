@@ -1,6 +1,5 @@
 package com.demich.cps.develop
 
-import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,25 +31,10 @@ import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.utils.context
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
-import com.demich.datastore_itemized.ItemizedDataStore
-import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
-
-
-class SettingsDev(context: Context): ItemizedDataStore(context.settings_dev_dataStore) {
-    companion object {
-        private val Context.settings_dev_dataStore by dataStoreWrapper("settings_develop")
-    }
-
-    val devModeEnabled = itemBoolean(name = "develop_enabled", defaultValue = false)
-}
-
-val Context.settingsDev: SettingsDev
-    get() = SettingsDev(this)
-
 
 @Composable
 fun DevelopScreen() {

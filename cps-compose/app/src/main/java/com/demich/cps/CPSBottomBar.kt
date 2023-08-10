@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
-import com.demich.cps.develop.settingsDev
 import com.demich.cps.navigation.RootScreen
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTypes
@@ -62,7 +61,7 @@ private fun CPSBottomBarMain(
     val scope = rememberCoroutineScope()
     val context = context
 
-    val devModeEnabled by rememberCollect { context.settingsDev.devModeEnabled.flow }
+    val devModeEnabled by rememberCollect { context.settingsUI.devModeEnabled.flow }
 
     val rootScreens = remember(devModeEnabled) {
         buildList {
