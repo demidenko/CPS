@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import java.util.Collections
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.measureTimedValue
@@ -40,6 +41,11 @@ fun <T> List<T>.isSortedWith(comparator: Comparator<in T>): Boolean {
     for (i in 1 until size) if (comparator.compare(get(i-1),get(i)) > 0) return false
     return true
 }
+
+fun<T> List<T>.swapped(i: Int, j: Int): List<T> =
+    toMutableList().apply {
+        Collections.swap(this, i, j)
+    }
 
 inline fun firstFalse(first: Int, last: Int, pred: (Int) -> Boolean): Int {
     var l = first

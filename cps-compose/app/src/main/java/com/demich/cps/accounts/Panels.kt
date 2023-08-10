@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
-import java.util.Collections
 
 @Composable
 fun<U: UserInfo> AccountPanel(
@@ -127,22 +126,19 @@ private fun PanelMovingButtons(
 ) {
     val context = context
     val scope = rememberCoroutineScope()
-    fun swapAndSave(i: Int, j: Int) {
+    fun saveSwapped(i: Int, j: Int) {
         scope.launch {
-            val newOrder = visibleOrder.toMutableList().apply {
-                Collections.swap(this, i, j)
-            }
-            context.settingsUI.accountsOrder(newOrder)
+            context.settingsUI.accountsOrder(newValue = visibleOrder.swapped(i, j))
         }
     }
     val index = visibleOrder.indexOf(type)
     PanelMovingButtons(
         modifier = modifier,
         onUpClick = {
-            swapAndSave(index - 1, index)
+            saveSwapped(index - 1, index)
         }.takeIf { index > 0 },
         onDownClick = {
-            swapAndSave(index, index + 1)
+            saveSwapped(index, index + 1)
         }.takeIf { index + 1 < visibleOrder.size }
     )
 }
