@@ -29,9 +29,10 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
     val statusBarDisabledManagers = itemEnumSet<AccountManagers>(name = "status_bar_disabled_managers")
     val statusBarResultByMaximum = itemBoolean(name = "status_bar_result_by_max", defaultValue = true)
 
-    private val accountsOrder = jsonCPS.item<List<AccountManagers>>(name = "accounts_order", defaultValue = emptyList())
-    suspend fun saveAccountsOrder(order: List<AccountManagers>) = accountsOrder(order)
-    fun flowOfAccountsOrder(): Flow<List<AccountManagers>> = accountsOrder.flow.map { order ->
+    val accountsOrder = jsonCPS.item<List<AccountManagers>>(
+        name = "accounts_order",
+        defaultValue = emptyList()
+    ).mapGetter { order ->
         order + AccountManagers.entries.filter { it !in order }
     }
 

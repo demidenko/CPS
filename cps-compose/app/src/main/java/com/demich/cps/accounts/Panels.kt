@@ -132,7 +132,7 @@ private fun PanelMovingButtons(
             val newOrder = visibleOrder.toMutableList().apply {
                 Collections.swap(this, i, j)
             }
-            context.settingsUI.saveAccountsOrder(newOrder)
+            context.settingsUI.accountsOrder(newOrder)
         }
     }
     val index = visibleOrder.indexOf(type)

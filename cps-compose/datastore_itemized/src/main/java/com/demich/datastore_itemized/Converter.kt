@@ -21,6 +21,12 @@ internal abstract class Converter<T, S: Any>(
         if (value == null) prefs.remove(key)
         else prefs[key] = toPrefs(value)
     }
+
+    internal fun mapGetter(transform: (T) -> T): Converter<T, S> =
+        object : Converter<T, S>(key = key) {
+            override fun fromPrefs(s: S?) = transform(this@Converter.fromPrefs(s))
+            override fun toPrefs(t: T & Any) = this@Converter.toPrefs(t)
+        }
 }
 
 internal class ValueWithDefault<T: Any>(

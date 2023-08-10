@@ -80,4 +80,10 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
             encode = ::encodeToString,
             decode = ::decodeFromString
         )
+
+    protected fun<T> DataStoreItem<T>.mapGetter(transform: (T) -> T): DataStoreItem<T> =
+        DataStoreItem(
+            dataStore = dataStore,
+            converter = converter.mapGetter(transform)
+        )
 }

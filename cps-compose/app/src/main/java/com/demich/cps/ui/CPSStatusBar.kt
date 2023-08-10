@@ -162,7 +162,7 @@ fun StatusBarButtonsForUIPanel() {
             .map { it.flowOfInfoWithManager() }
         ) { array ->
             array.mapNotNull { it?.manager }
-        }.combine(settingsUI.flowOfAccountsOrder()) { managers, order ->
+        }.combine(settingsUI.accountsOrder.flow) { managers, order ->
             managers.sortedBy { order.indexOf(it.type) }
         }
     }
