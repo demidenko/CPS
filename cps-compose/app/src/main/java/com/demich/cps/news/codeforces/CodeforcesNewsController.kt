@@ -100,10 +100,10 @@ class CodeforcesNewsController internal constructor(
     var recentFilterByBlogEntry: CodeforcesBlogEntry? by mutableStateOf(data.recentFilterByBlogEntry)
 
 
-    private val badges = mutableMapOf<CodeforcesTitle, MutableState<Int>>()
-    fun getBadgeCountState(tab: CodeforcesTitle): State<Int> = badges.getOrPut(tab) { mutableStateOf(0) }
+    private val badges = mutableMapOf<CodeforcesTitle, MutableIntState>()
+    fun getBadgeCountState(tab: CodeforcesTitle): State<Int> = badges.getOrPut(tab) { mutableIntStateOf(0) }
     fun setBadgeCount(tab: CodeforcesTitle, count: Int) {
-        badges.getOrPut(tab) { mutableStateOf(count) }.value = count
+        badges.getOrPut(tab) { mutableIntStateOf(count) }.intValue = count
     }
 
     @Composable
