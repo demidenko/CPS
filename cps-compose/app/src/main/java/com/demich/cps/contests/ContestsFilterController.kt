@@ -16,7 +16,7 @@ fun rememberContestsFilterController() =
         )
     }
 
-@Stable
+@Stable //TODO: not enough, compose ignores
 class ContestsFilterController(
     filter: String,
     enabled: Boolean,
