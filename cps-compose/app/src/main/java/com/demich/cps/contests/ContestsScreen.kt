@@ -26,7 +26,7 @@ import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
-import com.demich.cps.contests.loaders.makeCombinedMessage
+import com.demich.cps.contests.loading.makeCombinedMessage
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
 import com.demich.cps.contests.monitors.flowOfContestData

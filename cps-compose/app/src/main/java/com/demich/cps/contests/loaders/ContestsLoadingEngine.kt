@@ -2,6 +2,7 @@ package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
+import com.demich.cps.contests.loading.ContestsLoaders
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.*
@@ -104,12 +105,12 @@ private suspend fun ContestsSettingsDataStore.createLoaders(
     loaderTypes: Set<ContestsLoaders>
 ): List<ContestsLoader> = loaderTypes.map { loaderType ->
     when (loaderType) {
-        ContestsLoaders.clist -> ClistContestsLoader(
+        ContestsLoaders.clist_api -> ClistContestsLoader(
             apiAccess = clistApiAccess(),
             includeResourceIds = { clistAdditionalResources().map { it.id } }
         )
-        ContestsLoaders.codeforces -> CodeforcesContestsLoader()
-        ContestsLoaders.atcoder -> AtCoderContestsLoader()
-        ContestsLoaders.dmoj -> DmojContestsLoader()
+        ContestsLoaders.codeforces_api -> CodeforcesContestsLoader()
+        ContestsLoaders.atcoder_parse -> AtCoderContestsLoader()
+        ContestsLoaders.dmoj_api -> DmojContestsLoader()
     }
 }

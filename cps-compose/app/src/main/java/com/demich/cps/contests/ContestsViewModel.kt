@@ -7,8 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestsListDao
 import com.demich.cps.contests.database.contestsListDao
-import com.demich.cps.contests.loaders.ContestsLoaders
 import com.demich.cps.contests.loaders.ContestsReceiver
+import com.demich.cps.contests.loading.ContestsLoaders
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus

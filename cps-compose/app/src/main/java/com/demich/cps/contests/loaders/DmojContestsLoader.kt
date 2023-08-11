@@ -1,10 +1,11 @@
 package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.loading.ContestsLoaders
 import com.demich.cps.platforms.api.DmojApi
 import kotlinx.datetime.Instant
 
-class DmojContestsLoader: ContestsLoader(ContestsLoaders.dmoj) {
+class DmojContestsLoader: ContestsLoader(ContestsLoaders.dmoj_api) {
     override suspend fun loadContests(platform: Contest.Platform) =
         DmojApi.getContests().map { contest ->
             Contest(

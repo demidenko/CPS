@@ -2,6 +2,7 @@ package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestsListDao
+import com.demich.cps.contests.loading.ContestsLoaders
 import com.demich.cps.utils.LoadingStatus
 
 class ContestsReceiver(
