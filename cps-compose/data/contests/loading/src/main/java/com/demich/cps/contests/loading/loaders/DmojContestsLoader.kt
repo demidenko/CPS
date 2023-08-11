@@ -1,4 +1,4 @@
-package com.demich.cps.contests.loaders
+package com.demich.cps.contests.loading.loaders
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsLoaders

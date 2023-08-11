@@ -35,6 +35,7 @@ android {
 
 dependencies {
     implementation(project(":data:platforms:api"))
+    implementation(project(":data:platforms:utils"))
     implementation(project(":data:contests:database"))
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
