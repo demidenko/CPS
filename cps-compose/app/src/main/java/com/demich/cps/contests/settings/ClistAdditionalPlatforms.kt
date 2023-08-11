@@ -12,14 +12,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.ui.dialogs.CPSDialog
+import com.demich.cps.platforms.api.ClistApi
+import com.demich.cps.platforms.api.ClistResource
+import com.demich.cps.platforms.api.niceMessage
+import com.demich.cps.platforms.utils.ClistUtils
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LazyColumnWithScrollBar
 import com.demich.cps.ui.LoadingContentBox
+import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.utils.*
-import com.demich.cps.platforms.api.ClistApi
-import com.demich.cps.platforms.api.ClistResource
-import com.demich.cps.platforms.utils.ClistUtils
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
@@ -32,24 +33,19 @@ fun ClistAdditionalResourcesDialog(
     val context = context
     val scope = rememberCoroutineScope()
 
-    var loadingStatus by remember { mutableStateOf(LoadingStatus.LOADING) }
-    var unselectedItems: List<ClistResource> by remember { mutableStateOf(emptyList()) }
+    val dataLoader = remember(scope) { BackgroundDataLoader<List<ClistResource>>(scope = scope) }
+    val resourcesResult by dataLoader.flowOfResult().collectAsState()
 
     val selectedItems by rememberCollect { item.flow }
 
     LaunchedEffect(Unit) {
-        loadingStatus = LoadingStatus.LOADING
-        kotlin.runCatching {
+        dataLoader.execute(id = Unit) {
+            val alreadySupported by lazy {
+                Contest.platformsExceptUnknown.map(ClistUtils::getClistApiResourceId)
+            }
             ClistApi.getResources(apiAccess = context.settingsContests.clistApiAccess())
-        }.onFailure {
-            loadingStatus = LoadingStatus.FAILED
-        }.onSuccess { resources ->
-            val alreadySupported =
-                Contest.platformsExceptUnknown.map { ClistUtils.getClistApiResourceId(it) }
-            unselectedItems = resources
                 .filter { it.id !in alreadySupported }
                 .sortedBy { it.name }
-            loadingStatus = LoadingStatus.PENDING
         }
     }
 
@@ -69,8 +65,7 @@ fun ClistAdditionalResourcesDialog(
 
         Text(text = "available:")
         UnselectedPlatforms(
-            loadingStatus = loadingStatus,
-            resources = unselectedItems - selectedItems,
+            resourcesResult = { resourcesResult?.map { it - selectedItems.toSet() } },
             modifier = Modifier
                 .heightIn(max = 200.dp),
             onClick = { resource ->
@@ -109,15 +104,16 @@ private fun SelectedPlatforms(
 @Composable
 private fun UnselectedPlatforms(
     modifier: Modifier = Modifier,
-    loadingStatus: LoadingStatus,
-    resources: List<ClistResource>,
+    resourcesResult: () -> Result<List<ClistResource>>?,
     onClick: (ClistResource) -> Unit
 ) {
     LoadingContentBox(
-        loadingStatus = loadingStatus,
-        failedText = "Failed to load resources",
+        dataResult = resourcesResult,
+        failedText = {
+            it.niceMessage ?: "Failed to load resources"
+        },
         modifier = modifier
-    ) {
+    ) { resources ->
         var searchFilter by remember { mutableStateOf("") }
         Column {
             OutlinedTextField(
