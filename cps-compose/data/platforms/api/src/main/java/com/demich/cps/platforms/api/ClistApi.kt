@@ -17,6 +17,19 @@ object ClistApi: PlatformApi {
         }
     }
 
+    private suspend inline fun<reified T> getApiJsonObjects(
+        page: String,
+        apiAccess: ApiAccess,
+        limit: Int = 1000,
+        block: HttpRequestBuilder.() -> Unit = {}
+    ): List<T> = client.getAs<ClistApiResponse<T>>("${urls.api}/$page") {
+        parameter("format", "json")
+        parameter("username", apiAccess.login)
+        parameter("api_key", apiAccess.key)
+        parameter("limit", limit)
+        block()
+    }.objects
+
     suspend fun getContests(
         apiAccess: ApiAccess,
         resourceIds: List<Int>,
@@ -24,25 +37,15 @@ object ClistApi: PlatformApi {
         minEndTime: Instant
     ): List<ClistContest> {
         if (resourceIds.isEmpty()) return emptyList()
-        return client.getAs<ClistApiResponse<ClistContest>>("${urls.api}/contest") {
-            parameter("format", "json")
-            parameter("username", apiAccess.login)
-            parameter("api_key", apiAccess.key)
+        return getApiJsonObjects(page = "contest", apiAccess = apiAccess) {
             parameter("start__lte", maxStartTime.toString())
             parameter("end__gte", minEndTime.toString())
             parameter("resource_id__in", resourceIds.joinToString())
-        }.objects
+        }
     }
 
-    suspend fun getResources(
-        apiAccess: ApiAccess
-    ): List<ClistResource> {
-        return client.getAs<ClistApiResponse<ClistResource>>(urlString = "${urls.api}/resource") {
-            parameter("format", "json")
-            parameter("username", apiAccess.login)
-            parameter("api_key", apiAccess.key)
-            parameter("limit", 1000)
-        }.objects
+    suspend fun getResources(apiAccess: ApiAccess): List<ClistResource> {
+        return getApiJsonObjects(page = "resource", apiAccess = apiAccess)
     }
 
     object urls {
@@ -62,7 +65,17 @@ object ClistApi: PlatformApi {
 
 @Serializable
 private class ClistApiResponse<T>(
-    val objects: List<T>
+    val objects: List<T>,
+    //TODO: val meta: PageInfo
+)
+
+@Serializable
+private data class PageInfo(
+    val limit: Int,
+    val next: String,
+    val offset: Int,
+    val previous: String?,
+    val total_count: Int?
 )
 
 @Serializable
