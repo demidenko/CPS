@@ -38,7 +38,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
 
     val contestsDateConstraints = jsonCPS.item(name = "contests_date_constraints", defaultValue = ContestDateConstraints())
 
-    val contestsLoadersPriorityLists = jsonCPS.item(name = "loading_priorities", defaultValue = defaultLoadingPriorities)
+    val contestsLoadersPriorityLists = jsonCPS.item(name = "loading_priorities", defaultValue = ::makeDefaultLoadingPriorities)
 
     val enabledAutoUpdate = itemBoolean(name = "auto_update", defaultValue = true)
 }
@@ -65,22 +65,13 @@ data class ContestDateConstraints(
     }
 }
 
-private val defaultLoadingPriorities by lazy {
-    Contest.platforms.associateWith { platform ->
-        when (platform) {
-            Contest.Platform.codeforces -> listOf(
-                ContestsLoaders.clist,
-                ContestsLoaders.codeforces
-            )
-            Contest.Platform.atcoder -> listOf(
-                ContestsLoaders.clist,
-                ContestsLoaders.atcoder
-            )
-            Contest.Platform.dmoj -> listOf(
-                ContestsLoaders.clist,
-                ContestsLoaders.dmoj
-            )
-            else -> listOf(ContestsLoaders.clist)
+private fun makeDefaultLoadingPriorities() =
+    listOf(ContestsLoaders.clist).let { loaders ->
+        loaders + ContestsLoaders.entries.filter { it !in loaders }
+    }.let { loaders ->
+        Contest.platforms.associateWith { platform ->
+            buildList {
+                loaders.forEach { if (platform in it.supportedPlatforms) add(it) }
+            }
         }
     }
-}
