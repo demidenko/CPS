@@ -55,8 +55,7 @@ val Throwable.niceMessage: String? get() =
     when (this) {
         is java.net.UnknownHostException,
         is java.net.SocketException,
-        is SocketTimeoutException,
-        is ConnectTimeoutException -> "Connection failed"
+        is SocketTimeoutException -> "Connection failed"
 
         is ResponseException -> HttpStatusCode.fromValue(response.status.value).toString()
 
