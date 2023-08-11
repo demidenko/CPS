@@ -76,9 +76,9 @@ data class ContestDateConstraints(
 }
 
 private fun makeDefaultLoadingPriorities() =
-    listOf(ContestsLoaders.clist).let { loaders ->
-        loaders + ContestsLoaders.entries.filter { it !in loaders }
-    }.let { loaders ->
+    ContestsLoaders.entries.sortedWith(
+        compareByDescending<ContestsLoaders> { it.supportedPlatforms.size }.thenBy { it.ordinal }
+    ).let { loaders ->
         Contest.platforms.associateWith { platform ->
             buildList {
                 loaders.forEach { if (platform in it.supportedPlatforms) add(it) }
