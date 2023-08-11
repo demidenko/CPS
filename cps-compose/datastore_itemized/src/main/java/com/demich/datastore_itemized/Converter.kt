@@ -46,10 +46,10 @@ internal class ValueNullable<T: Any>(
 
 internal class ValueConvertible<T, S: Any>(
     key: Preferences.Key<S>,
-    private val defaultValue: T,
+    private val defaultValue: () -> T,
     private val encode: (T) -> S,
     private val decode: (S) -> T
 ): Converter<T, S>(key) {
-    override fun fromPrefs(s: S?): T = s?.runCatching(decode)?.getOrNull() ?: defaultValue
+    override fun fromPrefs(s: S?): T = s?.runCatching(decode)?.getOrNull() ?: defaultValue()
     override fun toPrefs(t: T & Any): S = encode(t)
 }

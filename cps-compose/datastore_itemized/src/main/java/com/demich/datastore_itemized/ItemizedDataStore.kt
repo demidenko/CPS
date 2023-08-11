@@ -3,7 +3,6 @@ package com.demich.datastore_itemized
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.flow.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -28,11 +27,25 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
     private fun<T: Any> itemNullable(key: Preferences.Key<T>): DataStoreItem<T?> =
         DataStoreItem(converter = ValueNullable(key), dataStore = dataStore)
 
-    protected fun<T> itemStringConvertible(name: String, defaultValue: T, encode: (T) -> String, decode: (String) -> T): DataStoreItem<T> =
-        DataStoreItem(converter = ValueConvertible(stringPreferencesKey(name), defaultValue, encode, decode), dataStore = dataStore)
+    protected fun<T> itemStringConvertible(
+        name: String,
+        defaultValue: () -> T,
+        encode: (T) -> String,
+        decode: (String) -> T
+    ): DataStoreItem<T> = DataStoreItem(
+        converter = ValueConvertible(stringPreferencesKey(name), defaultValue, encode, decode),
+        dataStore = dataStore
+    )
 
-    protected fun<T> itemStringSetConvertible(name: String, defaultValue: T, encode: (T) -> Set<String>, decode: (Set<String>) -> T): DataStoreItem<T> =
-        DataStoreItem(converter = ValueConvertible(stringSetPreferencesKey(name), defaultValue, encode,  decode), dataStore = dataStore)
+    protected fun<T> itemStringSetConvertible(
+        name: String,
+        defaultValue: () -> T,
+        encode: (T) -> Set<String>,
+        decode: (Set<String>) -> T
+    ): DataStoreItem<T> = DataStoreItem(
+        converter = ValueConvertible(stringSetPreferencesKey(name), defaultValue, encode, decode),
+        dataStore = dataStore
+    )
 
 
 
@@ -60,7 +73,7 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
     protected inline fun<reified T: Enum<T>> itemEnum(name: String, defaultValue: T): DataStoreItem<T> =
         itemStringConvertible(
             name = name,
-            defaultValue = defaultValue,
+            defaultValue = { defaultValue },
             encode = Enum<T>::name,
             decode = ::enumValueOf
         )
@@ -68,18 +81,21 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
     protected inline fun<reified T: Enum<T>> itemEnumSet(name: String, defaultValue: Set<T> = emptySet()): DataStoreItem<Set<T>> =
         itemStringSetConvertible(
             name = name,
-            defaultValue = defaultValue,
+            defaultValue = { defaultValue },
             encode = { it.mapTo(mutableSetOf(), Enum<T>::name) },
             decode = { it.mapTo(mutableSetOf(), ::enumValueOf) }
         )
 
-    protected inline fun<reified T> Json.item(name: String, defaultValue: T): DataStoreItem<T> =
+    protected inline fun<reified T> Json.item(name: String, noinline defaultValue: () -> T): DataStoreItem<T> =
         itemStringConvertible(
             name = name,
             defaultValue = defaultValue,
             encode = ::encodeToString,
             decode = ::decodeFromString
         )
+
+    protected inline fun<reified T> Json.item(name: String, defaultValue: T): DataStoreItem<T> =
+        item(name = name, defaultValue = { defaultValue })
 
     protected fun<T> DataStoreItem<T>.mapGetter(transform: (T) -> T): DataStoreItem<T> =
         DataStoreItem(
