@@ -36,7 +36,16 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
     val clistAdditionalResources = jsonCPS.item<List<ClistResource>>(name = "clist_additional_resources", defaultValue = emptyList())
     val clistLastReloadedAdditionalResources = jsonCPS.item<Set<Int>>(name = "clist_additional_last_reloaded", defaultValue = emptySet())
 
-    val contestsDateConstraints = jsonCPS.item(name = "contests_date_constraints", defaultValue = ContestDateBaseConstraints())
+    val contestsDateConstraints = jsonCPS.item(
+        name = "contests_date_constraints",
+        defaultValue = {
+            ContestDateBaseConstraints(
+                maxDuration = 30.days,
+                nowToStartTimeMaxDuration = 120.days,
+                endTimeToNowMaxDuration = 7.days
+            )
+        }
+    )
 
     val contestsLoadersPriorityLists = jsonCPS.item(name = "loading_priorities", defaultValue = ::makeDefaultLoadingPriorities)
 
@@ -45,9 +54,9 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
 
 @Serializable
 data class ContestDateBaseConstraints(
-    val maxDuration: Duration = 30.days,
-    val nowToStartTimeMaxDuration: Duration = 120.days,
-    val endTimeToNowMaxDuration: Duration = 7.days,
+    val maxDuration: Duration,
+    val nowToStartTimeMaxDuration: Duration,
+    val endTimeToNowMaxDuration: Duration,
 ) {
     fun at(currentTime: Instant) = ContestDateConstraints(
         maxStartTime = currentTime + nowToStartTimeMaxDuration,
