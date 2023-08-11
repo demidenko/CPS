@@ -3,24 +3,27 @@ package com.demich.cps.contests.loaders
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsLoaders
-import com.demich.cps.contests.loading.loaders.*
-import com.demich.cps.contests.settings.ContestsSettingsDataStore
-import com.demich.cps.utils.getCurrentTime
-import kotlinx.coroutines.*
+import com.demich.cps.contests.loading.loaders.ContestsLoader
+import com.demich.cps.contests.loading.loaders.ContestsLoaderMultiple
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
-suspend fun getContests(
+suspend fun launchContestsLoading(
     setup: Map<Contest.Platform, List<ContestsLoaders>>,
-    settings: ContestsSettingsDataStore,
-    contestsReceiver: ContestsReceiver
+    dateConstraints: ContestDateConstraints,
+    contestsReceiver: ContestsReceiver,
+    createLoader: suspend (ContestsLoaders) -> ContestsLoader
 ) {
-    val loaders = settings.createLoaders(
-        loaderTypes = setup.flatMapTo(mutableSetOf()) { it.value }
-    ).associateBy { it.type }
+    val memoizer = MultipleLoadersMemoizer(setup, dateConstraints)
 
-    val dateConstraints = settings.contestsDateConstraints().at(currentTime = getCurrentTime())
-    val memorizer = MultipleLoadersMemorizer(setup, dateConstraints)
+    val possibleLoaders = setup.flatMapTo(mutableSetOf()) { it.value }
+        .associateWith { createLoader(it) }
 
     coroutineScope {
         setup.forEach { (platform, priorities) ->
@@ -28,10 +31,10 @@ suspend fun getContests(
                 loadUntilSuccess(
                     platform = platform,
                     priorities = priorities,
-                    loaders = loaders,
-                    memorizer = memorizer,
                     dateConstraints = dateConstraints,
-                    contestsReceiver = contestsReceiver
+                    contestsReceiver = contestsReceiver,
+                    memoizer = memoizer,
+                    getLoader = possibleLoaders::getValue
                 )
             }
         }
@@ -41,17 +44,17 @@ suspend fun getContests(
 private suspend fun loadUntilSuccess(
     platform: Contest.Platform,
     priorities: List<ContestsLoaders>,
-    loaders: Map<ContestsLoaders, ContestsLoader>,
-    memorizer: MultipleLoadersMemorizer,
     dateConstraints: ContestDateConstraints,
-    contestsReceiver: ContestsReceiver
+    contestsReceiver: ContestsReceiver,
+    memoizer: MultipleLoadersMemoizer,
+    getLoader: (ContestsLoaders) -> ContestsLoader
 ) {
     require(priorities.isNotEmpty())
     contestsReceiver.startLoading(platform)
     for (loaderType in priorities) {
-        val loader = loaders.getValue(loaderType)
+        val loader = getLoader(loaderType)
         val result: Result<List<Contest>> = if (loader is ContestsLoaderMultiple) {
-            memorizer.get(loader).map { it.getOrElse(platform) { emptyList() } }
+            memoizer.get(loader).map { it.getOrElse(platform) { emptyList() } }
         } else {
             withContext(Dispatchers.IO) {
                 kotlin.runCatching {
@@ -71,7 +74,7 @@ private suspend fun loadUntilSuccess(
 
 typealias ContestsLoadResult = Result<Map<Contest.Platform, List<Contest>>>
 
-private class MultipleLoadersMemorizer(
+private class MultipleLoadersMemoizer(
     private val setup: Map<Contest.Platform, List<ContestsLoaders>>,
     private val dateConstraints: ContestDateConstraints
 ) {
@@ -92,26 +95,12 @@ private class MultipleLoadersMemorizer(
             if (loader.type in loaderTypes) platform else null
         }
         return withContext(Dispatchers.IO) {
-            kotlin.runCatching {
-                loader.getContests(
+            loader.runCatching {
+                getContests(
                     platforms = platforms,
                     dateConstraints = dateConstraints
                 ).groupBy { it.platform }
             }
         }
-    }
-}
-
-private suspend fun ContestsSettingsDataStore.createLoaders(
-    loaderTypes: Set<ContestsLoaders>
-): List<ContestsLoader> = loaderTypes.map { loaderType ->
-    when (loaderType) {
-        ContestsLoaders.clist_api -> ClistContestsLoader(
-            apiAccess = clistApiAccess(),
-            includeResourceIds = { clistAdditionalResources().map { it.id } }
-        )
-        ContestsLoaders.codeforces_api -> CodeforcesContestsLoader()
-        ContestsLoaders.atcoder_parse -> AtCoderContestsLoader()
-        ContestsLoaders.dmoj_api -> DmojContestsLoader()
     }
 }

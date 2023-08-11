@@ -2,8 +2,14 @@ package com.demich.cps.contests
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loaders.ContestsReceiver
-import com.demich.cps.contests.loaders.getContests
+import com.demich.cps.contests.loaders.launchContestsLoading
+import com.demich.cps.contests.loading.ContestsLoaders
+import com.demich.cps.contests.loading.loaders.AtCoderContestsLoader
+import com.demich.cps.contests.loading.loaders.ClistContestsLoader
+import com.demich.cps.contests.loading.loaders.CodeforcesContestsLoader
+import com.demich.cps.contests.loading.loaders.DmojContestsLoader
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
+import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.edit
 
 interface ContestsReloader {
@@ -63,9 +69,19 @@ private suspend fun loadContests(
             return
         }
     }
-    getContests(
+    launchContestsLoading(
         setup = settings.contestsLoadersPriorityLists().filterKeys { it in platforms },
-        settings = settings,
+        dateConstraints = settings.contestsDateConstraints().at(currentTime = getCurrentTime()),
         contestsReceiver = contestsReceiver
-    )
+    ) { loaderType ->
+        when (loaderType) {
+            ContestsLoaders.clist_api -> ClistContestsLoader(
+                apiAccess = settings.clistApiAccess(),
+                includeResourceIds = { settings.clistAdditionalResources().map { it.id } }
+            )
+            ContestsLoaders.codeforces_api -> CodeforcesContestsLoader()
+            ContestsLoaders.atcoder_parse -> AtCoderContestsLoader()
+            ContestsLoaders.dmoj_api -> DmojContestsLoader()
+        }
+    }
 }
