@@ -49,7 +49,7 @@ object ClistApi: PlatformApi {
         const val main = "https://clist.by"
         fun user(login: String) = "$main/coder/$login"
 
-        const val api = "$main/api/v2"
+        const val api = "$main/api/v3"
         val apiHelp get() = "$api/doc/"
     }
 
