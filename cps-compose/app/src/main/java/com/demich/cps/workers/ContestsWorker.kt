@@ -3,9 +3,9 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
-import com.demich.cps.contests.ContestsReloader
+import com.demich.cps.contests.loaders.ContestsReloader
 import com.demich.cps.contests.database.contestsListDao
-import com.demich.cps.contests.loaders.ContestsReceiver
+import com.demich.cps.contests.loading.asContestsReceiver
 import com.demich.cps.contests.settings.settingsContests
 import kotlin.time.Duration.Companion.hours
 
@@ -26,19 +26,14 @@ class ContestsWorker(
                 )
         }
     }
+
     override suspend fun runWork(): Result {
         //usual reload
         reloadEnabledPlatforms(
             settings = context.settingsContests,
-            contestsReceiver = ContestsReceiver(
-                dao = context.contestsListDao,
-                setLoadingStatus = { _, _ -> },
-                consumeError = { _, _, _ -> },
-                clearErrors = { }
-            )
+            contestsReceiver = context.contestsListDao.asContestsReceiver()
         )
 
         return Result.success()
     }
-
 }

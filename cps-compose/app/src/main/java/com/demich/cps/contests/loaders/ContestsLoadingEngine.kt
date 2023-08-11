@@ -3,6 +3,7 @@ package com.demich.cps.contests.loaders
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsLoaders
+import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading.loaders.ContestsLoader
 import com.demich.cps.contests.loading.loaders.ContestsLoaderMultiple
 import kotlinx.coroutines.Deferred
@@ -50,7 +51,7 @@ private suspend fun loadUntilSuccess(
     getLoader: (ContestsLoaders) -> ContestsLoader
 ) {
     require(priorities.isNotEmpty())
-    contestsReceiver.startLoading(platform)
+    contestsReceiver.onStartLoading(platform)
     for (loaderType in priorities) {
         val loader = getLoader(loaderType)
         val result: Result<List<Contest>> = if (loader is ContestsLoaderMultiple) {
@@ -62,14 +63,27 @@ private suspend fun loadUntilSuccess(
                 }
             }
         }
-        result.onSuccess { contests ->
-            contestsReceiver.finishSuccess(platform, contests)
-            return
-        }.onFailure {
-            contestsReceiver.consumeError(platform, loaderType, it)
-        }
+        contestsReceiver.onResult(
+            platform = platform,
+            loaderType = loaderType,
+            result = result.map { it.map(::titleFix) }
+        )
+        if (result.isSuccess) break
     }
-    contestsReceiver.finishFailed(platform)
+    contestsReceiver.onFinish(platform)
+}
+
+private fun titleFix(contest: Contest): Contest {
+    val fixedTitle = when (contest.platform) {
+        Contest.Platform.atcoder -> {
+            contest.title
+                .replace("（", " (")
+                .replace("）",") ")
+        }
+        else -> contest.title
+    }.trim()
+    return if (contest.title == fixedTitle) contest
+    else contest.copy(title = fixedTitle)
 }
 
 typealias ContestsLoadResult = Result<Map<Contest.Platform, List<Contest>>>

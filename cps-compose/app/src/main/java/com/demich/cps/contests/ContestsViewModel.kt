@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestsListDao
 import com.demich.cps.contests.database.contestsListDao
-import com.demich.cps.contests.loaders.ContestsReceiver
+import com.demich.cps.contests.loaders.ContestsReloader
+import com.demich.cps.contests.loading.ContestsReceiver
+import com.demich.cps.contests.loading.asContestsReceiver
 import com.demich.cps.contests.loading.ContestsLoaders
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
@@ -15,6 +17,7 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.mapToSet
 import com.demich.cps.utils.sharedViewModel
+import com.demich.cps.utils.toLoadingStatus
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,20 +58,30 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
         mutableLoadingStatusFor(platform).value = LoadingStatus.PENDING
     }
 
-    private fun ContestsListDao.makeReceiver() =
-        ContestsReceiver(
-            dao = this,
-            setLoadingStatus = { platform, loadingStatus ->
-                mutableLoadingStatusFor(platform).update {
-                    if (loadingStatus == LoadingStatus.LOADING) require(it != LoadingStatus.LOADING)
-                    loadingStatus
+    private fun setLoadingStatus(platform: Contest.Platform, loadingStatus: LoadingStatus) =
+        mutableLoadingStatusFor(platform).update {
+            if (loadingStatus == LoadingStatus.LOADING) require(it != LoadingStatus.LOADING)
+            loadingStatus
+        }
+
+    private fun ContestsListDao.makeReceiver(): ContestsReceiver {
+        val lastResult = mutableMapOf<Contest.Platform, Result<*>>()
+        return asContestsReceiver(
+            onStartLoading = { platform ->
+                setLoadingStatus(platform, LoadingStatus.LOADING)
+                mutableErrorsList(platform).value = emptyList()
+            },
+            onFinish = { platform ->
+                setLoadingStatus(platform, lastResult.getValue(platform).toLoadingStatus())
+            },
+            onResult = { platform, loaderType, result ->
+                result.onFailure {
+                    mutableErrorsList(platform).value += loaderType to it
                 }
-            },
-            consumeError = { platform, loaderType, e ->
-                mutableErrorsList(platform).value += loaderType to e
-            },
-            clearErrors = { mutableErrorsList(it).value = emptyList() }
+                lastResult[platform] = result
+            }
         )
+    }
 
     fun reloadEnabledPlatforms(context: Context) {
         viewModelScope.launch {

@@ -1,8 +1,7 @@
-package com.demich.cps.contests
+package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.loaders.ContestsReceiver
-import com.demich.cps.contests.loaders.launchContestsLoading
+import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading.ContestsLoaders
 import com.demich.cps.contests.loading.loaders.AtCoderContestsLoader
 import com.demich.cps.contests.loading.loaders.ClistContestsLoader
@@ -57,10 +56,15 @@ private suspend fun loadContests(
 ) {
     if (Contest.Platform.unknown in platforms) {
         if (settings.clistAdditionalResources().isEmpty()) {
-            contestsReceiver.finishSuccess(
+            //fake loading
+            contestsReceiver.onStartLoading(platform = Contest.Platform.unknown)
+            contestsReceiver.onResult(
                 platform = Contest.Platform.unknown,
-                contests = emptyList()
+                result = Result.success(emptyList()),
+                loaderType = ContestsLoaders.clist_api
             )
+            contestsReceiver.onFinish(platform = Contest.Platform.unknown)
+            //continue without unknown
             loadContests(
                 platforms = platforms - Contest.Platform.unknown,
                 settings = settings,
