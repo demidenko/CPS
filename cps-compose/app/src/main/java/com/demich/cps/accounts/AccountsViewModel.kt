@@ -14,8 +14,8 @@ import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
-import com.demich.cps.utils.BackgroundDataLoader
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -97,7 +97,7 @@ class AccountsViewModel: ViewModel() {
         manager.setSavedInfo(manager.loadInfo(userId))
     }
 
-    private val ratingLoader = BackgroundDataLoader<List<RatingChange>>(viewModelScope)
+    private val ratingLoader = backgroundDataLoader<List<RatingChange>>()
     fun flowOfRatingResult() = ratingLoader.flowOfResult()
     fun loadRating(manager: RatedAccountManager<*>, userId: String, dataId: Long) {
         ratingLoader.execute(id = "$userId#$dataId") {

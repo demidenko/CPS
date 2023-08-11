@@ -12,9 +12,9 @@ import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.api.CodeforcesRecentAction
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.room.followListDao
-import com.demich.cps.utils.BackgroundDataLoader
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
+import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -165,7 +165,7 @@ class CodeforcesNewsViewModel: ViewModel() {
         }
     }
 
-    private val blogEntriesLoader = BackgroundDataLoader<List<CodeforcesBlogEntry>>(viewModelScope)
+    private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesBlogEntry>>()
     fun flowOfBlogEntriesResult(handle: String, context: Context, id: Long) =
         blogEntriesLoader.run {
             execute(id = "$handle#$id") {
