@@ -7,7 +7,7 @@ import com.demich.cps.platforms.api.CodeforcesApi
 class CodeforcesContestsLoader: ContestsLoader(type = ContestsLoaders.codeforces) {
     override suspend fun loadContests(
         platform: Contest.Platform,
-        dateConstraints: ContestDateConstraints.Current
+        dateConstraints: ContestDateConstraints
     ) = CodeforcesApi.getContests()
         .filter { dateConstraints.check(startTime = it.startTime, duration = it.duration) }
         .map { contest ->

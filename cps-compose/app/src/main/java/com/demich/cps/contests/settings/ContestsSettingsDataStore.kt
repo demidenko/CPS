@@ -36,7 +36,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
     val clistAdditionalResources = jsonCPS.item<List<ClistResource>>(name = "clist_additional_resources", defaultValue = emptyList())
     val clistLastReloadedAdditionalResources = jsonCPS.item<Set<Int>>(name = "clist_additional_last_reloaded", defaultValue = emptySet())
 
-    val contestsDateConstraints = jsonCPS.item(name = "contests_date_constraints", defaultValue = ContestDateConstraints())
+    val contestsDateConstraints = jsonCPS.item(name = "contests_date_constraints", defaultValue = ContestDateBaseConstraints())
 
     val contestsLoadersPriorityLists = jsonCPS.item(name = "loading_priorities", defaultValue = ::makeDefaultLoadingPriorities)
 
@@ -44,24 +44,25 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
 }
 
 @Serializable
-data class ContestDateConstraints(
+data class ContestDateBaseConstraints(
     val maxDuration: Duration = 30.days,
     val nowToStartTimeMaxDuration: Duration = 120.days,
     val endTimeToNowMaxDuration: Duration = 7.days,
 ) {
-    fun makeFor(currentTime: Instant) = Current(
+    fun at(currentTime: Instant) = ContestDateConstraints(
         maxStartTime = currentTime + nowToStartTimeMaxDuration,
         minEndTime = currentTime - endTimeToNowMaxDuration,
         maxDuration = maxDuration
     )
-    data class Current(
-        val maxStartTime: Instant = Instant.DISTANT_FUTURE,
-        val minEndTime: Instant = Instant.DISTANT_PAST,
-        val maxDuration: Duration = Duration.INFINITE
-    ) {
-        fun check(startTime: Instant, duration: Duration): Boolean {
-            return duration <= maxDuration && startTime <= maxStartTime && startTime + duration >= minEndTime
-        }
+}
+
+data class ContestDateConstraints(
+    val maxStartTime: Instant = Instant.DISTANT_FUTURE,
+    val minEndTime: Instant = Instant.DISTANT_PAST,
+    val maxDuration: Duration = Duration.INFINITE
+) {
+    fun check(startTime: Instant, duration: Duration): Boolean {
+        return duration <= maxDuration && startTime <= maxStartTime && startTime + duration >= minEndTime
     }
 }
 

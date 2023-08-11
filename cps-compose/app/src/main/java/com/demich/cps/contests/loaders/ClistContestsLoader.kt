@@ -13,7 +13,7 @@ class ClistContestsLoader(
 ): ContestsLoaderMultiple(type = ContestsLoaders.clist) {
     override suspend fun loadContests(
         platforms: Set<Contest.Platform>,
-        dateConstraints: ContestDateConstraints.Current
+        dateConstraints: ContestDateConstraints
     ) = ClistApi.getContests(
         apiAccess = apiAccess,
         maxStartTime = dateConstraints.maxStartTime,
@@ -23,7 +23,7 @@ class ClistContestsLoader(
 }
 
 
-private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: ContestDateConstraints.Current) =
+private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: ContestDateConstraints) =
     mapNotNull { clistContest ->
         val contest = clistContest.toContest()
         if (!dateConstraints.check(startTime = contest.startTime, duration = contest.duration)) return@mapNotNull null

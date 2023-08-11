@@ -18,7 +18,7 @@ enum class ContestsLoaders(val supportedPlatforms: Set<Contest.Platform>) {
 abstract class ContestsLoader(val type: ContestsLoaders) {
     protected open suspend fun loadContests(
         platform: Contest.Platform,
-        dateConstraints: ContestDateConstraints.Current
+        dateConstraints: ContestDateConstraints
     ): List<Contest> {
         return loadContests(platform = platform).filterWith(dateConstraints)
     }
@@ -28,13 +28,13 @@ abstract class ContestsLoader(val type: ContestsLoaders) {
     ): List<Contest> {
         return loadContests(
             platform = platform,
-            dateConstraints = ContestDateConstraints.Current()
+            dateConstraints = ContestDateConstraints()
         )
     }
 
     suspend fun getContests(
         platform: Contest.Platform,
-        dateConstraints: ContestDateConstraints.Current
+        dateConstraints: ContestDateConstraints
     ): List<Contest> {
         require(platform in type.supportedPlatforms)
         return loadContests(
@@ -50,7 +50,7 @@ abstract class ContestsLoaderMultiple(type: ContestsLoaders): ContestsLoader(typ
 
     protected open suspend fun loadContests(
         platforms: Set<Contest.Platform>,
-        dateConstraints: ContestDateConstraints.Current
+        dateConstraints: ContestDateConstraints
     ): List<Contest> {
         return loadContests(platforms = platforms).filterWith(dateConstraints)
     }
@@ -60,13 +60,13 @@ abstract class ContestsLoaderMultiple(type: ContestsLoaders): ContestsLoader(typ
     ): List<Contest> {
         return loadContests(
             platforms = platforms,
-            dateConstraints = ContestDateConstraints.Current()
+            dateConstraints = ContestDateConstraints()
         )
     }
 
     suspend fun getContests(
         platforms: Collection<Contest.Platform>,
-        dateConstraints: ContestDateConstraints.Current
+        dateConstraints: ContestDateConstraints
     ): List<Contest> {
         if (platforms.isEmpty()) return emptyList()
         require(type.supportedPlatforms.containsAll(platforms))
@@ -81,11 +81,11 @@ abstract class ContestsLoaderMultiple(type: ContestsLoaders): ContestsLoader(typ
 
     final override suspend fun loadContests(
         platform: Contest.Platform,
-        dateConstraints: ContestDateConstraints.Current
+        dateConstraints: ContestDateConstraints
     ) = loadContests(platforms = setOf(platform), dateConstraints = dateConstraints)
 }
 
-private fun List<Contest>.filterWith(dateConstraints: ContestDateConstraints.Current) =
+private fun List<Contest>.filterWith(dateConstraints: ContestDateConstraints) =
     filter { contest -> dateConstraints.check(startTime = contest.startTime, duration = contest.duration) }
 
 fun makeCombinedMessage(

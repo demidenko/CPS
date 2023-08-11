@@ -17,7 +17,7 @@ suspend fun getContests(
         loaderTypes = setup.flatMapTo(mutableSetOf()) { it.value }
     ).associateBy { it.type }
 
-    val dateConstraints = settings.contestsDateConstraints().makeFor(currentTime = getCurrentTime())
+    val dateConstraints = settings.contestsDateConstraints().at(currentTime = getCurrentTime())
     val memorizer = MultipleLoadersMemorizer(setup, dateConstraints)
 
     coroutineScope {
@@ -41,7 +41,7 @@ private suspend fun loadUntilSuccess(
     priorities: List<ContestsLoaders>,
     loaders: Map<ContestsLoaders, ContestsLoader>,
     memorizer: MultipleLoadersMemorizer,
-    dateConstraints: ContestDateConstraints.Current,
+    dateConstraints: ContestDateConstraints,
     contestsReceiver: ContestsReceiver
 ) {
     require(priorities.isNotEmpty())
@@ -71,7 +71,7 @@ typealias ContestsLoadResult = Result<Map<Contest.Platform, List<Contest>>>
 
 private class MultipleLoadersMemorizer(
     private val setup: Map<Contest.Platform, List<ContestsLoaders>>,
-    private val dateConstraints: ContestDateConstraints.Current
+    private val dateConstraints: ContestDateConstraints
 ) {
     private val mutex = Mutex()
     private val results = mutableMapOf<ContestsLoaders, Deferred<ContestsLoadResult>>()

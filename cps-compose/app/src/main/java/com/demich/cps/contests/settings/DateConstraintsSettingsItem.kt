@@ -37,7 +37,7 @@ internal fun DateConstraintsSettingsItem() {
     val settings = remember { context.settingsContests }
     val dateConstraints by rememberCollect { settings.contestsDateConstraints.flow }
 
-    fun saveConstraints(newConstraints: ContestDateConstraints) {
+    fun saveConstraints(newConstraints: ContestDateBaseConstraints) {
         scope.launch {
             settings.contestsDateConstraints(
                 newValue = newConstraints
@@ -70,7 +70,7 @@ internal fun DateConstraintsSettingsItem() {
     )
 }
 
-private fun makeInfoString(dateConstraints: ContestDateConstraints): String =
+private fun makeInfoString(dateConstraints: ContestDateBaseConstraints): String =
     with(dateConstraints) {
         "duration ≤ $maxDuration; start ≤ now + $nowToStartTimeMaxDuration; now - $endTimeToNowMaxDuration ≤ end"
     }
