@@ -7,8 +7,6 @@ import com.demich.cps.ui.theme.DarkLightMode
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 
 val Context.settingsUI: UISettingsDataStore

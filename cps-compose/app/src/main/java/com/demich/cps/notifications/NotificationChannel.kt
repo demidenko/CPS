@@ -39,7 +39,7 @@ class NotificationChannelSingleId(
 }
 
 class NotificationChannelRangeId(
-    val idRange: IntRange,
+    private val idRange: IntRange,
     val channelInfo: NotificationChannelInfo
 ) {
     operator fun invoke(key: Any): NotificationChannelSingleId =

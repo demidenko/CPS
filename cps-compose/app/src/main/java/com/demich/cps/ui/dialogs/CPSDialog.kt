@@ -10,7 +10,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -21,7 +20,6 @@ import com.demich.cps.ui.CPSCheckBoxTitled
 import com.demich.cps.ui.CPSRadioButtonTitled
 import com.demich.cps.ui.theme.cpsColors
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CPSDialog(
     modifier: Modifier = Modifier,

@@ -6,7 +6,6 @@ import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.features.room.RoomJsonConverter
 import com.demich.cps.features.room.jsonRoom
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
 

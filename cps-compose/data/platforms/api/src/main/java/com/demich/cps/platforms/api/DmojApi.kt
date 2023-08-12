@@ -2,7 +2,6 @@ package com.demich.cps.platforms.api
 
 import io.ktor.client.request.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
 
 object DmojApi: PlatformApi {

@@ -120,7 +120,6 @@ class AccountsWorker(
         }
     }
 
-    private val KEY_CF_CONTRIBUTION get() = "cf_contribution"
     private fun getNotifiedCodeforcesContribution(): Int? {
         val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val notificationId = notificationChannels.codeforces.contribution_changes.notificationId
@@ -129,3 +128,5 @@ class AccountsWorker(
             ?.notification?.extras?.getInt(KEY_CF_CONTRIBUTION)
     }
 }
+
+private const val KEY_CF_CONTRIBUTION = "cf_contribution"

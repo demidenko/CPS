@@ -86,7 +86,7 @@ abstract class CPSWorker(
 
 }
 
-private val KEY_PROGRESS get() = "cpsworker_progress"
+private const val KEY_PROGRESS = "cpsworker_progress"
 fun WorkInfo.getProgressInfo(): ProgressBarInfo? {
     val arr = progress.getIntArray(KEY_PROGRESS)?.takeIf { it.size == 2 } ?: return null
     return ProgressBarInfo(
