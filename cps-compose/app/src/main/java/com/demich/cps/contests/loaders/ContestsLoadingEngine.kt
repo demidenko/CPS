@@ -54,12 +54,14 @@ private suspend fun loadUntilSuccess(
     contestsReceiver.onStartLoading(platform)
     for (loaderType in priorities) {
         val loader = getLoader(loaderType)
-        val result: Result<List<Contest>> = if (loader is ContestsLoaderMultiple) {
-            memoizer.get(loader).map { it.getOrElse(platform) { emptyList() } }
-        } else {
-            withContext(Dispatchers.IO) {
-                kotlin.runCatching {
-                    loader.getContests(platform = platform, dateConstraints = dateConstraints)
+        val result: Result<List<Contest>> = withContext(Dispatchers.IO) {
+            if (loader is ContestsLoaderMultiple) {
+                memoizer.getContestsResult(loader).map {
+                    it.getOrElse(platform) { emptyList() }
+                }
+            } else {
+                loader.runCatching {
+                    getContests(platform = platform, dateConstraints = dateConstraints)
                 }
             }
         }
@@ -94,7 +96,7 @@ private class MultipleLoadersMemoizer(
 ) {
     private val mutex = Mutex()
     private val results = mutableMapOf<ContestsLoaders, Deferred<ContestsLoadResult>>()
-    suspend fun get(loader: ContestsLoaderMultiple): ContestsLoadResult {
+    suspend fun getContestsResult(loader: ContestsLoaderMultiple): ContestsLoadResult {
         return coroutineScope {
             mutex.withLock {
                 results.getOrPut(loader.type) {
@@ -108,13 +110,11 @@ private class MultipleLoadersMemoizer(
         val platforms = setup.mapNotNull { (platform, loaderTypes) ->
             if (loader.type in loaderTypes) platform else null
         }
-        return withContext(Dispatchers.IO) {
-            loader.runCatching {
-                getContests(
-                    platforms = platforms,
-                    dateConstraints = dateConstraints
-                ).groupBy { it.platform }
-            }
+        return loader.runCatching {
+            getContests(
+                platforms = platforms,
+                dateConstraints = dateConstraints
+            ).groupBy { it.platform }
         }
     }
 }
