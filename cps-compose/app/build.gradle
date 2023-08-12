@@ -66,6 +66,7 @@ dependencies {
     implementation project(":data:contests:loading")
     implementation project(":features:codeforces_lost:database")
     implementation project(":features:codeforces_follow:database")
+    implementation project(":features:contests_loading_engine")
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kt_serialization_version"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'

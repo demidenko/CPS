@@ -1,11 +1,11 @@
-package com.demich.cps.contests.loaders
+package com.demich.cps.contests.loading_engine
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsLoaders
 import com.demich.cps.contests.loading.ContestsReceiver
-import com.demich.cps.contests.loading.loaders.ContestsLoader
-import com.demich.cps.contests.loading.loaders.ContestsLoaderMultiple
+import com.demich.cps.contests.loading_engine.loaders.ContestsLoader
+import com.demich.cps.contests.loading_engine.loaders.ContestsLoaderMultiple
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

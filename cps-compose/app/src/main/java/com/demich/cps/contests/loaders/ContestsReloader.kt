@@ -3,10 +3,11 @@ package com.demich.cps.contests.loaders
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading.ContestsLoaders
-import com.demich.cps.contests.loading.loaders.AtCoderContestsLoader
-import com.demich.cps.contests.loading.loaders.ClistContestsLoader
-import com.demich.cps.contests.loading.loaders.CodeforcesContestsLoader
-import com.demich.cps.contests.loading.loaders.DmojContestsLoader
+import com.demich.cps.contests.loading_engine.launchContestsLoading
+import com.demich.cps.contests.loading_engine.loaders.AtCoderContestsLoader
+import com.demich.cps.contests.loading_engine.loaders.ClistContestsLoader
+import com.demich.cps.contests.loading_engine.loaders.CodeforcesContestsLoader
+import com.demich.cps.contests.loading_engine.loaders.DmojContestsLoader
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.edit
