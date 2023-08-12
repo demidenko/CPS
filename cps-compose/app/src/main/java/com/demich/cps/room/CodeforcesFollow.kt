@@ -32,16 +32,12 @@ class FollowListDao internal constructor(
 
     suspend fun getHandles() = dao.getHandles()
 
-    suspend fun getAndReloadBlogEntries(handle: String): List<CodeforcesBlogEntry>? {
-        val settingsNews = context.settingsNews
-        val blogEntries = dao.getAndReloadBlogEntries(
+    suspend fun getAndReloadBlogEntries(handle: String) =
+        dao.getAndReloadBlogEntries(
             handle = handle,
-            locale = settingsNews.codeforcesLocale(),
+            locale = context.settingsNews.codeforcesLocale(),
             onNewBlogEntry = ::notifyNewBlogEntry
         )
-
-        return blogEntries
-    }
 
     suspend fun addNewUser(userInfo: CodeforcesUserInfo) {
         if (dao.getUserBlog(userInfo.handle) != null) return

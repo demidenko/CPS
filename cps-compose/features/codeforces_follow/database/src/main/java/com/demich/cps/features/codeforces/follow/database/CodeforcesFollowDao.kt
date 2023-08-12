@@ -71,7 +71,7 @@ interface CodeforcesFollowDao {
         handle: String,
         locale: CodeforcesLocale,
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
-    ): List<CodeforcesBlogEntry>? {
+    ): Result<List<CodeforcesBlogEntry>> {
         return CodeforcesApi.runCatching {
             getUserBlogEntries(handle = handle, locale = locale)
         }.recoverCatching {
@@ -86,11 +86,11 @@ interface CodeforcesFollowDao {
                         handle = userInfo.handle,
                         locale = locale,
                         onNewBlogEntry = onNewBlogEntry
-                    )
+                    ).getOrThrow()
                 }
             }
             throw it
-        }.getOrNull()?.also { blogEntries ->
+        }.onSuccess { blogEntries ->
             getUserBlog(handle)?.blogEntries?.toSet()?.let { saved ->
                 for (blogEntry in blogEntries) {
                     if (blogEntry.id !in saved) onNewBlogEntry(blogEntry)

@@ -46,7 +46,7 @@ class CodeforcesNewsFollowWorker(
 
         var done = 0
         savedHandles.forEachWithProgress { handle ->
-            if (dao.getAndReloadBlogEntries(handle) == null) return Result.retry()
+            if (dao.getAndReloadBlogEntries(handle).isFailure) return Result.retry()
             ++done
             builder.apply {
                 edit { setProgress(total = savedHandles.size, current = done) }

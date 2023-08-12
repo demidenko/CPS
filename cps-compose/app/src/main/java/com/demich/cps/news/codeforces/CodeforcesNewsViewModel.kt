@@ -174,12 +174,12 @@ class CodeforcesNewsViewModel: ViewModel() {
                     blockFirst = { context.followListDao.getAndReloadBlogEntries(handle) },
                     blockSecond = { CodeforcesUtils.getRealColorTag(handle) }
                 )
-                result?.map {
+                result.getOrThrow().map {
                     it.copy(
                         title = CodeforcesUtils.extractTitle(it),
                         authorColorTag = colorTag
                     )
-                } ?: throw Error()
+                }
             }
             flowOfResult()
         }
