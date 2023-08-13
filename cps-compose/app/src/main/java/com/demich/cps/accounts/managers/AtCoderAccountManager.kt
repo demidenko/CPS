@@ -22,7 +22,9 @@ import com.demich.cps.platforms.api.AtCoderRatingChange
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.ui.SettingsSwitchItemWithWork
+import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.AccountsWorker
+import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.dataStoreWrapper
 
 
@@ -31,10 +33,6 @@ class AtCoderAccountManager(context: Context):
     AccountSettingsProvider,
     UserSuggestionsProvider
 {
-    companion object {
-        private val Context.account_atcoder_dataStore by dataStoreWrapper(AccountManagers.atcoder.name)
-    }
-
     override val urlHomePage get() = AtCoderApi.urls.main
 
     override fun isValidForUserId(char: Char): Boolean = when(char) {
@@ -107,7 +105,7 @@ class AtCoderAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = accountDataStore(context.account_atcoder_dataStore)
+    override fun getDataStore() = AtCoderAccountDataStore(context)
     override fun getSettings() = AtCoderAccountSettingsDataStore(this)
 
     @Composable
@@ -128,6 +126,17 @@ class AtCoderAccountManager(context: Context):
             handle = handle,
             ratingChange = ratingChange.toRatingChange(handle)
         )
+}
+
+class AtCoderAccountDataStore(context: Context):
+    AccountUniqueDataStore<AtCoderUserInfo>(context.account_atcoder_dataStore)
+{
+    companion object {
+        private val Context.account_atcoder_dataStore by dataStoreWrapper(AccountManagers.atcoder.name)
+    }
+
+    override val userInfo: DataStoreItem<AtCoderUserInfo?>
+        get() = jsonCPS.item(name = "user_info", defaultValue = null)
 }
 
 class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager):
