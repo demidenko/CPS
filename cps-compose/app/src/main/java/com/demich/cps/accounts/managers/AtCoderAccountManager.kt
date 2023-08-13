@@ -107,11 +107,11 @@ class AtCoderAccountManager(context: Context):
     }
 
     override fun dataStore(context: Context) = AtCoderAccountDataStore(context)
-    override fun getSettings() = AtCoderAccountSettingsDataStore(this)
+    override fun getSettings(context: Context) = AtCoderAccountSettingsDataStore(context)
 
     @Composable
     override fun SettingsItems() {
-        val settings = remember { getSettings() }
+        val settings = getSettings(context)
         SettingsSwitchItemWithWork(
             item = settings.observeRating,
             title = "Rating changes observer",
@@ -143,8 +143,8 @@ class AtCoderAccountDataStore(context: Context):
     val lastRatedContestId = itemStringNullable(name = "last_rated_contest")
 }
 
-class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager):
-    ItemizedDataStore(manager.context.account_settings_atcoder_dataStore)
+class AtCoderAccountSettingsDataStore(context: Context):
+    ItemizedDataStore(context.account_settings_atcoder_dataStore)
 {
     companion object {
         private val Context.account_settings_atcoder_dataStore

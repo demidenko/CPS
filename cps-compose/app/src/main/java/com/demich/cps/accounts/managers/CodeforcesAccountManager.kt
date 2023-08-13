@@ -189,11 +189,11 @@ class CodeforcesAccountManager(context: Context):
     }
 
     override fun dataStore(context: Context) = CodeforcesAccountDataStore(context)
-    override fun getSettings() = CodeforcesAccountSettingsDataStore(this)
+    override fun getSettings(context: Context) = CodeforcesAccountSettingsDataStore(context)
 
     @Composable
     override fun SettingsItems() {
-        val settings = remember { getSettings() }
+        val settings = getSettings(context)
         SettingsSwitchItemWithWork(
             item = settings.observeRating,
             title = "Rating changes observer",
@@ -305,8 +305,8 @@ class CodeforcesAccountDataStore(context: Context):
     val upsolvingSuggestedProblems = jsonCPS.item<List<Pair<CodeforcesProblem, Instant>>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
 }
 
-class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
-    ItemizedDataStore(manager.context.account_settings_codeforces_dataStore)
+class CodeforcesAccountSettingsDataStore(context: Context):
+    ItemizedDataStore(context.account_settings_codeforces_dataStore)
 {
     companion object {
         private val Context.account_settings_codeforces_dataStore

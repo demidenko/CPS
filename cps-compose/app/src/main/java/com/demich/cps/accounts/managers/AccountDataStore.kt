@@ -60,7 +60,7 @@ internal inline fun<reified U: UserInfo> AccountManager<U>.simpleAccountDataStor
 
 
 interface AccountSettingsProvider {
-    fun getSettings(): ItemizedDataStore
+    fun getSettings(context: Context): ItemizedDataStore
 
     @Composable
     fun SettingsItems() {}

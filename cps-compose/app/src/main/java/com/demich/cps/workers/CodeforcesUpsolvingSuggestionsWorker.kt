@@ -27,7 +27,9 @@ class CodeforcesUpsolvingSuggestionsWorker(
 
     companion object {
         fun getWork(context: Context) = object : CPSWork(name = "cf_upsolving", context = context) {
-            override suspend fun isEnabled() = CodeforcesAccountManager(context).getSettings().upsolvingSuggestionsEnabled()
+            override suspend fun isEnabled() =
+                CodeforcesAccountManager(context).getSettings(context).upsolvingSuggestionsEnabled()
+
             override val requestBuilder: PeriodicWorkRequest.Builder
                 get() = CPSPeriodicWorkRequestBuilder<CodeforcesUpsolvingSuggestionsWorker>(
                     repeatInterval = 12.hours,

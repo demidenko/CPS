@@ -40,11 +40,11 @@ class AccountsWorker(
 
     override suspend fun runWork(): Result {
         val jobs = buildList {
-            with(codeforcesAccountManager.getSettings()) {
+            with(codeforcesAccountManager.getSettings(context)) {
                 if (observeRating()) add(::codeforcesRating)
                 if (observeContribution()) add(::codeforcesContribution)
             }
-            with(atcoderAccountManager.getSettings()) {
+            with(atcoderAccountManager.getSettings(context)) {
                 if (observeRating()) add(::atcoderRating)
             }
         }

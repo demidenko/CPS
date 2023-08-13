@@ -19,9 +19,11 @@ class CodeforcesMonitorLauncherWorker(
 ) {
     companion object {
         fun getWork(context: Context) = object : CPSWork(name = "cf_monitor_launcher", context = context) {
-            override suspend fun isEnabled() = CodeforcesAccountManager(context).getSettings().monitorEnabled()
-            override val requestBuilder get() =
-                CPSPeriodicWorkRequestBuilder<CodeforcesMonitorLauncherWorker>(
+            override suspend fun isEnabled() =
+                CodeforcesAccountManager(context).getSettings(context).monitorEnabled()
+
+            override val requestBuilder
+                get() = CPSPeriodicWorkRequestBuilder<CodeforcesMonitorLauncherWorker>(
                     repeatInterval = 45.minutes
                 )
         }
