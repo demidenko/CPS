@@ -11,15 +11,19 @@ abstract class AccountDataStore<U: UserInfo>(
     dataStoreWrapper: DataStoreWrapper
 ): ItemizedDataStore(dataStoreWrapper) {
     abstract val userInfo: DataStoreItem<U?>
+    abstract suspend fun onResetUserInfo()
 }
 
 inline fun<reified U: UserInfo> AccountManager<U>.accountDataStore(
     dataStoreWrapper: DataStoreWrapper
-): AccountDataStore<U> = object : AccountDataStore<U>(dataStoreWrapper) {
+): AccountDataStore<U> =
+    object : AccountDataStore<U>(dataStoreWrapper) {
         override val userInfo = jsonCPS.item<U?>(
             name = "user_info",
             defaultValue = null
         )
+
+        override suspend fun onResetUserInfo() = Unit
     }
 
 

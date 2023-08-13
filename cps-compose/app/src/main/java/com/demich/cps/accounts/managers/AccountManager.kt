@@ -49,7 +49,10 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     suspend fun setSavedInfo(info: U) {
         val oldUserId = getSavedInfo()?.userId ?: ""
         userInfoItem(info)
-        if (info.userId != oldUserId && this is AccountSettingsProvider) getSettings().resetRelatedItems()
+        if (!oldUserId.equals(info.userId, ignoreCase = true)) {
+            if (this is AccountSettingsProvider) getSettings().resetRelatedItems()
+            getDataStore().onResetUserInfo()
+        }
     }
 
     suspend fun deleteSavedInfo() {
