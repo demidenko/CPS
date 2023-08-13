@@ -47,11 +47,6 @@ fun<U: UserInfo> DialogAccountChooser(
     onDismissRequest: () -> Unit,
     onResult: (U) -> Unit
 ) {
-    val charValidator = remember(manager) {
-        if (manager is UserSuggestionsProvider) manager::isValidForSearch
-        else manager::isValidForUserId
-    }
-
     CPSDialog(onDismissRequest = onDismissRequest) {
         val context = context
 
@@ -63,7 +58,7 @@ fun<U: UserInfo> DialogAccountChooser(
         var userInfo by remember { mutableStateOf(initialUserInfo) }
         var loadingInProgress by remember { mutableStateOf(false) }
 
-        val suggestionsListState = remember { mutableStateOf(emptyList<UserSuggestion>()) }
+        var suggestions by remember { mutableStateOf(emptyList<UserSuggestion>()) }
         var loadingSuggestionsInProgress by remember { mutableStateOf(false) }
         var suggestionsLoadError by remember { mutableStateOf(false) }
         var blockSuggestionsReload by remember { mutableStateOf(false) }
@@ -83,7 +78,7 @@ fun<U: UserInfo> DialogAccountChooser(
             userInfo = userInfo,
             textFieldValue = textFieldValue,
             onValueChange = {
-                if (it.text.all(charValidator)) textFieldValue = it
+                if (it.text.all(manager::charValidator)) textFieldValue = it
             },
             loadingInProgress = loadingInProgress,
             modifier = Modifier
@@ -102,7 +97,7 @@ fun<U: UserInfo> DialogAccountChooser(
 
         if (manager is UserSuggestionsProvider) {
             SuggestionsList(
-                suggestionsState = suggestionsListState,
+                suggestions = suggestions,
                 isLoading = loadingSuggestionsInProgress,
                 isError = suggestionsLoadError,
                 modifier = Modifier.fillMaxWidth(),
@@ -121,7 +116,7 @@ fun<U: UserInfo> DialogAccountChooser(
             val suggestionTextLimit = 3
             userInfo = null
             if (userId.length < suggestionTextLimit) {
-                suggestionsListState.value = emptyList()
+                suggestions = emptyList()
                 loadingSuggestionsInProgress = false
                 suggestionsLoadError = false
                 blockSuggestionsReload = false
@@ -144,7 +139,7 @@ fun<U: UserInfo> DialogAccountChooser(
                         val result = manager.runCatching { loadSuggestions(userId) }
                         loadingSuggestionsInProgress = false
                         if (isActive) { //Because of "StandaloneCoroutine was cancelled" exception during cancelling LaunchedEffect
-                            suggestionsListState.value = result.getOrDefault(emptyList())
+                            suggestions = result.getOrDefault(emptyList())
                             suggestionsLoadError = result.isFailure
                         }
                     }
@@ -249,13 +244,12 @@ private fun TextFieldMainIcon(
 
 @Composable
 private fun SuggestionsList(
-    suggestionsState: State<List<UserSuggestion>>,
+    suggestions: List<UserSuggestion>,
     isLoading: Boolean,
     isError: Boolean,
     modifier: Modifier = Modifier,
     onClick: (UserSuggestion) -> Unit
 ) {
-    val suggestions by suggestionsState
     if (suggestions.isNotEmpty() || isLoading || isError) {
         Column(modifier = modifier) {
             AccountChooserHeader(
@@ -340,8 +334,6 @@ private fun AccountChooserHeader(
     }
 }
 
-private fun String.toTextFieldValue() = TextFieldValue(text = this, selection = TextRange(length))
-
 @Composable
 private fun<U: UserInfo> makeUserInfoSpan(userInfo: U?, manager: AccountManager<U>): AnnotatedString {
     if (userInfo == null) return AnnotatedString("")
@@ -355,3 +347,10 @@ private fun<U: UserInfo> makeUserInfoSpan(userInfo: U?, manager: AccountManager<
         }
     }
 }
+
+
+private fun String.toTextFieldValue() = TextFieldValue(text = this, selection = TextRange(length))
+
+private fun AccountManager<out UserInfo>.charValidator(char: Char) =
+    if (this is UserSuggestionsProvider) isValidForSearch(char)
+    else isValidForUserId(char)
