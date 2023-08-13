@@ -51,7 +51,7 @@ class CodeforcesMonitorLauncherWorker(
         val info = manager.getSavedInfo() ?: return Result.success()
         if (info.status != STATUS.OK) return Result.success()
 
-        val lastSubmissionId = manager.getSettings().monitorLastSubmissionId()
+        val lastSubmissionId = manager.getDataStore().monitorLastSubmissionId()
 
         val newSubmissions = kotlin.runCatching {
             getNewSubmissions(info.handle, lastSubmissionId)
@@ -59,7 +59,7 @@ class CodeforcesMonitorLauncherWorker(
             return Result.retry()
         }
 
-        manager.getSettings().apply {
+        manager.getDataStore().apply {
             newSubmissions.firstOrNull()?.let {
                 monitorLastSubmissionId(it.id)
             }
