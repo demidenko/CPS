@@ -43,6 +43,7 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.AccountsWorker
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
+import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.datetime.Instant
 import kotlin.text.contains
@@ -54,11 +55,6 @@ class CodeforcesAccountManager(context: Context):
     UserSuggestionsProvider,
     RatingRevolutionsProvider
 {
-
-    companion object {
-        private val Context.account_codeforces_dataStore by dataStoreWrapper(AccountManagers.codeforces.name)
-    }
-
     override val urlHomePage get() = CodeforcesApi.urls.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)
@@ -191,7 +187,7 @@ class CodeforcesAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = accountDataStore(context.account_codeforces_dataStore)
+    override fun getDataStore() = CodeforcesAccountDataStore(context)
     override fun getSettings() = CodeforcesAccountSettingsDataStore(this)
 
     @Composable
@@ -287,6 +283,18 @@ class CodeforcesAccountManager(context: Context):
             )
             //https://codeforces.com/blog/entry/126
         )
+}
+
+class CodeforcesAccountDataStore(context: Context):
+    AccountUniqueDataStore<CodeforcesUserInfo>(context.account_codeforces_dataStore)
+{
+    companion object {
+        private val Context.account_codeforces_dataStore by dataStoreWrapper(AccountManagers.codeforces.name)
+    }
+
+    override val userInfo: DataStoreItem<CodeforcesUserInfo?>
+        get() = jsonCPS.item(name = "user_info", defaultValue = null)
+
 }
 
 class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
