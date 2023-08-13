@@ -28,7 +28,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
     companion object {
         fun getWork(context: Context) = object : CPSWork(name = "cf_upsolving", context = context) {
             override suspend fun isEnabled() =
-                CodeforcesAccountManager(context).getSettings(context).upsolvingSuggestionsEnabled()
+                CodeforcesAccountManager().getSettings(context).upsolvingSuggestionsEnabled()
 
             override val requestBuilder: PeriodicWorkRequest.Builder
                 get() = CPSPeriodicWorkRequestBuilder<CodeforcesUpsolvingSuggestionsWorker>(
@@ -39,7 +39,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
     }
 
     override suspend fun runWork(): Result {
-        val dataStore = CodeforcesAccountManager(context).dataStore(context)
+        val dataStore = CodeforcesAccountManager().dataStore(context)
         val suggestedItem = dataStore.upsolvingSuggestedProblems
 
         val deadLine = currentTime - 90.days

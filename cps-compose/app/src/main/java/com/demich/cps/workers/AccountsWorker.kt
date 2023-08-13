@@ -35,7 +35,7 @@ class AccountsWorker(
         }
     }
 
-    private val codeforcesAccountManager by lazy { CodeforcesAccountManager(context) }
+    private val codeforcesAccountManager by lazy { CodeforcesAccountManager() }
     private val atcoderAccountManager by lazy { AtCoderAccountManager() }
 
     override suspend fun runWork(): Result {

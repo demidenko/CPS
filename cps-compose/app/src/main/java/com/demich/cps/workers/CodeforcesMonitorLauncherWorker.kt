@@ -20,7 +20,7 @@ class CodeforcesMonitorLauncherWorker(
     companion object {
         fun getWork(context: Context) = object : CPSWork(name = "cf_monitor_launcher", context = context) {
             override suspend fun isEnabled() =
-                CodeforcesAccountManager(context).getSettings(context).monitorEnabled()
+                CodeforcesAccountManager().getSettings(context).monitorEnabled()
 
             override val requestBuilder
                 get() = CPSPeriodicWorkRequestBuilder<CodeforcesMonitorLauncherWorker>(
@@ -48,7 +48,7 @@ class CodeforcesMonitorLauncherWorker(
     private fun isActual(time: Instant) = currentTime - time < 24.hours
 
     override suspend fun runWork(): Result {
-        val dataStore = CodeforcesAccountManager(context).dataStore(context)
+        val dataStore = CodeforcesAccountManager().dataStore(context)
 
         val info = dataStore.getSavedInfo() ?: return Result.success()
         if (info.status != STATUS.OK) return Result.success()

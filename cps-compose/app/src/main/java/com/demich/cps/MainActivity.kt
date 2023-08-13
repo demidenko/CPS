@@ -77,7 +77,7 @@ class MainActivity: ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            CompositionLocalProvider(LocalCodeforcesAccountManager provides CodeforcesAccountManager(context)) {
+            CompositionLocalProvider(LocalCodeforcesAccountManager provides CodeforcesAccountManager()) {
                 CPSTheme {
                     CPSContent()
                 }

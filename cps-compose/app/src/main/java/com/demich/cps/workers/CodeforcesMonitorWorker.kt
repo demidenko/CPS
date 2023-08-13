@@ -40,7 +40,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
             monitor.launchIn(
                 scope = this,
                 onRatingChange = { ratingChange ->
-                    launch { CodeforcesAccountManager(context).applyRatingChange(ratingChange, context) }
+                    launch { CodeforcesAccountManager().applyRatingChange(ratingChange, context) }
                 },
                 onSubmissionFinalResult = { submission ->
                     launch { notify(submission) }

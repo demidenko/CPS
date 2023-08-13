@@ -74,7 +74,7 @@ fun developAdditionalBottomBarBuilder(): AdditionalBottomBarBuilder = {
                 CodeforcesMonitorLauncherWorker.startMonitor(
                     contestId = it,
                     context = context,
-                    handle = CodeforcesAccountManager(context)
+                    handle = CodeforcesAccountManager()
                         .dataStore(context)
                         .getSavedInfo()?.handle ?: return@launch
                 )
