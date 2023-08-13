@@ -11,8 +11,8 @@ import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.platforms.utils.ClistUtils
 
 
-class CListAccountManager(context: Context):
-    AccountManager<ClistUserInfo>(context, AccountManagers.clist),
+class CListAccountManager :
+    AccountManager<ClistUserInfo>(AccountManagers.clist),
     UserSuggestionsProvider
 {
     override val userIdTitle = "login"

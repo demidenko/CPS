@@ -28,12 +28,12 @@ val Context.allAccountManagers: List<AccountManager<out UserInfo>>
         AtCoderAccountManager(this),
         CodeChefAccountManager(this),
         DmojAccountManager(this),
-        ACMPAccountManager(this),
-        TimusAccountManager(this)
+        ACMPAccountManager(),
+        TimusAccountManager()
     )
 
 
-abstract class AccountManager<U: UserInfo>(val context: Context, val type: AccountManagers) {
+abstract class AccountManager<U: UserInfo>(val type: AccountManagers) {
 
     abstract val userIdTitle: String
     abstract val urlHomePage: String

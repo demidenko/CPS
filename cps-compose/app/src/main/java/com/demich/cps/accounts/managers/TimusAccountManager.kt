@@ -11,8 +11,8 @@ import com.demich.cps.platforms.api.TimusApi
 import com.demich.cps.platforms.utils.TimusUtils
 
 
-class TimusAccountManager(context: Context):
-    AccountManager<TimusUserInfo>(context, AccountManagers.timus),
+class TimusAccountManager :
+    AccountManager<TimusUserInfo>(AccountManagers.timus),
     UserSuggestionsProvider
 {
     override val userIdTitle get() = "id"

@@ -218,7 +218,7 @@ private fun CListImportDialog(
     val context = context
     val accountsViewModel = accountsViewModel()
     val progressBarsViewModel = progressBarsViewModel()
-    val cListAccountManager = remember { CListAccountManager(context) }
+    val cListAccountManager = remember { CListAccountManager() }
     DialogAccountChooser(
         manager = cListAccountManager,
         initialUserInfo = null,

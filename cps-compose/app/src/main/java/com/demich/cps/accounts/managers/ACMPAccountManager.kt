@@ -12,8 +12,8 @@ import com.demich.cps.platforms.api.ACMPApi
 import com.demich.cps.platforms.utils.ACMPUtils
 
 
-class ACMPAccountManager(context: Context):
-    AccountManager<ACMPUserInfo>(context, AccountManagers.acmp),
+class ACMPAccountManager :
+    AccountManager<ACMPUserInfo>(AccountManagers.acmp),
     UserSuggestionsProvider
 {
     override val userIdTitle get() = "id"

@@ -79,7 +79,7 @@ fun notifyRatingChange(
         setSubText("${manager.type.name} rating changes")
         color = manager.originalColor(manager.getHandleColor(ratingChange.rating))
             .toArgb() //TODO not original but cpsColors
-        ratingChange.url?.let { attachUrl(it, manager.context) }
+        ratingChange.url?.let { attachUrl(it, context) }
         setWhen(ratingChange.date)
     }
 }
