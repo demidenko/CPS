@@ -133,6 +133,21 @@ private fun ReloadAccountsButton() {
 }
 
 @Composable
+private fun AddAccountMenuItem(type: AccountManagers, onSelect: () -> Unit) {
+    DropdownMenuItem(
+        onClick = onSelect,
+        content = {
+            MonospacedText(
+                text = when (type) {
+                    AccountManagers.clist -> "import from clist.by"
+                    else -> type.name
+                }
+            )
+        }
+    )
+}
+
+@Composable
 private fun AddAccountButton() {
     var showMenu by remember { mutableStateOf(false) }
     var chosenManager: AccountManagers? by remember { mutableStateOf(null) }
@@ -153,37 +168,29 @@ private fun AddAccountButton() {
             onDismissRequest = { showMenu = false },
             modifier = Modifier.background(cpsColors.backgroundAdditional)
         ) {
-            runBlocking {
-                context.allAccountManagers.filter { it.getSavedInfo() == null }
-            }.forEach { manager ->
-                DropdownMenuItem(
-                    onClick = {
-                        showMenu = false
-                        chosenManager = manager.type
-                    },
-                    content = { MonospacedText(text = manager.type.name) }
-                )
-            }
-            DropdownMenuItem(
-                onClick = {
+            remember {
+                runBlocking {
+                    context.allAccountManagers.filter { it.getSavedInfo() == null }
+                }.map { it.type }.plus(AccountManagers.clist)
+            }.forEach { type ->
+                AddAccountMenuItem(type = type) {
                     showMenu = false
-                    chosenManager = AccountManagers.clist
-                },
-                content = { MonospacedText(text = "import from clist.by") }
-            )
-        }
-        
-        chosenManager?.let { type -> 
-            if (type == AccountManagers.clist) {
-                CListImportDialog { chosenManager = null }
-            } else {
-                context.allAccountManagers
-                    .first { it.type == type }
-                    .ChangeSavedInfoDialog(
-                        scope = scope,
-                        onDismissRequest = { chosenManager = null }
-                    )
+                    chosenManager = type
+                }
             }
+        }
+    }
+
+    chosenManager?.let { type ->
+        if (type == AccountManagers.clist) {
+            CListImportDialog { chosenManager = null }
+        } else {
+            context.allAccountManagers
+                .first { it.type == type }
+                .ChangeSavedInfoDialog(
+                    scope = scope,
+                    onDismissRequest = { chosenManager = null }
+                )
         }
     }
 }
