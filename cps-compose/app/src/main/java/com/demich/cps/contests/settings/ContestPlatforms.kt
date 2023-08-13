@@ -34,8 +34,7 @@ internal fun ContestPlatformsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val settings = remember { context.settingsContests }
-    val enabledPlatforms by rememberCollect { settings.enabledPlatforms.flow }
+    val enabledPlatforms by rememberCollect { context.settingsContests.enabledPlatforms.flow }
 
     ExpandableSettingsItem(
         title = "Platforms",
@@ -92,12 +91,7 @@ private fun PlatformCheckRow(
     onCheckedChange: (Boolean) -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        ContestPlatformIcon(
-            platform = platform,
-            size = 28.sp,
-            color = cpsColors.content,
-            modifier = Modifier.padding(end = 8.dp)
-        )
+        LeadingIcon(platform = platform)
         MonospacedText(text = platform.name, modifier = Modifier.weight(1f))
         if (isChecked && availableLoaders.size > 1) {
             LoadersSetupButton(
@@ -139,12 +133,7 @@ private fun ClistAdditionalRow() {
     var showDialog by remember { mutableStateOf(false) }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        ContestPlatformIcon(
-            platform = Contest.Platform.unknown,
-            size = 28.sp,
-            color = cpsColors.content,
-            modifier = Modifier.padding(end = 8.dp)
-        )
+        LeadingIcon(platform = Contest.Platform.unknown)
         Column(modifier = Modifier.weight(1f)) {
             MonospacedText(text = "clist additional")
             if (resources.isNotEmpty()) {
@@ -165,3 +154,12 @@ private fun ClistAdditionalRow() {
         }
     }
 }
+
+@Composable
+private fun LeadingIcon(platform: Contest.Platform) =
+    ContestPlatformIcon(
+        platform = platform,
+        size = 28.sp,
+        color = cpsColors.content,
+        modifier = Modifier.padding(end = 8.dp)
+    )
