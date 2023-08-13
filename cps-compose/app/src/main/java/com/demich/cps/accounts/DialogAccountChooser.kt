@@ -40,6 +40,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
+const val suggestionsMinLength = 3
+
 @Composable
 fun<U: UserInfo> DialogAccountChooser(
     manager: AccountManager<U>,
@@ -48,23 +50,6 @@ fun<U: UserInfo> DialogAccountChooser(
     onResult: (U) -> Unit
 ) {
     CPSDialog(onDismissRequest = onDismissRequest) {
-        val context = context
-
-        var textFieldValue by remember {
-            mutableStateOf((initialUserInfo?.userId ?: "").toTextFieldValue())
-        }
-        val userId by remember { derivedStateOf { textFieldValue.text } }
-
-        var userInfo by remember { mutableStateOf(initialUserInfo) }
-        var loadingInProgress by remember { mutableStateOf(false) }
-
-        var suggestionsResult by remember { mutableStateOf(Result.success(emptyList<UserSuggestion>())) }
-        var loadingSuggestionsInProgress by remember { mutableStateOf(false) }
-        var blockSuggestionsReload by remember { mutableStateOf(false) }
-
-        val focusRequester = rememberFocusOnCreationRequester()
-        var firstLaunch by remember { mutableStateOf(true) }
-
         AccountChooserHeader(
             text = "getUser(${manager.type.name}):",
             color = cpsColors.contentAdditional
@@ -72,77 +57,112 @@ fun<U: UserInfo> DialogAccountChooser(
             Icon(imageVector = CPSIcons.Account, contentDescription = null, tint = it)
         }
 
-        UserIdTextField(
+        DialogContent(
             manager = manager,
-            userInfo = userInfo,
-            textFieldValue = textFieldValue,
-            onValueChange = {
-                if (it.text.all(manager::charValidator)) textFieldValue = it
-            },
-            loadingInProgress = loadingInProgress,
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .fillMaxWidth(),
-            inputTextSize = 18.sp,
-            resultTextSize = 14.sp
-        ) {
-            if (userId.all(manager::isValidForUserId)) {
-                onResult(it)
-                onDismissRequest()
-            } else {
-                context.showToast("${manager.userIdTitle} contains unacceptable symbols")
+            initialUserInfo = initialUserInfo,
+            onDismissRequest = onDismissRequest,
+            onResult = onResult,
+            charValidator = when (manager) {
+                is UserSuggestionsProvider -> manager::isValidForSearch
+                else -> manager::isValidForUserId
             }
-        }
+        )
+    }
+}
 
-        if (manager is UserSuggestionsProvider) {
-            SuggestionsList(
-                suggestions = suggestionsResult.getOrDefault(emptyList()),
-                isLoading = loadingSuggestionsInProgress,
-                isError = suggestionsResult.isFailure,
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { suggestion ->
-                    blockSuggestionsReload = true
-                    textFieldValue = suggestion.userId.toTextFieldValue()
-                }
-            )
-        }
+@Composable
+private fun<U: UserInfo> DialogContent(
+    manager: AccountManager<U>,
+    initialUserInfo: U?,
+    onDismissRequest: () -> Unit,
+    onResult: (U) -> Unit,
+    charValidator: (Char) -> Boolean
+) {
+    val context = context
 
-        LaunchedEffect(userId) {
-            if (firstLaunch) {
-                firstLaunch = false
-                return@LaunchedEffect
+    var textFieldValue by remember {
+        mutableStateOf((initialUserInfo?.userId ?: "").toTextFieldValue())
+    }
+    val userId by remember { derivedStateOf { textFieldValue.text } }
+
+    var userInfo by remember { mutableStateOf(initialUserInfo) }
+    var loadingInProgress by remember { mutableStateOf(false) }
+
+    var suggestionsResult by remember { mutableStateOf(Result.success(emptyList<UserSuggestion>())) }
+    var loadingSuggestionsInProgress by remember { mutableStateOf(false) }
+    var blockSuggestionsReload by remember { mutableStateOf(false) }
+
+    val focusRequester = rememberFocusOnCreationRequester()
+    var firstLaunch by remember { mutableStateOf(true) }
+
+    UserIdTextField(
+        manager = manager,
+        userInfo = userInfo,
+        textFieldValue = textFieldValue,
+        onValueChange = {
+            if (it.text.all(charValidator)) textFieldValue = it
+        },
+        loadingInProgress = loadingInProgress,
+        modifier = Modifier
+            .focusRequester(focusRequester)
+            .fillMaxWidth(),
+        inputTextSize = 18.sp,
+        resultTextSize = 14.sp
+    ) {
+        if (userId.all(manager::isValidForUserId)) {
+            onResult(it)
+            onDismissRequest()
+        } else {
+            context.showToast("${manager.userIdTitle} contains unacceptable symbols")
+        }
+    }
+
+    if (manager is UserSuggestionsProvider) {
+        SuggestionsList(
+            suggestions = suggestionsResult.getOrDefault(emptyList()),
+            isLoading = loadingSuggestionsInProgress,
+            isError = suggestionsResult.isFailure,
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { suggestion ->
+                blockSuggestionsReload = true
+                textFieldValue = suggestion.userId.toTextFieldValue()
             }
-            val suggestionTextLimit = 3
-            userInfo = null
-            if (userId.length < suggestionTextLimit) {
-                suggestionsResult = Result.success(emptyList())
-                loadingSuggestionsInProgress = false
-                blockSuggestionsReload = false
-            }
-            if (userId.isBlank()) {
-                loadingInProgress = false
-                loadingSuggestionsInProgress = false
-                return@LaunchedEffect
-            }
-            delay(300)
-            launch {
-                loadingInProgress = true
-                userInfo = manager.loadInfo(userId)
-                loadingInProgress = false
-            }
-            if (manager is UserSuggestionsProvider && userId.length >= suggestionTextLimit) {
-                if (!blockSuggestionsReload) {
-                    loadingSuggestionsInProgress = true
-                    launch(Dispatchers.IO) {
-                        val result = manager.runCatching { loadSuggestions(userId) }
-                        loadingSuggestionsInProgress = false
-                        if (isActive) { //Because of "StandaloneCoroutine was cancelled" exception during cancelling LaunchedEffect
-                            suggestionsResult = result
-                        }
+        )
+    }
+
+    LaunchedEffect(userId) {
+        if (firstLaunch) {
+            firstLaunch = false
+            return@LaunchedEffect
+        }
+        if (userId.length < suggestionsMinLength) {
+            suggestionsResult = Result.success(emptyList())
+            loadingSuggestionsInProgress = false
+            blockSuggestionsReload = false
+        }
+        userInfo = null
+        if (userId.isBlank()) {
+            loadingInProgress = false
+            return@LaunchedEffect
+        }
+        delay(300)
+        launch {
+            loadingInProgress = true
+            userInfo = manager.loadInfo(userId)
+            loadingInProgress = false
+        }
+        if (manager is UserSuggestionsProvider && userId.length >= suggestionsMinLength) {
+            if (!blockSuggestionsReload) {
+                loadingSuggestionsInProgress = true
+                launch(Dispatchers.IO) {
+                    val result = manager.runCatching { loadSuggestions(userId) }
+                    loadingSuggestionsInProgress = false
+                    if (isActive) { //Because of "StandaloneCoroutine was cancelled" exception during cancelling LaunchedEffect
+                        suggestionsResult = result
                     }
-                } else {
-                    blockSuggestionsReload = false
                 }
+            } else {
+                blockSuggestionsReload = false
             }
         }
     }
@@ -347,7 +367,3 @@ private fun<U: UserInfo> makeUserInfoSpan(userInfo: U?, manager: AccountManager<
 
 
 private fun String.toTextFieldValue() = TextFieldValue(text = this, selection = TextRange(length))
-
-private fun AccountManager<out UserInfo>.charValidator(char: Char) =
-    if (this is UserSuggestionsProvider) isValidForSearch(char)
-    else isValidForUserId(char)
