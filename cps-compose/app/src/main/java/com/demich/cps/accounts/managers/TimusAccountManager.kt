@@ -9,17 +9,12 @@ import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.TimusApi
 import com.demich.cps.platforms.utils.TimusUtils
-import com.demich.datastore_itemized.dataStoreWrapper
 
 
 class TimusAccountManager(context: Context):
     AccountManager<TimusUserInfo>(context, AccountManagers.timus),
     UserSuggestionsProvider
 {
-    companion object {
-        private val Context.account_timus_dataStore by dataStoreWrapper(AccountManagers.timus.name)
-    }
-
     override val userIdTitle get() = "id"
     override val urlHomePage get() = TimusApi.urls.main
 
@@ -64,5 +59,5 @@ class TimusAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = accountDataStore(context.account_timus_dataStore)
+    override fun getDataStore() = simpleAccountDataStore(context)
 }

@@ -1,11 +1,13 @@
 package com.demich.cps.accounts.managers
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreWrapper
 import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 
 abstract class AccountDataStore<U: UserInfo>(
@@ -28,12 +30,12 @@ abstract class AccountUniqueDataStore<U: UserInfo>(
     }
 }
 
-inline fun<reified U: UserInfo> AccountManager<U>.accountDataStore(
-    dataStoreWrapper: DataStoreWrapper
-): AccountDataStore<U> =
-    object : AccountDataStore<U>(dataStoreWrapper) {
+internal val Context.multipleUserInfoDataStoreWrapper by dataStoreWrapper("users_info")
+
+internal inline fun<reified U: UserInfo> AccountManager<U>.simpleAccountDataStore(context: Context): AccountDataStore<U> =
+    object : AccountDataStore<U>(context.multipleUserInfoDataStoreWrapper) {
         override val userInfo = jsonCPS.item<U?>(
-            name = "user_info",
+            name = "${type}_user_info",
             defaultValue = null
         )
 

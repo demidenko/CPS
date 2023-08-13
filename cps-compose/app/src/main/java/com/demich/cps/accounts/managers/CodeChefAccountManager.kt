@@ -33,7 +33,6 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.platforms.utils.CodeChefUtils
 import com.demich.cps.utils.append
-import com.demich.datastore_itemized.dataStoreWrapper
 import kotlin.text.contains
 
 
@@ -42,9 +41,7 @@ class CodeChefAccountManager(context: Context):
     UserSuggestionsProvider
 {
     companion object {
-        private val Context.account_codechef_dataStore by dataStoreWrapper(AccountManagers.codechef.name)
-
-        private val star get() = "★"
+        private const val star = "★"
     }
 
     override val urlHomePage get() = CodeChefApi.urls.main
@@ -206,5 +203,5 @@ class CodeChefAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = accountDataStore(context.account_codechef_dataStore)
+    override fun getDataStore() = simpleAccountDataStore(context)
 }

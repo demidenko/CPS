@@ -22,17 +22,12 @@ import com.demich.cps.platforms.api.DmojApi
 import com.demich.cps.platforms.api.DmojRatingChange
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.utils.append
-import com.demich.datastore_itemized.dataStoreWrapper
 
 
 class DmojAccountManager(context: Context):
     RatedAccountManager<DmojUserInfo>(context, AccountManagers.dmoj),
     UserSuggestionsProvider
 {
-    companion object {
-        private val Context.account_dmoj_dataStore by dataStoreWrapper(AccountManagers.dmoj.name)
-    }
-
     override val urlHomePage get() = DmojApi.urls.main
 
     override fun isValidForUserId(char: Char): Boolean = when(char) {
@@ -119,5 +114,5 @@ class DmojAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = accountDataStore(context.account_dmoj_dataStore)
+    override fun getDataStore() = simpleAccountDataStore(context)
 }

@@ -10,18 +10,12 @@ import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.ACMPApi
 import com.demich.cps.platforms.utils.ACMPUtils
-import com.demich.datastore_itemized.dataStoreWrapper
 
 
 class ACMPAccountManager(context: Context):
     AccountManager<ACMPUserInfo>(context, AccountManagers.acmp),
     UserSuggestionsProvider
 {
-
-    companion object {
-        private val Context.account_acmp_dataStore by dataStoreWrapper(AccountManagers.acmp.name)
-    }
-
     override val userIdTitle get() = "id"
     override val urlHomePage get() = ACMPApi.urls.main
 
@@ -77,6 +71,6 @@ class ACMPAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = accountDataStore(context.account_acmp_dataStore)
+    override fun getDataStore() = simpleAccountDataStore(context)
 
 }
