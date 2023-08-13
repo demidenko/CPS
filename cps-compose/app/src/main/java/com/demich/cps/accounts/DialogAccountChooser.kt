@@ -58,9 +58,8 @@ fun<U: UserInfo> DialogAccountChooser(
         var userInfo by remember { mutableStateOf(initialUserInfo) }
         var loadingInProgress by remember { mutableStateOf(false) }
 
-        var suggestions by remember { mutableStateOf(emptyList<UserSuggestion>()) }
+        var suggestionsResult by remember { mutableStateOf(Result.success(emptyList<UserSuggestion>())) }
         var loadingSuggestionsInProgress by remember { mutableStateOf(false) }
-        var suggestionsLoadError by remember { mutableStateOf(false) }
         var blockSuggestionsReload by remember { mutableStateOf(false) }
 
         val focusRequester = rememberFocusOnCreationRequester()
@@ -97,9 +96,9 @@ fun<U: UserInfo> DialogAccountChooser(
 
         if (manager is UserSuggestionsProvider) {
             SuggestionsList(
-                suggestions = suggestions,
+                suggestions = suggestionsResult.getOrDefault(emptyList()),
                 isLoading = loadingSuggestionsInProgress,
-                isError = suggestionsLoadError,
+                isError = suggestionsResult.isFailure,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { suggestion ->
                     blockSuggestionsReload = true
@@ -116,9 +115,8 @@ fun<U: UserInfo> DialogAccountChooser(
             val suggestionTextLimit = 3
             userInfo = null
             if (userId.length < suggestionTextLimit) {
-                suggestions = emptyList()
+                suggestionsResult = Result.success(emptyList())
                 loadingSuggestionsInProgress = false
-                suggestionsLoadError = false
                 blockSuggestionsReload = false
             }
             if (userId.isBlank()) {
@@ -139,8 +137,7 @@ fun<U: UserInfo> DialogAccountChooser(
                         val result = manager.runCatching { loadSuggestions(userId) }
                         loadingSuggestionsInProgress = false
                         if (isActive) { //Because of "StandaloneCoroutine was cancelled" exception during cancelling LaunchedEffect
-                            suggestions = result.getOrDefault(emptyList())
-                            suggestionsLoadError = result.isFailure
+                            suggestionsResult = result
                         }
                     }
                 } else {
