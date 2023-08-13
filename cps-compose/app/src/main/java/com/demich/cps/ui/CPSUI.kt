@@ -223,11 +223,10 @@ fun MonospacedText(
     modifier = modifier,
     color = color,
     fontSize = fontSize,
-    fontFamily = FontFamily.Monospace,
     textAlign = textAlign,
     maxLines = maxLines,
     overflow = overflow,
-    letterSpacing = 0.sp
+    style = CPSDefaults.MonospaceTextStyle
 )
 
 

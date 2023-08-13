@@ -3,12 +3,19 @@ package com.demich.cps.ui.dialogs
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.*
+import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.demich.cps.BuildConfig
 import com.demich.cps.ui.CPSCheckBox
-import com.demich.cps.ui.MonospacedText
+import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.context
@@ -41,25 +48,43 @@ fun CPSAboutDialog(onDismissRequest: () -> Unit) {
             .fillMaxWidth()
             .clickableNoRipple(enabled = !showDevModeLine, onClick = onClick)
     ) {
-        MonospacedText("   Competitive")
-        MonospacedText("   Programming")
-        MonospacedText("&& Solving")
-        MonospacedText("{")
-        MonospacedText("   version = ${BuildConfig.VERSION_NAME}" + if (devModeEnabled) " (${BuildConfig.VERSION_CODE})" else "")
+        DialogContent(
+            devModeEnabled = devModeEnabled,
+            showDevModeLine = showDevModeLine,
+            onDevModeChange = { checked ->
+                scope.launch { context.settingsUI.devModeEnabled(checked) }
+            }
+        )
+    }
+}
+
+@Composable
+private fun DialogContent(
+    devModeEnabled: Boolean,
+    showDevModeLine: Boolean,
+    onDevModeChange: (Boolean) -> Unit
+) {
+    ProvideTextStyle(value = CPSDefaults.MonospaceTextStyle) {
+        Text("   Competitive")
+        Text("   Programming")
+        Text("&& Solving")
+        Text("{")
+        Text("   version = ${cpsVersion(devModeEnabled)}")
         if (showDevModeLine) {
             Row(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                MonospacedText("   dev_mode = $devModeEnabled", Modifier.weight(1f))
-                CPSCheckBox(checked = devModeEnabled) { checked ->
-                    scope.launch { context.settingsUI.devModeEnabled(checked) }
-                }
+                Text("   dev_mode = $devModeEnabled", Modifier.weight(1f))
+                CPSCheckBox(checked = devModeEnabled, onCheckedChange = onDevModeChange)
             }
         }
-        MonospacedText("}")
+        Text("}")
     }
 }
+
+private fun cpsVersion(devModeEnabled: Boolean): String =
+    BuildConfig.VERSION_NAME + if (devModeEnabled) " (${BuildConfig.VERSION_CODE})" else ""
 
 private fun patternClickListener(
     pattern: String,

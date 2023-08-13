@@ -6,6 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
+import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -41,7 +43,7 @@ fun CPSTopBar(
             .fillMaxHeight()
         ) {
             CPSTitle(
-                navigator = navigator,
+                subtitle = { navigator.subtitle },
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterStart)
@@ -79,22 +81,24 @@ fun CPSTopBar(
 
 @Composable
 private fun CPSTitle(
-    navigator: CPSNavigator,
+    subtitle: () -> String,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 16.sp
-) = Column(modifier = modifier) {
-    MonospacedText(
-        text = "Competitive Programming && Solving",
-        color = cpsColors.content,
-        fontSize = fontSize,
-        maxLines = 1
-    )
-    MonospacedText(
-        text = navigator.subtitle,
-        color = cpsColors.contentAdditional,
-        fontSize = fontSize,
-        maxLines = 1
-    )
+) {
+    Column(modifier = modifier) {
+        ProvideTextStyle(value = CPSDefaults.MonospaceTextStyle.copy(fontSize = fontSize)) {
+            Text(
+                text = "Competitive Programming && Solving",
+                color = cpsColors.content,
+                maxLines = 1
+            )
+            Text(
+                text = subtitle(),
+                color = cpsColors.contentAdditional,
+                maxLines = 1
+            )
+        }
+    }
 }
 
 @Composable
