@@ -102,12 +102,12 @@ class AccountsWorker(
 
         val lastRatingChangeContestId = lastRatingChange.getContestId()
 
-        val settings = atcoderAccountManager.getSettings()
-        val prevRatingChangeContestId = settings.lastRatedContestId()
+        val dataStore = atcoderAccountManager.getDataStore()
+        val prevRatingChangeContestId = dataStore.lastRatedContestId()
 
         if (prevRatingChangeContestId == lastRatingChangeContestId && userInfo.rating == lastRatingChange.NewRating) return
 
-        settings.lastRatedContestId(lastRatingChangeContestId)
+        dataStore.lastRatedContestId(lastRatingChangeContestId)
 
         if (prevRatingChangeContestId != null) {
             atcoderAccountManager.notifyRatingChange(userInfo.handle, lastRatingChange)

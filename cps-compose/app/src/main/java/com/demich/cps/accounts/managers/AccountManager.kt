@@ -39,7 +39,9 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     abstract val userIdTitle: String
     abstract val urlHomePage: String
 
-    protected abstract fun getDataStore(): AccountDataStore<U>
+    //TODO: make not public
+    abstract fun getDataStore(): AccountDataStore<U>
+
     private val userInfoItem: DataStoreItem<U?> get() = getDataStore().userInfo
     fun flowOfInfo() = userInfoItem.flow
     fun flowOfInfoWithManager() = flowOfInfo().map { info -> info?.let { UserInfoWithManager(it, this) } }

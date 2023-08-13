@@ -137,6 +137,8 @@ class AtCoderAccountDataStore(context: Context):
 
     override val userInfo: DataStoreItem<AtCoderUserInfo?>
         get() = jsonCPS.item(name = "user_info", defaultValue = null)
+
+    val lastRatedContestId = itemStringNullable(name = "last_rated_contest")
 }
 
 class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager):
@@ -148,8 +150,5 @@ class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager):
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)
-    val lastRatedContestId = itemStringNullable(name = "last_rated_contest")
-
-    override fun itemsForReset() = listOf(lastRatedContestId)
 
 }
