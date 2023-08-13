@@ -115,112 +115,110 @@ private fun CPSScaffold(
         }
     }
 
-    val navBuilder: NavGraphBuilder.() -> Unit = remember(key1 = navigator) {
-        {
-            cpsComposable(ScreenTypes.accounts) { holder ->
-                var reorderEnabled by rememberSaveable { mutableStateOf(false) }
-                AccountsScreen(
-                    onExpandAccount = { type -> navigator.navigateTo(Screen.AccountExpanded(type)) },
-                    onSetAdditionalMenu = holder.menuSetter,
-                    reorderEnabled = { reorderEnabled },
-                    enableReorder = { reorderEnabled = true }
-                )
-                holder.bottomBar = accountsBottomBarBuilder(
-                    reorderEnabled = { reorderEnabled },
-                    onReorderDone = { reorderEnabled = false }
-                )
-                holder.setSubtitle("accounts")
-            }
-            cpsComposable(ScreenTypes.accountExpanded) { holder ->
-                val accountsViewModel = accountsViewModel()
-                val type = (holder.screen as Screen.AccountExpanded).type
-                var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
-                AccountExpandedScreen(
-                    type = type,
-                    showDeleteDialog = showDeleteDialog,
-                    onDeleteRequest = { manager ->
-                        navigator.popBack()
-                        accountsViewModel.delete(manager)
-                    },
-                    onDismissDeleteDialog = { showDeleteDialog = false },
-                    setBottomBarContent = holder.bottomBarSetter
-                )
-                holder.menu = accountExpandedMenuBuilder(
-                    type = type,
-                    navigator = navigator,
-                    onShowDeleteDialog = { showDeleteDialog = true }
-                )
-                holder.setSubtitle("accounts", type.name)
-            }
-            cpsComposable(ScreenTypes.accountSettings) { holder ->
-                val type = (holder.screen as Screen.AccountSettings).type
-                AccountSettingsScreen(type)
-                holder.setSubtitle("accounts", type.name, "settings")
-            }
+    val navBuilder: NavGraphBuilder.() -> Unit = {
+        cpsComposable(ScreenTypes.accounts) { holder ->
+            var reorderEnabled by rememberSaveable { mutableStateOf(false) }
+            AccountsScreen(
+                onExpandAccount = { type -> navigator.navigateTo(Screen.AccountExpanded(type)) },
+                onSetAdditionalMenu = holder.menuSetter,
+                reorderEnabled = { reorderEnabled },
+                enableReorder = { reorderEnabled = true }
+            )
+            holder.bottomBar = accountsBottomBarBuilder(
+                reorderEnabled = { reorderEnabled },
+                onReorderDone = { reorderEnabled = false }
+            )
+            holder.setSubtitle("accounts")
+        }
+        cpsComposable(ScreenTypes.accountExpanded) { holder ->
+            val accountsViewModel = accountsViewModel()
+            val type = (holder.screen as Screen.AccountExpanded).type
+            var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+            AccountExpandedScreen(
+                type = type,
+                showDeleteDialog = showDeleteDialog,
+                onDeleteRequest = { manager ->
+                    navigator.popBack()
+                    accountsViewModel.delete(manager)
+                },
+                onDismissDeleteDialog = { showDeleteDialog = false },
+                setBottomBarContent = holder.bottomBarSetter
+            )
+            holder.menu = accountExpandedMenuBuilder(
+                type = type,
+                navigator = navigator,
+                onShowDeleteDialog = { showDeleteDialog = true }
+            )
+            holder.setSubtitle("accounts", type.name)
+        }
+        cpsComposable(ScreenTypes.accountSettings) { holder ->
+            val type = (holder.screen as Screen.AccountSettings).type
+            AccountSettingsScreen(type)
+            holder.setSubtitle("accounts", type.name, "settings")
+        }
 
-            cpsComposable(ScreenTypes.news) { holder ->
-                val controller = rememberCodeforcesNewsController()
-                NewsScreen(controller = controller)
-                holder.menu = newsMenuBuilder(
-                    navigator = navigator,
-                    controller = controller
-                )
-                holder.bottomBar = newsBottomBarBuilder(
-                    controller = controller
-                )
-                holder.setSubtitle("news", "codeforces", controller.currentTab.name)
-            }
-            cpsComposable(ScreenTypes.newsSettings) { holder ->
-                NewsSettingsScreen()
-                holder.setSubtitle("news", "settings")
-            }
-            cpsComposable(ScreenTypes.newsFollowList) { holder ->
-                NewsFollowScreen(navigator = navigator)
-                holder.bottomBar = newsFollowListBottomBarBuilder()
-                holder.setSubtitle("news", "codeforces", "follow", "list")
-            }
-            cpsComposable(ScreenTypes.newsCodeforcesBlog) { holder ->
-                val handle = (holder.screen as Screen.NewsCodeforcesBlog).handle
-                val newsViewModel = codeforcesNewsViewModel()
-                val loadingDataId = rememberSaveable { Random.nextLong() }
-                val blogEntriesResult by newsViewModel.flowOfBlogEntriesResult(handle, context, loadingDataId).collectAsState()
-                CodeforcesBlogScreen(blogEntriesResult = { blogEntriesResult })
-                holder.setSubtitle("news", "codeforces", "blog")
-            }
+        cpsComposable(ScreenTypes.news) { holder ->
+            val controller = rememberCodeforcesNewsController()
+            NewsScreen(controller = controller)
+            holder.menu = newsMenuBuilder(
+                navigator = navigator,
+                controller = controller
+            )
+            holder.bottomBar = newsBottomBarBuilder(
+                controller = controller
+            )
+            holder.setSubtitle("news", "codeforces", controller.currentTab.name)
+        }
+        cpsComposable(ScreenTypes.newsSettings) { holder ->
+            NewsSettingsScreen()
+            holder.setSubtitle("news", "settings")
+        }
+        cpsComposable(ScreenTypes.newsFollowList) { holder ->
+            NewsFollowScreen(navigator = navigator)
+            holder.bottomBar = newsFollowListBottomBarBuilder()
+            holder.setSubtitle("news", "codeforces", "follow", "list")
+        }
+        cpsComposable(ScreenTypes.newsCodeforcesBlog) { holder ->
+            val handle = (holder.screen as Screen.NewsCodeforcesBlog).handle
+            val newsViewModel = codeforcesNewsViewModel()
+            val loadingDataId = rememberSaveable { Random.nextLong() }
+            val blogEntriesResult by newsViewModel.flowOfBlogEntriesResult(handle, context, loadingDataId).collectAsState()
+            CodeforcesBlogScreen(blogEntriesResult = { blogEntriesResult })
+            holder.setSubtitle("news", "codeforces", "blog")
+        }
 
-            cpsComposable(ScreenTypes.contests) { holder ->
-                val context = context
-                val contestsViewModel = contestsViewModel()
-                val filterController = rememberContestsFilterController()
-                val loadingStatus by rememberCombinedLoadingStatusState()
-                val isReloading = { loadingStatus == LoadingStatus.LOADING }
-                val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
-                ContestsScreen(
-                    filterController = filterController,
-                    isReloading = isReloading,
-                    onReload = onReload
-                )
-                holder.bottomBar = contestsBottomBarBuilder(
-                    filterController = filterController,
-                    loadingStatus = { loadingStatus },
-                    onReloadClick = onReload
-                )
-                holder.menu = contestsMenuBuilder(
-                    onOpenSettings = { navigator.navigateTo(Screen.ContestsSettings) },
-                    isReloading = isReloading
-                )
-                holder.setSubtitle("contests")
-            }
-            cpsComposable(ScreenTypes.contestsSettings) { holder ->
-                ContestsSettingsScreen()
-                holder.setSubtitle("contests", "settings")
-            }
+        cpsComposable(ScreenTypes.contests) { holder ->
+            val context = context
+            val contestsViewModel = contestsViewModel()
+            val filterController = rememberContestsFilterController()
+            val loadingStatus by rememberCombinedLoadingStatusState()
+            val isReloading = { loadingStatus == LoadingStatus.LOADING }
+            val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
+            ContestsScreen(
+                filterController = filterController,
+                isReloading = isReloading,
+                onReload = onReload
+            )
+            holder.bottomBar = contestsBottomBarBuilder(
+                filterController = filterController,
+                loadingStatus = { loadingStatus },
+                onReloadClick = onReload
+            )
+            holder.menu = contestsMenuBuilder(
+                onOpenSettings = { navigator.navigateTo(Screen.ContestsSettings) },
+                isReloading = isReloading
+            )
+            holder.setSubtitle("contests")
+        }
+        cpsComposable(ScreenTypes.contestsSettings) { holder ->
+            ContestsSettingsScreen()
+            holder.setSubtitle("contests", "settings")
+        }
 
-            cpsComposable(ScreenTypes.develop) { holder ->
-                DevelopScreen()
-                holder.bottomBar = developAdditionalBottomBarBuilder()
-                holder.setSubtitle("develop")
-            }
+        cpsComposable(ScreenTypes.develop) { holder ->
+            DevelopScreen()
+            holder.bottomBar = developAdditionalBottomBarBuilder()
+            holder.setSubtitle("develop")
         }
     }
 
