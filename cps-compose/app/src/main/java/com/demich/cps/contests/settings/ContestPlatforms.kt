@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.loading.ContestsLoaders
+import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -75,7 +75,7 @@ private fun ContestPlatformsSettingsItemExpandedContent(
         Contest.platformsExceptUnknown.forEach { platform ->
             PlatformCheckRow(
                 platform = platform,
-                availableLoaders = ContestsLoaders.entries.filter { platform in it.supportedPlatforms }.toSet(),
+                availableLoaders = ContestsLoaderType.entries.filter { platform in it.supportedPlatforms }.toSet(),
                 isChecked = platform in enabledPlatforms,
                 onCheckedChange = { onCheckedChange(platform, it) }
             )
@@ -87,7 +87,7 @@ private fun ContestPlatformsSettingsItemExpandedContent(
 @Composable
 private fun PlatformCheckRow(
     platform: Contest.Platform,
-    availableLoaders: Set<ContestsLoaders>,
+    availableLoaders: Set<ContestsLoaderType>,
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
@@ -115,7 +115,7 @@ private fun PlatformCheckRow(
 @Composable
 private fun LoadersSetupButton(
     platform: Contest.Platform,
-    availableLoaders: Set<ContestsLoaders>
+    availableLoaders: Set<ContestsLoaderType>
 ) {
     var showDialog by remember { mutableStateOf(false) }
     CPSIconButton(icon = CPSIcons.SetupLoaders) {

@@ -2,7 +2,7 @@ package com.demich.cps.contests.loaders
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsReceiver
-import com.demich.cps.contests.loading.ContestsLoaders
+import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.loading_engine.launchContestsLoading
 import com.demich.cps.contests.loading_engine.loaders.AtCoderContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ClistContestsLoader
@@ -62,7 +62,7 @@ private suspend fun loadContests(
             contestsReceiver.onResult(
                 platform = Contest.Platform.unknown,
                 result = Result.success(emptyList()),
-                loaderType = ContestsLoaders.clist_api
+                loaderType = ContestsLoaderType.clist_api
             )
             contestsReceiver.onFinish(platform = Contest.Platform.unknown)
             //continue without unknown
@@ -80,13 +80,13 @@ private suspend fun loadContests(
         contestsReceiver = contestsReceiver
     ) { loaderType ->
         when (loaderType) {
-            ContestsLoaders.clist_api -> ClistContestsLoader(
+            ContestsLoaderType.clist_api -> ClistContestsLoader(
                 apiAccess = settings.clistApiAccess(),
                 includeResourceIds = { settings.clistAdditionalResources().map { it.id } }
             )
-            ContestsLoaders.codeforces_api -> CodeforcesContestsLoader()
-            ContestsLoaders.atcoder_parse -> AtCoderContestsLoader()
-            ContestsLoaders.dmoj_api -> DmojContestsLoader()
+            ContestsLoaderType.codeforces_api -> CodeforcesContestsLoader()
+            ContestsLoaderType.atcoder_parse -> AtCoderContestsLoader()
+            ContestsLoaderType.dmoj_api -> DmojContestsLoader()
         }
     }
 }

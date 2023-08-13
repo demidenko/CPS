@@ -2,7 +2,7 @@ package com.demich.cps.contests.loading_engine
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
-import com.demich.cps.contests.loading.ContestsLoaders
+import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoaderMultiple
@@ -16,10 +16,10 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 suspend fun launchContestsLoading(
-    setup: Map<Contest.Platform, List<ContestsLoaders>>,
+    setup: Map<Contest.Platform, List<ContestsLoaderType>>,
     dateConstraints: ContestDateConstraints,
     contestsReceiver: ContestsReceiver,
-    createLoader: suspend (ContestsLoaders) -> ContestsLoader
+    createLoader: suspend (ContestsLoaderType) -> ContestsLoader
 ) {
     val memoizer = MultipleLoadersMemoizer(setup, dateConstraints)
 
@@ -44,11 +44,11 @@ suspend fun launchContestsLoading(
 
 private suspend fun loadUntilSuccess(
     platform: Contest.Platform,
-    priorities: List<ContestsLoaders>,
+    priorities: List<ContestsLoaderType>,
     dateConstraints: ContestDateConstraints,
     contestsReceiver: ContestsReceiver,
     memoizer: MultipleLoadersMemoizer,
-    getLoader: (ContestsLoaders) -> ContestsLoader
+    getLoader: (ContestsLoaderType) -> ContestsLoader
 ) {
     require(priorities.isNotEmpty())
     contestsReceiver.onStartLoading(platform)
@@ -91,11 +91,11 @@ private fun titleFix(contest: Contest): Contest {
 typealias ContestsLoadResult = Result<Map<Contest.Platform, List<Contest>>>
 
 private class MultipleLoadersMemoizer(
-    private val setup: Map<Contest.Platform, List<ContestsLoaders>>,
+    private val setup: Map<Contest.Platform, List<ContestsLoaderType>>,
     private val dateConstraints: ContestDateConstraints
 ) {
     private val mutex = Mutex()
-    private val results = mutableMapOf<ContestsLoaders, Deferred<ContestsLoadResult>>()
+    private val results = mutableMapOf<ContestsLoaderType, Deferred<ContestsLoadResult>>()
     suspend fun getContestsResult(loader: ContestsLoaderMultiple): ContestsLoadResult {
         return coroutineScope {
             mutex.withLock {

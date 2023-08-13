@@ -3,7 +3,7 @@ package com.demich.cps.contests.settings
 import android.content.Context
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateBaseConstraints
-import com.demich.cps.contests.loading.ContestsLoaders
+import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.platforms.api.ClistApi
 import com.demich.cps.platforms.api.ClistResource
 import com.demich.cps.utils.jsonCPS
@@ -52,8 +52,8 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
 }
 
 private fun makeDefaultLoadingPriorities() =
-    ContestsLoaders.entries.sortedWith(
-        compareByDescending<ContestsLoaders> { it.supportedPlatforms.size }.thenBy { it.ordinal }
+    ContestsLoaderType.entries.sortedWith(
+        compareByDescending<ContestsLoaderType> { it.supportedPlatforms.size }.thenBy { it.ordinal }
     ).let { loaders ->
         Contest.platforms.associateWith { platform ->
             buildList {

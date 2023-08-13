@@ -2,10 +2,10 @@ package com.demich.cps.contests.loading_engine.loaders
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
-import com.demich.cps.contests.loading.ContestsLoaders
+import com.demich.cps.contests.loading.ContestsLoaderType
 
 
-abstract class ContestsLoader(val type: ContestsLoaders) {
+abstract class ContestsLoader(val type: ContestsLoaderType) {
     protected open suspend fun loadContests(
         platform: Contest.Platform,
         dateConstraints: ContestDateConstraints
@@ -36,7 +36,7 @@ abstract class ContestsLoader(val type: ContestsLoaders) {
     }
 }
 
-abstract class ContestsLoaderMultiple(type: ContestsLoaders): ContestsLoader(type) {
+abstract class ContestsLoaderMultiple(type: ContestsLoaderType): ContestsLoader(type) {
 
     protected open suspend fun loadContests(
         platforms: Set<Contest.Platform>,

@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.loading.ContestsLoaders
+import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoadersPriorityListDialog(
     platform: Contest.Platform,
-    availableOptions: Set<ContestsLoaders>,
+    availableOptions: Set<ContestsLoaderType>,
     onDismissRequest: () -> Unit
 ) {
     val context = context
@@ -80,9 +80,9 @@ fun LoadersPriorityListDialog(
 @Composable
 fun LoadersPriorityList(
     modifier: Modifier = Modifier,
-    priorityList: List<ContestsLoaders>,
-    availableOptions: Set<ContestsLoaders>,
-    onListChange: (List<ContestsLoaders>) -> Unit
+    priorityList: List<ContestsLoaderType>,
+    availableOptions: Set<ContestsLoaderType>,
+    onListChange: (List<ContestsLoaderType>) -> Unit
 ) {
     require(priorityList.isNotEmpty())
     Column(modifier = modifier) {
@@ -121,12 +121,12 @@ fun LoadersPriorityList(
 @Composable
 private fun PriorityListItemLoader(
     modifier: Modifier = Modifier,
-    loaderType: ContestsLoaders,
+    loaderType: ContestsLoaderType,
     index: Int,
     deleteEnabled: Boolean,
     onDeleteRequest: () -> Unit,
-    availableOptions: Set<ContestsLoaders>,
-    onOptionSelected: (ContestsLoaders) -> Unit
+    availableOptions: Set<ContestsLoaderType>,
+    onOptionSelected: (ContestsLoaderType) -> Unit
 ) {
     PriorityListItem(
         modifier = modifier,
@@ -140,8 +140,8 @@ private fun PriorityListItemLoader(
 @Composable
 private fun PriorityListItemAdd(
     modifier: Modifier = Modifier,
-    availableOptions: Set<ContestsLoaders>,
-    onOptionSelected: (ContestsLoaders) -> Unit
+    availableOptions: Set<ContestsLoaderType>,
+    onOptionSelected: (ContestsLoaderType) -> Unit
 ) {
     PriorityListItem(
         modifier = modifier,
@@ -155,8 +155,8 @@ private fun PriorityListItemAdd(
 private fun PriorityListItem(
     modifier: Modifier = Modifier,
     text: String,
-    options: Set<ContestsLoaders>,
-    onOptionSelected: (ContestsLoaders) -> Unit,
+    options: Set<ContestsLoaderType>,
+    onOptionSelected: (ContestsLoaderType) -> Unit,
     onDeleteRequest: (() -> Unit)? = null
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -178,9 +178,9 @@ private fun PriorityListItem(
 
 @Composable
 private fun CPSDropdownMenuScope.LoadersMenu(
-    options: Set<ContestsLoaders>,
+    options: Set<ContestsLoaderType>,
     onDeleteRequest: (() -> Unit)?,
-    onOptionSelected: (ContestsLoaders) -> Unit
+    onOptionSelected: (ContestsLoaderType) -> Unit
 ) {
     options.forEach { option ->
         CPSDropdownMenuItem(

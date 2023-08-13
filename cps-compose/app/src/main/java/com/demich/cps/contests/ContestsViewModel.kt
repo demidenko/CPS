@@ -10,7 +10,7 @@ import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.loaders.ContestsReloader
 import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading.asContestsReceiver
-import com.demich.cps.contests.loading.ContestsLoaders
+import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
@@ -33,7 +33,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
     fun flowOfLoadingStatus(): Flow<LoadingStatus> =
             Contest.platforms.map { mutableLoadingStatusFor(it) }.combine()
 
-    fun flowOfLoadingErrors(): Flow<List<Pair<ContestsLoaders,Throwable>>> =
+    fun flowOfLoadingErrors(): Flow<List<Pair<ContestsLoaderType,Throwable>>> =
         combine(
             flow = Contest.platforms.associateWith { mutableLoadingStatusFor(it) }.combine(),
             flow2 = Contest.platforms.associateWith { mutableErrorsList(it) }.combine()
@@ -48,7 +48,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
     private fun mutableLoadingStatusFor(platform: Contest.Platform) =
         loadingStatuses.getOrPut(platform) { MutableStateFlow(LoadingStatus.PENDING) }
 
-    private val errors: MutableMap<Contest.Platform, MutableStateFlow<List<Pair<ContestsLoaders,Throwable>>>> = mutableMapOf()
+    private val errors: MutableMap<Contest.Platform, MutableStateFlow<List<Pair<ContestsLoaderType,Throwable>>>> = mutableMapOf()
     private fun mutableErrorsList(platform: Contest.Platform) =
         errors.getOrPut(platform) { MutableStateFlow(emptyList()) }
 
