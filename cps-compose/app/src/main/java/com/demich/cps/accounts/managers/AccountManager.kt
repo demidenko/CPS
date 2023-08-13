@@ -8,8 +8,8 @@ import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -40,19 +40,20 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     abstract val urlHomePage: String
 
     protected abstract fun getDataStore(): AccountDataStore<U>
-    fun flowOfInfo() = getDataStore().userInfo.flow
+    private val userInfoItem: DataStoreItem<U?> get() = getDataStore().userInfo
+    fun flowOfInfo() = userInfoItem.flow
     fun flowOfInfoWithManager() = flowOfInfo().map { info -> info?.let { UserInfoWithManager(it, this) } }
 
-    suspend fun getSavedInfo(): U? = flowOfInfo().first()
+    suspend fun getSavedInfo(): U? = userInfoItem()
 
     suspend fun setSavedInfo(info: U) {
         val oldUserId = getSavedInfo()?.userId ?: ""
-        getDataStore().userInfo(info)
+        userInfoItem(info)
         if (info.userId != oldUserId && this is AccountSettingsProvider) getSettings().resetRelatedItems()
     }
 
     suspend fun deleteSavedInfo() {
-        getDataStore().userInfo(null)
+        userInfoItem(null)
     }
 
     open fun isValidForUserId(char: Char): Boolean = true
