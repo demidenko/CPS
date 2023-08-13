@@ -41,13 +41,8 @@ inline fun<reified U: UserInfo> AccountManager<U>.accountDataStore(
     }
 
 
-open class AccountSettingsDataStore(dataStoreWrapper: DataStoreWrapper): ItemizedDataStore(dataStoreWrapper) {
-    protected open fun itemsForReset(): List<DataStoreItem<*>> = emptyList()
-    suspend fun resetRelatedItems() = resetItems(itemsForReset())
-}
-
 interface AccountSettingsProvider {
-    fun getSettings(): AccountSettingsDataStore
+    fun getSettings(): ItemizedDataStore
 
     @Composable
     fun SettingsItems() {}

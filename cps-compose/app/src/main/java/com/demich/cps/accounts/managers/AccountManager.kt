@@ -52,7 +52,6 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
         val oldUserId = getSavedInfo()?.userId ?: ""
         userInfoItem(info)
         if (!oldUserId.equals(info.userId, ignoreCase = true)) {
-            if (this is AccountSettingsProvider) getSettings().resetRelatedItems()
             getDataStore().onResetUserInfo()
         }
     }

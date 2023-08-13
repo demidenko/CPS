@@ -44,6 +44,7 @@ import com.demich.cps.workers.AccountsWorker
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
 import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.datetime.Instant
 import kotlin.text.contains
@@ -304,7 +305,7 @@ class CodeforcesAccountDataStore(context: Context):
 }
 
 class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
-    AccountSettingsDataStore(manager.context.account_settings_codeforces_dataStore)
+    ItemizedDataStore(manager.context.account_settings_codeforces_dataStore)
 {
     companion object {
         private val Context.account_settings_codeforces_dataStore

@@ -25,6 +25,7 @@ import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.AccountsWorker
 import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 
 
@@ -142,7 +143,7 @@ class AtCoderAccountDataStore(context: Context):
 }
 
 class AtCoderAccountSettingsDataStore(manager: AtCoderAccountManager):
-    AccountSettingsDataStore(manager.context.account_settings_atcoder_dataStore)
+    ItemizedDataStore(manager.context.account_settings_atcoder_dataStore)
 {
     companion object {
         private val Context.account_settings_atcoder_dataStore
