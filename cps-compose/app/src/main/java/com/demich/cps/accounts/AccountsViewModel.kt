@@ -84,9 +84,14 @@ class AccountsViewModel: ViewModel() {
                 launch {
                     //wait for loading stops
                     loadingStatusState.takeWhile { it == LoadingStatus.LOADING }.collect()
-                    loadingStatusState.value = LoadingStatus.LOADING
-                    loadAndSave(manager, userId)
-                    loadingStatusState.value = LoadingStatus.PENDING
+                    if (userId.equals(manager.getSavedInfo()?.userId, ignoreCase = true)) {
+                        //if userId is same just reload to prevent replace by FAILED
+                        reload(manager)
+                    } else {
+                        loadingStatusState.value = LoadingStatus.LOADING
+                        loadAndSave(manager, userId)
+                        loadingStatusState.value = LoadingStatus.PENDING
+                    }
                     progress.value++
                 }
             }.joinAll()
