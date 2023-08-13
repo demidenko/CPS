@@ -229,12 +229,12 @@ class CodeforcesAccountManager(context: Context):
     suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange) {
         val info = getSavedInfo() ?: return
 
-        val settings = getSettings()
-        val prevRatingChangeContestId = settings.lastRatedContestId()
+        val dataStore = getDataStore()
+        val prevRatingChangeContestId = dataStore.lastRatedContestId()
 
         if (prevRatingChangeContestId == ratingChange.contestId && info.rating == ratingChange.newRating) return
 
-        settings.lastRatedContestId(ratingChange.contestId)
+        dataStore.lastRatedContestId(ratingChange.contestId)
 
         if (prevRatingChangeContestId != null) {
             notifyRatingChange(ratingChange)
@@ -295,6 +295,7 @@ class CodeforcesAccountDataStore(context: Context):
     override val userInfo: DataStoreItem<CodeforcesUserInfo?>
         get() = jsonCPS.item(name = "user_info", defaultValue = null)
 
+    val lastRatedContestId = itemIntNullable(name = "last_rated_contest")
 }
 
 class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
@@ -306,7 +307,6 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)
-    val lastRatedContestId = itemIntNullable(name = "last_rated_contest")
 
     val observeContribution = itemBoolean(name = "observe_contribution", defaultValue = false)
 
@@ -318,7 +318,6 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
     val upsolvingSuggestedProblems = jsonCPS.item<List<Pair<CodeforcesProblem, Instant>>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
 
     override fun itemsForReset() = listOf(
-        lastRatedContestId,
         monitorLastSubmissionId,
         monitorCanceledContests,
         upsolvingSuggestedProblems
