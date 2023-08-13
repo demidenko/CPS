@@ -18,6 +18,10 @@ class ItemizedMutablePreferences(private val preferences: MutablePreferences) {
     operator fun<T> set(item: DataStoreItem<T>, value: T) =
         item.converter.setTo(preferences, value)
 
+    fun clear() {
+        preferences.clear()
+    }
+
     fun<T> remove(item: DataStoreItem<T>) {
         preferences.remove(item.converter.key)
     }
