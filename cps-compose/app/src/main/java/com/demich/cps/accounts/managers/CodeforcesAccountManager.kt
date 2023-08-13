@@ -299,6 +299,8 @@ class CodeforcesAccountDataStore(context: Context):
 
     val monitorLastSubmissionId = itemLongNullable(name = "monitor_last_submission")
     val monitorCanceledContests = jsonCPS.item<List<Pair<Int,Instant>>>(name = "monitor_canceled", defaultValue = emptyList())
+
+    val upsolvingSuggestedProblems = jsonCPS.item<List<Pair<CodeforcesProblem, Instant>>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
 }
 
 class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
@@ -312,12 +314,6 @@ class CodeforcesAccountSettingsDataStore(manager: CodeforcesAccountManager):
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)
     val observeContribution = itemBoolean(name = "observe_contribution", defaultValue = false)
     val monitorEnabled = itemBoolean(name = "monitor_enabled", defaultValue = false)
-
     val upsolvingSuggestionsEnabled = itemBoolean(name = "upsolving_suggestions", defaultValue = false)
-    val upsolvingSuggestedProblems = jsonCPS.item<List<Pair<CodeforcesProblem, Instant>>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
-
-    override fun itemsForReset() = listOf(
-        upsolvingSuggestedProblems
-    )
 
 }

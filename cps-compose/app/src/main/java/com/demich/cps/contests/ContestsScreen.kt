@@ -402,7 +402,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
             onStop = {
                 scope.launch {
                     monitor.reset()
-                    CodeforcesAccountManager(context).getSettings().monitorCanceledContests.add(
+                    CodeforcesAccountManager(context).getDataStore().monitorCanceledContests.add(
                         contestData.contestId to getCurrentTime()
                     )
                 }
