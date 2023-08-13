@@ -52,7 +52,8 @@ private fun<U: UserInfo> AccountExpandedContent(
     manager: AccountManager<U>,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
-    val userInfo by rememberCollect { manager.flowOfInfo() }
+    val context = context
+    val userInfo by rememberCollect { manager.dataStore(context).flowOfInfo() }
     userInfo?.let {
         manager.ExpandedContent(
             userInfo = it,
@@ -79,7 +80,7 @@ fun accountExpandedMenuBuilder(
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         scope.launch {
             context.allAccountManagers.first { it.type == type }
-                .getSavedInfo()
+                .dataStore(context).getSavedInfo()
                 ?.userPageUrl
                 ?.let { url -> context.openUrlInBrowser(url) }
         }

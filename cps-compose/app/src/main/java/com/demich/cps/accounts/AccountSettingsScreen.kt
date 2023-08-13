@@ -27,7 +27,7 @@ fun AccountSettingsScreen(
     var showChangeDialog by remember { mutableStateOf(false) }
 
     val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
-    val userInfo by rememberCollect { manager.flowOfInfo() }
+    val userInfo by rememberCollect { manager.dataStore(context).flowOfInfo() }
 
     userInfo?.let {
         UserInfoSettings(

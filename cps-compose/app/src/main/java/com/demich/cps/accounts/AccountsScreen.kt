@@ -50,6 +50,8 @@ fun AccountsScreen(
         }
     }
 
+    val context = context
+
     LazyColumn(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -65,7 +67,7 @@ fun AccountsScreen(
         ) { userInfoWithManager ->
             AccountPanel(
                 userInfoWithManager = userInfoWithManager,
-                onReloadRequest = { accountsViewModel.reload(userInfoWithManager.manager) },
+                onReloadRequest = { accountsViewModel.reload(userInfoWithManager.manager, context) },
                 onExpandRequest = { onExpandAccount(userInfoWithManager.type) },
                 visibleOrder = visibleOrder,
                 modifier = Modifier
@@ -81,7 +83,7 @@ fun AccountsScreen(
 private fun rememberRecordedAccounts() = with(context) {
     rememberCollect {
         combine(
-            flows = allAccountManagers.map { it.flowOfInfoWithManager() }
+            flows = allAccountManagers.map { it.flowOfInfoWithManager(this) }
         ) {
             it.filterNotNull()
         }.combine(settingsUI.accountsOrder.flow) { accounts, order ->
@@ -119,7 +121,7 @@ private fun ReloadAccountsButton() {
     }
 
     val anyRecordedAccount by rememberCollect {
-        combine(flows = context.allAccountManagers.map { it.flowOfInfo() }) {
+        combine(flows = context.allAccountManagers.map { it.dataStore(context).flowOfInfo() }) {
             it.any { userInfo -> userInfo != null }
         }
     }
@@ -128,7 +130,7 @@ private fun ReloadAccountsButton() {
         loadingStatus = loadingStatus,
         enabled = anyRecordedAccount
     ) {
-        context.allAccountManagers.forEach { accountsViewModel.reload(it) }
+        context.allAccountManagers.forEach { accountsViewModel.reload(it, context) }
     }
 }
 
@@ -170,7 +172,7 @@ private fun AddAccountButton() {
         ) {
             remember {
                 runBlocking {
-                    context.allAccountManagers.filter { it.getSavedInfo() == null }
+                    context.allAccountManagers.filter { it.dataStore(context).getSavedInfo() == null }
                 }.map { it.type }.plus(AccountManagers.clist)
             }.forEach { type ->
                 AddAccountMenuItem(type = type) {
@@ -200,11 +202,12 @@ internal fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
     scope: CoroutineScope,
     onDismissRequest: () -> Unit
 ) {
+    val dataStore = dataStore(context)
     DialogAccountChooser(
         manager = this,
-        initialUserInfo = runBlocking { getSavedInfo() },
+        initialUserInfo = runBlocking { dataStore.getSavedInfo() },
         onDismissRequest = onDismissRequest,
-        onResult = { userInfo -> scope.launch { setSavedInfo(userInfo) } }
+        onResult = { userInfo -> scope.launch { dataStore.setSavedInfo(userInfo) } }
     )
 }
 

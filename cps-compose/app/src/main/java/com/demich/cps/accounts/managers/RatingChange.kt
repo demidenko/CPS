@@ -1,5 +1,6 @@
 package com.demich.cps.accounts.managers
 
+import android.content.Context
 import androidx.compose.ui.graphics.toArgb
 import com.demich.cps.R
 import com.demich.cps.accounts.userinfo.RatedUserInfo
@@ -64,12 +65,13 @@ internal fun DmojRatingChange.toRatingChange() =
 
 
 fun notifyRatingChange(
-    manager: RatedAccountManager<out RatedUserInfo>,
     channel: NotificationChannelSingleId,
+    ratingChange: RatingChange,
     handle: String,
-    ratingChange: RatingChange
+    manager: RatedAccountManager<out RatedUserInfo>,
+    context: Context
 ) {
-    channel.notify(manager.context) {
+    channel.notify(context) {
         val difference = ratingChange.rating - (ratingChange.oldRating ?: 0)
         setSmallIcon(if (difference < 0) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
         setContentTitle("$handle new rating: ${ratingChange.rating}")

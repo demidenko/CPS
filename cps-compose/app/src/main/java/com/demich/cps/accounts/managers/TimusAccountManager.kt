@@ -59,5 +59,5 @@ class TimusAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = simpleAccountDataStore(context)
+    override fun dataStore(context: Context) = simpleAccountDataStore(context)
 }

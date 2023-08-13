@@ -188,7 +188,7 @@ class CodeforcesAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = CodeforcesAccountDataStore(context)
+    override fun dataStore(context: Context) = CodeforcesAccountDataStore(context)
     override fun getSettings() = CodeforcesAccountSettingsDataStore(this)
 
     @Composable
@@ -219,18 +219,19 @@ class CodeforcesAccountManager(context: Context):
         )
     }
 
-    fun notifyRatingChange(ratingChange: CodeforcesRatingChange) =
+    private fun notifyRatingChange(ratingChange: CodeforcesRatingChange, context: Context) =
         notifyRatingChange(
-            manager = this,
             channel = notificationChannels.codeforces.rating_changes,
+            ratingChange = ratingChange.toRatingChange(),
             handle = ratingChange.handle,
-            ratingChange = ratingChange.toRatingChange()
+            manager = this,
+            context = context
         )
 
-    suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange) {
-        val info = getSavedInfo() ?: return
+    suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange, context: Context) {
+        val dataStore = dataStore(context)
+        val info = dataStore.getSavedInfo() ?: return
 
-        val dataStore = getDataStore()
         val prevRatingChangeContestId = dataStore.lastRatedContestId()
 
         if (prevRatingChangeContestId == ratingChange.contestId && info.rating == ratingChange.newRating) return
@@ -238,12 +239,12 @@ class CodeforcesAccountManager(context: Context):
         dataStore.lastRatedContestId(ratingChange.contestId)
 
         if (prevRatingChangeContestId != null) {
-            notifyRatingChange(ratingChange)
+            notifyRatingChange(ratingChange, context)
             val newInfo = CodeforcesUtils.getUserInfo(handle = info.handle, doRedirect = false)
             if (newInfo.status != STATUS.FAILED) {
-                setSavedInfo(newInfo)
+                dataStore.setSavedInfo(newInfo)
             } else {
-                setSavedInfo(info.copy(rating = ratingChange.newRating))
+                dataStore.setSavedInfo(info.copy(rating = ratingChange.newRating))
             }
         }
     }

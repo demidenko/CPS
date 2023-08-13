@@ -87,8 +87,8 @@ private fun<U: RatedUserInfo> RatedAccountManager<U>.getRank(userInfo: U?): Rate
 }
 
 
-private fun<U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(): Flow<RatedRank?> =
-    flowOfInfo().map(this::getRank)
+private fun<U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(context: Context): Flow<RatedRank?> =
+    dataStore(context).flowOfInfo().map(this::getRank)
 
 private data class RankGetter(
     private val validRanks: List<RatedRank>,
@@ -110,7 +110,7 @@ private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
     combine(
         flow = combine(flows = context.allAccountManagers
             .filterIsInstance<RatedAccountManager<out RatedUserInfo>>()
-            .map { it.flowOfRatedRank() }
+            .map { it.flowOfRatedRank(context) }
         ) { it },
         flow2 = context.settingsUI.statusBarDisabledManagers.flow,
         flow3 = context.settingsUI.statusBarResultByMaximum.flow
@@ -159,7 +159,7 @@ fun StatusBarButtonsForUIPanel() {
     val recordedAccountManagers by rememberCollect {
         combine(flows = context.allAccountManagers
             .filterIsInstance<RatedAccountManager<*>>()
-            .map { it.flowOfInfoWithManager() }
+            .map { it.flowOfInfoWithManager(context) }
         ) { array ->
             array.mapNotNull { it?.manager?.type }
         }.combine(settingsUI.accountsOrder.flow) { managers, order ->

@@ -55,18 +55,19 @@ class AccountsWorker(
     }
 
     private suspend fun codeforcesRating() {
-        val userInfo = codeforcesAccountManager.getSavedInfo() ?: return
+        val userInfo = codeforcesAccountManager.dataStore(context).getSavedInfo() ?: return
         if (userInfo.status != STATUS.OK) return
 
         val lastRatingChange = CodeforcesApi.runCatching {
             getUserRatingChanges(handle = userInfo.handle)
         }.getOrNull()?.lastOrNull() ?: return
 
-        codeforcesAccountManager.applyRatingChange(lastRatingChange)
+        codeforcesAccountManager.applyRatingChange(lastRatingChange, context)
     }
 
     private suspend fun codeforcesContribution() {
-        val userInfo = codeforcesAccountManager.getSavedInfo() ?: return
+        val dataStore = codeforcesAccountManager.dataStore(context)
+        val userInfo = dataStore.getSavedInfo() ?: return
         if (userInfo.status != STATUS.OK) return
 
         val handle = userInfo.handle
@@ -76,7 +77,7 @@ class AccountsWorker(
 
         if (newContribution == userInfo.contribution) return
 
-        codeforcesAccountManager.setSavedInfo(userInfo.copy(contribution = newContribution))
+        dataStore.setSavedInfo(userInfo.copy(contribution = newContribution))
 
         val oldContribution = getNotifiedCodeforcesContribution() ?: userInfo.contribution
 
@@ -93,7 +94,8 @@ class AccountsWorker(
     }
 
     private suspend fun atcoderRating() {
-        val userInfo = atcoderAccountManager.getSavedInfo() ?: return
+        val dataStore = atcoderAccountManager.dataStore(context)
+        val userInfo = dataStore.getSavedInfo() ?: return
         if (userInfo.status != STATUS.OK) return
 
         val lastRatingChange = AtCoderApi.runCatching {
@@ -102,7 +104,6 @@ class AccountsWorker(
 
         val lastRatingChangeContestId = lastRatingChange.getContestId()
 
-        val dataStore = atcoderAccountManager.getDataStore()
         val prevRatingChangeContestId = dataStore.lastRatedContestId()
 
         if (prevRatingChangeContestId == lastRatingChangeContestId && userInfo.rating == lastRatingChange.NewRating) return
@@ -110,12 +111,12 @@ class AccountsWorker(
         dataStore.lastRatedContestId(lastRatingChangeContestId)
 
         if (prevRatingChangeContestId != null) {
-            atcoderAccountManager.notifyRatingChange(userInfo.handle, lastRatingChange)
+            atcoderAccountManager.notifyRatingChange(userInfo.handle, lastRatingChange, context)
             val newInfo = atcoderAccountManager.loadInfo(userInfo.handle)
             if (newInfo.status != STATUS.FAILED) {
-                atcoderAccountManager.setSavedInfo(newInfo)
+                dataStore.setSavedInfo(newInfo)
             } else {
-                atcoderAccountManager.setSavedInfo(userInfo.copy(rating = lastRatingChange.NewRating))
+                dataStore.setSavedInfo(userInfo.copy(rating = lastRatingChange.NewRating))
             }
         }
     }

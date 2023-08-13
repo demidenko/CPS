@@ -38,9 +38,10 @@ class AccountsViewModel: ViewModel() {
         mutableLoadingStatusFor(manager)
 
 
-    fun<U: UserInfo> reload(manager: AccountManager<U>) {
+    fun<U: UserInfo> reload(manager: AccountManager<U>, context: Context) {
         viewModelScope.launch {
-            val savedInfo = manager.getSavedInfo() ?: return@launch
+            val dataStore = manager.dataStore(context)
+            val savedInfo = dataStore.getSavedInfo() ?: return@launch
 
             val loadingStatusState = mutableLoadingStatusFor(manager)
             if (loadingStatusState.value == LoadingStatus.LOADING) return@launch
@@ -52,18 +53,18 @@ class AccountsViewModel: ViewModel() {
                 loadingStatusState.value = LoadingStatus.FAILED
             } else {
                 loadingStatusState.value = LoadingStatus.PENDING
-                manager.setSavedInfo(info)
+                dataStore.setSavedInfo(info)
             }
         }
     }
 
-    fun<U: UserInfo> delete(manager: AccountManager<U>) {
+    fun<U: UserInfo> delete(manager: AccountManager<U>, context: Context) {
         viewModelScope.launch {
             mutableLoadingStatusFor(manager).update {
                 require(it != LoadingStatus.LOADING)
                 LoadingStatus.PENDING
             }
-            manager.deleteSavedInfo()
+            manager.dataStore(context).deleteSavedInfo()
         }
     }
 
@@ -84,12 +85,12 @@ class AccountsViewModel: ViewModel() {
                 launch {
                     //wait for loading stops
                     loadingStatusState.takeWhile { it == LoadingStatus.LOADING }.collect()
-                    if (userId.equals(manager.getSavedInfo()?.userId, ignoreCase = true)) {
+                    if (userId.equals(manager.dataStore(context).getSavedInfo()?.userId, ignoreCase = true)) {
                         //if userId is same just reload to prevent replace by FAILED
-                        reload(manager)
+                        reload(manager, context)
                     } else {
                         loadingStatusState.value = LoadingStatus.LOADING
-                        loadAndSave(manager, userId)
+                        loadAndSave(manager, userId, context)
                         loadingStatusState.value = LoadingStatus.PENDING
                     }
                     progress.value++
@@ -98,8 +99,8 @@ class AccountsViewModel: ViewModel() {
         }
     }
 
-    private suspend fun<U: UserInfo> loadAndSave(manager: AccountManager<U>, userId: String) {
-        manager.setSavedInfo(manager.loadInfo(userId))
+    private suspend fun<U: UserInfo> loadAndSave(manager: AccountManager<U>, userId: String, context: Context) {
+        manager.dataStore(context).setSavedInfo(manager.loadInfo(userId))
     }
 
     private val ratingLoader = backgroundDataLoader<List<RatingChange>>()

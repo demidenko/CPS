@@ -8,7 +8,6 @@ import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -39,26 +38,12 @@ abstract class AccountManager<U: UserInfo>(val context: Context, val type: Accou
     abstract val userIdTitle: String
     abstract val urlHomePage: String
 
-    //TODO: make not public
-    abstract fun getDataStore(): AccountDataStore<U>
+    abstract fun dataStore(context: Context): AccountDataStore<U>
 
-    private val userInfoItem: DataStoreItem<U?> get() = getDataStore().userInfo
-    fun flowOfInfo() = userInfoItem.flow
-    fun flowOfInfoWithManager() = flowOfInfo().map { info -> info?.let { UserInfoWithManager(it, this) } }
-
-    suspend fun getSavedInfo(): U? = userInfoItem()
-
-    suspend fun setSavedInfo(info: U) {
-        val oldUserId = getSavedInfo()?.userId
-        userInfoItem(info)
-        if (!oldUserId.equals(info.userId, ignoreCase = true)) {
-            getDataStore().onResetUserInfo()
+    fun flowOfInfoWithManager(context: Context) =
+        dataStore(context).flowOfInfo().map { info ->
+            info?.let { UserInfoWithManager(it, this) }
         }
-    }
-
-    suspend fun deleteSavedInfo() {
-        userInfoItem(null)
-    }
 
     open fun isValidForUserId(char: Char): Boolean = true
 

@@ -106,7 +106,7 @@ class AtCoderAccountManager(context: Context):
         }
     }
 
-    override fun getDataStore() = AtCoderAccountDataStore(context)
+    override fun dataStore(context: Context) = AtCoderAccountDataStore(context)
     override fun getSettings() = AtCoderAccountSettingsDataStore(this)
 
     @Composable
@@ -120,12 +120,13 @@ class AtCoderAccountManager(context: Context):
         )
     }
 
-    fun notifyRatingChange(handle: String, ratingChange: AtCoderRatingChange) =
+    fun notifyRatingChange(handle: String, ratingChange: AtCoderRatingChange, context: Context) =
         notifyRatingChange(
-            manager = this,
             channel = notificationChannels.atcoder.rating_changes,
+            ratingChange = ratingChange.toRatingChange(handle),
             handle = handle,
-            ratingChange = ratingChange.toRatingChange(handle)
+            manager = this,
+            context = context
         )
 }
 

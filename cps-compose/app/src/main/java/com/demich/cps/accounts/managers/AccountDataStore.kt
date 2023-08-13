@@ -13,8 +13,24 @@ import com.demich.datastore_itemized.edit
 abstract class AccountDataStore<U: UserInfo>(
     dataStoreWrapper: DataStoreWrapper
 ): ItemizedDataStore(dataStoreWrapper) {
-    abstract val userInfo: DataStoreItem<U?>
+    protected abstract val userInfo: DataStoreItem<U?>
     abstract suspend fun onResetUserInfo()
+
+    fun flowOfInfo() = userInfo.flow
+
+    suspend fun getSavedInfo(): U? = userInfo()
+
+    suspend fun setSavedInfo(info: U) {
+        val oldUserId = getSavedInfo()?.userId
+        userInfo(info)
+        if (!oldUserId.equals(info.userId, ignoreCase = true)) {
+            onResetUserInfo()
+        }
+    }
+
+    suspend fun deleteSavedInfo() {
+        userInfo(null)
+    }
 }
 
 abstract class AccountUniqueDataStore<U: UserInfo>(

@@ -37,13 +37,13 @@ class CodeforcesUpsolvingSuggestionsWorker(
     }
 
     override suspend fun runWork(): Result {
-        val codeforcesAccountManager = CodeforcesAccountManager(context)
-        val suggestedItem = codeforcesAccountManager.getDataStore().upsolvingSuggestedProblems
+        val dataStore = CodeforcesAccountManager(context).dataStore(context)
+        val suggestedItem = dataStore.upsolvingSuggestedProblems
 
         val deadLine = currentTime - 90.days
         suggestedItem.edit { filter { it.second > deadLine } }
 
-        val handle = codeforcesAccountManager.getSavedInfo()
+        val handle = dataStore.getSavedInfo()
             ?.takeIf { it.hasRating() }
             ?.handle
             ?: return Result.success()

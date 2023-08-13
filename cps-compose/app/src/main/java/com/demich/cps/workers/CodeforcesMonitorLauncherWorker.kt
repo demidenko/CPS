@@ -46,12 +46,12 @@ class CodeforcesMonitorLauncherWorker(
     private fun isActual(time: Instant) = currentTime - time < 24.hours
 
     override suspend fun runWork(): Result {
-        val manager = CodeforcesAccountManager(context)
+        val dataStore = CodeforcesAccountManager(context).dataStore(context)
 
-        val info = manager.getSavedInfo() ?: return Result.success()
+        val info = dataStore.getSavedInfo() ?: return Result.success()
         if (info.status != STATUS.OK) return Result.success()
 
-        val lastSubmissionId = manager.getDataStore().monitorLastSubmissionId()
+        val lastSubmissionId = dataStore.monitorLastSubmissionId()
 
         val newSubmissions = kotlin.runCatching {
             getNewSubmissions(info.handle, lastSubmissionId)
@@ -59,7 +59,7 @@ class CodeforcesMonitorLauncherWorker(
             return Result.retry()
         }
 
-        manager.getDataStore().apply {
+        dataStore.apply {
             newSubmissions.firstOrNull()?.let {
                 monitorLastSubmissionId(it.id)
             }

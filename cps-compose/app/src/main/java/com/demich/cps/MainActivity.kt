@@ -131,6 +131,7 @@ private fun CPSScaffold(
             holder.setSubtitle("accounts")
         }
         cpsComposable(ScreenTypes.accountExpanded) { holder ->
+            val context = context
             val accountsViewModel = accountsViewModel()
             val type = (holder.screen as Screen.AccountExpanded).type
             var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
@@ -139,7 +140,7 @@ private fun CPSScaffold(
                 showDeleteDialog = showDeleteDialog,
                 onDeleteRequest = { manager ->
                     navigator.popBack()
-                    accountsViewModel.delete(manager)
+                    accountsViewModel.delete(manager, context)
                 },
                 onDismissDeleteDialog = { showDeleteDialog = false },
                 setBottomBarContent = holder.bottomBarSetter
