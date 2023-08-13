@@ -1,6 +1,5 @@
 package com.demich.cps.accounts.managers
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -13,7 +12,7 @@ import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import kotlinx.datetime.Instant
 
-abstract class RatedAccountManager<U: RatedUserInfo>(context: Context, type: AccountManagers):
+abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagers):
     AccountManager<U>(type)
 {
     override val userIdTitle get() = "handle"

@@ -25,9 +25,9 @@ enum class AccountManagers {
 val Context.allAccountManagers: List<AccountManager<out UserInfo>>
     get() = listOf(
         CodeforcesAccountManager(this),
-        AtCoderAccountManager(this),
-        CodeChefAccountManager(this),
-        DmojAccountManager(this),
+        AtCoderAccountManager(),
+        CodeChefAccountManager(),
+        DmojAccountManager(),
         ACMPAccountManager(),
         TimusAccountManager()
     )

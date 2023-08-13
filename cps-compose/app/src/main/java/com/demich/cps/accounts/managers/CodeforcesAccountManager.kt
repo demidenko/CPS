@@ -52,7 +52,7 @@ import kotlin.text.contains
 
 
 class CodeforcesAccountManager(context: Context):
-    RatedAccountManager<CodeforcesUserInfo>(context, AccountManagers.codeforces),
+    RatedAccountManager<CodeforcesUserInfo>(AccountManagers.codeforces),
     AccountSettingsProvider,
     UserSuggestionsProvider,
     RatingRevolutionsProvider

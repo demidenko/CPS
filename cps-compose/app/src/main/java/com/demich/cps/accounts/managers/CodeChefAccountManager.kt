@@ -36,8 +36,8 @@ import com.demich.cps.utils.append
 import kotlin.text.contains
 
 
-class CodeChefAccountManager(context: Context):
-    RatedAccountManager<CodeChefUserInfo>(context, AccountManagers.codechef),
+class CodeChefAccountManager :
+    RatedAccountManager<CodeChefUserInfo>(AccountManagers.codechef),
     UserSuggestionsProvider
 {
     companion object {

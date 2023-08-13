@@ -24,8 +24,8 @@ import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.utils.append
 
 
-class DmojAccountManager(context: Context):
-    RatedAccountManager<DmojUserInfo>(context, AccountManagers.dmoj),
+class DmojAccountManager :
+    RatedAccountManager<DmojUserInfo>(AccountManagers.dmoj),
     UserSuggestionsProvider
 {
     override val urlHomePage get() = DmojApi.urls.main
