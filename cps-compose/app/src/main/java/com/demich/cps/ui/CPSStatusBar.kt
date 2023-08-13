@@ -161,9 +161,9 @@ fun StatusBarButtonsForUIPanel() {
             .filterIsInstance<RatedAccountManager<*>>()
             .map { it.flowOfInfoWithManager() }
         ) { array ->
-            array.mapNotNull { it?.manager }
+            array.mapNotNull { it?.manager?.type }
         }.combine(settingsUI.accountsOrder.flow) { managers, order ->
-            managers.sortedBy { order.indexOf(it.type) }
+            managers.sortedBy { order.indexOf(it) }
         }
     }
 
@@ -173,7 +173,7 @@ fun StatusBarButtonsForUIPanel() {
 
     val noneEnabled by remember {
         derivedStateOf {
-            recordedAccountManagers.all { it.type in disabledManagers }
+            recordedAccountManagers.all { it in disabledManagers }
         }
     }
 
@@ -223,7 +223,7 @@ private fun StatusBarAccountsPopup(
     setResultByMaximum: (Boolean) -> Unit,
     disabledManagers: Set<AccountManagers>,
     onCheckedChange: (AccountManagers, Boolean) -> Unit,
-    accountManagers: List<AccountManager<out RatedUserInfo>>,
+    accountManagers: List<AccountManagers>,
     onDismissRequest: () -> Unit
 ) {
     DropdownMenu(
@@ -231,13 +231,13 @@ private fun StatusBarAccountsPopup(
         onDismissRequest = onDismissRequest,
         modifier = Modifier.background(cpsColors.backgroundAdditional)
     ) {
-        accountManagers.forEach { manager ->
+        accountManagers.forEach { type ->
             Row(modifier = Modifier.padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                 CPSCheckBox(
-                    checked = manager.type !in disabledManagers,
-                    onCheckedChange = { checked -> onCheckedChange(manager.type, checked) }
+                    checked = type !in disabledManagers,
+                    onCheckedChange = { checked -> onCheckedChange(type, checked) }
                 )
-                MonospacedText(text = manager.type.name)
+                MonospacedText(text = type.name)
             }
         }
         TextButtonsSelectRow(
