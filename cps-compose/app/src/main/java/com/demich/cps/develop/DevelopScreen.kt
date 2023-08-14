@@ -125,10 +125,8 @@ fun ContentLoadingButton(
 private fun TestHandles(
     modifier: Modifier = Modifier
 ) {
-    val context = context
     val managers = remember {
-        context.allAccountManagers
-            .filterIsInstance<RatedAccountManager<*>>()
+        allAccountManagers.filterIsInstance<RatedAccountManager<*>>()
     }
 
     var selectedType by rememberSaveable {

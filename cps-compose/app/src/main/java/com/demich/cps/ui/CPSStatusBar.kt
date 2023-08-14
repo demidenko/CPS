@@ -108,7 +108,7 @@ private data class RankGetter(
 
 private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
     combine(
-        flow = combine(flows = context.allAccountManagers
+        flow = combine(flows = allAccountManagers
             .filterIsInstance<RatedAccountManager<out RatedUserInfo>>()
             .map { it.flowOfRatedRank(context) }
         ) { it },
@@ -157,7 +157,7 @@ fun StatusBarButtonsForUIPanel() {
     val coloredStatusBar by rememberCollect { settingsUI.coloredStatusBar.flow }
 
     val recordedAccountManagers by rememberCollect {
-        combine(flows = context.allAccountManagers
+        combine(flows = allAccountManagers
             .filterIsInstance<RatedAccountManager<*>>()
             .map { it.flowOfInfoWithManager(context) }
         ) { array ->

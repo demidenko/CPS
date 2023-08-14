@@ -22,7 +22,7 @@ enum class AccountManagers {
     clist
 }
 
-val Context.allAccountManagers: List<AccountManager<out UserInfo>>
+val allAccountManagers: List<AccountManager<out UserInfo>>
     get() = listOf(
         CodeforcesAccountManager(),
         AtCoderAccountManager(),

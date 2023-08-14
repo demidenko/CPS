@@ -115,13 +115,13 @@ private fun ReloadAccountsButton() {
     val accountsViewModel = accountsViewModel()
 
     val loadingStatus by rememberCollect {
-        context.allAccountManagers
+        allAccountManagers
             .map { accountsViewModel.flowOfLoadingStatus(it) }
             .combine()
     }
 
     val anyRecordedAccount by rememberCollect {
-        combine(flows = context.allAccountManagers.map { it.dataStore(context).flowOfInfo() }) {
+        combine(flows = allAccountManagers.map { it.dataStore(context).flowOfInfo() }) {
             it.any { userInfo -> userInfo != null }
         }
     }
@@ -130,7 +130,7 @@ private fun ReloadAccountsButton() {
         loadingStatus = loadingStatus,
         enabled = anyRecordedAccount
     ) {
-        context.allAccountManagers.forEach { accountsViewModel.reload(it, context) }
+        allAccountManagers.forEach { accountsViewModel.reload(it, context) }
     }
 }
 
@@ -172,7 +172,7 @@ private fun AddAccountButton() {
         ) {
             remember {
                 runBlocking {
-                    context.allAccountManagers.filter { it.dataStore(context).getSavedInfo() == null }
+                    allAccountManagers.filter { it.dataStore(context).getSavedInfo() == null }
                 }.map { it.type }.plus(AccountManagers.clist)
             }.forEach { type ->
                 AddAccountMenuItem(type = type) {
@@ -187,8 +187,7 @@ private fun AddAccountButton() {
         if (type == AccountManagers.clist) {
             CListImportDialog { chosenManager = null }
         } else {
-            context.allAccountManagers
-                .first { it.type == type }
+            allAccountManagers.first { it.type == type }
                 .ChangeSavedInfoDialog(
                     scope = scope,
                     onDismissRequest = { chosenManager = null }

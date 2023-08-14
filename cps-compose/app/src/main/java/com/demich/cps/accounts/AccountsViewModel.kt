@@ -78,9 +78,8 @@ class AccountsViewModel: ViewModel() {
                 getManager(resource, userData.first, userData.second)
             }
             progress.value = ProgressBarInfo(title = "clist import", total = supported.size)
-            val managers = context.allAccountManagers
             supported.map { (type, userId) ->
-                val manager = managers.first { it.type == type }
+                val manager = allAccountManagers.first { it.type == type }
                 val loadingStatusState = mutableLoadingStatusFor(manager)
                 launch {
                     //wait for loading stops

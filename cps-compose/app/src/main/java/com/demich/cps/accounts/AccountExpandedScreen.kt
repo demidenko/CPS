@@ -31,8 +31,7 @@ fun AccountExpandedScreen(
     onDismissDeleteDialog: () -> Unit,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
-    val context = context
-    val manager = remember(type) { context.allAccountManagers.first { it.type == type } }
+    val manager = remember(type) { allAccountManagers.first { it.type == type } }
     AccountExpandedContent(
         manager = manager,
         setBottomBarContent = setBottomBarContent
@@ -79,7 +78,7 @@ fun accountExpandedMenuBuilder(
     }
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         scope.launch {
-            context.allAccountManagers.first { it.type == type }
+            allAccountManagers.first { it.type == type }
                 .dataStore(context).getSavedInfo()
                 ?.userPageUrl
                 ?.let { url -> context.openUrlInBrowser(url) }
