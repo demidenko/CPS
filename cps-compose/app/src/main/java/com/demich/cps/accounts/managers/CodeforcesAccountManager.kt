@@ -300,9 +300,9 @@ class CodeforcesAccountDataStore(context: Context):
     val lastRatedContestId = itemIntNullable(name = "last_rated_contest")
 
     val monitorLastSubmissionId = itemLongNullable(name = "monitor_last_submission")
-    val monitorCanceledContests = jsonCPS.item<List<Pair<Int,Instant>>>(name = "monitor_canceled", defaultValue = emptyList())
+    val monitorCanceledContests = jsonCPS.itemList<Pair<Int,Instant>>(name = "monitor_canceled")
 
-    val upsolvingSuggestedProblems = jsonCPS.item<List<Pair<CodeforcesProblem, Instant>>>(name = "upsolving_suggested_problems_list", defaultValue = emptyList())
+    val upsolvingSuggestedProblems = jsonCPS.itemList<Pair<CodeforcesProblem, Instant>>(name = "upsolving_suggested_problems_list")
 }
 
 class CodeforcesAccountSettingsDataStore(context: Context):

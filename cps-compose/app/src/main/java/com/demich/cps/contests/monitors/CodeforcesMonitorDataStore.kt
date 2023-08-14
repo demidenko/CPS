@@ -35,10 +35,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
     internal val participationType = itemEnum(name = "participation_type", defaultValue = CodeforcesParticipationType.NOT_PARTICIPATED)
     internal val contestantRank = itemInt(name = "contestant_rank", defaultValue = -1)
 
-    internal val problemResults = jsonCPS.item<List<CodeforcesMonitorProblemResult>>(
-        name = "problem_results",
-        defaultValue = emptyList()
-    )
+    internal val problemResults = jsonCPS.itemList<CodeforcesMonitorProblemResult>(name = "problem_results")
 
     internal val submissionsInfo = jsonCPS.item<Map<String, List<CodeforcesMonitorSubmissionInfo>>> (
         name = "problems_submissions_info",

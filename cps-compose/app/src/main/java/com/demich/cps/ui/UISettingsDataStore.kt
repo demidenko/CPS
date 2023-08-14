@@ -27,10 +27,7 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
     val statusBarDisabledManagers = itemEnumSet<AccountManagerType>(name = "status_bar_disabled_managers")
     val statusBarResultByMaximum = itemBoolean(name = "status_bar_result_by_max", defaultValue = true)
 
-    val accountsOrder = jsonCPS.item<List<AccountManagerType>>(
-        name = "accounts_order",
-        defaultValue = emptyList()
-    ).mapGetter { order ->
+    val accountsOrder = jsonCPS.itemList<AccountManagerType>(name = "accounts_order").mapGetter { order ->
         order + AccountManagerType.entries.filter { it !in order }
     }
 

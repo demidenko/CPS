@@ -29,7 +29,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
     val ignoredContests = jsonCPS.item<Map<Pair<Contest.Platform, String>, Instant>>(name = "ignored_contests", defaultValue = emptyMap())
 
     val clistApiAccess = jsonCPS.item(name = "clist_api_access", defaultValue = ClistApi.ApiAccess("", ""))
-    val clistAdditionalResources = jsonCPS.item<List<ClistResource>>(name = "clist_additional_resources", defaultValue = emptyList())
+    val clistAdditionalResources = jsonCPS.itemList<ClistResource>(name = "clist_additional_resources")
     val clistLastReloadedAdditionalResources = jsonCPS.item<Set<Int>>(name = "clist_additional_last_reloaded", defaultValue = emptySet())
 
     val contestsDateConstraints = jsonCPS.item(
