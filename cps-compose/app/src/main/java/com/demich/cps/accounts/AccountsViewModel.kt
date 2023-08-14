@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.managers.AccountManager
-import com.demich.cps.accounts.managers.AccountManagers
+import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.accounts.managers.allAccountManagers
@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 fun accountsViewModel(): AccountsViewModel = sharedViewModel()
 
 class AccountsViewModel: ViewModel() {
-    private val loadingStatuses = mutableMapOf<AccountManagers, MutableStateFlow<LoadingStatus>>()
+    private val loadingStatuses = mutableMapOf<AccountManagerType, MutableStateFlow<LoadingStatus>>()
 
     private fun mutableLoadingStatusFor(manager: AccountManager<out UserInfo>): MutableStateFlow<LoadingStatus> =
         loadingStatuses.getOrPut(manager.type) { MutableStateFlow(LoadingStatus.PENDING) }
@@ -111,15 +111,15 @@ class AccountsViewModel: ViewModel() {
     }
 }
 
-private fun getManager(resource: String, userName: String, link: String): Pair<AccountManagers, String>? =
+private fun getManager(resource: String, userName: String, link: String): Pair<AccountManagerType, String>? =
     when (resource) {
-        "codeforces.com" -> AccountManagers.codeforces to userName
-        "atcoder.jp" -> AccountManagers.atcoder to userName
-        "codechef.com" -> AccountManagers.codechef to userName
-        "dmoj.ca" -> AccountManagers.dmoj to userName
+        "codeforces.com" -> AccountManagerType.codeforces to userName
+        "atcoder.jp" -> AccountManagerType.atcoder to userName
+        "codechef.com" -> AccountManagerType.codechef to userName
+        "dmoj.ca" -> AccountManagerType.dmoj to userName
         "acm.timus.ru", "timus.online" -> {
             val userId = link.substring(link.lastIndexOf('=')+1)
-            AccountManagers.timus to userId
+            AccountManagerType.timus to userId
         }
         else -> null
     }

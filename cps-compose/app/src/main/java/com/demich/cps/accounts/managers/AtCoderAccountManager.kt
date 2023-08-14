@@ -30,7 +30,7 @@ import com.demich.datastore_itemized.dataStoreWrapper
 
 
 class AtCoderAccountManager :
-    RatedAccountManager<AtCoderUserInfo>(AccountManagers.atcoder),
+    RatedAccountManager<AtCoderUserInfo>(AccountManagerType.atcoder),
     AccountSettingsProvider,
     UserSuggestionsProvider
 {
@@ -134,7 +134,7 @@ class AtCoderAccountDataStore(context: Context):
     AccountUniqueDataStore<AtCoderUserInfo>(context.account_atcoder_dataStore)
 {
     companion object {
-        private val Context.account_atcoder_dataStore by dataStoreWrapper(AccountManagers.atcoder.name)
+        private val Context.account_atcoder_dataStore by dataStoreWrapper(AccountManagerType.atcoder.name)
     }
 
     override val userInfo: DataStoreItem<AtCoderUserInfo?>
@@ -148,7 +148,7 @@ class AtCoderAccountSettingsDataStore(context: Context):
 {
     companion object {
         private val Context.account_settings_atcoder_dataStore
-            by dataStoreWrapper(AccountManagers.atcoder.name + "_account_settings")
+            by dataStoreWrapper(AccountManagerType.atcoder.name + "_account_settings")
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)

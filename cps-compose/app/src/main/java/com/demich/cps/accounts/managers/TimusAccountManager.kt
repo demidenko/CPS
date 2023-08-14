@@ -12,7 +12,7 @@ import com.demich.cps.platforms.utils.TimusUtils
 
 
 class TimusAccountManager :
-    AccountManager<TimusUserInfo>(AccountManagers.timus),
+    AccountManager<TimusUserInfo>(AccountManagerType.timus),
     UserSuggestionsProvider
 {
     override val userIdTitle get() = "id"

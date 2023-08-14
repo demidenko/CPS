@@ -37,7 +37,7 @@ import kotlin.text.contains
 
 
 class CodeChefAccountManager :
-    RatedAccountManager<CodeChefUserInfo>(AccountManagers.codechef),
+    RatedAccountManager<CodeChefUserInfo>(AccountManagerType.codechef),
     UserSuggestionsProvider
 {
     companion object {

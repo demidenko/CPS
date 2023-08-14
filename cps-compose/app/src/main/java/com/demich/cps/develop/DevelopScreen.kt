@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.AdditionalBottomBarBuilder
-import com.demich.cps.accounts.managers.AccountManagers
+import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.allRatedAccountManagers
@@ -128,7 +128,7 @@ private fun TestHandles(
     val managers = remember { allRatedAccountManagers }
 
     var selectedType by rememberSaveable {
-        mutableStateOf(AccountManagers.codeforces)
+        mutableStateOf(AccountManagerType.codeforces)
     }
 
     Row(modifier = modifier) {

@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.AccountManager
-import com.demich.cps.accounts.managers.AccountManagers
+import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.AccountSettingsProvider
 import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.accounts.userinfo.UserInfo
@@ -20,7 +20,7 @@ import com.demich.cps.utils.rememberCollect
 
 @Composable
 fun AccountSettingsScreen(
-    type: AccountManagers
+    type: AccountManagerType
 ) {
     val context = context
     val scope = rememberCoroutineScope()

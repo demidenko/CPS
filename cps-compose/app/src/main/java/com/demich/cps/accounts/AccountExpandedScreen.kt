@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.managers.AccountManager
-import com.demich.cps.accounts.managers.AccountManagers
+import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.navigation.Screen
@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AccountExpandedScreen(
-    type: AccountManagers,
+    type: AccountManagerType,
     showDeleteDialog: Boolean,
     onDeleteRequest: (AccountManager<out UserInfo>) -> Unit,
     onDismissDeleteDialog: () -> Unit,
@@ -65,7 +65,7 @@ private fun<U: UserInfo> AccountExpandedContent(
 }
 
 fun accountExpandedMenuBuilder(
-    type: AccountManagers,
+    type: AccountManagerType,
     navigator: CPSNavigator,
     onShowDeleteDialog: () -> Unit
 ): CPSMenuBuilder = {

@@ -34,7 +34,7 @@ import kotlinx.datetime.Instant
 fun<U: UserInfo> AccountPanel(
     userInfoWithManager: UserInfoWithManager<U>,
     modifier: Modifier = Modifier,
-    visibleOrder: List<AccountManagers>? = null,
+    visibleOrder: List<AccountManagerType>? = null,
     onReloadRequest: () -> Unit,
     onExpandRequest: () -> Unit
 ) {
@@ -120,8 +120,8 @@ private fun PanelUIButtons(
 
 @Composable
 private fun PanelMovingButtons(
-    type: AccountManagers,
-    visibleOrder: List<AccountManagers>,
+    type: AccountManagerType,
+    visibleOrder: List<AccountManagerType>,
     modifier: Modifier = Modifier
 ) {
     val context = context

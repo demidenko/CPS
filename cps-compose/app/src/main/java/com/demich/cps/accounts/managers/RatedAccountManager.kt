@@ -12,7 +12,7 @@ import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import kotlinx.datetime.Instant
 
-abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagers):
+abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagerType):
     AccountManager<U>(type)
 {
     override val userIdTitle get() = "handle"

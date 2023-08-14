@@ -29,7 +29,7 @@ import kotlinx.coroutines.runBlocking
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AccountsScreen(
-    onExpandAccount: (AccountManagers) -> Unit,
+    onExpandAccount: (AccountManagerType) -> Unit,
     onSetAdditionalMenu: (CPSMenuBuilder) -> Unit,
     reorderEnabled: () -> Boolean,
     enableReorder: () -> Unit
@@ -135,13 +135,13 @@ private fun ReloadAccountsButton() {
 }
 
 @Composable
-private fun AddAccountMenuItem(type: AccountManagers, onSelect: () -> Unit) {
+private fun AddAccountMenuItem(type: AccountManagerType, onSelect: () -> Unit) {
     DropdownMenuItem(
         onClick = onSelect,
         content = {
             MonospacedText(
                 text = when (type) {
-                    AccountManagers.clist -> "import from clist.by"
+                    AccountManagerType.clist -> "import from clist.by"
                     else -> type.name
                 }
             )
@@ -152,7 +152,7 @@ private fun AddAccountMenuItem(type: AccountManagers, onSelect: () -> Unit) {
 @Composable
 private fun AddAccountButton() {
     var showMenu by remember { mutableStateOf(false) }
-    var chosenManager: AccountManagers? by remember { mutableStateOf(null) }
+    var chosenManager: AccountManagerType? by remember { mutableStateOf(null) }
 
     val context = context
     val scope = rememberCoroutineScope()
@@ -173,7 +173,7 @@ private fun AddAccountButton() {
             remember {
                 runBlocking {
                     allAccountManagers.filter { it.dataStore(context).getSavedInfo() == null }
-                }.map { it.type }.plus(AccountManagers.clist)
+                }.map { it.type }.plus(AccountManagerType.clist)
             }.forEach { type ->
                 AddAccountMenuItem(type = type) {
                     showMenu = false
@@ -184,7 +184,7 @@ private fun AddAccountButton() {
     }
 
     chosenManager?.let { type ->
-        if (type == AccountManagers.clist) {
+        if (type == AccountManagerType.clist) {
             CListImportDialog { chosenManager = null }
         } else {
             allAccountManagers.first { it.type == type }

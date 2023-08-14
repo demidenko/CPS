@@ -2,7 +2,7 @@ package com.demich.cps.navigation
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavBackStackEntry
-import com.demich.cps.accounts.managers.AccountManagers
+import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.ui.CPSIcons
 
 enum class ScreenTypes(
@@ -32,12 +32,12 @@ sealed class Screen(
 
     data object Accounts: RootScreen(ScreenTypes.accounts, icon = CPSIcons.Account)
 
-    data class AccountExpanded(val type: AccountManagers)
+    data class AccountExpanded(val type: AccountManagerType)
         : Screen(ScreenTypes.accountExpanded, rootScreenType = ScreenTypes.accounts) {
             override fun createPath(pattern: String) = pattern.replace("{manager}", type.name)
         }
 
-    data class AccountSettings(val type: AccountManagers)
+    data class AccountSettings(val type: AccountManagerType)
         : Screen(ScreenTypes.accountSettings, rootScreenType = ScreenTypes.accounts, enableBottomBar = false) {
             override fun createPath(pattern: String) = pattern.replace("{manager}", type.name)
         }
@@ -78,10 +78,10 @@ private val simpleScreens = arrayOf(
 fun NavBackStackEntry.getScreen(): Screen {
     return when(val route = destination.route) {
         ScreenTypes.accountExpanded.route -> {
-            Screen.AccountExpanded(type = AccountManagers.valueOf(requireString("manager")))
+            Screen.AccountExpanded(type = AccountManagerType.valueOf(requireString("manager")))
         }
         ScreenTypes.accountSettings.route -> {
-            Screen.AccountSettings(type = AccountManagers.valueOf(requireString("manager")))
+            Screen.AccountSettings(type = AccountManagerType.valueOf(requireString("manager")))
         }
         ScreenTypes.newsCodeforcesBlog.route -> {
             Screen.NewsCodeforcesBlog(handle = requireString("handle"))

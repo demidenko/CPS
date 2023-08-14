@@ -215,9 +215,9 @@ private fun StatusBarAccountsPopup(
     expanded: Boolean,
     resultByMaximum: Boolean,
     setResultByMaximum: (Boolean) -> Unit,
-    disabledManagers: Set<AccountManagers>,
-    onCheckedChange: (AccountManagers, Boolean) -> Unit,
-    accountManagers: List<AccountManagers>,
+    disabledManagers: Set<AccountManagerType>,
+    onCheckedChange: (AccountManagerType, Boolean) -> Unit,
+    accountManagers: List<AccountManagerType>,
     onDismissRequest: () -> Unit
 ) {
     DropdownMenu(

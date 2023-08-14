@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-enum class AccountManagers {
+enum class AccountManagerType {
     codeforces,
     atcoder,
     codechef,
@@ -37,7 +37,7 @@ val allRatedAccountManagers: List<RatedAccountManager<out RatedUserInfo>>
     get() = allAccountManagers.filterIsInstance<RatedAccountManager<*>>()
 
 
-abstract class AccountManager<U: UserInfo>(val type: AccountManagers) {
+abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
 
     abstract val userIdTitle: String
     abstract val urlHomePage: String
@@ -79,7 +79,7 @@ data class UserInfoWithManager<U: UserInfo>(
     val userInfo: U,
     val manager: AccountManager<U>
 ) {
-    val type: AccountManagers get() = manager.type
+    val type: AccountManagerType get() = manager.type
 }
 
 interface UserSuggestionsProvider {

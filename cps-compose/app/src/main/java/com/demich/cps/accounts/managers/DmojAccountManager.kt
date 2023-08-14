@@ -25,7 +25,7 @@ import com.demich.cps.utils.append
 
 
 class DmojAccountManager :
-    RatedAccountManager<DmojUserInfo>(AccountManagers.dmoj),
+    RatedAccountManager<DmojUserInfo>(AccountManagerType.dmoj),
     UserSuggestionsProvider
 {
     override val urlHomePage get() = DmojApi.urls.main

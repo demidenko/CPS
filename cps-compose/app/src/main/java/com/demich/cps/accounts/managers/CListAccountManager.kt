@@ -12,7 +12,7 @@ import com.demich.cps.platforms.utils.ClistUtils
 
 
 class CListAccountManager :
-    AccountManager<ClistUserInfo>(AccountManagers.clist),
+    AccountManager<ClistUserInfo>(AccountManagerType.clist),
     UserSuggestionsProvider
 {
     override val userIdTitle = "login"

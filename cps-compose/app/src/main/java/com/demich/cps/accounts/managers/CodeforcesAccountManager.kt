@@ -51,7 +51,7 @@ import kotlin.text.contains
 
 
 class CodeforcesAccountManager :
-    RatedAccountManager<CodeforcesUserInfo>(AccountManagers.codeforces),
+    RatedAccountManager<CodeforcesUserInfo>(AccountManagerType.codeforces),
     AccountSettingsProvider,
     UserSuggestionsProvider,
     RatingRevolutionsProvider
@@ -291,7 +291,7 @@ class CodeforcesAccountDataStore(context: Context):
     AccountUniqueDataStore<CodeforcesUserInfo>(context.account_codeforces_dataStore)
 {
     companion object {
-        private val Context.account_codeforces_dataStore by dataStoreWrapper(AccountManagers.codeforces.name)
+        private val Context.account_codeforces_dataStore by dataStoreWrapper(AccountManagerType.codeforces.name)
     }
 
     override val userInfo: DataStoreItem<CodeforcesUserInfo?>
@@ -310,7 +310,7 @@ class CodeforcesAccountSettingsDataStore(context: Context):
 {
     companion object {
         private val Context.account_settings_codeforces_dataStore
-            by dataStoreWrapper(AccountManagers.codeforces.name + "_account_settings")
+            by dataStoreWrapper(AccountManagerType.codeforces.name + "_account_settings")
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)

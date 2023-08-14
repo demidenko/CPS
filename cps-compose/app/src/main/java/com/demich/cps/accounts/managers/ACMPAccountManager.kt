@@ -13,7 +13,7 @@ import com.demich.cps.platforms.utils.ACMPUtils
 
 
 class ACMPAccountManager :
-    AccountManager<ACMPUserInfo>(AccountManagers.acmp),
+    AccountManager<ACMPUserInfo>(AccountManagerType.acmp),
     UserSuggestionsProvider
 {
     override val userIdTitle get() = "id"
