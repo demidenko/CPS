@@ -4,6 +4,7 @@ import com.demich.cps.platforms.api.*
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.add
+import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.withSnapShot
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -100,29 +101,30 @@ private fun isBecomeContestant(
     return new == CodeforcesParticipationType.CONTESTANT && old != CodeforcesParticipationType.CONTESTANT
 }
 
+//optimized for write
 private suspend fun CodeforcesMonitorDataStore.applyStandings(
     standings: CodeforcesContestStandings
-) {
-    contestInfo(standings.contest)
+) = edit { prefs ->
+    prefs[contestInfo] = standings.contest
 
     val row = standings.rows.find { row -> row.party.participantType.contestParticipant() }
     val results = row?.problemResults ?: emptyList()
-    problemResults(standings.problems.mapIndexed { index, problem ->
+    prefs[problemResults] = standings.problems.mapIndexed { index, problem ->
         val result = results.getOrNull(index)
         CodeforcesMonitorProblemResult(
             problemIndex = problem.index,
             points = result?.points ?: 0.0,
             type = result?.type ?: CodeforcesProblemStatus.FINAL
         )
-    })
+    }
 
     row?.run {
         party.participantType.let {
-            val old = participationType()
-            participationType(it)
-            if (isBecomeContestant(old = old, new = it)) return
+            val old = prefs[participationType]
+            prefs[participationType] = it
+            if (isBecomeContestant(old = old, new = it)) return@edit
         }
-        contestantRank(rank)
+        prefs[contestantRank] = rank
     }
 }
 
