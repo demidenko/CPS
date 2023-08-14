@@ -17,13 +17,14 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
     onSubmissionFinalResult: (CodeforcesSubmission) -> Unit
 ) {
     val contestId = contestId() ?: return
+    val handle = handle()
 
-    val ratingChangeWaiter = RatingChangeWaiter(contestId, handle(), onRatingChange)
+    val ratingChangeWaiter = RatingChangeWaiter(contestId, handle, onRatingChange)
 
     val mainJob = scope.launchWhileActive {
         val prevParticipationType = participationType()
 
-        getStandingsData(contestId)
+        getStandingsData(contestId, handle)
 
         if (isBecomeContestant(old = prevParticipationType, new = participationType())) {
             return@launchWhileActive Duration.ZERO
@@ -37,7 +38,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
             if (problemResults.any { needCheckSubmissions(it, info) }) {
                 getSubmissions(
                     contestId = contestId,
-                    handle = handle()
+                    handle = handle
                 )?.let { submissions ->
                     val notified = notifiedSubmissionsIds()
                     submissions.filter {
@@ -77,11 +78,11 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
         .launchIn(scope)
 }
 
-private suspend fun CodeforcesMonitorDataStore.getStandingsData(contestId: Int) {
+private suspend fun CodeforcesMonitorDataStore.getStandingsData(contestId: Int, handle: String) {
     CodeforcesApi.runCatching {
         getContestStandings(
             contestId = contestId,
-            handle = handle(),
+            handle = handle,
             includeUnofficial = participationType() != CodeforcesParticipationType.CONTESTANT
         )
     }.onFailure { e ->
