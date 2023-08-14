@@ -78,10 +78,13 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
             decode = ::enumValueOf
         )
 
-    protected inline fun<reified T: Enum<T>> itemEnumSet(name: String, defaultValue: Set<T> = emptySet()): DataStoreItem<Set<T>> =
+    protected inline fun<reified T: Enum<T>> itemEnumSet(
+        name: String,
+        noinline defaultValue: () -> Set<T> = ::emptySet
+    ): DataStoreItem<Set<T>> =
         itemStringSetConvertible(
             name = name,
-            defaultValue = { defaultValue },
+            defaultValue = defaultValue,
             encode = { it.mapTo(mutableSetOf(), Enum<T>::name) },
             decode = { it.mapTo(mutableSetOf(), ::enumValueOf) }
         )
@@ -96,6 +99,12 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
 
     protected inline fun<reified T> Json.item(name: String, defaultValue: T): DataStoreItem<T> =
         item(name = name, defaultValue = { defaultValue })
+
+    protected inline fun<reified T> Json.itemList(
+        name: String,
+        noinline defaultValue: () -> List<T> = ::emptyList
+    ): DataStoreItem<List<T>> = item(name, defaultValue)
+
 
     protected fun<T> DataStoreItem<T>.mapGetter(transform: (T) -> T): DataStoreItem<T> =
         DataStoreItem(

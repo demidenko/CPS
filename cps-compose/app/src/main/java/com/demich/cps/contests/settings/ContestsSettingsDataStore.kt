@@ -21,14 +21,11 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         private val Context.contests_settings_dataStore by dataStoreWrapper("contests_settings")
     }
 
-    val enabledPlatforms = itemEnumSet<Contest.Platform>(
-        name = "enabled_platforms",
-        defaultValue = emptySet()
-    ).mapGetter { platforms ->
+    val enabledPlatforms = itemEnumSet<Contest.Platform>(name = "enabled_platforms").mapGetter { platforms ->
         //This set must contain Platform.unknown
         Contest.Platform.unknown.let { if (it in platforms) platforms else platforms + it }
     }
-    val lastReloadedPlatforms = itemEnumSet<Contest.Platform>(name = "last_reloaded_platforms", defaultValue = emptySet())
+    val lastReloadedPlatforms = itemEnumSet<Contest.Platform>(name = "last_reloaded_platforms")
     val ignoredContests = jsonCPS.item<Map<Pair<Contest.Platform, String>, Instant>>(name = "ignored_contests", defaultValue = emptyMap())
 
     val clistApiAccess = jsonCPS.item(name = "clist_api_access", defaultValue = ClistApi.ApiAccess("", ""))
