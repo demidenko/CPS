@@ -60,7 +60,7 @@ class NewsSettingsDataStore(context: Context): ItemizedDataStore(context.news_se
     }
 
     val enabledNewsFeeds = itemEnumSet<NewsFeed>(name = "news_feeds")
-    val newsFeedsLastIds = jsonCPS.item<Map<NewsFeed,String>>(name = "news_feeds_last_id", defaultValue = emptyMap())
+    val newsFeedsLastIds = jsonCPS.itemMap<NewsFeed,String>(name = "news_feeds_last_id")
 
     suspend fun<T: NewsPostEntry> scanNewsFeed(
         newsFeed: NewsFeed,

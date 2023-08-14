@@ -13,6 +13,5 @@ class CodeforcesNewEntriesDataStore(context: Context): ItemizedDataStore(context
     val mainNewEntries = itemNewEntriesTypes(name = "main")
     val lostNewEntries = itemNewEntriesTypes(name = "lost")
 
-    private fun itemNewEntriesTypes(name: String) =
-        NewEntriesDataStoreItem(jsonCPS.item(name = name, defaultValue = emptyMap()))
+    private fun itemNewEntriesTypes(name: String) = NewEntriesDataStoreItem(jsonCPS.itemMap(name = name))
 }

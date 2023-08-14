@@ -37,9 +37,8 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     internal val problemResults = jsonCPS.itemList<CodeforcesMonitorProblemResult>(name = "problem_results")
 
-    internal val submissionsInfo = jsonCPS.item<Map<String, List<CodeforcesMonitorSubmissionInfo>>> (
-        name = "problems_submissions_info",
-        defaultValue = emptyMap()
+    internal val submissionsInfo = jsonCPS.itemMap<String, List<CodeforcesMonitorSubmissionInfo>>(
+        name = "problems_submissions_info"
     )
 
     internal val sysTestPercentage = itemIntNullable("sys_test_percentage")

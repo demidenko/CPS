@@ -101,5 +101,5 @@ class CPSWorkersDataStore(context: Context): ItemizedDataStore(context.workersDa
         private val Context.workersDataStore by dataStoreWrapper(name = "workers_info")
     }
 
-    val lastExecutionTime = jsonCPS.item<Map<String, Instant>>(name = "last_execution_time", defaultValue = emptyMap())
+    val lastExecutionTime = jsonCPS.itemMap<String, Instant>(name = "last_execution_time")
 }

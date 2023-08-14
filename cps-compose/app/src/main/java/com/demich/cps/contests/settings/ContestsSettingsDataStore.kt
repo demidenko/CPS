@@ -26,7 +26,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         Contest.Platform.unknown.let { if (it in platforms) platforms else platforms + it }
     }
     val lastReloadedPlatforms = itemEnumSet<Contest.Platform>(name = "last_reloaded_platforms")
-    val ignoredContests = jsonCPS.item<Map<Pair<Contest.Platform, String>, Instant>>(name = "ignored_contests", defaultValue = emptyMap())
+    val ignoredContests = jsonCPS.itemMap<Pair<Contest.Platform, String>, Instant>(name = "ignored_contests")
 
     val clistApiAccess = jsonCPS.item(name = "clist_api_access", defaultValue = ClistApi.ApiAccess("", ""))
     val clistAdditionalResources = jsonCPS.itemList<ClistResource>(name = "clist_additional_resources")
@@ -43,7 +43,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         }
     )
 
-    val contestsLoadersPriorityLists = jsonCPS.item(name = "loading_priorities", defaultValue = ::makeDefaultLoadingPriorities)
+    val contestsLoadersPriorityLists = jsonCPS.itemMap(name = "loading_priorities", defaultValue = ::makeDefaultLoadingPriorities)
 
     val enabledAutoUpdate = itemBoolean(name = "auto_update", defaultValue = true)
 }

@@ -110,6 +110,11 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
         noinline defaultValue: () -> Set<T> = ::emptySet
     ): DataStoreItem<Set<T>> = item(name, defaultValue)
 
+    protected inline fun<reified K, reified V> Json.itemMap(
+        name: String,
+        noinline defaultValue: () -> Map<K, V> = ::emptyMap
+    ): DataStoreItem<Map<K, V>> = item(name, defaultValue)
+
 
     protected fun<T> DataStoreItem<T>.mapGetter(transform: (T) -> T): DataStoreItem<T> =
         DataStoreItem(
