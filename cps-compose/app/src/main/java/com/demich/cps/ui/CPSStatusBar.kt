@@ -108,10 +108,7 @@ private data class RankGetter(
 
 private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
     combine(
-        flow = combine(flows = allAccountManagers
-            .filterIsInstance<RatedAccountManager<out RatedUserInfo>>()
-            .map { it.flowOfRatedRank(context) }
-        ) { it },
+        flow = combine(allRatedAccountManagers.map { it.flowOfRatedRank(context) }) { it },
         flow2 = context.settingsUI.statusBarDisabledManagers.flow,
         flow3 = context.settingsUI.statusBarResultByMaximum.flow
     ) { ranks, disabledManagers, resultByMaximum ->
@@ -157,10 +154,7 @@ fun StatusBarButtonsForUIPanel() {
     val coloredStatusBar by rememberCollect { settingsUI.coloredStatusBar.flow }
 
     val recordedAccountManagers by rememberCollect {
-        combine(flows = allAccountManagers
-            .filterIsInstance<RatedAccountManager<*>>()
-            .map { it.flowOfInfoWithManager(context) }
-        ) { array ->
+        combine(allRatedAccountManagers.map { it.flowOfInfoWithManager(context) }) { array ->
             array.mapNotNull { it?.manager?.type }
         }.combine(settingsUI.accountsOrder.flow) { managers, order ->
             managers.sortedBy { order.indexOf(it) }

@@ -20,7 +20,7 @@ import com.demich.cps.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.managers.AccountManagers
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.RatedAccountManager
-import com.demich.cps.accounts.managers.allAccountManagers
+import com.demich.cps.accounts.managers.allRatedAccountManagers
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.contests.contestsViewModel
 import com.demich.cps.ui.CPSIconButton
@@ -125,9 +125,7 @@ fun ContentLoadingButton(
 private fun TestHandles(
     modifier: Modifier = Modifier
 ) {
-    val managers = remember {
-        allAccountManagers.filterIsInstance<RatedAccountManager<*>>()
-    }
+    val managers = remember { allRatedAccountManagers }
 
     var selectedType by rememberSaveable {
         mutableStateOf(AccountManagers.codeforces)

@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.AdditionalBottomBarBuilder
+import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +32,9 @@ val allAccountManagers: List<AccountManager<out UserInfo>>
         ACMPAccountManager(),
         TimusAccountManager()
     )
+
+val allRatedAccountManagers: List<RatedAccountManager<out RatedUserInfo>>
+    get() = allAccountManagers.filterIsInstance<RatedAccountManager<*>>()
 
 
 abstract class AccountManager<U: UserInfo>(val type: AccountManagers) {
