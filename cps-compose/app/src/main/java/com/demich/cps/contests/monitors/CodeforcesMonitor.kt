@@ -51,12 +51,12 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
         }
 
         getDelay(
-            contestPhase = contestInfo()?.phase,
+            contestPhase = contestInfo().phase,
             ratingChangeWaiter = ratingChangeWaiter
         )
     }
 
-    val percentageJob = contestInfo.flow.map { it?.phase ?: CodeforcesContestPhase.UNDEFINED }
+    val percentageJob = contestInfo.flow.map { it.phase }
         .collectSystemTestPercentage(
             contestId = contestId,
             scope = scope,
@@ -85,8 +85,7 @@ private suspend fun CodeforcesMonitorDataStore.getStandingsData(contestId: Int, 
         lastRequest(false)
         if (e is CodeforcesAPIErrorResponse) {
             if (e.isContestNotStarted(contestId)) {
-                //phase is CodeforcesContestPhase.BEFORE but don't care
-                contestInfo(newValue = null)
+                contestInfo.update { it.copy(phase = CodeforcesContestPhase.BEFORE) }
             }
         }
     }.onSuccess { standings ->
@@ -130,7 +129,7 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
 }
 
 private suspend fun getDelay(
-    contestPhase: CodeforcesContestPhase?,
+    contestPhase: CodeforcesContestPhase,
     ratingChangeWaiter: RatingChangeWaiter
 ): Duration {
     return when (contestPhase) {
@@ -212,11 +211,11 @@ private fun CoroutineScope.launchWhileActive(block: suspend CoroutineScope.() ->
 
 
 private fun needCheckSubmissions(
-    contestInfo: CodeforcesContest?,
+    contestInfo: CodeforcesContest,
     participationType: CodeforcesParticipationType
 ): Boolean {
     if (!participationType.contestParticipant()) return false
-    if (contestInfo == null || contestInfo.type == CodeforcesContestType.ICPC) return false
+    if (contestInfo.type == CodeforcesContestType.ICPC) return false
     return contestInfo.phase.isSystemTestOrFinished()
 }
 

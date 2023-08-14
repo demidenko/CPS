@@ -1,18 +1,14 @@
 package com.demich.cps.contests.monitors
 
 import android.content.Context
-import com.demich.cps.platforms.api.CodeforcesContest
-import com.demich.cps.platforms.api.CodeforcesContestPhase
-import com.demich.cps.platforms.api.CodeforcesParticipationType
-import com.demich.cps.platforms.api.CodeforcesProblemStatus
-import com.demich.cps.platforms.api.CodeforcesProblemVerdict
-import com.demich.cps.platforms.api.CodeforcesSubmission
-import com.demich.cps.platforms.api.CodeforcesTestset
+import com.demich.cps.platforms.api.*
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.flowBy
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
+import kotlin.time.Duration
 
 class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf_monitor_dataStore) {
     companion object {
@@ -24,10 +20,16 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     val lastRequest = jsonCPS.item<Boolean?>(name = "last_request", defaultValue = null)
 
-    internal val contestInfo = jsonCPS.item<CodeforcesContest?>(
-        name = "contest_info",
-        defaultValue = null
-    )
+    internal val contestInfo = jsonCPS.item(name = "contest_info") {
+        CodeforcesContest(
+            id = -1,
+            name = "",
+            phase = CodeforcesContestPhase.UNDEFINED,
+            type = CodeforcesContestType.UNDEFINED,
+            duration = Duration.ZERO,
+            startTime = Instant.DISTANT_PAST
+        )
+    }
 
     internal val participationType = itemEnum(name = "participation_type", defaultValue = CodeforcesParticipationType.NOT_PARTICIPATED)
     internal val contestantRank = itemInt(name = "contestant_rank", defaultValue = -1)
@@ -78,7 +80,7 @@ internal data class CodeforcesMonitorSubmissionInfo(
 fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?> =
     flowBy { prefs ->
         val contestId = prefs[contestId] ?: return@flowBy null
-        val contest = prefs[contestInfo]?.copy(id = contestId) ?: return@flowBy null
+        val contest = prefs[contestInfo].copy(id = contestId)
         val phase = when (contest.phase) {
             CodeforcesContestPhase.CODING -> CodeforcesMonitorData.ContestPhase.Coding(contest.startTime + contest.duration)
             CodeforcesContestPhase.SYSTEM_TEST -> CodeforcesMonitorData.ContestPhase.SystemTesting(prefs[sysTestPercentage])
