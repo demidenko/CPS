@@ -32,6 +32,7 @@ import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
 import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.platforms.api.CodeforcesApi
+import com.demich.cps.platforms.api.CodeforcesContestPhase
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
@@ -388,7 +389,12 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val monitor = remember { CodeforcesMonitorDataStore(context) }
 
-    val contestDataState = rememberCollectWithLifecycle { monitor.flowOfContestData() }
+    val contestDataState = rememberCollectWithLifecycle {
+        monitor.flowOfContestData().map {
+            if (it?.contestPhase?.phase != CodeforcesContestPhase.UNDEFINED) it
+            else null
+        }
+    }
 
     contestDataState.value?.let { contestData ->
         val requestFailed by rememberCollectWithLifecycle { monitor.lastRequest.flow.map { it == false } }
