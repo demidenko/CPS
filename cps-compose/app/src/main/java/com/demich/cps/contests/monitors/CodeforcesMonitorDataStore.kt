@@ -44,7 +44,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     internal val sysTestPercentage = itemIntNullable("sys_test_percentage")
 
-    internal val notifiedSubmissionsIds = jsonCPS.item<Set<Long>>(name = "submissions_notified", defaultValue = emptySet())
+    internal val notifiedSubmissionsIds = jsonCPS.itemSet<Long>(name = "submissions_notified")
 
     suspend fun reset() = resetAll()
 }
