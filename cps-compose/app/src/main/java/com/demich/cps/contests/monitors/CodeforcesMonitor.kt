@@ -4,6 +4,7 @@ import com.demich.cps.platforms.api.*
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.add
+import com.demich.datastore_itemized.withSnapShot
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlin.time.Duration
@@ -30,32 +31,26 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
             return@launchWhileActive Duration.ZERO
         }
 
-        val contestInfo = contestInfo()
-
-        if (needCheckSubmissions(contestInfo, participationType())) {
-            val problemResults = problemResults()
-            val info = submissionsInfo()
-            if (problemResults.any { needCheckSubmissions(it, info) }) {
-                getSubmissions(
-                    contestId = contestId,
-                    handle = handle
-                )?.let { submissions ->
-                    val notified = notifiedSubmissionsIds()
-                    submissions.filter {
-                           it.testset == CodeforcesTestset.TESTS
-                        && it.verdict.isResult()
-                        && it.id !in notified
-                    }.forEach {
-                        onSubmissionFinalResult(it)
-                        notifiedSubmissionsIds.add(it.id)
-                    }
-                    submissionsInfo.update { problemResults.makeMapWith(submissions) }
+        ifNeedCheckSubmissions { problemResults ->
+            getSubmissions(
+                contestId = contestId,
+                handle = handle
+            )?.let { submissions ->
+                val notified = notifiedSubmissionsIds()
+                submissions.filter {
+                    it.testset == CodeforcesTestset.TESTS
+                    && it.verdict.isResult()
+                    && it.id !in notified
+                }.forEach {
+                    onSubmissionFinalResult(it)
+                    notifiedSubmissionsIds.add(it.id)
                 }
+                submissionsInfo.update { problemResults.makeMapWith(submissions) }
             }
         }
 
         getDelay(
-            contestPhase = contestInfo.phase,
+            contestPhase = contestInfo().phase,
             ratingChangeWaiter = ratingChangeWaiter
         )
     }
@@ -229,6 +224,20 @@ private fun needCheckSubmissions(
     if (problemResult.type != CodeforcesProblemStatus.FINAL) return false
     val list = submissionsInfo[problemResult.problemIndex] ?: return true
     return list.any { it.isPreliminary() }
+}
+
+//optimized for read
+private suspend inline fun CodeforcesMonitorDataStore.ifNeedCheckSubmissions(
+    block: (List<CodeforcesMonitorProblemResult>) -> Unit
+) {
+    withSnapShot { prefs ->
+        if (needCheckSubmissions(contestInfo = prefs[contestInfo], participationType = prefs[participationType])) {
+            val problemResults = prefs[problemResults]
+            val info = prefs[submissionsInfo]
+            if (problemResults.any { needCheckSubmissions(it, info) }) return@withSnapShot problemResults
+        }
+        null
+    }?.let(block)
 }
 
 private suspend fun getSubmissions(contestId: Int, handle: String) =
