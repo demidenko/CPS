@@ -53,8 +53,6 @@ private fun makeDefaultLoadingPriorities() =
         compareByDescending<ContestsLoaderType> { it.supportedPlatforms.size }.thenBy { it.ordinal }
     ).let { loaders ->
         Contest.platforms.associateWith { platform ->
-            buildList {
-                loaders.forEach { if (platform in it.supportedPlatforms) add(it) }
-            }
+            loaders.filter { platform in it.supportedPlatforms }
         }
     }
