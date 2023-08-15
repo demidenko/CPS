@@ -495,8 +495,9 @@ enum class CodeforcesTestset {
 
 private fun isTemporarilyUnavailable(str: String): Boolean {
     val i = str.indexOf("<body>")
-    val j = str.indexOf("</body>")
-    if (i == -1 || j == -1 || i >= j) return false
+    if (i == -1) return false
+    val j = str.lastIndexOf("</body>")
+    if (j == -1 || i >= j) return false
     val body = str.substring(i + 6, j).trim().removeSurrounding("<p>", "</p>")
     return body == "Codeforces is temporarily unavailable. Please, return in several minutes. Please try <a href=\"https://m1.codeforces.com/\">m1.codeforces.com</a>, <a href=\"https://m2.codeforces.com/\">m2.codeforces.com</a> or <a href=\"https://m3.codeforces.com/\">m3.codeforces.com</a>"
     /* full message:
