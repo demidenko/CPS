@@ -2,6 +2,7 @@ package com.demich.cps.contests
 
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -202,7 +203,7 @@ private fun ContestsColumn(
         ) { contest ->
             ContestItem(
                 contest = contest,
-                expanded = contest.compositeId in expandedItems,
+                isExpanded = { contest.compositeId in expandedItems },
                 onDeleteRequest = {
                     scope.launch {
                         context.settingsContests.ignoredContests.edit {
@@ -212,7 +213,7 @@ private fun ContestsColumn(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {
+                    .clickableNoRipple {
                         val id = contest.compositeId
                         if (id in expandedItems) expandedItems -= id
                         else expandedItems += id
@@ -222,7 +223,7 @@ private fun ContestsColumn(
                         end = 7.dp,
                         top = 4.dp,
                         bottom = 3.dp
-                    )
+                    ).animateContentSize()
             )
             Divider()
         }

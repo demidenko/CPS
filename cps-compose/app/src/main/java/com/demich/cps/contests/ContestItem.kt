@@ -25,12 +25,12 @@ import kotlin.time.Duration.Companion.hours
 @Composable
 fun ContestItem(
     contest: Contest,
-    expanded: Boolean,
+    isExpanded: () -> Boolean,
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
     Column(modifier = modifier) {
-        if (!expanded) ContestItemContent(contest = contest)
+        if (!isExpanded()) ContestItemContent(contest = contest)
         else ContestExpandedItemContent(contest = contest, onDeleteRequest = onDeleteRequest)
     }
 }
