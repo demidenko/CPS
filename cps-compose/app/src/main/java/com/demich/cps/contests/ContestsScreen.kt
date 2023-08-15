@@ -1,5 +1,6 @@
 package com.demich.cps.contests
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -107,18 +108,21 @@ private fun ContestsReloadableContent(
 }
 
 
+private fun flowOfContestsToShow(context: Context) =
+    context.contestsListDao.flowOfContests()
+        .distinctUntilChanged()
+        .combine(context.settingsContests.ignoredContests.flow) { list, ignored ->
+            if (ignored.isEmpty()) list
+            else list.filter { contest -> contest.compositeId !in ignored }
+        }
+
 @Composable
 private fun ContestsContent(
     filterController: ContestsFilterController
 ) {
     val context = context
     val contestsToShowState = rememberCollectWithLifecycle {
-        context.contestsListDao.flowOfContests()
-            .distinctUntilChanged()
-            .combine(context.settingsContests.ignoredContests.flow) { list, ignored ->
-                if (ignored.isEmpty()) list
-                else list.filter { contest -> contest.compositeId !in ignored }
-            }
+        flowOfContestsToShow(context)
     }
 
     LaunchedEffect(contestsToShowState, filterController) {
@@ -144,7 +148,7 @@ private fun ContestsContent(
                 .fillMaxWidth()
         )
         ContestsList(
-            contestsState = contestsToShowState,
+            contests = { contestsToShowState.value },
             filterController = filterController,
             modifier = Modifier
                 .fillMaxSize()
@@ -154,12 +158,18 @@ private fun ContestsContent(
 
 @Composable
 private fun ContestsList(
-    contestsState: State<List<Contest>>,
+    contests: () -> List<Contest>,
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
+    val filteredContests by remember(contests, filterController) {
+        derivedStateOf {
+            filterController.filterContests(contests())
+        }
+    }
+
     ProvideTimeEachSecond {
-        val sortedState = rememberWith(contestsState.value) {
+        val finalContestsState = rememberWith(filteredContests) {
             mutableStateOf(this)
         }.apply {
             value.let {
@@ -167,24 +177,16 @@ private fun ContestsList(
                 if (!it.isSortedWith(comparator)) value = it.sortedWith(comparator)
             }
         }
-
-        //TODO: without remember ContestsSortedList called each seconds (no skip!)
-        remember<@Composable () -> Unit>(sortedState, filterController, modifier) {
-            {
-                ContestsSortedList(
-                    contestsSortedListState = sortedState,
-                    filterController = filterController,
-                    modifier = modifier
-                )
-            }
-        }()
+        ContestsColumn(
+            contestsState = finalContestsState,
+            modifier = modifier
+        )
     }
 }
 
 @Composable
-private fun ContestsSortedList(
-    contestsSortedListState: State<List<Contest>>,
-    filterController: ContestsFilterController,
+private fun ContestsColumn(
+    contestsState: State<List<Contest>>,
     modifier: Modifier = Modifier
 ) {
     val context = context
@@ -193,15 +195,9 @@ private fun ContestsSortedList(
     var expandedItems: List<Pair<Contest.Platform, String>>
         by rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(emptyList()) }
 
-    val filteredContests by remember(contestsSortedListState, filterController) {
-        derivedStateOf {
-            filterController.filterContests(contestsSortedListState.value)
-        }
-    }
-
     LazyColumnWithScrollBar(modifier = modifier) {
         itemsNotEmpty(
-            items = filteredContests,
+            items = contestsState.value,
             /*key = { it.compositeId }*/ //TODO: key effects jumping on reorder
         ) { contest ->
             ContestItem(
