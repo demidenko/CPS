@@ -56,13 +56,6 @@ fun ContestsScreen(
     val contestsViewModel = contestsViewModel()
 
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
-    val errorsMessage by rememberCollect {
-        combine(
-            flow = contestsViewModel.flowOfLoadingErrors(),
-            flow2 = context.settingsUI.devModeEnabled.flow,
-            transform = ::makeCombinedMessage
-        )
-    }
 
     Column(
         modifier = Modifier
@@ -79,7 +72,6 @@ fun ContestsScreen(
                 filterController = filterController,
                 isReloading = isReloading,
                 onReload = onReload,
-                errorsMessage = { errorsMessage },
                 modifier = Modifier.weight(1f, false)
             )
             ContestsFilterTextField(
@@ -101,7 +93,6 @@ private fun ContestsReloadableContent(
     filterController: ContestsFilterController,
     isReloading: () -> Boolean,
     onReload: () -> Unit,
-    errorsMessage: () -> String,
     modifier: Modifier = Modifier
 ) {
     CPSSwipeRefreshBox(
@@ -110,8 +101,7 @@ private fun ContestsReloadableContent(
         modifier = modifier
     ) {
         ContestsContent(
-            filterController = filterController,
-            errorsMessage = errorsMessage
+            filterController = filterController
         )
     }
 }
@@ -119,8 +109,7 @@ private fun ContestsReloadableContent(
 
 @Composable
 private fun ContestsContent(
-    filterController: ContestsFilterController,
-    errorsMessage: () -> String
+    filterController: ContestsFilterController
 ) {
     val context = context
     val contestsToShowState = rememberCollectWithLifecycle {
@@ -139,9 +128,18 @@ private fun ContestsContent(
             }
     }
 
+    val contestsViewModel = contestsViewModel()
+    val errorsMessage by rememberCollect {
+        combine(
+            flow = contestsViewModel.flowOfLoadingErrors(),
+            flow2 = context.settingsUI.devModeEnabled.flow,
+            transform = ::makeCombinedMessage
+        )
+    }
+
     Column {
         LoadingError(
-            errorsMessage = errorsMessage,
+            errorsMessage = { errorsMessage },
             modifier = Modifier
                 .fillMaxWidth()
         )
