@@ -126,13 +126,11 @@ private fun DurationPickerDialog(
         mutableStateOf(number.toString())
     }
 
-    val duration: Duration? by remember {
-        derivedStateOf {
-            input.toIntOrNull()?.let { number ->
-                if (inDays) number.days else number.hours
-            }
+    val duration: Duration? by rememberUpdatedState(
+        input.toIntOrNull()?.let { number ->
+            if (inDays) number.days else number.hours
         }
-    }
+    )
 
     CPSDialog(onDismissRequest = onDismissRequest) {
         OutlinedTextField(

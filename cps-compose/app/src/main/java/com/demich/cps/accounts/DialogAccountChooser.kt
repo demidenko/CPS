@@ -83,7 +83,7 @@ private fun<U: UserInfo> DialogContent(
     var textFieldValue by remember {
         mutableStateOf((initialUserInfo?.userId ?: "").toTextFieldValue())
     }
-    val userId by remember { derivedStateOf { textFieldValue.text } }
+    val userId by rememberUpdatedState(newValue = textFieldValue.text)
 
     var userInfo by remember { mutableStateOf(initialUserInfo) }
     var loadingInProgress by remember { mutableStateOf(false) }
