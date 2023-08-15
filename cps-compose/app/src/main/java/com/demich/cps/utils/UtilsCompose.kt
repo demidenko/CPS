@@ -44,13 +44,11 @@ val context: Context
     get() = LocalContext.current
 
 
-@Composable
-inline fun<reified T> Json.saver() = remember(this) {
+inline fun<reified T> Json.saver() =
     Saver<T, String>(
         restore = ::decodeFromString,
         save = { encodeToString(it) }
     )
-}
 
 @Composable
 inline fun<T, K> rememberWith(
