@@ -94,10 +94,12 @@ class CodeforcesNewsLostRecentWorker(
     override suspend fun runWork(): Result {
         val locale = context.settingsNews.codeforcesLocale()
 
-        val source = CodeforcesApi.getPageSource(
-            path = "/recent-actions",
-            locale = locale
-        ) ?: return Result.retry()
+        val source = CodeforcesApi.runCatching {
+            getPageSource(
+                path = "/recent-actions",
+                locale = locale
+            )
+        }.getOrElse { return Result.retry() }
 
         val recentBlogEntries: List<CodeforcesBlogEntry> =
             CodeforcesUtils.runCatching {

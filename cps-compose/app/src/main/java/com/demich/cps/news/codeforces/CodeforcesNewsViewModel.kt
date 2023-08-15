@@ -99,17 +99,17 @@ class CodeforcesNewsViewModel: ViewModel() {
     }
 
     private suspend fun loadBlogEntries(page: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry>? {
-        val s = CodeforcesApi.getPageSource(path = page, locale = locale) ?: return null
+        val s = CodeforcesApi.getPageSource(path = page, locale = locale)
         return CodeforcesUtils.extractBlogEntries(s)
     }
 
     private suspend fun loadComments(page: String, locale: CodeforcesLocale): List<CodeforcesRecentAction>? {
-        val s = CodeforcesApi.getPageSource(path = page, locale = locale) ?: return null
+        val s = CodeforcesApi.getPageSource(path = page, locale = locale)
         return CodeforcesUtils.extractComments(s)
     }
 
     private suspend fun loadRecentActions(locale: CodeforcesLocale): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>? {
-        val s = CodeforcesApi.getPageSource(path = "/recent-actions", locale = locale) ?: return null
+        val s = CodeforcesApi.getPageSource(path = "/recent-actions", locale = locale)
         val comments = CodeforcesUtils.extractComments(s)
         //blog entry with low rating disappeared from blogEntries but has comments, need to merge
         val blogEntries = CodeforcesUtils.extractRecentBlogEntries(s).toMutableList()

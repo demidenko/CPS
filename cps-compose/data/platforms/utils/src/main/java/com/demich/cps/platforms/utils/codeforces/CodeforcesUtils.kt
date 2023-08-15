@@ -176,14 +176,17 @@ object CodeforcesUtils {
         }
     }
 
+    private suspend fun getUserPageOrNull(handle: String): String? =
+        CodeforcesApi.runCatching { getUserPage(handle) }.getOrNull()
+
     suspend fun getRealHandle(handle: String): Pair<String, STATUS> {
-        val page = CodeforcesApi.getUserPage(handle) ?: return handle to STATUS.FAILED
+        val page = getUserPageOrNull(handle) ?: return handle to STATUS.FAILED
         val realHandle = extractRealHandle(page)?.first ?: return handle to STATUS.NOT_FOUND
         return realHandle to STATUS.OK
     }
 
     suspend fun getRealColorTag(handle: String): CodeforcesColorTag {
-        return CodeforcesApi.getUserPage(handle)?.let { extractRealHandle(it)?.second } ?: CodeforcesColorTag.BLACK
+        return getUserPageOrNull(handle)?.let { extractRealHandle(it)?.second } ?: CodeforcesColorTag.BLACK
     }
 
     private fun extractRealHandle(page: String): Pair<String, CodeforcesColorTag>? {
@@ -260,8 +263,11 @@ object CodeforcesUtils {
         }.getOrNull()
     }
 
+    private suspend fun getContestPageOrNull(contestId: Int): String? =
+        CodeforcesApi.runCatching { getContestPage(contestId) }.getOrNull()
+
     suspend fun getContestAcceptedStatistics(contestId: Int): Map<CodeforcesProblem, Int>? {
-        val src = CodeforcesApi.getContestPage(contestId) ?: return null
+        val src = getContestPageOrNull(contestId) ?: return null
         return Jsoup.parse(src).selectFirst("table.problems")
             ?.select("tr")
             ?.mapNotNull { extractProblemWithAccepteds(it, contestId) }
@@ -269,7 +275,7 @@ object CodeforcesUtils {
     }
 
     suspend fun getContestSystemTestingPercentage(contestId: Int): Int? {
-        val src = CodeforcesApi.getContestPage(contestId) ?: return null
+        val src = getContestPageOrNull(contestId) ?: return null
         return Jsoup.parse(src).selectFirst("span.contest-state-regular")
             ?.text()
             ?.removeSuffix("%")

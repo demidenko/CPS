@@ -70,7 +70,7 @@ class CodeforcesAccountManager :
 
     override suspend fun loadSuggestions(str: String): List<UserSuggestion> =
         buildList {
-            val s = CodeforcesApi.getHandleSuggestionsPage(str)!!
+            val s = CodeforcesApi.getHandleSuggestionsPage(str)
             CodeforcesUtils.extractHandleSuggestions(source = s) { handle ->
                 add(UserSuggestion(title = handle, userId = handle))
             }

@@ -86,7 +86,7 @@ object CodeforcesApi: PlatformApi {
     private suspend fun getCodeforcesWeb(
         path: String,
         block: HttpRequestBuilder.() -> Unit = {}
-    ): String? {
+    ): String {
         val callGet = suspend {
             client.getText(path) {
                 header("Cookie", "RCPC=$RCPC")
@@ -96,16 +96,14 @@ object CodeforcesApi: PlatformApi {
                 require(!isTemporarilyUnavailable(it))
             }
         }
-        return kotlin.runCatching {
-            withContext(Dispatchers.IO) {
-                val s = callGet()
-                if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
-                    RCPC.recalc(s)
-                    delay(redirectWaitTime)
-                    callGet()
-                } else s
-            }
-        }.getOrNull()
+        return withContext(Dispatchers.IO) {
+            val s = callGet()
+            if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
+                RCPC.recalc(s)
+                delay(redirectWaitTime)
+                callGet()
+            } else s
+        }
     }
 
 
@@ -154,23 +152,23 @@ object CodeforcesApi: PlatformApi {
         }
     }
 
-    suspend fun getHandleSuggestionsPage(str: String): String? {
+    suspend fun getHandleSuggestionsPage(str: String): String {
         return getCodeforcesWeb(path = "data/handles") {
             parameter("q", str)
         }
     }
 
-    suspend fun getPageSource(path: String, locale: CodeforcesLocale): String? {
+    suspend fun getPageSource(path: String, locale: CodeforcesLocale): String {
         return getCodeforcesWeb(path = path) {
             parameter("locale", locale)
         }
     }
 
-    suspend fun getUserPage(handle: String): String? {
+    suspend fun getUserPage(handle: String): String {
         return getPageSource(path = urls.user(handle), locale = CodeforcesLocale.EN)
     }
 
-    suspend fun getContestPage(contestId: Int): String? {
+    suspend fun getContestPage(contestId: Int): String {
         return getPageSource(path = urls.contest(contestId), locale = CodeforcesLocale.EN)
     }
 
@@ -196,8 +194,9 @@ object CodeforcesApi: PlatformApi {
         }
     }
 
-    suspend fun getContestStandings(contestId: Int, handle: String, includeUnofficial: Boolean) =
-        getContestStandings(contestId, listOf(handle), includeUnofficial)
+    suspend fun getContestStandings(contestId: Int, handle: String, includeUnofficial: Boolean): CodeforcesContestStandings {
+        return getContestStandings(contestId, listOf(handle), includeUnofficial)
+    }
 
 
     object urls {
