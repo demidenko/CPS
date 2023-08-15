@@ -15,7 +15,7 @@ import com.demich.cps.contests.database.Contest
 object CPSIcons {
     val Account get() = Icons.Rounded.Person
     val Accounts get() = Icons.Rounded.PeopleAlt
-    val News get() = Icons.Default.Subtitles //TODO: Icons.Default.Newspaper?
+    val News get() = Icons.Rounded.Newspaper //Before: Icons.Default.Subtitles
     val Contest get() = Icons.Filled.EmojiEvents
     val Development get() = Icons.Default.AllOut
     val Settings get() = Icons.Default.Settings
