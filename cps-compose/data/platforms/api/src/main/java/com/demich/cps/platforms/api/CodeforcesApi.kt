@@ -22,6 +22,13 @@ object CodeforcesApi: PlatformApi {
             url(urls.main)
         }
         HttpResponseValidator {
+            /*TODO: DoubleReceiveException after bodyAsText()
+            validateResponse {
+                if (it.status.value == 200) {
+                    val text = it.bodyAsText()
+                    if (isTemporarilyUnavailable(text)) throw CodeforcesTemporarilyUnavailableException()
+                }
+            }*/
             handleResponseExceptionWithRequest { exception, _ ->
                 if (exception !is ResponseException) return@handleResponseExceptionWithRequest
                 val response = exception.response
@@ -31,6 +38,8 @@ object CodeforcesApi: PlatformApi {
             }
         }
     }
+
+    class CodeforcesTemporarilyUnavailableException: Throwable("Codeforces Temporarily Unavailable")
 
     private val callLimitExceededWaitTime: Duration = 500.milliseconds
     private val redirectWaitTime: Duration = 300.milliseconds
@@ -91,8 +100,8 @@ object CodeforcesApi: PlatformApi {
                 header("Cookie", "RCPC=$RCPC")
                 block()
             }.also {
-                //TODO: check this for api requests too
-                require(!isTemporarilyUnavailable(it))
+                //TODO: check this for api requests too (in validateResponse)
+                if (isTemporarilyUnavailable(it)) throw CodeforcesTemporarilyUnavailableException()
             }
         }
         return withContext(Dispatchers.IO) {
@@ -494,22 +503,26 @@ enum class CodeforcesTestset {
 
 
 private fun isTemporarilyUnavailable(str: String): Boolean {
+    if (str.length > 2000) return false //trick based on full msg length
     val i = str.indexOf("<body>")
     if (i == -1) return false
     val j = str.lastIndexOf("</body>")
     if (j == -1 || i >= j) return false
-    val body = str.substring(i + 6, j).trim().removeSurrounding("<p>", "</p>")
+    val pi = str.indexOf("<p>", i)
+    val pj = str.lastIndexOf("</p>", j)
+    if (pi == -1 || pj == -1 || pi > pj) return false
+    val body = str.substring(pi + 3, pj)
     return body == "Codeforces is temporarily unavailable. Please, return in several minutes. Please try <a href=\"https://m1.codeforces.com/\">m1.codeforces.com</a>, <a href=\"https://m2.codeforces.com/\">m2.codeforces.com</a> or <a href=\"https://m3.codeforces.com/\">m3.codeforces.com</a>"
     /* full message:
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>Codeforces</title>
-    </head>
-    <body>
-        <p>Codeforces is temporarily unavailable. Please, return in several minutes. Please try <a href="https://m1.codeforces.com/">m1.codeforces.com</a>, <a href="https://m2.codeforces.com/">m2.codeforces.com</a> or <a href="https://m3.codeforces.com/">m3.codeforces.com</a></p>
-    </body>
-    </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Codeforces</title>
+</head>
+<body>
+    <p>Codeforces is temporarily unavailable. Please, return in several minutes. Please try <a href="https://m1.codeforces.com/">m1.codeforces.com</a>, <a href="https://m2.codeforces.com/">m2.codeforces.com</a> or <a href="https://m3.codeforces.com/">m3.codeforces.com</a></p>
+<script>(function(){var js = "window['__CF$cv$params']={r:'7f71322edbeb9d70',t:'MTY5MjA5OTk3NS41NTQwMDA='};_cpo=document.createElement('script');_cpo.nonce='',_cpo.src='/cdn-cgi/challenge-platform/scripts/invisible.js',document.getElementsByTagName('head')[0].appendChild(_cpo);";var _0xh = document.createElement('iframe');_0xh.height = 1;_0xh.width = 1;_0xh.style.position = 'absolute';_0xh.style.top = 0;_0xh.style.left = 0;_0xh.style.border = 'none';_0xh.style.visibility = 'hidden';document.body.appendChild(_0xh);function handler() {var _0xi = _0xh.contentDocument || _0xh.contentWindow.document;if (_0xi) {var _0xj = _0xi.createElement('script');_0xj.innerHTML = js;_0xi.getElementsByTagName('head')[0].appendChild(_0xj);}}if (document.readyState !== 'loading') {handler();} else if (window.addEventListener) {document.addEventListener('DOMContentLoaded', handler);} else {var prev = document.onreadystatechange || function () {};document.onreadystatechange = function (e) {prev(e);if (document.readyState !== 'loading') {document.onreadystatechange = prev;handler();}};}})();</script></body>
+</html>
      */
 }
