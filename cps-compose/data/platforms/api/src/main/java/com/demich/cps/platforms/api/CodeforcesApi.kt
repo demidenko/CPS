@@ -44,26 +44,29 @@ object CodeforcesApi: PlatformApi {
         return false
     }
 
+    private suspend fun<T> responseWithRetry(
+        remainingRetries: Int,
+        get: suspend () -> CodeforcesAPIResponse<T>
+    ): CodeforcesAPIResponse<T> {
+        return kotlin.runCatching { get() }.getOrElse { exception ->
+            if (isCallLimitExceeded(exception) && remainingRetries > 0) {
+                delay(callLimitExceededWaitTime)
+                responseWithRetry(remainingRetries - 1, get)
+            } else {
+                throw exception
+            }
+        }
+    }
+
     private suspend inline fun<reified T> getCodeforcesApi(
         path: String,
         crossinline block: HttpRequestBuilder.() -> Unit = {}
     ): T {
-        (9 downTo 0).forEach { remainingRuns ->
-            kotlin.runCatching {
-                withContext(Dispatchers.IO) {
-                    client.getAs<CodeforcesAPIResponse<T>>(urlString = "/api/$path", block = block)
-                }
-            }.onSuccess {
-                return it.result
-            }.onFailure { exception ->
-                if (isCallLimitExceeded(exception)) {
-                    if (remainingRuns > 0) delay(callLimitExceededWaitTime)
-                } else {
-                    throw exception
-                }
-            }
+        return withContext(Dispatchers.IO) {
+            responseWithRetry(remainingRetries = 9) {
+                client.getAs<CodeforcesAPIResponse<T>>(urlString = "/api/$path", block = block)
+            }.result
         }
-        throw CodeforcesAPICallLimitExceeded()
     }
 
     private val RCPC = object {
