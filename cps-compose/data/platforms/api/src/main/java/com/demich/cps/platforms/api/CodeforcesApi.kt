@@ -25,9 +25,6 @@ object CodeforcesApi: PlatformApi {
             handleResponseExceptionWithRequest { exception, _ ->
                 if (exception !is ResponseException) return@handleResponseExceptionWithRequest
                 val response = exception.response
-                if (response.status == HttpStatusCode.ServiceUnavailable) {
-                    throw CodeforcesAPICallLimitExceeded()
-                }
                 json.runCatching { decodeFromString<CodeforcesAPIErrorResponse>(response.bodyAsText()) }
                     .onSuccess { throw it }
                     .onFailure { throw exception }
@@ -37,10 +34,9 @@ object CodeforcesApi: PlatformApi {
 
     private val callLimitExceededWaitTime: Duration = 500.milliseconds
     private val redirectWaitTime: Duration = 300.milliseconds
-    private class CodeforcesAPICallLimitExceeded: Throwable()
     private fun isCallLimitExceeded(e: Throwable): Boolean {
         if (e is CodeforcesAPIErrorResponse) return e.isCallLimitExceeded()
-        if (e is CodeforcesAPICallLimitExceeded) return true
+        if (e is ResponseException && e.response.status == HttpStatusCode.ServiceUnavailable) return true
         return false
     }
 
