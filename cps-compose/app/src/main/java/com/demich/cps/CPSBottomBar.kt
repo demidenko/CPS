@@ -62,6 +62,7 @@ private fun CPSBottomBarMain(
     val context = context
 
     val devModeEnabled by rememberCollect { context.settingsUI.devModeEnabled.flow }
+    val layoutType by rememberCollect { context.settingsUI.navigationLayoutType.flow }
 
     val rootScreens = remember(devModeEnabled) {
         buildList {
@@ -76,6 +77,7 @@ private fun CPSBottomBarMain(
         modifier = modifier.fillMaxSize(),
         rootScreens = rootScreens,
         selectedRootScreenType = navigator.currentScreen?.rootScreenType,
+        layoutType = layoutType,
         onSelect = { screen ->
             if (screen !is Screen.Development) {
                 scope.launch { context.settingsUI.startScreenRoute(screen.routePath) }
@@ -88,33 +90,40 @@ private fun CPSBottomBarMain(
     )
 }
 
+enum class NavigationLayoutType {
+    start,  //ABC....
+    center, //..ABC..
+    evenly  //.A.B.C. (tap area as weight(1f))
+}
+
 @Composable
 private fun CPSBottomNavigationMainItems(
     modifier: Modifier = Modifier,
     rootScreens: List<RootScreen>,
     selectedRootScreenType: ScreenTypes?,
+    layoutType: NavigationLayoutType,
     onSelect: (RootScreen) -> Unit,
     onLongPress: () -> Unit
 ) {
-    /*
-    TODO: horizontalArrangement
-     Start:         ABC....
-     Center:        ..ABC..
-     SpaceEvenly:   .A.B.C. (tap area as weight(1f))
-     */
     Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
+        //horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.clipToBounds()
     ) {
+        if (layoutType == NavigationLayoutType.center) {
+            Spacer(modifier = Modifier.weight(1f))
+        }
         for (screen in rootScreens) {
             CPSBottomNavigationItem(
                 icon = screen.icon,
                 isSelected = screen.screenType == selectedRootScreenType,
                 onSelect = { onSelect(screen) },
                 onLongPress = onLongPress,
-                modifier = Modifier.weight(1f)
+                modifier = if (layoutType == NavigationLayoutType.evenly) Modifier.weight(1f) else Modifier
             )
+        }
+        if (layoutType == NavigationLayoutType.center || layoutType == NavigationLayoutType.start) {
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.demich.cps.ui
 
 import android.content.Context
+import com.demich.cps.NavigationLayoutType
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.navigation.ScreenTypes
 import com.demich.cps.ui.theme.DarkLightMode
@@ -32,4 +33,6 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
     }
 
     val startScreenRoute = itemString(name = "start_screen_route", defaultValue = ScreenTypes.accounts.route)
+    val navigationLayoutType = itemEnum(name = "navigation_bar_layout", defaultValue = NavigationLayoutType.evenly)
+
 }
