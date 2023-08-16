@@ -106,7 +106,6 @@ private fun CPSBottomNavigationMainItems(
     onLongPress: () -> Unit
 ) {
     Row(
-        //horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.clipToBounds()
     ) {
@@ -117,7 +116,9 @@ private fun CPSBottomNavigationMainItems(
             CPSBottomNavigationItem(
                 icon = screen.icon,
                 isSelected = screen.screenType == selectedRootScreenType,
-                onSelect = { onSelect(screen) },
+                onClick = {
+                    if (screen.screenType != selectedRootScreenType) onSelect(screen)
+                },
                 onLongPress = onLongPress,
                 modifier = if (layoutType == NavigationLayoutType.evenly) Modifier.weight(1f) else Modifier
             )
@@ -136,18 +137,18 @@ private fun CPSBottomNavigationItem(
     isSelected: Boolean,
     modifier: Modifier = Modifier,
     onLongPress: (() -> Unit)? = null,
-    onSelect: () -> Unit
+    onClick: () -> Unit
 ) {
     val fraction by animateFloatAsState(targetValue = if (isSelected) 1f else 0f)
 
     Box(
         modifier = modifier
+            .minimumInteractiveComponentSize()
             .fillMaxHeight()
-            .widthIn(min = 48.dp)
             .combinedClickable(
                 indication = rememberRipple(bounded = false, radius = 48.dp),
                 interactionSource = remember { MutableInteractionSource() },
-                onClick = { if (!isSelected) onSelect() },
+                onClick = onClick,
                 onLongClick = onLongPress?.withVibration()
             )
     ) {
