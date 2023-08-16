@@ -83,7 +83,7 @@ private fun CPSBottomBarMain(
             navigator.navigateTo(screen)
         },
         onLongPress = {
-            //TODO: change layout
+            //TODO: setup layout
         }
     )
 }
@@ -96,8 +96,14 @@ private fun CPSBottomNavigationMainItems(
     onSelect: (RootScreen) -> Unit,
     onLongPress: () -> Unit
 ) {
+    /*
+    TODO: horizontalArrangement
+     Start:         ABC....
+     Center:        ..ABC..
+     SpaceEvenly:   .A.B.C. (tap area as weight(1f))
+     */
     Row(
-        horizontalArrangement = Arrangement.SpaceAround,
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.clipToBounds()
     ) {
@@ -125,19 +131,26 @@ private fun CPSBottomNavigationItem(
 ) {
     val fraction by animateFloatAsState(targetValue = if (isSelected) 1f else 0f)
 
-    Icon(
-        imageVector = icon,
-        contentDescription = null,
-        tint = lerp(start = cpsColors.content, stop = cpsColors.accent, fraction),
+    Box(
         modifier = modifier
-            .size(lerp(start = 24.dp, stop = 28.dp, fraction = fraction))
+            .fillMaxHeight()
+            .widthIn(min = 48.dp)
             .combinedClickable(
                 indication = rememberRipple(bounded = false, radius = 48.dp),
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = { if (!isSelected) onSelect() },
                 onLongClick = onLongPress?.withVibration()
             )
-    )
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = lerp(start = cpsColors.content, stop = cpsColors.accent, fraction),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .size(lerp(start = 24.dp, stop = 28.dp, fraction = fraction))
+        )
+    }
 }
 
 @Composable
