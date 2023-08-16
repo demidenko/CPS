@@ -1,17 +1,23 @@
 package com.demich.cps.notifications
 
-abstract class NotificationIdProvider(val rangeLength: Int) {
+private class Allocator {
     private var firstUnused = 0
-
-    private fun alloc(size: Int) =
+    operator fun invoke(size: Int) =
         firstUnused.also {
-            //it + size - 1 <= Int.MAX_VALUE
-            require(it <= Int.MAX_VALUE - size + 1)
+            require(size > 0)
+            //it + size <= Int.MAX_VALUE
+            require(it <= Int.MAX_VALUE - size)
             firstUnused += size
         }
+}
 
-    protected fun nextId() = alloc(1)
-    protected fun nextIdRange() = alloc(rangeLength).let { start ->
-        start until start + rangeLength
-    }
+abstract class NotificationIdProvider(val rangeLength: Int) {
+    private val allocator = Allocator()
+
+    protected fun nextId(): Int = allocator(size = 1)
+
+    protected fun nextIdRange(): IntRange =
+        allocator(size = rangeLength).let { start ->
+            start until start + rangeLength
+        }
 }

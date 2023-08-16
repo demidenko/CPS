@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
-class NotificationBuilder(
+class NotificationBuilder internal constructor(
     private val builder: NotificationCompat.Builder,
     val notificationId: Int,
     private val notificationManager: NotificationManagerCompat
@@ -19,7 +19,7 @@ class NotificationBuilder(
     fun notify() = notificationManager.notify(notificationId, build())
 }
 
-class NotificationChannelSingleId(
+class NotificationChannelSingleId internal constructor(
     val notificationId: Int,
     val channelInfo: NotificationChannelInfo
 ) {
@@ -38,7 +38,7 @@ class NotificationChannelSingleId(
         builder(context, buildBody).notify()
 }
 
-class NotificationChannelRangeId(
+class NotificationChannelRangeId internal constructor(
     private val idRange: IntRange,
     val channelInfo: NotificationChannelInfo
 ) {
