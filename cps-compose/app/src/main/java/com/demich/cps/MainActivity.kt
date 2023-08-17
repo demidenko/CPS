@@ -3,11 +3,7 @@ package com.demich.cps
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -17,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
@@ -55,6 +50,7 @@ import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
 import com.demich.cps.news.settings.NewsSettingsScreen
 import com.demich.cps.ui.CPSNavigator
+import com.demich.cps.ui.CPSScaffold
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.rememberCPSNavigator
 import com.demich.cps.ui.theme.CPSTheme
@@ -215,20 +211,13 @@ private fun CPSContent() {
         }
     }
 
-    Scaffold(
+    CPSScaffold(
         topBar = { navigator.TopBar() },
         bottomBar = { navigator.BottomBar() },
+        progressBars = { CPSBottomProgressBarsColumn() },
         modifier = Modifier.systemBarsPadding()
-    ) { innerPadding ->
-        Box(modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxSize()
-        ) {
-            navigator.NavHost(builder = navBuilder)
-            CPSBottomProgressBarsColumn(
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
-        }
+    ) {
+        navigator.NavHost(builder = navBuilder)
     }
 }
 
