@@ -12,12 +12,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -55,7 +57,6 @@ fun CPSBottomBar(
         Column(
             modifier = Modifier
                 .layoutId(BottomBarHeaderLayoutId)
-                .background(backgroundColor)
                 .pointerInput(Unit) {},
         ) {
             AnimatedVisibility(
@@ -67,6 +68,8 @@ fun CPSBottomBar(
                     onDismissRequest = { layoutSetupEnabled = false },
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
+                        .background(backgroundColor)
                         .padding(all = 8.dp)
                 )
             }
@@ -74,7 +77,11 @@ fun CPSBottomBar(
                 navigator = navigator,
                 additionalBottomBar = additionalBottomBar,
                 layoutSettingsEnabled = layoutSetupEnabled,
-                onEnableLayoutSettings = { layoutSetupEnabled = true }
+                onEnableLayoutSettings = { layoutSetupEnabled = true },
+                modifier = Modifier
+                    .height(CPSDefaults.bottomBarHeight)
+                    .fillMaxWidth()
+                    .background(backgroundColor)
             )
         }
     }
@@ -85,14 +92,12 @@ private fun BottomBarBody(
     navigator: CPSNavigator,
     additionalBottomBar: AdditionalBottomBarBuilder?,
     layoutSettingsEnabled: Boolean,
-    onEnableLayoutSettings: () -> Unit
+    onEnableLayoutSettings: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .height(CPSDefaults.bottomBarHeight)
-            .fillMaxWidth()
-            .swallowInitialEvents(enabled = layoutSettingsEnabled)
+        modifier = modifier.swallowInitialEvents(enabled = layoutSettingsEnabled)
     ) {
         CPSBottomBarAdditional(
             modifier = Modifier.weight(1f),

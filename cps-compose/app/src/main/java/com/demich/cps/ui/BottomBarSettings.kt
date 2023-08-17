@@ -1,8 +1,6 @@
 package com.demich.cps.ui
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,11 +33,10 @@ fun BottomBarSettings(
             }
         )
 
-        TextButton(
+        CPSIconButton(
+            icon = CPSIcons.Close,
             onClick = onDismissRequest,
-            Modifier.align(Alignment.TopEnd)
-        ) {
-            Text(text = "close")
-        }
+            modifier = Modifier.align(Alignment.TopEnd)
+        )
     }
 }
