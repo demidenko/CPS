@@ -2,7 +2,11 @@ package com.demich.cps
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -33,6 +37,8 @@ import kotlinx.coroutines.launch
 
 typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
 
+private const val stiffness = Spring.StiffnessMediumLow
+
 @Composable
 fun CPSBottomBar(
     navigator: CPSNavigator,
@@ -42,7 +48,8 @@ fun CPSBottomBar(
         var layoutSetupEnabled by rememberSaveable { mutableStateOf(false) }
         val backgroundColor by animateColorAsState(
             targetValue = if (layoutSetupEnabled) cpsColors.backgroundAdditional else cpsColors.backgroundNavigation,
-            label = "bottom_bar_background"
+            label = "bottom_bar_background",
+            animationSpec = spring(stiffness = stiffness)
         )
 
         Column(
@@ -51,7 +58,11 @@ fun CPSBottomBar(
                 .background(backgroundColor)
                 .pointerInput(Unit) {},
         ) {
-            AnimatedVisibility(visible = layoutSetupEnabled) {
+            AnimatedVisibility(
+                visible = layoutSetupEnabled,
+                exit = shrinkVertically(spring(stiffness = stiffness)),
+                enter = expandVertically(spring(stiffness = stiffness))
+            ) {
                 BottomBarSettings(
                     onDismissRequest = { layoutSetupEnabled = false },
                     modifier = Modifier
