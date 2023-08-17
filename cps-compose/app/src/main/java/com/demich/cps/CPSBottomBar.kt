@@ -1,5 +1,7 @@
 package com.demich.cps
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -15,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import com.demich.cps.navigation.RootScreen
@@ -24,6 +28,7 @@ import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.swallowInitialEvents
 import kotlinx.coroutines.launch
 
 typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
@@ -35,32 +40,58 @@ fun CPSBottomBar(
 ) {
     if (navigator.isBottomBarEnabled) {
         var layoutSetupEnabled by rememberSaveable { mutableStateOf(false) }
-        Row(
-            modifier = Modifier
-                .height(CPSDefaults.bottomBarHeight)
-                .fillMaxWidth()
-                .background(cpsColors.backgroundNavigation),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            CPSBottomBarAdditional(
-                modifier = Modifier.weight(1f),
-                content = additionalBottomBar ?: {}
-            )
-            CPSBottomBarVerticalDivider()
-            CPSBottomBarMain(
-                navigator = navigator,
-                modifier = Modifier.weight(1f),
-                onEnableLayoutSettings = {
-                    layoutSetupEnabled = true
-                }
-            )
-        }
+        val backgroundColor by animateColorAsState(
+            targetValue = if (layoutSetupEnabled) cpsColors.backgroundAdditional else cpsColors.backgroundNavigation,
+            label = "bottom_bar_background"
+        )
 
-        if (layoutSetupEnabled) {
-            BottomBarSettings(
-                onDismissRequest = { layoutSetupEnabled = false }
+        Column(
+            modifier = Modifier
+                .layoutId(BottomBarHeaderLayoutId)
+                .background(backgroundColor)
+                .pointerInput(Unit) {},
+        ) {
+            AnimatedVisibility(visible = layoutSetupEnabled) {
+                BottomBarSettings(
+                    onDismissRequest = { layoutSetupEnabled = false },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(all = 8.dp)
+                )
+            }
+            BottomBarBody(
+                navigator = navigator,
+                additionalBottomBar = additionalBottomBar,
+                onEnableLayoutSettings = { layoutSetupEnabled = true },
+                modifier = Modifier.swallowInitialEvents(enabled = layoutSetupEnabled)
             )
         }
+    }
+}
+
+@Composable
+private fun BottomBarBody(
+    navigator: CPSNavigator,
+    additionalBottomBar: AdditionalBottomBarBuilder?,
+    onEnableLayoutSettings: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .height(CPSDefaults.bottomBarHeight)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        CPSBottomBarAdditional(
+            modifier = Modifier.weight(1f),
+            content = additionalBottomBar ?: {}
+        )
+        CPSBottomBarVerticalDivider()
+        CPSBottomBarMain(
+            navigator = navigator,
+            modifier = Modifier.weight(1f),
+            onEnableLayoutSettings = onEnableLayoutSettings
+        )
     }
 }
 

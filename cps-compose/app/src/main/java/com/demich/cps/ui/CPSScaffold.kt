@@ -50,19 +50,12 @@ private fun ScaffoldLayout(
             }
             val topBarHeight = topBarPlaceables.maxHeight()
 
-            var bottomBarHeadPlaceable: Placeable? = null
-            val bottomBarPlaceables = subcompose(ScaffoldLayoutContent.BottomBar, bottomBar).mapNotNull {
-                val placeable = it.measure(looseConstraints)
-                if (it.layoutId == BottomBarHeaderLayoutId) {
-                    bottomBarHeadPlaceable = placeable
-                    null
-                } else {
-                    placeable
-                }
-            }
-            val bottomBarHeight = bottomBarPlaceables.maxHeight()
+            val bottomBarPlaceable = subcompose(ScaffoldLayoutContent.BottomBar, bottomBar)
+                .first { it.layoutId == BottomBarHeaderLayoutId }
+                .measure(looseConstraints)
+            val bottomBarBodyHeight = CPSDefaults.bottomBarHeight.roundToPx()
 
-            val bodyContentHeight = layoutHeight - topBarHeight - bottomBarHeight
+            val bodyContentHeight = layoutHeight - topBarHeight - bottomBarBodyHeight
             val bodyContentPlaceables = subcompose(ScaffoldLayoutContent.MainContent, content).map {
                 it.measure(looseConstraints.copy(maxHeight = bodyContentHeight))
             }
@@ -77,20 +70,14 @@ private fun ScaffoldLayout(
             }
 
             progressBarsPlaceables.forEach {
-                it.place(x = 0, y = layoutHeight - bottomBarHeight - progressBarsHeight)
+                it.place(x = 0, y = layoutHeight - bottomBarBodyHeight - progressBarsHeight)
             }
 
             topBarPlaceables.forEach {
                 it.place(x = 0, y = 0)
             }
 
-            bottomBarHeadPlaceable?.let { placeable ->
-                placeable.place(x = 0, y = layoutHeight - bottomBarHeight - placeable.height)
-            }
-
-            bottomBarPlaceables.forEach {
-                it.place(x = 0, y = layoutHeight - bottomBarHeight)
-            }
+            bottomBarPlaceable.place(x = 0, y = layoutHeight - bottomBarPlaceable.height)
         }
     }
 }

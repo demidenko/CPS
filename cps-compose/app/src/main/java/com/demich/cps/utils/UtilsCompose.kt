@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -104,6 +106,17 @@ fun Modifier.clickableNoRipple(
         onClick = onClick
     )
 }
+
+fun Modifier.swallowInitialEvents(enabled: Boolean) =
+    pointerInput(enabled) {
+        if (enabled) awaitPointerEventScope {
+            while (true) {
+                awaitPointerEvent(PointerEventPass.Initial)
+                    .changes
+                    .forEach { it.consume() }
+            }
+        }
+    }
 
 
 fun LazyListState.visibleRange(requiredVisiblePart: Float = 0.5f): IntRange {
