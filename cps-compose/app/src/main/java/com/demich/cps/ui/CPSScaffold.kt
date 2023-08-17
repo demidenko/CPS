@@ -1,11 +1,11 @@
 package com.demich.cps.ui
 
 import androidx.compose.material.Surface
-import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.layoutId
 import com.demich.cps.ui.theme.cpsColors
 
 //based on Material::Scaffold source code
@@ -50,8 +50,15 @@ private fun ScaffoldLayout(
             }
             val topBarHeight = topBarPlaceables.maxHeight()
 
-            val bottomBarPlaceables = subcompose(ScaffoldLayoutContent.BottomBar, bottomBar).map {
-                it.measure(looseConstraints)
+            var bottomBarHeadPlaceable: Placeable? = null
+            val bottomBarPlaceables = subcompose(ScaffoldLayoutContent.BottomBar, bottomBar).mapNotNull {
+                val placeable = it.measure(looseConstraints)
+                if (it.layoutId == BottomBarHeaderLayoutId) {
+                    bottomBarHeadPlaceable = placeable
+                    null
+                } else {
+                    placeable
+                }
             }
             val bottomBarHeight = bottomBarPlaceables.maxHeight()
 
@@ -75,6 +82,10 @@ private fun ScaffoldLayout(
 
             topBarPlaceables.forEach {
                 it.place(x = 0, y = 0)
+            }
+
+            bottomBarHeadPlaceable?.let { placeable ->
+                placeable.place(x = 0, y = layoutHeight - bottomBarHeight - placeable.height)
             }
 
             bottomBarPlaceables.forEach {

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -33,6 +34,7 @@ fun CPSBottomBar(
     additionalBottomBar: AdditionalBottomBarBuilder? = null
 ) {
     if (navigator.isBottomBarEnabled) {
+        var layoutSetupEnabled by rememberSaveable { mutableStateOf(false) }
         Row(
             modifier = Modifier
                 .height(CPSDefaults.bottomBarHeight)
@@ -47,7 +49,16 @@ fun CPSBottomBar(
             CPSBottomBarVerticalDivider()
             CPSBottomBarMain(
                 navigator = navigator,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onEnableLayoutSettings = {
+                    layoutSetupEnabled = true
+                }
+            )
+        }
+
+        if (layoutSetupEnabled) {
+            BottomBarSettings(
+                onDismissRequest = { layoutSetupEnabled = false }
             )
         }
     }
@@ -56,6 +67,7 @@ fun CPSBottomBar(
 @Composable
 private fun CPSBottomBarMain(
     navigator: CPSNavigator,
+    onEnableLayoutSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -84,9 +96,7 @@ private fun CPSBottomBarMain(
             }
             navigator.navigateTo(screen)
         },
-        onLongPress = {
-            //TODO: setup layout
-        }
+        onLongPress = onEnableLayoutSettings
     )
 }
 
