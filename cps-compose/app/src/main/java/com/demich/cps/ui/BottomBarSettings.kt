@@ -13,8 +13,6 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.launch
 
-data object BottomBarHeaderLayoutId
-
 @Composable
 fun BottomBarSettings(
     modifier: Modifier = Modifier,

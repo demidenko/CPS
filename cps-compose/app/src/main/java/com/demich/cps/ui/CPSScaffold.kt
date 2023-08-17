@@ -82,6 +82,8 @@ private fun ScaffoldLayout(
     }
 }
 
+data object BottomBarHeaderLayoutId
+
 private enum class ScaffoldLayoutContent { TopBar, MainContent, BottomBar, ProgressBars }
 
 private fun List<Placeable>.maxHeight(): Int =

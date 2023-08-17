@@ -62,8 +62,8 @@ fun CPSBottomBar(
             BottomBarBody(
                 navigator = navigator,
                 additionalBottomBar = additionalBottomBar,
-                onEnableLayoutSettings = { layoutSetupEnabled = true },
-                modifier = Modifier.swallowInitialEvents(enabled = layoutSetupEnabled)
+                layoutSettingsEnabled = layoutSetupEnabled,
+                onEnableLayoutSettings = { layoutSetupEnabled = true }
             )
         }
     }
@@ -73,14 +73,15 @@ fun CPSBottomBar(
 private fun BottomBarBody(
     navigator: CPSNavigator,
     additionalBottomBar: AdditionalBottomBarBuilder?,
-    onEnableLayoutSettings: () -> Unit,
-    modifier: Modifier = Modifier
+    layoutSettingsEnabled: Boolean,
+    onEnableLayoutSettings: () -> Unit
 ) {
     Row(
-        modifier = modifier
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
             .height(CPSDefaults.bottomBarHeight)
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+            .fillMaxWidth()
+            .swallowInitialEvents(enabled = layoutSettingsEnabled)
     ) {
         CPSBottomBarAdditional(
             modifier = Modifier.weight(1f),
@@ -88,8 +89,9 @@ private fun BottomBarBody(
         )
         CPSBottomBarVerticalDivider()
         CPSBottomBarMain(
-            navigator = navigator,
             modifier = Modifier.weight(1f),
+            selectedRootScreenType = navigator.currentScreen?.rootScreenType?.takeIf { !layoutSettingsEnabled },
+            onNavigateToScreen = navigator::navigateTo,
             onEnableLayoutSettings = onEnableLayoutSettings
         )
     }
@@ -97,7 +99,8 @@ private fun BottomBarBody(
 
 @Composable
 private fun CPSBottomBarMain(
-    navigator: CPSNavigator,
+    selectedRootScreenType: ScreenTypes?,
+    onNavigateToScreen: (RootScreen) -> Unit,
     onEnableLayoutSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -119,13 +122,13 @@ private fun CPSBottomBarMain(
     CPSBottomNavigationMainItems(
         modifier = modifier.fillMaxSize(),
         rootScreens = rootScreens,
-        selectedRootScreenType = navigator.currentScreen?.rootScreenType,
+        selectedRootScreenType = selectedRootScreenType,
         layoutType = layoutType,
         onSelect = { screen ->
             if (screen !is Screen.Development) {
                 scope.launch { context.settingsUI.startScreenRoute(screen.routePath) }
             }
-            navigator.navigateTo(screen)
+            onNavigateToScreen(screen)
         },
         onLongPress = onEnableLayoutSettings
     )
