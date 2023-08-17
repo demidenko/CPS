@@ -48,6 +48,9 @@ fun CPSBottomBar(
 ) {
     if (navigator.isBottomBarEnabled) {
         var layoutSetupEnabled by rememberSaveable { mutableStateOf(false) }
+
+        //TODO: no animation on dark mode change
+        //TODO: system bottom bar same color
         val backgroundColor by animateColorAsState(
             targetValue = if (layoutSetupEnabled) cpsColors.backgroundAdditional else cpsColors.backgroundNavigation,
             label = "bottom_bar_background",
