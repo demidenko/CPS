@@ -66,7 +66,7 @@ class DmojAccountManager :
         HandleColor.GREEN to 1300,
         HandleColor.BLUE to 1600,
         HandleColor.VIOLET to 1900,
-        HandleColor.YELLOW to 2400
+        HandleColor.ORANGE to 2400
     )
 
     override val rankedHandleColorsList = HandleColor.rankedDmoj
@@ -77,7 +77,7 @@ class DmojAccountManager :
             HandleColor.GREEN -> Color(0xff00a900)
             HandleColor.BLUE -> Color(0xFF0000FF)
             HandleColor.VIOLET -> Color(0xFF800080)
-            HandleColor.YELLOW -> Color(0xFFFFB100)
+            HandleColor.ORANGE -> Color(0xFFFFB100)
             HandleColor.RED -> Color(0xFFEE0000)
             else -> throw HandleColor.UnknownHandleColorException(handleColor, this)
         }
