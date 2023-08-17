@@ -92,14 +92,6 @@ private fun CPSContent() {
 
     navigator.ColorizeNavAndStatusBars()
 
-    CPSScaffold(navigator = navigator)
-}
-
-
-@Composable
-private fun CPSScaffold(
-    navigator: CPSNavigator
-) {
     fun NavGraphBuilder.cpsComposable(
         screenType: ScreenTypes,
         content: @Composable (CPSNavigator.DuringCompositionHolder) -> Unit
