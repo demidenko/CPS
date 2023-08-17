@@ -107,11 +107,12 @@ private fun CPSBottomNavigationMainItems(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.clipToBounds()
-    ) {
-        if (layoutType == NavigationLayoutType.center) {
-            Spacer(modifier = Modifier.weight(1f))
+        modifier = modifier.clipToBounds(),
+        horizontalArrangement = when (layoutType) {
+            NavigationLayoutType.start -> Arrangement.Start
+            else -> Arrangement.Center
         }
+    ) {
         for (screen in rootScreens) {
             CPSBottomNavigationItem(
                 icon = screen.icon,
@@ -122,9 +123,6 @@ private fun CPSBottomNavigationMainItems(
                 onLongPress = onLongPress,
                 modifier = if (layoutType == NavigationLayoutType.evenly) Modifier.weight(1f) else Modifier
             )
-        }
-        if (layoutType == NavigationLayoutType.center || layoutType == NavigationLayoutType.start) {
-            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
