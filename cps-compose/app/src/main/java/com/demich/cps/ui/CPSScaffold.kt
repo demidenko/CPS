@@ -10,8 +10,6 @@ import com.demich.cps.ui.theme.cpsColors
 
 //based on Material::Scaffold source code
 
-//TODO: block events on bottom bar setup
-
 @Composable
 fun CPSScaffold(
     modifier: Modifier = Modifier,

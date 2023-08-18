@@ -6,10 +6,12 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -52,48 +55,68 @@ fun CPSBottomBar(
     if (navigator.isBottomBarEnabled) {
         var layoutSetupEnabled by rememberSaveable { mutableStateOf(false) }
 
-        val backgroundColor = animateColor(
-            onColor = cpsColors.backgroundAdditional,
-            offColor = cpsColors.backgroundNavigation,
-            enabled = layoutSetupEnabled,
-            animationSpec = switchAnimationSpec()
-        ).also {
-            systemUiController.setNavigationBarColor(
-                color = it,
-                darkIcons = MaterialTheme.colors.isLight
+        Box(modifier = Modifier.layoutId(BottomBarLayoutId)) {
+            Scrim(
+                show = layoutSetupEnabled,
+                onDismiss = { layoutSetupEnabled = false },
+                modifier = Modifier.fillMaxSize()
             )
-        }
-
-        Column(
-            modifier = Modifier
-                .layoutId(BottomBarLayoutId)
-                .pointerInput(Unit) {},
-        ) {
-            AnimatedVisibility(
-                visible = layoutSetupEnabled,
-                exit = shrinkVertically(switchAnimationSpec()),
-                enter = expandVertically(switchAnimationSpec())
-            ) {
-                BottomBarSettings(
-                    onDismissRequest = { layoutSetupEnabled = false },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
-                        .background(backgroundColor)
-                        .padding(all = 8.dp)
-                )
-            }
-            BottomBarBody(
+            BottomBarContent(
                 navigator = navigator,
                 additionalBottomBar = additionalBottomBar,
-                layoutSettingsEnabled = layoutSetupEnabled,
-                onEnableLayoutSettings = { layoutSetupEnabled = true },
-                modifier = Modifier
-                    .height(CPSDefaults.bottomBarHeight)
-                    .fillMaxWidth()
-                    .background(backgroundColor)
+                layoutSetupEnabled = layoutSetupEnabled,
+                onEnableLayoutSetup = { layoutSetupEnabled = true },
+                onDismissLayoutSetup = { layoutSetupEnabled = false },
+                onSetSystemNavColor = systemUiController::setNavigationBarColor,
+                modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
+    }
+}
+
+
+@Composable
+private fun BottomBarContent(
+    navigator: CPSNavigator,
+    additionalBottomBar: AdditionalBottomBarBuilder?,
+    layoutSetupEnabled: Boolean,
+    onEnableLayoutSetup: () -> Unit,
+    onDismissLayoutSetup: () -> Unit,
+    onSetSystemNavColor: (Color) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val backgroundColor = animateColor(
+        onColor = cpsColors.backgroundAdditional,
+        offColor = cpsColors.backgroundNavigation,
+        enabled = layoutSetupEnabled,
+        animationSpec = switchAnimationSpec()
+    ).also(onSetSystemNavColor)
+
+    Column(modifier = modifier.pointerInput(Unit) {}) {
+        AnimatedVisibility(
+            visible = layoutSetupEnabled,
+            exit = shrinkVertically(switchAnimationSpec()),
+            enter = expandVertically(switchAnimationSpec())
+        ) {
+            BottomBarSettings(
+                onDismissRequest = onDismissLayoutSetup,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
+                    .background(backgroundColor)
+                    .padding(all = 8.dp)
+            )
+        }
+        BottomBarBody(
+            navigator = navigator,
+            additionalBottomBar = additionalBottomBar,
+            layoutSettingsEnabled = layoutSetupEnabled,
+            onEnableLayoutSettings = onEnableLayoutSetup,
+            modifier = Modifier
+                .height(CPSDefaults.bottomBarHeight)
+                .fillMaxWidth()
+                .background(backgroundColor)
+        )
     }
 }
 
@@ -121,6 +144,23 @@ private fun BottomBarBody(
             layoutSettingsEnabled = layoutSettingsEnabled,
             onEnableLayoutSettings = onEnableLayoutSettings
         )
+    }
+}
+
+@Composable
+private fun Scrim(
+    show: Boolean,
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit
+) {
+    val alpha by animateFloatAsState(targetValue = if (show) 0.32f else 0f, label = "scrim_alpha")
+    if (alpha > 0f) {
+        Canvas(modifier = modifier.let {
+            if (!show) it
+            else it.pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
+        }) {
+            drawRect(color = Color.Black.copy(alpha = alpha))
+        }
     }
 }
 
