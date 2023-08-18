@@ -1,7 +1,6 @@
 package com.demich.cps
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -36,6 +35,7 @@ import com.demich.cps.utils.animateColor
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.swallowInitialEvents
+import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.launch
 
 typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
@@ -45,18 +45,23 @@ private fun<T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessMed
 @Composable
 fun CPSBottomBar(
     navigator: CPSNavigator,
-    additionalBottomBar: AdditionalBottomBarBuilder? = null
+    additionalBottomBar: AdditionalBottomBarBuilder? = null,
+    systemUiController: SystemUiController
 ) {
     if (navigator.isBottomBarEnabled) {
         var layoutSetupEnabled by rememberSaveable { mutableStateOf(false) }
 
-        //TODO: system bottom bar same color
         val backgroundColor = animateColor(
             onColor = cpsColors.backgroundAdditional,
             offColor = cpsColors.backgroundNavigation,
             enabled = layoutSetupEnabled,
             animationSpec = switchAnimationSpec()
-        )
+        ).also {
+            systemUiController.setNavigationBarColor(
+                color = it,
+                darkIcons = MaterialTheme.colors.isLight
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -202,6 +207,8 @@ private fun CPSBottomNavigationItem(
     onClick: () -> Unit
 ) {
     val fraction by animateFloatAsState(targetValue = if (isSelected) 1f else 0f)
+
+    //TODO: remove ripple on layout setup enabled
 
     Box(
         modifier = modifier

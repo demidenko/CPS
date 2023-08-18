@@ -57,6 +57,7 @@ import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.workers.enqueueEnabledWorkers
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -85,8 +86,9 @@ class MainActivity: ComponentActivity() {
 @Composable
 private fun CPSContent() {
     val navigator = rememberCPSNavigator(navController = rememberNavController())
+    val systemUiController = rememberSystemUiController()
 
-    navigator.ColorizeNavAndStatusBars()
+    navigator.ColorizeNavAndStatusBars(systemUiController)
 
     fun NavGraphBuilder.cpsComposable(
         screenType: ScreenTypes,
@@ -213,7 +215,7 @@ private fun CPSContent() {
 
     CPSScaffold(
         topBar = { navigator.TopBar() },
-        bottomBar = { navigator.BottomBar() },
+        bottomBar = { navigator.BottomBar(systemUiController) },
         progressBars = { CPSBottomProgressBarsColumn() },
         modifier = Modifier.systemBarsPadding()
     ) {

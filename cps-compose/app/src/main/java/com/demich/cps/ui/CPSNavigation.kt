@@ -125,10 +125,11 @@ class CPSNavigator(
     }
 
     @Composable
-    fun BottomBar() {
+    fun BottomBar(systemUiController: SystemUiController) {
         CPSBottomBar(
             navigator = this,
-            additionalBottomBar = bottomBarBuilderState.value
+            additionalBottomBar = bottomBarBuilderState.value,
+            systemUiController = systemUiController
         )
     }
 
