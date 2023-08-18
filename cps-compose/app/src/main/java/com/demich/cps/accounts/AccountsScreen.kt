@@ -11,7 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.demich.cps.AdditionalBottomBarBuilder
+import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.managers.*
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.*

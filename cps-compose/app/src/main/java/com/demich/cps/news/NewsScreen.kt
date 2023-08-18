@@ -2,7 +2,7 @@ package com.demich.cps.news
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import com.demich.cps.AdditionalBottomBarBuilder
+import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.navigation.Screen
 import com.demich.cps.news.codeforces.CodeforcesNewsBottomBar
 import com.demich.cps.news.codeforces.CodeforcesNewsController

@@ -1,39 +1,46 @@
-package com.demich.cps
+package com.demich.cps.ui.bottombar
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import com.demich.cps.navigation.RootScreen
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTypes
-import com.demich.cps.ui.*
+import com.demich.cps.ui.BottomBarLayoutId
+import com.demich.cps.ui.CPSDefaults
+import com.demich.cps.ui.CPSNavigator
+import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.animateColor
 import com.demich.cps.utils.context
@@ -43,8 +50,6 @@ import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.launch
 
 typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
-
-private fun<T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessMediumLow)
 
 @Composable
 fun CPSBottomBar(
@@ -74,6 +79,7 @@ fun CPSBottomBar(
     }
 }
 
+private fun<T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessMediumLow)
 
 @Composable
 private fun BottomBarContent(
@@ -132,13 +138,13 @@ private fun BottomBarBody(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.swallowInitialEvents(enabled = layoutSettingsEnabled)
     ) {
-        CPSBottomBarAdditional(
+        BottomBarBodyAdditional(
             modifier = Modifier.weight(1f),
             content = additionalBottomBar ?: {}
         )
-        CPSBottomBarVerticalDivider()
-        CPSBottomBarMain(
-            modifier = Modifier.weight(1f),
+        BottomBarVerticalDivider()
+        BottomBarBodyMain(
+            modifier = Modifier.weight(1f).fillMaxHeight(),
             selectedRootScreenType = { navigator.currentScreen?.rootScreenType },
             onNavigateToScreen = navigator::navigateTo,
             layoutSettingsEnabled = layoutSettingsEnabled,
@@ -148,24 +154,7 @@ private fun BottomBarBody(
 }
 
 @Composable
-private fun Scrim(
-    show: Boolean,
-    modifier: Modifier = Modifier,
-    onDismiss: () -> Unit
-) {
-    val alpha by animateFloatAsState(targetValue = if (show) 0.32f else 0f, label = "scrim_alpha")
-    if (alpha > 0f) {
-        Canvas(modifier = modifier.let {
-            if (!show) it
-            else it.pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
-        }) {
-            drawRect(color = Color.Black.copy(alpha = alpha))
-        }
-    }
-}
-
-@Composable
-private fun CPSBottomBarMain(
+private fun BottomBarBodyMain(
     selectedRootScreenType: () -> ScreenTypes?,
     onNavigateToScreen: (RootScreen) -> Unit,
     layoutSettingsEnabled: Boolean,
@@ -187,8 +176,8 @@ private fun CPSBottomBarMain(
         }
     }
 
-    CPSBottomNavigationMainItems(
-        modifier = modifier.fillMaxSize(),
+    BottomNavigationMainItems(
+        modifier = modifier,
         rootScreens = rootScreens,
         selectedRootScreenType = if (layoutSettingsEnabled) null else selectedRootScreenType(),
         indication = if (layoutSettingsEnabled) null else rememberRipple(bounded = false, radius = 48.dp),
@@ -201,14 +190,8 @@ private fun CPSBottomBarMain(
     )
 }
 
-enum class NavigationLayoutType {
-    start,  //ABC....
-    center, //..ABC..
-    evenly  //.A.B.C. (tap area as weight(1f))
-}
-
 @Composable
-private fun CPSBottomNavigationMainItems(
+private fun BottomNavigationMainItems(
     modifier: Modifier = Modifier,
     rootScreens: List<RootScreen>,
     selectedRootScreenType: ScreenTypes?,
@@ -225,7 +208,7 @@ private fun CPSBottomNavigationMainItems(
             else -> Arrangement.Center
         }
     ) {
-        for (screen in rootScreens) {
+        rootScreens.forEach { screen ->
             CPSBottomNavigationItem(
                 icon = screen.icon,
                 isSelected = screen.screenType == selectedRootScreenType,
@@ -240,59 +223,14 @@ private fun CPSBottomNavigationMainItems(
     }
 }
 
-
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun CPSBottomNavigationItem(
-    icon: ImageVector,
-    isSelected: Boolean,
-    modifier: Modifier = Modifier,
-    indication: Indication?,
-    onLongPress: (() -> Unit)? = null,
-    onClick: () -> Unit
-) {
-    val fraction by animateFloatAsState(targetValue = if (isSelected) 1f else 0f)
-
-    Box(
-        modifier = modifier
-            .minimumInteractiveComponentSize()
-            .fillMaxHeight()
-            .combinedClickable(
-                indication = indication,
-                interactionSource = remember { MutableInteractionSource() },
-                onClick = onClick,
-                onLongClick = onLongPress?.withVibration()
-            )
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = lerp(start = cpsColors.content, stop = cpsColors.accent, fraction),
-            modifier = Modifier
-                .align(Alignment.Center)
-                .size(lerp(start = 24.dp, stop = 28.dp, fraction = fraction))
-        )
-    }
-}
-
-@Composable
-private fun CPSBottomBarAdditional(
+private fun BottomBarBodyAdditional(
     modifier: Modifier = Modifier,
     content: AdditionalBottomBarBuilder
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         horizontalArrangement = Arrangement.End,
         content = content
-    )
-}
-
-@Composable
-private fun CPSBottomBarVerticalDivider() {
-    Box(
-        Modifier
-            .fillMaxHeight(0.6f)
-            .width(1.dp)
-            .background(cpsColors.divider)
     )
 }
