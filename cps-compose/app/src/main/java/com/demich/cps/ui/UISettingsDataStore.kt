@@ -33,6 +33,6 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
     }
 
     val startScreenRoute = itemString(name = "start_screen_route", defaultValue = ScreenTypes.accounts.route)
-    val navigationLayoutType = itemEnum(name = "navigation_bar_layout", defaultValue = NavigationLayoutType.evenly)
+    val navigationLayoutType = itemEnum(name = "navigation_bar_layout", defaultValue = NavigationLayoutType.start)
 
 }
