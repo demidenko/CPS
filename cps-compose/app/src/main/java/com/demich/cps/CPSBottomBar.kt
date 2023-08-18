@@ -7,6 +7,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -115,8 +116,9 @@ private fun BottomBarBody(
         CPSBottomBarVerticalDivider()
         CPSBottomBarMain(
             modifier = Modifier.weight(1f),
-            selectedRootScreenType = navigator.currentScreen?.rootScreenType?.takeIf { !layoutSettingsEnabled },
+            selectedRootScreenType = { navigator.currentScreen?.rootScreenType },
             onNavigateToScreen = navigator::navigateTo,
+            layoutSettingsEnabled = layoutSettingsEnabled,
             onEnableLayoutSettings = onEnableLayoutSettings
         )
     }
@@ -124,8 +126,9 @@ private fun BottomBarBody(
 
 @Composable
 private fun CPSBottomBarMain(
-    selectedRootScreenType: ScreenTypes?,
+    selectedRootScreenType: () -> ScreenTypes?,
     onNavigateToScreen: (RootScreen) -> Unit,
+    layoutSettingsEnabled: Boolean,
     onEnableLayoutSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -147,12 +150,11 @@ private fun CPSBottomBarMain(
     CPSBottomNavigationMainItems(
         modifier = modifier.fillMaxSize(),
         rootScreens = rootScreens,
-        selectedRootScreenType = selectedRootScreenType,
+        selectedRootScreenType = if (layoutSettingsEnabled) null else selectedRootScreenType(),
+        indication = if (layoutSettingsEnabled) null else rememberRipple(bounded = false, radius = 48.dp),
         layoutType = layoutType,
         onSelect = { screen ->
-            if (screen !is Screen.Development) {
-                scope.launch { context.settingsUI.startScreenRoute(screen.routePath) }
-            }
+            scope.launch { context.settingsUI.startScreenRoute(screen.routePath) }
             onNavigateToScreen(screen)
         },
         onLongPress = onEnableLayoutSettings
@@ -170,6 +172,7 @@ private fun CPSBottomNavigationMainItems(
     modifier: Modifier = Modifier,
     rootScreens: List<RootScreen>,
     selectedRootScreenType: ScreenTypes?,
+    indication: Indication?,
     layoutType: NavigationLayoutType,
     onSelect: (RootScreen) -> Unit,
     onLongPress: () -> Unit
@@ -190,6 +193,7 @@ private fun CPSBottomNavigationMainItems(
                     if (screen.screenType != selectedRootScreenType) onSelect(screen)
                 },
                 onLongPress = onLongPress,
+                indication = indication,
                 modifier = if (layoutType == NavigationLayoutType.evenly) Modifier.weight(1f) else Modifier
             )
         }
@@ -203,19 +207,18 @@ private fun CPSBottomNavigationItem(
     icon: ImageVector,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
+    indication: Indication?,
     onLongPress: (() -> Unit)? = null,
     onClick: () -> Unit
 ) {
     val fraction by animateFloatAsState(targetValue = if (isSelected) 1f else 0f)
-
-    //TODO: remove ripple on layout setup enabled
 
     Box(
         modifier = modifier
             .minimumInteractiveComponentSize()
             .fillMaxHeight()
             .combinedClickable(
-                indication = rememberRipple(bounded = false, radius = 48.dp),
+                indication = indication,
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = onClick,
                 onLongClick = onLongPress?.withVibration()
