@@ -32,6 +32,7 @@ import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTypes
 import com.demich.cps.ui.*
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.animateColor
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.swallowInitialEvents
@@ -39,7 +40,7 @@ import kotlinx.coroutines.launch
 
 typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
 
-private const val stiffness = Spring.StiffnessMediumLow
+private fun<T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessMediumLow)
 
 @Composable
 fun CPSBottomBar(
@@ -49,23 +50,23 @@ fun CPSBottomBar(
     if (navigator.isBottomBarEnabled) {
         var layoutSetupEnabled by rememberSaveable { mutableStateOf(false) }
 
-        //TODO: no animation on dark mode change
         //TODO: system bottom bar same color
-        val backgroundColor by animateColorAsState(
-            targetValue = if (layoutSetupEnabled) cpsColors.backgroundAdditional else cpsColors.backgroundNavigation,
-            label = "bottom_bar_background",
-            animationSpec = spring(stiffness = stiffness)
+        val backgroundColor = animateColor(
+            onColor = cpsColors.backgroundAdditional,
+            offColor = cpsColors.backgroundNavigation,
+            enabled = layoutSetupEnabled,
+            animationSpec = switchAnimationSpec()
         )
 
         Column(
             modifier = Modifier
-                .layoutId(BottomBarHeaderLayoutId)
+                .layoutId(BottomBarLayoutId)
                 .pointerInput(Unit) {},
         ) {
             AnimatedVisibility(
                 visible = layoutSetupEnabled,
-                exit = shrinkVertically(spring(stiffness = stiffness)),
-                enter = expandVertically(spring(stiffness = stiffness))
+                exit = shrinkVertically(switchAnimationSpec()),
+                enter = expandVertically(switchAnimationSpec())
             ) {
                 BottomBarSettings(
                     onDismissRequest = { layoutSetupEnabled = false },

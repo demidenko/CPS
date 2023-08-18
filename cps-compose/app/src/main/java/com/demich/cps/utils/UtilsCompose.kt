@@ -2,6 +2,8 @@ package com.demich.cps.utils
 
 import android.content.Context
 import androidx.activity.ComponentActivity
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyListState
@@ -21,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -117,6 +120,17 @@ fun Modifier.swallowInitialEvents(enabled: Boolean) =
             }
         }
     }
+
+@Composable
+fun animateColor(
+    onColor: Color,
+    offColor: Color,
+    enabled: Boolean,
+    animationSpec: AnimationSpec<Float>
+): Color {
+    val fraction by animateFloatAsState(targetValue = if (enabled) 1f else 0f, animationSpec = animationSpec)
+    return lerp(start = offColor, stop = onColor, fraction = fraction)
+}
 
 
 fun LazyListState.visibleRange(requiredVisiblePart: Float = 0.5f): IntRange {
