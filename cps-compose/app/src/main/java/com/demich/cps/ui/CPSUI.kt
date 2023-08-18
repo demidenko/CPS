@@ -24,13 +24,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.toSignedString
@@ -231,6 +229,27 @@ fun MonospacedText(
 
 
 @Composable
+fun<T> ButtonsSelectRow(
+    values: List<T>,
+    selectedValue: T,
+    modifier: Modifier = Modifier,
+    onSelect: (T) -> Unit,
+    content: @Composable (T) -> Unit
+) {
+    Row(modifier = modifier) {
+        values.forEach { value ->
+            TextButton(
+                onClick = { onSelect(value) },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = if (value == selectedValue) cpsColors.accent else cpsColors.contentAdditional
+                ),
+                content = { content(value) }
+            )
+        }
+    }
+}
+
+@Composable
 fun<T> TextButtonsSelectRow(
     values: List<T>,
     selectedValue: T,
@@ -238,15 +257,13 @@ fun<T> TextButtonsSelectRow(
     text: (T) -> String,
     onSelect: (T) -> Unit
 ) {
-    Row(modifier = modifier) {
-        values.forEach { value ->
-            TextButton(onClick = { onSelect(value) }) {
-                Text(
-                    text = text(value),
-                    color = if (value == selectedValue) cpsColors.accent else cpsColors.contentAdditional
-                )
-            }
-        }
+    ButtonsSelectRow(
+        values = values,
+        selectedValue = selectedValue,
+        onSelect = onSelect,
+        modifier = modifier
+    ) {
+        Text(text = text(it))
     }
 }
 

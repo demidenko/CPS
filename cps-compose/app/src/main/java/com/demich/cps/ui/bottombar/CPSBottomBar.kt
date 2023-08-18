@@ -110,7 +110,7 @@ private fun BottomBarContent(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
                     .background(backgroundColor)
-                    .padding(all = 8.dp)
+                    .padding(horizontal = 8.dp)
             )
         }
         BottomBarBody(
