@@ -200,13 +200,9 @@ private fun BottomNavigationMainItems(
     onSelect: (RootScreen) -> Unit,
     onLongPress: () -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    MainNavItemsRow(
         modifier = modifier.clipToBounds(),
-        horizontalArrangement = when (layoutType) {
-            NavigationLayoutType.start -> Arrangement.Start
-            else -> Arrangement.Center
-        }
+        navigationLayoutType = layoutType
     ) {
         rootScreens.forEach { screen ->
             CPSBottomNavigationItem(
@@ -217,7 +213,7 @@ private fun BottomNavigationMainItems(
                 },
                 onLongPress = onLongPress,
                 indication = indication,
-                modifier = if (layoutType == NavigationLayoutType.evenly) Modifier.weight(1f) else Modifier
+                modifier = Modifier.fillMaxHeight()
             )
         }
     }

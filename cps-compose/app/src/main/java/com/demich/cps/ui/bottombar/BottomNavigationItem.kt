@@ -6,7 +6,6 @@ import androidx.compose.foundation.Indication
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.minimumInteractiveComponentSize
@@ -38,7 +37,6 @@ internal fun CPSBottomNavigationItem(
     Box(
         modifier = modifier
             .minimumInteractiveComponentSize()
-            .fillMaxHeight()
             .combinedClickable(
                 indication = indication,
                 interactionSource = remember { MutableInteractionSource() },

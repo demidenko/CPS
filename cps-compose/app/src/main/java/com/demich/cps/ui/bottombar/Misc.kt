@@ -16,13 +16,6 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.theme.cpsColors
 
 
-enum class NavigationLayoutType {
-    start,  //ABC....
-    center, //..ABC..
-    evenly  //.A.B.C. (tap area as weight(1f))
-}
-
-
 @Composable
 internal fun Scrim(
     show: Boolean,
