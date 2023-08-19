@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.demich.cps.accounts.managers.HandleColor
+import com.demich.cps.accounts.HandleColor
 
 internal val LocalCPSColors = compositionLocalOf<CPSColors> { throw IllegalAccessError() }
 

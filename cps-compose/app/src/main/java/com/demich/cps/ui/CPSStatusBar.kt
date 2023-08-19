@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.managers.AccountManagerType
-import com.demich.cps.accounts.managers.HandleColor
+import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.allRatedAccountManagers
 import com.demich.cps.accounts.userinfo.RatedUserInfo

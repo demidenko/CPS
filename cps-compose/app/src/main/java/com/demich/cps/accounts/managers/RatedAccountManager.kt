@@ -5,6 +5,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import com.demich.cps.accounts.HandleColor
+import com.demich.cps.accounts.HandleColorBound
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
@@ -71,40 +73,12 @@ abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagerType):
     protected abstract suspend fun loadRatingHistory(userId: String): List<RatingChange>
     suspend fun getRatingHistory(userId: String): List<RatingChange> =
         loadRatingHistory(userId).sortedBy { it.date }
+
 }
 
-enum class HandleColor {
-    GRAY,
-    BROWN,
-    GREEN,
-    CYAN,
-    BLUE,
-    VIOLET,
-    YELLOW,
-    ORANGE,
-    RED;
 
-    companion object {
-        //TODO atcoder::orange == cf::red
-        val rankedCodeforces    = arrayOf(GRAY, GRAY, GREEN, CYAN, BLUE, VIOLET, VIOLET, ORANGE, ORANGE, RED)
-        val rankedAtCoder       = arrayOf(GRAY, BROWN, GREEN, CYAN, BLUE, YELLOW, YELLOW, ORANGE, ORANGE, RED)
-        val rankedTopCoder      = arrayOf(GRAY, GRAY, GREEN, GREEN, BLUE, YELLOW, YELLOW, YELLOW, YELLOW, RED)
-        //TODO:
-        val rankedCodeChef      = arrayOf(GRAY, GRAY, GREEN, GREEN, BLUE, VIOLET, YELLOW, YELLOW, ORANGE, RED)
-        val rankedDmoj          = arrayOf(GRAY, GRAY, GREEN, GREEN, BLUE, VIOLET, VIOLET, ORANGE, ORANGE, RED)
-    }
-
-    class UnknownHandleColorException(color: HandleColor, manager: RatedAccountManager<*>):
-        Throwable("Manager ${manager.type.name} does not support color ${color.name}")
-}
-
-data class HandleColorBound(
-    val handleColor: HandleColor,
-    val ratingUpperBound: Int
-)
-
-infix fun HandleColor.to(rating: Int): HandleColorBound =
-    HandleColorBound(handleColor = this, ratingUpperBound = rating)
+class UnknownHandleColorException(color: HandleColor, manager: RatedAccountManager<*>):
+    IllegalArgumentException("Manager ${manager.type.name} does not support color ${color.name}")
 
 
 interface RatingRevolutionsProvider {

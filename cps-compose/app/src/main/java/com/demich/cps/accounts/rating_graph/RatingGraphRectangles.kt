@@ -1,8 +1,8 @@
 package com.demich.cps.accounts.rating_graph
 
 import androidx.compose.runtime.Immutable
-import com.demich.cps.accounts.managers.HandleColor
-import com.demich.cps.accounts.managers.HandleColorBound
+import com.demich.cps.accounts.HandleColor
+import com.demich.cps.accounts.HandleColorBound
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingRevolutionsProvider
 import com.demich.cps.accounts.userinfo.RatedUserInfo

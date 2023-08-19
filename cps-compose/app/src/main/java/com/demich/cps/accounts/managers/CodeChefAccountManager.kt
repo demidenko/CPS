@@ -18,11 +18,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.accounts.HandleColor
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
+import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
@@ -93,7 +95,7 @@ class CodeChefAccountManager :
             HandleColor.YELLOW -> Color(255, 191, 0)
             HandleColor.ORANGE -> Color(255, 127, 0)
             HandleColor.RED -> Color(208,1,27)
-            else -> throw HandleColor.UnknownHandleColorException(handleColor, this)
+            else -> throw UnknownHandleColorException(handleColor, this)
         }
 
     override val rankedHandleColorsList = HandleColor.rankedCodeChef

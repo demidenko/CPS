@@ -7,11 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.demich.cps.accounts.HandleColor
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
+import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
@@ -80,7 +82,7 @@ class AtCoderAccountManager :
             HandleColor.YELLOW -> Color(0xFFC0C000)
             HandleColor.ORANGE -> Color(0xFFFF8000)
             HandleColor.RED -> Color(0xFFFF0000)
-            else -> throw HandleColor.UnknownHandleColorException(handleColor, this)
+            else -> throw UnknownHandleColorException(handleColor, this)
         }
 
     @Composable

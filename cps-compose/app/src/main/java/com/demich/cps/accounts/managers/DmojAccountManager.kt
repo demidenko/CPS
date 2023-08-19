@@ -10,11 +10,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import com.demich.cps.accounts.HandleColor
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
+import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.DmojUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
@@ -79,7 +81,7 @@ class DmojAccountManager :
             HandleColor.VIOLET -> Color(0xFF800080)
             HandleColor.ORANGE -> Color(0xFFFFB100)
             HandleColor.RED -> Color(0xFFEE0000)
-            else -> throw HandleColor.UnknownHandleColorException(handleColor, this)
+            else -> throw UnknownHandleColorException(handleColor, this)
         }
 
     @Composable

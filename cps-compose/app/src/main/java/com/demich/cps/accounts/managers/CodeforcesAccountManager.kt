@@ -20,10 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.R
+import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.rating_graph.RatingLoadButton
 import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
+import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
@@ -101,7 +103,7 @@ class CodeforcesAccountManager :
             HandleColor.YELLOW -> Color(0xFFBBBB00)
             HandleColor.ORANGE -> Color(0xFFFF8C00)
             HandleColor.RED -> Color(0xFFFF0000)
-            else -> throw HandleColor.UnknownHandleColorException(handleColor, this)
+            else -> throw UnknownHandleColorException(handleColor, this)
         }
 
     private fun CodeforcesColorTag.toHandleColor(): HandleColor? {
