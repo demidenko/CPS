@@ -99,7 +99,7 @@ class CodeChefAccountManager :
     override val rankedHandleColorsList = HandleColor.rankedCodeChef
 
     private fun getRatingStarNumber(rating: Int): Int {
-        val index = ratingsUpperBounds.indexOfFirst { rating < it.second }
+        val index = ratingsUpperBounds.indexOfFirst { rating < it.ratingUpperBound }
         return if (index == -1) ratingsUpperBounds.size + 1 else index + 1
     }
 

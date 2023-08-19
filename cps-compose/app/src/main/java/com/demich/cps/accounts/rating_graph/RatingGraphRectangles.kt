@@ -2,6 +2,7 @@ package com.demich.cps.accounts.rating_graph
 
 import androidx.compose.runtime.Immutable
 import com.demich.cps.accounts.managers.HandleColor
+import com.demich.cps.accounts.managers.HandleColorBound
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingRevolutionsProvider
 import com.demich.cps.accounts.userinfo.RatedUserInfo
@@ -13,13 +14,13 @@ internal class RatingGraphRectangles(
     manager: RatedAccountManager<out RatedUserInfo>
 ) {
     private val rectangles: List<Pair<Point, HandleColor>> = buildList {
-        fun addBounds(bounds: Array<Pair<HandleColor, Int>>, x: Long) {
-            bounds.sortedBy { it.second }.let { list ->
+        fun addBounds(bounds: Array<HandleColorBound>, x: Long) {
+            bounds.sortedBy { it.ratingUpperBound }.let { list ->
                 for (i in list.indices) {
-                    val y = if (i == 0) Int.MIN_VALUE else list[i-1].second
-                    add(Point(x = x, y = y.toLong()) to list[i].first)
+                    val y = if (i == 0) Int.MIN_VALUE else list[i-1].ratingUpperBound
+                    add(Point(x = x, y = y.toLong()) to list[i].handleColor)
                 }
-                add(Point(x = x, y = list.last().second.toLong()) to HandleColor.RED)
+                add(Point(x = x, y = list.last().ratingUpperBound.toLong()) to HandleColor.RED)
             }
         }
         addBounds(x = Long.MAX_VALUE, bounds = manager.ratingsUpperBounds)

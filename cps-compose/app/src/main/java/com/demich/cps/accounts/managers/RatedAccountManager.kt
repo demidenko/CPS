@@ -17,10 +17,10 @@ abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagerType):
 {
     override val userIdTitle get() = "handle"
 
-    abstract val ratingsUpperBounds: Array<Pair<HandleColor, Int>>
+    abstract val ratingsUpperBounds: Array<HandleColorBound>
     fun getHandleColor(rating: Int): HandleColor =
         ratingsUpperBounds
-            .firstOrNull { rating < it.second }?.first
+            .firstOrNull { rating < it.ratingUpperBound }?.handleColor
             ?: HandleColor.RED
 
     abstract fun originalColor(handleColor: HandleColor): Color
@@ -98,7 +98,16 @@ enum class HandleColor {
         Throwable("Manager ${manager.type.name} does not support color ${color.name}")
 }
 
+data class HandleColorBound(
+    val handleColor: HandleColor,
+    val ratingUpperBound: Int
+)
+
+infix fun HandleColor.to(rating: Int): HandleColorBound =
+    HandleColorBound(handleColor = this, ratingUpperBound = rating)
+
+
 interface RatingRevolutionsProvider {
     //list of (last time, bounds)
-    val ratingUpperBoundRevolutions: List<Pair<Instant, Array<Pair<HandleColor, Int>>>>
+    val ratingUpperBoundRevolutions: List<Pair<Instant, Array<HandleColorBound>>>
 }

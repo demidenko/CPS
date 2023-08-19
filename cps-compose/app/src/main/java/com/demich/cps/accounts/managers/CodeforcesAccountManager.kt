@@ -249,7 +249,7 @@ class CodeforcesAccountManager :
         }
     }
 
-    override val ratingUpperBoundRevolutions: List<Pair<Instant, Array<Pair<HandleColor, Int>>>>
+    override val ratingUpperBoundRevolutions
         get() = listOf(
             //https://codeforces.com/blog/entry/59228
             Instant.fromEpochSeconds(1525364996L) to arrayOf(
