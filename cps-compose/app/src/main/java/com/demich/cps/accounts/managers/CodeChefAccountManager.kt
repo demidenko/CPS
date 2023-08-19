@@ -34,6 +34,7 @@ import com.demich.cps.platforms.api.isRedirect
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.platforms.utils.CodeChefUtils
+import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.utils.append
 import kotlin.text.contains
 
@@ -105,11 +106,11 @@ class CodeChefAccountManager :
         return if (index == -1) ratingsUpperBounds.size + 1 else index + 1
     }
 
-    @Composable
-    override fun makeRatedSpan(text: String, rating: Int) = buildAnnotatedString {
-        append(text = "${getRatingStarNumber(rating)}$star ", color = colorFor(rating = rating))
-        append(text)
-    }
+    override fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors) =
+        buildAnnotatedString {
+            append(text = "${getRatingStarNumber(rating)}$star ", color = colorFor(rating, cpsColors))
+            append(text)
+        }
 
     @Composable
     private fun StarBox(

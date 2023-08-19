@@ -30,11 +30,17 @@ abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagerType):
         if (cpsColors.useOriginalHandleColors) originalColor(handleColor)
         else cpsColors.handleColor(handleColor)
 
-    @Composable
-    open fun makeRatedSpan(text: String, rating: Int) = AnnotatedString(
-        text = text,
-        spanStyle = SpanStyle(color = colorFor(rating = rating), fontWeight = FontWeight.Bold)
-    )
+    fun colorFor(rating: Int, cpsColors: CPSColors): Color =
+        colorFor(handleColor = getHandleColor(rating), cpsColors = cpsColors)
+
+    open fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString =
+        AnnotatedString(
+            text = text,
+            spanStyle = SpanStyle(
+                color = colorFor(rating = rating, cpsColors = cpsColors),
+                fontWeight = FontWeight.Bold
+            )
+        )
 
     @Composable
     final override fun makeOKInfoSpan(userInfo: U) = with(userInfo) {

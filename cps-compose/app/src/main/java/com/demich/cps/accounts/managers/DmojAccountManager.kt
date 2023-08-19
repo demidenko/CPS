@@ -23,6 +23,7 @@ import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.DmojApi
 import com.demich.cps.platforms.api.DmojRatingChange
 import com.demich.cps.platforms.api.isPageNotFound
+import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.utils.append
 
 
@@ -84,12 +85,11 @@ class DmojAccountManager :
             else -> throw UnknownHandleColorException(handleColor, this)
         }
 
-    @Composable
-    override fun makeRatedSpan(text: String, rating: Int): AnnotatedString {
-        if (rating < 3000) return super.makeRatedSpan(text, rating)
+    override fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString {
+        if (rating < 3000) return super.makeRatedSpan(text, rating, cpsColors)
         return buildAnnotatedString {
             append(text[0].toString(), fontWeight = FontWeight.Bold)
-            append(super.makeRatedSpan(text.drop(1), rating))
+            append(super.makeRatedSpan(text.drop(1), rating, cpsColors))
         }
     }
 

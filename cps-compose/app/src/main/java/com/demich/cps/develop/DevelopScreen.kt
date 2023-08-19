@@ -21,6 +21,7 @@ import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.allRatedAccountManagers
+import com.demich.cps.accounts.managers.makeRatedSpan
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.contests.contestsViewModel
 import com.demich.cps.ui.CPSIconButton

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -139,14 +140,15 @@ class CodeforcesAccountManager :
         }
 
     @Composable
+    @ReadOnlyComposable
     fun makeHandleSpan(handle: String, tag: CodeforcesColorTag): AnnotatedString =
         makeHandleSpan(handle = handle, tag = tag, cpsColors = cpsColors)
 
-    @Composable
-    override fun makeRatedSpan(text: String, rating: Int): AnnotatedString =
+    override fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString =
         makeHandleSpan(
             handle = text,
-            tag = CodeforcesColorTag.fromRating(rating)
+            tag = CodeforcesColorTag.fromRating(rating),
+            cpsColors = cpsColors
         )
 
 
