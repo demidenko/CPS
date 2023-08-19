@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
+import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp

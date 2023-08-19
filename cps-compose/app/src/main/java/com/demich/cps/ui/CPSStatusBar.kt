@@ -26,6 +26,7 @@ import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.allRatedAccountManagers
+import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.theme.cpsColors

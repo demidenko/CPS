@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.DialogAccountChooser
+import com.demich.cps.accounts.managers.makeHandleSpan
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.navigation.Screen
 import com.demich.cps.news.codeforces.codeforcesNewsViewModel

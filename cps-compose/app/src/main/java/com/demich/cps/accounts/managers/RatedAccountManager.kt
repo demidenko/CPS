@@ -11,7 +11,6 @@ import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.ui.theme.CPSColors
-import com.demich.cps.ui.theme.cpsColors
 import kotlinx.datetime.Instant
 
 abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagerType):
@@ -32,29 +31,10 @@ abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagerType):
         else cpsColors.handleColor(handleColor)
 
     @Composable
-    fun colorFor(handleColor: HandleColor): Color =
-        colorFor(handleColor = handleColor, cpsColors = cpsColors)
-
-    @Composable
-    fun colorFor(rating: Int): Color = colorFor(handleColor = getHandleColor(rating))
-
-    @Composable
-    fun makeHandleSpan(userInfo: U): AnnotatedString = with(userInfo) {
-        if (status == STATUS.OK) makeOKSpan(text = handle, rating = rating)
-        else AnnotatedString(text = handle)
-    }
-
-    @Composable
     open fun makeRatedSpan(text: String, rating: Int) = AnnotatedString(
         text = text,
         spanStyle = SpanStyle(color = colorFor(rating = rating), fontWeight = FontWeight.Bold)
     )
-
-    @Composable
-    fun makeOKSpan(text: String, rating: Int?): AnnotatedString {
-        return if (rating == null) AnnotatedString(text = text)
-        else makeRatedSpan(text, rating)
-    }
 
     @Composable
     final override fun makeOKInfoSpan(userInfo: U) = with(userInfo) {
