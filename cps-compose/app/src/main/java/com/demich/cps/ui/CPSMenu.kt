@@ -170,7 +170,7 @@ class CPSDropdownMenuScope(private val menuDismissRequest: () -> Unit) {
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(end = 8.dp)
+                    .padding(end = 10.dp)
                     .size(26.dp)
             )
             title()
