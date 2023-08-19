@@ -9,28 +9,34 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 val LocalCurrentTime = compositionLocalOf { getCurrentTime() }
 
+private operator fun Instant.rem(period: Duration): Duration {
+    val periodMillis = period.inWholeMilliseconds
+    val thisMillis = toEpochMilliseconds()
+    return (thisMillis % periodMillis).milliseconds
+}
+
 private fun currentTimeFlow(period: Duration): Flow<Instant> =
     flow {
-        val periodMillis = period.inWholeMilliseconds
-        require(periodMillis > 0)
         while (currentCoroutineContext().isActive) {
-            val currentMillis = getCurrentTime().toEpochMilliseconds()
-            val rem = currentMillis % periodMillis
-            emit(Instant.fromEpochMilliseconds(currentMillis - rem))
-            delay(timeMillis = if (rem == 0L) periodMillis else periodMillis - rem)
+            val current = getCurrentTime()
+            val rem = current % period
+            emit(current - rem)
+            delay(period - rem)
         }
     }
 
 @Composable
 fun collectCurrentTimeAsState(period: Duration): State<Instant> {
+    require(period.isPositive())
     return remember(key1 = period) {
         currentTimeFlow(period = period)
-    }.collectAsStateWithLifecycle(initialValue = remember(::getCurrentTime))
+    }.collectAsStateWithLifecycle(initialValue = remember { getCurrentTime().let { it - it % period } })
 }
 
 @Composable
