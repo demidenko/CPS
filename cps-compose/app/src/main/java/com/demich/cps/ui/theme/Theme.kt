@@ -40,6 +40,12 @@ fun CPSTheme(content: @Composable () -> Unit) {
                 fontWeight = FontWeight.Normal,
                 fontSize = 16.sp,
                 letterSpacing = 0.3.sp
+            ),
+            subtitle1 = TextStyle(
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 15.sp,
+                letterSpacing = 0.3.sp
             )
         )
     ) {
