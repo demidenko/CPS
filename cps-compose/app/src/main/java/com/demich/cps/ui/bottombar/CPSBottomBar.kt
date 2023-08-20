@@ -46,7 +46,6 @@ import com.demich.cps.utils.animateColor
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.swallowInitialEvents
-import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.launch
 
 typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
@@ -55,7 +54,7 @@ typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
 fun CPSBottomBar(
     navigator: CPSNavigator,
     additionalBottomBar: AdditionalBottomBarBuilder? = null,
-    systemUiController: SystemUiController
+    onSetSystemNavColor: (Color) -> Unit
 ) {
     if (navigator.isBottomBarEnabled) {
         var layoutSetupEnabled by rememberSaveable { mutableStateOf(false) }
@@ -72,7 +71,7 @@ fun CPSBottomBar(
                 layoutSetupEnabled = layoutSetupEnabled,
                 onEnableLayoutSetup = { layoutSetupEnabled = true },
                 onDismissLayoutSetup = { layoutSetupEnabled = false },
-                onSetSystemNavColor = systemUiController::setNavigationBarColor,
+                onSetSystemNavColor = onSetSystemNavColor,
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }

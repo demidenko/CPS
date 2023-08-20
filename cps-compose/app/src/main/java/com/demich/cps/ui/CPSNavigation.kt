@@ -1,16 +1,21 @@
 package com.demich.cps.ui
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import com.demich.cps.*
+import com.demich.cps.CPSTopBar
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.getScreen
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottombar.CPSBottomBar
-import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberWith
 import com.google.accompanist.systemuicontroller.SystemUiController
@@ -131,7 +136,7 @@ class CPSNavigator(
         CPSBottomBar(
             navigator = this,
             additionalBottomBar = bottomBarBuilderState.value,
-            systemUiController = systemUiController
+            onSetSystemNavColor = systemUiController::setNavigationBarColor
         )
     }
 
@@ -140,11 +145,6 @@ class CPSNavigator(
     fun ColorizeNavAndStatusBars(
         systemUiController: SystemUiController = rememberSystemUiController()
     ) {
-        systemUiController.setNavigationBarColor(
-            color = cpsColors.backgroundNavigation,
-            darkIcons = MaterialTheme.colors.isLight
-        )
-
         CPSStatusBar(
             systemUiController = systemUiController,
             currentScreen = currentScreen
