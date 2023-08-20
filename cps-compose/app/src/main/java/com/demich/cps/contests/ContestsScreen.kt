@@ -199,7 +199,7 @@ private fun ContestsColumn(
 
     LazyColumnOfData(
         modifier = modifier,
-        items = contestsState.value,
+        items = { contestsState.value },
         /*key = { it.compositeId }*/ //TODO: key effects jumping on reorder
     ) { contest ->
         ContestItem(

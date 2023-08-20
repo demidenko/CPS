@@ -42,7 +42,7 @@ fun CodeforcesBlogEntries(
         state = lazyListState,
         modifier = modifier,
         scrollBarEnabled = enableScrollBar,
-        items = blogEntriesController.blogEntries,
+        items = blogEntriesController::blogEntries,
         key = { it.id }
     ) { blogEntry ->
         BlogEntryInfo(

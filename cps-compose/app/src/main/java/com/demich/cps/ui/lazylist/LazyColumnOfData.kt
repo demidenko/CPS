@@ -12,7 +12,7 @@ fun<T> LazyColumnOfData(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     scrollBarEnabled: Boolean = true,
-    items: List<T>,
+    items: () -> List<T>,
     key: ((item: T) -> Any)? = null,
     onEmptyMessage: @Composable () -> Unit = { Text(text = "List is empty") },
     itemContent: @Composable LazyItemScope.(item: T) -> Unit
@@ -23,7 +23,7 @@ fun<T> LazyColumnOfData(
         enableScrollBar = scrollBarEnabled
     ) {
         itemsNotEmpty(
-            items = items,
+            items = items(),
             key = key,
             onEmptyMessage = onEmptyMessage,
             itemContent = itemContent

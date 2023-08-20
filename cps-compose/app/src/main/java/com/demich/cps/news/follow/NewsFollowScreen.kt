@@ -100,7 +100,7 @@ private fun CodeforcesFollowList(
     LazyColumnOfData(
         state = listState,
         modifier = modifier,
-        items = userBlogs(),
+        items = userBlogs,
         key = { it.id }
     ) { userBlog ->
         ContentWithCPSDropdownMenu(

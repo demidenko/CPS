@@ -58,7 +58,7 @@ fun CodeforcesComments(
     LazyColumnOfData(
         state = lazyListState,
         modifier = modifier,
-        items = comments(),
+        items = comments,
         key = { it.comment.id }
     ) { recentAction ->
         val blogEntry = recentAction.blogEntry!!
