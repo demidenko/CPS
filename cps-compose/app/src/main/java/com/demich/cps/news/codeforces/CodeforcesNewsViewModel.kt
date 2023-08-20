@@ -98,17 +98,17 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
         }
     }
 
-    private suspend fun loadBlogEntries(page: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry>? {
+    private suspend fun loadBlogEntries(page: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
         val s = CodeforcesApi.getPageSource(path = page, locale = locale)
         return CodeforcesUtils.extractBlogEntries(s)
     }
 
-    private suspend fun loadComments(page: String, locale: CodeforcesLocale): List<CodeforcesRecentAction>? {
+    private suspend fun loadComments(page: String, locale: CodeforcesLocale): List<CodeforcesRecentAction> {
         val s = CodeforcesApi.getPageSource(path = page, locale = locale)
         return CodeforcesUtils.extractComments(s)
     }
 
-    private suspend fun loadRecentActions(locale: CodeforcesLocale): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>>? {
+    private suspend fun loadRecentActions(locale: CodeforcesLocale): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>> {
         val s = CodeforcesApi.getPageSource(path = "/recent-actions", locale = locale)
         val comments = CodeforcesUtils.extractComments(s)
         //blog entry with low rating disappeared from blogEntries but has comments, need to merge
@@ -188,7 +188,7 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
 private class CodeforcesDataLoader<T>(
     val scope: CoroutineScope,
     init: T,
-    val getData: suspend (CodeforcesLocale) -> T?
+    val getData: suspend (CodeforcesLocale) -> T
 ) {
     private val dataFlow: MutableStateFlow<T> = MutableStateFlow(init)
 
@@ -212,17 +212,17 @@ private class CodeforcesDataLoader<T>(
             LoadingStatus.LOADING
         }
         scope.launch {
-            val data = withContext(Dispatchers.IO) {
-                kotlin.runCatching { getData(locale) }.getOrNull()
-            }
-            if(data == null) loadingStatusState.value = LoadingStatus.FAILED
-            else {
-                dataFlow.value = data
+            withContext(Dispatchers.IO) {
+                kotlin.runCatching { getData(locale) }
+            }.onFailure {
+                loadingStatusState.value = LoadingStatus.FAILED
+            }.onSuccess {
+                dataFlow.value = it
                 loadingStatusState.value = LoadingStatus.PENDING
             }
         }
     }
 }
 
-private fun<T> ViewModel.dataLoader(init: T, getData: suspend (CodeforcesLocale) -> T?) =
+private fun<T> ViewModel.dataLoader(init: T, getData: suspend (CodeforcesLocale) -> T) =
     CodeforcesDataLoader(scope = viewModelScope, init = init, getData = getData)
