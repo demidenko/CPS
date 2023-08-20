@@ -69,10 +69,10 @@ internal data class CodeforcesNewsControllerData(
 @OptIn(ExperimentalFoundationApi::class)
 @Stable
 class CodeforcesNewsController internal constructor(
-    private val viewModel: CodeforcesNewsViewModel,
-    private val tabsState: State<List<CodeforcesTitle>>,
+    viewModel: CodeforcesNewsViewModel,
+    tabsState: State<List<CodeforcesTitle>>,
     data: CodeforcesNewsControllerData
-) {
+): CodeforcesNewsDataManger by viewModel {
     val tabs by tabsState
 
     //TODO: future support for dynamic tabs (selectedIndex can be out of bounds)
@@ -107,28 +107,16 @@ class CodeforcesNewsController internal constructor(
     }
 
     @Composable
-    fun rememberLoadingStatusState(title: CodeforcesTitle) = rememberCollect { viewModel.flowOfLoadingStatus(title) }
+    fun rememberLoadingStatusState() = rememberCollect { flowOfLoadingStatus() }
 
     @Composable
-    fun rememberLoadingStatusState() = rememberCollect { viewModel.flowOfLoadingStatus() }
-
-    fun reload(title: CodeforcesTitle, context: Context) = viewModel.reload(title, context)
-    fun reloadAll(context: Context) = viewModel.reloadAll(context)
-
-    fun flowOfMainBlogEntries(context: Context) = viewModel.flowOfMainBlogEntries(context)
-    fun flowOfTopBlogEntries(context: Context) = viewModel.flowOfTopBlogEntries(context)
-    fun flowOfTopComments(context: Context) = viewModel.flowOfTopComments(context)
-    fun flowOfRecentActions(context: Context) = viewModel.flowOfRecentActions(context)
+    fun rememberLoadingStatusState(title: CodeforcesTitle) = rememberCollect { flowOfLoadingStatus(title) }
 
     fun flowOfLostBlogEntries(context: Context) =
         context.lostBlogEntriesDao.flowOfLost().map { blogEntries ->
             blogEntries.sortedByDescending { it.timeStamp }
                 .map { it.blogEntry }
         }
-
-
-    fun addToFollow(handle: String, context: Context) = viewModel.addToFollowList(handle, context)
-    fun updateFollowUsersInfo(context: Context) = viewModel.updateFollowUsersInfo(context)
 
     companion object {
         fun saver(

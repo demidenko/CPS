@@ -60,7 +60,7 @@ fun CodeforcesBlogEntriesFollowAddable(
             },
             onDismissRequest = { showAddToFollowDialogFor = null },
             onConfirmRequest = {
-                controller.addToFollow(handle = blogEntry.authorHandle, context = context)
+                controller.addToFollowList(handle = blogEntry.authorHandle, context = context)
             }
         )
     }

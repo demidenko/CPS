@@ -31,7 +31,7 @@ import kotlin.math.max
 @Composable
 fun codeforcesNewsViewModel(): CodeforcesNewsViewModel = sharedViewModel()
 
-class CodeforcesNewsViewModel: ViewModel() {
+class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
 
     private val reloadableTitles = listOf(
         CodeforcesTitle.MAIN,
@@ -39,7 +39,7 @@ class CodeforcesNewsViewModel: ViewModel() {
         CodeforcesTitle.RECENT
     )
 
-    fun flowOfLoadingStatus(): Flow<LoadingStatus> =
+    override fun flowOfLoadingStatus(): Flow<LoadingStatus> =
         listOf(
             mainBlogEntries.loadingStatusState,
             topBlogEntries.loadingStatusState,
@@ -47,7 +47,7 @@ class CodeforcesNewsViewModel: ViewModel() {
             recentActions.loadingStatusState
         ).combine()
 
-    fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus> {
+    override fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus> {
         return when (title) {
             CodeforcesTitle.MAIN -> mainBlogEntries.loadingStatusState
             CodeforcesTitle.TOP -> {
@@ -60,16 +60,16 @@ class CodeforcesNewsViewModel: ViewModel() {
     }
 
     private val mainBlogEntries = dataLoader(emptyList()) { loadBlogEntries(page = "/", locale = it) }
-    fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.getDataFlow(context)
+    override fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.getDataFlow(context)
 
     private val topBlogEntries = dataLoader(emptyList()) { loadBlogEntries(page = "/top", locale = it) }
-    fun flowOfTopBlogEntries(context: Context) = topBlogEntries.getDataFlow(context)
+    override fun flowOfTopBlogEntries(context: Context) = topBlogEntries.getDataFlow(context)
 
     private val topComments = dataLoader(emptyList()) { loadComments(page = "/topComments?days=2", locale = it) }
-    fun flowOfTopComments(context: Context) = topComments.getDataFlow(context)
+    override fun flowOfTopComments(context: Context) = topComments.getDataFlow(context)
 
     private val recentActions = dataLoader(Pair(emptyList(), emptyList())) { loadRecentActions(locale = it) }
-    fun flowOfRecentActions(context: Context) = recentActions.getDataFlow(context)
+    override fun flowOfRecentActions(context: Context) = recentActions.getDataFlow(context)
 
     private fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
         when(title) {
@@ -84,14 +84,14 @@ class CodeforcesNewsViewModel: ViewModel() {
         }
     }
 
-    fun reload(title: CodeforcesTitle, context: Context) {
+    override fun reload(title: CodeforcesTitle, context: Context) {
         viewModelScope.launch {
             val locale = context.settingsNews.codeforcesLocale()
             reload(title = title, locale = locale)
         }
     }
 
-    fun reloadAll(context: Context) {
+    override fun reloadAll(context: Context) {
         viewModelScope.launch {
             val locale = context.settingsNews.codeforcesLocale()
             reloadableTitles.forEach { reload(title = it, locale = locale) }
@@ -148,7 +148,7 @@ class CodeforcesNewsViewModel: ViewModel() {
         }
     }
 
-    fun addToFollowList(handle: String, context: Context) {
+    override fun addToFollowList(handle: String, context: Context) {
         viewModelScope.launch {
             context.settingsNews.codeforcesFollowEnabled(newValue = true)
             context.followListDao.addNewUser(handle)
@@ -157,7 +157,7 @@ class CodeforcesNewsViewModel: ViewModel() {
 
     private val followLoadingStatus = MutableStateFlow(LoadingStatus.PENDING)
     fun flowOfFollowUpdateLoadingStatus(): StateFlow<LoadingStatus> = followLoadingStatus
-    fun updateFollowUsersInfo(context: Context) {
+    override fun updateFollowUsersInfo(context: Context) {
         viewModelScope.launch {
             if (!followLoadingStatus.compareAndSet(LoadingStatus.PENDING, LoadingStatus.LOADING)) return@launch
             context.followListDao.updateUsers()
