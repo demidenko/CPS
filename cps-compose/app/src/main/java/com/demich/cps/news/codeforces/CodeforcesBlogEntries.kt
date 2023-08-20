@@ -43,7 +43,7 @@ fun CodeforcesBlogEntries(
         modifier = modifier,
         scrollBarEnabled = scrollBarEnabled,
         items = blogEntriesController::blogEntries,
-        key = { it.id }
+        key = CodeforcesBlogEntry::id
     ) { blogEntry ->
         BlogEntryInfo(
             blogEntry = blogEntry,

@@ -101,7 +101,7 @@ private fun CodeforcesFollowList(
         state = listState,
         modifier = modifier,
         items = userBlogs,
-        key = { it.id }
+        key = CodeforcesUserBlog::id
     ) { userBlog ->
         ContentWithCPSDropdownMenu(
             modifier = Modifier.animateItemPlacement(),
