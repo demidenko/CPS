@@ -1,7 +1,10 @@
 package com.demich.cps.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -69,7 +72,8 @@ private fun CPSIcon(
 ) {
     val alpha by animateFloatAsState(
         targetValue = if (onState) 1f else ContentAlpha.disabled,
-        animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis)
+        animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis),
+        label = "icon_alpha"
     )
     Icon(
         imageVector = icon,
@@ -286,13 +290,16 @@ fun EmptyMessageBox(
 @Composable
 fun CPSCountBadge(count: Int) {
     require(count >= 0)
-    if (count > 0) {
+    AnimatedVisibility(
+        visible = count > 0,
+        enter = scaleIn(),
+        exit = scaleOut()
+    ) {
         Badge(
             backgroundColor = cpsColors.newEntry,
-            contentColor = cpsColors.background
-        ) {
-            Text(count.toString())
-        }
+            contentColor = cpsColors.background,
+            content = { Text(count.toString()) }
+        )
     }
 }
 
