@@ -28,6 +28,8 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesComment
 import com.demich.cps.platforms.api.CodeforcesRecentAction
+import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
+import com.demich.cps.ui.lazylist.itemsNotEmpty
 import com.demich.cps.utils.*
 import kotlin.math.roundToInt
 

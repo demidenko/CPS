@@ -6,9 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -283,30 +280,6 @@ fun EmptyMessageBox(
                 content = content
             )
         }
-    }
-}
-
-inline fun <T> LazyListScope.itemsNotEmpty(
-    items: List<T>,
-    noinline onEmptyMessage: @Composable () -> Unit = { Text(text = "List is empty") },
-    noinline key: ((item: T) -> Any)? = null,
-    noinline contentType: (item: T) -> Any? = { null },
-    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
-) {
-    if (items.isEmpty()) {
-        item {
-            EmptyMessageBox(
-                modifier = Modifier.fillParentMaxSize(),
-                content = onEmptyMessage
-            )
-        }
-    } else {
-        items(
-            items = items,
-            key = key,
-            contentType = contentType,
-            itemContent = itemContent
-        )
     }
 }
 

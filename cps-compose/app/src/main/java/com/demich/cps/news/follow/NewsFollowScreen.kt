@@ -20,6 +20,8 @@ import com.demich.cps.news.codeforces.codeforcesNewsViewModel
 import com.demich.cps.room.followListDao
 import com.demich.cps.ui.*
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
+import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
+import com.demich.cps.ui.lazylist.itemsNotEmpty
 import com.demich.cps.utils.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChangedBy

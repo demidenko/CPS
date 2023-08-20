@@ -17,7 +17,7 @@ import com.demich.cps.platforms.api.ClistResource
 import com.demich.cps.platforms.api.niceMessage
 import com.demich.cps.platforms.utils.ClistUtils
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.LazyColumnWithScrollBar
+import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.utils.*

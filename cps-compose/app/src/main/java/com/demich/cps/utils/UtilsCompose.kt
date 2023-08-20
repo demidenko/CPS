@@ -6,7 +6,6 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.LaunchedEffect
@@ -132,28 +131,6 @@ fun animateColor(
     return lerp(start = offColor, stop = onColor, fraction = fraction)
 }
 
-
-fun LazyListState.visibleRange(requiredVisiblePart: Float = 0.5f): IntRange {
-    require(requiredVisiblePart in 0f..1f)
-
-    val visibleItems = layoutInfo.visibleItemsInfo
-    if (visibleItems.isEmpty()) return IntRange.EMPTY
-
-    val firstVisible = visibleItems.first().let { item ->
-        val topHidden = (-item.offset).coerceAtLeast(0)
-        val visiblePart = (item.size - topHidden).toFloat() / item.size
-        if (visiblePart < requiredVisiblePart) item.index + 1 else item.index
-    }
-
-    val lastVisible = visibleItems.last().let { item ->
-        val bottomHidden = (item.offset + item.size - layoutInfo.viewportEndOffset)
-            .coerceAtLeast(0)
-        val visiblePart = (item.size - bottomHidden).toFloat() / item.size
-        if (visiblePart < requiredVisiblePart) item.index - 1 else item.index
-    }
-
-    return firstVisible .. lastVisible
-}
 
 @Composable
 fun rememberFocusOnCreationRequester(): FocusRequester {

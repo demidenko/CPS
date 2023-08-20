@@ -27,7 +27,7 @@ import com.demich.cps.contests.contestsViewModel
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSRadioButtonTitled
-import com.demich.cps.ui.LazyColumnWithScrollBar
+import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.utils.context

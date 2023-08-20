@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
-import com.demich.cps.ui.itemsNotEmpty
+import com.demich.cps.ui.lazylist.itemsNotEmpty
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.rememberWith
 import com.demich.cps.platforms.api.CodeforcesBlogEntry

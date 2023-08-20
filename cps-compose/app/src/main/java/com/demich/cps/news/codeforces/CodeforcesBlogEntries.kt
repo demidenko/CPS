@@ -24,6 +24,8 @@ import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.context
 import com.demich.cps.utils.timeAgo
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
+import com.demich.cps.ui.lazylist.itemsNotEmpty
 
 
 @OptIn(ExperimentalFoundationApi::class)
