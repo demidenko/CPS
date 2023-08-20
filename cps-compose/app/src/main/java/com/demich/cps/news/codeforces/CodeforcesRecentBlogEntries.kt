@@ -1,11 +1,20 @@
 package com.demich.cps.news.codeforces
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
@@ -14,14 +23,13 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.LocalCodeforcesAccountManager
-import com.demich.cps.ui.CPSDropdownMenuScope
-import com.demich.cps.ui.ContentWithCPSDropdownMenu
-import com.demich.cps.ui.lazylist.itemsNotEmpty
-import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.rememberWith
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesComment
 import com.demich.cps.platforms.api.CodeforcesRecentAction
+import com.demich.cps.ui.CPSDropdownMenuScope
+import com.demich.cps.ui.ContentWithCPSDropdownMenu
+import com.demich.cps.ui.lazylist.LazyColumnOfData
+import com.demich.cps.ui.theme.cpsColors
 
 @Composable
 fun CodeforcesRecentBlogEntries(
@@ -30,29 +38,35 @@ fun CodeforcesRecentBlogEntries(
     onBrowseBlogEntry: (CodeforcesBlogEntry) -> Unit,
     menuBuilder: @Composable CPSDropdownMenuScope.(CodeforcesBlogEntry, List<CodeforcesComment>) -> Unit
 ) {
-    val recent = rememberWith(recentActions()) {
-        makeRecentBlogEntries(blogEntries = first, comments = second)
+    val recent by remember(recentActions) {
+        derivedStateOf {
+            with(recentActions()) {
+                makeRecentBlogEntries(blogEntries = first, comments = second)
+            }
+        }
     }
 
     var showMenuForBlogEntryId: Int? by remember { mutableStateOf(null) }
-    LazyColumn(modifier = modifier) {
-        itemsNotEmpty(items = recent) {
-            ContentWithCPSDropdownMenu(
-                modifier = Modifier
-                    .clickable {
-                        if (it.comments.isEmpty()) onBrowseBlogEntry(it.blogEntry)
-                        else showMenuForBlogEntryId = it.blogEntry.id
-                    }
-                    .fillMaxWidth()
-                    .padding(start = 3.dp, end = 3.dp, bottom = 2.dp),
-                expanded = it.blogEntry.id == showMenuForBlogEntryId,
-                menuAlignment = Alignment.CenterStart,
-                onDismissRequest = { showMenuForBlogEntryId = null },
-                menuBuilder = { menuBuilder(it.blogEntry, it.comments) },
-                content = { RecentBlogEntry(recentBlogEntryData = it) }
-            )
-            Divider()
-        }
+    LazyColumnOfData(
+        modifier = modifier,
+        items = { recent },
+        scrollBarEnabled = false
+    ) {
+        ContentWithCPSDropdownMenu(
+            modifier = Modifier
+                .clickable {
+                    if (it.comments.isEmpty()) onBrowseBlogEntry(it.blogEntry)
+                    else showMenuForBlogEntryId = it.blogEntry.id
+                }
+                .fillMaxWidth()
+                .padding(start = 3.dp, end = 3.dp, bottom = 2.dp),
+            expanded = it.blogEntry.id == showMenuForBlogEntryId,
+            menuAlignment = Alignment.CenterStart,
+            onDismissRequest = { showMenuForBlogEntryId = null },
+            menuBuilder = { menuBuilder(it.blogEntry, it.comments) },
+            content = { RecentBlogEntry(recentBlogEntryData = it) }
+        )
+        Divider()
     }
 }
 
