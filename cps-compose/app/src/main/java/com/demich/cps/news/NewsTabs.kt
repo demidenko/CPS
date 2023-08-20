@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package com.demich.cps.news
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -25,7 +23,7 @@ import com.google.accompanist.pager.pagerTabIndicatorOffset
 import kotlin.math.max
 import kotlin.math.min
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun NewsTabRow(
     modifier: Modifier = Modifier,
@@ -52,11 +50,12 @@ fun NewsTabRow(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NewsTab(
     title: String,
     index: Int,
-    badgeCount: Int = 0,
+    badgeCount: Int,
     pagerState: PagerState,
     modifier: Modifier = Modifier,
     selectedTextColor: Color,

@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package com.demich.cps.news.codeforces
 
 import android.content.Context
@@ -68,6 +66,7 @@ internal data class CodeforcesNewsControllerData(
     val recentFilterByBlogEntry: CodeforcesBlogEntry?
 )
 
+@OptIn(ExperimentalFoundationApi::class)
 @Stable
 class CodeforcesNewsController internal constructor(
     private val viewModel: CodeforcesNewsViewModel,
@@ -101,7 +100,8 @@ class CodeforcesNewsController internal constructor(
 
 
     private val badges = mutableMapOf<CodeforcesTitle, MutableIntState>()
-    fun getBadgeCountState(tab: CodeforcesTitle): State<Int> = badges.getOrPut(tab) { mutableIntStateOf(0) }
+    private val zeroIntState: IntState = mutableIntStateOf(0)
+    fun getBadgeCountState(tab: CodeforcesTitle): IntState = badges.getOrElse(tab) { zeroIntState }
     fun setBadgeCount(tab: CodeforcesTitle, count: Int) {
         badges.getOrPut(tab) { mutableIntStateOf(count) }.intValue = count
     }
