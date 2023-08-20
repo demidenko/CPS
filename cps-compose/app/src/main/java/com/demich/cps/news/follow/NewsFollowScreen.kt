@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
-import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.DialogAccountChooser
 import com.demich.cps.accounts.managers.makeHandleSpan
@@ -19,9 +18,9 @@ import com.demich.cps.navigation.Screen
 import com.demich.cps.news.codeforces.codeforcesNewsViewModel
 import com.demich.cps.room.followListDao
 import com.demich.cps.ui.*
+import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
-import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
-import com.demich.cps.ui.lazylist.itemsNotEmpty
+import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.utils.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -98,43 +97,40 @@ private fun CodeforcesFollowList(
 
     var showDeleteDialogForBlog: CodeforcesUserBlog? by remember { mutableStateOf(null) }
 
-    LazyColumnWithScrollBar(
+    LazyColumnOfData(
         state = listState,
-        modifier = modifier
-    ) {
-        itemsNotEmpty(
-            items = userBlogs(),
-            key = { it.id }
-        ) { userBlog ->
-            ContentWithCPSDropdownMenu(
-                modifier = Modifier.animateItemPlacement(),
-                content = {
-                    NewsFollowListItem(
-                        userInfo = userBlog.userInfo,
-                        blogEntriesCount = userBlog.blogEntries?.size,
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp, vertical = 5.dp)
-                            .fillMaxWidth()
-                    )
-                },
-                menuBuilder = {
-                    val enabled = !isRefreshing()
-                    CPSDropdownMenuItem(
-                        title = "Show blog",
-                        icon = CPSIcons.BlogEntry,
-                        enabled = enabled,
-                        onClick = { onOpenBlog(userBlog.handle) }
-                    )
-                    CPSDropdownMenuItem(
-                        title = "Delete",
-                        icon = CPSIcons.Delete,
-                        enabled = enabled,
-                        onClick = { showDeleteDialogForBlog = userBlog }
-                    )
-                }
-            )
-            Divider(modifier = Modifier.animateItemPlacement())
-        }
+        modifier = modifier,
+        items = userBlogs(),
+        key = { it.id }
+    ) { userBlog ->
+        ContentWithCPSDropdownMenu(
+            modifier = Modifier.animateItemPlacement(),
+            content = {
+                NewsFollowListItem(
+                    userInfo = userBlog.userInfo,
+                    blogEntriesCount = userBlog.blogEntries?.size,
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp, vertical = 5.dp)
+                        .fillMaxWidth()
+                )
+            },
+            menuBuilder = {
+                val enabled = !isRefreshing()
+                CPSDropdownMenuItem(
+                    title = "Show blog",
+                    icon = CPSIcons.BlogEntry,
+                    enabled = enabled,
+                    onClick = { onOpenBlog(userBlog.handle) }
+                )
+                CPSDropdownMenuItem(
+                    title = "Delete",
+                    icon = CPSIcons.Delete,
+                    enabled = enabled,
+                    onClick = { showDeleteDialogForBlog = userBlog }
+                )
+            }
+        )
+        Divider(modifier = Modifier.animateItemPlacement())
     }
 
     showDeleteDialogForBlog?.let { userBlog ->

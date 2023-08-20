@@ -18,14 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.LocalCodeforcesAccountManager
+import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.ui.*
+import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.context
 import com.demich.cps.utils.timeAgo
-import com.demich.cps.platforms.api.CodeforcesBlogEntry
-import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
-import com.demich.cps.ui.lazylist.itemsNotEmpty
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -39,35 +38,32 @@ fun CodeforcesBlogEntries(
     label: (@Composable (CodeforcesBlogEntry) -> Unit)? = null
 ) {
     val context = context
-    LazyColumnWithScrollBar(
+    LazyColumnOfData(
         state = lazyListState,
         modifier = modifier,
-        enableScrollBar = enableScrollBar
-    ) {
-        itemsNotEmpty(
-            items = blogEntriesController.blogEntries,
-            key = { it.id }
-        ) { blogEntry ->
-            BlogEntryInfo(
-                blogEntry = blogEntry,
-                markNew = blogEntriesController.isNew(blogEntry.id),
-                label = label,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .combinedClickable(
-                        onClick = { blogEntriesController.openBlogEntry(blogEntry, context) },
-                        onLongClick = onLongClick?.let { { it(blogEntry) } }?.withVibration()
-                    )
-                    .padding(
-                        start = 5.dp,
-                        end = 4.dp + (if (enableScrollBar) CPSDefaults.scrollBarWidth else 0.dp),
-                        top = 1.dp,
-                        bottom = 4.dp
-                    )
-                    .animateItemPlacement()
-            )
-            Divider(modifier = Modifier.animateItemPlacement())
-        }
+        scrollBarEnabled = enableScrollBar,
+        items = blogEntriesController.blogEntries,
+        key = { it.id }
+    ) { blogEntry ->
+        BlogEntryInfo(
+            blogEntry = blogEntry,
+            markNew = blogEntriesController.isNew(blogEntry.id),
+            label = label,
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = { blogEntriesController.openBlogEntry(blogEntry, context) },
+                    onLongClick = onLongClick?.let { { it(blogEntry) } }?.withVibration()
+                )
+                .padding(
+                    start = 5.dp,
+                    end = 4.dp + (if (enableScrollBar) CPSDefaults.scrollBarWidth else 0.dp),
+                    top = 1.dp,
+                    bottom = 4.dp
+                )
+                .animateItemPlacement()
+        )
+        Divider(modifier = Modifier.animateItemPlacement())
     }
 }
 

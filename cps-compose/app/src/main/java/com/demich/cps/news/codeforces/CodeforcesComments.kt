@@ -6,14 +6,23 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -23,14 +32,19 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.LocalCodeforcesAccountManager
-import com.demich.cps.ui.*
-import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesComment
 import com.demich.cps.platforms.api.CodeforcesRecentAction
-import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
-import com.demich.cps.ui.lazylist.itemsNotEmpty
-import com.demich.cps.utils.*
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.IconSp
+import com.demich.cps.ui.VotedRating
+import com.demich.cps.ui.lazylist.LazyColumnOfData
+import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.LocalCurrentTime
+import com.demich.cps.utils.context
+import com.demich.cps.utils.htmlToAnnotatedString
+import com.demich.cps.utils.openUrlInBrowser
+import com.demich.cps.utils.timeAgo
 import kotlin.math.roundToInt
 
 @Composable
@@ -41,32 +55,29 @@ fun CodeforcesComments(
     showTitle: Boolean = true
 ) {
     val context = context
-    LazyColumnWithScrollBar(
+    LazyColumnOfData(
         state = lazyListState,
-        modifier = modifier
-    ) {
-        itemsNotEmpty(
-            items = comments(),
-            key = { it.comment.id }
-        ) { recentAction ->
-            val blogEntry = recentAction.blogEntry!!
-            val comment = recentAction.comment
-            Comment(
-                comment = comment,
-                blogEntryTitle = blogEntry.title.takeIf { showTitle },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        context.openUrlInBrowser(CodeforcesApi.urls.comment(
-                            blogEntryId = blogEntry.id,
-                            commentId = comment.id
-                        ))
-                    }
-                    .padding(start = 3.dp, end = 5.dp, bottom = 3.dp)
-                    .animateContentSize()
-            )
-            Divider()
-        }
+        modifier = modifier,
+        items = comments(),
+        key = { it.comment.id }
+    ) { recentAction ->
+        val blogEntry = recentAction.blogEntry!!
+        val comment = recentAction.comment
+        Comment(
+            comment = comment,
+            blogEntryTitle = blogEntry.title.takeIf { showTitle },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    context.openUrlInBrowser(CodeforcesApi.urls.comment(
+                        blogEntryId = blogEntry.id,
+                        commentId = comment.id
+                    ))
+                }
+                .padding(start = 3.dp, end = 5.dp, bottom = 3.dp)
+                .animateContentSize()
+        )
+        Divider()
     }
 }
 

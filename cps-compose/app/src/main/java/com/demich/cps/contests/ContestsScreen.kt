@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import androidx.work.WorkInfo
-import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
@@ -36,8 +35,8 @@ import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesContestPhase
 import com.demich.cps.ui.*
-import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
-import com.demich.cps.ui.lazylist.itemsNotEmpty
+import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
+import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.demich.cps.workers.ContestsWorker
@@ -198,37 +197,36 @@ private fun ContestsColumn(
     var expandedItems: List<Pair<Contest.Platform, String>>
         by rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(emptyList()) }
 
-    LazyColumnWithScrollBar(modifier = modifier) {
-        itemsNotEmpty(
-            items = contestsState.value,
-            /*key = { it.compositeId }*/ //TODO: key effects jumping on reorder
-        ) { contest ->
-            ContestItem(
-                contest = contest,
-                isExpanded = { contest.compositeId in expandedItems },
-                onDeleteRequest = {
-                    scope.launch {
-                        context.settingsContests.ignoredContests.edit {
-                            put(contest.compositeId, getCurrentTime())
-                        }
+    LazyColumnOfData(
+        modifier = modifier,
+        items = contestsState.value,
+        /*key = { it.compositeId }*/ //TODO: key effects jumping on reorder
+    ) { contest ->
+        ContestItem(
+            contest = contest,
+            isExpanded = { contest.compositeId in expandedItems },
+            onDeleteRequest = {
+                scope.launch {
+                    context.settingsContests.ignoredContests.edit {
+                        put(contest.compositeId, getCurrentTime())
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickableNoRipple {
-                        val id = contest.compositeId
-                        if (id in expandedItems) expandedItems -= id
-                        else expandedItems += id
-                    }
-                    .padding(
-                        start = 4.dp,
-                        end = 7.dp,
-                        top = 4.dp,
-                        bottom = 3.dp
-                    ).animateContentSize()
-            )
-            Divider()
-        }
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickableNoRipple {
+                    val id = contest.compositeId
+                    if (id in expandedItems) expandedItems -= id
+                    else expandedItems += id
+                }
+                .padding(
+                    start = 4.dp,
+                    end = 7.dp,
+                    top = 4.dp,
+                    bottom = 3.dp
+                ).animateContentSize()
+        )
+        Divider()
     }
 }
 
