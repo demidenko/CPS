@@ -14,7 +14,6 @@ import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.DialogAccountChooser
 import com.demich.cps.accounts.managers.makeHandleSpan
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
-import com.demich.cps.navigation.Screen
 import com.demich.cps.news.codeforces.codeforcesNewsViewModel
 import com.demich.cps.room.followListDao
 import com.demich.cps.ui.*
@@ -30,7 +29,9 @@ import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 
 @Composable
-fun NewsFollowScreen(navigator: CPSNavigator) {
+fun NewsFollowScreen(
+    onShowBlogScreen: (String) -> Unit
+) {
     val context = context
     val scope = rememberCoroutineScope()
 
@@ -48,9 +49,7 @@ fun NewsFollowScreen(navigator: CPSNavigator) {
         CodeforcesFollowList(
             userBlogs = { userBlogs },
             isRefreshing = { followLoadingStatus == LoadingStatus.LOADING },
-            onOpenBlog = { handle ->
-                navigator.navigateTo(Screen.NewsCodeforcesBlog(handle = handle))
-            },
+            onOpenBlog = onShowBlogScreen,
             onDeleteUser = { handle ->
                 scope.launch {
                     context.followListDao.remove(handle)

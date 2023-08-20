@@ -29,9 +29,7 @@ fun rememberCodeforcesNewsController(): CodeforcesNewsController {
 
     val controller = rememberSaveable(
         viewModel,
-        saver = remember(viewModel, tabsState) {
-            CodeforcesNewsController.saver(viewModel, tabsState)
-        }
+        saver = CodeforcesNewsController.saver(viewModel, tabsState)
     ) {
         val settings = context.settingsNews
         val defaultTab = runBlocking { settings.codeforcesDefaultTab() }

@@ -8,15 +8,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.accounts.userinfo.UserInfo
-import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
-import com.demich.cps.ui.CPSNavigator
+import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
@@ -66,16 +64,14 @@ private fun<U: UserInfo> AccountExpandedContent(
 
 fun accountExpandedMenuBuilder(
     type: AccountManagerType,
-    navigator: CPSNavigator,
+    onOpenSettings: () -> Unit,
     onShowDeleteDialog: () -> Unit
 ): CPSMenuBuilder = {
     val context = context
     val scope = rememberCoroutineScope()
 
     CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete, onClick = onShowDeleteDialog)
-    CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings) {
-        navigator.navigateTo(Screen.AccountSettings(type))
-    }
+    CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings, onClick = onOpenSettings)
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         scope.launch {
             allAccountManagers.first { it.type == type }

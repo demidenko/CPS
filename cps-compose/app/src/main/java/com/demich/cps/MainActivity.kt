@@ -137,8 +137,8 @@ private fun CPSContent() {
             )
             holder.menu = accountExpandedMenuBuilder(
                 type = type,
-                navigator = navigator,
-                onShowDeleteDialog = { showDeleteDialog = true }
+                onShowDeleteDialog = { showDeleteDialog = true },
+                onOpenSettings = { navigator.navigateTo(Screen.AccountSettings(type)) }
             )
             holder.setSubtitle("accounts", type.name)
         }
@@ -152,8 +152,9 @@ private fun CPSContent() {
             val controller = rememberCodeforcesNewsController()
             NewsScreen(controller = controller)
             holder.menu = newsMenuBuilder(
-                navigator = navigator,
-                controller = controller
+                controller = controller,
+                onOpenSettings = { navigator.navigateTo(Screen.NewsSettings) },
+                onOpenFollowList = { navigator.navigateTo(Screen.NewsFollowList) }
             )
             holder.bottomBar = newsBottomBarBuilder(
                 controller = controller
@@ -165,7 +166,9 @@ private fun CPSContent() {
             holder.setSubtitle("news", "settings")
         }
         cpsComposable(ScreenTypes.newsFollowList) { holder ->
-            NewsFollowScreen(navigator = navigator)
+            NewsFollowScreen { handle ->
+                navigator.navigateTo(Screen.NewsCodeforcesBlog(handle = handle))
+            }
             holder.bottomBar = newsFollowListBottomBarBuilder()
             holder.setSubtitle("news", "codeforces", "follow", "list")
         }
