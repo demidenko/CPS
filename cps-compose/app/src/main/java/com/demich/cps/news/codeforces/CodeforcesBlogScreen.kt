@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.niceMessage
 import com.demich.cps.ui.LoadingContentBox
+import com.demich.cps.utils.ProvideTimeEachMinute
 
 @Composable
 fun CodeforcesBlogScreen(
@@ -16,10 +17,12 @@ fun CodeforcesBlogScreen(
         failedText = { it.niceMessage ?: "Blog load error" },
         modifier = Modifier.fillMaxSize()
     ) { blogEntries ->
-        CodeforcesBlogEntries(
-            blogEntriesController = rememberCodeforcesBlogEntriesController { blogEntries },
-            scrollBarEnabled = true,
-            modifier = Modifier.fillMaxSize()
-        )
+        ProvideTimeEachMinute {
+            CodeforcesBlogEntries(
+                blogEntriesController = rememberCodeforcesBlogEntriesController { blogEntries },
+                scrollBarEnabled = true,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }

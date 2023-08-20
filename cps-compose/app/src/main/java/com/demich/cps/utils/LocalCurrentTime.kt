@@ -23,7 +23,9 @@ private fun Instant.floorBy(period: Duration): Instant = this - this % period
 
 
 
-val LocalCurrentTime = compositionLocalOf<Instant> { throw IllegalAccessException() }
+val LocalCurrentTime = compositionLocalOf<Instant> {
+    throw IllegalAccessException("current time not provided")
+}
 
 private fun flowOfFlooredCurrentTime(period: Duration): Flow<Instant> =
     flow {
