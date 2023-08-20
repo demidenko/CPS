@@ -122,13 +122,17 @@ fun Modifier.swallowInitialEvents(enabled: Boolean) =
 
 @Composable
 fun animateColor(
-    onColor: Color,
-    offColor: Color,
+    enabledColor: Color,
+    disabledColor: Color,
     enabled: Boolean,
     animationSpec: AnimationSpec<Float>
 ): Color {
-    val fraction by animateFloatAsState(targetValue = if (enabled) 1f else 0f, animationSpec = animationSpec)
-    return lerp(start = offColor, stop = onColor, fraction = fraction)
+    val fraction by animateFloatAsState(
+        targetValue = if (enabled) 1f else 0f,
+        animationSpec = animationSpec,
+        label = "color_fraction"
+    )
+    return lerp(start = disabledColor, stop = enabledColor, fraction = fraction)
 }
 
 

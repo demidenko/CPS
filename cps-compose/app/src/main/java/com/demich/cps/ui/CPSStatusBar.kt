@@ -146,8 +146,8 @@ private fun ColorizeStatusBar(
     )
     systemUiController.setStatusBarColor(
         color = animateColor(
-            onColor = statusBarColor,
-            offColor = offColor,
+            enabledColor = statusBarColor,
+            disabledColor = offColor,
             enabled = isStatusBarEnabled,
             animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis)
         ),

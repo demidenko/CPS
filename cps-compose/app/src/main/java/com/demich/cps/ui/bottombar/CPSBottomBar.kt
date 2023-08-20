@@ -91,8 +91,8 @@ private fun BottomBarContent(
     modifier: Modifier = Modifier
 ) {
     val backgroundColor = animateColor(
-        onColor = cpsColors.backgroundAdditional,
-        offColor = cpsColors.backgroundNavigation,
+        enabledColor = cpsColors.backgroundAdditional,
+        disabledColor = cpsColors.backgroundNavigation,
         enabled = layoutSetupEnabled,
         animationSpec = switchAnimationSpec()
     ).also(onSetSystemNavColor)
