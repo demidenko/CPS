@@ -16,11 +16,11 @@ fun LazyColumnWithScrollBar(
     state: LazyListState = rememberLazyListState(),
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    enableScrollBar: Boolean = true,
+    scrollBarEnabled: Boolean = true,
     content: LazyListScope.() -> Unit
 ) {
     LazyColumn(
-        modifier = if (enableScrollBar) modifier.lazyColumnScrollBar(
+        modifier = if (scrollBarEnabled) modifier.lazyColumnScrollBar(
             state = state,
             scrollBarColor = cpsColors.content.copy(alpha = 0.5f)
         ) else modifier,

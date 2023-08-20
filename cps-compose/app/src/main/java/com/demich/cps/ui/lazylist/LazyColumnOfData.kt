@@ -20,7 +20,7 @@ fun<T> LazyColumnOfData(
     LazyColumnWithScrollBar(
         modifier = modifier,
         state = state,
-        enableScrollBar = scrollBarEnabled
+        scrollBarEnabled = scrollBarEnabled
     ) {
         itemsNotEmpty(
             items = items(),

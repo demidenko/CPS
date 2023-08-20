@@ -24,7 +24,7 @@ fun CodeforcesBlogEntriesFollowAddable(
     blogEntriesController: CodeforcesBlogEntriesController,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
-    enableScrollBar: Boolean = false,
+    scrollBarEnabled: Boolean = false,
     label: (@Composable (CodeforcesBlogEntry) -> Unit)? = null
 ) {
     val context = context
@@ -35,7 +35,7 @@ fun CodeforcesBlogEntriesFollowAddable(
         blogEntriesController = blogEntriesController,
         modifier = modifier,
         lazyListState = lazyListState,
-        enableScrollBar = enableScrollBar,
+        scrollBarEnabled = scrollBarEnabled,
         onLongClick = { showAddToFollowDialogFor = it },
         label = label
     )

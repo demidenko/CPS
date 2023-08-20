@@ -42,7 +42,7 @@ fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
         blogEntriesController = blogEntriesController,
         lazyListState = listState,
         modifier = Modifier.fillMaxSize(),
-        enableScrollBar = true,
+        scrollBarEnabled = true,
         label = {
             if (it.id in topIds) TopLabel()
         }

@@ -33,7 +33,7 @@ fun CodeforcesBlogEntries(
     blogEntriesController: CodeforcesBlogEntriesController,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
-    enableScrollBar: Boolean = false,
+    scrollBarEnabled: Boolean = false,
     onLongClick: ((CodeforcesBlogEntry) -> Unit)? = null,
     label: (@Composable (CodeforcesBlogEntry) -> Unit)? = null
 ) {
@@ -41,7 +41,7 @@ fun CodeforcesBlogEntries(
     LazyColumnOfData(
         state = lazyListState,
         modifier = modifier,
-        scrollBarEnabled = enableScrollBar,
+        scrollBarEnabled = scrollBarEnabled,
         items = blogEntriesController::blogEntries,
         key = { it.id }
     ) { blogEntry ->
@@ -57,7 +57,7 @@ fun CodeforcesBlogEntries(
                 )
                 .padding(
                     start = 5.dp,
-                    end = 4.dp + (if (enableScrollBar) CPSDefaults.scrollBarWidth else 0.dp),
+                    end = 4.dp + (if (scrollBarEnabled) CPSDefaults.scrollBarWidth else 0.dp),
                     top = 1.dp,
                     bottom = 4.dp
                 )

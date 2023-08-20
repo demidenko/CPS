@@ -18,7 +18,7 @@ fun CodeforcesBlogScreen(
     ) { blogEntries ->
         CodeforcesBlogEntries(
             blogEntriesController = rememberCodeforcesBlogEntriesController { blogEntries },
-            enableScrollBar = true,
+            scrollBarEnabled = true,
             modifier = Modifier.fillMaxSize()
         )
     }
