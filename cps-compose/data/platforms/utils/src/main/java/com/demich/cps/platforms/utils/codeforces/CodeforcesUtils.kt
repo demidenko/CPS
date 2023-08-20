@@ -8,6 +8,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.max
 
 internal fun Element.extractRatedUser(): Pair<String, CodeforcesColorTag> = Pair(
     first = text(),
@@ -167,6 +168,39 @@ object CodeforcesUtils {
         return Jsoup.parse(source).expectSidebar().expectFirst("div.recent-actions")
             .select("li")
             .mapNotNull(::extractRecentBlogEntryOrNull)
+    }
+
+    fun extractRecentActions(source: String): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>> {
+        val comments = extractComments(source)
+        //blog entry with low rating disappeared from blogEntries but has comments, need to merge
+        val blogEntries = extractRecentBlogEntries(source).toMutableList()
+        val blogEntriesIds = blogEntries.mapTo(mutableSetOf()) { it.id }
+        val usedIds = mutableSetOf<Int>()
+        var index = 0
+        for (comment in comments) {
+            val blogEntry = comment.blogEntry!!
+            val id = blogEntry.id
+            if (id !in blogEntriesIds) {
+                blogEntriesIds.add(id)
+                if (index < blogEntries.size) {
+                    //mark low rated
+                    blogEntries.add(
+                        index = index,
+                        element = blogEntry.copy(rating = -1)
+                    )
+                } else {
+                    //latest recent comments has no blog entries in recent action, so most likely not low rated
+                    require(index == blogEntries.size)
+                    blogEntries.add(blogEntry)
+                }
+            }
+            if (id !in usedIds) {
+                usedIds.add(id)
+                val curIndex = blogEntries.indexOfFirst { it.id == id }
+                index = max(index, curIndex + 1)
+            }
+        }
+        return Pair(blogEntries, comments)
     }
 
     inline fun extractHandleSuggestions(source: String, block: (String) -> Unit) {

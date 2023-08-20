@@ -9,7 +9,6 @@ import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesLocale
-import com.demich.cps.platforms.api.CodeforcesRecentAction
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.room.followListDao
 import com.demich.cps.utils.LoadingStatus
@@ -26,7 +25,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.max
 
 @Composable
 fun codeforcesNewsViewModel(): CodeforcesNewsViewModel = sharedViewModel()
@@ -98,49 +96,14 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
         }
     }
 
-    private suspend fun loadBlogEntries(page: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
-        val s = CodeforcesApi.getPageSource(path = page, locale = locale)
-        return CodeforcesUtils.extractBlogEntries(s)
-    }
+    private suspend fun loadBlogEntries(page: String, locale: CodeforcesLocale) =
+        CodeforcesUtils.extractBlogEntries(source = CodeforcesApi.getPageSource(path = page, locale = locale))
 
-    private suspend fun loadComments(page: String, locale: CodeforcesLocale): List<CodeforcesRecentAction> {
-        val s = CodeforcesApi.getPageSource(path = page, locale = locale)
-        return CodeforcesUtils.extractComments(s)
-    }
+    private suspend fun loadComments(page: String, locale: CodeforcesLocale) =
+        CodeforcesUtils.extractComments(source = CodeforcesApi.getPageSource(path = page, locale = locale))
 
-    private suspend fun loadRecentActions(locale: CodeforcesLocale): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>> {
-        val s = CodeforcesApi.getPageSource(path = "/recent-actions", locale = locale)
-        val comments = CodeforcesUtils.extractComments(s)
-        //blog entry with low rating disappeared from blogEntries but has comments, need to merge
-        val blogEntries = CodeforcesUtils.extractRecentBlogEntries(s).toMutableList()
-        val blogEntriesIds = blogEntries.mapTo(mutableSetOf()) { it.id }
-        val usedIds = mutableSetOf<Int>()
-        var index = 0
-        for (comment in comments) {
-            val blogEntry = comment.blogEntry!!
-            val id = blogEntry.id
-            if (id !in blogEntriesIds) {
-                blogEntriesIds.add(id)
-                if (index < blogEntries.size) {
-                    //mark low rated
-                    blogEntries.add(
-                        index = index,
-                        element = blogEntry.copy(rating = -1)
-                    )
-                } else {
-                    //latest recent comments has no blog entries in recent action, so most likely not low rated
-                    require(index == blogEntries.size)
-                    blogEntries.add(blogEntry)
-                }
-            }
-            if (id !in usedIds) {
-                usedIds.add(id)
-                val curIndex = blogEntries.indexOfFirst { it.id == id }
-                index = max(index, curIndex + 1)
-            }
-        }
-        return Pair(blogEntries, comments)
-    }
+    private suspend fun loadRecentActions(locale: CodeforcesLocale) =
+        CodeforcesUtils.extractRecentActions(source = CodeforcesApi.getPageSource(path = "/recent-actions", locale = locale))
 
     fun addToFollowList(userInfo: CodeforcesUserInfo, context: Context) {
         viewModelScope.launch {
