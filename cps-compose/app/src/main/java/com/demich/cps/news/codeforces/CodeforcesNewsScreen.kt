@@ -41,6 +41,23 @@ fun CodeforcesNewsScreen(
             modifier = Modifier.fillMaxSize()
         )
     }
+
+    val context = context
+    LaunchedEffect(controller) {
+        val newEntriesDataStore = CodeforcesNewEntriesDataStore(context)
+        collectBadgeCount(
+            tab = CodeforcesTitle.MAIN,
+            controller = controller,
+            blogEntriesFlow = controller.flowOfMainBlogEntries(context),
+            newEntriesItem = newEntriesDataStore.mainNewEntries
+        )
+        collectBadgeCount(
+            tab = CodeforcesTitle.LOST,
+            controller = controller,
+            blogEntriesFlow = controller.flowOfLostBlogEntries(context),
+            newEntriesItem = newEntriesDataStore.lostNewEntries
+        )
+    }
 }
 
 
@@ -111,23 +128,6 @@ private fun TabsHeader(
                 )
             }
         }
-    }
-
-    val context = context
-    LaunchedEffect(controller) {
-        val newEntriesDataStore = CodeforcesNewEntriesDataStore(context)
-        collectBadgeCount(
-            tab = CodeforcesTitle.MAIN,
-            controller = controller,
-            blogEntriesFlow = controller.flowOfMainBlogEntries(context),
-            newEntriesItem = newEntriesDataStore.mainNewEntries
-        )
-        collectBadgeCount(
-            tab = CodeforcesTitle.LOST,
-            controller = controller,
-            blogEntriesFlow = controller.flowOfLostBlogEntries(context),
-            newEntriesItem = newEntriesDataStore.lostNewEntries
-        )
     }
 }
 

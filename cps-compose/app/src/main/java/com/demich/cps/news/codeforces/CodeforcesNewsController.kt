@@ -100,11 +100,9 @@ class CodeforcesNewsController internal constructor(
 
 
     private val badges = mutableMapOf<CodeforcesTitle, MutableIntState>()
-    private val zeroIntState: IntState = mutableIntStateOf(0)
-    fun getBadgeCountState(tab: CodeforcesTitle): IntState = badges.getOrElse(tab) { zeroIntState }
-    fun setBadgeCount(tab: CodeforcesTitle, count: Int) {
-        badges.getOrPut(tab) { mutableIntStateOf(count) }.intValue = count
-    }
+    private fun badgeState(tab: CodeforcesTitle) = badges.getOrPut(tab) { mutableIntStateOf(0) }
+    fun getBadgeCountState(tab: CodeforcesTitle): IntState = badgeState(tab)
+    fun setBadgeCount(tab: CodeforcesTitle, count: Int) { badgeState(tab).intValue = count }
 
     @Composable
     fun rememberLoadingStatusState() = rememberCollect { flowOfLoadingStatus() }
