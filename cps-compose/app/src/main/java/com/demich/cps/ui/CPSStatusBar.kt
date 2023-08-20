@@ -102,18 +102,18 @@ private fun<U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(context: Co
 
 private data class RankGetter(
     private val validRanks: List<RatedRank>,
+    private val disabledManagers: Set<AccountManagerType>,
     private val resultByMaximum: Boolean
 ) {
-    operator fun get(screen: Screen?): RatedRank? {
-        return when (screen) {
+    operator fun get(screen: Screen?): RatedRank? =
+        when (screen) {
             is Screen.AccountExpanded -> validRanks.find { it.manager.type == screen.type }
             is Screen.AccountSettings -> validRanks.find { it.manager.type == screen.type }
-            else -> {
-                if (resultByMaximum) validRanks.maxByOrNull { it.rank }
-                else validRanks.minByOrNull { it.rank }
+            else -> validRanks.filter { it.manager.type !in disabledManagers }.run {
+                if (resultByMaximum) maxByOrNull { it.rank }
+                else minByOrNull { it.rank }
             }
         }
-    }
 }
 
 private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
@@ -123,7 +123,8 @@ private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
         flow3 = context.settingsUI.statusBarResultByMaximum.flow
     ) { ranks, disabledManagers, resultByMaximum ->
         RankGetter(
-            validRanks = ranks.filterNotNull().filter { it.manager.type !in disabledManagers },
+            validRanks = ranks.filterNotNull(),
+            disabledManagers = disabledManagers,
             resultByMaximum = resultByMaximum
         )
     }.distinctUntilChanged()
