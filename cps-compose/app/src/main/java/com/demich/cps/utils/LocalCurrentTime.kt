@@ -13,21 +13,24 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-val LocalCurrentTime = compositionLocalOf { getCurrentTime() }
-
 private operator fun Instant.rem(period: Duration): Duration {
     val periodMillis = period.inWholeMilliseconds
     val thisMillis = toEpochMilliseconds()
     return (thisMillis % periodMillis).milliseconds
 }
 
-private fun currentTimeFlow(period: Duration): Flow<Instant> =
+private fun Instant.floorBy(period: Duration): Instant = this - this % period
+
+
+
+val LocalCurrentTime = compositionLocalOf<Instant> { throw IllegalAccessException() }
+
+private fun flowOfFlooredCurrentTime(period: Duration): Flow<Instant> =
     flow {
         while (currentCoroutineContext().isActive) {
-            val current = getCurrentTime()
-            val rem = current % period
-            emit(current - rem)
-            delay(period - rem)
+            val currentTime = getCurrentTime()
+            emit(currentTime.floorBy(period))
+            delay(duration = period - currentTime % period)
         }
     }
 
@@ -35,8 +38,8 @@ private fun currentTimeFlow(period: Duration): Flow<Instant> =
 fun collectCurrentTimeAsState(period: Duration): State<Instant> {
     require(period.isPositive())
     return remember(key1 = period) {
-        currentTimeFlow(period = period)
-    }.collectAsStateWithLifecycle(initialValue = remember { getCurrentTime().let { it - it % period } })
+        flowOfFlooredCurrentTime(period = period)
+    }.collectAsStateWithLifecycle(initialValue = remember { getCurrentTime().floorBy(period) })
 }
 
 @Composable
