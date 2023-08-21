@@ -75,6 +75,8 @@ fun CPSBottomBar(
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
+    } else {
+        onSetSystemNavColor(cpsColors.backgroundNavigation)
     }
 }
 
