@@ -53,7 +53,10 @@ private fun ScaffoldLayout(
             val bottomBarPlaceable = subcompose(ScaffoldLayoutContent.BottomBar, bottomBar)
                 .find { it.layoutId == BottomBarLayoutId }
                 ?.measure(looseConstraints)
-            val bottomBarBodyHeight = CPSDefaults.bottomBarHeight.roundToPx()
+
+            val bottomBarBodyHeight =
+                if (bottomBarPlaceable == null) 0
+                else CPSDefaults.bottomBarHeight.roundToPx()
 
             val bodyContentHeight = layoutHeight - topBarHeight - bottomBarBodyHeight
             val bodyContentPlaceables = subcompose(ScaffoldLayoutContent.MainContent, content).map {
