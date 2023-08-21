@@ -35,7 +35,7 @@ data class CodeforcesMonitorData(
         }
 
         companion object {
-            val failedSystemTestSymbol get() = "⨯" //alternatives: × ✖
+            const val failedSystemTestSymbol = "⨯" //alternatives: × ✖
         }
     }
 }
