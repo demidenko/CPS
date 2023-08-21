@@ -316,7 +316,6 @@ fun<T: Enum<T>> SettingsSubtitleOfEnabled(
     else WordsWithCounterOnOverflow(words = enabled.sortedBy { it.ordinal }.map(name), fontSize = 15.sp)
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ExpandableSettingsItem(
     title: String,
@@ -353,7 +352,9 @@ fun ExpandableSettingsItem(
                 )
                 AnimatedContent(
                     targetState = expanded,
-                    transitionSpec = { fadeIn() with fadeOut(snap()) }
+                    transitionSpec = { fadeIn() togetherWith fadeOut(snap()) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = "settings item content"
                 ) { itemExpanded ->
                     if (itemExpanded) {
                         Box(
@@ -367,7 +368,6 @@ fun ExpandableSettingsItem(
                     }
                 }
             }
-
         }
     }
 }
