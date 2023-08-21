@@ -286,10 +286,7 @@ private fun SuggestionsList(
                     )
                 }
             }
-            LazyColumnWithScrollBar(
-                modifier = Modifier
-                    .heightIn(max = 230.dp) //TODO adjustSpan like solution needed
-            ) {
+            LazyColumnWithScrollBar {
                 items(suggestions, key = { it.userId }) {
                     SuggestionItem(
                         suggestion = it,
