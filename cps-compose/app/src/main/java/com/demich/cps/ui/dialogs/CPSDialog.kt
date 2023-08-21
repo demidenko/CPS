@@ -29,13 +29,16 @@ fun CPSDialog(
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        )
     ) {
         Card(
             elevation = 0.dp,
             shape = RoundedCornerShape(12.dp),
             backgroundColor = cpsColors.backgroundAdditional,
-            modifier = Modifier.padding(horizontal = 26.dp, vertical = 12.dp)
+            modifier = Modifier.imePadding().padding(horizontal = 26.dp, vertical = 12.dp)
         ) {
             Column(
                 modifier = modifier.padding(all = 18.dp),
