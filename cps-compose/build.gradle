@@ -4,7 +4,6 @@ buildscript {
         kotlin_version = '1.9.0'
         java_version = JavaVersion.VERSION_17
         java_toolchain_version = 17
-        ktor_version = '2.3.3'
         accompanist_version = '0.30.0'
         room_version = '2.6.0-alpha01'
         lifecycle_version = '2.6.1'
