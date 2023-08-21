@@ -2,7 +2,7 @@ buildscript {
     ext {
         gradle_version = '8.1.0'
         kotlin_version = '1.9.0'
-        java_version = JavaVersion.VERSION_1_8
+        java_version = JavaVersion.VERSION_17
         java_toolchain_version = 17
         ktor_version = '2.3.3'
         accompanist_version = '0.30.0'
