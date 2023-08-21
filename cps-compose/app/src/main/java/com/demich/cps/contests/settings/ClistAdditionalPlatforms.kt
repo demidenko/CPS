@@ -34,7 +34,6 @@ internal fun ClistAdditionalResourcesDialog(
 ) {
     CPSDialog(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.Start,
         onDismissRequest = onDismissRequest
     ) {
         DialogContent()
@@ -42,7 +41,7 @@ internal fun ClistAdditionalResourcesDialog(
 }
 
 @Composable
-private fun DialogContent() {
+private fun ColumnScope.DialogContent() {
     val context = context
     val scope = rememberCoroutineScope()
 
@@ -63,32 +62,36 @@ private fun DialogContent() {
 
     var searchFilter by remember { mutableStateOf("") }
 
-    ListTitle(text = "selected:")
-    ClistResourcesList(
-        resources = { filter(selected, searchFilter) },
-        modifier = Modifier
-            .padding(bottom = 3.dp)
-            .heightIn(max = 180.dp),
-        onItemClick = { resource ->
-            scope.launch { item.edit { remove(resource) } }
-        }
-    )
-
-    ListTitle(text = "available:")
-    LoadingContentBox(
-        dataResult = { resourcesResult?.map { it - selected.toSet() } },
-        failedText = { it.niceMessage ?: "Failed to load resources" },
-        modifier = Modifier
-            .padding(bottom = 5.dp)
-            .heightIn(max = 180.dp)
-            .fillMaxWidth()
-    ) { resources ->
+    Column(
+        modifier = Modifier.weight(1f, fill = false),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        ListTitle(text = "selected:")
         ClistResourcesList(
-            resources = { filter(resources, searchFilter) },
+            resources = { filter(selected, searchFilter) },
+            modifier = Modifier
+                .padding(bottom = 3.dp)
+                .heightIn(max = 200.dp),
             onItemClick = { resource ->
-                scope.launch { item.edit { add(index = 0, element = resource) } }
+                scope.launch { item.edit { remove(resource) } }
             }
         )
+
+        ListTitle(text = "available:")
+        LoadingContentBox(
+            dataResult = { resourcesResult?.map { it - selected.toSet() } },
+            failedText = { it.niceMessage ?: "Failed to load resources" },
+            modifier = Modifier
+                .padding(bottom = 5.dp)
+                .fillMaxWidth()
+        ) { resources ->
+            ClistResourcesList(
+                resources = { filter(resources, searchFilter) },
+                onItemClick = { resource ->
+                    scope.launch { item.edit { add(index = 0, element = resource) } }
+                }
+            )
+        }
     }
 
     OutlinedTextField(
