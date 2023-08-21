@@ -9,143 +9,135 @@ import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.ClistApi
 import com.demich.cps.platforms.api.ClistResource
 import com.demich.cps.platforms.api.niceMessage
 import com.demich.cps.platforms.utils.ClistUtils
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.dialogs.CPSDialog
+import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
-import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
 
 @Composable
-fun ClistAdditionalResourcesDialog(
-    item: DataStoreItem<List<ClistResource>>,
+internal fun ClistAdditionalResourcesDialog(
     onDismissRequest: () -> Unit
 ) {
+    CPSDialog(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.Start,
+        onDismissRequest = onDismissRequest
+    ) {
+        DialogContent()
+    }
+}
+
+@Composable
+private fun DialogContent() {
     val context = context
     val scope = rememberCoroutineScope()
 
     val dataLoader = remember(scope) { BackgroundDataLoader<List<ClistResource>>(scope = scope) }
     val resourcesResult by dataLoader.flowOfResult().collectAsState()
 
-    val selectedItems by rememberCollect { item.flow }
-
-    LaunchedEffect(Unit) {
+    LaunchedEffect(dataLoader) {
         dataLoader.execute(id = Unit) {
-            val alreadySupported by lazy {
-                Contest.platformsExceptUnknown.map(ClistUtils::getClistApiResourceId)
-            }
+            val alreadySupported = Contest.platformsExceptUnknown.mapToSet(ClistUtils::getClistApiResourceId)
             ClistApi.getResources(apiAccess = context.settingsContests.clistApiAccess())
                 .filter { it.id !in alreadySupported }
                 .sortedBy { it.name }
         }
     }
 
-    CPSDialog(
-        modifier = Modifier.fillMaxWidth(),
-        onDismissRequest = onDismissRequest
-    ) {
-        Text(text = "selected:")
-        SelectedPlatforms(
-            resources = selectedItems,
-            modifier = Modifier
-                .padding(bottom = 3.dp)
-                .heightIn(max = 200.dp)
-        ) { resource ->
+    val item = remember { context.settingsContests.clistAdditionalResources }
+    val selected by rememberCollect { item.flow }
+
+    var searchFilter by remember { mutableStateOf("") }
+
+    ListTitle(text = "selected:")
+    ClistResourcesList(
+        resources = { filter(selected, searchFilter) },
+        modifier = Modifier
+            .padding(bottom = 3.dp)
+            .heightIn(max = 180.dp),
+        onItemClick = { resource ->
             scope.launch { item.edit { remove(resource) } }
         }
+    )
 
-        Text(text = "available:")
-        UnselectedPlatforms(
-            resourcesResult = { resourcesResult?.map { it - selectedItems.toSet() } },
-            modifier = Modifier
-                .heightIn(max = 200.dp),
-            onClick = { resource ->
+    ListTitle(text = "available:")
+    LoadingContentBox(
+        dataResult = { resourcesResult?.map { it - selected.toSet() } },
+        failedText = { it.niceMessage ?: "Failed to load resources" },
+        modifier = Modifier
+            .padding(bottom = 5.dp)
+            .heightIn(max = 180.dp)
+            .fillMaxWidth()
+    ) { resources ->
+        ClistResourcesList(
+            resources = { filter(resources, searchFilter) },
+            onItemClick = { resource ->
                 scope.launch { item.edit { add(index = 0, element = resource) } }
             }
         )
-
-
     }
+
+    OutlinedTextField(
+        value = searchFilter,
+        onValueChange = { searchFilter = it },
+        leadingIcon = {
+            Icon(
+                imageVector = CPSIcons.Search,
+                contentDescription = null,
+                tint = cpsColors.content
+            )
+        },
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
+
+private fun filter(resources: List<ClistResource>, searchFilter: String) =
+    resources.filter { it.name.contains(searchFilter, ignoreCase = true) }
+
+@Composable
+private fun ListTitle(text: String) {
+    Text(
+        text = text,
+        color = cpsColors.contentAdditional,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.SemiBold
+    )
+}
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun SelectedPlatforms(
+private fun ClistResourcesList(
+    resources: () -> List<ClistResource>,
     modifier: Modifier = Modifier,
-    resources: List<ClistResource>,
-    onClick: (ClistResource) -> Unit
+    onItemClick: (ClistResource) -> Unit
 ) {
     LazyColumnWithScrollBar(modifier = modifier) {
-        items(items = resources, key = { it.id }) { resource ->
+        items(items = resources(), key = { it.id }) { resource ->
             Text(
                 text = resource.name,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {
-                        onClick(resource)
-                    }
+                    .clickable { onItemClick(resource) }
                     .padding(all = 2.dp)
                     .animateItemPlacement()
             )
-            Divider()
-        }
-    }
-}
-
-@Composable
-private fun UnselectedPlatforms(
-    modifier: Modifier = Modifier,
-    resourcesResult: () -> Result<List<ClistResource>>?,
-    onClick: (ClistResource) -> Unit
-) {
-    LoadingContentBox(
-        dataResult = resourcesResult,
-        failedText = {
-            it.niceMessage ?: "Failed to load resources"
-        },
-        modifier = modifier
-    ) { resources ->
-        var searchFilter by remember { mutableStateOf("") }
-        Column {
-            OutlinedTextField(
-                value = searchFilter,
-                onValueChange = { searchFilter = it },
-                leadingIcon = {
-                    Icon(
-                        imageVector = CPSIcons.Search,
-                        contentDescription = null,
-                        modifier = modifier.size(32.dp)
-                    )
-                },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-            LazyColumnWithScrollBar {
-                items(
-                    items = resources.filter { it.name.contains(searchFilter, ignoreCase = true) },
-                    key = { it.id }
-                ) { resource ->
-                    Text(
-                        text = resource.name,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                onClick(resource)
-                            }
-                            .padding(all = 2.dp)
-                    )
-                    Divider()
-                }
-            }
+            Divider(modifier = Modifier.animateItemPlacement())
         }
     }
 }

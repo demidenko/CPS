@@ -149,9 +149,9 @@ private fun ClistAdditionalRow() {
     }
 
     if (showDialog) {
-        ClistAdditionalResourcesDialog(item = settings.clistAdditionalResources) {
-            showDialog = false
-        }
+        ClistAdditionalResourcesDialog(
+            onDismissRequest = { showDialog = false }
+        )
     }
 }
 
