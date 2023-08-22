@@ -3,82 +3,35 @@ package com.demich.cps.accounts.rating_graph
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import com.demich.cps.accounts.managers.*
+import com.demich.cps.accounts.managers.RatedAccountManager
+import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.accounts.userinfo.RatedUserInfo
-import com.demich.cps.ui.CPSIconButton
-import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.saver
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 
-
-@Composable
-fun<U: RatedUserInfo> RatedAccountManager<U>.RatingLoadButton(
-    userInfo: U,
-    ratingGraphUIStates: RatingGraphUIStates
-) {
-    val scope = rememberCoroutineScope()
-    CPSIconButton(
-        icon = CPSIcons.RatingGraph,
-        enabled = !ratingGraphUIStates.showRatingGraph || ratingGraphUIStates.loadingStatus == LoadingStatus.FAILED
-    ) {
-        ratingGraphUIStates.loadingStatus = LoadingStatus.LOADING
-        ratingGraphUIStates.showRatingGraph = true
-        scope.launch {
-            this@RatingLoadButton.runCatching {
-                getRatingHistory(userInfo.handle)
-            }.onFailure {
-                ratingGraphUIStates.loadingStatus = LoadingStatus.FAILED
-            }.onSuccess {
-                ratingGraphUIStates.ratingChanges = it
-                ratingGraphUIStates.loadingStatus = LoadingStatus.PENDING
-            }
-        }
-    }
-}
-
-@Composable
-fun<U: RatedUserInfo> RatedAccountManager<U>.RatingGraph(
-    ratingGraphUIStates: RatingGraphUIStates,
-    modifier: Modifier = Modifier
-) = RatingGraph(
-    ratingGraphUIStates = ratingGraphUIStates,
-    manager = this,
-    modifier = modifier
-)
-
-@Composable
-fun RatingGraph(
-    ratingGraphUIStates: RatingGraphUIStates,
-    manager: RatedAccountManager<out RatedUserInfo>,
-    modifier: Modifier = Modifier
-) {
-    if (ratingGraphUIStates.showRatingGraph) {
-        RatingGraph(
-            loadingStatus = ratingGraphUIStates.loadingStatus,
-            resultRatingChanges = ratingGraphUIStates.ratingChanges,
-            manager = manager,
-            modifier = modifier
-        )
-    }
-}
 
 internal enum class RatingFilterType {
     ALL,
@@ -89,25 +42,6 @@ internal enum class RatingFilterType {
     val title: String get() = name.lowercase().replace('_', ' ')
 }
 
-@Composable
-private fun RatingGraph(
-    loadingStatus: LoadingStatus,
-    resultRatingChanges: List<RatingChange>,
-    manager: RatedAccountManager<out RatedUserInfo>,
-    modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(5.dp)
-) {
-    RatingGraph(
-        ratingChangesResult = {
-            if (loadingStatus == LoadingStatus.LOADING) null
-            else runCatching {
-                require(loadingStatus == LoadingStatus.PENDING)
-                resultRatingChanges
-            }
-        },
-        manager, modifier, shape
-    )
-}
 
 @Composable
 fun RatingGraph(
