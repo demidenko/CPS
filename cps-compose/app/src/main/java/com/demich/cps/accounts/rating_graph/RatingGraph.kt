@@ -85,7 +85,7 @@ fun RatingGraph(
     if (ratingGraphUIStates.showRatingGraph) {
         RatingGraph(
             loadingStatus = ratingGraphUIStates.loadingStatus,
-            ratingChanges = ratingGraphUIStates.ratingChanges,
+            resultRatingChanges = ratingGraphUIStates.ratingChanges,
             manager = manager,
             modifier = modifier
         )
@@ -98,22 +98,61 @@ internal enum class RatingFilterType {
     LAST_MONTH,
     LAST_YEAR;
 
-    val title: String get() = when (this) {
-        ALL -> "all"
-        LAST_10 -> "last 10"
-        LAST_MONTH -> "last month"
-        LAST_YEAR -> "last year"
-    }
+    val title: String get() = name.lowercase().replace('_', ' ')
 }
 
 @Composable
 private fun RatingGraph(
     loadingStatus: LoadingStatus,
-    ratingChanges: List<RatingChange>,
+    resultRatingChanges: List<RatingChange>,
     manager: RatedAccountManager<out RatedUserInfo>,
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(5.dp)
 ) {
+    //TODO: find good solution instead of this
+    var header: @Composable () -> Unit by remember { mutableStateOf({}) }
+
+    Column(modifier = modifier) {
+        header()
+
+        LoadingContentBox(
+            dataResult = {
+                if (loadingStatus == LoadingStatus.LOADING) null
+                else kotlin.runCatching {
+                    require(loadingStatus == LoadingStatus.PENDING)
+                    resultRatingChanges
+                }
+            },
+            failedText = { "Failed to get rating history" },
+            modifier = Modifier
+                .height(240.dp)
+                .fillMaxWidth()
+                .background(cpsColors.backgroundAdditional, shape)
+                .clip(shape)
+        ) { ratingChanges ->
+            if (ratingChanges.isEmpty()) {
+                Text(text = "Rating history is empty")
+            } else {
+                RatingGraph(
+                    ratingChanges = ratingChanges,
+                    manager = manager,
+                    setHeader = { header = it },
+                    shape = shape
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RatingGraph(
+    ratingChanges: List<RatingChange>,
+    manager: RatedAccountManager<out RatedUserInfo>,
+    setHeader: (@Composable () -> Unit) -> Unit,
+    shape: Shape
+) {
+    require(ratingChanges.isNotEmpty())
+
     val translator = rememberCoordinateTranslator()
 
     val currentTime = remember(ratingChanges) { getCurrentTime() }
@@ -127,15 +166,12 @@ private fun RatingGraph(
     }
 
     var selectedRatingChange: RatingChange?
-        by rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(null) }
+            by rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(null) }
 
     val rectangles = remember(manager.type) { RatingGraphRectangles(manager) }
 
-    Column(
-        modifier = modifier
-    ) {
+    setHeader {
         RatingGraphHeader(
-            loadingStatus = loadingStatus,
             ratingChanges = ratingChanges,
             manager = manager,
             rectangles = rectangles,
@@ -150,51 +186,36 @@ private fun RatingGraph(
             selectedRatingChange = selectedRatingChange,
             shape = shape
         )
-
-        LoadingContentBox(
-            loadingStatus = loadingStatus,
-            failedText = "Failed to load rating history",
-            modifier = Modifier
-                .height(240.dp)
-                .fillMaxWidth()
-                .background(cpsColors.backgroundAdditional, shape)
-                .clip(shape)
-        ) {
-            if (ratingChanges.isEmpty()) {
-                Text(text = "Rating history is empty")
-            } else {
-                DrawRatingGraph(
-                    ratingChanges = ratingChanges,
-                    manager = manager,
-                    rectangles = rectangles,
-                    translator = translator,
-                    currentTime = currentTime,
-                    filterType = filterType,
-                    selectedRatingChange = selectedRatingChange,
-                    modifier = Modifier
-                        .pointerInput(Unit) {
-                            detectTransformGestures { centroid, pan, zoom, _ ->
-                                translator.move(pan)
-                                translator.scale(centroid, zoom)
-                            }
-                        }
-                        .pointerInput(ratingChanges) {
-                            detectTapGestures { tapPoint ->
-                                selectedRatingChange = translator.getNearestRatingChange(
-                                    ratingChanges = ratingChanges,
-                                    tap = tapPoint
-                                )
-                            }
-                        }
-                )
-            }
-        }
     }
+
+    RatingGraphCanvas(
+        ratingChanges = ratingChanges,
+        manager = manager,
+        rectangles = rectangles,
+        translator = translator,
+        currentTime = currentTime,
+        filterType = filterType,
+        selectedRatingChange = selectedRatingChange,
+        modifier = Modifier
+            .pointerInput(Unit) {
+                detectTransformGestures { centroid, pan, zoom, _ ->
+                    translator.move(pan)
+                    translator.scale(centroid, zoom)
+                }
+            }
+            .pointerInput(ratingChanges) {
+                detectTapGestures { tapPoint ->
+                    selectedRatingChange = translator.getNearestRatingChange(
+                        ratingChanges = ratingChanges,
+                        tap = tapPoint
+                    )
+                }
+            }
+    )
 }
 
 @Composable
 private fun RatingGraphHeader(
-    loadingStatus: LoadingStatus,
     ratingChanges: List<RatingChange>,
     manager: RatedAccountManager<out RatedUserInfo>,
     rectangles: RatingGraphRectangles,
@@ -215,8 +236,8 @@ private fun RatingGraphHeader(
                 .padding(all = 5.dp)
                 .fillMaxWidth()
         )
-    } else
-    if (loadingStatus == LoadingStatus.PENDING && ratingChanges.isNotEmpty()) {
+    } else {
+        require(ratingChanges.isNotEmpty())
         TextButtonsSelectRow(
             values = remember(ratingChanges, currentTime) {
                 buildList {
@@ -241,7 +262,7 @@ private fun RatingGraphHeader(
 }
 
 @Composable
-private fun DrawRatingGraph(
+private fun RatingGraphCanvas(
     ratingChanges: List<RatingChange>,
     manager: RatedAccountManager<out RatedUserInfo>,
     rectangles: RatingGraphRectangles,
@@ -266,7 +287,7 @@ private fun DrawRatingGraph(
         }
     }
 
-    DrawRatingGraph(
+    RatingGraphCanvas(
         ratingPoints = ratingChanges.map { it.toPoint() }.sortedBy { it.x },
         translator = translator,
         selectedPoint = selectedRatingChange?.toPoint(),
@@ -278,7 +299,7 @@ private fun DrawRatingGraph(
 }
 
 @Composable
-private fun DrawRatingGraph(
+private fun RatingGraphCanvas(
     ratingPoints: List<Point>,
     translator: CoordinateTranslator,
     selectedPoint: Point?,
