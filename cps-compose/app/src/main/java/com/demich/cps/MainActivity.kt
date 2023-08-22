@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,7 +60,6 @@ import com.demich.cps.utils.context
 import com.demich.cps.workers.enqueueEnabledWorkers
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -175,8 +175,9 @@ private fun CPSContent() {
         cpsComposable(ScreenTypes.newsCodeforcesBlog) { holder ->
             val handle = (holder.screen as Screen.NewsCodeforcesBlog).handle
             val newsViewModel = codeforcesNewsViewModel()
-            val loadingDataId = rememberSaveable { Random.nextLong() }
-            val blogEntriesResult by newsViewModel.flowOfBlogEntriesResult(handle, context, loadingDataId).collectAsState()
+            val blogEntriesResult by newsViewModel
+                .flowOfBlogEntriesResult(handle, context, key = currentCompositeKeyHash)
+                .collectAsState()
             CodeforcesBlogScreen(blogEntriesResult = { blogEntriesResult })
             holder.setSubtitle("news", "codeforces", "blog")
         }

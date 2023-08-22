@@ -104,8 +104,8 @@ class AccountsViewModel: ViewModel() {
 
     private val ratingLoader = backgroundDataLoader<List<RatingChange>>()
     fun flowOfRatingResult() = ratingLoader.flowOfResult()
-    fun loadRating(manager: RatedAccountManager<*>, userId: String, dataId: Long) {
-        ratingLoader.execute(id = "$userId#$dataId") {
+    fun loadRating(manager: RatedAccountManager<*>, userId: String, key: Int) {
+        ratingLoader.execute(id = "$userId#$key") {
             manager.getRatingHistory(userId)
         }
     }

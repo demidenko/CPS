@@ -129,9 +129,9 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
     }
 
     private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesBlogEntry>>()
-    fun flowOfBlogEntriesResult(handle: String, context: Context, id: Long) =
+    fun flowOfBlogEntriesResult(handle: String, context: Context, key: Int) =
         blogEntriesLoader.run {
-            execute(id = "$handle#$id") {
+            execute(id = "$handle#$key") {
                 val (result, colorTag) = awaitPair(
                     context = Dispatchers.IO,
                     blockFirst = { context.followListDao.getAndReloadBlogEntries(handle) },
