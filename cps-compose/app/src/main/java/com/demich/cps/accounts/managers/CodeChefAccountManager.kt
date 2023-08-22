@@ -2,7 +2,9 @@ package com.demich.cps.accounts.managers
 
 import android.content.Context
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.Icon
@@ -19,11 +21,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.HandleColor
-import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.SmallRatedAccountPanel
-import com.demich.cps.accounts.rating_graph.RatingGraph
-import com.demich.cps.accounts.rating_graph.RatingLoadButton
-import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
+import com.demich.cps.accounts.screens.CodeChefUserInfoExpandedContent
 import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
@@ -31,10 +30,11 @@ import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.CodeChefApi
 import com.demich.cps.platforms.api.CodeChefRatingChange
 import com.demich.cps.platforms.api.isRedirect
-import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.platforms.utils.CodeChefUtils
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
 import kotlin.text.contains
 
@@ -188,23 +188,11 @@ class CodeChefAccountManager :
         userInfo: CodeChefUserInfo,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier
-    ) {
-        val ratingGraphUIStates = rememberRatingGraphUIStates()
-        Box(modifier = modifier) {
-            PanelContent(userInfo)
-            RatingGraph(
-                ratingGraphUIStates = ratingGraphUIStates,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-            )
-        }
-        setBottomBarContent {
-            if (userInfo.hasRating()) {
-                RatingLoadButton(userInfo, ratingGraphUIStates)
-            }
-        }
-    }
+    ) = CodeChefUserInfoExpandedContent(
+        userInfo = userInfo,
+        setBottomBarContent = setBottomBarContent,
+        modifier = modifier
+    )
 
     override fun dataStore(context: Context) = simpleAccountDataStore(context)
 }
