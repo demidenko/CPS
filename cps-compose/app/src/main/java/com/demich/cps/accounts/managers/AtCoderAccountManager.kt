@@ -1,18 +1,11 @@
 package com.demich.cps.accounts.managers
 
 import android.content.Context
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.accounts.HandleColor
-import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
-import com.demich.cps.accounts.SmallRatedAccountPanel
-import com.demich.cps.accounts.rating_graph.RatingGraph
-import com.demich.cps.accounts.rating_graph.RatingLoadButton
-import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
+import com.demich.cps.accounts.screens.AtCoderUserInfoExpandedContent
 import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
@@ -23,6 +16,7 @@ import com.demich.cps.platforms.api.AtCoderRatingChange
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.ui.SettingsSwitchItemWithWork
+import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.AccountsWorker
@@ -90,23 +84,11 @@ class AtCoderAccountManager :
         userInfo: AtCoderUserInfo,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier
-    ) {
-        val ratingGraphUIStates = rememberRatingGraphUIStates()
-        Box(modifier = modifier) {
-            SmallRatedAccountPanel(userInfo)
-            RatingGraph(
-                ratingGraphUIStates = ratingGraphUIStates,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-            )
-        }
-        setBottomBarContent {
-            if (userInfo.hasRating()) {
-                RatingLoadButton(userInfo, ratingGraphUIStates)
-            }
-        }
-    }
+    ) = AtCoderUserInfoExpandedContent(
+        userInfo = userInfo,
+        setBottomBarContent = setBottomBarContent,
+        modifier = modifier
+    )
 
     override fun dataStore(context: Context) = AtCoderAccountDataStore(context)
     override fun getSettings(context: Context) = AtCoderAccountSettingsDataStore(context)

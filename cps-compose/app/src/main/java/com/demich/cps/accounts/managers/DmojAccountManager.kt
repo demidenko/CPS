@@ -1,21 +1,14 @@
 package com.demich.cps.accounts.managers
 
 import android.content.Context
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.accounts.HandleColor
-import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
-import com.demich.cps.accounts.SmallRatedAccountPanel
-import com.demich.cps.accounts.rating_graph.RatingGraph
-import com.demich.cps.accounts.rating_graph.RatingLoadButton
-import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
+import com.demich.cps.accounts.screens.DmojUserInfoExpandedContent
 import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.DmojUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
@@ -23,6 +16,7 @@ import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.DmojApi
 import com.demich.cps.platforms.api.DmojRatingChange
 import com.demich.cps.platforms.api.isPageNotFound
+import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.utils.append
 
@@ -98,23 +92,11 @@ class DmojAccountManager :
         userInfo: DmojUserInfo,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier
-    ) {
-        val ratingGraphUIStates = rememberRatingGraphUIStates()
-        Box(modifier = modifier) {
-            SmallRatedAccountPanel(userInfo)
-            RatingGraph(
-                ratingGraphUIStates = ratingGraphUIStates,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-            )
-        }
-        setBottomBarContent {
-            if (userInfo.hasRating()) {
-                RatingLoadButton(userInfo, ratingGraphUIStates)
-            }
-        }
-    }
+    ) = DmojUserInfoExpandedContent(
+        userInfo = userInfo,
+        setBottomBarContent = setBottomBarContent,
+        modifier = modifier
+    )
 
     override fun dataStore(context: Context) = simpleAccountDataStore(context)
 }
