@@ -97,6 +97,25 @@ private fun RatingGraph(
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(5.dp)
 ) {
+    RatingGraph(
+        ratingChangesResult = {
+            if (loadingStatus == LoadingStatus.LOADING) null
+            else runCatching {
+                require(loadingStatus == LoadingStatus.PENDING)
+                resultRatingChanges
+            }
+        },
+        manager, modifier, shape
+    )
+}
+
+@Composable
+fun RatingGraph(
+    ratingChangesResult: () -> Result<List<RatingChange>>?,
+    manager: RatedAccountManager<out RatedUserInfo>,
+    modifier: Modifier = Modifier,
+    shape: Shape = RoundedCornerShape(5.dp)
+) {
     //TODO: find good solution instead of this
     var header: @Composable () -> Unit by remember { mutableStateOf({}) }
 
@@ -104,13 +123,7 @@ private fun RatingGraph(
         header()
 
         LoadingContentBox(
-            dataResult = {
-                if (loadingStatus == LoadingStatus.LOADING) null
-                else kotlin.runCatching {
-                    require(loadingStatus == LoadingStatus.PENDING)
-                    resultRatingChanges
-                }
-            },
+            dataResult = ratingChangesResult,
             failedText = { "Failed to get rating history" },
             modifier = Modifier
                 .height(240.dp)
@@ -141,6 +154,7 @@ private fun RatingGraph(
 ) {
     require(ratingChanges.isNotEmpty())
 
+    //TODO: saveables not reset after ratings changes
     val translator = rememberCoordinateTranslator()
 
     val currentTime = remember { getCurrentTime() }

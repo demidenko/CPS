@@ -1,15 +1,8 @@
 package com.demich.cps.accounts.managers
 
 import android.content.Context
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -17,15 +10,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.R
 import com.demich.cps.accounts.HandleColor
-import com.demich.cps.accounts.SmallRatedAccountPanel
-import com.demich.cps.accounts.rating_graph.RatingGraph
-import com.demich.cps.accounts.rating_graph.RatingLoadButton
-import com.demich.cps.accounts.rating_graph.rememberRatingGraphUIStates
+import com.demich.cps.accounts.screens.CodeforcesUserInfoExpandedContent
 import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
@@ -37,7 +24,7 @@ import com.demich.cps.platforms.api.CodeforcesProblem
 import com.demich.cps.platforms.api.CodeforcesRatingChange
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.ui.SettingsSwitchItemWithWork
-import com.demich.cps.ui.VotedRating
+import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
@@ -157,40 +144,11 @@ class CodeforcesAccountManager :
         userInfo: CodeforcesUserInfo,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier
-    ) {
-        val ratingGraphUIStates = rememberRatingGraphUIStates()
-        Box(modifier = modifier) {
-            Column {
-                SmallRatedAccountPanel(userInfo)
-                if (userInfo.contribution != 0) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "contribution:",
-                            color = cpsColors.contentAdditional,
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(end = 5.dp)
-                        )
-                        VotedRating(
-                            rating = userInfo.contribution,
-                            fontSize = 20.sp
-                        )
-                    }
-                }
-            }
-            RatingGraph(
-                ratingGraphUIStates = ratingGraphUIStates,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-            )
-        }
-        setBottomBarContent {
-            //TODO: upsolving list button (icon = Icons.Default.FitnessCenter)
-            if (userInfo.hasRating()) {
-                RatingLoadButton(userInfo, ratingGraphUIStates)
-            }
-        }
-    }
+    ) = CodeforcesUserInfoExpandedContent(
+        userInfo = userInfo,
+        setBottomBarContent = setBottomBarContent,
+        modifier = modifier
+    )
 
     override fun dataStore(context: Context) = CodeforcesAccountDataStore(context)
     override fun getSettings(context: Context) = CodeforcesAccountSettingsDataStore(context)
