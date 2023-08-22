@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,9 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.SmallRatedAccountPanel
-import com.demich.cps.accounts.accountsViewModel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
-import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -36,10 +32,8 @@ fun CodeforcesUserInfoExpandedContent(
     modifier: Modifier
 ) {
     val manager = remember { CodeforcesAccountManager() }
-    val accountsViewModel = accountsViewModel()
 
     var showRatingGraph by rememberSaveable { mutableStateOf(false) }
-    val ratingDataKey = currentCompositeKeyHash
 
     Box(modifier = modifier) {
         Column {
@@ -49,12 +43,9 @@ fun CodeforcesUserInfoExpandedContent(
             }
         }
         if (showRatingGraph) {
-            val ratingChangesResult by accountsViewModel
-                .flowOfRatingResult(manager, userInfo.userId, key = ratingDataKey)
-                .collectAsState()
-            RatingGraph(
-                ratingChangesResult = { ratingChangesResult },
+            RatingGraphItem(
                 manager = manager,
+                userInfo = userInfo,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
