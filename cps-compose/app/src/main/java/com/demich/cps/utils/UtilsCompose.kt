@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -153,3 +154,9 @@ fun rememberFocusOnCreationRequester(): FocusRequester {
 @Composable
 inline fun<reified T: ViewModel> sharedViewModel(): T =
     viewModel(viewModelStoreOwner = context as ComponentActivity)
+
+
+val currentDataKey: Int
+    @Composable
+    //get() = rememberSaveable { Random.nextInt() }
+    get() = currentCompositeKeyHash
