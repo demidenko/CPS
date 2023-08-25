@@ -39,5 +39,5 @@ dependencies {
     implementation(project(":data:platforms:utils"))
 
     implementation(libs.kotlin.datetime)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation(libs.kotlin.coroutines)
 }

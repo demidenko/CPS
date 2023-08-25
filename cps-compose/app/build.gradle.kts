@@ -73,7 +73,7 @@ dependencies {
     implementation(project(":features:contests_loading_engine"))
 
     implementation(libs.kotlin.serialization)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation(libs.kotlin.coroutines)
     implementation(libs.kotlin.datetime)
 
     implementation("androidx.core:core-ktx:1.10.1")
