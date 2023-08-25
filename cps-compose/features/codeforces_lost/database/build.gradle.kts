@@ -46,8 +46,8 @@ dependencies {
     implementation(project(":features:room_base"))
     implementation(project(":data:platforms:api"))
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    implementation(libs.kotlin.serialization)
+    implementation(libs.kotlin.datetime)
 
     val room_version = "2.6.0-alpha01"
     implementation("androidx.room:room-ktx:$room_version")

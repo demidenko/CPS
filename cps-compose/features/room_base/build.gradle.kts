@@ -33,8 +33,8 @@ android {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    implementation(libs.kotlin.serialization)
+    implementation(libs.kotlin.datetime)
 
     implementation("androidx.room:room-ktx:2.6.0-alpha01")
 }

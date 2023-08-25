@@ -17,7 +17,7 @@ android {
         minSdk = 26
         targetSdk = 33 //TODO: as compileSdk
 
-        versionCode = 354
+        versionCode = 353
         versionName = "1.9.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -72,9 +72,9 @@ dependencies {
     implementation(project(":features:codeforces_follow:database"))
     implementation(project(":features:contests_loading_engine"))
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation(libs.kotlin.serialization)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    implementation(libs.kotlin.datetime)
 
     implementation("androidx.core:core-ktx:1.10.1")
 

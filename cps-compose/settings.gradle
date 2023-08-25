@@ -11,6 +11,13 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+    versionCatalogs {
+        //https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog-declaration
+        libs {
+            library("kotlin_serialization", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+            library("kotlin_datetime", "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+        }
+    }
 }
 rootProject.name = "CPS"
 include ':app'

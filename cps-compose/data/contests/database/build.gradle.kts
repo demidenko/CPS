@@ -45,7 +45,7 @@ android {
 dependencies {
     implementation(project(":features:room_base"))
 
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    implementation(libs.kotlin.datetime)
 
     val room_version = "2.6.0-alpha01"
     implementation("androidx.room:room-ktx:$room_version")

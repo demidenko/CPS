@@ -38,6 +38,6 @@ dependencies {
     implementation(project(":data:platforms:api"))
     implementation(project(":data:platforms:utils"))
 
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    implementation(libs.kotlin.datetime)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }
