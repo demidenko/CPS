@@ -37,17 +37,14 @@ fun SettingsColumn(
 ) {
     //spaceBy adds space only between items but start + end required too
     Column(
+        verticalArrangement = Arrangement.spacedBy(border),
         modifier = Modifier
             .padding(horizontal = border)
             .verticalScroll(rememberScrollState())
     ) {
-        Spacer(modifier = Modifier.fillMaxWidth().height(border))
-        Column(
-            verticalArrangement = Arrangement.spacedBy(border),
-            content = content,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.fillMaxWidth().height(border))
+        Spacer(modifier = Modifier.fillMaxWidth())
+        content()
+        Spacer(modifier = Modifier.fillMaxWidth())
     }
 }
 
@@ -101,7 +98,7 @@ fun SettingsItemContent(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.heightIn(min = 48.dp)
+        modifier = Modifier.minimumInteractiveComponentSize()
     ) {
         Column(
             modifier = Modifier.weight(1f)
