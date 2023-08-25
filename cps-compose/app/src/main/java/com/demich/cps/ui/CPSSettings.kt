@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.dialogs.CPSDialogSelectEnum
@@ -31,16 +32,23 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsColumn(
+    border: Dp = 10.dp,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    //spaceBy adds space only between items but start + end required too
     Column(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        content = content,
         modifier = Modifier
-            .padding(all = 10.dp)
+            .padding(horizontal = border)
             .verticalScroll(rememberScrollState())
-            .fillMaxWidth()
-    )
+    ) {
+        Spacer(modifier = Modifier.fillMaxWidth().height(border))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(border),
+            content = content,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.fillMaxWidth().height(border))
+    }
 }
 
 @Composable
