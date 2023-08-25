@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +25,13 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
+import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.context
+import com.demich.cps.utils.jsonCPS
+import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.saver
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun CodeforcesUserInfoExpandedContent(
@@ -33,7 +41,9 @@ fun CodeforcesUserInfoExpandedContent(
 ) {
     val manager = remember { CodeforcesAccountManager() }
 
-    var showRatingGraph by rememberSaveable { mutableStateOf(false) }
+    var showItem: ItemType? by rememberSaveable(stateSaver = jsonCPS.saver()) {
+        mutableStateOf(null)
+    }
 
     Box(modifier = modifier) {
         Column {
@@ -42,26 +52,53 @@ fun CodeforcesUserInfoExpandedContent(
                 Contribution(contribution = userInfo.contribution)
             }
         }
-        if (showRatingGraph) {
-            RatingGraphItem(
-                manager = manager,
-                userInfo = userInfo,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-            )
+        Box(modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .heightIn(max = 300.dp)
+        ) {
+            //TODO: saveables as pager
+            when (showItem) {
+                ItemType.RATING -> {
+                    RatingGraphItem(
+                        manager = manager,
+                        userInfo = userInfo
+                    )
+                }
+                ItemType.UPSOLVING -> {
+                    UpsolvingSuggestionsList(
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                null -> Unit
+            }
         }
     }
+
+    val context = context
+    val upsolvingSuggestionsEnabled by rememberCollect {
+        manager.getSettings(context).upsolvingSuggestionsEnabled.flow
+    }
+
     setBottomBarContent {
-        //TODO: upsolving list button (icon = Icons.Default.FitnessCenter)
+        if (upsolvingSuggestionsEnabled) {
+            CPSIconButton(
+                icon = CPSIcons.Upsolving,
+                enabled = showItem != ItemType.UPSOLVING,
+                onClick = { showItem = ItemType.UPSOLVING }
+            )
+        }
         if (userInfo.hasRating()) {
             CPSIconButton(
                 icon = CPSIcons.RatingGraph,
-                enabled = !showRatingGraph,
-                onClick = { showRatingGraph = true }
+                enabled = showItem != ItemType.RATING,
+                onClick = { showItem = ItemType.RATING }
             )
         }
     }
+}
+
+private enum class ItemType {
+    RATING, UPSOLVING
 }
 
 @Composable
@@ -77,5 +114,25 @@ private fun Contribution(contribution: Int) {
             rating = contribution,
             fontSize = 20.sp
         )
+    }
+}
+
+@Composable
+private fun UpsolvingSuggestionsList(
+    modifier: Modifier = Modifier
+) {
+    val context = context
+    val problems by rememberCollect {
+        CodeforcesAccountManager().dataStore(context)
+            .upsolvingSuggestedProblems.flow
+            .map { list -> list.map { it.first } }
+    }
+
+    LazyColumnOfData(
+        items = { problems },
+        key = { it.problemId },
+        modifier = modifier
+    ) {
+        Text(text = "${it.problemId}. ${it.name}")
     }
 }

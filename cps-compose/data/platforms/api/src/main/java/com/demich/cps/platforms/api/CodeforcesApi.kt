@@ -374,7 +374,9 @@ data class CodeforcesProblem(
     val index: String,
     val contestId: Int = -1,
     val points: Double = 0.0
-)
+) {
+    val problemId: String get() = "$contestId$index"
+}
 
 @Serializable
 data class CodeforcesProblemResult(

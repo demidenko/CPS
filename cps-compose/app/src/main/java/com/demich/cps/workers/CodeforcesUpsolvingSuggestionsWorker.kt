@@ -102,7 +102,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
         a.contestId == b.contestId && a.index == b.index
 
     private fun notifyProblemForUpsolve(problem: CodeforcesProblem) {
-        val problemId = "${problem.contestId}${problem.index}"
+        val problemId = problem.problemId
         notificationChannels.codeforces.upsolving_suggestion(problemId).notify(context) {
             setSmallIcon(R.drawable.ic_training)
             setContentTitle("Consider to upsolve problem $problemId")

@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlin.random.Random
 
 val context: Context
     @Composable
@@ -158,5 +159,5 @@ inline fun<reified T: ViewModel> sharedViewModel(): T =
 
 val currentDataKey: Int
     @Composable
-    //get() = rememberSaveable { Random.nextInt() }
-    get() = currentCompositeKeyHash
+    get() = rememberSaveable { Random.nextInt() }
+    //get() = currentCompositeKeyHash //hash is cached in if else

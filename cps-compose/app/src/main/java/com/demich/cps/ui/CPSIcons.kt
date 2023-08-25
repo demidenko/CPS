@@ -56,6 +56,7 @@ object CPSIcons {
     val Error get() = Icons.Default.Error
     val NewsFeeds get() = Icons.Default.RssFeed
     val Monitor get() = Icons.Default.Dvr
+    val Upsolving get() = Icons.Default.FitnessCenter
 }
 
 
