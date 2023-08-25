@@ -36,5 +36,5 @@ dependencies {
     implementation(libs.kotlin.serialization)
     implementation(libs.kotlin.datetime)
 
-    implementation("androidx.room:room-ktx:2.6.0-alpha01")
+    implementation(libs.room.ktx)
 }

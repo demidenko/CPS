@@ -49,7 +49,6 @@ dependencies {
     implementation(libs.kotlin.serialization)
     implementation(libs.kotlin.datetime)
 
-    val room_version = "2.6.0-alpha01"
-    implementation("androidx.room:room-ktx:$room_version")
-    ksp("androidx.room:room-compiler:$room_version")
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 }
