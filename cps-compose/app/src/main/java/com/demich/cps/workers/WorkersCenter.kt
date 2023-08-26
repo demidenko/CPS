@@ -85,7 +85,6 @@ suspend fun Context.enqueueEnabledWorkers() {
 
 internal fun WorkManager.enqueueCodeforcesMonitorWorker(replace: Boolean) {
     val requestBuilder = OneTimeWorkRequestBuilder<CodeforcesMonitorWorker>()
-        .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
     enqueueUniqueWork(
         "cf_monitor",
         if (replace) ExistingWorkPolicy.REPLACE else ExistingWorkPolicy.KEEP,
