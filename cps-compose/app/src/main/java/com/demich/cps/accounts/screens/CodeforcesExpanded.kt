@@ -17,6 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,10 +58,7 @@ fun CodeforcesUserInfoExpandedContent(
                 Contribution(contribution = userInfo.contribution)
             }
         }
-        Box(modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .heightIn(max = 300.dp)
-        ) {
+        Box(modifier = Modifier.align(Alignment.BottomCenter)) {
             //TODO: saveables as pager
             when (showItem) {
                 ItemType.RATING -> {
@@ -70,9 +68,14 @@ fun CodeforcesUserInfoExpandedContent(
                     )
                 }
                 ItemType.UPSOLVING -> {
-                    Column {
-                        ListTitle(text = "upsolving suggestions:", modifier = Modifier.fillMaxWidth())
-                        UpsolvingSuggestionsList(modifier = Modifier.fillMaxWidth())
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        ListTitle(text = "upsolving suggestions:")
+                        UpsolvingSuggestionsList(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 3.dp)
+                                .heightIn(max = 240.dp)
+                        )
                     }
                 }
                 null -> Unit
@@ -145,6 +148,8 @@ private fun UpsolvingSuggestionsList(
             text = "${it.problemId}. ${it.name}",
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
             modifier = Modifier
                 .clickable {
                     context.openUrlInBrowser(
