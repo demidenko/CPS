@@ -32,15 +32,11 @@ sealed class Screen(
 
     data object Accounts: RootScreen(ScreenTypes.accounts, icon = CPSIcons.Account)
 
-    data class AccountExpanded(val type: AccountManagerType)
-        : Screen(ScreenTypes.accountExpanded, rootScreenType = ScreenTypes.accounts) {
-            override fun createPath(pattern: String) = pattern.replace("{manager}", type.name)
-        }
+    data class AccountExpanded(override val type: AccountManagerType)
+        : AccountScreen(ScreenTypes.accountExpanded, type, true)
 
-    data class AccountSettings(val type: AccountManagerType)
-        : Screen(ScreenTypes.accountSettings, rootScreenType = ScreenTypes.accounts, enableBottomBar = false) {
-            override fun createPath(pattern: String) = pattern.replace("{manager}", type.name)
-        }
+    data class AccountSettings(override val type: AccountManagerType)
+        : AccountScreen(ScreenTypes.accountSettings, type, false)
 
     data object News: RootScreen(ScreenTypes.news, icon = CPSIcons.News)
     data object NewsSettings: Screen(ScreenTypes.newsSettings, rootScreenType = ScreenTypes.news, enableBottomBar = false)
@@ -64,6 +60,19 @@ sealed class RootScreen(
     screenType = screenType,
     rootScreenType = screenType
 )
+
+sealed class AccountScreen(
+    screenType: ScreenTypes,
+    open val type: AccountManagerType,
+    enableBottomBar: Boolean
+): Screen(
+    screenType = screenType,
+    rootScreenType = ScreenTypes.accounts,
+    enableBottomBar = enableBottomBar
+) {
+    final override fun createPath(pattern: String): String =
+        pattern.replace("{manager}", type.name)
+}
 
 private val simpleScreens = arrayOf(
     Screen.Contests,
