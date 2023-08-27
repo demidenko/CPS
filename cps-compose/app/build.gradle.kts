@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId = "com.demich.cps"
         minSdk = 26
-        targetSdk = 33 //TODO: as compileSdk
+        targetSdk = 34
 
         versionCode = 355
         versionName = "1.9.1"
