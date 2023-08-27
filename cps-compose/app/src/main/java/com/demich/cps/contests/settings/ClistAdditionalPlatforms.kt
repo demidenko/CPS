@@ -11,15 +11,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.ClistApi
 import com.demich.cps.platforms.api.ClistResource
 import com.demich.cps.platforms.api.niceMessage
 import com.demich.cps.platforms.utils.ClistUtils
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.ListTitle
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
@@ -111,16 +110,6 @@ private fun ColumnScope.DialogContent() {
 
 private fun filter(resources: List<ClistResource>, searchFilter: String) =
     resources.filter { it.name.contains(searchFilter, ignoreCase = true) }
-
-@Composable
-private fun ListTitle(text: String) {
-    Text(
-        text = text,
-        color = cpsColors.contentAdditional,
-        fontSize = 14.sp,
-        fontWeight = FontWeight.SemiBold
-    )
-}
 
 
 @OptIn(ExperimentalFoundationApi::class)

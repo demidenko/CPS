@@ -1,12 +1,13 @@
 package com.demich.cps.accounts.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,19 +17,23 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
+import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.ListTitle
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
+import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.saver
 import kotlinx.coroutines.flow.map
@@ -65,9 +70,10 @@ fun CodeforcesUserInfoExpandedContent(
                     )
                 }
                 ItemType.UPSOLVING -> {
-                    UpsolvingSuggestionsList(
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Column {
+                        ListTitle(text = "upsolving suggestions:", modifier = Modifier.fillMaxWidth())
+                        UpsolvingSuggestionsList(modifier = Modifier.fillMaxWidth())
+                    }
                 }
                 null -> Unit
             }
@@ -125,7 +131,9 @@ private fun UpsolvingSuggestionsList(
     val problems by rememberCollect {
         CodeforcesAccountManager().dataStore(context)
             .upsolvingSuggestedProblems.flow
-            .map { list -> list.map { it.first } }
+            .map { list ->
+                list.sortedByDescending { it.second }.map { it.first }
+            }
     }
 
     LazyColumnOfData(
@@ -133,6 +141,22 @@ private fun UpsolvingSuggestionsList(
         key = { it.problemId },
         modifier = modifier
     ) {
-        Text(text = "${it.problemId}. ${it.name}")
+        Text(
+            text = "${it.problemId}. ${it.name}",
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .clickable {
+                    context.openUrlInBrowser(
+                        CodeforcesApi.urls.problem(
+                            contestId = it.contestId,
+                            problemIndex = it.index
+                        )
+                    )
+                }
+                .padding(all = 2.dp)
+                .fillMaxWidth()
+        )
+        Divider()
     }
 }

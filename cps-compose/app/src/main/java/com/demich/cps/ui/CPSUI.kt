@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.toSignedString
@@ -206,6 +207,18 @@ fun CPSRadioButtonTitled(
         CPSRadioButton(selected = selected, onClick = onClick)
         title()
     }
+}
+
+@Composable
+fun ListTitle(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        color = cpsColors.contentAdditional,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.SemiBold,
+        textAlign = TextAlign.Center,
+        modifier = modifier
+    )
 }
 
 @Composable
