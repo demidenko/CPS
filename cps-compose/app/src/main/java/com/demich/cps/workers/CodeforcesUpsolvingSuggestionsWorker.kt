@@ -79,10 +79,14 @@ class CodeforcesUpsolvingSuggestionsWorker(
                     .filter { it.verdict == CodeforcesProblemVerdict.OK }
                     .map { it.problem.index }
 
-                if (!acceptedStats.map { it.key.index }.containsAll(solvedProblems)) {
-                    return Result.failure()
+                require(acceptedStats.map { it.key.index }.containsAll(solvedProblems))
+
+                //remove solved problems from suggestions list
+                suggestedItem.edit {
+                    removeAll { it.first.contestId == contestId && it.first.index in solvedProblems }
                 }
 
+                //add new suggestions
                 acceptedStats.forEach { (problem, solvers) ->
                     if (solvers >= ratingChange.rank && problem.index !in solvedProblems) {
                         suggestedItem.edit {
