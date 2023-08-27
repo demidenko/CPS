@@ -12,6 +12,8 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesProblem
 import com.demich.cps.platforms.api.CodeforcesProblemVerdict
+import com.demich.cps.utils.mapToSet
+import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -40,19 +42,22 @@ class CodeforcesUpsolvingSuggestionsWorker(
 
     override suspend fun runWork(): Result {
         val dataStore = CodeforcesAccountManager().dataStore(context)
-        val suggestedItem = dataStore.upsolvingSuggestedProblems
-
-        val deadLine = currentTime - 90.days
-        suggestedItem.edit { filter { it.second > deadLine } }
 
         val handle = dataStore.getSavedInfo()
             ?.takeIf { it.hasRating() }
             ?.handle
             ?: return Result.success()
 
+        val suggestedItem = dataStore.upsolvingSuggestedProblems
+
+        val deadLine = currentTime - 90.days
+        suggestedItem.edit { filter { it.second > deadLine } }
+
         val ratingChanges = CodeforcesApi.runCatching {
             getUserRatingChanges(handle)
         }.getOrNull() ?: return Result.retry()
+
+        val alreadySuggested = suggestedItem().map { it.first.problemId }
 
         ratingChanges
             .filter { it.ratingUpdateTime > deadLine }
@@ -75,25 +80,23 @@ class CodeforcesUpsolvingSuggestionsWorker(
                 val userSubmissions = data.first ?: return Result.retry()
                 val acceptedStats = data.second ?: return Result.failure()
 
-                val solvedProblems = userSubmissions
+                val solvedIndices = userSubmissions
                     .filter { it.verdict == CodeforcesProblemVerdict.OK }
-                    .map { it.problem.index }
+                    .mapToSet { it.problem.index }
 
-                require(acceptedStats.map { it.key.index }.containsAll(solvedProblems))
+                require(acceptedStats.map { it.key.index }.containsAll(solvedIndices))
 
                 //remove solved problems from suggestions list
                 suggestedItem.edit {
-                    removeAll { it.first.contestId == contestId && it.first.index in solvedProblems }
+                    removeAll { it.first.contestId == contestId && it.first.index in solvedIndices }
                 }
 
                 //add new suggestions
                 acceptedStats.forEach { (problem, solvers) ->
-                    if (solvers >= ratingChange.rank && problem.index !in solvedProblems) {
-                        suggestedItem.edit {
-                            if (none { sameProblems(it.first, problem) }) {
-                                add(problem to currentTime)
-                                notifyProblemForUpsolve(problem)
-                            }
+                    if (solvers >= ratingChange.rank && problem.index !in solvedIndices) {
+                        if (problem.problemId !in alreadySuggested) {
+                            suggestedItem.add(problem to ratingChange.ratingUpdateTime)
+                            notifyProblemForUpsolve(problem, context)
                         }
                     }
                 }
@@ -102,19 +105,16 @@ class CodeforcesUpsolvingSuggestionsWorker(
         return Result.success()
     }
 
-    private fun sameProblems(a: CodeforcesProblem, b: CodeforcesProblem) =
-        a.contestId == b.contestId && a.index == b.index
+}
 
-    private fun notifyProblemForUpsolve(problem: CodeforcesProblem) {
-        val problemId = problem.problemId
-        notificationChannels.codeforces.upsolving_suggestion(problemId).notify(context) {
-            setSmallIcon(R.drawable.ic_training)
-            setContentTitle("Consider to upsolve problem $problemId")
-            setSubText("codeforces upsolving suggestion")
-            setShowWhen(false)
-            setAutoCancel(true)
-            attachUrl(url = CodeforcesApi.urls.problem(problem.contestId, problem.index), context = context)
-        }
+private fun notifyProblemForUpsolve(problem: CodeforcesProblem, context: Context) {
+    val problemId = problem.problemId
+    notificationChannels.codeforces.upsolving_suggestion(problemId).notify(context) {
+        setSmallIcon(R.drawable.ic_training)
+        setContentTitle("Consider to upsolve problem $problemId")
+        setSubText("codeforces upsolving suggestion")
+        setShowWhen(false)
+        setAutoCancel(true)
+        attachUrl(url = CodeforcesApi.urls.problem(problem.contestId, problem.index), context = context)
     }
-
 }
