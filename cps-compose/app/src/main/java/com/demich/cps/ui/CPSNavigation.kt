@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import com.demich.cps.CPSTopBar
@@ -19,7 +20,7 @@ import com.demich.cps.ui.bottombar.CPSBottomBar
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberWith
 import com.google.accompanist.systemuicontroller.SystemUiController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 
@@ -29,10 +30,8 @@ fun rememberCPSNavigator(
 ): CPSNavigator {
     val subtitleState = remember { mutableStateOf("") }
 
-    val currentScreenState: State<Screen?>
-        = rememberWith(navController) {
-            currentBackStackEntryFlow.map { it.getScreen() }
-        }.collectAsState(initial = null)
+    val currentScreenState: State<Screen?> =
+        rememberWith(navController) { flowOfCurrentScreen() }.collectAsState(initial = null)
 
     val menuBuilderState = remember { mutableStateOf<CPSMenuBuilder?>(null) }
     val bottomBarBuilderState = remember { mutableStateOf<AdditionalBottomBarBuilder?>(null) }
@@ -45,6 +44,9 @@ fun rememberCPSNavigator(
         bottomBarBuilderState = bottomBarBuilderState
     )
 }
+
+fun NavController.flowOfCurrentScreen(): Flow<Screen> =
+    currentBackStackEntryFlow.map { it.getScreen() }
 
 @Stable
 class CPSNavigator(
@@ -137,17 +139,6 @@ class CPSNavigator(
             navigator = this,
             additionalBottomBar = bottomBarBuilderState.value,
             onSetSystemNavColor = systemUiController::setNavigationBarColor
-        )
-    }
-
-
-    @Composable
-    fun ColorizeNavAndStatusBars(
-        systemUiController: SystemUiController = rememberSystemUiController()
-    ) {
-        CPSStatusBar(
-            systemUiController = systemUiController,
-            currentScreen = currentScreen
         )
     }
 }

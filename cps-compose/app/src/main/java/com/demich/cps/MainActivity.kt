@@ -51,6 +51,7 @@ import com.demich.cps.news.newsMenuBuilder
 import com.demich.cps.news.settings.NewsSettingsScreen
 import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.CPSScaffold
+import com.demich.cps.ui.CPSStatusBar
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.rememberCPSNavigator
 import com.demich.cps.ui.theme.CPSTheme
@@ -85,10 +86,11 @@ class MainActivity: ComponentActivity() {
 
 @Composable
 private fun CPSContent() {
-    val navigator = rememberCPSNavigator(navController = rememberNavController())
+    val navController = rememberNavController()
+    val navigator = rememberCPSNavigator(navController)
     val systemUiController = rememberSystemUiController()
 
-    navigator.ColorizeNavAndStatusBars(systemUiController)
+    CPSStatusBar(systemUiController, navController)
 
     fun NavGraphBuilder.cpsComposable(
         screenType: ScreenTypes,

@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.RatedAccountManager
@@ -37,21 +38,31 @@ import com.demich.datastore_itemized.edit
 import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable
 fun CPSStatusBar(
     systemUiController: SystemUiController,
-    currentScreen: Screen?
+    navController: NavController
 ) {
     val context = context
     val coloredStatusBar by rememberCollect { context.settingsUI.coloredStatusBar.flow }
-    val rankGetter by rememberCollect { makeFlowOfRankGetter(context) }
+    val rank by rememberCollect {
+        combine(
+            flow = makeFlowOfRankGetter(context),
+            flow2 = flow {
+                emit(null)
+                emitAll(navController.flowOfCurrentScreen())
+            }
+        ) { rankGetter, currentScreen -> rankGetter[currentScreen] }
+    }
     ColorizeStatusBar(
         systemUiController = systemUiController,
         coloredStatusBar = coloredStatusBar,
-        rank = rankGetter[currentScreen]
+        rank = rank
     )
 }
 
