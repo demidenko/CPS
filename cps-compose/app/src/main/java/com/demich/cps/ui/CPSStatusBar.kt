@@ -22,8 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.HandleColor
+import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.allRatedAccountManagers
 import com.demich.cps.accounts.managers.colorFor
@@ -37,7 +37,6 @@ import com.demich.datastore_itemized.edit
 import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -100,19 +99,22 @@ private fun<U: RatedUserInfo> RatedAccountManager<U>.getRank(userInfo: U?): Rate
 private fun<U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(context: Context): Flow<RatedRank?> =
     dataStore(context).flowOfInfo().map(this::getRank)
 
-private data class RankGetter(
+private class RankGetter(
     private val validRanks: List<RatedRank>,
-    private val disabledManagers: Set<AccountManagerType>,
-    private val resultByMaximum: Boolean
+    disabledManagers: Set<AccountManagerType>,
+    resultByMaximum: Boolean
 ) {
+    private val rank: RatedRank? =
+        validRanks.filter { it.manager.type !in disabledManagers }.run {
+            if (resultByMaximum) maxByOrNull { it.rank }
+            else minByOrNull { it.rank }
+        }
+
     operator fun get(screen: Screen?): RatedRank? =
         when (screen) {
             is Screen.AccountExpanded -> validRanks.find { it.manager.type == screen.type }
             is Screen.AccountSettings -> validRanks.find { it.manager.type == screen.type }
-            else -> validRanks.filter { it.manager.type !in disabledManagers }.run {
-                if (resultByMaximum) maxByOrNull { it.rank }
-                else minByOrNull { it.rank }
-            }
+            else -> rank
         }
 }
 
@@ -127,7 +129,7 @@ private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
             disabledManagers = disabledManagers,
             resultByMaximum = resultByMaximum
         )
-    }.distinctUntilChanged()
+    }
 
 @Composable
 private fun ColorizeStatusBar(
