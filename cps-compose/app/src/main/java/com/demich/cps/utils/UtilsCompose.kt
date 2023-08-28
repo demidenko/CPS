@@ -144,7 +144,7 @@ fun rememberFocusOnCreationRequester(): FocusRequester {
     var focusedOnCreation by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(requester) {
         if (!focusedOnCreation) {
-            awaitFrame() //TODO is this ok? instead of [if (!focusImmediately) delay(100.milliseconds)]
+            awaitFrame() //instead of delay(100.milliseconds)
             requester.requestFocus()
             focusedOnCreation = true
         }

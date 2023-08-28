@@ -3,11 +3,13 @@ package com.demich.cps.ui.bottomprogressbar
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,9 +31,7 @@ fun CPSBottomProgressBarsColumn(
     modifier: Modifier = Modifier
 ) {
     val progressBarsViewModel = progressBarsViewModel()
-    LazyColumn(
-        modifier = modifier
-    ) {
+    LazyColumn(modifier = modifier) {
         items(
             items = progressBarsViewModel.progressBarsIdsList,
             key = { it }
@@ -56,7 +56,7 @@ fun CPSBottomProgressBar(
             modifier = modifier
                 .fillMaxWidth()
                 .background(
-                    color = cpsColors.backgroundNavigation.copy(alpha = 0.75f),
+                    color = cpsColors.backgroundNavigation,
                     shape = RoundedCornerShape(8.dp)
                 )
                 .padding(vertical = 4.dp)
@@ -94,7 +94,7 @@ fun CPSProgressIndicator(
 private fun LinearProgressIndicatorRounded(
     progress: Float,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colors.primary,
+    color: Color = cpsColors.accent,
     backgroundColor: Color = color.copy(alpha = ProgressIndicatorDefaults.IndicatorBackgroundOpacity)
 ) {
     Canvas(
