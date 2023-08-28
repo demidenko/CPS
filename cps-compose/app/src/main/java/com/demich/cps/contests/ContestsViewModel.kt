@@ -22,6 +22,7 @@ import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -31,11 +32,11 @@ fun contestsViewModel(): ContestsViewModel = sharedViewModel()
 class ContestsViewModel: ViewModel(), ContestsReloader {
 
     fun flowOfLoadingStatus(): Flow<LoadingStatus> =
-            Contest.platforms.map { mutableLoadingStatusFor(it) }.combine()
+        loadingStatuses.map { it.values.combine() }
 
     fun flowOfLoadingErrors(): Flow<List<Pair<ContestsLoaderType,Throwable>>> =
         combine(
-            flow = Contest.platforms.associateWith { mutableLoadingStatusFor(it) }.combine(),
+            flow = loadingStatuses,
             flow2 = errors
         ) { loadingStatuses, errors ->
             loadingStatuses
@@ -44,22 +45,20 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
                 .distinct()
         }
 
-    private val loadingStatuses: MutableMap<Contest.Platform, MutableStateFlow<LoadingStatus>> = mutableMapOf()
-    private fun mutableLoadingStatusFor(platform: Contest.Platform) =
-        loadingStatuses.getOrPut(platform) { MutableStateFlow(LoadingStatus.PENDING) }
-
+    private val loadingStatuses = MutableStateFlow(emptyMap<Contest.Platform, LoadingStatus>())
     private val errors = MutableStateFlow(emptyMap<Contest.Platform, List<Pair<ContestsLoaderType,Throwable>>>())
 
     private suspend fun ContestsListDao.removePlatform(platform: Contest.Platform) {
         replace(platform, emptyList())
         errors.update { it - platform }
-        mutableLoadingStatusFor(platform).value = LoadingStatus.PENDING
+        setLoadingStatus(platform, LoadingStatus.PENDING)
     }
 
     private fun setLoadingStatus(platform: Contest.Platform, loadingStatus: LoadingStatus) =
-        mutableLoadingStatusFor(platform).update {
-            if (loadingStatus == LoadingStatus.LOADING) require(it != LoadingStatus.LOADING)
-            loadingStatus
+        loadingStatuses.update {
+            if (loadingStatus == LoadingStatus.LOADING) require(it[platform] != LoadingStatus.LOADING)
+            if (loadingStatus == LoadingStatus.PENDING) it - platform
+            else it + (platform to loadingStatus)
         }
 
     private fun ContestsListDao.makeReceiver(): ContestsReceiver {
