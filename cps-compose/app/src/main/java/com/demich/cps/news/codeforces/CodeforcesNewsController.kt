@@ -102,27 +102,15 @@ class CodeforcesNewsController internal constructor(
     var recentFilterByBlogEntry: CodeforcesBlogEntry? by mutableStateOf(data.recentFilterByBlogEntry)
 
 
-    private fun flowOfBadgeCount(
-        tab: CodeforcesTitle,
-        blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
-        newEntriesItem: NewEntriesDataStoreItem
-    ) = combineToCounters(
-        flowOfIds = blogEntriesFlow.map { it.map { it.id } },
-        flowOfTypes = newEntriesItem.flow
-    ).combine(snapshotFlow { currentTab }) { counters, currentTab ->
-        if (currentTab == tab) counters.seenCount + counters.unseenCount
-        else counters.unseenCount
-    }
-
     fun flowOfBadgeCount(tab: CodeforcesTitle, context: Context): Flow<Int> =
         when (tab) {
             CodeforcesTitle.MAIN -> flowOfBadgeCount(
-                tab = tab,
+                isTabVisibleFlow = snapshotFlow { tab == currentTab },
                 blogEntriesFlow = flowOfMainBlogEntries(context),
                 newEntriesItem = CodeforcesNewEntriesDataStore(context).mainNewEntries
             )
             CodeforcesTitle.LOST -> flowOfBadgeCount(
-                tab = tab,
+                isTabVisibleFlow = snapshotFlow { tab == currentTab },
                 blogEntriesFlow = flowOfLostBlogEntries(context),
                 newEntriesItem = CodeforcesNewEntriesDataStore(context).lostNewEntries
             )
@@ -164,3 +152,16 @@ class CodeforcesNewsController internal constructor(
         )
     }
 }
+
+private fun flowOfBadgeCount(
+    isTabVisibleFlow: Flow<Boolean>,
+    blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
+    newEntriesItem: NewEntriesDataStoreItem
+): Flow<Int> =
+    combineToCounters(
+        flowOfIds = blogEntriesFlow.map { it.map { it.id } },
+        flowOfTypes = newEntriesItem.flow
+    ).combine(isTabVisibleFlow) { counters, isTabVisible ->
+        if (isTabVisible) counters.seenCount + counters.unseenCount
+        else counters.unseenCount
+    }

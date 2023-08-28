@@ -15,6 +15,9 @@ enum class NewEntryType {
 
 typealias NewEntriesTypes = Map<Int, NewEntryType>
 
+private fun NewEntriesTypes.getType(blogEntryId: Int): NewEntryType =
+    this[blogEntryId] ?: NewEntryType.UNSEEN
+
 class NewEntriesDataStoreItem (
     private val item: DataStoreItem<NewEntriesTypes>
 ) {
@@ -23,7 +26,7 @@ class NewEntriesDataStoreItem (
     suspend fun apply(newEntries: Collection<Int>) {
         if (newEntries.isEmpty()) return //TODO: is this OK/enough?
         item.update { old ->
-            newEntries.associateWith { id -> old[id] ?: NewEntryType.UNSEEN }
+            newEntries.associateWith { id -> old.getType(id) }
         }
     }
 
@@ -39,7 +42,7 @@ class NewEntriesDataStoreItem (
     }
 
     private fun MutableMap<Int, NewEntryType>.markAtLeast(id: Int, type: NewEntryType) {
-        val old = this[id] ?: NewEntryType.UNSEEN
+        val old = getType(id)
         if (type > old) this[id] = type
     }
 }
@@ -52,7 +55,7 @@ data class NewEntryTypeCounters(
 fun combineToCounters(flowOfIds: Flow<List<Int>>, flowOfTypes: Flow<NewEntriesTypes>) =
     combine(flowOfIds, flowOfTypes) { ids, types ->
         NewEntryTypeCounters(
-            unseenCount = ids.count { (types[it] ?: NewEntryType.UNSEEN) == NewEntryType.UNSEEN },
-            seenCount = ids.count { types[it] == NewEntryType.SEEN }
+            unseenCount = ids.count { types.getType(it) == NewEntryType.UNSEEN },
+            seenCount = ids.count { types.getType(it) == NewEntryType.SEEN }
         )
     }.distinctUntilChanged()
