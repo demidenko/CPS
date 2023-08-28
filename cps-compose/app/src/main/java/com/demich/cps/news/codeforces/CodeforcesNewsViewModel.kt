@@ -39,20 +39,20 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
 
     override fun flowOfLoadingStatus(): Flow<LoadingStatus> =
         listOf(
-            mainBlogEntries.loadingStatusState,
-            topBlogEntries.loadingStatusState,
-            topComments.loadingStatusState,
-            recentActions.loadingStatusState
+            mainBlogEntries.loadingStatusFlow,
+            topBlogEntries.loadingStatusFlow,
+            topComments.loadingStatusFlow,
+            recentActions.loadingStatusFlow
         ).combine()
 
     override fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus> {
         return when (title) {
-            CodeforcesTitle.MAIN -> mainBlogEntries.loadingStatusState
+            CodeforcesTitle.MAIN -> mainBlogEntries.loadingStatusFlow
             CodeforcesTitle.TOP -> {
-                listOf(topBlogEntries.loadingStatusState, topComments.loadingStatusState)
+                listOf(topBlogEntries.loadingStatusFlow, topComments.loadingStatusFlow)
                     .combine()
             }
-            CodeforcesTitle.RECENT -> recentActions.loadingStatusState
+            CodeforcesTitle.RECENT -> recentActions.loadingStatusFlow
             else -> flowOf(LoadingStatus.PENDING)
         }
     }
@@ -166,11 +166,12 @@ private class CodeforcesDataLoader<T>(
         return dataFlow
     }
 
-    val loadingStatusState = MutableStateFlow(LoadingStatus.PENDING)
+    private val loadingStatus = MutableStateFlow(LoadingStatus.PENDING)
+    val loadingStatusFlow: StateFlow<LoadingStatus> get() = loadingStatus
 
     fun launchLoadIfActive(locale: CodeforcesLocale) {
         if (inactive) return
-        loadingStatusState.update {
+        loadingStatus.update {
             require(it != LoadingStatus.LOADING)
             LoadingStatus.LOADING
         }
@@ -178,10 +179,10 @@ private class CodeforcesDataLoader<T>(
             withContext(Dispatchers.IO) {
                 kotlin.runCatching { getData(locale) }
             }.onFailure {
-                loadingStatusState.value = LoadingStatus.FAILED
+                loadingStatus.value = LoadingStatus.FAILED
             }.onSuccess {
                 dataFlow.value = it
-                loadingStatusState.value = LoadingStatus.PENDING
+                loadingStatus.value = LoadingStatus.PENDING
             }
         }
     }
