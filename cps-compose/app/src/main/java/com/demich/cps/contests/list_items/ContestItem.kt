@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.ui.MonospacedText
+import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.append
@@ -140,18 +141,19 @@ private fun ContestItemFooter(
     counter: String,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier) {
-        MonospacedText(
-            text = date,
-            fontSize = 15.sp,
-            color = cpsColors.contentAdditional,
-            modifier = Modifier.align(Alignment.CenterStart)
-        )
-        MonospacedText(
-            text = counter,
-            fontSize = 15.sp,
-            color = cpsColors.contentAdditional,
-            modifier = Modifier.align(Alignment.CenterEnd)
-        )
+    ProvideTextStyle(CPSDefaults.MonospaceTextStyle.copy(
+        fontSize = 15.sp,
+        color = cpsColors.contentAdditional
+    )) {
+        Box(modifier = modifier) {
+            Text(
+                text = date,
+                modifier = Modifier.align(Alignment.CenterStart)
+            )
+            Text(
+                text = counter,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+        }
     }
 }

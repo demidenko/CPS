@@ -8,9 +8,9 @@ import androidx.compose.ui.unit.sp
 object CPSDefaults {
     const val buttonOnOffDurationMillis: Int = 800
 
-    val bottomBarHeight = 56.dp //as BottomNavigationHeight
+    val bottomBarHeight get() = 56.dp //as BottomNavigationHeight
 
-    val scrollBarWidth = 5.dp
+    val scrollBarWidth get() = 5.dp
 
     val MonospaceTextStyle = TextStyle(
         fontFamily = FontFamily.Monospace,
