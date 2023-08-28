@@ -36,7 +36,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
     fun flowOfLoadingErrors(): Flow<List<Pair<ContestsLoaderType,Throwable>>> =
         combine(
             flow = Contest.platforms.associateWith { mutableLoadingStatusFor(it) }.combine(),
-            flow2 = Contest.platforms.associateWith { mutableErrorsList(it) }.combine()
+            flow2 = errors
         ) { loadingStatuses, errors ->
             loadingStatuses
                 .filter { it.value == LoadingStatus.FAILED }
@@ -48,13 +48,11 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
     private fun mutableLoadingStatusFor(platform: Contest.Platform) =
         loadingStatuses.getOrPut(platform) { MutableStateFlow(LoadingStatus.PENDING) }
 
-    private val errors: MutableMap<Contest.Platform, MutableStateFlow<List<Pair<ContestsLoaderType,Throwable>>>> = mutableMapOf()
-    private fun mutableErrorsList(platform: Contest.Platform) =
-        errors.getOrPut(platform) { MutableStateFlow(emptyList()) }
+    private val errors = MutableStateFlow(emptyMap<Contest.Platform, List<Pair<ContestsLoaderType,Throwable>>>())
 
     private suspend fun ContestsListDao.removePlatform(platform: Contest.Platform) {
         replace(platform, emptyList())
-        mutableErrorsList(platform).value = emptyList()
+        errors.update { it - platform }
         mutableLoadingStatusFor(platform).value = LoadingStatus.PENDING
     }
 
@@ -69,14 +67,17 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
         return asContestsReceiver(
             onStartLoading = { platform ->
                 setLoadingStatus(platform, LoadingStatus.LOADING)
-                mutableErrorsList(platform).value = emptyList()
+                errors.update { it - platform }
             },
             onFinish = { platform ->
                 setLoadingStatus(platform, lastResult.getValue(platform).toLoadingStatus())
             },
             onResult = { platform, loaderType, result ->
-                result.onFailure {
-                    mutableErrorsList(platform).value += loaderType to it
+                result.onFailure { error ->
+                    errors.update {
+                        val prev = it.getOrDefault(platform, emptyList())
+                        it + (platform to (prev + (loaderType to error)))
+                    }
                 }
                 lastResult[platform] = result
             }
