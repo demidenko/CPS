@@ -59,6 +59,10 @@ inline fun firstFalse(first: Int, last: Int, pred: (Int) -> Boolean): Int {
 
 inline fun <T, R> Iterable<T>.mapToSet(transform: (T) -> R): Set<R> = mapTo(mutableSetOf(), transform)
 
+fun<K, V> Map<K, List<V>>.append(key: K, value: V): Map<K, List<V>> =
+    toMutableMap().apply {
+        this[key] = this[key]?.let { it + value } ?: listOf(value)
+    }
 
 fun<K, V> Map<K, Flow<V>>.combine(): Flow<Map<K, V>> =
     combine(entries.map { (key, value) -> value.map { key to it } }) { it.toMap() }

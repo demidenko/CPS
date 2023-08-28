@@ -14,6 +14,7 @@ import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.append
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.mapToSet
 import com.demich.cps.utils.sharedViewModel
@@ -35,10 +36,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
         loadingStatuses.map { it.values.combine() }
 
     fun flowOfLoadingErrors(): Flow<List<Pair<ContestsLoaderType,Throwable>>> =
-        combine(
-            flow = loadingStatuses,
-            flow2 = errors
-        ) { loadingStatuses, errors ->
+        combine(loadingStatuses, errors) { loadingStatuses, errors ->
             loadingStatuses
                 .filter { it.value == LoadingStatus.FAILED }
                 .flatMap { errors[it.key] ?: emptyList() }
@@ -73,10 +71,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
             },
             onResult = { platform, loaderType, result ->
                 result.onFailure { error ->
-                    errors.update {
-                        val prev = it.getOrDefault(platform, emptyList())
-                        it + (platform to (prev + (loaderType to error)))
-                    }
+                    errors.update { it.append(platform, loaderType to error) }
                 }
                 lastResult[platform] = result
             }
