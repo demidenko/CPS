@@ -8,13 +8,15 @@ import kotlinx.datetime.Instant
 internal data class ContestData(
     val contest: Contest,
     val phase: Contest.Phase,
-    val startsIn: String,
-    val endsIn: String
-) {
-    constructor(contest: Contest, currentTime: Instant): this(
-        contest = contest,
-        phase = contest.getPhase(currentTime),
-        startsIn = contestTimeDifference(currentTime, contest.startTime),
-        endsIn = contestTimeDifference(currentTime, contest.endTime)
-    )
+    val counter: String
+)
+
+internal fun contestData(contest: Contest, currentTime: Instant): ContestData {
+    val phase = contest.getPhase(currentTime)
+    val counter = when (phase) {
+        Contest.Phase.BEFORE -> contestTimeDifference(currentTime, contest.startTime) //startsIn
+        Contest.Phase.RUNNING -> contestTimeDifference(currentTime, contest.endTime) //endsIn
+        Contest.Phase.FINISHED -> ""
+    }
+    return ContestData(contest, phase, counter)
 }

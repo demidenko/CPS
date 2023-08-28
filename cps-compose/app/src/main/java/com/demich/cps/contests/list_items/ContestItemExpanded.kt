@@ -30,7 +30,7 @@ internal fun ContestExpandedItemContent(
     contest: Contest,
     onDeleteRequest: () -> Unit
 ) {
-    val data = ContestData(
+    val data = contestData(
         contest = contest,
         currentTime = LocalCurrentTime.current
     )
@@ -86,12 +86,8 @@ private fun ContestItemFooter(
         endTime = data.contest.endTime.contestDate(),
         contestLink = data.contest.link,
         counter = when (data.phase) {
-            Contest.Phase.BEFORE -> {
-                "starts in " + data.startsIn
-            }
-            Contest.Phase.RUNNING -> {
-                "ends in " + data.endsIn
-            }
+            Contest.Phase.BEFORE -> "starts in " + data.counter
+            Contest.Phase.RUNNING -> "ends in " + data.counter
             Contest.Phase.FINISHED -> ""
         },
         modifier = modifier,

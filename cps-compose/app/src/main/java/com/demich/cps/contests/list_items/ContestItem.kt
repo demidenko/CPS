@@ -38,7 +38,7 @@ fun ContestItem(
 @Composable
 private fun ContestItemContent(contest: Contest) {
     //TODO: recompose twice per second! (wtf?)
-    val data = ContestData(
+    val data = contestData(
         contest = contest,
         currentTime = LocalCurrentTime.current
     )
@@ -116,11 +116,11 @@ private fun ContestItemFooter(
     when (data.phase) {
         Contest.Phase.BEFORE -> {
             date = data.contest.dateRange()
-            counter = "in " + data.startsIn
+            counter = "in " + data.counter
         }
         Contest.Phase.RUNNING -> {
             date = "ends " + data.contest.endTime.contestDate()
-            counter = "left " + data.endsIn
+            counter = "left " + data.counter
         }
         Contest.Phase.FINISHED -> {
             date = data.contest.startTime.contestDate() + " - " + data.contest.endTime.contestDate()
