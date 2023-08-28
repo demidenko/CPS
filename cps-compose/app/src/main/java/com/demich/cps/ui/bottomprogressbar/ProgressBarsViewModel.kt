@@ -25,30 +25,31 @@ data class ProgressBarInfo(
 fun progressBarsViewModel(): ProgressBarsViewModel = sharedViewModel()
 
 class ProgressBarsViewModel: ViewModel() {
-    val progressBars = mutableStateListOf<String>()
+    //TODO: to StateFlows
+    private val progressIds = mutableStateListOf<String>()
+    val progressBarsIdsList: List<String> get() = progressIds
 
-    private val states = mutableMapOf<String, MutableState<ProgressBarInfo>>()
+    private val progressStates = mutableMapOf<String, MutableState<ProgressBarInfo>>()
 
-    @Composable
-    fun collectProgress(id: String) = states.getValue(id)
+    fun progressState(id: String): State<ProgressBarInfo> = progressStates.getValue(id)
 
     fun doJob(
         id: String,
         coroutineScope: CoroutineScope = viewModelScope,
         block: suspend CoroutineScope.(MutableState<ProgressBarInfo>) -> Unit
     ) {
+        require(id !in progressStates) { "progress bar with id=$id is already started" }
         coroutineScope.launch {
-            require(id !in states) { "progress bar with id=$id is already started" }
-            val progressStateFlow = states.getOrPut(id) { mutableStateOf(ProgressBarInfo(total = 0)) }
-            progressBars.add(id)
-            block(progressStateFlow)
-            if (progressStateFlow.value.total > 0) delay(1.seconds)
-            progressBars.remove(id)
-            states.remove(id)
+            val progressState = progressStates.getOrPut(id) { mutableStateOf(ProgressBarInfo(total = 0)) }
+            progressIds.add(id)
+            block(progressState)
+            if (progressState.value.total > 0) delay(1.seconds)
+            progressIds.remove(id)
+            progressStates.remove(id)
         }
     }
 
-    val clistImportIsRunning: Boolean get() = clistImportId in progressBars
+    val clistImportIsRunning: Boolean get() = clistImportId in progressIds
 
     companion object {
         const val clistImportId = "clist_import"

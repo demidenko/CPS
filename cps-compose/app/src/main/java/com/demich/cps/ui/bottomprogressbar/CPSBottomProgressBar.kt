@@ -33,10 +33,10 @@ fun CPSBottomProgressBarsColumn(
         modifier = modifier
     ) {
         items(
-            items = progressBarsViewModel.progressBars,
+            items = progressBarsViewModel.progressBarsIdsList,
             key = { it }
         ) {
-            val progress by progressBarsViewModel.collectProgress(id = it)
+            val progress by progressBarsViewModel.progressState(id = it)
             CPSBottomProgressBar(
                 progressBarInfo = progress,
                 modifier = Modifier.padding(all = 3.dp)
