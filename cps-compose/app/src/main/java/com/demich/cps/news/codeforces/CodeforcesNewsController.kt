@@ -9,9 +9,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.utils.NewEntriesDataStoreItem
+import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.rememberCollect
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
@@ -97,10 +102,32 @@ class CodeforcesNewsController internal constructor(
     var recentFilterByBlogEntry: CodeforcesBlogEntry? by mutableStateOf(data.recentFilterByBlogEntry)
 
 
-    private val badges = mutableMapOf<CodeforcesTitle, MutableIntState>()
-    private fun badgeState(tab: CodeforcesTitle) = badges.getOrPut(tab) { mutableIntStateOf(0) }
-    fun getBadgeCountState(tab: CodeforcesTitle): IntState = badgeState(tab)
-    fun setBadgeCount(tab: CodeforcesTitle, count: Int) { badgeState(tab).intValue = count }
+    private fun flowOfBadgeCount(
+        tab: CodeforcesTitle,
+        blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
+        newEntriesItem: NewEntriesDataStoreItem
+    ) = combineToCounters(
+        flowOfIds = blogEntriesFlow.map { it.map { it.id } },
+        flowOfTypes = newEntriesItem.flow
+    ).combine(snapshotFlow { currentTab }) { counters, currentTab ->
+        if (currentTab == tab) counters.seenCount + counters.unseenCount
+        else counters.unseenCount
+    }
+
+    fun flowOfBadgeCount(tab: CodeforcesTitle, context: Context): Flow<Int> =
+        when (tab) {
+            CodeforcesTitle.MAIN -> flowOfBadgeCount(
+                tab = tab,
+                blogEntriesFlow = flowOfMainBlogEntries(context),
+                newEntriesItem = CodeforcesNewEntriesDataStore(context).mainNewEntries
+            )
+            CodeforcesTitle.LOST -> flowOfBadgeCount(
+                tab = tab,
+                blogEntriesFlow = flowOfLostBlogEntries(context),
+                newEntriesItem = CodeforcesNewEntriesDataStore(context).lostNewEntries
+            )
+            else -> flowOf(0)
+        }
 
     @Composable
     fun rememberLoadingStatusState() = rememberCollect { flowOfLoadingStatus() }

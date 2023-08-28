@@ -18,8 +18,6 @@ import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
-import com.demich.cps.platforms.api.CodeforcesBlogEntry
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -39,23 +37,6 @@ fun CodeforcesNewsScreen(
         CodeforcesPager(
             controller = controller,
             modifier = Modifier.fillMaxSize()
-        )
-    }
-
-    val context = context
-    LaunchedEffect(controller) {
-        val newEntriesDataStore = CodeforcesNewEntriesDataStore(context)
-        collectBadgeCount(
-            tab = CodeforcesTitle.MAIN,
-            controller = controller,
-            blogEntriesFlow = controller.flowOfMainBlogEntries(context),
-            newEntriesItem = newEntriesDataStore.mainNewEntries
-        )
-        collectBadgeCount(
-            tab = CodeforcesTitle.LOST,
-            controller = controller,
-            blogEntriesFlow = controller.flowOfLostBlogEntries(context),
-            newEntriesItem = newEntriesDataStore.lostNewEntries
         )
     }
 }
@@ -131,31 +112,15 @@ private fun TabsHeader(
     }
 }
 
-private fun CoroutineScope.collectBadgeCount(
-    tab: CodeforcesTitle,
-    controller: CodeforcesNewsController,
-    blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
-    newEntriesItem: NewEntriesDataStoreItem
-) {
-    combineToCounters(
-        flowOfIds = blogEntriesFlow.map { it.map { it.id } },
-        flowOfTypes = newEntriesItem.flow
-    ).combine(snapshotFlow { controller.currentTab }) { counters, currentTab ->
-        if (currentTab == tab) counters.seenCount + counters.unseenCount
-        else counters.unseenCount
-    }.onEach { count ->
-        controller.setBadgeCount(tab = tab, count = count)
-    }.launchIn(this)
-}
-
 @Composable
 private fun CodeforcesNewsTab(
     title: CodeforcesTitle,
     controller: CodeforcesNewsController,
     modifier: Modifier = Modifier
 ) {
+    val context = context
     val loadingStatus by controller.rememberLoadingStatusState(title)
-    val badgeCount by controller.getBadgeCountState(title)
+    val badgeCount by rememberCollect { controller.flowOfBadgeCount(tab = title, context) }
     CodeforcesNewsTab(
         title = title,
         index = controller.tabs.indexOf(title),
