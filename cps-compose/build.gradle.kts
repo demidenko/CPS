@@ -16,9 +16,11 @@ tasks.register<Delete>("clean") {
 }
 
 allprojects {
+    val javaCompatibility = JavaVersion.VERSION_17.toString()
+
     tasks.withType<KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "17"
+            jvmTarget = javaCompatibility
         }
     }
 }
