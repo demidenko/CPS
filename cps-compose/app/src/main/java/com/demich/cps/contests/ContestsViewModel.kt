@@ -16,6 +16,7 @@ import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.append
 import com.demich.cps.utils.combine
+import com.demich.cps.utils.edit
 import com.demich.cps.utils.mapToSet
 import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.toLoadingStatus
@@ -48,15 +49,15 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
 
     private suspend fun ContestsListDao.removePlatform(platform: Contest.Platform) {
         replace(platform, emptyList())
-        errors.update { it - platform }
+        errors.edit { remove(platform) }
         setLoadingStatus(platform, LoadingStatus.PENDING)
     }
 
     private fun setLoadingStatus(platform: Contest.Platform, loadingStatus: LoadingStatus) =
-        loadingStatuses.update {
-            if (loadingStatus == LoadingStatus.LOADING) require(it[platform] != LoadingStatus.LOADING)
-            if (loadingStatus == LoadingStatus.PENDING) it - platform
-            else it + (platform to loadingStatus)
+        loadingStatuses.edit {
+            if (loadingStatus == LoadingStatus.LOADING) require(this[platform] != LoadingStatus.LOADING)
+            if (loadingStatus == LoadingStatus.PENDING) remove(platform)
+            else this[platform] = loadingStatus
         }
 
     private fun ContestsListDao.makeReceiver(): ContestsReceiver {
@@ -64,7 +65,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
         return asContestsReceiver(
             onStartLoading = { platform ->
                 setLoadingStatus(platform, LoadingStatus.LOADING)
-                errors.update { it - platform }
+                errors.edit { remove(platform) }
             },
             onFinish = { platform ->
                 setLoadingStatus(platform, lastResult.getValue(platform).toLoadingStatus())

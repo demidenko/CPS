@@ -4,8 +4,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import java.util.Collections
@@ -58,6 +60,9 @@ inline fun firstFalse(first: Int, last: Int, pred: (Int) -> Boolean): Int {
 }
 
 inline fun <T, R> Iterable<T>.mapToSet(transform: (T) -> R): Set<R> = mapTo(mutableSetOf(), transform)
+
+inline fun<K, V> MutableStateFlow<Map<K, V>>.edit(block: MutableMap<K, V>.() -> Unit) =
+    update { it.toMutableMap().apply(block) }
 
 fun<K, V> Map<K, List<V>>.append(key: K, value: V): Map<K, List<V>> =
     toMutableMap().apply {
