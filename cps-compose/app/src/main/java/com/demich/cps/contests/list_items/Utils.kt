@@ -23,8 +23,8 @@ internal fun Contest.dateRange(): String {
     return "$start-$end"
 }
 
-internal fun cutTrailingBrackets(title: String): Pair<String, String> {
-    if (title.isEmpty() || title.last() != ')') return title to ""
+private fun trailingBracketsStart(title: String): Int {
+    if (title.isEmpty() || title.last() != ')') return title.length
     var i = title.length - 2
     var ballance = 1
     while (ballance > 0 && i > 0) {
@@ -32,9 +32,13 @@ internal fun cutTrailingBrackets(title: String): Pair<String, String> {
             '(' -> --ballance
             ')' -> ++ballance
         }
-        if (ballance == 0) break
+        if (ballance == 0) return i
         --i
     }
-    if (ballance != 0) return title to ""
-    return title.substring(0, i) to title.substring(i)
+    return title.length
+}
+
+internal inline fun splitTrailingBrackets(title: String, block: (String, String) -> Unit) {
+    val i = trailingBracketsStart(title)
+    block(title.substring(0, i), title.substring(i))
 }

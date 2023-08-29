@@ -89,9 +89,10 @@ internal fun ContestColoredTitle(
 ) {
     Text(
         text = buildAnnotatedString {
-            val (title, brackets) = cutTrailingBrackets(contestTitle.trim())
-            append(title)
-            if (brackets.isNotBlank()) append(brackets, color = cpsColors.contentAdditional)
+            splitTrailingBrackets(contestTitle) { title, brackets ->
+                append(title)
+                if (brackets.isNotBlank()) append(brackets, color = cpsColors.contentAdditional)
+            }
         },
         color = when (phase) {
             Contest.Phase.BEFORE -> cpsColors.content
