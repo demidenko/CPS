@@ -6,9 +6,19 @@ import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 fun getCurrentTime() = Clock.System.now()
+
+operator fun Instant.rem(period: Duration): Duration {
+    val periodMillis = period.inWholeMilliseconds
+    val thisMillis = toEpochMilliseconds()
+    return (thisMillis % periodMillis).milliseconds
+}
+
+fun Instant.floorBy(period: Duration): Instant = this - this % period
+
 
 fun Instant.format(dateFormat: String): String =
     DateFormat.format(dateFormat, toEpochMilliseconds()).toString()

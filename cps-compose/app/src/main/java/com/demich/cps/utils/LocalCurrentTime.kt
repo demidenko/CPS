@@ -1,6 +1,11 @@
 package com.demich.cps.utils
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.State
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -9,19 +14,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
-private operator fun Instant.rem(period: Duration): Duration {
-    val periodMillis = period.inWholeMilliseconds
-    val thisMillis = toEpochMilliseconds()
-    return (thisMillis % periodMillis).milliseconds
-}
-
-private fun Instant.floorBy(period: Duration): Instant = this - this % period
-
-
 
 val LocalCurrentTime = compositionLocalOf<Instant> {
     throw IllegalAccessException("current time not provided")
