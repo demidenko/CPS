@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestsListDao
 import com.demich.cps.contests.database.contestsListDao
-import com.demich.cps.contests.loaders.ContestsReloader
 import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading.asContestsReceiver
 import com.demich.cps.contests.loading.ContestsLoaderType
