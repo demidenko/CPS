@@ -10,9 +10,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.max
 
-internal fun Element.extractRatedUser(): Pair<String, CodeforcesColorTag> = Pair(
-    first = text(),
-    second = CodeforcesColorTag.fromString(
+internal class CodeforcesHandle(
+    val handle: String,
+    val colorTag: CodeforcesColorTag
+)
+
+internal fun Element.extractRatedUser() = CodeforcesHandle(
+    handle = text(),
+    colorTag = CodeforcesColorTag.fromString(
         str = classNames().first { name -> name.startsWith("user-") }
     )
 )
@@ -36,14 +41,10 @@ object CodeforcesUtils {
                 id = it.expectFirst("a").attr("href").removePrefix("/blog/entry/").toInt()
             }
 
-            val authorHandle: String
-            val authorColorTag: CodeforcesColorTag
+            val author: CodeforcesHandle
             val creationTime: Instant
             topic.expectFirst("div.info").let { info ->
-                with(info.expectFirst(".rated-user").extractRatedUser()) {
-                    authorHandle = first
-                    authorColorTag = second
-                }
+                author = info.expectFirst(".rated-user").extractRatedUser()
                 creationTime = info.expectFirst(".format-humantime").attr("title").extractTime()
             }
 
@@ -58,8 +59,8 @@ object CodeforcesUtils {
             CodeforcesBlogEntry(
                 id = id,
                 title = title,
-                authorHandle = authorHandle,
-                authorColorTag = authorColorTag,
+                authorHandle = author.handle,
+                authorColorTag = author.colorTag,
                 creationTime = creationTime,
                 rating = rating,
                 commentsCount = commentsCount
@@ -69,28 +70,19 @@ object CodeforcesUtils {
 
     private fun extractCommentOrNull(commentBox: Element): CodeforcesRecentAction? {
         return kotlin.runCatching {
-            val commentatorHandle: String
-            val commentatorHandleColorTag: CodeforcesColorTag
-            commentBox.expectFirst(".avatar").let { avatarBox ->
-                with(avatarBox.expectFirst("a.rated-user").extractRatedUser()) {
-                    commentatorHandle = first
-                    commentatorHandleColorTag = second
-                }
-            }
+            val commentator = commentBox.expectFirst(".avatar")
+                .expectFirst("a.rated-user")
+                .extractRatedUser()
 
             val blogEntryId: Int
             val blogEntryTitle: String
-            val blogEntryAuthorHandle: String
-            val blogEntryAuthorHandleColorTag: CodeforcesColorTag
+            val blogEntryAuthor: CodeforcesHandle
             val commentId: Long
             val commentCreationTime: Instant
             val commentRating: Int
             commentBox.expectFirst("div.info").let { info ->
                 commentCreationTime = info.expectFirst(".format-humantime").attr("title").extractTime()
-                with(info.expectFirst("a.rated-user").extractRatedUser()) {
-                    blogEntryAuthorHandle = first
-                    blogEntryAuthorHandleColorTag = second
-                }
+                blogEntryAuthor = info.expectFirst("a.rated-user").extractRatedUser()
                 info.getElementsByAttributeValueContaining("href", "#comment")[0]!!.let { commentLink ->
                     with(commentLink.attr("href").split("#comment-")) {
                         blogEntryId = this[0].removePrefix("/blog/entry/").toInt()
@@ -112,8 +104,8 @@ object CodeforcesUtils {
                 time = commentCreationTime,
                 comment = CodeforcesComment(
                     id = commentId,
-                    commentatorHandle = commentatorHandle,
-                    commentatorHandleColorTag = commentatorHandleColorTag,
+                    commentatorHandle = commentator.handle,
+                    commentatorHandleColorTag = commentator.colorTag,
                     html = commentHtml,
                     rating = commentRating,
                     creationTime = commentCreationTime
@@ -121,8 +113,8 @@ object CodeforcesUtils {
                 blogEntry = CodeforcesBlogEntry(
                     id = blogEntryId,
                     title = blogEntryTitle,
-                    authorHandle = blogEntryAuthorHandle,
-                    authorColorTag = blogEntryAuthorHandleColorTag,
+                    authorHandle = blogEntryAuthor.handle,
+                    authorColorTag = blogEntryAuthor.colorTag,
                     creationTime = Instant.DISTANT_PAST
                 )
             )
@@ -131,7 +123,7 @@ object CodeforcesUtils {
 
     private fun extractRecentBlogEntryOrNull(item: Element): CodeforcesBlogEntry? {
         return kotlin.runCatching {
-            val (handle, handleColorTag) = item.expectFirst("a.rated-user").extractRatedUser()
+            val author = item.expectFirst("a.rated-user").extractRatedUser()
             val blogEntryId: Int
             val blogEntryTitle: String
             item.getElementsByAttributeValueStarting("href", "/blog/entry/")[0]!!.let {
@@ -141,8 +133,8 @@ object CodeforcesUtils {
             CodeforcesBlogEntry(
                 id = blogEntryId,
                 title = blogEntryTitle,
-                authorHandle = handle,
-                authorColorTag = handleColorTag,
+                authorHandle = author.handle,
+                authorColorTag = author.colorTag,
                 creationTime = Instant.DISTANT_PAST
             )
         }.getOrNull()
@@ -215,15 +207,15 @@ object CodeforcesUtils {
 
     suspend fun getRealHandle(handle: String): Pair<String, STATUS> {
         val page = getUserPageOrNull(handle) ?: return handle to STATUS.FAILED
-        val realHandle = extractRealHandle(page)?.first ?: return handle to STATUS.NOT_FOUND
+        val realHandle = extractRealHandle(page)?.handle ?: return handle to STATUS.NOT_FOUND
         return realHandle to STATUS.OK
     }
 
     suspend fun getRealColorTag(handle: String): CodeforcesColorTag {
-        return getUserPageOrNull(handle)?.let { extractRealHandle(it)?.second } ?: CodeforcesColorTag.BLACK
+        return getUserPageOrNull(handle)?.let { extractRealHandle(it)?.colorTag } ?: CodeforcesColorTag.BLACK
     }
 
-    private fun extractRealHandle(page: String): Pair<String, CodeforcesColorTag>? {
+    private fun extractRealHandle(page: String): CodeforcesHandle? {
         val userBox = Jsoup.parse(page).selectFirst("div.userbox") ?: return null
         return userBox.selectFirst("a.rated-user")?.extractRatedUser()
     }

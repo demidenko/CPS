@@ -42,8 +42,8 @@ class CodeforcesHtmlParser(val builder: CodeforcesHtmlStringBuilder): NodeVisito
          */
 
         if (name.isLink() && e.hasClass("rated-user")) {
-            val (handle, tag) = e.extractRatedUser()
-            builder.appendRatedSpan(handle = handle, tag = tag)
+            val user = e.extractRatedUser()
+            builder.appendRatedSpan(handle = user.handle, tag = user.colorTag)
             e.remove()
             return
         }
