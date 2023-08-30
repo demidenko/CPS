@@ -67,7 +67,6 @@ fun platformIconPainter(platform: Contest.Platform): Painter {
         Contest.Platform.atcoder -> R.drawable.ic_logo_atcoder
         Contest.Platform.topcoder -> R.drawable.ic_logo_topcoder
         Contest.Platform.codechef -> R.drawable.ic_logo_codechef
-        Contest.Platform.google -> R.drawable.ic_logo_google
         Contest.Platform.dmoj -> R.drawable.ic_logo_dmoj
         Contest.Platform.unknown -> null
     }

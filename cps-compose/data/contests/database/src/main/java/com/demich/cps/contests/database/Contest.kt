@@ -54,8 +54,7 @@ data class Contest (
         atcoder,
         codechef,
         topcoder,
-        dmoj,
-        google
+        dmoj
         ;
     }
 

@@ -25,7 +25,6 @@ object ClistUtils {
             Contest.Platform.atcoder -> 93
             Contest.Platform.topcoder -> 12
             Contest.Platform.codechef -> 2
-            Contest.Platform.google -> 35
             Contest.Platform.dmoj -> 77
         }
 
