@@ -12,6 +12,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesProblem
 import com.demich.cps.platforms.api.CodeforcesProblemVerdict
+import com.demich.cps.platforms.api.CodeforcesRatingChange
 import com.demich.cps.utils.mapToSet
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
@@ -50,60 +51,87 @@ class CodeforcesUpsolvingSuggestionsWorker(
 
         val suggestedItem = dataStore.upsolvingSuggestedProblems
 
-        val deadLine = currentTime - 90.days
-        suggestedItem.edit { filter { it.second > deadLine } }
+        val dateThreshold = currentTime - 90.days
+        suggestedItem.edit { filter { it.second > dateThreshold } }
 
         val ratingChanges = CodeforcesApi.runCatching {
             getUserRatingChanges(handle)
-        }.getOrNull() ?: return Result.retry()
+        }.getOrElse { return Result.retry() }
 
-        val alreadySuggested = suggestedItem().map { it.first.problemId }
+        val alreadySuggested = suggestedItem().map { it.first }
 
+        var anyFailure = false
         ratingChanges
-            .filter { it.ratingUpdateTime > deadLine }
+            .filter { it.ratingUpdateTime > dateThreshold }
             .forEachWithProgress { ratingChange ->
-                val contestId = ratingChange.contestId
-                val data = awaitPair(
-                    blockFirst = {
-                        CodeforcesApi.runCatching {
-                            getContestSubmissions(contestId = contestId, handle = handle)
+                kotlin.runCatching {
+                    getSuggestions(
+                        handle = handle,
+                        ratingChange = ratingChange,
+                        alreadySuggested = alreadySuggested,
+                        toRemoveAsSolved = { solved ->
+                            val solvedIds = solved.mapToSet { it.problemId }
+                            suggestedItem.edit {
+                                removeAll { it.first.problemId in solvedIds }
+                            }
                         }
-                    },
-                    blockSecond = {
-                        CodeforcesUtils.runCatching {
-                            getContestAcceptedStatistics(contestId = contestId)
-                        }
+                    ) { problem ->
+                        suggestedItem.add(problem to ratingChange.ratingUpdateTime)
+                        notifyProblemForUpsolve(problem, context)
                     }
-                )
-
-                val userSubmissions = data.first.getOrElse { return Result.retry() }
-                val acceptedStats = data.second.getOrElse { return Result.failure() }
-
-                val solvedIndices = userSubmissions
-                    .filter { it.verdict == CodeforcesProblemVerdict.OK }
-                    .mapToSet { it.problem.index }
-
-                require(acceptedStats.map { it.key.index }.containsAll(solvedIndices))
-
-                //remove solved problems from suggestions list
-                suggestedItem.edit {
-                    removeAll { it.first.contestId == contestId && it.first.index in solvedIndices }
-                }
-
-                //add new suggestions
-                acceptedStats.forEach { (problem, solvers) ->
-                    if (solvers >= ratingChange.rank && problem.index !in solvedIndices) {
-                        if (problem.problemId !in alreadySuggested) {
-                            suggestedItem.add(problem to ratingChange.ratingUpdateTime)
-                            notifyProblemForUpsolve(problem, context)
-                        }
-                    }
+                }.onFailure {
+                    anyFailure = true
                 }
             }
 
-        return Result.success()
+        return if (anyFailure) Result.failure() else Result.success()
     }
 
+}
+
+private suspend inline fun getSuggestions(
+    handle: String,
+    ratingChange: CodeforcesRatingChange,
+    alreadySuggested: Collection<CodeforcesProblem>,
+    toRemoveAsSolved: (List<CodeforcesProblem>) -> Unit,
+    onNewSuggestion: (CodeforcesProblem) -> Unit
+) {
+    val contestId = ratingChange.contestId
+    val data = awaitPair(
+        blockFirst = {
+            CodeforcesApi.runCatching {
+                getContestSubmissions(contestId = contestId, handle = handle)
+            }
+        },
+        blockSecond = {
+            CodeforcesUtils.runCatching {
+                getContestAcceptedStatistics(contestId = contestId)
+            }
+        }
+    )
+
+    val userSubmissions = data.first.getOrThrow()
+    val acceptedStats = data.second.getOrThrow()
+
+    val solvedIndices = userSubmissions
+        .filter { it.verdict == CodeforcesProblemVerdict.OK }
+        .mapToSet { it.problem.index }
+
+    require(acceptedStats.map { it.key.index }.containsAll(solvedIndices))
+
+    alreadySuggested.filter { it.contestId == contestId && it.index in solvedIndices }.let { solved ->
+        if (solved.isNotEmpty()) toRemoveAsSolved(solved)
+    }
+
+    val alreadySuggestedIndices = alreadySuggested
+        .filter { it.contestId == contestId }
+        .mapToSet { it.index }
+
+    acceptedStats.forEach { (problem, solvers) ->
+        if (solvers >= ratingChange.rank && problem.index !in solvedIndices) {
+            if (problem.index !in alreadySuggestedIndices) onNewSuggestion(problem)
+        }
+    }
 }
 
 private fun notifyProblemForUpsolve(problem: CodeforcesProblem, context: Context) {
