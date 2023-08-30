@@ -188,8 +188,9 @@ private fun Flow<CodeforcesContestPhase>.collectSystemTestPercentage(
     return distinctUntilChanged().onEach { phase ->
         if (phase == CodeforcesContestPhase.SYSTEM_TEST) {
             job = scope.launchWhileActive {
-                CodeforcesUtils.getContestSystemTestingPercentage(contestId)?.let {
-                    if (isActive) onSetPercentage(it)
+                CodeforcesUtils.getContestSystemTestingPercentageOrNull(contestId)?.let {
+                    ensureActive()
+                    onSetPercentage(it)
                 }
                 delay
             }

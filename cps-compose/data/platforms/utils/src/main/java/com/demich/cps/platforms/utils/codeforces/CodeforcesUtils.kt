@@ -292,15 +292,15 @@ object CodeforcesUtils {
     private suspend fun getContestPageOrNull(contestId: Int): String? =
         CodeforcesApi.runCatching { getContestPage(contestId) }.getOrNull()
 
-    suspend fun getContestAcceptedStatistics(contestId: Int): Map<CodeforcesProblem, Int>? {
-        val src = getContestPageOrNull(contestId) ?: return null
-        return Jsoup.parse(src).selectFirst("table.problems")
-            ?.select("tr")
-            ?.mapNotNull { extractProblemWithAccepteds(it, contestId) }
-            ?.toMap()
+    suspend fun getContestAcceptedStatistics(contestId: Int): Map<CodeforcesProblem, Int> {
+        val src = CodeforcesApi.getContestPage(contestId)
+        return Jsoup.parse(src).expectFirst("table.problems")
+            .select("tr")
+            .mapNotNull { extractProblemWithAccepteds(it, contestId) }
+            .toMap()
     }
 
-    suspend fun getContestSystemTestingPercentage(contestId: Int): Int? {
+    suspend fun getContestSystemTestingPercentageOrNull(contestId: Int): Int? {
         val src = getContestPageOrNull(contestId) ?: return null
         return Jsoup.parse(src).selectFirst("span.contest-state-regular")
             ?.text()

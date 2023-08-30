@@ -66,19 +66,18 @@ class CodeforcesUpsolvingSuggestionsWorker(
                 val data = awaitPair(
                     blockFirst = {
                         CodeforcesApi.runCatching {
-                            getContestSubmissions(
-                                contestId = contestId,
-                                handle = handle
-                            )
-                        }.getOrNull()
+                            getContestSubmissions(contestId = contestId, handle = handle)
+                        }
                     },
                     blockSecond = {
-                        CodeforcesUtils.getContestAcceptedStatistics(contestId)
+                        CodeforcesUtils.runCatching {
+                            getContestAcceptedStatistics(contestId = contestId)
+                        }
                     }
                 )
 
-                val userSubmissions = data.first ?: return Result.retry()
-                val acceptedStats = data.second ?: return Result.failure()
+                val userSubmissions = data.first.getOrElse { return Result.retry() }
+                val acceptedStats = data.second.getOrElse { return Result.failure() }
 
                 val solvedIndices = userSubmissions
                     .filter { it.verdict == CodeforcesProblemVerdict.OK }
