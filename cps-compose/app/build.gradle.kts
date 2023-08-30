@@ -13,7 +13,7 @@ android {
         minSdk = 26
         targetSdk = 34
 
-        versionCode = 357
+        versionCode = 358
         versionName = "1.9.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -44,7 +44,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
 
     packaging {
