@@ -97,21 +97,14 @@ private suspend inline fun getSuggestions(
     onNewSuggestion: (CodeforcesProblem) -> Unit
 ) {
     val contestId = ratingChange.contestId
-    val data = awaitPair(
+    val (userSubmissions, acceptedStats) = awaitPair(
         blockFirst = {
-            CodeforcesApi.runCatching {
-                getContestSubmissions(contestId = contestId, handle = handle)
-            }
+            CodeforcesApi.getContestSubmissions(contestId = contestId, handle = handle)
         },
         blockSecond = {
-            CodeforcesUtils.runCatching {
-                getContestAcceptedStatistics(contestId = contestId)
-            }
+            CodeforcesUtils.getContestAcceptedStatistics(contestId = contestId)
         }
     )
-
-    val userSubmissions = data.first.getOrThrow()
-    val acceptedStats = data.second.getOrThrow()
 
     val solvedIndices = userSubmissions
         .filter { it.verdict == CodeforcesProblemVerdict.OK }
