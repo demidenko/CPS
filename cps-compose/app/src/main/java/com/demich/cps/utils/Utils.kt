@@ -8,7 +8,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import java.util.Collections
 import kotlin.coroutines.CoroutineContext
@@ -81,5 +85,25 @@ suspend fun<A, B> awaitPair(
         val first = async(context = context, block = blockFirst)
         val second = async(context = context, block = blockSecond)
         Pair(first.await(), second.await())
+    }
+}
+
+suspend fun List<suspend () -> Unit>.joinAllWithCounter(block: suspend (Int) -> Unit) {
+    coroutineScope {
+        val mutex = Mutex()
+        var counter = 0
+        block(counter)
+        map { job ->
+            launch {
+                try {
+                    job()
+                } finally {
+                    mutex.withLock {
+                        counter++
+                        block(counter)
+                    }
+                }
+            }
+        }.joinAll()
     }
 }
