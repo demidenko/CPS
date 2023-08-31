@@ -106,13 +106,13 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
         CodeforcesUtils.extractRecentActions(source = CodeforcesApi.getPageSource(path = "/recent-actions", locale = locale))
 
     fun addToFollowList(userInfo: CodeforcesUserInfo, context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             context.followListDao.addNewUser(userInfo)
         }
     }
 
     override fun addToFollowList(handle: String, context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             context.settingsNews.codeforcesFollowEnabled(newValue = true)
             context.followListDao.addNewUser(handle)
         }
@@ -123,7 +123,7 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
     override fun updateFollowUsersInfo(context: Context) {
         viewModelScope.launch {
             if (!followLoadingStatus.compareAndSet(LoadingStatus.PENDING, LoadingStatus.LOADING)) return@launch
-            context.followListDao.updateUsers()
+            withContext(Dispatchers.IO) { context.followListDao.updateUsers() }
             followLoadingStatus.value = LoadingStatus.PENDING
         }
     }
