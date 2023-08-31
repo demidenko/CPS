@@ -5,13 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
-import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import kotlinx.coroutines.Dispatchers
+import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 
 enum class AccountManagerType {
     codeforces,
@@ -51,13 +49,7 @@ abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
 
     open fun isValidForUserId(char: Char): Boolean = true
 
-    protected abstract suspend fun getUserInfo(data: String): U
-    suspend fun loadInfo(data: String): U {
-        require(data.isNotBlank())
-        return withContext(Dispatchers.IO) {
-            getUserInfo(data)
-        }
-    }
+    abstract suspend fun getUserInfo(data: String): U
 
     @Composable
     abstract fun makeOKInfoSpan(userInfo: U): AnnotatedString

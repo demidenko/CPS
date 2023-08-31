@@ -49,7 +49,7 @@ class AccountsViewModel: ViewModel() {
             val savedInfo = dataStore.getSavedInfo() ?: return@launch
 
             setLoadingStatus(manager, LoadingStatus.LOADING)
-            val info = manager.loadInfo(savedInfo.userId)
+            val info = manager.getUserInfo(savedInfo.userId)
 
             if (info.status == STATUS.FAILED) {
                 setLoadingStatus(manager, LoadingStatus.FAILED)
@@ -87,7 +87,7 @@ class AccountsViewModel: ViewModel() {
                         reload(manager, context)
                     } else {
                         setLoadingStatus(manager, LoadingStatus.LOADING)
-                        loadAndSave(manager, userId, context)
+                        getAndSave(manager, userId, context)
                         setLoadingStatus(manager, LoadingStatus.PENDING)
                     }
                     progress.value++
@@ -96,8 +96,8 @@ class AccountsViewModel: ViewModel() {
         }
     }
 
-    private suspend fun<U: UserInfo> loadAndSave(manager: AccountManager<U>, userId: String, context: Context) {
-        manager.dataStore(context).setSavedInfo(manager.loadInfo(userId))
+    private suspend fun<U: UserInfo> getAndSave(manager: AccountManager<U>, userId: String, context: Context) {
+        manager.dataStore(context).setSavedInfo(manager.getUserInfo(userId))
     }
 
     private val ratingLoader = backgroundDataLoader<List<RatingChange>>()

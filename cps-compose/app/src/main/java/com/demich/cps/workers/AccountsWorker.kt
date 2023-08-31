@@ -112,7 +112,7 @@ class AccountsWorker(
 
         if (prevRatingChangeContestId != null) {
             atcoderAccountManager.notifyRatingChange(userInfo.handle, lastRatingChange, context)
-            val newInfo = atcoderAccountManager.loadInfo(userInfo.handle)
+            val newInfo = atcoderAccountManager.getUserInfo(userInfo.handle)
             if (newInfo.status != STATUS.FAILED) {
                 dataStore.setSavedInfo(newInfo)
             } else {

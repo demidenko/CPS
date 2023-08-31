@@ -148,7 +148,7 @@ private fun<U: UserInfo> DialogContent(
         delay(300)
         launch(Dispatchers.IO) {
             loadingInProgress = true
-            userInfo = manager.loadInfo(userId)
+            userInfo = manager.getUserInfo(userId)
             loadingInProgress = false
         }
         if (manager is UserSuggestionsProvider && userId.length >= suggestionsMinLength) {
