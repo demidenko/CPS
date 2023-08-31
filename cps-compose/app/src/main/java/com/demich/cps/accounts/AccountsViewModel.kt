@@ -18,6 +18,7 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
@@ -43,7 +44,7 @@ class AccountsViewModel: ViewModel() {
 
     fun<U: UserInfo> reload(manager: AccountManager<U>, context: Context) {
         if (loadingStatuses.value[manager.type] == LoadingStatus.LOADING) return
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val dataStore = manager.dataStore(context)
             val savedInfo = dataStore.getSavedInfo() ?: return@launch
 
@@ -60,7 +61,7 @@ class AccountsViewModel: ViewModel() {
     }
 
     fun<U: UserInfo> delete(manager: AccountManager<U>, context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             setLoadingStatus(manager, LoadingStatus.PENDING)
             manager.dataStore(context).deleteSavedInfo()
         }
@@ -78,7 +79,7 @@ class AccountsViewModel: ViewModel() {
             progress.value = ProgressBarInfo(title = "clist import", total = supported.size)
             supported.map { (type, userId) ->
                 val manager = allAccountManagers.first { it.type == type }
-                launch {
+                launch(Dispatchers.IO) {
                     //wait for loading stops
                     loadingStatuses.takeWhile { it[type] == LoadingStatus.LOADING }.collect()
                     if (userId.equals(manager.dataStore(context).getSavedInfo()?.userId, ignoreCase = true)) {

@@ -146,7 +146,7 @@ private fun<U: UserInfo> DialogContent(
             return@LaunchedEffect
         }
         delay(300)
-        launch {
+        launch(Dispatchers.IO) {
             loadingInProgress = true
             userInfo = manager.loadInfo(userId)
             loadingInProgress = false
