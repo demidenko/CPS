@@ -29,7 +29,7 @@ class CListAccountManager :
             else ClistUserInfo(status = STATUS.FAILED, login = data)
         }
 
-    override suspend fun loadSuggestions(str: String): List<UserSuggestion> =
+    override suspend fun getSuggestions(str: String): List<UserSuggestion> =
         ClistUtils.extractLoginSuggestions(source = ClistApi.getUsersSearchPage(str))
             .map { UserSuggestion(userId = it) }
 

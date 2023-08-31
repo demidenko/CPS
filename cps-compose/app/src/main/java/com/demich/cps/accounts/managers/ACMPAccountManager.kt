@@ -35,7 +35,7 @@ class ACMPAccountManager :
         }
     }
 
-    override suspend fun loadSuggestions(str: String): List<UserSuggestion> {
+    override suspend fun getSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
         return ACMPUtils.extractUsersSuggestions(source = ACMPApi.getUsersSearch(str))
     }

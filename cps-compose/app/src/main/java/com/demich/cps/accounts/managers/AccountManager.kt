@@ -83,7 +83,7 @@ data class UserInfoWithManager<U: UserInfo>(
 }
 
 interface UserSuggestionsProvider {
-    suspend fun loadSuggestions(str: String): List<UserSuggestion>
+    suspend fun getSuggestions(str: String): List<UserSuggestion>
     fun isValidForSearch(char: Char): Boolean = true
 }
 

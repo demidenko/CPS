@@ -66,7 +66,7 @@ class CodeChefAccountManager :
             else CodeChefUserInfo(status = STATUS.FAILED, handle = data)
         }
 
-    override suspend fun loadSuggestions(str: String): List<UserSuggestion> =
+    override suspend fun getSuggestions(str: String): List<UserSuggestion> =
         CodeChefApi.getSuggestions(str).list.map {
             UserSuggestion(
                 userId = it.username,

@@ -155,7 +155,7 @@ private fun<U: UserInfo> DialogContent(
             if (!blockSuggestionsReload) {
                 loadingSuggestionsInProgress = true
                 launch(Dispatchers.IO) {
-                    val result = manager.runCatching { loadSuggestions(userId) }
+                    val result = manager.runCatching { getSuggestions(userId) }
                     loadingSuggestionsInProgress = false
                     if (isActive) { //Because of "StandaloneCoroutine was cancelled" exception during cancelling LaunchedEffect
                         suggestionsResult = result

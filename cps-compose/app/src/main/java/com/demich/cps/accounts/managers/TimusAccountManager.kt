@@ -31,7 +31,7 @@ class TimusAccountManager :
             TimusUserInfo(status = STATUS.FAILED, id = data)
         }
 
-    override suspend fun loadSuggestions(str: String): List<UserSuggestion> {
+    override suspend fun getSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
         return TimusUtils.extractUsersSuggestions(source = TimusApi.getSearchPage(str))
     }
