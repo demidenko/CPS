@@ -14,6 +14,9 @@ abstract class AccountDataStore<U: UserInfo>(
     dataStoreWrapper: DataStoreWrapper
 ): ItemizedDataStore(dataStoreWrapper) {
     protected abstract val userInfo: DataStoreItem<U?>
+    protected inline fun<reified T: UserInfo> makeUserInfoItem(): DataStoreItem<T?> =
+        jsonCPS.item(name = "user_info", defaultValue = null)
+
     abstract suspend fun onResetUserInfo()
 
     fun flowOfInfo() = userInfo.flow

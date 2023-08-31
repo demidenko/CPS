@@ -18,9 +18,7 @@ import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.utils.context
-import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.AccountsWorker
-import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 
@@ -121,8 +119,7 @@ class AtCoderAccountDataStore(context: Context):
         private val Context.account_atcoder_dataStore by dataStoreWrapper(AccountManagerType.atcoder.name)
     }
 
-    override val userInfo: DataStoreItem<AtCoderUserInfo?>
-        get() = jsonCPS.item(name = "user_info", defaultValue = null)
+    override val userInfo = makeUserInfoItem<AtCoderUserInfo>()
 
     val lastRatedContestId = itemStringNullable(name = "last_rated_contest")
 }

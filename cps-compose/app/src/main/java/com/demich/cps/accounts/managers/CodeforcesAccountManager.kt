@@ -33,7 +33,6 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.AccountsWorker
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
-import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.datetime.Instant
@@ -256,8 +255,7 @@ class CodeforcesAccountDataStore(context: Context):
         private val Context.account_codeforces_dataStore by dataStoreWrapper(AccountManagerType.codeforces.name)
     }
 
-    override val userInfo: DataStoreItem<CodeforcesUserInfo?>
-        get() = jsonCPS.item(name = "user_info", defaultValue = null)
+    override val userInfo = makeUserInfoItem<CodeforcesUserInfo>()
 
     val lastRatedContestId = itemIntNullable(name = "last_rated_contest")
 
