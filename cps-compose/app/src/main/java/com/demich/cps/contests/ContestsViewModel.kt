@@ -20,6 +20,7 @@ import com.demich.cps.utils.mapToSet
 import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.toLoadingStatus
 import com.demich.datastore_itemized.edit
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -79,7 +80,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
     }
 
     fun reloadEnabledPlatforms(context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             reloadEnabledPlatforms(
                 settings = context.settingsContests,
                 contestsReceiver = context.contestsListDao.makeReceiver()
@@ -88,7 +89,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
     }
 
     fun syncEnabledAndLastReloaded(context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val settings = context.settingsContests
             val dao = context.contestsListDao
             val enabled = settings.enabledPlatforms()

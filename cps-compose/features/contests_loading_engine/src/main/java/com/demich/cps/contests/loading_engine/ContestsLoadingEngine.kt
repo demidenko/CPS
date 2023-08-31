@@ -7,13 +7,11 @@ import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoaderMultiple
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 
 suspend fun launchContestsLoading(
     setup: Map<Contest.Platform, List<ContestsLoaderType>>,
@@ -54,7 +52,7 @@ private suspend fun loadUntilSuccess(
     contestsReceiver.onStartLoading(platform)
     for (loaderType in priorities) {
         val loader = getLoader(loaderType)
-        val result: Result<List<Contest>> = withContext(Dispatchers.IO) {
+        val result: Result<List<Contest>> =
             if (loader is ContestsLoaderMultiple) {
                 memoizer.getContestsResult(loader).map {
                     it.getOrElse(platform) { emptyList() }
@@ -64,7 +62,6 @@ private suspend fun loadUntilSuccess(
                     getContests(platform = platform, dateConstraints = dateConstraints)
                 }
             }
-        }
         contestsReceiver.onResult(
             platform = platform,
             loaderType = loaderType,
