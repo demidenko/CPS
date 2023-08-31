@@ -32,21 +32,20 @@ class DmojAccountManager :
         else -> false
     }
 
-    override suspend fun getUserInfo(data: String): DmojUserInfo {
-        try {
-            val res = DmojApi.getUser(handle = data)
-            return DmojUserInfo(
+    override suspend fun getUserInfo(data: String): DmojUserInfo =
+        DmojApi.runCatching {
+            val res = getUser(handle = data)
+            DmojUserInfo(
                 status = STATUS.OK,
                 handle = res.username,
                 rating = res.rating
             )
-        } catch (e: Throwable) {
-            if (e.isPageNotFound) {
+        }.getOrElse {
+            if (it.isPageNotFound) {
                 return DmojUserInfo(status = STATUS.NOT_FOUND, handle = data)
             }
             return DmojUserInfo(status = STATUS.FAILED, handle = data)
         }
-    }
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> {
         return DmojApi.getSuggestions(str).map {
