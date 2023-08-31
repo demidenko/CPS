@@ -16,16 +16,17 @@ class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
 
     fun flowOfResult(): StateFlow<Result<T>?> = flow
 
-    fun execute(id: Any, block: suspend () -> T) {
-        if (currentId != id) {
-            currentId = id
-            job?.cancel()
-            flow.value = null
-            job = scope.launch(Dispatchers.IO) {
-                flow.value = kotlin.runCatching { block() }
+    fun execute(id: Any, block: suspend () -> T) =
+        flowOfResult().also {
+            if (currentId != id) {
+                currentId = id
+                job?.cancel()
+                flow.value = null
+                job = scope.launch(Dispatchers.IO) {
+                    flow.value = kotlin.runCatching { block() }
+                }
             }
         }
-    }
 }
 
 inline fun<reified T> ViewModel.backgroundDataLoader() = BackgroundDataLoader<T>(scope = viewModelScope)

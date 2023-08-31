@@ -57,20 +57,20 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
         }
     }
 
-    private val mainBlogEntries = dataLoader(emptyList()) { loadBlogEntries(page = "/", locale = it) }
+    private val mainBlogEntries = dataLoader(emptyList()) { getBlogEntries(page = "/", locale = it) }
     override fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.getDataFlow(context)
 
-    private val topBlogEntries = dataLoader(emptyList()) { loadBlogEntries(page = "/top", locale = it) }
+    private val topBlogEntries = dataLoader(emptyList()) { getBlogEntries(page = "/top", locale = it) }
     override fun flowOfTopBlogEntries(context: Context) = topBlogEntries.getDataFlow(context)
 
-    private val topComments = dataLoader(emptyList()) { loadComments(page = "/topComments?days=2", locale = it) }
+    private val topComments = dataLoader(emptyList()) { getComments(page = "/topComments?days=2", locale = it) }
     override fun flowOfTopComments(context: Context) = topComments.getDataFlow(context)
 
-    private val recentActions = dataLoader(Pair(emptyList(), emptyList())) { loadRecentActions(locale = it) }
+    private val recentActions = dataLoader(Pair(emptyList(), emptyList())) { getRecentActions(locale = it) }
     override fun flowOfRecentActions(context: Context) = recentActions.getDataFlow(context)
 
     private fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
-        when(title) {
+        when (title) {
             CodeforcesTitle.MAIN -> mainBlogEntries.launchLoadIfActive(locale)
             CodeforcesTitle.TOP -> {
                 topBlogEntries.launchLoadIfActive(locale)
@@ -96,13 +96,13 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
         }
     }
 
-    private suspend fun loadBlogEntries(page: String, locale: CodeforcesLocale) =
+    private suspend fun getBlogEntries(page: String, locale: CodeforcesLocale) =
         CodeforcesUtils.extractBlogEntries(source = CodeforcesApi.getPageSource(path = page, locale = locale))
 
-    private suspend fun loadComments(page: String, locale: CodeforcesLocale) =
+    private suspend fun getComments(page: String, locale: CodeforcesLocale) =
         CodeforcesUtils.extractComments(source = CodeforcesApi.getPageSource(path = page, locale = locale))
 
-    private suspend fun loadRecentActions(locale: CodeforcesLocale) =
+    private suspend fun getRecentActions(locale: CodeforcesLocale) =
         CodeforcesUtils.extractRecentActions(source = CodeforcesApi.getPageSource(path = "/recent-actions", locale = locale))
 
     fun addToFollowList(userInfo: CodeforcesUserInfo, context: Context) {
@@ -130,21 +130,17 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
 
     private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesBlogEntry>>()
     fun flowOfBlogEntriesResult(handle: String, context: Context, key: Int) =
-        blogEntriesLoader.run {
-            execute(id = "$handle#$key") {
-                val (result, colorTag) = awaitPair(
-                    context = Dispatchers.IO,
-                    blockFirst = { context.followListDao.getAndReloadBlogEntries(handle) },
-                    blockSecond = { CodeforcesUtils.getRealColorTag(handle) }
+        blogEntriesLoader.execute(id = "$handle#$key") {
+            val (result, colorTag) = awaitPair(
+                blockFirst = { context.followListDao.getAndReloadBlogEntries(handle) },
+                blockSecond = { CodeforcesUtils.getRealColorTag(handle) }
+            )
+            result.getOrThrow().map {
+                it.copy(
+                    title = CodeforcesUtils.extractTitle(it),
+                    authorColorTag = colorTag
                 )
-                result.getOrThrow().map {
-                    it.copy(
-                        title = CodeforcesUtils.extractTitle(it),
-                        authorColorTag = colorTag
-                    )
-                }
             }
-            flowOfResult()
         }
 }
 
