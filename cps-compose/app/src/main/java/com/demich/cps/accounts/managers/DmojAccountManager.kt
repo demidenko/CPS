@@ -32,7 +32,7 @@ class DmojAccountManager :
         else -> false
     }
 
-    override suspend fun downloadInfo(data: String): DmojUserInfo {
+    override suspend fun getUserInfo(data: String): DmojUserInfo {
         try {
             val res = DmojApi.getUser(handle = data)
             return DmojUserInfo(

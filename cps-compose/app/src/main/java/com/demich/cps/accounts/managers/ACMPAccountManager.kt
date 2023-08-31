@@ -21,7 +21,7 @@ class ACMPAccountManager :
 
     override fun isValidForUserId(char: Char): Boolean = char in '0'..'9'
 
-    override suspend fun downloadInfo(data: String): ACMPUserInfo {
+    override suspend fun getUserInfo(data: String): ACMPUserInfo {
         return ACMPUtils.runCatching {
             extractUserInfo(
                 source = ACMPApi.getUserPage(id = data.toInt()),

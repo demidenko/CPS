@@ -18,7 +18,7 @@ class CListAccountManager :
     override val userIdTitle = "login"
     override val urlHomePage = ClistApi.urls.main
 
-    override suspend fun downloadInfo(data: String): ClistUserInfo =
+    override suspend fun getUserInfo(data: String): ClistUserInfo =
         ClistUtils.runCatching {
             extractUserInfo(
                 source = ClistApi.getUserPage(login = data),

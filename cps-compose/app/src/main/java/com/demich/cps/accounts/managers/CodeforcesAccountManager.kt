@@ -55,7 +55,7 @@ class CodeforcesAccountManager :
     }
 
 
-    override suspend fun downloadInfo(data: String): CodeforcesUserInfo =
+    override suspend fun getUserInfo(data: String): CodeforcesUserInfo =
         CodeforcesUtils.getUserInfo(handle = data, doRedirect = true)
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> =

@@ -21,7 +21,7 @@ class TimusAccountManager :
     override fun isValidForUserId(char: Char): Boolean = char in '0'..'9'
     override fun isValidForSearch(char: Char): Boolean = true
 
-    override suspend fun downloadInfo(data: String): TimusUserInfo =
+    override suspend fun getUserInfo(data: String): TimusUserInfo =
         TimusUtils.runCatching {
             extractUserInfo(
                 source = TimusApi.getUserPage(data.toInt()),

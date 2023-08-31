@@ -55,7 +55,7 @@ class CodeChefAccountManager :
         else -> false
     }
 
-    override suspend fun downloadInfo(data: String): CodeChefUserInfo =
+    override suspend fun getUserInfo(data: String): CodeChefUserInfo =
         CodeChefUtils.runCatching {
             extractUserInfo(
                 source = CodeChefApi.getUserPage(handle = data),

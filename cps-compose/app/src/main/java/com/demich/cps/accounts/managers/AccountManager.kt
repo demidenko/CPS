@@ -51,11 +51,11 @@ abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
 
     open fun isValidForUserId(char: Char): Boolean = true
 
-    protected abstract suspend fun downloadInfo(data: String): U
+    protected abstract suspend fun getUserInfo(data: String): U
     suspend fun loadInfo(data: String): U {
         require(data.isNotBlank())
         return withContext(Dispatchers.IO) {
-            downloadInfo(data)
+            getUserInfo(data)
         }
     }
 

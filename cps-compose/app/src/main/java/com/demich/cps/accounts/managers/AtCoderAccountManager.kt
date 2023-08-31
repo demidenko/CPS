@@ -37,7 +37,7 @@ class AtCoderAccountManager :
         else -> false
     }
 
-    override suspend fun downloadInfo(data: String): AtCoderUserInfo {
+    override suspend fun getUserInfo(data: String): AtCoderUserInfo {
         return AtCoderUtils.runCatching {
             extractUserInfo(source = AtCoderApi.getUserPage(handle = data))
         }.getOrElse { e ->
