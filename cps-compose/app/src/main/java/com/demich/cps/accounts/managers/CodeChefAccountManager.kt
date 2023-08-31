@@ -74,7 +74,7 @@ class CodeChefAccountManager :
             )
         }
 
-    override suspend fun loadRatingHistory(userId: String): List<RatingChange> =
+    override suspend fun getRatingChanges(userId: String): List<RatingChange> =
         CodeChefApi.getRatingChanges(handle = userId)
             .map(CodeChefRatingChange::toRatingChange)
 

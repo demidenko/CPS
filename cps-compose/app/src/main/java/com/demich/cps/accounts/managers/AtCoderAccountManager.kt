@@ -49,7 +49,7 @@ class AtCoderAccountManager :
     override suspend fun getSuggestions(str: String): List<UserSuggestion> =
         AtCoderUtils.extractUserSuggestions(source = AtCoderApi.getSuggestionsPage(str))
 
-    override suspend fun loadRatingHistory(userId: String): List<RatingChange> =
+    override suspend fun getRatingChanges(userId: String): List<RatingChange> =
         AtCoderApi.getRatingChanges(handle = userId).map {
             it.toRatingChange(handle = userId)
         }

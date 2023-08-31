@@ -66,7 +66,7 @@ class CodeforcesAccountManager :
             }
         }.asReversed()
 
-    override suspend fun loadRatingHistory(userId: String): List<RatingChange> =
+    override suspend fun getRatingChanges(userId: String): List<RatingChange> =
         CodeforcesApi.getUserRatingChanges(handle = userId)
             .map(CodeforcesRatingChange::toRatingChange)
 
