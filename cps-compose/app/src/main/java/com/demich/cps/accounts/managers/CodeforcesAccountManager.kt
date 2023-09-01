@@ -15,8 +15,8 @@ import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.screens.CodeforcesUserInfoExpandedContent
 import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesColorTag
@@ -180,34 +180,11 @@ class CodeforcesAccountManager :
         )
     }
 
-    private fun notifyRatingChange(ratingChange: CodeforcesRatingChange, context: Context) =
-        notifyRatingChange(
-            channel = notificationChannels.codeforces.rating_changes,
-            ratingChange = ratingChange.toRatingChange(),
-            handle = ratingChange.handle,
-            manager = this,
-            context = context
-        )
-
     suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange, context: Context) {
-        val dataStore = dataStore(context)
-        val info = dataStore.getSavedInfo() ?: return
-
-        val prevRatingChangeContestId = dataStore.lastRatedContestId()
-
-        if (prevRatingChangeContestId == ratingChange.contestId && info.rating == ratingChange.newRating) return
-
-        dataStore.lastRatedContestId(ratingChange.contestId)
-
-        if (prevRatingChangeContestId != null) {
-            notifyRatingChange(ratingChange, context)
-            val newInfo = CodeforcesUtils.getUserInfo(handle = info.handle, doRedirect = false)
-            if (newInfo.status != STATUS.FAILED) {
-                dataStore.setSavedInfo(newInfo)
-            } else {
-                dataStore.setSavedInfo(info.copy(rating = ratingChange.newRating))
-            }
-        }
+        dataStore(context).applyRatingChange(
+            ratingChange = ratingChange.toRatingChange(),
+            manager = this
+        )
     }
 
     override val ratingUpperBoundRevolutions
@@ -249,7 +226,7 @@ class CodeforcesAccountManager :
 }
 
 class CodeforcesAccountDataStore(context: Context):
-    AccountUniqueDataStore<CodeforcesUserInfo>(context.account_codeforces_dataStore)
+    RatedAccountDataStore<CodeforcesUserInfo>(context, context.account_codeforces_dataStore)
 {
     companion object {
         private val Context.account_codeforces_dataStore by dataStoreWrapper(AccountManagerType.codeforces.name)
@@ -257,7 +234,11 @@ class CodeforcesAccountDataStore(context: Context):
 
     override val userInfo = makeUserInfoItem<CodeforcesUserInfo>()
 
-    val lastRatedContestId = itemIntNullable(name = "last_rated_contest")
+    override val ratingChangeNotificationChannel: NotificationChannelSingleId
+        get() = notificationChannels.codeforces.rating_changes
+
+    override fun CodeforcesUserInfo.withNewRating(rating: Int) = copy(rating = rating)
+
 
     val monitorLastSubmissionId = itemLongNullable(name = "monitor_last_submission")
     val monitorCanceledContests = jsonCPS.itemList<Pair<Int,Instant>>(name = "monitor_canceled")
