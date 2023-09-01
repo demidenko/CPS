@@ -10,9 +10,9 @@ import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
-import com.demich.cps.platforms.api.AtCoderRatingChange
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.ui.SettingsSwitchItemWithWork
@@ -102,18 +102,10 @@ class AtCoderAccountManager :
         )
     }
 
-    fun notifyRatingChange(handle: String, ratingChange: AtCoderRatingChange, context: Context) =
-        notifyRatingChange(
-            channel = notificationChannels.atcoder.rating_changes,
-            ratingChange = ratingChange.toRatingChange(handle),
-            handle = handle,
-            manager = this,
-            context = context
-        )
 }
 
 class AtCoderAccountDataStore(context: Context):
-    AccountUniqueDataStore<AtCoderUserInfo>(context.account_atcoder_dataStore)
+    RatedAccountDataStore<AtCoderUserInfo>(context, context.account_atcoder_dataStore)
 {
     companion object {
         private val Context.account_atcoder_dataStore by dataStoreWrapper(AccountManagerType.atcoder.name)
@@ -121,7 +113,10 @@ class AtCoderAccountDataStore(context: Context):
 
     override val userInfo = makeUserInfoItem<AtCoderUserInfo>()
 
-    val lastRatedContestId = itemStringNullable(name = "last_rated_contest")
+    override val ratingChangeNotificationChannel: NotificationChannelSingleId
+        get() = notificationChannels.atcoder.rating_changes
+
+    override fun AtCoderUserInfo.withNewRating(rating: Int) = copy(rating = rating)
 }
 
 class AtCoderAccountSettingsDataStore(context: Context):

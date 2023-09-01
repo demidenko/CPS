@@ -9,6 +9,7 @@ import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.AtCoderAccountManager
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.accounts.managers.toRatingChange
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
@@ -102,23 +103,10 @@ class AccountsWorker(
             getRatingChanges(handle = userInfo.handle)
         }.getOrNull()?.lastOrNull() ?: return
 
-        val lastRatingChangeContestId = lastRatingChange.getContestId()
-
-        val prevRatingChangeContestId = dataStore.lastRatedContestId()
-
-        if (prevRatingChangeContestId == lastRatingChangeContestId && userInfo.rating == lastRatingChange.NewRating) return
-
-        dataStore.lastRatedContestId(lastRatingChangeContestId)
-
-        if (prevRatingChangeContestId != null) {
-            atcoderAccountManager.notifyRatingChange(userInfo.handle, lastRatingChange, context)
-            val newInfo = atcoderAccountManager.getUserInfo(userInfo.handle)
-            if (newInfo.status != STATUS.FAILED) {
-                dataStore.setSavedInfo(newInfo)
-            } else {
-                dataStore.setSavedInfo(userInfo.copy(rating = lastRatingChange.NewRating))
-            }
-        }
+        dataStore.applyRatingChange(
+            ratingChange = lastRatingChange.toRatingChange(handle = userInfo.handle),
+            manager = atcoderAccountManager
+        )
     }
 
     private fun getNotifiedCodeforcesContribution(): Int? {
