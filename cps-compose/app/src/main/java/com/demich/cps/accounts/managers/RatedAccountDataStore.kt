@@ -30,7 +30,7 @@ abstract class RatedAccountDataStore<U: RatedUserInfo>(
         }
 
         //save
-        lastRatingChange(newValue = ratingChange)
+        lastRatingChange(newValue = ratingChange.copy(title = "", url = null))
 
         if (prev == null) return //TODO: consider cases
 
