@@ -149,7 +149,7 @@ class CodeforcesAccountManager :
         modifier = modifier
     )
 
-    override fun dataStore(context: Context) = CodeforcesAccountDataStore(context)
+    override fun dataStore(context: Context) = CodeforcesAccountDataStore(this, context)
     override fun getSettings(context: Context) = CodeforcesAccountSettingsDataStore(context)
 
     @Composable
@@ -181,10 +181,7 @@ class CodeforcesAccountManager :
     }
 
     suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange, context: Context) {
-        dataStore(context).applyRatingChange(
-            ratingChange = ratingChange.toRatingChange(),
-            manager = this
-        )
+        dataStore(context).applyRatingChange(ratingChange = ratingChange.toRatingChange())
     }
 
     override val ratingUpperBoundRevolutions
@@ -225,8 +222,8 @@ class CodeforcesAccountManager :
         )
 }
 
-class CodeforcesAccountDataStore(context: Context):
-    RatedAccountDataStore<CodeforcesUserInfo>(context, context.account_codeforces_dataStore)
+class CodeforcesAccountDataStore(manager: CodeforcesAccountManager, context: Context):
+    RatedAccountDataStore<CodeforcesUserInfo>(manager, context, context.account_codeforces_dataStore)
 {
     companion object {
         private val Context.account_codeforces_dataStore by dataStoreWrapper(AccountManagerType.codeforces.name)

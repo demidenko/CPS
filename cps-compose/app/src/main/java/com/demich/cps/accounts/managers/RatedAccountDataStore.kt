@@ -9,18 +9,19 @@ import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreWrapper
 
 abstract class RatedAccountDataStore<U: RatedUserInfo>(
+    private val manager: RatedAccountManager<U>,
     private val context: Context,
     dataStoreWrapper: DataStoreWrapper
 ):
     AccountUniqueDataStore<U>(dataStoreWrapper)
 {
-    protected val lastRatingChange: DataStoreItem<RatingChange?> =
+    private val lastRatingChange: DataStoreItem<RatingChange?> =
         jsonCPS.item(name = "last_rating_change", defaultValue = null)
 
     protected abstract val ratingChangeNotificationChannel: NotificationChannelSingleId
     protected abstract fun U.withNewRating(rating: Int): U
 
-    suspend fun applyRatingChange(ratingChange: RatingChange, manager: RatedAccountManager<U>) {
+    suspend fun applyRatingChange(ratingChange: RatingChange) {
         val info = userInfo() ?: return
         val prev = lastRatingChange()
 

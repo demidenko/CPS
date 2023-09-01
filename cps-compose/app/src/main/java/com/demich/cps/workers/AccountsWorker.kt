@@ -103,10 +103,7 @@ class AccountsWorker(
             getRatingChanges(handle = userInfo.handle)
         }.getOrNull()?.lastOrNull() ?: return
 
-        dataStore.applyRatingChange(
-            ratingChange = lastRatingChange.toRatingChange(handle = userInfo.handle),
-            manager = atcoderAccountManager
-        )
+        dataStore.applyRatingChange(ratingChange = lastRatingChange.toRatingChange(handle = userInfo.handle))
     }
 
     private fun getNotifiedCodeforcesContribution(): Int? {

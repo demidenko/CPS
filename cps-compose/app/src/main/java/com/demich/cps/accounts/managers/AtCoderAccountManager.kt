@@ -88,7 +88,7 @@ class AtCoderAccountManager :
         modifier = modifier
     )
 
-    override fun dataStore(context: Context) = AtCoderAccountDataStore(context)
+    override fun dataStore(context: Context) = AtCoderAccountDataStore(this, context)
     override fun getSettings(context: Context) = AtCoderAccountSettingsDataStore(context)
 
     @Composable
@@ -104,8 +104,8 @@ class AtCoderAccountManager :
 
 }
 
-class AtCoderAccountDataStore(context: Context):
-    RatedAccountDataStore<AtCoderUserInfo>(context, context.account_atcoder_dataStore)
+class AtCoderAccountDataStore(manager: AtCoderAccountManager, context: Context):
+    RatedAccountDataStore<AtCoderUserInfo>(manager, context, context.account_atcoder_dataStore)
 {
     companion object {
         private val Context.account_atcoder_dataStore by dataStoreWrapper(AccountManagerType.atcoder.name)
