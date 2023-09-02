@@ -115,17 +115,17 @@ class CodeforcesNewsLostRecentWorker(
                 blogEntries = recentBlogEntries
                     .filter { it.authorColorTag >= minRatingColorTag }
                     .filter { blogEntry -> suspects.none { it.id == blogEntry.id } }
-            )
-        }.getOrElse {
-            return Result.failure()
-        }.forEach {
-            dao.insert(
-                CodeforcesLostBlogEntry(
-                    blogEntry = it,
-                    isSuspect = true,
-                    timeStamp = Instant.DISTANT_PAST
+            ) {
+                dao.insert(
+                    CodeforcesLostBlogEntry(
+                        blogEntry = it,
+                        isSuspect = true,
+                        timeStamp = Instant.DISTANT_PAST
+                    )
                 )
-            )
+            }
+        }.onFailure {
+            return Result.failure()
         }
 
         val recentIds = recentBlogEntries.mapToSet { it.id }
@@ -165,25 +165,28 @@ private class CachedBlogEntryApi(
             ).creationTime
         }
 
-    private suspend fun filterSorted(
-        blogEntries: List<CodeforcesBlogEntry>
-    ): List<CodeforcesBlogEntry> {
+    private suspend inline fun filterSorted(
+        blogEntries: List<CodeforcesBlogEntry>,
+        block: (CodeforcesBlogEntry) -> Unit
+    ) {
         val firstNew = firstFalse(0, blogEntries.size) { index ->
             val creationTime = getCreationTime(id = blogEntries[index].id)
             !isNew(creationTime)
         }
-        return (firstNew until blogEntries.size).map { index ->
+        return (firstNew until blogEntries.size).forEach { index ->
             val blogEntry = blogEntries[index]
-            blogEntry.copy(
+            block(blogEntry.copy(
                 creationTime = getCreationTime(id = blogEntry.id),
                 rating = 0,
                 commentsCount = 0
-            )
+            ))
         }
     }
 
-    suspend fun filterNewBlogEntries(blogEntries: List<CodeforcesBlogEntry>) =
-        filterSorted(blogEntries = blogEntries.sortedBy { it.id })
+    suspend inline fun filterNewBlogEntries(
+        blogEntries: List<CodeforcesBlogEntry>,
+        block: (CodeforcesBlogEntry) -> Unit
+    ) = filterSorted(blogEntries = blogEntries.sortedBy { it.id }, block)
 }
 
 //Required against new year color chaos
