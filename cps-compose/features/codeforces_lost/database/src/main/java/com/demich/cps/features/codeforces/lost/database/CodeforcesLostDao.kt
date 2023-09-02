@@ -17,7 +17,7 @@ private const val selectSuspect = "SELECT * FROM $cfLostTableName where isSuspec
 @Dao
 interface CodeforcesLostDao {
     @Upsert
-    suspend fun insert(blogEntries: List<CodeforcesLostBlogEntry>)
+    suspend fun insert(blogEntry: CodeforcesLostBlogEntry)
 
     @Delete
     suspend fun remove(blogEntries: List<CodeforcesLostBlogEntry>)

@@ -118,13 +118,15 @@ class CodeforcesNewsLostRecentWorker(
             )
         }.getOrElse {
             return Result.failure()
-        }.map {
-            CodeforcesLostBlogEntry(
-                blogEntry = it,
-                isSuspect = true,
-                timeStamp = Instant.DISTANT_PAST
+        }.forEach {
+            dao.insert(
+                CodeforcesLostBlogEntry(
+                    blogEntry = it,
+                    isSuspect = true,
+                    timeStamp = Instant.DISTANT_PAST
+                )
             )
-        }.also { dao.insert(it) }
+        }
 
         val recentIds = recentBlogEntries.mapToSet { it.id }
 
@@ -136,14 +138,14 @@ class CodeforcesNewsLostRecentWorker(
         )
 
         //suspect become lost
-        suspects.mapNotNull { blogEntry ->
+        suspects.forEach { blogEntry ->
             if (blogEntry.id !in recentIds) {
-                blogEntry.copy(
+                dao.insert(blogEntry.copy(
                     isSuspect = false,
                     timeStamp = currentTime
-                )
-            } else null
-        }.also { dao.insert(it) }
+                ))
+            }
+        }
 
         return Result.success()
     }
