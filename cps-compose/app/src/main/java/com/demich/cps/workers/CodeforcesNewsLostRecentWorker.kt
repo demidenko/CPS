@@ -10,7 +10,9 @@ import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.utils.firstFalse
 import com.demich.cps.utils.mapToSet
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
@@ -156,6 +158,23 @@ class CodeforcesNewsLostRecentWorker(
         return Result.success()
     }
 
+}
+
+
+private suspend fun filterNewBlogEntries(
+    blogEntries: List<CodeforcesBlogEntry>,
+    locale: CodeforcesLocale,
+    isNew: (Instant) -> Boolean
+): List<CodeforcesBlogEntry> {
+    val sorted = blogEntries.sortedBy { it.id }
+    val firstNew = firstFalse(0, sorted.size) { index ->
+        val creationTime = CodeforcesApi.getBlogEntry(
+            blogEntryId = blogEntries[index].id,
+            locale = locale
+        ).creationTime
+        !isNew(creationTime)
+    }
+    return blogEntries.subList(firstNew, blogEntries.size)
 }
 
 //Required against new year color chaos
