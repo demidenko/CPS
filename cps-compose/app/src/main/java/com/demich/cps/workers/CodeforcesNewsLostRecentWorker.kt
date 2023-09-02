@@ -79,18 +79,6 @@ class CodeforcesNewsLostRecentWorker(
         }*/
     }
 
-    //Required against new year color chaos
-    private suspend fun List<CodeforcesBlogEntry>.fixedHandleColors(): List<CodeforcesBlogEntry> {
-        val authors = CodeforcesUtils.getUsersInfo(handles = map { it.authorHandle }, doRedirect = false)
-        //TODO: if api load failed?..
-        return map { blogEntry ->
-            val userInfo = authors[blogEntry.authorHandle]
-                ?.takeIf { it.status == STATUS.OK }
-            if (userInfo == null) blogEntry
-            else blogEntry.copy(authorColorTag = CodeforcesColorTag.fromRating(rating = userInfo.rating))
-        }
-    }
-
     override suspend fun runWork(): Result {
         val locale = context.settingsNews.codeforcesLocale()
 
@@ -102,9 +90,7 @@ class CodeforcesNewsLostRecentWorker(
         }.getOrElse { return Result.retry() }
 
         val recentBlogEntries: List<CodeforcesBlogEntry> =
-            CodeforcesUtils.runCatching {
-                extractRecentBlogEntries(source).fixedHandleColors()
-            }.getOrNull() ?: return Result.failure()
+            extractRecentBlogEntriesOrNull(source) ?: return Result.failure()
 
         fun isNew(blogCreationTime: Instant) = currentTime - blogCreationTime < 24.hours
         fun isOldLost(blogCreationTime: Instant) = currentTime - blogCreationTime > 7.days
@@ -170,4 +156,30 @@ class CodeforcesNewsLostRecentWorker(
         return Result.success()
     }
 
+}
+
+//Required against new year color chaos
+private suspend fun List<CodeforcesBlogEntry>.fixedHandleColors(): List<CodeforcesBlogEntry> {
+    val authors = CodeforcesUtils.getUsersInfo(handles = map { it.authorHandle }, doRedirect = false)
+    //TODO: if api load failed?..
+    return map { blogEntry ->
+        val userInfo = authors[blogEntry.authorHandle]
+            ?.takeIf { it.status == STATUS.OK }
+        if (userInfo == null) blogEntry
+        else blogEntry.copy(authorColorTag = CodeforcesColorTag.fromRating(rating = userInfo.rating))
+    }
+}
+
+private fun isNewYearChaos(source: String): Boolean {
+    //TODO: check is new year chaos
+    return false
+}
+
+private suspend fun extractRecentBlogEntriesOrNull(source: String): List<CodeforcesBlogEntry>? {
+    return CodeforcesUtils.runCatching { extractRecentBlogEntries(source) }
+        .mapCatching {
+            if (isNewYearChaos(source)) it.fixedHandleColors()
+            else it
+        }
+        .getOrNull()
 }
