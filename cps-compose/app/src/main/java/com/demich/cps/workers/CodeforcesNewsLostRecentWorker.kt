@@ -110,31 +110,23 @@ class CodeforcesNewsLostRecentWorker(
             }.first
 
         //catch new suspects from recent actions
-        recentBlogEntries
-            .filter { it.authorColorTag >= minRatingColorTag }
-            .filter { blogEntry -> suspects.none { it.id == blogEntry.id } }
-            .forEachWithProgress { blogEntry ->
-                val creationTime = CodeforcesApi.runCatching {
-                    getBlogEntry(
-                        blogEntryId = blogEntry.id,
-                        locale = locale
-                    ).creationTime
-                }.getOrNull() ?: return@forEachWithProgress //TODO: set distant_future and try to know later?
-
-                if (isNew(creationTime)) {
-                    dao.insert(
-                        CodeforcesLostBlogEntry(
-                            blogEntry = blogEntry.copy(
-                                creationTime = creationTime,
-                                rating = 0,
-                                commentsCount = 0
-                            ),
-                            isSuspect = true,
-                            timeStamp = Instant.DISTANT_PAST
-                        )
-                    )
-                }
-            }
+        CachedBlogEntryApi(locale = locale, isNew = ::isNew).runCatching {
+            filterNewBlogEntries(
+                blogEntries = recentBlogEntries
+                    .filter { it.authorColorTag >= minRatingColorTag }
+                    .filter { blogEntry -> suspects.none { it.id == blogEntry.id } }
+            )
+        }.getOrElse {
+            return Result.failure()
+        }.forEach {
+            dao.insert(
+                CodeforcesLostBlogEntry(
+                    blogEntry = it,
+                    isSuspect = true,
+                    timeStamp = Instant.DISTANT_PAST
+                )
+            )
+        }
 
         val recentIds = recentBlogEntries.mapToSet { it.id }
 
@@ -160,21 +152,38 @@ class CodeforcesNewsLostRecentWorker(
 
 }
 
+private class CachedBlogEntryApi(
+    val locale: CodeforcesLocale,
+    val isNew: (Instant) -> Boolean
+) {
+    private val cacheTime = mutableMapOf<Int, Instant>()
+    private suspend fun getCreationTime(id: Int): Instant =
+        cacheTime.getOrPut(id) {
+            CodeforcesApi.getBlogEntry(
+                blogEntryId = id,
+                locale = locale
+            ).creationTime
+        }
 
-private suspend fun filterNewBlogEntries(
-    blogEntries: List<CodeforcesBlogEntry>,
-    locale: CodeforcesLocale,
-    isNew: (Instant) -> Boolean
-): List<CodeforcesBlogEntry> {
-    val sorted = blogEntries.sortedBy { it.id }
-    val firstNew = firstFalse(0, sorted.size) { index ->
-        val creationTime = CodeforcesApi.getBlogEntry(
-            blogEntryId = blogEntries[index].id,
-            locale = locale
-        ).creationTime
-        !isNew(creationTime)
+    private suspend fun filterSorted(
+        blogEntries: List<CodeforcesBlogEntry>
+    ): List<CodeforcesBlogEntry> {
+        val firstNew = firstFalse(0, blogEntries.size) { index ->
+            val creationTime = getCreationTime(id = blogEntries[index].id)
+            !isNew(creationTime)
+        }
+        return (firstNew until blogEntries.size).map { index ->
+            val blogEntry = blogEntries[index]
+            blogEntry.copy(
+                creationTime = getCreationTime(id = blogEntry.id),
+                rating = 0,
+                commentsCount = 0
+            )
+        }
     }
-    return blogEntries.subList(firstNew, blogEntries.size)
+
+    suspend fun filterNewBlogEntries(blogEntries: List<CodeforcesBlogEntry>) =
+        filterSorted(blogEntries = blogEntries.sortedBy { it.id })
 }
 
 //Required against new year color chaos
