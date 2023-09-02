@@ -161,12 +161,11 @@ class CodeforcesNewsLostRecentWorker(
 //Required against new year color chaos
 private suspend fun List<CodeforcesBlogEntry>.fixedHandleColors(): List<CodeforcesBlogEntry> {
     val authors = CodeforcesUtils.getUsersInfo(handles = map { it.authorHandle }, doRedirect = false)
-    //TODO: if api load failed?..
     return map { blogEntry ->
-        val userInfo = authors[blogEntry.authorHandle]
-            ?.takeIf { it.status == STATUS.OK }
-        if (userInfo == null) blogEntry
-        else blogEntry.copy(authorColorTag = CodeforcesColorTag.fromRating(rating = userInfo.rating))
+        val userInfo = authors.getValue(blogEntry.authorHandle)
+        require(userInfo.status == STATUS.OK)
+        if (blogEntry.authorColorTag == CodeforcesColorTag.ADMIN) blogEntry
+        else blogEntry.copy(authorColorTag = CodeforcesColorTag.fromRating(userInfo.rating))
     }
 }
 
