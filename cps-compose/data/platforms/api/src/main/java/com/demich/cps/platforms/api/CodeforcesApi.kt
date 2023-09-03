@@ -4,9 +4,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -67,11 +65,9 @@ object CodeforcesApi: PlatformApi {
         path: String,
         crossinline block: HttpRequestBuilder.() -> Unit = {}
     ): T {
-        return withContext(Dispatchers.IO) {
-            responseWithRetry(remainingRetries = 9) {
-                client.getAs<CodeforcesAPIResponse<T>>(urlString = "/api/$path", block = block)
-            }.result
-        }
+        return responseWithRetry(remainingRetries = 9) {
+            client.getAs<CodeforcesAPIResponse<T>>(urlString = "/api/$path", block = block)
+        }.result
     }
 
     private val RCPC = object {
@@ -104,14 +100,12 @@ object CodeforcesApi: PlatformApi {
                 if (isTemporarilyUnavailable(it)) throw CodeforcesTemporarilyUnavailableException()
             }
         }
-        return withContext(Dispatchers.IO) {
-            val s = callGet()
-            if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
-                RCPC.recalc(s)
-                delay(redirectWaitTime)
-                callGet()
-            } else s
-        }
+        val s = callGet()
+        return if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
+            RCPC.recalc(s)
+            delay(redirectWaitTime)
+            callGet()
+        } else s
     }
 
 
