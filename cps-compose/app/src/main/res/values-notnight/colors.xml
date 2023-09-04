@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="textColor">#272727</color>
+    <color name="textColor">#242424</color>
+    <color name="backgroundColor">#F8F8F8</color>
 
     <color name="success">#008000</color>
     <color name="fail">#DD2222</color>
