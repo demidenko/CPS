@@ -1,5 +1,6 @@
 package com.demich.cps
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -68,7 +69,7 @@ class MainActivity: ComponentActivity() {
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                this@MainActivity.enqueueEnabledWorkers()
+                appStartUp(this@MainActivity)
             }
         }
 
@@ -231,4 +232,8 @@ private fun CPSContent() {
 
 val LocalCodeforcesAccountManager = staticCompositionLocalOf<CodeforcesAccountManager> {
     throw IllegalAccessException()
+}
+
+private suspend fun appStartUp(context: Context) {
+    context.enqueueEnabledWorkers()
 }
