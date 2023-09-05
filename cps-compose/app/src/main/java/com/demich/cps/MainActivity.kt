@@ -50,6 +50,7 @@ import com.demich.cps.news.follow.newsFollowListBottomBarBuilder
 import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
 import com.demich.cps.news.settings.NewsSettingsScreen
+import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.ui.CPSNavigator
 import com.demich.cps.ui.CPSScaffold
 import com.demich.cps.ui.CPSStatusBar
@@ -235,5 +236,10 @@ val LocalCodeforcesAccountManager = staticCompositionLocalOf<CodeforcesAccountMa
 }
 
 private suspend fun appStartUp(context: Context) {
+    //init items with dynamic defaults
+    //TODO: not perfect solution, default still can run multiple times
+    context.settingsNews.codeforcesLocale.update { it }
+
+    //workers
     context.enqueueEnabledWorkers()
 }

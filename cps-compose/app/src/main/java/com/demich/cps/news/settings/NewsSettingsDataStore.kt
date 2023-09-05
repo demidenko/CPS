@@ -7,6 +7,7 @@ import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.NewsPostEntry
 import com.demich.cps.platforms.utils.scanNewsPostEntries
+import com.demich.cps.utils.isRuSystemLanguage
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
@@ -22,7 +23,10 @@ class NewsSettingsDataStore(context: Context): ItemizedDataStore(context.news_se
     }
 
     val codeforcesDefaultTab = itemEnum(name = "cf_default_tab", defaultValue = CodeforcesTitle.TOP)
-    val codeforcesLocale = itemEnum(name = "cf_locale", defaultValue = CodeforcesLocale.EN)
+    val codeforcesLocale = jsonCPS.item(name = "cf_locale") {
+        if (isRuSystemLanguage()) CodeforcesLocale.RU
+        else CodeforcesLocale.EN
+    }
 
     val codeforcesFollowEnabled = itemBoolean(name = "cf_follow_enabled", defaultValue = false)
 
