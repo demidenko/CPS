@@ -2,7 +2,7 @@ package com.demich.cps.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.demich.cps.contests.settings.settingsContests
+import com.demich.cps.contests.ContestsInfoDataStore
 import kotlin.time.Duration.Companion.days
 
 class UtilityWorker(
@@ -31,7 +31,7 @@ class UtilityWorker(
     }
 
     private suspend fun removeOldIgnoredContests() {
-        context.settingsContests.ignoredContests.update {
+        ContestsInfoDataStore(context).ignoredContests.update {
             it.filterValues { ignoredAtTime ->
                 currentTime - ignoredAtTime < 30.days
             }

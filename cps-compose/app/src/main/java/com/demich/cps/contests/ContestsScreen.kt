@@ -113,7 +113,7 @@ private fun ContestsReloadableContent(
 private fun flowOfContestsToShow(context: Context) =
     context.contestsListDao.flowOfContests()
         .distinctUntilChanged()
-        .combine(context.settingsContests.ignoredContests.flow) { list, ignored ->
+        .combine(ContestsInfoDataStore(context).ignoredContests.flow) { list, ignored ->
             if (ignored.isEmpty()) list
             else list.filter { contest -> contest.compositeId !in ignored }
         }
@@ -207,7 +207,7 @@ private fun ContestsColumn(
             isExpanded = { contest.compositeId in expandedItems },
             onDeleteRequest = {
                 scope.launch {
-                    context.settingsContests.ignoredContests.edit {
+                    ContestsInfoDataStore(context).ignoredContests.edit {
                         put(contest.compositeId, getCurrentTime())
                     }
                 }

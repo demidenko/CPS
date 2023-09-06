@@ -26,8 +26,6 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         Contest.Platform.unknown.let { if (it in platforms) platforms else platforms + it }
     }
 
-    val ignoredContests = jsonCPS.itemMap<Pair<Contest.Platform, String>, Instant>(name = "ignored_contests")
-
     val clistApiAccess = jsonCPS.item(name = "clist_api_access", defaultValue = ClistApi.ApiAccess("", ""))
     val clistAdditionalResources = jsonCPS.itemList<ClistResource>(name = "clist_additional_resources")
 
