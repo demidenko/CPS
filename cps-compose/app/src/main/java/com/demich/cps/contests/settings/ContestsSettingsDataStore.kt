@@ -25,12 +25,11 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         //This set must contain Platform.unknown
         Contest.Platform.unknown.let { if (it in platforms) platforms else platforms + it }
     }
-    val lastReloadedPlatforms = itemEnumSet<Contest.Platform>(name = "last_reloaded_platforms")
+
     val ignoredContests = jsonCPS.itemMap<Pair<Contest.Platform, String>, Instant>(name = "ignored_contests")
 
     val clistApiAccess = jsonCPS.item(name = "clist_api_access", defaultValue = ClistApi.ApiAccess("", ""))
     val clistAdditionalResources = jsonCPS.itemList<ClistResource>(name = "clist_additional_resources")
-    val clistLastReloadedAdditionalResources = jsonCPS.itemSet<Int>(name = "clist_additional_last_reloaded")
 
     val contestsDateConstraints = jsonCPS.item(
         name = "contests_date_constraints",

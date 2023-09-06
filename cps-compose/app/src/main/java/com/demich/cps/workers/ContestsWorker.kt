@@ -3,6 +3,7 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
+import com.demich.cps.contests.ContestsInfoDataStore
 import com.demich.cps.contests.ContestsReloader
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.loading.asContestsReceiver
@@ -31,6 +32,7 @@ class ContestsWorker(
         //usual reload
         reloadEnabledPlatforms(
             settings = context.settingsContests,
+            contestsInfo = ContestsInfoDataStore(context),
             contestsReceiver = context.contestsListDao.asContestsReceiver()
         )
 

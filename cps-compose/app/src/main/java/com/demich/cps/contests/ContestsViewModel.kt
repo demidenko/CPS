@@ -83,6 +83,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
         viewModelScope.launch(Dispatchers.IO) {
             reloadEnabledPlatforms(
                 settings = context.settingsContests,
+                contestsInfo = ContestsInfoDataStore(context),
                 contestsReceiver = context.contestsListDao.makeReceiver()
             )
         }
@@ -91,32 +92,34 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
     fun syncEnabledAndLastReloaded(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             val settings = context.settingsContests
+            val listInfo = ContestsInfoDataStore(context)
             val dao = context.contestsListDao
             val enabled = settings.enabledPlatforms()
-            val lastReloaded = settings.lastReloadedPlatforms()
+            val lastReloaded = listInfo.lastReloadedPlatforms()
             (lastReloaded - enabled).takeIf { it.isNotEmpty() }?.let { toRemove ->
-                settings.lastReloadedPlatforms.edit { removeAll(toRemove) }
+                listInfo.lastReloadedPlatforms.edit { removeAll(toRemove) }
                 toRemove.forEach { platform -> dao.removePlatform(platform) }
             }
 
             val toReload = (enabled - lastReloaded).toMutableSet()
 
-            if (settings.needToReloadClistAdditional()) {
-                settings.clistLastReloadedAdditionalResources.update { emptySet() }
+            if (needToReloadClistAdditional(settings, listInfo)) {
+                listInfo.clistLastReloadedAdditionalResources.update { emptySet() }
                 toReload.add(Contest.Platform.unknown)
             }
 
             reload(
                 platforms = toReload,
                 settings = settings,
+                contestsInfo = listInfo,
                 contestsReceiver = dao.makeReceiver()
             )
         }
     }
 
-    private suspend fun ContestsSettingsDataStore.needToReloadClistAdditional(): Boolean {
-        val enabled: Set<Int> = clistAdditionalResources().mapToSet { it.id }
-        val lastReloaded: Set<Int> = clistLastReloadedAdditionalResources()
+    private suspend fun needToReloadClistAdditional(settings: ContestsSettingsDataStore, listInfo: ContestsInfoDataStore): Boolean {
+        val enabled: Set<Int> = settings.clistAdditionalResources().mapToSet { it.id }
+        val lastReloaded: Set<Int> = listInfo.clistLastReloadedAdditionalResources()
         return enabled != lastReloaded //hope it is proper equals
     }
 }

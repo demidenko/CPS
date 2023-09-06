@@ -15,13 +15,15 @@ import com.demich.datastore_itemized.edit
 interface ContestsReloader {
     suspend fun reloadEnabledPlatforms(
         settings: ContestsSettingsDataStore,
+        contestsInfo: ContestsInfoDataStore,
         contestsReceiver: ContestsReceiver
     ) {
-        settings.lastReloadedPlatforms(emptySet())
-        settings.clistLastReloadedAdditionalResources(emptySet())
+        contestsInfo.lastReloadedPlatforms(emptySet())
+        contestsInfo.clistLastReloadedAdditionalResources(emptySet())
         reload(
             platforms = settings.enabledPlatforms(),
             settings = settings,
+            contestsInfo = contestsInfo,
             contestsReceiver = contestsReceiver
         )
     }
@@ -29,16 +31,17 @@ interface ContestsReloader {
     suspend fun reload(
         platforms: Collection<Contest.Platform>,
         settings: ContestsSettingsDataStore,
+        contestsInfo: ContestsInfoDataStore,
         contestsReceiver: ContestsReceiver
     ) {
         if (platforms.isEmpty()) {
             return
         }
 
-        settings.lastReloadedPlatforms.edit { addAll(platforms) }
+        contestsInfo.lastReloadedPlatforms.edit { addAll(platforms) }
         if (Contest.Platform.unknown in platforms) {
             val ids = settings.clistAdditionalResources().map { it.id }
-            settings.clistLastReloadedAdditionalResources.edit { addAll(ids) }
+            contestsInfo.clistLastReloadedAdditionalResources.edit { addAll(ids) }
         }
 
         loadContests(
