@@ -6,11 +6,12 @@ import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.platforms.utils.ClistUtils
 import com.demich.cps.platforms.api.ClistApi
 import com.demich.cps.platforms.api.ClistContest
+import com.demich.cps.platforms.api.ClistResource
 import kotlinx.datetime.Instant
 
 class ClistContestsLoader(
     val apiAccess: ClistApi.ApiAccess,
-    val includeResourceIds: suspend () -> Collection<Int>
+    val additionalResources: suspend () -> Collection<ClistResource>
 ): ContestsLoaderMultiple(type = ContestsLoaderType.clist_api) {
     override suspend fun loadContests(
         platforms: Set<Contest.Platform>,
@@ -19,7 +20,7 @@ class ClistContestsLoader(
         apiAccess = apiAccess,
         maxStartTime = dateConstraints.maxStartTime,
         minEndTime = dateConstraints.minEndTime,
-        resourceIds = ClistUtils.makeResourceIds(platforms, includeResourceIds)
+        resourceIds = ClistUtils.makeResourceIds(platforms, additionalResources)
     ).mapAndFilterResult(dateConstraints)
 }
 
