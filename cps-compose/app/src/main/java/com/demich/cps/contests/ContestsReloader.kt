@@ -18,8 +18,10 @@ interface ContestsReloader {
         contestsInfo: ContestsInfoDataStore,
         contestsReceiver: ContestsReceiver
     ) {
-        contestsInfo.lastReloadedPlatforms(emptySet())
-        contestsInfo.clistLastReloadedAdditionalResources(emptySet())
+        contestsInfo.edit { prefs ->
+            prefs[lastReloadedPlatforms] = emptySet()
+            prefs[clistLastReloadedAdditionalResources] = emptySet()
+        }
         reload(
             platforms = settings.enabledPlatforms(),
             settings = settings,
