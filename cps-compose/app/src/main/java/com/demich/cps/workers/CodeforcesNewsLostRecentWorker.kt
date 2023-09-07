@@ -81,8 +81,12 @@ class CodeforcesNewsLostRecentWorker(
         }*/
     }
 
+    private fun isNew(blogCreationTime: Instant) = currentTime - blogCreationTime < 24.hours
+    private fun isOldLost(blogCreationTime: Instant) = currentTime - blogCreationTime > 7.days
+
     override suspend fun runWork(): Result {
-        val locale = context.settingsNews.codeforcesLocale()
+        val settings = context.settingsNews
+        val locale = settings.codeforcesLocale()
 
         val source = CodeforcesApi.runCatching {
             getPageSource(
@@ -94,11 +98,8 @@ class CodeforcesNewsLostRecentWorker(
         val recentBlogEntries: List<CodeforcesBlogEntry> =
             extractRecentBlogEntriesOrNull(source) ?: return Result.failure()
 
-        fun isNew(blogCreationTime: Instant) = currentTime - blogCreationTime < 24.hours
-        fun isOldLost(blogCreationTime: Instant) = currentTime - blogCreationTime > 7.days
-
         val dao = context.lostBlogEntriesDao
-        val minRatingColorTag = context.settingsNews.codeforcesLostMinRatingTag()
+        val minRatingColorTag = settings.codeforcesLostMinRatingTag()
 
         //get current suspects with removing old ones
         //TODO: glorious code
@@ -170,16 +171,17 @@ private class CachedBlogEntryApi(
         block: (CodeforcesBlogEntry) -> Unit
     ) {
         val firstNew = firstFalse(0, blogEntries.size) { index ->
-            val creationTime = getCreationTime(id = blogEntries[index].id)
-            !isNew(creationTime)
+            !isNew(getCreationTime(id = blogEntries[index].id))
         }
         return (firstNew until blogEntries.size).forEach { index ->
-            val blogEntry = blogEntries[index]
-            block(blogEntry.copy(
-                creationTime = getCreationTime(id = blogEntry.id),
-                rating = 0,
-                commentsCount = 0
-            ))
+            val blogEntry = blogEntries[index].let {
+                it.copy(
+                    creationTime = getCreationTime(id = it.id),
+                    rating = 0,
+                    commentsCount = 0
+                )
+            }
+            block(blogEntry)
         }
     }
 
