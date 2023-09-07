@@ -14,6 +14,7 @@ import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.firstFalse
 import com.demich.cps.utils.mapToSet
+import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -111,7 +112,11 @@ class CodeforcesNewsLostRecentWorker(
             }.first
 
         //catch new suspects from recent actions
-        CachedBlogEntryApi(locale = locale, isNew = ::isNew).runCatching {
+        CachedBlogEntryApi(
+            locale = locale,
+            isNew = ::isNew,
+            hintItem = settings.codeforcesLostHintNotNew
+        ).runCatching {
             filterNewBlogEntries(
                 blogEntries = recentBlogEntries
                     .filter { it.authorColorTag >= minRatingColorTag }
@@ -155,7 +160,8 @@ class CodeforcesNewsLostRecentWorker(
 
 private class CachedBlogEntryApi(
     val locale: CodeforcesLocale,
-    val isNew: (Instant) -> Boolean
+    val isNew: (Instant) -> Boolean,
+    val hintItem: DataStoreItem<Pair<Int, Instant>?>
 ) {
     private val cacheTime = mutableMapOf<Int, Instant>()
     private suspend fun getCreationTime(id: Int): Instant =
@@ -170,10 +176,20 @@ private class CachedBlogEntryApi(
         blogEntries: List<CodeforcesBlogEntry>,
         block: (CodeforcesBlogEntry) -> Unit
     ) {
-        val firstNew = firstFalse(0, blogEntries.size) { index ->
-            !isNew(getCreationTime(id = blogEntries[index].id))
+        //reset just in case isNew window change
+        hintItem.update {
+            if (it != null && isNew(it.second)) null
+            else it
         }
-        return (firstNew until blogEntries.size).forEach { index ->
+
+        val notNewBlogEntryId = hintItem()?.first ?: Int.MIN_VALUE
+        val indexOfFirstNew = firstFalse(0, blogEntries.size) { index ->
+            val blogEntryId = blogEntries[index].id
+            if (blogEntryId <= notNewBlogEntryId) true
+            else !isNew(getCreationTime(id = blogEntryId))
+        }
+
+        (indexOfFirstNew until blogEntries.size).forEach { index ->
             val blogEntry = blogEntries[index].let {
                 it.copy(
                     creationTime = getCreationTime(id = it.id),
@@ -183,6 +199,17 @@ private class CachedBlogEntryApi(
             }
             block(blogEntry)
         }
+
+        //save hint
+        cacheTime.asSequence()
+            .filter { !isNew(it.value) }
+            .maxByOrNull { it.value }
+            ?.let { entry ->
+                hintItem.update {
+                    if (it == null || it.second < entry.value) entry.toPair()
+                    else it
+                }
+            }
     }
 
     suspend inline fun filterNewBlogEntries(

@@ -13,6 +13,7 @@ import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Instant
 
 val Context.settingsNews: NewsSettingsDataStore
     get() = NewsSettingsDataStore(this)
@@ -32,6 +33,7 @@ class NewsSettingsDataStore(context: Context): ItemizedDataStore(context.news_se
 
     val codeforcesLostEnabled = itemBoolean(name = "cf_lost_enabled", defaultValue = false)
     val codeforcesLostMinRatingTag = itemEnum(name = "cf_lost_min_rating", defaultValue = CodeforcesColorTag.ORANGE)
+    val codeforcesLostHintNotNew = jsonCPS.item<Pair<Int,Instant>?>(name = "cf_lost_hint", defaultValue = null)
 
     fun flowOfCodeforcesTabs(): Flow<List<CodeforcesTitle>> {
         return codeforcesLostEnabled.flow.map { lostEnabled ->
