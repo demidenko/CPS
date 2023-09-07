@@ -113,15 +113,12 @@ class CodeforcesNewsLostRecentWorker(
             }.first
 
         //catch new suspects from recent actions
-        CachedBlogEntryApi(
-            locale = locale,
-            isNew = ::isNew,
-            hintItem = settings.codeforcesLostHintNotNew
-        ).runCatching {
-            filterNewBlogEntries(
+        CachedBlogEntryApi(locale = locale, isNew = ::isNew).runCatching {
+            forNewBlogEntries(
                 blogEntries = recentBlogEntries
                     .filter { it.authorColorTag >= minRatingColorTag }
-                    .filter { blogEntry -> suspects.none { it.id == blogEntry.id } }
+                    .filter { blogEntry -> suspects.none { it.id == blogEntry.id } },
+                hintItem = settings.codeforcesLostHintNotNew
             ) {
                 dao.insert(
                     CodeforcesLostBlogEntry(
@@ -161,8 +158,7 @@ class CodeforcesNewsLostRecentWorker(
 
 private class CachedBlogEntryApi(
     val locale: CodeforcesLocale,
-    val isNew: (Instant) -> Boolean,
-    val hintItem: DataStoreItem<Pair<Int, Instant>?>
+    val isNew: (Instant) -> Boolean
 ) {
     private val cacheTime = mutableMapOf<Int, Instant>()
     private suspend fun getCreationTime(id: Int): Instant =
@@ -193,8 +189,9 @@ private class CachedBlogEntryApi(
         }
     }
 
-    suspend inline fun filterNewBlogEntries(
+    suspend inline fun forNewBlogEntries(
         blogEntries: List<CodeforcesBlogEntry>,
+        hintItem: DataStoreItem<Pair<Int, Instant>?>,
         block: (CodeforcesBlogEntry) -> Unit
     ) {
         //reset just in case isNew window change
