@@ -177,17 +177,8 @@ private class CachedBlogEntryApi(
         blogEntries: List<CodeforcesBlogEntry>,
         block: (CodeforcesBlogEntry) -> Unit
     ) {
-        //reset just in case isNew window change
-        hintItem.update {
-            if (it != null && isNew(it.second)) null
-            else it
-        }
-
-        val notNewBlogEntryId = hintItem()?.first ?: Int.MIN_VALUE
         val indexOfFirstNew = firstFalse(0, blogEntries.size) { index ->
-            val blogEntryId = blogEntries[index].id
-            if (blogEntryId <= notNewBlogEntryId) true
-            else !isNew(getCreationTime(id = blogEntryId))
+            !isNew(getCreationTime(id = blogEntries[index].id))
         }
 
         (indexOfFirstNew until blogEntries.size).forEach { index ->
@@ -200,6 +191,25 @@ private class CachedBlogEntryApi(
             }
             block(blogEntry)
         }
+    }
+
+    suspend inline fun filterNewBlogEntries(
+        blogEntries: List<CodeforcesBlogEntry>,
+        block: (CodeforcesBlogEntry) -> Unit
+    ) {
+        //reset just in case isNew window change
+        hintItem.update {
+            if (it != null && isNew(it.second)) null
+            else it
+        }
+
+        val notNewBlogEntryId = hintItem()?.first ?: Int.MIN_VALUE
+        filterSorted(
+            blogEntries = blogEntries
+                .filter { it.id > notNewBlogEntryId }
+                .sortedBy { it.id },
+            block = block
+        )
 
         //save hint
         cacheTime.asSequence()
@@ -212,11 +222,6 @@ private class CachedBlogEntryApi(
                 }
             }
     }
-
-    suspend inline fun filterNewBlogEntries(
-        blogEntries: List<CodeforcesBlogEntry>,
-        block: (CodeforcesBlogEntry) -> Unit
-    ) = filterSorted(blogEntries = blogEntries.sortedBy { it.id }, block)
 }
 
 //Required against new year color chaos
