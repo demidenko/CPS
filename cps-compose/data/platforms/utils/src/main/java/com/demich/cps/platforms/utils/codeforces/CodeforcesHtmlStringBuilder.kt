@@ -18,6 +18,7 @@ interface CodeforcesHtmlStringBuilder {
     fun pushItalic()
     fun pushMono()
     fun pushQuote()
+    fun pushStroke()
 }
 
 fun parseCodeforcesHtml(html: String, parser: CodeforcesHtmlParser) {
@@ -84,6 +85,11 @@ class CodeforcesHtmlParser(val builder: CodeforcesHtmlStringBuilder): NodeVisito
             return
         }
 
+        if (name.isStroke()) {
+            builder.pushStroke()
+            return
+        }
+
         if (name == "img") {
             builder.append("[pic]")
             return
@@ -94,7 +100,8 @@ class CodeforcesHtmlParser(val builder: CodeforcesHtmlStringBuilder): NodeVisito
         val e = node as? Element ?: return
         val name = e.normalName()
 
-        if (name.isLink() || name.isBold() || name.isItalic() || name.isCode() || name.isQuote()) {
+
+        if (name.isLink() || name.isBold() || name.isItalic() || name.isCode() || name.isQuote() || name.isStroke()) {
             builder.pop()
             return
         }
@@ -107,3 +114,4 @@ private fun String.isBold() = this == "b" || this == "strong"
 private fun String.isItalic() = this == "i" || this == "em"
 private fun String.isCode() = this == "code"
 private fun String.isQuote() = this == "blockquote"
+private fun String.isStroke() = this == "s"

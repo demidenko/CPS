@@ -71,6 +71,10 @@ private class CodeforcesHtmlStringBuilderImpl(
     override fun pushQuote() {
         builder.pushStyle(SpanStyle(fontStyle = FontStyle.Italic, color = quoteColor))
     }
+
+    override fun pushStroke() {
+        builder.pushStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
+    }
 }
 
 
