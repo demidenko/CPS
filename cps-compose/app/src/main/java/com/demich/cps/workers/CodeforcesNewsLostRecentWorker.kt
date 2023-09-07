@@ -18,6 +18,7 @@ import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 
 class CodeforcesNewsLostRecentWorker(
@@ -32,7 +33,7 @@ class CodeforcesNewsLostRecentWorker(
             override suspend fun isEnabled() = context.settingsNews.codeforcesLostEnabled()
             override val requestBuilder: PeriodicWorkRequest.Builder
                 get() = CPSPeriodicWorkRequestBuilder<CodeforcesNewsLostRecentWorker>(
-                    repeatInterval = 1.hours
+                    repeatInterval = 45.minutes
                 )
         }
 
