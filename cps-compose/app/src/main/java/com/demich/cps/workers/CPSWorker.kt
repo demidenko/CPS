@@ -37,6 +37,10 @@ abstract class CPSWorker(
                 this[work.name] = currentTime
             }
 
+            workersInfo.lastResult.edit {
+                remove(work.name)
+            }
+
             kotlin.runCatching {
                 runWork()
             }.getOrElse { Result.failure() }

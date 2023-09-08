@@ -51,12 +51,17 @@ private fun WorkersList(
         CPSWorkersDataStore(context).lastExecutionTime.flow
     }
 
+    val lastResult by rememberCollect {
+        CPSWorkersDataStore(context).lastResult.flow
+    }
+
     ProvideTimeEachMinute {
         LazyColumn(modifier = modifier) {
             items(items = works, key = { it.name }) { work ->
                 WorkerItem(
                     work = work,
                     lastExecutionTime = lastExecutionTime[work.name],
+                    lastResult = lastResult[work.name],
                     modifier = Modifier
                         .clickable { onClick(work) }
                         .fillMaxWidth()
@@ -72,6 +77,7 @@ private fun WorkersList(
 private fun WorkerItem(
     work: CPSWork,
     lastExecutionTime: Instant?,
+    lastResult: CPSWorker.ResultTypes?,
     modifier: Modifier = Modifier
 ) {
 
@@ -84,6 +90,7 @@ private fun WorkerItem(
         lastRunTimeAgo = lastExecutionTime?.let {
             timeAgo(fromTime = it, toTime = LocalCurrentTime.current)
         } ?: "never",
+        lastResult = lastResult,
         modifier = modifier
     )
 }
@@ -94,6 +101,7 @@ private fun WorkerItem(
     workState: WorkInfo.State,
     progressInfo: ProgressBarInfo?,
     lastRunTimeAgo: String,
+    lastResult: CPSWorker.ResultTypes?,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -108,7 +116,7 @@ private fun WorkerItem(
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = "last run: $lastRunTimeAgo",
+                text = "last run: $lastRunTimeAgo " + (lastResult?.name?.lowercase() ?: ""),
                 fontSize = 14.sp,
                 color = cpsColors.contentAdditional,
                 modifier = Modifier.padding(top = 3.dp)
