@@ -4,48 +4,61 @@
     android:viewportWidth="105"
     android:viewportHeight="105">
   <path
-      android:pathData="M33.25,52.5m-5.75,0a5.75,5.75 0,1 1,11.5 0a5.75,5.75 0,1 1,-11.5 0"
-      android:strokeWidth="2.3"
+      android:pathData="M32.95,52.5m-6.45,0a6.45,6.45 0,1 1,12.9 0a6.45,6.45 0,1 1,-12.9 0"
+      android:strokeWidth="2.5"
       android:strokeColor="@color/textColor"/>
   <path
-      android:pathData="m47.5,46.75h-3.5v11.5h3.5"
-      android:strokeLineJoin="miter"
-      android:strokeWidth="2.3"
-      android:strokeColor="@color/textColor"
-      android:strokeLineCap="butt"/>
-  <path
-      android:pathData="m73.5,46.75h3.5v11.5h-3.5"
-      android:strokeLineJoin="miter"
-      android:strokeWidth="2.3"
-      android:strokeColor="@color/textColor"
-      android:strokeLineCap="butt"/>
-  <path
-      android:pathData="m50.25,52.5 l5.5,5.5 15,-15"
+      android:pathData="m47.5,46.05h-3.6v12.9h3.6"
       android:strokeLineJoin="miter"
       android:strokeWidth="2.5"
+      android:strokeColor="@color/textColor"
+      android:strokeLineCap="butt"/>
+  <path
+      android:pathData="m74,46.05h3.6v12.9h-3.6"
+      android:strokeLineJoin="miter"
+      android:strokeWidth="2.5"
+      android:strokeColor="@color/textColor"
+      android:strokeLineCap="butt"/>
+  <path
+      android:pathData="m50.5,52.5 l5.5,5.5 15,-15"
+      android:strokeLineJoin="miter"
+      android:strokeWidth="2.7"
       android:strokeColor="@color/success"
       android:strokeLineCap="butt"/>
 </vector>
 
 <!--
 val viewSize: Double = 70.0
-val innerBorder = viewSize / 7
+val innerBorder = viewSize / 7 * 0.9
 val outerBorder = viewSize / 4
 
 val space = innerBorder / 2
-val bracketW = innerBorder * 0.35
+val bracketW = innerBorder * 0.4
 
 val lbStartX = viewSize / 7 * 3
 val rbStartX = viewSize / 7 * 5.5
 
 //innerBorder + r*2 + space + bracketWidth = lbStartX
 val r = (lbStartX - space - bracketW - innerBorder) / 2
+val ox = outerBorder+innerBorder+r
+val oy = outerBorder+viewSize/2
+printlnf("O = M%,%m-%,0a%,% 0,1 1,% 0a%,% 0,1 1,-% 0", ox, oy, r, r, r, r*2, r, r, r*2)
+
 val bracketH = r * 2
-
 val bStartY = viewSize / 2 - bracketH / 2
-println("leftB = m${lbStartX+outerBorder},${bStartY+outerBorder}h-${bracketW}v${bracketH}h$bracketW")
+printlnf("[ = m%,%h-%v%h%", lbStartX+outerBorder, bStartY+outerBorder, bracketW, bracketH, bracketW)
+printlnf("] = m%,%h%v%h-%", rbStartX+outerBorder, bStartY+outerBorder, bracketW, bracketH, bracketW)
 
-println("rightB = m${rbStartX+outerBorder},${bStartY+outerBorder}h${bracketW}v${bracketH}h-$bracketW")
 
-println("O = M${outerBorder+innerBorder+r},${outerBorder+viewSize/2}m-$r,0a$r,$r 0,1 1,${r*2} 0a$r,$r 0,1 1,-${r*2} 0")
+fun printlnf(str: String, vararg args: Double) {
+    var i = 0
+    buildString {
+        for (c in str) {
+            if (c == '%') {
+                val x = args[i++]
+                append(String.format("%.2f", x).removeSuffix("0").removeSuffix("0").removeSuffix("."))
+            } else append(c)
+        }
+    }.apply(::println)
+}
 -->
