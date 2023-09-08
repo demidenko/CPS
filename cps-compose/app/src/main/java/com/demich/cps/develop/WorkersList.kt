@@ -15,6 +15,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.work.WorkInfo
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.bottomprogressbar.CPSProgressIndicator
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
@@ -115,12 +117,25 @@ private fun WorkerItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            Text(
-                text = "last run: $lastRunTimeAgo " + (lastResult?.name?.lowercase() ?: ""),
-                fontSize = 14.sp,
-                color = cpsColors.contentAdditional,
-                modifier = Modifier.padding(top = 3.dp)
-            )
+            Row(modifier = Modifier.padding(top = 3.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "last run: $lastRunTimeAgo",
+                    fontSize = 14.sp,
+                    color = cpsColors.contentAdditional
+                )
+                if (lastResult != null) {
+                    IconSp(
+                        imageVector = if (lastResult == CPSWorker.ResultTypes.SUCCESS) CPSIcons.Done else CPSIcons.Error,
+                        color = when (lastResult) {
+                            CPSWorker.ResultTypes.SUCCESS -> cpsColors.success
+                            CPSWorker.ResultTypes.RETRY -> cpsColors.warning
+                            CPSWorker.ResultTypes.FAILURE -> cpsColors.error
+                        },
+                        size = if (lastResult == CPSWorker.ResultTypes.SUCCESS) 16.sp else 14.sp,
+                        modifier = Modifier.padding(start = 3.dp)
+                    )
+                }
+            }
         }
 
         Column(
