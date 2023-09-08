@@ -14,13 +14,13 @@
       android:strokeColor="@color/textColor"
       android:strokeLineCap="butt"/>
   <path
-      android:pathData="m73,46.75h3.5v11.5h-3.5"
+      android:pathData="m73.5,46.75h3.5v11.5h-3.5"
       android:strokeLineJoin="miter"
       android:strokeWidth="2.3"
       android:strokeColor="@color/textColor"
       android:strokeLineCap="butt"/>
   <path
-      android:pathData="m50,52.5 l5.5,5.5 15,-15"
+      android:pathData="m50.25,52.5 l5.5,5.5 15,-15"
       android:strokeLineJoin="miter"
       android:strokeWidth="2.5"
       android:strokeColor="@color/success"
