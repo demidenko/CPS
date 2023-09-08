@@ -4,17 +4,17 @@
     android:viewportWidth="105"
     android:viewportHeight="105">
   <path
-      android:pathData="M32.5,52.5m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"
+      android:pathData="M33.25,52.5m-5.75,0a5.75,5.75 0,1 1,11.5 0a5.75,5.75 0,1 1,-11.5 0"
       android:strokeWidth="2.0"
       android:strokeColor="@color/textColor"/>
   <path
-      android:pathData="m47.5,47.5h-5v10h5"
+      android:pathData="m47.5,46.75h-3.5v11.5h3.5"
       android:strokeLineJoin="miter"
       android:strokeWidth="2.0"
       android:strokeColor="@color/textColor"
       android:strokeLineCap="butt"/>
   <path
-      android:pathData="m72.5,47.5h5v10h-5"
+      android:pathData="m72.5,46.75h3.5v11.5h-3.5"
       android:strokeLineJoin="miter"
       android:strokeWidth="2.0"
       android:strokeColor="@color/textColor"
@@ -26,3 +26,26 @@
       android:strokeColor="@color/success"
       android:strokeLineCap="butt"/>
 </vector>
+
+<!--
+val viewSize: Double = 70.0
+val innerBorder = viewSize / 7
+val outerBorder = viewSize / 4
+
+val space = innerBorder / 2
+val bracketW = innerBorder * 0.35
+
+val lbStartX = viewSize / 7 * 3
+val rbStartX = viewSize / 7 * 5.5
+
+//innerBorder + r*2 + space + bracketWidth = lbStartX
+val r = (lbStartX - space - bracketW - innerBorder) / 2
+val bracketH = r * 2
+
+val bStartY = viewSize / 2 - bracketH / 2
+println("leftB = m${lbStartX+outerBorder},${bStartY+outerBorder}h-${bracketW}v${bracketH}h$bracketW")
+
+println("rightB = m${rbStartX+outerBorder},${bStartY+outerBorder}h${bracketW}v${bracketH}h-$bracketW")
+
+println("O = M${outerBorder+innerBorder+r},${outerBorder+viewSize/2}m-$r,0a$r,$r 0,1 1,${r*2} 0a$r,$r 0,1 1,-${r*2} 0")
+-->
