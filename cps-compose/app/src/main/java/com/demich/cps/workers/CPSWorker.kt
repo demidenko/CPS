@@ -30,12 +30,23 @@ abstract class CPSWorker(
             return Result.success()
         }
 
-        CPSWorkersDataStore(context).lastExecutionTime.edit {
-            this[work.name] = currentTime
-        }
+        val workersInfo = CPSWorkersDataStore(context)
 
         val result = withContext(Dispatchers.IO) {
-            runWork()
+            workersInfo.lastExecutionTime.edit {
+                this[work.name] = currentTime
+            }
+
+            kotlin.runCatching {
+                runWork()
+            }.getOrElse { Result.failure() }
+            .also {
+                val type = it.toType()
+                workersInfo.lastResult.edit {
+                    if (type == null) remove(work.name)
+                    else this[work.name] = type
+                }
+            }
         }
 
         return result
@@ -69,6 +80,19 @@ abstract class CPSWorker(
         }
     }
 
+
+    enum class ResultTypes {
+        SUCCESS, RETRY, FAILURE
+    }
+
+    private fun Result.toType(): ResultTypes? {
+        return when (this) {
+            is Result.Success -> ResultTypes.SUCCESS
+            is Result.Retry -> ResultTypes.RETRY
+            is Result.Failure -> ResultTypes.FAILURE
+            else -> null
+        }
+    }
 }
 
 private const val KEY_PROGRESS = "cpsworker_progress"
@@ -87,4 +111,6 @@ class CPSWorkersDataStore(context: Context): ItemizedDataStore(context.workersDa
     }
 
     val lastExecutionTime = jsonCPS.itemMap<String, Instant>(name = "last_execution_time")
+
+    val lastResult = jsonCPS.itemMap<String, CPSWorker.ResultTypes>(name = "last_result_type")
 }
