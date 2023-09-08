@@ -4,16 +4,19 @@
     android:viewportWidth="105"
     android:viewportHeight="105">
   <path
+      android:name="O"
       android:pathData="M32.95,52.5m-6.45,0a6.45,6.45 0,1 1,12.9 0a6.45,6.45 0,1 1,-12.9 0"
       android:strokeWidth="2.5"
       android:strokeColor="@color/textColor"/>
   <path
+      android:name="["
       android:pathData="m47.5,46.05h-3.6v12.9h3.6"
       android:strokeLineJoin="miter"
       android:strokeWidth="2.5"
       android:strokeColor="@color/textColor"
       android:strokeLineCap="butt"/>
   <path
+      android:name="]"
       android:pathData="m74,46.05h3.6v12.9h-3.6"
       android:strokeLineJoin="miter"
       android:strokeWidth="2.5"
