@@ -23,7 +23,7 @@
       android:strokeColor="@color/textColor"
       android:strokeLineCap="butt"/>
   <path
-      android:pathData="m50.75,52.5 l6,6 15.5,-15.5"
+      android:pathData="m50.25,52.5 l6,6 15.5,-15.5"
       android:strokeLineJoin="miter"
       android:strokeWidth="2.7"
       android:strokeColor="@color/success"
