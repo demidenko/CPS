@@ -88,6 +88,7 @@ dependencies {
 
     val accompanist_version = "0.30.0"
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanist_version")
+    implementation("com.google.accompanist:accompanist-permissions:$accompanist_version")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
