@@ -26,6 +26,7 @@ class CPSColors(
     val divider: Color,
     val success: Color,
     val error: Color,
+    val warning: Color,
     private val votedRatingNegative: Color,
     val newEntry: Color,
     val useOriginalHandleColors: Boolean,
@@ -56,6 +57,7 @@ internal fun lightCPSColors(useOriginalHandleColors: Boolean) = CPSColors(
     divider = Color(85, 85, 85),
     success = Color(0, 128, 0),
     error = Color(221, 34, 34),
+    warning = Color(240, 185, 0),
     votedRatingNegative = Color(128, 128, 128),
     newEntry = Color(0xFF669900), //android:color/holo_green_dark,
     useOriginalHandleColors = useOriginalHandleColors,
@@ -84,6 +86,7 @@ internal fun darkCPSColors(useOriginalHandleColors: Boolean) = CPSColors(
     divider = Color(85, 85, 85),
     success = Color(51, 153, 51),
     error = Color(200, 64, 64),
+    warning = Color(189, 144, 23),
     votedRatingNegative = Color(150, 150, 150),
     newEntry = Color(0xFF99CC00), //android:color/holo_green_light
     useOriginalHandleColors = useOriginalHandleColors,
