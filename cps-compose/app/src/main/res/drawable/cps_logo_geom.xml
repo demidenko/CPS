@@ -5,7 +5,7 @@
     android:viewportHeight="105">
   <path
       android:name="O"
-      android:pathData="M32.95,52.5m-6.45,0a6.45,6.45 0,1 1,12.9 0a6.45,6.45 0,1 1,-12.9 0"
+      android:pathData="M32,52.5m-6.45,0a6.45,6.45 0,1 1,12.9 0a6.45,6.45 0,1 1,-12.9 0"
       android:strokeWidth="2.5"
       android:strokeColor="@color/textColor"/>
   <path
