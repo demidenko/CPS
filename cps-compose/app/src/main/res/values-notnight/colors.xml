@@ -4,5 +4,5 @@
     <color name="backgroundColor">#F8F8F8</color>
 
     <color name="success">#008000</color>
-    <color name="fail">#DD2222</color>
+    <color name="fail">#C80020</color>
 </resources>
