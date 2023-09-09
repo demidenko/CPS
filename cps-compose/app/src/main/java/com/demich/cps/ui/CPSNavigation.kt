@@ -56,8 +56,6 @@ class CPSNavigator(
     private val menuBuilderState: MutableState<CPSMenuBuilder?>,
     private val bottomBarBuilderState: MutableState<AdditionalBottomBarBuilder?>
 ) {
-
-    val subtitle by subtitleState
     val currentScreen by currentScreenState
 
     val isBottomBarEnabled: Boolean
@@ -128,7 +126,7 @@ class CPSNavigator(
     @Composable
     fun TopBar() {
         CPSTopBar(
-            navigator = this,
+            subtitle = { subtitleState.value },
             additionalMenu = menuBuilderState.value
         )
     }

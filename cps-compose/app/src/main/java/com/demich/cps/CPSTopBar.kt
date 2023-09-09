@@ -4,20 +4,38 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.Divider
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.*
+import com.demich.cps.ui.CPSDefaults
+import com.demich.cps.ui.CPSDropdownMenuButton
+import com.demich.cps.ui.CPSIconButton
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.CPSMenuBuilder
+import com.demich.cps.ui.StatusBarButtonsForUIPanel
 import com.demich.cps.ui.dialogs.CPSAboutDialog
+import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.DarkLightMode
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
@@ -26,7 +44,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CPSTopBar(
-    navigator: CPSNavigator,
+    subtitle: () -> String,
     additionalMenu: CPSMenuBuilder?,
 ) {
     var showUIPanel by rememberSaveable { mutableStateOf(false) }
@@ -43,7 +61,7 @@ fun CPSTopBar(
             .fillMaxHeight()
         ) {
             CPSTitle(
-                subtitle = { navigator.subtitle },
+                subtitle = subtitle,
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterStart)
