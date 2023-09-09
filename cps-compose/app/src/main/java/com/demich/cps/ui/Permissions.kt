@@ -8,8 +8,10 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
+import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -43,17 +45,20 @@ private fun NotificationPermissionsPanel(modifier: Modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
-                .background(color = cpsColors.backgroundAdditional)
-                .padding(all = 5.dp)
+                .background(color = cpsColors.error)
+                .padding(all = 8.dp)
         ) {
             Text(
-                text = "The features you turned on use notifications for full functionality. Please grant the permission for CPS to post notifications.",
+                text = "Some features you turned on use notifications for full functionality. Please grant the permission for CPS to post notifications.",
                 fontWeight = FontWeight.SemiBold,
-                color = cpsColors.error
+                color = contentColorFor(cpsColors.error)
             )
-            Button(
+            OutlinedButton(
                 onClick = { state.launchPermissionRequest() },
-                content = { Text("Request permission") }
+                content = { Text("Request permission") },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = cpsColors.backgroundAdditional
+                )
             )
         }
     }
