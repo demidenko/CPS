@@ -102,7 +102,8 @@ class CPSNavigator(
 
         fun setSubtitle(vararg words: String) {
             if (screen == currentScreen) {
-                subtitleState.value = words.joinToString(prefix = "::", separator = ".") { it.lowercase() }
+                subtitleState.value =
+                    words.joinToString(prefix = "::", separator = ".", transform = String::lowercase)
             }
         }
     }
