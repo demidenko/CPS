@@ -25,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -101,10 +102,15 @@ fun CPSTopBar(
 private fun CPSTitle(
     subtitle: () -> String,
     modifier: Modifier = Modifier,
-    fontSize: TextUnit = 16.sp
+    fontSize: TextUnit = 15.sp
 ) {
-    Column(modifier = modifier) {
-        ProvideTextStyle(value = CPSDefaults.MonospaceTextStyle.copy(fontSize = fontSize)) {
+    ProvideTextStyle(
+        value = CPSDefaults.MonospaceTextStyle.copy(
+            fontSize = fontSize,
+            fontWeight = FontWeight.SemiBold
+        )
+    ) {
+        Column(modifier = modifier) {
             Text(
                 text = "Competitive Programming && Solving",
                 color = cpsColors.content,
