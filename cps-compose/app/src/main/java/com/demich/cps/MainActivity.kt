@@ -62,7 +62,9 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.currentDataKey
 import com.demich.cps.workers.enqueueEnabledWorkers
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -238,7 +240,9 @@ val LocalCodeforcesAccountManager = staticCompositionLocalOf<CodeforcesAccountMa
 private suspend fun appStartUp(context: Context) {
     //init items with dynamic defaults
     //TODO: not perfect solution, default still can run multiple times
-    context.settingsNews.codeforcesLocale.update { it }
+    withContext(Dispatchers.IO) {
+        context.settingsNews.codeforcesLocale.update { it }
+    }
 
     //workers
     context.enqueueEnabledWorkers()
