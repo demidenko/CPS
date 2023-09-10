@@ -48,7 +48,7 @@ class ContestsFilterController(
     }
 
     companion object {
-        val saver = listSaver<ContestsFilterController, String>(
+        val saver get() = listSaver<ContestsFilterController, String>(
             save = {
                 listOf(it.filter, it.enabled.toString(), it.available.toString())
             },
