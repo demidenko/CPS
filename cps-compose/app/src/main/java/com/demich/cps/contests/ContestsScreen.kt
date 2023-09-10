@@ -164,23 +164,26 @@ private fun ContestsList(
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
-    val filteredContests by remember(contests, filterController) {
+    val contestsSortedState = rememberWith(contests()) {
+        mutableStateOf(this)
+    }
+
+    val filteredState = remember(contestsSortedState, filterController) {
         derivedStateOf {
-            filterController.filterContests(contests())
+            filterController.filterContests(contestsSortedState.value)
         }
     }
 
     ProvideTimeEachSecond {
-        val finalContestsState = rememberWith(filteredContests) {
-            mutableStateOf(this)
-        }.apply {
+        contestsSortedState.apply {
             value.let {
                 val comparator = Contest.getComparator(LocalCurrentTime.current)
                 if (!it.isSortedWith(comparator)) value = it.sortedWith(comparator)
             }
         }
+
         ContestsColumn(
-            contestsState = finalContestsState,
+            contestsState = filteredState,
             modifier = modifier
         )
     }
@@ -188,7 +191,7 @@ private fun ContestsList(
 
 @Composable
 private fun ContestsColumn(
-    contestsState: State<List<Contest>>,
+    contestsState: State<List<Contest>>, //seems like () -> List<Contest> is not stable
     modifier: Modifier = Modifier
 ) {
     val context = context
