@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.utils.containsTokensAsSubsequence
 
 
 @Composable
@@ -60,28 +61,19 @@ class ContestsFilterController(
                 )
             }
         )
+
+        private val whiteSpaceRegex = "\\s+".toRegex()
     }
 }
 
-private val whiteSpaceRegex = "\\s+".toRegex()
-
-//can't resist to note that it be solved in O(nlogn) by suffix array + segment tree
-private fun String.containsTokensAsSubsequence(tokens: List<String>, ignoreCase: Boolean = false): Boolean {
-    var i = 0
-    for (token in tokens) {
-        val pos = indexOf(string = token, ignoreCase = ignoreCase, startIndex = i)
-        if (pos == -1) return false
-        i = pos + token.length
-    }
-    return true
-}
-
-private fun checkString(string: String, tokens: List<String>) =
-    string.containsTokensAsSubsequence(tokens = tokens, ignoreCase = true)
+private fun List<String>.check(string: String) =
+    string.containsTokensAsSubsequence(tokens = this, ignoreCase = true)
 
 private fun checkContest(contest: Contest, tokens: List<String>): Boolean {
-    if (checkString(contest.title, tokens)) return true
-    if (contest.platform != Contest.Platform.unknown && checkString(contest.platform.name, tokens)) return true
-    contest.host?.let { if (checkString(it, tokens)) return true }
+    with(contest) {
+        if (tokens.check(title)) return true
+        if (platform != Contest.Platform.unknown && tokens.check(platform.name)) return true
+        host?.let { if (tokens.check(it)) return true }
+    }
     return false
 }

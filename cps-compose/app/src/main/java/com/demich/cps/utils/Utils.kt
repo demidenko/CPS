@@ -43,6 +43,17 @@ inline fun firstFalse(first: Int, last: Int, pred: (Int) -> Boolean): Int {
     return r
 }
 
+//couldn't resist to note that it can be solved in O(nlogn) by suffix array + segment tree
+fun String.containsTokensAsSubsequence(tokens: List<String>, ignoreCase: Boolean = false): Boolean {
+    var i = 0
+    for (token in tokens) {
+        val pos = indexOf(string = token, ignoreCase = ignoreCase, startIndex = i)
+        if (pos == -1) return false
+        i = pos + token.length
+    }
+    return true
+}
+
 inline fun <T, R> Iterable<T>.mapToSet(transform: (T) -> R): Set<R> = mapTo(mutableSetOf(), transform)
 
 fun<K, V> Map<K, List<V>>.append(key: K, value: V): Map<K, List<V>> =
