@@ -38,6 +38,7 @@ internal fun ContestExpandedItemContent(
     )
     ContestItemHeader(
         platform = contest.platform,
+        platformName = contest.host ?: contest.platform.name,
         contestTitle = contest.title,
         phase = data.phase,
         modifier = Modifier.fillMaxWidth()
@@ -52,6 +53,7 @@ internal fun ContestExpandedItemContent(
 @Composable
 private fun ContestItemHeader(
     platform: Contest.Platform,
+    platformName: String,
     contestTitle: String,
     phase: Contest.Phase,
     modifier: Modifier = Modifier
@@ -67,11 +69,12 @@ private fun ContestItemHeader(
                 color = cpsColors.contentAdditional
             )
             Text(
-                text = platform.name,
+                text = platformName,
                 style = CPSDefaults.MonospaceTextStyle.copy(
                     fontSize = 13.sp,
                     color = cpsColors.contentAdditional
                 ),
+                maxLines = 1,
                 modifier = Modifier.padding(start = 5.dp)
             )
         }
