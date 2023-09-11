@@ -55,15 +55,18 @@ fun rememberCodeforcesBlogEntriesController(
         snapshotFlow {
             if (!controller.isTabVisible(tab)) return@snapshotFlow IntRange.EMPTY
             listState.visibleRange(0.75f)
-        }.combine(flowOfIds) { visibleRange, ids ->
-            //empty ids can create Empty message item!!
-            if (ids.isNotEmpty()) {
-                newEntriesItem.markAtLeast(
-                    ids = visibleRange.map { ids[it] },
-                    type = NewEntryType.SEEN
-                )
+        }.combine(flowOfIds) { visibleRange, ids -> visibleRange to ids }
+            .debounce(250.milliseconds)
+            .onEach { (visibleRange, ids) ->
+                //empty ids can create Empty message item!!
+                if (ids.isNotEmpty()) {
+                    newEntriesItem.markAtLeast(
+                        ids = visibleRange.map { ids[it] },
+                        type = NewEntryType.SEEN
+                    )
+                }
             }
-        }.debounce(250.milliseconds).launchIn(this)
+            .launchIn(this)
     }
 
     val scope = rememberCoroutineScope()
