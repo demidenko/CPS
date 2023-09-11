@@ -46,6 +46,7 @@ private fun ClistContest.toContest(): Contest {
         title = event,
         startTime = Instant.parse(start+"Z"),
         endTime = Instant.parse(end+"Z"),
-        link = href
+        link = href,
+        host = host.takeIf { platform == Contest.Platform.unknown }
     )
 }

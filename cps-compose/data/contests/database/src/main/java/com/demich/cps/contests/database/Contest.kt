@@ -14,7 +14,8 @@ data class Contest (
     val title: String,
     val startTime: Instant,
     val duration: Duration,
-    val link: String? = null
+    val link: String? = null,
+    val host: String? = null
 ) {
     val compositeId get() = platform to id
 
@@ -32,14 +33,16 @@ data class Contest (
         title: String,
         startTime: Instant,
         endTime: Instant,
-        link: String? = null
+        link: String? = null,
+        host: String? = null
     ): this(
         platform = platform,
         id = id,
         title = title,
         startTime = startTime,
         duration = endTime - startTime,
-        link = link
+        link = link,
+        host = host
     )
 
     enum class Phase {

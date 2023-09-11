@@ -9,9 +9,10 @@ import com.demich.cps.features.room.InstantSecondsConverter
 
 @Database(
     entities = [Contest::class],
-    version = 2,
+    version = 3,
     autoMigrations = [
-        AutoMigration(from = 1, to = 2, spec = ContestsDatabase.DurationRenameMigration::class)
+        AutoMigration(from = 1, to = 2, spec = ContestsDatabase.DurationRenameMigration::class),
+        AutoMigration(from = 2, to = 3)
     ]
 )
 @TypeConverters(
