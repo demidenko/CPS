@@ -80,7 +80,8 @@ private fun checkString(string: String, tokens: List<String>) =
     string.containsTokensAsSubsequence(tokens = tokens, ignoreCase = true)
 
 private fun checkContest(contest: Contest, tokens: List<String>): Boolean {
-    if(checkString(contest.title, tokens)) return true
-    if(contest.platform != Contest.Platform.unknown && checkString(contest.platform.name, tokens)) return true
+    if (checkString(contest.title, tokens)) return true
+    if (contest.platform != Contest.Platform.unknown && checkString(contest.platform.name, tokens)) return true
+    contest.host?.let { if (checkString(it, tokens)) return true }
     return false
 }
