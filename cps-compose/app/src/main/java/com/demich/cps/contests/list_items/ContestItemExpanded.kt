@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,9 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSDropdownMenuButton
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LocalCurrentTime
@@ -54,23 +56,30 @@ private fun ContestItemHeader(
     phase: Contest.Phase,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier = modifier) {
-        ContestPlatformIcon(
-            platform = platform,
-            modifier = Modifier
-                .padding(end = 4.dp)
-                .padding(all = 5.dp)
-                .align(Alignment.Top),
-            size = 30.sp,
-            color = if (phase == Contest.Phase.FINISHED) cpsColors.contentAdditional else cpsColors.content
-        )
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ContestPlatformIcon(
+                platform = platform,
+                size = 18.sp,
+                color = cpsColors.contentAdditional
+            )
+            Text(
+                text = platform.name,
+                style = CPSDefaults.MonospaceTextStyle.copy(
+                    fontSize = 13.sp,
+                    color = cpsColors.contentAdditional
+                ),
+                modifier = Modifier.padding(start = 5.dp)
+            )
+        }
         ContestColoredTitle(
             contestTitle = contestTitle,
             phase = phase,
             singleLine = false,
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically)
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -116,10 +125,12 @@ private fun ContestItemFooter(
             onDeleteRequest = onDeleteRequest
         )
         if (counter.isNotBlank()) {
-            MonospacedText(
+            Text(
                 text = counter,
-                fontSize = 15.sp,
-                color = cpsColors.contentAdditional
+                style = CPSDefaults.MonospaceTextStyle.copy(
+                    fontSize = 15.sp,
+                    color = cpsColors.contentAdditional
+                )
             )
         }
     }
@@ -135,16 +146,13 @@ private fun ContestItemDatesAndMenuButton(
 ) {
     Box(modifier = modifier) {
         Column(modifier = Modifier.align(Alignment.CenterStart)) {
-            MonospacedText(
-                text = startTime,
+            ProvideTextStyle(value = CPSDefaults.MonospaceTextStyle.copy(
                 fontSize = 15.sp,
                 color = cpsColors.contentAdditional
-            )
-            MonospacedText(
-                text = endTime,
-                fontSize = 15.sp,
-                color = cpsColors.contentAdditional
-            )
+            )) {
+                Text(text = startTime)
+                Text(text = endTime)
+            }
         }
         ContestItemMenuButton(
             contestLink = contestLink,
