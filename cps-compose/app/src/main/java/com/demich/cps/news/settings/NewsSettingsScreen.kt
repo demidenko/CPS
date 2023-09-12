@@ -1,9 +1,11 @@
 package com.demich.cps.news.settings
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -26,14 +28,24 @@ import com.demich.cps.workers.NewsWorker
 import com.demich.cps.workers.ProjectEulerRecentProblemsWorker
 import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesLocale
+import com.demich.cps.utils.rememberWith
 import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.flowBy
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
 @Composable
 fun NewsSettingsScreen() {
-    SettingsColumn {
+    val requiredPermissions by rememberWith(context) {
+        flowOfNotificationPermissionsRequired(this)
+    }.collectAsState(initial = false)
+
+    SettingsColumn(
+        requiredNotificationPermissions = requiredPermissions,
+        modifier = Modifier.fillMaxHeight()
+    ) {
         SettingsSectionHeader(
             title = "codeforces",
             painter = platformIconPainter(platform = Contest.Platform.codeforces)
@@ -50,6 +62,11 @@ fun NewsSettingsScreen() {
         NewsFeedsSettingsItem()
     }
 }
+
+private fun flowOfNotificationPermissionsRequired(context: Context): Flow<Boolean> =
+    context.settingsNews.flowBy { prefs ->
+        prefs[codeforcesFollowEnabled] || prefs[enabledNewsFeeds].isNotEmpty()
+    }
 
 @Composable
 private fun CodeforcesDefaultTabSettingsItem() {

@@ -32,19 +32,32 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsColumn(
-    border: Dp = 10.dp,
+    modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val border: Dp = 10.dp
     //spaceBy adds space only between items but start + end required too
     Column(
         verticalArrangement = Arrangement.spacedBy(border),
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = border)
             .verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = Modifier.fillMaxWidth())
         content()
         Spacer(modifier = Modifier.fillMaxWidth())
+    }
+}
+
+@Composable
+fun SettingsColumn(
+    requiredNotificationPermissions: Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(modifier = modifier) {
+        SettingsColumn(content = content, modifier = Modifier.weight(1f))
+        NotificationPermissionsPanel(permissionsRequired = requiredNotificationPermissions)
     }
 }
 
