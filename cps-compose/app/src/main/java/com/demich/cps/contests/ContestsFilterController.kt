@@ -41,6 +41,8 @@ class ContestsFilterController(
             if (!value) enabled = false
         }
 
+    private val whiteSpaceRegex = "\\s+".toRegex()
+
     fun filterContests(contests: List<Contest>): List<Contest> {
         val tokens = filter.trim().also {
             if (it.isEmpty()) return contests
@@ -61,8 +63,6 @@ class ContestsFilterController(
                 )
             }
         )
-
-        private val whiteSpaceRegex = "\\s+".toRegex()
     }
 }
 
