@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -148,15 +147,14 @@ private fun ContestItemDatesAndMenuButton(
     onDeleteRequest: () -> Unit
 ) {
     Box(modifier = modifier) {
-        Column(modifier = Modifier.align(Alignment.CenterStart)) {
-            ProvideTextStyle(value = CPSDefaults.MonospaceTextStyle.copy(
+        Text(
+            text = "$startTime - $endTime",
+            style = CPSDefaults.MonospaceTextStyle.copy(
                 fontSize = 15.sp,
                 color = cpsColors.contentAdditional
-            )) {
-                Text(text = startTime)
-                Text(text = endTime)
-            }
-        }
+            ),
+            modifier = Modifier.align(Alignment.Center)
+        )
         ContestItemMenuButton(
             contestLink = contestLink,
             modifier = Modifier.align(Alignment.CenterEnd),
