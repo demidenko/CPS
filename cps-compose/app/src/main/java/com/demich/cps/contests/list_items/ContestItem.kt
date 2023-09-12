@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
@@ -31,21 +33,20 @@ fun ContestItem(
     onDeleteRequest: () -> Unit
 ) {
     Column(modifier = modifier) {
-        if (!isExpanded()) ContestItemContent(contest = contest)
-        else ContestExpandedItemContent(contest = contest, onDeleteRequest = onDeleteRequest)
+        val data by rememberUpdatedState(
+            //TODO: recompose twice per second! (wtf?)
+            contestData(contest = contest, currentTime = LocalCurrentTime.current)
+        )
+        if (!isExpanded()) ContestItemContent(data = data)
+        else ContestExpandedItemContent(data = data, onDeleteRequest = onDeleteRequest)
     }
 }
 
 @Composable
-private fun ContestItemContent(contest: Contest) {
-    //TODO: recompose twice per second! (wtf?)
-    val data = contestData(
-        contest = contest,
-        currentTime = LocalCurrentTime.current
-    )
+private fun ContestItemContent(data: ContestData) {
     ContestItemHeader(
-        platform = contest.platform,
-        contestTitle = contest.title,
+        platform = data.contest.platform,
+        contestTitle = data.contest.title,
         phase = data.phase,
         modifier = Modifier.fillMaxWidth()
     )

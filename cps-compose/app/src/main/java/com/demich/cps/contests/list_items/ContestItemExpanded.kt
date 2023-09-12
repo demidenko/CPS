@@ -22,119 +22,99 @@ import com.demich.cps.ui.CPSDropdownMenuButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 
 @Composable
 internal fun ContestExpandedItemContent(
+    data: ContestData,
+    onDeleteRequest: () -> Unit
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        ContestPlatform(
+            platform = data.contest.platform,
+            platformName = data.contest.host ?: data.contest.platform.name
+        )
+        ContestTitle(
+            contestTitle = data.contest.title,
+            phase = data.phase
+        )
+        ContestItemDatesAndMenuButton(
+            contest = data.contest,
+            onDeleteRequest = onDeleteRequest
+        )
+        ContestCounter(
+            counter = when (data.phase) {
+                Contest.Phase.BEFORE -> "starts in " + data.counter
+                Contest.Phase.RUNNING -> "ends in " + data.counter
+                Contest.Phase.FINISHED -> ""
+            }
+        )
+    }
+}
+
+@Composable
+private fun ContestPlatform(
+    platform: Contest.Platform,
+    platformName: String
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        ContestPlatformIcon(
+            platform = platform,
+            size = 18.sp,
+            color = cpsColors.contentAdditional
+        )
+        Text(
+            text = platformName,
+            style = CPSDefaults.MonospaceTextStyle.copy(
+                fontSize = 13.sp,
+                color = cpsColors.contentAdditional
+            ),
+            maxLines = 1,
+            modifier = Modifier.padding(start = 5.dp)
+        )
+    }
+}
+
+@Composable
+private fun ContestTitle(
+    contestTitle: String,
+    phase: Contest.Phase
+) {
+    ContestColoredTitle(
+        contestTitle = contestTitle,
+        phase = phase,
+        singleLine = false,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+private fun ContestItemDatesAndMenuButton(
     contest: Contest,
     onDeleteRequest: () -> Unit
 ) {
-    val data = contestData(
-        contest = contest,
-        currentTime = LocalCurrentTime.current
-    )
-    ContestItemHeader(
-        platform = contest.platform,
-        platformName = contest.host ?: contest.platform.name,
-        contestTitle = contest.title,
-        phase = data.phase,
-        modifier = Modifier.fillMaxWidth()
-    )
-    ContestItemFooter(
-        data = data,
+    ContestItemDatesAndMenuButton(
+        startTime = contest.startTime.contestDate(),
+        endTime = contest.endTime.contestDate(),
+        contestLink = contest.link,
         modifier = Modifier.fillMaxWidth(),
         onDeleteRequest = onDeleteRequest
     )
 }
 
 @Composable
-private fun ContestItemHeader(
-    platform: Contest.Platform,
-    platformName: String,
-    contestTitle: String,
-    phase: Contest.Phase,
-    modifier: Modifier = Modifier
+private fun ContestCounter(
+    counter: String
 ) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            ContestPlatformIcon(
-                platform = platform,
-                size = 18.sp,
+    if (counter.isNotBlank()) {
+        Text(
+            text = counter,
+            style = CPSDefaults.MonospaceTextStyle.copy(
+                fontSize = 15.sp,
                 color = cpsColors.contentAdditional
             )
-            Text(
-                text = platformName,
-                style = CPSDefaults.MonospaceTextStyle.copy(
-                    fontSize = 13.sp,
-                    color = cpsColors.contentAdditional
-                ),
-                maxLines = 1,
-                modifier = Modifier.padding(start = 5.dp)
-            )
-        }
-        ContestColoredTitle(
-            contestTitle = contestTitle,
-            phase = phase,
-            singleLine = false,
-            modifier = Modifier.fillMaxWidth()
         )
-    }
-}
-
-@Composable
-private fun ContestItemFooter(
-    data: ContestData,
-    modifier: Modifier = Modifier,
-    onDeleteRequest: () -> Unit
-) {
-    ContestItemFooter(
-        startTime = data.contest.startTime.contestDate(),
-        endTime = data.contest.endTime.contestDate(),
-        contestLink = data.contest.link,
-        counter = when (data.phase) {
-            Contest.Phase.BEFORE -> "starts in " + data.counter
-            Contest.Phase.RUNNING -> "ends in " + data.counter
-            Contest.Phase.FINISHED -> ""
-        },
-        modifier = modifier,
-        onDeleteRequest = onDeleteRequest
-    )
-}
-
-@Composable
-private fun ContestItemFooter(
-    startTime: String,
-    endTime: String,
-    contestLink: String?,
-    counter: String,
-    modifier: Modifier = Modifier,
-    onDeleteRequest: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-    ) {
-        ContestItemDatesAndMenuButton(
-            startTime = startTime,
-            endTime = endTime,
-            contestLink = contestLink,
-            modifier = Modifier.fillMaxWidth(),
-            onDeleteRequest = onDeleteRequest
-        )
-        if (counter.isNotBlank()) {
-            Text(
-                text = counter,
-                style = CPSDefaults.MonospaceTextStyle.copy(
-                    fontSize = 15.sp,
-                    color = cpsColors.contentAdditional
-                )
-            )
-        }
     }
 }
 
