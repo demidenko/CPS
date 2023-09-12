@@ -1,7 +1,6 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.news.settings.settingsNews
@@ -37,9 +36,7 @@ class CodeforcesNewsFollowWorker(
             setSmallIcon(R.drawable.ic_logo_codeforces)
             setSilent(true)
             setShowWhen(false)
-        }.apply {
-            setForeground(ForegroundInfo(notificationId, build()))
-        }
+        }.also { setForeground(it) }
 
         val dao = context.followListDao
         val savedHandles = dao.getHandles().shuffled()

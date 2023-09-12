@@ -3,9 +3,8 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
-import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
-import com.demich.cps.*
+import com.demich.cps.R
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorNotifier
@@ -32,9 +31,8 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         val contestId = monitor.contestId.flow.filterNotNull().first()
         val handle = monitor.handle()
 
-        val notificationBuilder = createNotificationBuilder(handle).apply {
-            setForeground(ForegroundInfo(notificationId, build()))
-        }
+        val notificationBuilder = createNotificationBuilder(handle)
+            .also { setForeground(it) }
 
         withContext(Dispatchers.IO) {
             monitor.launchIn(

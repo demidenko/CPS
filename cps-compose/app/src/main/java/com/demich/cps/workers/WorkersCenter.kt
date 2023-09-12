@@ -1,9 +1,12 @@
 package com.demich.cps.workers
 
 import android.content.Context
+import android.content.pm.ServiceInfo
+import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.work.*
+import com.demich.cps.notifications.NotificationBuilder
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.toJavaDuration
@@ -90,4 +93,12 @@ internal fun WorkManager.enqueueCodeforcesMonitorWorker(replace: Boolean) {
         if (replace) ExistingWorkPolicy.REPLACE else ExistingWorkPolicy.KEEP,
         requestBuilder.build()
     )
+}
+
+internal suspend fun CoroutineWorker.setForeground(builder: NotificationBuilder) {
+    setForeground(ForegroundInfo(
+        builder.notificationId,
+        builder.build(),
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC else 0
+    ))
 }
