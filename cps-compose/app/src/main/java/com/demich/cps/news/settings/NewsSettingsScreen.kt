@@ -43,7 +43,7 @@ fun NewsSettingsScreen() {
     }.collectAsState(initial = false)
 
     SettingsColumn(
-        requiredNotificationPermissions = requiredPermissions,
+        requiredNotificationsPermission = requiredPermissions,
         modifier = Modifier.fillMaxHeight()
     ) {
         SettingsSectionHeader(

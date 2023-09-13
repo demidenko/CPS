@@ -21,6 +21,7 @@ import com.demich.cps.utils.context
 import com.demich.cps.workers.AccountsWorker
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
+import kotlinx.coroutines.flow.Flow
 
 
 class AtCoderAccountManager :
@@ -101,6 +102,9 @@ class AtCoderAccountManager :
             stopWorkOnUnchecked = false
         )
     }
+
+    override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
+        AtCoderAccountSettingsDataStore(context).observeRating.flow
 
 }
 

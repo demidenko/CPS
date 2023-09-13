@@ -35,6 +35,8 @@ import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
+import com.demich.datastore_itemized.flowBy
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import kotlin.text.contains
 
@@ -179,6 +181,14 @@ class CodeforcesAccountManager :
             stopWorkOnUnchecked = false
         )
     }
+
+    override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
+        CodeforcesAccountSettingsDataStore(context).flowBy { prefs ->
+            prefs[observeRating] or
+            prefs[monitorEnabled] or
+            prefs[upsolvingSuggestionsEnabled] or
+            prefs[observeContribution]
+        }
 
     suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange, context: Context) {
         dataStore(context).applyRatingChange(ratingChange = ratingChange.toRatingChange())

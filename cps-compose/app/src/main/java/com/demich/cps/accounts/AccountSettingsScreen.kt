@@ -17,6 +17,8 @@ import com.demich.cps.ui.SettingsItem
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.rememberWith
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun AccountSettingsScreen(
@@ -51,7 +53,13 @@ private fun UserInfoSettings(
     userInfo: UserInfo,
     onUserIdClick: () -> Unit
 ) {
-    SettingsColumn {
+    val requiredPermission by rememberWith(context) {
+        (manager as? AccountSettingsProvider)
+            ?.flowOfRequiredNotificationsPermission(this)
+            ?: flowOf(false)
+    }.collectAsState(initial = false)
+
+    SettingsColumn(requiredNotificationsPermission = requiredPermission) {
         UserIdSettingsItem(
             userId = userInfo.userId,
             userIdTitle = manager.userIdTitle,

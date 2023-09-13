@@ -51,13 +51,13 @@ fun SettingsColumn(
 
 @Composable
 fun SettingsColumn(
-    requiredNotificationPermissions: Boolean,
+    requiredNotificationsPermission: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(modifier = modifier) {
         SettingsColumn(content = content, modifier = Modifier.weight(1f))
-        NotificationPermissionsPanel(permissionsRequired = requiredNotificationPermissions)
+        NotificationsPermissionPanel(permissionRequired = requiredNotificationsPermission)
     }
 }
 

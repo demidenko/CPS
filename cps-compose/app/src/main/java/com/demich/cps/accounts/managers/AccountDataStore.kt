@@ -9,6 +9,7 @@ import com.demich.datastore_itemized.DataStoreWrapper
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
+import kotlinx.coroutines.flow.Flow
 
 abstract class AccountDataStore<U: UserInfo>(
     dataStoreWrapper: DataStoreWrapper
@@ -67,4 +68,6 @@ interface AccountSettingsProvider {
 
     @Composable
     fun SettingsItems() {}
+
+    fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean>? = null
 }
