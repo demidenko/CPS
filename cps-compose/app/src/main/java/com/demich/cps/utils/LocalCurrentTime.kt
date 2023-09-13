@@ -21,8 +21,9 @@ val LocalCurrentTime = compositionLocalOf<Instant> {
     throw IllegalAccessException("current time not provided")
 }
 
-private fun flowOfFlooredCurrentTime(period: Duration): Flow<Instant> =
+fun flowOfFlooredCurrentTime(period: Duration): Flow<Instant> =
     flow {
+        require(period.isPositive())
         while (currentCoroutineContext().isActive) {
             val currentTime = getCurrentTime()
             emit(currentTime.floorBy(period))
@@ -31,8 +32,7 @@ private fun flowOfFlooredCurrentTime(period: Duration): Flow<Instant> =
     }
 
 @Composable
-fun collectCurrentTimeAsState(period: Duration): State<Instant> {
-    require(period.isPositive())
+fun currentTimeAsState(period: Duration): State<Instant> {
     return remember(key1 = period) {
         flowOfFlooredCurrentTime(period = period)
     }.collectAsStateWithLifecycle(initialValue = remember { getCurrentTime().floorBy(period) })
@@ -40,7 +40,7 @@ fun collectCurrentTimeAsState(period: Duration): State<Instant> {
 
 @Composable
 private fun ProvideCurrentTime(period: Duration, content: @Composable () -> Unit) {
-    val currentTime by collectCurrentTimeAsState(period)
+    val currentTime by currentTimeAsState(period)
     CompositionLocalProvider(LocalCurrentTime provides currentTime, content = content)
 }
 

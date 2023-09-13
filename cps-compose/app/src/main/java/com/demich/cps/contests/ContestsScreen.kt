@@ -43,10 +43,14 @@ import com.demich.cps.workers.ContestsWorker
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.flowBy
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -117,6 +121,26 @@ private fun flowOfContestsToShow(context: Context) =
             if (ignored.isEmpty()) list
             else list.filter { contest -> contest.compositeId !in ignored }
         }
+
+
+private fun flowOfSortedContestsWithTime(context: Context): Flow<Pair<List<Contest>, Instant>> {
+    var last: List<Contest> = emptyList()
+    var sortedLast: List<Contest> = emptyList()
+    return combineTransform(
+        flow = flowOfContestsToShow(context),
+        flow2 = flowOfFlooredCurrentTime(1.seconds)
+    ) { contests, currentTime ->
+        if (last != contests) {
+            last = contests
+            sortedLast = contests
+        }
+        val comparator = Contest.getComparator(currentTime)
+        if (!sortedLast.isSortedWith(comparator)) {
+            sortedLast = sortedLast.sortedWith(comparator)
+        }
+        emit(sortedLast to currentTime)
+    }
+}
 
 @Composable
 private fun ContestsContent(

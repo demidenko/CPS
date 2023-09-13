@@ -25,7 +25,7 @@ import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.collectCurrentTimeAsState
+import com.demich.cps.utils.currentTimeAsState
 import com.demich.cps.utils.rememberWith
 import com.demich.cps.utils.toHHMMSS
 import com.demich.cps.utils.toMMSS
@@ -119,7 +119,7 @@ private fun PhaseTitle(
 ) {
     when (contestPhase) {
         is CodeforcesMonitorData.ContestPhase.Coding -> {
-            val currentTime by collectCurrentTimeAsState(period = 1.seconds)
+            val currentTime by currentTimeAsState(period = 1.seconds)
             PhaseTitle(
                 phase = contestPhase.phase,
                 modifier = modifier,
