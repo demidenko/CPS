@@ -13,7 +13,7 @@ android {
         minSdk = 26
         targetSdk = 34
 
-        versionCode = 365
+        versionCode = 366
         versionName = "1.9.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -69,7 +69,7 @@ dependencies {
     implementation(libs.kotlin.coroutines)
     implementation(libs.kotlin.datetime)
 
-    implementation("androidx.core:core-ktx:1.10.1")
+    implementation("androidx.core:core-ktx:1.12.0")
 
     implementation(platform("androidx.compose:compose-bom:2023.09.00"))
     implementation("androidx.compose.ui:ui")
@@ -80,7 +80,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.navigation:navigation-compose:2.6.0")
 
-    val lifecycle_version = "2.6.1"
+    val lifecycle_version = "2.6.2"
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version")
 
