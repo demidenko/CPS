@@ -50,7 +50,7 @@ fun ProvideCurrentTime(currentTime: () -> Instant, content: @Composable () -> Un
 }
 
 @Composable
-private fun ProvideCurrentTime(currentTimeState: State<Instant>, content: @Composable () -> Unit) {
+fun ProvideCurrentTime(currentTimeState: State<Instant>, content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalCurrentTime provides currentTimeState.value, content = content)
 }
 

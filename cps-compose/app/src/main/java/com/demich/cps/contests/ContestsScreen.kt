@@ -140,15 +140,7 @@ private fun ContestsList(
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
-    val context = context
-    //TODO: produce to two states
-    val contestsWithTimeState = rememberCollectWithLifecycle {
-        flowOfSortedContestsWithTime(context)
-    }
-
-    val contestsToShowState = remember(contestsWithTimeState) {
-        derivedStateOf { contestsWithTimeState.value.contests }
-    }
+    val (contestsToShowState, currentTimeState) = produceSortedContestsWithTime()
 
     LaunchedEffect(contestsToShowState, filterController) {
         snapshotFlow { contestsToShowState.value.isEmpty() }
@@ -163,7 +155,7 @@ private fun ContestsList(
         }
     }
 
-    ProvideCurrentTime(currentTime = { contestsWithTimeState.value.currentTime }) {
+    ProvideCurrentTime(currentTimeState) {
         ContestsColumn(
             contestsState = filteredState,
             modifier = modifier
@@ -176,6 +168,7 @@ private fun ContestsColumn(
     contestsState: State<List<Contest>>, //seems like () -> List<Contest> is not stable
     modifier: Modifier = Modifier
 ) {
+    println("???")
     val context = context
     val scope = rememberCoroutineScope()
 
