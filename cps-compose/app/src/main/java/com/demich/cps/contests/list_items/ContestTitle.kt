@@ -3,6 +3,10 @@ package com.demich.cps.contests.list_items
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -38,13 +42,17 @@ internal fun ContestTitleExpanded(
     phase: Contest.Phase,
     modifier: Modifier = Modifier
 ) {
+    var isMultiline by remember { mutableStateOf(false) }
     Text(
-        text = title.makeTitle(),
+        text = title.makeTitle(useNewLine = isMultiline),
         color = colorFor(phase),
         fontSize = 19.sp,
         fontWeight = FontWeight.Bold,
         modifier = modifier,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        onTextLayout = {
+            isMultiline = it.lineCount > 1
+        }
     )
 }
 
@@ -59,11 +67,14 @@ private fun colorFor(phase: Contest.Phase): Color =
 
 @Composable
 @ReadOnlyComposable
-private fun String.makeTitle(): AnnotatedString =
+private fun String.makeTitle(useNewLine: Boolean = false): AnnotatedString =
     buildAnnotatedString {
         splitTrailingBrackets { title, brackets ->
             append(title)
-            if (brackets.isNotBlank()) append(brackets, color = cpsColors.contentAdditional)
+            if (brackets.isNotBlank()) {
+                if (useNewLine) append('\n')
+                append(brackets, color = cpsColors.contentAdditional)
+            }
         }
     }
 
