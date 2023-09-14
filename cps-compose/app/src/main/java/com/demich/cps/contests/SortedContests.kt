@@ -1,14 +1,24 @@
 package com.demich.cps.contests
 
 import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
+import com.demich.cps.utils.context
+import com.demich.cps.utils.floorBy
 import com.demich.cps.utils.flowOfFlooredCurrentTime
+import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.isSortedWith
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
 
@@ -42,4 +52,29 @@ internal fun flowOfSortedContestsWithTime(context: Context): Flow<SortedContests
         }
         emit(SortedContests(sortedLast, currentTime))
     }
+}
+
+@Composable
+internal fun produceSortedContestsWithTime(
+
+): Pair<State<List<Contest>>, State<Instant>> {
+    val context = context
+
+    val initPair = remember {
+        val contests = runBlocking { flowOfContests(context).first() }
+        val currentTime = getCurrentTime().floorBy(1.seconds)
+        SortedContests(
+            contests = contests.sortedWith(Contest.getComparator(currentTime)),
+            currentTime = currentTime
+        )
+    }
+
+    val contestsState = remember(initPair) { mutableStateOf(initPair.contests) }
+    val currentTimeState = remember(initPair) { mutableStateOf(initPair.currentTime) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    //TODO: launch collect
+
+    return Pair(contestsState, currentTimeState)
 }
