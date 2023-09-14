@@ -12,17 +12,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.append
 import com.demich.cps.utils.localCurrentTime
 
 @Composable
@@ -73,41 +68,12 @@ private fun ContestItemHeader(
             size = 18.sp,
             color = cpsColors.contentAdditional
         )
-        ContestColoredTitle(
-            contestTitle = contestTitle,
+        ContestTitleCollapsed(
+            title = contestTitle,
             phase = phase,
-            singleLine = true,
             modifier = Modifier.weight(1f)
         )
     }
-}
-
-@Composable
-internal fun ContestColoredTitle(
-    contestTitle: String,
-    phase: Contest.Phase,
-    singleLine: Boolean,
-    modifier: Modifier = Modifier
-) {
-    Text(
-        text = buildAnnotatedString {
-            splitTrailingBrackets(contestTitle) { title, brackets ->
-                append(title)
-                if (brackets.isNotBlank()) append(brackets, color = cpsColors.contentAdditional)
-            }
-        },
-        color = when (phase) {
-            Contest.Phase.BEFORE -> cpsColors.content
-            Contest.Phase.RUNNING -> cpsColors.success
-            Contest.Phase.FINISHED -> cpsColors.contentAdditional
-        },
-        fontSize = 19.sp,
-        fontWeight = FontWeight.Bold,
-        maxLines = if (singleLine) 1 else Int.MAX_VALUE,
-        overflow = if (singleLine) TextOverflow.Ellipsis else TextOverflow.Clip,
-        textAlign = if (singleLine) null else TextAlign.Center,
-        modifier = modifier
-    )
 }
 
 @Composable

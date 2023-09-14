@@ -81,10 +81,9 @@ private fun ContestTitle(
     contestTitle: String,
     phase: Contest.Phase
 ) {
-    ContestColoredTitle(
-        contestTitle = contestTitle,
+    ContestTitleExpanded(
+        title = contestTitle,
         phase = phase,
-        singleLine = false,
         modifier = Modifier.fillMaxWidth()
     )
 }
