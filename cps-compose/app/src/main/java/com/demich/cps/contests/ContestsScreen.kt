@@ -177,6 +177,7 @@ private fun ContestsList(
     modifier: Modifier = Modifier
 ) {
     val context = context
+    //TODO: produce to two states
     val contestsWithTimeState = rememberCollectWithLifecycle {
         flowOfSortedContestsWithTime(context)
     }
