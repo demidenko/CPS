@@ -2,10 +2,13 @@ package com.demich.cps.contests
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.utils.context
@@ -18,6 +21,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
@@ -74,7 +79,16 @@ internal fun produceSortedContestsWithTime(
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    //TODO: launch collect
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            //TODO: optimize emplace (??)
+            flowOfSortedContestsWithTime(context)
+                .onEach {
+                    contestsState.value = it.contests
+                    currentTimeState.value = it.currentTime
+                }.launchIn(this)
+        }
+    }
 
     return Pair(contestsState, currentTimeState)
 }
