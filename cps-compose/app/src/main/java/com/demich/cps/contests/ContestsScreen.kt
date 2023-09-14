@@ -147,16 +147,6 @@ private fun ContestsContent(
     filterController: ContestsFilterController
 ) {
     val context = context
-    val contestsToShowState = rememberCollectWithLifecycle {
-        flowOfContestsToShow(context)
-    }
-
-    LaunchedEffect(contestsToShowState, filterController) {
-        snapshotFlow { contestsToShowState.value.isEmpty() }
-            .collect {
-                filterController.available = !it
-            }
-    }
 
     val contestsViewModel = contestsViewModel()
     val errorsMessage by rememberCollect {
@@ -174,7 +164,6 @@ private fun ContestsContent(
                 .fillMaxWidth()
         )
         ContestsList(
-            contests = { contestsToShowState.value },
             filterController = filterController,
             modifier = Modifier
                 .fillMaxSize()
@@ -184,33 +173,45 @@ private fun ContestsContent(
 
 @Composable
 private fun ContestsList(
-    contests: () -> List<Contest>,
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
-    val contestsSortedState = rememberWith(contests()) {
-        mutableStateOf(this)
+    val context = context
+    val contestsWithTimeState = rememberCollectWithLifecycle {
+        flowOfSortedContestsWithTime(context)
     }
 
-    val filteredState = remember(contestsSortedState, filterController) {
-        derivedStateOf {
-            filterController.filterContests(contestsSortedState.value)
-        }
+    val contestsToShowState = remember(contestsWithTimeState) {
+        derivedStateOf { contestsWithTimeState.value.first }
     }
 
-    ProvideTimeEachSecond {
-        contestsSortedState.apply {
-            value.let {
-                val comparator = Contest.getComparator(LocalCurrentTime.current)
-                if (!it.isSortedWith(comparator)) value = it.sortedWith(comparator)
+    LaunchedEffect(contestsToShowState, filterController) {
+        snapshotFlow { contestsToShowState.value.isEmpty() }
+            .collect {
+                filterController.available = !it
             }
-        }
+    }
 
+    val filteredState = remember(contestsToShowState, filterController) {
+        derivedStateOf {
+            filterController.filterContests(contestsToShowState.value)
+        }
+    }
+
+    ProvideTimeEachSecond(contestsWithTimeState) {
         ContestsColumn(
             contestsState = filteredState,
             modifier = modifier
         )
     }
+}
+
+@Composable
+private fun ProvideTimeEachSecond(
+    state: State<Pair<List<Contest>, Instant>>,
+    content: @Composable () -> Unit
+) {
+    CompositionLocalProvider(LocalCurrentTime provides state.value.second, content = content)
 }
 
 @Composable
@@ -251,7 +252,8 @@ private fun ContestsColumn(
                     end = 7.dp,
                     top = 4.dp,
                     bottom = 3.dp
-                ).animateContentSize()
+                )
+                .animateContentSize()
         )
         Divider()
     }
