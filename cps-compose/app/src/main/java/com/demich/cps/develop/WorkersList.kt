@@ -90,7 +90,7 @@ private fun WorkerItem(
         workState = workState?.state ?: WorkInfo.State.CANCELLED,
         progressInfo = workState?.takeIf { it.state == WorkInfo.State.RUNNING }?.getProgressInfo(),
         lastRunTimeAgo = lastExecutionTime?.let {
-            timeAgo(fromTime = it, toTime = LocalCurrentTime.current)
+            timeAgo(fromTime = it, toTime = localCurrentTime)
         } ?: "never",
         lastResult = lastResult,
         modifier = modifier

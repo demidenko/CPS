@@ -2,9 +2,9 @@ package com.demich.cps.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.currentCoroutineContext
@@ -17,7 +17,12 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-val LocalCurrentTime = compositionLocalOf<Instant> {
+val localCurrentTime: Instant
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalCurrentTime.current
+
+private val LocalCurrentTime = compositionLocalOf<Instant> {
     throw IllegalAccessException("current time not provided")
 }
 

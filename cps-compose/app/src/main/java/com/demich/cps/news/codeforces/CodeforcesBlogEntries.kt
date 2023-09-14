@@ -22,8 +22,8 @@ import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.ui.*
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.context
+import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.timeAgo
 
 
@@ -76,7 +76,6 @@ private fun BlogEntryInfo(
     label: (@Composable (CodeforcesBlogEntry) -> Unit)?
 ) {
     val manager = LocalCodeforcesAccountManager.current
-    val currentTime = LocalCurrentTime.current
 
     BlogEntryInfo(
         title = blogEntry.title,
@@ -88,7 +87,7 @@ private fun BlogEntryInfo(
         commentsCount = blogEntry.commentsCount,
         timeAgo = timeAgo(
             fromTime = blogEntry.creationTime,
-            toTime = currentTime
+            toTime = localCurrentTime
         ),
         markNew = markNew,
         label = label?.let { { it(blogEntry) } },

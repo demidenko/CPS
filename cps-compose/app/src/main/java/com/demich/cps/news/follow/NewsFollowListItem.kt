@@ -17,7 +17,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LocalCurrentTime
+import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.timeAgo
 
 @Composable
@@ -87,10 +87,9 @@ private fun NewsFollowListItemInfo(
     modifier: Modifier = Modifier,
     fontSize: TextUnit
 ) {
-    val currentTime = LocalCurrentTime.current
     Box(modifier = modifier) {
         Text(
-            text = "online: " + timeAgo(fromTime = userInfo.lastOnlineTime, toTime = currentTime),
+            text = "online: " + timeAgo(fromTime = userInfo.lastOnlineTime, toTime = localCurrentTime),
             color = cpsColors.contentAdditional,
             fontSize = fontSize,
             modifier = Modifier

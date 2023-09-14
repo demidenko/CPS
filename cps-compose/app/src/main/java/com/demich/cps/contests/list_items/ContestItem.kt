@@ -22,8 +22,8 @@ import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.append
+import com.demich.cps.utils.localCurrentTime
 
 @Composable
 fun ContestItem(
@@ -35,7 +35,7 @@ fun ContestItem(
     Column(modifier = modifier) {
         val data by rememberUpdatedState(
             //TODO: recompose twice per second! (wtf?)
-            contestData(contest = contest, currentTime = LocalCurrentTime.current)
+            contestData(contest = contest, currentTime = localCurrentTime)
         )
         if (!isExpanded()) ContestItemContent(data = data)
         else ContestExpandedItemContent(data = data, onDeleteRequest = onDeleteRequest)

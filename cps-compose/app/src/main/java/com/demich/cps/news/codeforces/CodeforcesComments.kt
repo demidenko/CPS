@@ -40,9 +40,9 @@ import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LocalCurrentTime
 import com.demich.cps.utils.context
 import com.demich.cps.utils.htmlToAnnotatedString
+import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.timeAgo
 import kotlin.math.roundToInt
@@ -88,7 +88,6 @@ private fun Comment(
     modifier: Modifier = Modifier
 ) {
     val manager = LocalCodeforcesAccountManager.current
-    val currentTime = LocalCurrentTime.current
 
     Comment(
         modifier = modifier,
@@ -98,7 +97,7 @@ private fun Comment(
         ),
         blogEntryTitle = blogEntryTitle,
         rating = comment.rating,
-        timeAgo = timeAgo(fromTime = comment.creationTime, toTime = currentTime ),
+        timeAgo = timeAgo(fromTime = comment.creationTime, toTime = localCurrentTime),
         commentHtml = comment.html
     )
 }
