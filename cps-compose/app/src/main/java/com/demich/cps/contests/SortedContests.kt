@@ -13,12 +13,11 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.utils.context
 import com.demich.cps.utils.floorBy
-import com.demich.cps.utils.flowOfFlooredCurrentTime
+import com.demich.cps.utils.flowOfCurrentTimeEachSecond
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.isSortedWith
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
@@ -43,10 +42,7 @@ private fun flowOfContests(context: Context) =
 internal fun flowOfSortedContestsWithTime(context: Context): Flow<SortedContests> {
     var last: List<Contest> = emptyList()
     var sortedLast: List<Contest> = emptyList()
-    return combineTransform(
-        flow = flowOfContests(context),
-        flow2 = flowOfFlooredCurrentTime(1.seconds)
-    ) { contests, currentTime ->
+    return flowOfContests(context).combine(flowOfCurrentTimeEachSecond()) { contests, currentTime ->
         if (last != contests) {
             last = contests
             sortedLast = contests
@@ -55,7 +51,7 @@ internal fun flowOfSortedContestsWithTime(context: Context): Flow<SortedContests
         if (!sortedLast.isSortedWith(comparator)) {
             sortedLast = sortedLast.sortedWith(comparator)
         }
-        emit(SortedContests(sortedLast, currentTime))
+        SortedContests(sortedLast, currentTime)
     }
 }
 
