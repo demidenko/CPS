@@ -168,7 +168,6 @@ private fun ContestsColumn(
     contestsState: State<List<Contest>>, //seems like () -> List<Contest> is not stable
     modifier: Modifier = Modifier
 ) {
-    println("???")
     val context = context
     val scope = rememberCoroutineScope()
 
