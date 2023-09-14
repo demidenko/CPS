@@ -199,20 +199,12 @@ private fun ContestsList(
         }
     }
 
-    ProvideTimeEachSecond(contestsWithTimeState) {
+    ProvideCurrentTime(currentTime = { contestsWithTimeState.value.second }) {
         ContestsColumn(
             contestsState = filteredState,
             modifier = modifier
         )
     }
-}
-
-@Composable
-private fun ProvideTimeEachSecond(
-    state: State<Pair<List<Contest>, Instant>>,
-    content: @Composable () -> Unit
-) {
-    CompositionLocalProvider(LocalCurrentTime provides state.value.second, content = content)
 }
 
 @Composable

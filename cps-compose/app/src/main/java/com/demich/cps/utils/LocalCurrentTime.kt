@@ -38,16 +38,21 @@ fun currentTimeAsState(period: Duration): State<Instant> {
     }.collectAsStateWithLifecycle(initialValue = remember { getCurrentTime().floorBy(period) })
 }
 
+
 @Composable
-private fun ProvideCurrentTime(period: Duration, content: @Composable () -> Unit) {
-    val currentTime by currentTimeAsState(period)
-    CompositionLocalProvider(LocalCurrentTime provides currentTime, content = content)
+fun ProvideCurrentTime(currentTime: () -> Instant, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalCurrentTime provides currentTime(), content = content)
+}
+
+@Composable
+private fun ProvideCurrentTime(currentTimeState: State<Instant>, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalCurrentTime provides currentTimeState.value, content = content)
 }
 
 @Composable
 fun ProvideTimeEachSecond(content: @Composable () -> Unit) =
-    ProvideCurrentTime(period = 1.seconds, content = content)
+    ProvideCurrentTime(currentTimeState = currentTimeAsState(1.seconds), content = content)
 
 @Composable
 fun ProvideTimeEachMinute(content: @Composable () -> Unit) =
-    ProvideCurrentTime(period = 1.minutes, content = content)
+    ProvideCurrentTime(currentTimeState = currentTimeAsState(1.minutes), content = content)
