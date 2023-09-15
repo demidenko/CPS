@@ -18,13 +18,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.SettingsItemWithInfo
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.demich.cps.platforms.api.ClistApi
+import com.demich.cps.ui.CPSDefaults
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -74,8 +74,10 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
 
     CPSDialog(onDismissRequest = onDismissRequest) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            MonospacedText(
-                text = "clist.by::api", modifier = Modifier
+            Text(
+                text = "clist.by::api",
+                style = CPSDefaults.MonospaceTextStyle,
+                modifier = Modifier
                     .weight(1f)
                     .padding(start = 4.dp)
             )
@@ -128,7 +130,7 @@ private fun ClistApiTextField(
         value = input,
         singleLine = true,
         textStyle = TextStyle(fontSize = inputTextSize, fontFamily = FontFamily.Monospace),
-        label = { MonospacedText(text = title) },
+        label = { Text(text = title, style = CPSDefaults.MonospaceTextStyle) },
         onValueChange = onChangeInput,
         isError = input.isBlank()
     )

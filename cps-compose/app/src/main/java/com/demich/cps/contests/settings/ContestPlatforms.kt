@@ -3,6 +3,7 @@ package com.demich.cps.contests.settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,10 +18,10 @@ import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.ui.CPSCheckBox
+import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ExpandableSettingsItem
-import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.SettingsSubtitleOfEnabled
 import com.demich.cps.ui.WordsWithCounterOnOverflow
 import com.demich.cps.ui.theme.cpsColors
@@ -92,7 +93,11 @@ private fun PlatformCheckRow(
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         LeadingIcon(platform = platform)
-        MonospacedText(text = platform.name, modifier = Modifier.weight(1f))
+        Text(
+            text = platform.name,
+            style = CPSDefaults.MonospaceTextStyle,
+            modifier = Modifier.weight(1f)
+        )
         if (isChecked && availableLoaders.size > 1) {
             LoadersSetupButton(
                 platform = platform,
@@ -135,7 +140,7 @@ private fun ClistAdditionalRow() {
     Row(verticalAlignment = Alignment.CenterVertically) {
         LeadingIcon(platform = Contest.Platform.unknown)
         Column(modifier = Modifier.weight(1f)) {
-            MonospacedText(text = "clist additional")
+            Text(text = "clist additional", style = CPSDefaults.MonospaceTextStyle)
             if (resources.isNotEmpty()) {
                 WordsWithCounterOnOverflow(
                     words = resources.map { it.name },
