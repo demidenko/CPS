@@ -140,11 +140,12 @@ private fun AddAccountMenuItem(type: AccountManagerType, onSelect: () -> Unit) {
     DropdownMenuItem(
         onClick = onSelect,
         content = {
-            MonospacedText(
+            Text(
                 text = when (type) {
                     AccountManagerType.clist -> "import from clist.by"
                     else -> type.name
-                }
+                },
+                style = CPSDefaults.MonospaceTextStyle
             )
         }
     )

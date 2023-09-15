@@ -222,27 +222,6 @@ fun ListTitle(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MonospacedText(
-    text: String,
-    modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
-    fontSize: TextUnit = TextUnit.Unspecified,
-    textAlign: TextAlign? = null,
-    maxLines: Int = Int.MAX_VALUE,
-    overflow: TextOverflow = TextOverflow.Clip
-) = Text(
-    text = text,
-    modifier = modifier,
-    color = color,
-    fontSize = fontSize,
-    textAlign = textAlign,
-    maxLines = maxLines,
-    overflow = overflow,
-    style = CPSDefaults.MonospaceTextStyle
-)
-
-
-@Composable
 fun<T> ButtonsSelectRow(
     values: List<T>,
     selectedValue: T,

@@ -26,9 +26,9 @@ import com.demich.cps.accounts.managers.*
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
-import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
@@ -340,10 +340,12 @@ private fun AccountChooserHeader(
             .size(18.dp)) {
             icon(color)
         }
-        MonospacedText(
+        Text(
             text = text,
-            fontSize = 14.sp,
-            color = color
+            style = CPSDefaults.MonospaceTextStyle.copy(
+                fontSize = 14.sp,
+                color = color
+            )
         )
     }
 }
