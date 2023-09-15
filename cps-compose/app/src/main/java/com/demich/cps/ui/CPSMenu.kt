@@ -15,6 +15,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -73,6 +75,54 @@ fun ContentWithCPSDropdownMenu(
     }
 }
 
+@Stable
+class CPSMenuState(
+    private val expandedState: MutableState<Boolean>,
+    private val menuOffsetState: MutableState<DpOffset>,
+    private val componentSizeState: MutableState<IntSize>,
+    private val density: Density
+) {
+    fun isOpened(): Boolean = expandedState.value
+
+    fun offset(): DpOffset = menuOffsetState.value
+
+    fun saveSize(size: IntSize) {
+        componentSizeState.value = size
+    }
+
+    fun open(offset: Offset) {
+        menuOffsetState.value = convert(offset)
+        expandedState.value = true
+    }
+
+    fun close() {
+        expandedState.value = false
+    }
+
+    private fun convert(o: Offset): DpOffset =
+        with(density) {
+            DpOffset(
+                x = o.x.toDp(),
+                y = (o.y - componentSizeState.value.height).toDp()
+            )
+        }
+}
+
+@Composable
+fun rememberMenuState(): CPSMenuState {
+    val expanded = remember { mutableStateOf(false) }
+    val menuOffset = remember { mutableStateOf(DpOffset.Zero) }
+    val componentSize = remember { mutableStateOf(IntSize.Zero) }
+    return rememberWith(LocalDensity.current) {
+        CPSMenuState(
+            expandedState = expanded,
+            menuOffsetState = menuOffset,
+            componentSizeState = componentSize,
+            density = this
+        )
+    }
+}
+
 //experimental
 @Composable
 fun ContentWithCPSDropdownMenu(
@@ -81,31 +131,19 @@ fun ContentWithCPSDropdownMenu(
     menuBuilder: CPSMenuBuilder
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    var menuOffset by remember { mutableStateOf(DpOffset.Zero) }
-    var expanded by remember { mutableStateOf(false) }
-    var componentSize: IntSize by remember { mutableStateOf(IntSize.Zero) }
+    val menuState = rememberMenuState()
 
-    val convert = rememberWith(LocalDensity.current) {
-        { o: Offset ->
-            DpOffset(
-                x = o.x.toDp(),
-                y = (o.y - componentSize.height).toDp()
-            )
-        }
-    }
-
-    LaunchedEffect(interactionSource) {
+    LaunchedEffect(interactionSource, menuState) {
         interactionSource.interactions.collect {
             if (it is PressInteraction.Release) {
-                menuOffset = convert(it.press.pressPosition)
-                expanded = true
+                menuState.open(it.press.pressPosition)
             }
         }
     }
 
     Box(
         modifier = modifier
-            .onPlaced { componentSize = it.size }
+            .onPlaced { menuState.saveSize(it.size) }
             .clickable(
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
@@ -114,9 +152,9 @@ fun ContentWithCPSDropdownMenu(
     ) {
         content()
         CPSDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            offset = menuOffset,
+            expanded = menuState.isOpened(),
+            onDismissRequest = menuState::close,
+            offset = menuState.offset(),
             menuBuilder = menuBuilder
         )
     }
