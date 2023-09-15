@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
@@ -81,9 +82,9 @@ fun CPSDropdownMenu(
     menuBuilder: CPSMenuBuilder
 ) {
     CPSDropdownMenu(
-        expanded = menuState.isOpened(),
+        expanded = menuState.expanded,
         onDismissRequest = menuState::close,
-        offset = menuState.offset(),
+        offset = menuState.offset,
         menuBuilder = menuBuilder
     )
 }
@@ -95,16 +96,15 @@ class CPSMenuState(
     private val componentSizeState: MutableState<IntSize>,
     private val density: Density
 ) {
-    fun isOpened(): Boolean = expandedState.value
+    val expanded by expandedState
+    val offset by menuOffsetState
 
-    fun offset(): DpOffset = menuOffsetState.value
-
-    fun saveSize(size: IntSize) {
-        componentSizeState.value = size
+    fun onPlaced(layoutCoordinates: LayoutCoordinates) {
+        componentSizeState.value = layoutCoordinates.size
     }
 
-    fun open(offset: Offset) {
-        menuOffsetState.value = convert(offset)
+    fun open(pressPosition: Offset) {
+        menuOffsetState.value = convert(pressPosition)
         expandedState.value = true
     }
 
@@ -156,7 +156,7 @@ fun ContentWithCPSDropdownMenu(
 
     Box(
         modifier = modifier
-            .onPlaced { menuState.saveSize(it.size) }
+            .onPlaced(menuState::onPlaced)
             .clickable(
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
