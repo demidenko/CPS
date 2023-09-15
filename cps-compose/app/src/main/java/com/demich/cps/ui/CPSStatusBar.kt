@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.derivedStateOf
@@ -256,7 +257,7 @@ private fun StatusBarAccountsPopup(
                     checked = type !in disabledManagers,
                     onCheckedChange = { checked -> onCheckedChange(type, checked) }
                 )
-                MonospacedText(text = type.name)
+                Text(text = type.name, style = CPSDefaults.MonospaceTextStyle)
             }
         }
         TextButtonsSelectRow(

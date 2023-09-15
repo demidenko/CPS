@@ -15,9 +15,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.work.WorkInfo
+import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
-import com.demich.cps.ui.MonospacedText
 import com.demich.cps.ui.bottomprogressbar.CPSProgressIndicator
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
@@ -34,7 +34,12 @@ fun WorkersList(modifier: Modifier = Modifier) {
 
     showRestartDialogFor?.let { work ->
         CPSYesNoDialog(
-            title = { MonospacedText("restart ${work.name}?") },
+            title = {
+                Text(
+                    text = "restart ${work.name}?",
+                    style = CPSDefaults.MonospaceTextStyle
+                )
+            },
             onDismissRequest = { showRestartDialogFor = null },
             onConfirmRequest = { work.startImmediate() }
         )
@@ -111,9 +116,9 @@ private fun WorkerItem(
         modifier = modifier,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            MonospacedText(
+            Text(
                 text = name,
-                fontSize = 18.sp,
+                style = CPSDefaults.MonospaceTextStyle.copy(fontSize = 18.sp),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
