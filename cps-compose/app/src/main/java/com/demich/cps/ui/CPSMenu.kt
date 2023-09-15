@@ -75,6 +75,19 @@ fun ContentWithCPSDropdownMenu(
     }
 }
 
+@Composable
+fun CPSDropdownMenu(
+    menuState: CPSMenuState,
+    menuBuilder: CPSMenuBuilder
+) {
+    CPSDropdownMenu(
+        expanded = menuState.isOpened(),
+        onDismissRequest = menuState::close,
+        offset = menuState.offset(),
+        menuBuilder = menuBuilder
+    )
+}
+
 @Stable
 class CPSMenuState(
     private val expandedState: MutableState<Boolean>,
@@ -152,9 +165,7 @@ fun ContentWithCPSDropdownMenu(
     ) {
         content()
         CPSDropdownMenu(
-            expanded = menuState.isOpened(),
-            onDismissRequest = menuState::close,
-            offset = menuState.offset(),
+            menuState = menuState,
             menuBuilder = menuBuilder
         )
     }
