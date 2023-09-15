@@ -94,8 +94,7 @@ private fun ContestItemDatesAndMenuButton(
     onDeleteRequest: () -> Unit
 ) {
     ContestItemDatesAndMenuButton(
-        startTime = contest.startTime.contestDate(),
-        endTime = contest.endTime.contestDate(),
+        dateRange = contest.dateRange(),
         contestLink = contest.link,
         modifier = Modifier.fillMaxWidth(),
         onDeleteRequest = onDeleteRequest
@@ -119,15 +118,14 @@ private fun ContestCounter(
 
 @Composable
 private fun ContestItemDatesAndMenuButton(
-    startTime: String,
-    endTime: String,
+    dateRange: String,
     contestLink: String?,
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
     Box(modifier = modifier) {
         Text(
-            text = "$startTime - $endTime",
+            text = dateRange,
             style = CPSDefaults.MonospaceTextStyle.copy(
                 fontSize = 15.sp,
                 color = cpsColors.contentAdditional

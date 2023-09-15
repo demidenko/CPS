@@ -85,7 +85,7 @@ private fun ContestItemFooter(
     val counter: String
     when (data.phase) {
         Contest.Phase.BEFORE -> {
-            date = data.contest.dateRange()
+            date = data.contest.dateShortRange()
             counter = "in " + data.counter
         }
         Contest.Phase.RUNNING -> {
@@ -93,7 +93,7 @@ private fun ContestItemFooter(
             counter = "left " + data.counter
         }
         Contest.Phase.FINISHED -> {
-            date = data.contest.startTime.contestDate() + " - " + data.contest.endTime.contestDate()
+            date = data.contest.dateRange()
             counter = ""
         }
     }
