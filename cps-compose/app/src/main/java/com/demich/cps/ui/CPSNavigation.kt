@@ -1,5 +1,9 @@
 package com.demich.cps.ui
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
@@ -119,7 +123,9 @@ class CPSNavigator(
         androidx.navigation.compose.NavHost(
             navController = navController,
             startDestination = startRoute,
-            modifier = modifier,
+            modifier = modifier.fillMaxSize(),
+            enterTransition = { fadeIn(tween(500)) },
+            exitTransition = { fadeOut(tween(500)) },
             builder = builder
         )
     }
