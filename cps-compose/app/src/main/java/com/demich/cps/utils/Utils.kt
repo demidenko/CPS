@@ -47,12 +47,12 @@ fun<T> List<T>.swapped(i: Int, j: Int): List<T> =
         Collections.swap(this, i, j)
     }
 
-inline fun firstFalse(first: Int, last: Int, pred: (Int) -> Boolean): Int {
+inline fun firstFalse(first: Int, last: Int, predicate: (Int) -> Boolean): Int {
     var l = first
     var r = last
     while (l < r) {
         val mid = (r - l) / 2 + l
-        if (!pred(mid)) r = mid else l = mid + 1
+        if (!predicate(mid)) r = mid else l = mid + 1
     }
     return r
 }
