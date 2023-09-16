@@ -6,6 +6,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import com.demich.cps.accounts.managers.RatingChange
+import com.demich.cps.utils.minOfWithIndex
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
@@ -89,17 +90,10 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
         tap: Offset,
         tapRadius: Float = 50f
     ): RatingChange? {
-        var pos = -1
-        var minDist = Float.POSITIVE_INFINITY
-        for (i in ratingChanges.indices) {
-            val o = pointToOffset(ratingChanges[i].toPoint())
-            val dist = (o - tap).getDistance()
-            if (dist <= tapRadius && dist < minDist) {
-                pos = i
-                minDist = dist
-            }
-        }
-        if (pos == -1) return null
+        val pos = ratingChanges.minOfWithIndex {
+            val o = pointToOffset(it.toPoint())
+            (o - tap).getDistance()
+        }.takeIf { it.value <= tapRadius }?.index ?: return null
         val res = ratingChanges[pos]
         if (pos == 0 || res.oldRating != null) return res
         return res.copy(oldRating = ratingChanges[pos-1].rating)

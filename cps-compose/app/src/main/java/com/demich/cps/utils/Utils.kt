@@ -22,10 +22,24 @@ fun Int.toSignedString(zeroAsPositive: Boolean = false): String =
     if (this > 0 || this == 0 && zeroAsPositive) "+${this}" else "$this"
 
 
-fun <T> List<T>.isSortedWith(comparator: Comparator<in T>): Boolean {
+fun<T> List<T>.isSortedWith(comparator: Comparator<in T>): Boolean {
     if (size < 2) return true
     for (i in 1 until size) if (comparator.compare(get(i-1),get(i)) > 0) return false
     return true
+}
+
+inline fun<T, R: Comparable<R>> List<T>.minOfWithIndex(selector: (T) -> R): IndexedValue<R> {
+    if (isEmpty()) throw NoSuchElementException()
+    var indexOfMinValue = 0
+    var minValue = selector(get(indexOfMinValue))
+    (1 until size).forEach { index ->
+        val value = selector(get(index))
+        if (value < minValue) {
+            minValue = value
+            indexOfMinValue = index
+        }
+    }
+    return IndexedValue(indexOfMinValue, minValue)
 }
 
 fun<T> List<T>.swapped(i: Int, j: Int): List<T> =
