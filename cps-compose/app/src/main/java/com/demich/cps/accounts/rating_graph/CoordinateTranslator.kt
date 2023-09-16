@@ -7,6 +7,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import com.demich.cps.accounts.managers.RatingChange
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 
 @Composable
 internal fun rememberCoordinateTranslator(): CoordinateTranslator =
@@ -16,6 +17,7 @@ internal fun rememberCoordinateTranslator(): CoordinateTranslator =
 
 @Stable
 internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY: Float) {
+    //x is seconds, y is rating
     private var o: Offset by mutableStateOf(Offset(x = minX, y = minY))
     private var size: Size by mutableStateOf(Size(width = maxX - minX, height = maxY - minY))
 
@@ -70,6 +72,13 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
     }
 
     fun scale(center: Offset, scale: Float) {
+        //size.height / scale >= 1
+        //size.height >= scale
+        //size.width / scale >= 1.hour
+        //size.width / 1.hour >= scale
+        minOf(size.height, size.width / 1.hours.inWholeSeconds).let {
+            if (scale > it) return scale(center, it)
+        }
         val c = offsetToPoint(center)
         o = (o - c) / scale + c
         size /= scale
