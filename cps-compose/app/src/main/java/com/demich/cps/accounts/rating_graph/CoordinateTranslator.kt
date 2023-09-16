@@ -97,7 +97,7 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
     }
 
     companion object {
-        val saver = listSaver<CoordinateTranslator, Float>(
+        internal val saver get() = listSaver<CoordinateTranslator, Float>(
             save = {
                 listOf(it.o.x, it.o.y, it.size.width, it.size.height)
             },
