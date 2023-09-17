@@ -49,13 +49,19 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
         toWidth: Float
     ) = (x - fromWidth/2) * (fromWidth / toWidth) + (fromWidth / 2)
 
-    fun pointToOffset(x: Long, y: Long) = Offset(
-        x = transformX(
+    private fun pointXToOffsetX(x: Long) =
+        transformX(
             x = (x - o.x) / size.width * canvasSize.width,
             fromWidth = canvasSize.width,
             toWidth = canvasSize.width + borderX * 2
-        ),
-        y = canvasSize.height - ((y - o.y) / size.height * canvasSize.height)
+        )
+
+    private fun pointYToOffsetY(y: Long) =
+        canvasSize.height - ((y - o.y) / size.height * canvasSize.height)
+
+    fun pointToOffset(x: Long, y: Long) = Offset(
+        x = pointXToOffsetX(x),
+        y = pointYToOffsetY(y)
     )
 
     fun pointToOffset(point: Point) = pointToOffset(point.x, point.y)
@@ -74,17 +80,17 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
         bottomRight: Point,
         block: (Offset, Size) -> Unit
     ) {
-        val o = pointToOffset(topLeft).let {
+        val o = with(topLeft) {
             Offset(
-                x = if (topLeft.x == Long.MIN_VALUE) 0f else round(it.x),
-                y = if (topLeft.y == Long.MIN_VALUE) 0f else round(it.y)
+                x = if (x == Long.MIN_VALUE) 0f else round(pointXToOffsetX(x)),
+                y = if (y == Long.MIN_VALUE) 0f else round(pointYToOffsetY(y))
             )
         }
 
-        val s = pointToOffset(bottomRight).let {
+        val s = with(bottomRight) {
             Offset(
-                x = if (bottomRight.x == Long.MAX_VALUE) size.width else round(it.x),
-                y = if (bottomRight.y == Long.MAX_VALUE) size.height else round(it.y)
+                x = if (x == Long.MAX_VALUE) size.width else round(pointXToOffsetX(x)),
+                y = if (y == Long.MAX_VALUE) size.height else round(pointYToOffsetY(y))
             )
         }
 
