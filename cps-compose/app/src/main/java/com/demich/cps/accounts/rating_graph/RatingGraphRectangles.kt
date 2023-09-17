@@ -17,8 +17,8 @@ internal class RatingGraphRectangles(
         fun addBounds(bounds: Array<HandleColorBound>, x: Long) {
             bounds.sortedBy { it.ratingUpperBound }.let { list ->
                 for (i in list.indices) {
-                    val y = if (i == 0) Int.MIN_VALUE else list[i-1].ratingUpperBound
-                    add(Point(x = x, y = y.toLong()) to list[i].handleColor)
+                    val y = if (i == 0) Long.MIN_VALUE else list[i-1].ratingUpperBound.toLong()
+                    add(Point(x = x, y = y) to list[i].handleColor)
                 }
                 add(Point(x = x, y = list.last().ratingUpperBound.toLong()) to HandleColor.RED)
             }

@@ -7,7 +7,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
@@ -20,7 +19,6 @@ import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import kotlinx.datetime.Instant
-import kotlin.math.round
 
 @Composable
 internal fun RatingGraphCanvas(
@@ -98,14 +96,16 @@ private fun RatingGraphCanvas(
 
         //rating filled areas
         rectangles.forEach { point, handleColor ->
-            val (px, py) = translator.pointToOffset(point).let {
-                round(it.x) to round(it.y)
+            translator.pointRectToCanvasRect(
+                topLeft = Point(Long.MIN_VALUE, Long.MIN_VALUE),
+                bottomRight = point
+            ) { topLeft, size ->
+                drawRect(
+                    color = colorsMap.getValue(handleColor),
+                    topLeft = topLeft,
+                    size = size
+                )
             }
-            drawRect(
-                color = colorsMap.getValue(handleColor),
-                topLeft = Offset.Zero,
-                size = Size(px, py)
-            )
         }
 
         //time dashes

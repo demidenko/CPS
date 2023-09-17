@@ -7,6 +7,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.utils.minOfWithIndex
+import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
@@ -67,6 +68,28 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
         ) / canvasSize.width * size.width + o.x,
         y = (canvasSize.height - offset.y) / canvasSize.height * size.height + o.y
     )
+
+    inline fun pointRectToCanvasRect(
+        topLeft: Point,
+        bottomRight: Point,
+        block: (Offset, Size) -> Unit
+    ) {
+        val o = pointToOffset(topLeft).let {
+            Offset(
+                x = if (topLeft.x == Long.MIN_VALUE) 0f else round(it.x),
+                y = if (topLeft.y == Long.MIN_VALUE) 0f else round(it.y)
+            )
+        }
+
+        val s = pointToOffset(bottomRight).let {
+            Offset(
+                x = if (bottomRight.x == Long.MAX_VALUE) size.width else round(it.x),
+                y = if (bottomRight.y == Long.MAX_VALUE) size.height else round(it.y)
+            )
+        }
+
+        block(o, Size(s.x - o.x, s.y - o.y))
+    }
 
     fun move(offset: Offset) {
         o -= offsetToPoint(offset) - offsetToPoint(Offset.Zero)
