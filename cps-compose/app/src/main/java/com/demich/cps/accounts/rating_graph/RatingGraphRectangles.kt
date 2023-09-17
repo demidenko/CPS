@@ -38,14 +38,11 @@ internal class RatingGraphRectangles(
 
     inline fun forEachRect(block: (Point, Point, HandleColor) -> Unit) {
         var prevX: Long = Long.MIN_VALUE
-        var r = 0
-        while (r < rectangles.size) {
-            val l = r
-            while (r < rectangles.size && rectangles[r].first.x == rectangles[l].first.x) ++r
+        forEachXRange { l, r ->
             var prevY: Long = Long.MIN_VALUE
-            rectangles.subList(l, r).forEach {
-                block(Point(prevX, prevY), it.first, it.second)
-                prevY = it.first.y
+            rectangles.subList(l, r).forEach { (point, handleColor) ->
+                block(Point(prevX, prevY), point, handleColor)
+                prevY = point.y
             }
             prevX = rectangles[l].first.x
         }
@@ -60,15 +57,22 @@ internal class RatingGraphRectangles(
         points.forEach { point -> block(point, getHandleColor(point)) }
          */
         require(points.isSortedWith(compareBy { it.x }))
-        var l = 0
-        var r = l
-        points.forEach { point ->
-            while (r == 0 || point.x >= rectangles[r-1].first.x) {
-                l = r
-                while (r < rectangles.size && rectangles[r].first.x == rectangles[l].first.x) ++r
+        var k = 0
+        forEachXRange { l, r ->
+            while (k < points.size && points[k].x < rectangles[l].first.x) {
+                val point = points[k++]
+                val i = firstTrue(l, r) { point.y < rectangles[it].first.y }
+                block(point, rectangles[i].second)
             }
-            val i = firstTrue(l, r) { point.y < rectangles[it].first.y }
-            block(point, rectangles[i].second)
+        }
+    }
+
+    private inline fun forEachXRange(block: (Int, Int) -> Unit) {
+        var r = 0
+        while (r < rectangles.size) {
+            val l = r
+            while (r < rectangles.size && rectangles[r].first.x == rectangles[l].first.x) ++r
+            block(l, r)
         }
     }
 }
