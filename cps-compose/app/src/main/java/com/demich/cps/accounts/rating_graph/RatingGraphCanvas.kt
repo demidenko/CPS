@@ -73,9 +73,10 @@ private fun RatingGraphCanvas(
     pathWidth: Float = 4f,
     shadowOffset: Offset = Offset(4f, 4f),
     shadowAlpha: Float = 0.3f,
-    selectedPointRadiusMultiplier: Float = 1.5f
+    selectedPointScale: Float = 1.5f
 ) {
-    fun radiusMultiplier(point: Point) = if (selectedPoint == point) selectedPointRadiusMultiplier else 1f
+    fun radius(point: Point, radius: Float) =
+        if (selectedPoint == point) selectedPointScale * radius else radius
 
     val dashEffect = remember { PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f) }
 
@@ -142,7 +143,7 @@ private fun RatingGraphCanvas(
                 val center = translator.pointToOffset(point)
                 drawCircle(
                     color = Color.Black,
-                    radius = (circleRadius + circleBorderWidth) * radiusMultiplier(point),
+                    radius = radius(point, circleRadius + circleBorderWidth),
                     center = center,
                     style = Fill,
                     alpha = shadowAlpha
@@ -162,20 +163,20 @@ private fun RatingGraphCanvas(
             val center = translator.pointToOffset(point)
             drawCircle(
                 color = Color.Black,
-                radius = (circleRadius + circleBorderWidth) * radiusMultiplier(point),
+                radius = radius(point, circleRadius + circleBorderWidth),
                 center = center,
                 style = Fill
             )
             drawCircle(
                 color = colorsMap.getValue(handleColor),
-                radius = circleRadius * radiusMultiplier(point),
+                radius = radius(point, circleRadius),
                 center = center,
                 style = Fill
             )
             if (point == selectedPoint) {
                 drawCircle(
                     color = Color.Black,
-                    radius = (circleRadius / 2) * radiusMultiplier(point),
+                    radius = radius(point, circleRadius / 2),
                     center = center,
                     style = Fill
                 )
