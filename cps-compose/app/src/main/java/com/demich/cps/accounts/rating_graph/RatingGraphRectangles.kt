@@ -44,18 +44,16 @@ internal class RatingGraphRectangles(
         fast version of
         points.forEach { point -> block(point, getHandleColor(point)) }
          */
-        points.forEach { point -> block(point, getHandleColor(point)) }
-        return
         require(points.isSortedWith(compareBy { it.x }))
-        var r = rectangles.size
-        var l = r
+        var l = 0
+        var r = l
         points.forEach { point ->
-            while (l == rectangles.size || point.x >= rectangles[l].first.x) {
-                r = l
-                do --l while (l > 0 && rectangles[l-1].first.x == rectangles[r-1].first.x)
+            while (r == 0 || point.x >= rectangles[r-1].first.x) {
+                l = r
+                while (r < rectangles.size && rectangles[r].first.x == rectangles[l].first.x) ++r
             }
-            val i = firstFalse(l, r) { rectangles[it].first.y <= point.y }
-            block(point, rectangles[i-1].second)
+            val i = firstFalse(l, r) { point.y >= rectangles[it].first.y }
+            block(point, rectangles[i].second)
         }
     }
 }
