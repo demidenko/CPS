@@ -49,14 +49,14 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
         toWidth: Float
     ) = (x - fromWidth/2) * (fromWidth / toWidth) + (fromWidth / 2)
 
-    private fun pointXToOffsetX(x: Long) =
+    fun pointXToOffsetX(x: Long) =
         transformX(
             x = (x - o.x) / size.width * canvasSize.width,
             fromWidth = canvasSize.width,
             toWidth = canvasSize.width + borderX * 2
         )
 
-    private fun pointYToOffsetY(y: Long) =
+    fun pointYToOffsetY(y: Long) =
         canvasSize.height - ((y - o.y) / size.height * canvasSize.height)
 
     fun pointToOffset(x: Long, y: Long) = Offset(

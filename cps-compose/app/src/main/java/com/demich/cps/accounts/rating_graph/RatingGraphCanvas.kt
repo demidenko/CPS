@@ -119,11 +119,11 @@ private fun RatingGraphCanvas(
             )
         } else {
             markVerticals.forEach { x ->
-                val p = translator.pointToOffset(x, 0)
+                val px = translator.pointXToOffsetX(x)
                 drawLine(
                     color = Color.Black,
-                    start = Offset(p.x, 0f),
-                    end = Offset(p.x, size.height),
+                    start = Offset(px, 0f),
+                    end = Offset(px, size.height),
                     pathEffect = dashEffect
                 )
             }
