@@ -13,39 +13,39 @@ import com.demich.cps.utils.isSortedWith
 internal class RatingGraphRectangles(
     manager: RatedAccountManager<out RatedUserInfo>
 ) {
+    //point is upperBound (endTime, ratingUpperBound)
     private val rectangles: List<Pair<Point, HandleColor>> = buildList {
-        fun addBounds(bounds: Array<HandleColorBound>, x: Long) {
-            bounds.sortedBy { it.ratingUpperBound }.let { list ->
-                for (i in list.indices) {
-                    val y = if (i == 0) Long.MIN_VALUE else list[i-1].ratingUpperBound.toLong()
-                    add(Point(x = x, y = y) to list[i].handleColor)
-                }
-                add(Point(x = x, y = list.last().ratingUpperBound.toLong()) to HandleColor.RED)
+        fun addBounds(x: Long, bounds: Array<HandleColorBound>) {
+            bounds.sortedBy { it.ratingUpperBound }.forEach {
+                add(Point(x = x, y = it.ratingUpperBound.toLong()) to it.handleColor)
             }
+            add(Point(x = x, y = Long.MAX_VALUE) to HandleColor.RED)
         }
-        addBounds(x = Long.MAX_VALUE, bounds = manager.ratingsUpperBounds)
         if (manager is RatingRevolutionsProvider) {
             manager.ratingUpperBoundRevolutions
-                .sortedByDescending { it.first }
-                .forEach { (time, bounds) ->
-                    addBounds(x = time.epochSeconds, bounds = bounds)
+                .sortedBy { it.first }
+                .forEach { (endTime, bounds) ->
+                    addBounds(x = endTime.epochSeconds, bounds = bounds)
                 }
         }
+        addBounds(x = Long.MAX_VALUE, bounds = manager.ratingsUpperBounds)
     }.apply {
-        require(isSortedWith(compareByDescending<Pair<Point, HandleColor>> { it.first.x }.thenBy { it.first.y }))
+        require(isSortedWith(compareBy<Pair<Point, HandleColor>> { it.first.x }.thenBy { it.first.y }))
     }
 
     inline fun forEach(block: (Point, HandleColor) -> Unit) =
-        rectangles.forEach { block(it.first, it.second) }
+        rectangles.asReversed().forEach { block(it.first, it.second) }
 
     fun getHandleColor(point: Point): HandleColor =
-        rectangles.last { (r, _) -> point.x < r.x && point.y >= r.y }.second
+        rectangles.first { (r, _) -> point.x < r.x && point.y < r.y }.second
 
     fun iterateWithHandleColor(points: List<Point>, block: (Point, HandleColor) -> Unit) {
         /*
         fast version of
         points.forEach { point -> block(point, getHandleColor(point)) }
          */
+        points.forEach { point -> block(point, getHandleColor(point)) }
+        return
         require(points.isSortedWith(compareBy { it.x }))
         var r = rectangles.size
         var l = r

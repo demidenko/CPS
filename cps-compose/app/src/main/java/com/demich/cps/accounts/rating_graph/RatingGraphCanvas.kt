@@ -97,8 +97,8 @@ private fun RatingGraphCanvas(
         //rating filled areas
         rectangles.forEach { point, handleColor ->
             translator.pointRectToCanvasRect(
-                bottomLeft = Point(x = Long.MIN_VALUE, y = point.y),
-                topRight = Point(x = point.x, y = Long.MAX_VALUE)
+                bottomLeft = Point(x = Long.MIN_VALUE, y = Long.MIN_VALUE),
+                topRight = point
             ) { topLeft, size ->
                 drawRect(
                     color = colorsMap.getValue(handleColor),
