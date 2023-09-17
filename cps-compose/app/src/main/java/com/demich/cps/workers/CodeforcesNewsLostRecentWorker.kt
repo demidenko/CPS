@@ -4,15 +4,15 @@ import android.content.Context
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.platforms.api.CodeforcesApi
-import com.demich.cps.platforms.api.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.platforms.api.CodeforcesApi
+import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
-import com.demich.cps.utils.firstFalse
+import com.demich.cps.utils.firstTrue
 import com.demich.cps.utils.mapToSet
 import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.datetime.Instant
@@ -173,8 +173,8 @@ private class CachedBlogEntryApi(
         blogEntries: List<CodeforcesBlogEntry>,
         block: (CodeforcesBlogEntry) -> Unit
     ) {
-        val indexOfFirstNew = firstFalse(0, blogEntries.size) { index ->
-            !isNew(getCreationTime(id = blogEntries[index].id))
+        val indexOfFirstNew = firstTrue(0, blogEntries.size) { index ->
+            isNew(getCreationTime(id = blogEntries[index].id))
         }
 
         (indexOfFirstNew until blogEntries.size).forEach { index ->

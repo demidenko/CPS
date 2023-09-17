@@ -57,6 +57,9 @@ inline fun firstFalse(first: Int, last: Int, predicate: (Int) -> Boolean): Int {
     return r
 }
 
+inline fun firstTrue(first: Int, last: Int, predicate: (Int) -> Boolean): Int =
+    firstFalse(first, last) { !predicate(it) }
+
 //couldn't resist to note that it can be solved in O(nlogn) by suffix array + segment tree
 fun String.containsTokensAsSubsequence(tokens: List<String>, ignoreCase: Boolean = false): Boolean {
     var i = 0

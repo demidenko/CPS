@@ -6,7 +6,7 @@ import com.demich.cps.accounts.HandleColorBound
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingRevolutionsProvider
 import com.demich.cps.accounts.userinfo.RatedUserInfo
-import com.demich.cps.utils.firstFalse
+import com.demich.cps.utils.firstTrue
 import com.demich.cps.utils.isSortedWith
 
 @Immutable
@@ -52,7 +52,7 @@ internal class RatingGraphRectangles(
                 l = r
                 while (r < rectangles.size && rectangles[r].first.x == rectangles[l].first.x) ++r
             }
-            val i = firstFalse(l, r) { point.y >= rectangles[it].first.y }
+            val i = firstTrue(l, r) { point.y < rectangles[it].first.y }
             block(point, rectangles[i].second)
         }
     }
