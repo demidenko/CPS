@@ -74,25 +74,34 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
     )
 
     inline fun pointRectToCanvasRect(
-        topLeft: Point,
-        bottomRight: Point,
+        bottomLeft: Point,
+        topRight: Point,
         block: (Offset, Size) -> Unit
     ) {
-        val o = with(topLeft) {
-            Offset(
-                x = if (x == Long.MIN_VALUE) 0f else round(pointXToOffsetX(x)),
-                y = if (y == Long.MIN_VALUE) 0f else round(pointYToOffsetY(y))
-            )
+        val minX = with(bottomLeft) {
+            if (x == Long.MIN_VALUE) 0f else round(pointXToOffsetX(x)).coerceAtLeast(0f)
         }
 
-        val s = with(bottomRight) {
-            Offset(
-                x = if (x == Long.MAX_VALUE) size.width else round(pointXToOffsetX(x)),
-                y = if (y == Long.MAX_VALUE) size.height else round(pointYToOffsetY(y))
-            )
+        val maxX = with(topRight) {
+            val width = canvasSize.width
+            if (x == Long.MAX_VALUE) width else round(pointXToOffsetX(x)).coerceAtMost(width)
         }
 
-        block(o, Size(s.x - o.x, s.y - o.y))
+        val minY = with(topRight) {
+            if (y == Long.MAX_VALUE) 0f else round(pointYToOffsetY(y)).coerceAtLeast(0f)
+        }
+
+        val maxY = with(bottomLeft) {
+            val height = canvasSize.height
+            if (y == Long.MIN_VALUE) height else round(pointYToOffsetY(y)).coerceAtMost(height)
+        }
+
+        if (minX <= maxX && minY <= maxY) {
+            block(
+                Offset(minX, minY),
+                Size(maxX - minX, maxY - minY)
+            )
+        }
     }
 
     fun move(offset: Offset) {
