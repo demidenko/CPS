@@ -73,11 +73,7 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
     }
 
     fun scale(center: Offset, scale: Float) {
-        //size.height / scale >= 1
-        //size.height >= scale
-        //size.width / scale >= 1.hour
-        //size.width / 1.hour >= scale
-        minOf(size.height, size.width / 1.hours.inWholeSeconds).let {
+        size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f).let {
             if (scale > it) return scale(center, it)
         }
         val c = offsetToPoint(center)
@@ -100,6 +96,14 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
     }
 
     companion object {
+        private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
+            //width / scale >= minWidth
+            //width / minWidth >= scale
+            //height / scale >= minHeight
+            //height / minHeight >= scale
+            return minOf(width / minWidth, height / minHeight)
+        }
+
         internal val saver get() = listSaver<CoordinateTranslator, Float>(
             save = {
                 listOf(it.o.x, it.o.y, it.size.width, it.size.height)
