@@ -60,6 +60,16 @@ inline fun firstFalse(first: Int, last: Int, predicate: (Int) -> Boolean): Int {
 inline fun firstTrue(first: Int, last: Int, predicate: (Int) -> Boolean): Int =
     firstFalse(first, last) { !predicate(it) }
 
+inline fun<T, R> List<T>.forEachRangeEqualBy(selector: (T) -> R, block: (Int, Int) -> Unit) {
+    var r = 0
+    while (r < size) {
+        val l = r
+        val value = selector(get(l))
+        while (r < size && selector(get(r)) == value) ++r
+        block(l, r)
+    }
+}
+
 //couldn't resist to note that it can be solved in O(nlogn) by suffix array + segment tree
 fun String.containsTokensAsSubsequence(tokens: List<String>, ignoreCase: Boolean = false): Boolean {
     var i = 0

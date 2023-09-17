@@ -7,6 +7,7 @@ import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingRevolutionsProvider
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.utils.firstTrue
+import com.demich.cps.utils.forEachRangeEqualBy
 import com.demich.cps.utils.isSortedWith
 
 @Immutable
@@ -67,12 +68,6 @@ internal class RatingGraphRectangles(
         }
     }
 
-    private inline fun forEachXRange(block: (Int, Int) -> Unit) {
-        var r = 0
-        while (r < rectangles.size) {
-            val l = r
-            while (r < rectangles.size && rectangles[r].first.x == rectangles[l].first.x) ++r
-            block(l, r)
-        }
-    }
+    private inline fun forEachXRange(block: (Int, Int) -> Unit) =
+        rectangles.forEachRangeEqualBy(selector = { it.first.x }, block = block)
 }
