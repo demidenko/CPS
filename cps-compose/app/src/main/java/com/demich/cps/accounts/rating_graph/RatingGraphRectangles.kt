@@ -6,6 +6,7 @@ import com.demich.cps.accounts.HandleColorBound
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingRevolutionsProvider
 import com.demich.cps.accounts.userinfo.RatedUserInfo
+import com.demich.cps.utils.forEach
 import com.demich.cps.utils.forEachRangeEqualBy
 import com.demich.cps.utils.isSortedWith
 
@@ -43,8 +44,7 @@ internal class RatingGraphRectangles(
         var prevX: Long = Long.MIN_VALUE
         rectangles.forEachRangeEqualBy(selector = { it.first.x }) { l, r ->
             var prevY: Long = Long.MIN_VALUE
-            (l until r).forEach {
-                val (point, handleColor) = rectangles[it]
+            rectangles.forEach(l, r) { (point, handleColor) ->
                 block(Point(prevX, prevY), point, handleColor)
                 prevY = point.y
             }

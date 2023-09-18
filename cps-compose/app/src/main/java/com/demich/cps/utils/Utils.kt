@@ -16,6 +16,8 @@ val jsonCPS = Json {
     allowStructuredMapKeys = true
 }
 
+inline fun<T> List<T>.forEach(from: Int, to: Int = size, block: (T) -> Unit) =
+    (from until to).forEach { block(get(it)) }
 
 
 fun Int.toSignedString(zeroAsPositive: Boolean = false): String =
