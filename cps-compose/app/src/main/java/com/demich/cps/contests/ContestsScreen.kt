@@ -359,9 +359,8 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     val monitor = remember { CodeforcesMonitorDataStore(context) }
 
     val contestDataState = rememberCollectWithLifecycle {
-        monitor.flowOfContestData().map {
-            if (it?.contestPhase?.phase != CodeforcesContestPhase.UNDEFINED) it
-            else null
+        monitor.flowOfContestData().map { data ->
+            data?.takeIf { it.contestPhase.phase != CodeforcesContestPhase.UNDEFINED }
         }
     }
 
