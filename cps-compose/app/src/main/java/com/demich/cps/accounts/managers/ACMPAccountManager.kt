@@ -10,6 +10,7 @@ import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.ACMPApi
 import com.demich.cps.platforms.utils.ACMPUtils
+import com.demich.cps.utils.forEach
 
 
 class ACMPAccountManager :
@@ -47,7 +48,7 @@ class ACMPAccountManager :
             if (words.size < 3) append(userInfo.userName)
             else {
                 append(words[0])
-                for(i in 1 until words.size) append(" ${words[i][0]}.")
+                words.forEach(from = 1) { append(" ${it[0]}.") }
             }
             if (userInfo.solvedTasks > 0) append(" [${userInfo.solvedTasks} / ${userInfo.rating}]")
         }

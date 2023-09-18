@@ -13,6 +13,7 @@ import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.firstTrue
+import com.demich.cps.utils.forEach
 import com.demich.cps.utils.mapToSet
 import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.datetime.Instant
@@ -177,14 +178,12 @@ private class CachedBlogEntryApi(
             isNew(getCreationTime(id = blogEntries[index].id))
         }
 
-        (indexOfFirstNew until blogEntries.size).forEach { index ->
-            val blogEntry = blogEntries[index].let {
-                it.copy(
-                    creationTime = getCreationTime(id = it.id),
-                    rating = 0,
-                    commentsCount = 0
-                )
-            }
+        blogEntries.forEach(from = indexOfFirstNew) {
+            val blogEntry = it.copy(
+                creationTime = getCreationTime(id = it.id),
+                rating = 0,
+                commentsCount = 0
+            )
             block(blogEntry)
         }
     }
