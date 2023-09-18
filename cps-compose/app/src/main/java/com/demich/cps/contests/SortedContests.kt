@@ -33,22 +33,24 @@ internal data class SortedContests(
     val currentTime: Instant
 )
 
+private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<Pair<Contest.Platform, String>>> =
+    combine(
+        flow = ContestsInfoDataStore(context).ignoredContests.flow,
+        flow2 = CodeforcesMonitorDataStore(context).contestId.flow
+    ) { ignored, monitorContestId ->
+        ignored.keys.let {
+            if (monitorContestId == null) it
+            else it.plus(Contest.Platform.codeforces to monitorContestId.toString())
+        }
+    }
+
 private fun flowOfContests(context: Context) =
     combine(
         flow = context.contestsListDao.flowOfContests().distinctUntilChanged(),
-        flow2 = ContestsInfoDataStore(context).ignoredContests.flow,
-        flow3 = CodeforcesMonitorDataStore(context).contestId.flow.map {
-            if (it != null) Contest.Platform.codeforces to it.toString()
-            else null
-        }
-    ) { list, ignored, monitorCompositeId ->
-        if (ignored.isEmpty() && monitorCompositeId == null) list
-        else {
-            list.filter { contest ->
-                val id = contest.compositeId
-                id !in ignored && id != monitorCompositeId
-            }
-        }
+        flow2 = flowOfIgnoredOrMonitored(context)
+    ) { list, ignored ->
+        if (ignored.isEmpty()) list
+        else list.filter { contest -> contest.compositeId !in ignored }
     }
 
 internal fun flowOfSortedContestsWithTime(context: Context): Flow<SortedContests> {
