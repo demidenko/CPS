@@ -12,6 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
+import com.demich.cps.contests.monitors.flowOfContestId
 import com.demich.cps.utils.context
 import com.demich.cps.utils.floorBy
 import com.demich.cps.utils.flowOfCurrentTimeEachSecond
@@ -35,7 +36,7 @@ internal data class SortedContests(
 private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<Pair<Contest.Platform, String>>> =
     combine(
         flow = ContestsInfoDataStore(context).ignoredContests.flow,
-        flow2 = CodeforcesMonitorDataStore(context).contestId.flow
+        flow2 = CodeforcesMonitorDataStore(context).flowOfContestId()
     ) { ignored, monitorContestId ->
         buildSet {
             ignored.forEach { add(it.key) }

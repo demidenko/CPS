@@ -114,3 +114,14 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
             problems = problems
         )
     }
+
+fun CodeforcesMonitorDataStore.flowOfContestId(): Flow<Int?> =
+    flowBy { prefs ->
+        val contestId = prefs[contestId]
+        if (contestId == null) null
+        else {
+            val contestInfo = prefs[contestInfo]
+            if (contestInfo.phase == CodeforcesContestPhase.UNDEFINED) null
+            else contestId
+        }
+    }
