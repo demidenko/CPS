@@ -11,6 +11,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
+import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.utils.context
 import com.demich.cps.utils.floorBy
 import com.demich.cps.utils.flowOfCurrentTimeEachSecond
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
@@ -32,12 +34,22 @@ internal data class SortedContests(
 )
 
 private fun flowOfContests(context: Context) =
-    context.contestsListDao.flowOfContests()
-        .distinctUntilChanged()
-        .combine(ContestsInfoDataStore(context).ignoredContests.flow) { list, ignored ->
-            if (ignored.isEmpty()) list
-            else list.filter { contest -> contest.compositeId !in ignored }
+    combine(
+        flow = context.contestsListDao.flowOfContests().distinctUntilChanged(),
+        flow2 = ContestsInfoDataStore(context).ignoredContests.flow,
+        flow3 = CodeforcesMonitorDataStore(context).contestId.flow.map {
+            if (it != null) Contest.Platform.codeforces to it.toString()
+            else null
         }
+    ) { list, ignored, monitorCompositeId ->
+        if (ignored.isEmpty() && monitorCompositeId == null) list
+        else {
+            list.filter { contest ->
+                val id = contest.compositeId
+                id !in ignored && id != monitorCompositeId
+            }
+        }
+    }
 
 internal fun flowOfSortedContestsWithTime(context: Context): Flow<SortedContests> {
     var last: List<Contest> = emptyList()
