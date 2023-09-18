@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
@@ -38,20 +37,19 @@ private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<Pair<Contest.Pl
         flow = ContestsInfoDataStore(context).ignoredContests.flow,
         flow2 = CodeforcesMonitorDataStore(context).contestId.flow
     ) { ignored, monitorContestId ->
-        ignored.keys.let {
-            if (monitorContestId == null) it
-            else it.plus(Contest.Platform.codeforces to monitorContestId.toString())
+        buildSet {
+            ignored.forEach { add(it.key) }
+            monitorContestId?.let { add(Contest.Platform.codeforces to it.toString()) }
         }
     }
 
 private fun flowOfContests(context: Context) =
-    combine(
-        flow = context.contestsListDao.flowOfContests().distinctUntilChanged(),
-        flow2 = flowOfIgnoredOrMonitored(context)
-    ) { list, ignored ->
-        if (ignored.isEmpty()) list
-        else list.filter { contest -> contest.compositeId !in ignored }
-    }
+    context.contestsListDao.flowOfContests()
+        .distinctUntilChanged()
+        .combine(flowOfIgnoredOrMonitored(context)) { list, ignored ->
+            if (ignored.isEmpty()) list
+            else list.filter { contest -> contest.compositeId !in ignored }
+        }
 
 internal fun flowOfSortedContestsWithTime(context: Context): Flow<SortedContests> {
     var last: List<Contest> = emptyList()
