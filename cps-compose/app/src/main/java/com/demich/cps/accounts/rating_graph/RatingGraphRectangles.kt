@@ -6,7 +6,6 @@ import com.demich.cps.accounts.HandleColorBound
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingRevolutionsProvider
 import com.demich.cps.accounts.userinfo.RatedUserInfo
-import com.demich.cps.utils.firstTrue
 import com.demich.cps.utils.forEachRangeEqualBy
 import com.demich.cps.utils.isSortedWith
 
@@ -51,22 +50,6 @@ internal class RatingGraphRectangles(
 
     fun getHandleColor(point: Point): HandleColor =
         rectangles.first { (r, _) -> point.x < r.x && point.y < r.y }.second
-
-    fun iterateWithHandleColor(points: List<Point>, block: (Point, HandleColor) -> Unit) {
-        /*
-        fast version of
-        points.forEach { point -> block(point, getHandleColor(point)) }
-         */
-        require(points.isSortedWith(compareBy { it.x }))
-        var k = 0
-        forEachXRange { l, r ->
-            while (k < points.size && points[k].x < rectangles[l].first.x) {
-                val point = points[k++]
-                val i = firstTrue(l, r) { point.y < rectangles[it].first.y }
-                block(point, rectangles[i].second)
-            }
-        }
-    }
 
     private inline fun forEachXRange(block: (Int, Int) -> Unit) =
         rectangles.forEachRangeEqualBy(selector = { it.first.x }, block = block)
