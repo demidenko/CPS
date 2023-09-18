@@ -33,24 +33,22 @@ internal class RatingGraphRectangles(
         require(isSortedWith(compareBy<Pair<Point, HandleColor>> { it.first.x }.thenBy { it.first.y }))
     }
 
+    fun getHandleColor(point: Point): HandleColor =
+        rectangles.first { (r, _) -> point.x < r.x && point.y < r.y }.second
+
     inline fun forEachUpperBound(block: (Point, HandleColor) -> Unit) =
         rectangles.asReversed().forEach { block(it.first, it.second) }
 
     inline fun forEachRect(block: (Point, Point, HandleColor) -> Unit) {
         var prevX: Long = Long.MIN_VALUE
-        forEachXRange { l, r ->
+        rectangles.forEachRangeEqualBy(selector = { it.first.x }) { l, r ->
             var prevY: Long = Long.MIN_VALUE
-            rectangles.subList(l, r).forEach { (point, handleColor) ->
+            (l until r).forEach {
+                val (point, handleColor) = rectangles[it]
                 block(Point(prevX, prevY), point, handleColor)
                 prevY = point.y
             }
             prevX = rectangles[l].first.x
         }
     }
-
-    fun getHandleColor(point: Point): HandleColor =
-        rectangles.first { (r, _) -> point.x < r.x && point.y < r.y }.second
-
-    private inline fun forEachXRange(block: (Int, Int) -> Unit) =
-        rectangles.forEachRangeEqualBy(selector = { it.first.x }, block = block)
 }
