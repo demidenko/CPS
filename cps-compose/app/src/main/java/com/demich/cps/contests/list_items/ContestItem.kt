@@ -52,7 +52,7 @@ private fun ContestItemContent(data: ContestData) {
 }
 
 @Composable
-private fun ContestItemHeader(
+fun ContestItemHeader(
     platform: Contest.Platform,
     contestTitle: String,
     phase: Contest.Phase,

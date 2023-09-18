@@ -19,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.list_items.ContestItemHeader
 import com.demich.cps.platforms.api.CodeforcesContestPhase
 import com.demich.cps.platforms.api.CodeforcesContestType
 import com.demich.cps.platforms.api.CodeforcesParticipationType
@@ -76,9 +78,20 @@ private fun CodeforcesMonitor(
     modifier: Modifier
 ) {
     Column(modifier) {
+        ContestItemHeader(
+            platform = Contest.Platform.codeforces,
+            contestTitle = contestData.contestInfo.name,
+            phase = when (contestData.contestPhase) {
+                is CodeforcesMonitorData.ContestPhase.Coding -> Contest.Phase.RUNNING
+                else -> Contest.Phase.BEFORE
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
         StandingsRow(
             contestData = contestData,
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
         )
         Footer(
             contestData = contestData,
