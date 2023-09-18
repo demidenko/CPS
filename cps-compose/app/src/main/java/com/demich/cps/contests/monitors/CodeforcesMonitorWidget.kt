@@ -87,16 +87,16 @@ private fun CodeforcesMonitor(
             },
             modifier = Modifier.fillMaxWidth()
         )
+        Footer(
+            contestData = contestData,
+            requestFailed = requestFailed,
+            modifier = Modifier.fillMaxWidth()
+        )
         StandingsRow(
             contestData = contestData,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
-        )
-        Footer(
-            contestData = contestData,
-            requestFailed = requestFailed,
-            modifier = Modifier.fillMaxWidth()
         )
     }
 }
