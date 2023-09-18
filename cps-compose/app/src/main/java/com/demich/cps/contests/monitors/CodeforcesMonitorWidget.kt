@@ -1,16 +1,15 @@
 package com.demich.cps.contests.monitors
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,6 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.platforms.api.CodeforcesContestPhase
+import com.demich.cps.platforms.api.CodeforcesContestType
+import com.demich.cps.platforms.api.CodeforcesParticipationType
+import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.IconSp
@@ -29,9 +32,6 @@ import com.demich.cps.utils.currentTimeAsState
 import com.demich.cps.utils.rememberWith
 import com.demich.cps.utils.toHHMMSS
 import com.demich.cps.utils.toMMSS
-import com.demich.cps.platforms.api.CodeforcesContestPhase
-import com.demich.cps.platforms.api.CodeforcesContestType
-import com.demich.cps.platforms.api.CodeforcesParticipationType
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -45,20 +45,20 @@ fun CodeforcesMonitorWidget(
     onOpenInBrowser: () -> Unit,
     onStop: () -> Unit
 ) {
-    var showMenu by rememberSaveable { mutableStateOf(false) }
-
     ContentWithCPSDropdownMenu(
-        expanded = showMenu,
-        onDismissRequest = { showMenu = false },
         content = {
             CodeforcesMonitor(
                 contestData = contestData,
                 requestFailed = requestFailed,
                 modifier = modifier
-                    .clip(shape = RoundedCornerShape(6.dp))
-                    .clickable { showMenu = true }
+                    .clip(RoundedCornerShape(6.dp))
                     .background(color = cpsColors.backgroundAdditional)
-                    .padding(vertical = 8.dp)
+                    .padding(
+                        start = 4.dp,
+                        end = 7.dp,
+                        top = 4.dp,
+                        bottom = 3.dp
+                    )
             )
         }
     ) {
@@ -76,39 +76,45 @@ private fun CodeforcesMonitor(
     modifier: Modifier
 ) {
     Column(modifier) {
-        Title(
-            contestPhase = contestData.contestPhase,
-            requestFailed = requestFailed,
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .fillMaxWidth()
-        )
         StandingsRow(
             contestData = contestData,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+        )
+        Footer(
+            contestData = contestData,
+            requestFailed = requestFailed,
             modifier = Modifier.fillMaxWidth()
         )
     }
 }
 
 @Composable
-private fun Title(
-    contestPhase: CodeforcesMonitorData.ContestPhase,
+private fun Footer(
+    contestData: CodeforcesMonitorData,
     requestFailed: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier) {
-        if (requestFailed) {
-            IconSp(
-                imageVector = CPSIcons.Error,
-                size = 16.sp,
-                color = cpsColors.error,
-                modifier = Modifier.align(Alignment.CenterStart)
+    ProvideTextStyle(CPSDefaults.MonospaceTextStyle.copy(
+        fontSize = 15.sp,
+        color = cpsColors.contentAdditional
+    )) {
+        Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+            Rank(
+                contestantRank = contestData.contestantRank,
+                modifier = Modifier.weight(1f)
+            )
+            if (requestFailed) {
+                IconSp(
+                    imageVector = CPSIcons.Error,
+                    size = 14.sp,
+                    color = cpsColors.error,
+                    modifier = Modifier.padding(end = 4.dp)
+                )
+            }
+            PhaseTitle(
+                contestPhase = contestData.contestPhase
             )
         }
-        PhaseTitle(
-            contestPhase = contestPhase,
-            modifier = Modifier.align(Alignment.Center)
-        )
     }
 }
 
@@ -147,9 +153,12 @@ private fun PhaseTitle(
     modifier: Modifier = Modifier,
     info: String = ""
 ) {
+    val title = when (phase) {
+        CodeforcesContestPhase.CODING -> "left"
+        else -> phase.title.lowercase()
+    }
     Text(
-        text = phase.title + " " + info,
-        fontWeight = FontWeight.Bold,
+        text = if (info.isEmpty()) title else "$title $info",
         modifier = modifier
     )
 }
@@ -174,11 +183,6 @@ private fun StandingsRow(
     ProvideTextStyle(value = textStyle) {
         if (contestData.problems.isNotEmpty()) {
             Row(modifier = modifier) {
-                RankColumn(
-                    rank = contestData.contestantRank.rank,
-                    participationType = contestData.contestantRank.participationType,
-                    modifier = Modifier.padding(horizontal = 4.dp)
-                )
                 contestData.problems.forEach {
                     ProblemColumn(
                         problemName = it.first,
@@ -265,20 +269,21 @@ private fun ProblemResultCell(
 }
 
 @Composable
-private fun RankColumn(
-    rank: Int,
-    participationType: CodeforcesParticipationType,
-    modifier: Modifier = Modifier
+private fun Rank(
+    contestantRank: CodeforcesMonitorData.ContestRank,
+    modifier: Modifier
 ) {
-    Column(modifier = modifier) {
-        Text(text = "rank")
-        Text(text = when {
+    Text(
+        text = with(contestantRank) {
+            val rankText = when {
                 rank <= 0 -> ""
                 participationType == CodeforcesParticipationType.CONTESTANT -> "$rank"
                 else -> "*$rank"
             }
-        )
-    }
+            "rank: $rankText"
+        },
+        modifier = modifier,
+    )
 }
 
 @Preview(showBackground = true)

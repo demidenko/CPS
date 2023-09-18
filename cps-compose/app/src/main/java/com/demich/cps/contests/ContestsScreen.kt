@@ -62,11 +62,7 @@ fun ContestsScreen(
             .consumeWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
             .imePadding()
     ) {
-        CodeforcesMonitor(
-            modifier = Modifier
-                .padding(horizontal = 3.dp)
-                .fillMaxWidth()
-        )
+        CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
         if (isAnyPlatformEnabled) {
             ContestsReloadableContent(
                 filterController = filterController,
