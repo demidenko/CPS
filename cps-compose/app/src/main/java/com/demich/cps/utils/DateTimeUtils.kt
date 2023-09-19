@@ -31,9 +31,8 @@ fun Duration.toMMSS(): String = toComponents { minutes, seconds, _ ->
     String.format("%02d:%02d", minutes, seconds)
 }
 
-fun timeDifference(fromTime: Instant, toTime: Instant): String {
-    val t: Duration = toTime - fromTime
-    return when {
+fun timeDifference(t: Duration): String =
+    when {
         t < 2.minutes -> "minute"
         t < 2.hours -> "${t.inWholeMinutes} minutes"
         t < 24.hours * 2 -> "${t.inWholeHours} hours"
@@ -42,6 +41,7 @@ fun timeDifference(fromTime: Instant, toTime: Instant): String {
         t < 365.days * 2 -> "${t.inWholeDays / 31} months"
         else -> "${t.inWholeDays / 365} years"
     }
-}
+
+fun timeDifference(fromTime: Instant, toTime: Instant) = timeDifference(toTime - fromTime)
 
 fun timeAgo(fromTime: Instant, toTime: Instant) = timeDifference(fromTime, toTime) + " ago"
