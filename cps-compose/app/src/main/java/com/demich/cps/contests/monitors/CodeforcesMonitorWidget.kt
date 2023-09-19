@@ -142,9 +142,7 @@ private fun PhaseTitle(
             PhaseTitle(
                 phase = contestPhase.phase,
                 modifier = modifier,
-                info = (contestPhase.endTime - currentTime).coerceAtLeast(Duration.ZERO).let {
-                    if (it < 1.hours) it.toMMSS() else it.toHHMMSS()
-                }
+                info = (contestPhase.endTime - currentTime).coerceAtLeast(Duration.ZERO).toHHMMSS()
             )
         }
         is CodeforcesMonitorData.ContestPhase.SystemTesting -> {

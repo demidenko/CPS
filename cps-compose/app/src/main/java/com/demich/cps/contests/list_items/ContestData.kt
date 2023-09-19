@@ -1,6 +1,7 @@
 package com.demich.cps.contests.list_items
 
 import androidx.compose.runtime.Immutable
+import com.demich.cps.contests.contestTimeDifference
 import com.demich.cps.contests.database.Contest
 import kotlinx.datetime.Instant
 

@@ -1,4 +1,4 @@
-package com.demich.cps.contests.list_items
+package com.demich.cps.contests
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.utils.format
