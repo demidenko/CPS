@@ -15,16 +15,21 @@ internal fun contestTimeDifference(fromTime: Instant, toTime: Instant): String {
     return timeDifference(t)
 }
 
-internal fun Instant.contestDate() = format("dd.MM E HH:mm")
+private fun Instant.formatDate() = format("dd.MM E")
+private fun Instant.formatTime() = format("HH:mm")
+
+internal fun Instant.contestDate() = formatDate() + " " + formatTime()
 
 internal fun Contest.dateShortRange(): String {
     val start = startTime.contestDate()
-    val end = if (duration < 1.days) endTime.format("HH:mm") else "..."
+    val end = if (duration < 1.days) endTime.formatTime() else "..."
     return "$start-$end"
 }
 
 internal fun Contest.dateRange(): String {
-    //TODO: smart shrink
     //TODO: show year
-    return startTime.contestDate() + " - " + endTime.contestDate()
+    val start = startTime.contestDate()
+    val end = if (startTime.formatDate() == endTime.formatDate())
+        endTime.formatTime() else endTime.contestDate()
+    return "$start - $end"
 }
