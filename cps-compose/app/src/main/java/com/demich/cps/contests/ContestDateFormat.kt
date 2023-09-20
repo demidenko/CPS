@@ -11,7 +11,7 @@ import kotlin.time.Duration.Companion.hours
 
 internal fun contestTimeDifference(fromTime: Instant, toTime: Instant): String {
     val t: Duration = toTime - fromTime
-    if(t < 24.hours * 2) return t.toHHMMSS()
+    if(t < 48.hours) return t.toHHMMSS()
     return timeDifference(t)
 }
 

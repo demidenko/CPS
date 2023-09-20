@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.contests.contestTimeDifference
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.list_items.ContestItemHeader
 import com.demich.cps.platforms.api.CodeforcesContestPhase
@@ -32,10 +33,6 @@ import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.currentTimeAsState
 import com.demich.cps.utils.rememberWith
-import com.demich.cps.utils.toHHMMSS
-import com.demich.cps.utils.toMMSS
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -142,7 +139,9 @@ private fun PhaseTitle(
             PhaseTitle(
                 phase = contestPhase.phase,
                 modifier = modifier,
-                info = (contestPhase.endTime - currentTime).coerceAtLeast(Duration.ZERO).toHHMMSS()
+                info = contestPhase.endTime.let {
+                    contestTimeDifference(fromTime = currentTime.coerceAtMost(it), toTime = it)
+                }
             )
         }
         is CodeforcesMonitorData.ContestPhase.SystemTesting -> {
