@@ -183,6 +183,7 @@ private fun ContestsColumn(
         ContestItem(
             contest = contest,
             isExpanded = { contestsListController.isExpanded(contest) },
+            collisionType = { contestsListController.collisionType(contest) },
             onDeleteRequest = {
                 scope.launch {
                     ContestsInfoDataStore(context).ignoredContests.edit {

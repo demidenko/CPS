@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -21,20 +19,20 @@ import com.demich.cps.contests.dateRange
 import com.demich.cps.contests.dateShortRange
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.localCurrentTime
 
 @Composable
 fun ContestItem(
     contest: Contest,
     isExpanded: () -> Boolean,
+    collisionType: () -> DangerType,
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
     Column(modifier = modifier) {
-        val data by rememberUpdatedState(
-            //TODO: recompose twice per second! (wtf?)
-            contestData(contest = contest, currentTime = localCurrentTime)
-        )
+        //TODO: recompose twice per second! (wtf?)
+        val data = contestData(contest = contest, currentTime = localCurrentTime)
         if (!isExpanded()) ContestItemContent(data = data)
         else ContestExpandedItemContent(data = data, onDeleteRequest = onDeleteRequest)
     }
