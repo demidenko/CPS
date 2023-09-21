@@ -11,7 +11,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
@@ -142,11 +141,13 @@ private fun ContestsList(
         currentTimeState: State<Instant>
     ) = produceSortedContestsWithTime()
 
+    val contestsListController = rememberContestsListController()
+
     LaunchedEffect(contestsToShowState, filterController) {
         snapshotFlow { contestsToShowState.value }
             .collect { contests ->
                 filterController.available = contests.isNotEmpty()
-                //TODO: filter expanded
+                contestsListController.removeUnavailable(contests)
             }
     }
 
@@ -159,6 +160,7 @@ private fun ContestsList(
     ProvideCurrentTime(currentTimeState) {
         ContestsColumn(
             contestsState = filteredState,
+            contestsListController = contestsListController,
             modifier = modifier
         )
     }
@@ -167,22 +169,20 @@ private fun ContestsList(
 @Composable
 private fun ContestsColumn(
     contestsState: State<List<Contest>>, //seems like () -> List<Contest> is not stable
+    contestsListController: ContestsListController,
     modifier: Modifier = Modifier
 ) {
     val context = context
     val scope = rememberCoroutineScope()
 
-    var expandedItems: List<Pair<Contest.Platform, String>>
-        by rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(emptyList()) }
-
     LazyColumnOfData(
         modifier = modifier,
-        items = { contestsState.value },
+        items = contestsState::value,
         /*key = { it.compositeId }*/ //TODO: key effects jumping on reorder
     ) { contest ->
         ContestItem(
             contest = contest,
-            isExpanded = { contest.compositeId in expandedItems },
+            isExpanded = { contestsListController.isExpanded(contest) },
             onDeleteRequest = {
                 scope.launch {
                     ContestsInfoDataStore(context).ignoredContests.edit {
@@ -192,11 +192,7 @@ private fun ContestsColumn(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .clickableNoRipple {
-                    val id = contest.compositeId
-                    if (id in expandedItems) expandedItems -= id
-                    else expandedItems += id
-                }
+                .clickableNoRipple { contestsListController.toggleExpanded(contest) }
                 .padding(
                     start = 4.dp,
                     end = 7.dp,
