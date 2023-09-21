@@ -23,6 +23,7 @@ import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -31,7 +32,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun contestsViewModel(): ContestsViewModel = sharedViewModel()
 
-class ContestsViewModel: ViewModel(), ContestsReloader {
+class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
 
     fun flowOfLoadingStatus(): Flow<LoadingStatus> =
         loadingStatuses.map { it.values.combine() }
@@ -122,5 +123,12 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
         val lastReloaded: Set<Int> = listInfo.clistLastReloadedAdditionalResources()
         return enabled != lastReloaded //hope it is proper equals
     }
+
+    private val expandedItems = MutableStateFlow(emptyMap<ContestCompositeId, Contest>())
+    fun flowOfExpandedContests(): StateFlow<Map<ContestCompositeId, Contest>> = expandedItems
+
+    override fun editIds(block: MutableMap<ContestCompositeId, Contest>.() -> Unit) =
+        expandedItems.edit(block)
+
 }
 

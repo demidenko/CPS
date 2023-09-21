@@ -147,7 +147,7 @@ private fun ContestsList(
         snapshotFlow { contestsToShowState.value }
             .collect { contests ->
                 filterController.available = contests.isNotEmpty()
-                contestsListController.removeUnavailable(contests)
+                contestsListController.applyContests(contests)
             }
     }
 

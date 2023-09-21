@@ -1,50 +1,56 @@
 package com.demich.cps.contests
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.utils.jsonCPS
-import com.demich.cps.utils.mapToSet
-import com.demich.cps.utils.saver
+import com.demich.cps.utils.rememberCollect
 
 typealias ContestCompositeId = Pair<Contest.Platform, String>
 
 @Composable
-fun rememberContestsListController(): ContestsListController {
-    val expandedIdsState = rememberSaveable(stateSaver = jsonCPS.saver()) {
-        mutableStateOf(emptyList<ContestCompositeId>())
-    }
+internal fun rememberContestsListController(): ContestsListController {
+    val contestsViewModel = contestsViewModel()
 
-    return remember(expandedIdsState) {
+    val expandedIdsState = rememberCollect { contestsViewModel.flowOfExpandedContests() }
+
+    return remember(expandedIdsState, contestsViewModel) {
         ContestsListController(
-            expandedIdsState = expandedIdsState
+            expandedIdsState = expandedIdsState,
+            contestsViewModel = contestsViewModel
         )
     }
 }
 
+internal interface ContestsIdsHolder {
+    fun editIds(block: MutableMap<ContestCompositeId, Contest>.() -> Unit)
+
+    fun toggleExpanded(contest: Contest) {
+        editIds {
+            val id = contest.compositeId
+            if (id in this) remove(id)
+            else put(id, contest)
+        }
+    }
+
+    fun applyContests(contests: List<Contest>) {
+        val new = contests.associateBy { it.compositeId }
+        editIds {
+            keys.removeAll { it !in new }
+            replaceAll { id, _ -> new.getValue(id) }
+        }
+    }
+}
+
 @Stable
-class ContestsListController(
-    expandedIdsState: MutableState<List<ContestCompositeId>>
-) {
-    private var expandedIds by expandedIdsState
+internal class ContestsListController(
+    expandedIdsState: State<Map<ContestCompositeId, Contest>>,
+    contestsViewModel: ContestsViewModel
+): ContestsIdsHolder by contestsViewModel {
+    private val expandedIds by expandedIdsState
 
     fun isExpanded(contest: Contest): Boolean =
         contest.compositeId in expandedIds
-
-    fun toggleExpanded(contest: Contest) {
-        val id = contest.compositeId
-        if (id in expandedIds) expandedIds -= id
-        else expandedIds += id
-    }
-
-    fun removeUnavailable(contests: List<Contest>) {
-        val currentsIds = contests.mapToSet { it.compositeId }
-        expandedIds = expandedIds.filter { it in currentsIds }
-    }
 }
