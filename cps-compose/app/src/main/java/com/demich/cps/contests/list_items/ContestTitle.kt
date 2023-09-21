@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.append
 
 @Composable
@@ -63,6 +64,28 @@ private fun colorFor(phase: Contest.Phase): Color =
         Contest.Phase.BEFORE -> cpsColors.content
         Contest.Phase.RUNNING -> cpsColors.success
         Contest.Phase.FINISHED -> cpsColors.contentAdditional
+    }
+
+@Composable
+internal fun TextDate(
+    date: String,
+    collisionType: DangerType,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = date,
+        modifier = modifier,
+        color = colorFor(collisionType)
+    )
+}
+
+@Composable
+@ReadOnlyComposable
+private fun colorFor(collisionType: DangerType): Color =
+    when (collisionType) {
+        DangerType.SAFE -> Color.Unspecified
+        DangerType.WARNING -> cpsColors.warning
+        DangerType.DANGER -> cpsColors.error
     }
 
 @Composable

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,6 +24,7 @@ import com.demich.cps.ui.CPSDropdownMenuButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 
@@ -98,6 +100,7 @@ private fun ContestItemDatesAndMenuButton(
     ContestItemDatesAndMenuButton(
         dateRange = contestDisplay.contest.dateRange(),
         contestLink = contestDisplay.contest.link,
+        collisionType = contestDisplay.collisionType,
         modifier = Modifier.fillMaxWidth(),
         onDeleteRequest = onDeleteRequest
     )
@@ -121,19 +124,22 @@ private fun ContestCounter(
 @Composable
 private fun ContestItemDatesAndMenuButton(
     dateRange: String,
+    collisionType: DangerType,
     contestLink: String?,
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
     Box(modifier = modifier) {
-        Text(
-            text = dateRange,
-            style = CPSDefaults.MonospaceTextStyle.copy(
-                fontSize = 15.sp,
-                color = cpsColors.contentAdditional
-            ),
-            modifier = Modifier.align(Alignment.Center)
-        )
+        ProvideTextStyle(CPSDefaults.MonospaceTextStyle.copy(
+            fontSize = 15.sp,
+            color = cpsColors.contentAdditional
+        )) {
+            TextDate(
+                date = dateRange,
+                collisionType = collisionType,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
         ContestItemMenuButton(
             contestLink = contestLink,
             modifier = Modifier.align(Alignment.CenterEnd),
