@@ -39,7 +39,7 @@ private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<Pair<Contest.Pl
         flow2 = CodeforcesMonitorDataStore(context).flowOfContestId()
     ) { ignored, monitorContestId ->
         buildSet {
-            ignored.forEach { add(it.key) }
+            addAll(ignored.keys)
             monitorContestId?.let { add(Contest.Platform.codeforces to it.toString()) }
         }
     }
