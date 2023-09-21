@@ -74,7 +74,7 @@ private fun CodeforcesFollowList(
 ) {
     val listState = rememberLazyListState()
 
-    LaunchedEffect(key1 = listState) {
+    LaunchedEffect(listState, userBlogs) {
         /* Cases:
             1) delete not first -> removing animation
             2) delete first + scroll on top -> removing animation

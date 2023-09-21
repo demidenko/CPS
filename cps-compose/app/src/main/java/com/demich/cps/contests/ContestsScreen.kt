@@ -44,6 +44,7 @@ import com.demich.datastore_itemized.flowBy
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -136,12 +137,16 @@ private fun ContestsList(
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
-    val (contestsToShowState, currentTimeState) = produceSortedContestsWithTime()
+    val (
+        contestsToShowState: State<List<Contest>>,
+        currentTimeState: State<Instant>
+    ) = produceSortedContestsWithTime()
 
     LaunchedEffect(contestsToShowState, filterController) {
-        snapshotFlow { contestsToShowState.value.isEmpty() }
-            .collect {
-                filterController.available = !it
+        snapshotFlow { contestsToShowState.value }
+            .collect { contests ->
+                filterController.available = contests.isNotEmpty()
+                //TODO: filter expanded
             }
     }
 

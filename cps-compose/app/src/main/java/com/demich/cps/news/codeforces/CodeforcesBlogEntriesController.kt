@@ -57,7 +57,7 @@ fun rememberCodeforcesBlogEntriesController(
             listState.visibleRange(0.75f)
         }.combine(flowOfIds) { visibleRange, ids -> visibleRange to ids }
             .debounce(250.milliseconds)
-            .onEach { (visibleRange, ids) ->
+            .collect { (visibleRange, ids) ->
                 //empty ids can create Empty message item!!
                 if (ids.isNotEmpty()) {
                     newEntriesItem.markAtLeast(
@@ -66,7 +66,6 @@ fun rememberCodeforcesBlogEntriesController(
                     )
                 }
             }
-            .launchIn(this)
     }
 
     val scope = rememberCoroutineScope()
