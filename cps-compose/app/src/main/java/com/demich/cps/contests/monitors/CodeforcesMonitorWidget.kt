@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.contests.contestItemPaddings
 import com.demich.cps.contests.contestTimeDifference
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.list_items.ContestItemHeader
@@ -52,12 +53,7 @@ fun CodeforcesMonitorWidget(
                 modifier = modifier
                     .clip(RoundedCornerShape(6.dp))
                     .background(color = cpsColors.backgroundAdditional)
-                    .padding(
-                        start = 4.dp,
-                        end = 7.dp,
-                        top = 4.dp,
-                        bottom = 3.dp
-                    )
+                    .contestItemPaddings()
             )
         }
     ) {

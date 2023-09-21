@@ -193,17 +193,20 @@ private fun ContestsColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickableNoRipple { contestsListController.toggleExpanded(contest) }
-                .padding(
-                    start = 4.dp,
-                    end = 7.dp,
-                    top = 4.dp,
-                    bottom = 3.dp
-                )
+                .contestItemPaddings()
                 .animateContentSize()
         )
         Divider()
     }
 }
+
+internal fun Modifier.contestItemPaddings() =
+    padding(
+        start = 4.dp,
+        end = 7.dp,
+        top = 3.dp,
+        bottom = 4.dp
+    )
 
 @Composable
 private fun ContestsFilterTextField(
