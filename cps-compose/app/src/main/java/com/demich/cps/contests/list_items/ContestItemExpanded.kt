@@ -28,20 +28,21 @@ import com.demich.cps.utils.openUrlInBrowser
 
 @Composable
 internal fun ContestExpandedItemContent(
-    data: ContestData,
+    contestDisplay: ContestDisplay,
     onDeleteRequest: () -> Unit
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        val data = contestDisplay.dataByCurrentTime()
         ContestPlatform(
             platform = data.contest.platform,
-            platformName = data.contest.host ?: data.contest.platform.name
+            platformName = data.contest.platformName()
         )
         ContestTitle(
             contestTitle = data.contest.title,
             phase = data.phase
         )
         ContestItemDatesAndMenuButton(
-            contest = data.contest,
+            contestDisplay = contestDisplay,
             onDeleteRequest = onDeleteRequest
         )
         ContestCounter(
@@ -91,12 +92,12 @@ private fun ContestTitle(
 
 @Composable
 private fun ContestItemDatesAndMenuButton(
-    contest: Contest,
+    contestDisplay: ContestDisplay,
     onDeleteRequest: () -> Unit
 ) {
     ContestItemDatesAndMenuButton(
-        dateRange = contest.dateRange(),
-        contestLink = contest.link,
+        dateRange = contestDisplay.contest.dateRange(),
+        contestLink = contestDisplay.contest.link,
         modifier = Modifier.fillMaxWidth(),
         onDeleteRequest = onDeleteRequest
     )

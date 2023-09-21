@@ -20,7 +20,6 @@ import com.demich.cps.contests.dateShortRange
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
-import com.demich.cps.utils.localCurrentTime
 
 @Composable
 fun ContestItem(
@@ -30,16 +29,16 @@ fun ContestItem(
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
+    val contestDisplay = ContestDisplay(contest, collisionType())
     Column(modifier = modifier) {
-        //TODO: recompose twice per second! (wtf?)
-        val data = contestData(contest = contest, currentTime = localCurrentTime)
-        if (!isExpanded()) ContestItemContent(data = data)
-        else ContestExpandedItemContent(data = data, onDeleteRequest = onDeleteRequest)
+        if (!isExpanded()) ContestItemContent(contestDisplay)
+        else ContestExpandedItemContent(contestDisplay, onDeleteRequest = onDeleteRequest)
     }
 }
 
 @Composable
-private fun ContestItemContent(data: ContestData) {
+private fun ContestItemContent(contestDisplay: ContestDisplay) {
+    val data = contestDisplay.dataByCurrentTime()
     ContestItemHeader(
         platform = data.contest.platform,
         contestTitle = data.contest.title,
@@ -102,6 +101,7 @@ private fun ContestItemFooter(
     ContestItemFooter(
         date = date,
         counter = counter,
+        collisionType = data.collisionType,
         modifier = modifier
     )
 }
@@ -110,6 +110,7 @@ private fun ContestItemFooter(
 private fun ContestItemFooter(
     date: String,
     counter: String,
+    collisionType: DangerType,
     modifier: Modifier = Modifier
 ) {
     ProvideTextStyle(CPSDefaults.MonospaceTextStyle.copy(

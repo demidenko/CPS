@@ -42,7 +42,7 @@ internal fun ContestTitleExpanded(
     phase: Contest.Phase,
     modifier: Modifier = Modifier
 ) {
-    var isMultiline by remember { mutableStateOf(false) }
+    var isMultiline by remember(title) { mutableStateOf(false) }
     Text(
         text = title.makeTitle(useNewLine = isMultiline),
         color = colorFor(phase),
