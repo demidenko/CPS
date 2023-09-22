@@ -24,9 +24,8 @@ fun LazyColumnWithScrollBar(
     LazyColumn(
         modifier = if (scrollBarEnabled) modifier.drawScrollBar(
             state = state,
-            scrollBarColor = cpsColors.content,
-            scrollBarActiveAlpha = 0.5f,
-            scrollBarInactiveAlpha = 0.27f,
+            scrollBarActiveColor = cpsColors.content.copy(alpha = 0.6f),
+            scrollBarInactiveColor = cpsColors.content.copy(alpha = 0.37f),
             scrollBarWidth = CPSDefaults.scrollBarWidth,
             minimumScrollBarHeight = 10.dp
         ) else modifier,

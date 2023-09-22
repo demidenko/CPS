@@ -15,6 +15,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.Dp
 import kotlin.math.max
 
@@ -42,9 +43,8 @@ internal fun Modifier.drawScrollBar(
 
 internal fun Modifier.drawScrollBar(
     state: LazyListState,
-    scrollBarColor: Color,
-    scrollBarActiveAlpha: Float,
-    scrollBarInactiveAlpha: Float,
+    scrollBarActiveColor: Color,
+    scrollBarInactiveColor: Color,
     scrollBarWidth: Dp,
     minimumScrollBarHeight: Dp
 ): Modifier = composed {
@@ -52,15 +52,15 @@ internal fun Modifier.drawScrollBar(
         derivedStateOf { state.isScrollInProgress }
     }
 
-    val alpha by animateFloatAsState(
-        targetValue = if (scrollInProgress) scrollBarActiveAlpha else scrollBarInactiveAlpha,
+    val fraction by animateFloatAsState(
+        targetValue = if (scrollInProgress) 1f else 0f,
         animationSpec = if (scrollInProgress) snap() else tween(delayMillis = 1000),
-        label = "scroll_bar_alpha"
+        label = "scroll_bar_active"
     )
 
     drawScrollBar(
         state = state,
-        scrollBarColor = scrollBarColor.copy(alpha = alpha),
+        scrollBarColor = lerp(start = scrollBarInactiveColor, stop = scrollBarActiveColor, fraction),
         scrollBarWidth = scrollBarWidth,
         minimumScrollBarHeight = minimumScrollBarHeight
     )
