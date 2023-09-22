@@ -10,22 +10,21 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.demich.cps.ui.CPSDefaults
 import kotlin.math.max
 
-fun Modifier.lazyColumnScrollBar(
+internal fun Modifier.drawScrollBar(
     state: LazyListState,
     scrollBarColor: Color,
-    scrollBarWidth: Dp = CPSDefaults.scrollBarWidth,
+    scrollBarWidth: Dp,
     minimumScrollBarHeight: Dp = 10.dp
 ): Modifier = this.drawWithContent {
     drawContent()
-    state.layoutInfo.calculateSizes { windowSize, totalSize, beforeSize ->
+    state.layoutInfo.calculateSizes { windowSize, totalSize, windowOffset ->
         val w = scrollBarWidth.toPx()
         val barHeight = windowSize / totalSize * windowSize
         val h = max(barHeight, minimumScrollBarHeight.toPx())
-        val y = if (barHeight == h) beforeSize / totalSize * windowSize
-        else beforeSize / (totalSize - windowSize) * (windowSize - h)
+        val y = if (barHeight == h) windowOffset / totalSize * windowSize
+        else windowOffset / (totalSize - windowSize) * (windowSize - h)
         drawRoundRect(
             color = scrollBarColor,
             topLeft = Offset(x = size.width - w, y = y),
@@ -36,7 +35,7 @@ fun Modifier.lazyColumnScrollBar(
 }
 
 private inline fun LazyListLayoutInfo.calculateSizes(
-    block: (windowSize: Int, totalSize: Float, beforeSize: Float) -> Unit
+    block: (windowSize: Int, totalSize: Float, windowOffset: Float) -> Unit
 ) {
     val countOfVisible = visibleItemsInfo.size
     if (countOfVisible > 0) {
@@ -45,8 +44,8 @@ private inline fun LazyListLayoutInfo.calculateSizes(
         if (windowSize < visibleItemsSize) {
             val itemAvgSize: Float = visibleItemsSize.toFloat() / countOfVisible
             val totalSize: Float = totalItemsCount * itemAvgSize
-            val beforeSize: Float = visibleItemsInfo.first().run { index * itemAvgSize - offset }
-            block(windowSize, totalSize, beforeSize)
+            val windowOffset: Float = visibleItemsInfo.first().run { index * itemAvgSize - offset }
+            block(windowSize, totalSize, windowOffset)
         }
     }
 }
