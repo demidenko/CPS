@@ -125,7 +125,7 @@ private fun WorkerItem(
             Row(modifier = Modifier.padding(top = 3.dp), verticalAlignment = Alignment.CenterVertically) {
                 if (lastResult != null) {
                     IconSp(
-                        imageVector = if (lastResult == CPSWorker.ResultTypes.SUCCESS) CPSIcons.Done else CPSIcons.Error,
+                        imageVector = if (lastResult == CPSWorker.ResultTypes.SUCCESS) CPSIcons.Done else CPSIcons.Attention,
                         color = colorFor(lastResult),
                         size = if (lastResult == CPSWorker.ResultTypes.SUCCESS) 16.sp else 14.sp,
                         modifier = Modifier.padding(end = 3.dp)

@@ -111,7 +111,7 @@ private fun Footer(
             )
             if (requestFailed) {
                 IconSp(
-                    imageVector = CPSIcons.Error,
+                    imageVector = CPSIcons.Attention,
                     size = 14.sp,
                     color = cpsColors.error,
                     modifier = Modifier.padding(end = 4.dp)

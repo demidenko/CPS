@@ -57,7 +57,7 @@ private fun AttentionWithMark(
         Text(text = text)
         if (collisionType != DangerType.SAFE) {
             IconSp(
-                imageVector = CPSIcons.Error,
+                imageVector = CPSIcons.Attention,
                 color = colorFor(collisionType),
                 size = 14.sp,
                 modifier = Modifier.padding(start = 3.dp)
