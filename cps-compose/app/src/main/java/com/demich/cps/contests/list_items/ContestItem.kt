@@ -118,8 +118,8 @@ private fun ContestItemFooter(
         color = cpsColors.contentAdditional
     )) {
         Box(modifier = modifier) {
-            TextDate(
-                date = date,
+            AttentionText(
+                text = date,
                 collisionType = collisionType,
                 modifier = Modifier.align(Alignment.CenterStart)
             )

@@ -134,8 +134,8 @@ private fun ContestItemDatesAndMenuButton(
             fontSize = 15.sp,
             color = cpsColors.contentAdditional
         )) {
-            TextDate(
-                date = dateRange,
+            AttentionText(
+                text = dateRange,
                 collisionType = collisionType,
                 modifier = Modifier.align(Alignment.Center)
             )
