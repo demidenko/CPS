@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
 
@@ -23,8 +24,11 @@ fun LazyColumnWithScrollBar(
     LazyColumn(
         modifier = if (scrollBarEnabled) modifier.drawScrollBar(
             state = state,
-            scrollBarColor = cpsColors.content.copy(alpha = 0.5f),
-            scrollBarWidth = CPSDefaults.scrollBarWidth
+            scrollBarColor = cpsColors.content,
+            scrollBarActiveAlpha = 0.5f,
+            scrollBarInactiveAlpha = 0.27f,
+            scrollBarWidth = CPSDefaults.scrollBarWidth,
+            minimumScrollBarHeight = 10.dp
         ) else modifier,
         state = state,
         verticalArrangement = verticalArrangement,
