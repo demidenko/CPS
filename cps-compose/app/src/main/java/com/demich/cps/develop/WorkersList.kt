@@ -123,23 +123,19 @@ private fun WorkerItem(
                 overflow = TextOverflow.Ellipsis
             )
             Row(modifier = Modifier.padding(top = 3.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "last run: $lastRunTimeAgo",
-                    fontSize = 14.sp,
-                    color = cpsColors.contentAdditional
-                )
                 if (lastResult != null) {
                     IconSp(
                         imageVector = if (lastResult == CPSWorker.ResultTypes.SUCCESS) CPSIcons.Done else CPSIcons.Error,
-                        color = when (lastResult) {
-                            CPSWorker.ResultTypes.SUCCESS -> cpsColors.success
-                            CPSWorker.ResultTypes.RETRY -> cpsColors.warning
-                            CPSWorker.ResultTypes.FAILURE -> cpsColors.error
-                        },
+                        color = colorFor(lastResult),
                         size = if (lastResult == CPSWorker.ResultTypes.SUCCESS) 16.sp else 14.sp,
-                        modifier = Modifier.padding(start = 3.dp)
+                        modifier = Modifier.padding(end = 3.dp)
                     )
                 }
+                Text(
+                    text = lastRunTimeAgo,
+                    fontSize = 14.sp,
+                    color = cpsColors.contentAdditional
+                )
             }
         }
 
@@ -152,12 +148,7 @@ private fun WorkerItem(
                 text = workState.name,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = when (workState) {
-                    WorkInfo.State.ENQUEUED, WorkInfo.State.FAILED, WorkInfo.State.SUCCEEDED -> cpsColors.content
-                    WorkInfo.State.RUNNING -> cpsColors.success
-                    WorkInfo.State.BLOCKED -> cpsColors.error
-                    WorkInfo.State.CANCELLED -> cpsColors.contentAdditional
-                }
+                color = colorFor(workState)
             )
             //TODO: fadeIn / fadeOut
             if (progressInfo != null) {
@@ -169,5 +160,26 @@ private fun WorkerItem(
                 )
             }
         }
+    }
+}
+
+@Composable
+@ReadOnlyComposable
+private fun colorFor(resultType: CPSWorker.ResultTypes) = with(cpsColors) {
+    when (resultType) {
+        CPSWorker.ResultTypes.SUCCESS -> success
+        CPSWorker.ResultTypes.RETRY -> warning
+        CPSWorker.ResultTypes.FAILURE -> error
+    }
+}
+
+@Composable
+@ReadOnlyComposable
+private fun colorFor(workState: WorkInfo.State) = with(cpsColors) {
+    when (workState) {
+        WorkInfo.State.ENQUEUED, WorkInfo.State.FAILED, WorkInfo.State.SUCCEEDED -> content
+        WorkInfo.State.RUNNING -> success
+        WorkInfo.State.BLOCKED -> error
+        WorkInfo.State.CANCELLED -> contentAdditional
     }
 }
