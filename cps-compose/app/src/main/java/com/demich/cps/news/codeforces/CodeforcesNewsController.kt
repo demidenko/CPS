@@ -33,7 +33,6 @@ fun rememberCodeforcesNewsController(): CodeforcesNewsController {
     }
 
     val controller = rememberSaveable(
-        viewModel,
         saver = CodeforcesNewsController.saver(viewModel, tabsState)
     ) {
         val settings = context.settingsNews
