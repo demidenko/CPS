@@ -31,12 +31,6 @@ fun codeforcesNewsViewModel(): CodeforcesNewsViewModel = sharedViewModel()
 
 class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
 
-    private val reloadableTitles = listOf(
-        CodeforcesTitle.MAIN,
-        CodeforcesTitle.TOP,
-        CodeforcesTitle.RECENT
-    )
-
     override fun flowOfLoadingStatus(): Flow<LoadingStatus> =
         listOf(
             mainBlogEntries.loadingStatusFlow,
@@ -88,6 +82,12 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
             reload(title = title, locale = locale)
         }
     }
+
+    private val reloadableTitles get() = listOf(
+        CodeforcesTitle.MAIN,
+        CodeforcesTitle.TOP,
+        CodeforcesTitle.RECENT
+    )
 
     override fun reloadAll(context: Context) {
         viewModelScope.launch {
