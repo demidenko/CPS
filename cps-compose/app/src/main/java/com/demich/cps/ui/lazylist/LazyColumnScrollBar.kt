@@ -5,9 +5,7 @@ import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
@@ -48,9 +46,7 @@ internal fun Modifier.drawScrollBar(
     scrollBarWidth: Dp,
     minimumScrollBarHeight: Dp
 ): Modifier = composed {
-    val scrollInProgress by remember(state) {
-        derivedStateOf { state.isScrollInProgress }
-    }
+    val scrollInProgress = state.isScrollInProgress
 
     val fraction by animateFloatAsState(
         targetValue = if (scrollInProgress) 1f else 0f,
@@ -69,12 +65,11 @@ internal fun Modifier.drawScrollBar(
 private inline fun LazyListLayoutInfo.calculateSizes(
     block: (windowSize: Int, totalSize: Float, windowOffset: Float) -> Unit
 ) {
-    val countOfVisible = visibleItemsInfo.size
-    if (countOfVisible > 0) {
+    if (visibleItemsInfo.isNotEmpty()) {
         val windowSize = viewportEndOffset - viewportStartOffset
         val visibleItemsSize = visibleItemsInfo.sumOf { it.size }
         if (windowSize < visibleItemsSize) {
-            val itemAvgSize: Float = visibleItemsSize.toFloat() / countOfVisible
+            val itemAvgSize: Float = visibleItemsSize.toFloat() / visibleItemsInfo.size
             val totalSize: Float = totalItemsCount * itemAvgSize
             val windowOffset: Float = visibleItemsInfo.first().run { index * itemAvgSize - offset }
             block(windowSize, totalSize, windowOffset)
