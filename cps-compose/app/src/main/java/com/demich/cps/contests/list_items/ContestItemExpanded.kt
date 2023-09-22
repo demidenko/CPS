@@ -159,6 +159,7 @@ private fun ContestItemMenuButton(
     CPSDropdownMenuButton(
         icon = CPSIcons.More,
         color = cpsColors.contentAdditional,
+        iconSize = 22.dp,
         modifier = modifier
     ) {
         if (contestLink != null) {

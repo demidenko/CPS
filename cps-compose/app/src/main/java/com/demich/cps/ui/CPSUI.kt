@@ -27,6 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -89,6 +90,7 @@ fun CPSIconButton(
     icon: ImageVector,
     modifier: Modifier = Modifier,
     color: Color = cpsColors.content,
+    iconSize: Dp = 26.dp,
     enabled: Boolean = true,
     onState: Boolean = enabled,
     onClick: () -> Unit
@@ -102,7 +104,7 @@ fun CPSIconButton(
             icon = icon,
             color = color,
             onState = onState,
-            modifier = Modifier.size(26.dp)
+            modifier = Modifier.size(iconSize)
         )
     }
 }

@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -177,6 +178,7 @@ fun CPSDropdownMenuButton(
     icon: ImageVector,
     modifier: Modifier = Modifier,
     color: Color = cpsColors.content,
+    iconSize: Dp = 26.dp,
     enabled: Boolean = true,
     onState: Boolean = enabled,
     menuBuilder: CPSMenuBuilder
@@ -190,6 +192,7 @@ fun CPSDropdownMenuButton(
             CPSIconButton(
                 icon = icon,
                 color = color,
+                iconSize = iconSize,
                 enabled = enabled,
                 onState = onState,
                 onClick = { showMenu = true }
