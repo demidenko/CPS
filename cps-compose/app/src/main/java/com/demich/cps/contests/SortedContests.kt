@@ -22,8 +22,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
@@ -74,30 +72,28 @@ internal fun produceSortedContestsWithTime(
 ): Pair<State<List<Contest>>, State<Instant>> {
     val context = context
 
-    val initPair = remember {
+    val states = remember {
         val contests = runBlocking { flowOfContests(context).first() }
         val currentTime = getCurrentTime().floorBy(1.seconds)
-        SortedContests(
-            contests = contests.sortedWith(Contest.getComparator(currentTime)),
-            currentTime = currentTime
-        )
+        val sortedContests = contests.sortedWith(Contest.getComparator(currentTime))
+        val contestsState = mutableStateOf(sortedContests)
+        val currentTimeState = mutableStateOf(currentTime)
+        Pair(contestsState, currentTimeState)
     }
-
-    val contestsState = remember(initPair) { mutableStateOf(initPair.contests) }
-    val currentTimeState = remember(initPair) { mutableStateOf(initPair.currentTime) }
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(lifecycleOwner) {
+    LaunchedEffect(lifecycleOwner, states) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            val (contestsState, currentTimeState) = states
             //TODO: optimize emplace (??)
             flowOfSortedContestsWithTime(context)
-                .onEach {
+                .collect {
                     contestsState.value = it.contests
                     currentTimeState.value = it.currentTime
-                }.launchIn(this)
+                }
         }
     }
 
-    return Pair(contestsState, currentTimeState)
+    return states
 }
