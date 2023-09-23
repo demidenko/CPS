@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
@@ -19,11 +20,13 @@ class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
     fun execute(id: Any, block: suspend () -> T) =
         flowOfResult().also {
             if (currentId != id) {
+                flow.value = null
                 currentId = id
                 job?.cancel()
-                flow.value = null
                 job = scope.launch(Dispatchers.IO) {
-                    flow.value = kotlin.runCatching { block() }
+                    kotlin.runCatching { block() }.let {
+                        if (isActive && currentId == id) flow.value = it
+                    }
                 }
             }
         }
