@@ -49,8 +49,8 @@ class CPSColors(
 
 internal fun lightCPSColors(useOriginalHandleColors: Boolean) = CPSColors(
     accent = Color(21, 101, 192),
-    content = Color(36, 36, 36),
-    contentAdditional = Color(118, 118, 118),
+    content = Color(33, 33, 33),
+    contentAdditional = Color(113, 113, 113),
     background = Color(248, 248, 248),
     backgroundAdditional = Color(234, 234, 234),
     backgroundNavigation = Color(255, 255, 255),
