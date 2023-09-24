@@ -50,11 +50,27 @@ private fun flowOfContests(context: Context) =
             else list.filter { contest -> contest.compositeId !in ignored }
         }
 
-private class ContestsSorter {
+private interface ContestsSorter {
+    val contests: List<Contest>
+    fun apply(contests: List<Contest>, currentTime: Instant)
+}
+
+/*private class ContestsStupidSorter: ContestsSorter {
+    override var contests: List<Contest> = emptyList()
+        private set
+
+    override fun apply(contests: List<Contest>, currentTime: Instant) {
+        this.contests = contests.sortedWith(Contest.getComparator(currentTime))
+    }
+}*/
+
+private class ContestsDefaultSorter: ContestsSorter {
     private var last: List<Contest> = emptyList()
     private var sortedLast: List<Contest> = emptyList()
 
-    fun apply(contests: List<Contest>, currentTime: Instant) {
+    override val contests: List<Contest> get() = sortedLast
+
+    override fun apply(contests: List<Contest>, currentTime: Instant) {
         if (last != contests) {
             last = contests
             sortedLast = contests
@@ -64,12 +80,47 @@ private class ContestsSorter {
             sortedLast = sortedLast.sortedWith(comparator)
         }
     }
+}
 
-    val contests: List<Contest> get() = sortedLast
+private class ContestsSmartSorter: ContestsSorter {
+    private var last: List<Contest> = emptyList()
+    private var sortedLast: List<Contest> = emptyList()
+    private var sortedAt: Instant = Instant.DISTANT_PAST
+    private var nextSortMoment: Instant = Instant.DISTANT_PAST
+
+    override val contests: List<Contest> get() = sortedLast
+
+    override fun apply(contests: List<Contest>, currentTime: Instant) {
+        if (last != contests || currentTime < sortedAt) {
+            last = contests
+            sortedLast = contests.sortedWith(Contest.getComparator(currentTime))
+            sortedAt = currentTime
+            nextSortMoment = contests.nextSortMoment(currentTime)
+        } else {
+            if (currentTime >= nextSortMoment) {
+                val comparator = Contest.getComparator(currentTime)
+                if (!sortedLast.isSortedWith(comparator)) {
+                    sortedLast = sortedLast.sortedWith(comparator)
+                    sortedAt = currentTime
+                    nextSortMoment = contests.nextSortMoment(currentTime)
+                }
+            }
+        }
+    }
+    companion object {
+        private fun List<Contest>.nextSortMoment(currentTime: Instant): Instant =
+            minOfOrNull {
+                when (it.getPhase(currentTime)) {
+                    Contest.Phase.BEFORE -> it.startTime
+                    Contest.Phase.RUNNING -> it.endTime
+                    Contest.Phase.FINISHED -> Instant.DISTANT_FUTURE
+                }
+            } ?: Instant.DISTANT_FUTURE
+    }
 }
 
 internal fun flowOfSortedContestsWithTime(context: Context): Flow<SortedContests> {
-    val sorter = ContestsSorter()
+    val sorter: ContestsSorter = ContestsSmartSorter()
     return flowOfContests(context).combine(flowOfCurrentTimeEachSecond()) { contests, currentTime ->
         sorter.apply(contests, currentTime)
         SortedContests(sorter.contests, currentTime)
