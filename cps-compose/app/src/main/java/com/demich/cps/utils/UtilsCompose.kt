@@ -2,8 +2,17 @@ package com.demich.cps.utils
 
 import android.content.Context
 import androidx.activity.ComponentActivity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
@@ -12,7 +21,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -150,6 +158,31 @@ fun rememberFocusOnCreationRequester(): FocusRequester {
         }
     }
     return requester
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun<T: Any> AnimatedVisibleByNotNull(
+    value: T?,
+    modifier: Modifier = Modifier,
+    enter: EnterTransition = fadeIn() + expandIn(),
+    exit: ExitTransition = shrinkOut() + fadeOut(),
+    content: @Composable (T) -> Unit
+) {
+    val lastNotNull = remember { mutableStateOf<T?>(null) }.also {
+        if (value != null) it.value = value
+    }
+
+    val transition = updateTransition<T?>(targetState = value)
+
+    transition.AnimatedVisibility(
+        visible = { it != null },
+        modifier = modifier,
+        enter = enter,
+        exit = exit
+    ) {
+        content(lastNotNull.value!!)
+    }
 }
 
 @Composable
