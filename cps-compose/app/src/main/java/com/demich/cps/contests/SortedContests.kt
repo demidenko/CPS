@@ -90,32 +90,34 @@ private class ContestsSmartSorter: ContestsSorter {
 
     override val contests: List<Contest> get() = sortedLast
 
+    private fun saveToSorted(
+        contests: List<Contest>,
+        currentTime: Instant,
+        comparator: Comparator<Contest> = Contest.getComparator(currentTime)
+    ) {
+        sortedLast = contests.sortedWith(comparator)
+        sortedAt = currentTime
+        nextSortMoment = contests.minOfOrNull {
+            when (it.getPhase(currentTime)) {
+                Contest.Phase.BEFORE -> it.startTime
+                Contest.Phase.RUNNING -> it.endTime
+                Contest.Phase.FINISHED -> Instant.DISTANT_FUTURE
+            }
+        } ?: Instant.DISTANT_FUTURE
+    }
+
     override fun apply(contests: List<Contest>, currentTime: Instant) {
         if (last != contests || currentTime < sortedAt) {
             last = contests
-            sortedLast = contests.sortedWith(Contest.getComparator(currentTime))
-            sortedAt = currentTime
-            nextSortMoment = contests.nextSortMoment(currentTime)
+            saveToSorted(contests, currentTime)
         } else {
             if (currentTime >= nextSortMoment) {
                 val comparator = Contest.getComparator(currentTime)
                 if (!sortedLast.isSortedWith(comparator)) {
-                    sortedLast = sortedLast.sortedWith(comparator)
-                    sortedAt = currentTime
-                    nextSortMoment = contests.nextSortMoment(currentTime)
+                    saveToSorted(sortedLast, currentTime, comparator)
                 }
             }
         }
-    }
-    companion object {
-        private fun List<Contest>.nextSortMoment(currentTime: Instant): Instant =
-            minOfOrNull {
-                when (it.getPhase(currentTime)) {
-                    Contest.Phase.BEFORE -> it.startTime
-                    Contest.Phase.RUNNING -> it.endTime
-                    Contest.Phase.FINISHED -> Instant.DISTANT_FUTURE
-                }
-            } ?: Instant.DISTANT_FUTURE
     }
 }
 
