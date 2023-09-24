@@ -50,10 +50,11 @@ private fun flowOfContests(context: Context) =
             else list.filter { contest -> contest.compositeId !in ignored }
         }
 
-internal fun flowOfSortedContestsWithTime(context: Context): Flow<SortedContests> {
-    var last: List<Contest> = emptyList()
-    var sortedLast: List<Contest> = emptyList()
-    return flowOfContests(context).combine(flowOfCurrentTimeEachSecond()) { contests, currentTime ->
+private class ContestsSorter {
+    private var last: List<Contest> = emptyList()
+    private var sortedLast: List<Contest> = emptyList()
+
+    fun apply(contests: List<Contest>, currentTime: Instant) {
         if (last != contests) {
             last = contests
             sortedLast = contests
@@ -62,7 +63,16 @@ internal fun flowOfSortedContestsWithTime(context: Context): Flow<SortedContests
         if (!sortedLast.isSortedWith(comparator)) {
             sortedLast = sortedLast.sortedWith(comparator)
         }
-        SortedContests(sortedLast, currentTime)
+    }
+
+    val contests: List<Contest> get() = sortedLast
+}
+
+internal fun flowOfSortedContestsWithTime(context: Context): Flow<SortedContests> {
+    val sorter = ContestsSorter()
+    return flowOfContests(context).combine(flowOfCurrentTimeEachSecond()) { contests, currentTime ->
+        sorter.apply(contests, currentTime)
+        SortedContests(sorter.contests, currentTime)
     }
 }
 
