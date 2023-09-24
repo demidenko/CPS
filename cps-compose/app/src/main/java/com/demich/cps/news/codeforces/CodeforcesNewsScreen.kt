@@ -125,7 +125,7 @@ private fun CodeforcesNewsTab(
         title = title,
         index = controller.tabs.indexOf(title),
         loadingStatus = loadingStatus,
-        badgeCount = badgeCount,
+        badgeCount = { badgeCount.takeIf { it != 0 } },
         pagerState = controller.pagerState,
         modifier = modifier
     )
@@ -136,7 +136,7 @@ private fun CodeforcesNewsTab(
     title: CodeforcesTitle,
     index: Int,
     loadingStatus: LoadingStatus,
-    badgeCount: Int,
+    badgeCount: () -> Int?,
     pagerState: PagerState,
     modifier: Modifier = Modifier
 ) {

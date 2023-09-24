@@ -1,5 +1,7 @@
 package com.demich.cps.news
 
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +22,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSCountBadge
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.AnimatedVisibleByNotNull
 import kotlin.math.max
 import kotlin.math.min
 
@@ -55,7 +58,7 @@ fun NewsTabRow(
 fun NewsTab(
     title: String,
     index: Int,
-    badgeCount: Int,
+    badgeCount: () -> Int?,
     pagerState: PagerState,
     modifier: Modifier = Modifier,
     selectedTextColor: Color,
@@ -64,7 +67,14 @@ fun NewsTab(
     Box(modifier = modifier.fillMaxSize()) {
         BadgedBox(
             modifier = Modifier.align(Alignment.Center),
-            badge = { CPSCountBadge(count = badgeCount) }
+            badge = {
+                AnimatedVisibleByNotNull(
+                    value = badgeCount,
+                    enter = scaleIn(),
+                    exit = scaleOut(),
+                    content = { CPSCountBadge(count = it) }
+                )
+            }
         ) {
             Text(
                 text = title,

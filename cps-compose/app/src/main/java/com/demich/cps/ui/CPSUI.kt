@@ -1,10 +1,7 @@
 package com.demich.cps.ui
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -32,7 +29,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.AnimatedVisibleByNotNull
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.toSignedString
 
@@ -284,18 +280,11 @@ fun EmptyMessageBox(
 
 @Composable
 fun CPSCountBadge(count: Int) {
-    require(count >= 0)
-    AnimatedVisibleByNotNull(
-        value = { count.takeIf { it > 0 } },
-        enter = scaleIn(),
-        exit = scaleOut()
-    ) {
-        Badge(
-            backgroundColor = cpsColors.newEntry,
-            contentColor = cpsColors.background,
-            content = { Text(it.toString()) }
-        )
-    }
+    Badge(
+        backgroundColor = cpsColors.newEntry,
+        contentColor = cpsColors.background,
+        content = { Text(count.toString()) }
+    )
 }
 
 @OptIn(ExperimentalMaterialApi::class)
