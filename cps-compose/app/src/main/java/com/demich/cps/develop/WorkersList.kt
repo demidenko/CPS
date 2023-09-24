@@ -150,10 +150,13 @@ private fun WorkerItem(
                 fontWeight = FontWeight.Bold,
                 color = colorFor(workState)
             )
-            //TODO: fadeIn / fadeOut
-            if (progressInfo != null) {
+            AnimatedVisibleByNotNull(
+                value = { progressInfo },
+                enter = enterInColumn(),
+                exit = exitInColumn()
+            ) {
                 CPSProgressIndicator(
-                    progressBarInfo = progressInfo,
+                    progressBarInfo = it,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 3.dp)

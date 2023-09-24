@@ -72,6 +72,7 @@ fun developAdditionalBottomBarBuilder(): AdditionalBottomBarBuilder = {
     if (showMonitorDialog) {
         MonitorDialog(onDismissRequest = { showMonitorDialog = false }) {
             contestsViewModel.viewModelScope.launch {
+                delay(5.seconds)
                 CodeforcesMonitorLauncherWorker.startMonitor(
                     contestId = it,
                     context = context,
