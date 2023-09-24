@@ -97,7 +97,6 @@ private fun ContestItemDatesAndMenuButton(
     contestDisplay: ContestDisplay,
     onDeleteRequest: () -> Unit
 ) {
-    println("!!!")
     ContestItemDatesAndMenuButton(
         dateRange = contestDisplay.contest.dateRange(),
         contestLink = contestDisplay.contest.link,
