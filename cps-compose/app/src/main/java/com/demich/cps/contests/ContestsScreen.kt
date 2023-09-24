@@ -2,6 +2,10 @@ package com.demich.cps.contests
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,6 +21,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
@@ -369,20 +374,24 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
         }
     }
 
-    contestDataState.value?.let { contestData ->
+    AnimatedVisibleByNotNull(
+        value = { contestDataState.value },
+        enter = expandIn { IntSize(width = it.width, height = 0) } + fadeIn(),
+        exit = shrinkOut { IntSize(width = it.width, height = 0) } + fadeOut()
+    ) {
         val requestFailed by rememberCollectWithLifecycle { monitor.lastRequest.flow.map { it == false } }
         CodeforcesMonitorWidget(
-            contestData = contestData,
+            contestData = it,
             requestFailed = requestFailed,
             modifier = modifier,
             onOpenInBrowser = {
-                context.openUrlInBrowser(url = CodeforcesApi.urls.contest(contestData.contestId))
+                context.openUrlInBrowser(url = CodeforcesApi.urls.contest(it.contestId))
             },
             onStop = {
                 scope.launch {
                     monitor.reset()
                     CodeforcesAccountManager().dataStore(context).monitorCanceledContests.add(
-                        contestData.contestId to getCurrentTime()
+                        it.contestId to getCurrentTime()
                     )
                 }
             }

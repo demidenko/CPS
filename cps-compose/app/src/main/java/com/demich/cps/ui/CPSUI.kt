@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.AnimatedVisibleByNotNull
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.toSignedString
 
@@ -284,15 +285,15 @@ fun EmptyMessageBox(
 @Composable
 fun CPSCountBadge(count: Int) {
     require(count >= 0)
-    AnimatedVisibility(
-        visible = count > 0,
+    AnimatedVisibleByNotNull(
+        value = { count.takeIf { it > 0 } },
         enter = scaleIn(),
         exit = scaleOut()
     ) {
         Badge(
             backgroundColor = cpsColors.newEntry,
             contentColor = cpsColors.background,
-            content = { Text(count.toString()) }
+            content = { Text(it.toString()) }
         )
     }
 }

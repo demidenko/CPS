@@ -9,10 +9,6 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.expandIn
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
@@ -163,18 +159,20 @@ fun rememberFocusOnCreationRequester(): FocusRequester {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun<T: Any> AnimatedVisibleByNotNull(
-    value: T?,
+    value: () -> T?,
     modifier: Modifier = Modifier,
-    enter: EnterTransition = fadeIn() + expandIn(),
-    exit: ExitTransition = shrinkOut() + fadeOut(),
+    enter: EnterTransition,
+    exit: ExitTransition,
     content: @Composable (T) -> Unit
 ) {
+    val v = value()
     val lastNotNull = remember { mutableStateOf<T?>(null) }.also {
-        if (value != null) it.value = value
+        if (v != null) it.value = v
     }
 
-    val transition = updateTransition<T?>(targetState = value)
+    val transition = updateTransition<T?>(targetState = v)
 
+    //TODO: switch to null during enter is not well
     transition.AnimatedVisibility(
         visible = { it != null },
         modifier = modifier,
