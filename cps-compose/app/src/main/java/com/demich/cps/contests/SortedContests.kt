@@ -98,10 +98,10 @@ private class ContestsSmartSorter: ContestsSorter {
         sortedLast = contests.sortedWith(comparator)
         sortedAt = currentTime
         nextSortMoment = contests.minOfOrNull {
-            when (it.getPhase(currentTime)) {
-                Contest.Phase.BEFORE -> it.startTime
-                Contest.Phase.RUNNING -> it.endTime
-                Contest.Phase.FINISHED -> Instant.DISTANT_FUTURE
+            when {
+                currentTime < it.startTime -> it.startTime
+                currentTime < it.endTime -> it.endTime
+                else -> Instant.DISTANT_FUTURE
             }
         } ?: Instant.DISTANT_FUTURE
     }
