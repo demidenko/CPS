@@ -101,7 +101,7 @@ private fun ContestItemFooter(
     ContestItemFooter(
         date = date,
         counter = counter,
-        collisionType = data.collisionType,
+        collisionType = data.contestDisplay.collisionType,
         modifier = modifier
     )
 }

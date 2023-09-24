@@ -10,11 +10,12 @@ import com.demich.cps.utils.localCurrentTime
 
 @Immutable
 internal data class ContestData(
-    val contest: Contest,
     val phase: Contest.Phase,
     val counter: String,
-    val collisionType: DangerType
-)
+    val contestDisplay: ContestDisplay
+) {
+    val contest: Contest get() = contestDisplay.contest
+}
 
 @Composable
 @ReadOnlyComposable
@@ -27,7 +28,11 @@ internal fun ContestDisplay.dataByCurrentTime(): ContestData {
         Contest.Phase.RUNNING -> contestTimeDifference(currentTime, contest.endTime) //endsIn
         Contest.Phase.FINISHED -> ""
     }
-    return ContestData(contest, phase, counter, collisionType)
+    return ContestData(
+        phase = phase,
+        counter = counter,
+        contestDisplay = if (phase == Contest.Phase.BEFORE) this else copy(collisionType = DangerType.SAFE)
+    )
 }
 
 

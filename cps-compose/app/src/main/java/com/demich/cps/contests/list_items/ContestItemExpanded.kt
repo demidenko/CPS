@@ -44,7 +44,7 @@ internal fun ContestExpandedItemContent(
             phase = data.phase
         )
         ContestItemDatesAndMenuButton(
-            contestDisplay = contestDisplay,
+            contestDisplay = data.contestDisplay,
             onDeleteRequest = onDeleteRequest
         )
         ContestCounter(
@@ -97,6 +97,7 @@ private fun ContestItemDatesAndMenuButton(
     contestDisplay: ContestDisplay,
     onDeleteRequest: () -> Unit
 ) {
+    println("!!!")
     ContestItemDatesAndMenuButton(
         dateRange = contestDisplay.contest.dateRange(),
         contestLink = contestDisplay.contest.link,
