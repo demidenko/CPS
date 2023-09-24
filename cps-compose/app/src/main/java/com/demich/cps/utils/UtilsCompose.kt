@@ -9,10 +9,10 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.expandIn
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
@@ -40,7 +40,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -190,12 +189,10 @@ fun<T: Any> AnimatedVisibleByNotNull(
 }
 
 @Stable
-fun enterInColumn(): EnterTransition =
-    expandIn { IntSize(width = it.width, height = 0) } + fadeIn()
+fun enterInColumn(): EnterTransition = expandVertically() + fadeIn()
 
 @Stable
-fun exitInColumn(): ExitTransition =
-    shrinkOut { IntSize(width = it.width, height = 0) } + fadeOut()
+fun exitInColumn(): ExitTransition = shrinkVertically() + fadeOut()
 
 
 @Composable
