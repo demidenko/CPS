@@ -26,12 +26,13 @@ import com.demich.cps.contests.list_items.ContestItemHeader
 import com.demich.cps.platforms.api.CodeforcesContestPhase
 import com.demich.cps.platforms.api.CodeforcesContestType
 import com.demich.cps.platforms.api.CodeforcesParticipationType
+import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
-import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.currentTimeAsState
 import com.demich.cps.utils.rememberWith
 import kotlin.time.Duration.Companion.seconds
@@ -110,10 +111,9 @@ private fun Footer(
                 modifier = Modifier.weight(1f)
             )
             if (requestFailed) {
-                IconSp(
-                    imageVector = CPSIcons.Attention,
+                AttentionIcon(
+                    dangerType = DangerType.DANGER,
                     size = 14.sp,
-                    color = cpsColors.error,
                     modifier = Modifier.padding(end = 4.dp)
                 )
             }

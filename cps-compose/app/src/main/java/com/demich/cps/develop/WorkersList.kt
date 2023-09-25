@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.work.WorkInfo
+import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
@@ -124,10 +125,8 @@ private fun WorkerItem(
             )
             Row(modifier = Modifier.padding(top = 3.dp), verticalAlignment = Alignment.CenterVertically) {
                 if (lastResult != null) {
-                    IconSp(
-                        imageVector = if (lastResult == CPSWorker.ResultTypes.SUCCESS) CPSIcons.Done else CPSIcons.Attention,
-                        color = colorFor(lastResult),
-                        size = if (lastResult == CPSWorker.ResultTypes.SUCCESS) 16.sp else 14.sp,
+                    ResultIcon(
+                        result = lastResult,
                         modifier = Modifier.padding(end = 3.dp)
                     )
                 }
@@ -167,12 +166,23 @@ private fun WorkerItem(
 }
 
 @Composable
-@ReadOnlyComposable
-private fun colorFor(resultType: CPSWorker.ResultTypes) = with(cpsColors) {
-    when (resultType) {
-        CPSWorker.ResultTypes.SUCCESS -> success
-        CPSWorker.ResultTypes.RETRY -> warning
-        CPSWorker.ResultTypes.FAILURE -> error
+private fun ResultIcon(
+    result: CPSWorker.ResultTypes,
+    modifier: Modifier = Modifier
+) {
+    if (result == CPSWorker.ResultTypes.SUCCESS) {
+        IconSp(
+            imageVector = CPSIcons.Done,
+            color = cpsColors.success,
+            size = 16.sp,
+            modifier = modifier
+        )
+    } else {
+        AttentionIcon(
+            dangerType = if (result == CPSWorker.ResultTypes.RETRY) DangerType.WARNING else DangerType.DANGER,
+            size = 14.sp,
+            modifier = modifier
+        )
     }
 }
 

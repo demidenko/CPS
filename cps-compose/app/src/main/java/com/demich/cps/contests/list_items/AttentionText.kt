@@ -6,16 +6,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.IconSp
+import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
+import com.demich.cps.utils.colorFor
 
 
 @Composable
@@ -24,15 +22,6 @@ internal fun AttentionText(
     collisionType: DangerType,
     modifier: Modifier = Modifier
 ) = AttentionWithMark(text, collisionType, modifier)
-
-@Composable
-@ReadOnlyComposable
-private fun colorFor(collisionType: DangerType): Color =
-    when (collisionType) {
-        DangerType.SAFE -> Color.Unspecified
-        DangerType.WARNING -> cpsColors.warning
-        DangerType.DANGER -> cpsColors.error
-    }
 
 @Composable
 private fun AttentionHighlighted(
@@ -56,9 +45,8 @@ private fun AttentionWithMark(
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Text(text = text)
         if (collisionType != DangerType.SAFE) {
-            IconSp(
-                imageVector = CPSIcons.Attention,
-                color = colorFor(collisionType),
+            AttentionIcon(
+                dangerType = collisionType,
                 size = 14.sp,
                 modifier = Modifier.padding(start = 3.dp)
             )
