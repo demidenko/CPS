@@ -28,7 +28,7 @@ class ItemizedMutablePreferences(private val preferences: MutablePreferences) {
     }
 
     fun<T> remove(item: DataStoreItem<T>) {
-        preferences.remove(item.converter.key)
+        item.converter.removeFrom(preferences)
     }
 }
 

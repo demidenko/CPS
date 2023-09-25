@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 internal abstract class Converter<T, S: Any>(
-    val key: Preferences.Key<S>
+    private val key: Preferences.Key<S>
 ) {
     protected abstract fun fromPrefs(s: S?): T
     protected abstract fun toPrefs(t: T & Any): S
@@ -20,6 +20,10 @@ internal abstract class Converter<T, S: Any>(
     fun setTo(prefs: MutablePreferences, value: T) {
         if (value == null) prefs.remove(key)
         else prefs[key] = toPrefs(value)
+    }
+
+    fun removeFrom(prefs: MutablePreferences) {
+        prefs.remove(key)
     }
 
     internal fun mapGetter(transform: (T) -> T): Converter<T, S> =

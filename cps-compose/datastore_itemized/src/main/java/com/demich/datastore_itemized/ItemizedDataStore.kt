@@ -17,7 +17,7 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
     protected suspend fun resetItems(items: Collection<DataStoreItem<*>>) {
         if (items.isEmpty()) return
         dataStore.edit { prefs ->
-            items.forEach { prefs.remove(it.converter.key) }
+            items.forEach { it.converter.removeFrom(prefs) }
         }
     }
 
