@@ -23,7 +23,7 @@ abstract class CPSWorker(
 ): CoroutineWorker(work.context, parameters) {
 
     protected val context get() = work.context
-    protected val currentTime by lazy { getCurrentTime() }
+    protected val workerStartTime by lazy { getCurrentTime() }
 
     final override suspend fun doWork(): Result {
         if (!work.isEnabled()) {
@@ -36,7 +36,7 @@ abstract class CPSWorker(
         val result = withContext(Dispatchers.IO) {
             workersInfo.edit { prefs ->
                 prefs.edit(lastExecutionTime) {
-                    this[work.name] = currentTime
+                    this[work.name] = workerStartTime
                 }
                 prefs.edit(lastResult) {
                     remove(work.name)
@@ -56,7 +56,7 @@ abstract class CPSWorker(
                             else this[work.name] = type
                         }
                         prefs.edit(lastDuration) {
-                            this[work.name] = getCurrentTime() - currentTime
+                            this[work.name] = getCurrentTime() - workerStartTime
                         }
                     }
             }

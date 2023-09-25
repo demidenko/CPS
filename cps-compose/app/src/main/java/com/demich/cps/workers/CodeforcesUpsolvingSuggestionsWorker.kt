@@ -51,7 +51,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
 
         val suggestedItem = dataStore.upsolvingSuggestedProblems
 
-        val dateThreshold = currentTime - 90.days
+        val dateThreshold = workerStartTime - 90.days
         suggestedItem.edit { removeAll { it.second <= dateThreshold } }
 
         val ratingChanges = CodeforcesApi.runCatching {

@@ -84,8 +84,8 @@ class CodeforcesNewsLostRecentWorker(
         }*/
     }
 
-    private fun isNew(blogCreationTime: Instant) = currentTime - blogCreationTime < 24.hours
-    private fun isOldLost(blogCreationTime: Instant) = currentTime - blogCreationTime > 7.days
+    private fun isNew(blogCreationTime: Instant) = workerStartTime - blogCreationTime < 24.hours
+    private fun isOldLost(blogCreationTime: Instant) = workerStartTime - blogCreationTime > 7.days
 
     override suspend fun runWork(): Result {
         val settings = context.settingsNews
@@ -147,7 +147,7 @@ class CodeforcesNewsLostRecentWorker(
             if (blogEntry.id !in recentIds) {
                 dao.insert(blogEntry.copy(
                     isSuspect = false,
-                    timeStamp = currentTime
+                    timeStamp = workerStartTime
                 ))
             }
         }

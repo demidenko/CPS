@@ -45,7 +45,7 @@ class CodeforcesMonitorLauncherWorker(
         }
     }
 
-    private fun isActual(time: Instant) = currentTime - time < 24.hours
+    private fun isActual(time: Instant) = workerStartTime - time < 24.hours
 
     override suspend fun runWork(): Result {
         val dataStore = CodeforcesAccountManager().dataStore(context)

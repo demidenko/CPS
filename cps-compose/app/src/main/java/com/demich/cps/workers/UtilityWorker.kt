@@ -33,7 +33,7 @@ class UtilityWorker(
     private suspend fun removeOldIgnoredContests() {
         ContestsInfoDataStore(context).ignoredContests.update {
             it.filterValues { ignoredAtTime ->
-                currentTime - ignoredAtTime < 30.days
+                workerStartTime - ignoredAtTime < 30.days
             }
         }
     }
