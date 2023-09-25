@@ -26,6 +26,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
 import com.demich.cps.workers.*
 import kotlinx.datetime.Instant
+import kotlin.time.Duration
 
 @Composable
 fun WorkersList(modifier: Modifier = Modifier) {
@@ -63,6 +64,10 @@ private fun WorkersList(
         CPSWorkersDataStore(context).lastResult.flow
     }
 
+    val lastDuration by rememberCollect {
+        CPSWorkersDataStore(context).lastDuration.flow
+    }
+
     ProvideTimeEachMinute {
         LazyColumn(modifier = modifier) {
             items(items = works, key = { it.name }) { work ->
@@ -70,6 +75,7 @@ private fun WorkersList(
                     work = work,
                     lastExecutionTime = lastExecutionTime[work.name],
                     lastResult = lastResult[work.name],
+                    lastDuration = lastDuration[work.name],
                     modifier = Modifier
                         .clickable { onClick(work) }
                         .fillMaxWidth()
@@ -86,6 +92,7 @@ private fun WorkerItem(
     work: CPSWork,
     lastExecutionTime: Instant?,
     lastResult: CPSWorker.ResultTypes?,
+    lastDuration: Duration?,
     modifier: Modifier = Modifier
 ) {
 
@@ -99,6 +106,7 @@ private fun WorkerItem(
             timeAgo(fromTime = it, toTime = localCurrentTime)
         } ?: "never",
         lastResult = lastResult,
+        lastDuration = lastDuration?.let { "${it.inWholeMilliseconds}ms" } ?: "",
         modifier = modifier
     )
 }
@@ -110,6 +118,7 @@ private fun WorkerItem(
     progressInfo: ProgressBarInfo?,
     lastRunTimeAgo: String,
     lastResult: CPSWorker.ResultTypes?,
+    lastDuration: String,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -135,6 +144,14 @@ private fun WorkerItem(
                     fontSize = 14.sp,
                     color = cpsColors.contentAdditional
                 )
+                if (lastDuration.isNotEmpty()) {
+                    Text(
+                        text = "($lastDuration)",
+                        fontSize = 14.sp,
+                        color = cpsColors.contentAdditional,
+                        modifier = Modifier.padding(start = 3.dp)
+                    )
+                }
             }
         }
 

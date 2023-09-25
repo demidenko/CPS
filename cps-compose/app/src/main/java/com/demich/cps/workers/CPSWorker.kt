@@ -15,6 +15,7 @@ import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
+import kotlin.time.Duration
 
 abstract class CPSWorker(
     private val work: CPSWork,
@@ -33,23 +34,31 @@ abstract class CPSWorker(
         val workersInfo = CPSWorkersDataStore(context)
 
         val result = withContext(Dispatchers.IO) {
-            workersInfo.lastExecutionTime.edit {
-                this[work.name] = currentTime
-            }
-
-            workersInfo.lastResult.edit {
-                remove(work.name)
-            }
-
-            kotlin.runCatching {
-                runWork()
-            }.getOrElse { Result.failure() }
-            .also {
-                val type = it.toType()
-                workersInfo.lastResult.edit {
-                    if (type == null) remove(work.name)
-                    else this[work.name] = type
+            workersInfo.edit { prefs ->
+                prefs.edit(lastExecutionTime) {
+                    this[work.name] = currentTime
                 }
+                prefs.edit(lastResult) {
+                    remove(work.name)
+                }
+                prefs.edit(lastDuration) {
+                    remove(work.name)
+                }
+            }
+
+            kotlin.runCatching { runWork() }
+                .getOrElse { Result.failure() }
+                .also { result ->
+                    workersInfo.edit { prefs ->
+                        prefs.edit(lastResult) {
+                            val type = result.toType()
+                            if (type == null) remove(work.name)
+                            else this[work.name] = type
+                        }
+                        prefs.edit(lastDuration) {
+                            this[work.name] = getCurrentTime() - currentTime
+                        }
+                    }
             }
         }
 
@@ -117,4 +126,6 @@ class CPSWorkersDataStore(context: Context): ItemizedDataStore(context.workersDa
     val lastExecutionTime = jsonCPS.itemMap<String, Instant>(name = "last_execution_time")
 
     val lastResult = jsonCPS.itemMap<String, CPSWorker.ResultTypes>(name = "last_result_type")
+
+    val lastDuration = jsonCPS.itemMap<String, Duration>(name = "last_duration")
 }
