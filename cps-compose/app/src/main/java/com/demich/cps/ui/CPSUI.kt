@@ -67,8 +67,8 @@ fun IconSp(
 @Composable
 fun AttentionIcon(
     dangerType: DangerType,
-    size: TextUnit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    size: TextUnit = 14.sp
 ) {
     IconSp(
         imageVector = CPSIcons.Attention,

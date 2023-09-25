@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
@@ -47,7 +46,6 @@ private fun AttentionWithMark(
         if (collisionType != DangerType.SAFE) {
             AttentionIcon(
                 dangerType = collisionType,
-                size = 14.sp,
                 modifier = Modifier.padding(start = 3.dp)
             )
         }

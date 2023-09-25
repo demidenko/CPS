@@ -113,7 +113,6 @@ private fun Footer(
             if (requestFailed) {
                 AttentionIcon(
                     dangerType = DangerType.DANGER,
-                    size = 14.sp,
                     modifier = Modifier.padding(end = 4.dp)
                 )
             }

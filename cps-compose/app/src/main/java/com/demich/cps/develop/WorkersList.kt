@@ -180,7 +180,6 @@ private fun ResultIcon(
     } else {
         AttentionIcon(
             dangerType = if (result == CPSWorker.ResultTypes.RETRY) DangerType.WARNING else DangerType.DANGER,
-            size = 14.sp,
             modifier = modifier
         )
     }

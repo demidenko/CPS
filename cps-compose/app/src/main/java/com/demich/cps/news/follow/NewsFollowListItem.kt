@@ -13,12 +13,16 @@ import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.platforms.api.CodeforcesColorTag
+import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.timeAgo
+import kotlinx.datetime.Instant
+import kotlin.time.Duration.Companion.days
 
 @Composable
 fun NewsFollowListItem(
@@ -88,12 +92,10 @@ private fun NewsFollowListItemInfo(
     fontSize: TextUnit
 ) {
     Box(modifier = modifier) {
-        Text(
-            text = "online: " + timeAgo(fromTime = userInfo.lastOnlineTime, toTime = localCurrentTime),
-            color = cpsColors.contentAdditional,
+        UserOnlineInfo(
+            time = userInfo.lastOnlineTime,
             fontSize = fontSize,
-            modifier = Modifier
-                .align(Alignment.CenterStart)
+            modifier = Modifier.align(Alignment.CenterStart)
         )
         Row(modifier = Modifier.align(Alignment.CenterEnd)) {
             Text(
@@ -105,6 +107,27 @@ private fun NewsFollowListItemInfo(
                 rating = userInfo.contribution,
                 fontSize = fontSize,
                 showZero = true
+            )
+        }
+    }
+}
+
+@Composable
+private fun UserOnlineInfo(
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit,
+    time: Instant
+) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = "online: " + timeAgo(fromTime = time, toTime = localCurrentTime),
+            color = cpsColors.contentAdditional,
+            fontSize = fontSize
+        )
+        if (localCurrentTime - time > 365.days) {
+            AttentionIcon(
+                dangerType = DangerType.WARNING,
+                modifier = Modifier.padding(start = 3.dp)
             )
         }
     }
