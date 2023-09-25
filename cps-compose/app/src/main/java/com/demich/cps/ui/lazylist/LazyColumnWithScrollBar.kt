@@ -1,5 +1,8 @@
 package com.demich.cps.ui.lazylist
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -27,7 +30,9 @@ fun LazyColumnWithScrollBar(
             activeColor = cpsColors.content.copy(alpha = 0.6f),
             inactiveColor = cpsColors.content.copy(alpha = 0.37f),
             scrollBarWidth = CPSDefaults.scrollBarWidth,
-            minimumScrollBarHeight = 10.dp
+            minimumScrollBarHeight = 10.dp,
+            enterAnimationSpec = snap(),
+            exitAnimationSpec = tween(delayMillis = 600, easing = LinearEasing)
         ) else modifier,
         state = state,
         verticalArrangement = verticalArrangement,

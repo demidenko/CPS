@@ -1,8 +1,7 @@
 package com.demich.cps.ui.lazylist
 
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.getValue
@@ -44,13 +43,15 @@ internal fun Modifier.drawScrollBar(
     activeColor: Color,
     inactiveColor: Color,
     scrollBarWidth: Dp,
-    minimumScrollBarHeight: Dp
+    minimumScrollBarHeight: Dp,
+    enterAnimationSpec: AnimationSpec<Float>,
+    exitAnimationSpec: AnimationSpec<Float>,
 ): Modifier = composed {
     val scrollInProgress = state.isScrollInProgress
 
     val fraction by animateFloatAsState(
         targetValue = if (scrollInProgress) 1f else 0f,
-        animationSpec = if (scrollInProgress) snap() else tween(delayMillis = 500),
+        animationSpec = if (scrollInProgress) enterAnimationSpec else exitAnimationSpec,
         label = "scroll_bar_active"
     )
 
