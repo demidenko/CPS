@@ -1,13 +1,23 @@
 package com.demich.cps.develop
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -23,8 +33,20 @@ import com.demich.cps.ui.bottomprogressbar.CPSProgressIndicator
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.*
-import com.demich.cps.workers.*
+import com.demich.cps.utils.AnimatedVisibleByNotNull
+import com.demich.cps.utils.DangerType
+import com.demich.cps.utils.ProvideTimeEachMinute
+import com.demich.cps.utils.context
+import com.demich.cps.utils.enterInColumn
+import com.demich.cps.utils.exitInColumn
+import com.demich.cps.utils.localCurrentTime
+import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.timeAgo
+import com.demich.cps.workers.CPSWork
+import com.demich.cps.workers.CPSWorker
+import com.demich.cps.workers.CPSWorkersDataStore
+import com.demich.cps.workers.getCPSWorks
+import com.demich.cps.workers.getProgressInfo
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 
@@ -106,9 +128,16 @@ private fun WorkerItem(
             timeAgo(fromTime = it, toTime = localCurrentTime)
         } ?: "never",
         lastResult = lastResult,
-        lastDuration = lastDuration?.let { "${it.inWholeMilliseconds}ms" } ?: "",
+        lastDuration = lastDuration?.toNiceString() ?: "",
         modifier = modifier
     )
+}
+
+private fun Duration.toNiceString(): String {
+    val ms = inWholeMilliseconds
+    if (ms < 1000) return "${ms}ms"
+    val s = ((ms + 50) / 100).toDouble() / 10
+    return "${s}s"
 }
 
 @Composable
