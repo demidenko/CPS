@@ -19,16 +19,28 @@ class ItemizedMutablePreferences(private val preferences: MutablePreferences) {
     operator fun<T> set(item: DataStoreItem<T>, value: T) =
         item.converter.setTo(preferences, value)
 
-    inline fun<K, V> edit(item: DataStoreItem<Map<K, V>>, block: MutableMap<K, V>.() -> Unit) {
-        set(item, value = get(item).toMutableMap().apply(block))
-    }
-
     fun clear() {
         preferences.clear()
     }
 
     fun<T> remove(item: DataStoreItem<T>) {
         item.converter.removeFrom(preferences)
+    }
+
+    //maps editing
+    private inner class ConverterMap<K, V>(private val item: DataStoreItem<Map<K, V>>) {
+        val map: MutableMap<K, V> = get<Map<K, V>>(item).toMutableMap()
+        fun save() { set(item, map) }
+    }
+
+    private val mutableMaps = mutableMapOf<String, ConverterMap<*, *>>()
+
+    @Suppress("UNCHECKED_CAST")
+    operator fun<K, V> get(item: DataStoreItem<Map<K, V>>): MutableMap<K, V> =
+        mutableMaps.getOrPut(item.converter.name) { ConverterMap(item) }.map as MutableMap<K, V>
+
+    internal fun saveMutableMaps() {
+        mutableMaps.values.forEach { it.save() }
     }
 }
 
@@ -39,5 +51,9 @@ suspend fun<D: ItemizedDataStore, R> D.withSnapShot(block: D.(ItemizedPreference
     dataStore.data.first().let { block(ItemizedPreferences(it)) }
 
 suspend fun<D: ItemizedDataStore> D.edit(block: D.(ItemizedMutablePreferences) -> Unit) {
-    dataStore.edit { block(ItemizedMutablePreferences(it)) }
+    dataStore.edit {
+        val prefs = ItemizedMutablePreferences(it)
+        block(prefs)
+        prefs.saveMutableMaps()
+    }
 }

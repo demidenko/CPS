@@ -35,29 +35,21 @@ abstract class CPSWorker(
 
         val result = withContext(Dispatchers.IO) {
             workersInfo.edit { prefs ->
-                prefs.edit(lastExecutionTime) {
-                    this[work.name] = workerStartTime
-                }
-                prefs.edit(lastResult) {
-                    remove(work.name)
-                }
-                prefs.edit(lastDuration) {
-                    remove(work.name)
-                }
+                prefs[lastExecutionTime][work.name] = workerStartTime
+                prefs[lastResult].remove(work.name)
+                prefs[lastDuration].remove(work.name)
             }
 
             kotlin.runCatching { runWork() }
                 .getOrElse { Result.failure() }
                 .also { result ->
                     workersInfo.edit { prefs ->
-                        prefs.edit(lastResult) {
+                        prefs[lastResult].run {
                             val type = result.toType()
                             if (type == null) remove(work.name)
                             else this[work.name] = type
                         }
-                        prefs.edit(lastDuration) {
-                            this[work.name] = getCurrentTime() - workerStartTime
-                        }
+                        prefs[lastDuration][work.name] = getCurrentTime() - workerStartTime
                     }
             }
         }
