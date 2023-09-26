@@ -15,7 +15,11 @@ fun CodeforcesNewsBottomBar(
             }
         }
         CodeforcesTitle.RECENT -> {
-            if (controller.recentFilterByBlogEntry == null) {
+            if (controller.recentFilterByBlogEntry != null) {
+                CPSIconButton(icon = CPSIcons.ArrowBack) {
+                    controller.recentFilterByBlogEntry = null
+                }
+            } else {
                 CommentsModeButton(isOn = controller.recentShowComments) {
                     controller.recentShowComments = it
                 }
