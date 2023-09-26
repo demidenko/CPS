@@ -30,18 +30,15 @@ fun CodeforcesNewsRecentPage(
     CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.RECENT) {
         val blogEntry = controller.recentFilterByBlogEntry
         if (blogEntry != null) {
-            saveableStateHolder.SaveableStateProvider(key = blogEntry.id) {
-                RecentCommentsInBlogEntry(
-                    controller = controller,
-                    comments = { recentActions.second },
-                    blogEntry = recentActions.first.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
-                    onBackPressed = {
-                        saveableStateHolder.removeState(blogEntry.id)
-                        controller.recentFilterByBlogEntry = null
-                    },
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+            RecentCommentsInBlogEntry(
+                controller = controller,
+                comments = { recentActions.second },
+                blogEntry = recentActions.first.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
+                onBackPressed = {
+                    controller.recentFilterByBlogEntry = null
+                },
+                modifier = Modifier.fillMaxSize()
+            )
         } else
         if (controller.recentShowComments) {
             saveableStateHolder.SaveableStateProvider(key = true) {
