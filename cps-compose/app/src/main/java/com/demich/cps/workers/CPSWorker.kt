@@ -44,7 +44,7 @@ abstract class CPSWorker(
                 .getOrElse { Result.failure() }
                 .also { result ->
                     workersInfo.edit { prefs ->
-                        prefs[lastResult].run {
+                        prefs[lastResult].apply {
                             val type = result.toType()
                             if (type == null) remove(work.name)
                             else this[work.name] = type

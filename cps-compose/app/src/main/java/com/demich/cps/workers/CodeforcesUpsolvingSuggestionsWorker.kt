@@ -54,9 +54,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
         val dateThreshold = workerStartTime - 90.days
         suggestedItem.edit { removeAll { it.second <= dateThreshold } }
 
-        val ratingChanges = CodeforcesApi.runCatching {
-            getUserRatingChanges(handle)
-        }.getOrElse { return Result.retry() }
+        val ratingChanges = CodeforcesApi.getUserRatingChanges(handle)
 
         val alreadySuggested = suggestedItem().map { it.first }
 
@@ -84,7 +82,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
                 }
             }
 
-        return if (anyFailure) Result.failure() else Result.success()
+        return if (anyFailure) Result.retry() else Result.success()
     }
 
 }

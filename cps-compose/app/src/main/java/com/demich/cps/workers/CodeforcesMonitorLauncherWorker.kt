@@ -53,13 +53,10 @@ class CodeforcesMonitorLauncherWorker(
         val info = dataStore.getSavedInfo() ?: return Result.success()
         if (info.status != STATUS.OK) return Result.success()
 
-        val lastSubmissionId = dataStore.monitorLastSubmissionId()
-
-        val newSubmissions = kotlin.runCatching {
-            getNewSubmissions(info.handle, lastSubmissionId)
-        }.getOrElse {
-            return Result.retry()
-        }
+        val newSubmissions = getNewSubmissions(
+            handle = info.handle,
+            lastSubmissionId = dataStore.monitorLastSubmissionId()
+        )
 
         dataStore.apply {
             newSubmissions.firstOrNull()?.let {
