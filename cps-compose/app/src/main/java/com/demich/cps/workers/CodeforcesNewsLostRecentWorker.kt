@@ -98,8 +98,7 @@ class CodeforcesNewsLostRecentWorker(
             )
         }.getOrElse { return Result.retry() }
 
-        val recentBlogEntries: List<CodeforcesBlogEntry> =
-            extractRecentBlogEntriesOrNull(source) ?: return Result.failure()
+        val recentBlogEntries = extractRecentBlogEntries(source)
 
         val dao = context.lostBlogEntriesDao
         val minRatingColorTag = settings.codeforcesLostMinRatingTag()
@@ -114,23 +113,19 @@ class CodeforcesNewsLostRecentWorker(
             }.first
 
         //catch new suspects from recent actions
-        CachedBlogEntryApi(locale = locale, isNew = ::isNew).runCatching {
-            forNewBlogEntries(
-                blogEntries = recentBlogEntries
-                    .filter { it.authorColorTag >= minRatingColorTag }
-                    .filter { blogEntry -> suspects.none { it.id == blogEntry.id } },
-                hintItem = settings.codeforcesLostHintNotNew
-            ) {
-                dao.insert(
-                    CodeforcesLostBlogEntry(
-                        blogEntry = it,
-                        isSuspect = true,
-                        timeStamp = Instant.DISTANT_PAST
-                    )
+        CachedBlogEntryApi(locale = locale, isNew = ::isNew).forNewBlogEntries(
+            blogEntries = recentBlogEntries
+                .filter { it.authorColorTag >= minRatingColorTag }
+                .filter { blogEntry -> suspects.none { it.id == blogEntry.id } },
+            hintItem = settings.codeforcesLostHintNotNew
+        ) {
+            dao.insert(
+                CodeforcesLostBlogEntry(
+                    blogEntry = it,
+                    isSuspect = true,
+                    timeStamp = Instant.DISTANT_PAST
                 )
-            }
-        }.onFailure {
-            return Result.failure()
+            )
         }
 
         val recentIds = recentBlogEntries.mapToSet { it.id }
@@ -236,11 +231,9 @@ private fun isNewYearChaos(source: String): Boolean {
     return false
 }
 
-private suspend fun extractRecentBlogEntriesOrNull(source: String): List<CodeforcesBlogEntry>? {
-    return CodeforcesUtils.runCatching { extractRecentBlogEntries(source) }
-        .mapCatching {
-            if (isNewYearChaos(source)) it.fixedHandleColors()
-            else it
-        }
-        .getOrNull()
+private suspend fun extractRecentBlogEntries(source: String): List<CodeforcesBlogEntry> {
+    return CodeforcesUtils.extractRecentBlogEntries(source).let {
+        if (isNewYearChaos(source)) it.fixedHandleColors()
+        else it
+    }
 }
