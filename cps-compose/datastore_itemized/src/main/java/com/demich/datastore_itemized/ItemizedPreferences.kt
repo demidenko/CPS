@@ -44,7 +44,7 @@ class ItemizedMutablePreferences(private val preferences: MutablePreferences) {
     }
 }
 
-fun<D: ItemizedDataStore, R> D.flowBy(transform: D.(ItemizedPreferences) -> R): Flow<R> =
+fun<D: ItemizedDataStore, R> D.flowOf(transform: D.(ItemizedPreferences) -> R): Flow<R> =
     dataStore.data.map { transform(ItemizedPreferences(it)) }
 
 suspend fun<D: ItemizedDataStore, R> D.withSnapShot(block: D.(ItemizedPreferences) -> R): R =

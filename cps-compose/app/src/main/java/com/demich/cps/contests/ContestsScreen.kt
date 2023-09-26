@@ -39,7 +39,7 @@ import com.demich.cps.utils.*
 import com.demich.cps.workers.ContestsWorker
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
-import com.demich.datastore_itemized.flowBy
+import com.demich.datastore_itemized.flowOf
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -299,7 +299,7 @@ fun contestsBottomBarBuilder(
 private fun rememberIsAnyPlatformEnabled(): State<Boolean> {
     val context = context
     return rememberCollect {
-        context.settingsContests.flowBy { prefs ->
+        context.settingsContests.flowOf { prefs ->
             val any1 = prefs[enabledPlatforms].any { it != Contest.Platform.unknown }
             val any2 = prefs[clistAdditionalResources].isNotEmpty()
             any1 || any2

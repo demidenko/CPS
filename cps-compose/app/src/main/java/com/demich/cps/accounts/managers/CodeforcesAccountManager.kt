@@ -35,7 +35,7 @@ import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
-import com.demich.datastore_itemized.flowBy
+import com.demich.datastore_itemized.flowOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import kotlin.text.contains
@@ -183,7 +183,7 @@ class CodeforcesAccountManager :
     }
 
     override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
-        CodeforcesAccountSettingsDataStore(context).flowBy { prefs ->
+        CodeforcesAccountSettingsDataStore(context).flowOf { prefs ->
             prefs[observeRating] or
             prefs[monitorEnabled] or
             prefs[upsolvingSuggestionsEnabled] or

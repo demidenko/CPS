@@ -5,7 +5,7 @@ import com.demich.cps.platforms.api.*
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
-import com.demich.datastore_itemized.flowBy
+import com.demich.datastore_itemized.flowOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
@@ -78,8 +78,8 @@ internal data class CodeforcesMonitorSubmissionInfo(
 }
 
 fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?> =
-    flowBy { prefs ->
-        val contestId = prefs[contestId] ?: return@flowBy null
+    flowOf { prefs ->
+        val contestId = prefs[contestId] ?: return@flowOf null
         val contest = prefs[contestInfo].copy(id = contestId)
         val phase = when (contest.phase) {
             CodeforcesContestPhase.CODING -> CodeforcesMonitorData.ContestPhase.Coding(contest.startTime + contest.duration)
@@ -116,7 +116,7 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
     }
 
 fun CodeforcesMonitorDataStore.flowOfContestId(): Flow<Int?> =
-    flowBy { prefs ->
+    flowOf { prefs ->
         prefs[contestId]?.takeIf {
             prefs[contestInfo].phase != CodeforcesContestPhase.UNDEFINED
         }

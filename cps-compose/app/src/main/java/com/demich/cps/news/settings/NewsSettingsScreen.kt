@@ -30,7 +30,7 @@ import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.utils.rememberWith
 import com.demich.datastore_itemized.DataStoreItem
-import com.demich.datastore_itemized.flowBy
+import com.demich.datastore_itemized.flowOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -64,7 +64,7 @@ fun NewsSettingsScreen() {
 }
 
 private fun flowOfNotificationPermissionsRequired(context: Context): Flow<Boolean> =
-    context.settingsNews.flowBy { prefs ->
+    context.settingsNews.flowOf { prefs ->
         prefs[codeforcesFollowEnabled] || prefs[enabledNewsFeeds].isNotEmpty()
     }
 
