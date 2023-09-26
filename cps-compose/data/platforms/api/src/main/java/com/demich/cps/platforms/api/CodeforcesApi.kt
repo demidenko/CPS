@@ -272,7 +272,9 @@ enum class CodeforcesAPIStatus {
 data class CodeforcesAPIErrorResponse(
     private val status: CodeforcesAPIStatus,
     private val comment: String
-): Throwable(comment) {
+): Throwable() {
+    override val message: String = "Codeforces API: $comment"
+
     fun isCallLimitExceeded() = comment == "Call limit exceeded"
 
     fun isHandleNotFound(): String? {

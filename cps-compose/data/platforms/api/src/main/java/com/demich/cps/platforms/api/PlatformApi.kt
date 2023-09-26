@@ -60,6 +60,7 @@ val Throwable.niceMessage: String? get() =
         is ResponseException -> HttpStatusCode.fromValue(response.status.value).toString()
 
         is CodeforcesApi.CodeforcesTemporarilyUnavailableException -> message
+        is CodeforcesAPIErrorResponse -> message
 
         is kotlinx.serialization.SerializationException -> "Parse failed"
 
