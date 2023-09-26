@@ -91,14 +91,9 @@ class CodeforcesNewsLostRecentWorker(
         val settings = context.settingsNews
         val locale = settings.codeforcesLocale()
 
-        val source = CodeforcesApi.runCatching {
-            getPageSource(
-                path = "/recent-actions",
-                locale = locale
-            )
-        }.getOrElse { return Result.retry() }
-
-        val recentBlogEntries = extractRecentBlogEntries(source)
+        val recentBlogEntries = extractRecentBlogEntries(
+            source = CodeforcesApi.getPageSource(path = "/recent-actions", locale = locale)
+        )
 
         val dao = context.lostBlogEntriesDao
         val minRatingColorTag = settings.codeforcesLostMinRatingTag()
