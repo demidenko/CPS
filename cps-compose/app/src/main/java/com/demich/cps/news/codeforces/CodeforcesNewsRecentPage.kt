@@ -80,7 +80,7 @@ private fun RecentBlogEntriesPage(
         recent = recent,
         modifier = modifier,
         onBrowseBlogEntry = onBrowseBlogEntry,
-    ) { blogEntry, comments ->
+    ) { (blogEntry, comments) ->
         CPSDropdownMenuItem(title = "Open recent comment", icon = CPSIcons.OpenInBrowser) {
             onBrowseComment(blogEntry, comments.first())
         }

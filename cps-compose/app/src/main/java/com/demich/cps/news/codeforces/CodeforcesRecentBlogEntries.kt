@@ -38,7 +38,7 @@ internal fun CodeforcesRecentBlogEntries(
     recent: () -> CodeforcesRecent,
     modifier: Modifier = Modifier,
     onBrowseBlogEntry: (CodeforcesBlogEntry) -> Unit,
-    menuBuilder: @Composable CPSDropdownMenuScope.(CodeforcesBlogEntry, List<CodeforcesComment>) -> Unit
+    menuBuilder: @Composable CPSDropdownMenuScope.(RecentBlogEntryData) -> Unit
 ) {
     val recentData by remember(recent) {
         derivedStateOf {
@@ -63,7 +63,7 @@ internal fun CodeforcesRecentBlogEntries(
             expanded = it.blogEntry.id == showMenuForBlogEntryId,
             menuAlignment = Alignment.CenterStart,
             onDismissRequest = { showMenuForBlogEntryId = null },
-            menuBuilder = { menuBuilder(it.blogEntry, it.comments) },
+            menuBuilder = { menuBuilder(it) },
             content = { RecentBlogEntry(recentBlogEntryData = it) }
         )
         Divider()
@@ -71,17 +71,17 @@ internal fun CodeforcesRecentBlogEntries(
 }
 
 @Immutable
-private data class CodeforcesRecentBlogEntry(
+internal data class RecentBlogEntryData(
     val blogEntry: CodeforcesBlogEntry,
     val comments: List<CodeforcesComment>, //only first comment per each commentator
 ) {
     val isLowRated: Boolean get() = blogEntry.rating < 0
 }
 
-private fun CodeforcesRecent.makeRecentBlogEntries(): List<CodeforcesRecentBlogEntry> {
+private fun CodeforcesRecent.makeRecentBlogEntries(): List<RecentBlogEntryData> {
     val commentsGrouped = comments.groupBy { it.blogEntry?.id }
     return blogEntries.map { blogEntry ->
-        CodeforcesRecentBlogEntry(
+        RecentBlogEntryData(
             blogEntry = blogEntry,
             comments = commentsGrouped[blogEntry.id]
                 ?.map { it.comment }
@@ -93,7 +93,7 @@ private fun CodeforcesRecent.makeRecentBlogEntries(): List<CodeforcesRecentBlogE
 
 @Composable
 private fun RecentBlogEntry(
-    recentBlogEntryData: CodeforcesRecentBlogEntry,
+    recentBlogEntryData: RecentBlogEntryData,
     modifier: Modifier = Modifier
 ) {
     RecentBlogEntry(
