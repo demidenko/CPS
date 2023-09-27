@@ -31,7 +31,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.LocalCodeforcesAccountManager
+import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesComment
 import com.demich.cps.platforms.api.CodeforcesRecentAction
@@ -88,11 +88,9 @@ private fun Comment(
     blogEntryTitle: String?,
     modifier: Modifier = Modifier
 ) {
-    val manager = LocalCodeforcesAccountManager.current
-
     Comment(
         modifier = modifier,
-        authorHandle = manager.makeHandleSpan(comment.commentator),
+        authorHandle = comment.commentator.toHandleSpan(),
         blogEntryTitle = blogEntryTitle,
         rating = comment.rating,
         timeAgo = timeAgo(fromTime = comment.creationTime, toTime = localCurrentTime),

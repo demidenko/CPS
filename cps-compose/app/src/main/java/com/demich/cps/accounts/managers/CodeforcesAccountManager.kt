@@ -10,6 +10,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.R
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.screens.CodeforcesUserInfoExpandedContent
@@ -133,11 +134,6 @@ class CodeforcesAccountManager :
     fun makeHandleSpan(handle: String, tag: CodeforcesColorTag): AnnotatedString =
         makeHandleSpan(handle = handle, tag = tag, cpsColors = cpsColors)
 
-    @Composable
-    @ReadOnlyComposable
-    fun makeHandleSpan(handle: CodeforcesHandle) =
-        makeHandleSpan(handle = handle.handle, tag = handle.colorTag)
-
     override fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString =
         makeHandleSpan(
             handle = text,
@@ -237,6 +233,13 @@ class CodeforcesAccountManager :
             //https://codeforces.com/blog/entry/126
         )
 }
+
+
+@Composable
+@ReadOnlyComposable
+fun CodeforcesHandle.toHandleSpan() =
+    LocalCodeforcesAccountManager.current
+        .makeHandleSpan(handle = handle, tag = colorTag)
 
 class CodeforcesAccountDataStore(manager: CodeforcesAccountManager, context: Context):
     RatedAccountDataStore<CodeforcesUserInfo>(manager, context, context.account_codeforces_dataStore)

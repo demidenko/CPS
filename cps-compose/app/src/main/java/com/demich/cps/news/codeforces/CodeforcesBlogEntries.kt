@@ -17,7 +17,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.LocalCodeforcesAccountManager
+import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.*
@@ -76,11 +76,9 @@ private fun BlogEntryInfo(
     modifier: Modifier = Modifier,
     label: (@Composable (CodeforcesBlogEntry) -> Unit)?
 ) {
-    val manager = LocalCodeforcesAccountManager.current
-
     BlogEntryInfo(
         title = blogEntry.title,
-        authorHandle = manager.makeHandleSpan(blogEntry.author),
+        authorHandle = blogEntry.author.toHandleSpan(),
         rating = blogEntry.rating,
         commentsCount = blogEntry.commentsCount,
         timeAgo = timeAgo(

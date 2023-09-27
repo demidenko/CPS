@@ -22,7 +22,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.LocalCodeforcesAccountManager
+import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesComment
 import com.demich.cps.platforms.api.CodeforcesRecentAction
@@ -101,14 +101,13 @@ private fun RecentBlogEntry(
     recentBlogEntryData: CodeforcesRecentBlogEntry,
     modifier: Modifier = Modifier
 ) {
-    val manager = LocalCodeforcesAccountManager.current
     RecentBlogEntry(
         title = recentBlogEntryData.blogEntry.title,
-        authorHandle = manager.makeHandleSpan(recentBlogEntryData.blogEntry.author),
+        authorHandle = recentBlogEntryData.blogEntry.author.toHandleSpan(),
         commentators = buildAnnotatedString {
             recentBlogEntryData.comments.forEachIndexed { index, comment ->
                 if (index > 0) append(", ")
-                append(manager.makeHandleSpan(handle = comment.commentator))
+                append(comment.commentator.toHandleSpan())
             }
         },
         isLowRated = recentBlogEntryData.isLowRated,

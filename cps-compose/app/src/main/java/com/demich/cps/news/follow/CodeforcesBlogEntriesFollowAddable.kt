@@ -10,7 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
-import com.demich.cps.LocalCodeforcesAccountManager
+import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.news.codeforces.CodeforcesBlogEntries
 import com.demich.cps.news.codeforces.CodeforcesBlogEntriesController
 import com.demich.cps.news.codeforces.CodeforcesNewsController
@@ -52,7 +52,7 @@ fun CodeforcesBlogEntriesFollowAddable(
             title = {
                 Text(text = buildAnnotatedString {
                     append("Add ")
-                    append(LocalCodeforcesAccountManager.current.makeHandleSpan(blogEntry.author))
+                    append(blogEntry.author.toHandleSpan())
                     append(" to follow list?")
                 })
             },
