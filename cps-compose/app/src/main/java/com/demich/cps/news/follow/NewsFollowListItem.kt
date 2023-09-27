@@ -1,6 +1,10 @@
 package com.demich.cps.news.follow
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -9,10 +13,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.LocalCodeforcesAccountManager
+import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.platforms.api.CodeforcesColorTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
@@ -36,10 +41,10 @@ fun NewsFollowListItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = LocalCodeforcesAccountManager.current.makeHandleSpan(
+                text = CodeforcesHandle(
                     handle = userInfo.handle,
-                    tag = CodeforcesColorTag.fromRating(userInfo.rating)
-                ),
+                    colorTag = CodeforcesColorTag.fromRating(userInfo.rating)
+                ).toHandleSpan(),
                 fontSize = 18.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

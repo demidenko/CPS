@@ -8,27 +8,45 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.R
+import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.news.codeforces.CodeforcesTitle
-import com.demich.cps.ui.*
+import com.demich.cps.platforms.api.CodeforcesColorTag
+import com.demich.cps.platforms.api.CodeforcesLocale
+import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.SettingsColumn
+import com.demich.cps.ui.SettingsEnumItem
+import com.demich.cps.ui.SettingsEnumItemContent
+import com.demich.cps.ui.SettingsItem
+import com.demich.cps.ui.SettingsItemWithInfo
+import com.demich.cps.ui.SettingsSectionHeader
+import com.demich.cps.ui.SettingsSubtitleOfEnabled
+import com.demich.cps.ui.SettingsSwitchItem
+import com.demich.cps.ui.SettingsSwitchItemContent
+import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
+import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.rememberWith
 import com.demich.cps.workers.CodeforcesNewsFollowWorker
 import com.demich.cps.workers.CodeforcesNewsLostRecentWorker
 import com.demich.cps.workers.NewsWorker
 import com.demich.cps.workers.ProjectEulerRecentProblemsWorker
-import com.demich.cps.platforms.api.CodeforcesColorTag
-import com.demich.cps.platforms.api.CodeforcesLocale
-import com.demich.cps.utils.rememberWith
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.flowOf
 import kotlinx.coroutines.flow.Flow
@@ -125,7 +143,6 @@ private fun CodeforcesLostSettingsItem() {
 private fun CodeforcesLostAuthorSettingsItem(
     item: DataStoreItem<CodeforcesColorTag>
 ) {
-    val manager = LocalCodeforcesAccountManager.current
     val options = remember {
         listOf(
             CodeforcesColorTag.BLACK to "Exists",
@@ -146,10 +163,10 @@ private fun CodeforcesLostAuthorSettingsItem(
             title = "Author at least",
             options = options.map { it.first },
             optionToString = { tag ->
-                manager.makeHandleSpan(
+                CodeforcesHandle(
                     handle = options.first { it.first == tag }.second,
-                    tag = tag
-                )
+                    colorTag = tag
+                ).toHandleSpan()
             }
         )
     }

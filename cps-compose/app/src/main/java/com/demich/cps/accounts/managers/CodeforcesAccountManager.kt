@@ -129,11 +129,6 @@ class CodeforcesAccountManager :
             }
         }
 
-    @Composable
-    @ReadOnlyComposable
-    fun makeHandleSpan(handle: String, tag: CodeforcesColorTag): AnnotatedString =
-        makeHandleSpan(handle = handle, tag = tag, cpsColors = cpsColors)
-
     override fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString =
         makeHandleSpan(
             handle = text,
@@ -234,12 +229,12 @@ class CodeforcesAccountManager :
         )
 }
 
-
 @Composable
 @ReadOnlyComposable
 fun CodeforcesHandle.toHandleSpan() =
     LocalCodeforcesAccountManager.current
-        .makeHandleSpan(handle = handle, tag = colorTag)
+        .makeHandleSpan(handle = handle, tag = colorTag, cpsColors = cpsColors)
+
 
 class CodeforcesAccountDataStore(manager: CodeforcesAccountManager, context: Context):
     RatedAccountDataStore<CodeforcesUserInfo>(manager, context, context.account_codeforces_dataStore)
