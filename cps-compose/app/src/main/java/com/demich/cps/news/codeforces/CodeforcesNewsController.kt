@@ -53,7 +53,7 @@ fun rememberCodeforcesNewsController(): CodeforcesNewsController {
         with(controller) {
             flowOfMainBlogEntries(context)
             if (topShowComments) flowOfTopComments(context) else flowOfTopBlogEntries(context)
-            flowOfRecentActions(context)
+            flowOfRecent(context)
         }
     }
 

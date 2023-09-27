@@ -157,7 +157,7 @@ object CodeforcesUtils {
             .mapNotNull(::extractRecentBlogEntryOrNull)
     }
 
-    fun extractRecentActions(source: String): Pair<List<CodeforcesBlogEntry>,List<CodeforcesRecentAction>> {
+    fun extractRecentActions(source: String): CodeforcesRecent {
         val comments = extractComments(source)
         //blog entry with low rating disappeared from blogEntries but has comments, need to merge
         val blogEntries = extractRecentBlogEntries(source).toMutableList()
@@ -187,7 +187,7 @@ object CodeforcesUtils {
                 index = max(index, curIndex + 1)
             }
         }
-        return Pair(blogEntries, comments)
+        return CodeforcesRecent(blogEntries, comments)
     }
 
     inline fun extractHandleSuggestions(source: String, block: (String) -> Unit) {

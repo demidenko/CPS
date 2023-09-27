@@ -16,6 +16,7 @@ import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesComment
 import com.demich.cps.platforms.api.CodeforcesRecentAction
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
 
 @Composable
 fun CodeforcesNewsRecentPage(
@@ -23,7 +24,7 @@ fun CodeforcesNewsRecentPage(
 ) {
     val context = context
 
-    val recentActions by rememberCollect { controller.flowOfRecentActions(context) }
+    val recent by rememberCollect { controller.flowOfRecent(context) }
 
     val saveableStateHolder = rememberSaveableStateHolder()
 
@@ -32,8 +33,8 @@ fun CodeforcesNewsRecentPage(
         if (blogEntry != null) {
             RecentCommentsInBlogEntry(
                 controller = controller,
-                comments = { recentActions.second },
-                blogEntry = recentActions.first.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
+                comments = { recent.comments },
+                blogEntry = recent.blogEntries.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
                 onBackPressed = {
                     controller.recentFilterByBlogEntry = null
                 },
@@ -43,14 +44,14 @@ fun CodeforcesNewsRecentPage(
         if (controller.recentShowComments) {
             saveableStateHolder.SaveableStateProvider(key = true) {
                 CodeforcesComments(
-                    comments = { recentActions.second },
+                    comments = { recent.comments },
                     modifier = Modifier.fillMaxSize()
                 )
             }
         } else {
             saveableStateHolder.SaveableStateProvider(key = false) {
                 RecentBlogEntriesPage(
-                    recentActions = { recentActions },
+                    recent = { recent },
                     modifier = Modifier.fillMaxSize(),
                     onBrowseComment = { blogEntry, comment ->
                         context.openUrlInBrowser(CodeforcesApi.urls.comment(
@@ -69,14 +70,14 @@ fun CodeforcesNewsRecentPage(
 
 @Composable
 private fun RecentBlogEntriesPage(
-    recentActions: () -> Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>,
+    recent: () -> CodeforcesRecent,
     modifier: Modifier = Modifier,
     onBrowseComment: (CodeforcesBlogEntry, CodeforcesComment) -> Unit,
     onBrowseBlogEntry: (CodeforcesBlogEntry) -> Unit,
     onOpenComments: (CodeforcesBlogEntry) -> Unit
 ) {
     CodeforcesRecentBlogEntries(
-        recentActions = recentActions,
+        recent = recent,
         modifier = modifier,
         onBrowseBlogEntry = onBrowseBlogEntry,
     ) { blogEntry, comments ->

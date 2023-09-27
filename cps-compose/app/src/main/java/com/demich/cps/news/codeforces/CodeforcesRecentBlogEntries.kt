@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesComment
-import com.demich.cps.platforms.api.CodeforcesRecentAction
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
 import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.platforms.utils.codeforces.commentator
 import com.demich.cps.ui.CPSDropdownMenuScope
@@ -34,24 +34,22 @@ import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
 
 @Composable
-fun CodeforcesRecentBlogEntries(
-    recentActions: () -> Pair<List<CodeforcesBlogEntry>, List<CodeforcesRecentAction>>,
+internal fun CodeforcesRecentBlogEntries(
+    recent: () -> CodeforcesRecent,
     modifier: Modifier = Modifier,
     onBrowseBlogEntry: (CodeforcesBlogEntry) -> Unit,
     menuBuilder: @Composable CPSDropdownMenuScope.(CodeforcesBlogEntry, List<CodeforcesComment>) -> Unit
 ) {
-    val recent by remember(recentActions) {
+    val recentData by remember(recent) {
         derivedStateOf {
-            with(recentActions()) {
-                makeRecentBlogEntries(blogEntries = first, comments = second)
-            }
+            recent().makeRecentBlogEntries()
         }
     }
 
     var showMenuForBlogEntryId: Int? by remember { mutableStateOf(null) }
     LazyColumnOfData(
         modifier = modifier,
-        items = { recent },
+        items = { recentData },
         scrollBarEnabled = false
     ) {
         ContentWithCPSDropdownMenu(
@@ -80,10 +78,7 @@ private data class CodeforcesRecentBlogEntry(
     val isLowRated: Boolean get() = blogEntry.rating < 0
 }
 
-private fun makeRecentBlogEntries(
-    blogEntries: List<CodeforcesBlogEntry>,
-    comments: List<CodeforcesRecentAction>
-): List<CodeforcesRecentBlogEntry> {
+private fun CodeforcesRecent.makeRecentBlogEntries(): List<CodeforcesRecentBlogEntry> {
     val commentsGrouped = comments.groupBy { it.blogEntry?.id }
     return blogEntries.map { blogEntry ->
         CodeforcesRecentBlogEntry(

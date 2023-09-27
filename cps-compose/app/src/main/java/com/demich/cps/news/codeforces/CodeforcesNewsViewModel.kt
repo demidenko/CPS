@@ -9,6 +9,7 @@ import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesLocale
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.room.followListDao
 import com.demich.cps.utils.LoadingStatus
@@ -60,8 +61,8 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
     private val topComments = dataLoader(emptyList()) { getComments(page = "/topComments?days=2", locale = it) }
     override fun flowOfTopComments(context: Context) = topComments.getDataFlow(context)
 
-    private val recentActions = dataLoader(Pair(emptyList(), emptyList())) { getRecentActions(locale = it) }
-    override fun flowOfRecentActions(context: Context) = recentActions.getDataFlow(context)
+    private val recentActions = dataLoader(CodeforcesRecent(emptyList(), emptyList())) { getRecentActions(locale = it) }
+    override fun flowOfRecent(context: Context) = recentActions.getDataFlow(context)
 
     private fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
         when (title) {
