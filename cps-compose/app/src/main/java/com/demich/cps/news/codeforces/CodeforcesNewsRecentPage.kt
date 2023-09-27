@@ -1,22 +1,27 @@
 package com.demich.cps.news.codeforces
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
-import com.demich.cps.ui.CPSIcons
-import com.demich.cps.utils.context
-import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.rememberCollect
-import com.demich.cps.utils.rememberWith
+import androidx.compose.ui.text.AnnotatedString
+import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesComment
 import com.demich.cps.platforms.api.CodeforcesRecentAction
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
+import com.demich.cps.platforms.utils.codeforces.author
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.utils.context
+import com.demich.cps.utils.openUrlInBrowser
+import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.rememberWith
 
 @Composable
 fun CodeforcesNewsRecentPage(
@@ -109,11 +114,22 @@ private fun RecentCommentsInBlogEntry(
         }
     }
 
-    CodeforcesComments(
-        comments = { filteredComments },
-        showTitle = false,
-        modifier = modifier
-    )
+    Column(modifier = modifier) {
+        RecentBlogEntry(
+            title = blogEntry.title,
+            authorHandle = blogEntry.author.toHandleSpan(),
+            commentators = AnnotatedString(filteredComments.size.toString()),
+            isLowRated = false,
+            modifier = Modifier.recentBlogEntryPaddings()
+        )
+        Divider()
+        CodeforcesComments(
+            comments = { filteredComments },
+            showTitle = false,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+
 
     BackHandler(
         enabled = controller.isTabVisible(CodeforcesTitle.RECENT),

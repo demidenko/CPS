@@ -59,7 +59,7 @@ internal fun CodeforcesRecentBlogEntries(
                     else showMenuForBlogEntryId = it.blogEntry.id
                 }
                 .fillMaxWidth()
-                .padding(start = 3.dp, end = 3.dp, bottom = 2.dp),
+                .recentBlogEntryPaddings(),
             expanded = it.blogEntry.id == showMenuForBlogEntryId,
             menuAlignment = Alignment.CenterStart,
             onDismissRequest = { showMenuForBlogEntryId = null },
@@ -69,6 +69,9 @@ internal fun CodeforcesRecentBlogEntries(
         Divider()
     }
 }
+
+internal fun Modifier.recentBlogEntryPaddings() =
+    padding(start = 3.dp, end = 3.dp, bottom = 2.dp, top = 1.dp)
 
 @Immutable
 internal data class RecentBlogEntryData(
@@ -111,7 +114,7 @@ private fun RecentBlogEntry(
 }
 
 @Composable
-private fun RecentBlogEntry(
+internal fun RecentBlogEntry(
     title: String,
     authorHandle: AnnotatedString,
     commentators: AnnotatedString,
