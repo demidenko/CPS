@@ -15,6 +15,7 @@ import com.demich.cps.news.codeforces.CodeforcesBlogEntries
 import com.demich.cps.news.codeforces.CodeforcesBlogEntriesController
 import com.demich.cps.news.codeforces.CodeforcesNewsController
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.utils.context
 
@@ -51,10 +52,7 @@ fun CodeforcesBlogEntriesFollowAddable(
             title = {
                 Text(text = buildAnnotatedString {
                     append("Add ")
-                    append(LocalCodeforcesAccountManager.current.makeHandleSpan(
-                        handle = blogEntry.authorHandle,
-                        tag = blogEntry.authorColorTag
-                    ))
+                    append(LocalCodeforcesAccountManager.current.makeHandleSpan(blogEntry.author))
                     append(" to follow list?")
                 })
             },

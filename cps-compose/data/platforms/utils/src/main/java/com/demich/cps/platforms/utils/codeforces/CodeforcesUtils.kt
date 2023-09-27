@@ -10,11 +10,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.max
 
-internal class CodeforcesHandle(
-    val handle: String,
-    val colorTag: CodeforcesColorTag
-)
-
 internal fun Element.extractRatedUser() = CodeforcesHandle(
     handle = text(),
     colorTag = CodeforcesColorTag.fromString(

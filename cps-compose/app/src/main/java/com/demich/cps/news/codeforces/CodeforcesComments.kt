@@ -35,6 +35,7 @@ import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesComment
 import com.demich.cps.platforms.api.CodeforcesRecentAction
+import com.demich.cps.platforms.utils.codeforces.commentator
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating
@@ -91,10 +92,7 @@ private fun Comment(
 
     Comment(
         modifier = modifier,
-        authorHandle = manager.makeHandleSpan(
-            handle = comment.commentatorHandle,
-            tag = comment.commentatorHandleColorTag
-        ),
+        authorHandle = manager.makeHandleSpan(comment.commentator),
         blogEntryTitle = blogEntryTitle,
         rating = comment.rating,
         timeAgo = timeAgo(fromTime = comment.creationTime, toTime = localCurrentTime),

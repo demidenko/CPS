@@ -22,6 +22,7 @@ import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesProblem
 import com.demich.cps.platforms.api.CodeforcesRatingChange
+import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
@@ -131,6 +132,11 @@ class CodeforcesAccountManager :
     @ReadOnlyComposable
     fun makeHandleSpan(handle: String, tag: CodeforcesColorTag): AnnotatedString =
         makeHandleSpan(handle = handle, tag = tag, cpsColors = cpsColors)
+
+    @Composable
+    @ReadOnlyComposable
+    fun makeHandleSpan(handle: CodeforcesHandle) =
+        makeHandleSpan(handle = handle.handle, tag = handle.colorTag)
 
     override fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString =
         makeHandleSpan(

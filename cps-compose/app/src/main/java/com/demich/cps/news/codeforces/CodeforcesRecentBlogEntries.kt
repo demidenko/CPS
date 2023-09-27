@@ -26,6 +26,8 @@ import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesComment
 import com.demich.cps.platforms.api.CodeforcesRecentAction
+import com.demich.cps.platforms.utils.codeforces.author
+import com.demich.cps.platforms.utils.codeforces.commentator
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.lazylist.LazyColumnOfData
@@ -102,14 +104,11 @@ private fun RecentBlogEntry(
     val manager = LocalCodeforcesAccountManager.current
     RecentBlogEntry(
         title = recentBlogEntryData.blogEntry.title,
-        authorHandle = manager.makeHandleSpan(
-            handle = recentBlogEntryData.blogEntry.authorHandle,
-            tag = recentBlogEntryData.blogEntry.authorColorTag
-        ),
+        authorHandle = manager.makeHandleSpan(recentBlogEntryData.blogEntry.author),
         commentators = buildAnnotatedString {
             recentBlogEntryData.comments.forEachIndexed { index, comment ->
                 if (index > 0) append(", ")
-                append(manager.makeHandleSpan(handle = comment.commentatorHandle, tag = comment.commentatorHandleColorTag))
+                append(manager.makeHandleSpan(handle = comment.commentator))
             }
         },
         isLowRated = recentBlogEntryData.isLowRated,

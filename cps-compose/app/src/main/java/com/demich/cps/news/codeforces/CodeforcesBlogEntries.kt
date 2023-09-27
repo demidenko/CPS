@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.*
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
@@ -79,10 +80,7 @@ private fun BlogEntryInfo(
 
     BlogEntryInfo(
         title = blogEntry.title,
-        authorHandle = manager.makeHandleSpan(
-            handle = blogEntry.authorHandle,
-            tag = blogEntry.authorColorTag
-        ),
+        authorHandle = manager.makeHandleSpan(blogEntry.author),
         rating = blogEntry.rating,
         commentsCount = blogEntry.commentsCount,
         timeAgo = timeAgo(
