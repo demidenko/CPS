@@ -18,6 +18,7 @@ import com.demich.cps.utils.floorBy
 import com.demich.cps.utils.flowOfCurrentTimeEachSecond
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.isSortedWith
+import com.demich.cps.utils.partitionPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
@@ -46,17 +47,32 @@ private fun flowOfContests(context: Context) =
             else list.filter { contest -> contest.compositeId !in ignored }
         }
 
+internal data class SortedContests(
+    val contests: List<Contest>,
+    private val firstFinished: Int
+) {
+    val finished: List<Contest> =
+        contests.subList(fromIndex = firstFinished, toIndex = contests.size)
+
+    val runningOrFuture: List<Contest> =
+        contests.subList(fromIndex = 0, toIndex = firstFinished)
+}
+
 private interface ContestsSorter {
-    val contests: List<Contest>
+    val contests: SortedContests
     fun apply(contests: List<Contest>, currentTime: Instant): Boolean
 }
 
 private class ContestsBruteSorter: ContestsSorter {
-    override var contests: List<Contest> = emptyList()
+    override var contests: SortedContests = SortedContests(emptyList(), 0)
         private set
 
     override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
-        this.contests = contests.sortedWith(Contest.getComparator(currentTime))
+        val sorted = contests.sortedWith(Contest.getComparator(currentTime))
+        this.contests = SortedContests(
+            contests = sorted,
+            firstFinished = sorted.partitionPoint { it.getPhase(currentTime) != Contest.Phase.FINISHED }
+        )
         return true
     }
 }
@@ -64,10 +80,15 @@ private class ContestsBruteSorter: ContestsSorter {
 private class ContestsSmartSorter: ContestsSorter {
     private var last: List<Contest> = emptyList()
     private var sortedLast: List<Contest> = emptyList()
+    private var firstFinished: Int = 0
     private var sortedAt: Instant = Instant.DISTANT_PAST
-    private var nextSortMoment: Instant = Instant.DISTANT_FUTURE
+    private var nextReorderTime: Instant = Instant.DISTANT_FUTURE
 
-    override val contests: List<Contest> get() = sortedLast
+    override val contests: SortedContests
+        get() = SortedContests(
+            contests = sortedLast,
+            firstFinished = firstFinished
+        )
 
     private fun saveToSorted(
         contests: List<Contest>,
@@ -76,7 +97,7 @@ private class ContestsSmartSorter: ContestsSorter {
     ) {
         sortedLast = contests.sortedWith(comparator)
         sortedAt = currentTime
-        nextSortMoment = contests.minOfOrNull {
+        nextReorderTime = contests.minOfOrNull {
             when {
                 currentTime < it.startTime -> it.startTime
                 currentTime < it.endTime -> it.endTime
@@ -85,17 +106,25 @@ private class ContestsSmartSorter: ContestsSorter {
         } ?: Instant.DISTANT_FUTURE
     }
 
+    private fun updateFirstFinished(currentTime: Instant) {
+        firstFinished = sortedLast.partitionPoint {
+            it.getPhase(currentTime) != Contest.Phase.FINISHED
+        }
+    }
+
     override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
         if (last != contests || currentTime < sortedAt) {
             last = contests
             saveToSorted(contests, currentTime)
+            updateFirstFinished(currentTime)
             return true
         } else {
-            if (currentTime >= nextSortMoment) {
+            if (currentTime >= nextReorderTime) {
                 val comparator = Contest.getComparator(currentTime)
                 if (!sortedLast.isSortedWith(comparator)) {
                     saveToSorted(sortedLast, currentTime, comparator)
                 }
+                updateFirstFinished(currentTime)
                 return true
             }
         }
@@ -104,11 +133,10 @@ private class ContestsSmartSorter: ContestsSorter {
 }
 
 
-//TODO: split to finished / !finished
 @Composable
 internal fun produceSortedContestsWithTime(
 
-): Pair<State<List<Contest>>, State<Instant>> {
+): Pair<State<SortedContests>, State<Instant>> {
     val context = context
 
     val states = remember {
