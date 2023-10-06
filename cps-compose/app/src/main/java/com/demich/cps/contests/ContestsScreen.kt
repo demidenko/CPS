@@ -137,23 +137,23 @@ private fun ContestsList(
     modifier: Modifier = Modifier
 ) {
     val (
-        contestsToShowState: State<List<Contest>>,
+        contestsState: State<List<Contest>>,
         currentTimeState: State<Instant>
     ) = produceSortedContestsWithTime()
 
     val contestsListController = rememberContestsListController()
 
-    LaunchedEffect(contestsToShowState, filterController) {
-        snapshotFlow { contestsToShowState.value }
+    LaunchedEffect(contestsState, filterController, contestsListController) {
+        snapshotFlow { contestsState.value }
             .collect { contests ->
                 filterController.available = contests.isNotEmpty()
                 contestsListController.applyContests(contests)
             }
     }
 
-    val filteredState = remember(contestsToShowState, filterController) {
+    val filteredState = remember(contestsState, filterController) {
         derivedStateOf {
-            filterController.filterContests(contestsToShowState.value)
+            filterController.filterContests(contestsState.value)
         }
     }
 
