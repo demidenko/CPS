@@ -19,17 +19,13 @@ import com.demich.cps.utils.flowOfCurrentTimeEachSecond
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.isSortedWith
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
-
-internal data class SortedContests(
-    val contests: List<Contest>,
-    val currentTime: Instant
-)
 
 private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<Pair<Contest.Platform, String>>> =
     combine(
@@ -52,10 +48,10 @@ private fun flowOfContests(context: Context) =
 
 private interface ContestsSorter {
     val contests: List<Contest>
-    fun apply(contests: List<Contest>, currentTime: Instant)
+    fun apply(contests: List<Contest>, currentTime: Instant): Boolean
 }
 
-/*private class ContestsStupidSorter: ContestsSorter {
+/*private class ContestsBruteSorter: ContestsSorter {
     override var contests: List<Contest> = emptyList()
         private set
 
@@ -64,29 +60,11 @@ private interface ContestsSorter {
     }
 }*/
 
-private class ContestsDefaultSorter: ContestsSorter {
-    private var last: List<Contest> = emptyList()
-    private var sortedLast: List<Contest> = emptyList()
-
-    override val contests: List<Contest> get() = sortedLast
-
-    override fun apply(contests: List<Contest>, currentTime: Instant) {
-        if (last != contests) {
-            last = contests
-            sortedLast = contests
-        }
-        val comparator = Contest.getComparator(currentTime)
-        if (!sortedLast.isSortedWith(comparator)) {
-            sortedLast = sortedLast.sortedWith(comparator)
-        }
-    }
-}
-
 private class ContestsSmartSorter: ContestsSorter {
     private var last: List<Contest> = emptyList()
     private var sortedLast: List<Contest> = emptyList()
     private var sortedAt: Instant = Instant.DISTANT_PAST
-    private var nextSortMoment: Instant = Instant.DISTANT_PAST
+    private var nextSortMoment: Instant = Instant.DISTANT_FUTURE
 
     override val contests: List<Contest> get() = sortedLast
 
@@ -106,29 +84,26 @@ private class ContestsSmartSorter: ContestsSorter {
         } ?: Instant.DISTANT_FUTURE
     }
 
-    override fun apply(contests: List<Contest>, currentTime: Instant) {
+    override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
         if (last != contests || currentTime < sortedAt) {
             last = contests
             saveToSorted(contests, currentTime)
+            return true
         } else {
             if (currentTime >= nextSortMoment) {
                 val comparator = Contest.getComparator(currentTime)
                 if (!sortedLast.isSortedWith(comparator)) {
                     saveToSorted(sortedLast, currentTime, comparator)
                 }
+                return true
             }
         }
+        return false
     }
 }
 
-internal fun flowOfSortedContestsWithTime(context: Context): Flow<SortedContests> {
-    val sorter: ContestsSorter = ContestsSmartSorter()
-    return flowOfContests(context).combine(flowOfCurrentTimeEachSecond()) { contests, currentTime ->
-        sorter.apply(contests, currentTime)
-        SortedContests(sorter.contests, currentTime)
-    }
-}
 
+//TODO: split to finished / !finished
 @Composable
 internal fun produceSortedContestsWithTime(
 
@@ -149,12 +124,13 @@ internal fun produceSortedContestsWithTime(
     LaunchedEffect(lifecycleOwner, states) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             val (contestsState, currentTimeState) = states
-            //TODO: optimize emplace (??)
-            flowOfSortedContestsWithTime(context)
-                .collect {
-                    contestsState.value = it.contests
-                    currentTimeState.value = it.currentTime
+            val sorter: ContestsSorter = ContestsSmartSorter()
+            flowOfContests(context).combine(flowOfCurrentTimeEachSecond()) { contests, currentTime ->
+                if (sorter.apply(contests, currentTime)) {
+                    contestsState.value = sorter.contests
                 }
+                currentTimeState.value = currentTime
+            }.collect()
         }
     }
 
