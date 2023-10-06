@@ -40,7 +40,7 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.localCurrentTime
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.rememberCollectWithLifecycle
 import com.demich.cps.utils.timeAgo
 import com.demich.cps.workers.CPSWork
 import com.demich.cps.workers.CPSWorker
@@ -78,15 +78,15 @@ private fun WorkersList(
     val context = context
     val works = remember { context.getCPSWorks() }
 
-    val lastExecutionTime by rememberCollect {
+    val lastExecutionTime by rememberCollectWithLifecycle {
         CPSWorkersDataStore(context).lastExecutionTime.flow
     }
 
-    val lastResult by rememberCollect {
+    val lastResult by rememberCollectWithLifecycle {
         CPSWorkersDataStore(context).lastResult.flow
     }
 
-    val lastDuration by rememberCollect {
+    val lastDuration by rememberCollectWithLifecycle {
         CPSWorkersDataStore(context).lastDuration.flow
     }
 
