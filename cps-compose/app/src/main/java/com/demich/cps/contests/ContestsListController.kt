@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.utils.DangerType
+import com.demich.cps.utils.minOfNotNull
 import com.demich.cps.utils.rememberCollect
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -59,16 +60,16 @@ internal class ContestsListController(
 
     private val safeMinDuration: Duration = 1.hours
     fun collisionType(contest: Contest): DangerType {
-        val distance = expandedIds.minOfOrNull { (id, it) ->
+        val distance = expandedIds.entries.minOfNotNull(default = Duration.INFINITE) { (id, it) ->
             val l = it.startTime
             val r = it.endTime
             when {
-                id == contest.compositeId -> Duration.INFINITE
+                id == contest.compositeId -> null
                 l >= contest.endTime -> l - contest.endTime
                 r <= contest.startTime -> contest.startTime - r
                 else -> return DangerType.DANGER
             }
-        } ?: Duration.INFINITE
+        }
         if (distance < safeMinDuration) return DangerType.WARNING
         return DangerType.SAFE
     }

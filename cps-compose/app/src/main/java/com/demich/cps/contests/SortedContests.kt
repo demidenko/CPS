@@ -18,6 +18,7 @@ import com.demich.cps.utils.floorBy
 import com.demich.cps.utils.flowOfCurrentTimeEachSecond
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.isSortedWith
+import com.demich.cps.utils.minOfNotNull
 import com.demich.cps.utils.partitionPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -97,13 +98,13 @@ private class ContestsSmartSorter: ContestsSorter {
     ) {
         sortedLast = contests.sortedWith(comparator)
         sortedAt = currentTime
-        nextReorderTime = contests.minOfOrNull {
+        nextReorderTime = contests.minOfNotNull(default = Instant.DISTANT_FUTURE) {
             when {
                 currentTime < it.startTime -> it.startTime
                 currentTime < it.endTime -> it.endTime
-                else -> Instant.DISTANT_FUTURE
+                else -> null
             }
-        } ?: Instant.DISTANT_FUTURE
+        }
     }
 
     private fun updateFirstFinished(currentTime: Instant) {
