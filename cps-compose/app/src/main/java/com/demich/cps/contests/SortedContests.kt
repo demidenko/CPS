@@ -51,14 +51,15 @@ private interface ContestsSorter {
     fun apply(contests: List<Contest>, currentTime: Instant): Boolean
 }
 
-/*private class ContestsBruteSorter: ContestsSorter {
+private class ContestsBruteSorter: ContestsSorter {
     override var contests: List<Contest> = emptyList()
         private set
 
-    override fun apply(contests: List<Contest>, currentTime: Instant) {
+    override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
         this.contests = contests.sortedWith(Contest.getComparator(currentTime))
+        return true
     }
-}*/
+}
 
 private class ContestsSmartSorter: ContestsSorter {
     private var last: List<Contest> = emptyList()
@@ -111,10 +112,11 @@ internal fun produceSortedContestsWithTime(
     val context = context
 
     val states = remember {
-        val contests = runBlocking { flowOfContests(context).first() }
+        val initContests = runBlocking { flowOfContests(context).first() }
         val currentTime = getCurrentTime().floorBy(1.seconds)
-        val sortedContests = contests.sortedWith(Contest.getComparator(currentTime))
-        val contestsState = mutableStateOf(sortedContests)
+        val sorter = ContestsBruteSorter()
+        sorter.apply(initContests, currentTime)
+        val contestsState = mutableStateOf(sorter.contests)
         val currentTimeState = mutableStateOf(currentTime)
         Pair(contestsState, currentTimeState)
     }
