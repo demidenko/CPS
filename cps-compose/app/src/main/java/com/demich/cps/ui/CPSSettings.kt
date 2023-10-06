@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -305,7 +306,9 @@ fun<T> SettingsItemWithInfo(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold
             )
-            infoContent(value)
+            ProvideTextStyle(TextStyle(fontSize = 15.sp, color = cpsColors.contentAdditional)) {
+                infoContent(value)
+            }
         }
     }
 }
@@ -331,7 +334,7 @@ fun<T: Enum<T>> SettingsSubtitleOfEnabled(
 ) {
     if (enabled.isEmpty()) SettingsSubtitle("none selected")
     else if (enabled.size == allSize) SettingsSubtitle("all selected")
-    else WordsWithCounterOnOverflow(words = enabled.sortedBy { it.ordinal }.map(name), fontSize = 15.sp)
+    else WordsWithCounterOnOverflow(words = enabled.sortedBy { it.ordinal }.map(name))
 }
 
 @Composable

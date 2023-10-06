@@ -3,6 +3,7 @@ package com.demich.cps.contests.settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,6 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
@@ -142,10 +144,9 @@ private fun ClistAdditionalRow() {
         Column(modifier = Modifier.weight(1f)) {
             Text(text = "clist additional", style = CPSDefaults.MonospaceTextStyle)
             if (resources.isNotEmpty()) {
-                WordsWithCounterOnOverflow(
-                    words = resources.map { it.name },
-                    fontSize = 10.sp
-                )
+                ProvideTextStyle(TextStyle(fontSize = 10.sp, color = cpsColors.contentAdditional)) {
+                    WordsWithCounterOnOverflow(words = resources.map { it.name })
+                }
             }
         }
         CPSIconButton(icon = CPSIcons.EditList) {

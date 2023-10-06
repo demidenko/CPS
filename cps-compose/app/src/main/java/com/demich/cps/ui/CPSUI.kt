@@ -332,9 +332,7 @@ fun CPSSwipeRefreshBox(
 @Composable
 fun WordsWithCounterOnOverflow(
     words: Collection<String>,
-    modifier: Modifier = Modifier,
-    fontSize: TextUnit,
-    color: Color = cpsColors.contentAdditional
+    modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier) {
         var counter by remember { mutableStateOf("") }
@@ -342,19 +340,12 @@ fun WordsWithCounterOnOverflow(
             text = words.joinToString(),
             modifier = Modifier.weight(1f),
             maxLines = 1,
-            fontSize = fontSize,
-            color = color,
             overflow = TextOverflow.Ellipsis,
             onTextLayout = {
                 counter = if (it.hasVisualOverflow) "(${words.size})" else ""
             }
         )
-        Text(
-            text = counter,
-            maxLines = 1,
-            fontSize = fontSize,
-            color = color,
-        )
+        Text(text = counter)
     }
 }
 

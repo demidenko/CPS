@@ -40,11 +40,7 @@ internal fun ClistApiAccessSettingsItem() {
         title = "Clist API access"
     ) { (login, key) ->
         if (login.isBlank()) {
-            Text(
-                text = "click to setup",
-                fontSize = 15.sp,
-                color = cpsColors.contentAdditional
-            )
+            Text(text = "click to setup")
         } else {
             Text(
                 text = buildAnnotatedString {
