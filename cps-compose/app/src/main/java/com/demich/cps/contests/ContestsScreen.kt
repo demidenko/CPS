@@ -123,7 +123,7 @@ private fun ContestsContent(
             modifier = Modifier
                 .fillMaxWidth()
         )
-        ContestsList(
+        ContestsPager(
             filterController = filterController,
             modifier = Modifier
                 .fillMaxSize()
@@ -132,7 +132,7 @@ private fun ContestsContent(
 }
 
 @Composable
-private fun ContestsList(
+private fun ContestsPager(
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
@@ -151,46 +151,63 @@ private fun ContestsList(
             }
     }
 
-    val filteredState = remember(contestsState, filterController) {
-        derivedStateOf {
-            filterController.filterContests(contestsState.value.contests)
-        }
-    }
-
     ProvideCurrentTime(currentTimeState) {
-        ContestsColumn(
-            contestsState = filteredState,
+        ContestsPage(
+            contests = { contestsState.value.contests },
             contestsListController = contestsListController,
+            filterController = filterController,
             modifier = modifier
         )
     }
 }
 
 @Composable
-private fun ContestsColumn(
-    contestsState: State<List<Contest>>, //seems like () -> List<Contest> is not stable
+private fun ContestsPage(
+    contests: () -> List<Contest>,
     contestsListController: ContestsListController,
+    filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
     val context = context
     val scope = rememberCoroutineScope()
 
+    val filtered by remember(contests, filterController) {
+        derivedStateOf {
+            filterController.filterContests(contests())
+        }
+    }
+
+    ContestsColumn(
+        contests = { filtered },
+        contestsListController = contestsListController,
+        modifier = modifier,
+        onDeleteRequest = { contest ->
+            scope.launch {
+                ContestsInfoDataStore(context).ignoredContests.edit {
+                    put(contest.compositeId, getCurrentTime())
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun ContestsColumn(
+    contests: () -> List<Contest>,
+    contestsListController: ContestsListController,
+    onDeleteRequest: (Contest) -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumnOfData(
         modifier = modifier,
-        items = contestsState::value,
+        items = contests,
         /*key = { it.compositeId }*/ //TODO: key effects jumping on reorder
     ) { contest ->
         ContestItem(
             contest = contest,
             isExpanded = { contestsListController.isExpanded(contest) },
             collisionType = { contestsListController.collisionType(contest) },
-            onDeleteRequest = {
-                scope.launch {
-                    ContestsInfoDataStore(context).ignoredContests.edit {
-                        put(contest.compositeId, getCurrentTime())
-                    }
-                }
-            },
+            onDeleteRequest = { onDeleteRequest(contest) },
             modifier = Modifier
                 .fillMaxWidth()
                 .clickableNoRipple { contestsListController.toggleExpanded(contest) }
