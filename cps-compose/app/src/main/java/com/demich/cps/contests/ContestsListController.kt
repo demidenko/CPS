@@ -1,10 +1,14 @@
 package com.demich.cps.contests
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.minOfNotNull
@@ -20,10 +24,13 @@ internal fun rememberContestsListController(): ContestsListController {
 
     val expandedIdsState = rememberCollect { contestsViewModel.flowOfExpandedContests() }
 
-    return remember(expandedIdsState, contestsViewModel) {
+    val showFinishedState = rememberSaveable { mutableStateOf(false) }
+
+    return remember(contestsViewModel, expandedIdsState) {
         ContestsListController(
+            contestsViewModel = contestsViewModel,
             expandedIdsState = expandedIdsState,
-            contestsViewModel = contestsViewModel
+            showFinishedState = showFinishedState
         )
     }
 }
@@ -50,8 +57,9 @@ internal interface ContestsIdsHolder {
 
 @Stable
 internal class ContestsListController(
+    contestsViewModel: ContestsViewModel,
     expandedIdsState: State<Map<ContestCompositeId, Contest>>,
-    contestsViewModel: ContestsViewModel
+    private val showFinishedState: MutableState<Boolean>
 ): ContestsIdsHolder by contestsViewModel {
     private val expandedIds by expandedIdsState
 
@@ -73,4 +81,6 @@ internal class ContestsListController(
         if (distance < safeMinDuration) return DangerType.WARNING
         return DangerType.SAFE
     }
+
+    var showFinished by showFinishedState
 }
