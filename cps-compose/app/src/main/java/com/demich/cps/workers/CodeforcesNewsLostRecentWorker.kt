@@ -12,9 +12,9 @@ import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
-import com.demich.cps.utils.firstTrue
 import com.demich.cps.utils.forEach
 import com.demich.cps.utils.mapToSet
+import com.demich.cps.utils.partitionPoint
 import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
@@ -164,8 +164,8 @@ private class CachedBlogEntryApi(
         blogEntries: List<CodeforcesBlogEntry>,
         block: (CodeforcesBlogEntry) -> Unit
     ) {
-        val indexOfFirstNew = firstTrue(0, blogEntries.size) { index ->
-            isNew(getCreationTime(id = blogEntries[index].id))
+        val indexOfFirstNew = blogEntries.partitionPoint {
+            !isNew(getCreationTime(id = it.id))
         }
 
         blogEntries.forEach(from = indexOfFirstNew) {

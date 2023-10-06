@@ -49,7 +49,7 @@ fun<T> List<T>.swapped(i: Int, j: Int): List<T> =
         Collections.swap(this, i, j)
     }
 
-inline fun firstFalse(first: Int, last: Int, predicate: (Int) -> Boolean): Int {
+inline fun binarySearchFirstFalse(first: Int, last: Int, predicate: (Int) -> Boolean): Int {
     var l = first
     var r = last
     while (l < r) {
@@ -59,8 +59,12 @@ inline fun firstFalse(first: Int, last: Int, predicate: (Int) -> Boolean): Int {
     return r
 }
 
-inline fun firstTrue(first: Int, last: Int, predicate: (Int) -> Boolean): Int =
-    firstFalse(first, last) { !predicate(it) }
+inline fun<T> List<T>.partitionPoint(
+    fromIndex: Int = 0,
+    toIndex: Int = size,
+    predicate: (T) -> Boolean
+): Int = binarySearchFirstFalse(first = fromIndex, last = toIndex) { predicate(get(it)) }
+
 
 inline fun<T, R> List<T>.forEachRangeEqualBy(selector: (T) -> R, block: (Int, Int) -> Unit) {
     var r = 0
