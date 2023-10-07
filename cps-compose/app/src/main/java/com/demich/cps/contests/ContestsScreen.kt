@@ -11,6 +11,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
@@ -156,13 +157,18 @@ private fun ContestsPager(
             }
     }
 
+    val saveableStateHolder = rememberSaveableStateHolder()
+
     ProvideCurrentTime(currentTimeState) {
-        ContestsPage(
-            contests = { contestsState.value.contests },
-            contestsListController = contestsListController,
-            filterController = filterController,
-            modifier = modifier
-        )
+        val showFinished = contestsListController.showFinished
+        saveableStateHolder.SaveableStateProvider(key = showFinished) {
+            ContestsPage(
+                contests = { contestsState.value.sublist(showFinished) },
+                contestsListController = contestsListController,
+                filterController = filterController,
+                modifier = modifier
+            )
+        }
     }
 }
 
