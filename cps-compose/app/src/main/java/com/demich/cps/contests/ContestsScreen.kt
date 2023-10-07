@@ -48,6 +48,7 @@ import kotlinx.datetime.Instant
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ContestsScreen(
+    contestsListController: ContestsListController,
     filterController: ContestsFilterController,
     isReloading: () -> Boolean,
     onReload: () -> Unit
@@ -65,6 +66,7 @@ fun ContestsScreen(
         CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
         if (isAnyPlatformEnabled) {
             ContestsReloadableContent(
+                contestsListController = contestsListController,
                 filterController = filterController,
                 isReloading = isReloading,
                 onReload = onReload,
@@ -86,6 +88,7 @@ fun ContestsScreen(
 
 @Composable
 private fun ContestsReloadableContent(
+    contestsListController: ContestsListController,
     filterController: ContestsFilterController,
     isReloading: () -> Boolean,
     onReload: () -> Unit,
@@ -97,6 +100,7 @@ private fun ContestsReloadableContent(
         modifier = modifier
     ) {
         ContestsContent(
+            contestsListController = contestsListController,
             filterController = filterController
         )
     }
@@ -104,6 +108,7 @@ private fun ContestsReloadableContent(
 
 @Composable
 private fun ContestsContent(
+    contestsListController: ContestsListController,
     filterController: ContestsFilterController
 ) {
     val context = context
@@ -124,6 +129,7 @@ private fun ContestsContent(
                 .fillMaxWidth()
         )
         ContestsPager(
+            contestsListController = contestsListController,
             filterController = filterController,
             modifier = Modifier
                 .fillMaxSize()
@@ -133,6 +139,7 @@ private fun ContestsContent(
 
 @Composable
 private fun ContestsPager(
+    contestsListController: ContestsListController,
     filterController: ContestsFilterController,
     modifier: Modifier = Modifier
 ) {
@@ -140,8 +147,6 @@ private fun ContestsPager(
         contestsState: State<SortedContests>,
         currentTimeState: State<Instant>
     ) = produceSortedContestsWithTime()
-
-    val contestsListController = rememberContestsListController()
 
     LaunchedEffect(contestsState, filterController, contestsListController) {
         snapshotFlow { contestsState.value.contests }

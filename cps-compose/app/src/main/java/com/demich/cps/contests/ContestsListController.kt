@@ -56,7 +56,7 @@ internal interface ContestsIdsHolder {
 }
 
 @Stable
-internal class ContestsListController(
+class ContestsListController(
     contestsViewModel: ContestsViewModel,
     expandedIdsState: State<Map<ContestCompositeId, Contest>>,
     private val showFinishedState: MutableState<Boolean>
