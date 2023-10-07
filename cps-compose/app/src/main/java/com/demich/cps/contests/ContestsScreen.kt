@@ -1,6 +1,8 @@
 package com.demich.cps.contests
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -224,9 +226,10 @@ private fun ContestsColumn(
                 .fillMaxWidth()
                 .clickableNoRipple { contestsListController.toggleExpanded(contest) }
                 .contestItemPaddings()
-                .animateItemPlacement()
+                .animateItemPlacement(spring())
+                .animateContentSize(spring())
         )
-        Divider(Modifier.animateItemPlacement())
+        Divider(Modifier.animateItemPlacement(spring()))
     }
 }
 
