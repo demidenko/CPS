@@ -1,7 +1,7 @@
 package com.demich.cps.contests
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -202,6 +202,7 @@ private fun ContestsPage(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ContestsColumn(
     contests: () -> List<Contest>,
@@ -212,7 +213,7 @@ private fun ContestsColumn(
     LazyColumnOfData(
         modifier = modifier,
         items = contests,
-        /*key = { it.compositeId }*/ //TODO: key effects jumping on reorder
+        key = { it.compositeId }
     ) { contest ->
         ContestItem(
             contest = contest,
@@ -223,9 +224,9 @@ private fun ContestsColumn(
                 .fillMaxWidth()
                 .clickableNoRipple { contestsListController.toggleExpanded(contest) }
                 .contestItemPaddings()
-                .animateContentSize()
+                .animateItemPlacement()
         )
-        Divider()
+        Divider(Modifier.animateItemPlacement())
     }
 }
 
