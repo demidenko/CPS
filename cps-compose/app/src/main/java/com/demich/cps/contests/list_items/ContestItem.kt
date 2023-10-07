@@ -1,10 +1,5 @@
 package com.demich.cps.contests.list_items
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,36 +30,25 @@ fun ContestItem(
     onDeleteRequest: () -> Unit
 ) {
     val contestDisplay = ContestDisplay(contest, collisionType())
-    AnimatedContent(
-        targetState = isExpanded(),
-        transitionSpec = {
-            fadeIn(spring()) togetherWith fadeOut(spring())
-        },
-        label = ""
-    ) { expanded ->
-        if (!expanded) ContestItemContent(contestDisplay, modifier)
-        else ContestExpandedItemContent(contestDisplay, modifier, onDeleteRequest)
+    Column(modifier = modifier) {
+        if (!isExpanded()) ContestItemContent(contestDisplay)
+        else ContestExpandedItemContent(contestDisplay, onDeleteRequest = onDeleteRequest)
     }
 }
 
 @Composable
-private fun ContestItemContent(
-    contestDisplay: ContestDisplay,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier) {
-        val data = contestDisplay.dataByCurrentTime()
-        ContestItemHeader(
-            platform = data.contest.platform,
-            contestTitle = data.contest.title,
-            phase = data.phase,
-            modifier = Modifier.fillMaxWidth()
-        )
-        ContestItemFooter(
-            data = data,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
+private fun ContestItemContent(contestDisplay: ContestDisplay) {
+    val data = contestDisplay.dataByCurrentTime()
+    ContestItemHeader(
+        platform = data.contest.platform,
+        contestTitle = data.contest.title,
+        phase = data.phase,
+        modifier = Modifier.fillMaxWidth()
+    )
+    ContestItemFooter(
+        data = data,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @Composable

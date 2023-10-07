@@ -31,10 +31,9 @@ import com.demich.cps.utils.openUrlInBrowser
 @Composable
 internal fun ContestExpandedItemContent(
     contestDisplay: ContestDisplay,
-    modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         val data = contestDisplay.dataByCurrentTime()
         ContestPlatform(
             platform = data.contest.platform,

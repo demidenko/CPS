@@ -1,6 +1,7 @@
 package com.demich.cps.contests
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -222,6 +223,7 @@ private fun ContestsColumn(
                 .fillMaxWidth()
                 .clickableNoRipple { contestsListController.toggleExpanded(contest) }
                 .contestItemPaddings()
+                .animateContentSize()
         )
         Divider()
     }
