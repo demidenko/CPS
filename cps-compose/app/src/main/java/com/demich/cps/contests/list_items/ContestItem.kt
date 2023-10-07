@@ -30,8 +30,12 @@ fun ContestItem(
     onDeleteRequest: () -> Unit
 ) {
     val contestDisplay = ContestDisplay(contest, collisionType())
-    Column(modifier = modifier) {
-        if (!isExpanded()) ContestItemContent(contestDisplay)
+    val expanded = isExpanded()
+    Column(
+        modifier = modifier,
+        horizontalAlignment = if (expanded) Alignment.CenterHorizontally else Alignment.Start
+    ) {
+        if (!expanded) ContestItemContent(contestDisplay)
         else ContestExpandedItemContent(contestDisplay, onDeleteRequest = onDeleteRequest)
     }
 }

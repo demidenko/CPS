@@ -1,7 +1,6 @@
 package com.demich.cps.contests.list_items
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -33,28 +32,26 @@ internal fun ContestExpandedItemContent(
     contestDisplay: ContestDisplay,
     onDeleteRequest: () -> Unit
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        val data = contestDisplay.dataByCurrentTime()
-        ContestPlatform(
-            platform = data.contest.platform,
-            platformName = data.contest.platformName()
-        )
-        ContestTitle(
-            contestTitle = data.contest.title,
-            phase = data.phase
-        )
-        ContestItemDatesAndMenuButton(
-            contestDisplay = data.contestDisplay,
-            onDeleteRequest = onDeleteRequest
-        )
-        ContestCounter(
-            counter = when (data.phase) {
-                Contest.Phase.BEFORE -> "starts in " + data.counter
-                Contest.Phase.RUNNING -> "ends in " + data.counter
-                Contest.Phase.FINISHED -> ""
-            }
-        )
-    }
+    val data = contestDisplay.dataByCurrentTime()
+    ContestPlatform(
+        platform = data.contest.platform,
+        platformName = data.contest.platformName()
+    )
+    ContestTitle(
+        contestTitle = data.contest.title,
+        phase = data.phase
+    )
+    ContestItemDatesAndMenuButton(
+        contestDisplay = data.contestDisplay,
+        onDeleteRequest = onDeleteRequest
+    )
+    ContestCounter(
+        counter = when (data.phase) {
+            Contest.Phase.BEFORE -> "starts in " + data.counter
+            Contest.Phase.RUNNING -> "ends in " + data.counter
+            Contest.Phase.FINISHED -> ""
+        }
+    )
 }
 
 @Composable
