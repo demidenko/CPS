@@ -297,11 +297,19 @@ fun contestsMenuBuilder(
 }
 
 fun contestsBottomBarBuilder(
+    contestsListController: ContestsListController,
     filterController: ContestsFilterController,
     loadingStatus: () -> LoadingStatus,
     onReloadClick: () -> Unit
 ): AdditionalBottomBarBuilder = {
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
+
+    ContestsPageSwitchButton(
+        showFinished = contestsListController.showFinished,
+        onClick = {
+            contestsListController.showFinished = it
+        }
+    )
 
     if (isAnyPlatformEnabled && filterController.available && !filterController.enabled) {
         CPSIconButton(
@@ -314,6 +322,19 @@ fun contestsBottomBarBuilder(
         loadingStatus = loadingStatus(),
         enabled = isAnyPlatformEnabled,
         onClick = onReloadClick
+    )
+}
+
+@Composable
+private fun ContestsPageSwitchButton(
+    showFinished: Boolean,
+    onClick: (Boolean) -> Unit
+) {
+    CPSIconButton(
+        icon = CPSIcons.Swap,
+        onClick = {
+            onClick(!showFinished)
+        }
     )
 }
 

@@ -204,6 +204,7 @@ private fun CPSContent() {
                 onReload = onReload
             )
             holder.bottomBar = contestsBottomBarBuilder(
+                contestsListController = contestsListController,
                 filterController = filterController,
                 loadingStatus = { loadingStatus },
                 onReloadClick = onReload
@@ -212,7 +213,12 @@ private fun CPSContent() {
                 onOpenSettings = { navigator.navigateTo(Screen.ContestsSettings) },
                 isReloading = isReloading
             )
-            holder.setSubtitle("contests")
+
+            when (contestsListController.showFinished) {
+                true -> holder.setSubtitle("contests", "finished")
+                false -> holder.setSubtitle("contests")
+            }
+
         }
         cpsComposable(ScreenTypes.contestsSettings) { holder ->
             ContestsSettingsScreen()
