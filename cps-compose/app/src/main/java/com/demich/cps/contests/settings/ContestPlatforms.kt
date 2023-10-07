@@ -62,10 +62,12 @@ internal fun ContestPlatformsSettingsItem() {
 private fun ContestPlatformsSettingsItemContent(
     enabledPlatforms: Set<Contest.Platform>
 ) {
-    SettingsSubtitleOfEnabled(
-        enabled = enabledPlatforms - Contest.Platform.unknown,
-        allSize = Contest.platformsExceptUnknown.size
-    )
+    ProvideTextStyle(TextStyle(fontSize = 15.sp, color = cpsColors.contentAdditional)) {
+        SettingsSubtitleOfEnabled(
+            enabled = enabledPlatforms - Contest.Platform.unknown,
+            allSize = Contest.platformsExceptUnknown.size
+        )
+    }
 }
 
 @Composable

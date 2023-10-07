@@ -332,9 +332,11 @@ fun<T: Enum<T>> SettingsSubtitleOfEnabled(
     allSize: Int? = null,
     name: (T) -> String = { it.name }
 ) {
-    if (enabled.isEmpty()) SettingsSubtitle("none selected")
-    else if (enabled.size == allSize) SettingsSubtitle("all selected")
-    else WordsWithCounterOnOverflow(words = enabled.sortedBy { it.ordinal }.map(name))
+    when (enabled.size) {
+        0 -> SettingsSubtitle("none selected")
+        allSize -> SettingsSubtitle("all selected")
+        else -> WordsWithCounterOnOverflow(words = enabled.sortedBy { it.ordinal }.map(name))
+    }
 }
 
 @Composable
