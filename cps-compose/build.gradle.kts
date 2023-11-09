@@ -6,7 +6,7 @@ plugins {
     id("com.android.application") version gradle_version apply false
     id("com.android.library") version gradle_version apply false
 
-    val kotlin_version = "1.9.10"
+    val kotlin_version = "1.9.20"
     id("org.jetbrains.kotlin.android") version kotlin_version apply false
     id("org.jetbrains.kotlin.plugin.serialization") version kotlin_version apply false
     id("com.google.devtools.ksp") version "$kotlin_version-+" apply false
