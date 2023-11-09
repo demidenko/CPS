@@ -314,12 +314,14 @@ fun contestsBottomBarBuilder(
 ): AdditionalBottomBarBuilder = {
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
 
-    ContestsPageSwitchButton(
-        showFinished = contestsListController.showFinished,
-        onClick = {
-            contestsListController.showFinished = it
-        }
-    )
+    if (isAnyPlatformEnabled) {
+        ContestsPageSwitchButton(
+            showFinished = contestsListController.showFinished,
+            onClick = {
+                contestsListController.showFinished = it
+            }
+        )
+    }
 
     if (isAnyPlatformEnabled && filterController.available && !filterController.enabled) {
         CPSIconButton(
