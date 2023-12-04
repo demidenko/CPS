@@ -22,6 +22,11 @@ allprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = javaCompatibility
+            freeCompilerArgs += listOf(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
+                        "${project.rootDir.absolutePath}/compose_compiler_config.conf"
+            )
         }
     }
 }
