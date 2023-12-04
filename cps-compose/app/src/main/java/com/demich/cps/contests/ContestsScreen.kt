@@ -22,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.asFlow
 import androidx.work.WorkInfo
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.database.Contest
@@ -373,24 +372,13 @@ fun rememberCombinedLoadingStatusState(): State<LoadingStatus> {
         key1 = contestsViewModel
     ) {
         contestsViewModel.flowOfLoadingStatus()
-            .combine(
-                ContestsWorker.getWork(context).workInfoLiveData().asFlow()
-            ) { loadingStatus, workInfo ->
+            .combine(ContestsWorker.getWork(context).flowOfWorkInfo()) { loadingStatus, workInfo ->
                 if (workInfo?.state == WorkInfo.State.RUNNING) LoadingStatus.LOADING
                 else loadingStatus
             }.collect {
                 value = it
             }
     }
-
-    /*val loadingStatus by rememberCollect { contestsViewModel.flowOfLoadingStatus() }
-    val workInfo by remember { ContestsWorker.getWork(context) }.workInfoState()
-    return remember {
-        derivedStateOf {
-            if (workInfo?.state == WorkInfo.State.RUNNING) LoadingStatus.LOADING
-            else loadingStatus
-        }
-    }*/
 }
 
 @Composable

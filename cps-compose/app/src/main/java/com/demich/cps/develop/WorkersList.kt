@@ -13,8 +13,8 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -118,12 +118,12 @@ private fun WorkerItem(
     modifier: Modifier = Modifier
 ) {
 
-    val workState by remember(key1 = work, calculation = work::workInfoLiveData).observeAsState()
+    val workInfo by remember(key1 = work, calculation = work::flowOfWorkInfo).collectAsState(initial = null)
 
     WorkerItem(
         name = work.name,
-        workState = workState?.state ?: WorkInfo.State.CANCELLED,
-        progressInfo = workState?.takeIf { it.state == WorkInfo.State.RUNNING }?.getProgressInfo(),
+        workState = workInfo?.state ?: WorkInfo.State.CANCELLED,
+        progressInfo = workInfo?.takeIf { it.state == WorkInfo.State.RUNNING }?.getProgressInfo(),
         lastRunTimeAgo = lastExecutionTime?.let {
             timeAgo(fromTime = it, toTime = localCurrentTime)
         } ?: "never",

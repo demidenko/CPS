@@ -3,10 +3,10 @@ package com.demich.cps.workers
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import androidx.work.*
 import com.demich.cps.notifications.NotificationBuilder
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.toJavaDuration
@@ -48,8 +48,8 @@ abstract class CPSWork(
         if (isEnabled()) enqueue()
     }
 
-    fun workInfoLiveData(): LiveData<WorkInfo?> =
-        context.workManager.getWorkInfosForUniqueWorkLiveData(name)
+    fun flowOfWorkInfo(): Flow<WorkInfo?> =
+        context.workManager.getWorkInfosForUniqueWorkFlow(name)
             .map { it?.getOrNull(0) }
 }
 
