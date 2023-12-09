@@ -15,7 +15,9 @@ import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 
 abstract class CPSWorker(
     private val work: CPSWork,
@@ -34,22 +36,23 @@ abstract class CPSWorker(
         val workersInfo = CPSWorkersDataStore(context)
 
         val result = withContext(Dispatchers.IO) {
-            workersInfo.edit { prefs ->
-                prefs[lastExecutionTime][work.name] = workerStartTime
-                prefs[lastResult].remove(work.name)
-                prefs[lastDuration].remove(work.name)
+            workersInfo.executions.edit {
+                this[work.name] = get(work.name)?.filter {
+                    workerStartTime - it.start < 24.hours
+                }.orEmpty()
             }
 
             kotlin.runCatching { runWork() }
                 .getOrElse { Result.failure() }
                 .also { result ->
-                    workersInfo.edit { prefs ->
-                        prefs[lastResult].apply {
-                            val type = result.toType()
-                            if (type == null) remove(work.name)
-                            else this[work.name] = type
-                        }
-                        prefs[lastDuration][work.name] = getCurrentTime() - workerStartTime
+                    workersInfo.executions.edit {
+                        this[work.name] = this[work.name].orEmpty().plus(
+                            ExecutionEvent(
+                                start = workerStartTime,
+                                end = getCurrentTime(),
+                                resultType = result.toType()
+                            )
+                        )
                     }
             }
         }
@@ -86,17 +89,26 @@ abstract class CPSWorker(
     }
 
 
-    enum class ResultTypes {
+    enum class ResultType {
         SUCCESS, RETRY, FAILURE
     }
 
-    private fun Result.toType(): ResultTypes? {
+    private fun Result.toType(): ResultType? {
         return when (this) {
-            is Result.Success -> ResultTypes.SUCCESS
-            is Result.Retry -> ResultTypes.RETRY
-            is Result.Failure -> ResultTypes.FAILURE
+            is Result.Success -> ResultType.SUCCESS
+            is Result.Retry -> ResultType.RETRY
+            is Result.Failure -> ResultType.FAILURE
             else -> null
         }
+    }
+
+    @Serializable
+    data class ExecutionEvent(
+        val start: Instant,
+        val end: Instant,
+        val resultType: ResultType?
+    ) {
+        val duration: Duration get() = end - start
     }
 }
 
@@ -115,9 +127,5 @@ class CPSWorkersDataStore(context: Context): ItemizedDataStore(context.workersDa
         private val Context.workersDataStore by dataStoreWrapper(name = "workers_info")
     }
 
-    val lastExecutionTime = jsonCPS.itemMap<String, Instant>(name = "last_execution_time")
-
-    val lastResult = jsonCPS.itemMap<String, CPSWorker.ResultTypes>(name = "last_result_type")
-
-    val lastDuration = jsonCPS.itemMap<String, Duration>(name = "last_duration")
+    val executions = jsonCPS.itemMap<String, List<CPSWorker.ExecutionEvent>>("executions")
 }

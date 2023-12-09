@@ -47,7 +47,6 @@ import com.demich.cps.workers.CPSWorker
 import com.demich.cps.workers.CPSWorkersDataStore
 import com.demich.cps.workers.getCPSWorks
 import com.demich.cps.workers.getProgressInfo
-import kotlinx.datetime.Instant
 import kotlin.time.Duration
 
 @Composable
@@ -78,16 +77,8 @@ private fun WorkersList(
     val context = context
     val works = remember { context.getCPSWorks() }
 
-    val lastExecutionTime by rememberCollectWithLifecycle {
-        CPSWorkersDataStore(context).lastExecutionTime.flow
-    }
-
-    val lastResult by rememberCollectWithLifecycle {
-        CPSWorkersDataStore(context).lastResult.flow
-    }
-
-    val lastDuration by rememberCollectWithLifecycle {
-        CPSWorkersDataStore(context).lastDuration.flow
+    val executionEvents by rememberCollectWithLifecycle {
+        CPSWorkersDataStore(context).executions.flow
     }
 
     ProvideTimeEachMinute {
@@ -95,9 +86,7 @@ private fun WorkersList(
             items(items = works, key = { it.name }) { work ->
                 WorkerItem(
                     work = work,
-                    lastExecutionTime = lastExecutionTime[work.name],
-                    lastResult = lastResult[work.name],
-                    lastDuration = lastDuration[work.name],
+                    lastExecutionEvent = executionEvents[work.name]?.lastOrNull(),
                     modifier = Modifier
                         .clickable { onClick(work) }
                         .fillMaxWidth()
@@ -112,9 +101,7 @@ private fun WorkersList(
 @Composable
 private fun WorkerItem(
     work: CPSWork,
-    lastExecutionTime: Instant?,
-    lastResult: CPSWorker.ResultTypes?,
-    lastDuration: Duration?,
+    lastExecutionEvent: CPSWorker.ExecutionEvent?,
     modifier: Modifier = Modifier
 ) {
 
@@ -124,11 +111,11 @@ private fun WorkerItem(
         name = work.name,
         workState = workInfo?.state ?: WorkInfo.State.CANCELLED,
         progressInfo = workInfo?.takeIf { it.state == WorkInfo.State.RUNNING }?.getProgressInfo(),
-        lastRunTimeAgo = lastExecutionTime?.let {
-            timeAgo(fromTime = it, toTime = localCurrentTime)
+        lastRunTimeAgo = lastExecutionEvent?.let {
+            timeAgo(fromTime = it.start, toTime = localCurrentTime)
         } ?: "never",
-        lastResult = lastResult,
-        lastDuration = lastDuration?.toNiceString() ?: "",
+        lastResult = lastExecutionEvent?.resultType,
+        lastDuration = lastExecutionEvent?.duration?.toNiceString() ?: "",
         modifier = modifier
     )
 }
@@ -146,7 +133,7 @@ private fun WorkerItem(
     workState: WorkInfo.State,
     progressInfo: ProgressBarInfo?,
     lastRunTimeAgo: String,
-    lastResult: CPSWorker.ResultTypes?,
+    lastResult: CPSWorker.ResultType?,
     lastDuration: String,
     modifier: Modifier = Modifier
 ) {
@@ -213,10 +200,10 @@ private fun WorkerItem(
 
 @Composable
 private fun ResultIcon(
-    result: CPSWorker.ResultTypes,
+    result: CPSWorker.ResultType,
     modifier: Modifier = Modifier
 ) {
-    if (result == CPSWorker.ResultTypes.SUCCESS) {
+    if (result == CPSWorker.ResultType.SUCCESS) {
         IconSp(
             imageVector = CPSIcons.Done,
             color = cpsColors.success,
@@ -225,7 +212,7 @@ private fun ResultIcon(
         )
     } else {
         AttentionIcon(
-            dangerType = if (result == CPSWorker.ResultTypes.RETRY) DangerType.WARNING else DangerType.DANGER,
+            dangerType = if (result == CPSWorker.ResultType.RETRY) DangerType.WARNING else DangerType.DANGER,
             modifier = modifier
         )
     }
