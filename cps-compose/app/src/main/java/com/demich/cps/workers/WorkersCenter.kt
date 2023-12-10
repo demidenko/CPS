@@ -5,10 +5,12 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.work.*
 import com.demich.cps.notifications.NotificationBuilder
+import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.toJavaDuration
 
 internal val Context.workManager get() = WorkManager.getInstance(this)
@@ -46,6 +48,22 @@ abstract class CPSWork(
     private fun enqueue() = start(restart = false)
     suspend fun enqueueIfEnabled() {
         if (isEnabled()) enqueue()
+    }
+    fun enqueueRetry() {
+        val request = requestBuilder.apply {
+            setBackoffCriteria(
+                BackoffPolicy.LINEAR,
+                PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
+            setNextScheduleTimeOverride((getCurrentTime() + 15.minutes).toEpochMilliseconds())
+        }.build()
+
+        context.workManager.enqueueUniquePeriodicWork(
+            name,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            request
+        )
     }
 
     fun flowOfWorkInfo(): Flow<WorkInfo?> =

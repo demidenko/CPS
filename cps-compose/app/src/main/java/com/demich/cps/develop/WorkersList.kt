@@ -77,8 +77,8 @@ private fun WorkersList(
     val context = context
     val works = remember { context.getCPSWorks() }
 
-    val executionEvents by rememberCollectWithLifecycle {
-        CPSWorkersDataStore(context).executions.flow
+    val lastExecutionEvents by rememberCollectWithLifecycle {
+        CPSWorkersDataStore(context).lastExecutions.flow
     }
 
     ProvideTimeEachMinute {
@@ -86,7 +86,7 @@ private fun WorkersList(
             items(items = works, key = { it.name }) { work ->
                 WorkerItem(
                     work = work,
-                    lastExecutionEvent = executionEvents[work.name]?.lastOrNull(),
+                    lastExecutionEvent = lastExecutionEvents[work.name],
                     modifier = Modifier
                         .clickable { onClick(work) }
                         .fillMaxWidth()

@@ -13,11 +13,12 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.seconds
 
 abstract class CPSWorker(
     private val work: CPSWork,
@@ -36,31 +37,37 @@ abstract class CPSWorker(
         val workersInfo = CPSWorkersDataStore(context)
 
         val result = withContext(Dispatchers.IO) {
-            workersInfo.executions.edit {
-                this[work.name] = get(work.name)?.filter {
-                    workerStartTime - it.start < 24.hours
-                }.orEmpty()
+            workersInfo.lastExecutions.edit {
+                this[work.name] = ExecutionEvent(start = workerStartTime)
             }
 
-            kotlin.runCatching { runWork() }
-                .getOrElse { Result.failure() }
-                .also { result ->
-                    workersInfo.executions.edit {
-                        this[work.name] = this[work.name].orEmpty().plus(
-                            ExecutionEvent(
-                                start = workerStartTime,
-                                end = getCurrentTime(),
-                                resultType = result.toType()
-                            )
-                        )
-                    }
+            smartRunWork().also { result ->
+                workersInfo.lastExecutions.edit {
+                    this[work.name] = ExecutionEvent(
+                        start = workerStartTime,
+                        end = getCurrentTime(),
+                        resultType = result.toType()
+                    )
+                }
+                if (result.toType() == ResultType.RETRY) {
+                    work.enqueueRetry()
+                }
             }
         }
 
         return result
     }
 
-    abstract suspend fun runWork(): Result
+    protected abstract suspend fun runWork(): Result
+    private suspend fun smartRunWork(): Result {
+        suspend fun call(): Result = runCatching { runWork() }.getOrElse { Result.failure() }
+        return call().let { result ->
+            if (result.toType() == ResultType.RETRY) {
+                delay(duration = 5.seconds)
+                call()
+            } else result
+        }
+    }
 
     protected suspend fun setProgressInfo(progressInfo: ProgressBarInfo) {
         if (progressInfo.total == 0) return
@@ -105,10 +112,10 @@ abstract class CPSWorker(
     @Serializable
     data class ExecutionEvent(
         val start: Instant,
-        val end: Instant,
-        val resultType: ResultType?
+        val end: Instant? = null,
+        val resultType: ResultType? = null
     ) {
-        val duration: Duration get() = end - start
+        val duration: Duration? get() = end?.minus(start)
     }
 }
 
@@ -127,5 +134,6 @@ class CPSWorkersDataStore(context: Context): ItemizedDataStore(context.workersDa
         private val Context.workersDataStore by dataStoreWrapper(name = "workers_info")
     }
 
-    val executions = jsonCPS.itemMap<String, List<CPSWorker.ExecutionEvent>>("executions")
+    //val executions = jsonCPS.itemMap<String, List<CPSWorker.ExecutionEvent>>("executions")
+    val lastExecutions = jsonCPS.itemMap<String, CPSWorker.ExecutionEvent>("last_executions")
 }
