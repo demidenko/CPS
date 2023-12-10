@@ -92,20 +92,22 @@ class CodeforcesNewsLostRecentWorker(
         val locale = settings.codeforcesLocale()
 
         val recentBlogEntries = extractRecentBlogEntries(
-            source = CodeforcesApi.getPageSource(path = "/recent-actions", locale = locale)
+            source = CodeforcesApi.runCatching {
+                getPageSource(path = "/recent-actions", locale = locale)
+            }.getOrElse { return Result.retry() }
         )
 
         val dao = context.lostBlogEntriesDao
         val minRatingColorTag = settings.codeforcesLostMinRatingTag()
 
         //get current suspects with removing old ones
-        //TODO: glorious code
-        val suspects = dao.getSuspects()
-            .partition {
-                isNew(it.blogEntry.creationTime) && it.blogEntry.authorColorTag >= minRatingColorTag
-            }.also {
-                dao.remove(it.second)
-            }.first
+        val suspects: List<CodeforcesLostBlogEntry>
+        dao.getSuspects().partition {
+            isNew(it.blogEntry.creationTime) && it.blogEntry.authorColorTag >= minRatingColorTag
+        }.let { (valid, invalid) ->
+            suspects = valid
+            dao.remove(invalid)
+        }
 
         //catch new suspects from recent actions
         CachedBlogEntryApi(locale = locale, isNew = ::isNew).forNewBlogEntries(
@@ -223,7 +225,7 @@ private suspend fun List<CodeforcesBlogEntry>.fixedHandleColors(): List<Codeforc
 
 private fun isNewYearChaos(source: String): Boolean {
     //TODO: check is new year chaos
-    return false
+    return true
 }
 
 private suspend fun extractRecentBlogEntries(source: String): List<CodeforcesBlogEntry> {
