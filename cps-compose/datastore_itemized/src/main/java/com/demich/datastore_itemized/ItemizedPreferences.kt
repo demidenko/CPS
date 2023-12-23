@@ -4,7 +4,6 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class ItemizedPreferences(private val preferences: Preferences) {
@@ -46,9 +45,6 @@ class ItemizedMutablePreferences(private val preferences: MutablePreferences) {
 
 fun<D: ItemizedDataStore, R> D.flowOf(transform: D.(ItemizedPreferences) -> R): Flow<R> =
     dataStore.data.map { transform(ItemizedPreferences(it)) }
-
-suspend fun<D: ItemizedDataStore, R> D.withSnapShot(block: D.(ItemizedPreferences) -> R): R =
-    dataStore.data.first().let { block(ItemizedPreferences(it)) }
 
 suspend fun<D: ItemizedDataStore> D.edit(block: D.(ItemizedMutablePreferences) -> Unit) {
     dataStore.edit {
