@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -17,12 +18,10 @@ tasks.register<Delete>("clean") {
 }
 
 allprojects {
-    val javaCompatibility = JavaVersion.VERSION_17.toString()
-
     tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = javaCompatibility
-            freeCompilerArgs += listOf(
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.addAll(
                 "-P",
                 "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
                         "${project.rootDir.absolutePath}/compose_compiler_config.conf"
