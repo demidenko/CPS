@@ -200,7 +200,7 @@ object CodeforcesUtils {
     private suspend fun getUserPageOrNull(handle: String): String? =
         CodeforcesApi.runCatching { getUserPage(handle) }.getOrNull()
 
-    suspend fun getRealHandle(handle: String): Pair<String, STATUS> {
+    private suspend fun getRealHandle(handle: String): Pair<String, STATUS> {
         val page = getUserPageOrNull(handle) ?: return handle to STATUS.FAILED
         val realHandle = extractRealHandle(page)?.handle ?: return handle to STATUS.NOT_FOUND
         return realHandle to STATUS.OK
@@ -297,7 +297,7 @@ object CodeforcesUtils {
     }
 
     fun extractContestSystemTestingPercentageOrNull(source: String): Int? {
-        return Jsoup.parse(source).selectFirst("span.contest-state-regular")
+        return Jsoup.parse(source).expectSidebar().selectFirst("span.contest-state-regular")
             ?.text()
             ?.removeSuffix("%")
             ?.toIntOrNull()
