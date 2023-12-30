@@ -271,25 +271,29 @@ object CodeforcesUtils {
         }
     }
 
-    private fun extractProblemWithAccepteds(problemRow: Element, contestId: Int): Pair<CodeforcesProblem, Int>? {
-        return kotlin.runCatching {
-            val td = problemRow.select("td")
-            val acceptedCount = td[3].text().trim().removePrefix("x").toInt()
-            val problem = CodeforcesProblem(
-                index = td[0].text().trim(),
-                name = td[1].expectFirst("a").text(),
-                contestId = contestId
-            )
-            problem to acceptedCount
-        }.getOrNull()
+    private inline fun extractProblemWithAcceptedCount(
+        problemRow: Element,
+        contestId: Int,
+        block: (CodeforcesProblem, Int) -> Unit
+    ) {
+        val td = problemRow.select("td")
+        if (td.isEmpty()) return
+        val acceptedCount = td[3].text().trim().removePrefix("x").toInt()
+        val problem = CodeforcesProblem(
+            index = td[0].text().trim(),
+            name = td[1].expectFirst("a").text(),
+            contestId = contestId
+        )
+        block(problem, acceptedCount)
     }
 
-    suspend fun getContestAcceptedStatistics(contestId: Int): Map<CodeforcesProblem, Int> {
-        val src = CodeforcesApi.getContestPage(contestId)
-        return Jsoup.parse(src).expectFirst("table.problems")
-            .select("tr")
-            .mapNotNull { extractProblemWithAccepteds(it, contestId) }
-            .toMap()
+    fun extractContestAcceptedStatistics(source: String, contestId: Int): Map<CodeforcesProblem, Int> {
+        return buildMap {
+            Jsoup.parse(source).expectFirst("table.problems").select("tr")
+                .forEach {
+                    extractProblemWithAcceptedCount(it, contestId, ::put)
+                }
+        }
     }
 
     fun extractContestSystemTestingPercentageOrNull(source: String): Int? {

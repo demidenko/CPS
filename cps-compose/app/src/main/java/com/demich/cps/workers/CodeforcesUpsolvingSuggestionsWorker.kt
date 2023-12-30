@@ -100,7 +100,8 @@ private suspend inline fun getSuggestions(
             CodeforcesApi.getContestSubmissions(contestId = contestId, handle = handle)
         },
         blockSecond = {
-            CodeforcesUtils.getContestAcceptedStatistics(contestId = contestId)
+            val source = CodeforcesApi.getContestPage(contestId)
+            CodeforcesUtils.extractContestAcceptedStatistics(source = source, contestId = contestId)
         }
     )
 
