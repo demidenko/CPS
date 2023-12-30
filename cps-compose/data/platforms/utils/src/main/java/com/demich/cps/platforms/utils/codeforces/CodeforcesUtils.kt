@@ -47,8 +47,8 @@ object CodeforcesUtils {
             val commentsCount: Int
             topic.expectFirst(".roundbox").let { box ->
                 rating = box.expectFirst(".left-meta").expectFirst("span").text().toInt()
-                val commentsItem = box.expectFirst(".right-meta").select("li")[2]!!
-                commentsCount = commentsItem.select("a")[1]!!.text().toInt()
+                val commentsItem = box.expectFirst(".right-meta").select("li")[2]
+                commentsCount = commentsItem.select("a")[1].text().toInt()
             }
 
             CodeforcesBlogEntry(
@@ -78,14 +78,14 @@ object CodeforcesUtils {
             commentBox.expectFirst("div.info").let { info ->
                 commentCreationTime = info.expectFirst(".format-humantime").attr("title").extractTime()
                 blogEntryAuthor = info.expectFirst("a.rated-user").extractRatedUser()
-                info.getElementsByAttributeValueContaining("href", "#comment")[0]!!.let { commentLink ->
+                info.getElementsByAttributeValueContaining("href", "#comment")[0].let { commentLink ->
                     with(commentLink.attr("href").split("#comment-")) {
                         blogEntryId = this[0].removePrefix("/blog/entry/").toInt()
                         commentId = this[1].toLong()
                     }
                     blogEntryTitle = commentLink.text()
                 }
-                info.getElementsByAttribute("commentid")[0]!!.let { ratingBox ->
+                info.getElementsByAttribute("commentid")[0].let { ratingBox ->
                     commentRating = ratingBox.text().trim().toInt()
                 }
             }
@@ -121,7 +121,7 @@ object CodeforcesUtils {
             val author = item.expectFirst("a.rated-user").extractRatedUser()
             val blogEntryId: Int
             val blogEntryTitle: String
-            item.getElementsByAttributeValueStarting("href", "/blog/entry/")[0]!!.let {
+            item.getElementsByAttributeValueStarting("href", "/blog/entry/")[0].let {
                 blogEntryId = it.attr("href").removePrefix("/blog/entry/").toInt()
                 blogEntryTitle = it.text()
             }
