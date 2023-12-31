@@ -59,53 +59,55 @@ class CodeforcesUpsolvingSuggestionsWorker(
 
         val alreadySuggested = suggestedItem().map { it.first }
 
-        var anyFailure = false
         ratingChanges
             .filter { it.ratingUpdateTime > dateThreshold }
+            .sortedByDescending { it.ratingUpdateTime }
             .forEachWithProgress { ratingChange ->
-                kotlin.runCatching {
-                    getSuggestions(
-                        handle = handle,
-                        ratingChange = ratingChange,
-                        alreadySuggested = alreadySuggested,
-                        toRemoveAsSolved = { solved ->
-                            val solvedIds = solved.mapToSet { it.problemId }
-                            suggestedItem.edit {
-                                removeAll { it.first.problemId in solvedIds }
-                            }
+                getSuggestions(
+                    handle = handle,
+                    ratingChange = ratingChange,
+                    alreadySuggested = alreadySuggested,
+                    onApiFailure = { return Result.retry() },
+                    toRemoveAsSolved = { solved ->
+                        val solvedIds = solved.mapToSet { it.problemId }
+                        suggestedItem.edit {
+                            removeAll { it.first.problemId in solvedIds }
                         }
-                    ) { problem ->
-                        suggestedItem.add(problem to ratingChange.ratingUpdateTime)
-                        notifyProblemForUpsolve(problem, context)
                     }
-                }.onFailure {
-                    anyFailure = true
+                ) { problem ->
+                    suggestedItem.add(problem to ratingChange.ratingUpdateTime)
+                    notifyProblemForUpsolve(problem, context)
                 }
             }
 
-        return if (anyFailure) Result.retry() else Result.success()
+        return Result.success()
     }
-
 }
 
-//TODO: onApiFailure
 private suspend inline fun getSuggestions(
     handle: String,
     ratingChange: CodeforcesRatingChange,
     alreadySuggested: Collection<CodeforcesProblem>,
+    onApiFailure: () -> Nothing,
     toRemoveAsSolved: (List<CodeforcesProblem>) -> Unit,
     onNewSuggestion: (CodeforcesProblem) -> Unit
 ) {
     val contestId = ratingChange.contestId
     val (userSubmissions, acceptedStats) = awaitPair(
         blockFirst = {
-            CodeforcesApi.getContestSubmissions(contestId = contestId, handle = handle)
+            CodeforcesApi.runCatching { getContestSubmissions(contestId = contestId, handle = handle) }
         },
         blockSecond = {
-            val source = CodeforcesApi.getContestPage(contestId)
-            CodeforcesUtils.extractContestAcceptedStatistics(source = source, contestId = contestId)
+            CodeforcesApi.runCatching { getContestPage(contestId = contestId) }.map { source ->
+                CodeforcesUtils.extractContestAcceptedStatistics(source = source, contestId = contestId)
+            }
         }
-    )
+    ).let {
+        Pair(
+            first = it.first.getOrElse { onApiFailure() },
+            second = it.second.getOrElse { onApiFailure() }
+        )
+    }
 
     val solvedIndices = userSubmissions
         .filter { it.verdict == CodeforcesProblemVerdict.OK }
