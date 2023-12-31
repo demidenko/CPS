@@ -12,7 +12,6 @@ import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
-import com.demich.cps.utils.forEach
 import com.demich.cps.utils.mapToSet
 import com.demich.cps.utils.partitionPoint
 import com.demich.datastore_itemized.DataStoreItem
@@ -110,11 +109,14 @@ class CodeforcesNewsLostRecentWorker(
         }
 
         //catch new suspects from recent actions
-        CachedBlogEntryApi(locale = locale, isNew = ::isNew).forNewBlogEntries(
+        findSuspects(
             blogEntries = recentBlogEntries
                 .filter { it.authorColorTag >= minRatingColorTag }
                 .filter { blogEntry -> suspects.none { it.id == blogEntry.id } },
-            hintItem = settings.codeforcesLostHintNotNew
+            locale = locale,
+            isNew = ::isNew,
+            hintItem = settings.codeforcesLostHintNotNew,
+            onApiFailure = { return Result.retry() }
         ) {
             dao.insert(
                 CodeforcesLostBlogEntry(
@@ -149,66 +151,59 @@ class CodeforcesNewsLostRecentWorker(
 
 }
 
-private class CachedBlogEntryApi(
-    val locale: CodeforcesLocale,
-    val isNew: (Instant) -> Boolean
+private class CachedBlogEntryApi(val locale: CodeforcesLocale) {
+    private val cache = mutableMapOf<Int, Instant>()
+
+    suspend inline fun getCreationTime(blogEntryId: Int, onApiFailure: () -> Nothing): Instant =
+        cache.getOrPut(blogEntryId) {
+            CodeforcesApi.runCatching { getBlogEntry(blogEntryId = blogEntryId, locale = locale) }
+                .getOrElse { onApiFailure() }
+                .creationTime
+        }
+
+    fun getLastNotNew(isNew: (Instant) -> Boolean) =
+        cache.asSequence()
+            .filter { !isNew(it.value) }
+            .maxByOrNull { it.value }
+}
+
+private suspend inline fun findSuspects(
+    blogEntries: Collection<CodeforcesBlogEntry>,
+    locale: CodeforcesLocale,
+    noinline isNew: (Instant) -> Boolean,
+    hintItem: DataStoreItem<Pair<Int, Instant>?>,
+    onApiFailure: () -> Nothing,
+    onSuspect: (CodeforcesBlogEntry) -> Unit
 ) {
-    private val cacheTime = mutableMapOf<Int, Instant>()
-    private suspend fun getCreationTime(id: Int): Instant =
-        cacheTime.getOrPut(id) {
-            CodeforcesApi.getBlogEntry(
-                blogEntryId = id,
-                locale = locale
-            ).creationTime
-        }
+    //reset just in case isNew window change
+    hintItem.update {
+        if (it != null && isNew(it.second)) null
+        else it
+    }
 
-    private suspend inline fun filterSorted(
-        blogEntries: List<CodeforcesBlogEntry>,
-        block: (CodeforcesBlogEntry) -> Unit
-    ) {
-        val indexOfFirstNew = blogEntries.partitionPoint {
-            !isNew(getCreationTime(id = it.id))
-        }
+    val notNewBlogEntryId = hintItem()?.first ?: Int.MIN_VALUE
+    val cachedApi = CachedBlogEntryApi(locale = locale)
 
-        blogEntries.forEach(from = indexOfFirstNew) {
+    blogEntries.filter { it.id > notNewBlogEntryId }.sortedBy { it.id }.apply {
+        val indexOfFirstNew = partitionPoint {
+            !isNew(cachedApi.getCreationTime(blogEntryId = it.id, onApiFailure = onApiFailure))
+        }
+        subList(fromIndex = indexOfFirstNew, toIndex = size).forEach {
             val blogEntry = it.copy(
-                creationTime = getCreationTime(id = it.id),
+                creationTime = cachedApi.getCreationTime(blogEntryId = it.id, onApiFailure = onApiFailure),
                 rating = 0,
                 commentsCount = 0
             )
-            block(blogEntry)
+            onSuspect(blogEntry)
         }
     }
 
-    suspend inline fun forNewBlogEntries(
-        blogEntries: List<CodeforcesBlogEntry>,
-        hintItem: DataStoreItem<Pair<Int, Instant>?>,
-        block: (CodeforcesBlogEntry) -> Unit
-    ) {
-        //reset just in case isNew window change
+    //save hint
+    cachedApi.getLastNotNew(isNew)?.let { entry ->
         hintItem.update {
-            if (it != null && isNew(it.second)) null
+            if (it == null || it.second < entry.value) entry.toPair()
             else it
         }
-
-        val notNewBlogEntryId = hintItem()?.first ?: Int.MIN_VALUE
-        filterSorted(
-            blogEntries = blogEntries
-                .filter { it.id > notNewBlogEntryId }
-                .sortedBy { it.id },
-            block = block
-        )
-
-        //save hint
-        cacheTime.asSequence()
-            .filter { !isNew(it.value) }
-            .maxByOrNull { it.value }
-            ?.let { entry ->
-                hintItem.update {
-                    if (it == null || it.second < entry.value) entry.toPair()
-                    else it
-                }
-            }
     }
 }
 
