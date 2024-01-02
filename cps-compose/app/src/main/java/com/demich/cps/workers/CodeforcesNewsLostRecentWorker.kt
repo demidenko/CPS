@@ -149,20 +149,19 @@ class CodeforcesNewsLostRecentWorker(
 
 }
 
-private class CachedBlogEntryApi(val locale: CodeforcesLocale) {
+private class CachedBlogEntryApi(
+    val locale: CodeforcesLocale,
+    val onUpdate: suspend (CodeforcesBlogEntry) -> Unit
+) {
     private val cache = mutableMapOf<Int, Instant>()
 
     suspend inline fun getCreationTime(blogEntryId: Int, onApiFailure: () -> Nothing): Instant =
         cache.getOrPut(blogEntryId) {
             CodeforcesApi.runCatching { getBlogEntry(blogEntryId = blogEntryId, locale = locale) }
                 .getOrElse { onApiFailure() }
+                .also { onUpdate(it) }
                 .creationTime
         }
-
-    fun getLastNotNew(isNew: (Instant) -> Boolean) =
-        cache.asSequence()
-            .filter { !isNew(it.value) }
-            .maxByOrNull { it.value }
 }
 
 private fun Collection<CodeforcesBlogEntry>.filterIdGreaterThen(id: Int) = filter { it.id > id }
@@ -191,7 +190,16 @@ private suspend inline fun findSuspects(
         else it
     }
 
-    val cachedApi = CachedBlogEntryApi(locale = locale)
+    val cachedApi = CachedBlogEntryApi(locale = locale) { blogEntry ->
+        val time = blogEntry.creationTime
+        if (!isNew(time)) {
+            //save hint
+            lastNotNewIdItem.update {
+                if (it == null || it.second < time) Pair(blogEntry.id, time)
+                else it
+            }
+        }
+    }
 
     /*
     These 3 filters can be in arbitrary order but
@@ -215,14 +223,6 @@ private suspend inline fun findSuspects(
             )
             onSuspect(blogEntry)
         }
-
-    //save hint
-    cachedApi.getLastNotNew(isNew)?.let { entry ->
-        lastNotNewIdItem.update {
-            if (it == null || it.second < entry.value) entry.toPair()
-            else it
-        }
-    }
 }
 
 //Required against new year color chaos
