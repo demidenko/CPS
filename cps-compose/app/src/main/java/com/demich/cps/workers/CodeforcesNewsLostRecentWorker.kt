@@ -88,15 +88,9 @@ class CodeforcesNewsLostRecentWorker(
 
     override suspend fun runWork(): Result {
         val settings = context.settingsNews
-        val locale = settings.codeforcesLocale()
-
-        val recentBlogEntries = extractRecentBlogEntries(
-            source = CodeforcesApi.runCatching {
-                getPageSource(path = "/recent-actions", locale = locale)
-            }.getOrElse { return Result.retry() }
-        )
-
         val dao = context.lostBlogEntriesDao
+
+        val locale = settings.codeforcesLocale()
         val minRatingColorTag = settings.codeforcesLostMinRatingTag()
 
         //get current suspects with removing old ones
@@ -108,14 +102,18 @@ class CodeforcesNewsLostRecentWorker(
             dao.remove(invalid)
         }
 
+        val recentBlogEntries =
+            CodeforcesApi.runCatching { getPageSource(path = "/recent-actions", locale = locale) }
+            .getOrElse { return Result.retry() }
+            .let { CodeforcesUtils.extractRecentBlogEntries(it) }
+
         //catch new suspects from recent actions
         findSuspects(
-            blogEntries = recentBlogEntries
-                .filter { it.authorColorTag >= minRatingColorTag }
-                .filter { blogEntry -> suspects.none { it.id == blogEntry.id } },
+            blogEntries = recentBlogEntries.filter { blogEntry -> suspects.none { it.id == blogEntry.id } },
             locale = locale,
+            minRatingColorTag = minRatingColorTag,
             isNew = ::isNew,
-            hintItem = settings.codeforcesLostHintNotNew,
+            lastNotNewIdItem = settings.codeforcesLostHintNotNew,
             onApiFailure = { return Result.retry() }
         ) {
             dao.insert(
@@ -167,28 +165,49 @@ private class CachedBlogEntryApi(val locale: CodeforcesLocale) {
             .maxByOrNull { it.value }
 }
 
+private fun Collection<CodeforcesBlogEntry>.filterIdGreaterThen(id: Int) = filter { it.id > id }
+
+private suspend fun Collection<CodeforcesBlogEntry>.fixAndFilterColorTag(minRatingColorTag: CodeforcesColorTag) =
+    fixedHandleColors().filter { it.authorColorTag >= minRatingColorTag }
+
+private inline fun Collection<CodeforcesBlogEntry>.filterNewEntries(isNew: (CodeforcesBlogEntry) -> Boolean) =
+    sortedBy { it.id }.run {
+        val indexOfFirstNew = partitionPoint { !isNew(it) }
+        subList(fromIndex = indexOfFirstNew, toIndex = size)
+    }
+
 private suspend inline fun findSuspects(
     blogEntries: Collection<CodeforcesBlogEntry>,
     locale: CodeforcesLocale,
+    minRatingColorTag: CodeforcesColorTag,
     noinline isNew: (Instant) -> Boolean,
-    hintItem: DataStoreItem<Pair<Int, Instant>?>,
+    lastNotNewIdItem: DataStoreItem<Pair<Int, Instant>?>,
     onApiFailure: () -> Nothing,
     onSuspect: (CodeforcesBlogEntry) -> Unit
 ) {
     //reset just in case isNew window change
-    hintItem.update {
+    lastNotNewIdItem.update {
         if (it != null && isNew(it.second)) null
         else it
     }
 
-    val notNewBlogEntryId = hintItem()?.first ?: Int.MIN_VALUE
     val cachedApi = CachedBlogEntryApi(locale = locale)
 
-    blogEntries.filter { it.id > notNewBlogEntryId }.sortedBy { it.id }.apply {
-        val indexOfFirstNew = partitionPoint {
-            !isNew(cachedApi.getCreationTime(blogEntryId = it.id, onApiFailure = onApiFailure))
-        }
-        subList(fromIndex = indexOfFirstNew, toIndex = size).forEach {
+    /*
+    These 3 filters can be in arbitrary order but
+    .filterIdGreaterThen should be before .filterNewEntries
+    so there is three ways:
+    #1 .fixAndFilterColorTag .filterIdGreaterThen .filterNewEntries
+    #2 .filterIdGreaterThen .fixAndFilterColorTag .filterNewEntries
+    #3 .filterIdGreaterThen .filterNewEntries .fixAndFilterColorTag
+    additionally #2 is not worse than #1
+    So as result choose #2 or #3
+     */
+    blogEntries
+        .filterIdGreaterThen(lastNotNewIdItem()?.first ?: Int.MIN_VALUE)
+        .fixAndFilterColorTag(minRatingColorTag)
+        .filterNewEntries { isNew(cachedApi.getCreationTime(blogEntryId = it.id, onApiFailure = onApiFailure)) }
+        .forEach {
             val blogEntry = it.copy(
                 creationTime = cachedApi.getCreationTime(blogEntryId = it.id, onApiFailure = onApiFailure),
                 rating = 0,
@@ -196,11 +215,10 @@ private suspend inline fun findSuspects(
             )
             onSuspect(blogEntry)
         }
-    }
 
     //save hint
     cachedApi.getLastNotNew(isNew)?.let { entry ->
-        hintItem.update {
+        lastNotNewIdItem.update {
             if (it == null || it.second < entry.value) entry.toPair()
             else it
         }
@@ -208,24 +226,12 @@ private suspend inline fun findSuspects(
 }
 
 //Required against new year color chaos
-private suspend fun List<CodeforcesBlogEntry>.fixedHandleColors(): List<CodeforcesBlogEntry> {
+private suspend fun Collection<CodeforcesBlogEntry>.fixedHandleColors(): List<CodeforcesBlogEntry> {
     val authors = CodeforcesUtils.getUsersInfo(handles = map { it.authorHandle }, doRedirect = false)
     return map { blogEntry ->
         val userInfo = authors.getValue(blogEntry.authorHandle)
         require(userInfo.status == STATUS.OK)
         if (blogEntry.authorColorTag == CodeforcesColorTag.ADMIN) blogEntry
         else blogEntry.copy(authorColorTag = CodeforcesColorTag.fromRating(userInfo.rating))
-    }
-}
-
-private fun isNewYearChaos(source: String): Boolean {
-    //TODO: check is new year chaos
-    return true
-}
-
-private suspend fun extractRecentBlogEntries(source: String): List<CodeforcesBlogEntry> {
-    return CodeforcesUtils.extractRecentBlogEntries(source).let {
-        if (isNewYearChaos(source)) it.fixedHandleColors()
-        else it
     }
 }
