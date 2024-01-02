@@ -184,10 +184,9 @@ private suspend inline fun findSuspects(
     onApiFailure: () -> Nothing,
     onSuspect: (CodeforcesBlogEntry) -> Unit
 ) {
-    //reset just in case isNew window change
+    //ensure hint in case isNew logic changes
     lastNotNewIdItem.update {
-        if (it != null && isNew(it.second)) null
-        else it
+        if (it == null || !isNew(it.second)) it else null
     }
 
     val cachedApi = CachedBlogEntryApi(locale = locale) { blogEntry ->
