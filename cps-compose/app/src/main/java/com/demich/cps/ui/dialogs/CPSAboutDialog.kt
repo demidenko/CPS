@@ -35,7 +35,7 @@ fun CPSAboutDialog(onDismissRequest: () -> Unit) {
     var showDevModeLine by remember { mutableStateOf(devModeEnabled) }
 
     val onClick = remember {
-        patternClickListener("._.._...") {
+        patternClickListener(pattern = "._.._...", getCurrentTime = ::getCurrentTime) {
             showDevModeLine = true
             scope.launch { context.settingsUI.devModeEnabled(true) }
         }
@@ -88,24 +88,24 @@ private fun cpsVersion(devModeEnabled: Boolean): String =
 
 private fun patternClickListener(
     pattern: String,
+    getCurrentTime: () -> Instant,
     onMatch: () -> Unit
 ): () -> Unit {
-    fun badPattern() { throw Exception("Bad pattern: [$pattern]") }
-
-    if (pattern[0] != '.') badPattern()
+    val tap = '.'
+    val pause = '_'
+    require(pattern.all { it == tap || it == pause })
+    require(pattern.isNotEmpty() && pattern[0] == tap)
+    require(pattern.count { it == tap } >= 2)
+    require("$pause$pause" !in pattern)
 
     var pushes = 1
     val shorts = mutableListOf<Int>()
     val longs = mutableListOf<Int>()
     for (i in 1 until pattern.length) {
-        when (pattern[i]) {
-            '.' -> {
-                pushes++
-                if (pattern[i-1] == '.') shorts.add(pushes-2)
-                else longs.add(pushes-2)
-            }
-            '_' -> if (pattern[i-1] != '.') badPattern()
-            else -> badPattern()
+        if (pattern[i] == tap) {
+            pushes++
+            if (pattern[i-1] == tap) shorts.add(pushes-2)
+            else longs.add(pushes-2)
         }
     }
 
@@ -118,7 +118,7 @@ private fun patternClickListener(
 
     return {
         getCurrentTime().let { cur ->
-            if(clicks > 0 && cur - timeClicks[(clicks-1)%n] > 1.seconds) clicks = 0
+            if (clicks > 0 && cur - timeClicks[(clicks-1)%n] > 1.seconds) clicks = 0
             timeClicks[clicks%n] = cur
         }
         ++clicks
@@ -130,7 +130,7 @@ private fun patternClickListener(
             val x: Duration = longIndices.minOf { t[it] }
             val y: Duration = shortIndices.maxOf { t[it] }
 
-            if(x > y) {
+            if (x > y) {
                 clicks = 0
                 onMatch()
             }
