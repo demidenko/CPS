@@ -33,7 +33,7 @@ class CodeforcesNewsLostRecentWorker(
             override suspend fun isEnabled() = context.settingsNews.codeforcesLostEnabled()
             override val requestBuilder: PeriodicWorkRequest.Builder
                 get() = CPSPeriodicWorkRequestBuilder<CodeforcesNewsLostRecentWorker>(
-                    repeatInterval = 45.minutes
+                    repeatInterval = 30.minutes
                 )
         }
 
