@@ -88,14 +88,16 @@ private fun cpsVersion(devModeEnabled: Boolean): String =
 
 private fun patternClickListener(
     pattern: String,
+    tap: Char = '.',
+    pause: Char = '_',
     getCurrentTime: () -> Instant,
     onMatch: () -> Unit
 ): () -> Unit {
-    val tap = '.'
-    val pause = '_'
+    require(tap != pause)
     require(pattern.all { it == tap || it == pause })
     require(pattern.isNotEmpty() && pattern[0] == tap)
     require(pattern.count { it == tap } >= 2)
+    require(pattern.count { it == pause } >= 1)
     require("$pause$pause" !in pattern)
 
     var pushes = 1
