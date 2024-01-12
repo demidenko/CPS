@@ -29,13 +29,7 @@ abstract class CPSWork(
     }
 
     private fun start(restart: Boolean) {
-        val request = requestBuilder.apply {
-            setBackoffCriteria(
-                BackoffPolicy.LINEAR,
-                PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS,
-                TimeUnit.MILLISECONDS
-            )
-        }.build()
+        val request = requestBuilder.build()
 
         context.workManager.enqueueUniquePeriodicWork(
             name,
@@ -51,11 +45,6 @@ abstract class CPSWork(
     }
     fun enqueueRetry() {
         val request = requestBuilder.apply {
-            setBackoffCriteria(
-                BackoffPolicy.LINEAR,
-                PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS,
-                TimeUnit.MILLISECONDS
-            )
             setNextScheduleTimeOverride((getCurrentTime() + 15.minutes).toEpochMilliseconds())
         }.build()
 
@@ -86,7 +75,13 @@ internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
         requiresBatteryNotLow = batteryNotLow,
         requiresCharging = requiresCharging
     )
-)
+).apply {
+    setBackoffCriteria(
+        BackoffPolicy.LINEAR,
+        PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS,
+        TimeUnit.MILLISECONDS
+    )
+}
 
 fun Context.getCPSWorks() = listOf(
     AccountsWorker::getWork,
