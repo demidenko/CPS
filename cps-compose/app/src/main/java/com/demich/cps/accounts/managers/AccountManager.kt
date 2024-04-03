@@ -61,7 +61,7 @@ abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
     open fun ExpandedContent(
         userInfo: U,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
-        modifier: Modifier = Modifier
+        modifier: Modifier
      ) = Box(modifier) {
         PanelContent(userInfo)
     }
