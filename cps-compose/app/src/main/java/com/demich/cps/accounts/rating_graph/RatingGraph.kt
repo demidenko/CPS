@@ -6,6 +6,7 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
@@ -42,49 +44,44 @@ internal enum class RatingFilterType {
     val title: String get() = name.lowercase().replace('_', ' ')
 }
 
+//TODO: info comes from different sources (rating: vm, time: remember, selected: rememberSaveable)
 
 @Composable
 fun RatingGraph(
     ratingChangesResult: () -> Result<List<RatingChange>>?,
     manager: RatedAccountManager<out RatedUserInfo>,
     modifier: Modifier = Modifier,
+    graphHeight: Dp = 240.dp,
     shape: Shape = RoundedCornerShape(5.dp)
 ) {
-    //TODO: find good solution instead of this
-    var header: @Composable () -> Unit by remember { mutableStateOf({}) }
-
-    Column(modifier = modifier) {
-        header()
-
-        LoadingContentBox(
-            dataResult = ratingChangesResult,
-            failedText = { "Failed to get rating history" },
-            modifier = Modifier
-                .height(240.dp)
-                .fillMaxWidth()
-                .background(cpsColors.backgroundAdditional, shape)
-                .clip(shape)
-        ) { ratingChanges ->
-            if (ratingChanges.isEmpty()) {
-                Text(text = "Rating history is empty")
-            } else {
-                RatingGraph(
-                    ratingChanges = ratingChanges,
-                    manager = manager,
-                    setHeader = { header = it },
-                    shape = shape
-                )
-            }
+    LoadingContentBox(
+        dataResult = ratingChangesResult,
+        failedText = { "Failed to get rating history" },
+        modifier = modifier
+            .heightIn(min = graphHeight)
+            .fillMaxWidth()
+            .clip(shape)
+            .background(cpsColors.backgroundAdditional)
+    ) { ratingChanges ->
+        if (ratingChanges.isEmpty()) {
+            Text(text = "Rating history is empty")
+        } else {
+            RatingGraphWithHeader(
+                ratingChanges = ratingChanges,
+                manager = manager,
+                graphHeight = graphHeight,
+                shape = shape
+            )
         }
     }
 }
 
 @Composable
-private fun RatingGraph(
+private fun RatingGraphWithHeader(
     ratingChanges: List<RatingChange>,
     manager: RatedAccountManager<out RatedUserInfo>,
-    setHeader: (@Composable () -> Unit) -> Unit,
-    shape: Shape
+    shape: Shape,
+    graphHeight: Dp
 ) {
     require(ratingChanges.isNotEmpty())
 
@@ -104,83 +101,97 @@ private fun RatingGraph(
 
     val rectangles = remember(manager.type) { RatingGraphRectangles(manager) }
 
-    setHeader {
+    Column(modifier = Modifier.background(cpsColors.background)) {
         RatingGraphHeader(
+            manager = manager,
+            header = selectedRatingChange
+                ?.let { RatingChangeHeader(it, rectangles) }
+                ?: FilterHeader(filterType, ratingChanges, currentTime),
+            onHeaderChange = { header ->
+                if (header is FilterHeader) {
+                    translator.setWindow(
+                        createBounds(ratingChanges = ratingChanges, filterType = header.filterType, now = currentTime)
+                    )
+                    filterType = header.filterType
+                }
+            },
+            shape = shape
+        )
+
+        RatingGraphCanvas(
             ratingChanges = ratingChanges,
             manager = manager,
             rectangles = rectangles,
+            translator = translator,
             currentTime = currentTime,
-            selectedFilterType = filterType,
-            onSelectFilterType = {
-                translator.setWindow(
-                    createBounds(ratingChanges = ratingChanges, filterType = it, now = currentTime)
-                )
-                filterType = it
-            },
+            filterType = filterType,
             selectedRatingChange = selectedRatingChange,
-            shape = shape
+            modifier = Modifier
+                .height(graphHeight)
+                .clip(shape)
+                .pointerInput(Unit) {
+                    detectTransformGestures { centroid, pan, zoom, _ ->
+                        translator.move(pan)
+                        translator.scale(centroid, zoom)
+                    }
+                }
+                .pointerInput(ratingChanges) {
+                    detectTapGestures { tapPoint ->
+                        selectedRatingChange = translator.getNearestRatingChange(
+                            ratingChanges = ratingChanges,
+                            tap = tapPoint
+                        )
+                    }
+                }
         )
     }
-
-    RatingGraphCanvas(
-        ratingChanges = ratingChanges,
-        manager = manager,
-        rectangles = rectangles,
-        translator = translator,
-        currentTime = currentTime,
-        filterType = filterType,
-        selectedRatingChange = selectedRatingChange,
-        modifier = Modifier
-            .pointerInput(Unit) {
-                detectTransformGestures { centroid, pan, zoom, _ ->
-                    translator.move(pan)
-                    translator.scale(centroid, zoom)
-                }
-            }
-            .pointerInput(ratingChanges) {
-                detectTapGestures { tapPoint ->
-                    selectedRatingChange = translator.getNearestRatingChange(
-                        ratingChanges = ratingChanges,
-                        tap = tapPoint
-                    )
-                }
-            }
-    )
 }
+
+private sealed interface Header
+
+private class RatingChangeHeader(
+    val ratingChange: RatingChange,
+    val rectangles: RatingGraphRectangles
+): Header
+
+private data class FilterHeader(
+    val filterType: RatingFilterType,
+    val ratingChanges: List<RatingChange>,
+    val time: Instant
+): Header
 
 @Composable
 private fun RatingGraphHeader(
-    ratingChanges: List<RatingChange>,
     manager: RatedAccountManager<out RatedUserInfo>,
-    rectangles: RatingGraphRectangles,
-    currentTime: Instant,
-    selectedFilterType: RatingFilterType,
-    onSelectFilterType: (RatingFilterType) -> Unit,
-    selectedRatingChange: RatingChange?,
+    header: Header,
+    onHeaderChange: (Header) -> Unit,
     shape: Shape
 ) {
-    if (selectedRatingChange != null) {
-        ContestResult(
-            ratingChange = selectedRatingChange,
-            manager = manager,
-            rectangles = rectangles,
-            modifier = Modifier
-                .padding(bottom = 3.dp)
-                .background(cpsColors.backgroundAdditional, shape)
-                .padding(all = 5.dp)
-                .fillMaxWidth()
-        )
-    } else {
-        require(ratingChanges.isNotEmpty())
-        TextButtonsSelectRow(
-            values = remember(ratingChanges, currentTime) {
-                makeValidFilters(ratingChanges, currentTime)
-            },
-            selectedValue = selectedFilterType,
-            text = RatingFilterType::title,
-            onSelect = onSelectFilterType,
-            modifier = Modifier.background(cpsColors.background)
-        )
+    when (header) {
+        is RatingChangeHeader -> {
+            ContestResult(
+                ratingChange = header.ratingChange,
+                manager = manager,
+                rectangles = header.rectangles,
+                modifier = Modifier
+                    .padding(bottom = 3.dp)
+                    .background(cpsColors.backgroundAdditional, shape)
+                    .padding(all = 5.dp)
+                    .fillMaxWidth()
+            )
+        }
+        is FilterHeader -> {
+            require(header.ratingChanges.isNotEmpty())
+            TextButtonsSelectRow(
+                values = remember(header.ratingChanges, header.time) {
+                    makeValidFilters(header.ratingChanges, header.time)
+                },
+                selectedValue = header.filterType,
+                text = RatingFilterType::title,
+                onSelect = { onHeaderChange(header.copy(filterType = it)) },
+                modifier = Modifier.background(cpsColors.background)
+            )
+        }
     }
 }
 
