@@ -52,11 +52,11 @@ import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
 import com.demich.cps.news.settings.NewsSettingsScreen
 import com.demich.cps.news.settings.settingsNews
-import com.demich.cps.ui.CPSNavigator
+import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.ui.CPSScaffold
 import com.demich.cps.ui.CPSStatusBar
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
-import com.demich.cps.ui.rememberCPSNavigator
+import com.demich.cps.navigation.rememberCPSNavigator
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context

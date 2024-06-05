@@ -1,4 +1,4 @@
-package com.demich.cps.ui
+package com.demich.cps.navigation
 
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -17,10 +17,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import com.demich.cps.CPSTopBar
-import com.demich.cps.navigation.Screen
-import com.demich.cps.navigation.getScreen
+import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottombar.CPSBottomBar
+import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberWith
 import com.google.accompanist.systemuicontroller.SystemUiController

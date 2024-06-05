@@ -39,7 +39,7 @@ import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTypes
 import com.demich.cps.ui.BottomBarLayoutId
 import com.demich.cps.ui.CPSDefaults
-import com.demich.cps.ui.CPSNavigator
+import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.animateColor
