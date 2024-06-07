@@ -70,18 +70,18 @@ dependencies {
     implementation(libs.kotlinx.datetime)
 
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.work.runtime)
 
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material:material")
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.activity:activity-compose:1.9.0")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
 
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.navigation.compose)
 
-    implementation(libs.androidx.work.runtime)
 
     val accompanist_version = "0.30.0"
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanist_version")
