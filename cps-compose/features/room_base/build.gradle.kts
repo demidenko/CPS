@@ -33,5 +33,5 @@ dependencies {
     implementation(libs.kotlin.serialization)
     implementation(libs.kotlin.datetime)
 
-    implementation(libs.room.ktx)
+    implementation(libs.androidx.room.ktx)
 }

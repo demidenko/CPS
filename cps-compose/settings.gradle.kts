@@ -17,10 +17,6 @@ dependencyResolutionManagement {
             library("kotlin-serialization", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
             library("kotlin-datetime", "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
             library("kotlin-coroutines", "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-
-            version("room", "2.6.0-beta01")
-            library("room-ktx", "androidx.room", "room-ktx").versionRef("room")
-            library("room-compiler", "androidx.room", "room-compiler").versionRef("room")
         }
     }
 }

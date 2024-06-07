@@ -1,0 +1,8 @@
+[versions]
+room = "2.6.0-beta01"
+
+[libraries]
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room"}
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room"}
+
+[plugins]
