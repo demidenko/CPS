@@ -35,6 +35,6 @@ dependencies {
     implementation(project(":data:platforms:api"))
     implementation(project(":data:platforms:utils"))
 
-    implementation(libs.kotlin.datetime)
-    implementation(libs.kotlin.coroutines)
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.coroutines.android)
 }

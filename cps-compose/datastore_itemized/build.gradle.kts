@@ -31,6 +31,6 @@ android {
 
 dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-    implementation(libs.kotlin.serialization)
-    implementation(libs.kotlin.coroutines)
+    implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlinx.coroutines.android)
 }

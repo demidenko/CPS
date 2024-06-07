@@ -1,7 +1,15 @@
 [versions]
+serialization = "1.6.0"
+coroutines = "1.7.3"
+datetime = "0.4.0"
+
 room = "2.6.0-beta01"
 
 [libraries]
+kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
+
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room"}
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room"}
 

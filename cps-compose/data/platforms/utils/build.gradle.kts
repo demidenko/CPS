@@ -34,7 +34,7 @@ dependencies {
     implementation(project(":data:accounts:userinfo"))
     implementation(project(":data:contests:database"))
 
-    implementation(libs.kotlin.datetime)
+    implementation(libs.kotlinx.datetime)
 
     implementation("org.jsoup:jsoup:1.17.2")
 }

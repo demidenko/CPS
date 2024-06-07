@@ -33,6 +33,6 @@ android {
 dependencies {
     implementation(project(":data:platforms:api"))
 
-    implementation(libs.kotlin.serialization)
-    implementation(libs.kotlin.datetime)
+    implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlinx.datetime)
 }

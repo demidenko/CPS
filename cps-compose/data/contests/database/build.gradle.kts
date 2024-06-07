@@ -41,7 +41,7 @@ android {
 dependencies {
     implementation(project(":features:room_base"))
 
-    implementation(libs.kotlin.datetime)
+    implementation(libs.kotlinx.datetime)
 
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)

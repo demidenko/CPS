@@ -65,9 +65,9 @@ dependencies {
     implementation(project(":features:codeforces_follow:database"))
     implementation(project(":features:contests_loading_engine"))
 
-    implementation(libs.kotlin.serialization)
-    implementation(libs.kotlin.coroutines)
-    implementation(libs.kotlin.datetime)
+    implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.datetime)
 
     implementation("androidx.core:core-ktx:1.13.1")
 
