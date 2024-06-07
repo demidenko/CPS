@@ -5,9 +5,14 @@ datetime = "0.4.0"
 
 ktor = "2.3.11"
 
+core = "1.13.1"
+lifecycle = "2.6.2"
+work = "2.9.0"
+
 room = "2.6.0-beta01"
 
 datastore = "1.0.0"
+
 
 jsoup = "1.17.2"
 
@@ -19,6 +24,10 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "work" }
 
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room"}
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room"}
