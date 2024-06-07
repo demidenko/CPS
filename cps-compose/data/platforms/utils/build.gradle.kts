@@ -36,5 +36,5 @@ dependencies {
 
     implementation(libs.kotlinx.datetime)
 
-    implementation("org.jsoup:jsoup:1.17.2")
+    implementation(libs.jsoup)
 }

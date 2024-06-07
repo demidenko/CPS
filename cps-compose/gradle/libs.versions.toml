@@ -7,6 +7,10 @@ ktor = "2.3.11"
 
 room = "2.6.0-beta01"
 
+datastore = "1.0.0"
+
+jsoup = "1.17.2"
+
 [libraries]
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
@@ -18,5 +22,9 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room"}
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room"}
+
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 
 [plugins]

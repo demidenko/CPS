@@ -30,7 +30,8 @@ android {
 }
 
 dependencies {
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation(libs.androidx.datastore.preferences)
+
     implementation(libs.kotlinx.serialization)
     implementation(libs.kotlinx.coroutines.android)
 }
