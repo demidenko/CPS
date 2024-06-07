@@ -66,8 +66,8 @@ dependencies {
     implementation(project(":features:contests_loading_engine"))
 
     implementation(libs.kotlinx.serialization)
-    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.coroutines.android)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.work.runtime)
