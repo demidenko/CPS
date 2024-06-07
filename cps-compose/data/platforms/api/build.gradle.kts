@@ -31,10 +31,9 @@ android {
 }
 
 dependencies {
-    val ktor_version = "2.3.11"
-    implementation("io.ktor:ktor-client-okhttp:$ktor_version")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
 
     implementation(libs.kotlinx.datetime)
 }
