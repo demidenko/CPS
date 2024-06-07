@@ -22,6 +22,10 @@ jsoup = "1.17.2"
 
 accompanist = "0.30.0"
 
+junit = "4.13.2"
+androidx-junit = "1.1.5"
+espresso-core = "3.5.1"
+
 [libraries]
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
@@ -37,6 +41,8 @@ androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-material = { module = "androidx.compose.material:material" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 
@@ -53,5 +59,9 @@ jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
+
+junit = { module = "junit:junit", version.ref = "junit" }
+androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
+androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso-core" }
 
 [plugins]
