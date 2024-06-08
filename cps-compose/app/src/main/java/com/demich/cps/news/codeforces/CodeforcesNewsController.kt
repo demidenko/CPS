@@ -80,7 +80,7 @@ class CodeforcesNewsController internal constructor(
 
     //TODO: future support for dynamic tabs (selectedIndex can be out of bounds)
     val pagerState = object : PagerState(
-        initialPage = tabs.indexOf(data.selectedTab)
+        currentPage = tabs.indexOf(data.selectedTab)
             .takeIf { it != -1 } ?: 0
     ) {
         override val pageCount: Int

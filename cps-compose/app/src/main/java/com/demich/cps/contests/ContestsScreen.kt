@@ -47,7 +47,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ContestsScreen(
     contestsListController: ContestsListController,
