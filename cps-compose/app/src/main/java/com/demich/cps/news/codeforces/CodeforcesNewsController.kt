@@ -6,7 +6,6 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.lifecycle.compose.LifecycleStartEffect
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
@@ -50,13 +49,13 @@ fun rememberCodeforcesNewsController(): CodeforcesNewsController {
         )
     }
 
-    LifecycleStartEffect(controller) {
+    DisposableEffect(controller) {
         with(controller) {
             flowOfMainBlogEntries(context)
             if (topShowComments) flowOfTopComments(context) else flowOfTopBlogEntries(context)
             flowOfRecent(context)
         }
-        onStopOrDispose {  }
+        onDispose { }
     }
 
     return controller
