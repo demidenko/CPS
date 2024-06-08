@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.work.WorkInfo
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.database.Contest
@@ -83,8 +84,9 @@ fun ContestsScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LifecycleStartEffect(contestsViewModel) {
         contestsViewModel.syncEnabledAndLastReloaded(context)
+        onStopOrDispose {  }
     }
 }
 

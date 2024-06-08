@@ -13,11 +13,11 @@ import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleStartEffect
 import com.demich.cps.ui.theme.cpsColors
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -62,9 +62,11 @@ private fun NotificationsPermissionPanel(modifier: Modifier) {
             )
         }
     }
-    LaunchedEffect(Unit) {
+
+    LifecycleStartEffect(state) {
         if (!state.status.isGranted && !state.status.shouldShowRationale) {
             state.launchPermissionRequest()
         }
+        onStopOrDispose {  }
     }
 }
