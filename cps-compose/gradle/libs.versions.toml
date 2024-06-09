@@ -8,7 +8,7 @@ ktor = "2.3.11"
 core = "1.13.1"
 work = "2.9.0"
 
-compose-bom = "2024.01.00"
+compose-bom = "2024.02.01"
 
 activity-compose = "1.9.0"
 navigation-compose = "2.7.7"
