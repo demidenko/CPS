@@ -1,6 +1,8 @@
 package com.demich.cps.ui
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.automirrored.rounded.ReadMore
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material.icons.outlined.Info
@@ -24,12 +26,12 @@ object CPSIcons {
     val Add get() = Icons.Outlined.AddBox
     val Close get() = Icons.Default.Close
     val Done get() = Icons.Default.Done
-    val Help get() = Icons.Default.HelpOutline
+    val Help get() = Icons.AutoMirrored.Filled.HelpOutline
     val Info get() = Icons.Outlined.Info
     val More get() = Icons.Default.MoreVert
     val Search get() = Icons.Default.Search
     val Delete get() = Icons.Rounded.DeleteForever
-    val OpenInBrowser get() = Icons.Default.ExitToApp
+    val OpenInBrowser get() = Icons.AutoMirrored.Filled.ExitToApp
     val DarkLight get() = Icons.Default.BrightnessMedium
     val DarkLightAuto get() = Icons.Default.BrightnessAuto
     val Colors get() = Icons.Default.ColorLens
@@ -39,24 +41,24 @@ object CPSIcons {
     val CollapseUp get() = Icons.Default.ExpandLess
     val ExpandDown get() = Icons.Default.ExpandMore
     val Reorder get() = Icons.Default.Reorder
-    val ReorderDone get() = Icons.Default.PlaylistAddCheck
+    val ReorderDone get() = Icons.AutoMirrored.Filled.PlaylistAddCheck
     val MoveUp get() = Icons.Default.ArrowDropUp
     val MoveDown get() = Icons.Default.ArrowDropDown
     val RatingGraph get() = Icons.Default.Timeline
-    val RatingUp get() = Icons.Default.TrendingUp
-    val RatingDown get() = Icons.Default.TrendingDown
-    val Insert get() = Icons.Rounded.ReadMore
+    val RatingUp get() = Icons.AutoMirrored.Filled.TrendingUp
+    val RatingDown get() = Icons.AutoMirrored.Filled.TrendingDown
+    val Insert get() = Icons.AutoMirrored.Rounded.ReadMore
     val EditList get() = Icons.Default.EditNote
     val SetupLoaders get() = Icons.Default.PermDataSetting
     val Star get() = Icons.Default.Star
     val Comments get() = Icons.Rounded.Forum
     val CommentSingle get() = Icons.Rounded.ChatBubble
-    val BlogEntry get() = Icons.Filled.Wysiwyg
-    val ArrowRight get() = Icons.Default.ArrowRightAlt
-    val ArrowBack get() = Icons.Default.ArrowBack
+    val BlogEntry get() = Icons.AutoMirrored.Filled.Wysiwyg
+    val ArrowRight get() = Icons.AutoMirrored.Filled.ArrowRightAlt
+    val ArrowBack get() = Icons.AutoMirrored.Filled.ArrowBack
     val Attention get() = Icons.Default.ErrorOutline
     val NewsFeeds get() = Icons.Default.RssFeed
-    val Monitor get() = Icons.Default.Dvr
+    val Monitor get() = Icons.AutoMirrored.Filled.Dvr
     val Upsolving get() = Icons.Default.FitnessCenter
     val Swap get() = Icons.Default.SwapHoriz
 }
