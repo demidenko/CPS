@@ -73,7 +73,7 @@ inline fun<T> List<T>.partitionPoint(
 inline fun<T, R> List<T>.forEachRangeEqualBy(selector: (T) -> R, block: (Int, Int) -> Unit) {
     var r = 0
     while (r < size) {
-        val l = r
+        val l = r++
         val value = selector(get(l))
         while (r < size && selector(get(r)) == value) ++r
         block(l, r)
