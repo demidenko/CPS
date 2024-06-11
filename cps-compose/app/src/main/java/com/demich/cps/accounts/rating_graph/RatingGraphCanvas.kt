@@ -37,7 +37,9 @@ internal fun RatingGraphCanvas(
         }
     }
 
-    val timeMarkers: List<Instant> = remember(key1 = filterType, key2 = ratingChanges) {
+    val colorsMap = managerSupportedColors.associateWith { manager.colorFor(handleColor = it) }
+
+    val timeMarkers: List<Instant> = remember(filterType, ratingChanges, currentTime) {
         if (filterType == RatingFilterType.ALL || ratingChanges.size < 2) emptyList()
         else {
             createBounds(ratingChanges, filterType, currentTime).run {
@@ -51,7 +53,7 @@ internal fun RatingGraphCanvas(
         translator = translator,
         selectedPoint = selectedRatingChange?.toPoint(),
         markVerticals = timeMarkers.map { it.epochSeconds },
-        colorsMap = managerSupportedColors.associateWith { manager.colorFor(handleColor = it) },
+        getColor = colorsMap::getValue,
         rectangles = rectangles,
         modifier = modifier
     )
@@ -63,7 +65,7 @@ private fun RatingGraphCanvas(
     translator: CoordinateTranslator,
     selectedPoint: Point?,
     markVerticals: List<Long>,
-    colorsMap: Map<HandleColor, Color>,
+    getColor: (HandleColor) -> Color,
     rectangles: RatingGraphRectangles,
     modifier: Modifier = Modifier,
     circleRadius: Float = 6f,
@@ -78,8 +80,8 @@ private fun RatingGraphCanvas(
 
     val dashEffect = remember { PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f) }
 
-    val pointsWithColors = remember(ratingPoints, rectangles) {
-        ratingPoints.map { it to rectangles.getHandleColor(it) }
+    val pointsWithColors = remember(ratingPoints, rectangles, getColor) {
+        ratingPoints.map { it to getColor(rectangles.getHandleColor(it)) }
     }
 
     Canvas(
@@ -105,7 +107,7 @@ private fun RatingGraphCanvas(
                 topRight = topRight
             ) { topLeft, size ->
                 drawRect(
-                    color = colorsMap.getValue(handleColor),
+                    color = getColor(handleColor),
                     topLeft = topLeft,
                     size = size
                 )
@@ -163,7 +165,7 @@ private fun RatingGraphCanvas(
         )
 
         //rating points
-        pointsWithColors.forEach { (point, handleColor) ->
+        pointsWithColors.forEach { (point, color) ->
             val center = translator.pointToOffset(point)
             drawCircle(
                 color = Color.Black,
@@ -172,7 +174,7 @@ private fun RatingGraphCanvas(
                 style = Fill
             )
             drawCircle(
-                color = colorsMap.getValue(handleColor),
+                color = color,
                 radius = radius(point, circleRadius),
                 center = center,
                 style = Fill
