@@ -80,7 +80,7 @@ inline fun<T, R> List<T>.forEachRangeEqualBy(selector: (T) -> R, block: (Int, In
     }
 }
 
-//couldn't resist to note that it can be solved in O(nlogn) by suffix array + segment tree
+//couldn't resist to note that it can be solved in O(nlogn) by suffix array + rmq
 fun String.containsTokensAsSubsequence(tokens: List<String>, ignoreCase: Boolean = false): Boolean {
     var i = 0
     for (token in tokens) {
