@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import com.demich.cps.CPSTopBar
+import com.demich.cps.ui.topbar.CPSTopBar
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottombar.CPSBottomBar

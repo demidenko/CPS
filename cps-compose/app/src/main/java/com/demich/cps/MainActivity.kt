@@ -54,7 +54,7 @@ import com.demich.cps.news.settings.NewsSettingsScreen
 import com.demich.cps.news.settings.settingsNews
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.ui.CPSScaffold
-import com.demich.cps.ui.CPSStatusBar
+import com.demich.cps.ui.ColorizeStatusBar
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.navigation.rememberCPSNavigator
 import com.demich.cps.ui.theme.CPSTheme
@@ -95,7 +95,7 @@ private fun CPSContent() {
     val navigator = rememberCPSNavigator(navController)
     val systemUiController = rememberSystemUiController()
 
-    CPSStatusBar(systemUiController, navController)
+    ColorizeStatusBar(systemUiController, navController)
 
     fun NavGraphBuilder.cpsComposable(
         screenType: ScreenTypes,
