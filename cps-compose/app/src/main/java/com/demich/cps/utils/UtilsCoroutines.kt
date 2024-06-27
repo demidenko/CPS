@@ -3,9 +3,7 @@ package com.demich.cps.utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -24,9 +22,6 @@ fun<T> debugRunBlocking(block: suspend CoroutineScope.() -> T): T =
 
 inline fun<K, V> MutableStateFlow<Map<K, V>>.edit(block: MutableMap<K, V>.() -> Unit) =
     update { it.toMutableMap().apply(block) }
-
-fun<K, V> Map<K, Flow<V>>.combine(): Flow<Map<K, V>> =
-    kotlinx.coroutines.flow.combine(entries.map { (key, value) -> value.map { key to it } }) { it.toMap() }
 
 suspend fun<A, B> awaitPair(
     context: CoroutineContext = EmptyCoroutineContext,
