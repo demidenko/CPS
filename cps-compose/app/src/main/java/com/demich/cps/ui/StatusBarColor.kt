@@ -131,7 +131,8 @@ private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
 private fun statusBarColor(
     isStatusBarEnabled: Boolean,
     color: Color,
-    offColor: Color
+    offColor: Color,
+    durationMillis: Int = CPSDefaults.buttonOnOffDurationMillis
 ): Color {
     /*
         Important:
@@ -139,12 +140,12 @@ private fun statusBarColor(
     */
     val statusBarColor by animateColorAsState(
         targetValue = color,
-        animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis)
+        animationSpec = tween(durationMillis = durationMillis)
     )
     return animateColor(
         enabledColor = statusBarColor,
         disabledColor = offColor,
         enabled = isStatusBarEnabled,
-        animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis)
+        animationSpec = tween(durationMillis = durationMillis)
     )
 }
