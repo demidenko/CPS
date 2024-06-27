@@ -62,22 +62,22 @@ fun CPSStatusBar(
             }
         ) { rankGetter, currentScreen -> rankGetter[currentScreen] }
     }
-    ColorizeStatusBar(
-        systemUiController = systemUiController,
-        coloredStatusBar = coloredStatusBar,
-        rank = rank
+    systemUiController.setStatusBarColor(
+        color = statusBarColor(
+            coloredStatusBar = coloredStatusBar,
+            rank = rank
+        ),
+        darkIcons = MaterialTheme.colors.isLight
     )
 }
 
 @Composable
-private fun ColorizeStatusBar(
-    systemUiController: SystemUiController,
+private fun statusBarColor(
     coloredStatusBar: Boolean,
     rank: RatedRank?,
     offColor: Color = cpsColors.background
-) {
-    ColorizeStatusBar(
-        systemUiController = systemUiController,
+): Color {
+    return statusBarColor(
         isStatusBarEnabled = coloredStatusBar && rank != null,
         color = rank?.run { manager.colorFor(handleColor) } ?: offColor,
         offColor = offColor
@@ -145,12 +145,11 @@ private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
     }
 
 @Composable
-private fun ColorizeStatusBar(
-    systemUiController: SystemUiController,
+private fun statusBarColor(
     isStatusBarEnabled: Boolean,
     color: Color,
     offColor: Color
-) {
+): Color {
     /*
         Important:
         with statusbar=off switching dark/light mode MUST be as fast as everywhere else
@@ -159,14 +158,11 @@ private fun ColorizeStatusBar(
         targetValue = color,
         animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis)
     )
-    systemUiController.setStatusBarColor(
-        color = animateColor(
-            enabledColor = statusBarColor,
-            disabledColor = offColor,
-            enabled = isStatusBarEnabled,
-            animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis)
-        ),
-        darkIcons = MaterialTheme.colors.isLight
+    return animateColor(
+        enabledColor = statusBarColor,
+        disabledColor = offColor,
+        enabled = isStatusBarEnabled,
+        animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis)
     )
 }
 
