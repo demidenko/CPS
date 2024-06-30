@@ -93,6 +93,8 @@ class MainActivity: ComponentActivity() {
 private fun CPSContent() {
     val navController = rememberNavController()
     val navigator = rememberCPSNavigator(navController)
+
+    //TODO: replace to edgeToEdge
     val systemUiController = rememberSystemUiController()
 
     ColorizeStatusBar(systemUiController, navController)
@@ -155,6 +157,7 @@ private fun CPSContent() {
             holder.setSubtitle("accounts", type.name, "settings")
         }
 
+        //TODO: rename 'news' to 'community' everywhere
         cpsComposable(ScreenTypes.news) { holder ->
             val controller = rememberCodeforcesNewsController()
             NewsScreen(controller = controller)
