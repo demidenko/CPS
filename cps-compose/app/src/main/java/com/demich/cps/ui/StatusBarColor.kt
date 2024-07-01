@@ -25,8 +25,6 @@ import com.demich.cps.utils.rememberCollect
 import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 @Composable
@@ -39,10 +37,7 @@ fun ColorizeStatusBar(
     val rank by rememberCollect {
         combine(
             flow = makeFlowOfRankGetter(context),
-            flow2 = flow {
-                emit(null)
-                emitAll(navController.flowOfCurrentScreen())
-            }
+            flow2 = navController.flowOfCurrentScreen()
         ) { rankGetter, currentScreen -> rankGetter[currentScreen] }
     }
     systemUiController.setStatusBarColor(

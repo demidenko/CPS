@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,16 +15,17 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import com.demich.cps.ui.topbar.CPSTopBar
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottombar.CPSBottomBar
 import com.demich.cps.ui.settingsUI
+import com.demich.cps.ui.topbar.CPSTopBar
 import com.demich.cps.utils.context
+import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.rememberWith
 import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 
 @Composable
@@ -35,7 +35,7 @@ fun rememberCPSNavigator(
     val subtitleState = remember { mutableStateOf("") }
 
     val currentScreenState: State<Screen?> =
-        rememberWith(navController) { flowOfCurrentScreen() }.collectAsState(initial = null)
+        rememberCollect { navController.flowOfCurrentScreen() }
 
     val menuBuilderState = remember { mutableStateOf<CPSMenuBuilder?>(null) }
     val bottomBarBuilderState = remember { mutableStateOf<AdditionalBottomBarBuilder?>(null) }
@@ -49,8 +49,13 @@ fun rememberCPSNavigator(
     )
 }
 
-fun NavController.flowOfCurrentScreen(): Flow<Screen> =
-    currentBackStackEntryFlow.map { it.getScreen() }
+fun NavController.flowOfCurrentScreen(): Flow<Screen?> =
+    flow {
+        emit(null)
+        currentBackStackEntryFlow.collect {
+            emit(it.getScreen())
+        }
+    }
 
 @Stable
 class CPSNavigator(
