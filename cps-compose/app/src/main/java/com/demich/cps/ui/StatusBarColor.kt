@@ -67,6 +67,30 @@ private fun statusBarColor(
     )
 }
 
+@Composable
+private fun statusBarColor(
+    isStatusBarEnabled: Boolean,
+    color: Color,
+    offColor: Color,
+    durationMillis: Int = CPSDefaults.buttonOnOffDurationMillis
+): Color {
+    /*
+        Important:
+        with statusbar=off switching dark/light mode MUST be as fast as everywhere else
+    */
+    val statusBarColor by animateColorAsState(
+        targetValue = color,
+        animationSpec = tween(durationMillis = durationMillis)
+    )
+    return animateColor(
+        enabledColor = statusBarColor,
+        disabledColor = offColor,
+        enabled = isStatusBarEnabled,
+        animationSpec = tween(durationMillis = durationMillis)
+    )
+}
+
+
 @Immutable
 private data class RatedRank(
     val rank: Double,
@@ -127,25 +151,4 @@ private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
         )
     }
 
-@Composable
-private fun statusBarColor(
-    isStatusBarEnabled: Boolean,
-    color: Color,
-    offColor: Color,
-    durationMillis: Int = CPSDefaults.buttonOnOffDurationMillis
-): Color {
-    /*
-        Important:
-        with statusbar=off switching dark/light mode MUST be as fast as everywhere else
-    */
-    val statusBarColor by animateColorAsState(
-        targetValue = color,
-        animationSpec = tween(durationMillis = durationMillis)
-    )
-    return animateColor(
-        enabledColor = statusBarColor,
-        disabledColor = offColor,
-        enabled = isStatusBarEnabled,
-        animationSpec = tween(durationMillis = durationMillis)
-    )
-}
+
