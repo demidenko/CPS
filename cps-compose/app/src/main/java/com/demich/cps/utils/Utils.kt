@@ -45,7 +45,7 @@ inline fun<T, R: Comparable<R>> List<T>.minOfWithIndex(selector: (T) -> R): Inde
 }
 
 inline fun<T, R : Comparable<R>> Iterable<T>.minOfNotNull(default: R, selector: (T) -> R?): R {
-    return minOfOrNull { selector(it) ?: default } ?: default
+    return minOfWithOrNull(comparator = nullsLast(), selector = selector) ?: default
 }
 
 fun<T> List<T>.swapped(i: Int, j: Int): List<T> =
