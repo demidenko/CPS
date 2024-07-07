@@ -96,16 +96,18 @@ private data class RatedRank(
 private fun<U: RatedUserInfo> RatedAccountManager<U>.getRank(userInfo: U?): RatedRank? {
     val rating = userInfo?.rating ?: return null
     val handleColor = getHandleColor(rating)
-    if(handleColor == HandleColor.RED) return RatedRank(rank = 1e9, handleColor = handleColor, manager = this)
-    val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
-    val j = rankedHandleColorsList.indexOfLast { handleColor == it }
-    val pos = ratingsUpperBounds.indexOfFirst { it.handleColor == handleColor }
-    require(i != -1 && j >= i && pos != -1)
-    val lower = if(pos > 0) ratingsUpperBounds[pos-1].ratingUpperBound else 0
-    val upper = ratingsUpperBounds[pos].ratingUpperBound
-    val blockLength = (upper - lower).toDouble() / (j - i + 1)
+    val rank = if (handleColor == HandleColor.RED) Double.POSITIVE_INFINITY else {
+        val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
+        val j = rankedHandleColorsList.indexOfLast { handleColor == it }
+        val pos = ratingsUpperBounds.indexOfFirst { it.handleColor == handleColor }
+        require(i != -1 && j >= i && pos != -1)
+        val lower = if (pos > 0) ratingsUpperBounds[pos-1].ratingUpperBound else 0
+        val upper = ratingsUpperBounds[pos].ratingUpperBound
+        val blockLength = (upper - lower).toDouble() / (j - i + 1)
+        i + (rating - lower) / blockLength
+    }
     return RatedRank(
-        rank = i + (rating - lower) / blockLength,
+        rank = rank,
         handleColor = handleColor,
         manager = this
     )
