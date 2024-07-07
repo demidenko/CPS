@@ -411,6 +411,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
             data?.takeIf { it.contestPhase.phase != CodeforcesContestPhase.UNDEFINED }
         }
     }
+    //TODO: restart killed worker if data not null
 
     AnimatedVisibleByNotNull(
         value = { contestDataState.value },
