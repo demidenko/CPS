@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import com.demich.cps.news.codeforces.CodeforcesNewsBottomBar
 import com.demich.cps.news.codeforces.CodeforcesNewsController
 import com.demich.cps.news.codeforces.CodeforcesNewsScreen
-import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.news.settings.settingsCommunity
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
@@ -52,7 +52,7 @@ fun newsMenuBuilder(
         onClick = onOpenSettings
     )
 
-    val followEnabled by rememberCollect { context.settingsNews.codeforcesFollowEnabled.flow }
+    val followEnabled by rememberCollect { context.settingsCommunity.codeforcesFollowEnabled.flow }
     if (followEnabled) {
         CPSDropdownMenuItem(title = "Follow List", icon = CPSIcons.Accounts) {
             controller.updateFollowUsersInfo(context)

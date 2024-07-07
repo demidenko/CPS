@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
-import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.news.settings.settingsCommunity
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesLocale
@@ -79,7 +79,7 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
 
     override fun reload(title: CodeforcesTitle, context: Context) {
         viewModelScope.launch {
-            val locale = context.settingsNews.codeforcesLocale()
+            val locale = context.settingsCommunity.codeforcesLocale()
             reload(title = title, locale = locale)
         }
     }
@@ -92,7 +92,7 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
 
     override fun reloadAll(context: Context) {
         viewModelScope.launch {
-            val locale = context.settingsNews.codeforcesLocale()
+            val locale = context.settingsCommunity.codeforcesLocale()
             reloadableTitles.forEach { reload(title = it, locale = locale) }
         }
     }
@@ -114,7 +114,7 @@ class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
 
     override fun addToFollowList(handle: String, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            context.settingsNews.codeforcesFollowEnabled(newValue = true)
+            context.settingsCommunity.codeforcesFollowEnabled(newValue = true)
             context.followListDao.addNewUser(handle)
         }
     }
@@ -157,7 +157,7 @@ private class CodeforcesDataLoader<T>(
         if (inactive) {
             inactive = false
             scope.launch {
-                launchLoadIfActive(locale = context.settingsNews.codeforcesLocale())
+                launchLoadIfActive(locale = context.settingsCommunity.codeforcesLocale())
             }
         }
         return dataFlow

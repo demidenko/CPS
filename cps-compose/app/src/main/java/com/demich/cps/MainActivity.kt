@@ -51,7 +51,7 @@ import com.demich.cps.news.follow.newsFollowListBottomBarBuilder
 import com.demich.cps.news.newsBottomBarBuilder
 import com.demich.cps.news.newsMenuBuilder
 import com.demich.cps.news.settings.NewsSettingsScreen
-import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.news.settings.settingsCommunity
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.ui.CPSScaffold
 import com.demich.cps.ui.ColorizeStatusBar
@@ -157,8 +157,7 @@ private fun CPSContent() {
             holder.setSubtitle("accounts", type.name, "settings")
         }
 
-        //TODO: rename 'news' to 'community' everywhere
-        cpsComposable(ScreenTypes.news) { holder ->
+        cpsComposable(ScreenTypes.community) { holder ->
             val controller = rememberCodeforcesNewsController()
             NewsScreen(controller = controller)
             holder.menu = newsMenuBuilder(
@@ -169,27 +168,27 @@ private fun CPSContent() {
             holder.bottomBar = newsBottomBarBuilder(
                 controller = controller
             )
-            holder.setSubtitle("news", "codeforces", controller.currentTab.name)
+            holder.setSubtitle("community", "codeforces", controller.currentTab.name)
         }
-        cpsComposable(ScreenTypes.newsSettings) { holder ->
+        cpsComposable(ScreenTypes.communitySettings) { holder ->
             NewsSettingsScreen()
-            holder.setSubtitle("news", "settings")
+            holder.setSubtitle("community", "settings")
         }
-        cpsComposable(ScreenTypes.newsFollowList) { holder ->
+        cpsComposable(ScreenTypes.communityFollowList) { holder ->
             NewsFollowScreen { handle ->
                 navigator.navigateTo(Screen.NewsCodeforcesBlog(handle = handle))
             }
             holder.bottomBar = newsFollowListBottomBarBuilder()
-            holder.setSubtitle("news", "codeforces", "follow", "list")
+            holder.setSubtitle("community", "codeforces", "follow", "list")
         }
-        cpsComposable(ScreenTypes.newsCodeforcesBlog) { holder ->
+        cpsComposable(ScreenTypes.communityCodeforcesBlog) { holder ->
             val handle = (holder.screen as Screen.NewsCodeforcesBlog).handle
             val newsViewModel = codeforcesNewsViewModel()
             val blogEntriesResult by newsViewModel
                 .flowOfBlogEntriesResult(handle, context, key = currentDataKey)
                 .collectAsState()
             CodeforcesBlogScreen(blogEntriesResult = { blogEntriesResult })
-            holder.setSubtitle("news", "codeforces", "blog")
+            holder.setSubtitle("community", "codeforces", "blog")
         }
 
         cpsComposable(ScreenTypes.contests) { holder ->
@@ -253,7 +252,7 @@ private suspend fun appStartUp(context: Context) {
     //init items with dynamic defaults
     //TODO: not perfect solution, default still can run multiple times
     withContext(Dispatchers.IO) {
-        context.settingsNews.codeforcesLocale.update { it }
+        context.settingsCommunity.codeforcesLocale.update { it }
     }
 
     //workers

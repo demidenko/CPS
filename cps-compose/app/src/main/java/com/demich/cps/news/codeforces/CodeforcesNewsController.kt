@@ -7,7 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
-import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.news.settings.settingsCommunity
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.utils.NewEntriesDataStoreItem
 import com.demich.cps.utils.combineToCounters
@@ -29,13 +29,13 @@ fun rememberCodeforcesNewsController(): CodeforcesNewsController {
     val viewModel = codeforcesNewsViewModel()
 
     val tabsState = rememberCollect {
-        context.settingsNews.flowOfCodeforcesTabs()
+        context.settingsCommunity.flowOfCodeforcesTabs()
     }
 
     val controller = rememberSaveable(
         saver = CodeforcesNewsController.saver(viewModel, tabsState)
     ) {
-        val settings = context.settingsNews
+        val settings = context.settingsCommunity
         val defaultTab = runBlocking { settings.codeforcesDefaultTab() }
         CodeforcesNewsController(
             viewModel = viewModel,

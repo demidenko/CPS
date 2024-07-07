@@ -7,7 +7,7 @@ import com.demich.cps.*
 import com.demich.cps.news.settings.NewsSettingsDataStore
 import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.atcoder_news
 import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.project_euler_news
-import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.news.settings.settingsCommunity
 import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.notifications.setBigContent
@@ -29,7 +29,7 @@ class NewsWorker(
     companion object {
         fun getWork(context: Context) = object : CPSWork(name = "news", context = context) {
             override suspend fun isEnabled(): Boolean {
-                val enabledFeeds = context.settingsNews.enabledNewsFeeds() - NewsSettingsDataStore.NewsFeed.project_euler_problems
+                val enabledFeeds = context.settingsCommunity.enabledNewsFeeds() - NewsSettingsDataStore.NewsFeed.project_euler_problems
                 return enabledFeeds.isNotEmpty()
             }
 
@@ -41,7 +41,7 @@ class NewsWorker(
         }
     }
 
-    val settings by lazy { context.settingsNews }
+    val settings by lazy { context.settingsCommunity }
     override suspend fun runWork(): Result {
         val jobs = buildList {
             settings.enabledNewsFeeds().let { enabled ->
@@ -63,7 +63,7 @@ class NewsWorker(
             notificationChannels.atcoder.news(it.id.toInt()).notify(context) {
                 setSubText("atcoder news")
                 setBigContent(it.title.trim()) //TODO: title + content html
-                setSmallIcon(R.drawable.ic_news)
+                setSmallIcon(R.drawable.ic_community)
                 setWhen(it.time)
                 attachUrl(url = AtCoderApi.urls.post(it.id.toInt()), context = context)
                 //setColor
@@ -82,7 +82,7 @@ class NewsWorker(
                 setContentTitle(it.title)
                 //TODO: still <p> .. </p>
                 setBigContent(it.descriptionHtml.asHtmlToSpanned())
-                setSmallIcon(R.drawable.ic_news)
+                setSmallIcon(R.drawable.ic_community)
                 setColor(context.getColor(R.color.project_euler_main))
                 setShowWhen(false)
                 setAutoCancel(true)

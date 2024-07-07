@@ -5,11 +5,11 @@
 "Enables auto launched watcher of your contest participation. Allows to see contest phase, systest result notifications and catch rating changes early than usual."
     </string>
 
-    <string name="news_settings_cf_lost_description">
+    <string name="community_settings_cf_lost_description">
 "Catches new blog entries from recent actions that have lost because of low activity."
     </string>
 
-    <string name="news_settings_cf_follow_description">
+    <string name="community_settings_cf_follow_description">
 "Subscription to new blog entries from users you have selected."
     </string>
 

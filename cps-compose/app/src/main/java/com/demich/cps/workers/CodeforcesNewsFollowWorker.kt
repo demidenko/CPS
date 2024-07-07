@@ -2,7 +2,7 @@ package com.demich.cps.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.news.settings.settingsCommunity
 import com.demich.cps.room.followListDao
 import kotlin.time.Duration.Companion.hours
 
@@ -16,7 +16,7 @@ class CodeforcesNewsFollowWorker(
 ) {
     companion object {
         fun getWork(context: Context) = object : CPSWork(name = "cf_follow", context = context) {
-            override suspend fun isEnabled() = context.settingsNews.codeforcesFollowEnabled()
+            override suspend fun isEnabled() = context.settingsCommunity.codeforcesFollowEnabled()
             override val requestBuilder get() =
                 CPSPeriodicWorkRequestBuilder<CodeforcesNewsFollowWorker>(
                     repeatInterval = 6.hours,

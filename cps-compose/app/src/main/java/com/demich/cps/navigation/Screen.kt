@@ -13,10 +13,10 @@ enum class ScreenTypes(
     accountSettings("account.settings/{manager}"),
     contests("contests"),
     contestsSettings("contests.settings"),
-    news("news"),
-    newsSettings("news.settings"),
-    newsFollowList("news.follow"),
-    newsCodeforcesBlog("codeforces.blog/{handle}"),
+    community("community"),
+    communitySettings("community.settings"),
+    communityFollowList("community.follow"),
+    communityCodeforcesBlog("codeforces.blog/{handle}"),
     develop("develop")
 }
 
@@ -38,11 +38,11 @@ sealed class Screen(
     data class AccountSettings(override val type: AccountManagerType)
         : AccountScreen(ScreenTypes.accountSettings, type, false)
 
-    data object News: RootScreen(ScreenTypes.news, icon = CPSIcons.News)
-    data object NewsSettings: Screen(ScreenTypes.newsSettings, rootScreenType = ScreenTypes.news, enableBottomBar = false)
-    data object NewsFollowList: Screen(ScreenTypes.newsFollowList, rootScreenType = ScreenTypes.news)
+    data object News: RootScreen(ScreenTypes.community, icon = CPSIcons.News)
+    data object NewsSettings: Screen(ScreenTypes.communitySettings, rootScreenType = ScreenTypes.community, enableBottomBar = false)
+    data object NewsFollowList: Screen(ScreenTypes.communityFollowList, rootScreenType = ScreenTypes.community)
     data class NewsCodeforcesBlog(val handle: String)
-        : Screen(ScreenTypes.newsCodeforcesBlog, rootScreenType = ScreenTypes.news) {
+        : Screen(ScreenTypes.communityCodeforcesBlog, rootScreenType = ScreenTypes.community) {
             override fun createPath(pattern: String) = pattern.replace("{handle}", handle)
         }
 
@@ -92,7 +92,7 @@ fun NavBackStackEntry.getScreen(): Screen {
         ScreenTypes.accountSettings.route -> {
             Screen.AccountSettings(type = AccountManagerType.valueOf(requireString("manager")))
         }
-        ScreenTypes.newsCodeforcesBlog.route -> {
+        ScreenTypes.communityCodeforcesBlog.route -> {
             Screen.NewsCodeforcesBlog(handle = requireString("handle"))
         }
         else -> simpleScreens.first { it.screenType.route == route }

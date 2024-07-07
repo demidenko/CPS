@@ -7,7 +7,7 @@ import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowDao
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.features.codeforces.follow.database.cfFollowDao
-import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.news.settings.settingsCommunity
 import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.notifications.setBigContent
@@ -35,7 +35,7 @@ class FollowListDao internal constructor(
     suspend fun getAndReloadBlogEntries(handle: String) =
         dao.getAndReloadBlogEntries(
             handle = handle,
-            locale = context.settingsNews.codeforcesLocale(),
+            locale = context.settingsCommunity.codeforcesLocale(),
             onNewBlogEntry = ::notifyNewBlogEntry
         )
 

@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
-import com.demich.cps.news.settings.settingsNews
+import com.demich.cps.news.settings.settingsCommunity
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesColorTag
@@ -30,7 +30,7 @@ class CodeforcesNewsLostRecentWorker(
 ) {
     companion object {
         fun getWork(context: Context) = object : CPSWork(name = "cf_lost", context = context) {
-            override suspend fun isEnabled() = context.settingsNews.codeforcesLostEnabled()
+            override suspend fun isEnabled() = context.settingsCommunity.codeforcesLostEnabled()
             override val requestBuilder: PeriodicWorkRequest.Builder
                 get() = CPSPeriodicWorkRequestBuilder<CodeforcesNewsLostRecentWorker>(
                     repeatInterval = 30.minutes
@@ -87,7 +87,7 @@ class CodeforcesNewsLostRecentWorker(
     private fun isOldLost(blogCreationTime: Instant) = workerStartTime - blogCreationTime > 7.days
 
     override suspend fun runWork(): Result {
-        val settings = context.settingsNews
+        val settings = context.settingsCommunity
         val dao = context.lostBlogEntriesDao
 
         val locale = settings.codeforcesLocale()

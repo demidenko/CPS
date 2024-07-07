@@ -82,7 +82,7 @@ fun NewsSettingsScreen() {
 }
 
 private fun flowOfNotificationPermissionsRequired(context: Context): Flow<Boolean> =
-    context.settingsNews.flowOf { prefs ->
+    context.settingsCommunity.flowOf { prefs ->
         prefs[codeforcesFollowEnabled] || prefs[enabledNewsFeeds].isNotEmpty()
     }
 
@@ -90,7 +90,7 @@ private fun flowOfNotificationPermissionsRequired(context: Context): Flow<Boolea
 private fun CodeforcesDefaultTabSettingsItem() {
     val context = context
     SettingsEnumItem(
-        item = context.settingsNews.codeforcesDefaultTab,
+        item = context.settingsCommunity.codeforcesDefaultTab,
         title = "Default tab",
         options = listOf(
             CodeforcesTitle.MAIN,
@@ -104,9 +104,9 @@ private fun CodeforcesDefaultTabSettingsItem() {
 private fun CodeforcesFollowSettingsItem() {
     val context = context
     SettingsSwitchItemWithWork(
-        item = context.settingsNews.codeforcesFollowEnabled,
+        item = context.settingsCommunity.codeforcesFollowEnabled,
         title = "Follow",
-        description = stringResource(id = R.string.news_settings_cf_follow_description),
+        description = stringResource(id = R.string.community_settings_cf_follow_description),
         workGetter = CodeforcesNewsFollowWorker::getWork
     )
 }
@@ -115,14 +115,14 @@ private fun CodeforcesFollowSettingsItem() {
 private fun CodeforcesLostSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
-    val settings = remember { context.settingsNews }
+    val settings = remember { context.settingsCommunity }
     val enabled by rememberCollect { settings.codeforcesLostEnabled.flow }
     SettingsItem {
         Column {
             SettingsSwitchItemContent(
                 checked = enabled,
                 title = "Lost recent blog entries",
-                description = stringResource(id = R.string.news_settings_cf_lost_description),
+                description = stringResource(id = R.string.community_settings_cf_lost_description),
                 onCheckedChange = { checked ->
                     scope.launch {
                         settings.codeforcesLostEnabled(newValue = checked)
@@ -177,14 +177,14 @@ private fun CodeforcesRuEnabledSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val locale by rememberCollect { context.settingsNews.codeforcesLocale.flow }
+    val locale by rememberCollect { context.settingsCommunity.codeforcesLocale.flow }
 
     SettingsSwitchItem(
         title = "Russian content",
         checked = locale == CodeforcesLocale.RU,
         onCheckedChange = { checked ->
             scope.launch {
-                context.settingsNews.codeforcesLocale(
+                context.settingsCommunity.codeforcesLocale(
                     newValue = if (checked) CodeforcesLocale.RU else CodeforcesLocale.EN
                 )
             }
@@ -195,7 +195,7 @@ private fun CodeforcesRuEnabledSettingsItem() {
 @Composable
 private fun NewsFeedsSettingsItem() {
     val context = context
-    val enabledSettingsItem = remember { context.settingsNews.enabledNewsFeeds }
+    val enabledSettingsItem = remember { context.settingsCommunity.enabledNewsFeeds }
 
     val title = "Subscriptions"
     var showDialog by rememberSaveable { mutableStateOf(false) }

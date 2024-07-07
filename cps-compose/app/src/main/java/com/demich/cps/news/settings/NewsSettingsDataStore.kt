@@ -15,12 +15,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 
-val Context.settingsNews: NewsSettingsDataStore
+val Context.settingsCommunity: NewsSettingsDataStore
     get() = NewsSettingsDataStore(this)
 
-class NewsSettingsDataStore(context: Context): ItemizedDataStore(context.news_settings_dataStore) {
+class NewsSettingsDataStore(context: Context): ItemizedDataStore(context.community_settings_dataStore) {
     companion object {
-        private val Context.news_settings_dataStore by dataStoreWrapper("news_settings")
+        private val Context.community_settings_dataStore by dataStoreWrapper("community_settings")
     }
 
     val codeforcesDefaultTab = itemEnum(name = "cf_default_tab", defaultValue = CodeforcesTitle.TOP)
