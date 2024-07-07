@@ -38,10 +38,10 @@ sealed class Screen(
     data class AccountSettings(override val type: AccountManagerType)
         : AccountScreen(ScreenTypes.accountSettings, type, false)
 
-    data object News: RootScreen(ScreenTypes.community, icon = CPSIcons.News)
-    data object NewsSettings: Screen(ScreenTypes.communitySettings, rootScreenType = ScreenTypes.community, enableBottomBar = false)
-    data object NewsFollowList: Screen(ScreenTypes.communityFollowList, rootScreenType = ScreenTypes.community)
-    data class NewsCodeforcesBlog(val handle: String)
+    data object Community: RootScreen(ScreenTypes.community, icon = CPSIcons.Community)
+    data object CommunitySettings: Screen(ScreenTypes.communitySettings, rootScreenType = ScreenTypes.community, enableBottomBar = false)
+    data object CommunityFollowList: Screen(ScreenTypes.communityFollowList, rootScreenType = ScreenTypes.community)
+    data class CommunityCodeforcesBlog(val handle: String)
         : Screen(ScreenTypes.communityCodeforcesBlog, rootScreenType = ScreenTypes.community) {
             override fun createPath(pattern: String) = pattern.replace("{handle}", handle)
         }
@@ -76,11 +76,11 @@ sealed class AccountScreen(
 
 private val simpleScreens = arrayOf(
     Screen.Contests,
-    Screen.News,
+    Screen.Community,
     Screen.Accounts,
     Screen.ContestsSettings,
-    Screen.NewsSettings,
-    Screen.NewsFollowList,
+    Screen.CommunitySettings,
+    Screen.CommunityFollowList,
     Screen.Development
 )
 
@@ -93,7 +93,7 @@ fun NavBackStackEntry.getScreen(): Screen {
             Screen.AccountSettings(type = AccountManagerType.valueOf(requireString("manager")))
         }
         ScreenTypes.communityCodeforcesBlog.route -> {
-            Screen.NewsCodeforcesBlog(handle = requireString("handle"))
+            Screen.CommunityCodeforcesBlog(handle = requireString("handle"))
         }
         else -> simpleScreens.first { it.screenType.route == route }
     }

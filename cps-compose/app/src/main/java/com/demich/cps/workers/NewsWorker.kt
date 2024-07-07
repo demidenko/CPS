@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.*
-import com.demich.cps.news.settings.NewsSettingsDataStore
-import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.atcoder_news
-import com.demich.cps.news.settings.NewsSettingsDataStore.NewsFeed.project_euler_news
+import com.demich.cps.news.settings.CommunitySettingsDataStore
+import com.demich.cps.news.settings.CommunitySettingsDataStore.NewsFeed.atcoder_news
+import com.demich.cps.news.settings.CommunitySettingsDataStore.NewsFeed.project_euler_news
 import com.demich.cps.news.settings.settingsCommunity
 import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
@@ -29,7 +29,7 @@ class NewsWorker(
     companion object {
         fun getWork(context: Context) = object : CPSWork(name = "news", context = context) {
             override suspend fun isEnabled(): Boolean {
-                val enabledFeeds = context.settingsCommunity.enabledNewsFeeds() - NewsSettingsDataStore.NewsFeed.project_euler_problems
+                val enabledFeeds = context.settingsCommunity.enabledNewsFeeds() - CommunitySettingsDataStore.NewsFeed.project_euler_problems
                 return enabledFeeds.isNotEmpty()
             }
 

@@ -15,10 +15,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 
-val Context.settingsCommunity: NewsSettingsDataStore
-    get() = NewsSettingsDataStore(this)
+val Context.settingsCommunity: CommunitySettingsDataStore
+    get() = CommunitySettingsDataStore(this)
 
-class NewsSettingsDataStore(context: Context): ItemizedDataStore(context.community_settings_dataStore) {
+class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.community_settings_dataStore) {
     companion object {
         private val Context.community_settings_dataStore by dataStoreWrapper("community_settings")
     }

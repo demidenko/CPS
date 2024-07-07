@@ -171,7 +171,7 @@ private fun BottomBarBodyMain(
     val rootScreens = remember(devModeEnabled) {
         buildList {
             add(Screen.Accounts)
-            add(Screen.News)
+            add(Screen.Community)
             add(Screen.Contests)
             if (devModeEnabled) add(Screen.Development)
         }

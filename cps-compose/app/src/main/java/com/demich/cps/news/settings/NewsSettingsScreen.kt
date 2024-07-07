@@ -215,7 +215,7 @@ private fun NewsFeedsSettingsItem() {
     if (showDialog) {
         CPSDialogMultiSelectEnum(
             title = title,
-            options = NewsSettingsDataStore.NewsFeed.entries,
+            options = CommunitySettingsDataStore.NewsFeed.entries,
             selectedOptions = remember { runBlocking { enabledSettingsItem() } },
             optionTitle = { Text(it.link) },
             onDismissRequest = { showDialog = false },
@@ -223,7 +223,7 @@ private fun NewsFeedsSettingsItem() {
                 scope.launch {
                     val newSelectedFeeds = current - enabledSettingsItem()
                     enabledSettingsItem(newValue = current)
-                    val pe_recent = NewsSettingsDataStore.NewsFeed.project_euler_problems
+                    val pe_recent = CommunitySettingsDataStore.NewsFeed.project_euler_problems
                     if ((newSelectedFeeds - pe_recent).isNotEmpty()) {
                         NewsWorker.getWork(context).startImmediate()
                     }

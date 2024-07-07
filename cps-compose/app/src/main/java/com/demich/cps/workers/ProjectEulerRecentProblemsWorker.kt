@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.*
-import com.demich.cps.news.settings.NewsSettingsDataStore
+import com.demich.cps.news.settings.CommunitySettingsDataStore
 import com.demich.cps.news.settings.settingsCommunity
 import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
@@ -23,7 +23,7 @@ class ProjectEulerRecentProblemsWorker(
     companion object {
         fun getWork(context: Context) = object : CPSWork(name = "pe_recent", context = context) {
             override suspend fun isEnabled() =
-                context.settingsCommunity.enabledNewsFeeds().contains(NewsSettingsDataStore.NewsFeed.project_euler_problems)
+                context.settingsCommunity.enabledNewsFeeds().contains(CommunitySettingsDataStore.NewsFeed.project_euler_problems)
 
             override val requestBuilder: PeriodicWorkRequest.Builder
                 get() = CPSPeriodicWorkRequestBuilder<ProjectEulerRecentProblemsWorker>(
@@ -34,7 +34,7 @@ class ProjectEulerRecentProblemsWorker(
 
     override suspend fun runWork(): Result {
         context.settingsCommunity.scanNewsFeed(
-            newsFeed = NewsSettingsDataStore.NewsFeed.project_euler_problems,
+            newsFeed = CommunitySettingsDataStore.NewsFeed.project_euler_problems,
             posts = ProjectEulerUtils.extractRecentProblems(ProjectEulerApi.getRecentPage())
         ) {
             val problemId = it.id.toInt()

@@ -162,8 +162,8 @@ private fun CPSContent() {
             NewsScreen(controller = controller)
             holder.menu = newsMenuBuilder(
                 controller = controller,
-                onOpenSettings = { navigator.navigateTo(Screen.NewsSettings) },
-                onOpenFollowList = { navigator.navigateTo(Screen.NewsFollowList) }
+                onOpenSettings = { navigator.navigateTo(Screen.CommunitySettings) },
+                onOpenFollowList = { navigator.navigateTo(Screen.CommunityFollowList) }
             )
             holder.bottomBar = newsBottomBarBuilder(
                 controller = controller
@@ -176,13 +176,13 @@ private fun CPSContent() {
         }
         cpsComposable(ScreenTypes.communityFollowList) { holder ->
             NewsFollowScreen { handle ->
-                navigator.navigateTo(Screen.NewsCodeforcesBlog(handle = handle))
+                navigator.navigateTo(Screen.CommunityCodeforcesBlog(handle = handle))
             }
             holder.bottomBar = newsFollowListBottomBarBuilder()
             holder.setSubtitle("community", "codeforces", "follow", "list")
         }
         cpsComposable(ScreenTypes.communityCodeforcesBlog) { holder ->
-            val handle = (holder.screen as Screen.NewsCodeforcesBlog).handle
+            val handle = (holder.screen as Screen.CommunityCodeforcesBlog).handle
             val newsViewModel = codeforcesNewsViewModel()
             val blogEntriesResult by newsViewModel
                 .flowOfBlogEntriesResult(handle, context, key = currentDataKey)
