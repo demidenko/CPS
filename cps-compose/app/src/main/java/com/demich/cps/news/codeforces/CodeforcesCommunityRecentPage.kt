@@ -24,8 +24,8 @@ import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.rememberWith
 
 @Composable
-fun CodeforcesNewsRecentPage(
-    controller: CodeforcesNewsController
+fun CodeforcesCommunityRecentPage(
+    controller: CodeforcesCommunityController
 ) {
     val context = context
 
@@ -100,7 +100,7 @@ private fun RecentBlogEntriesPage(
 
 @Composable
 private fun RecentCommentsInBlogEntry(
-    controller: CodeforcesNewsController,
+    controller: CodeforcesCommunityController,
     comments: () -> List<CodeforcesRecentAction>,
     blogEntry: CodeforcesBlogEntry,
     onBackPressed: () -> Unit,

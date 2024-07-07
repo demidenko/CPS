@@ -24,23 +24,23 @@ import kotlinx.serialization.encodeToString
 
 
 @Composable
-fun rememberCodeforcesNewsController(): CodeforcesNewsController {
+fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
     val context = context
-    val viewModel = codeforcesNewsViewModel()
+    val viewModel = codeforcesCommunityViewModel()
 
     val tabsState = rememberCollect {
         context.settingsCommunity.flowOfCodeforcesTabs()
     }
 
     val controller = rememberSaveable(
-        saver = CodeforcesNewsController.saver(viewModel, tabsState)
+        saver = CodeforcesCommunityController.saver(viewModel, tabsState)
     ) {
         val settings = context.settingsCommunity
         val defaultTab = runBlocking { settings.codeforcesDefaultTab() }
-        CodeforcesNewsController(
+        CodeforcesCommunityController(
             viewModel = viewModel,
             tabsState = tabsState,
-            data = CodeforcesNewsControllerData(
+            data = CodeforcesCommunityControllerData(
                 selectedTab = defaultTab,
                 topShowComments = false,
                 recentShowComments = false,
@@ -62,7 +62,7 @@ fun rememberCodeforcesNewsController(): CodeforcesNewsController {
 }
 
 @Serializable
-internal data class CodeforcesNewsControllerData(
+internal data class CodeforcesCommunityControllerData(
     val selectedTab: CodeforcesTitle,
     val topShowComments: Boolean,
     val recentShowComments: Boolean,
@@ -71,11 +71,11 @@ internal data class CodeforcesNewsControllerData(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Stable
-class CodeforcesNewsController internal constructor(
-    viewModel: CodeforcesNewsViewModel,
+class CodeforcesCommunityController internal constructor(
+    viewModel: CodeforcesCommunityViewModel,
     tabsState: State<List<CodeforcesTitle>>,
-    data: CodeforcesNewsControllerData
-): CodeforcesNewsDataManger by viewModel {
+    data: CodeforcesCommunityControllerData
+): CodeforcesCommunityDataManger by viewModel {
     val tabs by tabsState
 
     //TODO: future support for dynamic tabs (selectedIndex can be out of bounds)
@@ -131,11 +131,11 @@ class CodeforcesNewsController internal constructor(
 
     companion object {
         fun saver(
-            viewModel: CodeforcesNewsViewModel,
+            viewModel: CodeforcesCommunityViewModel,
             tabsState: State<List<CodeforcesTitle>>
-        ) = Saver<CodeforcesNewsController, String>(
+        ) = Saver<CodeforcesCommunityController, String>(
             save = {
-                jsonCPS.encodeToString(CodeforcesNewsControllerData(
+                jsonCPS.encodeToString(CodeforcesCommunityControllerData(
                     selectedTab = it.currentTab,
                     topShowComments = it.topShowComments,
                     recentShowComments = it.recentShowComments,
@@ -143,7 +143,7 @@ class CodeforcesNewsController internal constructor(
                 ))
             },
             restore = {
-                CodeforcesNewsController(
+                CodeforcesCommunityController(
                     viewModel = viewModel,
                     tabsState = tabsState,
                     data = jsonCPS.decodeFromString(it)

@@ -5,8 +5,8 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 
 @Composable
-fun CodeforcesNewsBottomBar(
-    controller: CodeforcesNewsController,
+fun CodeforcesCommunityBottomBar(
+    controller: CodeforcesCommunityController,
 ) {
     when (controller.currentTab) {
         CodeforcesTitle.TOP -> {

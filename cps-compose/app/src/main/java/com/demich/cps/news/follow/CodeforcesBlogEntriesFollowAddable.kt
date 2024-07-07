@@ -13,7 +13,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.news.codeforces.CodeforcesBlogEntries
 import com.demich.cps.news.codeforces.CodeforcesBlogEntriesController
-import com.demich.cps.news.codeforces.CodeforcesNewsController
+import com.demich.cps.news.codeforces.CodeforcesCommunityController
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
@@ -21,7 +21,7 @@ import com.demich.cps.utils.context
 
 @Composable
 fun CodeforcesBlogEntriesFollowAddable(
-    controller: CodeforcesNewsController,
+    controller: CodeforcesCommunityController,
     blogEntriesController: CodeforcesBlogEntriesController,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),

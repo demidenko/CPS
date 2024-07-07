@@ -2,9 +2,9 @@ package com.demich.cps.news
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import com.demich.cps.news.codeforces.CodeforcesNewsBottomBar
-import com.demich.cps.news.codeforces.CodeforcesNewsController
-import com.demich.cps.news.codeforces.CodeforcesNewsScreen
+import com.demich.cps.news.codeforces.CodeforcesCommunityBottomBar
+import com.demich.cps.news.codeforces.CodeforcesCommunityController
+import com.demich.cps.news.codeforces.CodeforcesCommunityScreen
 import com.demich.cps.news.settings.settingsCommunity
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
@@ -15,21 +15,21 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 
 @Composable
-fun NewsScreen(
-    controller: CodeforcesNewsController
+fun CommunityScreen(
+    controller: CodeforcesCommunityController
 ) {
-    CodeforcesNewsScreen(
+    CodeforcesCommunityScreen(
         controller = controller
     )
 }
 
 
-fun newsBottomBarBuilder(
-    controller: CodeforcesNewsController
+fun communityBottomBarBuilder(
+    controller: CodeforcesCommunityController
 ): AdditionalBottomBarBuilder = {
     val context = context
 
-    CodeforcesNewsBottomBar(controller = controller)
+    CodeforcesCommunityBottomBar(controller = controller)
 
     val loadingStatus by controller.rememberLoadingStatusState()
     CPSReloadingButton(loadingStatus = loadingStatus) {
@@ -37,8 +37,8 @@ fun newsBottomBarBuilder(
     }
 }
 
-fun newsMenuBuilder(
-    controller: CodeforcesNewsController,
+fun communityMenuBuilder(
+    controller: CodeforcesCommunityController,
     onOpenSettings: () -> Unit,
     onOpenFollowList: () -> Unit
 ): CPSMenuBuilder = {

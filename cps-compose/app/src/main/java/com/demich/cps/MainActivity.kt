@@ -42,15 +42,15 @@ import com.demich.cps.develop.developAdditionalBottomBarBuilder
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTypes
 import com.demich.cps.navigation.getScreen
-import com.demich.cps.news.NewsScreen
+import com.demich.cps.news.CommunityScreen
 import com.demich.cps.news.codeforces.CodeforcesBlogScreen
-import com.demich.cps.news.codeforces.codeforcesNewsViewModel
-import com.demich.cps.news.codeforces.rememberCodeforcesNewsController
-import com.demich.cps.news.follow.NewsFollowScreen
-import com.demich.cps.news.follow.newsFollowListBottomBarBuilder
-import com.demich.cps.news.newsBottomBarBuilder
-import com.demich.cps.news.newsMenuBuilder
-import com.demich.cps.news.settings.NewsSettingsScreen
+import com.demich.cps.news.codeforces.codeforcesCommunityViewModel
+import com.demich.cps.news.codeforces.rememberCodeforcesCommunityController
+import com.demich.cps.news.follow.CommunityFollowScreen
+import com.demich.cps.news.follow.communityFollowListBottomBarBuilder
+import com.demich.cps.news.communityBottomBarBuilder
+import com.demich.cps.news.communityMenuBuilder
+import com.demich.cps.news.settings.CommunitySettingsScreen
 import com.demich.cps.news.settings.settingsCommunity
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.ui.CPSScaffold
@@ -158,32 +158,32 @@ private fun CPSContent() {
         }
 
         cpsComposable(ScreenTypes.community) { holder ->
-            val controller = rememberCodeforcesNewsController()
-            NewsScreen(controller = controller)
-            holder.menu = newsMenuBuilder(
+            val controller = rememberCodeforcesCommunityController()
+            CommunityScreen(controller = controller)
+            holder.menu = communityMenuBuilder(
                 controller = controller,
                 onOpenSettings = { navigator.navigateTo(Screen.CommunitySettings) },
                 onOpenFollowList = { navigator.navigateTo(Screen.CommunityFollowList) }
             )
-            holder.bottomBar = newsBottomBarBuilder(
+            holder.bottomBar = communityBottomBarBuilder(
                 controller = controller
             )
             holder.setSubtitle("community", "codeforces", controller.currentTab.name)
         }
         cpsComposable(ScreenTypes.communitySettings) { holder ->
-            NewsSettingsScreen()
+            CommunitySettingsScreen()
             holder.setSubtitle("community", "settings")
         }
         cpsComposable(ScreenTypes.communityFollowList) { holder ->
-            NewsFollowScreen { handle ->
+            CommunityFollowScreen { handle ->
                 navigator.navigateTo(Screen.CommunityCodeforcesBlog(handle = handle))
             }
-            holder.bottomBar = newsFollowListBottomBarBuilder()
+            holder.bottomBar = communityFollowListBottomBarBuilder()
             holder.setSubtitle("community", "codeforces", "follow", "list")
         }
         cpsComposable(ScreenTypes.communityCodeforcesBlog) { holder ->
             val handle = (holder.screen as Screen.CommunityCodeforcesBlog).handle
-            val newsViewModel = codeforcesNewsViewModel()
+            val newsViewModel = codeforcesCommunityViewModel()
             val blogEntriesResult by newsViewModel
                 .flowOfBlogEntriesResult(handle, context, key = currentDataKey)
                 .collectAsState()

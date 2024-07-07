@@ -14,7 +14,7 @@ import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.DialogAccountChooser
 import com.demich.cps.accounts.managers.makeHandleSpan
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
-import com.demich.cps.news.codeforces.codeforcesNewsViewModel
+import com.demich.cps.news.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.room.followListDao
 import com.demich.cps.ui.*
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
@@ -29,15 +29,15 @@ import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 
 @Composable
-fun NewsFollowScreen(
+fun CommunityFollowScreen(
     onShowBlogScreen: (String) -> Unit
 ) {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val newsViewModel = codeforcesNewsViewModel()
+    val communityViewModel = codeforcesCommunityViewModel()
 
-    val followLoadingStatus by rememberCollect { newsViewModel.flowOfFollowUpdateLoadingStatus() }
+    val followLoadingStatus by rememberCollect { communityViewModel.flowOfFollowUpdateLoadingStatus() }
 
     val userBlogs by rememberCollect {
         context.followListDao.flowOfAllBlogs().map {
@@ -105,7 +105,7 @@ private fun CodeforcesFollowList(
         ContentWithCPSDropdownMenu(
             modifier = Modifier.animateItemPlacement(),
             content = {
-                NewsFollowListItem(
+                CommunityFollowListItem(
                     userInfo = userBlog.userInfo,
                     blogEntriesCount = userBlog.blogEntries?.size,
                     modifier = Modifier
@@ -145,9 +145,9 @@ private fun CodeforcesFollowList(
     }
 }
 
-fun newsFollowListBottomBarBuilder(): AdditionalBottomBarBuilder = {
+fun communityFollowListBottomBarBuilder(): AdditionalBottomBarBuilder = {
     val context = context
-    val newsViewModel = codeforcesNewsViewModel()
+    val communityViewModel = codeforcesCommunityViewModel()
 
     var showChooseDialog by remember { mutableStateOf(false) }
 
@@ -160,7 +160,7 @@ fun newsFollowListBottomBarBuilder(): AdditionalBottomBarBuilder = {
             manager = LocalCodeforcesAccountManager.current,
             initialUserInfo = null,
             onDismissRequest = { showChooseDialog = false },
-            onResult = { newsViewModel.addToFollowList(userInfo = it, context = context) }
+            onResult = { communityViewModel.addToFollowList(userInfo = it, context = context) }
         )
     }
 }

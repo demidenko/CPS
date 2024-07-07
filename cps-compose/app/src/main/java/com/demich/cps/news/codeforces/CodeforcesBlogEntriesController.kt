@@ -42,7 +42,7 @@ fun rememberCodeforcesBlogEntriesController(
     blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
     newEntriesItem: NewEntriesDataStoreItem,
     listState: LazyListState,
-    controller: CodeforcesNewsController
+    controller: CodeforcesCommunityController
 ): CodeforcesBlogEntriesController {
 
     LaunchedEffect(tab, newEntriesItem, listState, controller) {

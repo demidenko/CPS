@@ -9,17 +9,17 @@ import com.demich.cps.news.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.context
 
 @Composable
-fun CodeforcesNewsMainPage(
-    controller: CodeforcesNewsController
+fun CodeforcesCommunityMainPage(
+    controller: CodeforcesCommunityController
 ) {
     CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.MAIN) {
-        CodeforcesNewsMainList(controller = controller)
+        CodeforcesCommunityMainList(controller = controller)
     }
 }
 
 @Composable
-private fun CodeforcesNewsMainList(
-    controller: CodeforcesNewsController
+private fun CodeforcesCommunityMainList(
+    controller: CodeforcesCommunityController
 ) {
     val context = context
     val newEntriesItem = remember { CodeforcesNewEntriesDataStore(context).mainNewEntries }

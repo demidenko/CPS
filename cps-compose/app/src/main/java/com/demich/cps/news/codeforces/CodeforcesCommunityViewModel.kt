@@ -28,9 +28,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun codeforcesNewsViewModel(): CodeforcesNewsViewModel = sharedViewModel()
+fun codeforcesCommunityViewModel(): CodeforcesCommunityViewModel = sharedViewModel()
 
-class CodeforcesNewsViewModel: ViewModel(), CodeforcesNewsDataManger {
+class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 
     override fun flowOfLoadingStatus(): Flow<LoadingStatus> =
         listOf(

@@ -28,7 +28,7 @@ import kotlin.math.min
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NewsTabRow(
+fun CommunityTabRow(
     modifier: Modifier = Modifier,
     pagerState: PagerState,
     tabs: @Composable () -> Unit
@@ -55,7 +55,7 @@ fun NewsTabRow(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NewsTab(
+fun CommunityTab(
     title: String,
     index: Int,
     badgeCount: () -> Int?,

@@ -12,13 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.news.NewsTab
-import com.demich.cps.news.NewsTabRow
+import com.demich.cps.news.CommunityTab
+import com.demich.cps.news.CommunityTabRow
 import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 enum class CodeforcesTitle {
@@ -26,8 +25,8 @@ enum class CodeforcesTitle {
 }
 
 @Composable
-fun CodeforcesNewsScreen(
-    controller: CodeforcesNewsController
+fun CodeforcesCommunityScreen(
+    controller: CodeforcesCommunityController
 ) {
     Column {
         TabsHeader(
@@ -44,7 +43,7 @@ fun CodeforcesNewsScreen(
 
 @Composable
 fun CodeforcesReloadablePage(
-    controller: CodeforcesNewsController,
+    controller: CodeforcesCommunityController,
     title: CodeforcesTitle,
     content: @Composable () -> Unit
 ) {
@@ -59,7 +58,7 @@ fun CodeforcesReloadablePage(
 
 @Composable
 private fun CodeforcesPager(
-    controller: CodeforcesNewsController,
+    controller: CodeforcesCommunityController,
     modifier: Modifier = Modifier
 ) {
     ProvideTimeEachMinute {
@@ -70,10 +69,10 @@ private fun CodeforcesPager(
             modifier = modifier
         ) { index ->
             when (controller.tabs[index]) {
-                CodeforcesTitle.MAIN -> CodeforcesNewsMainPage(controller = controller)
-                CodeforcesTitle.TOP -> CodeforcesNewsTopPage(controller = controller)
-                CodeforcesTitle.RECENT -> CodeforcesNewsRecentPage(controller = controller)
-                CodeforcesTitle.LOST -> CodeforcesNewsLostPage(controller = controller)
+                CodeforcesTitle.MAIN -> CodeforcesCommunityMainPage(controller = controller)
+                CodeforcesTitle.TOP -> CodeforcesCommunityTopPage(controller = controller)
+                CodeforcesTitle.RECENT -> CodeforcesCommunityRecentPage(controller = controller)
+                CodeforcesTitle.LOST -> CodeforcesCommunityLostPage(controller = controller)
             }
         }
     }
@@ -82,7 +81,7 @@ private fun CodeforcesPager(
 
 @Composable
 private fun TabsHeader(
-    controller: CodeforcesNewsController,
+    controller: CodeforcesCommunityController,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -98,9 +97,9 @@ private fun TabsHeader(
                 .padding(start = 8.dp, end = 6.dp)
                 .size(24.dp)
         )
-        NewsTabRow(pagerState = controller.pagerState) {
+        CommunityTabRow(pagerState = controller.pagerState) {
             controller.tabs.forEach { title ->
-                CodeforcesNewsTab(
+                CodeforcesCommunityTab(
                     title = title,
                     controller = controller,
                     modifier = Modifier.clickableNoRipple {
@@ -113,15 +112,15 @@ private fun TabsHeader(
 }
 
 @Composable
-private fun CodeforcesNewsTab(
+private fun CodeforcesCommunityTab(
     title: CodeforcesTitle,
-    controller: CodeforcesNewsController,
+    controller: CodeforcesCommunityController,
     modifier: Modifier = Modifier
 ) {
     val context = context
     val loadingStatus by controller.rememberLoadingStatusState(title)
     val badgeCount by rememberCollect { controller.flowOfBadgeCount(tab = title, context) }
-    CodeforcesNewsTab(
+    CodeforcesCommunityTab(
         title = title,
         index = controller.tabs.indexOf(title),
         loadingStatus = loadingStatus,
@@ -132,7 +131,7 @@ private fun CodeforcesNewsTab(
 }
 
 @Composable
-private fun CodeforcesNewsTab(
+private fun CodeforcesCommunityTab(
     title: CodeforcesTitle,
     index: Int,
     loadingStatus: LoadingStatus,
@@ -140,7 +139,7 @@ private fun CodeforcesNewsTab(
     pagerState: PagerState,
     modifier: Modifier = Modifier
 ) {
-    NewsTab(
+    CommunityTab(
         title = if (loadingStatus != LoadingStatus.LOADING) title.name else "...",
         index = index,
         badgeCount = badgeCount,

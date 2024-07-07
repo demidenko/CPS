@@ -17,7 +17,7 @@ import com.demich.cps.utils.mapToSet
 import kotlinx.coroutines.flow.map
 
 @Composable
-fun CodeforcesNewsLostPage(controller: CodeforcesNewsController) {
+fun CodeforcesCommunityLostPage(controller: CodeforcesCommunityController) {
     val context = context
     val newEntriesItem = remember { CodeforcesNewEntriesDataStore(context).lostNewEntries }
 

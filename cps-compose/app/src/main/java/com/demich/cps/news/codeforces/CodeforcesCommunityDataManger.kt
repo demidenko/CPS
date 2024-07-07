@@ -8,7 +8,7 @@ import com.demich.cps.utils.LoadingStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-interface CodeforcesNewsDataManger {
+interface CodeforcesCommunityDataManger {
     fun flowOfLoadingStatus(): Flow<LoadingStatus>
     fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus>
 

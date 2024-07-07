@@ -10,27 +10,27 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 
 @Composable
-fun CodeforcesNewsTopPage(
-    controller: CodeforcesNewsController
+fun CodeforcesCommunityTopPage(
+    controller: CodeforcesCommunityController
 ) {
     val saveableStateHolder = rememberSaveableStateHolder()
 
     CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.TOP) {
         if (controller.topShowComments) {
             saveableStateHolder.SaveableStateProvider(key = true) {
-                CodeforcesNewsTopComments(controller = controller)
+                CodeforcesCommunityTopComments(controller = controller)
             }
         } else {
             saveableStateHolder.SaveableStateProvider(key = false) {
-                CodeforcesNewsTopBlogEntries(controller = controller)
+                CodeforcesCommunityTopBlogEntries(controller = controller)
             }
         }
     }
 }
 
 @Composable
-private fun CodeforcesNewsTopBlogEntries(
-    controller: CodeforcesNewsController
+private fun CodeforcesCommunityTopBlogEntries(
+    controller: CodeforcesCommunityController
 ) {
     val context = context
     val blogEntries by rememberCollect { controller.flowOfTopBlogEntries(context) }
@@ -42,8 +42,8 @@ private fun CodeforcesNewsTopBlogEntries(
 }
 
 @Composable
-private fun CodeforcesNewsTopComments(
-    controller: CodeforcesNewsController
+private fun CodeforcesCommunityTopComments(
+    controller: CodeforcesCommunityController
 ) {
     val context = context
     val comments by rememberCollect { controller.flowOfTopComments(context) }

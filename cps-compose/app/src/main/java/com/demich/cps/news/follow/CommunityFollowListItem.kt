@@ -30,7 +30,7 @@ import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 
 @Composable
-fun NewsFollowListItem(
+fun CommunityFollowListItem(
     userInfo: CodeforcesUserInfo,
     blogEntriesCount: Int?,
     modifier: Modifier = Modifier
@@ -53,7 +53,7 @@ fun NewsFollowListItem(
                     .fillMaxWidth()
             )
             if (blogEntriesCount != null) {
-                NewsFollowListItemBlogEntryCount(
+                CommunityFollowListItemBlogEntryCount(
                     count = blogEntriesCount,
                     iconSize = 18.sp,
                     fontSize = 15.sp
@@ -61,7 +61,7 @@ fun NewsFollowListItem(
             }
         }
         if (userInfo.status == STATUS.OK) {
-            NewsFollowListItemInfo(
+            CommunityFollowListItemInfo(
                 userInfo = userInfo,
                 modifier = Modifier.fillMaxWidth(),
                 fontSize = 13.sp
@@ -71,7 +71,7 @@ fun NewsFollowListItem(
 }
 
 @Composable
-private fun NewsFollowListItemBlogEntryCount(
+private fun CommunityFollowListItemBlogEntryCount(
     count: Int,
     iconSize: TextUnit,
     fontSize: TextUnit,
@@ -91,7 +91,7 @@ private fun NewsFollowListItemBlogEntryCount(
 }
 
 @Composable
-private fun NewsFollowListItemInfo(
+private fun CommunityFollowListItemInfo(
     userInfo: CodeforcesUserInfo,
     modifier: Modifier = Modifier,
     fontSize: TextUnit

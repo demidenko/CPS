@@ -43,8 +43,8 @@ import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.rememberWith
-import com.demich.cps.workers.CodeforcesNewsFollowWorker
-import com.demich.cps.workers.CodeforcesNewsLostRecentWorker
+import com.demich.cps.workers.CodeforcesCommunityFollowWorker
+import com.demich.cps.workers.CodeforcesCommunityLostRecentWorker
 import com.demich.cps.workers.NewsWorker
 import com.demich.cps.workers.ProjectEulerRecentProblemsWorker
 import com.demich.datastore_itemized.DataStoreItem
@@ -55,7 +55,7 @@ import kotlinx.coroutines.runBlocking
 
 
 @Composable
-fun NewsSettingsScreen() {
+fun CommunitySettingsScreen() {
     val requiredPermissions by rememberWith(context) {
         flowOfNotificationPermissionsRequired(this)
     }.collectAsState(initial = false)
@@ -107,7 +107,7 @@ private fun CodeforcesFollowSettingsItem() {
         item = context.settingsCommunity.codeforcesFollowEnabled,
         title = "Follow",
         description = stringResource(id = R.string.community_settings_cf_follow_description),
-        workGetter = CodeforcesNewsFollowWorker::getWork
+        workGetter = CodeforcesCommunityFollowWorker::getWork
     )
 }
 
@@ -126,7 +126,7 @@ private fun CodeforcesLostSettingsItem() {
                 onCheckedChange = { checked ->
                     scope.launch {
                         settings.codeforcesLostEnabled(newValue = checked)
-                        with(CodeforcesNewsLostRecentWorker.getWork(context)) {
+                        with(CodeforcesCommunityLostRecentWorker.getWork(context)) {
                             if (checked) startImmediate() else stop()
                         }
                     }

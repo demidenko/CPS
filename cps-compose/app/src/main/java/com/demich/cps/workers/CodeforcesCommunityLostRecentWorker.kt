@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 
-class CodeforcesNewsLostRecentWorker(
+class CodeforcesCommunityLostRecentWorker(
     context: Context,
     parameters: WorkerParameters
 ): CPSWorker(
@@ -32,7 +32,7 @@ class CodeforcesNewsLostRecentWorker(
         fun getWork(context: Context) = object : CPSWork(name = "cf_lost", context = context) {
             override suspend fun isEnabled() = context.settingsCommunity.codeforcesLostEnabled()
             override val requestBuilder: PeriodicWorkRequest.Builder
-                get() = CPSPeriodicWorkRequestBuilder<CodeforcesNewsLostRecentWorker>(
+                get() = CPSPeriodicWorkRequestBuilder<CodeforcesCommunityLostRecentWorker>(
                     repeatInterval = 30.minutes
                 )
         }
