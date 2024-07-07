@@ -1,4 +1,4 @@
-package com.demich.cps.news.codeforces
+package com.demich.cps.community.codeforces
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Text

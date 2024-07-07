@@ -2,7 +2,7 @@ package com.demich.cps.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.demich.cps.news.settings.settingsCommunity
+import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.room.followListDao
 import kotlin.time.Duration.Companion.hours
 

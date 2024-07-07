@@ -1,7 +1,7 @@
-package com.demich.cps.news.settings
+package com.demich.cps.community.settings
 
 import android.content.Context
-import com.demich.cps.news.codeforces.CodeforcesTitle
+import com.demich.cps.community.codeforces.CodeforcesTitle
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesLocale

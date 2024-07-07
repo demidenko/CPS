@@ -1,4 +1,4 @@
-package com.demich.cps.news.codeforces
+package com.demich.cps.community.codeforces
 
 import androidx.compose.runtime.Composable
 import com.demich.cps.ui.CPSIconButton

@@ -1,4 +1,4 @@
-package com.demich.cps.news.codeforces
+package com.demich.cps.community.codeforces
 
 import android.content.Context
 import androidx.compose.foundation.lazy.LazyListState

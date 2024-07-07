@@ -1,4 +1,4 @@
-package com.demich.cps.news.codeforces
+package com.demich.cps.community.codeforces
 
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -7,7 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
-import com.demich.cps.news.settings.settingsCommunity
+import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.utils.NewEntriesDataStoreItem
 import com.demich.cps.utils.combineToCounters

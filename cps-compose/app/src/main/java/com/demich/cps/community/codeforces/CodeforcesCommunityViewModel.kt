@@ -1,11 +1,11 @@
-package com.demich.cps.news.codeforces
+package com.demich.cps.community.codeforces
 
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
-import com.demich.cps.news.settings.settingsCommunity
+import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesLocale

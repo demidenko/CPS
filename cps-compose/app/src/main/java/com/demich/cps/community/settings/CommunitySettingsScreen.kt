@@ -1,4 +1,4 @@
-package com.demich.cps.news.settings
+package com.demich.cps.community.settings
 
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.news.codeforces.CodeforcesTitle
+import com.demich.cps.community.codeforces.CodeforcesTitle
 import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle

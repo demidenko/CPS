@@ -1,11 +1,11 @@
-package com.demich.cps.news.codeforces
+package com.demich.cps.community.codeforces
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
-import com.demich.cps.news.follow.CodeforcesBlogEntriesFollowAddable
+import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 

@@ -1,11 +1,11 @@
-package com.demich.cps.news.codeforces
+package com.demich.cps.community.codeforces
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.demich.cps.news.follow.CodeforcesBlogEntriesFollowAddable
+import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.context
 
 @Composable

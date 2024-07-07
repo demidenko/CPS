@@ -1,4 +1,4 @@
-package com.demich.cps.news.codeforces
+package com.demich.cps.community.codeforces
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background

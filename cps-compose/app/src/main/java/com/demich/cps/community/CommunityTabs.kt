@@ -1,4 +1,4 @@
-package com.demich.cps.news
+package com.demich.cps.community
 
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut

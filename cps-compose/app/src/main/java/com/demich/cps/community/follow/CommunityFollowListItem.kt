@@ -1,4 +1,4 @@
-package com.demich.cps.news.follow
+package com.demich.cps.community.follow
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column

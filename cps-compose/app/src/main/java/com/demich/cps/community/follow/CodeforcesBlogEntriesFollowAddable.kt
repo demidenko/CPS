@@ -1,4 +1,4 @@
-package com.demich.cps.news.follow
+package com.demich.cps.community.follow
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -11,9 +11,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import com.demich.cps.accounts.managers.toHandleSpan
-import com.demich.cps.news.codeforces.CodeforcesBlogEntries
-import com.demich.cps.news.codeforces.CodeforcesBlogEntriesController
-import com.demich.cps.news.codeforces.CodeforcesCommunityController
+import com.demich.cps.community.codeforces.CodeforcesBlogEntries
+import com.demich.cps.community.codeforces.CodeforcesBlogEntriesController
+import com.demich.cps.community.codeforces.CodeforcesCommunityController
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.dialogs.CPSYesNoDialog

@@ -1,11 +1,11 @@
-package com.demich.cps.news
+package com.demich.cps.community
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import com.demich.cps.news.codeforces.CodeforcesCommunityBottomBar
-import com.demich.cps.news.codeforces.CodeforcesCommunityController
-import com.demich.cps.news.codeforces.CodeforcesCommunityScreen
-import com.demich.cps.news.settings.settingsCommunity
+import com.demich.cps.community.codeforces.CodeforcesCommunityBottomBar
+import com.demich.cps.community.codeforces.CodeforcesCommunityController
+import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
+import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton

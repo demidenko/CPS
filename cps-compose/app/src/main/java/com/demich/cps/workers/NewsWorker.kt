@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.*
-import com.demich.cps.news.settings.CommunitySettingsDataStore
-import com.demich.cps.news.settings.CommunitySettingsDataStore.NewsFeed.atcoder_news
-import com.demich.cps.news.settings.CommunitySettingsDataStore.NewsFeed.project_euler_news
-import com.demich.cps.news.settings.settingsCommunity
+import com.demich.cps.community.settings.CommunitySettingsDataStore
+import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed.atcoder_news
+import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed.project_euler_news
+import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.notifications.setBigContent

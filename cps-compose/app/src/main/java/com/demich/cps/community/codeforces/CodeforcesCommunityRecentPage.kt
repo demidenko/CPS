@@ -1,4 +1,4 @@
-package com.demich.cps.news.codeforces
+package com.demich.cps.community.codeforces
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column

@@ -1,4 +1,4 @@
-package com.demich.cps.news.follow
+package com.demich.cps.community.follow
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +14,7 @@ import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.DialogAccountChooser
 import com.demich.cps.accounts.managers.makeHandleSpan
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
-import com.demich.cps.news.codeforces.codeforcesCommunityViewModel
+import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.room.followListDao
 import com.demich.cps.ui.*
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder

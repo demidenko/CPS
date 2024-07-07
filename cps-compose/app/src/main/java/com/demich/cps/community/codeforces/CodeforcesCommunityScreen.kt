@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalFoundationApi::class)
 
-package com.demich.cps.news.codeforces
+package com.demich.cps.community.codeforces
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
@@ -12,8 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.news.CommunityTab
-import com.demich.cps.news.CommunityTabRow
+import com.demich.cps.community.CommunityTab
+import com.demich.cps.community.CommunityTabRow
 import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
