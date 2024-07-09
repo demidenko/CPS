@@ -2,12 +2,14 @@ package com.demich.cps.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -52,6 +54,7 @@ fun CPSTheme(content: @Composable () -> Unit) {
         CompositionLocalProvider(
             LocalCPSColors provides colors,
             LocalContentAlpha provides 1f,
+            LocalTextStyle provides TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = true)),
             content = content
         )
     }
