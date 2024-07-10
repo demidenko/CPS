@@ -8,7 +8,7 @@ plugins {
 
     val kotlin_version = "1.9.24"
     id("org.jetbrains.kotlin.android") version kotlin_version apply false
-    id("org.jetbrains.kotlin.plugin.serialization") version kotlin_version apply false
+    alias(libs.plugins.kotlin.serialization) apply false
     id("com.google.devtools.ksp") version "$kotlin_version-+" apply false
 }
 

@@ -1,4 +1,7 @@
 [versions]
+androidGradlePlugin = "8.5.0"
+kotlinPlugin = "1.9.24"
+
 serialization = "1.6.3"
 datetime = "0.5.0"
 coroutines = "1.8.1"
@@ -25,8 +28,6 @@ accompanist = "0.30.0"
 junit = "4.13.2"
 androidx-junit = "1.1.5"
 espresso-core = "3.5.1"
-
-androidGradlePlugin = "8.5.0"
 
 [libraries]
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
@@ -69,3 +70,5 @@ androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", vers
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinPlugin" }
