@@ -14,6 +14,6 @@ object CPSDefaults {
 
     val MonospaceTextStyle = TextStyle(
         fontFamily = FontFamily.Monospace,
-        letterSpacing = 0.sp
+        letterSpacing = 0.1.sp
     )
 }
