@@ -1,6 +1,7 @@
 [versions]
 androidGradlePlugin = "8.5.0"
-kotlinPlugin = "1.9.24"
+kotlin = "1.9.24"
+ksp = "1.9.24-+"
 
 serialization = "1.6.3"
 datetime = "0.5.0"
@@ -71,4 +72,5 @@ androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", vers
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinPlugin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
