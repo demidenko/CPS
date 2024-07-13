@@ -9,3 +9,6 @@ fun<T> List<T>.isSortedWith(comparator: Comparator<in T>): Boolean {
     for (i in 1 until size) if (comparator.compare(get(i-1),get(i)) > 0) return false
     return true
 }
+
+inline fun<T, R : Comparable<R>> Iterable<T>.minOfNotNull(default: R, selector: (T) -> R?): R =
+    minOfWithOrNull(comparator = nullsLast(), selector = selector) ?: default

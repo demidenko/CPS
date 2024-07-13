@@ -38,10 +38,6 @@ inline fun<T, R: Comparable<R>> List<T>.minOfWithIndex(selector: (T) -> R): Inde
     return IndexedValue(indexOfMinValue, minValue)
 }
 
-inline fun<T, R : Comparable<R>> Iterable<T>.minOfNotNull(default: R, selector: (T) -> R?): R {
-    return minOfWithOrNull(comparator = nullsLast(), selector = selector) ?: default
-}
-
 fun<T> List<T>.swapped(i: Int, j: Int): List<T> =
     toMutableList().apply {
         Collections.swap(this, i, j)

@@ -11,8 +11,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.utils.DangerType
-import com.demich.cps.utils.minOfNotNull
 import com.demich.cps.utils.rememberCollect
+import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 
