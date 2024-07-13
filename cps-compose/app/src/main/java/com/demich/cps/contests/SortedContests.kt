@@ -19,7 +19,7 @@ import com.demich.cps.utils.flowOfCurrentTimeEachSecond
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.isSortedWith
 import com.demich.cps.utils.minOfNotNull
-import com.demich.cps.utils.partitionPoint
+import com.demich.kotlin_stdlib_boost.partitionPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine

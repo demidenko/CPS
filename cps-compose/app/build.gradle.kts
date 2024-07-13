@@ -55,6 +55,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":kotlin-stdlib-boost"))
     implementation(project(":datastore_itemized"))
     implementation(project(":data:platforms:api"))
     implementation(project(":data:platforms:utils"))

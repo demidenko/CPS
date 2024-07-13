@@ -13,8 +13,8 @@ import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.mapToSet
-import com.demich.cps.utils.partitionPoint
 import com.demich.datastore_itemized.DataStoreItem
+import com.demich.kotlin_stdlib_boost.partitionPoint
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
