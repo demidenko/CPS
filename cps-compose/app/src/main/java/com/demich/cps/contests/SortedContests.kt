@@ -17,8 +17,8 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.floorBy
 import com.demich.cps.utils.flowOfCurrentTimeEachSecond
 import com.demich.cps.utils.getCurrentTime
-import com.demich.cps.utils.isSortedWith
 import com.demich.cps.utils.minOfNotNull
+import com.demich.kotlin_stdlib_boost.isSortedWith
 import com.demich.kotlin_stdlib_boost.partitionPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect

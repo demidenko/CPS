@@ -16,10 +16,10 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.append
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
-import com.demich.cps.utils.mapToSet
 import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.toLoadingStatus
 import com.demich.datastore_itemized.edit
+import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

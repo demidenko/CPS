@@ -13,9 +13,9 @@ import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesProblem
 import com.demich.cps.platforms.api.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.CodeforcesRatingChange
-import com.demich.cps.utils.mapToSet
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
+import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 

@@ -8,7 +8,7 @@ import com.demich.cps.accounts.managers.RatingRevolutionsProvider
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.utils.forEach
 import com.demich.cps.utils.forEachRangeEqualBy
-import com.demich.cps.utils.isSortedWith
+import com.demich.kotlin_stdlib_boost.isSortedWith
 
 @Immutable
 internal class RatingGraphRectangles(

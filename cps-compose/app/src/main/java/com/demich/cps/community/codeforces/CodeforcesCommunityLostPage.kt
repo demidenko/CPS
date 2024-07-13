@@ -13,7 +13,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
-import com.demich.cps.utils.mapToSet
+import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.flow.map
 
 @Composable
