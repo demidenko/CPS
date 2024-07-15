@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -48,18 +49,19 @@ fun CodeforcesMonitorWidget(
 ) {
     ContentWithCPSDropdownMenu(
         content = {
-            CodeforcesMonitor(
-                contestData = contestData,
-                requestFailed = requestFailed,
-                modifier = modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(color = cpsColors.backgroundAdditional)
-                    .contestItemPaddings()
-            )
+            Column {
+                CodeforcesMonitor(
+                    contestData = contestData,
+                    requestFailed = requestFailed,
+                    modifier = modifier
+                        .contestItemPaddings()
+                )
+                Divider()
+            }
         }
     ) {
-        CPSDropdownMenuItem(title = "Browse", icon = CPSIcons.OpenInBrowser, onClick = onOpenInBrowser)
-        CPSDropdownMenuItem(title = "Close", icon = CPSIcons.Close, onClick = onStop)
+        CPSDropdownMenuItem(title = "Open in browser", icon = CPSIcons.OpenInBrowser, onClick = onOpenInBrowser)
+        CPSDropdownMenuItem(title = "Stop monitor", icon = CPSIcons.Close, onClick = onStop)
     }
 }
 
@@ -89,8 +91,12 @@ private fun CodeforcesMonitor(
         StandingsRow(
             contestData = contestData,
             modifier = Modifier
+                .padding(top = 2.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(color = cpsColors.backgroundAdditional)
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
+
         )
     }
 }

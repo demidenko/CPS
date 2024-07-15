@@ -233,7 +233,7 @@ private fun ContestsColumn(
 }
 
 internal fun Modifier.contestItemPaddings() =
-    padding(
+    this.padding(
         start = 4.dp,
         end = 7.dp,
         top = 3.dp,
