@@ -2,12 +2,21 @@ package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.platforms.api.*
+import com.demich.cps.platforms.api.CodeforcesAPIErrorResponse
+import com.demich.cps.platforms.api.CodeforcesApi
+import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.CodeforcesColorTag
+import com.demich.cps.platforms.api.CodeforcesComment
+import com.demich.cps.platforms.api.CodeforcesProblem
+import com.demich.cps.platforms.api.CodeforcesRecentAction
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.char
+import kotlinx.datetime.toInstant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.math.max
 
 internal fun Element.extractRatedUser() = CodeforcesHandle(
@@ -18,14 +27,45 @@ internal fun Element.extractRatedUser() = CodeforcesHandle(
 )
 
 object CodeforcesUtils {
+    private object DateTimeParser {
+        private val moscowTimeZone = kotlinx.datetime.TimeZone.of("Europe/Moscow")
 
-    private val dateFormatRU = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
-    private val dateFormatEN = SimpleDateFormat("MMM/dd/yyyy HH:mm", Locale.US).apply { timeZone = TimeZone.getTimeZone("Europe/Moscow") }
+        private val timeFormat = LocalTime.Format {
+            //HH:mm
+            hour()
+            char(':')
+            minute()
+        }
 
-    private fun String.extractTime(): Instant {
-        val parser = if (this.contains('.')) dateFormatRU else dateFormatEN
-        return Instant.fromEpochMilliseconds(parser.parse(this)!!.time)
+        private val dateTimeFormatRU = LocalDateTime.Format {
+            //"dd.MM.yyyy HH:mm"
+            dayOfMonth()
+            char('.')
+            monthNumber()
+            char('.')
+            year()
+            char(' ')
+            time(timeFormat)
+        }
+
+        private val dateTimeFormatEN = LocalDateTime.Format {
+            //"MMM/dd/yyyy HH:mm"
+            monthName(MonthNames.ENGLISH_ABBREVIATED)
+            char('/')
+            dayOfMonth()
+            char('/')
+            year()
+            char(' ')
+            time(timeFormat)
+        }
+
+        fun parse(input: String): Instant {
+            val format = if (input.contains('.')) dateTimeFormatRU else dateTimeFormatEN
+            return LocalDateTime.parse(input, format).toInstant(moscowTimeZone)
+        }
     }
+
+    private fun String.extractTime(): Instant = DateTimeParser.parse(this)
 
     private fun extractBlogEntryOrNull(topic: Element): CodeforcesBlogEntry? {
         return kotlin.runCatching {
