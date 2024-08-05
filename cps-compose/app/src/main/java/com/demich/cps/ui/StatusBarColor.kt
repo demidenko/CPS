@@ -3,10 +3,16 @@ package com.demich.cps.ui
 import android.content.Context
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import com.demich.cps.accounts.HandleColor
@@ -22,24 +28,23 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.animateColor
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
-import com.google.accompanist.systemuicontroller.SystemUiController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 @Composable
-fun ColorizeStatusBar(
-    systemUiController: SystemUiController,
+fun StatusBarBox(
     navController: NavController
 ) {
-    systemUiController.setStatusBarColor(
-        color = statusBarColor(navController),
-        darkIcons = MaterialTheme.colors.isLight
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .background(color = statusBarColor(navController))
+        .windowInsetsPadding(WindowInsets.statusBars)
     )
 }
 
 @Composable
-fun statusBarColor(navController: NavController): Color {
+private fun statusBarColor(navController: NavController): Color {
     val context = context
 
     val coloredStatusBar by rememberCollect {

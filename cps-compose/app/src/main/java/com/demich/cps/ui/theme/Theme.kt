@@ -1,5 +1,9 @@
 package com.demich.cps.ui.theme
 
+import android.graphics.Color
+import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -32,6 +36,11 @@ private fun DarkLightMode.isDarkMode(): Boolean =
 fun CPSTheme(content: @Composable () -> Unit) {
     val context = context
     val darkLightMode by rememberCollect { context.settingsUI.darkLightMode.flow }
+    val isDarkMode = darkLightMode.isDarkMode()
+    (context as ComponentActivity).enableEdgeToEdge(
+        if (isDarkMode) SystemBarStyle.dark(Color.TRANSPARENT)
+        else SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+    )
     val useOriginalColors by rememberCollect { context.settingsUI.useOriginalColors.flow }
     val colors = if (darkLightMode.isDarkMode()) darkCPSColors(useOriginalColors) else lightCPSColors(useOriginalColors)
     MaterialTheme(

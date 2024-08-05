@@ -4,7 +4,9 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -15,7 +17,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -29,6 +30,16 @@ import com.demich.cps.accounts.accountExpandedMenuBuilder
 import com.demich.cps.accounts.accountsBottomBarBuilder
 import com.demich.cps.accounts.accountsViewModel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.community.CommunityScreen
+import com.demich.cps.community.codeforces.CodeforcesBlogScreen
+import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
+import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
+import com.demich.cps.community.communityBottomBarBuilder
+import com.demich.cps.community.communityMenuBuilder
+import com.demich.cps.community.follow.CommunityFollowScreen
+import com.demich.cps.community.follow.communityFollowListBottomBarBuilder
+import com.demich.cps.community.settings.CommunitySettingsScreen
+import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.contestsBottomBarBuilder
 import com.demich.cps.contests.contestsMenuBuilder
@@ -39,30 +50,19 @@ import com.demich.cps.contests.rememberContestsListController
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.develop.DevelopScreen
 import com.demich.cps.develop.developAdditionalBottomBarBuilder
+import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTypes
 import com.demich.cps.navigation.getScreen
-import com.demich.cps.community.CommunityScreen
-import com.demich.cps.community.codeforces.CodeforcesBlogScreen
-import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
-import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
-import com.demich.cps.community.follow.CommunityFollowScreen
-import com.demich.cps.community.follow.communityFollowListBottomBarBuilder
-import com.demich.cps.community.communityBottomBarBuilder
-import com.demich.cps.community.communityMenuBuilder
-import com.demich.cps.community.settings.CommunitySettingsScreen
-import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.navigation.CPSNavigator
-import com.demich.cps.ui.CPSScaffold
-import com.demich.cps.ui.ColorizeStatusBar
-import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.navigation.rememberCPSNavigator
+import com.demich.cps.ui.CPSScaffold
+import com.demich.cps.ui.StatusBarBox
+import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.utils.currentDataKey
 import com.demich.cps.workers.enqueueEnabledWorkers
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -71,13 +71,13 @@ class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        enableEdgeToEdge()
+
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 appStartUp(this@MainActivity)
             }
         }
-
-        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             CompositionLocalProvider(LocalCodeforcesAccountManager provides CodeforcesAccountManager()) {
@@ -93,11 +93,6 @@ class MainActivity: ComponentActivity() {
 private fun CPSContent() {
     val navController = rememberNavController()
     val navigator = rememberCPSNavigator(navController)
-
-    //TODO: replace to edgeToEdge
-    val systemUiController = rememberSystemUiController()
-
-    ColorizeStatusBar(systemUiController, navController)
 
     fun NavGraphBuilder.cpsComposable(
         screenType: ScreenTypes,
@@ -234,13 +229,16 @@ private fun CPSContent() {
         }
     }
 
-    CPSScaffold(
-        topBar = { navigator.TopBar() },
-        bottomBar = { navigator.BottomBar(systemUiController) },
-        progressBars = { CPSBottomProgressBarsColumn() },
-        modifier = Modifier.systemBarsPadding()
-    ) {
-        navigator.NavHost(builder = navBuilder)
+    Column {
+        StatusBarBox(navController)
+        CPSScaffold(
+            topBar = { navigator.TopBar() },
+            bottomBar = { navigator.BottomBar() },
+            progressBars = { CPSBottomProgressBarsColumn() },
+            modifier = Modifier.navigationBarsPadding()
+        ) {
+            navigator.NavHost(builder = navBuilder)
+        }
     }
 }
 
