@@ -6,7 +6,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Indication
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +42,7 @@ import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.animateColor
+import com.demich.cps.utils.background
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.swallowInitialEvents
@@ -105,7 +105,7 @@ private fun BottomBarContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
-                    .background(backgroundColor)
+                    .background { backgroundColor }
                     .padding(horizontal = 8.dp)
             )
         }
@@ -116,7 +116,7 @@ private fun BottomBarContent(
             onEnableLayoutSettings = onEnableLayoutSetup,
             modifier = Modifier
                 .fillMaxWidth()
-                .background(backgroundColor)
+                .background { backgroundColor }
                 .navigationBarsPadding()
                 .height(CPSDefaults.bottomBarHeight)
         )

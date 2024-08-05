@@ -30,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
@@ -121,7 +122,7 @@ fun Modifier.clickableNoRipple(
 }
 
 fun Modifier.swallowInitialEvents(enabled: Boolean) =
-    pointerInput(enabled) {
+    this.pointerInput(enabled) {
         if (enabled) awaitPointerEventScope {
             while (true) {
                 awaitPointerEvent(PointerEventPass.Initial)
@@ -130,6 +131,9 @@ fun Modifier.swallowInitialEvents(enabled: Boolean) =
             }
         }
     }
+
+fun Modifier.background(color: () -> Color) =
+    this.drawBehind { drawRect(color = color()) }
 
 @Composable
 fun animateColor(
