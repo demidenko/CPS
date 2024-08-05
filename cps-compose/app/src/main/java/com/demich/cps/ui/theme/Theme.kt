@@ -43,32 +43,38 @@ private fun setSystemBarsStyle(context: Context, isDarkMode: Boolean) {
 }
 
 @Composable
-fun CPSTheme(content: @Composable () -> Unit) {
+private fun ProvideCPSColors(content: @Composable () -> Unit) {
     val context = context
     val darkLightMode by rememberCollect { context.settingsUI.darkLightMode.flow }
     val isDarkMode = darkLightMode.isDarkMode()
     setSystemBarsStyle(context, isDarkMode)
     val useOriginalColors by rememberCollect { context.settingsUI.useOriginalColors.flow }
-    val colors = if (darkLightMode.isDarkMode()) darkCPSColors(useOriginalColors) else lightCPSColors(useOriginalColors)
-    MaterialTheme(
-        colors = colors.materialColors(),
-        typography = Typography(
-            body1 = TextStyle(
-                fontFamily = FontFamily.Default,
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.sp,
-                letterSpacing = 0.3.sp
+    val colors = if (isDarkMode) darkCPSColors(useOriginalColors) else lightCPSColors(useOriginalColors)
+    CompositionLocalProvider(LocalCPSColors provides colors, content = content)
+}
+
+@Composable
+fun CPSTheme(content: @Composable () -> Unit) {
+    ProvideCPSColors {
+        MaterialTheme(
+            colors = cpsColors.materialColors(),
+            typography = Typography(
+                body1 = TextStyle(
+                    fontFamily = FontFamily.Default,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 16.sp,
+                    letterSpacing = 0.3.sp
+                )
             )
-        )
-    ) {
-        CompositionLocalProvider(
-            LocalCPSColors provides colors,
-            LocalContentAlpha provides 1f
         ) {
-            ProvideTextStyle(
-                value = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = true)),
-                content = content
-            )
+            CompositionLocalProvider(
+                LocalContentAlpha provides 1f //because MaterialTheme override
+            ) {
+                ProvideTextStyle(
+                    value = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = true)),
+                    content = content
+                )
+            }
         }
     }
 }
