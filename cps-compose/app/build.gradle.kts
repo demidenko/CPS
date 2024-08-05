@@ -83,7 +83,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.navigation.compose)
 
-    implementation(libs.accompanist.systemuicontroller)
     implementation(libs.accompanist.permissions)
 
 
