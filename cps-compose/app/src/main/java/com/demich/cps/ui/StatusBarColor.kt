@@ -32,21 +32,28 @@ fun ColorizeStatusBar(
     systemUiController: SystemUiController,
     navController: NavController
 ) {
+    systemUiController.setStatusBarColor(
+        color = statusBarColor(navController),
+        darkIcons = MaterialTheme.colors.isLight
+    )
+}
+
+@Composable
+fun statusBarColor(navController: NavController): Color {
     val context = context
-    val coloredStatusBar by rememberCollect { context.settingsUI.coloredStatusBar.flow }
+
+    val coloredStatusBar by rememberCollect {
+        context.settingsUI.coloredStatusBar.flow
+    }
+
     val rank by rememberCollect {
         combine(
             flow = makeFlowOfRankGetter(context),
             flow2 = navController.flowOfCurrentScreen()
         ) { rankGetter, currentScreen -> rankGetter[currentScreen] }
     }
-    systemUiController.setStatusBarColor(
-        color = statusBarColor(
-            coloredStatusBar = coloredStatusBar,
-            rank = rank
-        ),
-        darkIcons = MaterialTheme.colors.isLight
-    )
+
+    return statusBarColor(coloredStatusBar = coloredStatusBar, rank = rank)
 }
 
 @Composable
@@ -96,15 +103,18 @@ private data class RatedRank(
 private fun<U: RatedUserInfo> RatedAccountManager<U>.getRank(userInfo: U?): RatedRank? {
     val rating = userInfo?.rating ?: return null
     val handleColor = getHandleColor(rating)
-    val rank = if (handleColor == HandleColor.RED) Double.POSITIVE_INFINITY else {
-        val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
-        val j = rankedHandleColorsList.indexOfLast { handleColor == it }
-        val pos = ratingsUpperBounds.indexOfFirst { it.handleColor == handleColor }
-        require(i != -1 && j >= i && pos != -1)
-        val lower = if (pos > 0) ratingsUpperBounds[pos-1].ratingUpperBound else 0
-        val upper = ratingsUpperBounds[pos].ratingUpperBound
-        val blockLength = (upper - lower).toDouble() / (j - i + 1)
-        i + (rating - lower) / blockLength
+    val rank = when (handleColor) {
+        HandleColor.RED -> Double.POSITIVE_INFINITY
+        else -> {
+            val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
+            val j = rankedHandleColorsList.indexOfLast { handleColor == it }
+            val pos = ratingsUpperBounds.indexOfFirst { it.handleColor == handleColor }
+            require(i != -1 && j >= i && pos != -1)
+            val lower = if (pos > 0) ratingsUpperBounds[pos-1].ratingUpperBound else 0
+            val upper = ratingsUpperBounds[pos].ratingUpperBound
+            val blockLength = (upper - lower).toDouble() / (j - i + 1)
+            i + (rating - lower) / blockLength
+        }
     }
     return RatedRank(
         rank = rank,
