@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -16,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -234,8 +232,7 @@ private fun CPSContent() {
         CPSScaffold(
             topBar = { navigator.TopBar() },
             bottomBar = { navigator.BottomBar() },
-            progressBars = { CPSBottomProgressBarsColumn() },
-            modifier = Modifier.navigationBarsPadding()
+            progressBars = { CPSBottomProgressBarsColumn() }
         ) {
             navigator.NavHost(builder = navBuilder)
         }

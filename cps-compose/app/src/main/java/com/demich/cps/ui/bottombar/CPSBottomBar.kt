@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
@@ -30,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.unit.dp
@@ -54,7 +54,6 @@ typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
 fun CPSBottomBar(
     navigator: CPSNavigator,
     additionalBottomBar: AdditionalBottomBarBuilder? = null,
-    onSetSystemNavColor: (Color) -> Unit
 ) {
     if (navigator.isBottomBarEnabled) {
         var layoutSetupEnabled by rememberSaveable { mutableStateOf(false) }
@@ -71,12 +70,9 @@ fun CPSBottomBar(
                 layoutSetupEnabled = layoutSetupEnabled,
                 onEnableLayoutSetup = { layoutSetupEnabled = true },
                 onDismissLayoutSetup = { layoutSetupEnabled = false },
-                onSetSystemNavColor = onSetSystemNavColor,
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
-    } else {
-        onSetSystemNavColor(cpsColors.backgroundNavigation)
     }
 }
 
@@ -89,7 +85,6 @@ private fun BottomBarContent(
     layoutSetupEnabled: Boolean,
     onEnableLayoutSetup: () -> Unit,
     onDismissLayoutSetup: () -> Unit,
-    onSetSystemNavColor: (Color) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val backgroundColor = animateColor(
@@ -97,7 +92,7 @@ private fun BottomBarContent(
         disabledColor = cpsColors.backgroundNavigation,
         enabled = layoutSetupEnabled,
         animationSpec = switchAnimationSpec()
-    ).also(onSetSystemNavColor)
+    )
 
     Column(modifier = modifier.pointerInput(Unit) {}) {
         AnimatedVisibility(
@@ -120,9 +115,10 @@ private fun BottomBarContent(
             layoutSettingsEnabled = layoutSetupEnabled,
             onEnableLayoutSettings = onEnableLayoutSetup,
             modifier = Modifier
-                .height(CPSDefaults.bottomBarHeight)
                 .fillMaxWidth()
                 .background(backgroundColor)
+                .navigationBarsPadding()
+                .height(CPSDefaults.bottomBarHeight)
         )
     }
 }

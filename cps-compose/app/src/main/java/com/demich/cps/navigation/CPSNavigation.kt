@@ -23,7 +23,6 @@ import com.demich.cps.ui.topbar.CPSTopBar
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.rememberWith
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
@@ -145,11 +144,9 @@ class CPSNavigator(
 
     @Composable
     fun BottomBar() {
-        val systemUiController = rememberSystemUiController()
         CPSBottomBar(
             navigator = this,
             additionalBottomBar = bottomBarBuilderState.value,
-            onSetSystemNavColor = systemUiController::setNavigationBarColor
         )
     }
 }
