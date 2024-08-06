@@ -61,6 +61,7 @@ fun ContestsScreen(
 
     Column(
         modifier = Modifier
+            .consumeWindowInsets(WindowInsets.navigationBars) //order matters!!
             .consumeWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
             .imePadding()
     ) {

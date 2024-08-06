@@ -15,9 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
-import com.demich.cps.ui.bottombar.CPSBottomBar
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.topbar.CPSTopBar
 import com.demich.cps.utils.context
@@ -29,7 +29,7 @@ import kotlinx.coroutines.runBlocking
 
 @Composable
 fun rememberCPSNavigator(
-    navController: NavHostController
+    navController: NavHostController = rememberNavController()
 ): CPSNavigator {
     val subtitleState = remember { mutableStateOf("") }
 
@@ -48,7 +48,7 @@ fun rememberCPSNavigator(
     )
 }
 
-fun NavController.flowOfCurrentScreen(): Flow<Screen?> =
+private fun NavController.flowOfCurrentScreen(): Flow<Screen?> =
     flow {
         emit(null)
         currentBackStackEntryFlow.collect {
@@ -65,6 +65,8 @@ class CPSNavigator(
     private val bottomBarBuilderState: MutableState<AdditionalBottomBarBuilder?>
 ) {
     val currentScreen by currentScreenState
+
+    fun flowOfCurrentScreen(): Flow<Screen?> = navController.flowOfCurrentScreen()
 
     val isBottomBarEnabled: Boolean
         get() = currentScreen.let {
@@ -142,11 +144,5 @@ class CPSNavigator(
         )
     }
 
-    @Composable
-    fun BottomBar() {
-        CPSBottomBar(
-            navigator = this,
-            additionalBottomBar = bottomBarBuilderState.value,
-        )
-    }
+    val additionalBottomBar get() = bottomBarBuilderState.value
 }

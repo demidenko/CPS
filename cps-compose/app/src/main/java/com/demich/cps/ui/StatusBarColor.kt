@@ -5,16 +5,13 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.RatedAccountManager
@@ -22,8 +19,8 @@ import com.demich.cps.accounts.managers.allRatedAccountManagers
 import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.navigation.AccountScreen
+import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
-import com.demich.cps.navigation.flowOfCurrentScreen
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.animateColor
 import com.demich.cps.utils.context
@@ -33,18 +30,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 @Composable
-fun StatusBarBox(
-    navController: NavController
-) {
+fun StatusBarBox(navigator: CPSNavigator) {
     Box(modifier = Modifier
         .fillMaxWidth()
-        .background(color = statusBarColor(navController))
-        .windowInsetsPadding(WindowInsets.statusBars)
+        .background(color = statusBarColor(navigator))
+        .statusBarsPadding()
     )
 }
 
 @Composable
-private fun statusBarColor(navController: NavController): Color {
+private fun statusBarColor(navigator: CPSNavigator): Color {
     val context = context
 
     val coloredStatusBar by rememberCollect {
@@ -54,7 +49,7 @@ private fun statusBarColor(navController: NavController): Color {
     val rank by rememberCollect {
         combine(
             flow = makeFlowOfRankGetter(context),
-            flow2 = navController.flowOfCurrentScreen()
+            flow2 = navigator.flowOfCurrentScreen()
         ) { rankGetter, currentScreen -> rankGetter[currentScreen] }
     }
 

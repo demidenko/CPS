@@ -1,5 +1,6 @@
 package com.demich.cps.ui.bottombar
 
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -20,9 +21,14 @@ import com.demich.cps.ui.theme.cpsColors
 internal fun Scrim(
     show: Boolean,
     modifier: Modifier = Modifier,
+    animationSpec: AnimationSpec<Float>,
     onDismiss: () -> Unit
 ) {
-    val alpha by animateFloatAsState(targetValue = if (show) 0.32f else 0f, label = "scrim_alpha")
+    val alpha by animateFloatAsState(
+        targetValue = if (show) 0.32f else 0f,
+        animationSpec = animationSpec,
+        label = "scrim_alpha"
+    )
     if (alpha > 0f) {
         Canvas(modifier = modifier.let {
             if (!show) it

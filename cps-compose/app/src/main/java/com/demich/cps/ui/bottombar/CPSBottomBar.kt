@@ -62,6 +62,7 @@ fun CPSBottomBar(
             Scrim(
                 show = layoutSetupEnabled,
                 onDismiss = { layoutSetupEnabled = false },
+                animationSpec = switchAnimationSpec(),
                 modifier = Modifier.fillMaxSize()
             )
             BottomBarContent(
@@ -109,7 +110,7 @@ private fun BottomBarContent(
                     .padding(horizontal = 8.dp)
             )
         }
-        BottomBarBody(
+        CPSBottomBar(
             navigator = navigator,
             additionalBottomBar = additionalBottomBar,
             layoutSettingsEnabled = layoutSetupEnabled,
@@ -124,7 +125,7 @@ private fun BottomBarContent(
 }
 
 @Composable
-private fun BottomBarBody(
+fun CPSBottomBar(
     navigator: CPSNavigator,
     additionalBottomBar: AdditionalBottomBarBuilder?,
     layoutSettingsEnabled: Boolean,

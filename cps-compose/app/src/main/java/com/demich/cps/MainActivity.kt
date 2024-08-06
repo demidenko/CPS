@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -20,7 +19,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.demich.cps.accounts.AccountExpandedScreen
 import com.demich.cps.accounts.AccountSettingsScreen
 import com.demich.cps.accounts.AccountsScreen
@@ -54,8 +52,6 @@ import com.demich.cps.navigation.ScreenTypes
 import com.demich.cps.navigation.getScreen
 import com.demich.cps.navigation.rememberCPSNavigator
 import com.demich.cps.ui.CPSScaffold
-import com.demich.cps.ui.StatusBarBox
-import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
@@ -89,8 +85,7 @@ class MainActivity: ComponentActivity() {
 
 @Composable
 private fun CPSContent() {
-    val navController = rememberNavController()
-    val navigator = rememberCPSNavigator(navController)
+    val navigator = rememberCPSNavigator()
 
     fun NavGraphBuilder.cpsComposable(
         screenType: ScreenTypes,
@@ -227,16 +222,12 @@ private fun CPSContent() {
         }
     }
 
-    Column {
-        StatusBarBox(navController)
-        CPSScaffold(
-            topBar = { navigator.TopBar() },
-            bottomBar = { navigator.BottomBar() },
-            progressBars = { CPSBottomProgressBarsColumn() }
-        ) {
-            navigator.NavHost(builder = navBuilder)
-        }
+    CPSScaffold(
+        navigator = navigator
+    ) {
+        navigator.NavHost(builder = navBuilder)
     }
+
 }
 
 val LocalCodeforcesAccountManager = staticCompositionLocalOf<CodeforcesAccountManager> {
