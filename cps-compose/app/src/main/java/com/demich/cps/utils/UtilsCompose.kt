@@ -109,8 +109,8 @@ fun AnnotatedString.Builder.append(
 fun Modifier.clickableNoRipple(
     enabled: Boolean = true,
     onClick: () -> Unit
-) = composed {
-    this.clickable(
+) = this.composed {
+    clickable(
         enabled = enabled,
         indication = null,
         interactionSource = remember { MutableInteractionSource() },
@@ -119,8 +119,9 @@ fun Modifier.clickableNoRipple(
 }
 
 fun Modifier.swallowInitialEvents(enabled: Boolean) =
-    this.pointerInput(enabled) {
-        if (enabled) awaitPointerEventScope {
+    if (!enabled) this
+    else this.pointerInput(Unit) {
+        awaitPointerEventScope {
             while (true) {
                 awaitPointerEvent(PointerEventPass.Initial)
                     .changes
