@@ -33,7 +33,7 @@ import com.demich.cps.ui.bottomprogressbar.CPSProgressIndicator
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.AnimatedVisibleByNotNull
+import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.ProvideTimeEachMinute
 import com.demich.cps.utils.context

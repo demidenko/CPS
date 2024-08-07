@@ -1,0 +1,37 @@
+package com.demich.cps.ui
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun<T: Any> AnimatedVisibleByNotNull(
+    value: () -> T?,
+    modifier: Modifier = Modifier,
+    enter: EnterTransition,
+    exit: ExitTransition,
+    content: @Composable (T) -> Unit
+) {
+    val state = remember { mutableStateOf<T?>(null) }
+    val v = value()?.also { state.value = it }
+
+    val transition = updateTransition(targetState = v)
+
+    state.value?.let { lastNotNull ->
+        transition.AnimatedVisibility(
+            visible = { it != null },
+            modifier = modifier,
+            enter = enter,
+            exit = exit
+        ) {
+            content(lastNotNull)
+        }
+    }
+}

@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSCountBadge
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.AnimatedVisibleByNotNull
+import com.demich.cps.ui.AnimatedVisibleByNotNull
 import kotlin.math.max
 import kotlin.math.min
 
