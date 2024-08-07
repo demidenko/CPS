@@ -151,12 +151,12 @@ fun animateColor(
 @Composable
 fun rememberFocusOnCreationRequester(): FocusRequester {
     val requester = remember { FocusRequester() }
-    var focusedOnCreation by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(requester) {
-        if (!focusedOnCreation) {
+    val focusedState = rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(requester, focusedState) {
+        if (!focusedState.value) {
             awaitFrame() //instead of delay(100.milliseconds)
             requester.requestFocus()
-            focusedOnCreation = true
+            focusedState.value = true
         }
     }
     return requester
