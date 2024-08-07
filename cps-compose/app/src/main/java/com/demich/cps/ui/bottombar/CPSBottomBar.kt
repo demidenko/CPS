@@ -25,7 +25,7 @@ import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
-import com.demich.cps.utils.swallowInitialEvents
+import com.demich.cps.utils.ignoreInputEvents
 import kotlinx.coroutines.launch
 
 typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
@@ -40,7 +40,7 @@ fun CPSBottomBar(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.swallowInitialEvents(enabled = layoutSettingsEnabled)
+        modifier = modifier.ignoreInputEvents(enabled = layoutSettingsEnabled)
     ) {
         BottomBarBodyAdditional(
             modifier = Modifier.weight(1f),
@@ -80,7 +80,7 @@ private fun BottomBarBodyMain(
         }
     }
 
-    BottomNavigationMainItems(
+    BottomBarNavigationItems(
         modifier = modifier,
         rootScreens = rootScreens,
         selectedRootScreenType = if (layoutSettingsEnabled) null else selectedRootScreenType(),
@@ -95,7 +95,7 @@ private fun BottomBarBodyMain(
 }
 
 @Composable
-private fun BottomNavigationMainItems(
+private fun BottomBarNavigationItems(
     modifier: Modifier = Modifier,
     rootScreens: List<RootScreen>,
     selectedRootScreenType: ScreenTypes?,
@@ -104,7 +104,7 @@ private fun BottomNavigationMainItems(
     onSelect: (RootScreen) -> Unit,
     onLongPress: () -> Unit
 ) {
-    MainNavItemsRow(
+    BottomBarNavigationItems(
         modifier = modifier.clipToBounds(),
         navigationLayoutType = layoutType
     ) {

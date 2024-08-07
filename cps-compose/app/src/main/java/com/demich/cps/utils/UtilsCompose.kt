@@ -24,7 +24,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
@@ -118,7 +117,7 @@ fun Modifier.clickableNoRipple(
     )
 }
 
-fun Modifier.swallowInitialEvents(enabled: Boolean) =
+fun Modifier.ignoreInputEvents(enabled: Boolean) =
     if (!enabled) this
     else this.pointerInput(Unit) {
         awaitPointerEventScope {

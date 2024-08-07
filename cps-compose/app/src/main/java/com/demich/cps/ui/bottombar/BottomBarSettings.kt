@@ -97,7 +97,7 @@ private fun DemoRow(
     modifier: Modifier = Modifier,
     color: Color = LocalContentColor.current
 ) {
-    MainNavItemsRow(
+    BottomBarNavigationItems(
         navigationLayoutType = navigationLayoutType,
         modifier = modifier
             .height(18.dp)

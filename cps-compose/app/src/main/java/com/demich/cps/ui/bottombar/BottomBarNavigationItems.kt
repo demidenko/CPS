@@ -12,7 +12,7 @@ enum class NavigationLayoutType {
 }
 
 @Composable
-internal fun MainNavItemsRow(
+internal fun BottomBarNavigationItems(
     modifier: Modifier = Modifier,
     navigationLayoutType: NavigationLayoutType,
     content: @Composable () -> Unit
@@ -20,7 +20,7 @@ internal fun MainNavItemsRow(
     Layout(
         modifier = modifier,
         content = content
-    ) {measurables, constraints ->
+    ) { measurables, constraints ->
         val placeables = measurables.mapIndexed { index, item ->
             val minWidth = when (navigationLayoutType) {
                 NavigationLayoutType.evenly -> {
