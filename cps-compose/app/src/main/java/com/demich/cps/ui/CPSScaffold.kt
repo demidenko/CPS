@@ -59,16 +59,39 @@ fun CPSScaffold(
         )
 
         Column(modifier = modifier) {
-            ScaffoldContent(
-                navigator = navigator,
-                bottomBarSettingsEnabled = bottomBarSettingsEnabled,
-                onCloseBottomBarSettings = { bottomBarSettingsEnabled = false },
-                bottomBarBackgroundColor = { bottomBarBackgroundColor },
-                content = content,
+            Box(
+                contentAlignment = Alignment.BottomCenter,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-            )
+            ) {
+                ScaffoldContent(
+                    navigator = navigator,
+                    content = content,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Scrim(
+                    show = bottomBarSettingsEnabled,
+                    onDismiss = { bottomBarSettingsEnabled = false },
+                    animationSpec = switchAnimationSpec(),
+                    modifier = Modifier.fillMaxSize()
+                )
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = bottomBarSettingsEnabled,
+                    exit = shrinkVertically(switchAnimationSpec()),
+                    enter = expandVertically(switchAnimationSpec())
+                ) {
+                    BottomBarSettings(
+                        onDismissRequest = { bottomBarSettingsEnabled = false },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
+                            .background { bottomBarBackgroundColor }
+                            .pointerInput(Unit) {} //for not send to scrim
+                            .padding(horizontal = 8.dp)
+                    )
+                }
+            }
             if (navigator.isBottomBarEnabled) {
                 CPSBottomBar(
                     navigator = navigator,
@@ -90,42 +113,17 @@ fun CPSScaffold(
 private fun ScaffoldContent(
     modifier: Modifier = Modifier,
     navigator: CPSNavigator,
-    bottomBarSettingsEnabled: Boolean,
-    onCloseBottomBarSettings: () -> Unit,
-    bottomBarBackgroundColor: () -> Color,
     content: @Composable () -> Unit
 ) {
-    Box(
-        contentAlignment = Alignment.BottomCenter,
-        modifier = modifier
-    ) {
+    Box(modifier = modifier) {
         Column(modifier = Modifier.fillMaxSize()) {
             StatusBarBox(navigator = navigator)
             navigator.TopBar()
             content()
         }
-        CPSBottomProgressBarsColumn()
-        Scrim(
-            show = bottomBarSettingsEnabled,
-            onDismiss = onCloseBottomBarSettings,
-            animationSpec = switchAnimationSpec(),
-            modifier = Modifier.fillMaxSize()
+        CPSBottomProgressBarsColumn(
+            modifier = Modifier.align(Alignment.BottomCenter)
         )
-        androidx.compose.animation.AnimatedVisibility(
-            visible = bottomBarSettingsEnabled,
-            exit = shrinkVertically(switchAnimationSpec()),
-            enter = expandVertically(switchAnimationSpec())
-        ) {
-            BottomBarSettings(
-                onDismissRequest = onCloseBottomBarSettings,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
-                    .background(bottomBarBackgroundColor)
-                    .pointerInput(Unit) {} //for not send to scrim
-                    .padding(horizontal = 8.dp)
-            )
-        }
     }
 }
 
