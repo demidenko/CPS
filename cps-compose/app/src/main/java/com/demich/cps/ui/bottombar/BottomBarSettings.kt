@@ -36,10 +36,10 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun BottomBarSettings(
     modifier: Modifier = Modifier,
-    onDismissRequest: () -> Unit
+    onCloseRequest: () -> Unit
 ) {
     Column(modifier = modifier) {
-        CloseRow(onDismissRequest)
+        CloseRow(onCloseRequest)
         Divider()
         LayoutSelectRow()
     }
@@ -47,12 +47,12 @@ internal fun BottomBarSettings(
 
 @Composable
 private fun CloseRow(
-    onDismissRequest: () -> Unit
+    onCloseRequest: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         CPSIconButton(
             icon = CPSIcons.Close,
-            onClick = onDismissRequest,
+            onClick = onCloseRequest,
             color = cpsColors.contentAdditional,
             modifier = Modifier.align(Alignment.TopEnd)
         )

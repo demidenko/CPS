@@ -51,60 +51,80 @@ fun CPSScaffold(
     ) {
         var bottomBarSettingsEnabled by rememberSaveable { mutableStateOf(false) }
 
-        val bottomBarBackgroundColor = animateColor(
-            enabledColor = cpsColors.backgroundAdditional,
-            disabledColor = cpsColors.backgroundNavigation,
-            enabled = bottomBarSettingsEnabled,
-            animationSpec = switchAnimationSpec()
+        Scaffold(
+            navigator = navigator,
+            bottomBarSettingsEnabled = bottomBarSettingsEnabled,
+            onDisableBottomBarSettings = { bottomBarSettingsEnabled = false },
+            onEnableBottomBarSettings = { bottomBarSettingsEnabled = true },
+            content = content,
+            modifier = Modifier.fillMaxWidth()
         )
+    }
+}
 
-        Column(modifier = modifier) {
-            Box(
-                contentAlignment = Alignment.BottomCenter,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
+@Composable
+private fun Scaffold(
+    modifier: Modifier = Modifier,
+    navigator: CPSNavigator,
+    bottomBarSettingsEnabled: Boolean,
+    onDisableBottomBarSettings: () -> Unit,
+    onEnableBottomBarSettings: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    val bottomBarBackgroundColor = animateColor(
+        enabledColor = cpsColors.backgroundAdditional,
+        disabledColor = cpsColors.backgroundNavigation,
+        enabled = bottomBarSettingsEnabled,
+        animationSpec = switchAnimationSpec()
+    )
+
+    Column(modifier = modifier) {
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            ScaffoldContent(
+                statusBar = { StatusBarBox(navigator = navigator) },
+                topBar = { navigator.TopBar() },
+                content = content,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Scrim(
+                show = bottomBarSettingsEnabled,
+                onDismiss = onDisableBottomBarSettings,
+                animationSpec = switchAnimationSpec(),
+                modifier = Modifier.fillMaxSize()
+            )
+            androidx.compose.animation.AnimatedVisibility(
+                visible = bottomBarSettingsEnabled,
+                exit = shrinkVertically(switchAnimationSpec()),
+                enter = expandVertically(switchAnimationSpec())
             ) {
-                ScaffoldContent(
-                    navigator = navigator,
-                    content = content,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Scrim(
-                    show = bottomBarSettingsEnabled,
-                    onDismiss = { bottomBarSettingsEnabled = false },
-                    animationSpec = switchAnimationSpec(),
-                    modifier = Modifier.fillMaxSize()
-                )
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = bottomBarSettingsEnabled,
-                    exit = shrinkVertically(switchAnimationSpec()),
-                    enter = expandVertically(switchAnimationSpec())
-                ) {
-                    BottomBarSettings(
-                        onDismissRequest = { bottomBarSettingsEnabled = false },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
-                            .background { bottomBarBackgroundColor }
-                            .pointerInput(Unit) {} //for not send to scrim
-                            .padding(horizontal = 8.dp)
-                    )
-                }
-            }
-            if (navigator.isBottomBarEnabled) {
-                CPSBottomBar(
-                    navigator = navigator,
-                    additionalBottomBar = navigator.additionalBottomBar,
-                    layoutSettingsEnabled = bottomBarSettingsEnabled,
-                    onEnableLayoutSettings = { bottomBarSettingsEnabled = true },
+                BottomBarSettings(
+                    onCloseRequest = onDisableBottomBarSettings,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
                         .background { bottomBarBackgroundColor }
-                        .navigationBarsPadding()
-                        .height(CPSDefaults.bottomBarHeight)
+                        .pointerInput(Unit) {} //for not send to scrim
+                        .padding(horizontal = 8.dp)
                 )
             }
+        }
+        if (navigator.isBottomBarEnabled) {
+            CPSBottomBar(
+                navigator = navigator,
+                additionalBottomBar = navigator.additionalBottomBar,
+                layoutSettingsEnabled = bottomBarSettingsEnabled,
+                onEnableLayoutSettings = onEnableBottomBarSettings,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background { bottomBarBackgroundColor }
+                    .navigationBarsPadding()
+                    .height(CPSDefaults.bottomBarHeight)
+            )
         }
     }
 }
@@ -112,13 +132,14 @@ fun CPSScaffold(
 @Composable
 private fun ScaffoldContent(
     modifier: Modifier = Modifier,
-    navigator: CPSNavigator,
+    statusBar: @Composable () -> Unit,
+    topBar: @Composable () -> Unit,
     content: @Composable () -> Unit
 ) {
     Box(modifier = modifier) {
         Column(modifier = Modifier.fillMaxSize()) {
-            StatusBarBox(navigator = navigator)
-            navigator.TopBar()
+            statusBar()
+            topBar()
             content()
         }
         CPSBottomProgressBarsColumn(
