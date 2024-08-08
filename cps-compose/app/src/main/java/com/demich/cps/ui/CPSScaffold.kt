@@ -57,7 +57,7 @@ fun CPSScaffold(
             onDisableBottomBarSettings = { bottomBarSettingsEnabled = false },
             onEnableBottomBarSettings = { bottomBarSettingsEnabled = true },
             content = content,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxSize()
         )
     }
 }
@@ -89,7 +89,7 @@ private fun Scaffold(
                 statusBar = { StatusBarBox(navigator = navigator) },
                 topBar = { navigator.TopBar() },
                 content = content,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxSize()
             )
             Scrim(
                 show = bottomBarSettingsEnabled,
