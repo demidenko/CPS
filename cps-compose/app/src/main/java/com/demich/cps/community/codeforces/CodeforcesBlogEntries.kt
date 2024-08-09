@@ -153,7 +153,7 @@ private fun BlogEntryInfoFooter(
         ) {
             Text(
                 text = authorHandle,
-                fontSize = 13.sp,
+                fontSize = 14.sp,
                 modifier = Modifier.alignByBaseline()
             )
             Text(
@@ -173,8 +173,8 @@ private fun BlogEntryInfoFooter(
             if (commentsCount > 0) {
                 CommentsRow(
                     text = AnnotatedString(commentsCount.toString()),
-                    fontSize = 13.sp,
-                    iconSize = 13.5.sp,
+                    fontSize = 14.sp,
+                    iconSize = 14.sp,
                     spaceSize = 2.dp
                 )
             }
