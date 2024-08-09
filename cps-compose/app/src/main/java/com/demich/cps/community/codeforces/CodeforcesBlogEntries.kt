@@ -125,7 +125,7 @@ private fun BlogEntryInfoHeader(
     Row(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = title,
-            fontSize = 18.5.sp,
+            fontSize = 19.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f)
         )
