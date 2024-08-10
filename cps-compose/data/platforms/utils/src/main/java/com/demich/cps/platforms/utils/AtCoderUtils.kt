@@ -6,6 +6,10 @@ import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.AtCoderApi
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.char
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import kotlin.time.Duration.Companion.hours
@@ -24,14 +28,24 @@ object AtCoderUtils {
             )
         }
 
+    private val contestDateTimeFormat by lazy {
+        DateTimeComponents.Format {
+            //YYYY-MM-DD hh:mm:ss+0900
+            date(LocalDate.Formats.ISO)
+            char(' ')
+            time(LocalTime.Formats.ISO)
+            offsetHours()
+            offsetMinutesOfHour()
+        }
+    }
+
     private fun extractContestOrNull(timeElement: Element): Contest? {
         return kotlin.runCatching {
             val row = timeElement.parents().find { it.normalName() == "tr" }!!
             val td = row.select("td")
 
-            //YYYY-MM-DD hh:mm:ss+0900
             val timeString = timeElement.text()
-            val startTime = Instant.parse(timeString.replace("+0900", "+09:00").replace(' ', 'T'))
+            val startTime = Instant.parse(timeString, contestDateTimeFormat)
 
             val duration = td[2].text().split(':').let {
                 val h = it[0].toInt()
