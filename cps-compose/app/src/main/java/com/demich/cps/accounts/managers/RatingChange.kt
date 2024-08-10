@@ -15,6 +15,12 @@ import com.demich.cps.platforms.api.CodeforcesRatingChange
 import com.demich.cps.platforms.api.DmojRatingChange
 import com.demich.cps.utils.toSignedString
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format.char
+import kotlinx.datetime.toInstant
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -52,7 +58,11 @@ internal fun CodeChefRatingChange.toRatingChange() =
         rating = rating.toInt(),
         rank = rank.toInt(),
         title = name,
-        date = Instant.parse(end_date.split(' ').run { "${get(0)}T${get(1)}Z" })
+        date = LocalDateTime.Format {
+            date(LocalDate.Formats.ISO)
+            char(' ')
+            time(LocalTime.Formats.ISO)
+        }.parse(end_date).toInstant(TimeZone.of("IST"))
     )
 
 internal fun DmojRatingChange.toRatingChange() =
