@@ -70,22 +70,27 @@ object AtCoderUtils {
 
     class NewsPost(
         val title: String,
-        val time: Instant,
+        val time: Instant?,
         override val id: String
     ): NewsPostEntry
 
+
+    ////TODO: parse is full and slow (100-200ms), map is fast (1ms), so get rid of Sequence???
     fun extractNews(source: String): Sequence<NewsPost?> =
-        Jsoup.parse(source).select("div.panel.panel-default")
-            .asSequence()
+        Jsoup.parse(source).select("div.panel.panel-default, div.panel.panel-info")
             .map { panel ->
                 val header = panel.expectFirst("div.panel-heading")
                 val titleElement = header.expectFirst("h3.panel-title")
-                val timeElement = header.expectFirst("span.tooltip-unix")
+                val timeElement = header.selectFirst("span.tooltip-unix")
                 val id = titleElement.expectFirst("a").attr("href").removePrefix("/posts/")
                 NewsPost(
                     title = titleElement.text(),
-                    time = Instant.fromEpochSeconds(timeElement.attr("title").toLong()),
+                    time = timeElement?.let {
+                        Instant.fromEpochSeconds(it.attr("title").toLong())
+                    },
                     id = id
                 )
             }
+            .sortedByDescending { it.id }
+            .asSequence()
 }

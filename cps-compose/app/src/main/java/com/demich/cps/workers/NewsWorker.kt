@@ -64,7 +64,7 @@ class NewsWorker(
                 setSubText("atcoder news")
                 setBigContent(it.title.trim()) //TODO: title + content html
                 setSmallIcon(R.drawable.ic_community)
-                setWhen(it.time)
+                it.time?.let { time -> setWhen(time) }
                 attachUrl(url = AtCoderApi.urls.post(it.id.toInt()), context = context)
                 //setColor
                 setAutoCancel(true)
