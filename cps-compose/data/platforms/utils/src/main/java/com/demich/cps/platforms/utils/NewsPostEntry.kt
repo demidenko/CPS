@@ -5,16 +5,16 @@ interface NewsPostEntry {
 }
 
 suspend fun<T: NewsPostEntry> scanNewsPostEntries(
-    posts: Sequence<T?>,
+    posts: List<T?>,
     getLastId: suspend () -> String?,
     setLastId: suspend (String) -> Unit,
     onNewPost: (T) -> Unit
 ) {
     val lastId = getLastId()
 
-    val newEntries = posts.filterNotNull()
+    val newEntries = posts
+        .filterNotNull()
         .takeWhile { it.id != lastId }
-        .toList()
 
     if (newEntries.isEmpty()) return
 

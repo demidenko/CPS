@@ -75,8 +75,7 @@ object AtCoderUtils {
     ): NewsPostEntry
 
 
-    ////TODO: parse is full and slow (100-200ms), map is fast (1ms), so get rid of Sequence???
-    fun extractNews(source: String): Sequence<NewsPost?> =
+    fun extractNews(source: String): List<NewsPost?> =
         Jsoup.parse(source).select("div.panel.panel-default, div.panel.panel-info")
             .map { panel ->
                 val header = panel.expectFirst("div.panel-heading")
@@ -92,5 +91,4 @@ object AtCoderUtils {
                 )
             }
             .sortedByDescending { it.id }
-            .asSequence()
 }

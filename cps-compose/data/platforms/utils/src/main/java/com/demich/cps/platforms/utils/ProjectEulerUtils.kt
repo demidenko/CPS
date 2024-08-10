@@ -8,9 +8,8 @@ object ProjectEulerUtils {
         override val id: String
     ): NewsPostEntry
 
-    fun extractRecentProblems(source: String): Sequence<RecentProblem?> =
+    fun extractRecentProblems(source: String): List<RecentProblem?> =
         Jsoup.parse(source).expectFirst("#problems_table").select("td.id_column")
-            .asSequence()
             .map { idCell ->
                 idCell.nextElementSibling()?.let { nameCell ->
                     RecentProblem(
@@ -26,9 +25,8 @@ object ProjectEulerUtils {
         override val id: String
     ): NewsPostEntry
 
-    fun extractNews(source: String): Sequence<NewsPost?> =
+    fun extractNews(source: String): List<NewsPost?> =
         Jsoup.parse(source).select("item")
-            .asSequence()
             .map { item ->
                 val idFull = item.expectFirst("guid").text()
                 val id = idFull.removePrefix("news_id_")

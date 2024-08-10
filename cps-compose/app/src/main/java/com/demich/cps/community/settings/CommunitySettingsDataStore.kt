@@ -70,7 +70,7 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
 
     suspend fun<T: NewsPostEntry> scanNewsFeed(
         newsFeed: NewsFeed,
-        posts: Sequence<T?>,
+        posts: List<T?>,
         onNewPost: (T) -> Unit
     ) {
         scanNewsPostEntries(
