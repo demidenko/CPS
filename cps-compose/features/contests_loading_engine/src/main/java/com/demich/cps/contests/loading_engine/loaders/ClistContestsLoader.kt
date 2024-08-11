@@ -8,6 +8,10 @@ import com.demich.cps.platforms.api.ClistApi
 import com.demich.cps.platforms.api.ClistContest
 import com.demich.cps.platforms.api.ClistResource
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.char
 
 class ClistContestsLoader(
     val apiAccess: ClistApi.ApiAccess,
@@ -35,6 +39,15 @@ private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: Contest
         }
     }
 
+private val contestDateTimeFormat by lazy {
+    //YYYY-MM-DDThh:mm:ss
+    DateTimeComponents.Format {
+        date(LocalDate.Formats.ISO)
+        char('T')
+        time(LocalTime.Formats.ISO)
+    }
+}
+
 private fun ClistContest.toContest(): Contest {
     val platform = Contest.platformsExceptUnknown
         .find { ClistUtils.getClistApiResourceId(it) == resource_id }
@@ -44,8 +57,8 @@ private fun ClistContest.toContest(): Contest {
         platform = platform,
         id = ClistUtils.extractContestId(this, platform),
         title = event,
-        startTime = Instant.parse(start+"Z"),
-        endTime = Instant.parse(end+"Z"),
+        startTime = Instant.parse(start, contestDateTimeFormat),
+        endTime = Instant.parse(end, contestDateTimeFormat),
         link = href,
         host = host.takeIf { platform == Contest.Platform.unknown }
     )
