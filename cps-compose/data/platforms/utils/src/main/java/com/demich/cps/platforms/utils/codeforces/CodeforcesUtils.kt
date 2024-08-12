@@ -318,7 +318,10 @@ object CodeforcesUtils {
     ) {
         val td = problemRow.select("td")
         if (td.isEmpty()) return
-        val acceptedCount = td[3].text().trim().removePrefix("x").toInt()
+        val acceptedCount = td[3].text().trim().run {
+            if (!startsWith("x")) return
+            substring(1).toInt()
+        }
         val problem = CodeforcesProblem(
             index = td[0].text().trim(),
             name = td[1].expectFirst("a").text(),
