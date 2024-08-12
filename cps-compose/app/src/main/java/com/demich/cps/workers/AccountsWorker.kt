@@ -27,7 +27,7 @@ class AccountsWorker(
     parameters = parameters
 ) {
     companion object {
-        fun getWork(context: Context) = object : CPSWork(name = "accounts", context = context) {
+        fun getWork(context: Context) = object : CPSPeriodicWork(name = "accounts", context = context) {
             override suspend fun isEnabled() = true //TODO something proper
             override val requestBuilder: PeriodicWorkRequest.Builder
                 get() = CPSPeriodicWorkRequestBuilder<AccountsWorker>(

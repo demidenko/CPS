@@ -27,7 +27,7 @@ class NewsWorker(
     parameters = parameters
 ) {
     companion object {
-        fun getWork(context: Context) = object : CPSWork(name = "news", context = context) {
+        fun getWork(context: Context) = object : CPSPeriodicWork(name = "news", context = context) {
             override suspend fun isEnabled(): Boolean {
                 val enabledFeeds = context.settingsCommunity.enabledNewsFeeds() - CommunitySettingsDataStore.NewsFeed.project_euler_problems
                 return enabledFeeds.isNotEmpty()

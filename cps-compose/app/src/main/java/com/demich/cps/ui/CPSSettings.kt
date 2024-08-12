@@ -27,7 +27,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
-import com.demich.cps.workers.CPSWork
+import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.launch
 
@@ -215,7 +215,7 @@ fun SettingsSwitchItemWithWork(
     item: DataStoreItem<Boolean>,
     title: String,
     description: String = "",
-    workGetter: (Context) -> CPSWork,
+    workGetter: (Context) -> CPSPeriodicWork,
     stopWorkOnUnchecked: Boolean = true
 ) {
     val context = context

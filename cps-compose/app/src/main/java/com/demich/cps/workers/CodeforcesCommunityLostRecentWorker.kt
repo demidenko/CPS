@@ -29,7 +29,7 @@ class CodeforcesCommunityLostRecentWorker(
     parameters = parameters
 ) {
     companion object {
-        fun getWork(context: Context) = object : CPSWork(name = "cf_lost", context = context) {
+        fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_lost", context = context) {
             override suspend fun isEnabled() = context.settingsCommunity.codeforcesLostEnabled()
             override val requestBuilder: PeriodicWorkRequest.Builder
                 get() = CPSPeriodicWorkRequestBuilder<CodeforcesCommunityLostRecentWorker>(

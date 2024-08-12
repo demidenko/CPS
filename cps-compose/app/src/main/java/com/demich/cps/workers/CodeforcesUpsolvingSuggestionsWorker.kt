@@ -29,7 +29,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
 ) {
 
     companion object {
-        fun getWork(context: Context) = object : CPSWork(name = "cf_upsolving", context = context) {
+        fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_upsolving", context = context) {
             override suspend fun isEnabled() =
                 CodeforcesAccountManager().getSettings(context).upsolvingSuggestionsEnabled()
 

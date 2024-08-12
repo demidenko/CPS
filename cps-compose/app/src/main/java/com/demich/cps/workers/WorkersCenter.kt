@@ -16,7 +16,7 @@ import kotlin.time.toJavaDuration
 internal val Context.workManager get() = WorkManager.getInstance(this)
 
 
-abstract class CPSWork(
+abstract class CPSPeriodicWork(
     val name: String,
     val context: Context
 ) {

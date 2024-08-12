@@ -42,7 +42,7 @@ import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.rememberCollectWithLifecycle
 import com.demich.cps.utils.timeAgo
-import com.demich.cps.workers.CPSWork
+import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.cps.workers.CPSWorker
 import com.demich.cps.workers.CPSWorkersDataStore
 import com.demich.cps.workers.getCPSWorks
@@ -51,7 +51,7 @@ import kotlin.time.Duration
 
 @Composable
 fun WorkersList(modifier: Modifier = Modifier) {
-    var showRestartDialogFor: CPSWork? by remember { mutableStateOf(null) }
+    var showRestartDialogFor: CPSPeriodicWork? by remember { mutableStateOf(null) }
 
     WorkersList(modifier = modifier, onClick = { showRestartDialogFor = it })
 
@@ -72,7 +72,7 @@ fun WorkersList(modifier: Modifier = Modifier) {
 @Composable
 private fun WorkersList(
     modifier: Modifier,
-    onClick: (CPSWork) -> Unit
+    onClick: (CPSPeriodicWork) -> Unit
 ) {
     val context = context
     val works = remember { context.getCPSWorks() }
@@ -100,7 +100,7 @@ private fun WorkersList(
 
 @Composable
 private fun WorkerItem(
-    work: CPSWork,
+    work: CPSPeriodicWork,
     lastExecutionEvent: CPSWorker.ExecutionEvent?,
     modifier: Modifier = Modifier
 ) {

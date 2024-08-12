@@ -13,7 +13,7 @@ class UtilityWorker(
     parameters = parameters
 ) {
     companion object {
-        fun getWork(context: Context) = object : CPSWork(name = "utility", context = context) {
+        fun getWork(context: Context) = object : CPSPeriodicWork(name = "utility", context = context) {
             override suspend fun isEnabled() = true
             override val requestBuilder get() =
                 CPSPeriodicWorkRequestBuilder<UtilityWorker>(

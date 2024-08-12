@@ -21,7 +21,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 abstract class CPSWorker(
-    private val work: CPSWork,
+    private val work: CPSPeriodicWork,
     val parameters: WorkerParameters
 ): CoroutineWorker(work.context, parameters) {
 
