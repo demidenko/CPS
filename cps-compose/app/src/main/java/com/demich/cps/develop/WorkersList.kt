@@ -26,19 +26,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
-import com.demich.cps.contests.contestsViewModel
+import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.bottomprogressbar.CPSProgressIndicator
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
+import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.ProvideTimeEachMinute
 import com.demich.cps.utils.context
@@ -56,7 +55,6 @@ import com.demich.cps.workers.getCPSWorks
 import com.demich.cps.workers.getCodeforcesMonitorWork
 import com.demich.cps.workers.getProgressInfo
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -84,18 +82,23 @@ fun WorkersList(modifier: Modifier = Modifier) {
         )
     }
 
-    val contestsViewModel = contestsViewModel()
     val context = context
+    val progressBarsViewModel = progressBarsViewModel()
     if (showMonitorDialog) {
-        CodeforcesMonitorDialog(onDismissRequest = { showMonitorDialog = false }) {
-            contestsViewModel.viewModelScope.launch {
-                delay(5.seconds)
+        CodeforcesMonitorDialog(onDismissRequest = { showMonitorDialog = false }) { contestId ->
+            progressBarsViewModel.doJob(id = "run_cf_monitor $contestId") { state ->
+                val handle = CodeforcesAccountManager()
+                    .dataStore(context)
+                    .getSavedInfo()?.handle ?: return@doJob
+                state.value = ProgressBarInfo(total = 5, title = "cf monitor")
+                repeat(state.value.total) {
+                    delay(1.seconds)
+                    state.value++
+                }
                 CodeforcesMonitorLauncherWorker.startMonitor(
-                    contestId = it,
+                    contestId = contestId,
                     context = context,
-                    handle = CodeforcesAccountManager()
-                        .dataStore(context)
-                        .getSavedInfo()?.handle ?: return@launch
+                    handle = handle
                 )
             }
         }
