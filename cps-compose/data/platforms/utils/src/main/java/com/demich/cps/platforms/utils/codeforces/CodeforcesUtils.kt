@@ -11,8 +11,8 @@ import com.demich.cps.platforms.api.CodeforcesProblem
 import com.demich.cps.platforms.api.CodeforcesRecentAction
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.alternativeParsing
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
 import org.jsoup.Jsoup
@@ -30,39 +30,30 @@ object CodeforcesUtils {
     private object DateTimeParser {
         private val moscowTimeZone = kotlinx.datetime.TimeZone.of("Europe/Moscow")
 
-        private val timeFormat = LocalTime.Format {
-            //HH:mm
+        private val dateTimeFormat = LocalDateTime.Format {
+            alternativeParsing({
+                //RU format: "dd.MM.yyyy HH:mm"
+                dayOfMonth()
+                char('.')
+                monthNumber()
+                char('.')
+                year()
+            }) {
+                //EN format: "MMM/dd/yyyy HH:mm"
+                monthName(MonthNames.ENGLISH_ABBREVIATED)
+                char('/')
+                dayOfMonth()
+                char('/')
+                year()
+            }
+            char(' ')
             hour()
             char(':')
             minute()
         }
 
-        private val dateTimeFormatRU = LocalDateTime.Format {
-            //"dd.MM.yyyy HH:mm"
-            dayOfMonth()
-            char('.')
-            monthNumber()
-            char('.')
-            year()
-            char(' ')
-            time(timeFormat)
-        }
-
-        private val dateTimeFormatEN = LocalDateTime.Format {
-            //"MMM/dd/yyyy HH:mm"
-            monthName(MonthNames.ENGLISH_ABBREVIATED)
-            char('/')
-            dayOfMonth()
-            char('/')
-            year()
-            char(' ')
-            time(timeFormat)
-        }
-
-        fun parse(input: String): Instant {
-            val format = if (input.contains('.')) dateTimeFormatRU else dateTimeFormatEN
-            return LocalDateTime.parse(input, format).toInstant(moscowTimeZone)
-        }
+        fun parse(input: String): Instant =
+            LocalDateTime.parse(input, dateTimeFormat).toInstant(moscowTimeZone)
     }
 
     private fun String.extractTime(): Instant = DateTimeParser.parse(this)
@@ -319,7 +310,7 @@ object CodeforcesUtils {
         val td = problemRow.select("td")
         if (td.isEmpty()) return
         val acceptedCount = td[3].text().trim().run {
-            if (!startsWith("x")) return
+            if (!startsWith('x')) return
             substring(1).toInt()
         }
         val problem = CodeforcesProblem(
