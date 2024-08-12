@@ -41,7 +41,7 @@ class CodeforcesMonitorLauncherWorker(
                 monitor.contestId(contestId)
             }
 
-            context.workManager.enqueueCodeforcesMonitorWorker(replace)
+            getCodeforcesMonitorWork(context).enqueue(replace)
         }
     }
 

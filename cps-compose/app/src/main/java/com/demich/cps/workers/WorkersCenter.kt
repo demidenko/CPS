@@ -16,17 +16,43 @@ import kotlin.time.toJavaDuration
 internal val Context.workManager get() = WorkManager.getInstance(this)
 
 
-abstract class CPSPeriodicWork(
+abstract class CPSWork(
     val name: String,
     val context: Context
 ) {
-    abstract suspend fun isEnabled(): Boolean
-
-    abstract val requestBuilder: PeriodicWorkRequest.Builder
-
     fun stop() {
         context.workManager.cancelUniqueWork(name)
     }
+
+    fun flowOfWorkInfo(): Flow<WorkInfo?> =
+        context.workManager.getWorkInfosForUniqueWorkFlow(name)
+            .map { it?.getOrNull(0) }
+}
+
+abstract class CPSOneTimeWork(
+    name: String,
+    context: Context
+): CPSWork(name, context) {
+    abstract val requestBuilder: OneTimeWorkRequest.Builder
+
+    fun enqueue(replace: Boolean) {
+        val request = requestBuilder.build()
+
+        context.workManager.enqueueUniqueWork(
+            name,
+            if (replace) ExistingWorkPolicy.REPLACE else ExistingWorkPolicy.KEEP,
+            request
+        )
+    }
+}
+
+abstract class CPSPeriodicWork(
+    name: String,
+    context: Context
+): CPSWork(name, context) {
+    abstract suspend fun isEnabled(): Boolean
+
+    abstract val requestBuilder: PeriodicWorkRequest.Builder
 
     private fun start(restart: Boolean) {
         val request = requestBuilder.build()
@@ -54,10 +80,6 @@ abstract class CPSPeriodicWork(
             request
         )
     }
-
-    fun flowOfWorkInfo(): Flow<WorkInfo?> =
-        context.workManager.getWorkInfosForUniqueWorkFlow(name)
-            .map { it?.getOrNull(0) }
 }
 
 internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
@@ -99,14 +121,12 @@ suspend fun Context.enqueueEnabledWorkers() {
     getCPSWorks().forEach { it.enqueueIfEnabled() }
 }
 
-internal fun WorkManager.enqueueCodeforcesMonitorWorker(replace: Boolean) {
-    val requestBuilder = OneTimeWorkRequestBuilder<CodeforcesMonitorWorker>()
-    enqueueUniqueWork(
-        "cf_monitor",
-        if (replace) ExistingWorkPolicy.REPLACE else ExistingWorkPolicy.KEEP,
-        requestBuilder.build()
-    )
-}
+//TODO: move to worker
+internal fun getCodeforcesMonitorWork(context: Context): CPSOneTimeWork =
+    object : CPSOneTimeWork(name = "cf_monitor", context = context) {
+        override val requestBuilder: OneTimeWorkRequest.Builder
+            get() = OneTimeWorkRequestBuilder<CodeforcesMonitorWorker>()
+    }
 
 internal suspend fun CoroutineWorker.setForeground(builder: NotificationBuilder) {
     setForeground(ForegroundInfo(
