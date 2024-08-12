@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,23 +14,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewModelScope
-import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.accounts.managers.AccountManagerType
-import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.allRatedAccountManagers
 import com.demich.cps.accounts.managers.makeRatedSpan
 import com.demich.cps.accounts.userinfo.RatedUserInfo
-import com.demich.cps.contests.contestsViewModel
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSRadioButtonTitled
-import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
+import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
-import com.demich.cps.ui.dialogs.CPSYesNoDialog
-import com.demich.cps.utils.context
-import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
+import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -47,7 +40,6 @@ fun DevelopScreen() {
 
 
 fun developAdditionalBottomBarBuilder(): AdditionalBottomBarBuilder = {
-    val context = context
     val progressBarsViewModel = progressBarsViewModel()
 
     CPSIconButton(icon = CPSIcons.Add) {
@@ -62,45 +54,8 @@ fun developAdditionalBottomBarBuilder(): AdditionalBottomBarBuilder = {
             }
         }
     }
-
-    var showMonitorDialog by remember { mutableStateOf(false) }
-    CPSIconButton(icon = CPSIcons.Monitor) {
-        showMonitorDialog = true
-    }
-
-    val contestsViewModel = contestsViewModel()
-    if (showMonitorDialog) {
-        MonitorDialog(onDismissRequest = { showMonitorDialog = false }) {
-            contestsViewModel.viewModelScope.launch {
-                delay(5.seconds)
-                CodeforcesMonitorLauncherWorker.startMonitor(
-                    contestId = it,
-                    context = context,
-                    handle = CodeforcesAccountManager()
-                        .dataStore(context)
-                        .getSavedInfo()?.handle ?: return@launch
-                )
-            }
-        }
-    }
 }
 
-@Composable
-private fun MonitorDialog(onDismissRequest: () -> Unit, onStart: (Int) -> Unit) {
-    var contestId by rememberSaveable { mutableStateOf("") }
-    CPSYesNoDialog(
-        onDismissRequest = onDismissRequest,
-        onConfirmRequest = { contestId.toIntOrNull()?.let(onStart) },
-        title = {
-            TextField(
-                value = contestId,
-                onValueChange = { contestId = it },
-                label = { Text("contestId") },
-                isError = contestId.toIntOrNull() == null
-            )
-        }
-    )
-}
 
 @Composable
 fun ContentLoadingButton(

@@ -11,12 +11,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,7 +26,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
+import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.contests.contestsViewModel
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
@@ -46,19 +51,24 @@ import com.demich.cps.workers.CPSOneTimeWork
 import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.cps.workers.CPSWorker
 import com.demich.cps.workers.CPSWorkersDataStore
+import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.getCPSWorks
 import com.demich.cps.workers.getCodeforcesMonitorWork
 import com.demich.cps.workers.getProgressInfo
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun WorkersList(modifier: Modifier = Modifier) {
     var showRestartDialogFor: CPSPeriodicWork? by remember { mutableStateOf(null) }
+    var showMonitorDialog by remember { mutableStateOf(false) }
 
     WorkersList(
         modifier = modifier,
         onClick = { showRestartDialogFor = it },
-        onCodeforcesMonitorClick = {  }
+        onCodeforcesMonitorClick = { showMonitorDialog = true }
     )
 
     showRestartDialogFor?.let { work ->
@@ -72,6 +82,23 @@ fun WorkersList(modifier: Modifier = Modifier) {
             onDismissRequest = { showRestartDialogFor = null },
             onConfirmRequest = { work.startImmediate() }
         )
+    }
+
+    val contestsViewModel = contestsViewModel()
+    val context = context
+    if (showMonitorDialog) {
+        CodeforcesMonitorDialog(onDismissRequest = { showMonitorDialog = false }) {
+            contestsViewModel.viewModelScope.launch {
+                delay(5.seconds)
+                CodeforcesMonitorLauncherWorker.startMonitor(
+                    contestId = it,
+                    context = context,
+                    handle = CodeforcesAccountManager()
+                        .dataStore(context)
+                        .getSavedInfo()?.handle ?: return@launch
+                )
+            }
+        }
     }
 }
 
@@ -262,4 +289,22 @@ private fun colorFor(workState: WorkInfo.State) = with(cpsColors) {
         WorkInfo.State.BLOCKED -> error
         WorkInfo.State.CANCELLED -> contentAdditional
     }
+}
+
+
+@Composable
+private fun CodeforcesMonitorDialog(onDismissRequest: () -> Unit, onStart: (Int) -> Unit) {
+    var contestId by rememberSaveable { mutableStateOf("") }
+    CPSYesNoDialog(
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = { contestId.toIntOrNull()?.let(onStart) },
+        title = {
+            TextField(
+                value = contestId,
+                onValueChange = { contestId = it },
+                label = { Text("contestId") },
+                isError = contestId.toIntOrNull() == null
+            )
+        }
+    )
 }
