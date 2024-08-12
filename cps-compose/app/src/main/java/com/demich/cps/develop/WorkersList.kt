@@ -42,10 +42,12 @@ import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.rememberCollectWithLifecycle
 import com.demich.cps.utils.timeAgo
+import com.demich.cps.workers.CPSOneTimeWork
 import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.cps.workers.CPSWorker
 import com.demich.cps.workers.CPSWorkersDataStore
 import com.demich.cps.workers.getCPSWorks
+import com.demich.cps.workers.getCodeforcesMonitorWork
 import com.demich.cps.workers.getProgressInfo
 import kotlin.time.Duration
 
@@ -53,7 +55,11 @@ import kotlin.time.Duration
 fun WorkersList(modifier: Modifier = Modifier) {
     var showRestartDialogFor: CPSPeriodicWork? by remember { mutableStateOf(null) }
 
-    WorkersList(modifier = modifier, onClick = { showRestartDialogFor = it })
+    WorkersList(
+        modifier = modifier,
+        onClick = { showRestartDialogFor = it },
+        onCodeforcesMonitorClick = {  }
+    )
 
     showRestartDialogFor?.let { work ->
         CPSYesNoDialog(
@@ -72,10 +78,12 @@ fun WorkersList(modifier: Modifier = Modifier) {
 @Composable
 private fun WorkersList(
     modifier: Modifier,
-    onClick: (CPSPeriodicWork) -> Unit
+    onClick: (CPSPeriodicWork) -> Unit,
+    onCodeforcesMonitorClick: (CPSOneTimeWork) -> Unit
 ) {
     val context = context
-    val works = remember { context.getCPSWorks() }
+    val periodicWorks = remember { context.getCPSWorks() }
+    val monitorWork = remember { getCodeforcesMonitorWork(context) }
 
     val lastExecutionEvents by rememberCollectWithLifecycle {
         CPSWorkersDataStore(context).lastExecutions.flow
@@ -83,13 +91,23 @@ private fun WorkersList(
 
     ProvideTimeEachMinute {
         LazyColumn(modifier = modifier) {
-            items(items = works, key = { it.name }) { work ->
+            items(items = periodicWorks, key = { it.name }) { work ->
                 WorkerItem(
                     work = work,
                     lastExecutionEvent = lastExecutionEvents[work.name],
                     modifier = Modifier
-                        .clickable { onClick(work) }
                         .fillMaxWidth()
+                        .clickable { onClick(work) }
+                        .padding(all = 4.dp)
+                )
+                Divider()
+            }
+            item {
+                WorkerItem(
+                    work = monitorWork,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onCodeforcesMonitorClick(monitorWork) }
                         .padding(all = 4.dp)
                 )
                 Divider()
@@ -104,7 +122,6 @@ private fun WorkerItem(
     lastExecutionEvent: CPSWorker.ExecutionEvent?,
     modifier: Modifier = Modifier
 ) {
-
     val workInfo by remember(key1 = work, calculation = work::flowOfWorkInfo).collectAsState(initial = null)
 
     WorkerItem(
@@ -116,6 +133,24 @@ private fun WorkerItem(
         } ?: "never",
         lastResult = lastExecutionEvent?.resultType,
         lastDuration = lastExecutionEvent?.duration?.toNiceString() ?: "",
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun WorkerItem(
+    work: CPSOneTimeWork,
+    modifier: Modifier = Modifier
+) {
+    val workInfo by remember(key1 = work, calculation = work::flowOfWorkInfo).collectAsState(initial = null)
+
+    WorkerItem(
+        name = work.name,
+        workState = workInfo?.state ?: WorkInfo.State.CANCELLED,
+        progressInfo = null,
+        lastRunTimeAgo = "",
+        lastResult = null,
+        lastDuration = "",
         modifier = modifier
     )
 }
