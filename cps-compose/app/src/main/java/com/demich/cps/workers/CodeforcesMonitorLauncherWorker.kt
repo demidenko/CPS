@@ -56,7 +56,7 @@ class CodeforcesMonitorLauncherWorker(
         val newSubmissions = getNewSubmissions(
             handle = info.handle,
             lastSubmissionId = dataStore.monitorLastSubmissionId()
-        ) { return Result.retry() }
+        )
 
         dataStore.apply {
             newSubmissions.firstOrNull()?.let {
@@ -85,14 +85,12 @@ class CodeforcesMonitorLauncherWorker(
 
     private suspend inline fun getNewSubmissions(
         handle: String,
-        lastSubmissionId: Long?,
-        onApiFailure: () -> Nothing
+        lastSubmissionId: Long?
     ) = buildList {
             var from = 1L
             var step = 1L
             while (true) {
-                val items = CodeforcesApi.runCatching { getUserSubmissions(handle = handle, from = from, count = step) }
-                    .getOrElse { onApiFailure() }
+                val items = CodeforcesApi.getUserSubmissions(handle = handle, from = from, count = step)
                     .filter { isActual(it.creationTime) }
                     .filter { lastSubmissionId == null || it.id > lastSubmissionId }
 

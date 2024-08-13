@@ -103,9 +103,9 @@ class CodeforcesCommunityLostRecentWorker(
         }
 
         val recentBlogEntries =
-            CodeforcesApi.runCatching { getPageSource(path = "/recent-actions", locale = locale) }
-            .getOrElse { return Result.retry() }
-            .let { CodeforcesUtils.extractRecentBlogEntries(it) }
+            CodeforcesUtils.extractRecentBlogEntries(
+                source = CodeforcesApi.getPageSource(path = "/recent-actions", locale = locale)
+            )
 
         //catch new suspects from recent actions
         findSuspects(
@@ -113,8 +113,7 @@ class CodeforcesCommunityLostRecentWorker(
             locale = locale,
             minRatingColorTag = minRatingColorTag,
             isNew = ::isNew,
-            lastNotNewIdItem = settings.codeforcesLostHintNotNew,
-            onApiFailure = { return Result.retry() }
+            lastNotNewIdItem = settings.codeforcesLostHintNotNew
         ) {
             dao.insert(
                 CodeforcesLostBlogEntry(
@@ -155,10 +154,9 @@ private class CachedBlogEntryApi(
 ) {
     private val cache = mutableMapOf<Int, Instant>()
 
-    suspend inline fun getCreationTime(blogEntryId: Int, onApiFailure: () -> Nothing): Instant =
+    suspend inline fun getCreationTime(blogEntryId: Int): Instant =
         cache.getOrPut(blogEntryId) {
-            CodeforcesApi.runCatching { getBlogEntry(blogEntryId = blogEntryId, locale = locale) }
-                .getOrElse { onApiFailure() }
+            CodeforcesApi.getBlogEntry(blogEntryId = blogEntryId, locale = locale)
                 .also { onUpdate(it) }
                 .creationTime
         }
@@ -181,7 +179,6 @@ private suspend inline fun findSuspects(
     minRatingColorTag: CodeforcesColorTag,
     noinline isNew: (Instant) -> Boolean,
     lastNotNewIdItem: DataStoreItem<Pair<Int, Instant>?>,
-    onApiFailure: () -> Nothing,
     onSuspect: (CodeforcesBlogEntry) -> Unit
 ) {
     //ensure hint in case isNew logic changes
@@ -213,10 +210,10 @@ private suspend inline fun findSuspects(
     blogEntries
         .filterIdGreaterThen(lastNotNewIdItem()?.first ?: Int.MIN_VALUE)
         .fixAndFilterColorTag(minRatingColorTag)
-        .filterNewEntries { isNew(cachedApi.getCreationTime(blogEntryId = it.id, onApiFailure = onApiFailure)) }
+        .filterNewEntries { isNew(cachedApi.getCreationTime(blogEntryId = it.id)) }
         .forEach {
             val blogEntry = it.copy(
-                creationTime = cachedApi.getCreationTime(blogEntryId = it.id, onApiFailure = onApiFailure),
+                creationTime = cachedApi.getCreationTime(blogEntryId = it.id),
                 rating = 0,
                 commentsCount = 0
             )

@@ -54,8 +54,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
         val dateThreshold = workerStartTime - 90.days
         suggestedItem.edit { removeAll { it.second <= dateThreshold } }
 
-        val ratingChanges = CodeforcesApi.runCatching { getUserRatingChanges(handle) }
-            .getOrElse { return Result.retry() }
+        val ratingChanges = CodeforcesApi.getUserRatingChanges(handle)
 
         val alreadySuggested = suggestedItem().map { it.first }
 
@@ -67,7 +66,6 @@ class CodeforcesUpsolvingSuggestionsWorker(
                     handle = handle,
                     ratingChange = ratingChange,
                     alreadySuggested = alreadySuggested,
-                    onApiFailure = { return Result.retry() },
                     toRemoveAsSolved = { solved ->
                         val solvedIds = solved.mapToSet { it.problemId }
                         suggestedItem.edit {
@@ -88,26 +86,21 @@ private suspend inline fun getSuggestions(
     handle: String,
     ratingChange: CodeforcesRatingChange,
     alreadySuggested: Collection<CodeforcesProblem>,
-    onApiFailure: () -> Nothing,
     toRemoveAsSolved: (List<CodeforcesProblem>) -> Unit,
     onNewSuggestion: (CodeforcesProblem) -> Unit
 ) {
     val contestId = ratingChange.contestId
     val (userSubmissions, acceptedStats) = awaitPair(
         blockFirst = {
-            CodeforcesApi.runCatching { getContestSubmissions(contestId = contestId, handle = handle) }
+            CodeforcesApi.getContestSubmissions(contestId = contestId, handle = handle)
         },
         blockSecond = {
-            CodeforcesApi.runCatching { getContestPage(contestId = contestId) }.map { source ->
-                CodeforcesUtils.extractContestAcceptedStatistics(source = source, contestId = contestId)
-            }
+            CodeforcesUtils.extractContestAcceptedStatistics(
+                source = CodeforcesApi.getContestPage(contestId = contestId),
+                contestId = contestId
+            )
         }
-    ).let {
-        Pair(
-            first = it.first.getOrElse { onApiFailure() },
-            second = it.second.getOrElse { onApiFailure() }
-        )
-    }
+    )
 
     val solvedIndices = userSubmissions
         .filter { it.verdict == CodeforcesProblemVerdict.OK }
