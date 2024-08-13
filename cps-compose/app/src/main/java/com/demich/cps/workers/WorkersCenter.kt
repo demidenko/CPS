@@ -78,6 +78,7 @@ abstract class CPSPeriodicWork(
         if (isEnabled()) enqueue()
     }
 
+    //TODO: ignores default even if default closer
     fun enqueueIn(duration: Duration) =
         enqueueWork(policy = ExistingPeriodicWorkPolicy.UPDATE) {
             setNextScheduleTimeOverride(getCurrentTime() + duration)
