@@ -14,13 +14,13 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.toJavaDuration
 
-private val CPSWork.workManager get() = WorkManager.getInstance(context)
-
 
 abstract class CPSWork(
     val name: String,
     val context: Context
 ) {
+    val workManager get() = WorkManager.getInstance(context)
+
     fun stop() {
         workManager.cancelUniqueWork(name)
     }
@@ -78,10 +78,12 @@ abstract class CPSPeriodicWork(
         if (isEnabled()) enqueue()
     }
 
-    fun enqueueRetry() =
+    fun enqueueIn(duration: Duration) =
         enqueueWork(policy = ExistingPeriodicWorkPolicy.UPDATE) {
-            setNextScheduleTimeOverride(getCurrentTime() + 15.minutes)
+            setNextScheduleTimeOverride(getCurrentTime() + duration)
         }
+
+    fun enqueueRetry() = enqueueIn(15.minutes)
 }
 
 internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
