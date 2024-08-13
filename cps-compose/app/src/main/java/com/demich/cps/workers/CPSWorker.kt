@@ -5,6 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.demich.cps.platforms.api.CodeforcesException
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.joinAllWithCounter
@@ -60,7 +61,12 @@ abstract class CPSWorker(
 
     protected abstract suspend fun runWork(): Result
     private suspend fun smartRunWork(): Result {
-        suspend fun call(): Result = runCatching { runWork() }.getOrElse { Result.failure() }
+        suspend fun call(): Result =
+            runCatching { runWork() }.getOrElse {
+                if (it is CodeforcesException) Result.retry()
+                else Result.failure()
+            }
+
         return call().let { result ->
             if (result.toType() == ResultType.RETRY) {
                 delay(duration = 5.seconds)
