@@ -8,12 +8,13 @@ import com.demich.cps.notifications.NotificationBuilder
 import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Instant
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.toJavaDuration
 
-internal val Context.workManager get() = WorkManager.getInstance(this)
+private val CPSWork.workManager get() = WorkManager.getInstance(context)
 
 
 abstract class CPSWork(
@@ -21,11 +22,11 @@ abstract class CPSWork(
     val context: Context
 ) {
     fun stop() {
-        context.workManager.cancelUniqueWork(name)
+        workManager.cancelUniqueWork(name)
     }
 
     fun flowOfWorkInfo(): Flow<WorkInfo?> =
-        context.workManager.getWorkInfosForUniqueWorkFlow(name)
+        workManager.getWorkInfosForUniqueWorkFlow(name)
             .map { it?.getOrNull(0) }
 }
 
@@ -35,15 +36,16 @@ abstract class CPSOneTimeWork(
 ): CPSWork(name, context) {
     abstract val requestBuilder: OneTimeWorkRequest.Builder
 
-    fun enqueue(replace: Boolean) {
-        val request = requestBuilder.build()
-
-        context.workManager.enqueueUniqueWork(
-            name,
-            if (replace) ExistingWorkPolicy.REPLACE else ExistingWorkPolicy.KEEP,
-            request
-        )
+    private inline fun enqueueWork(
+        policy: ExistingWorkPolicy,
+        block: OneTimeWorkRequest.Builder.() -> Unit = {}
+    ) {
+        val request = requestBuilder.apply(block).build()
+        workManager.enqueueUniqueWork(name, policy, request)
     }
+
+    fun enqueue(replace: Boolean) =
+        enqueueWork(policy = if (replace) ExistingWorkPolicy.REPLACE else ExistingWorkPolicy.KEEP)
 }
 
 abstract class CPSPeriodicWork(
@@ -54,32 +56,32 @@ abstract class CPSPeriodicWork(
 
     abstract val requestBuilder: PeriodicWorkRequest.Builder
 
-    private fun start(restart: Boolean) {
-        val request = requestBuilder.build()
-
-        context.workManager.enqueueUniquePeriodicWork(
-            name,
-            if (restart) ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE else ExistingPeriodicWorkPolicy.KEEP,
-            request
-        )
+    private inline fun enqueueWork(
+        policy: ExistingPeriodicWorkPolicy,
+        block: PeriodicWorkRequest.Builder.() -> Unit = {}
+    ) {
+        val request = requestBuilder.apply(block).build()
+        workManager.enqueueUniquePeriodicWork(name, policy, request)
     }
 
+    private fun start(restart: Boolean) =
+        enqueueWork(
+            policy = if (restart) ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE
+                    else ExistingPeriodicWorkPolicy.KEEP
+        )
+
     fun startImmediate() = start(restart = true)
+
     private fun enqueue() = start(restart = false)
+
     suspend fun enqueueIfEnabled() {
         if (isEnabled()) enqueue()
     }
-    fun enqueueRetry() {
-        val request = requestBuilder.apply {
-            setNextScheduleTimeOverride((getCurrentTime() + 15.minutes).toEpochMilliseconds())
-        }.build()
 
-        context.workManager.enqueueUniquePeriodicWork(
-            name,
-            ExistingPeriodicWorkPolicy.UPDATE,
-            request
-        )
-    }
+    fun enqueueRetry() =
+        enqueueWork(policy = ExistingPeriodicWorkPolicy.UPDATE) {
+            setNextScheduleTimeOverride(getCurrentTime() + 15.minutes)
+        }
 }
 
 internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
@@ -135,3 +137,6 @@ internal suspend fun CoroutineWorker.setForeground(builder: NotificationBuilder)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC else 0
     ))
 }
+
+private fun PeriodicWorkRequest.Builder.setNextScheduleTimeOverride(instant: Instant) =
+    setNextScheduleTimeOverride(instant.toEpochMilliseconds())
