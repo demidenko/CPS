@@ -37,7 +37,7 @@ object CodeforcesApi: PlatformApi {
         }
     }
 
-    class CodeforcesTemporarilyUnavailableException: CodeforcesException("Codeforces Temporarily Unavailable")
+    class CodeforcesTemporarilyUnavailableException: CodeforcesApiException("Codeforces Temporarily Unavailable")
 
     private val callLimitExceededWaitTime: Duration = 500.milliseconds
     private val redirectWaitTime: Duration = 300.milliseconds
@@ -265,7 +265,7 @@ enum class CodeforcesColorTag {
 }
 
 
-abstract class CodeforcesException(message: String?): Throwable(message) {
+abstract class CodeforcesApiException(message: String?): Throwable(message) {
     constructor(): this(null)
 }
 
@@ -277,7 +277,7 @@ enum class CodeforcesAPIStatus {
 data class CodeforcesAPIErrorResponse(
     private val status: CodeforcesAPIStatus,
     private val comment: String
-): CodeforcesException("Codeforces API: $comment") {
+): CodeforcesApiException("Codeforces API: $comment") {
 
     fun isCallLimitExceeded() = comment == "Call limit exceeded"
 

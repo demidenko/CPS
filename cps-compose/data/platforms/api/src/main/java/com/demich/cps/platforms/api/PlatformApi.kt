@@ -59,13 +59,16 @@ val Throwable.niceMessage: String? get() =
 
         is ResponseException -> HttpStatusCode.fromValue(response.status.value).toString()
 
-        is CodeforcesAPIErrorResponse -> message
-        is CodeforcesApi.CodeforcesTemporarilyUnavailableException -> message
+        is CodeforcesApiException -> message
 
         is kotlinx.serialization.SerializationException -> "Serialization failed"
 
         else -> null
     }
+
+
+val Throwable.isResponseException get() =
+    this is ResponseException
 
 val Throwable.isPageNotFound get() =
     this is ClientRequestException && response.status == HttpStatusCode.NotFound
