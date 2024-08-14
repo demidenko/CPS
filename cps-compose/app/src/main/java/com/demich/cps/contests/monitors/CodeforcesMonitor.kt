@@ -155,7 +155,7 @@ private class RatingChangeWaiter(
             waitingTime < 30.minutes -> 10.seconds
             waitingTime < 1.hours -> 30.seconds
             waitingTime < 4.hours -> 1.minutes
-            else -> Duration.INFINITE
+            else -> 5.minutes
         }
     }
 
