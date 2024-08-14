@@ -18,6 +18,7 @@ import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.toLoadingStatus
+import com.demich.cps.workers.ContestsWorker
 import com.demich.datastore_itemized.edit
 import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.Dispatchers
@@ -82,7 +83,8 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
 
     fun reloadEnabledPlatforms(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            //TODO: worker enqueue next
+            ContestsWorker.getWork(context).enqueueIn(ContestsWorker.workRepeatInterval)
+
             reloadEnabledPlatforms(
                 settings = context.settingsContests,
                 contestsInfo = ContestsInfoDataStore(context),
