@@ -3,15 +3,26 @@ package com.demich.cps.workers
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
-import androidx.work.*
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.ForegroundInfo
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.demich.cps.notifications.NotificationBuilder
 import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
-import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.toJavaDuration
 
 
@@ -84,7 +95,7 @@ abstract class CPSPeriodicWork(
             setNextScheduleTimeOverride(getCurrentTime() + duration)
         }
 
-    fun enqueueRetry() = enqueueIn(15.minutes)
+    fun enqueueRetry() = enqueueIn(PeriodicWorkRequest.minPeriodicInterval)
 }
 
 internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
@@ -93,22 +104,22 @@ internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
     batteryNotLow: Boolean = false,
     requiresCharging: Boolean = false,
     requireNetwork: Boolean = true
-) = PeriodicWorkRequestBuilder<W>(
-    repeatInterval = repeatInterval.toJavaDuration(),
-    flexTimeInterval = flex.toJavaDuration()
-).setConstraints(
-    Constraints(
-        requiredNetworkType = if (requireNetwork) NetworkType.CONNECTED else NetworkType.NOT_REQUIRED,
-        requiresBatteryNotLow = batteryNotLow,
-        requiresCharging = requiresCharging
-    )
-).apply {
-    setBackoffCriteria(
-        BackoffPolicy.LINEAR,
-        PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS,
-        TimeUnit.MILLISECONDS
-    )
-}
+) =
+    PeriodicWorkRequestBuilder<W>(
+        repeatInterval = repeatInterval.toJavaDuration(),
+        flexTimeInterval = flex.toJavaDuration()
+    ).setConstraints(
+        Constraints(
+            requiredNetworkType = if (requireNetwork) NetworkType.CONNECTED else NetworkType.NOT_REQUIRED,
+            requiresBatteryNotLow = batteryNotLow,
+            requiresCharging = requiresCharging
+        )
+    ).apply {
+        setBackoffCriteria(
+            BackoffPolicy.LINEAR,
+            PeriodicWorkRequest.minPeriodicInterval.toJavaDuration()
+        )
+    }
 
 fun Context.getCPSWorks() = listOf(
     AccountsWorker::getWork,
@@ -140,6 +151,10 @@ internal suspend fun CoroutineWorker.setForeground(builder: NotificationBuilder)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC else 0
     ))
 }
+
+
+private val PeriodicWorkRequest.Companion.minPeriodicInterval: Duration
+    get() = MIN_PERIODIC_INTERVAL_MILLIS.milliseconds
 
 private fun PeriodicWorkRequest.Builder.setNextScheduleTimeOverride(instant: Instant) =
     setNextScheduleTimeOverride(instant.toEpochMilliseconds())
