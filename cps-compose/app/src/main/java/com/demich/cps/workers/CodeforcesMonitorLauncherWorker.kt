@@ -58,15 +58,7 @@ class CodeforcesMonitorLauncherWorker(
             lastSubmissionId = dataStore.monitorLastSubmissionId()
         )
 
-        dataStore.apply {
-            newSubmissions.firstOrNull()?.let {
-                monitorLastSubmissionId(it.id)
-            }
-
-            monitorCanceledContests.update { list ->
-                list.filter { isActual(it.second) }
-            }
-
+        with(dataStore) {
             newSubmissions.firstOrNull { submission ->
                 submission.author.participantType.contestParticipant()
             }?.let { submission ->
@@ -77,6 +69,14 @@ class CodeforcesMonitorLauncherWorker(
                         context = context
                     )
                 }
+            }
+
+            newSubmissions.firstOrNull()?.let {
+                monitorLastSubmissionId(it.id)
+            }
+
+            monitorCanceledContests.update { list ->
+                list.filter { isActual(it.second) }
             }
         }
 
