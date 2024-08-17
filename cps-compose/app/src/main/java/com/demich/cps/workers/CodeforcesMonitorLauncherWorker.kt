@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.platforms.api.CodeforcesApi
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.hours
@@ -27,22 +26,6 @@ class CodeforcesMonitorLauncherWorker(
                     repeatInterval = 45.minutes
                 )
         }
-
-        suspend fun startMonitor(contestId: Int, handle: String, context: Context) {
-            val monitor = CodeforcesMonitorDataStore(context)
-
-            val replace: Boolean
-            if (contestId == monitor.contestId() && handle == monitor.handle()) {
-                replace = false
-            } else {
-                replace = true
-                monitor.reset()
-                monitor.handle(handle)
-                monitor.contestId(contestId)
-            }
-
-            getCodeforcesMonitorWork(context).enqueue(replace)
-        }
     }
 
     private fun isActual(time: Instant) = workerStartTime - time < 24.hours
@@ -63,7 +46,7 @@ class CodeforcesMonitorLauncherWorker(
                 submission.author.participantType.contestParticipant()
             }?.let { submission ->
                 if (monitorCanceledContests().none { it.first == submission.contestId }) {
-                    startMonitor(
+                    CodeforcesMonitorWorker.start(
                         contestId = submission.contestId,
                         handle = info.handle,
                         context = context

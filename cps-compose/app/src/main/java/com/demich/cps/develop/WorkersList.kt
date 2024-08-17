@@ -50,9 +50,8 @@ import com.demich.cps.workers.CPSOneTimeWork
 import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.cps.workers.CPSWorker
 import com.demich.cps.workers.CPSWorkersDataStore
-import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
+import com.demich.cps.workers.CodeforcesMonitorWorker
 import com.demich.cps.workers.getCPSWorks
-import com.demich.cps.workers.getCodeforcesMonitorWork
 import com.demich.cps.workers.getProgressInfo
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
@@ -95,7 +94,7 @@ fun WorkersList(modifier: Modifier = Modifier) {
                     delay(1.seconds)
                     state.value++
                 }
-                CodeforcesMonitorLauncherWorker.startMonitor(
+                CodeforcesMonitorWorker.start(
                     contestId = contestId,
                     context = context,
                     handle = handle
@@ -113,7 +112,7 @@ private fun WorkersList(
 ) {
     val context = context
     val periodicWorks = remember { context.getCPSWorks() }
-    val monitorWork = remember { getCodeforcesMonitorWork(context) }
+    val monitorWork = remember { CodeforcesMonitorWorker.getWork(context) }
 
     val lastExecutionEvents by rememberCollectWithLifecycle {
         CPSWorkersDataStore(context).lastExecutions.flow

@@ -11,7 +11,6 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
@@ -136,13 +135,6 @@ fun Context.getCPSWorks() = listOf(
 suspend fun Context.enqueueEnabledWorkers() {
     getCPSWorks().forEach { it.enqueueIfEnabled() }
 }
-
-//TODO: move to worker
-internal fun getCodeforcesMonitorWork(context: Context): CPSOneTimeWork =
-    object : CPSOneTimeWork(name = "cf_monitor", context = context) {
-        override val requestBuilder: OneTimeWorkRequest.Builder
-            get() = OneTimeWorkRequestBuilder<CodeforcesMonitorWorker>()
-    }
 
 internal suspend fun CoroutineWorker.setForeground(builder: NotificationBuilder) {
     setForeground(ForegroundInfo(

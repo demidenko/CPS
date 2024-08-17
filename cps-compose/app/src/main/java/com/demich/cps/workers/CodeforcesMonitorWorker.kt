@@ -3,6 +3,8 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
@@ -24,6 +26,30 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): CoroutineWorker(context, params) {
+
+    companion object {
+        fun getWork(context: Context): CPSOneTimeWork =
+            object : CPSOneTimeWork(name = "cf_monitor", context = context) {
+                override val requestBuilder: OneTimeWorkRequest.Builder
+                    get() = OneTimeWorkRequestBuilder<CodeforcesMonitorWorker>()
+            }
+
+        suspend fun start(contestId: Int, handle: String, context: Context) {
+            val monitor = CodeforcesMonitorDataStore(context)
+
+            val replace: Boolean
+            if (contestId == monitor.contestId() && handle == monitor.handle()) {
+                replace = false
+            } else {
+                replace = true
+                monitor.reset()
+                monitor.handle(handle)
+                monitor.contestId(contestId)
+            }
+
+            getWork(context).enqueue(replace)
+        }
+    }
 
     override suspend fun doWork(): Result {
         val monitor = CodeforcesMonitorDataStore(context)
