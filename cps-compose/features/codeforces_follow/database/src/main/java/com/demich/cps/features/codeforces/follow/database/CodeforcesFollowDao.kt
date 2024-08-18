@@ -1,6 +1,5 @@
 package com.demich.cps.features.codeforces.follow.database
 
-import android.content.Context
 import androidx.room.*
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
@@ -10,9 +9,6 @@ import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import kotlinx.coroutines.flow.Flow
-
-val Context.cfFollowDao: CodeforcesFollowDao
-    get() = CodeforcesFollowDataBase.getInstance(this).followListDao()
 
 internal const val cfFollowTableName = "FollowList"
 

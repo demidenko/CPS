@@ -9,8 +9,10 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 
 abstract class CodeforcesFollowList(
     protected val context: Context,
-    private val dao: CodeforcesFollowDao
 ) {
+    private val dao: CodeforcesFollowDao =
+        CodeforcesFollowDataBase.getInstance(context).followListDao()
+
     suspend fun remove(handle: String) = dao.remove(handle)
 
     fun flowOfAllBlogs() = dao.flowOfAllBlogs()

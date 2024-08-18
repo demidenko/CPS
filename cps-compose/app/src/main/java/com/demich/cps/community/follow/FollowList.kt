@@ -3,9 +3,7 @@ package com.demich.cps.community.follow
 import android.content.Context
 import com.demich.cps.R
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowDao
 import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowList
-import com.demich.cps.features.codeforces.follow.database.cfFollowDao
 import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.notifications.setBigContent
@@ -14,16 +12,10 @@ import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 
-val Context.followListDao: FollowListDao
-    get() = FollowListDao(
-        context = this,
-        dao = this.cfFollowDao
-    )
+val Context.followListDao: FollowList
+    get() = FollowList(context = this)
 
-class FollowListDao internal constructor(
-    context: Context,
-    dao: CodeforcesFollowDao
-): CodeforcesFollowList(context, dao) {
+class FollowList(context: Context): CodeforcesFollowList(context) {
 
     override suspend fun getLocale() = context.settingsCommunity.codeforcesLocale()
 
