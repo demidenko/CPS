@@ -1,29 +1,14 @@
-package com.demich.cps.room
+package com.demich.cps.features.codeforces.follow.database
 
 import android.content.Context
-import com.demich.cps.*
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowDao
-import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
-import com.demich.cps.features.codeforces.follow.database.cfFollowDao
-import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.notifications.attachUrl
-import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.notifications.setBigContent
-import com.demich.cps.notifications.setWhen
-import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 
-val Context.followListDao: FollowListDao
-    get() = FollowListDao(
-        context = this,
-        dao = this.cfFollowDao
-    )
-
-class FollowListDao internal constructor(
-    private val context: Context,
+abstract class CodeforcesFollowList(
+    protected val context: Context,
     private val dao: CodeforcesFollowDao
 ) {
     suspend fun remove(handle: String) = dao.remove(handle)
@@ -35,7 +20,7 @@ class FollowListDao internal constructor(
     suspend fun getAndReloadBlogEntries(handle: String) =
         dao.getAndReloadBlogEntries(
             handle = handle,
-            locale = context.settingsCommunity.codeforcesLocale(),
+            locale = getLocale(),
             onNewBlogEntry = ::notifyNewBlogEntry
         )
 
@@ -68,14 +53,7 @@ class FollowListDao internal constructor(
         }
     }
 
-    private fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry) =
-        notificationChannels.codeforces.new_blog_entry(blogEntry.id).notify(context) {
-            setSubText("New codeforces blog entry")
-            setContentTitle(blogEntry.authorHandle)
-            setBigContent(CodeforcesUtils.extractTitle(blogEntry))
-            setSmallIcon(R.drawable.ic_new_post)
-            setAutoCancel(true)
-            setWhen(blogEntry.creationTime)
-            attachUrl(url = CodeforcesApi.urls.blogEntry(blogEntry.id), context = context)
-        }
+    protected abstract suspend fun getLocale(): CodeforcesLocale
+
+    protected abstract fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry)
 }

@@ -15,7 +15,6 @@ import com.demich.cps.accounts.DialogAccountChooser
 import com.demich.cps.accounts.managers.makeHandleSpan
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
-import com.demich.cps.room.followListDao
 import com.demich.cps.ui.*
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
