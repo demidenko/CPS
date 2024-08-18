@@ -2,8 +2,8 @@ package com.demich.cps.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.community.follow.followListDao
+import com.demich.cps.community.settings.settingsCommunity
 import kotlin.time.Duration.Companion.hours
 
 
@@ -26,12 +26,18 @@ class CodeforcesCommunityFollowWorker(
         }
     }
 
+    //save handles between run after fast retry
+    private val proceeded = mutableSetOf<String>()
+
     override suspend fun runWork(): Result {
         val dao = context.followListDao
         val savedHandles = dao.getHandles().shuffled()
 
         savedHandles.forEachWithProgress { handle ->
-            if (dao.getAndReloadBlogEntries(handle).isFailure) return Result.retry()
+            if (handle !in proceeded) {
+                dao.getAndReloadBlogEntries(handle).getOrThrow()
+                proceeded.add(handle)
+            }
         }
 
         return Result.success()
