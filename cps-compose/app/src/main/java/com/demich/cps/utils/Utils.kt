@@ -53,17 +53,6 @@ inline fun<T, R> List<T>.forEachRangeEqualBy(selector: (T) -> R, block: (Int, In
     }
 }
 
-//couldn't resist to note that it can be solved in O(nlogn) by suffix array + rmq
-fun String.containsTokensAsSubsequence(tokens: List<String>, ignoreCase: Boolean = false): Boolean {
-    var i = 0
-    for (token in tokens) {
-        val pos = indexOf(string = token, ignoreCase = ignoreCase, startIndex = i)
-        if (pos == -1) return false
-        i = pos + token.length
-    }
-    return true
-}
-
 fun<K, V> Map<K, List<V>>.append(key: K, value: V): Map<K, List<V>> =
     toMutableMap().apply {
         this[key] = this[key]?.let { it + value } ?: listOf(value)

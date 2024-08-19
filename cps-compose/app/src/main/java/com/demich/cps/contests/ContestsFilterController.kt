@@ -1,10 +1,14 @@
 package com.demich.cps.contests
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.utils.containsTokensAsSubsequence
+import com.demich.cps.utils.filterByTokensAsSubsequence
 
 
 @Composable
@@ -41,14 +45,15 @@ class ContestsFilterController(
             if (!value) enabled = false
         }
 
-    private val whiteSpaceRegex = "\\s+".toRegex()
+    fun filterContests(contests: List<Contest>): List<Contest> =
+        contests.filterByTokensAsSubsequence(filter) {
+            sequence {
+                yield(title)
+                if (platform != Contest.Platform.unknown) yield(platform.name)
+                host?.let { yield(it) }
+            }
+        }
 
-    fun filterContests(contests: List<Contest>): List<Contest> {
-        val tokens = filter.trim().also {
-            if (it.isEmpty()) return contests
-        }.split(whiteSpaceRegex)
-        return contests.filter { checkContest(it, tokens) }
-    }
 
     companion object {
         val saver get() = listSaver<ContestsFilterController, String>(
@@ -64,16 +69,4 @@ class ContestsFilterController(
             }
         )
     }
-}
-
-private fun List<String>.check(string: String) =
-    string.containsTokensAsSubsequence(tokens = this, ignoreCase = true)
-
-private fun checkContest(contest: Contest, tokens: List<String>): Boolean {
-    with(contest) {
-        if (tokens.check(title)) return true
-        if (platform != Contest.Platform.unknown && tokens.check(platform.name)) return true
-        host?.let { if (tokens.check(it)) return true }
-    }
-    return false
 }
