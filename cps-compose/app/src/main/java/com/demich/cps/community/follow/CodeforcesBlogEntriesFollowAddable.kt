@@ -26,7 +26,7 @@ fun CodeforcesBlogEntriesFollowAddable(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     scrollBarEnabled: Boolean = false,
-    label: (@Composable (CodeforcesBlogEntry) -> Unit)? = null
+    label: @Composable (CodeforcesBlogEntry) -> Unit = {}
 ) {
     val context = context
 

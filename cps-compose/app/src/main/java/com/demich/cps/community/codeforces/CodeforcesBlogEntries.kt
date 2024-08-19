@@ -36,7 +36,7 @@ fun CodeforcesBlogEntries(
     lazyListState: LazyListState = rememberLazyListState(),
     scrollBarEnabled: Boolean = false,
     onLongClick: ((CodeforcesBlogEntry) -> Unit)? = null,
-    label: (@Composable (CodeforcesBlogEntry) -> Unit)? = null
+    label: (@Composable (CodeforcesBlogEntry) -> Unit) = {}
 ) {
     val context = context
     LazyColumnOfData(
@@ -74,7 +74,7 @@ private fun BlogEntryInfo(
     blogEntry: CodeforcesBlogEntry,
     markNew: Boolean,
     modifier: Modifier = Modifier,
-    label: (@Composable (CodeforcesBlogEntry) -> Unit)?
+    label: @Composable (CodeforcesBlogEntry) -> Unit
 ) {
     BlogEntryInfo(
         title = blogEntry.title,
@@ -86,7 +86,7 @@ private fun BlogEntryInfo(
             toTime = localCurrentTime
         ),
         markNew = markNew,
-        label = label?.let { { it(blogEntry) } },
+        label = { label(blogEntry) },
         modifier = modifier
     )
 }
@@ -100,7 +100,7 @@ private fun BlogEntryInfo(
     timeAgo: String,
     markNew: Boolean,
     modifier: Modifier = Modifier,
-    label: (@Composable () -> Unit)?
+    label: @Composable () -> Unit
 ) {
     Column(modifier = modifier) {
         BlogEntryInfoHeader(
@@ -143,7 +143,7 @@ private fun BlogEntryInfoFooter(
     timeAgo: String,
     commentsCount: Int,
     markNew: Boolean,
-    label: (@Composable () -> Unit)?
+    label: @Composable () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -169,7 +169,7 @@ private fun BlogEntryInfoFooter(
             }
         }
         Row(modifier = Modifier.align(Alignment.TopEnd)) {
-            if (label != null) label()
+            label()
             if (commentsCount > 0) {
                 CommentsRow(
                     text = AnnotatedString(commentsCount.toString()),
