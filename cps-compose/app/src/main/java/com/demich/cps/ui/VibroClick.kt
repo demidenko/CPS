@@ -3,7 +3,7 @@ package com.demich.cps.ui
 import android.view.HapticFeedbackConstants
 import android.view.View
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
 
 //https://stackoverflow.com/a/70853761
@@ -12,12 +12,13 @@ private fun View.vibrate() = reallyPerformHapticFeedback(HapticFeedbackConstants
 private fun View.vibrateStrong() = reallyPerformHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
 @Composable
-@ReadOnlyComposable
 fun (() -> Unit).withVibration(): () -> Unit {
     val view = LocalView.current
-    return {
-        view.vibrateStrong()
-        invoke()
+    return remember(key1 = this, key2 = view) {
+        {
+            view.vibrateStrong()
+            invoke()
+        }
     }
 }
 
