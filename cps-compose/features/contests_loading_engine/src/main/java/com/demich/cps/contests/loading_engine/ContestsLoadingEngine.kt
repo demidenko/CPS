@@ -6,6 +6,7 @@ import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoaderMultiple
+import com.demich.cps.contests.loading_engine.loaders.fixAtCoderTitle
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -74,11 +75,7 @@ private suspend fun loadUntilSuccess(
 
 private fun titleFix(contest: Contest): Contest {
     val fixedTitle = when (contest.platform) {
-        Contest.Platform.atcoder -> {
-            contest.title
-                .replace("（", " (")
-                .replace("）",") ")
-        }
+        Contest.Platform.atcoder -> fixAtCoderTitle(contest.title)
         else -> contest.title
     }.trim()
     return if (contest.title == fixedTitle) contest

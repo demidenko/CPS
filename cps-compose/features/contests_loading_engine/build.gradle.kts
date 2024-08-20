@@ -34,6 +34,7 @@ dependencies {
     implementation(project(":data:contests:loading"))
     implementation(project(":data:platforms:api"))
     implementation(project(":data:platforms:utils"))
+    implementation(project(":kotlin-stdlib-boost"))
 
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.coroutines.android)
