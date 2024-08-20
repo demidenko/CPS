@@ -24,33 +24,47 @@ fun CodeforcesUserBlogScreen(
     filterState: FilterState
 ) {
     LaunchedEffect(filterState, blogEntriesResult) {
-        snapshotFlow(blogEntriesResult)
+        //available = res != null && res.isSuccess && res.value.isNotEmpty()
+        snapshotFlow { blogEntriesResult()?.map { it.isNotEmpty() } }
             .distinctUntilChanged()
             .collect { result ->
-                filterState.available = result != null && result.isSuccess
+                filterState.available = result?.getOrNull() ?: false
             }
     }
 
     Column {
-        LoadingContentBox(
-            dataResult = blogEntriesResult,
-            failedText = { it.niceMessage ?: "Blog load error" },
-            modifier = Modifier.fillMaxSize()
-        ) { blogEntries ->
-            ProvideTimeEachMinute {
-                CodeforcesBlogEntries(
-                    blogEntriesController = rememberCodeforcesBlogEntriesController {
-                        filterState.filterUserBlogEntries(blogEntries)
-                    },
-                    scrollBarEnabled = true,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-        }
+        CodeforcesUserBlogContent(
+            blogEntriesResult = blogEntriesResult,
+            filterState = filterState,
+            modifier = Modifier.weight(1f)
+        )
         FilterTextField(
             filterState = filterState,
             modifier = Modifier.fillMaxWidth()
         )
+    }
+}
+
+@Composable
+private fun CodeforcesUserBlogContent(
+    blogEntriesResult: () -> Result<List<CodeforcesBlogEntry>>?,
+    filterState: FilterState,
+    modifier: Modifier = Modifier
+) {
+    LoadingContentBox(
+        dataResult = blogEntriesResult,
+        failedText = { it.niceMessage ?: "Blog load error" },
+        modifier = modifier.fillMaxSize()
+    ) { blogEntries ->
+        ProvideTimeEachMinute {
+            CodeforcesBlogEntries(
+                blogEntriesController = rememberCodeforcesBlogEntriesController {
+                    filterState.filterUserBlogEntries(blogEntries)
+                },
+                scrollBarEnabled = true,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }
 
