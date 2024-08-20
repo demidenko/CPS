@@ -5,20 +5,37 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,11 +50,31 @@ import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesContestPhase
-import com.demich.cps.ui.*
+import com.demich.cps.ui.AnimatedVisibleByNotNull
+import com.demich.cps.ui.CPSDefaults
+import com.demich.cps.ui.CPSIconButton
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.CPSMenuBuilder
+import com.demich.cps.ui.CPSReloadingButton
+import com.demich.cps.ui.CPSSwipeRefreshBox
+import com.demich.cps.ui.EmptyMessageBox
+import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
+import com.demich.cps.ui.filter.FilterState
 import com.demich.cps.ui.lazylist.LazyColumnOfData
+import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.*
+import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.ProvideCurrentTime
+import com.demich.cps.utils.clickableNoRipple
+import com.demich.cps.utils.context
+import com.demich.cps.utils.enterInColumn
+import com.demich.cps.utils.exitInColumn
+import com.demich.cps.utils.filterByTokensAsSubsequence
+import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.openUrlInBrowser
+import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.rememberCollectWithLifecycle
 import com.demich.cps.workers.ContestsWorker
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
@@ -50,7 +87,7 @@ import kotlinx.datetime.Instant
 @Composable
 fun ContestsScreen(
     contestsListController: ContestsListController,
-    filterController: ContestsFilterController,
+    filterState: FilterState,
     isReloading: () -> Boolean,
     onReload: () -> Unit
 ) {
@@ -69,13 +106,13 @@ fun ContestsScreen(
         if (isAnyPlatformEnabled) {
             ContestsReloadableContent(
                 contestsListController = contestsListController,
-                filterController = filterController,
+                filterState = filterState,
                 isReloading = isReloading,
                 onReload = onReload,
                 modifier = Modifier.weight(1f, false)
             )
-            ContestsFilterTextField(
-                filterController = filterController,
+            FilterTextField(
+                filterState = filterState,
                 modifier = Modifier.fillMaxWidth()
             )
         } else {
@@ -92,7 +129,7 @@ fun ContestsScreen(
 @Composable
 private fun ContestsReloadableContent(
     contestsListController: ContestsListController,
-    filterController: ContestsFilterController,
+    filterState: FilterState,
     isReloading: () -> Boolean,
     onReload: () -> Unit,
     modifier: Modifier = Modifier
@@ -104,7 +141,7 @@ private fun ContestsReloadableContent(
     ) {
         ContestsContent(
             contestsListController = contestsListController,
-            filterController = filterController
+            filterState = filterState
         )
     }
 }
@@ -112,7 +149,7 @@ private fun ContestsReloadableContent(
 @Composable
 private fun ContestsContent(
     contestsListController: ContestsListController,
-    filterController: ContestsFilterController
+    filterState: FilterState
 ) {
     val context = context
 
@@ -133,7 +170,7 @@ private fun ContestsContent(
         )
         ContestsPager(
             contestsListController = contestsListController,
-            filterController = filterController,
+            filterState = filterState,
             modifier = Modifier
                 .fillMaxSize()
         )
@@ -143,7 +180,7 @@ private fun ContestsContent(
 @Composable
 private fun ContestsPager(
     contestsListController: ContestsListController,
-    filterController: ContestsFilterController,
+    filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
     val (
@@ -151,10 +188,10 @@ private fun ContestsPager(
         currentTimeState: State<Instant>
     ) = produceSortedContestsWithTime()
 
-    LaunchedEffect(contestsState, filterController, contestsListController) {
+    LaunchedEffect(contestsState, filterState, contestsListController) {
         snapshotFlow { contestsState.value.contests }
             .collect { contests ->
-                filterController.available = contests.isNotEmpty()
+                filterState.available = contests.isNotEmpty()
                 contestsListController.applyContests(contests)
             }
     }
@@ -167,26 +204,35 @@ private fun ContestsPager(
             ContestsPage(
                 contests = { contestsState.value.sublist(showFinished) },
                 contestsListController = contestsListController,
-                filterController = filterController,
+                filterState = filterState,
                 modifier = modifier
             )
         }
     }
 }
 
+private fun FilterState.filterContests(contests: List<Contest>) =
+    contests.filterByTokensAsSubsequence(filter) {
+        sequence {
+            yield(title)
+            if (platform != Contest.Platform.unknown) yield(platform.name)
+            host?.let { yield(it) }
+        }
+    }
+
 @Composable
 private fun ContestsPage(
     contests: () -> List<Contest>,
     contestsListController: ContestsListController,
-    filterController: ContestsFilterController,
+    filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val filtered by remember(contests, filterController) {
+    val filtered by remember(contests, filterState) {
         derivedStateOf {
-            filterController.filterContests(contests())
+            filterState.filterContests(contests())
         }
     }
 
@@ -242,38 +288,6 @@ internal fun Modifier.contestItemPaddings() =
     )
 
 @Composable
-private fun ContestsFilterTextField(
-    filterController: ContestsFilterController,
-    modifier: Modifier = Modifier
-) {
-    if (filterController.enabled) {
-        val focusRequester = rememberFocusOnCreationRequester()
-        OutlinedTextField(
-            modifier = modifier.focusRequester(focusRequester),
-            singleLine = true,
-            textStyle = TextStyle(fontSize = 19.sp, fontWeight = FontWeight.Bold),
-            value = filterController.filter,
-            onValueChange = {
-                filterController.filter = it
-            },
-            label = { Text("filter") },
-            leadingIcon = {
-                Icon(
-                    imageVector = CPSIcons.Search,
-                    tint = cpsColors.content,
-                    contentDescription = null
-                )
-            },
-            trailingIcon = {
-                CPSIconButton(icon = CPSIcons.Close) {
-                    filterController.enabled = false
-                }
-            }
-        )
-    }
-}
-
-@Composable
 private fun ColumnScope.LoadingError(
     errorsMessage: () -> String,
     modifier: Modifier = Modifier
@@ -308,7 +322,7 @@ fun contestsMenuBuilder(
 
 fun contestsBottomBarBuilder(
     contestsListController: ContestsListController,
-    filterController: ContestsFilterController,
+    filterState: FilterState,
     loadingStatus: () -> LoadingStatus,
     onReloadClick: () -> Unit
 ): AdditionalBottomBarBuilder = {
@@ -323,10 +337,10 @@ fun contestsBottomBarBuilder(
         )
     }
 
-    if (isAnyPlatformEnabled && filterController.available && !filterController.enabled) {
+    if (isAnyPlatformEnabled && filterState.available && !filterState.enabled) {
         CPSIconButton(
             icon = CPSIcons.Search,
-            onClick = { filterController.enabled = true }
+            onClick = { filterState.enabled = true }
         )
     }
 

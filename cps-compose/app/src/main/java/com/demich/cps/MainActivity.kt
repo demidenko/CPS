@@ -41,7 +41,6 @@ import com.demich.cps.contests.contestsBottomBarBuilder
 import com.demich.cps.contests.contestsMenuBuilder
 import com.demich.cps.contests.contestsViewModel
 import com.demich.cps.contests.rememberCombinedLoadingStatusState
-import com.demich.cps.contests.rememberContestsFilterController
 import com.demich.cps.contests.rememberContestsListController
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.develop.DevelopScreen
@@ -52,6 +51,7 @@ import com.demich.cps.navigation.ScreenTypes
 import com.demich.cps.navigation.getScreen
 import com.demich.cps.navigation.rememberCPSNavigator
 import com.demich.cps.ui.CPSScaffold
+import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
@@ -183,19 +183,19 @@ private fun CPSContent() {
             val context = context
             val contestsViewModel = contestsViewModel()
             val contestsListController = rememberContestsListController()
-            val filterController = rememberContestsFilterController()
+            val filterState = rememberFilterState()
             val loadingStatus by rememberCombinedLoadingStatusState()
             val isReloading = { loadingStatus == LoadingStatus.LOADING }
             val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
             ContestsScreen(
                 contestsListController = contestsListController,
-                filterController = filterController,
+                filterState = filterState,
                 isReloading = isReloading,
                 onReload = onReload
             )
             holder.bottomBar = contestsBottomBarBuilder(
                 contestsListController = contestsListController,
-                filterController = filterController,
+                filterState = filterState,
                 loadingStatus = { loadingStatus },
                 onReloadClick = onReload
             )
