@@ -27,8 +27,9 @@ import com.demich.cps.accounts.accountsBottomBarBuilder
 import com.demich.cps.accounts.accountsViewModel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.community.CommunityScreen
-import com.demich.cps.community.codeforces.CodeforcesBlogScreen
+import com.demich.cps.community.codeforces.CodeforcesUserBlogScreen
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
+import com.demich.cps.community.codeforces.codeforcesUserBlogBottomBarBuilder
 import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
 import com.demich.cps.community.communityBottomBarBuilder
 import com.demich.cps.community.communityMenuBuilder
@@ -175,7 +176,12 @@ private fun CPSContent() {
             val blogEntriesResult by newsViewModel
                 .flowOfBlogEntriesResult(handle, context, key = currentDataKey)
                 .collectAsState()
-            CodeforcesBlogScreen(blogEntriesResult = { blogEntriesResult })
+            val filterState = rememberFilterState()
+            CodeforcesUserBlogScreen(
+                blogEntriesResult = { blogEntriesResult },
+                filterState = filterState
+            )
+            holder.bottomBar = codeforcesUserBlogBottomBarBuilder(filterState = filterState)
             holder.setSubtitle("community", "codeforces", "blog")
         }
 
