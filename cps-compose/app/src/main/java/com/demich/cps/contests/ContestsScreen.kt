@@ -8,15 +8,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -51,16 +46,15 @@ import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesContestPhase
 import com.demich.cps.ui.AnimatedVisibleByNotNull
-import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.EmptyMessageBox
-import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.filter.FilterState
+import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
@@ -96,12 +90,7 @@ fun ContestsScreen(
 
     val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
 
-    Column(
-        modifier = Modifier
-            .consumeWindowInsets(WindowInsets.navigationBars) //order matters!!
-            .consumeWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
-            .imePadding()
-    ) {
+    Column {
         CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
         if (isAnyPlatformEnabled) {
             ContestsReloadableContent(
