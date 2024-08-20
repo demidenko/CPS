@@ -53,6 +53,7 @@ import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.EmptyMessageBox
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
+import com.demich.cps.ui.filter.FilterIconButton
 import com.demich.cps.ui.filter.FilterState
 import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.lazylist.LazyColumnOfData
@@ -326,11 +327,8 @@ fun contestsBottomBarBuilder(
         )
     }
 
-    if (isAnyPlatformEnabled && filterState.available && !filterState.enabled) {
-        CPSIconButton(
-            icon = CPSIcons.Search,
-            onClick = { filterState.enabled = true }
-        )
+    if (isAnyPlatformEnabled) {
+        FilterIconButton(filterState = filterState)
     }
 
     CPSReloadingButton(
