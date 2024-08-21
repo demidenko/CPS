@@ -28,11 +28,6 @@ internal fun fixAtCoderTitle(origin: String): String {
     return s
 }
 
-//TODO use regex
 private fun String.isContestTitle(): Boolean {
-    if (startsWith("AtCoder Beginner Contest", ignoreCase = true)) return true
-    if (startsWith("AtCoder Regular Contest", ignoreCase = true)) return true
-    if (startsWith("AtCoder Grand Contest", ignoreCase = true)) return true
-    if (startsWith("AtCoder Heuristic Contest", ignoreCase = true)) return true
-    return false
+    return matches(Regex("^atcoder (beginner|regular|grand|heuristic) contest .*", RegexOption.IGNORE_CASE))
 }
