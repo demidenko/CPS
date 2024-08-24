@@ -57,3 +57,8 @@ fun<K, V> Map<K, List<V>>.append(key: K, value: V): Map<K, List<V>> =
     toMutableMap().apply {
         this[key] = this[key]?.let { it + value } ?: listOf(value)
     }
+
+fun <T> List<T>.subList(range: IntRange): List<T> {
+    if (range.isEmpty()) return emptyList()
+    return subList(fromIndex = range.first, toIndex = range.last + 1)
+}

@@ -46,22 +46,29 @@ fun rememberCodeforcesBlogEntriesController(
 ): CodeforcesBlogEntriesController {
 
     LaunchedEffect(tab, newEntriesItem, listState, controller) {
-        val flowOfIds = blogEntriesFlow.map {
-            it.map { it.id }
-        }.distinctUntilChanged().onEach { ids ->
-            newEntriesItem.apply(newEntries = ids)
-        }
-
-        snapshotFlow {
-            if (!controller.isTabVisible(tab)) return@snapshotFlow IntRange.EMPTY
-            listState.visibleRange(0.75f)
-        }.combine(flowOfIds) { visibleRange, ids -> visibleRange to ids }
-            .debounce(250.milliseconds)
-            .collect { (visibleRange, ids) ->
+        combine(
+            flow = blogEntriesFlow
+                .map { it.map { it.id } }
+                .distinctUntilChanged()
+                .onEach { ids -> newEntriesItem.apply(newEntries = ids) },
+            flow2 = snapshotFlow {
+                if (!controller.isTabVisible(tab)) return@snapshotFlow IntRange.EMPTY
+                listState.visibleRange(0.75f)
+            }
+        ) { ids, visibleRange ->
+            if (ids.isEmpty()) {
                 //empty ids can create Empty message item!!
-                if (ids.isNotEmpty()) {
+                null
+            } else {
+                ids.subList(visibleRange)
+            }
+        }
+            .debounce(250.milliseconds) //prevent user do fast scroll
+            .distinctUntilChanged() //prevent repeats after debounce
+            .collect { visibleIds ->
+                if (visibleIds != null) {
                     newEntriesItem.markAtLeast(
-                        ids = visibleRange.map { ids[it] },
+                        ids = visibleIds,
                         type = NewEntryType.SEEN
                     )
                 }
