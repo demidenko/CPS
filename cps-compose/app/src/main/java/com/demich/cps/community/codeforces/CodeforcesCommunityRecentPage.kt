@@ -1,6 +1,5 @@
 package com.demich.cps.community.codeforces
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Divider
@@ -17,6 +16,7 @@ import com.demich.cps.platforms.api.CodeforcesComment
 import com.demich.cps.platforms.api.CodeforcesRecentAction
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
 import com.demich.cps.platforms.utils.codeforces.author
+import com.demich.cps.ui.BackHandler
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
@@ -28,7 +28,6 @@ fun CodeforcesCommunityRecentPage(
     controller: CodeforcesCommunityController
 ) {
     val context = context
-
     val recent by rememberCollect { controller.flowOfRecent(context) }
 
     val saveableStateHolder = rememberSaveableStateHolder()
@@ -36,15 +35,16 @@ fun CodeforcesCommunityRecentPage(
     CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.RECENT) {
         val blogEntry = controller.recentFilterByBlogEntry
         if (blogEntry != null) {
-            RecentCommentsInBlogEntry(
-                controller = controller,
-                comments = { recent.comments },
-                blogEntry = recent.blogEntries.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
-                onBackPressed = {
-                    controller.recentFilterByBlogEntry = null
-                },
-                modifier = Modifier.fillMaxSize()
-            )
+            BackHandler(
+                enabled = { controller.isTabVisible(CodeforcesTitle.RECENT) },
+                onBackPressed = { controller.recentFilterByBlogEntry = null }
+            ) {
+                RecentCommentsInBlogEntry(
+                    comments = { recent.comments },
+                    blogEntry = recent.blogEntries.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         } else
         if (controller.recentShowComments) {
             saveableStateHolder.SaveableStateProvider(key = true) {
@@ -100,10 +100,8 @@ private fun RecentBlogEntriesPage(
 
 @Composable
 private fun RecentCommentsInBlogEntry(
-    controller: CodeforcesCommunityController,
     comments: () -> List<CodeforcesRecentAction>,
     blogEntry: CodeforcesBlogEntry,
-    onBackPressed: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val filteredComments by rememberWith(blogEntry) {
@@ -129,10 +127,4 @@ private fun RecentCommentsInBlogEntry(
             modifier = Modifier.fillMaxSize()
         )
     }
-
-
-    BackHandler(
-        enabled = controller.isTabVisible(CodeforcesTitle.RECENT),
-        onBack = onBackPressed
-    )
 }
