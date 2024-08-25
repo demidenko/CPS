@@ -32,9 +32,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
         context.settingsCommunity.flowOfCodeforcesTabs()
     }
 
-    val controller = rememberSaveable(
-        saver = CodeforcesCommunityController.saver(viewModel, tabsState)
-    ) {
+    val controller = rememberSaveable(saver = controllerSaver(viewModel, tabsState)) {
         val settings = context.settingsCommunity
         val defaultTab = runBlocking { settings.codeforcesDefaultTab() }
         CodeforcesCommunityController(
@@ -50,11 +48,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
     }
 
     DisposableEffect(controller) {
-        with(controller) {
-            flowOfMainBlogEntries(context)
-            if (topShowComments) flowOfTopComments(context) else flowOfTopBlogEntries(context)
-            flowOfRecent(context)
-        }
+        controller.touchFlows(context)
         onDispose { }
     }
 
@@ -128,30 +122,28 @@ class CodeforcesCommunityController internal constructor(
             blogEntries.sortedByDescending { it.timeStamp }
                 .map { it.blogEntry }
         }
+}
 
-    companion object {
-        fun saver(
-            viewModel: CodeforcesCommunityViewModel,
-            tabsState: State<List<CodeforcesTitle>>
-        ) = Saver<CodeforcesCommunityController, String>(
-            save = {
-                jsonCPS.encodeToString(CodeforcesCommunityControllerData(
-                    selectedTab = it.currentTab,
-                    topShowComments = it.topShowComments,
-                    recentShowComments = it.recentShowComments,
-                    recentFilterByBlogEntry = it.recentFilterByBlogEntry
-                ))
-            },
-            restore = {
-                CodeforcesCommunityController(
-                    viewModel = viewModel,
-                    tabsState = tabsState,
-                    data = jsonCPS.decodeFromString(it)
-                )
-            }
+private fun controllerSaver(
+    viewModel: CodeforcesCommunityViewModel,
+    tabsState: State<List<CodeforcesTitle>>
+) = Saver<CodeforcesCommunityController, String>(
+    save = {
+        jsonCPS.encodeToString(CodeforcesCommunityControllerData(
+            selectedTab = it.currentTab,
+            topShowComments = it.topShowComments,
+            recentShowComments = it.recentShowComments,
+            recentFilterByBlogEntry = it.recentFilterByBlogEntry
+        ))
+    },
+    restore = {
+        CodeforcesCommunityController(
+            viewModel = viewModel,
+            tabsState = tabsState,
+            data = jsonCPS.decodeFromString(it)
         )
     }
-}
+)
 
 private fun flowOfBadgeCount(
     isTabVisibleFlow: Flow<Boolean>,
@@ -165,3 +157,9 @@ private fun flowOfBadgeCount(
         if (isTabVisible) counters.seenCount + counters.unseenCount
         else counters.unseenCount
     }
+
+private fun CodeforcesCommunityController.touchFlows(context: Context) {
+    flowOfMainBlogEntries(context)
+    if (topShowComments) flowOfTopComments(context) else flowOfTopBlogEntries(context)
+    flowOfRecent(context)
+}
