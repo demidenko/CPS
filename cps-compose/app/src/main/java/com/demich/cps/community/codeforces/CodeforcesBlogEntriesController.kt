@@ -62,7 +62,7 @@ fun rememberCodeforcesBlogEntriesController(
                 ids.subList(visibleRange)
             }
         }
-            .debounce(250.milliseconds) //prevent user do fast scroll
+            .debounce(250.milliseconds) //to sync ids with range / prevent user do fast scroll
             .distinctUntilChanged() //prevent repeats after debounce
             .collect { visibleIds ->
                 if (visibleIds != null) {
