@@ -16,13 +16,16 @@ fun CodeforcesCommunityTopPage(
     val saveableStateHolder = rememberSaveableStateHolder()
 
     CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.TOP) {
-        if (controller.topShowComments) {
-            saveableStateHolder.SaveableStateProvider(key = true) {
-                CodeforcesCommunityTopComments(controller = controller)
+        when (val key = controller.topType) {
+            CodeforcesCommunityController.TopType.BlogEntries -> {
+                saveableStateHolder.SaveableStateProvider(key = key) {
+                    CodeforcesCommunityTopBlogEntries(controller = controller)
+                }
             }
-        } else {
-            saveableStateHolder.SaveableStateProvider(key = false) {
-                CodeforcesCommunityTopBlogEntries(controller = controller)
+            CodeforcesCommunityController.TopType.Comments -> {
+                saveableStateHolder.SaveableStateProvider(key = key) {
+                    CodeforcesCommunityTopComments(controller = controller)
+                }
             }
         }
     }

@@ -40,7 +40,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
             tabsState = tabsState,
             data = CodeforcesCommunityControllerData(
                 selectedTab = defaultTab,
-                topShowComments = false,
+                topType = CodeforcesCommunityController.TopType.BlogEntries,
                 recentShowComments = false,
                 recentFilterByBlogEntry = null
             )
@@ -58,7 +58,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
 @Serializable
 internal data class CodeforcesCommunityControllerData(
     val selectedTab: CodeforcesTitle,
-    val topShowComments: Boolean,
+    val topType: CodeforcesCommunityController.TopType,
     val recentShowComments: Boolean,
     val recentFilterByBlogEntry: CodeforcesBlogEntry?
 )
@@ -90,7 +90,7 @@ class CodeforcesCommunityController internal constructor(
         pagerState.animateScrollToPage(page = tabs.indexOf(tab))
 
 
-    var topShowComments by mutableStateOf(data.topShowComments)
+    var topType by mutableStateOf(data.topType)
 
     var recentShowComments by mutableStateOf(data.recentShowComments)
     var recentFilterByBlogEntry: CodeforcesBlogEntry? by mutableStateOf(data.recentFilterByBlogEntry)
@@ -122,6 +122,10 @@ class CodeforcesCommunityController internal constructor(
             blogEntries.sortedByDescending { it.timeStamp }
                 .map { it.blogEntry }
         }
+
+    enum class TopType {
+        BlogEntries, Comments
+    }
 }
 
 private fun controllerSaver(
@@ -131,7 +135,7 @@ private fun controllerSaver(
     save = {
         jsonCPS.encodeToString(CodeforcesCommunityControllerData(
             selectedTab = it.currentTab,
-            topShowComments = it.topShowComments,
+            topType = it.topType,
             recentShowComments = it.recentShowComments,
             recentFilterByBlogEntry = it.recentFilterByBlogEntry
         ))
@@ -160,6 +164,9 @@ private fun flowOfBadgeCount(
 
 private fun CodeforcesCommunityController.touchFlows(context: Context) {
     flowOfMainBlogEntries(context)
-    if (topShowComments) flowOfTopComments(context) else flowOfTopBlogEntries(context)
+    when (topType) {
+        CodeforcesCommunityController.TopType.BlogEntries -> flowOfTopBlogEntries(context)
+        CodeforcesCommunityController.TopType.Comments -> flowOfTopComments(context)
+    }
     flowOfRecent(context)
 }
