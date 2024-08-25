@@ -49,8 +49,7 @@ fun rememberCodeforcesBlogEntriesController(
         combine(
             flow = blogEntriesFlow
                 .map { it.map { it.id } }
-                .distinctUntilChanged()
-                .onEach { ids -> newEntriesItem.apply(newEntries = ids) },
+                .distinctUntilChanged(),
             flow2 = snapshotFlow {
                 if (!controller.isTabVisible(tab)) return@snapshotFlow IntRange.EMPTY
                 listState.visibleRange(0.75f)
@@ -84,12 +83,12 @@ fun rememberCodeforcesBlogEntriesController(
 
             override fun onOpenBlogEntry(blogEntry: CodeforcesBlogEntry) {
                 scope.launch {
-                    newEntriesItem.mark(id = blogEntry.id, type = NewEntryType.OPENED)
+                    newEntriesItem.markAtLeast(id = blogEntry.id, type = NewEntryType.OPENED)
                 }
             }
 
             override fun isNew(id: Int): Boolean {
-                val type = types.value[id]
+                val type = types.value.getType(id)
                 return type == NewEntryType.UNSEEN || type == NewEntryType.SEEN
             }
         }
