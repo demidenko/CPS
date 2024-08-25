@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 
@@ -50,6 +51,13 @@ class NewEntriesDataStoreItem (
         val date = getCurrentDate()
         item.edit {
             for (id in ids) this.markAtLeast(id, type, date)
+        }
+    }
+
+    suspend fun removeOldMarkedItems() {
+        val currentDate = getCurrentDate()
+        item.update { types ->
+            types.filterValues { it.date.daysUntil(currentDate) < 30 }
         }
     }
 }
