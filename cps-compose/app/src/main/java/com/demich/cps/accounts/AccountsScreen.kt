@@ -18,7 +18,6 @@ import com.demich.cps.ui.*
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.lazylist.itemsNotEmpty
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.combine
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.CoroutineScope
@@ -116,9 +115,7 @@ private fun ReloadAccountsButton() {
     val accountsViewModel = accountsViewModel()
 
     val loadingStatus by rememberCollect {
-        allAccountManagers
-            .map { accountsViewModel.flowOfLoadingStatus(it) }
-            .combine()
+        accountsViewModel.flowOfLoadingStatus(allAccountManagers)
     }
 
     val anyRecordedAccount by rememberCollect {

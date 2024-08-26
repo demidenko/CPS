@@ -16,6 +16,7 @@ import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.backgroundDataLoader
+import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +36,9 @@ class AccountsViewModel: ViewModel() {
 
     fun flowOfLoadingStatus(manager: AccountManager<out UserInfo>): Flow<LoadingStatus> =
         loadingStatuses.map { it[manager.type] ?: LoadingStatus.PENDING }
+
+    fun flowOfLoadingStatus(managers: Collection<AccountManager<out UserInfo>>): Flow<LoadingStatus> =
+        loadingStatuses.map { map -> managers.mapNotNull { map[it.type] }.combine() }
 
     private fun setLoadingStatus(manager: AccountManager<out UserInfo>, loadingStatus: LoadingStatus) =
         loadingStatuses.edit {
