@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.ui.withVibration
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -41,7 +40,7 @@ internal fun CPSBottomNavigationItem(
                 indication = indication,
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = onClick,
-                onLongClick = onLongPress?.withVibration()
+                onLongClick = onLongPress
             )
     ) {
         Icon(

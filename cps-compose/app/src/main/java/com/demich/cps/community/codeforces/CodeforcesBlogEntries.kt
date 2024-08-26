@@ -54,7 +54,7 @@ fun CodeforcesBlogEntries(
                 .fillMaxWidth()
                 .combinedClickable(
                     onClick = { blogEntriesController.openBlogEntry(blogEntry, context) },
-                    onLongClick = onLongClick?.let { { it(blogEntry) }.withVibration() }
+                    onLongClick = onLongClick?.let { { it(blogEntry) } }
                 )
                 .padding(
                     start = 5.dp,

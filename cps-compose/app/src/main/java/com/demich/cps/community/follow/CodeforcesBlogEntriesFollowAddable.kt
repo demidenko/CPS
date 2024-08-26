@@ -17,6 +17,7 @@ import com.demich.cps.community.codeforces.CodeforcesCommunityController
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
+import com.demich.cps.ui.withVibration
 import com.demich.cps.utils.context
 
 @Composable
@@ -37,7 +38,7 @@ fun CodeforcesBlogEntriesFollowAddable(
         modifier = modifier,
         lazyListState = lazyListState,
         scrollBarEnabled = scrollBarEnabled,
-        onLongClick = { showAddToFollowDialogFor = it },
+        onLongClick = withVibration { showAddToFollowDialogFor = it },
         label = label
     )
 

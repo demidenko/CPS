@@ -22,6 +22,17 @@ fun (() -> Unit).withVibration(): () -> Unit {
     }
 }
 
+@Composable
+fun <T> withVibration(block: ((T) -> Unit)): (T) -> Unit {
+    val view = LocalView.current
+    return remember(key1 = block, key2 = view) {
+        {
+            view.vibrateStrong()
+            block(it)
+        }
+    }
+}
+
 private fun View.reallyPerformHapticFeedback(feedbackConstant: Int) {
     /*if (context.isTouchExplorationEnabled()) {
         // Don't mess with a blind person's vibrations

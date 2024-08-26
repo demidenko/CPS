@@ -55,7 +55,7 @@ fun CPSScaffold(
             navigator = navigator,
             bottomBarSettingsEnabled = bottomBarSettingsEnabled,
             onDisableBottomBarSettings = { bottomBarSettingsEnabled = false },
-            onEnableBottomBarSettings = { bottomBarSettingsEnabled = true },
+            onEnableBottomBarSettings = { bottomBarSettingsEnabled = true }.withVibration(),
             content = content,
             modifier = Modifier.fillMaxSize()
         )
