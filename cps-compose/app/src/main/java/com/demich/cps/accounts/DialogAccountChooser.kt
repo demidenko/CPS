@@ -35,6 +35,7 @@ import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberFocusOnCreationRequester
 import com.demich.cps.utils.showToast
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -86,10 +87,10 @@ private fun<U: UserInfo> DialogContent(
     val userId by rememberUpdatedState(newValue = textFieldValue.text)
 
     var userInfo by remember { mutableStateOf(initialUserInfo) }
-    var loadingInProgress by remember { mutableStateOf(false) }
+    val loadingInProgressState = remember { mutableStateOf(false) }
 
     var suggestionsResult by remember { mutableStateOf(Result.success(emptyList<UserSuggestion>())) }
-    var loadingSuggestionsInProgress by remember { mutableStateOf(false) }
+    val loadingSuggestionsInProgressState = remember { mutableStateOf(false) }
     var blockSuggestionsReload by remember { mutableStateOf(false) }
 
     val focusRequester = rememberFocusOnCreationRequester()
@@ -100,9 +101,12 @@ private fun<U: UserInfo> DialogContent(
         userInfo = userInfo,
         textFieldValue = textFieldValue,
         onValueChange = {
-            if (it.text.all(charValidator)) textFieldValue = it
+            if (it.text.all(charValidator)) {
+                blockSuggestionsReload = false
+                textFieldValue = it
+            }
         },
-        loadingInProgress = loadingInProgress,
+        loadingInProgress = loadingInProgressState.value,
         modifier = Modifier
             .focusRequester(focusRequester)
             .fillMaxWidth(),
@@ -120,10 +124,10 @@ private fun<U: UserInfo> DialogContent(
     if (manager is UserSuggestionsProvider) {
         SuggestionsList(
             suggestionsResult = suggestionsResult,
-            isLoading = loadingSuggestionsInProgress,
+            isLoading = loadingSuggestionsInProgressState.value,
             modifier = Modifier.fillMaxWidth(),
             onClick = { suggestion ->
-                blockSuggestionsReload = true //TODO: bug if suggestion same as current userId
+                blockSuggestionsReload = true
                 textFieldValue = suggestion.userId.toTextFieldValue()
             }
         )
@@ -136,33 +140,45 @@ private fun<U: UserInfo> DialogContent(
         }
         if (userId.length < suggestionsMinLength) {
             suggestionsResult = Result.success(emptyList())
-            loadingSuggestionsInProgress = false
+            loadingSuggestionsInProgressState.value = false
             blockSuggestionsReload = false
         }
         userInfo = null
         if (userId.isBlank()) {
-            loadingInProgress = false
+            loadingInProgressState.value = false
             return@LaunchedEffect
         }
         delay(300)
-        launch(Dispatchers.IO) {
-            loadingInProgress = true
-            userInfo = manager.getUserInfo(userId)
-            loadingInProgress = false
-        }
+        launchLoading(
+            loadingInProgressState = loadingInProgressState,
+            getData = { manager.getUserInfo(userId) },
+            saveData = { userInfo = it }
+        )
         if (manager is UserSuggestionsProvider && userId.length >= suggestionsMinLength) {
             if (!blockSuggestionsReload) {
-                loadingSuggestionsInProgress = true
-                launch(Dispatchers.IO) {
-                    val result = manager.runCatching { getSuggestions(userId) }
-                    loadingSuggestionsInProgress = false
-                    if (isActive) { //Because of "StandaloneCoroutine was cancelled" exception during cancelling LaunchedEffect
-                        suggestionsResult = result
-                    }
-                }
+                launchLoading(
+                    loadingInProgressState = loadingSuggestionsInProgressState,
+                    getData = { manager.runCatching { getSuggestions(userId) } },
+                    saveData = { suggestionsResult = it }
+                )
             } else {
                 blockSuggestionsReload = false
             }
+        }
+    }
+}
+
+private fun <T> CoroutineScope.launchLoading(
+    loadingInProgressState: MutableState<Boolean>,
+    getData: suspend () -> T,
+    saveData: (T) -> Unit
+) {
+    loadingInProgressState.value = true
+    launch(Dispatchers.IO) {
+        val data = getData()
+        loadingInProgressState.value = false
+        if (isActive) { //Because of "StandaloneCoroutine was cancelled" exception during cancelling LaunchedEffect
+            saveData(data)
         }
     }
 }
