@@ -9,6 +9,7 @@ import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.TimusApi
 import com.demich.cps.platforms.utils.TimusUtils
+import com.demich.cps.ui.theme.CPSColors
 
 
 class TimusAccountManager :
@@ -36,10 +37,10 @@ class TimusAccountManager :
         return TimusUtils.extractUsersSuggestions(source = TimusApi.getSearchPage(str))
     }
 
-    @Composable
-    override fun makeOKInfoSpan(userInfo: TimusUserInfo) = with(userInfo) {
-        AnnotatedString("$userName $solvedTasks")
-    }
+    override fun makeOKInfoSpan(userInfo: TimusUserInfo, cpsColors: CPSColors): AnnotatedString =
+        with(userInfo) {
+            AnnotatedString("$userName $solvedTasks")
+        }
 
     @Composable
     override fun PanelContent(userInfo: TimusUserInfo) {

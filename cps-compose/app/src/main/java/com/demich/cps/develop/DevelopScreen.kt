@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.allRatedAccountManagers
-import com.demich.cps.accounts.managers.makeRatedSpan
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -25,6 +24,7 @@ import com.demich.cps.ui.CPSRadioButtonTitled
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
+import com.demich.cps.ui.theme.cpsColors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -119,7 +119,11 @@ private fun HandlesList(
     ) {
         items(4000) { rating ->
             Text(
-                text = manager.makeRatedSpan(text = rating.toString(), rating = rating)
+                text = manager.makeRatedSpan(
+                    text = rating.toString(),
+                    rating = rating,
+                    cpsColors = cpsColors
+                )
             )
         }
     }

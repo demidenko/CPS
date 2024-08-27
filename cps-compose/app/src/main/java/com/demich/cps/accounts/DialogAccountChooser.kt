@@ -205,7 +205,7 @@ private fun<U: UserInfo> UserIdTextField(
         },
         label = {
             Text(
-                text = makeUserInfoSpan(userInfo, manager),
+                text = manager.makeUserInfoSpan(userInfo),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = resultTextSize
@@ -351,12 +351,13 @@ private fun AccountChooserHeader(
 }
 
 @Composable
-private fun<U: UserInfo> makeUserInfoSpan(userInfo: U?, manager: AccountManager<U>): AnnotatedString {
+@ReadOnlyComposable
+private fun<U: UserInfo> AccountManager<U>.makeUserInfoSpan(userInfo: U?): AnnotatedString {
     if (userInfo == null) return AnnotatedString("")
     return buildAnnotatedString {
         withStyle(SpanStyle(color = cpsColors.content)) {
             when (userInfo.status) {
-                STATUS.OK -> append(manager.makeOKInfoSpan(userInfo))
+                STATUS.OK -> append(makeOKInfoSpan(userInfo, cpsColors))
                 STATUS.NOT_FOUND -> append(text = "User not found", fontStyle = FontStyle.Italic)
                 STATUS.FAILED -> append(text = "Loading failed", fontStyle = FontStyle.Italic)
             }

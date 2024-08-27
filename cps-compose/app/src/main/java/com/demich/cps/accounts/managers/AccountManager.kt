@@ -9,6 +9,7 @@ import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
+import com.demich.cps.ui.theme.CPSColors
 import kotlinx.coroutines.flow.map
 
 enum class AccountManagerType {
@@ -51,8 +52,7 @@ abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
 
     abstract suspend fun getUserInfo(data: String): U
 
-    @Composable
-    abstract fun makeOKInfoSpan(userInfo: U): AnnotatedString
+    abstract fun makeOKInfoSpan(userInfo: U, cpsColors: CPSColors): AnnotatedString
 
     @Composable
     open fun PanelContent(userInfo: U) {}

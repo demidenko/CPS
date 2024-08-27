@@ -10,6 +10,7 @@ import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.ACMPApi
 import com.demich.cps.platforms.utils.ACMPUtils
+import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.utils.forEach
 
 
@@ -41,8 +42,7 @@ class ACMPAccountManager :
         return ACMPUtils.extractUsersSuggestions(source = ACMPApi.getUsersSearch(str))
     }
 
-    @Composable
-    override fun makeOKInfoSpan(userInfo: ACMPUserInfo): AnnotatedString =
+    override fun makeOKInfoSpan(userInfo: ACMPUserInfo, cpsColors: CPSColors): AnnotatedString =
         buildAnnotatedString {
             val words = userInfo.userName.split(' ')
             if (words.size < 3) append(userInfo.userName)

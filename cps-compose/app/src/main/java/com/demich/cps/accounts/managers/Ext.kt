@@ -22,20 +22,8 @@ fun RatedAccountManager<*>.colorFor(rating: Int): Color =
 
 @Composable
 @ReadOnlyComposable
-fun RatedAccountManager<*>.makeRatedSpan(text: String, rating: Int): AnnotatedString =
-    makeRatedSpan(text = text, rating = rating, cpsColors = cpsColors)
-
-@Composable
-@ReadOnlyComposable
-fun RatedAccountManager<*>.makeOKSpan(text: String, rating: Int?): AnnotatedString {
-    return if (rating == null) AnnotatedString(text = text)
-    else makeRatedSpan(text, rating)
-}
-
-@Composable
-@ReadOnlyComposable
 fun<U: RatedUserInfo> RatedAccountManager<U>.makeHandleSpan(userInfo: U): AnnotatedString =
     with(userInfo) {
-        if (status == STATUS.OK) makeOKSpan(text = handle, rating = rating)
+        if (status == STATUS.OK) makeOKSpan(text = handle, rating = rating, cpsColors = cpsColors)
         else AnnotatedString(text = handle)
     }

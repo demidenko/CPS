@@ -1,7 +1,6 @@
 package com.demich.cps.accounts.managers
 
 import android.content.Context
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.userinfo.ClistUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
@@ -9,6 +8,7 @@ import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.ClistApi
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.platforms.utils.ClistUtils
+import com.demich.cps.ui.theme.CPSColors
 
 
 class CListAccountManager :
@@ -33,10 +33,10 @@ class CListAccountManager :
         ClistUtils.extractLoginSuggestions(source = ClistApi.getUsersSearchPage(str))
             .map { UserSuggestion(userId = it) }
 
-    @Composable
-    override fun makeOKInfoSpan(userInfo: ClistUserInfo) = with(userInfo) {
-        AnnotatedString("$login (${accounts.size})")
-    }
+    override fun makeOKInfoSpan(userInfo: ClistUserInfo, cpsColors: CPSColors): AnnotatedString =
+        with(userInfo) {
+            AnnotatedString("$login (${accounts.size})")
+        }
 
     override fun dataStore(context: Context): AccountDataStore<ClistUserInfo> {
         throw IllegalAccessException("CList account manager can not provide data store")

@@ -42,14 +42,19 @@ abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagerType):
             )
         )
 
-    @Composable
-    final override fun makeOKInfoSpan(userInfo: U) = with(userInfo) {
-        require(status == STATUS.OK)
-        makeOKSpan(
-            text = handle + " " + ratingToString(),
-            rating = rating
-        )
-    }
+    fun makeOKSpan(text: String, rating: Int?, cpsColors: CPSColors): AnnotatedString =
+        if (rating == null) AnnotatedString(text = text)
+        else makeRatedSpan(text, rating, cpsColors)
+
+    final override fun makeOKInfoSpan(userInfo: U, cpsColors: CPSColors): AnnotatedString =
+        with(userInfo) {
+            require(status == STATUS.OK)
+            makeOKSpan(
+                text = handle + " " + ratingToString(),
+                rating = rating,
+                cpsColors = cpsColors
+            )
+        }
 
     @Composable
     override fun PanelContent(userInfo: U) = SmallRatedAccountPanel(userInfo)
