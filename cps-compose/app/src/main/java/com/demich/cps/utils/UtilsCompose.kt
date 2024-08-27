@@ -12,7 +12,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material.LocalContentColor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
@@ -55,6 +57,11 @@ val context: Context
     @ReadOnlyComposable
     get() = LocalContext.current
 
+
+@Composable
+fun ProvideContentColor(color: Color, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalContentColor provides color, content = content)
+}
 
 inline fun<reified T> Json.saver() =
     Saver<T, String>(

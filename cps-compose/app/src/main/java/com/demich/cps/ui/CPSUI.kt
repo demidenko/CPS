@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.colorFor
 import com.demich.cps.utils.toSignedString
 
@@ -285,7 +286,7 @@ fun EmptyMessageBox(
         contentAlignment = Alignment.Center,
         modifier = modifier
     ) {
-        CompositionLocalProvider(LocalContentColor provides cpsColors.contentAdditional) {
+        ProvideContentColor(cpsColors.contentAdditional) {
             ProvideTextStyle(
                 value = TextStyle(fontWeight = FontWeight.Medium),
                 content = content
