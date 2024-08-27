@@ -37,6 +37,7 @@ import com.demich.cps.community.follow.CommunityFollowScreen
 import com.demich.cps.community.follow.communityFollowListBottomBarBuilder
 import com.demich.cps.community.settings.CommunitySettingsScreen
 import com.demich.cps.community.settings.settingsCommunity
+import com.demich.cps.contests.ContestsListController
 import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.contestsBottomBarBuilder
 import com.demich.cps.contests.contestsMenuBuilder
@@ -210,9 +211,9 @@ private fun CPSContent() {
                 isReloading = isReloading
             )
 
-            when (contestsListController.showFinished) {
-                true -> holder.setSubtitle("contests", "finished")
-                false -> holder.setSubtitle("contests")
+            when (contestsListController.contestsPage) {
+                ContestsListController.ContestsPage.Finished -> holder.setSubtitle("contests", "finished")
+                ContestsListController.ContestsPage.RunningOrFuture -> holder.setSubtitle("contests")
             }
 
         }

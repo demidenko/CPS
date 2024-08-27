@@ -24,13 +24,15 @@ internal fun rememberContestsListController(): ContestsListController {
 
     val expandedIdsState = rememberCollect { contestsViewModel.flowOfExpandedContests() }
 
-    val showFinishedState = rememberSaveable { mutableStateOf(false) }
+    val contestsPageState = rememberSaveable {
+        mutableStateOf(ContestsListController.ContestsPage.RunningOrFuture)
+    }
 
     return remember(contestsViewModel, expandedIdsState) {
         ContestsListController(
             contestsViewModel = contestsViewModel,
             expandedIdsState = expandedIdsState,
-            showFinishedState = showFinishedState
+            contestsPageState = contestsPageState
         )
     }
 }
@@ -59,7 +61,7 @@ internal interface ContestsIdsHolder {
 class ContestsListController(
     contestsViewModel: ContestsViewModel,
     expandedIdsState: State<Map<ContestCompositeId, Contest>>,
-    private val showFinishedState: MutableState<Boolean>
+    contestsPageState: MutableState<ContestsPage>
 ): ContestsIdsHolder by contestsViewModel {
     private val expandedIds by expandedIdsState
 
@@ -82,5 +84,9 @@ class ContestsListController(
         return DangerType.SAFE
     }
 
-    var showFinished by showFinishedState
+    var contestsPage by contestsPageState
+
+    enum class ContestsPage {
+        Finished, RunningOrFuture
+    }
 }

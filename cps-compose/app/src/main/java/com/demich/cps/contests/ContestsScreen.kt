@@ -189,10 +189,10 @@ private fun ContestsPager(
     val saveableStateHolder = rememberSaveableStateHolder()
 
     ProvideCurrentTime(currentTimeState) {
-        val showFinished = contestsListController.showFinished
-        saveableStateHolder.SaveableStateProvider(key = showFinished) {
+        val page = contestsListController.contestsPage
+        saveableStateHolder.SaveableStateProvider(key = page) {
             ContestsPage(
-                contests = { contestsState.value.sublist(showFinished) },
+                contests = { contestsState.value.sublist(page) },
                 contestsListController = contestsListController,
                 filterState = filterState,
                 modifier = modifier
@@ -320,9 +320,9 @@ fun contestsBottomBarBuilder(
 
     if (isAnyPlatformEnabled) {
         ContestsPageSwitchButton(
-            showFinished = contestsListController.showFinished,
+            contestsPage = contestsListController.contestsPage,
             onClick = {
-                contestsListController.showFinished = it
+                contestsListController.contestsPage = it
             }
         )
     }
@@ -340,13 +340,18 @@ fun contestsBottomBarBuilder(
 
 @Composable
 private fun ContestsPageSwitchButton(
-    showFinished: Boolean,
-    onClick: (Boolean) -> Unit
+    contestsPage: ContestsListController.ContestsPage,
+    onClick: (ContestsListController.ContestsPage) -> Unit
 ) {
     CPSIconButton(
         icon = CPSIcons.Swap,
         onClick = {
-            onClick(!showFinished)
+            onClick(
+                when (contestsPage) {
+                    ContestsListController.ContestsPage.Finished -> ContestsListController.ContestsPage.RunningOrFuture
+                    ContestsListController.ContestsPage.RunningOrFuture -> ContestsListController.ContestsPage.Finished
+                }
+            )
         }
     )
 }
