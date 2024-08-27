@@ -119,12 +119,11 @@ private fun<U: UserInfo> DialogContent(
 
     if (manager is UserSuggestionsProvider) {
         SuggestionsList(
-            suggestions = suggestionsResult.getOrDefault(emptyList()),
+            suggestionsResult = suggestionsResult,
             isLoading = loadingSuggestionsInProgress,
-            isError = suggestionsResult.isFailure,
             modifier = Modifier.fillMaxWidth(),
             onClick = { suggestion ->
-                blockSuggestionsReload = true
+                blockSuggestionsReload = true //TODO: bug if suggestion same as current userId
                 textFieldValue = suggestion.userId.toTextFieldValue()
             }
         )
@@ -261,12 +260,13 @@ private fun TextFieldMainIcon(
 
 @Composable
 private fun SuggestionsList(
-    suggestions: List<UserSuggestion>,
+    suggestionsResult: Result<List<UserSuggestion>>,
     isLoading: Boolean,
-    isError: Boolean,
     modifier: Modifier = Modifier,
     onClick: (UserSuggestion) -> Unit
 ) {
+    val isError = suggestionsResult.isFailure
+    val suggestions = suggestionsResult.getOrDefault(emptyList())
     if (suggestions.isNotEmpty() || isLoading || isError) {
         Column(modifier = modifier) {
             AccountChooserHeader(
