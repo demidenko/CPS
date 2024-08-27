@@ -38,6 +38,7 @@ fun StatusBarBox(navigator: CPSNavigator) {
     )
 }
 
+//TODO: State<Color>
 @Composable
 private fun statusBarColor(navigator: CPSNavigator): Color {
     val context = context
@@ -125,7 +126,7 @@ private fun<U: RatedUserInfo> RatedAccountManager<U>.getRank(userInfo: U?): Rate
 
 
 private fun<U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(context: Context): Flow<RatedRank?> =
-    dataStore(context).flowOfInfo().map(this::getRank)
+    dataStore(context).flowOfInfo().map { getRank(it) }
 
 private class RankGetter(
     private val validRanks: List<RatedRank>,
@@ -147,7 +148,7 @@ private class RankGetter(
 
 private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
     combine(
-        flow = combine(allRatedAccountManagers.map { it.flowOfRatedRank(context) }) { it },
+        flow = combine(allRatedAccountManagers.map { it.flowOfRatedRank(context) }) { it }, //TODO: optimize
         flow2 = context.settingsUI.statusBarDisabledManagers.flow,
         flow3 = context.settingsUI.statusBarResultByMaximum.flow
     ) { ranks, disabledManagers, resultByMaximum ->
