@@ -31,6 +31,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberFocusOnCreationRequester
@@ -55,7 +56,7 @@ fun<U: UserInfo> DialogAccountChooser(
             text = "getUser(${manager.type.name}):",
             color = cpsColors.contentAdditional
         ) {
-            Icon(imageVector = CPSIcons.Account, contentDescription = null, tint = it)
+            Icon(imageVector = CPSIcons.Account, contentDescription = null)
         }
 
         DialogContent(
@@ -288,16 +289,15 @@ private fun SuggestionsList(
             AccountChooserHeader(
                 text = if (isError) "suggestions load failed" else "suggestions:",
                 color = if (isError) cpsColors.error else cpsColors.contentAdditional
-            ) { color ->
+            ) {
                 if (isLoading) {
                     CircularProgressIndicator(
-                        color = color,
+                        color = LocalContentColor.current,
                         strokeWidth = 2.dp
                     )
                 } else {
                     Icon(
                         imageVector = CPSIcons.Search,
-                        tint = color,
                         contentDescription = null
                     )
                 }
@@ -344,25 +344,25 @@ private fun SuggestionItem(
 private fun AccountChooserHeader(
     text: String,
     color: Color,
-    icon: @Composable (Color) -> Unit
+    icon: @Composable () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(modifier = Modifier
-            .padding(3.dp)
-            .size(18.dp)) {
-            icon(color)
-        }
-        Text(
-            text = text,
-            style = CPSDefaults.MonospaceTextStyle.copy(
-                fontSize = 14.sp,
-                color = color
+        ProvideContentColor(color = color) {
+            Box(
+                modifier = Modifier
+                    .padding(3.dp)
+                    .size(18.dp),
+                content = { icon() }
             )
-        )
+            Text(
+                text = text,
+                style = CPSDefaults.MonospaceTextStyle.copy(fontSize = 14.sp)
+            )
+        }
     }
 }
 
