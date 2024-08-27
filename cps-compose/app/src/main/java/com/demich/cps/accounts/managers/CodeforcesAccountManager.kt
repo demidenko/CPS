@@ -97,8 +97,8 @@ class CodeforcesAccountManager :
             else -> throw UnknownHandleColorException(handleColor, this)
         }
 
-    private fun CodeforcesColorTag.toHandleColor(): HandleColor? {
-        return when (this) {
+    private fun CodeforcesColorTag.toHandleColor(): HandleColor? =
+        when (this) {
             CodeforcesColorTag.GRAY -> HandleColor.GRAY
             CodeforcesColorTag.GREEN -> HandleColor.GREEN
             CodeforcesColorTag.CYAN -> HandleColor.CYAN
@@ -106,9 +106,8 @@ class CodeforcesAccountManager :
             CodeforcesColorTag.VIOLET -> HandleColor.VIOLET
             CodeforcesColorTag.ORANGE -> HandleColor.ORANGE
             CodeforcesColorTag.RED, CodeforcesColorTag.LEGENDARY -> HandleColor.RED
-            else -> null
+            CodeforcesColorTag.BLACK, CodeforcesColorTag.ADMIN -> null
         }
-    }
 
     fun makeHandleSpan(handle: String, tag: CodeforcesColorTag, cpsColors: CPSColors): AnnotatedString =
         buildAnnotatedString {
