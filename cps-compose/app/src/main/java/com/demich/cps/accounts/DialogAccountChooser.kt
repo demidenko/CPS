@@ -28,6 +28,7 @@ import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.LoadingIndicator
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
@@ -253,8 +254,7 @@ private fun TextFieldMainIcon(
             enabled = !loadingInProgress
         ) {
             if (loadingInProgress) {
-                CircularProgressIndicator(
-                    color = cpsColors.content,
+                LoadingIndicator(
                     modifier = Modifier.size(iconSize),
                     strokeWidth = 3.dp
                 )
@@ -291,10 +291,7 @@ private fun SuggestionsList(
                 color = if (isError) cpsColors.error else cpsColors.contentAdditional
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(
-                        color = LocalContentColor.current,
-                        strokeWidth = 2.dp
-                    )
+                    LoadingIndicator(strokeWidth = 2.dp)
                 } else {
                     Icon(
                         imageVector = CPSIcons.Search,

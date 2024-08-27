@@ -1,13 +1,11 @@
 package com.demich.cps.ui
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 
@@ -48,13 +46,6 @@ fun<T> LoadingContentBox(
         } ?: LoadingIndicator()
     }
 }
-
-@Composable
-private fun LoadingIndicator() =
-    CircularProgressIndicator(
-        color = cpsColors.content,
-        strokeWidth = 3.dp
-    )
 
 @Composable
 private fun FailedText(failedText: String) =

@@ -137,9 +137,8 @@ fun CPSReloadingButton(
         onClick = onClick
     ) {
         if (loadingStatus == LoadingStatus.LOADING) {
-            CircularProgressIndicator(
+            LoadingIndicator(
                 modifier = Modifier.size(20.dp),
-                color = cpsColors.content,
                 strokeWidth = 2.dp
             )
         } else {
@@ -224,6 +223,16 @@ fun CPSRadioButtonTitled(
         title()
     }
 }
+
+@Composable
+fun LoadingIndicator(
+    modifier: Modifier = Modifier,
+    strokeWidth: Dp = 3.dp
+) = CircularProgressIndicator(
+    modifier = modifier,
+    color = LocalContentColor.current,
+    strokeWidth = strokeWidth
+)
 
 @Composable
 fun ListTitle(text: String, modifier: Modifier = Modifier) {
