@@ -57,7 +57,7 @@ fun rememberCodeforcesBlogEntriesController(
         ) { ids, visibleRange ->
             if (ids.isEmpty()) {
                 //empty ids can create Empty message item!!
-                null
+                emptyList()
             } else {
                 ids.subList(visibleRange)
             }
@@ -65,12 +65,10 @@ fun rememberCodeforcesBlogEntriesController(
             .debounce(250.milliseconds) //to sync ids with range / prevent user do fast scroll
             .distinctUntilChanged() //prevent repeats after debounce
             .collect { visibleIds ->
-                if (visibleIds != null) {
-                    newEntriesItem.markAtLeast(
-                        ids = visibleIds,
-                        type = NewEntryType.SEEN
-                    )
-                }
+                newEntriesItem.markAtLeast(
+                    ids = visibleIds,
+                    type = NewEntryType.SEEN
+                )
             }
     }
 

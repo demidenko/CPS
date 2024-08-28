@@ -145,7 +145,6 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         }
 }
 
-//TODO: replace init to null
 private class CodeforcesDataLoader<T: Any>(
     val scope: CoroutineScope,
     init: T,
