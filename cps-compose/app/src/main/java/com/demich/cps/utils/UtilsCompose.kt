@@ -152,24 +152,37 @@ fun animateColorAsState(
         label = "color_fraction"
     )
     return remember(disabledColor, enabledColor, fractionState) {
-        derivedStateOf { lerp(start = disabledColor, stop = enabledColor, fraction = fractionState.value) }
+        derivedStateOf {
+            lerp(
+                start = disabledColor,
+                stop = enabledColor,
+                fraction = fractionState.value
+            )
+        }
     }
 }
 
 @Composable
-fun animateColor(
-    enabledColor: Color,
+fun animateColorAsState(
+    enabledColorState: State<Color>,
     disabledColor: Color,
     enabled: Boolean,
     animationSpec: AnimationSpec<Float>
-): Color {
-    val state = animateColorAsState(
-        enabledColor = enabledColor,
-        disabledColor = disabledColor,
-        enabled = enabled,
-        animationSpec = animationSpec
+): State<Color> {
+    val fractionState = animateFloatAsState(
+        targetValue = if (enabled) 1f else 0f,
+        animationSpec = animationSpec,
+        label = "color_fraction"
     )
-    return state.value
+    return remember(disabledColor, enabledColorState, fractionState) {
+        derivedStateOf {
+            lerp(
+                start = disabledColor,
+                stop = enabledColorState.value,
+                fraction = fractionState.value
+            )
+        }
+    }
 }
 
 
