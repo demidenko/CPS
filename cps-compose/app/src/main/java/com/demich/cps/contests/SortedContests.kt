@@ -29,7 +29,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
 
-private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<Pair<Contest.Platform, String>>> =
+private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestCompositeId>> =
     combine(
         flow = ContestsInfoDataStore(context).ignoredContests.flow,
         flow2 = CodeforcesMonitorDataStore(context).flowOfContestId()

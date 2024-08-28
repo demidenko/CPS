@@ -17,8 +17,6 @@ data class Contest (
     val link: String? = null,
     val host: String? = null
 ) {
-    val compositeId get() = platform to id
-
     val endTime: Instant get() = startTime + duration
 
     fun getPhase(currentTime: Instant): Phase {

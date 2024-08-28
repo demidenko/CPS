@@ -18,6 +18,10 @@ import kotlin.time.Duration.Companion.hours
 
 typealias ContestCompositeId = Pair<Contest.Platform, String>
 
+val Contest.compositeId: ContestCompositeId
+    get() = platform to id
+
+
 @Composable
 internal fun rememberContestsListController(): ContestsListController {
     val contestsViewModel = contestsViewModel()
