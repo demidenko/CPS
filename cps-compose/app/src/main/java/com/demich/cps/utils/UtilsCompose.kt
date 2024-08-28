@@ -21,7 +21,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
@@ -140,18 +140,36 @@ fun Modifier.background(color: () -> Color) =
     this.drawBehind { drawRect(color = color()) }
 
 @Composable
+fun animateColorAsState(
+    enabledColor: Color,
+    disabledColor: Color,
+    enabled: Boolean,
+    animationSpec: AnimationSpec<Float>
+): State<Color> {
+    val fractionState = animateFloatAsState(
+        targetValue = if (enabled) 1f else 0f,
+        animationSpec = animationSpec,
+        label = "color_fraction"
+    )
+    return remember(disabledColor, enabledColor, fractionState) {
+        derivedStateOf { lerp(start = disabledColor, stop = enabledColor, fraction = fractionState.value) }
+    }
+}
+
+@Composable
 fun animateColor(
     enabledColor: Color,
     disabledColor: Color,
     enabled: Boolean,
     animationSpec: AnimationSpec<Float>
 ): Color {
-    val fraction by animateFloatAsState(
-        targetValue = if (enabled) 1f else 0f,
-        animationSpec = animationSpec,
-        label = "color_fraction"
+    val state = animateColorAsState(
+        enabledColor = enabledColor,
+        disabledColor = disabledColor,
+        enabled = enabled,
+        animationSpec = animationSpec
     )
-    return lerp(start = disabledColor, stop = enabledColor, fraction = fraction)
+    return state.value
 }
 
 

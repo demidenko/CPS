@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,10 +34,10 @@ import com.demich.cps.ui.bottombar.BottomBarSettings
 import com.demich.cps.ui.bottombar.CPSBottomBar
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.animateColor
+import com.demich.cps.utils.animateColorAsState
 import com.demich.cps.utils.background
 
-
+@Stable
 private fun<T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessMediumLow)
 
 @Composable
@@ -71,7 +72,7 @@ private fun Scaffold(
     onEnableBottomBarSettings: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    val bottomBarBackgroundColor = animateColor(
+    val bottomBarBackgroundColor by animateColorAsState(
         enabledColor = cpsColors.backgroundAdditional,
         disabledColor = cpsColors.backgroundNavigation,
         enabled = bottomBarSettingsEnabled,
