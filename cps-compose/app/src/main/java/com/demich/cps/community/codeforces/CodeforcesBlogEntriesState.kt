@@ -43,7 +43,7 @@ fun rememberNewEntriesState(): NewEntriesState {
 }
 
 @Stable
-abstract class CodeforcesBlogEntriesController {
+abstract class CodeforcesBlogEntriesState {
     abstract val blogEntries: List<CodeforcesBlogEntry>
 
     protected open fun onOpenBlogEntry(blogEntry: CodeforcesBlogEntry) = Unit
@@ -56,24 +56,24 @@ abstract class CodeforcesBlogEntriesController {
 }
 
 @Composable
-fun rememberCodeforcesBlogEntriesController(
+fun rememberCodeforcesBlogEntriesState(
     blogEntries: () -> List<CodeforcesBlogEntry>
-): CodeforcesBlogEntriesController {
+): CodeforcesBlogEntriesState {
     return remember(blogEntries) {
-        object : CodeforcesBlogEntriesController() {
+        object : CodeforcesBlogEntriesState() {
             override val blogEntries get() = blogEntries()
         }
     }
 }
 
 @Composable
-fun rememberCodeforcesBlogEntriesController(
+fun rememberCodeforcesBlogEntriesState(
     blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
     isTabVisible: () -> Boolean,
     listState: LazyListState,
     newEntriesState: NewEntriesState,
     showNewEntries: Boolean
-): CodeforcesBlogEntriesController {
+): CodeforcesBlogEntriesState {
 
     LaunchedEffect(blogEntriesFlow, newEntriesState, listState, isTabVisible) {
         combine(
@@ -101,7 +101,7 @@ fun rememberCodeforcesBlogEntriesController(
 
     val blogEntriesState = rememberCollectWithLifecycle { blogEntriesFlow }
     return remember(blogEntriesState, newEntriesState, showNewEntries) {
-        object : CodeforcesBlogEntriesController() {
+        object : CodeforcesBlogEntriesState() {
             override val blogEntries by blogEntriesState
 
             override fun onOpenBlogEntry(blogEntry: CodeforcesBlogEntry) {

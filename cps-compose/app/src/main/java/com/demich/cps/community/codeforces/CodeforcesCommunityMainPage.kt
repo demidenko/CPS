@@ -3,7 +3,6 @@ package com.demich.cps.community.codeforces
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.context
@@ -26,7 +25,7 @@ private fun CodeforcesCommunityMainList(
     val context = context
     val listState = rememberLazyListState()
 
-    val blogEntriesController = rememberCodeforcesBlogEntriesController(
+    val blogEntriesState = rememberCodeforcesBlogEntriesState(
         blogEntriesFlow = controller.flowOfMainBlogEntries(context),
         isTabVisible = { controller.isTabVisible(CodeforcesTitle.MAIN) },
         listState = listState,
@@ -36,7 +35,7 @@ private fun CodeforcesCommunityMainList(
 
     CodeforcesBlogEntriesFollowAddable(
         controller = controller,
-        blogEntriesController = blogEntriesController,
+        blogEntriesState = blogEntriesState,
         lazyListState = listState,
         modifier = Modifier.fillMaxSize()
     )

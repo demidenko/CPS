@@ -58,7 +58,7 @@ private fun CodeforcesUserBlogContent(
     ) { blogEntries ->
         ProvideTimeEachMinute {
             CodeforcesBlogEntries(
-                blogEntriesController = rememberCodeforcesBlogEntriesController {
+                blogEntriesState = rememberCodeforcesBlogEntriesState {
                     filterState.filterUserBlogEntries(blogEntries)
                 },
                 scrollBarEnabled = true,

@@ -31,7 +31,7 @@ import com.demich.cps.utils.timeAgo
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CodeforcesBlogEntries(
-    blogEntriesController: CodeforcesBlogEntriesController,
+    blogEntriesState: CodeforcesBlogEntriesState,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     scrollBarEnabled: Boolean = false,
@@ -43,17 +43,17 @@ fun CodeforcesBlogEntries(
         state = lazyListState,
         modifier = modifier,
         scrollBarEnabled = scrollBarEnabled,
-        items = blogEntriesController::blogEntries,
+        items = blogEntriesState::blogEntries,
         key = CodeforcesBlogEntry::id
     ) { blogEntry ->
         BlogEntryInfo(
             blogEntry = blogEntry,
-            markNew = blogEntriesController.isNew(blogEntry.id),
+            markNew = blogEntriesState.isNew(blogEntry.id),
             label = label?.let { { it(blogEntry) } },
             modifier = Modifier
                 .fillMaxWidth()
                 .combinedClickable(
-                    onClick = { blogEntriesController.openBlogEntry(blogEntry, context) },
+                    onClick = { blogEntriesState.openBlogEntry(blogEntry, context) },
                     onLongClick = onLongClick?.let { { it(blogEntry) } }
                 )
                 .padding(
