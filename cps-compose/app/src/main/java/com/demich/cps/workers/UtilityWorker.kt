@@ -42,8 +42,7 @@ class UtilityWorker(
 
     private suspend fun removeOldCodeforcesNewEntries() {
         with(CodeforcesNewEntriesDataStore(context)) {
-            mainNewEntries.removeOldMarkedItems()
-            lostNewEntries.removeOldMarkedItems()
+            commonNewEntries.removeOldMarkedItems()
         }
     }
 }

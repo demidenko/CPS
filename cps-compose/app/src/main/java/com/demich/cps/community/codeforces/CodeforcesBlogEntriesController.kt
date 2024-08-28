@@ -12,6 +12,36 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 
+abstract class NewEntriesState {
+    abstract val types: Map<Int, NewEntryInfo>
+    abstract suspend fun markSeen(ids: List<Int>)
+    abstract fun markOpened(id: Int)
+    fun getType(id: Int) = types.getType(id)
+}
+
+@Composable
+fun rememberNewEntriesState(): NewEntriesState {
+    val context = context
+    val scope = rememberCoroutineScope()
+    val item = remember { CodeforcesNewEntriesDataStore(context).commonNewEntries }
+    val typesState = rememberCollect { item.flow }
+    return remember(scope, item, typesState) {
+        object : NewEntriesState() {
+            override val types by typesState
+
+            override suspend fun markSeen(ids: List<Int>) {
+                item.markAtLeast(ids, NewEntryType.SEEN)
+            }
+
+            override fun markOpened(id: Int) {
+                scope.launch {
+                    item.markAtLeast(id, NewEntryType.OPENED)
+                }
+            }
+        }
+    }
+}
+
 @Stable
 abstract class CodeforcesBlogEntriesController {
     abstract val blogEntries: List<CodeforcesBlogEntry>
@@ -41,10 +71,11 @@ fun rememberCodeforcesBlogEntriesController(
     blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
     isTabVisible: () -> Boolean,
     listState: LazyListState,
-    newEntriesItem: NewEntriesDataStoreItem
+    newEntriesState: NewEntriesState,
+    showNewEntries: Boolean
 ): CodeforcesBlogEntriesController {
 
-    LaunchedEffect(blogEntriesFlow, newEntriesItem, listState, isTabVisible) {
+    LaunchedEffect(blogEntriesFlow, newEntriesState, listState, isTabVisible) {
         combine(
             flow = blogEntriesFlow
                 .map { it.map { it.id } }
@@ -64,28 +95,22 @@ fun rememberCodeforcesBlogEntriesController(
             .debounce(250.milliseconds) //to sync ids with range / prevent user do fast scroll
             .distinctUntilChanged() //prevent repeats after debounce
             .collect { visibleIds ->
-                newEntriesItem.markAtLeast(
-                    ids = visibleIds,
-                    type = NewEntryType.SEEN
-                )
+                newEntriesState.markSeen(ids = visibleIds)
             }
     }
 
-    val scope = rememberCoroutineScope()
-    val types = rememberCollect { newEntriesItem.flow }
     val blogEntriesState = rememberCollectWithLifecycle { blogEntriesFlow }
-    return remember(blogEntriesState, types, scope) {
+    return remember(blogEntriesState, newEntriesState, showNewEntries) {
         object : CodeforcesBlogEntriesController() {
             override val blogEntries by blogEntriesState
 
             override fun onOpenBlogEntry(blogEntry: CodeforcesBlogEntry) {
-                scope.launch {
-                    newEntriesItem.markAtLeast(id = blogEntry.id, type = NewEntryType.OPENED)
-                }
+                newEntriesState.markOpened(id = blogEntry.id)
             }
 
             override fun isNew(id: Int): Boolean {
-                val type = types.value.getType(id)
+                if (!showNewEntries) return false
+                val type = newEntriesState.getType(id)
                 return type == NewEntryType.UNSEEN || type == NewEntryType.SEEN
             }
         }

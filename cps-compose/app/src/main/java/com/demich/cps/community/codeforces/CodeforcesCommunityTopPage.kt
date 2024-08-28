@@ -1,6 +1,7 @@
 package com.demich.cps.community.codeforces
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
@@ -11,7 +12,8 @@ import com.demich.cps.utils.rememberCollect
 
 @Composable
 fun CodeforcesCommunityTopPage(
-    controller: CodeforcesCommunityController
+    controller: CodeforcesCommunityController,
+    newEntriesState: NewEntriesState
 ) {
     val saveableStateHolder = rememberSaveableStateHolder()
 
@@ -19,7 +21,7 @@ fun CodeforcesCommunityTopPage(
         when (val key = controller.topType) {
             CodeforcesCommunityController.TopType.BlogEntries -> {
                 saveableStateHolder.SaveableStateProvider(key = key) {
-                    CodeforcesCommunityTopBlogEntries(controller = controller)
+                    CodeforcesCommunityTopBlogEntries(controller, newEntriesState)
                 }
             }
             CodeforcesCommunityController.TopType.Comments -> {
@@ -33,13 +35,22 @@ fun CodeforcesCommunityTopPage(
 
 @Composable
 private fun CodeforcesCommunityTopBlogEntries(
-    controller: CodeforcesCommunityController
+    controller: CodeforcesCommunityController,
+    newEntriesState: NewEntriesState
 ) {
     val context = context
-    val blogEntries by rememberCollect { controller.flowOfTopBlogEntries(context) }
+    val listState = rememberLazyListState()
+
+    val blogEntriesController = rememberCodeforcesBlogEntriesController(
+        blogEntriesFlow = controller.flowOfTopBlogEntries(context),
+        isTabVisible = { controller.isTabVisible(CodeforcesTitle.TOP) },
+        listState = listState,
+        newEntriesState = newEntriesState,
+        showNewEntries = false
+    )
     CodeforcesBlogEntriesFollowAddable(
         controller = controller,
-        blogEntriesController = rememberCodeforcesBlogEntriesController { blogEntries },
+        blogEntriesController = blogEntriesController,
         modifier = Modifier.fillMaxSize()
     )
 }

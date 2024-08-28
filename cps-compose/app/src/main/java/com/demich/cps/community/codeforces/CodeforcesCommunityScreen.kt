@@ -61,6 +61,7 @@ private fun CodeforcesPager(
     controller: CodeforcesCommunityController,
     modifier: Modifier = Modifier
 ) {
+    val newEntriesState = rememberNewEntriesState()
     ProvideTimeEachMinute {
         HorizontalPager(
             beyondBoundsPageCount = controller.tabs.size - 1,
@@ -69,10 +70,10 @@ private fun CodeforcesPager(
             modifier = modifier
         ) { index ->
             when (controller.tabs[index]) {
-                CodeforcesTitle.MAIN -> CodeforcesCommunityMainPage(controller = controller)
-                CodeforcesTitle.TOP -> CodeforcesCommunityTopPage(controller = controller)
+                CodeforcesTitle.MAIN -> CodeforcesCommunityMainPage(controller, newEntriesState)
+                CodeforcesTitle.TOP -> CodeforcesCommunityTopPage(controller, newEntriesState)
                 CodeforcesTitle.RECENT -> CodeforcesCommunityRecentPage(controller = controller)
-                CodeforcesTitle.LOST -> CodeforcesCommunityLostPage(controller = controller)
+                CodeforcesTitle.LOST -> CodeforcesCommunityLostPage(controller, newEntriesState)
             }
         }
     }

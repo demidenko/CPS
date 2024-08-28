@@ -99,14 +99,14 @@ class CodeforcesCommunityController internal constructor(
     fun flowOfBadgeCount(tab: CodeforcesTitle, context: Context): Flow<Int> =
         when (tab) {
             CodeforcesTitle.MAIN -> flowOfBadgeCount(
-                isTabVisibleFlow = snapshotFlow { tab == currentTab },
+                isTabVisibleFlow = snapshotFlow { currentTab == CodeforcesTitle.MAIN },
                 blogEntriesFlow = flowOfMainBlogEntries(context),
-                newEntriesItem = CodeforcesNewEntriesDataStore(context).mainNewEntries
+                newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
             )
             CodeforcesTitle.LOST -> flowOfBadgeCount(
-                isTabVisibleFlow = snapshotFlow { tab == currentTab },
+                isTabVisibleFlow = snapshotFlow { currentTab == CodeforcesTitle.LOST },
                 blogEntriesFlow = flowOfLostBlogEntries(context),
-                newEntriesItem = CodeforcesNewEntriesDataStore(context).lostNewEntries
+                newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
             )
             else -> flowOf(0)
         }

@@ -10,8 +10,9 @@ class CodeforcesNewEntriesDataStore(context: Context): ItemizedDataStore(context
         private val Context.cf_new_entries_dataStore by dataStoreWrapper("cf_new_entries")
     }
 
-    val mainNewEntries = itemNewEntriesTypes(name = "main")
-    val lostNewEntries = itemNewEntriesTypes(name = "lost")
+    val commonNewEntries = itemNewEntriesTypes(name = "common")
+    //val mainNewEntries = itemNewEntriesTypes(name = "main")
+    //val lostNewEntries = itemNewEntriesTypes(name = "lost")
 
     private fun itemNewEntriesTypes(name: String) = NewEntriesDataStoreItem(jsonCPS.itemMap(name = name))
 }

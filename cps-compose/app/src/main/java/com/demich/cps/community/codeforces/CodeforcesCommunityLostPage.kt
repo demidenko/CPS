@@ -17,17 +17,19 @@ import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.flow.map
 
 @Composable
-fun CodeforcesCommunityLostPage(controller: CodeforcesCommunityController) {
+fun CodeforcesCommunityLostPage(
+    controller: CodeforcesCommunityController,
+    newEntriesState: NewEntriesState
+) {
     val context = context
-    val newEntriesItem = remember { CodeforcesNewEntriesDataStore(context).lostNewEntries }
-
     val listState = rememberLazyListState()
 
     val blogEntriesController = rememberCodeforcesBlogEntriesController(
         blogEntriesFlow = controller.flowOfLostBlogEntries(context),
         isTabVisible = { controller.isTabVisible(CodeforcesTitle.LOST) },
         listState = listState,
-        newEntriesItem = newEntriesItem
+        newEntriesState = newEntriesState,
+        showNewEntries = true
     )
 
     val topIds by remember {
