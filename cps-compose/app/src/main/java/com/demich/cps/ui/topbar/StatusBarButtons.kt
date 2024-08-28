@@ -24,6 +24,7 @@ import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.TextButtonsSelectRow
+import com.demich.cps.ui.UISettingsDataStore
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
@@ -51,7 +52,7 @@ internal fun StatusBarButtons() {
     }
 
     var showPopup by rememberSaveable { mutableStateOf(false) }
-    val resultByMaximum by rememberCollect { settingsUI.statusBarResultByMaximum.flow }
+    val rankSelector by rememberCollect { settingsUI.statusBarRankSelector.flow }
     val disabledManagers by rememberCollect { settingsUI.statusBarDisabledManagers.flow }
 
     val noneEnabled by remember {
@@ -78,9 +79,9 @@ internal fun StatusBarButtons() {
             )
             StatusBarAccountsPopup(
                 expanded = showPopup,
-                resultByMaximum = resultByMaximum,
-                setResultByMaximum = {
-                    scope.launch { settingsUI.statusBarResultByMaximum(it) }
+                rankSelector = rankSelector,
+                onSetRankSelector = {
+                    scope.launch { settingsUI.statusBarRankSelector(it) }
                 },
                 disabledManagers = disabledManagers,
                 onCheckedChange = { type, checked ->
@@ -102,8 +103,8 @@ internal fun StatusBarButtons() {
 @Composable
 private fun StatusBarAccountsPopup(
     expanded: Boolean,
-    resultByMaximum: Boolean,
-    setResultByMaximum: (Boolean) -> Unit,
+    rankSelector: UISettingsDataStore.StatusBarRankSelector,
+    onSetRankSelector: (UISettingsDataStore.StatusBarRankSelector) -> Unit,
     disabledManagers: Set<AccountManagerType>,
     onCheckedChange: (AccountManagerType, Boolean) -> Unit,
     accountManagers: List<AccountManagerType>,
@@ -124,12 +125,15 @@ private fun StatusBarAccountsPopup(
             }
         }
         TextButtonsSelectRow(
-            values = listOf(false, true),
-            selectedValue = resultByMaximum,
+            values = UISettingsDataStore.StatusBarRankSelector.entries,
+            selectedValue = rankSelector,
             text = { value ->
-                if (value) "best" else "worst"
+                when (value) {
+                    UISettingsDataStore.StatusBarRankSelector.Min -> "worst"
+                    UISettingsDataStore.StatusBarRankSelector.Max -> "best"
+                }
             },
-            onSelect = setResultByMaximum,
+            onSelect = onSetRankSelector,
             modifier = Modifier
                 .padding(horizontal = 10.dp)
                 .align(Alignment.CenterHorizontally)

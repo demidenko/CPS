@@ -18,6 +18,10 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
         private val Context.settingsUI_dataStore by dataStoreWrapper("settings_ui")
     }
 
+    enum class StatusBarRankSelector {
+        Min, Max
+    }
+
     val devModeEnabled = itemBoolean(name = "develop_enabled", defaultValue = false)
 
     val darkLightMode = itemEnum(name = "dark_light_mode", defaultValue = DarkLightMode.SYSTEM)
@@ -26,7 +30,7 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
 
     val coloredStatusBar = itemBoolean(name = "use_status_bar", defaultValue = true)
     val statusBarDisabledManagers = itemEnumSet<AccountManagerType>(name = "status_bar_disabled_managers")
-    val statusBarResultByMaximum = itemBoolean(name = "status_bar_result_by_max", defaultValue = true)
+    val statusBarRankSelector = itemEnum(name = "status_bar_rank_selector", defaultValue = StatusBarRankSelector.Max)
 
     val accountsOrder = jsonCPS.itemList<AccountManagerType>(name = "accounts_order").mapGetter { order ->
         order + AccountManagerType.entries.filter { it !in order }

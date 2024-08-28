@@ -131,12 +131,14 @@ private fun<U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(context: Co
 private class RankGetter(
     private val validRanks: List<RatedRank>,
     disabledManagers: Set<AccountManagerType>,
-    resultByMaximum: Boolean
+    rankSelector: UISettingsDataStore.StatusBarRankSelector
 ) {
     private val rank: RatedRank? =
         validRanks.filter { it.manager.type !in disabledManagers }.run {
-            if (resultByMaximum) maxByOrNull { it.rank }
-            else minByOrNull { it.rank }
+            when (rankSelector) {
+                UISettingsDataStore.StatusBarRankSelector.Min -> minByOrNull { it.rank }
+                UISettingsDataStore.StatusBarRankSelector.Max -> maxByOrNull { it.rank }
+            }
         }
 
     operator fun get(screen: Screen?): RatedRank? =
@@ -150,12 +152,12 @@ private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
     combine(
         flow = combine(allRatedAccountManagers.map { it.flowOfRatedRank(context) }) { it }, //TODO: optimize
         flow2 = context.settingsUI.statusBarDisabledManagers.flow,
-        flow3 = context.settingsUI.statusBarResultByMaximum.flow
-    ) { ranks, disabledManagers, resultByMaximum ->
+        flow3 = context.settingsUI.statusBarRankSelector.flow
+    ) { ranks, disabledManagers, rankSelector ->
         RankGetter(
             validRanks = ranks.filterNotNull(),
             disabledManagers = disabledManagers,
-            resultByMaximum = resultByMaximum
+            rankSelector = rankSelector
         )
     }
 
