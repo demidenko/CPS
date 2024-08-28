@@ -24,11 +24,10 @@ fun CodeforcesCommunityLostPage(controller: CodeforcesCommunityController) {
     val listState = rememberLazyListState()
 
     val blogEntriesController = rememberCodeforcesBlogEntriesController(
-        tab = CodeforcesTitle.LOST,
         blogEntriesFlow = controller.flowOfLostBlogEntries(context),
-        newEntriesItem = newEntriesItem,
+        isTabVisible = { controller.isTabVisible(CodeforcesTitle.LOST) },
         listState = listState,
-        controller = controller
+        newEntriesItem = newEntriesItem
     )
 
     val topIds by remember {

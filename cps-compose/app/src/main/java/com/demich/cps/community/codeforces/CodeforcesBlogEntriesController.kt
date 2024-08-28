@@ -38,21 +38,20 @@ fun rememberCodeforcesBlogEntriesController(
 
 @Composable
 fun rememberCodeforcesBlogEntriesController(
-    tab: CodeforcesTitle,
     blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
-    newEntriesItem: NewEntriesDataStoreItem,
+    isTabVisible: () -> Boolean,
     listState: LazyListState,
-    controller: CodeforcesCommunityController
+    newEntriesItem: NewEntriesDataStoreItem
 ): CodeforcesBlogEntriesController {
 
-    LaunchedEffect(tab, newEntriesItem, listState, controller) {
+    LaunchedEffect(blogEntriesFlow, newEntriesItem, listState, isTabVisible) {
         combine(
             flow = blogEntriesFlow
                 .map { it.map { it.id } }
                 .distinctUntilChanged(),
             flow2 = snapshotFlow {
-                if (!controller.isTabVisible(tab)) return@snapshotFlow IntRange.EMPTY
-                listState.visibleRange(0.75f)
+                if (!isTabVisible()) IntRange.EMPTY
+                else listState.visibleRange(0.75f)
             }
         ) { ids, visibleRange ->
             if (ids.isEmpty()) {

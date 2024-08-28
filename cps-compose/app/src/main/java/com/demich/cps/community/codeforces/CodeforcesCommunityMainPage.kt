@@ -27,11 +27,10 @@ private fun CodeforcesCommunityMainList(
     val listState = rememberLazyListState()
 
     val blogEntriesController = rememberCodeforcesBlogEntriesController(
-        tab = CodeforcesTitle.MAIN,
         blogEntriesFlow = controller.flowOfMainBlogEntries(context),
-        newEntriesItem = newEntriesItem,
+        isTabVisible = { controller.isTabVisible(CodeforcesTitle.MAIN) },
         listState = listState,
-        controller = controller
+        newEntriesItem = newEntriesItem
     )
 
     CodeforcesBlogEntriesFollowAddable(
