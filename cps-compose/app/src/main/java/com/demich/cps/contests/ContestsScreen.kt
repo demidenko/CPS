@@ -69,7 +69,7 @@ import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.rememberCollect
-import com.demich.cps.utils.rememberCollectWithLifecycle
+import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.workers.ContestsWorker
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
@@ -413,7 +413,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val monitor = remember { CodeforcesMonitorDataStore(context) }
 
-    val contestDataState = rememberCollectWithLifecycle {
+    val contestDataState = collectAsStateWithLifecycle {
         monitor.flowOfContestData().map { data ->
             data?.takeIf { it.contestPhase.phase != CodeforcesContestPhase.UNDEFINED }
         }
@@ -425,7 +425,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
         enter = enterInColumn(),
         exit = exitInColumn()
     ) {
-        val requestFailed by rememberCollectWithLifecycle { monitor.lastRequest.flow.map { it == false } }
+        val requestFailed by collectAsStateWithLifecycle { monitor.lastRequest.flow.map { it == false } }
         CodeforcesMonitorWidget(
             contestData = it,
             requestFailed = requestFailed,

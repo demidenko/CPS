@@ -99,7 +99,7 @@ fun rememberCodeforcesBlogEntriesState(
             }
     }
 
-    val blogEntriesState = rememberCollectWithLifecycle { blogEntriesFlow }
+    val blogEntriesState = collectAsStateWithLifecycle { blogEntriesFlow }
     return remember(blogEntriesState, newEntriesState, showNewEntries) {
         object : CodeforcesBlogEntriesState() {
             override val blogEntries by blogEntriesState

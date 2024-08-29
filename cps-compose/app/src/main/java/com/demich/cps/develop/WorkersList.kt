@@ -44,7 +44,7 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.localCurrentTime
-import com.demich.cps.utils.rememberCollectWithLifecycle
+import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.timeAgo
 import com.demich.cps.workers.CPSOneTimeWork
 import com.demich.cps.workers.CPSPeriodicWork
@@ -114,7 +114,7 @@ private fun WorkersList(
     val periodicWorks = remember { context.getCPSWorks() }
     val monitorWork = remember { CodeforcesMonitorWorker.getWork(context) }
 
-    val lastExecutionEvents by rememberCollectWithLifecycle {
+    val lastExecutionEvents by collectAsStateWithLifecycle {
         CPSWorkersDataStore(context).lastExecutions.flow
     }
 
