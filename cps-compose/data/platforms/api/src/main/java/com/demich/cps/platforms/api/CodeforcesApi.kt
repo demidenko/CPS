@@ -1,14 +1,17 @@
 package com.demich.cps.platforms.api
 
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.header
+import io.ktor.client.request.parameter
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -258,9 +261,6 @@ enum class CodeforcesColorTag {
                 rating < 3000 -> RED
                 else -> LEGENDARY
             }
-
-        fun fromString(str: String): CodeforcesColorTag =
-            valueOf(str.removePrefix("user-").uppercase(Locale.ENGLISH))
     }
 }
 

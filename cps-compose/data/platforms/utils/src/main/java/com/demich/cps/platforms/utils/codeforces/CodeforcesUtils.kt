@@ -17,12 +17,16 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import java.util.Locale
 import kotlin.math.max
 
 internal fun Element.extractRatedUser() = CodeforcesHandle(
     handle = text(),
-    colorTag = CodeforcesColorTag.fromString(
-        str = classNames().first { name -> name.startsWith("user-") }
+    colorTag = CodeforcesColorTag.valueOf(
+        value = classNames()
+            .first { name -> name.startsWith("user-") }
+            .removePrefix("user-")
+            .uppercase(Locale.ENGLISH)
     )
 )
 
