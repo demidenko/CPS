@@ -7,11 +7,9 @@ plugins {
 
 android {
     namespace = "com.demich.cps"
-    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.demich.cps"
-        minSdk = 26
         targetSdk = 34
 
         versionCode = 408
@@ -35,11 +33,6 @@ android {
         debug {
             applicationIdSuffix = ".debug"
         }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {

@@ -1,3 +1,8 @@
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.LibraryPlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -19,7 +24,14 @@ tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
 
-allprojects {
+
+fun BaseExtension.baseConfig() {
+    compileSdkVersion(apiLevel = 34)
+
+    defaultConfig.apply {
+        minSdk = 26
+    }
+
     tasks.withType<KotlinCompile> {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
@@ -28,6 +40,36 @@ allprojects {
                 "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
                         "${project.rootDir.absolutePath}/compose_compiler_config.conf"
             )
+        }
+    }
+
+    compileOptions.apply {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+subprojects {
+    project.plugins.applyBaseConfig(project)
+}
+
+fun PluginContainer.applyBaseConfig(project: Project) {
+    whenPluginAdded {
+        when (this) {
+            is AppPlugin -> {
+                project.extensions
+                    .getByType<AppExtension>()
+                    .apply {
+                        baseConfig()
+                    }
+            }
+            is LibraryPlugin -> {
+                project.extensions
+                    .getByType<LibraryExtension>()
+                    .apply {
+                        baseConfig()
+                    }
+            }
         }
     }
 }

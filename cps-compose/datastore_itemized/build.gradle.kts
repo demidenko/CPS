@@ -5,7 +5,6 @@ plugins {
 
 android {
     namespace = ("com.demich.datastore_itemized")
-    compileSdk = 33
 
     defaultConfig {
         minSdk = 22
@@ -22,10 +21,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
