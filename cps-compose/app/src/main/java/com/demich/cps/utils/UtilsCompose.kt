@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -90,6 +91,13 @@ inline fun<T> rememberCollectWithLifecycle(crossinline block: () -> Flow<T>): St
         if (flow is StateFlow<T>) flow.collectAsStateWithLifecycle()
         else flow.collectAsStateWithLifecycle(initialValue = remember(flow) { runBlocking { flow.first() } })
     }
+
+@Composable
+inline fun <T> collectAsState(crossinline block: @DisallowComposableCalls () -> DataStoreItem<T>): State<T> =
+    remember {
+        val item = block()
+        item.flow to runBlocking { item() }
+    }.run { first.collectAsState(initial = second) }
 
 
 fun AnnotatedString.Builder.append(
