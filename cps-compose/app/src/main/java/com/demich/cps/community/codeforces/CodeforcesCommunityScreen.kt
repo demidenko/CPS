@@ -48,7 +48,7 @@ fun CodeforcesReloadablePage(
     content: @Composable () -> Unit
 ) {
     val context = context
-    val loadingStatus by controller.rememberLoadingStatusState(title = title)
+    val loadingStatus by controller.loadingStatusState(title = title)
     CPSSwipeRefreshBox(
         isRefreshing = { loadingStatus == LoadingStatus.LOADING },
         onRefresh = { controller.reload(title = title, context = context) },
@@ -119,8 +119,8 @@ private fun CodeforcesCommunityTab(
     modifier: Modifier = Modifier
 ) {
     val context = context
-    val loadingStatus by controller.rememberLoadingStatusState(title)
-    val badgeCount by rememberCollect { controller.flowOfBadgeCount(tab = title, context) }
+    val loadingStatus by controller.loadingStatusState(title)
+    val badgeCount by collectAsState { controller.flowOfBadgeCount(tab = title, context) }
     CodeforcesCommunityTab(
         title = title,
         index = controller.tabs.indexOf(title),

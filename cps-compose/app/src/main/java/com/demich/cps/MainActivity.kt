@@ -42,7 +42,7 @@ import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.contestsBottomBarBuilder
 import com.demich.cps.contests.contestsMenuBuilder
 import com.demich.cps.contests.contestsViewModel
-import com.demich.cps.contests.rememberCombinedLoadingStatusState
+import com.demich.cps.contests.combinedLoadingStatusState
 import com.demich.cps.contests.rememberContestsListController
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.develop.DevelopScreen
@@ -191,7 +191,7 @@ private fun CPSContent() {
             val contestsViewModel = contestsViewModel()
             val contestsListController = rememberContestsListController()
             val filterState = rememberFilterState()
-            val loadingStatus by rememberCombinedLoadingStatusState()
+            val loadingStatus by combinedLoadingStatusState()
             val isReloading = { loadingStatus == LoadingStatus.LOADING }
             val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
             ContestsScreen(

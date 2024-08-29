@@ -68,7 +68,7 @@ import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.workers.ContestsWorker
 import com.demich.datastore_itemized.add
@@ -89,11 +89,11 @@ fun ContestsScreen(
     val context = context
     val contestsViewModel = contestsViewModel()
 
-    val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
+    val anyPlatformEnabled by anyPlatformEnabledState()
 
     Column {
         CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
-        if (isAnyPlatformEnabled) {
+        if (anyPlatformEnabled) {
             ContestsReloadableContent(
                 contestsListController = contestsListController,
                 filterState = filterState,
@@ -144,7 +144,7 @@ private fun ContestsContent(
     val context = context
 
     val contestsViewModel = contestsViewModel()
-    val errorsMessage by rememberCollect {
+    val errorsMessage by collectAsState {
         combine(
             flow = contestsViewModel.flowOfLoadingErrors(),
             flow2 = context.settingsUI.devModeEnabled.flow,
@@ -316,7 +316,7 @@ fun contestsBottomBarBuilder(
     loadingStatus: () -> LoadingStatus,
     onReloadClick: () -> Unit
 ): AdditionalBottomBarBuilder = {
-    val isAnyPlatformEnabled by rememberIsAnyPlatformEnabled()
+    val isAnyPlatformEnabled by anyPlatformEnabledState()
 
     if (isAnyPlatformEnabled) {
         ContestsPageSwitchButton(
@@ -357,9 +357,9 @@ private fun ContestsPageSwitchButton(
 }
 
 @Composable
-private fun rememberIsAnyPlatformEnabled(): State<Boolean> {
+private fun anyPlatformEnabledState(): State<Boolean> {
     val context = context
-    return rememberCollect {
+    return collectAsState {
         context.settingsContests.flowOf { prefs ->
             val any1 = prefs[enabledPlatforms].any { it != Contest.Platform.unknown }
             val any2 = prefs[clistAdditionalResources].isNotEmpty()
@@ -370,7 +370,7 @@ private fun rememberIsAnyPlatformEnabled(): State<Boolean> {
 
 
 @Composable
-fun rememberCombinedLoadingStatusState(): State<LoadingStatus> {
+fun combinedLoadingStatusState(): State<LoadingStatus> {
     val context = context
     val contestsViewModel = contestsViewModel()
 

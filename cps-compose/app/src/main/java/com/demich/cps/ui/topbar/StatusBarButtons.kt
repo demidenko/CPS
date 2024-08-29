@@ -29,7 +29,7 @@ import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.collectAsState
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -44,7 +44,7 @@ internal fun StatusBarButtons() {
 
     val coloredStatusBar by collectItemAsState { settingsUI.coloredStatusBar }
 
-    val recordedAccountManagers by rememberCollect {
+    val recordedAccountManagers by collectAsState {
         combine(allRatedAccountManagers.map { it.flowOfInfoWithManager(context) }) { array ->
             array.mapNotNull { it?.manager?.type }
         }.combine(settingsUI.accountsOrder.flow) { managers, order ->

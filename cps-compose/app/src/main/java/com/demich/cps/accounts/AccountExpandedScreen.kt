@@ -18,7 +18,7 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.collectAsState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -50,7 +50,7 @@ private fun<U: UserInfo> AccountExpandedContent(
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
     val context = context
-    val userInfo by rememberCollect { manager.dataStore(context).flowOfInfo() }
+    val userInfo by collectAsState { manager.dataStore(context).flowOfInfo() }
     userInfo?.let {
         manager.ExpandedContent(
             userInfo = it,

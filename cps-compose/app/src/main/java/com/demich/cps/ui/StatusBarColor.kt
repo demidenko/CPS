@@ -25,7 +25,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.background
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.collectAsState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -47,7 +47,7 @@ private fun statusBarColor(navigator: CPSNavigator): State<Color> {
 
     val coloredStatusBar by collectItemAsState { context.settingsUI.coloredStatusBar }
 
-    val rank by rememberCollect {
+    val rank by collectAsState {
         combine(
             flow = makeFlowOfRankGetter(context),
             flow2 = navigator.flowOfCurrentScreen()

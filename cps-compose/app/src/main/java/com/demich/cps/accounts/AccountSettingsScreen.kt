@@ -16,7 +16,7 @@ import com.demich.cps.ui.SettingsColumn
 import com.demich.cps.ui.SettingsItem
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.rememberWith
 import kotlinx.coroutines.flow.flowOf
 
@@ -29,7 +29,7 @@ fun AccountSettingsScreen(
     var showChangeDialog by remember { mutableStateOf(false) }
 
     val manager = remember(type) { allAccountManagers.first { it.type == type } }
-    val userInfo by rememberCollect { manager.dataStore(context).flowOfInfo() }
+    val userInfo by collectAsState { manager.dataStore(context).flowOfInfo() }
 
     userInfo?.let {
         UserInfoSettings(

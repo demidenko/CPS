@@ -20,7 +20,7 @@ import com.demich.cps.ui.BackHandler
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.rememberWith
 
 @Composable
@@ -28,7 +28,7 @@ fun CodeforcesCommunityRecentPage(
     controller: CodeforcesCommunityController
 ) {
     val context = context
-    val recent by rememberCollect { controller.flowOfRecent(context) }
+    val recent by collectAsState { controller.flowOfRecent(context) }
 
     val saveableStateHolder = rememberSaveableStateHolder()
 

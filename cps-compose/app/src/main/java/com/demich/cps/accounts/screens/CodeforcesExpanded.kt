@@ -36,7 +36,7 @@ import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.saver
 import kotlinx.coroutines.flow.map
 
@@ -132,7 +132,7 @@ private fun UpsolvingSuggestionsList(
     modifier: Modifier = Modifier
 ) {
     val context = context
-    val problems by rememberCollect {
+    val problems by collectAsState {
         CodeforcesAccountManager().dataStore(context)
             .upsolvingSuggestedProblems.flow
             .map { list ->

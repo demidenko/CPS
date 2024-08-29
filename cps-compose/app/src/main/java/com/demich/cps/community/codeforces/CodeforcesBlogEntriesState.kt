@@ -24,7 +24,7 @@ fun rememberNewEntriesState(): NewEntriesState {
     val context = context
     val scope = rememberCoroutineScope()
     val item = remember { CodeforcesNewEntriesDataStore(context).commonNewEntries }
-    val typesState = rememberCollect { item.flow }
+    val typesState = collectAsState { item.flow }
     return remember(scope, item, typesState) {
         object : NewEntriesState() {
             override val types by typesState

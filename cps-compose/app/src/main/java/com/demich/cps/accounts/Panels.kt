@@ -43,7 +43,7 @@ fun<U: UserInfo> AccountPanel(
 
     var lastClick by remember { mutableStateOf(Instant.DISTANT_PAST) }
 
-    val loadingStatus by rememberCollect {
+    val loadingStatus by collectAsState {
         accountsViewModel.flowOfLoadingStatus(manager)
             .onEach {
                 if (it == LoadingStatus.LOADING) lastClick = Instant.DISTANT_PAST

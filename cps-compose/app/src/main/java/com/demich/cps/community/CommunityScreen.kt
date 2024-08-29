@@ -31,7 +31,7 @@ fun communityBottomBarBuilder(
 
     CodeforcesCommunityBottomBar(controller = controller)
 
-    val loadingStatus by controller.rememberLoadingStatusState()
+    val loadingStatus by controller.loadingStatusState()
     CPSReloadingButton(loadingStatus = loadingStatus) {
         controller.reloadAll(context)
     }
@@ -44,7 +44,7 @@ fun communityMenuBuilder(
 ): CPSMenuBuilder = {
     val context = context
 
-    val loadingStatus by controller.rememberLoadingStatusState()
+    val loadingStatus by controller.loadingStatusState()
     CPSDropdownMenuItem(
         title = "Settings",
         icon = CPSIcons.Settings,

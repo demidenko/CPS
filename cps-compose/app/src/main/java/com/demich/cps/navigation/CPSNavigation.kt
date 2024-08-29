@@ -21,7 +21,7 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.topbar.CPSTopBar
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.rememberWith
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -34,7 +34,7 @@ fun rememberCPSNavigator(
     val subtitleState = remember { mutableStateOf("") }
 
     val currentScreenState: State<Screen?> =
-        rememberCollect { navController.flowOfCurrentScreen() }
+        collectAsState { navController.flowOfCurrentScreen() }
 
     val menuBuilderState = remember { mutableStateOf<CPSMenuBuilder?>(null) }
     val bottomBarBuilderState = remember { mutableStateOf<AdditionalBottomBarBuilder?>(null) }

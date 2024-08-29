@@ -36,9 +36,9 @@ fun CommunityFollowScreen(
 
     val communityViewModel = codeforcesCommunityViewModel()
 
-    val followLoadingStatus by rememberCollect { communityViewModel.flowOfFollowUpdateLoadingStatus() }
+    val followLoadingStatus by collectAsState { communityViewModel.flowOfFollowUpdateLoadingStatus() }
 
-    val userBlogs by rememberCollect {
+    val userBlogs by collectAsState {
         context.followListDao.flowOfAllBlogs().map {
             it.sortedByDescending { it.id }
         }

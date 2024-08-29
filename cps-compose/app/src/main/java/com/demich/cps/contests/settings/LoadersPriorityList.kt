@@ -25,7 +25,7 @@ import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.collectAsState
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -40,7 +40,7 @@ fun LoadersPriorityListDialog(
     val scope = rememberCoroutineScope()
 
     val settings = remember { context.settingsContests }
-    val priorityList by rememberCollect {
+    val priorityList by collectAsState {
         settings.contestsLoadersPriorityLists.flow.map { it.getValue(platform) }
     }
 

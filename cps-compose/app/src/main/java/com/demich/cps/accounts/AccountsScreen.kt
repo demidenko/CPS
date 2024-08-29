@@ -19,7 +19,7 @@ import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.lazylist.itemsNotEmpty
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.collectAsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -35,7 +35,7 @@ fun AccountsScreen(
     enableReorder: () -> Unit
 ) {
     val accountsViewModel = accountsViewModel()
-    val recordedAccounts by rememberRecordedAccounts()
+    val recordedAccounts by recordedAccountsState()
 
     val visibleOrder by remember {
         derivedStateOf { if (reorderEnabled()) recordedAccounts.map { it.type } else null }
@@ -80,8 +80,8 @@ fun AccountsScreen(
 }
 
 @Composable
-private fun rememberRecordedAccounts() = with(context) {
-    rememberCollect {
+private fun recordedAccountsState() = with(context) {
+    collectAsState {
         combine(
             flows = allAccountManagers.map { it.flowOfInfoWithManager(this) }
         ) {
@@ -114,11 +114,11 @@ private fun ReloadAccountsButton() {
     val context = context
     val accountsViewModel = accountsViewModel()
 
-    val loadingStatus by rememberCollect {
+    val loadingStatus by collectAsState {
         accountsViewModel.flowOfLoadingStatus(allAccountManagers)
     }
 
-    val anyRecordedAccount by rememberCollect {
+    val anyRecordedAccount by collectAsState {
         combine(flows = allAccountManagers.map { it.dataStore(context).flowOfInfo() }) {
             it.any { userInfo -> userInfo != null }
         }

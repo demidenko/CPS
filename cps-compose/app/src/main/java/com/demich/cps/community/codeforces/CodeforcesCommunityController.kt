@@ -13,7 +13,7 @@ import com.demich.cps.utils.NewEntriesDataStoreItem
 import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.collectAsState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
@@ -28,7 +28,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
     val context = context
     val viewModel = codeforcesCommunityViewModel()
 
-    val tabsState = rememberCollect {
+    val tabsState = collectAsState {
         context.settingsCommunity.flowOfCodeforcesTabs()
     }
 
@@ -112,10 +112,10 @@ class CodeforcesCommunityController internal constructor(
         }
 
     @Composable
-    fun rememberLoadingStatusState() = rememberCollect { flowOfLoadingStatus() }
+    fun loadingStatusState() = collectAsState { flowOfLoadingStatus() }
 
     @Composable
-    fun rememberLoadingStatusState(title: CodeforcesTitle) = rememberCollect { flowOfLoadingStatus(title) }
+    fun loadingStatusState(title: CodeforcesTitle) = collectAsState { flowOfLoadingStatus(title) }
 
     fun flowOfLostBlogEntries(context: Context) =
         context.lostBlogEntriesDao.flowOfLost().map { blogEntries ->

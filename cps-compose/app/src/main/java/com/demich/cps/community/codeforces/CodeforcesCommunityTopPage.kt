@@ -8,7 +8,7 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
+import com.demich.cps.utils.collectAsState
 
 @Composable
 fun CodeforcesCommunityTopPage(
@@ -60,7 +60,7 @@ private fun CodeforcesCommunityTopComments(
     controller: CodeforcesCommunityController
 ) {
     val context = context
-    val comments by rememberCollect { controller.flowOfTopComments(context) }
+    val comments by collectAsState { controller.flowOfTopComments(context) }
     CodeforcesComments(
         comments = { comments },
         modifier = Modifier.fillMaxSize()
