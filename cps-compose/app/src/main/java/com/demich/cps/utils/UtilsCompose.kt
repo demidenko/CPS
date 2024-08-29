@@ -93,7 +93,7 @@ inline fun<T> rememberCollectWithLifecycle(crossinline block: () -> Flow<T>): St
     }
 
 @Composable
-inline fun <T> collectAsState(crossinline block: @DisallowComposableCalls () -> DataStoreItem<T>): State<T> =
+inline fun <T> collectItemAsState(crossinline block: @DisallowComposableCalls () -> DataStoreItem<T>): State<T> =
     remember {
         val item = block()
         item.flow to runBlocking { item() }

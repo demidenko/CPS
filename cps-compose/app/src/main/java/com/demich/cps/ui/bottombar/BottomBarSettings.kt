@@ -29,8 +29,8 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.launch
 
 @Composable
@@ -63,7 +63,7 @@ private fun CloseRow(
 private fun LayoutSelectRow() {
     val context = context
     val scope = rememberCoroutineScope()
-    val layoutType by rememberCollect { context.settingsUI.navigationLayoutType.flow }
+    val layoutType by collectItemAsState { context.settingsUI.navigationLayoutType }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

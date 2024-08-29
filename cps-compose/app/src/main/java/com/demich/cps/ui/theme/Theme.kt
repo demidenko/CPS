@@ -20,8 +20,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.settingsUI
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
 
 
 enum class DarkLightMode {
@@ -45,10 +45,10 @@ private fun setSystemBarsStyle(context: Context, isDarkMode: Boolean) {
 @Composable
 private fun ProvideCPSColors(content: @Composable () -> Unit) {
     val context = context
-    val darkLightMode by rememberCollect { context.settingsUI.darkLightMode.flow }
+    val darkLightMode by collectItemAsState { context.settingsUI.darkLightMode }
     val isDarkMode = darkLightMode.isDarkMode()
     setSystemBarsStyle(context, isDarkMode)
-    val useOriginalColors by rememberCollect { context.settingsUI.useOriginalColors.flow }
+    val useOriginalColors by collectItemAsState { context.settingsUI.useOriginalColors }
     val colors = if (isDarkMode) darkCPSColors(useOriginalColors) else lightCPSColors(useOriginalColors)
     CompositionLocalProvider(LocalCPSColors provides colors, content = content)
 }

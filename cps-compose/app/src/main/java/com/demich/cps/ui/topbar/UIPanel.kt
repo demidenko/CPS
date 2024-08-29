@@ -13,8 +13,8 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.rememberWith
 import kotlinx.coroutines.launch
 
@@ -27,8 +27,8 @@ internal fun UIPanel(
     val scope = rememberCoroutineScope()
     val settingsUI = rememberWith(key = context) { settingsUI }
 
-    val useOriginalColors by rememberCollect { settingsUI.useOriginalColors.flow }
-    val darkLightMode by rememberCollect { settingsUI.darkLightMode.flow }
+    val useOriginalColors by collectItemAsState { settingsUI.useOriginalColors }
+    val darkLightMode by collectItemAsState { settingsUI.darkLightMode }
 
     Row(modifier = modifier.background(cpsColors.background)) {
         CPSIconButton(icon = CPSIcons.Close, onClick = onClosePanel)

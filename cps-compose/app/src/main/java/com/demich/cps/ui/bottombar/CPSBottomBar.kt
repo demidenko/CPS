@@ -17,14 +17,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.dp
+import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.RootScreen
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTypes
-import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.ignoreInputEvents
 import kotlinx.coroutines.launch
 
@@ -68,8 +68,8 @@ private fun BottomBarBodyMain(
     val scope = rememberCoroutineScope()
     val context = context
 
-    val devModeEnabled by rememberCollect { context.settingsUI.devModeEnabled.flow }
-    val layoutType by rememberCollect { context.settingsUI.navigationLayoutType.flow }
+    val devModeEnabled by collectItemAsState { context.settingsUI.devModeEnabled }
+    val layoutType by collectItemAsState { context.settingsUI.navigationLayoutType }
 
     val rootScreens = remember(devModeEnabled) {
         buildList {

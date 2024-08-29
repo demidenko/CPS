@@ -27,6 +27,7 @@ import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.UISettingsDataStore
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberCollect
 import com.demich.datastore_itemized.edit
@@ -41,7 +42,7 @@ internal fun StatusBarButtons() {
     val context = context
     val settingsUI = remember { context.settingsUI }
 
-    val coloredStatusBar by rememberCollect { settingsUI.coloredStatusBar.flow }
+    val coloredStatusBar by collectItemAsState { settingsUI.coloredStatusBar }
 
     val recordedAccountManagers by rememberCollect {
         combine(allRatedAccountManagers.map { it.flowOfInfoWithManager(context) }) { array ->
@@ -52,8 +53,8 @@ internal fun StatusBarButtons() {
     }
 
     var showPopup by rememberSaveable { mutableStateOf(false) }
-    val rankSelector by rememberCollect { settingsUI.statusBarRankSelector.flow }
-    val disabledManagers by rememberCollect { settingsUI.statusBarDisabledManagers.flow }
+    val rankSelector by collectItemAsState { settingsUI.statusBarRankSelector }
+    val disabledManagers by collectItemAsState { settingsUI.statusBarDisabledManagers }
 
     val noneEnabled by remember {
         derivedStateOf {
