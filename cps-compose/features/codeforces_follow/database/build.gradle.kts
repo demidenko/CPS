@@ -26,10 +26,6 @@ android {
             )
         }
     }
-
-    kotlinOptions {
-        freeCompilerArgs += "-Xstring-concat=inline"
-    }
 }
 
 dependencies {
