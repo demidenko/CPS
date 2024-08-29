@@ -1,15 +1,13 @@
 package com.demich.cps.utils
 
 
-private val whiteSpaceRegex = "\\s+".toRegex()
-
-fun <T> List<T>.filterByTokensAsSubsequence(
+inline fun <T> List<T>.filterByTokensAsSubsequence(
     filter: String,
     toCheck: T.() -> Sequence<String>
 ): List<T> {
     val tokens = filter.trim().also {
         if (it.isEmpty()) return this
-    }.split(whiteSpaceRegex)
+    }.split("\\s+".toRegex())
 
     return filter {
         it.toCheck().any { string ->
