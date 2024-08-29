@@ -14,7 +14,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.work.WorkInfo
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.ui.AnimatedVisibleByNotNull
@@ -40,14 +41,15 @@ import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.ProvideTimeEachMinute
+import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.context
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.localCurrentTime
-import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.timeAgo
 import com.demich.cps.workers.CPSOneTimeWork
 import com.demich.cps.workers.CPSPeriodicWork
+import com.demich.cps.workers.CPSWork
 import com.demich.cps.workers.CPSWorker
 import com.demich.cps.workers.CPSWorkersDataStore
 import com.demich.cps.workers.CodeforcesMonitorWorker
@@ -146,12 +148,17 @@ private fun WorkersList(
 }
 
 @Composable
+private fun CPSWork.workInfoAsState(): State<WorkInfo?> =
+    remember(key1 = this, calculation = ::flowOfWorkInfo)
+        .collectAsStateWithLifecycle(initialValue = null)
+
+@Composable
 private fun WorkerItem(
     work: CPSPeriodicWork,
     lastExecutionEvent: CPSWorker.ExecutionEvent?,
     modifier: Modifier = Modifier
 ) {
-    val workInfo by remember(key1 = work, calculation = work::flowOfWorkInfo).collectAsState(initial = null)
+    val workInfo by work.workInfoAsState()
 
     WorkerItem(
         name = work.name,
@@ -171,7 +178,7 @@ private fun WorkerItem(
     work: CPSOneTimeWork,
     modifier: Modifier = Modifier
 ) {
-    val workInfo by remember(key1 = work, calculation = work::flowOfWorkInfo).collectAsState(initial = null)
+    val workInfo by work.workInfoAsState()
 
     WorkerItem(
         name = work.name,
