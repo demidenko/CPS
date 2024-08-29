@@ -13,8 +13,8 @@ import com.demich.cps.contests.ContestsInfoDataStore
 import com.demich.cps.ui.SettingsItemWithInfo
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.settingsUI
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
 
@@ -23,7 +23,7 @@ internal fun DeletedContestsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val devModeEnabled by rememberCollect { context.settingsUI.devModeEnabled.flow }
+    val devModeEnabled by collectItemAsState { context.settingsUI.devModeEnabled }
     val settings = remember { ContestsInfoDataStore(context) }
 
     if (devModeEnabled) {

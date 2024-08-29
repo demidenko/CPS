@@ -11,8 +11,8 @@ import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
 
 @Composable
 fun CommunityScreen(
@@ -52,7 +52,7 @@ fun communityMenuBuilder(
         onClick = onOpenSettings
     )
 
-    val followEnabled by rememberCollect { context.settingsCommunity.codeforcesFollowEnabled.flow }
+    val followEnabled by collectItemAsState { context.settingsCommunity.codeforcesFollowEnabled }
     if (followEnabled) {
         CPSDropdownMenuItem(title = "Follow List", icon = CPSIcons.Accounts) {
             controller.updateFollowUsersInfo(context)

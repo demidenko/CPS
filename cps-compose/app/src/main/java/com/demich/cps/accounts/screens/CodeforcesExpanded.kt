@@ -32,6 +32,7 @@ import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.openUrlInBrowser
@@ -84,8 +85,8 @@ fun CodeforcesUserInfoExpandedContent(
     }
 
     val context = context
-    val upsolvingSuggestionsEnabled by rememberCollect {
-        manager.getSettings(context).upsolvingSuggestionsEnabled.flow
+    val upsolvingSuggestionsEnabled by collectItemAsState {
+        manager.getSettings(context).upsolvingSuggestionsEnabled
     }
 
     setBottomBarContent {

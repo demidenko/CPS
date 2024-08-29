@@ -27,8 +27,8 @@ import com.demich.cps.ui.ExpandableSettingsItem
 import com.demich.cps.ui.SettingsSubtitleOfEnabled
 import com.demich.cps.ui.WordsWithCounterOnOverflow
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
 
@@ -37,7 +37,7 @@ internal fun ContestPlatformsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val enabledPlatforms by rememberCollect { context.settingsContests.enabledPlatforms.flow }
+    val enabledPlatforms by collectItemAsState { context.settingsContests.enabledPlatforms }
 
     ExpandableSettingsItem(
         title = "Platforms",
@@ -136,8 +136,7 @@ private fun LoadersSetupButton(
 @Composable
 private fun ClistAdditionalRow() {
     val context = context
-    val settings = remember { context.settingsContests }
-    val resources by rememberCollect { settings.clistAdditionalResources.flow }
+    val resources by collectItemAsState { context.settingsContests.clistAdditionalResources }
 
     var showDialog by remember { mutableStateOf(false) }
 

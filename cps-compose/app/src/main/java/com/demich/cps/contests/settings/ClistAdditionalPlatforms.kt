@@ -58,7 +58,7 @@ private fun ColumnScope.DialogContent() {
     }
 
     val item = remember { context.settingsContests.clistAdditionalResources }
-    val selected by rememberCollect { item.flow }
+    val selected by collectItemAsState { item }
 
     var searchFilter by remember { mutableStateOf("") }
 

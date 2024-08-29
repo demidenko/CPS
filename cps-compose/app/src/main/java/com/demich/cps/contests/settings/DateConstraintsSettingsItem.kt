@@ -8,7 +8,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -23,8 +29,8 @@ import com.demich.cps.ui.SettingsSubtitle
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -36,7 +42,7 @@ internal fun DateConstraintsSettingsItem() {
     val scope = rememberCoroutineScope()
 
     val settings = remember { context.settingsContests }
-    val dateConstraints by rememberCollect { settings.contestsDateConstraints.flow }
+    val dateConstraints by collectItemAsState { settings.contestsDateConstraints }
 
     fun saveConstraints(newConstraints: ContestDateBaseConstraints) {
         scope.launch {

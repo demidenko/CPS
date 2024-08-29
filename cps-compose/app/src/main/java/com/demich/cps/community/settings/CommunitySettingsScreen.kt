@@ -22,8 +22,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.toHandleSpan
-import com.demich.cps.contests.database.Contest
 import com.demich.cps.community.codeforces.CodeforcesTitle
+import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
@@ -40,8 +40,8 @@ import com.demich.cps.ui.SettingsSwitchItemContent
 import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
 import com.demich.cps.ui.platformIconPainter
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberCollect
 import com.demich.cps.utils.rememberWith
 import com.demich.cps.workers.CodeforcesCommunityFollowWorker
 import com.demich.cps.workers.CodeforcesCommunityLostRecentWorker
@@ -116,7 +116,7 @@ private fun CodeforcesLostSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
     val settings = remember { context.settingsCommunity }
-    val enabled by rememberCollect { settings.codeforcesLostEnabled.flow }
+    val enabled by collectItemAsState { settings.codeforcesLostEnabled }
     SettingsItem {
         Column {
             SettingsSwitchItemContent(
@@ -177,7 +177,7 @@ private fun CodeforcesRuEnabledSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val locale by rememberCollect { context.settingsCommunity.codeforcesLocale.flow }
+    val locale by collectItemAsState { context.settingsCommunity.codeforcesLocale }
 
     SettingsSwitchItem(
         title = "Russian content",
