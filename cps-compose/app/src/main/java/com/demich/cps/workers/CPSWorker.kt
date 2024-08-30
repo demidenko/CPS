@@ -79,7 +79,8 @@ abstract class CPSWorker(
         }
     }
 
-    protected fun enqueueIn(duration: Duration) = work.enqueueIn(duration)
+    protected fun enqueueRetry() = work.enqueueRetry()
+    protected fun enqueueAt(time: Instant) = work.enqueueAt(time)
 
     protected suspend fun setProgressInfo(progressInfo: ProgressBarInfo) {
         if (progressInfo.total == 0) return

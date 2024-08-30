@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.platforms.api.CodeforcesApi
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.hours
@@ -17,13 +19,14 @@ class CodeforcesMonitorLauncherWorker(
     parameters = parameters
 ) {
     companion object {
+        private val repeatInterval get() = 45.minutes
         fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_monitor_launcher", context = context) {
             override suspend fun isEnabled() =
                 CodeforcesAccountManager().getSettings(context).monitorEnabled()
 
             override val requestBuilder
                 get() = CPSPeriodicWorkRequestBuilder<CodeforcesMonitorLauncherWorker>(
-                    repeatInterval = 45.minutes
+                    repeatInterval = repeatInterval
                 )
         }
     }
@@ -31,6 +34,8 @@ class CodeforcesMonitorLauncherWorker(
     private fun isActual(time: Instant) = workerStartTime - time < 24.hours
 
     override suspend fun runWork(): Result {
+        //TODO: restart failed monitor
+
         val dataStore = CodeforcesAccountManager().dataStore(context)
 
         val info = dataStore.getSavedInfo() ?: return Result.success()
@@ -63,6 +68,8 @@ class CodeforcesMonitorLauncherWorker(
             }
         }
 
+        enqueueToCodeforcesContest()
+
         return Result.success()
     }
 
@@ -84,4 +91,19 @@ class CodeforcesMonitorLauncherWorker(
                 step += 10
             }
         }
+
+    private suspend fun enqueueToCodeforcesContest() {
+        with(context.contestsListDao.getContests(Contest.Platform.codeforces)) {
+            if (any { it.getPhase(workerStartTime) == Contest.Phase.RUNNING }) {
+                enqueueRetry()
+            }
+
+            filter { it.getPhase(workerStartTime) == Contest.Phase.BEFORE }
+                .minOfOrNull { it.startTime }
+                ?.takeIf { it - workerStartTime < repeatInterval }
+                ?.let {
+                    enqueueAt(time = it + 5.minutes)
+                }
+        }
+    }
 }

@@ -32,6 +32,6 @@ abstract class ContestsListDao {
     abstract fun flowOfContests(): Flow<List<Contest>>
 
     @Query("select * from $contestsTableName where platform = :platform")
-    protected abstract suspend fun getContests(platform: Contest.Platform): List<Contest>
+    abstract suspend fun getContests(platform: Contest.Platform): List<Contest>
 
 }
