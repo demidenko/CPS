@@ -39,7 +39,10 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
 
             val replace: Boolean
             if (contestId == monitor.contestId() && handle == monitor.handle()) {
-                replace = false
+                if (getWork(context).flowOfWorkInfo().first().isRunning)
+                    replace = false
+                else
+                    replace = true
             } else {
                 replace = true
                 monitor.reset()

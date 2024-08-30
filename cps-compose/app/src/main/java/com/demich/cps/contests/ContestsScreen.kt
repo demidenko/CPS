@@ -71,6 +71,7 @@ import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.workers.ContestsWorker
+import com.demich.cps.workers.isRunning
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.flowOf
@@ -380,7 +381,7 @@ fun combinedLoadingStatusState(): State<LoadingStatus> {
     ) {
         contestsViewModel.flowOfLoadingStatus()
             .combine(ContestsWorker.getWork(context).flowOfWorkInfo()) { loadingStatus, workInfo ->
-                if (workInfo?.state == WorkInfo.State.RUNNING) LoadingStatus.LOADING
+                if (workInfo.isRunning) LoadingStatus.LOADING
                 else loadingStatus
             }.collect {
                 value = it

@@ -55,6 +55,8 @@ import com.demich.cps.workers.CPSWorkersDataStore
 import com.demich.cps.workers.CodeforcesMonitorWorker
 import com.demich.cps.workers.getCPSWorks
 import com.demich.cps.workers.getProgressInfo
+import com.demich.cps.workers.isRunning
+import com.demich.cps.workers.stateOrCancelled
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -162,8 +164,8 @@ private fun WorkerItem(
 
     WorkerItem(
         name = work.name,
-        workState = workInfo?.state ?: WorkInfo.State.CANCELLED,
-        progressInfo = workInfo?.takeIf { it.state == WorkInfo.State.RUNNING }?.getProgressInfo(),
+        workState = workInfo.stateOrCancelled,
+        progressInfo = workInfo?.takeIf { it.isRunning }?.getProgressInfo(),
         lastRunTimeAgo = lastExecutionEvent?.let {
             timeAgo(fromTime = it.start, toTime = localCurrentTime)
         } ?: "never",
@@ -182,7 +184,7 @@ private fun WorkerItem(
 
     WorkerItem(
         name = work.name,
-        workState = workInfo?.state ?: WorkInfo.State.CANCELLED,
+        workState = workInfo.stateOrCancelled,
         progressInfo = null,
         lastRunTimeAgo = "",
         lastResult = null,

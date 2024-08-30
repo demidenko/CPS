@@ -150,3 +150,9 @@ private val PeriodicWorkRequest.Companion.minPeriodicInterval: Duration
 
 private fun PeriodicWorkRequest.Builder.setNextScheduleTimeOverride(instant: Instant) =
     setNextScheduleTimeOverride(instant.toEpochMilliseconds())
+
+val WorkInfo?.stateOrCancelled: WorkInfo.State
+    get() = this?.state ?: WorkInfo.State.CANCELLED
+
+val WorkInfo?.isRunning: Boolean
+    get() = this?.state == WorkInfo.State.RUNNING
