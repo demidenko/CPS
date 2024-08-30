@@ -80,7 +80,7 @@ abstract class CPSWorker(
     }
 
     protected fun enqueueRetry() = work.enqueueRetry()
-    protected fun enqueueAt(time: Instant) = work.enqueueAt(time)
+    protected fun enqueueAt(time: Instant, repeatInterval: Duration) = work.enqueueAt(time, repeatInterval)
 
     protected suspend fun setProgressInfo(progressInfo: ProgressBarInfo) {
         if (progressInfo.total == 0) return

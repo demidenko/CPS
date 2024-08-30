@@ -100,9 +100,8 @@ class CodeforcesMonitorLauncherWorker(
 
             filter { it.getPhase(workerStartTime) == Contest.Phase.BEFORE }
                 .minOfOrNull { it.startTime }
-                ?.takeIf { it - workerStartTime < repeatInterval }
                 ?.let {
-                    enqueueAt(time = it + 5.minutes)
+                    enqueueAt(time = it + 5.minutes, repeatInterval)
                 }
         }
     }

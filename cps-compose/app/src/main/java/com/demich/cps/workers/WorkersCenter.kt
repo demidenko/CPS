@@ -88,14 +88,24 @@ abstract class CPSPeriodicWork(
         if (isEnabled()) enqueue()
     }
 
-    //TODO: ignores default even if default closer
-    fun enqueueAt(time: Instant) =
+    private fun enqueueAt(time: Instant) =
         enqueueWork(policy = ExistingPeriodicWorkPolicy.UPDATE) {
+            //TODO: ignores default even if default closer
             setNextScheduleTimeOverride(time)
         }
 
-    fun enqueueIn(duration: Duration) = enqueueAt(getCurrentTime() + duration)
-    fun enqueueRetry() = enqueueIn(PeriodicWorkRequest.minPeriodicInterval)
+    fun enqueueAt(time: Instant, repeatInterval: Duration) {
+        if (getCurrentTime() + repeatInterval < time) return
+        enqueueAt(time)
+    }
+
+    fun enqueueIn(duration: Duration, repeatInterval: Duration) {
+        if (repeatInterval < duration) return
+        enqueueAt(time = getCurrentTime() + duration)
+    }
+
+    fun enqueueRetry() =
+        enqueueAt(time = getCurrentTime() + PeriodicWorkRequest.minPeriodicInterval)
 }
 
 internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
