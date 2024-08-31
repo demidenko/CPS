@@ -1,7 +1,6 @@
 package com.demich.cps.community.follow
 
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,7 +24,7 @@ fun CodeforcesBlogEntriesFollowAddable(
     controller: CodeforcesCommunityController,
     blogEntriesState: CodeforcesBlogEntriesState,
     modifier: Modifier = Modifier,
-    lazyListState: LazyListState = rememberLazyListState(),
+    lazyListState: LazyListState,
     scrollBarEnabled: Boolean = false,
     label: (@Composable (CodeforcesBlogEntry) -> Unit)? = null
 ) {
