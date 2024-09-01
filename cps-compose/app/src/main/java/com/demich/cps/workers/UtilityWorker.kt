@@ -34,7 +34,7 @@ class UtilityWorker(
 
     private suspend fun removeOldIgnoredContests() {
         ContestsInfoDataStore(context).ignoredContests.update {
-            it.removeOld(workerStartTime - 30.days)
+            it.withoutOld(workerStartTime - 30.days)
         }
     }
 

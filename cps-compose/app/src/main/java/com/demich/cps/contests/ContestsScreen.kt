@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -34,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.work.WorkInfo
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.list_items.ContestItem
@@ -61,19 +61,18 @@ import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.ProvideCurrentTime
+import com.demich.cps.utils.add
 import com.demich.cps.utils.clickableNoRipple
+import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.context
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.collectAsState
-import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.workers.ContestsWorker
 import com.demich.cps.workers.isRunning
-import com.demich.datastore_itemized.add
-import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.flowOf
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -233,9 +232,8 @@ private fun ContestsPage(
         modifier = modifier,
         onDeleteRequest = { contest ->
             scope.launch {
-                ContestsInfoDataStore(context).ignoredContests.update {
-                    it.add(contest.compositeId, getCurrentTime())
-                }
+                ContestsInfoDataStore(context)
+                    .ignoredContests.add(contest.compositeId, getCurrentTime())
             }
         }
     )
@@ -421,25 +419,28 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     }
     //TODO: restart killed worker if data not null
 
+    val requestFailed by collectAsStateWithLifecycle {
+        monitor.lastRequest.flow.map { it == false }
+    }
+
     AnimatedVisibleByNotNull(
         value = { contestDataState.value },
         enter = enterInColumn(),
         exit = exitInColumn()
     ) {
-        val requestFailed by collectAsStateWithLifecycle { monitor.lastRequest.flow.map { it == false } }
+        val contestId by rememberUpdatedState(it.contestId)
         CodeforcesMonitorWidget(
             contestData = it,
             requestFailed = requestFailed,
             modifier = modifier,
             onOpenInBrowser = {
-                context.openUrlInBrowser(url = CodeforcesApi.urls.contest(it.contestId))
+                context.openUrlInBrowser(url = CodeforcesApi.urls.contest(contestId))
             },
             onStop = {
                 scope.launch {
+                    CodeforcesAccountManager().dataStore(context)
+                        .monitorCanceledContests.add(contestId, getCurrentTime())
                     monitor.reset()
-                    CodeforcesAccountManager().dataStore(context).monitorCanceledContests.add(
-                        it.contestId to getCurrentTime()
-                    )
                 }
             }
         )

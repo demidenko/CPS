@@ -50,7 +50,7 @@ class CodeforcesMonitorLauncherWorker(
             newSubmissions.firstOrNull { submission ->
                 submission.author.participantType.contestParticipant()
             }?.let { submission ->
-                if (monitorCanceledContests().none { it.first == submission.contestId }) {
+                if (monitorCanceledContests().none { it == submission.contestId }) {
                     CodeforcesMonitorWorker.start(
                         contestId = submission.contestId,
                         handle = info.handle,
@@ -63,8 +63,8 @@ class CodeforcesMonitorLauncherWorker(
                 monitorLastSubmissionId(it.id)
             }
 
-            monitorCanceledContests.update { list ->
-                list.filter { isActual(it.second) }
+            monitorCanceledContests.update {
+                it.withoutOld { time -> !isActual(time) }
             }
         }
 

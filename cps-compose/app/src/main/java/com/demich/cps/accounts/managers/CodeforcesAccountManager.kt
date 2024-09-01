@@ -31,6 +31,7 @@ import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
 import com.demich.cps.utils.context
+import com.demich.cps.utils.emptyTimedCollection
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.AccountsWorker
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
@@ -251,7 +252,7 @@ class CodeforcesAccountDataStore(manager: CodeforcesAccountManager, context: Con
 
 
     val monitorLastSubmissionId = itemLongNullable(name = "monitor_last_submission")
-    val monitorCanceledContests = jsonCPS.itemList<Pair<Int,Instant>>(name = "monitor_canceled")
+    val monitorCanceledContests = jsonCPS.item(name = "monitor_canceled", defaultValue = emptyTimedCollection<Int>())
 
     val upsolvingSuggestedProblems = jsonCPS.itemList<Pair<CodeforcesProblem, Instant>>(name = "upsolving_suggested_problems_list")
 }
