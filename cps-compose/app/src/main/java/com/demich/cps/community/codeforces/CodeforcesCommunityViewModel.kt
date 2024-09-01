@@ -12,6 +12,7 @@ import com.demich.cps.platforms.api.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.community.follow.followListDao
+import com.demich.cps.platforms.api.CodeforcesColorTag
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.backgroundDataLoader
@@ -134,12 +135,12 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         blogEntriesLoader.execute(id = "$handle#$key") {
             val (result, colorTag) = awaitPair(
                 blockFirst = { context.followListDao.getAndReloadBlogEntries(handle) },
-                blockSecond = { CodeforcesUtils.getRealColorTag(handle) }
+                blockSecond = { CodeforcesUtils.getRealColorTagOrNull(handle) }
             )
             result.getOrThrow().map {
                 it.copy(
                     title = CodeforcesUtils.extractTitle(it),
-                    authorColorTag = colorTag
+                    authorColorTag = colorTag ?: CodeforcesColorTag.BLACK
                 )
             }
         }
