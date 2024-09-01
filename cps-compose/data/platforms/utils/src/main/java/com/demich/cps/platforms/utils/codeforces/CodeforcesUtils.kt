@@ -161,7 +161,9 @@ object CodeforcesUtils {
     }
 
     private fun Element.expectContent(): Element = expectFirst("div.content-with-sidebar")
-    private fun Element.expectSidebar(): Element = expectFirst("div#sidebar")
+
+    private fun Element.selectSidebar(): Element? = selectFirst("div#sidebar")
+    private fun Element.expectSidebar(): Element = requireNotNull(selectSidebar())
 
     fun extractTitle(blogEntry: CodeforcesBlogEntry): String =
         Jsoup.parse(blogEntry.title).text()
@@ -307,7 +309,7 @@ object CodeforcesUtils {
     }
 
     fun extractContestSystemTestingPercentageOrNull(source: String): Int? {
-        return Jsoup.parse(source).expectSidebar().selectFirst("span.contest-state-regular")
+        return Jsoup.parse(source).selectSidebar()?.selectFirst("span.contest-state-regular")
             ?.text()
             ?.removeSuffix("%")
             ?.toIntOrNull()
