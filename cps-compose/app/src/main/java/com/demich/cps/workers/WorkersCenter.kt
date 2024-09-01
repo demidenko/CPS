@@ -104,7 +104,7 @@ abstract class CPSPeriodicWork(
         enqueueAt(time = getCurrentTime() + duration)
     }
 
-    fun enqueueRetry() =
+    fun enqueueAsap() =
         enqueueAt(time = getCurrentTime() + PeriodicWorkRequest.minPeriodicInterval)
 }
 

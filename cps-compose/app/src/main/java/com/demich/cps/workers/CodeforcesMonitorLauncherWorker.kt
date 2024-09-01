@@ -95,7 +95,7 @@ class CodeforcesMonitorLauncherWorker(
     private suspend fun enqueueToCodeforcesContest() {
         with(context.contestsListDao.getContests(Contest.Platform.codeforces)) {
             if (any { it.getPhase(workerStartTime) == Contest.Phase.RUNNING }) {
-                enqueueRetry()
+                enqueueAsap()
             }
 
             filter { it.getPhase(workerStartTime) == Contest.Phase.BEFORE }

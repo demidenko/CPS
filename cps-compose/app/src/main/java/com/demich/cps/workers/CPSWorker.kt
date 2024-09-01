@@ -52,7 +52,7 @@ abstract class CPSWorker(
                     )
                 }
                 if (result.toType() == ResultType.RETRY) {
-                    work.enqueueRetry()
+                    work.enqueueAsap()
                 }
             }
         }
@@ -79,7 +79,7 @@ abstract class CPSWorker(
         }
     }
 
-    protected fun enqueueRetry() = work.enqueueRetry()
+    protected fun enqueueAsap() = work.enqueueAsap()
     protected fun enqueueAt(time: Instant, repeatInterval: Duration) = work.enqueueAt(time, repeatInterval)
 
     protected suspend fun setProgressInfo(progressInfo: ProgressBarInfo) {
