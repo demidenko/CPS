@@ -65,7 +65,7 @@ class AccountsViewModel: ViewModel() {
     }
 
     fun<U: UserInfo> delete(manager: AccountManager<U>, context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             setLoadingStatus(manager, LoadingStatus.PENDING)
             manager.dataStore(context).deleteSavedInfo()
         }

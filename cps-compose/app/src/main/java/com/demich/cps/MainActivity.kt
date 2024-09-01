@@ -39,10 +39,10 @@ import com.demich.cps.community.settings.CommunitySettingsScreen
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.contests.ContestsListController
 import com.demich.cps.contests.ContestsScreen
+import com.demich.cps.contests.combinedLoadingStatusState
 import com.demich.cps.contests.contestsBottomBarBuilder
 import com.demich.cps.contests.contestsMenuBuilder
 import com.demich.cps.contests.contestsViewModel
-import com.demich.cps.contests.combinedLoadingStatusState
 import com.demich.cps.contests.rememberContestsListController
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.develop.DevelopScreen
@@ -59,9 +59,7 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.utils.currentDataKey
 import com.demich.cps.workers.enqueueEnabledWorkers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -244,9 +242,7 @@ val LocalCodeforcesAccountManager = staticCompositionLocalOf<CodeforcesAccountMa
 private suspend fun appStartUp(context: Context) {
     //init items with dynamic defaults
     //TODO: not perfect solution, default still can run multiple times
-    withContext(Dispatchers.IO) {
-        context.settingsCommunity.codeforcesLocale.update { it }
-    }
+    context.settingsCommunity.codeforcesLocale.update { it }
 
     //workers
     context.enqueueEnabledWorkers()

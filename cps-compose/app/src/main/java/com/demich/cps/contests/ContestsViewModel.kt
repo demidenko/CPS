@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun contestsViewModel(): ContestsViewModel = sharedViewModel()
@@ -82,12 +83,11 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
     }
 
     fun reloadEnabledPlatforms(context: Context) {
+        ContestsWorker.getWork(context).enqueueIn(
+            duration = ContestsWorker.workRepeatInterval,
+            repeatInterval = ContestsWorker.workRepeatInterval
+        )
         viewModelScope.launch(Dispatchers.IO) {
-            ContestsWorker.getWork(context).enqueueIn(
-                duration = ContestsWorker.workRepeatInterval,
-                repeatInterval = ContestsWorker.workRepeatInterval
-            )
-
             reloadEnabledPlatforms(
                 settings = context.settingsContests,
                 contestsInfo = ContestsInfoDataStore(context),
@@ -97,7 +97,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
     }
 
     fun syncEnabledAndLastReloaded(context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val settings = context.settingsContests
             val listInfo = ContestsInfoDataStore(context)
             val dao = context.contestsListDao
@@ -115,12 +115,14 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
                 toReload.add(Contest.Platform.unknown)
             }
 
-            reload(
-                platforms = toReload,
-                settings = settings,
-                contestsInfo = listInfo,
-                contestsReceiver = dao.makeReceiver()
-            )
+            withContext(Dispatchers.IO) {
+                reload(
+                    platforms = toReload,
+                    settings = settings,
+                    contestsInfo = listInfo,
+                    contestsReceiver = dao.makeReceiver()
+                )
+            }
         }
     }
 
