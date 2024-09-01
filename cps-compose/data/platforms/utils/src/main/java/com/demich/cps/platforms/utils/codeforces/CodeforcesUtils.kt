@@ -55,6 +55,8 @@ object CodeforcesUtils {
     private fun Element.selectSidebar(): Element? = selectFirst("div#sidebar")
     private fun Element.expectSidebar(): Element = requireNotNull(selectSidebar())
 
+    private fun Element.expectDivInfo(): Element = expectFirst("div.info")
+
     private fun Element.selectRatedUser(): Element? = selectFirst("a.rated-user")
     private fun Element.expectRatedUser(): Element = requireNotNull(selectRatedUser())
 
@@ -73,7 +75,7 @@ object CodeforcesUtils {
 
             val author: CodeforcesHandle
             val creationTime: Instant
-            topic.expectFirst("div.info").let { info ->
+            topic.expectDivInfo().let { info ->
                 author = info.expectRatedUser().extractRatedUser()
                 creationTime = info.expectHumanTimeTitle().extractTime()
             }
@@ -110,7 +112,7 @@ object CodeforcesUtils {
             val commentId: Long
             val commentCreationTime: Instant
             val commentRating: Int
-            commentBox.expectFirst("div.info").let { info ->
+            commentBox.expectDivInfo().let { info ->
                 blogEntryAuthor = info.expectRatedUser().extractRatedUser()
                 commentCreationTime = info.expectHumanTimeTitle().extractTime()
                 info.getElementsByAttributeValueContaining("href", "#comment")[0].let { commentLink ->
