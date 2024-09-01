@@ -95,13 +95,13 @@ class CodeforcesMonitorLauncherWorker(
     private suspend fun enqueueToCodeforcesContest() {
         with(context.contestsListDao.getContests(Contest.Platform.codeforces)) {
             if (any { it.getPhase(workerStartTime) == Contest.Phase.RUNNING }) {
-                enqueueAsap()
+                work.enqueueAsap()
             }
 
             filter { it.getPhase(workerStartTime) == Contest.Phase.BEFORE }
                 .minOfOrNull { it.startTime }
                 ?.let {
-                    enqueueAt(time = it + 5.minutes, repeatInterval)
+                    work.enqueueAt(time = it + 5.minutes, repeatInterval)
                 }
         }
     }

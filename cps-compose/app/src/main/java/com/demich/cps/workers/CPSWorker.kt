@@ -23,7 +23,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 abstract class CPSWorker(
-    private val work: CPSPeriodicWork,
+    protected val work: CPSPeriodicWork,
     val parameters: WorkerParameters
 ): CoroutineWorker(work.context, parameters) {
 
@@ -78,9 +78,6 @@ abstract class CPSWorker(
             } else result
         }
     }
-
-    protected fun enqueueAsap() = work.enqueueAsap()
-    protected fun enqueueAt(time: Instant, repeatInterval: Duration) = work.enqueueAt(time, repeatInterval)
 
     protected suspend fun setProgressInfo(progressInfo: ProgressBarInfo) {
         if (progressInfo.total == 0) return
