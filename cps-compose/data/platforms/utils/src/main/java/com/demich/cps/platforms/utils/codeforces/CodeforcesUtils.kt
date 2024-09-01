@@ -244,31 +244,19 @@ object CodeforcesUtils {
     suspend fun getUsersInfo(handles: Collection<String>, doRedirect: Boolean) =
         getUsersInfo(handles.toSet(), doRedirect)
 
+    //TODO: non recursive O(n) version
     suspend fun getUsersInfo(handles: Set<String>, doRedirect: Boolean): Map<String, CodeforcesUserInfo> {
         return CodeforcesApi.runCatching {
-            getUsers(handles = handles)
+            getUsers(handles = handles, checkHistoricHandles = doRedirect)
+                .apply { require(size == handles.size) }
         }.map { infos ->
-            handles.associateWith { handle ->
-                infos.find { handle.equals(it.handle, ignoreCase = true) }
-                    ?.let { CodeforcesUserInfo(it) }
-                    ?: CodeforcesUserInfo(handle = handle, status = STATUS.FAILED)
-            }
+            //relying to cf api return in same order
+            handles.zip(infos.map { CodeforcesUserInfo(it) }).toMap()
         }.getOrElse { e ->
             if (e is CodeforcesAPIErrorResponse) {
                 e.isHandleNotFound()?.let { badHandle ->
-                    val (realHandle, status) =
-                        if (doRedirect) getRealHandle(handle = badHandle)
-                        else badHandle to STATUS.NOT_FOUND
-                    return@getOrElse if (status == STATUS.OK) {
-                        val withReplaced = getUsersInfo(handles = handles - badHandle + realHandle, doRedirect = doRedirect)
-                        handles.associateWith { handle ->
-                            if (handle == badHandle) withReplaced.getValue(realHandle)
-                            else withReplaced.getValue(handle)
-                        }
-                    } else {
-                        getUsersInfo(handles = handles - badHandle, doRedirect = doRedirect)
-                            .plus(badHandle to CodeforcesUserInfo(handle = badHandle, status = status))
-                    }
+                    return@getOrElse getUsersInfo(handles = handles - badHandle, doRedirect = doRedirect)
+                        .plus(badHandle to CodeforcesUserInfo(handle = badHandle, status = STATUS.NOT_FOUND))
                 }
             }
             handles.associateWith { handle -> CodeforcesUserInfo(handle = handle, status = STATUS.FAILED) }
