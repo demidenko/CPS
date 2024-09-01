@@ -112,14 +112,20 @@ object CodeforcesApi: PlatformApi {
     }
 
 
-    suspend fun getUsers(handles: Collection<String>): List<CodeforcesUser> {
+    suspend fun getUsers(
+        handles: Collection<String>,
+        checkHistoricHandles: Boolean = false
+    ): List<CodeforcesUser> {
         if (handles.isEmpty()) return emptyList()
         return getCodeforcesApi(path = "user.info") {
             parameter("handles", handles.joinToString(separator = ";"))
+            parameter("checkHistoricHandles", checkHistoricHandles)
         }
     }
 
-    suspend fun getUser(handle: String) = getUsers(listOf(handle)).first()
+    suspend fun getUser(handle: String, checkHistoricHandles: Boolean = false): CodeforcesUser {
+        return getUsers(listOf(handle), checkHistoricHandles).first()
+    }
 
     suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange> {
         return getCodeforcesApi(path = "user.rating") {

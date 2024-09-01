@@ -280,16 +280,10 @@ object CodeforcesUtils {
     suspend fun getUserInfo(handle: String, doRedirect: Boolean): CodeforcesUserInfo {
         //return getUsersInfo(setOf(handle), doRedirect).getValue(handle)
         return CodeforcesApi.runCatching {
-            CodeforcesUserInfo(getUser(handle = handle))
+            CodeforcesUserInfo(getUser(handle = handle, checkHistoricHandles = doRedirect))
         }.getOrElse { e ->
             if (e is CodeforcesAPIErrorResponse && e.isHandleNotFound() == handle) {
-                if (doRedirect) {
-                    val (realHandle, status) = getRealHandle(handle = handle)
-                    if (status == STATUS.OK) getUserInfo(handle = realHandle, doRedirect = false)
-                    else CodeforcesUserInfo(handle = handle, status = status)
-                } else {
-                    CodeforcesUserInfo(handle = handle, status = STATUS.NOT_FOUND)
-                }
+                CodeforcesUserInfo(handle = handle, status = STATUS.NOT_FOUND)
             } else {
                 CodeforcesUserInfo(handle = handle, status = STATUS.FAILED)
             }
