@@ -15,6 +15,5 @@ class ContestsInfoDataStore(context: Context): ItemizedDataStore(context.contest
     val lastReloadedPlatforms = itemEnumSet<Contest.Platform>(name = "last_reloaded_platforms")
     val clistLastReloadedAdditionalResources = jsonCPS.itemSet<Int>(name = "clist_additional_last_reloaded")
 
-    //val ignoredContests = jsonCPS.itemMap<ContestCompositeId, Instant>(name = "ignored_contests")
     val ignoredContests = jsonCPS.item(name = "ignored_contests", defaultValue = emptyTimedCollection<ContestCompositeId>())
 }

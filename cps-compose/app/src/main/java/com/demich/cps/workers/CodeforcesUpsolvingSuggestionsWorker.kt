@@ -3,18 +3,17 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
-import com.demich.cps.*
+import com.demich.cps.R
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.utils.awaitPair
-import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesProblem
 import com.demich.cps.platforms.api.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.CodeforcesRatingChange
-import com.demich.datastore_itemized.add
-import com.demich.datastore_itemized.edit
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.utils.add
+import com.demich.cps.utils.awaitPair
 import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -52,14 +51,14 @@ class CodeforcesUpsolvingSuggestionsWorker(
         val suggestedItem = dataStore.upsolvingSuggestedProblems
 
         val dateThreshold = workerStartTime - 90.days
-        suggestedItem.edit { removeAll { it.second <= dateThreshold } }
+        suggestedItem.update { it.withoutOld(dateThreshold) }
 
         val ratingChanges = CodeforcesApi.getUserRatingChanges(handle)
 
-        val alreadySuggested = suggestedItem().map { it.first }
+        val alreadySuggested = suggestedItem()
 
         ratingChanges
-            .filter { it.ratingUpdateTime > dateThreshold }
+            .filter { it.ratingUpdateTime >= dateThreshold }
             .sortedByDescending { it.ratingUpdateTime }
             .forEachWithProgress { ratingChange ->
                 getSuggestions(
@@ -68,12 +67,12 @@ class CodeforcesUpsolvingSuggestionsWorker(
                     alreadySuggested = alreadySuggested,
                     toRemoveAsSolved = { solved ->
                         val solvedIds = solved.mapToSet { it.problemId }
-                        suggestedItem.edit {
-                            removeAll { it.first.problemId in solvedIds }
+                        suggestedItem.update {
+                            it.without { it.problemId in solvedIds }
                         }
                     }
                 ) { problem ->
-                    suggestedItem.add(problem to ratingChange.ratingUpdateTime)
+                    suggestedItem.add(problem, ratingChange.ratingUpdateTime)
                     notifyProblemForUpsolve(problem, context)
                 }
             }
