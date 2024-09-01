@@ -15,7 +15,7 @@ import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.datastore_itemized.edit
+import com.demich.cps.utils.emptyTimedCollection
 import kotlinx.coroutines.launch
 
 @Composable
@@ -42,7 +42,7 @@ internal fun DeletedContestsSettingsItem() {
                 onDismissRequest = { showDialog = false },
                 onConfirmRequest = {
                     scope.launch {
-                        settings.ignoredContests.edit { clear() }
+                        settings.ignoredContests(newValue = emptyTimedCollection())
                     }
                 }
             )

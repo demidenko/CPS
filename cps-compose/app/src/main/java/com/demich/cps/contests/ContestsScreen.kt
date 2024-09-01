@@ -233,8 +233,8 @@ private fun ContestsPage(
         modifier = modifier,
         onDeleteRequest = { contest ->
             scope.launch {
-                ContestsInfoDataStore(context).ignoredContests.edit {
-                    put(contest.compositeId, getCurrentTime())
+                ContestsInfoDataStore(context).ignoredContests.update {
+                    it.add(contest.compositeId, getCurrentTime())
                 }
             }
         }
