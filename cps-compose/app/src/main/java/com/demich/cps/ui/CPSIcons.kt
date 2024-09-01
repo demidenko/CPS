@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.*
+import androidx.compose.material.icons.twotone.Error
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -56,7 +57,7 @@ object CPSIcons {
     val BlogEntry get() = Icons.AutoMirrored.Filled.Wysiwyg
     val ArrowRight get() = Icons.AutoMirrored.Filled.ArrowRightAlt
     val ArrowBack get() = Icons.AutoMirrored.Filled.ArrowBack
-    val Attention get() = Icons.Default.ErrorOutline
+    val Attention get() = Icons.TwoTone.Error
     val NewsFeeds get() = Icons.Default.RssFeed
     val Monitor get() = Icons.AutoMirrored.Filled.Dvr
     val Upsolving get() = Icons.Default.FitnessCenter
