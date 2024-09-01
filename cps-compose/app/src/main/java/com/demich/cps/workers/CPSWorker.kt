@@ -72,7 +72,7 @@ abstract class CPSWorker(
             }
 
         return call().let { result ->
-            if (result.toType() == ResultType.RETRY) {
+            if (result.toType() != ResultType.SUCCESS) {
                 delay(duration = 5.seconds)
                 call()
             } else result
