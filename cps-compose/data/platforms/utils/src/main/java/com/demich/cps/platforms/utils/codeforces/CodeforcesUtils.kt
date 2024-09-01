@@ -58,6 +58,8 @@ object CodeforcesUtils {
     private fun Element.selectRatedUser(): Element? = selectFirst("a.rated-user")
     private fun Element.expectRatedUser(): Element = requireNotNull(selectRatedUser())
 
+    private fun Element.expectHumanTimeTitle(): String = expectFirst(".format-humantime").attr("title")
+
     private fun String.extractTime(): Instant = DateTimeParser.parse(this)
 
     private fun extractBlogEntryOrNull(topic: Element): CodeforcesBlogEntry? {
@@ -73,7 +75,7 @@ object CodeforcesUtils {
             val creationTime: Instant
             topic.expectFirst("div.info").let { info ->
                 author = info.expectRatedUser().extractRatedUser()
-                creationTime = info.expectFirst(".format-humantime").attr("title").extractTime()
+                creationTime = info.expectHumanTimeTitle().extractTime()
             }
 
             val rating: Int
@@ -109,8 +111,8 @@ object CodeforcesUtils {
             val commentCreationTime: Instant
             val commentRating: Int
             commentBox.expectFirst("div.info").let { info ->
-                commentCreationTime = info.expectFirst(".format-humantime").attr("title").extractTime()
                 blogEntryAuthor = info.expectRatedUser().extractRatedUser()
+                commentCreationTime = info.expectHumanTimeTitle().extractTime()
                 info.getElementsByAttributeValueContaining("href", "#comment")[0].let { commentLink ->
                     with(commentLink.attr("href").split("#comment-")) {
                         blogEntryId = this[0].removePrefix("/blog/entry/").toInt()
