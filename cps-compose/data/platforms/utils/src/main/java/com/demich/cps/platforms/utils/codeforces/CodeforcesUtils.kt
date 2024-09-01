@@ -50,6 +50,14 @@ object CodeforcesUtils {
             LocalDateTime.parse(input, dateTimeFormat).toInstant(moscowTimeZone)
     }
 
+    private fun Element.expectContent(): Element = expectFirst("div.content-with-sidebar")
+
+    private fun Element.selectSidebar(): Element? = selectFirst("div#sidebar")
+    private fun Element.expectSidebar(): Element = requireNotNull(selectSidebar())
+
+    private fun Element.selectRatedUser(): Element? = selectFirst("a.rated-user")
+    private fun Element.expectRatedUser(): Element = requireNotNull(selectRatedUser())
+
     private fun String.extractTime(): Instant = DateTimeParser.parse(this)
 
     private fun extractBlogEntryOrNull(topic: Element): CodeforcesBlogEntry? {
@@ -64,7 +72,7 @@ object CodeforcesUtils {
             val author: CodeforcesHandle
             val creationTime: Instant
             topic.expectFirst("div.info").let { info ->
-                author = info.expectFirst(".rated-user").extractRatedUser()
+                author = info.expectRatedUser().extractRatedUser()
                 creationTime = info.expectFirst(".format-humantime").attr("title").extractTime()
             }
 
@@ -91,7 +99,7 @@ object CodeforcesUtils {
     private fun extractCommentOrNull(commentBox: Element): CodeforcesRecentAction? {
         return kotlin.runCatching {
             val commentator = commentBox.expectFirst(".avatar")
-                .expectFirst("a.rated-user")
+                .expectRatedUser()
                 .extractRatedUser()
 
             val blogEntryId: Int
@@ -102,7 +110,7 @@ object CodeforcesUtils {
             val commentRating: Int
             commentBox.expectFirst("div.info").let { info ->
                 commentCreationTime = info.expectFirst(".format-humantime").attr("title").extractTime()
-                blogEntryAuthor = info.expectFirst("a.rated-user").extractRatedUser()
+                blogEntryAuthor = info.expectRatedUser().extractRatedUser()
                 info.getElementsByAttributeValueContaining("href", "#comment")[0].let { commentLink ->
                     with(commentLink.attr("href").split("#comment-")) {
                         blogEntryId = this[0].removePrefix("/blog/entry/").toInt()
@@ -143,7 +151,7 @@ object CodeforcesUtils {
 
     private fun extractRecentBlogEntryOrNull(item: Element): CodeforcesBlogEntry? {
         return kotlin.runCatching {
-            val author = item.expectFirst("a.rated-user").extractRatedUser()
+            val author = item.expectRatedUser().extractRatedUser()
             val blogEntryId: Int
             val blogEntryTitle: String
             item.getElementsByAttributeValueStarting("href", "/blog/entry/")[0].let {
@@ -159,11 +167,6 @@ object CodeforcesUtils {
             )
         }.getOrNull()
     }
-
-    private fun Element.expectContent(): Element = expectFirst("div.content-with-sidebar")
-
-    private fun Element.selectSidebar(): Element? = selectFirst("div#sidebar")
-    private fun Element.expectSidebar(): Element = requireNotNull(selectSidebar())
 
     fun extractTitle(blogEntry: CodeforcesBlogEntry): String =
         Jsoup.parse(blogEntry.title).text()
@@ -239,7 +242,7 @@ object CodeforcesUtils {
 
     private fun extractRealHandleOrNull(page: String): CodeforcesHandle? {
         val userBox = Jsoup.parse(page).selectFirst("div.userbox") ?: return null
-        return userBox.selectFirst("a.rated-user")?.extractRatedUser()
+        return userBox.selectRatedUser()?.extractRatedUser()
     }
 
 
