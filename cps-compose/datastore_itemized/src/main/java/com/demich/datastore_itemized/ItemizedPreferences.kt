@@ -6,15 +6,16 @@ import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class ItemizedPreferences(private val preferences: Preferences) {
+open class ItemizedPreferences internal constructor(
+    protected open val preferences: Preferences
+) {
     operator fun<T> get(item: DataStoreItem<T>): T =
         item.converter.getFrom(preferences)
 }
 
-class ItemizedMutablePreferences(private val preferences: MutablePreferences) {
-    operator fun<T> get(item: DataStoreItem<T>): T =
-        item.converter.getFrom(preferences)
-
+class ItemizedMutablePreferences internal constructor(
+    override val preferences: MutablePreferences
+): ItemizedPreferences(preferences) {
     operator fun<T> set(item: DataStoreItem<T>, value: T) =
         item.converter.setTo(preferences, value)
 
