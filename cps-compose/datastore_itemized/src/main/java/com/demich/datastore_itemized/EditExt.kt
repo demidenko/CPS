@@ -1,17 +1,17 @@
 package com.demich.datastore_itemized
 
 @JvmName("editList")
-suspend fun<T> DataStoreItem<List<T>>.edit(block: MutableList<T>.() -> Unit) {
+suspend inline fun<T> DataStoreItem<List<T>>.edit(crossinline block: MutableList<T>.() -> Unit) {
     update { it.toMutableList().apply(block) }
 }
 
 @JvmName("editSet")
-suspend fun<T> DataStoreItem<Set<T>>.edit(block: MutableSet<T>.() -> Unit) {
+suspend inline fun<T> DataStoreItem<Set<T>>.edit(crossinline block: MutableSet<T>.() -> Unit) {
     update { it.toMutableSet().apply(block) }
 }
 
 @JvmName("editMap")
-suspend fun<K, V> DataStoreItem<Map<K, V>>.edit(block: MutableMap<K,V>.() -> Unit) {
+suspend inline fun<K, V> DataStoreItem<Map<K, V>>.edit(crossinline block: MutableMap<K,V>.() -> Unit) {
     update { it.toMutableMap().apply(block) }
 }
 
