@@ -14,11 +14,8 @@ class TimedCollection<T>(
     fun add(item: T, time: Instant): TimedCollection<T> =
         TimedCollection(m.plus(item to time))
 
-    fun withoutOld(timeThreshold: Instant): TimedCollection<T> =
-        withoutOld { it < timeThreshold }
-
-    fun withoutOld(isOld: (Instant) -> Boolean): TimedCollection<T> =
-        TimedCollection(m.filterValues { !isOld(it) })
+    fun internalFilterByTime(predicate: (Instant) -> Boolean): TimedCollection<T> =
+        TimedCollection(m.filterValues(predicate))
 
     fun filterByValue(predicate: (T) -> Boolean): TimedCollection<T> =
         TimedCollection(m.filterKeys(predicate))
@@ -31,9 +28,9 @@ suspend fun <T> DataStoreItem<TimedCollection<T>>.add(item: T, time: Instant) {
 }
 
 suspend fun <T> DataStoreItem<TimedCollection<T>>.removeOlderThan(time: Instant) {
-    update { it.withoutOld(time) }
+    removeOld { it < time }
 }
 
 suspend fun <T> DataStoreItem<TimedCollection<T>>.removeOld(isOld: (Instant) -> Boolean) {
-    update { it.withoutOld(isOld) }
+    update { it.internalFilterByTime { time -> !isOld(time) } }
 }
