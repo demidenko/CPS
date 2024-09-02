@@ -12,7 +12,7 @@ object ClistApi: PlatformApi {
     }
 
     suspend fun getUsersSearchPage(str: String): String {
-        return client.getText(urls.main + "/coders") {
+        return client.getText("${urls.main}/coders") {
             parameter("search", str)
         }
     }
@@ -22,13 +22,26 @@ object ClistApi: PlatformApi {
         apiAccess: ApiAccess,
         limit: Int = 1000,
         block: HttpRequestBuilder.() -> Unit = {}
-    ): List<T> = client.getAs<ClistApiResponse<T>>("${urls.api}/$page") {
-        parameter("format", "json")
-        parameter("username", apiAccess.login)
-        parameter("api_key", apiAccess.key)
-        parameter("limit", limit)
-        block()
-    }.objects
+    ): List<T> = buildList {
+        //TODO: what if meta.total_count changes?
+        var offset = 0
+        do {
+            val result = client.getAs<ClistApiResponse<T>>("${urls.api}/$page") {
+                parameter("format", "json")
+                parameter("username", apiAccess.login)
+                parameter("api_key", apiAccess.key)
+                parameter("limit", limit)
+                parameter("offset", offset)
+                parameter("total_count", true)
+                block()
+            }
+            result.objects.let {
+                addAll(it)
+                offset += it.size
+            }
+            val totalCount = requireNotNull(result.meta.total_count)
+        } while (offset < totalCount)
+    }
 
     suspend fun getContests(
         apiAccess: ApiAccess,
@@ -66,15 +79,15 @@ object ClistApi: PlatformApi {
 @Serializable
 private class ClistApiResponse<T>(
     val objects: List<T>,
-    //TODO: val meta: PageInfo
+    val meta: PageInfo
 )
 
 @Serializable
-private data class PageInfo(
-    val limit: Int,
-    val next: String,
-    val offset: Int,
-    val previous: String?,
+private class PageInfo(
+    //val limit: Int,
+    //val next: String,
+    //val offset: Int,
+    //val previous: String?,
     val total_count: Int?
 )
 
