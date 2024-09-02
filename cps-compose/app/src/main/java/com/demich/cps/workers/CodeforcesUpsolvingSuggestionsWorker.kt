@@ -69,7 +69,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
                     toRemoveAsSolved = { solved ->
                         val solvedIds = solved.mapToSet { it.problemId }
                         suggestedItem.update {
-                            it.without { it.problemId in solvedIds }
+                            it.filterByValue { it.problemId !in solvedIds }
                         }
                     }
                 ) { problem ->

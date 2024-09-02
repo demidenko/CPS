@@ -20,8 +20,8 @@ class TimedCollection<T>(
     fun withoutOld(isOld: (Instant) -> Boolean): TimedCollection<T> =
         TimedCollection(m.filterValues { !isOld(it) })
 
-    fun without(predicate: (T) -> Boolean): TimedCollection<T> =
-        TimedCollection(m.filterKeys { !predicate(it) })
+    fun filterByValue(predicate: (T) -> Boolean): TimedCollection<T> =
+        TimedCollection(m.filterKeys(predicate))
 }
 
 fun <T> emptyTimedCollection(): TimedCollection<T> = TimedCollection()
