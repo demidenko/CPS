@@ -135,7 +135,7 @@ private fun UpsolvingSuggestionsList(
     val problems by collectAsState {
         CodeforcesAccountManager().dataStore(context)
             .upsolvingSuggestedProblems.flow
-            .map { it.itemsSortedByTime().asReversed() }
+            .map { it.valuesSortedByTime().asReversed() }
     }
 
     LazyColumnOfData(

@@ -8,11 +8,11 @@ import kotlinx.serialization.Serializable
 class TimedCollection<T>(
     private val m: Map<T, Instant> = emptyMap()
 ): Collection<T> by m.keys {
-    fun itemsSortedByTime(): List<T> =
+    fun valuesSortedByTime(): List<T> =
         m.entries.sortedBy { it.value }.map { it.key }
 
-    fun add(item: T, time: Instant): TimedCollection<T> =
-        TimedCollection(m.plus(item to time))
+    fun add(value: T, time: Instant): TimedCollection<T> =
+        TimedCollection(m.plus(value to time))
 
     fun internalFilterByTime(predicate: (Instant) -> Boolean): TimedCollection<T> =
         TimedCollection(m.filterValues(predicate))
@@ -23,14 +23,14 @@ class TimedCollection<T>(
 
 fun <T> emptyTimedCollection(): TimedCollection<T> = TimedCollection()
 
-suspend fun <T> DataStoreItem<TimedCollection<T>>.add(item: T, time: Instant) {
-    update { it.add(item, time) }
+suspend fun <T> DataStoreItem<TimedCollection<T>>.add(value: T, time: Instant) {
+    update { it.add(value, time) }
 }
 
 suspend fun <T> DataStoreItem<TimedCollection<T>>.removeOlderThan(time: Instant) {
     removeOld { it < time }
 }
 
-suspend fun <T> DataStoreItem<TimedCollection<T>>.removeOld(isOld: (Instant) -> Boolean) {
+suspend inline fun <T> DataStoreItem<TimedCollection<T>>.removeOld(crossinline isOld: (Instant) -> Boolean) {
     update { it.internalFilterByTime { time -> !isOld(time) } }
 }
