@@ -89,14 +89,16 @@ fun WorkersList(modifier: Modifier = Modifier) {
     val progressBarsViewModel = progressBarsViewModel()
     if (showMonitorDialog) {
         CodeforcesMonitorDialog(onDismissRequest = { showMonitorDialog = false }) { contestId ->
-            progressBarsViewModel.doJob(id = "run_cf_monitor $contestId") { state ->
+            progressBarsViewModel.doJob(id = "run_cf_monitor $contestId") { progress ->
                 val handle = CodeforcesAccountManager()
                     .dataStore(context)
                     .getSavedInfo()?.handle ?: return@doJob
-                state.value = ProgressBarInfo(total = 5, title = "cf monitor")
-                repeat(state.value.total) {
+                var progressInfo = ProgressBarInfo(total = 5, title = "cf monitor")
+                progress(progressInfo)
+                repeat(progressInfo.total) {
                     delay(1.seconds)
-                    state.value++
+                    progressInfo++
+                    progress(progressInfo)
                 }
                 CodeforcesMonitorWorker.start(
                     contestId = contestId,

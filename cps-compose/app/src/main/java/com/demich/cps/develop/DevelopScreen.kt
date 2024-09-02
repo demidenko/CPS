@@ -27,6 +27,7 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSRadioButtonTitled
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
+import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
@@ -54,12 +55,12 @@ fun developAdditionalBottomBarBuilder(): AdditionalBottomBarBuilder = {
     CPSIconButton(icon = CPSIcons.Add) {
         progressBarsViewModel.doJob(
             id = Random.nextLong().toString()
-        ) { state ->
+        ) { progress ->
             val total = Random.nextInt(5, 15)
-            state.value = state.value.copy(total = total, title = total.toString())
+            progress(ProgressBarInfo(total = total, title = total.toString()))
             repeat(total) {
                 delay(1.seconds)
-                state.value++
+                progress(ProgressBarInfo(total = total, title = total.toString(), current = it + 1))
             }
         }
     }

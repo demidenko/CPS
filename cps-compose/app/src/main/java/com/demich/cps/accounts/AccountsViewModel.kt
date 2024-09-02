@@ -80,7 +80,8 @@ class AccountsViewModel: ViewModel() {
             val supported = cListUserInfo.accounts.mapNotNull { (resource, userData) ->
                 getManager(resource, userData.first, userData.second)
             }
-            progress.value = ProgressBarInfo(title = "clist import", total = supported.size)
+            var progressBarInfo = ProgressBarInfo(title = "clist import", total = supported.size)
+            progress(progressBarInfo)
             supported.map { (type, userId) ->
                 val manager = allAccountManagers.first { it.type == type }
                 launch(Dispatchers.IO) {
@@ -94,7 +95,8 @@ class AccountsViewModel: ViewModel() {
                         getAndSave(manager, userId, context)
                         setLoadingStatus(manager, LoadingStatus.PENDING)
                     }
-                    progress.value++
+                    progressBarInfo++
+                    progress(progressBarInfo)
                 }
             }.joinAll()
         }

@@ -156,11 +156,12 @@ private fun AddAccountButton() {
     val context = context
     val scope = rememberCoroutineScope()
     val progressBarsViewModel = progressBarsViewModel()
+    val clistImportIsRunning by collectAsState { progressBarsViewModel.flowOfClistImportIsRunning() }
 
     Box {
         CPSIconButton(
             icon = CPSIcons.Add,
-            enabled = progressBarsViewModel.clistImportIsRunning.not(),
+            enabled = !clistImportIsRunning,
             onClick = { showMenu = true }
         )
 

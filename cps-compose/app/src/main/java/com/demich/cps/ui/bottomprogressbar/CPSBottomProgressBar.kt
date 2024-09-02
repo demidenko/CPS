@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.collectAsState
 
 
 @Composable
@@ -32,14 +33,14 @@ fun CPSBottomProgressBarsColumn(
     modifier: Modifier = Modifier
 ) {
     val progressBarsViewModel = progressBarsViewModel()
+    val progresses by collectAsState { progressBarsViewModel.flowOfProgresses() }
     LazyColumn(modifier = modifier) {
         items(
-            items = progressBarsViewModel.progressBarsIdsList,
-            key = { it }
+            items = progresses.toList(),
+            key = { it.first }
         ) {
-            val progress by progressBarsViewModel.progressState(id = it)
             CPSBottomProgressBar(
-                progressBarInfo = progress,
+                progressBarInfo = it.second,
                 modifier = Modifier.padding(all = 3.dp)
             )
         }
