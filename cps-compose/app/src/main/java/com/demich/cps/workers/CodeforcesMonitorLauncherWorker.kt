@@ -7,6 +7,7 @@ import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.platforms.api.CodeforcesApi
+import com.demich.cps.utils.removeOld
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -63,9 +64,7 @@ class CodeforcesMonitorLauncherWorker(
                 monitorLastSubmissionId(it.id)
             }
 
-            monitorCanceledContests.update {
-                it.withoutOld { time -> !isActual(time) }
-            }
+            monitorCanceledContests.removeOld { !isActual(it) }
         }
 
         enqueueToCodeforcesContest()

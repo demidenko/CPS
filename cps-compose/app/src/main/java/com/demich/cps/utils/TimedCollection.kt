@@ -29,3 +29,11 @@ fun <T> emptyTimedCollection(): TimedCollection<T> = TimedCollection()
 suspend fun <T> DataStoreItem<TimedCollection<T>>.add(item: T, time: Instant) {
     update { it.add(item, time) }
 }
+
+suspend fun <T> DataStoreItem<TimedCollection<T>>.removeOlderThan(time: Instant) {
+    update { it.withoutOld(time) }
+}
+
+suspend fun <T> DataStoreItem<TimedCollection<T>>.removeOld(isOld: (Instant) -> Boolean) {
+    update { it.withoutOld(isOld) }
+}

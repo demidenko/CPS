@@ -14,6 +14,7 @@ import com.demich.cps.platforms.api.CodeforcesRatingChange
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.add
 import com.demich.cps.utils.awaitPair
+import com.demich.cps.utils.removeOlderThan
 import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -51,7 +52,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
         val suggestedItem = dataStore.upsolvingSuggestedProblems
 
         val dateThreshold = workerStartTime - 90.days
-        suggestedItem.update { it.withoutOld(dateThreshold) }
+        suggestedItem.removeOlderThan(dateThreshold)
 
         val ratingChanges = CodeforcesApi.getUserRatingChanges(handle)
 
