@@ -20,7 +20,7 @@ object ClistApi: PlatformApi {
     private suspend inline fun<reified T> getApiJsonObjects(
         page: String,
         apiAccess: ApiAccess,
-        limit: Int = 1000,
+        responseSizeLimit: Int = 1000,
         block: HttpRequestBuilder.() -> Unit = {}
     ): List<T> = buildList {
         //TODO: what if meta.total_count changes?
@@ -30,7 +30,7 @@ object ClistApi: PlatformApi {
                 parameter("format", "json")
                 parameter("username", apiAccess.login)
                 parameter("api_key", apiAccess.key)
-                parameter("limit", limit)
+                parameter("limit", responseSizeLimit)
                 parameter("offset", offset)
                 parameter("total_count", true)
                 block()
@@ -65,7 +65,7 @@ object ClistApi: PlatformApi {
         const val main = "https://clist.by"
         fun user(login: String) = "$main/coder/$login"
 
-        const val api = "$main/api/v3"
+        const val api = "$main/api/v4"
         val apiHelp get() = "$api/doc/"
     }
 
