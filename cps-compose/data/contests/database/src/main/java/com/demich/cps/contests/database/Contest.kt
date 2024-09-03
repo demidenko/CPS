@@ -99,6 +99,6 @@ data class Contest (
                 Phase.BEFORE -> compareValues(c1.startTime, c2.startTime)
                 Phase.FINISHED -> -compareValues(c1.endTime, c2.endTime)
             }
-        }.thenBy { it.duration }.thenBy { it.platform }.thenBy { it.id }
+        }.thenBy { it.platform }.thenBy { it.id }.thenBy { it.duration }
     }
 }
