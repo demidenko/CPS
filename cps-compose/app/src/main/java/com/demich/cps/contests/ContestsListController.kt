@@ -61,6 +61,9 @@ internal interface ContestsIdsHolder {
     }
 }
 
+private val Contest.isVirtual
+    get() = duration < eventDuration
+
 @Stable
 class ContestsListController(
     contestsViewModel: ContestsViewModel,
@@ -79,6 +82,7 @@ class ContestsListController(
             val r = it.endTime
             when {
                 id == contest.compositeId -> null
+                it.isVirtual -> null
                 l >= contest.endTime -> l - contest.endTime
                 r <= contest.startTime -> contest.startTime - r
                 else -> return DangerType.DANGER
