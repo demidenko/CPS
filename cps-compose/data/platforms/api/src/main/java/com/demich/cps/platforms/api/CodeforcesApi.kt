@@ -80,7 +80,7 @@ object CodeforcesApi: PlatformApi {
         override fun toString(): String = rcpc_value
 
         private var last_c = ""
-        fun recalc(source: String) {
+        private fun recalc(source: String) {
             val i = source.indexOf("c=toNumbers(")
             val c = source.substring(source.indexOf("(\"",i)+2, source.indexOf("\")",i))
             if (c == last_c) return
@@ -88,13 +88,25 @@ object CodeforcesApi: PlatformApi {
             last_c = c
             println("$c: $rcpc_value")
         }
+
+        private fun String.isRCPCCase() =
+            startsWith("<html><body>Redirecting... Please, wait.")
+
+        suspend inline fun getPage(get: () -> String): String {
+            val s = get()
+            return if (s.isRCPCCase()) {
+                recalc(s)
+                delay(redirectWaitTime)
+                get()
+            } else s
+        }
     }
 
-    private suspend fun getCodeforcesWeb(
+    private suspend inline fun getCodeforcesWeb(
         path: String,
         block: HttpRequestBuilder.() -> Unit = {}
     ): String {
-        val callGet = suspend {
+        return RCPC.getPage {
             client.getText(path) {
                 header("Cookie", "RCPC=$RCPC")
                 block()
@@ -103,12 +115,6 @@ object CodeforcesApi: PlatformApi {
                 if (isTemporarilyUnavailable(it)) throw CodeforcesTemporarilyUnavailableException()
             }
         }
-        val s = callGet()
-        return if (s.startsWith("<html><body>Redirecting... Please, wait.")) {
-            RCPC.recalc(s)
-            delay(redirectWaitTime)
-            callGet()
-        } else s
     }
 
 
@@ -158,7 +164,7 @@ object CodeforcesApi: PlatformApi {
 
     //TODO: Sequence instead of List
     suspend fun getContestRatingChanges(contestId: Int): List<CodeforcesRatingChange> {
-        return getCodeforcesApi(path ="contest.ratingChanges" ) {
+        return getCodeforcesApi(path = "contest.ratingChanges" ) {
             parameter("contestId", contestId)
         }
     }
