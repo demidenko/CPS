@@ -85,6 +85,7 @@ private fun CodeforcesMonitor(
                 is CodeforcesMonitorData.ContestPhase.Coding -> Contest.Phase.RUNNING
                 else -> Contest.Phase.BEFORE
             },
+            isVirtual = false,
             modifier = Modifier.fillMaxWidth()
         )
         Footer(

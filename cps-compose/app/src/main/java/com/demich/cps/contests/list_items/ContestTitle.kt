@@ -24,11 +24,12 @@ import com.demich.kotlin_stdlib_boost.splitTrailingBrackets
 internal fun ContestTitleCollapsed(
     title: String,
     phase: Contest.Phase,
+    isVirtual: Boolean,
     modifier: Modifier = Modifier
 ) {
     Text(
         text = title.makeTitle(),
-        color = colorFor(phase),
+        color = colorFor(phase, isVirtual),
         fontSize = 19.sp,
         fontWeight = FontWeight.Bold,
         modifier = modifier,
@@ -41,12 +42,13 @@ internal fun ContestTitleCollapsed(
 internal fun ContestTitleExpanded(
     title: String,
     phase: Contest.Phase,
+    isVirtual: Boolean,
     modifier: Modifier = Modifier
 ) {
     var isMultiline by remember(title) { mutableStateOf(false) }
     Text(
         text = title.makeTitle(useNewLine = isMultiline),
-        color = colorFor(phase),
+        color = colorFor(phase, isVirtual),
         fontSize = 19.sp,
         fontWeight = FontWeight.Bold,
         modifier = modifier,
@@ -59,12 +61,9 @@ internal fun ContestTitleExpanded(
 
 @Composable
 @ReadOnlyComposable
-private fun colorFor(phase: Contest.Phase): Color =
-    when (phase) {
-        Contest.Phase.BEFORE -> cpsColors.content
-        Contest.Phase.RUNNING -> cpsColors.success
-        Contest.Phase.FINISHED -> cpsColors.contentAdditional
-    }
+private fun colorFor(phase: Contest.Phase, isVirtual: Boolean): Color =
+    if (phase == Contest.Phase.RUNNING && !isVirtual) cpsColors.success
+    else cpsColors.content
 
 
 @Composable

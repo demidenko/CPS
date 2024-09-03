@@ -17,6 +17,7 @@ import com.demich.cps.contests.contestDate
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.dateRange
 import com.demich.cps.contests.dateShortRange
+import com.demich.cps.contests.isVirtual
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
@@ -47,6 +48,7 @@ private fun ContestItemContent(contestDisplay: ContestDisplay) {
         platform = data.contest.platform,
         contestTitle = data.contest.title,
         phase = data.phase,
+        isVirtual = data.contest.isVirtual,
         modifier = Modifier.fillMaxWidth()
     )
     ContestItemFooter(
@@ -60,6 +62,7 @@ fun ContestItemHeader(
     platform: Contest.Platform,
     contestTitle: String,
     phase: Contest.Phase,
+    isVirtual: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -75,6 +78,7 @@ fun ContestItemHeader(
         ContestTitleCollapsed(
             title = contestTitle,
             phase = phase,
+            isVirtual = isVirtual,
             modifier = Modifier.weight(1f)
         )
     }

@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.dateRange
+import com.demich.cps.contests.isVirtual
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSDropdownMenuButton
 import com.demich.cps.ui.CPSIcons
@@ -39,7 +40,8 @@ internal fun ContestExpandedItemContent(
     )
     ContestTitle(
         contestTitle = data.contest.title,
-        phase = data.phase
+        phase = data.phase,
+        isVirtual = data.contest.isVirtual
     )
     ContestItemDatesAndMenuButton(
         contestDisplay = data.contestDisplay,
@@ -80,11 +82,13 @@ private fun ContestPlatform(
 @Composable
 private fun ContestTitle(
     contestTitle: String,
-    phase: Contest.Phase
+    phase: Contest.Phase,
+    isVirtual: Boolean
 ) {
     ContestTitleExpanded(
         title = contestTitle,
         phase = phase,
+        isVirtual = isVirtual,
         modifier = Modifier.fillMaxWidth()
     )
 }

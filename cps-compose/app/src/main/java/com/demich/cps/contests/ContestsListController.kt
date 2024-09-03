@@ -22,6 +22,9 @@ val Contest.compositeId: ContestCompositeId
     get() = platform to id
 
 
+val Contest.isVirtual: Boolean
+    get() = duration < eventDuration
+
 @Composable
 internal fun rememberContestsListController(): ContestsListController {
     val contestsViewModel = contestsViewModel()
@@ -60,9 +63,6 @@ internal interface ContestsIdsHolder {
         }
     }
 }
-
-private val Contest.isVirtual
-    get() = duration < eventDuration
 
 @Stable
 class ContestsListController(
