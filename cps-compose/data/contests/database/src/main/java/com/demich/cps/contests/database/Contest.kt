@@ -13,11 +13,12 @@ data class Contest (
     val id: String,
     val title: String,
     val startTime: Instant,
+    val endTime: Instant,
     val duration: Duration,
     val link: String? = null,
     val host: String? = null
 ) {
-    val endTime: Instant get() = startTime + duration
+    val eventDuration: Duration get() = endTime - startTime
 
     fun getPhase(currentTime: Instant): Phase {
         if (currentTime >= endTime) return Phase.FINISHED
@@ -38,7 +39,27 @@ data class Contest (
         id = id,
         title = title,
         startTime = startTime,
+        endTime = endTime,
         duration = endTime - startTime,
+        link = link,
+        host = host
+    )
+
+    constructor(
+        platform: Platform,
+        id: String,
+        title: String,
+        startTime: Instant,
+        duration: Duration,
+        link: String? = null,
+        host: String? = null
+    ): this(
+        platform = platform,
+        id = id,
+        title = title,
+        startTime = startTime,
+        endTime = startTime + duration,
+        duration = duration,
         link = link,
         host = host
     )
