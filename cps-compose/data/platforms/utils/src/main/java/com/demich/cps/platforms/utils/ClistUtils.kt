@@ -72,7 +72,7 @@ object ClistUtils {
             if (a.isEmpty()) return@forEach
             val href = a[0].attr("href")
             val resource = href.removePrefix("/resource/").removeSuffix("/")
-            val link = button.getElementsByClass("fas fa-external-link-alt").first()?.parent()?.attr("href") ?: ""
+            val link = button.getElementsByClass("btn-xs").first()?.attr("href") ?: ""
             val span = a[1].selectFirst("span") ?: return@forEach
             val userName = span.run {
                 val attr = "title"

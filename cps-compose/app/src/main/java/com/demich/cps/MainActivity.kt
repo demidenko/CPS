@@ -126,8 +126,8 @@ private fun CPSContent() {
                 type = type,
                 showDeleteDialog = showDeleteDialog,
                 onDeleteRequest = { manager ->
-                    navigator.popBack()
                     accountsViewModel.delete(manager, context)
+                    navigator.popBack()
                 },
                 onDismissDeleteDialog = { showDeleteDialog = false },
                 setBottomBarContent = holder.bottomBarSetter
