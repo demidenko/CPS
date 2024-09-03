@@ -84,5 +84,6 @@ data class DmojContest(
     val end_time: String,
 
     //contest time limit in seconds, or null if the contest is not windowed
-    val time_limit: Long?
+    //Double because of "time_limit":10800.0
+    val time_limit: Double?
 )
