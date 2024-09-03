@@ -12,6 +12,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
+import kotlin.time.Duration.Companion.seconds
 
 class ClistContestsLoader(
     val apiAccess: ClistApi.ApiAccess,
@@ -59,6 +60,7 @@ private fun ClistContest.toContest(): Contest {
         title = event,
         startTime = Instant.parse(start, contestDateTimeFormat),
         endTime = Instant.parse(end, contestDateTimeFormat),
+        duration = duration.seconds,
         link = href,
         host = host.takeIf { platform == Contest.Platform.unknown }
     )
