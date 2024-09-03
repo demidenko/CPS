@@ -29,16 +29,16 @@ val Contest.isVirtual: Boolean
 internal fun rememberContestsListController(): ContestsListController {
     val contestsViewModel = contestsViewModel()
 
-    val expandedIdsState = collectAsState { contestsViewModel.flowOfExpandedContests() }
+    val expandedContestsState = collectAsState { contestsViewModel.flowOfExpandedContests() }
 
     val contestsPageState = rememberSaveable {
         mutableStateOf(ContestsListController.ContestsPage.RunningOrFuture)
     }
 
-    return remember(contestsViewModel, expandedIdsState) {
+    return remember(contestsViewModel, expandedContestsState) {
         ContestsListController(
             contestsViewModel = contestsViewModel,
-            expandedIdsState = expandedIdsState,
+            expandedContestsState = expandedContestsState,
             contestsPageState = contestsPageState
         )
     }
@@ -51,15 +51,18 @@ internal interface ContestsIdsHolder {
         editIds {
             val id = contest.compositeId
             if (id in this) remove(id)
-            else put(id, contest)
+            else put(key = id, value = contest)
         }
     }
 
     fun applyContests(contests: List<Contest>) {
-        val new = contests.associateBy { it.compositeId }
         editIds {
-            keys.removeAll { it !in new }
-            replaceAll { id, _ -> new.getValue(id) }
+            val prev = this.keys.toSet()
+            clear()
+            contests.forEach { contest ->
+                val id = contest.compositeId
+                if (id in prev) put(key = id, value = contest)
+            }
         }
     }
 }
@@ -67,21 +70,21 @@ internal interface ContestsIdsHolder {
 @Stable
 class ContestsListController(
     contestsViewModel: ContestsViewModel,
-    expandedIdsState: State<Map<ContestCompositeId, Contest>>,
+    expandedContestsState: State<Map<ContestCompositeId, Contest>>,
     contestsPageState: MutableState<ContestsPage>
 ): ContestsIdsHolder by contestsViewModel {
-    private val expandedIds by expandedIdsState
+    private val expandedContests by expandedContestsState
 
     fun isExpanded(contest: Contest): Boolean =
-        contest.compositeId in expandedIds
+        contest.compositeId in expandedContests
 
     private val safeMinDuration: Duration = 1.hours
     fun collisionType(contest: Contest): DangerType {
-        val distance = expandedIds.entries.minOfNotNull(default = Duration.INFINITE) { (id, it) ->
+        val distance = expandedContests.values.minOfNotNull(default = Duration.INFINITE) {
             val l = it.startTime
             val r = it.endTime
             when {
-                id == contest.compositeId -> null
+                it.compositeId == contest.compositeId -> null
                 it.isVirtual -> null
                 l >= contest.endTime -> l - contest.endTime
                 r <= contest.startTime -> contest.startTime - r

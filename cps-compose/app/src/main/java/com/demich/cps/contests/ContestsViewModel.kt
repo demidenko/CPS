@@ -132,11 +132,11 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
         return enabled != lastReloaded //hope it is proper equals
     }
 
-    private val expandedItems = MutableStateFlow(emptyMap<ContestCompositeId, Contest>())
-    fun flowOfExpandedContests(): StateFlow<Map<ContestCompositeId, Contest>> = expandedItems
+    private val expandedContests = MutableStateFlow(emptyMap<ContestCompositeId, Contest>())
+    fun flowOfExpandedContests(): StateFlow<Map<ContestCompositeId, Contest>> = expandedContests
 
     override fun editIds(block: MutableMap<ContestCompositeId, Contest>.() -> Unit) =
-        expandedItems.edit(block)
+        expandedContests.edit(block)
 
 }
 
