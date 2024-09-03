@@ -74,30 +74,27 @@ object CodeforcesApi: PlatformApi {
     }
 
     private val RCPC = object {
-
-        private var rcpc_value: String = ""
-
-        override fun toString(): String = rcpc_value
+        private var rcpcToken: String = ""
 
         private var last_c = ""
-        private fun recalc(source: String) {
+        private fun calculateToken(source: String) {
             val i = source.indexOf("c=toNumbers(")
             val c = source.substring(source.indexOf("(\"",i)+2, source.indexOf("\")",i))
             if (c == last_c) return
-            rcpc_value = decodeAES(c)
+            rcpcToken = decodeAES(c)
             last_c = c
-            println("$c: $rcpc_value")
+            println("$c: $rcpcToken")
         }
 
         private fun String.isRCPCCase() =
             startsWith("<html><body>Redirecting... Please, wait.")
 
-        suspend inline fun getPage(get: () -> String): String {
-            val s = get()
+        suspend inline fun getPage(get: (String) -> String): String {
+            val s = get(rcpcToken)
             return if (s.isRCPCCase()) {
-                recalc(s)
+                calculateToken(s)
                 delay(redirectWaitTime)
-                get()
+                get(rcpcToken)
             } else s
         }
     }
@@ -106,9 +103,9 @@ object CodeforcesApi: PlatformApi {
         path: String,
         block: HttpRequestBuilder.() -> Unit = {}
     ): String {
-        return RCPC.getPage {
+        return RCPC.getPage { rcpcToken ->
             client.getText(path) {
-                header("Cookie", "RCPC=$RCPC")
+                if (rcpcToken.isNotEmpty()) header("Cookie", "RCPC=$rcpcToken")
                 block()
             }.also {
                 //TODO: check this for api requests too (in validateResponse)
