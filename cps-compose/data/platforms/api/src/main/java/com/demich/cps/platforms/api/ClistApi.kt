@@ -97,6 +97,7 @@ data class ClistContest(
     val id: Long,
     val start: String,
     val end: String,
+    val duration: Long,
     val event: String,
     val href: String,
     val host: String

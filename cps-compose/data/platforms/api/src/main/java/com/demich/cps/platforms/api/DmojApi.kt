@@ -76,6 +76,13 @@ data class DmojRatingChange(
 data class DmojContest(
     val key: String,
     val name: String,
+
+    //contest start time in ISO format
     val start_time: String,
-    val end_time: String
+
+    //contest end time in ISO format
+    val end_time: String,
+
+    //contest time limit in seconds, or null if the contest is not windowed
+    val time_limit: Long?
 )
