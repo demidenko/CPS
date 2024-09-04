@@ -30,21 +30,22 @@ import com.demich.cps.utils.openUrlInBrowser
 
 @Composable
 internal fun ContestExpandedItemContent(
-    contestDisplay: ContestDisplay,
+    contest: Contest,
+    collisionType: DangerType,
     onDeleteRequest: () -> Unit
 ) {
-    val data = contestDisplay.dataByCurrentTime()
+    val data = dataByCurrentTime(contest)
     ContestPlatform(
-        platform = data.contest.platform,
-        platformName = data.contest.platformName()
+        platform = contest.platform,
+        platformName = contest.platformName()
     )
     ContestTitle(
-        contestTitle = data.contest.title,
+        contest = contest,
         phase = data.phase,
-        isVirtual = data.contest.isVirtual
     )
     ContestItemDatesAndMenuButton(
-        contestDisplay = data.contestDisplay,
+        contest = contest,
+        collisionType = if (data.phase == Contest.Phase.BEFORE) collisionType else DangerType.SAFE,
         onDeleteRequest = onDeleteRequest
     )
     ContestCounter(
@@ -81,27 +82,27 @@ private fun ContestPlatform(
 
 @Composable
 private fun ContestTitle(
-    contestTitle: String,
+    contest: Contest,
     phase: Contest.Phase,
-    isVirtual: Boolean
 ) {
     ContestTitleExpanded(
-        title = contestTitle,
+        title = contest.title,
         phase = phase,
-        isVirtual = isVirtual,
+        isVirtual = contest.isVirtual,
         modifier = Modifier.fillMaxWidth()
     )
 }
 
 @Composable
 private fun ContestItemDatesAndMenuButton(
-    contestDisplay: ContestDisplay,
+    contest: Contest,
+    collisionType: DangerType,
     onDeleteRequest: () -> Unit
 ) {
     ContestItemDatesAndMenuButton(
-        dateRange = contestDisplay.contest.dateRange(),
-        contestLink = contestDisplay.contest.link,
-        collisionType = contestDisplay.collisionType,
+        dateRange = contest.dateRange(),
+        contestLink = contest.link,
+        collisionType = collisionType,
         modifier = Modifier.fillMaxWidth(),
         onDeleteRequest = onDeleteRequest
     )

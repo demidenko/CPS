@@ -5,21 +5,17 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import com.demich.cps.contests.contestTimeDifference
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.localCurrentTime
 
 @Immutable
 internal data class ContestData(
     val phase: Contest.Phase,
-    val counter: String,
-    val contestDisplay: ContestDisplay
-) {
-    val contest: Contest get() = contestDisplay.contest
-}
+    val counter: String
+)
 
 @Composable
 @ReadOnlyComposable
-internal fun ContestDisplay.dataByCurrentTime(): ContestData {
+internal fun dataByCurrentTime(contest: Contest): ContestData {
     //TODO: call recomposes two times
     val currentTime = localCurrentTime
     val phase = contest.getPhase(currentTime)
@@ -30,16 +26,8 @@ internal fun ContestDisplay.dataByCurrentTime(): ContestData {
     }
     return ContestData(
         phase = phase,
-        counter = counter,
-        contestDisplay = if (phase == Contest.Phase.BEFORE) this else copy(collisionType = DangerType.SAFE)
+        counter = counter
     )
 }
-
-
-@Immutable
-internal data class ContestDisplay(
-    val contest: Contest,
-    val collisionType: DangerType
-)
 
 internal fun Contest.platformName() = host ?: platform.name

@@ -30,29 +30,34 @@ fun ContestItem(
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
-    val contestDisplay = ContestDisplay(contest, collisionType())
     val expanded = isExpanded()
     Column(
         modifier = modifier,
         horizontalAlignment = if (expanded) Alignment.CenterHorizontally else Alignment.Start
     ) {
-        if (!expanded) ContestItemContent(contestDisplay)
-        else ContestExpandedItemContent(contestDisplay, onDeleteRequest = onDeleteRequest)
+        //TODO: pass collisionType lambda down
+        if (!expanded) ContestItemContent(contest, collisionType())
+        else ContestExpandedItemContent(contest, collisionType(), onDeleteRequest = onDeleteRequest)
     }
 }
 
 @Composable
-private fun ContestItemContent(contestDisplay: ContestDisplay) {
-    val data = contestDisplay.dataByCurrentTime()
+private fun ContestItemContent(
+    contest: Contest,
+    collisionType: DangerType
+) {
+    val data = dataByCurrentTime(contest)
     ContestItemHeader(
-        platform = data.contest.platform,
-        contestTitle = data.contest.title,
+        platform = contest.platform,
+        contestTitle = contest.title,
         phase = data.phase,
-        isVirtual = data.contest.isVirtual,
+        isVirtual = contest.isVirtual,
         modifier = Modifier.fillMaxWidth()
     )
     ContestItemFooter(
+        contest = contest,
         data = data,
+        collisionType = collisionType,
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -86,22 +91,24 @@ fun ContestItemHeader(
 
 @Composable
 private fun ContestItemFooter(
+    contest: Contest,
     data: ContestData,
+    collisionType: DangerType,
     modifier: Modifier = Modifier
 ) {
     val date: String
     val counter: String
     when (data.phase) {
         Contest.Phase.BEFORE -> {
-            date = data.contest.dateShortRange()
+            date = contest.dateShortRange()
             counter = "in " + data.counter
         }
         Contest.Phase.RUNNING -> {
-            date = "ends " + data.contest.endTime.contestDate()
+            date = "ends " + contest.endTime.contestDate()
             counter = "left " + data.counter
         }
         Contest.Phase.FINISHED -> {
-            date = data.contest.dateRange()
+            date = contest.dateRange()
             counter = ""
         }
     }
@@ -109,7 +116,7 @@ private fun ContestItemFooter(
     ContestItemFooter(
         date = date,
         counter = counter,
-        collisionType = data.contestDisplay.collisionType,
+        collisionType = if (data.phase == Contest.Phase.BEFORE) collisionType else DangerType.SAFE,
         modifier = modifier
     )
 }
