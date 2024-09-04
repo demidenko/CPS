@@ -49,11 +49,8 @@ internal fun ContestExpandedItemContent(
         onDeleteRequest = onDeleteRequest
     )
     ContestCounter(
-        counter = when (data.phase) {
-            Contest.Phase.BEFORE -> "starts in " + data.counter
-            Contest.Phase.RUNNING -> "ends in " + data.counter
-            Contest.Phase.FINISHED -> ""
-        }
+        phase = data.phase,
+        counter = data.counter
     )
 }
 
@@ -110,17 +107,20 @@ private fun ContestItemDatesAndMenuButton(
 
 @Composable
 private fun ContestCounter(
+    phase: Contest.Phase,
     counter: String
 ) {
-    if (counter.isNotBlank()) {
-        Text(
-            text = counter,
-            style = CPSDefaults.MonospaceTextStyle.copy(
-                fontSize = 15.sp,
-                color = cpsColors.contentAdditional
-            )
+    Text(
+        text = when (phase) {
+            Contest.Phase.BEFORE -> "starts in $counter"
+            Contest.Phase.RUNNING -> "ends in $counter"
+            Contest.Phase.FINISHED -> "finished"
+        },
+        style = CPSDefaults.MonospaceTextStyle.copy(
+            fontSize = 15.sp,
+            color = cpsColors.contentAdditional
         )
-    }
+    )
 }
 
 @Composable
