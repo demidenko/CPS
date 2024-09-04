@@ -36,8 +36,16 @@ android {
     }
 
     buildFeatures {
-        compose = true
         buildConfig = true
+    }
+
+    kotlinOptions {
+        freeCompilerArgs += listOf(
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
+                    "${projectDir}/compose_compiler_config.conf"
+        )
+
     }
 
     packaging {
