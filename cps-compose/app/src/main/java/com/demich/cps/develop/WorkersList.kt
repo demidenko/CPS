@@ -47,6 +47,7 @@ import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.timeAgo
+import com.demich.cps.utils.timeDifference
 import com.demich.cps.workers.CPSOneTimeWork
 import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.cps.workers.CPSWork
@@ -58,32 +59,29 @@ import com.demich.cps.workers.getProgressInfo
 import com.demich.cps.workers.isRunning
 import com.demich.cps.workers.stateOrCancelled
 import kotlinx.coroutines.delay
+import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun WorkersList(modifier: Modifier = Modifier) {
-    var showRestartDialogFor: CPSPeriodicWork? by remember { mutableStateOf(null) }
     var showMonitorDialog by remember { mutableStateOf(false) }
-
-    WorkersList(
-        modifier = modifier,
-        onClick = { showRestartDialogFor = it },
-        onCodeforcesMonitorClick = { showMonitorDialog = true }
-    )
-
-    showRestartDialogFor?.let { work ->
-        CPSYesNoDialog(
-            title = {
-                Text(
-                    text = "restart ${work.name}?",
-                    style = CPSDefaults.MonospaceTextStyle
-                )
-            },
-            onDismissRequest = { showRestartDialogFor = null },
-            onConfirmRequest = { work.startImmediate() }
+    var showRestartDialogFor: CPSPeriodicWork? by remember { mutableStateOf(null) }
+    ProvideTimeEachMinute {
+        WorkersList(
+            modifier = modifier,
+            onClick = { showRestartDialogFor = it },
+            onCodeforcesMonitorClick = { showMonitorDialog = true }
         )
+
+        showRestartDialogFor?.let { work ->
+            WorkerDialog(
+                work = work,
+                onDismissRequest = { showRestartDialogFor = null }
+            )
+        }
     }
+
 
     val context = context
     val progressBarsViewModel = progressBarsViewModel()
@@ -111,6 +109,28 @@ fun WorkersList(modifier: Modifier = Modifier) {
 }
 
 @Composable
+private fun WorkerDialog(work: CPSPeriodicWork, onDismissRequest: () -> Unit) {
+    val context = context
+    val workInfo by work.workInfoAsState()
+    CPSYesNoDialog(
+        title = {
+            Column {
+                workInfo?.let {
+                    val nextTime = Instant.fromEpochMilliseconds(it.nextScheduleTimeMillis)
+                    Text(text = "next in ${timeDifference(localCurrentTime, nextTime)}")
+                }
+                Text(
+                    text = "restart ${work.name}?",
+                    style = CPSDefaults.MonospaceTextStyle
+                )
+            }
+        },
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = { work.startImmediate() }
+    )
+}
+
+@Composable
 private fun WorkersList(
     modifier: Modifier,
     onClick: (CPSPeriodicWork) -> Unit,
@@ -124,29 +144,27 @@ private fun WorkersList(
         CPSWorkersDataStore(context).lastExecutions.flow
     }
 
-    ProvideTimeEachMinute {
-        LazyColumn(modifier = modifier) {
-            items(items = periodicWorks, key = { it.name }) { work ->
-                WorkerItem(
-                    work = work,
-                    lastExecutionEvent = lastExecutionEvents[work.name],
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onClick(work) }
-                        .padding(all = 4.dp)
-                )
-                Divider()
-            }
-            item {
-                WorkerItem(
-                    work = monitorWork,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onCodeforcesMonitorClick(monitorWork) }
-                        .padding(all = 4.dp)
-                )
-                Divider()
-            }
+    LazyColumn(modifier = modifier) {
+        items(items = periodicWorks, key = { it.name }) { work ->
+            WorkerItem(
+                work = work,
+                lastExecutionEvent = lastExecutionEvents[work.name],
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onClick(work) }
+                    .padding(all = 4.dp)
+            )
+            Divider()
+        }
+        item {
+            WorkerItem(
+                work = monitorWork,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onCodeforcesMonitorClick(monitorWork) }
+                    .padding(all = 4.dp)
+            )
+            Divider()
         }
     }
 }
