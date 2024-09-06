@@ -12,11 +12,7 @@ import androidx.compose.ui.Modifier
 import com.demich.cps.ui.EmptyMessageBox
 import com.demich.cps.utils.subList
 
-private const val defaultVisiblePart = 0.5f
-
-fun LazyListLayoutInfo.visibleItemsInfo(
-    requiredVisiblePart: Float = defaultVisiblePart
-): List<LazyListItemInfo> {
+fun LazyListLayoutInfo.visibleItemsInfo(requiredVisiblePart: Float): List<LazyListItemInfo> {
     require(requiredVisiblePart in 0f..1f)
 
     val visibleItems = visibleItemsInfo
@@ -39,18 +35,15 @@ fun LazyListLayoutInfo.visibleItemsInfo(
     return visibleItems.subList(firstVisible .. lastVisible)
 }
 
-fun LazyListState.visibleRange(requiredVisiblePart: Float = defaultVisiblePart): IntRange {
-    require(requiredVisiblePart in 0f..1f)
-
+fun LazyListState.visibleRange(requiredVisiblePart: Float): IntRange =
     with(layoutInfo.visibleItemsInfo(requiredVisiblePart)) {
         if (isEmpty()) return IntRange.EMPTY
 
         val firstVisibleIndex = first().index
         val lastVisibleIndex = last().index
 
-        return firstVisibleIndex .. lastVisibleIndex
+        firstVisibleIndex .. lastVisibleIndex
     }
-}
 
 
 inline fun <T> LazyListScope.itemsNotEmpty(

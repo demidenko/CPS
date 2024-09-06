@@ -22,6 +22,7 @@ import com.demich.cps.platforms.api.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.*
 import com.demich.cps.ui.lazylist.LazyColumnOfData
+import com.demich.cps.ui.lazylist.visibleItemsInfo
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.localCurrentTime
@@ -69,7 +70,12 @@ fun CodeforcesBlogEntries(
     }
 }
 
-data object CodeforcesBlogEntryContentType
+private data object CodeforcesBlogEntryContentType
+
+fun LazyListState.visibleBlogEntriesIds(requiredVisiblePart: Float): List<Int> =
+    layoutInfo.visibleItemsInfo(requiredVisiblePart)
+        .filter { it.contentType is CodeforcesBlogEntryContentType }
+        .map { it.key as Int }
 
 @Composable
 private fun BlogEntryInfo(
