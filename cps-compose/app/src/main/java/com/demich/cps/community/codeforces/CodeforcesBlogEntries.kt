@@ -44,7 +44,8 @@ fun CodeforcesBlogEntries(
         modifier = modifier,
         scrollBarEnabled = scrollBarEnabled,
         items = blogEntriesState::blogEntries,
-        key = CodeforcesBlogEntry::id
+        key = CodeforcesBlogEntry::id,
+        contentType = { CodeforcesBlogEntryContentType }
     ) { blogEntry ->
         BlogEntryInfo(
             blogEntry = blogEntry,
@@ -68,6 +69,7 @@ fun CodeforcesBlogEntries(
     }
 }
 
+data object CodeforcesBlogEntryContentType
 
 @Composable
 private fun BlogEntryInfo(

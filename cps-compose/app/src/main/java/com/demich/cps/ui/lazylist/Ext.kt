@@ -40,7 +40,7 @@ inline fun <T> LazyListScope.itemsNotEmpty(
     crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
     if (items.isEmpty()) {
-        item {
+        item(contentType = EmptyMessageContentType) {
             EmptyMessageBox(
                 modifier = Modifier.fillParentMaxSize(),
                 content = onEmptyMessage
@@ -55,3 +55,5 @@ inline fun <T> LazyListScope.itemsNotEmpty(
         )
     }
 }
+
+data object EmptyMessageContentType

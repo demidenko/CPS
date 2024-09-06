@@ -17,6 +17,7 @@ fun<T> LazyColumnOfData(
     scrollToStartButtonEnabled: Boolean = false,
     items: () -> List<T>,
     key: ((item: T) -> Any)? = null,
+    contentType: (item: T) -> Any? = { null },
     itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
     Box(modifier = modifier) {
@@ -28,7 +29,8 @@ fun<T> LazyColumnOfData(
             itemsNotEmpty(
                 items = items(),
                 key = key,
-                itemContent = itemContent
+                itemContent = itemContent,
+                contentType = contentType
             )
         }
 
