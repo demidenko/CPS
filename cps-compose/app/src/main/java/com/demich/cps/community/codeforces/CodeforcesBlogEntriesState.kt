@@ -2,12 +2,25 @@ package com.demich.cps.community.codeforces
 
 import android.content.Context
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import com.demich.cps.platforms.api.CodeforcesApi
 import com.demich.cps.platforms.api.CodeforcesBlogEntry
-import com.demich.cps.ui.lazylist.visibleRange
-import com.demich.cps.utils.*
-import kotlinx.coroutines.flow.*
+import com.demich.cps.utils.NewEntryInfo
+import com.demich.cps.utils.NewEntryType
+import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.collectAsStateWithLifecycle
+import com.demich.cps.utils.context
+import com.demich.cps.utils.getType
+import com.demich.cps.utils.openUrlInBrowser
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -74,25 +87,12 @@ fun rememberCodeforcesBlogEntriesState(
     newEntriesState: NewEntriesState,
     showNewEntries: Boolean
 ): CodeforcesBlogEntriesState {
-
-    LaunchedEffect(blogEntriesFlow, newEntriesState, listState, isTabVisible) {
-        combine(
-            flow = blogEntriesFlow
-                .map { it.map { it.id } }
-                .distinctUntilChanged(),
-            flow2 = snapshotFlow {
-                if (!isTabVisible()) IntRange.EMPTY
-                else listState.visibleRange(0.75f)
-            }
-        ) { ids, visibleRange ->
-            if (ids.isEmpty()) {
-                //empty ids can create Empty message item!!
-                emptyList()
-            } else {
-                ids.subList(visibleRange)
-            }
+    LaunchedEffect(newEntriesState, listState, isTabVisible) {
+        snapshotFlow {
+            if (!isTabVisible()) emptyList()
+            else listState.visibleBlogEntriesIds(0.75f)
         }
-            .debounce(250.milliseconds) //to sync ids with range / prevent user do fast scroll
+            .debounce(250.milliseconds) //prevent user do fast scroll / page switch
             .distinctUntilChanged() //prevent repeats after debounce
             .collect { visibleIds ->
                 newEntriesState.markSeen(ids = visibleIds)
