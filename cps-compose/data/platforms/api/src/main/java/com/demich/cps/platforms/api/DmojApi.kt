@@ -1,38 +1,46 @@
 package com.demich.cps.platforms.api
 
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 
 object DmojApi: PlatformApi {
     private val json get() = defaultJson
-    override val client = cpsHttpClient(json = json) { }
+    override val client = cpsHttpClient(json = json) {
+        defaultRequest {
+            url(urls.main)
+        }
+    }
 
-    suspend fun getUser(handle: String): DmojUserResult {
-        val obj = client.getAs<JsonObject>(urlString = "${urls.main}/api/v2/user/$handle")
+    private inline fun <reified T> JsonObject.getObject(key: String): T =
+        json.decodeFromJsonElement(getValue(key))
+
+    private suspend inline fun getApiDataObject(
+        path: String
+    ): JsonObject {
+        return client.getAs<JsonObject>(urlString = "/api/v2/$path")
             .getValue("data").jsonObject
-            .getValue("object")
-        return json.decodeFromJsonElement(obj)
     }
 
     suspend fun getUserPage(handle: String): String {
-        return client.getText(urlString = "${urls.main}/user/$handle")
+        return client.getText(urlString = "/user/$handle")
+    }
+
+    suspend fun getUser(handle: String): DmojUserResult {
+        return getApiDataObject(path = "user/$handle").getObject(key = "object")
     }
 
     suspend fun getSuggestions(str: String): List<DmojSuggestion> {
-        val obj = client.getAs<JsonObject>(urlString = "${urls.main}/widgets/select2/user_search") {
+        return client.getAs<JsonObject>(urlString = "/widgets/select2/user_search") {
             parameter("_type", "query")
             parameter("term", str)
             parameter("q", str)
-        }
-        return json.decodeFromJsonElement(obj.getValue("results"))
+        }.getObject(key = "results")
     }
 
     suspend fun getContests(): List<DmojContest> {
-        val obj = client.getAs<JsonObject>(urlString = "${urls.main}/api/v2/contests")
-            .getValue("data").jsonObject
-            .getValue("objects")
-        return json.decodeFromJsonElement(obj)
+        return getApiDataObject(path = "contests").getObject(key = "objects")
     }
 
     suspend fun getRatingChanges(handle: String): List<DmojRatingChange> {
