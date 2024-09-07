@@ -228,6 +228,6 @@ private suspend fun Collection<CodeforcesBlogEntry>.fixedHandleColors(): List<Co
         val userInfo = authors.getValue(blogEntry.authorHandle)
         require(userInfo.status == STATUS.OK)
         if (blogEntry.authorColorTag == CodeforcesColorTag.ADMIN) blogEntry
-        else blogEntry.copy(authorColorTag = CodeforcesColorTag.fromRating(userInfo.rating))
+        else blogEntry.copy(authorColorTag = CodeforcesUtils.colorTagFrom(userInfo.rating))
     }
 }

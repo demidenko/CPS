@@ -321,4 +321,17 @@ object CodeforcesUtils {
             ?.removeSuffix("%")
             ?.toIntOrNull()
     }
+
+    fun colorTagFrom(rating: Int?): CodeforcesColorTag =
+        when {
+            rating == null -> CodeforcesColorTag.BLACK
+            rating < 1200 -> CodeforcesColorTag.GRAY
+            rating < 1400 -> CodeforcesColorTag.GREEN
+            rating < 1600 -> CodeforcesColorTag.CYAN
+            rating < 1900 -> CodeforcesColorTag.BLUE
+            rating < 2100 -> CodeforcesColorTag.VIOLET
+            rating < 2400 -> CodeforcesColorTag.ORANGE
+            rating < 3000 -> CodeforcesColorTag.RED
+            else -> CodeforcesColorTag.LEGENDARY
+        }
 }

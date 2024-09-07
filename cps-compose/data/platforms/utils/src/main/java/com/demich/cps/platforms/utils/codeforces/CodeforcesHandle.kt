@@ -37,8 +37,9 @@ private fun Element.extractColorTag(): CodeforcesColorTag {
     return kotlin.runCatching {
         enumValueOf<CodeforcesColorTag>(str)
     }.getOrElse {
-        str.toIntOrNull()?.let { CodeforcesColorTag.fromRating(it) }
-            ?: CodeforcesColorTag.BLACK
+        str.toIntOrNull()?.let {
+            CodeforcesUtils.colorTagFrom(it)
+        } ?: CodeforcesColorTag.BLACK
     }
 }
 
