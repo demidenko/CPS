@@ -39,6 +39,7 @@ import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.flowOf
+import com.demich.kotlin_stdlib_boost.binarySearchFirstFalse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import kotlin.text.contains
@@ -74,14 +75,22 @@ class CodeforcesAccountManager :
         CodeforcesApi.getUserRatingChanges(handle = userId)
             .map(CodeforcesRatingChange::toRatingChange)
 
-    override val ratingsUpperBounds = arrayOf(
-        HandleColor.GRAY to 1200,
-        HandleColor.GREEN to 1400,
-        HandleColor.CYAN to 1600,
-        HandleColor.BLUE to 1900,
-        HandleColor.VIOLET to 2100,
-        HandleColor.ORANGE to 2400
-    )
+    //TODO: bs can be optimized if iterate from orange to gray
+    override val ratingsUpperBounds =
+        listOf(
+            CodeforcesColorTag.GRAY,
+            CodeforcesColorTag.GREEN,
+            CodeforcesColorTag.CYAN,
+            CodeforcesColorTag.BLUE,
+            CodeforcesColorTag.VIOLET,
+            CodeforcesColorTag.ORANGE
+        ).map { colorTag ->
+            val rating = binarySearchFirstFalse(first = 0, last = Int.MAX_VALUE) { rating ->
+                CodeforcesUtils.colorTagFrom(rating) <= colorTag
+            }
+            val handleColor = requireNotNull(colorTag.toHandleColor())
+            handleColor to rating
+        }.toTypedArray()
 
     override val rankedHandleColorsList = HandleColor.rankedCodeforces
 

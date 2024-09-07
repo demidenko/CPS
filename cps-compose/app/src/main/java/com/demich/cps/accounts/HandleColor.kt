@@ -1,7 +1,5 @@
 package com.demich.cps.accounts
 
-import com.demich.cps.accounts.managers.RatedAccountManager
-
 enum class HandleColor {
     GRAY,
     BROWN,
@@ -24,7 +22,7 @@ enum class HandleColor {
     }
 }
 
-class HandleColorBound(
+data class HandleColorBound(
     val handleColor: HandleColor,
     val ratingUpperBound: Int
 )
