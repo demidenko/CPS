@@ -31,6 +31,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.saver
+import com.demich.kotlin_stdlib_boost.partitionPoint
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 
@@ -198,12 +199,12 @@ private fun RatingGraphHeader(
 private fun makeValidFilters(ratingChanges: List<RatingChange>, currentTime: Instant) =
     buildList {
         if (ratingChanges.size > 10) add(RatingFilterType.LAST_10)
-        val firstInMonth = ratingChanges.indexOfFirst { it.date >= currentTime - 30.days }
-        val firstInYear = ratingChanges.indexOfFirst { it.date >= currentTime - 365.days }
-        if (firstInMonth != -1 && firstInMonth > 0) {
+        val firstInMonth = ratingChanges.partitionPoint { it.date < currentTime - 30.days }
+        val firstInYear = ratingChanges.partitionPoint { it.date < currentTime - 365.days }
+        if (firstInMonth < ratingChanges.size && firstInMonth > 0) {
             add(RatingFilterType.LAST_MONTH)
         }
-        if (firstInYear != -1 && firstInYear > 0 && firstInYear != firstInMonth) {
+        if (firstInYear < ratingChanges.size && firstInYear > 0 && firstInYear != firstInMonth) {
             add(RatingFilterType.LAST_YEAR)
         }
         if (isNotEmpty()) add(index = 0, RatingFilterType.ALL)

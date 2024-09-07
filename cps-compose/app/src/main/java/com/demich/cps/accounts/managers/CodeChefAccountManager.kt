@@ -36,6 +36,7 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
+import com.demich.kotlin_stdlib_boost.partitionPoint
 import kotlin.text.contains
 
 
@@ -104,8 +105,7 @@ class CodeChefAccountManager :
     override val rankedHandleColorsList = HandleColor.rankedCodeChef
 
     private fun getRatingStarNumber(rating: Int): Int {
-        val index = ratingsUpperBounds.indexOfFirst { rating < it.ratingUpperBound }
-        return if (index == -1) ratingsUpperBounds.size + 1 else index + 1
+        return ratingsUpperBounds.partitionPoint { rating >= it.ratingUpperBound } + 1
     }
 
     override fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors) =
