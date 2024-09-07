@@ -18,7 +18,7 @@ abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagerType):
 {
     override val userIdTitle get() = "handle"
 
-    abstract val ratingsUpperBounds: Array<HandleColorBound>
+    abstract val ratingsUpperBounds: List<HandleColorBound>
     fun getHandleColor(rating: Int): HandleColor =
         ratingsUpperBounds
             .firstOrNull { rating < it.ratingUpperBound }?.handleColor
@@ -74,5 +74,5 @@ class UnknownHandleColorException(color: HandleColor, manager: RatedAccountManag
 
 interface RatingRevolutionsProvider {
     //list of (last time, bounds)
-    val ratingUpperBoundRevolutions: List<Pair<Instant, Array<HandleColorBound>>>
+    val ratingUpperBoundRevolutions: List<Pair<Instant, List<HandleColorBound>>>
 }

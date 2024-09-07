@@ -78,14 +78,16 @@ class CodeChefAccountManager :
         CodeChefApi.getRatingChanges(handle = userId)
             .map(CodeChefRatingChange::toRatingChange)
 
-    override val ratingsUpperBounds = arrayOf(
-        HandleColor.GRAY to 1400,
-        HandleColor.GREEN to 1600,
-        HandleColor.BLUE to 1800,
-        HandleColor.VIOLET to 2000,
-        HandleColor.YELLOW to 2200,
-        HandleColor.ORANGE to 2500
-    )
+    override val ratingsUpperBounds by lazy {
+        listOf(
+            HandleColor.GRAY to 1400,
+            HandleColor.GREEN to 1600,
+            HandleColor.BLUE to 1800,
+            HandleColor.VIOLET to 2000,
+            HandleColor.YELLOW to 2200,
+            HandleColor.ORANGE to 2500
+        )
+    }
 
     override fun originalColor(handleColor: HandleColor): Color =
         when (handleColor) {

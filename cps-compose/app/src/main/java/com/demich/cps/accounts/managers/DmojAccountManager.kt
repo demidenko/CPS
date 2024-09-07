@@ -57,13 +57,15 @@ class DmojAccountManager :
         DmojApi.getRatingChanges(handle = userId)
             .map(DmojRatingChange::toRatingChange)
 
-    override val ratingsUpperBounds = arrayOf(
-        HandleColor.GRAY to 1000,
-        HandleColor.GREEN to 1300,
-        HandleColor.BLUE to 1600,
-        HandleColor.VIOLET to 1900,
-        HandleColor.ORANGE to 2400
-    )
+    override val ratingsUpperBounds by lazy {
+        listOf(
+            HandleColor.GRAY to 1000,
+            HandleColor.GREEN to 1300,
+            HandleColor.BLUE to 1600,
+            HandleColor.VIOLET to 1900,
+            HandleColor.ORANGE to 2400
+        )
+    }
 
     override val rankedHandleColorsList = HandleColor.rankedDmoj
 

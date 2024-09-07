@@ -75,8 +75,7 @@ class CodeforcesAccountManager :
         CodeforcesApi.getUserRatingChanges(handle = userId)
             .map(CodeforcesRatingChange::toRatingChange)
 
-    //TODO: bs can be optimized if iterate from orange to gray
-    override val ratingsUpperBounds =
+    override val ratingsUpperBounds by lazy {
         listOf(
             CodeforcesColorTag.GRAY,
             CodeforcesColorTag.GREEN,
@@ -85,12 +84,14 @@ class CodeforcesAccountManager :
             CodeforcesColorTag.VIOLET,
             CodeforcesColorTag.ORANGE
         ).map { colorTag ->
+            //TODO: bs can be optimized if iterate from orange to gray
             val rating = binarySearchFirstFalse(first = 0, last = Int.MAX_VALUE) { rating ->
                 CodeforcesUtils.colorTagFrom(rating) <= colorTag
             }
             val handleColor = requireNotNull(colorTag.toHandleColor())
             handleColor to rating
-        }.toTypedArray()
+        }
+    }
 
     override val rankedHandleColorsList = HandleColor.rankedCodeforces
 
@@ -203,7 +204,7 @@ class CodeforcesAccountManager :
     override val ratingUpperBoundRevolutions
         get() = listOf(
             //https://codeforces.com/blog/entry/59228
-            Instant.fromEpochSeconds(1525364996L) to arrayOf(
+            Instant.fromEpochSeconds(1525364996L) to listOf(
                 HandleColor.GRAY to 1200,
                 HandleColor.GREEN to 1400,
                 HandleColor.CYAN to 1600,
@@ -212,7 +213,7 @@ class CodeforcesAccountManager :
                 HandleColor.ORANGE to 2400
             ),
             //https://codeforces.com/blog/entry/20638
-            Instant.fromEpochSeconds(1443721088L) to arrayOf(
+            Instant.fromEpochSeconds(1443721088L) to listOf(
                 HandleColor.GRAY to 1200,
                 HandleColor.GREEN to 1500,
                 HandleColor.BLUE to 1700,
@@ -220,7 +221,7 @@ class CodeforcesAccountManager :
                 HandleColor.ORANGE to 2200
             ),
             //https://codeforces.com/blog/entry/3064
-            Instant.fromEpochSeconds(1320620562L) to arrayOf(
+            Instant.fromEpochSeconds(1320620562L) to listOf(
                 HandleColor.GRAY to 1200,
                 HandleColor.GREEN to 1500,
                 HandleColor.BLUE to 1650,
@@ -228,7 +229,7 @@ class CodeforcesAccountManager :
                 HandleColor.ORANGE to 2000
             ),
             //https://codeforces.com/blog/entry/1383
-            Instant.fromEpochSeconds(1298914585L) to arrayOf(
+            Instant.fromEpochSeconds(1298914585L) to listOf(
                 HandleColor.GRAY to 1200,
                 HandleColor.GREEN to 1500,
                 HandleColor.BLUE to 1650,

@@ -53,15 +53,17 @@ class AtCoderAccountManager :
             it.toRatingChange(handle = userId)
         }
 
-    override val ratingsUpperBounds = arrayOf(
-        HandleColor.GRAY to 400,
-        HandleColor.BROWN to 800,
-        HandleColor.GREEN to 1200,
-        HandleColor.CYAN to 1600,
-        HandleColor.BLUE to 2000,
-        HandleColor.YELLOW to 2400,
-        HandleColor.ORANGE to 2800
-    )
+    override val ratingsUpperBounds by lazy {
+        listOf(
+            HandleColor.GRAY to 400,
+            HandleColor.BROWN to 800,
+            HandleColor.GREEN to 1200,
+            HandleColor.CYAN to 1600,
+            HandleColor.BLUE to 2000,
+            HandleColor.YELLOW to 2400,
+            HandleColor.ORANGE to 2800
+        )
+    }
 
     override val rankedHandleColorsList = HandleColor.rankedAtCoder
 

@@ -16,7 +16,7 @@ internal class RatingGraphRectangles(
 ) {
     //point is upperBound (endTime, ratingUpperBound)
     private val rectangles: List<Pair<Point, HandleColor>> = buildList {
-        fun addBounds(x: Long, bounds: Array<HandleColorBound>) {
+        fun addBounds(x: Long, bounds: List<HandleColorBound>) {
             bounds.sortedBy { it.ratingUpperBound }.forEach {
                 add(Point(x = x, y = it.ratingUpperBound.toLong()) to it.handleColor)
             }
