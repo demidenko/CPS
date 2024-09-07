@@ -1,6 +1,6 @@
 package com.demich.cps.platforms.utils.codeforces
 
-import com.demich.cps.platforms.api.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.CodeforcesColorTag
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node

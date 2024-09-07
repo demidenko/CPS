@@ -1,7 +1,7 @@
 package com.demich.cps.features.codeforces.lost.database
 
 import androidx.room.*
-import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
 import com.demich.cps.features.room.InstanceProvider
 import com.demich.cps.features.room.InstantSecondsConverter
 import com.demich.cps.features.room.RoomJsonConverter

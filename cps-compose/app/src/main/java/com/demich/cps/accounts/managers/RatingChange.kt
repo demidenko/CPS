@@ -10,8 +10,8 @@ import com.demich.cps.notifications.setWhen
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.AtCoderRatingChange
 import com.demich.cps.platforms.api.CodeChefRatingChange
-import com.demich.cps.platforms.api.CodeforcesApi
-import com.demich.cps.platforms.api.CodeforcesRatingChange
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesRatingChange
 import com.demich.cps.platforms.api.DmojRatingChange
 import com.demich.cps.utils.toSignedString
 import kotlinx.datetime.Instant

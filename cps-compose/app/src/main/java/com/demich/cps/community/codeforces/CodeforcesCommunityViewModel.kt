@@ -6,13 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.platforms.api.CodeforcesApi
-import com.demich.cps.platforms.api.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.CodeforcesLocale
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.community.follow.followListDao
-import com.demich.cps.platforms.api.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.CodeforcesColorTag
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.backgroundDataLoader

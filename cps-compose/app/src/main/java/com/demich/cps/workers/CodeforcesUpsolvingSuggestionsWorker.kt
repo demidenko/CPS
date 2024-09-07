@@ -7,10 +7,10 @@ import com.demich.cps.R
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.platforms.api.CodeforcesApi
-import com.demich.cps.platforms.api.CodeforcesProblem
-import com.demich.cps.platforms.api.CodeforcesProblemVerdict
-import com.demich.cps.platforms.api.CodeforcesRatingChange
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesProblem
+import com.demich.cps.platforms.api.codeforces.CodeforcesProblemVerdict
+import com.demich.cps.platforms.api.codeforces.CodeforcesRatingChange
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.add
 import com.demich.cps.utils.awaitPair

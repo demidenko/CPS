@@ -32,9 +32,9 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.toHandleSpan
-import com.demich.cps.platforms.api.CodeforcesApi
-import com.demich.cps.platforms.api.CodeforcesComment
-import com.demich.cps.platforms.api.CodeforcesRecentAction
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesComment
+import com.demich.cps.platforms.api.codeforces.CodeforcesRecentAction
 import com.demich.cps.platforms.utils.codeforces.commentator
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
@@ -70,7 +70,8 @@ fun CodeforcesComments(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    context.openUrlInBrowser(CodeforcesApi.urls.comment(
+                    context.openUrlInBrowser(
+                        CodeforcesApi.urls.comment(
                         blogEntryId = blogEntry.id,
                         commentId = comment.id
                     ))

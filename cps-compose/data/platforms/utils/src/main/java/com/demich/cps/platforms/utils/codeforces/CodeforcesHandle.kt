@@ -1,8 +1,8 @@
 package com.demich.cps.platforms.utils.codeforces
 
-import com.demich.cps.platforms.api.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.CodeforcesColorTag
-import com.demich.cps.platforms.api.CodeforcesComment
+import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.CodeforcesComment
 import org.jsoup.nodes.Element
 import java.util.Locale
 

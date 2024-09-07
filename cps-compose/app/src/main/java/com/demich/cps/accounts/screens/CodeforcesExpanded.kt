@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
-import com.demich.cps.platforms.api.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ListTitle

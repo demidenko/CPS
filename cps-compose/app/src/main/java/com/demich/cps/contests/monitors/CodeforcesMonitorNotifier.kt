@@ -8,9 +8,9 @@ import androidx.core.text.bold
 import androidx.core.text.color
 import com.demich.cps.R
 import com.demich.cps.notifications.NotificationBuilder
-import com.demich.cps.platforms.api.CodeforcesContestPhase
-import com.demich.cps.platforms.api.CodeforcesContestType
-import com.demich.cps.platforms.api.CodeforcesParticipationType
+import com.demich.cps.platforms.api.codeforces.CodeforcesContestPhase
+import com.demich.cps.platforms.api.codeforces.CodeforcesContestType
+import com.demich.cps.platforms.api.codeforces.CodeforcesParticipationType
 import com.demich.cps.utils.getCurrentTime
 import kotlin.time.Duration.Companion.milliseconds
 

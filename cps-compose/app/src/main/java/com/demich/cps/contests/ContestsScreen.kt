@@ -43,8 +43,8 @@ import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
 import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.settings.settingsContests
-import com.demich.cps.platforms.api.CodeforcesApi
-import com.demich.cps.platforms.api.CodeforcesContestPhase
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesContestPhase
 import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons

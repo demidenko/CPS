@@ -13,7 +13,7 @@ import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.community.codeforces.CodeforcesBlogEntries
 import com.demich.cps.community.codeforces.CodeforcesBlogEntriesState
 import com.demich.cps.community.codeforces.CodeforcesCommunityController
-import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.withVibration

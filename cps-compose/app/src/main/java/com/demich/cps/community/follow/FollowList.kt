@@ -8,8 +8,8 @@ import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.notifications.setBigContent
 import com.demich.cps.notifications.setWhen
-import com.demich.cps.platforms.api.CodeforcesApi
-import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 
 val Context.followListDao: FollowList

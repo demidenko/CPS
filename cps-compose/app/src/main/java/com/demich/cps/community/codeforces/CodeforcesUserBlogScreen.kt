@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import com.demich.cps.platforms.api.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.niceMessage
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder

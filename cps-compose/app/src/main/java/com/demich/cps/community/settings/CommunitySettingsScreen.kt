@@ -24,8 +24,8 @@ import com.demich.cps.R
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.community.codeforces.CodeforcesTitle
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.platforms.api.CodeforcesColorTag
-import com.demich.cps.platforms.api.CodeforcesLocale
+import com.demich.cps.platforms.api.codeforces.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.SettingsColumn

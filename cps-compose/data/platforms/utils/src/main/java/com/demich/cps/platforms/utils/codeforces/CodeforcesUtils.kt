@@ -2,13 +2,13 @@ package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.platforms.api.CodeforcesAPIErrorResponse
-import com.demich.cps.platforms.api.CodeforcesApi
-import com.demich.cps.platforms.api.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.CodeforcesColorTag
-import com.demich.cps.platforms.api.CodeforcesComment
-import com.demich.cps.platforms.api.CodeforcesProblem
-import com.demich.cps.platforms.api.CodeforcesRecentAction
+import com.demich.cps.platforms.api.codeforces.CodeforcesAPIErrorResponse
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.CodeforcesComment
+import com.demich.cps.platforms.api.codeforces.CodeforcesProblem
+import com.demich.cps.platforms.api.codeforces.CodeforcesRecentAction
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.MonthNames

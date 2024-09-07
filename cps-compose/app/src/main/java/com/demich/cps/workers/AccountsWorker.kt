@@ -14,7 +14,7 @@ import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
-import com.demich.cps.platforms.api.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.toSignedString
 import kotlin.time.Duration.Companion.minutes

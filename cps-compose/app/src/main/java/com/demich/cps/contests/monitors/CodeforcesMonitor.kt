@@ -1,6 +1,17 @@
 package com.demich.cps.contests.monitors
 
-import com.demich.cps.platforms.api.*
+import com.demich.cps.platforms.api.codeforces.CodeforcesAPIErrorResponse
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesContest
+import com.demich.cps.platforms.api.codeforces.CodeforcesContestPhase
+import com.demich.cps.platforms.api.codeforces.CodeforcesContestStandings
+import com.demich.cps.platforms.api.codeforces.CodeforcesContestType
+import com.demich.cps.platforms.api.codeforces.CodeforcesParticipationType
+import com.demich.cps.platforms.api.codeforces.CodeforcesProblemStatus
+import com.demich.cps.platforms.api.codeforces.CodeforcesProblemVerdict
+import com.demich.cps.platforms.api.codeforces.CodeforcesRatingChange
+import com.demich.cps.platforms.api.codeforces.CodeforcesSubmission
+import com.demich.cps.platforms.api.codeforces.CodeforcesTestset
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.add

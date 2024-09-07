@@ -10,7 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
-import com.demich.cps.platforms.api.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHtmlParser
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHtmlStringBuilder
 import com.demich.cps.platforms.utils.codeforces.parseCodeforcesHtml

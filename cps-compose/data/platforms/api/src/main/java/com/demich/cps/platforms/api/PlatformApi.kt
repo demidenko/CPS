@@ -1,5 +1,6 @@
 package com.demich.cps.platforms.api
 
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.network.sockets.*

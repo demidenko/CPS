@@ -3,8 +3,8 @@ package com.demich.cps.community.settings
 import android.content.Context
 import com.demich.cps.community.codeforces.CodeforcesTitle
 import com.demich.cps.utils.jsonCPS
-import com.demich.cps.platforms.api.CodeforcesColorTag
-import com.demich.cps.platforms.api.CodeforcesLocale
+import com.demich.cps.platforms.api.codeforces.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.CodeforcesLocale
 import com.demich.cps.platforms.utils.NewsPostEntry
 import com.demich.cps.platforms.utils.scanNewsPostEntries
 import com.demich.cps.utils.isRuSystemLanguage

@@ -10,10 +10,10 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.managers.toHandleSpan
-import com.demich.cps.platforms.api.CodeforcesApi
-import com.demich.cps.platforms.api.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.CodeforcesComment
-import com.demich.cps.platforms.api.CodeforcesRecentAction
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.CodeforcesComment
+import com.demich.cps.platforms.api.codeforces.CodeforcesRecentAction
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
 import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.BackHandler

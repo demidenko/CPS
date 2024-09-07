@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.platforms.api.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSIcons
