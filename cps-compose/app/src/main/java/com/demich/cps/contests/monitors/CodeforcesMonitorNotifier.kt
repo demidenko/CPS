@@ -8,9 +8,9 @@ import androidx.core.text.bold
 import androidx.core.text.color
 import com.demich.cps.R
 import com.demich.cps.notifications.NotificationBuilder
-import com.demich.cps.platforms.api.codeforces.CodeforcesContestPhase
-import com.demich.cps.platforms.api.codeforces.CodeforcesContestType
-import com.demich.cps.platforms.api.codeforces.CodeforcesParticipationType
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.utils.getCurrentTime
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -60,7 +60,8 @@ class CodeforcesMonitorNotifier(
         return true
     }
 
-    private var _phase: CodeforcesMonitorData.ContestPhase = CodeforcesMonitorData.ContestPhase.Other(CodeforcesContestPhase.UNDEFINED)
+    private var _phase: CodeforcesMonitorData.ContestPhase = CodeforcesMonitorData.ContestPhase.Other(
+        CodeforcesContestPhase.UNDEFINED)
     private fun setContestPhase(phase: CodeforcesMonitorData.ContestPhase): Boolean {
         if (_phase == phase) return false
         val phaseChanged = _phase.phase != phase.phase

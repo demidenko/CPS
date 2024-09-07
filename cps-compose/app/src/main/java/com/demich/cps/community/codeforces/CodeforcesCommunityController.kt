@@ -8,7 +8,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.utils.NewEntriesDataStoreItem
 import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context

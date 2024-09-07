@@ -8,9 +8,9 @@ import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
-import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.codeforces.CodeforcesColorTag
-import com.demich.cps.platforms.api.codeforces.CodeforcesLocale
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.kotlin_stdlib_boost.mapToSet

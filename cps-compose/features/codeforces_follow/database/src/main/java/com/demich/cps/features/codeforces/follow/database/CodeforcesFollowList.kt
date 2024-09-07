@@ -3,8 +3,8 @@ package com.demich.cps.features.codeforces.follow.database
 import android.content.Context
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.codeforces.CodeforcesLocale
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 
 abstract class CodeforcesFollowList(

@@ -7,12 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
-import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.codeforces.CodeforcesLocale
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.community.follow.followListDao
-import com.demich.cps.platforms.api.codeforces.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.backgroundDataLoader

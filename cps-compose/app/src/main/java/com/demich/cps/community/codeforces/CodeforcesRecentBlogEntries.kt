@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.toHandleSpan
-import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.codeforces.CodeforcesComment
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
 import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.platforms.utils.codeforces.commentator

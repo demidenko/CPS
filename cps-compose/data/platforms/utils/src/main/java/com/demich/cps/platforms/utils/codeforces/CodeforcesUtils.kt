@@ -4,11 +4,11 @@ import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.platforms.api.codeforces.CodeforcesAPIErrorResponse
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
-import com.demich.cps.platforms.api.codeforces.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.codeforces.CodeforcesColorTag
-import com.demich.cps.platforms.api.codeforces.CodeforcesComment
-import com.demich.cps.platforms.api.codeforces.CodeforcesProblem
-import com.demich.cps.platforms.api.codeforces.CodeforcesRecentAction
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.MonthNames

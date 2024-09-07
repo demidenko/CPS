@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
-import com.demich.cps.platforms.api.codeforces.CodeforcesComment
-import com.demich.cps.platforms.api.codeforces.CodeforcesRecentAction
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import com.demich.cps.platforms.utils.codeforces.commentator
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp

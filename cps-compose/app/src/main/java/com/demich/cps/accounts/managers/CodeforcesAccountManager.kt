@@ -20,9 +20,9 @@ import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
-import com.demich.cps.platforms.api.codeforces.CodeforcesColorTag
-import com.demich.cps.platforms.api.codeforces.CodeforcesProblem
-import com.demich.cps.platforms.api.codeforces.CodeforcesRatingChange
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.ui.SettingsSwitchItemWithWork

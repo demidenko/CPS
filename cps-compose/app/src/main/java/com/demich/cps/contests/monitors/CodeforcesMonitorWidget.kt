@@ -28,9 +28,9 @@ import com.demich.cps.contests.contestItemPaddings
 import com.demich.cps.contests.contestTimeDifference
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.list_items.ContestItemHeader
-import com.demich.cps.platforms.api.codeforces.CodeforcesContestPhase
-import com.demich.cps.platforms.api.codeforces.CodeforcesContestType
-import com.demich.cps.platforms.api.codeforces.CodeforcesParticipationType
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
