@@ -244,7 +244,7 @@ abstract class CodeforcesApiException(message: String?): Throwable(message) {
     constructor(): this(null)
 }
 
-enum class CodeforcesAPIStatus {
+internal enum class CodeforcesAPIStatus {
     OK, FAILED
 }
 

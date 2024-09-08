@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class CodeforcesAPIErrorResponse internal constructor(
-    private val status: CodeforcesAPIStatus,
     private val comment: String
 ): CodeforcesApiException("Codeforces API: $comment") {
 
@@ -41,6 +40,16 @@ class CodeforcesAPIErrorResponse internal constructor(
 
     fun isContestNotStarted(contestId: Int): Boolean {
         if (comment == "contestId: Contest with id $contestId has not started") return true
+        return false
+    }
+
+    fun isContestNotFound(contestId: Int): Boolean {
+        if (comment == "contestId: Contest with id $contestId not found") return true
+        return false
+    }
+
+    fun isContestManagerAreNotAllowed(): Boolean {
+        if (comment == "asManager: Only contest managers can use \"asManager\" option") return true
         return false
     }
 }
