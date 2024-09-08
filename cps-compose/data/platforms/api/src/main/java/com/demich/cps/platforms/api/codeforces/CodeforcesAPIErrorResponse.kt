@@ -1,6 +1,9 @@
 package com.demich.cps.platforms.api.codeforces
 
 import kotlinx.serialization.Serializable
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 @Serializable
 class CodeforcesAPIErrorResponse internal constructor(
@@ -24,12 +27,10 @@ class CodeforcesAPIErrorResponse internal constructor(
 
     private fun isHandleNotFound(): String? {
         //userinfo response
-        comment.removeSurrounding("handles: User with handle ", " not found")
-            .let { handle -> if (handle != comment) return handle }
+        comment.ifSurrounded("handles: User with handle ", " not found") { return it }
 
         //user blog response
-        comment.removeSurrounding("handle: User with handle ", " not found")
-            .let { handle -> if (handle != comment) return handle }
+        comment.ifSurrounded("handle: User with handle ", " not found") { return it }
 
         return null
     }
@@ -58,8 +59,9 @@ class CodeforcesAPIErrorResponse internal constructor(
     }
 
     private fun isContestNotStarted(): Int? {
-        comment.removeSurrounding("contestId: Contest with id ", " has not started")
-            .let { cut -> if (cut != comment) return cut.toIntOrNull() }
+        comment.ifSurrounded("contestId: Contest with id ", " has not started") {
+            return it.toIntOrNull()
+        }
         return null
     }
 
@@ -89,3 +91,14 @@ internal constructor(comment: String): CodeforcesApiException(comment)
 
 class CodeforcesApiContestNotStartedException
 internal constructor(comment: String, val contestId: Int): CodeforcesApiException(comment)
+
+
+@OptIn(ExperimentalContracts::class)
+private inline fun String.ifSurrounded(prefix: String, suffix: String, block: (String) -> Unit) {
+    contract {
+        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+    }
+    if (startsWith(prefix) && endsWith(suffix)) {
+        block(substring(startIndex = prefix.length, endIndex = length - suffix.length))
+    }
+}
