@@ -2,8 +2,8 @@ package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.platforms.api.codeforces.CodeforcesAPIErrorResponse
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
@@ -262,11 +262,10 @@ object CodeforcesUtils {
             //relying to cf api return in same order
             handles.zip(infos.map { CodeforcesUserInfo(it) }).toMap()
         }.getOrElse { e ->
-            if (e is CodeforcesAPIErrorResponse) {
-                e.isHandleNotFound()?.let { badHandle ->
-                    return@getOrElse getUsersInfo(handles = handles - badHandle, doRedirect = doRedirect)
-                        .plus(badHandle to CodeforcesUserInfo(handle = badHandle, status = STATUS.NOT_FOUND))
-                }
+            if (e is CodeforcesHandleNotFoundException) {
+                val badHandle = e.handle
+                return@getOrElse getUsersInfo(handles = handles - badHandle, doRedirect = doRedirect)
+                    .plus(badHandle to CodeforcesUserInfo(handle = badHandle, status = STATUS.NOT_FOUND))
             }
             handles.associateWith { handle -> CodeforcesUserInfo(handle = handle, status = STATUS.FAILED) }
         }.apply {
@@ -279,7 +278,7 @@ object CodeforcesUtils {
         return CodeforcesApi.runCatching {
             CodeforcesUserInfo(getUser(handle = handle, checkHistoricHandles = doRedirect))
         }.getOrElse { e ->
-            if (e is CodeforcesAPIErrorResponse && e.isHandleNotFound() == handle) {
+            if (e is CodeforcesHandleNotFoundException && e.handle == handle) {
                 CodeforcesUserInfo(handle = handle, status = STATUS.NOT_FOUND)
             } else {
                 CodeforcesUserInfo(handle = handle, status = STATUS.FAILED)

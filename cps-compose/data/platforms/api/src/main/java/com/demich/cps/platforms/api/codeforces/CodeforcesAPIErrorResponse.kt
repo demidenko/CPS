@@ -9,13 +9,13 @@ class CodeforcesAPIErrorResponse internal constructor(
 
     internal fun mapOrThis(): CodeforcesApiException {
         if (isCallLimitExceeded()) return CodeforcesApiCallLimitExceededException(comment)
-
+        isHandleNotFound()?.let { handle -> return CodeforcesHandleNotFoundException(comment, handle) }
         return this
     }
 
     private fun isCallLimitExceeded() = comment == "Call limit exceeded"
 
-    fun isHandleNotFound(): String? {
+    private fun isHandleNotFound(): String? {
         val cut = comment.removeSurrounding("handles: User with handle ", " not found")
         if (cut == comment) return null
         return cut
@@ -63,3 +63,6 @@ class CodeforcesAPIErrorResponse internal constructor(
 
 class CodeforcesApiCallLimitExceededException
 internal constructor(comment: String): CodeforcesApiException(comment)
+
+class CodeforcesHandleNotFoundException
+internal constructor(comment: String, val handle: String): CodeforcesApiException(comment)
