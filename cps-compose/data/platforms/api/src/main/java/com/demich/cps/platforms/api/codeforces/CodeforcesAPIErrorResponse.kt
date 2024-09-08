@@ -9,16 +9,23 @@ class CodeforcesAPIErrorResponse internal constructor(
 
     internal fun mapOrThis(): CodeforcesApiException {
         if (isCallLimitExceeded()) return CodeforcesApiCallLimitExceededException(comment)
-        isHandleNotFound()?.let { handle -> return CodeforcesHandleNotFoundException(comment, handle) }
+        isHandleNotFound()?.let { handle -> return CodeforcesApiHandleNotFoundException(comment, handle) }
+        if (isNotAllowedToReadThatBlog()) return CodeforcesApiNotAllowedReadBlogException(comment)
         return this
     }
 
     private fun isCallLimitExceeded() = comment == "Call limit exceeded"
 
     private fun isHandleNotFound(): String? {
-        val cut = comment.removeSurrounding("handles: User with handle ", " not found")
-        if (cut == comment) return null
-        return cut
+        //userinfo response
+        comment.removeSurrounding("handles: User with handle ", " not found")
+            .let { handle -> if (handle != comment) return handle }
+
+        //user blog response
+        comment.removeSurrounding("handle: User with handle ", " not found")
+            .let { handle -> if (handle != comment) return handle }
+
+        return null
     }
 
     fun isBlogEntryNotFound(blogEntryId: Int): Boolean {
@@ -27,14 +34,13 @@ class CodeforcesAPIErrorResponse internal constructor(
         return false
     }
 
-    fun isBlogHandleNotFound(handle: String): Boolean {
-        if (comment == "handle: User with handle $handle not found") return true
+    private fun isBlogHandleNotFound(handle: String): Boolean {
         if (comment == "handle: Field should contain between 3 and 24 characters, inclusive") return true
         if (comment == "handle: Поле должно содержать от 3 до 24 символов, включительно") return true
         return false
     }
 
-    fun isNotAllowedToReadThatBlog(): Boolean {
+    private fun isNotAllowedToReadThatBlog(): Boolean {
         if (comment == "handle: You are not allowed to read that blog") return true
         return false
     }
@@ -64,5 +70,8 @@ class CodeforcesAPIErrorResponse internal constructor(
 class CodeforcesApiCallLimitExceededException
 internal constructor(comment: String): CodeforcesApiException(comment)
 
-class CodeforcesHandleNotFoundException
+class CodeforcesApiHandleNotFoundException
 internal constructor(comment: String, val handle: String): CodeforcesApiException(comment)
+
+class CodeforcesApiNotAllowedReadBlogException
+internal constructor(comment: String): CodeforcesApiException(comment)

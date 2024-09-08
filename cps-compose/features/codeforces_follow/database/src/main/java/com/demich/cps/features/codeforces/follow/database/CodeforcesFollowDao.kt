@@ -3,8 +3,9 @@ package com.demich.cps.features.codeforces.follow.database
 import androidx.room.*
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.platforms.api.codeforces.CodeforcesAPIErrorResponse
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogException
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
@@ -71,10 +72,10 @@ interface CodeforcesFollowDao {
         return CodeforcesApi.runCatching {
             getUserBlogEntries(handle = handle, locale = locale)
         }.recoverCatching {
-            if (it is CodeforcesAPIErrorResponse && it.isNotAllowedToReadThatBlog()) {
+            if (it is CodeforcesApiNotAllowedReadBlogException) {
                 return@recoverCatching emptyList()
             }
-            if (it is CodeforcesAPIErrorResponse && it.isBlogHandleNotFound(handle)) {
+            if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
                 val userInfo = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
                 applyUserInfo(handle, userInfo)
                 if (userInfo.status == STATUS.OK) {
