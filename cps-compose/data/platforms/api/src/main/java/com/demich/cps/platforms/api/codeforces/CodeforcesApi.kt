@@ -47,8 +47,8 @@ object CodeforcesApi: PlatformApi {
 
     class CodeforcesTemporarilyUnavailableException: CodeforcesApiException("Codeforces Temporarily Unavailable")
 
-    private val callLimitExceededWaitTime: Duration = 500.milliseconds
-    private val redirectWaitTime: Duration = 300.milliseconds
+    private val callLimitExceededWaitTime: Duration get() = 500.milliseconds
+    private val redirectWaitTime: Duration get() = 300.milliseconds
     private fun isCallLimitExceeded(e: Throwable): Boolean {
         if (e is CodeforcesAPIErrorResponse) return e.isCallLimitExceeded()
         if (e is ResponseException && e.response.status == HttpStatusCode.ServiceUnavailable) return true

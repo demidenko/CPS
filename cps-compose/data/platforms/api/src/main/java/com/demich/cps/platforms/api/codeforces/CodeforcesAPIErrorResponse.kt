@@ -3,7 +3,7 @@ package com.demich.cps.platforms.api.codeforces
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CodeforcesAPIErrorResponse(
+class CodeforcesAPIErrorResponse internal constructor(
     private val status: CodeforcesAPIStatus,
     private val comment: String
 ): CodeforcesApiException("Codeforces API: $comment") {
