@@ -244,13 +244,13 @@ abstract class CodeforcesApiException(message: String?): Throwable(message) {
     constructor(): this(null)
 }
 
-internal enum class CodeforcesAPIStatus {
+private enum class CodeforcesAPIStatus {
     OK, FAILED
 }
 
 @Serializable
-private data class CodeforcesAPIResponse<T>(
-    val status: CodeforcesAPIStatus,
+private class CodeforcesAPIResponse<T>(
+    //val status: CodeforcesAPIStatus,
     val result: T
 )
 

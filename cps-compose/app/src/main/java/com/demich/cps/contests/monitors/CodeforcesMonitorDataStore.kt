@@ -15,6 +15,7 @@ import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.flowOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 
 class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf_monitor_dataStore) {
@@ -54,14 +55,14 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
     suspend fun reset() = resetAll()
 }
 
-@kotlinx.serialization.Serializable
+@Serializable
 internal data class CodeforcesMonitorProblemResult(
     val problemIndex: String,
     val points: Double,
     val type: CodeforcesProblemStatus
 )
 
-@kotlinx.serialization.Serializable
+@Serializable
 internal data class CodeforcesMonitorSubmissionInfo(
     val testset: CodeforcesTestset,
     val verdict: CodeforcesProblemVerdict
@@ -89,9 +90,15 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
         val contestId = prefs[contestId] ?: return@flowOf null
         val contest = prefs[contestInfo].copy(id = contestId)
         val phase = when (contest.phase) {
-            CodeforcesContestPhase.CODING -> CodeforcesMonitorData.ContestPhase.Coding(contest.startTime + contest.duration)
-            CodeforcesContestPhase.SYSTEM_TEST -> CodeforcesMonitorData.ContestPhase.SystemTesting(prefs[sysTestPercentage])
-            else -> CodeforcesMonitorData.ContestPhase.Other(contest.phase)
+            CodeforcesContestPhase.CODING -> {
+                CodeforcesMonitorData.ContestPhase.Coding(endTime = contest.startTime + contest.duration)
+            }
+            CodeforcesContestPhase.SYSTEM_TEST -> {
+                CodeforcesMonitorData.ContestPhase.SystemTesting(percentage = prefs[sysTestPercentage])
+            }
+            else -> {
+                CodeforcesMonitorData.ContestPhase.Other(phase = contest.phase)
+            }
         }
         val contestantRank = CodeforcesMonitorData.ContestRank(
             rank = prefs[contestantRank],
