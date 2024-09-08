@@ -5,9 +5,15 @@ import kotlinx.serialization.Serializable
 @Serializable
 class CodeforcesAPIErrorResponse internal constructor(
     private val comment: String
-): CodeforcesApiException("Codeforces API: $comment") {
+): CodeforcesApiException(comment) {
 
-    fun isCallLimitExceeded() = comment == "Call limit exceeded"
+    internal fun mapOrThis(): CodeforcesApiException {
+        if (isCallLimitExceeded()) return CodeforcesApiCallLimitExceededException(comment)
+
+        return this
+    }
+
+    private fun isCallLimitExceeded() = comment == "Call limit exceeded"
 
     fun isHandleNotFound(): String? {
         val cut = comment.removeSurrounding("handles: User with handle ", " not found")
@@ -53,3 +59,7 @@ class CodeforcesAPIErrorResponse internal constructor(
         return false
     }
 }
+
+
+class CodeforcesApiCallLimitExceededException
+internal constructor(comment: String): CodeforcesApiException(comment)
