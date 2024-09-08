@@ -9,8 +9,14 @@ class CodeforcesAPIErrorResponse internal constructor(
 
     internal fun mapOrThis(): CodeforcesApiException {
         if (isCallLimitExceeded()) return CodeforcesApiCallLimitExceededException(comment)
+
         isHandleNotFound()?.let { handle -> return CodeforcesApiHandleNotFoundException(comment, handle) }
+
+        if (isContestRatingUnavailable()) return CodeforcesApiContestRatingUnavailableException(comment)
+        isContestNotStarted()?.let { contestId -> return CodeforcesApiContestNotStartedException(comment, contestId) }
+
         if (isNotAllowedToReadThatBlog()) return CodeforcesApiNotAllowedReadBlogException(comment)
+
         return this
     }
 
@@ -34,7 +40,8 @@ class CodeforcesAPIErrorResponse internal constructor(
         return false
     }
 
-    private fun isBlogHandleNotFound(handle: String): Boolean {
+    //user blog response
+    private fun isHandleFieldIncorrectLength(): Boolean {
         if (comment == "handle: Field should contain between 3 and 24 characters, inclusive") return true
         if (comment == "handle: Поле должно содержать от 3 до 24 символов, включительно") return true
         return false
@@ -45,14 +52,15 @@ class CodeforcesAPIErrorResponse internal constructor(
         return false
     }
 
-    fun isContestRatingUnavailable(): Boolean {
+    private fun isContestRatingUnavailable(): Boolean {
         if (comment == "contestId: Rating changes are unavailable for this contest") return true
         return false
     }
 
-    fun isContestNotStarted(contestId: Int): Boolean {
-        if (comment == "contestId: Contest with id $contestId has not started") return true
-        return false
+    private fun isContestNotStarted(): Int? {
+        comment.removeSurrounding("contestId: Contest with id ", " has not started")
+            .let { cut -> if (cut != comment) return cut.toIntOrNull() }
+        return null
     }
 
     fun isContestNotFound(contestId: Int): Boolean {
@@ -75,3 +83,9 @@ internal constructor(comment: String, val handle: String): CodeforcesApiExceptio
 
 class CodeforcesApiNotAllowedReadBlogException
 internal constructor(comment: String): CodeforcesApiException(comment)
+
+class CodeforcesApiContestRatingUnavailableException
+internal constructor(comment: String): CodeforcesApiException(comment)
+
+class CodeforcesApiContestNotStartedException
+internal constructor(comment: String, val contestId: Int): CodeforcesApiException(comment)

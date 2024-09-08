@@ -1,7 +1,8 @@
 package com.demich.cps.contests.monitors
 
-import com.demich.cps.platforms.api.codeforces.CodeforcesAPIErrorResponse
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingUnavailableException
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
@@ -16,8 +17,19 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -93,10 +105,8 @@ private suspend fun CodeforcesMonitorDataStore.getStandingsData(contestId: Int, 
         )
     }.onFailure { e ->
         lastRequest(false)
-        if (e is CodeforcesAPIErrorResponse) {
-            if (e.isContestNotStarted(contestId)) {
-                contestInfo.update { it.copy(phase = CodeforcesContestPhase.BEFORE) }
-            }
+        if (e is CodeforcesApiContestNotStartedException && e.contestId == contestId) {
+            contestInfo.update { it.copy(phase = CodeforcesContestPhase.BEFORE) }
         }
     }.onSuccess { standings ->
         lastRequest(true)
@@ -174,7 +184,7 @@ private class RatingChangeWaiter(
         CodeforcesApi.runCatching {
             getContestRatingChanges(contestId)
         }.getOrElse {
-            if (it is CodeforcesAPIErrorResponse && it.isContestRatingUnavailable()) {
+            if (it is CodeforcesApiContestRatingUnavailableException) {
                 //unrated contest
                 return true
             }
