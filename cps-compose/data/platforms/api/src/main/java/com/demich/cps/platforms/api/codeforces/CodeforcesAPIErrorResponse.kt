@@ -1,9 +1,6 @@
 package com.demich.cps.platforms.api.codeforces
 
 import kotlinx.serialization.Serializable
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
 @Serializable
 class CodeforcesAPIErrorResponse internal constructor(
@@ -13,10 +10,10 @@ class CodeforcesAPIErrorResponse internal constructor(
     internal fun mapOrThis(): CodeforcesApiException {
         if (isCallLimitExceeded()) return CodeforcesApiCallLimitExceededException(comment)
 
-        isHandleNotFound()?.let { handle -> return CodeforcesApiHandleNotFoundException(comment, handle) }
+        ifIsHandleNotFound { return CodeforcesApiHandleNotFoundException(comment, handle = it) }
 
         if (isContestRatingUnavailable()) return CodeforcesApiContestRatingUnavailableException(comment)
-        isContestNotStarted()?.let { contestId -> return CodeforcesApiContestNotStartedException(comment, contestId) }
+        ifIsContestNotStarted { return CodeforcesApiContestNotStartedException(comment, contestId = it) }
 
         if (isNotAllowedToReadThatBlog()) return CodeforcesApiNotAllowedReadBlogException(comment)
 
@@ -25,20 +22,12 @@ class CodeforcesAPIErrorResponse internal constructor(
 
     private fun isCallLimitExceeded() = comment == "Call limit exceeded"
 
-    private fun isHandleNotFound(): String? {
+    private inline fun ifIsHandleNotFound(block: (String) -> Unit) {
         //userinfo response
-        comment.ifSurrounded("handles: User with handle ", " not found") { return it }
+        comment.ifSurrounded("handles: User with handle ", " not found", block)
 
         //user blog response
-        comment.ifSurrounded("handle: User with handle ", " not found") { return it }
-
-        return null
-    }
-
-    fun isBlogEntryNotFound(blogEntryId: Int): Boolean {
-        if (comment == "blogEntryId: Blog entry with id $blogEntryId not found") return true
-        if (comment == "Blog entry with id $blogEntryId not found") return true
-        return false
+        comment.ifSurrounded("handle: User with handle ", " not found", block)
     }
 
     //user blog response
@@ -58,21 +47,22 @@ class CodeforcesAPIErrorResponse internal constructor(
         return false
     }
 
-    private fun isContestNotStarted(): Int? {
-        comment.ifSurrounded("contestId: Contest with id ", " has not started") {
-            return it.toIntOrNull()
-        }
-        return null
+    private inline fun ifIsContestNotStarted(block: (Int) -> Unit) {
+        comment.ifIntSurrounded("contestId: Contest with id ", " has not started", block)
     }
 
-    fun isContestNotFound(contestId: Int): Boolean {
-        if (comment == "contestId: Contest with id $contestId not found") return true
-        return false
+    private inline fun ifIsContestNotFound(block: (Int) -> Unit) {
+        comment.ifIntSurrounded("contestId: Contest with id ", " not found", block)
     }
 
-    fun isContestManagerAreNotAllowed(): Boolean {
+    private fun isContestManagerAreNotAllowed(): Boolean {
         if (comment == "asManager: Only contest managers can use \"asManager\" option") return true
         return false
+    }
+
+    private inline fun ifIsBlogEntryNotFound(block: (Int) -> Unit) {
+        comment.ifIntSurrounded("blogEntryId: Blog entry with id ", " not found", block)
+        comment.ifIntSurrounded("Blog entry with id ", " not found", block)
     }
 }
 
@@ -93,12 +83,15 @@ class CodeforcesApiContestNotStartedException
 internal constructor(comment: String, val contestId: Int): CodeforcesApiException(comment)
 
 
-@OptIn(ExperimentalContracts::class)
+
 private inline fun String.ifSurrounded(prefix: String, suffix: String, block: (String) -> Unit) {
-    contract {
-        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-    }
     if (startsWith(prefix) && endsWith(suffix)) {
         block(substring(startIndex = prefix.length, endIndex = length - suffix.length))
+    }
+}
+
+private inline fun String.ifIntSurrounded(prefix: String, suffix: String, block: (Int) -> Unit) {
+    ifSurrounded(prefix = prefix, suffix = suffix) {
+        it.toIntOrNull()?.let(block)
     }
 }
