@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.community.settings.CodeforcesLostHint
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.community.settings.settingsCommunity
@@ -177,13 +178,13 @@ private suspend inline fun findSuspects(
     blogEntries: Collection<CodeforcesBlogEntry>,
     locale: CodeforcesLocale,
     minRatingColorTag: CodeforcesColorTag,
-    noinline isNew: (Instant) -> Boolean,
-    lastNotNewIdItem: DataStoreItem<Pair<Int, Instant>?>,
+    crossinline isNew: (Instant) -> Boolean,
+    lastNotNewIdItem: DataStoreItem<CodeforcesLostHint?>,
     onSuspect: (CodeforcesBlogEntry) -> Unit
 ) {
     //ensure hint in case isNew logic changes
     lastNotNewIdItem.update {
-        if (it == null || !isNew(it.second)) it else null
+        if (it == null || !isNew(it.creationTime)) it else null
     }
 
     val cachedApi = CachedBlogEntryApi(locale = locale) { blogEntry ->
@@ -191,7 +192,7 @@ private suspend inline fun findSuspects(
         if (!isNew(time)) {
             //save hint
             lastNotNewIdItem.update {
-                if (it == null || it.second < time) Pair(blogEntry.id, time)
+                if (it == null || it.creationTime < time) CodeforcesLostHint(blogEntry.id, time)
                 else it
             }
         }
@@ -208,7 +209,7 @@ private suspend inline fun findSuspects(
     So as result choose #2 or #3
      */
     blogEntries
-        .filterIdGreaterThen(lastNotNewIdItem()?.first ?: Int.MIN_VALUE)
+        .filterIdGreaterThen(lastNotNewIdItem()?.blogEntryId ?: Int.MIN_VALUE)
         .fixAndFilterColorTag(minRatingColorTag)
         .filterNewEntries { isNew(cachedApi.getCreationTime(blogEntryId = it.id)) }
         .forEach {
