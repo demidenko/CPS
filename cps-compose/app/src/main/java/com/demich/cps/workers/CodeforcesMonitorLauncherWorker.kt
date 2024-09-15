@@ -8,6 +8,7 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.utils.removeOld
+import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -93,15 +94,18 @@ class CodeforcesMonitorLauncherWorker(
 
     private suspend fun enqueueToCodeforcesContest() {
         with(context.contestsListDao.getContests(Contest.Platform.codeforces)) {
-            if (any { it.getPhase(workerStartTime) == Contest.Phase.RUNNING }) {
-                work.enqueueAsap()
-            }
-
-            filter { it.getPhase(workerStartTime) == Contest.Phase.BEFORE }
-                .minOfOrNull { it.startTime }
-                ?.let {
-                    work.enqueueAt(time = it + 5.minutes, repeatInterval)
+            minOfNotNull(default = Instant.DISTANT_FUTURE) {
+                when (it.getPhase(workerStartTime)) {
+                    Contest.Phase.RUNNING -> {
+                        work.enqueueAsap()
+                        return
+                    }
+                    Contest.Phase.BEFORE -> it.startTime
+                    else -> null
                 }
+            }.let {
+                work.enqueueAt(time = it + 5.minutes, repeatInterval)
+            }
         }
     }
 }
