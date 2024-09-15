@@ -70,6 +70,9 @@ private interface ContestsSorter {
     fun apply(contests: List<Contest>, currentTime: Instant): Boolean
 }
 
+private fun List<Contest>.firstFinished(currentTime: Instant) =
+    partitionPoint { it.getPhase(currentTime) != Contest.Phase.FINISHED }
+
 private class ContestsBruteSorter: ContestsSorter {
     override var contests: SortedContests = SortedContests(emptyList(), 0)
         private set
@@ -78,7 +81,7 @@ private class ContestsBruteSorter: ContestsSorter {
         val sorted = contests.sortedWith(Contest.getComparator(currentTime))
         this.contests = SortedContests(
             contests = sorted,
-            firstFinished = sorted.partitionPoint { it.getPhase(currentTime) != Contest.Phase.FINISHED }
+            firstFinished = sorted.firstFinished(currentTime)
         )
         return true
     }
@@ -97,12 +100,8 @@ private class ContestsSmartSorter: ContestsSorter {
             firstFinished = firstFinished
         )
 
-    private fun saveToSorted(
-        contests: List<Contest>,
-        currentTime: Instant,
-        comparator: Comparator<Contest> = Contest.getComparator(currentTime)
-    ) {
-        sortedLast = contests.sortedWith(comparator)
+    private fun saveToSorted(contests: List<Contest>, currentTime: Instant) {
+        sortedLast = contests.sortedWith(Contest.getComparator(currentTime))
         sortedAt = currentTime
         nextReorderTime = contests.minOfNotNull {
             when {
@@ -114,9 +113,7 @@ private class ContestsSmartSorter: ContestsSorter {
     }
 
     private fun updateFirstFinished(currentTime: Instant) {
-        firstFinished = sortedLast.partitionPoint {
-            it.getPhase(currentTime) != Contest.Phase.FINISHED
-        }
+        firstFinished = sortedLast.firstFinished(currentTime)
     }
 
     override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
@@ -127,9 +124,8 @@ private class ContestsSmartSorter: ContestsSorter {
             return true
         } else {
             if (currentTime >= nextReorderTime) {
-                val comparator = Contest.getComparator(currentTime)
-                if (!sortedLast.isSortedWith(comparator)) {
-                    saveToSorted(sortedLast, currentTime, comparator)
+                if (!sortedLast.isSortedWith(Contest.getComparator(currentTime))) {
+                    saveToSorted(sortedLast, currentTime)
                 }
                 updateFirstFinished(currentTime)
                 return true
