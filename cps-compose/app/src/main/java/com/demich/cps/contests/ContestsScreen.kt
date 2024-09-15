@@ -81,7 +81,7 @@ import kotlinx.datetime.Instant
 
 @Composable
 fun ContestsScreen(
-    contestsListController: ContestsListController,
+    contestsListState: ContestsListState,
     filterState: FilterState,
     isReloading: () -> Boolean,
     onReload: () -> Unit
@@ -95,7 +95,7 @@ fun ContestsScreen(
         CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
         if (anyPlatformEnabled) {
             ContestsReloadableContent(
-                contestsListController = contestsListController,
+                contestsListState = contestsListState,
                 filterState = filterState,
                 isReloading = isReloading,
                 onReload = onReload,
@@ -118,7 +118,7 @@ fun ContestsScreen(
 
 @Composable
 private fun ContestsReloadableContent(
-    contestsListController: ContestsListController,
+    contestsListState: ContestsListState,
     filterState: FilterState,
     isReloading: () -> Boolean,
     onReload: () -> Unit,
@@ -130,7 +130,7 @@ private fun ContestsReloadableContent(
         modifier = modifier
     ) {
         ContestsContent(
-            contestsListController = contestsListController,
+            contestsListState = contestsListState,
             filterState = filterState
         )
     }
@@ -138,7 +138,7 @@ private fun ContestsReloadableContent(
 
 @Composable
 private fun ContestsContent(
-    contestsListController: ContestsListController,
+    contestsListState: ContestsListState,
     filterState: FilterState
 ) {
     val context = context
@@ -159,7 +159,7 @@ private fun ContestsContent(
                 .fillMaxWidth()
         )
         ContestsPager(
-            contestsListController = contestsListController,
+            contestsListState = contestsListState,
             filterState = filterState,
             modifier = Modifier
                 .fillMaxSize()
@@ -169,7 +169,7 @@ private fun ContestsContent(
 
 @Composable
 private fun ContestsPager(
-    contestsListController: ContestsListController,
+    contestsListState: ContestsListState,
     filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
@@ -178,22 +178,22 @@ private fun ContestsPager(
         currentTimeState: State<Instant>
     ) = produceSortedContestsWithTime()
 
-    LaunchedEffect(contestsState, filterState, contestsListController) {
+    LaunchedEffect(contestsState, filterState, contestsListState) {
         snapshotFlow { contestsState.value.contests }
             .collect { contests ->
                 filterState.available = contests.isNotEmpty()
-                contestsListController.applyContests(contests)
+                contestsListState.applyContests(contests)
             }
     }
 
     val saveableStateHolder = rememberSaveableStateHolder()
 
     ProvideCurrentTime(currentTimeState) {
-        val page = contestsListController.contestsPage
+        val page = contestsListState.contestsPage
         saveableStateHolder.SaveableStateProvider(key = page) {
             ContestsPage(
                 contests = { contestsState.value.sublist(page) },
-                contestsListController = contestsListController,
+                contestsListState = contestsListState,
                 filterState = filterState,
                 modifier = modifier
             )
@@ -213,7 +213,7 @@ private fun FilterState.filterContests(contests: List<Contest>) =
 @Composable
 private fun ContestsPage(
     contests: () -> List<Contest>,
-    contestsListController: ContestsListController,
+    contestsListState: ContestsListState,
     filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
@@ -228,7 +228,7 @@ private fun ContestsPage(
 
     ContestsColumn(
         contests = { filtered },
-        contestsListController = contestsListController,
+        contestsListState = contestsListState,
         modifier = modifier,
         onDeleteRequest = { contest ->
             scope.launch {
@@ -243,7 +243,7 @@ private fun ContestsPage(
 @Composable
 private fun ContestsColumn(
     contests: () -> List<Contest>,
-    contestsListController: ContestsListController,
+    contestsListState: ContestsListState,
     onDeleteRequest: (Contest) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -254,12 +254,12 @@ private fun ContestsColumn(
     ) { contest ->
         ContestItem(
             contest = contest,
-            isExpanded = { contestsListController.isExpanded(contest) },
-            collisionType = { contestsListController.collisionType(contest) },
+            isExpanded = { contestsListState.isExpanded(contest) },
+            collisionType = { contestsListState.collisionType(contest) },
             onDeleteRequest = { onDeleteRequest(contest) },
             modifier = Modifier
                 .fillMaxWidth()
-                .clickableNoRipple { contestsListController.toggleExpanded(contest) }
+                .clickableNoRipple { contestsListState.toggleExpanded(contest) }
                 .contestItemPaddings()
                 .animateItemPlacement(spring())
                 .animateContentSize(spring())
@@ -310,7 +310,7 @@ fun contestsMenuBuilder(
 }
 
 fun contestsBottomBarBuilder(
-    contestsListController: ContestsListController,
+    contestsListState: ContestsListState,
     filterState: FilterState,
     loadingStatus: () -> LoadingStatus,
     onReloadClick: () -> Unit
@@ -319,9 +319,9 @@ fun contestsBottomBarBuilder(
 
     if (isAnyPlatformEnabled) {
         ContestsPageSwitchButton(
-            contestsPage = contestsListController.contestsPage,
+            contestsPage = contestsListState.contestsPage,
             onClick = {
-                contestsListController.contestsPage = it
+                contestsListState.contestsPage = it
             }
         )
     }
@@ -339,16 +339,16 @@ fun contestsBottomBarBuilder(
 
 @Composable
 private fun ContestsPageSwitchButton(
-    contestsPage: ContestsListController.ContestsPage,
-    onClick: (ContestsListController.ContestsPage) -> Unit
+    contestsPage: ContestsListState.ContestsPage,
+    onClick: (ContestsListState.ContestsPage) -> Unit
 ) {
     CPSIconButton(
         icon = CPSIcons.Swap,
         onClick = {
             onClick(
                 when (contestsPage) {
-                    ContestsListController.ContestsPage.Finished -> ContestsListController.ContestsPage.RunningOrFuture
-                    ContestsListController.ContestsPage.RunningOrFuture -> ContestsListController.ContestsPage.Finished
+                    ContestsListState.ContestsPage.Finished -> ContestsListState.ContestsPage.RunningOrFuture
+                    ContestsListState.ContestsPage.RunningOrFuture -> ContestsListState.ContestsPage.Finished
                 }
             )
         }

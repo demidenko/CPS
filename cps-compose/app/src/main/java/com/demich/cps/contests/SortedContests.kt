@@ -52,10 +52,10 @@ internal data class SortedContests(
     val contests: List<Contest>,
     private val firstFinished: Int
 ) {
-    fun sublist(page: ContestsListController.ContestsPage): List<Contest> =
+    fun sublist(page: ContestsListState.ContestsPage): List<Contest> =
         when (page) {
-            ContestsListController.ContestsPage.Finished -> finished
-            ContestsListController.ContestsPage.RunningOrFuture -> runningOrFuture
+            ContestsListState.ContestsPage.Finished -> finished
+            ContestsListState.ContestsPage.RunningOrFuture -> runningOrFuture
         }
 
     val finished: List<Contest> =

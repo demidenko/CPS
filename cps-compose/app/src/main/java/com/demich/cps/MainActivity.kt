@@ -37,13 +37,13 @@ import com.demich.cps.community.follow.CommunityFollowScreen
 import com.demich.cps.community.follow.communityFollowListBottomBarBuilder
 import com.demich.cps.community.settings.CommunitySettingsScreen
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.contests.ContestsListController
+import com.demich.cps.contests.ContestsListState
 import com.demich.cps.contests.ContestsScreen
 import com.demich.cps.contests.combinedLoadingStatusState
 import com.demich.cps.contests.contestsBottomBarBuilder
 import com.demich.cps.contests.contestsMenuBuilder
 import com.demich.cps.contests.contestsViewModel
-import com.demich.cps.contests.rememberContestsListController
+import com.demich.cps.contests.rememberContestsListState
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.develop.DevelopScreen
 import com.demich.cps.develop.developAdditionalBottomBarBuilder
@@ -187,19 +187,19 @@ private fun CPSContent() {
         cpsComposable(ScreenTypes.contests) { holder ->
             val context = context
             val contestsViewModel = contestsViewModel()
-            val contestsListController = rememberContestsListController()
+            val contestsListState = rememberContestsListState()
             val filterState = rememberFilterState()
             val loadingStatus by combinedLoadingStatusState()
             val isReloading = { loadingStatus == LoadingStatus.LOADING }
             val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
             ContestsScreen(
-                contestsListController = contestsListController,
+                contestsListState = contestsListState,
                 filterState = filterState,
                 isReloading = isReloading,
                 onReload = onReload
             )
             holder.bottomBar = contestsBottomBarBuilder(
-                contestsListController = contestsListController,
+                contestsListState = contestsListState,
                 filterState = filterState,
                 loadingStatus = { loadingStatus },
                 onReloadClick = onReload
@@ -209,9 +209,9 @@ private fun CPSContent() {
                 isReloading = isReloading
             )
 
-            when (contestsListController.contestsPage) {
-                ContestsListController.ContestsPage.Finished -> holder.setSubtitle("contests", "finished")
-                ContestsListController.ContestsPage.RunningOrFuture -> holder.setSubtitle("contests")
+            when (contestsListState.contestsPage) {
+                ContestsListState.ContestsPage.Finished -> holder.setSubtitle("contests", "finished")
+                ContestsListState.ContestsPage.RunningOrFuture -> holder.setSubtitle("contests")
             }
 
         }

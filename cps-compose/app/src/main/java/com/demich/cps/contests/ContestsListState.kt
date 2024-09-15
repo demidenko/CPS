@@ -26,17 +26,17 @@ val Contest.isVirtual: Boolean
     get() = duration < eventDuration
 
 @Composable
-internal fun rememberContestsListController(): ContestsListController {
+internal fun rememberContestsListState(): ContestsListState {
     val contestsViewModel = contestsViewModel()
 
     val expandedContestsState = collectAsState { contestsViewModel.flowOfExpandedContests() }
 
     val contestsPageState = rememberSaveable {
-        mutableStateOf(ContestsListController.ContestsPage.RunningOrFuture)
+        mutableStateOf(ContestsListState.ContestsPage.RunningOrFuture)
     }
 
     return remember(contestsViewModel, expandedContestsState) {
-        ContestsListController(
+        ContestsListState(
             contestsViewModel = contestsViewModel,
             expandedContestsState = expandedContestsState,
             contestsPageState = contestsPageState
@@ -68,7 +68,7 @@ internal interface ContestsIdsHolder {
 }
 
 @Stable
-class ContestsListController(
+class ContestsListState(
     contestsViewModel: ContestsViewModel,
     expandedContestsState: State<Map<ContestCompositeId, Contest>>,
     contestsPageState: MutableState<ContestsPage>
