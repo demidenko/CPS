@@ -94,7 +94,7 @@ class CodeforcesMonitorLauncherWorker(
 
     private suspend fun enqueueToCodeforcesContest() {
         with(context.contestsListDao.getContests(Contest.Platform.codeforces)) {
-            minOfNotNull(default = Instant.DISTANT_FUTURE) {
+            minOfNotNull {
                 when (it.getPhase(workerStartTime)) {
                     Contest.Phase.RUNNING -> {
                         work.enqueueAsap()
@@ -103,7 +103,7 @@ class CodeforcesMonitorLauncherWorker(
                     Contest.Phase.BEFORE -> it.startTime
                     else -> null
                 }
-            }.let {
+            }?.let {
                 work.enqueueAt(time = it + 5.minutes, repeatInterval)
             }
         }

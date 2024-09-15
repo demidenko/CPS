@@ -104,13 +104,13 @@ private class ContestsSmartSorter: ContestsSorter {
     ) {
         sortedLast = contests.sortedWith(comparator)
         sortedAt = currentTime
-        nextReorderTime = contests.minOfNotNull(default = Instant.DISTANT_FUTURE) {
+        nextReorderTime = contests.minOfNotNull {
             when {
                 currentTime < it.startTime -> it.startTime
                 currentTime < it.endTime -> it.endTime
                 else -> null
             }
-        }
+        } ?: Instant.DISTANT_FUTURE
     }
 
     private fun updateFirstFinished(currentTime: Instant) {

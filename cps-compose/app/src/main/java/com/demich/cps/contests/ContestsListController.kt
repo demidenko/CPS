@@ -80,7 +80,7 @@ class ContestsListController(
 
     private val safeMinDuration: Duration = 1.hours
     fun collisionType(contest: Contest): DangerType {
-        val distance = expandedContests.values.minOfNotNull(default = Duration.INFINITE) {
+        val distance = expandedContests.values.minOfNotNull {
             val l = it.startTime
             val r = it.endTime
             when {
@@ -90,7 +90,7 @@ class ContestsListController(
                 r <= contest.startTime -> contest.startTime - r
                 else -> return DangerType.DANGER
             }
-        }
+        } ?: Duration.INFINITE
         if (distance < safeMinDuration) return DangerType.WARNING
         return DangerType.SAFE
     }
