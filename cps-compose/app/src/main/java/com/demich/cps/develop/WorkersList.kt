@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
@@ -22,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -29,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.work.WorkInfo
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSDefaults
@@ -42,6 +45,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.ProvideTimeEachMinute
 import com.demich.cps.utils.collectAsStateWithLifecycle
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
@@ -110,7 +114,6 @@ fun WorkersList(modifier: Modifier = Modifier) {
 
 @Composable
 private fun WorkerDialog(work: CPSPeriodicWork, onDismissRequest: () -> Unit) {
-    val context = context
     val workInfo by work.workInfoAsState()
     CPSYesNoDialog(
         title = {
@@ -157,7 +160,7 @@ private fun WorkersList(
             Divider()
         }
         item {
-            WorkerItem(
+            CodeforcesMonitorWorkItem(
                 work = monitorWork,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -186,31 +189,30 @@ private fun WorkerItem(
         name = work.name,
         workState = workInfo.stateOrCancelled,
         progressInfo = workInfo?.takeIf { it.isRunning }?.getProgressInfo(),
-        lastRunTimeAgo = lastExecutionEvent?.let {
-            timeAgo(fromTime = it.start, toTime = localCurrentTime)
-        } ?: "never",
+        lastExecTime = lastExecutionEvent?.start,
         lastResult = lastExecutionEvent?.resultType,
-        lastDuration = lastExecutionEvent?.duration?.toNiceString() ?: "",
+        lastDuration = lastExecutionEvent?.duration,
         modifier = modifier
     )
 }
 
 @Composable
-private fun WorkerItem(
+private fun CodeforcesMonitorWorkItem(
     work: CPSOneTimeWork,
     modifier: Modifier = Modifier
 ) {
+    val context = context
     val workInfo by work.workInfoAsState()
+    val contestId by collectItemAsState { CodeforcesMonitorDataStore(context).contestId }
 
     WorkerItem(
+        modifier = modifier,
         name = work.name,
         workState = workInfo.stateOrCancelled,
-        progressInfo = null,
-        lastRunTimeAgo = "",
-        lastResult = null,
-        lastDuration = "",
-        modifier = modifier
-    )
+        progressInfo = null
+    ) {
+        Text(text = "contestId = $contestId")
+    }
 }
 
 private fun Duration.toNiceString(): String {
@@ -222,13 +224,45 @@ private fun Duration.toNiceString(): String {
 
 @Composable
 private fun WorkerItem(
+    modifier: Modifier = Modifier,
     name: String,
     workState: WorkInfo.State,
     progressInfo: ProgressBarInfo?,
-    lastRunTimeAgo: String,
+    lastExecTime: Instant?,
     lastResult: CPSWorker.ResultType?,
-    lastDuration: String,
-    modifier: Modifier = Modifier
+    lastDuration: Duration?
+) {
+    WorkerItem(
+        modifier = modifier,
+        name = name,
+        workState = workState,
+        progressInfo = progressInfo
+    ) {
+        Row(modifier = Modifier.padding(top = 3.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (lastResult != null) {
+                ResultIcon(
+                    result = lastResult,
+                    modifier = Modifier.padding(end = 3.dp)
+                )
+            }
+            Text(text = lastExecTime?.let { timeAgo(fromTime = it, toTime = localCurrentTime) } ?: "never")
+            if (lastDuration != null) {
+                Text(
+                    text = "(${lastDuration.toNiceString()})",
+                    modifier = Modifier.padding(start = 3.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WorkerItem(
+    modifier: Modifier = Modifier,
+    name: String,
+    workState: WorkInfo.State,
+    progressInfo: ProgressBarInfo?,
+    additional: @Composable () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -241,26 +275,11 @@ private fun WorkerItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            Row(modifier = Modifier.padding(top = 3.dp), verticalAlignment = Alignment.CenterVertically) {
-                if (lastResult != null) {
-                    ResultIcon(
-                        result = lastResult,
-                        modifier = Modifier.padding(end = 3.dp)
-                    )
-                }
-                Text(
-                    text = lastRunTimeAgo,
-                    fontSize = 14.sp,
-                    color = cpsColors.contentAdditional
-                )
-                if (lastDuration.isNotEmpty()) {
-                    Text(
-                        text = "($lastDuration)",
-                        fontSize = 14.sp,
-                        color = cpsColors.contentAdditional,
-                        modifier = Modifier.padding(start = 3.dp)
-                    )
-                }
+            ProvideTextStyle(TextStyle(
+                fontSize = 14.sp,
+                color = cpsColors.contentAdditional
+            )) {
+                additional()
             }
         }
 
