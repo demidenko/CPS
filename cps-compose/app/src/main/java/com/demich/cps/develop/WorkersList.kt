@@ -188,7 +188,7 @@ private fun WorkerItem(
     WorkerItem(
         name = work.name,
         workState = workInfo.stateOrCancelled,
-        progressInfo = workInfo?.takeIf { it.isRunning }?.getProgressInfo(),
+        progressInfo = { workInfo?.takeIf { it.isRunning }?.getProgressInfo() },
         lastExecTime = lastExecutionEvent?.start,
         lastResult = lastExecutionEvent?.resultType,
         lastDuration = lastExecutionEvent?.duration,
@@ -209,7 +209,7 @@ private fun CodeforcesMonitorWorkItem(
         modifier = modifier,
         name = work.name,
         workState = workInfo.stateOrCancelled,
-        progressInfo = null
+        progressInfo = { null }
     ) {
         Text(text = "contestId = $contestId")
     }
@@ -227,7 +227,7 @@ private fun WorkerItem(
     modifier: Modifier = Modifier,
     name: String,
     workState: WorkInfo.State,
-    progressInfo: ProgressBarInfo?,
+    progressInfo: () -> ProgressBarInfo?,
     lastExecTime: Instant?,
     lastResult: CPSWorker.ResultType?,
     lastDuration: Duration?
@@ -261,7 +261,7 @@ private fun WorkerItem(
     modifier: Modifier = Modifier,
     name: String,
     workState: WorkInfo.State,
-    progressInfo: ProgressBarInfo?,
+    progressInfo: () -> ProgressBarInfo?,
     additional: @Composable () -> Unit
 ) {
     Row(
@@ -295,7 +295,7 @@ private fun WorkerItem(
                 color = colorFor(workState)
             )
             AnimatedVisibleByNotNull(
-                value = { progressInfo },
+                value = progressInfo,
                 enter = enterInColumn(),
                 exit = exitInColumn()
             ) {
