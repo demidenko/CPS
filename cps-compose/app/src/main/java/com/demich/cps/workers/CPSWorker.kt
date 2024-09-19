@@ -62,14 +62,16 @@ abstract class CPSWorker(
 
     protected abstract suspend fun runWork(): Result
     private suspend fun smartRunWork(): Result {
-        suspend fun call(): Result =
-            runCatching { runWork() }.getOrElse {
+        suspend fun call(): Result {
+            setProgressInfo(ProgressBarInfo(total = 0))
+            return runCatching { runWork() }.getOrElse {
                 when {
                     it.isResponseException -> Result.retry()
                     it is CodeforcesApiException -> Result.retry()
                     else -> Result.failure()
                 }
             }
+        }
 
         return call().let { result ->
             if (result.toType() != ResultType.SUCCESS) {
@@ -80,7 +82,10 @@ abstract class CPSWorker(
     }
 
     protected suspend fun setProgressInfo(progressInfo: ProgressBarInfo) {
-        if (progressInfo.total == 0) return
+        if (progressInfo.total == 0) {
+            setProgress(workDataOf())
+            return
+        }
         setProgress(workDataOf(
             KEY_PROGRESS to arrayOf(progressInfo.current, progressInfo.total)
         ))
