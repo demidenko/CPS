@@ -1,15 +1,15 @@
 package com.demich.cps.platforms.api
 
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.network.sockets.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
+import io.ktor.client.call.body
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -23,7 +23,7 @@ internal fun cpsHttpClient(
     connectionTimeout: Duration = 15.seconds,
     requestTimeout: Duration = 30.seconds,
     block: HttpClientConfig<*>.() -> Unit
-) = HttpClient {
+) = HttpClient(OkHttp) {
     expectSuccess = true
     install(HttpTimeout) {
         connectTimeoutMillis = connectionTimeout.inWholeMilliseconds
@@ -34,6 +34,11 @@ internal fun cpsHttpClient(
             json(json = it)
         }
     }
+    /*TODO: engine {
+        config {
+            sslSocketFactory()
+        }
+    }*/
     block()
 }
 
@@ -52,27 +57,3 @@ internal suspend inline fun HttpClient.getText(
 ): String = this.get(urlString = urlString, block = block).bodyAsText()
 
 
-val Throwable.niceMessage: String? get() =
-    when (this) {
-        is java.net.UnknownHostException,
-        is java.net.SocketException,
-        is SocketTimeoutException -> "Connection failed"
-
-        is ResponseException -> HttpStatusCode.fromValue(response.status.value).toString()
-
-        is CodeforcesApiException -> message
-
-        is kotlinx.serialization.SerializationException -> "Serialization failed"
-
-        else -> null
-    }
-
-
-val Throwable.isResponseException get() =
-    this is ResponseException
-
-val Throwable.isPageNotFound get() =
-    this is ClientRequestException && response.status == HttpStatusCode.NotFound
-
-val Throwable.isRedirect get() =
-    this is RedirectResponseException

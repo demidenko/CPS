@@ -34,8 +34,6 @@ object CodeChefApi: PlatformApi {
         }
     }
 
-    private val somethingWentWrongMessage get() = "{\"status\":\"apierror\",\"message\":\"Something went wrong\"}"
-
     private class CodeChefCSRFTokenExpiredException: Throwable()
 
     private object CSRFToken {
@@ -133,3 +131,5 @@ private fun extractCSRFToken(source: String): String {
     i = source.indexOf('"', i)
     return source.substring(i+1, source.indexOf('"', i+1))
 }
+
+private const val somethingWentWrongMessage = "{\"status\":\"apierror\",\"message\":\"Something went wrong\"}"
