@@ -28,13 +28,12 @@ object CodeforcesApi: PlatformApi {
             url(urls.main)
         }
         HttpResponseValidator {
-            /*TODO: DoubleReceiveException after bodyAsText()
             validateResponse {
                 if (it.status.value == 200) {
                     val text = it.bodyAsText()
                     if (isTemporarilyUnavailable(text)) throw CodeforcesTemporarilyUnavailableException()
                 }
-            }*/
+            }
             handleResponseExceptionWithRequest { exception, _ ->
                 if (exception !is ResponseException) return@handleResponseExceptionWithRequest
                 val response = exception.response
@@ -112,9 +111,6 @@ object CodeforcesApi: PlatformApi {
             client.getText(path) {
                 if (rcpcToken.isNotEmpty()) header("Cookie", "RCPC=$rcpcToken")
                 block()
-            }.also {
-                //TODO: check this for api requests too (in validateResponse)
-                if (isTemporarilyUnavailable(it)) throw CodeforcesTemporarilyUnavailableException()
             }
         }
     }
