@@ -1,9 +1,14 @@
 package com.demich.cps.platforms.api.codeforces
 
 import com.demich.cps.platforms.api.PlatformApi
-import com.demich.cps.platforms.api.codeforces.models.*
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.platforms.api.cpsHttpClient
-import com.demich.cps.platforms.api.decodeAES
 import com.demich.cps.platforms.api.defaultJson
 import com.demich.cps.platforms.api.getAs
 import com.demich.cps.platforms.api.getText
@@ -11,7 +16,6 @@ import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
@@ -47,7 +51,6 @@ object CodeforcesApi: PlatformApi {
     class CodeforcesTemporarilyUnavailableException: CodeforcesApiException("Codeforces Temporarily Unavailable")
 
     private val callLimitExceededWaitTime: Duration get() = 500.milliseconds
-    private val redirectWaitTime: Duration get() = 300.milliseconds
     private fun isCallLimitExceeded(e: Throwable): Boolean {
         if (e is CodeforcesApiCallLimitExceededException) return true
         if (e is ResponseException && e.response.status == HttpStatusCode.ServiceUnavailable) return true
@@ -77,42 +80,11 @@ object CodeforcesApi: PlatformApi {
         }.result
     }
 
-    private val RCPC = object {
-        private var rcpcToken: String = ""
-
-        private var last_c = ""
-        private fun calculateToken(source: String) {
-            val i = source.indexOf("c=toNumbers(")
-            val c = source.substring(source.indexOf("(\"",i)+2, source.indexOf("\")",i))
-            if (c == last_c) return
-            rcpcToken = decodeAES(c)
-            last_c = c
-            println("$c: $rcpcToken")
-        }
-
-        private fun String.isRCPCCase() =
-            startsWith("<html><body>Redirecting... Please, wait.")
-
-        suspend inline fun getPage(get: (String) -> String): String {
-            val s = get(rcpcToken)
-            return if (s.isRCPCCase()) {
-                calculateToken(s)
-                delay(redirectWaitTime)
-                get(rcpcToken)
-            } else s
-        }
-    }
-
     private suspend inline fun getCodeforcesWeb(
         path: String,
         block: HttpRequestBuilder.() -> Unit = {}
     ): String {
-        return RCPC.getPage { rcpcToken ->
-            client.getText(path) {
-                if (rcpcToken.isNotEmpty()) header("Cookie", "RCPC=$rcpcToken")
-                block()
-            }
-        }
+        return client.getText(path, block)
     }
 
 
