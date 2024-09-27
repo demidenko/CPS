@@ -21,6 +21,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.appendPathSegments
 import io.ktor.http.setCookie
+import korlibs.crypto.sha1
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -269,3 +270,12 @@ private fun isTemporarilyUnavailable(str: String): Boolean {
 }
 
 //TODO: is cloudflare (just a moment...)
+
+private fun proofOfWork(pow: String): String {
+    repeat(Int.MAX_VALUE) {
+        val str = "${it}_$pow"
+        val h = str.toByteArray().sha1().hex
+        if (h.startsWith("0000")) return str
+    }
+    throw IllegalStateException()
+}
