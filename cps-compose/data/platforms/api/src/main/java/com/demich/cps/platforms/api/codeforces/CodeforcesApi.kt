@@ -19,6 +19,7 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.setCookie
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -32,10 +33,17 @@ object CodeforcesApi: PlatformApi {
             url(urls.main)
         }
         HttpResponseValidator {
-            validateResponse {
-                if (it.status.value == 200) {
-                    val text = it.bodyAsText()
-                    if (isTemporarilyUnavailable(text)) throw CodeforcesTemporarilyUnavailableException()
+            validateResponse { response ->
+                if (response.status.value == 200) {
+                    val text = response.bodyAsText()
+                    if (isTemporarilyUnavailable(text)) {
+                        throw CodeforcesTemporarilyUnavailableException()
+                    }
+
+                    if (isBrowserChecker(text)) {
+                        val pow = response.setCookie().firstOrNull { it.name == "pow" }?.value
+                        //TODO: proof of work
+                    }
                 }
             }
             handleResponseExceptionWithRequest { exception, _ ->
@@ -222,6 +230,14 @@ private class CodeforcesAPIResponse<T>(
     val result: T
 )
 
+private fun isBrowserChecker(str: String): Boolean {
+    val i = str.indexOf("<p>")
+    if (i == -1) return false
+    val j = str.indexOf("</p", i)
+    if(j == -1 || i >= j) return false
+    val msg = str.substring(i + 3, j)
+    return msg == "Please wait. Your browser is being checked. It may take a few seconds..."
+}
 
 private fun isTemporarilyUnavailable(str: String): Boolean {
     if (str.length > 2000) return false //trick based on full msg length
