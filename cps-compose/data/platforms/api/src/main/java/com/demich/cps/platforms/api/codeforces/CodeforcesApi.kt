@@ -19,6 +19,7 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.appendPathSegments
 import io.ktor.http.setCookie
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
@@ -80,11 +81,14 @@ object CodeforcesApi: PlatformApi {
     }
 
     private suspend inline fun<reified T> getCodeforcesApi(
-        path: String,
+        method: String,
         crossinline block: HttpRequestBuilder.() -> Unit = {}
     ): T {
         return responseWithRetry(remainingRetries = 9) {
-            client.getAs<CodeforcesAPIResponse<T>>(urlString = "/api/$path", block = block)
+            client.getAs<CodeforcesAPIResponse<T>>(urlString = "") {
+                url.appendPathSegments("api", method)
+                block()
+            }
         }.result
     }
 
@@ -101,7 +105,7 @@ object CodeforcesApi: PlatformApi {
         checkHistoricHandles: Boolean = false
     ): List<CodeforcesUser> {
         if (handles.isEmpty()) return emptyList()
-        return getCodeforcesApi(path = "user.info") {
+        return getCodeforcesApi(method = "user.info") {
             parameter("handles", handles.joinToString(separator = ";"))
             parameter("checkHistoricHandles", checkHistoricHandles)
         }
@@ -112,20 +116,20 @@ object CodeforcesApi: PlatformApi {
     }
 
     suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange> {
-        return getCodeforcesApi(path = "user.rating") {
+        return getCodeforcesApi(method = "user.rating") {
             parameter("handle", handle)
         }
     }
 
     //TODO: Sequence instead of List?
     suspend fun getContests(): List<CodeforcesContest> {
-        return getCodeforcesApi(path = "contest.list") {
+        return getCodeforcesApi(method = "contest.list") {
             parameter("gym", false)
         }
     }
 
     suspend fun getContestSubmissions(contestId: Int, handle: String): List<CodeforcesSubmission> {
-        return getCodeforcesApi(path = "contest.status") {
+        return getCodeforcesApi(method = "contest.status") {
             parameter("contestId", contestId)
             parameter("handle", handle)
             parameter("count", 1e9.toInt())
@@ -133,7 +137,7 @@ object CodeforcesApi: PlatformApi {
     }
 
     suspend fun getUserSubmissions(handle: String, count: Long, from: Long): List<CodeforcesSubmission> {
-        return getCodeforcesApi(path = "user.status") {
+        return getCodeforcesApi(method = "user.status") {
             parameter("handle", handle)
             parameter("count", count)
             parameter("from", from)
@@ -142,7 +146,7 @@ object CodeforcesApi: PlatformApi {
 
     //TODO: Sequence instead of List
     suspend fun getContestRatingChanges(contestId: Int): List<CodeforcesRatingChange> {
-        return getCodeforcesApi(path = "contest.ratingChanges" ) {
+        return getCodeforcesApi(method = "contest.ratingChanges" ) {
             parameter("contestId", contestId)
         }
     }
@@ -168,21 +172,21 @@ object CodeforcesApi: PlatformApi {
     }
 
     suspend fun getUserBlogEntries(handle: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
-        return getCodeforcesApi(path = "user.blogEntries") {
+        return getCodeforcesApi(method = "user.blogEntries") {
             parameter("handle", handle)
             parameter("locale", locale)
         }
     }
 
     suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale): CodeforcesBlogEntry {
-        return getCodeforcesApi(path = "blogEntry.view") {
+        return getCodeforcesApi(method = "blogEntry.view") {
             parameter("blogEntryId", blogEntryId)
             parameter("locale", locale)
         }
     }
 
     suspend fun getContestStandings(contestId: Int, handles: Collection<String>, includeUnofficial: Boolean): CodeforcesContestStandings {
-        return getCodeforcesApi(path = "contest.standings") {
+        return getCodeforcesApi(method = "contest.standings") {
             parameter("contestId", contestId)
             parameter("handles", handles.joinToString(separator = ";"))
             parameter("showUnofficial", includeUnofficial)
