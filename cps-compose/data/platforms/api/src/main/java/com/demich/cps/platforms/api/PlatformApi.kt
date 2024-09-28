@@ -6,6 +6,8 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.cookies.AcceptAllCookiesStorage
+import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -20,25 +22,36 @@ internal interface PlatformApi {
 
 internal fun cpsHttpClient(
     json: Json? = null,
+    useCookies: Boolean = false,
     connectionTimeout: Duration = 15.seconds,
     requestTimeout: Duration = 30.seconds,
     block: HttpClientConfig<*>.() -> Unit
 ) = HttpClient(OkHttp) {
     expectSuccess = true
+
     install(HttpTimeout) {
         connectTimeoutMillis = connectionTimeout.inWholeMilliseconds
         requestTimeoutMillis = requestTimeout.inWholeMilliseconds
     }
+
     json?.let {
         install(ContentNegotiation) {
             json(json = it)
         }
     }
+
+    if (useCookies) {
+        install(HttpCookies) {
+            storage = AcceptAllCookiesStorage()
+        }
+    }
+
     /*TODO: engine {
         config {
             sslSocketFactory()
         }
     }*/
+
     block()
 }
 

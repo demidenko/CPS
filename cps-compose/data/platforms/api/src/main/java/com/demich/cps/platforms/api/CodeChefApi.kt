@@ -1,9 +1,11 @@
 package com.demich.cps.platforms.api
 
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.cookies.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.client.plugins.ResponseException
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.header
+import io.ktor.client.request.parameter
+import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.serialization.Serializable
@@ -14,14 +16,12 @@ object CodeChefApi: PlatformApi {
 
     override val client = cpsHttpClient(
         json = json,
+        useCookies = true,
         connectionTimeout = 30.seconds,
         requestTimeout = 60.seconds
     ) {
         followRedirects = false
         //BrowserUserAgent()
-        install(HttpCookies) {
-            storage = AcceptAllCookiesStorage()
-        }
         HttpResponseValidator {
             handleResponseExceptionWithRequest { exception, _ ->
                 if (exception !is ResponseException) return@handleResponseExceptionWithRequest
