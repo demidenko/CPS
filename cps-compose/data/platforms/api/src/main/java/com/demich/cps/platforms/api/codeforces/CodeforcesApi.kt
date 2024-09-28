@@ -10,14 +10,18 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.platforms.api.cpsHttpClient
 import com.demich.cps.platforms.api.defaultJson
-import com.demich.cps.platforms.api.getAs
-import com.demich.cps.platforms.api.getText
+import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.cookie
+import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.client.request.url
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.request
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.appendPathSegments
 import io.ktor.http.setCookie
@@ -30,21 +34,30 @@ import kotlin.time.Duration.Companion.milliseconds
 object CodeforcesApi: PlatformApi {
     private val json get() = defaultJson
 
-    override val client = cpsHttpClient(json = json) {
+    override val client = cpsHttpClient(
+        json = json,
+        useCookies = true
+    ) {
         defaultRequest {
             url(urls.main)
         }
+
         HttpResponseValidator {
             validateResponse { response ->
                 if (response.status.value == 200) {
                     val text = response.bodyAsText()
+
                     if (isTemporarilyUnavailable(text)) {
                         throw CodeforcesTemporarilyUnavailableException()
                     }
 
                     if (isBrowserChecker(text)) {
-                        val pow = response.setCookie().firstOrNull { it.name == "pow" }?.value
-                        //TODO: proof of work
+                        response.setCookie().firstOrNull { it.name == "pow" }?.let {
+                            val pow = it.value
+                            val url = response.request.url
+                            println("pow = $pow for $url")
+                            throw CodeforcesPOWException(pow)
+                        }
                     }
                 }
             }
@@ -59,6 +72,7 @@ object CodeforcesApi: PlatformApi {
     }
 
     class CodeforcesTemporarilyUnavailableException: CodeforcesApiException("Codeforces Temporarily Unavailable")
+    private class CodeforcesPOWException(val pow: String): CodeforcesApiException("pow = $pow")
 
     private val callLimitExceededWaitTime: Duration get() = 500.milliseconds
     private fun isCallLimitExceeded(e: Throwable): Boolean {
@@ -81,15 +95,30 @@ object CodeforcesApi: PlatformApi {
         }
     }
 
+    //TODO: find proper solution (intercept / retry plugins not works)
+    private suspend inline fun getCodeforces(block: HttpRequestBuilder.() -> Unit): HttpResponse {
+        runCatching {
+            return client.get(block)
+        }.getOrElse { exception ->
+            if (exception is CodeforcesPOWException) {
+                return client.get {
+                    cookie(name = "pow", value = proofOfWork(exception.pow))
+                    block()
+                }
+            }
+            throw exception
+        }
+    }
+
     private suspend inline fun<reified T> getCodeforcesApi(
         method: String,
         crossinline block: HttpRequestBuilder.() -> Unit = {}
     ): T {
         return responseWithRetry(remainingRetries = 9) {
-            client.getAs<CodeforcesAPIResponse<T>>(urlString = "") {
+            getCodeforces {
                 url.appendPathSegments("api", method)
                 block()
-            }
+            }.body<CodeforcesAPIResponse<T>>()
         }.result
     }
 
@@ -97,7 +126,10 @@ object CodeforcesApi: PlatformApi {
         path: String,
         block: HttpRequestBuilder.() -> Unit = {}
     ): String {
-        return client.getText(path, block)
+        return getCodeforces {
+            url(path)
+            block()
+        }.bodyAsText()
     }
 
 
