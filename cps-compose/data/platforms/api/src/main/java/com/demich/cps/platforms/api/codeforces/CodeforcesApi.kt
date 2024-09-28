@@ -11,6 +11,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.platforms.api.cpsHttpClient
 import com.demich.cps.platforms.api.defaultJson
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.defaultRequest
@@ -22,11 +23,9 @@ import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.appendPathSegments
 import io.ktor.http.setCookie
 import korlibs.crypto.sha1
-import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -69,30 +68,24 @@ object CodeforcesApi: PlatformApi {
                     .onFailure { throw exception }
             }
         }
+
+        //careful!!! only one install and retry block is used in ktor
+        install(HttpRequestRetry) {
+            retryOnExceptionIf(maxRetries = 10) { requestBuilder, throwable ->
+                throwable.shouldRetry()
+            }
+            delayMillis { callLimitExceededWaitTime.inWholeMilliseconds }
+        }
     }
 
     class CodeforcesTemporarilyUnavailableException: CodeforcesApiException("Codeforces Temporarily Unavailable")
     private class CodeforcesPOWException(val pow: String): CodeforcesApiException("pow = $pow")
 
     private val callLimitExceededWaitTime: Duration get() = 500.milliseconds
-    private fun isCallLimitExceeded(e: Throwable): Boolean {
-        if (e is CodeforcesApiCallLimitExceededException) return true
-        if (e is ResponseException && e.response.status == HttpStatusCode.ServiceUnavailable) return true
+    private fun Throwable.shouldRetry(): Boolean {
+        if (this is ResponseException && response.status.value in 500 until 600) return true
+        if (this is CodeforcesApiCallLimitExceededException) return true
         return false
-    }
-
-    private suspend fun<T> responseWithRetry(
-        remainingRetries: Int,
-        get: suspend () -> CodeforcesAPIResponse<T>
-    ): CodeforcesAPIResponse<T> {
-        return kotlin.runCatching { get() }.getOrElse { exception ->
-            if (isCallLimitExceeded(exception) && remainingRetries > 0) {
-                delay(callLimitExceededWaitTime)
-                responseWithRetry(remainingRetries - 1, get)
-            } else {
-                throw exception
-            }
-        }
     }
 
     //TODO: find proper solution (intercept / retry plugins not works)
@@ -110,16 +103,14 @@ object CodeforcesApi: PlatformApi {
         }
     }
 
-    private suspend inline fun<reified T> getCodeforcesApi(
+    private suspend inline fun <reified T> getCodeforcesApi(
         method: String,
-        crossinline block: HttpRequestBuilder.() -> Unit = {}
+        block: HttpRequestBuilder.() -> Unit = {}
     ): T {
-        return responseWithRetry(remainingRetries = 9) {
-            getCodeforces {
-                url.appendPathSegments("api", method)
-                block()
-            }.body<CodeforcesAPIResponse<T>>()
-        }.result
+        return getCodeforces {
+            url.appendPathSegments("api", method)
+            block()
+        }.body<CodeforcesAPIResponse<T>>().result
     }
 
     private suspend inline fun getCodeforcesWeb(
