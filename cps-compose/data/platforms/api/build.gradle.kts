@@ -27,7 +27,8 @@ dependencies {
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
-    implementation("com.soywiz:korlibs-crypto:6.0.0")
 
     implementation(libs.kotlinx.datetime)
+
+    implementation(libs.korlibs.crypto)
 }

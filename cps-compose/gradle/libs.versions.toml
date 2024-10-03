@@ -23,6 +23,7 @@ room = "2.6.1"
 datastore = "1.0.0" # 1.1.1 coroutines crash
 
 jsoup = "1.18.1"
+korlibs = "6.0.0"
 
 accompanist = "0.34.0"
 
@@ -60,6 +61,7 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+korlibs-crypto = { module = "com.soywiz:korlibs-crypto", version.ref = "korlibs" }
 
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 
