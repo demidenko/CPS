@@ -237,9 +237,9 @@ object CodeforcesApi: PlatformApi {
 
         fun contestsWith(handle: String) = "$main/contests/with/$handle"
 
-        fun submission(submission: CodeforcesSubmission) = "$main/contest/${submission.contestId}/submission/${submission.id}"
+        fun submission(submission: CodeforcesSubmission) = contest(submission.contestId) + "/submission/${submission.id}"
 
-        fun problem(contestId: Int, problemIndex: String) = "$main/contest/$contestId/problem/$problemIndex"
+        fun problem(contestId: Int, problemIndex: String) = contest(contestId) + "/problem/$problemIndex"
     }
 }
 
