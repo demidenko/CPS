@@ -14,6 +14,7 @@ class CodeforcesAPIErrorResponse internal constructor(
 
         if (isContestRatingUnavailable()) return CodeforcesApiContestRatingUnavailableException(comment)
         ifIsContestNotStarted { return CodeforcesApiContestNotStartedException(comment, contestId = it) }
+        ifIsContestNotFound { return CodeforcesApiContestNotFoundException(comment, contestId = it) }
 
         if (isNotAllowedToReadThatBlog()) return CodeforcesApiNotAllowedReadBlogException(comment)
 
@@ -82,6 +83,8 @@ internal constructor(comment: String): CodeforcesApiException(comment)
 class CodeforcesApiContestNotStartedException
 internal constructor(comment: String, val contestId: Int): CodeforcesApiException(comment)
 
+class CodeforcesApiContestNotFoundException
+internal constructor(comment: String, val contestId: Int): CodeforcesApiException(comment)
 
 
 private inline fun String.ifSurrounded(prefix: String, suffix: String, block: (String) -> Unit) {

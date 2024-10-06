@@ -1,6 +1,7 @@
 package com.demich.cps.contests.monitors
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingUnavailableException
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
@@ -109,6 +110,9 @@ private suspend inline fun CodeforcesMonitorDataStore.getStandingsData(
         lastRequest(false)
         if (e is CodeforcesApiContestNotStartedException && e.contestId == contestId) {
             contestInfo.update { it.copy(phase = CodeforcesContestPhase.BEFORE) }
+        }
+        if (e is CodeforcesApiContestNotFoundException && e.contestId == contestId) {
+            reset()
         }
     }.onSuccess { standings ->
         lastRequest(true)
