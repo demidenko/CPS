@@ -47,11 +47,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
     val ratingChangeWaiter = RatingChangeWaiter(contestId, handle, onRatingChange)
 
     val mainJob = scope.launchWhileActive {
-        val prevParticipationType = participationType()
-
-        getStandingsData(contestId, handle)
-
-        if (isBecomeContestant(old = prevParticipationType, new = participationType())) {
+        getStandingsData(contestId, handle) {
             return@launchWhileActive Duration.ZERO
         }
 
@@ -97,12 +93,17 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
         .launchIn(scope)
 }
 
-private suspend fun CodeforcesMonitorDataStore.getStandingsData(contestId: Int, handle: String) {
+private suspend inline fun CodeforcesMonitorDataStore.getStandingsData(
+    contestId: Int,
+    handle: String,
+    onOfficialChanged: () -> Unit
+) {
+    val participationType = participationType()
     CodeforcesApi.runCatching {
         getContestStandings(
             contestId = contestId,
             handle = handle,
-            includeUnofficial = participationType() != CodeforcesParticipationType.CONTESTANT
+            includeUnofficial = !participationType.isOfficial()
         )
     }.onFailure { e ->
         lastRequest(false)
@@ -112,15 +113,20 @@ private suspend fun CodeforcesMonitorDataStore.getStandingsData(contestId: Int, 
     }.onSuccess { standings ->
         lastRequest(true)
         applyStandings(standings)
+        val newParticipationType = participationType()
+        if (isOfficialChanged(old = participationType, new = newParticipationType)) {
+            onOfficialChanged()
+        }
     }
 }
 
-private fun isBecomeContestant(
+private fun CodeforcesParticipationType.isOfficial(): Boolean =
+    this == CodeforcesParticipationType.CONTESTANT
+
+private fun isOfficialChanged(
     old: CodeforcesParticipationType,
     new: CodeforcesParticipationType
-): Boolean {
-    return new == CodeforcesParticipationType.CONTESTANT && old != CodeforcesParticipationType.CONTESTANT
-}
+): Boolean = new.isOfficial() != old.isOfficial()
 
 //optimized for write
 private suspend fun CodeforcesMonitorDataStore.applyStandings(
@@ -143,7 +149,7 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
         party.participantType.let {
             val old = prefs[participationType]
             prefs[participationType] = it
-            if (isBecomeContestant(old = old, new = it)) return@edit
+            if (isOfficialChanged(old = old, new = it)) return@edit
         }
         prefs[contestantRank] = rank
     }
