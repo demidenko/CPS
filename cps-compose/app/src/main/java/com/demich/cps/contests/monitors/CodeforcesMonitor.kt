@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -73,7 +74,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
         }
 
         getDelay(
-            contestPhase = contestInfo().phase,
+            contest = contestInfo(),
             ratingChangeWaiter = ratingChangeWaiter
         )
     }
@@ -149,14 +150,16 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
 }
 
 private suspend fun getDelay(
-    contestPhase: CodeforcesContestPhase,
+    contest: CodeforcesContest,
     ratingChangeWaiter: RatingChangeWaiter
 ): Duration {
-    return when (contestPhase) {
+    return when (contest.phase) {
         CodeforcesContestPhase.CODING -> 10.seconds
         CodeforcesContestPhase.PENDING_SYSTEM_TEST -> 15.seconds
         CodeforcesContestPhase.SYSTEM_TEST -> 3.seconds
-        CodeforcesContestPhase.FINISHED -> ratingChangeWaiter.getDelayOnFinished()
+        CodeforcesContestPhase.FINISHED -> {
+            ratingChangeWaiter.getDelayOnFinished(contestEnd = contest.startTime + contest.duration)
+        }
         else -> 5.seconds
     }
 }
@@ -167,11 +170,9 @@ private class RatingChangeWaiter(
     val handle: String,
     val onRatingChange: (CodeforcesRatingChange) -> Unit
 ) {
-    private val waitingStartTime by lazy { getCurrentTime() }
-
-    suspend fun getDelayOnFinished(): Duration {
+    suspend fun getDelayOnFinished(contestEnd: Instant): Duration {
         if (isRatingChangeDone()) return Duration.INFINITE
-        val waitingTime = getCurrentTime() - waitingStartTime
+        val waitingTime = getCurrentTime() - contestEnd
         return when {
             waitingTime < 30.minutes -> 10.seconds
             waitingTime < 1.hours -> 30.seconds
