@@ -201,8 +201,8 @@ private fun StandingsRow(
             Row(modifier = modifier) {
                 contestData.problems.forEach {
                     ProblemColumn(
-                        problemName = it.first,
-                        problemResult = it.second,
+                        problemName = it.name,
+                        problemResult = it.result,
                         contestType = contestData.contestInfo.type,
                         modifier = Modifier.weight(1f)
                     )

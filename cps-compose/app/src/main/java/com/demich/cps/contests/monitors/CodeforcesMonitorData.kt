@@ -11,7 +11,7 @@ data class CodeforcesMonitorData(
     val contestInfo: CodeforcesContest,
     val contestPhase: ContestPhase,
     val contestantRank: ContestRank,
-    val problems: List<Pair<String, ProblemResult>>
+    val problems: List<ProblemInfo>
 ) {
     val contestId: Int get() = contestInfo.id
 
@@ -24,6 +24,11 @@ data class CodeforcesMonitorData(
     data class ContestRank(
         val rank: Int,
         val participationType: CodeforcesParticipationType
+    )
+
+    data class ProblemInfo(
+        val name: String,
+        val result: ProblemResult
     )
 
     sealed interface ProblemResult {

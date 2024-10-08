@@ -29,11 +29,11 @@ class CodeforcesMonitorNotifier(
         if (setContestName(contestData.contestInfo.name)) changed = true
         if (setContestPhase(contestData.contestPhase)) changed = true
         if (setContestantRank(contestData.contestantRank)) changed = true
-        if (setProblemNames(contestData.problems.map { it.first })) changed = true
+        if (setProblemNames(contestData.problems.map { it.name })) changed = true
         contestData.problems.forEach { //don't confuse with .any{} !!
             if (setProblemResult(
-                problemName = it.first,
-                problemResult = it.second,
+                problemName = it.name,
+                problemResult = it.result,
                 contestType = contestData.contestInfo.type
             )) changed = true
         }
