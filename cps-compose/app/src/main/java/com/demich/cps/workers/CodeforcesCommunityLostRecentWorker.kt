@@ -168,11 +168,18 @@ private fun Collection<CodeforcesBlogEntry>.filterIdGreaterThen(id: Int) = filte
 private suspend fun Collection<CodeforcesBlogEntry>.fixAndFilterColorTag(minRatingColorTag: CodeforcesColorTag) =
     fixedHandleColors().filter { it.authorColorTag >= minRatingColorTag }
 
-private inline fun Collection<CodeforcesBlogEntry>.filterNewEntries(isNew: (CodeforcesBlogEntry) -> Boolean) =
-    sortedBy { it.id }.run {
-        val indexOfFirstNew = partitionPoint { !isNew(it) }
-        subList(fromIndex = indexOfFirstNew, toIndex = size)
-    }
+private inline fun Collection<CodeforcesBlogEntry>.filterNewEntries(
+    isFinalFilter: Boolean = false,
+    isNew: (CodeforcesBlogEntry) -> Boolean
+) = sortedBy { it.id }.run {
+    val indexOfFirstNew =
+        if (isFinalFilter) {
+            indexOfLast { !isNew(it) } + 1
+        } else {
+            partitionPoint { !isNew(it) }
+        }
+    subList(fromIndex = indexOfFirstNew, toIndex = size)
+}
 
 private suspend inline fun findSuspects(
     blogEntries: Collection<CodeforcesBlogEntry>,
@@ -211,7 +218,7 @@ private suspend inline fun findSuspects(
     blogEntries
         .filterIdGreaterThen(lastNotNewIdItem()?.blogEntryId ?: Int.MIN_VALUE)
         .fixAndFilterColorTag(minRatingColorTag)
-        .filterNewEntries { isNew(cachedApi.getCreationTime(blogEntryId = it.id)) }
+        .filterNewEntries(isFinalFilter = true) { isNew(cachedApi.getCreationTime(blogEntryId = it.id)) }
         .forEach {
             val blogEntry = it.copy(
                 creationTime = cachedApi.getCreationTime(blogEntryId = it.id),
