@@ -15,7 +15,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.kotlin_stdlib_boost.mapToSet
-import com.demich.kotlin_stdlib_boost.partitionPoint
+import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -176,7 +176,7 @@ private inline fun Collection<CodeforcesBlogEntry>.filterNewEntries(
         if (isFinalFilter) {
             indexOfLast { !isNew(it) } + 1
         } else {
-            partitionPoint { !isNew(it) }
+            partitionIndex { !isNew(it) }
         }
     subList(fromIndex = indexOfFirstNew, toIndex = size)
 }

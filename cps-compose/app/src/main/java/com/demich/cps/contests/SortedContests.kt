@@ -19,7 +19,7 @@ import com.demich.cps.utils.flowOfCurrentTimeEachSecond
 import com.demich.cps.utils.getCurrentTime
 import com.demich.kotlin_stdlib_boost.isSortedWith
 import com.demich.kotlin_stdlib_boost.minOfNotNull
-import com.demich.kotlin_stdlib_boost.partitionPoint
+import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
@@ -71,7 +71,7 @@ private interface ContestsSorter {
 }
 
 private fun List<Contest>.firstFinished(currentTime: Instant) =
-    partitionPoint { it.getPhase(currentTime) != Contest.Phase.FINISHED }
+    partitionIndex { it.getPhase(currentTime) != Contest.Phase.FINISHED }
 
 private class ContestsBruteSorter: ContestsSorter {
     override var contests: SortedContests = SortedContests(emptyList(), 0)

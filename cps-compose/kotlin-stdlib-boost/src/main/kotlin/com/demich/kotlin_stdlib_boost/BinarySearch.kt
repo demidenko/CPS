@@ -13,5 +13,5 @@ inline fun binarySearchFirstFalse(first: Int, last: Int, predicate: (Int) -> Boo
     return r
 }
 
-inline fun <T> List<T>.partitionPoint(predicate: (T) -> Boolean): Int = 
+inline fun <T> List<T>.partitionIndex(predicate: (T) -> Boolean): Int =
     binarySearchFirstFalse(first = 0, last = size) { predicate(get(it)) }
