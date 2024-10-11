@@ -1,7 +1,7 @@
 [versions]
 androidGradlePlugin = "8.7.0"
-kotlin = "2.0.20"
-ksp = "2.0.20-1.0.25"
+kotlin = "2.0.21"
+ksp = "2.0.21-1.0.25"
 
 serialization = "1.7.3"
 datetime = "0.6.1"
