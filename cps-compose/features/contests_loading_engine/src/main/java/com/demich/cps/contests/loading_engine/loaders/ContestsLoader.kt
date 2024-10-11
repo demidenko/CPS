@@ -31,7 +31,7 @@ abstract class ContestsLoader(val type: ContestsLoaderType) {
             platform = platform,
             dateConstraints = dateConstraints
         ).apply {
-            require(all { it.platform == platform })
+            check(all { it.platform == platform })
         }
     }
 }
@@ -65,7 +65,7 @@ abstract class ContestsLoaderMultiple(type: ContestsLoaderType): ContestsLoader(
             platforms = setOfPlatforms,
             dateConstraints = dateConstraints
         ).apply {
-            require(all { it.platform in setOfPlatforms })
+            check(all { it.platform in setOfPlatforms })
         }
     }
 

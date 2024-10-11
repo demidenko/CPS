@@ -31,7 +31,7 @@ internal class RatingGraphRectangles(
         }
         addBounds(x = Long.MAX_VALUE, bounds = manager.ratingsUpperBounds)
     }.apply {
-        require(isSortedWith(compareBy<Pair<Point, HandleColor>> { it.first.x }.thenBy { it.first.y }))
+        check(isSortedWith(compareBy<Pair<Point, HandleColor>> { it.first.x }.thenBy { it.first.y }))
     }
 
     fun getHandleColor(point: Point): HandleColor =

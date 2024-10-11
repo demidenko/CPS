@@ -58,7 +58,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
 
     private fun setLoadingStatus(platform: Contest.Platform, loadingStatus: LoadingStatus) =
         loadingStatuses.edit {
-            if (loadingStatus == LoadingStatus.LOADING) require(this[platform] != LoadingStatus.LOADING)
+            if (loadingStatus == LoadingStatus.LOADING) check(this[platform] != LoadingStatus.LOADING)
             if (loadingStatus == LoadingStatus.PENDING) remove(platform)
             else this[platform] = loadingStatus
         }

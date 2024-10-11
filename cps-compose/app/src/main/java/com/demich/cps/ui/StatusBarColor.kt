@@ -110,7 +110,7 @@ private fun<U: RatedUserInfo> RatedAccountManager<U>.getRank(userInfo: U?): Rate
             val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
             val j = rankedHandleColorsList.indexOfLast { handleColor == it }
             val pos = ratingsUpperBounds.indexOfFirst { it.handleColor == handleColor }
-            require(i != -1 && j >= i && pos != -1)
+            check(i != -1 && j >= i && pos != -1)
             val lower = if (pos > 0) ratingsUpperBounds[pos-1].ratingUpperBound else 0
             val upper = ratingsUpperBounds[pos].ratingUpperBound
             val blockLength = (upper - lower).toDouble() / (j - i + 1)

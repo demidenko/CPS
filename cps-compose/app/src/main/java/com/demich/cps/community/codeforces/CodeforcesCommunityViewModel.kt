@@ -170,7 +170,7 @@ private class CodeforcesDataLoader<T: Any>(
     fun launchLoadIfActive(locale: CodeforcesLocale) {
         if (inactive) return
         loadingStatus.update {
-            require(it != LoadingStatus.LOADING)
+            check(it != LoadingStatus.LOADING)
             LoadingStatus.LOADING
         }
         scope.launch {

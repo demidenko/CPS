@@ -52,7 +52,7 @@ class ProgressBarsViewModel: ViewModel() {
                     }
                 }
             }
-            require(progressBarInfo == null)
+            check(progressBarInfo == null)
             block {
                 progressBarInfo = it
             }

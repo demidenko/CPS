@@ -106,7 +106,7 @@ private suspend inline fun getSuggestions(
         .filter { it.verdict == CodeforcesProblemVerdict.OK }
         .mapToSet { it.problem.index }
 
-    require(acceptedStats.map { it.key.index }.containsAll(solvedIndices))
+    check(acceptedStats.map { it.key.index }.containsAll(solvedIndices))
 
     alreadySuggested.filter { it.contestId == contestId && it.index in solvedIndices }.let { solved ->
         if (solved.isNotEmpty()) toRemoveAsSolved(solved)

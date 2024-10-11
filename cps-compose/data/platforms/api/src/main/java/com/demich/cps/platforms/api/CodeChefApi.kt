@@ -47,7 +47,7 @@ object CodeChefApi: PlatformApi {
                 println("codechef x-csrf-token start recalc...")
                 extractCSRFToken(source = client.getText("${urls.main}/ratings/all")).also {
                     println("codechef x-csrf-token = $it")
-                    require(it.length == 64)
+                    check(it.length == 64)
                 }
             }.also { tokenDeferred = it }
             return d.await()
@@ -126,7 +126,7 @@ data class CodeChefRatingChange(
 
 private fun extractCSRFToken(source: String): String {
     var i = source.indexOf("window.csrfToken")
-    require(i != -1)
+    check(i != -1)
     i = source.indexOf('=', i + 1)
     i = source.indexOf('"', i)
     return source.substring(i+1, source.indexOf('"', i+1))

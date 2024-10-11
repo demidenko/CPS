@@ -48,7 +48,7 @@ abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagerType):
 
     final override fun makeOKInfoSpan(userInfo: U, cpsColors: CPSColors): AnnotatedString =
         with(userInfo) {
-            require(status == STATUS.OK)
+            check(status == STATUS.OK)
             makeOKSpan(
                 text = handle + " " + ratingToString(),
                 rating = rating,

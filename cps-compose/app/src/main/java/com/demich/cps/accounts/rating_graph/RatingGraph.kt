@@ -182,7 +182,7 @@ private fun RatingGraphHeader(
             )
         }
         is FilterHeader -> {
-            require(header.ratingChanges.isNotEmpty())
+            check(header.ratingChanges.isNotEmpty())
             TextButtonsSelectRow(
                 values = remember(header.ratingChanges, header.time) {
                     makeValidFilters(header.ratingChanges, header.time)

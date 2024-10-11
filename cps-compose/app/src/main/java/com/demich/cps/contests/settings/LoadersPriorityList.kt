@@ -98,7 +98,7 @@ fun LoadersPriorityList(
                 },
                 availableOptions = availableOptions,
                 onOptionSelected = { newType ->
-                    require(newType != loaderType)
+                    check(newType != loaderType)
                     val newList = priorityList.toMutableList()
                     newList.remove(newType)
                     newList[newList.indexOf(loaderType)] = newType
@@ -110,7 +110,7 @@ fun LoadersPriorityList(
             PriorityListItemAdd(
                 availableOptions = availableOptions - priorityList,
                 onOptionSelected = { loaderType ->
-                    require(loaderType !in priorityList)
+                    check(loaderType !in priorityList)
                     onListChange(priorityList + loaderType)
                 }
             )

@@ -211,7 +211,7 @@ object CodeforcesUtils {
                     )
                 } else {
                     //latest recent comments has no blog entries in recent action, so most likely not low rated
-                    require(index == blogEntries.size)
+                    check(index == blogEntries.size)
                     blogEntries.add(blogEntry)
                 }
             }
@@ -257,7 +257,7 @@ object CodeforcesUtils {
     suspend fun getUsersInfo(handles: Set<String>, doRedirect: Boolean): Map<String, CodeforcesUserInfo> {
         return CodeforcesApi.runCatching {
             getUsers(handles = handles, checkHistoricHandles = doRedirect)
-                .apply { require(size == handles.size) }
+                .apply { check(size == handles.size) }
         }.map { infos ->
             //relying to cf api return in same order
             handles.zip(infos.map { CodeforcesUserInfo(it) }).toMap()
@@ -269,7 +269,7 @@ object CodeforcesUtils {
             }
             handles.associateWith { handle -> CodeforcesUserInfo(handle = handle, status = STATUS.FAILED) }
         }.apply {
-            require(handles.all { it in this })
+            check(handles.all { it in this })
         }
     }
 
