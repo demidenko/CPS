@@ -39,13 +39,8 @@ android {
         buildConfig = true
     }
 
-    kotlinOptions {
-        freeCompilerArgs += listOf(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
-                    "${projectDir}/compose_compiler_config.conf"
-        )
-
+    composeCompiler {
+        stabilityConfigurationFiles.add(project.layout.projectDirectory.file("compose_compiler_config.conf"))
     }
 
     packaging {
