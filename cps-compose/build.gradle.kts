@@ -26,7 +26,7 @@ tasks.register<Delete>("clean") {
 
 
 fun BaseExtension.baseConfig() {
-    compileSdkVersion(apiLevel = 34)
+    compileSdkVersion(apiLevel = 35)
 
     defaultConfig.apply {
         minSdk = 26
@@ -35,11 +35,6 @@ fun BaseExtension.baseConfig() {
     tasks.withType<KotlinCompile> {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
-            freeCompilerArgs.addAll(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
-                        "${project.rootDir.absolutePath}/compose_compiler_config.conf"
-            )
         }
     }
 
