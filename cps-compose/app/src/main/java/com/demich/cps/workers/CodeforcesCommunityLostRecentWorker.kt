@@ -181,13 +181,16 @@ private inline fun Collection<CodeforcesBlogEntry>.filterNewEntries(
     subList(fromIndex = indexOfFirstNew, toIndex = size)
 }
 
-private suspend inline fun findSuspects(
+//private suspend inline fun findSuspects(
+private suspend fun findSuspects(
     blogEntries: Collection<CodeforcesBlogEntry>,
     locale: CodeforcesLocale,
     minRatingColorTag: CodeforcesColorTag,
-    crossinline isNew: (Instant) -> Boolean,
+//    crossinline isNew: (Instant) -> Boolean,
+    isNew: (Instant) -> Boolean,
     lastNotNewIdItem: DataStoreItem<CodeforcesLostHint?>,
-    onSuspect: (CodeforcesBlogEntry) -> Unit
+//    onSuspect: (CodeforcesBlogEntry) -> Unit
+    onSuspect: suspend (CodeforcesBlogEntry) -> Unit
 ) {
     //ensure hint in case isNew logic changes
     lastNotNewIdItem.update {
