@@ -20,6 +20,7 @@ operator fun Instant.rem(period: Duration): Duration {
 fun Instant.floorBy(period: Duration): Instant = this - this % period
 
 
+//TODO replace to kotlin datetime formatters
 fun Instant.format(dateFormat: String): String =
     DateFormat.format(dateFormat, toEpochMilliseconds()).toString()
 
@@ -36,8 +37,7 @@ fun timeDifference(t: Duration): String =
         t < 2.minutes -> "minute"
         t < 2.hours -> "${t.inWholeMinutes} minutes"
         t < 24.hours * 2 -> "${t.inWholeHours} hours"
-        t < 7.days * 2 -> "${t.inWholeDays} days"
-        t < 31.days * 2 -> "${t.inWholeDays / 7} weeks"
+        t < 31.days * 2 -> "${t.inWholeDays} days"
         t < 365.days * 2 -> "${t.inWholeDays / 31} months"
         else -> "${t.inWholeDays / 365} years"
     }
