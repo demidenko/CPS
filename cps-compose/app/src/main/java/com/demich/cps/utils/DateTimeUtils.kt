@@ -17,7 +17,7 @@ operator fun Instant.rem(period: Duration): Duration {
     return (thisMillis % periodMillis).milliseconds
 }
 
-fun Instant.floorBy(period: Duration): Instant = this - this % period
+fun Instant.truncateBy(period: Duration): Instant = this - this % period
 
 
 //TODO replace to kotlin datetime formatters
@@ -25,11 +25,11 @@ fun Instant.format(dateFormat: String): String =
     DateFormat.format(dateFormat, toEpochMilliseconds()).toString()
 
 fun Duration.toHHMMSS(): String = toComponents { hours, minutes, seconds, _ ->
-    String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    String.format(null, "%02d:%02d:%02d", hours, minutes, seconds)
 }
 
 fun Duration.toMMSS(): String = toComponents { minutes, seconds, _ ->
-    String.format("%02d:%02d", minutes, seconds)
+    String.format(null, "%02d:%02d", minutes, seconds)
 }
 
 fun timeDifference(t: Duration): String =

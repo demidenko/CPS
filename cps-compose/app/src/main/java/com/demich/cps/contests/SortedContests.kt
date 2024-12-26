@@ -14,7 +14,7 @@ import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.flowOfContestId
 import com.demich.cps.utils.context
-import com.demich.cps.utils.floorBy
+import com.demich.cps.utils.truncateBy
 import com.demich.cps.utils.flowOfCurrentTimeEachSecond
 import com.demich.cps.utils.getCurrentTime
 import com.demich.kotlin_stdlib_boost.isSortedWith
@@ -144,7 +144,7 @@ internal fun produceSortedContestsWithTime(
 
     val states = remember {
         val initContests = runBlocking { flowOfContests(context).first() }
-        val currentTime = getCurrentTime().floorBy(1.seconds)
+        val currentTime = getCurrentTime().truncateBy(1.seconds)
         val sorter = ContestsBruteSorter()
         sorter.apply(initContests, currentTime)
         val contestsState = mutableStateOf(sorter.contests)
