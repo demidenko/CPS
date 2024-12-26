@@ -6,9 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 
 
@@ -41,8 +39,7 @@ class NewEntriesDataStoreItem (
 ) {
     val flow get() = item.flow
 
-    private fun getCurrentDate(): LocalDate =
-        getCurrentTime().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    private fun getCurrentDate(): LocalDate = getCurrentTime().toSystemDateTime().date
 
     suspend fun markAtLeast(id: Int, type: NewEntryType) = markAtLeast(listOf(id), type)
 

@@ -1,8 +1,10 @@
 package com.demich.cps.utils
 
-import android.text.format.DateFormat
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -10,6 +12,9 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 fun getCurrentTime() = Clock.System.now()
+
+fun Instant.toSystemDateTime(): LocalDateTime =
+    toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
 
 operator fun Instant.rem(period: Duration): Duration {
     val periodMillis = period.inWholeMilliseconds
@@ -19,10 +24,6 @@ operator fun Instant.rem(period: Duration): Duration {
 
 fun Instant.truncateBy(period: Duration): Instant = this - this % period
 
-
-//TODO replace to kotlin datetime formatters
-fun Instant.format(dateFormat: String): String =
-    DateFormat.format(dateFormat, toEpochMilliseconds()).toString()
 
 fun Duration.toHHMMSS(): String = toComponents { hours, minutes, seconds, _ ->
     String.format(null, "%02d:%02d:%02d", hours, minutes, seconds)

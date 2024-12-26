@@ -21,6 +21,7 @@ import com.demich.cps.contests.isVirtual
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
+import com.demich.cps.utils.toSystemDateTime
 
 @Composable
 fun ContestItem(
@@ -104,7 +105,7 @@ private fun ContestItemFooter(
             counter = "in " + data.counter
         }
         Contest.Phase.RUNNING -> {
-            date = "ends " + contest.endTime.contestDate()
+            date = "ends " + contest.endTime.toSystemDateTime().contestDate()
             counter = "left " + data.counter
         }
         Contest.Phase.FINISHED -> {

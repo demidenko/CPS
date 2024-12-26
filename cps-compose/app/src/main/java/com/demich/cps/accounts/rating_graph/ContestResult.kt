@@ -17,11 +17,11 @@ import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.RatedUserInfo
+import com.demich.cps.contests.ratingChangeDate
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.format
 import com.demich.cps.utils.toSignedString
 import kotlinx.datetime.Instant
 
@@ -63,7 +63,7 @@ private fun ContestResult(
             )
             Text(
                 text = ratingChange.run {
-                    date.format("dd.MM.yyyy HH:mm") + "  rank: $rank"
+                    date.ratingChangeDate() + "  rank: $rank"
                 },
                 fontSize = subTitleFontSize,
                 color = cpsColors.contentAdditional
