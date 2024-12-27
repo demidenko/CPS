@@ -22,35 +22,41 @@ fun contestTimeDifference(fromTime: Instant, toTime: Instant): String {
     return timeDifference(t)
 }
 
-private val HHMMFormat = LocalTime.Format {
-    hour()
-    char(':')
-    minute()
+private object Formats {
+    val HHMM = LocalTime.Format {
+        hour()
+        char(':')
+        minute()
+    }
+
+    val ddMM = LocalDate.Format {
+        dayOfMonth()
+        char('.')
+        monthNumber()
+    }
+
+    val ddMME = LocalDate.Format {
+        date(ddMM)
+        char(' ')
+        dayOfWeek(
+            names = when (Locale.current.language) {
+                "ru" -> DayOfWeekNames(listOf("пн", "вт", "ср", "чт", "пт", "сб", "вс"))
+                else -> DayOfWeekNames.ENGLISH_ABBREVIATED
+            }
+        )
+    }
 }
 
-private val ddMMFormat = LocalDate.Format {
-    dayOfMonth()
-    char('.')
-    monthNumber()
-}
+private fun LocalDateTime.formatDate() = date.format(Formats.ddMME)
+private fun LocalDateTime.formatTime() = time.format(Formats.HHMM)
 
-private val ruWeekNames by lazy { DayOfWeekNames(listOf("пн", "вт", "ср", "чт", "пт", "сб", "вс")) }
-
-private fun LocalDate.formated(): String = format(LocalDate.Format {
-    date(ddMMFormat)
-    char(' ')
-    dayOfWeek(names = if (Locale.current.language == "ru") ruWeekNames else DayOfWeekNames.ENGLISH_ABBREVIATED)
-})
-
-private fun LocalTime.formatted(): String = format(HHMMFormat)
-
-fun LocalDateTime.contestDate() = date.formated() + " " + time.formatted()
+fun LocalDateTime.contestDate() = "${formatDate()} ${formatTime()}"
 
 fun Contest.dateShortRange(): String {
     val startLocalDateTime = startTime.toSystemDateTime()
     val endLocalDateTime = endTime.toSystemDateTime()
     val start = startLocalDateTime.contestDate()
-    val end = if (duration < 1.days) endLocalDateTime.time.formatted() else "..."
+    val end = if (duration < 1.days) endLocalDateTime.formatTime() else "..."
     return "$start-$end"
 }
 
@@ -60,15 +66,15 @@ fun Contest.dateRange(): String {
     val endLocalDateTime = endTime.toSystemDateTime()
     val start = startLocalDateTime.contestDate()
     val end = if (startLocalDateTime.date == endLocalDateTime.date)
-        endLocalDateTime.time.formatted() else endLocalDateTime.contestDate()
+        endLocalDateTime.formatTime() else endLocalDateTime.contestDate()
     return "$start - $end"
 }
 
 fun Instant.ratingChangeDate(): String =
     toSystemDateTime().format(LocalDateTime.Format {
-        date(ddMMFormat)
+        date(Formats.ddMM)
         char('.')
         year()
         char(' ')
-        time(HHMMFormat)
+        time(Formats.HHMM)
     })
