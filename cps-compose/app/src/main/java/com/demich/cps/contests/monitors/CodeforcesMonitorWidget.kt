@@ -1,9 +1,7 @@
 package com.demich.cps.contests.monitors
 
-import androidx.compose.animation.core.animateInt
-import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -289,27 +287,32 @@ private fun Rank(
     contestantRank: CodeforcesMonitorData.ContestRank,
     modifier: Modifier
 ) {
-    val transition = updateTransition(targetState = contestantRank.rank, label = null)
-    val rank by transition.animateInt(
-        transitionSpec = {
-            if (initialState > 0 && targetState > 0) tween()
-            else snap()
-        },
-        targetValueByState = { it },
-        label = "rank"
-    )
+    when (contestantRank.rank) {
+        null -> {
+            Text(
+                text = "rank: no",
+                modifier = modifier,
+            )
+        }
+        else -> {
+            val rank by animateIntAsState(
+                targetValue = contestantRank.rank,
+                animationSpec = tween()
+            )
 
-    val rankText = buildString {
-        if (rank > 0) {
-            if (contestantRank.participationType != CodeforcesParticipationType.CONTESTANT) append('*')
-            append(rank)
+            val rankText = buildString {
+                if (rank > 0) {
+                    if (contestantRank.participationType != CodeforcesParticipationType.CONTESTANT) append('*')
+                    append(rank)
+                }
+            }
+
+            Text(
+                text = "rank: $rankText",
+                modifier = modifier,
+            )
         }
     }
-
-    Text(
-        text = "rank: $rankText",
-        modifier = modifier,
-    )
 }
 
 @Preview(showBackground = true)
