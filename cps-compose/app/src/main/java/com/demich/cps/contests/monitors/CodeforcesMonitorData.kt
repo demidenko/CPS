@@ -22,7 +22,7 @@ data class CodeforcesMonitorData(
     }
 
     data class ContestRank(
-        val rank: Int,
+        val rank: Int?,
         val participationType: CodeforcesParticipationType
     )
 

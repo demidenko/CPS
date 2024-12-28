@@ -40,15 +40,14 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
     }
 
     internal val participationType = itemEnum(name = "participation_type", defaultValue = CodeforcesParticipationType.NOT_PARTICIPATED)
-    internal val contestantRank = itemInt(name = "contestant_rank", defaultValue = -1)
+
+    internal val contestantRank = itemIntNullable(name = "contestant_rank")
 
     internal val problemResults = jsonCPS.itemList<CodeforcesMonitorProblemResult>(name = "problem_results")
 
-    internal val submissionsInfo = jsonCPS.itemMap<String, List<CodeforcesMonitorSubmissionInfo>>(
-        name = "problems_submissions_info"
-    )
+    internal val submissionsInfo = jsonCPS.itemMap<String, List<CodeforcesMonitorSubmissionInfo>>(name = "problems_submissions_info")
 
-    internal val sysTestPercentage = itemIntNullable("sys_test_percentage")
+    internal val sysTestPercentage = itemIntNullable(name = "sys_test_percentage")
 
     internal val notifiedSubmissionsIds = jsonCPS.itemSet<Long>(name = "submissions_notified")
 

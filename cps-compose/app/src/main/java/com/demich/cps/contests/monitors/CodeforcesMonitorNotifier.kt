@@ -40,7 +40,7 @@ class CodeforcesMonitorNotifier(
         if (changed) submitNotification()
     }
 
-    private var _contestantRank = CodeforcesMonitorData.ContestRank(rank = -1, participationType = CodeforcesParticipationType.NOT_PARTICIPATED)
+    private var _contestantRank = CodeforcesMonitorData.ContestRank(rank = null, participationType = CodeforcesParticipationType.NOT_PARTICIPATED)
     private fun setContestantRank(contestantRank: CodeforcesMonitorData.ContestRank): Boolean {
         if (_contestantRank == contestantRank) return false
         _contestantRank = contestantRank
