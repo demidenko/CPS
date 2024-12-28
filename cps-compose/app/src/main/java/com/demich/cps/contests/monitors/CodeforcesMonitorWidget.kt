@@ -301,10 +301,8 @@ private fun Rank(
             )
 
             val rankText = buildString {
-                if (rank > 0) {
-                    if (contestantRank.participationType != CodeforcesParticipationType.CONTESTANT) append('*')
-                    append(rank)
-                }
+                if (contestantRank.participationType != CodeforcesParticipationType.CONTESTANT) append('*')
+                append(rank)
             }
 
             Text(
