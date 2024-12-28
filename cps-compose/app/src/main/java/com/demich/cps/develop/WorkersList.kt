@@ -63,6 +63,7 @@ import com.demich.cps.workers.getProgressInfo
 import com.demich.cps.workers.isRunning
 import com.demich.cps.workers.stateOrCancelled
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -334,9 +335,9 @@ private fun ResultIcon(
 @ReadOnlyComposable
 private fun colorFor(workState: WorkInfo.State) = with(cpsColors) {
     when (workState) {
-        WorkInfo.State.ENQUEUED, WorkInfo.State.FAILED, WorkInfo.State.SUCCEEDED -> content
+        WorkInfo.State.ENQUEUED, WorkInfo.State.SUCCEEDED -> content
         WorkInfo.State.RUNNING -> success
-        WorkInfo.State.BLOCKED -> error
+        WorkInfo.State.BLOCKED, WorkInfo.State.FAILED -> error
         WorkInfo.State.CANCELLED -> contentAdditional
     }
 }
@@ -344,7 +345,12 @@ private fun colorFor(workState: WorkInfo.State) = with(cpsColors) {
 
 @Composable
 private fun CodeforcesMonitorDialog(onDismissRequest: () -> Unit, onStart: (Int) -> Unit) {
-    var contestId by rememberSaveable { mutableStateOf("") }
+    val context = context
+    var contestId: String by rememberSaveable {
+        mutableStateOf(value = runBlocking {
+            CodeforcesMonitorDataStore(context).contestId()?.toString() ?: ""
+        })
+    }
     CPSYesNoDialog(
         onDismissRequest = onDismissRequest,
         onConfirmRequest = { contestId.toIntOrNull()?.let(onStart) },
