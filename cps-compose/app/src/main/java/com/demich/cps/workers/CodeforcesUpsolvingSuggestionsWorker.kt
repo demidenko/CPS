@@ -49,23 +49,21 @@ class CodeforcesUpsolvingSuggestionsWorker(
             ?.handle
             ?: return Result.success()
 
-        val suggestedItem = dataStore.upsolvingSuggestedProblems
-
         val dateThreshold = workerStartTime - 90.days
-        suggestedItem.removeOlderThan(dateThreshold)
+        val suggestedItem = dataStore.upsolvingSuggestedProblems.also {
+            it.removeOlderThan(dateThreshold)
+        }
 
-        val ratingChanges = CodeforcesApi.getUserRatingChanges(handle)
+        val suggestedProblems = suggestedItem()
 
-        val alreadySuggested = suggestedItem()
-
-        ratingChanges
+        CodeforcesApi.getUserRatingChanges(handle)
             .filter { it.ratingUpdateTime >= dateThreshold }
             .sortedByDescending { it.ratingUpdateTime }
             .forEachWithProgress { ratingChange ->
                 getSuggestions(
                     handle = handle,
                     ratingChange = ratingChange,
-                    alreadySuggested = alreadySuggested,
+                    suggestedProblems = suggestedProblems,
                     toRemoveAsSolved = { solved ->
                         val solvedIds = solved.mapToSet { it.problemId }
                         suggestedItem.update {
@@ -85,7 +83,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
 private suspend inline fun getSuggestions(
     handle: String,
     ratingChange: CodeforcesRatingChange,
-    alreadySuggested: Collection<CodeforcesProblem>,
+    suggestedProblems: Collection<CodeforcesProblem>,
     toRemoveAsSolved: (List<CodeforcesProblem>) -> Unit,
     onNewSuggestion: (CodeforcesProblem) -> Unit
 ) {
@@ -108,17 +106,17 @@ private suspend inline fun getSuggestions(
 
     check(acceptedStats.map { it.key.index }.containsAll(solvedIndices))
 
-    alreadySuggested.filter { it.contestId == contestId && it.index in solvedIndices }.let { solved ->
+    val contestSuggested = suggestedProblems.filter { it.contestId == contestId }
+
+    contestSuggested.filter { it.index in solvedIndices }.let { solved ->
         if (solved.isNotEmpty()) toRemoveAsSolved(solved)
     }
 
-    val alreadySuggestedIndices = alreadySuggested
-        .filter { it.contestId == contestId }
-        .mapToSet { it.index }
+    val contestSuggestedIndices = contestSuggested.mapToSet { it.index }
 
     acceptedStats.forEach { (problem, solvers) ->
         if (solvers >= ratingChange.rank && problem.index !in solvedIndices) {
-            if (problem.index !in alreadySuggestedIndices) onNewSuggestion(problem)
+            if (problem.index !in contestSuggestedIndices) onNewSuggestion(problem)
         }
     }
 }
