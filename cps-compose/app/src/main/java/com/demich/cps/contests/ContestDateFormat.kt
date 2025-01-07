@@ -13,7 +13,6 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.char
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
 fun contestTimeDifference(fromTime: Instant, toTime: Instant): String {
@@ -56,7 +55,7 @@ fun Contest.dateShortRange(): String {
     val startLocalDateTime = startTime.toSystemDateTime()
     val endLocalDateTime = endTime.toSystemDateTime()
     val start = startLocalDateTime.contestDate()
-    val end = if (duration < 1.days) endLocalDateTime.formatTime() else "..."
+    val end = if (eventDuration < 24.hours) endLocalDateTime.formatTime() else "..."
     return "$start-$end"
 }
 
