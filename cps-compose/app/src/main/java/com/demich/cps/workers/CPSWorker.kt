@@ -51,7 +51,7 @@ abstract class CPSWorker(
                         resultType = result.toType()
                     )
                 }
-                if (result.toType() == ResultType.RETRY) {
+                if (result.toType() != ResultType.SUCCESS) {
                     work.enqueueAsap()
                 }
             }
