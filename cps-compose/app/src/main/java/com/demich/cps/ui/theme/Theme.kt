@@ -34,12 +34,11 @@ private fun DarkLightMode.isDarkMode(): Boolean =
     if (this == DarkLightMode.SYSTEM) isSystemInDarkTheme() else this == DarkLightMode.DARK
 
 private fun setSystemBarsStyle(context: Context, isDarkMode: Boolean) {
-    val style = if (isDarkMode) SystemBarStyle.dark(Color.TRANSPARENT)
-    else SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-    (context as ComponentActivity).enableEdgeToEdge(
-        statusBarStyle = style,
-        navigationBarStyle = style
-    )
+    if (context is ComponentActivity) {
+        val style = if (isDarkMode) SystemBarStyle.dark(Color.TRANSPARENT)
+            else SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+        context.enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
+    }
 }
 
 @Composable
