@@ -4,10 +4,10 @@ kotlin = "2.1.0"
 ksp = "2.1.0-1.0.29"
 
 serialization = "1.8.0"
-datetime = "0.6.1"
+datetime = "0.6.2"
 coroutines = "1.10.1"
 
-ktor = "3.0.3"
+ktor = "3.1.0"
 
 core = "1.15.0"
 work = "2.10.0"
