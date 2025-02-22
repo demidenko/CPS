@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
@@ -44,12 +45,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.demich.datastore_itemized.DataStoreItem
-import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.random.Random
 
@@ -200,7 +199,7 @@ fun rememberFocusOnCreationRequester(): FocusRequester {
     val focusedState = rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(requester, focusedState) {
         if (!focusedState.value) {
-            awaitFrame() //instead of delay(100.milliseconds)
+            withFrameMillis {  }
             requester.requestFocus()
             focusedState.value = true
         }
