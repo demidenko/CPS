@@ -20,6 +20,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 abstract class CPSWorker(
@@ -39,18 +40,16 @@ abstract class CPSWorker(
         val workersInfo = CPSWorkersDataStore(context)
 
         val result = withContext(Dispatchers.IO) {
-            workersInfo.lastExecutions.edit {
-                this[work.name] = ExecutionEvent(start = workerStartTime)
-            }
+            workersInfo.append(ExecutionEvent(start = workerStartTime))
 
             smartRunWork().also { result ->
-                workersInfo.lastExecutions.edit {
-                    this[work.name] = ExecutionEvent(
+                workersInfo.append(
+                    ExecutionEvent(
                         start = workerStartTime,
                         end = getCurrentTime(),
                         resultType = result.toType()
                     )
-                }
+                )
                 if (result.toType() != ResultType.SUCCESS) {
                     work.enqueueAsap()
                 }
@@ -132,6 +131,22 @@ abstract class CPSWorker(
     ) {
         val duration: Duration? get() = end?.minus(start)
     }
+
+    private suspend fun CPSWorkersDataStore.append(event: ExecutionEvent) {
+        executions.edit {
+            val list = mutableListOf<ExecutionEvent>()
+            val dateThreshold = workerStartTime - 1.days
+            this[work.name]?.filterTo(list) { it.start >= dateThreshold }
+
+            if (list.isNotEmpty() && list.last().start == event.start) {
+                list[list.size - 1] = event
+            } else {
+                list.add(event)
+            }
+
+            this[work.name] = list
+        }
+    }
 }
 
 private const val KEY_PROGRESS = "cpsworker_progress"
@@ -149,6 +164,6 @@ class CPSWorkersDataStore(context: Context): ItemizedDataStore(context.workersDa
         private val Context.workersDataStore by dataStoreWrapper(name = "workers_info")
     }
 
-    //val executions = jsonCPS.itemMap<String, List<CPSWorker.ExecutionEvent>>("executions")
-    val lastExecutions = jsonCPS.itemMap<String, CPSWorker.ExecutionEvent>("last_executions")
+    val executions = jsonCPS.itemMap<String, List<CPSWorker.ExecutionEvent>>("executions")
+//    val lastExecutions = jsonCPS.itemMap<String, CPSWorker.ExecutionEvent>("last_executions")
 }

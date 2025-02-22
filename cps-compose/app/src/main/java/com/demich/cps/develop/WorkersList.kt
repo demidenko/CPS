@@ -144,15 +144,15 @@ private fun WorkersList(
     val periodicWorks = remember { context.getCPSWorks() }
     val monitorWork = remember { CodeforcesMonitorWorker.getWork(context) }
 
-    val lastExecutionEvents by collectAsStateWithLifecycle {
-        CPSWorkersDataStore(context).lastExecutions.flow
+    val executionEvents by collectAsStateWithLifecycle {
+        CPSWorkersDataStore(context).executions.flow
     }
 
     LazyColumn(modifier = modifier) {
         items(items = periodicWorks, key = { it.name }) { work ->
             WorkerItem(
                 work = work,
-                lastExecutionEvent = lastExecutionEvents[work.name],
+                executionEvents = executionEvents[work.name],
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onClick(work) }
@@ -181,10 +181,11 @@ private fun CPSWork.workInfoAsState(): State<WorkInfo?> =
 @Composable
 private fun WorkerItem(
     work: CPSPeriodicWork,
-    lastExecutionEvent: CPSWorker.ExecutionEvent?,
+    executionEvents: List<CPSWorker.ExecutionEvent>?,
     modifier: Modifier = Modifier
 ) {
     val workInfo by work.workInfoAsState()
+    val lastExecutionEvent = executionEvents?.lastOrNull()
 
     WorkerItem(
         name = work.name,
