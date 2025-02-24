@@ -29,6 +29,7 @@ import com.demich.cps.ui.CPSRadioButtonTitled
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
+import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectAsState
@@ -45,9 +46,28 @@ fun DevelopScreen() {
     Column {
         WorkersList(modifier = Modifier.fillMaxWidth().weight(1f))
         NewEntriesCfInfo(modifier = Modifier.fillMaxWidth().padding(all = 12.dp))
+        TestDialogList()
     }
 }
 
+
+@Composable
+private fun TestDialogList() {
+    var show by rememberSaveable { mutableStateOf(false) }
+    Button(onClick = { show = true }) {
+        Text("test dialog")
+    }
+
+    if (show) {
+        CPSDialog(onDismissRequest = { show = false }) {
+            LazyColumnWithScrollBar {
+                items(100) {
+                    Text("$it")
+                }
+            }
+        }
+    }
+}
 
 fun developAdditionalBottomBarBuilder(): AdditionalBottomBarBuilder = {
     val progressBarsViewModel = progressBarsViewModel()
