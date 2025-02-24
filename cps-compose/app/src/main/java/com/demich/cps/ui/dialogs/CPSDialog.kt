@@ -21,7 +21,6 @@ import com.demich.cps.ui.CPSRadioButtonTitled
 import com.demich.cps.ui.theme.cpsColors
 
 
-//TODO: fix bad bottom padding
 @Composable
 fun CPSDialog(
     modifier: Modifier = Modifier,
@@ -32,17 +31,16 @@ fun CPSDialog(
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(
-            usePlatformDefaultWidth = false,
+//            usePlatformDefaultWidth = false, //affects height!!!
             decorFitsSystemWindows = false
         )
     ) {
         Card(
-            elevation = 0.dp,
             shape = RoundedCornerShape(12.dp),
             backgroundColor = cpsColors.backgroundAdditional,
             modifier = Modifier
                 .imePadding()
-                .padding(horizontal = 26.dp, vertical = 12.dp)
+                .padding(vertical = 12.dp)
         ) {
             Column(
                 modifier = modifier.padding(all = 18.dp),
