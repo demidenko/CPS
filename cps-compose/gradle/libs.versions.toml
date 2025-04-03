@@ -3,11 +3,11 @@ androidGradlePlugin = "8.9.1"
 kotlin = "2.1.10"
 ksp = "2.1.10-1.0.31"
 
-serialization = "1.8.0"
+serialization = "1.8.1"
 datetime = "0.6.2"
 coroutines = "1.10.1"
 
-ktor = "3.1.0"
+ktor = "3.1.2"
 
 core = "1.15.0"
 work = "2.10.0"
@@ -22,7 +22,7 @@ room = "2.6.1"
 
 datastore = "1.1.4"
 
-jsoup = "1.18.3"
+jsoup = "1.19.1"
 korlibs = "6.0.0"
 
 accompanist = "0.34.0"
