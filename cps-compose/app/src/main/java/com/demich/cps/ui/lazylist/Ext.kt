@@ -45,13 +45,13 @@ fun LazyListState.visibleRange(requiredVisiblePart: Float): IntRange =
         firstVisibleIndex .. lastVisibleIndex
     }
 
-
-inline fun <T> LazyListScope.itemsNotEmpty(
+// TODO: inline + kotlin 2.1.20 = Backend Internal error: Exception during IR lowering
+/*inline*/ fun <T> LazyListScope.itemsNotEmpty(
     items: List<T>,
-    noinline onEmptyMessage: @Composable () -> Unit = { Text(text = "List is empty") },
-    noinline key: ((item: T) -> Any)? = null,
-    noinline contentType: (item: T) -> Any? = { null },
-    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
+    /*noinline*/ onEmptyMessage: @Composable () -> Unit = { Text(text = "List is empty") },
+    /*noinline*/ key: ((item: T) -> Any)? = null,
+    /*noinline*/ contentType: (item: T) -> Any? = { null },
+    /*crossinline*/ itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
     if (items.isEmpty()) {
         item(contentType = EmptyMessageContentType) {
