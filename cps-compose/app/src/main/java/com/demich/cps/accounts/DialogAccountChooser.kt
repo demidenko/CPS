@@ -91,7 +91,7 @@ private fun<U: UserInfo> DialogContent(
     var userInfo by remember { mutableStateOf(initialUserInfo) }
     val loadingInProgressState = remember { mutableStateOf(false) }
 
-    var suggestionsResult by remember { mutableStateOf(Result.success(emptyList<UserSuggestion>())) }
+    var suggestionsResult: Result<List<UserSuggestion>> by remember { mutableStateOf(Result.success(emptyList())) }
     val loadingSuggestionsInProgressState = remember { mutableStateOf(false) }
     var blockSuggestionsReload by remember { mutableStateOf(false) }
 
@@ -106,6 +106,10 @@ private fun<U: UserInfo> DialogContent(
             if (it.text.all(charValidator)) {
                 blockSuggestionsReload = false
                 textFieldValue = it
+            } else {
+                // keyboard suggestion can contain invalid char (like space in the end)
+                blockSuggestionsReload = false
+                textFieldValue = it.copy(text = it.text.filter(charValidator))
             }
         },
         loadingInProgress = loadingInProgressState.value,
