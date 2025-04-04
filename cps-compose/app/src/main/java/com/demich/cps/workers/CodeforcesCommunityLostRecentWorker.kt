@@ -181,16 +181,13 @@ private inline fun Collection<CodeforcesBlogEntry>.filterNewEntries(
     subList(fromIndex = indexOfFirstNew, toIndex = size)
 }
 
-//private suspend inline fun findSuspects(
-private suspend fun findSuspects(
+private suspend inline fun findSuspects(
     blogEntries: Collection<CodeforcesBlogEntry>,
     locale: CodeforcesLocale,
     minRatingColorTag: CodeforcesColorTag,
-//    crossinline isNew: (Instant) -> Boolean,
-    isNew: (Instant) -> Boolean,
+    crossinline isNew: (Instant) -> Boolean,
     lastNotNewIdItem: DataStoreItem<CodeforcesLostHint?>,
-//    onSuspect: (CodeforcesBlogEntry) -> Unit
-    onSuspect: suspend (CodeforcesBlogEntry) -> Unit
+    onSuspect: (CodeforcesBlogEntry) -> Unit
 ) {
     //ensure hint in case isNew logic changes
     lastNotNewIdItem.update {
@@ -219,7 +216,8 @@ private suspend fun findSuspects(
     So as result choose #2 or #3
      */
     blogEntries
-        .filterIdGreaterThen(lastNotNewIdItem()?.blogEntryId ?: Int.MIN_VALUE)
+        // TODO: `.invoke()` instead of `()` https://youtrack.jetbrains.com/issue/KT-74111/
+        .filterIdGreaterThen(lastNotNewIdItem.invoke()?.blogEntryId ?: Int.MIN_VALUE)
         .fixAndFilterColorTag(minRatingColorTag)
         .filterNewEntries(isFinalFilter = true) { isNew(cachedApi.getCreationTime(blogEntryId = it.id)) }
         .forEach {
