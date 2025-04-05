@@ -68,9 +68,9 @@ object CodeforcesUtils {
         return kotlin.runCatching {
             val id: Int
             val title: String
-            topic.expectFirst("div.title").let {
-                title = it.expectFirst("p").text()
-                id = it.expectFirst("a").attr("href").removePrefix("/blog/entry/").toInt()
+            topic.expectFirst("div.title").expectFirst("a").let {
+                title = it.text()
+                id = it.attr("href").removePrefix("/blog/entry/").toInt()
             }
 
             val author: CodeforcesHandle
