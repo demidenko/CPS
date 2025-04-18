@@ -14,7 +14,6 @@ import com.demich.cps.accounts.userinfo.DmojUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.DmojApi
-import com.demich.cps.platforms.api.DmojRatingChange
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
@@ -54,8 +53,7 @@ class DmojAccountManager :
     }
 
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
-        DmojApi.getRatingChanges(handle = userId)
-            .map(DmojRatingChange::toRatingChange)
+        DmojApi.getRatingChanges(handle = userId).map { it.toRatingChange() }
 
     override val ratingsUpperBounds by lazy {
         listOf(

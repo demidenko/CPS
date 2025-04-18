@@ -34,7 +34,6 @@ import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.emptyTimedCollection
 import com.demich.cps.utils.jsonCPS
-import com.demich.cps.workers.AccountsWorker
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
 import com.demich.datastore_itemized.ItemizedDataStore
@@ -73,8 +72,7 @@ class CodeforcesAccountManager :
         }.asReversed()
 
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
-        CodeforcesApi.getUserRatingChanges(handle = userId)
-            .map(CodeforcesRatingChange::toRatingChange)
+        CodeforcesApi.getUserRatingChanges(handle = userId).map { it.toRatingChange() }
 
     override val ratingsUpperBounds by lazy {
         listOf(
@@ -187,7 +185,7 @@ class CodeforcesAccountManager :
     }
 
     override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
-        CodeforcesAccountSettingsDataStore(context).flowOf { prefs ->
+        getSettings(context).flowOf { prefs ->
             prefs[observeRating] or
             prefs[monitorEnabled] or
             prefs[upsolvingSuggestionsEnabled] or
