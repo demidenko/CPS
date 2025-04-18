@@ -103,10 +103,10 @@ private fun CPSContent() {
     }
 
     val navBuilder: NavGraphBuilder.() -> Unit = {
-        cpsComposable(ScreenTypes.accounts) { holder ->
+        cpsComposable(ScreenTypes.profiles) { holder ->
             var reorderEnabled by rememberSaveable { mutableStateOf(false) }
             AccountsScreen(
-                onExpandAccount = { type -> navigator.navigateTo(Screen.AccountExpanded(type)) },
+                onExpandAccount = { type -> navigator.navigateTo(Screen.ProfileExpanded(type)) },
                 onSetAdditionalMenu = holder.menuSetter,
                 reorderEnabled = { reorderEnabled },
                 enableReorder = { reorderEnabled = true }
@@ -115,12 +115,12 @@ private fun CPSContent() {
                 reorderEnabled = { reorderEnabled },
                 onReorderDone = { reorderEnabled = false }
             )
-            holder.setSubtitle("accounts")
+            holder.setSubtitle("profiles")
         }
-        cpsComposable(ScreenTypes.accountExpanded) { holder ->
+        cpsComposable(ScreenTypes.profileExpanded) { holder ->
             val context = context
             val accountsViewModel = accountsViewModel()
-            val type = (holder.screen as Screen.AccountExpanded).type
+            val type = (holder.screen as Screen.ProfileExpanded).type
             var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
             AccountExpandedScreen(
                 type = type,
@@ -135,14 +135,14 @@ private fun CPSContent() {
             holder.menu = accountExpandedMenuBuilder(
                 type = type,
                 onShowDeleteDialog = { showDeleteDialog = true },
-                onOpenSettings = { navigator.navigateTo(Screen.AccountSettings(type)) }
+                onOpenSettings = { navigator.navigateTo(Screen.ProfileSettings(type)) }
             )
-            holder.setSubtitle("accounts", type.name)
+            holder.setSubtitle("profiles", type.name)
         }
-        cpsComposable(ScreenTypes.accountSettings) { holder ->
-            val type = (holder.screen as Screen.AccountSettings).type
+        cpsComposable(ScreenTypes.profileSettings) { holder ->
+            val type = (holder.screen as Screen.ProfileSettings).type
             AccountSettingsScreen(type)
-            holder.setSubtitle("accounts", type.name, "settings")
+            holder.setSubtitle("profiles", type.name, "settings")
         }
 
         cpsComposable(ScreenTypes.community) { holder ->

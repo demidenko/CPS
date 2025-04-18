@@ -57,7 +57,7 @@ fun<U: UserInfo> DialogAccountChooser(
             text = "getUser(${manager.type.name}):",
             color = cpsColors.contentAdditional
         ) {
-            Icon(imageVector = CPSIcons.Account, contentDescription = null)
+            Icon(imageVector = CPSIcons.Profile, contentDescription = null)
         }
 
         DialogContent(

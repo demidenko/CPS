@@ -8,9 +8,9 @@ import com.demich.cps.ui.CPSIcons
 enum class ScreenTypes(
     val route: String
 ) {
-    accounts("accounts"),
-    accountExpanded("account/{manager}"),
-    accountSettings("account.settings/{manager}"),
+    profiles("profiles"),
+    profileExpanded("profile/{manager}"),
+    profileSettings("profile.settings/{manager}"),
     contests("contests"),
     contestsSettings("contests.settings"),
     community("community"),
@@ -30,13 +30,13 @@ sealed class Screen(
 
     val routePath get() = createPath(screenType.route)
 
-    data object Accounts: RootScreen(ScreenTypes.accounts, icon = CPSIcons.Account)
+    data object Profiles: RootScreen(ScreenTypes.profiles, icon = CPSIcons.Profile)
 
-    data class AccountExpanded(override val type: AccountManagerType)
-        : AccountScreen(ScreenTypes.accountExpanded, type, true)
+    data class ProfileExpanded(override val type: AccountManagerType)
+        : ProfileScreen(ScreenTypes.profileExpanded, type, true)
 
-    data class AccountSettings(override val type: AccountManagerType)
-        : AccountScreen(ScreenTypes.accountSettings, type, false)
+    data class ProfileSettings(override val type: AccountManagerType)
+        : ProfileScreen(ScreenTypes.profileSettings, type, false)
 
     data object Community: RootScreen(ScreenTypes.community, icon = CPSIcons.Community)
     data object CommunitySettings: Screen(ScreenTypes.communitySettings, rootScreenType = ScreenTypes.community, enableBottomBar = false)
@@ -61,13 +61,13 @@ sealed class RootScreen(
     rootScreenType = screenType
 )
 
-sealed class AccountScreen(
+sealed class ProfileScreen(
     screenType: ScreenTypes,
     open val type: AccountManagerType,
     enableBottomBar: Boolean
 ): Screen(
     screenType = screenType,
-    rootScreenType = ScreenTypes.accounts,
+    rootScreenType = ScreenTypes.profiles,
     enableBottomBar = enableBottomBar
 ) {
     final override fun createPath(pattern: String): String =
@@ -77,7 +77,7 @@ sealed class AccountScreen(
 private val simpleScreens = arrayOf(
     Screen.Contests,
     Screen.Community,
-    Screen.Accounts,
+    Screen.Profiles,
     Screen.ContestsSettings,
     Screen.CommunitySettings,
     Screen.CommunityFollowList,
@@ -86,11 +86,11 @@ private val simpleScreens = arrayOf(
 
 fun NavBackStackEntry.getScreen(): Screen {
     return when(val route = destination.route) {
-        ScreenTypes.accountExpanded.route -> {
-            Screen.AccountExpanded(type = AccountManagerType.valueOf(requireString("manager")))
+        ScreenTypes.profileExpanded.route -> {
+            Screen.ProfileExpanded(type = AccountManagerType.valueOf(requireString("manager")))
         }
-        ScreenTypes.accountSettings.route -> {
-            Screen.AccountSettings(type = AccountManagerType.valueOf(requireString("manager")))
+        ScreenTypes.profileSettings.route -> {
+            Screen.ProfileSettings(type = AccountManagerType.valueOf(requireString("manager")))
         }
         ScreenTypes.communityCodeforcesBlog.route -> {
             Screen.CommunityCodeforcesBlog(handle = requireString("handle"))

@@ -54,7 +54,7 @@ fun communityMenuBuilder(
 
     val followEnabled by collectItemAsState { context.settingsCommunity.codeforcesFollowEnabled }
     if (followEnabled) {
-        CPSDropdownMenuItem(title = "Follow List", icon = CPSIcons.Accounts) {
+        CPSDropdownMenuItem(title = "Follow List", icon = CPSIcons.Profiles) {
             controller.updateFollowUsersInfo(context)
             onOpenFollowList()
         }
