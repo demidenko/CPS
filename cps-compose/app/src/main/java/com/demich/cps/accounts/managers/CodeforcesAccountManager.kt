@@ -25,6 +25,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.ui.SettingsSwitchItemWithAccountsWork
 import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
@@ -164,11 +165,9 @@ class CodeforcesAccountManager :
     @Composable
     override fun SettingsItems() {
         val settings = getSettings(context)
-        SettingsSwitchItemWithWork(
+        SettingsSwitchItemWithAccountsWork(
             item = settings.observeRating,
-            title = "Rating changes observer",
-            workGetter = AccountsWorker::getWork,
-            stopWorkOnUnchecked = false
+            title = "Rating changes observer"
         )
         SettingsSwitchItemWithWork(
             item = settings.monitorEnabled,
@@ -181,11 +180,9 @@ class CodeforcesAccountManager :
             title = "Upsolving suggestions",
             workGetter = CodeforcesUpsolvingSuggestionsWorker::getWork
         )
-        SettingsSwitchItemWithWork(
+        SettingsSwitchItemWithAccountsWork(
             item = settings.observeContribution,
-            title = "Contribution changes observer",
-            workGetter = AccountsWorker::getWork,
-            stopWorkOnUnchecked = false
+            title = "Contribution changes observer"
         )
     }
 

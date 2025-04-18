@@ -49,6 +49,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
+import com.demich.cps.workers.AccountsWorker
 import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.launch
@@ -251,6 +252,21 @@ fun SettingsSwitchItemWithWork(
             else if (stopWorkOnUnchecked) stop()
         }
     }
+}
+
+@Composable
+fun SettingsSwitchItemWithAccountsWork(
+    item: DataStoreItem<Boolean>,
+    title: String,
+    description: String = ""
+) {
+    SettingsSwitchItemWithWork(
+        item = item,
+        title = title,
+        description = description,
+        workGetter = AccountsWorker::getWork,
+        stopWorkOnUnchecked = false
+    )
 }
 
 @Composable
