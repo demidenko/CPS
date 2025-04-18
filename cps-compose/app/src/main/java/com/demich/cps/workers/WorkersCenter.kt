@@ -37,7 +37,7 @@ abstract class CPSWork(
 
     fun flowOfWorkInfo(): Flow<WorkInfo?> =
         workManager.getWorkInfosForUniqueWorkFlow(name)
-            .map { it?.getOrNull(0) }
+            .map { it.getOrNull(0) }
 }
 
 abstract class CPSOneTimeWork(
@@ -144,6 +144,9 @@ fun Context.getCPSWorks() = listOf(
 ).map { it(this) }
 
 suspend fun Context.enqueueEnabledWorkers() {
+    //accounts renamed to profiles but work still in database
+    WorkManager.getInstance(this).cancelUniqueWork(uniqueWorkName = "accounts")
+
     getCPSWorks().forEach { it.enqueueIfEnabled() }
 }
 
