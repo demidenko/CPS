@@ -5,11 +5,11 @@ ksp = "2.1.20-2.0.0"
 
 serialization = "1.8.1"
 datetime = "0.6.2"
-coroutines = "1.10.1"
+coroutines = "1.10.2"
 
 ktor = "3.1.2"
 
-core = "1.15.0"
+core = "1.16.0"
 work = "2.10.0"
 
 compose-bom = "2024.02.01"
@@ -23,7 +23,7 @@ room = "2.7.0"
 datastore = "1.1.4"
 
 jsoup = "1.19.1"
-korlibs = "6.0.0"
+korlibs = "6.0.1"
 
 accompanist = "0.34.0"
 
