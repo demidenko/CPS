@@ -15,7 +15,7 @@ import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.platforms.utils.AtCoderUtils
-import com.demich.cps.ui.SettingsSwitchItemWithAccountsWork
+import com.demich.cps.ui.SettingsSwitchItemWithProfilesWork
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.utils.context
 import com.demich.datastore_itemized.ItemizedDataStore
@@ -96,7 +96,7 @@ class AtCoderAccountManager :
     @Composable
     override fun SettingsItems() {
         val settings = getSettings(context)
-        SettingsSwitchItemWithAccountsWork(
+        SettingsSwitchItemWithProfilesWork(
             item = settings.observeRating,
             title = "Rating changes observer"
         )

@@ -19,7 +19,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.toSignedString
 import kotlin.time.Duration.Companion.minutes
 
-class AccountsWorker(
+class ProfilesWorker(
     context: Context,
     parameters: WorkerParameters
 ): CPSWorker(
@@ -30,7 +30,7 @@ class AccountsWorker(
         fun getWork(context: Context) = object : CPSPeriodicWork(name = "profiles", context = context) {
             override suspend fun isEnabled() = true //TODO something proper
             override val requestBuilder: PeriodicWorkRequest.Builder
-                get() = CPSPeriodicWorkRequestBuilder<AccountsWorker>(
+                get() = CPSPeriodicWorkRequestBuilder<ProfilesWorker>(
                     repeatInterval = 15.minutes
                 )
         }

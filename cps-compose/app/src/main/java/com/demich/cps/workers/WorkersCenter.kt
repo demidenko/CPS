@@ -132,7 +132,7 @@ internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
     }
 
 fun Context.getCPSWorks() = listOf(
-    AccountsWorker::getWork,
+    ProfilesWorker::getWork,
     NewsWorker::getWork,
     ContestsWorker::getWork,
     CodeforcesCommunityFollowWorker::getWork,
