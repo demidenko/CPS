@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="38"
+   height="38"
+   version="1.1"
+   id="svg8"
+   sodipodi:docname="dmoj-logo.svg"
+   inkscape:version="1.4.1 (93de688d07, 2025-03-30)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs8" />
+  <sodipodi:namedview
+     id="namedview8"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="8"
+     inkscape:cx="-3.9375"
+     inkscape:cy="19.3125"
+     inkscape:window-width="1896"
+     inkscape:window-height="1116"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg8" />
+  <g
+     stroke="#ffdd00"
+     transform="matrix(0.0875,0,0,0.0875,-2.1000077,-2.1)"
+     id="g2">
+    <path
+       d="m 240,36 a 204,204 0 1 1 0,408 204,204 0 1 1 0,-408"
+       fill="none"
+       stroke-width="24"
+       id="path1" />
+    <path
+       d="m 215.8,126 h 48.4 l -10.1,94.6 86.8,-38.9 15,46.1 -93.1,19.6 63.8,70.6 -39.2,28.5 L 240,264 192.6,346.5 153.4,318 l 63.8,-70.6 -93.1,-19.6 15,-46.1 86.8,38.9 z"
+       fill="#ffdd00"
+       stroke-linejoin="round"
+       stroke-width="12"
+       id="path2" />
+  </g>
+</svg>
