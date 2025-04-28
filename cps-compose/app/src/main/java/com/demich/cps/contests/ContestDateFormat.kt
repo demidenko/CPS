@@ -64,8 +64,9 @@ fun Contest.dateRange(): String {
     val startLocalDateTime = startTime.toSystemDateTime()
     val endLocalDateTime = endTime.toSystemDateTime()
     val start = startLocalDateTime.contestDate()
-    val end = if (startLocalDateTime.date == endLocalDateTime.date)
-        endLocalDateTime.formatTime() else endLocalDateTime.contestDate()
+    val end = endLocalDateTime.run {
+        if (date == startLocalDateTime.date) formatTime() else contestDate()
+    }
     return "$start - $end"
 }
 
