@@ -20,8 +20,8 @@ internal fun fixAtCoderTitle(origin: String): String {
 
     s.splitTrailingBrackets { title, brackets ->
         if (brackets.isNotEmpty()) {
-            val t = brackets.removeSurrounding("(", ")")
-            if (t.isContestTitle()) return "$t (${title.trim()})"
+            val t = brackets.substring(1, brackets.length - 1)
+            if (t.isContestTitle()) return "$t ${brackets.first()}${title.trim()}${brackets.last()}"
         }
     }
 
