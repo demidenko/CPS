@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
+//TODO: data is still existing even after close screen
 class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
     private var currentId: Any? = null
     private val flow = MutableStateFlow<Result<T>?>(null)
