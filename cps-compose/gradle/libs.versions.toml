@@ -20,7 +20,7 @@ lifecycle = "2.8.5" # 2.8.6 Lifecycle Runtime Compose now depends on Compose Run
 
 room = "2.7.1"
 
-datastore = "1.1.4"
+datastore = "1.1.6"
 
 jsoup = "1.19.1"
 korlibs = "6.0.1"
