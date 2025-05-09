@@ -211,7 +211,12 @@ object CodeforcesApi: PlatformApi {
         }
     }
 
-    suspend fun getContestStandings(contestId: Int, handles: Collection<String>, includeUnofficial: Boolean): CodeforcesContestStandings {
+    suspend fun getContestStandings(
+        contestId: Int,
+        handles: Collection<String>,
+        includeUnofficial: Boolean
+        //TODO: participantTypes: Colliction<CodeforcesParticipationType>
+    ): CodeforcesContestStandings {
         return getCodeforcesApi(method = "contest.standings") {
             parameter("contestId", contestId)
             parameter("handles", handles.joinToString(separator = ";"))
