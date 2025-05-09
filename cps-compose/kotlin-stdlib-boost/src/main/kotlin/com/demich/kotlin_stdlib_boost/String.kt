@@ -29,3 +29,30 @@ inline fun String.splitTrailingBrackets(block: (String, String) -> Unit) {
     val i = trailingBracketsStart(this)
     block(substring(0, i), substring(i))
 }
+
+
+inline fun ifBetweenFirstFirst(
+    str: String,
+    a: String,
+    b: String,
+    block: (String) -> Unit
+) {
+    val i = str.indexOf(a)
+    if (i == -1) return
+    val j = str.indexOf(b, startIndex = i + a.length)
+    if (j == -1) return
+    block(str.substring(i + a.length, j))
+}
+
+inline fun ifBetweenFirstLast(
+    str: String,
+    a: String,
+    b: String,
+    block: (String) -> Unit
+) {
+    val i = str.indexOf(a)
+    if (i == -1) return
+    val j = str.lastIndexOf(b)
+    if (j == -1 || i + a.length > j) return
+    block(str.substring(i + a.length, j))
+}
