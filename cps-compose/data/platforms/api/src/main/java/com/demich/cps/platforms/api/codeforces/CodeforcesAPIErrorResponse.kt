@@ -88,7 +88,7 @@ internal constructor(comment: String, val contestId: Int): CodeforcesApiExceptio
 
 
 private inline fun String.ifSurrounded(prefix: String, suffix: String, block: (String) -> Unit) {
-    if (startsWith(prefix) && endsWith(suffix)) {
+    if (prefix.length + suffix.length <= length && startsWith(prefix) && endsWith(suffix)) {
         block(substring(startIndex = prefix.length, endIndex = length - suffix.length))
     }
 }
