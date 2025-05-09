@@ -20,7 +20,8 @@ lifecycle = "2.8.5" # 2.8.6 Lifecycle Runtime Compose now depends on Compose Run
 
 room = "2.7.1"
 
-datastore = "1.1.6"
+datastore = "1.1.4" #1.1.6 release-build runtime-crash:
+#java.lang.RuntimeException: Field value_ for g1.i not found. Known fields are [public int g1.i.e, public java.lang.Object g1.i.f, public static final g1.i g1.i.g, public static volatile i1.s g1.i.h]
 
 jsoup = "1.20.1"
 korlibs = "6.0.1"
