@@ -12,6 +12,7 @@ import com.demich.cps.platforms.api.cpsHttpClient
 import com.demich.cps.platforms.api.defaultJson
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpResponseValidator
@@ -28,6 +29,8 @@ import io.ktor.client.statement.request
 import io.ktor.http.appendPathSegments
 import io.ktor.http.setCookie
 import korlibs.crypto.sha1
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -90,13 +93,18 @@ object CodeforcesApi: PlatformApi {
         return false
     }
 
+    private val semaphore = Semaphore(permits = 4)
+    private suspend inline fun HttpClient.getWithPermit(block: HttpRequestBuilder.() -> Unit) =
+        semaphore.withPermit { get(block) }
+
+
     //TODO: find proper solution (intercept / retry plugins not works)
     private suspend inline fun getCodeforces(block: HttpRequestBuilder.() -> Unit): HttpResponse {
         runCatching {
-            return client.get(block)
+            return client.getWithPermit(block)
         }.getOrElse { exception ->
             if (exception is CodeforcesPOWException) {
-                return client.get {
+                return client.getWithPermit {
                     cookie(name = "pow", value = proofOfWork(exception.pow))
                     block()
                 }
@@ -215,7 +223,7 @@ object CodeforcesApi: PlatformApi {
         contestId: Int,
         handles: Collection<String>,
         includeUnofficial: Boolean
-        //TODO: participantTypes: Colliction<CodeforcesParticipationType>
+        //TODO: participantTypes: Collection<CodeforcesParticipationType>
     ): CodeforcesContestStandings {
         return getCodeforcesApi(method = "contest.standings") {
             parameter("contestId", contestId)
