@@ -33,26 +33,28 @@ inline fun String.splitTrailingBrackets(block: (String, String) -> Unit) {
 
 inline fun ifBetweenFirstFirst(
     str: String,
-    a: String,
-    b: String,
+    from: String,
+    to: String,
     block: (String) -> Unit
 ) {
-    val i = str.indexOf(a)
+    val i = str.indexOf(from)
     if (i == -1) return
-    val j = str.indexOf(b, startIndex = i + a.length)
+    val j = str.indexOf(to, startIndex = i + from.length)
     if (j == -1) return
-    block(str.substring(i + a.length, j))
+    block(str.substring(i + from.length, j))
 }
 
 inline fun ifBetweenFirstLast(
     str: String,
-    a: String,
-    b: String,
+    from: String,
+    to: String,
+    include: Boolean = false,
     block: (String) -> Unit
 ) {
-    val i = str.indexOf(a)
+    val i = str.indexOf(from)
     if (i == -1) return
-    val j = str.lastIndexOf(b)
-    if (j == -1 || i + a.length > j) return
-    block(str.substring(i + a.length, j))
+    val j = str.lastIndexOf(to)
+    if (j == -1 || i + from.length > j) return
+    if (include) block(str.substring(i, j + to.length))
+    else block(str.substring(i + from.length, j))
 }

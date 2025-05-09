@@ -1,5 +1,7 @@
 package com.demich.cps.platforms.api
 
+import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
+import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.request.HttpRequestBuilder
@@ -89,11 +91,16 @@ object CodeChefApi: PlatformApi {
     }
 
     suspend fun getRatingChanges(handle: String): List<CodeChefRatingChange> {
-        val s = getUserPage(handle = handle)
-        val i = s.indexOf("var all_rating = ")
-        if (i == -1) return emptyList()
-        val ar = s.substring(s.indexOf("[", i), s.indexOf("];", i) + 1)
-        return json.decodeFromString(ar)
+        ifBetweenFirstFirst(
+            str = getUserPage(handle = handle),
+            from = "var all_rating",
+            to = ";"
+        ) { str ->
+            ifBetweenFirstLast(str, from = "[", to = "]", include = true) {
+                return json.decodeFromString(it)
+            }
+        }
+        return emptyList()
     }
 
     object urls {

@@ -1,5 +1,7 @@
 package com.demich.cps.platforms.api
 
+import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
+import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
 import io.ktor.client.request.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -22,12 +24,16 @@ object AtCoderApi: PlatformApi {
     }
 
     suspend fun getRatingChanges(handle: String): List<AtCoderRatingChange> {
-        val src = getUserPage(handle)
-        val i = src.lastIndexOf("<script>var rating_history=[{")
-        if (i == -1) return emptyList()
-        val j = src.indexOf("];</script>", i)
-        val str = src.substring(src.indexOf('[', i), j+1)
-        return json.decodeFromString(str)
+        ifBetweenFirstFirst(
+            str = getUserPage(handle),
+            from = "<script>var rating_history",
+            to = ";</script>"
+        ) { str ->
+            ifBetweenFirstLast(str, from = "[", to = "]", include = true) {
+                return json.decodeFromString(it)
+            }
+        }
+        return emptyList()
     }
 
     suspend fun getSuggestionsPage(str: String): String {

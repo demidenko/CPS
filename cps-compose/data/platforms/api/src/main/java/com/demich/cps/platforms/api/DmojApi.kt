@@ -1,5 +1,7 @@
 package com.demich.cps.platforms.api
 
+import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
+import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.*
 import kotlinx.serialization.Serializable
@@ -44,12 +46,16 @@ object DmojApi: PlatformApi {
     }
 
     suspend fun getRatingChanges(handle: String): List<DmojRatingChange> {
-        val s = getUserPage(handle = handle)
-        val i = s.indexOf("var rating_history = [")
-        if (i == -1) return emptyList()
-        val j = s.indexOf("];", i)
-        val str = s.substring(s.indexOf('[', i), j+1)
-        return json.decodeFromString(str)
+        ifBetweenFirstFirst(
+            str = getUserPage(handle = handle),
+            from = "var rating_history",
+            to = ";"
+        ) { str ->
+            ifBetweenFirstLast(str, from = "[", to = "]", include = true) {
+                return json.decodeFromString(it)
+            }
+        }
+        return emptyList()
     }
 
     object urls {

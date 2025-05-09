@@ -10,6 +10,8 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.platforms.api.cpsHttpClient
 import com.demich.cps.platforms.api.defaultJson
+import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
+import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpResponseValidator
@@ -259,25 +261,19 @@ private class CodeforcesAPIResponse<T>(
 )
 
 private fun isBrowserChecker(str: String): Boolean {
-    val i = str.indexOf("<p>")
-    if (i == -1) return false
-    val j = str.indexOf("</p", i)
-    if(j == -1 || i >= j) return false
-    val msg = str.substring(i + 3, j)
-    return msg == "Please wait. Your browser is being checked. It may take a few seconds..."
+    ifBetweenFirstFirst(str, "<p>", "</p") { msg ->
+        return msg == "Please wait. Your browser is being checked. It may take a few seconds..."
+    }
+    return false
 }
 
 private fun isTemporarilyUnavailable(str: String): Boolean {
     if (str.length > 2000) return false //trick based on full msg length
-    val i = str.indexOf("<body>")
-    if (i == -1) return false
-    val j = str.lastIndexOf("</body>")
-    if (j == -1 || i >= j) return false
-    val pi = str.indexOf("<p>", i)
-    val pj = str.lastIndexOf("</p>", j)
-    if (pi == -1 || pj == -1 || pi > pj) return false
-    val body = str.substring(pi + 3, pj)
-    return body == "Codeforces is temporarily unavailable. Please, return in several minutes. Please try <a href=\"https://m1.codeforces.com/\">m1.codeforces.com</a>, <a href=\"https://m2.codeforces.com/\">m2.codeforces.com</a> or <a href=\"https://m3.codeforces.com/\">m3.codeforces.com</a>"
+    ifBetweenFirstLast(str, "<body>", "</body>") { body ->
+        ifBetweenFirstLast(body, "<p>", "</p>") { msg ->
+            return msg == "Codeforces is temporarily unavailable. Please, return in several minutes. Please try <a href=\"https://m1.codeforces.com/\">m1.codeforces.com</a>, <a href=\"https://m2.codeforces.com/\">m2.codeforces.com</a> or <a href=\"https://m3.codeforces.com/\">m3.codeforces.com</a>"
+        }
+    }
     /* full message:
 <!DOCTYPE html>
 <html lang="en">
@@ -290,6 +286,7 @@ private fun isTemporarilyUnavailable(str: String): Boolean {
 <script>(function(){var js = "window['__CF$cv$params']={r:'7f71322edbeb9d70',t:'MTY5MjA5OTk3NS41NTQwMDA='};_cpo=document.createElement('script');_cpo.nonce='',_cpo.src='/cdn-cgi/challenge-platform/scripts/invisible.js',document.getElementsByTagName('head')[0].appendChild(_cpo);";var _0xh = document.createElement('iframe');_0xh.height = 1;_0xh.width = 1;_0xh.style.position = 'absolute';_0xh.style.top = 0;_0xh.style.left = 0;_0xh.style.border = 'none';_0xh.style.visibility = 'hidden';document.body.appendChild(_0xh);function handler() {var _0xi = _0xh.contentDocument || _0xh.contentWindow.document;if (_0xi) {var _0xj = _0xi.createElement('script');_0xj.innerHTML = js;_0xi.getElementsByTagName('head')[0].appendChild(_0xj);}}if (document.readyState !== 'loading') {handler();} else if (window.addEventListener) {document.addEventListener('DOMContentLoaded', handler);} else {var prev = document.onreadystatechange || function () {};document.onreadystatechange = function (e) {prev(e);if (document.readyState !== 'loading') {document.onreadystatechange = prev;handler();}};}})();</script></body>
 </html>
      */
+    return false
 }
 
 //TODO: is cloudflare (just a moment...)
