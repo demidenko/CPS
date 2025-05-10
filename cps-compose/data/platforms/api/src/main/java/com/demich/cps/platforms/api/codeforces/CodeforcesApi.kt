@@ -191,10 +191,19 @@ object CodeforcesApi: PlatformApi {
         }
     }
 
-    suspend fun getPageSource(path: String, locale: CodeforcesLocale): String {
+    private suspend inline fun getPageSource(
+        path: String,
+        locale: CodeforcesLocale,
+        block: HttpRequestBuilder.() -> Unit = {}
+    ): String {
         return getCodeforcesWeb(path = path) {
             parameter("locale", locale)
+            block()
         }
+    }
+
+    suspend fun getPage(page: BasePage, locale: CodeforcesLocale): String {
+        return getPageSource(path = "/${page.path}", locale = locale)
     }
 
     suspend fun getUserPage(handle: String): String {
@@ -203,6 +212,12 @@ object CodeforcesApi: PlatformApi {
 
     suspend fun getContestPage(contestId: Int): String {
         return getPageSource(path = urls.contest(contestId), locale = CodeforcesLocale.EN)
+    }
+
+    suspend fun getTopCommentsPage(locale: CodeforcesLocale, days: Int = 2): String {
+        return getPageSource(path = "/topComments", locale = locale) {
+            parameter("days", days)
+        }
     }
 
     suspend fun getUserBlogEntries(handle: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
@@ -255,6 +270,13 @@ object CodeforcesApi: PlatformApi {
         fun submission(submission: CodeforcesSubmission) = contest(submission.contestId) + "/submission/${submission.id}"
 
         fun problem(contestId: Int, problemIndex: String) = contest(contestId) + "/problem/$problemIndex"
+    }
+
+    enum class BasePage(val path: String) {
+        main(""),
+        top("top"),
+        recent("recent-actions"),
+        groups("groups")
     }
 }
 

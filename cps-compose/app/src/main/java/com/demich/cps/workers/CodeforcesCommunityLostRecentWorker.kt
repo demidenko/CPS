@@ -97,16 +97,16 @@ class CodeforcesCommunityLostRecentWorker(
         }
 
     private suspend fun getRecentBlogEntries(locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
-        suspend fun extractFrom(page: String) =
+        suspend fun extractFrom(page: CodeforcesApi.BasePage) =
             CodeforcesUtils.extractRecentBlogEntries(
-                source = CodeforcesApi.getPageSource(path = "/$page", locale = locale)
+                source = CodeforcesApi.getPage(page = page, locale = locale)
             )
 
         // "/groups" has less size than "/recent" and hopefully will be cached by cf
         return runCatching {
-            extractFrom("groups")
+            extractFrom(CodeforcesApi.BasePage.groups)
         }.getOrElse {
-            extractFrom("recent-actions")
+            extractFrom(CodeforcesApi.BasePage.recent)
         }
     }
 

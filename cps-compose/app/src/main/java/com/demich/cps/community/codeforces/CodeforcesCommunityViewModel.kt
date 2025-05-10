@@ -53,13 +53,13 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         }
     }
 
-    private val mainBlogEntries = dataLoader(emptyList()) { getBlogEntries(page = "/", locale = it) }
+    private val mainBlogEntries = dataLoader(emptyList()) { getBlogEntries(page = CodeforcesApi.BasePage.main, locale = it) }
     override fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.getDataFlow(context)
 
-    private val topBlogEntries = dataLoader(emptyList()) { getBlogEntries(page = "/top", locale = it) }
+    private val topBlogEntries = dataLoader(emptyList()) { getBlogEntries(page = CodeforcesApi.BasePage.top, locale = it) }
     override fun flowOfTopBlogEntries(context: Context) = topBlogEntries.getDataFlow(context)
 
-    private val topComments = dataLoader(emptyList()) { getComments(page = "/topComments?days=2", locale = it) }
+    private val topComments = dataLoader(emptyList()) { getTopComments(locale = it) }
     override fun flowOfTopComments(context: Context) = topComments.getDataFlow(context)
 
     private val recentActions = dataLoader(CodeforcesRecent(emptyList(), emptyList())) { getRecentActions(locale = it) }
@@ -98,14 +98,14 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         }
     }
 
-    private suspend fun getBlogEntries(page: String, locale: CodeforcesLocale) =
-        CodeforcesUtils.extractBlogEntries(source = CodeforcesApi.getPageSource(path = page, locale = locale))
+    private suspend fun getBlogEntries(page: CodeforcesApi.BasePage, locale: CodeforcesLocale) =
+        CodeforcesUtils.extractBlogEntries(source = CodeforcesApi.getPage(page = page, locale = locale))
 
-    private suspend fun getComments(page: String, locale: CodeforcesLocale) =
-        CodeforcesUtils.extractComments(source = CodeforcesApi.getPageSource(path = page, locale = locale))
+    private suspend fun getTopComments(locale: CodeforcesLocale) =
+        CodeforcesUtils.extractComments(source = CodeforcesApi.getTopCommentsPage(locale = locale))
 
     private suspend fun getRecentActions(locale: CodeforcesLocale) =
-        CodeforcesUtils.extractRecentActions(source = CodeforcesApi.getPageSource(path = "/recent-actions", locale = locale))
+        CodeforcesUtils.extractRecentActions(source = CodeforcesApi.getPage(page = CodeforcesApi.BasePage.recent, locale = locale))
 
     fun addToFollowList(userInfo: CodeforcesUserInfo, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
