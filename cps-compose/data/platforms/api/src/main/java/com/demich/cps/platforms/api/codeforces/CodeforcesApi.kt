@@ -97,7 +97,6 @@ object CodeforcesApi: PlatformApi {
     private suspend inline fun HttpClient.getWithPermit(block: HttpRequestBuilder.() -> Unit) =
         semaphore.withPermit { get(block) }
 
-
     //TODO: find proper solution (intercept / retry plugins not works)
     private suspend inline fun getCodeforces(block: HttpRequestBuilder.() -> Unit): HttpResponse {
         runCatching {
@@ -113,6 +112,7 @@ object CodeforcesApi: PlatformApi {
         }
     }
 
+    //api methods from https://codeforces.com/apiHelp/methods
     private suspend inline fun <reified T> getCodeforcesApi(
         method: String,
         block: HttpRequestBuilder.() -> Unit = {}
@@ -123,27 +123,58 @@ object CodeforcesApi: PlatformApi {
         }.body<CodeforcesAPIResponse<T>>().result
     }
 
-    private suspend inline fun getCodeforcesPage(
-        path: String,
-        block: HttpRequestBuilder.() -> Unit = {}
-    ): String {
-        return getCodeforces {
-            url(path)
-            block()
-        }.bodyAsText()
-    }
-
-    private suspend inline fun getCodeforcesPage(
-        path: String,
-        locale: CodeforcesLocale,
-        block: HttpRequestBuilder.() -> Unit = {}
-    ): String {
-        return getCodeforcesPage(path = path) {
+    suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale): CodeforcesBlogEntry {
+        return getCodeforcesApi(method = "blogEntry.view") {
+            parameter("blogEntryId", blogEntryId)
             parameter("locale", locale)
-            block()
         }
     }
 
+    //TODO: Sequence instead of List?
+    suspend fun getContests(): List<CodeforcesContest> {
+        return getCodeforcesApi(method = "contest.list") {
+            parameter("gym", false)
+        }
+    }
+
+    //TODO: Sequence instead of List
+    suspend fun getContestRatingChanges(contestId: Int): List<CodeforcesRatingChange> {
+        return getCodeforcesApi(method = "contest.ratingChanges" ) {
+            parameter("contestId", contestId)
+        }
+    }
+
+    suspend fun getContestStandings(
+        contestId: Int,
+        handles: Collection<String>,
+        includeUnofficial: Boolean
+        //TODO: participantTypes: Collection<CodeforcesParticipationType>
+    ): CodeforcesContestStandings {
+        return getCodeforcesApi(method = "contest.standings") {
+            parameter("contestId", contestId)
+            parameter("handles", handles.joinToString(separator = ";"))
+            parameter("showUnofficial", includeUnofficial)
+        }
+    }
+
+    suspend fun getContestStandings(contestId: Int, handle: String, includeUnofficial: Boolean): CodeforcesContestStandings {
+        return getContestStandings(contestId, listOf(handle), includeUnofficial)
+    }
+
+    suspend fun getContestSubmissions(contestId: Int, handle: String): List<CodeforcesSubmission> {
+        return getCodeforcesApi(method = "contest.status") {
+            parameter("contestId", contestId)
+            parameter("handle", handle)
+            parameter("count", 1e9.toInt())
+        }
+    }
+
+    suspend fun getUserBlogEntries(handle: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
+        return getCodeforcesApi(method = "user.blogEntries") {
+            parameter("handle", handle)
+            parameter("locale", locale)
+        }
+    }
 
     suspend fun getUsers(
         handles: Collection<String>,
@@ -166,21 +197,6 @@ object CodeforcesApi: PlatformApi {
         }
     }
 
-    //TODO: Sequence instead of List?
-    suspend fun getContests(): List<CodeforcesContest> {
-        return getCodeforcesApi(method = "contest.list") {
-            parameter("gym", false)
-        }
-    }
-
-    suspend fun getContestSubmissions(contestId: Int, handle: String): List<CodeforcesSubmission> {
-        return getCodeforcesApi(method = "contest.status") {
-            parameter("contestId", contestId)
-            parameter("handle", handle)
-            parameter("count", 1e9.toInt())
-        }
-    }
-
     suspend fun getUserSubmissions(handle: String, count: Long, from: Long): List<CodeforcesSubmission> {
         return getCodeforcesApi(method = "user.status") {
             parameter("handle", handle)
@@ -189,21 +205,36 @@ object CodeforcesApi: PlatformApi {
         }
     }
 
-    //TODO: Sequence instead of List
-    suspend fun getContestRatingChanges(contestId: Int): List<CodeforcesRatingChange> {
-        return getCodeforcesApi(method = "contest.ratingChanges" ) {
-            parameter("contestId", contestId)
+    //raw pages methods
+    private suspend inline fun getCodeforcesPage(
+        path: String,
+        block: HttpRequestBuilder.() -> Unit = {}
+    ): String {
+        return getCodeforces {
+            url(path)
+            block()
+        }.bodyAsText()
+    }
+
+    private suspend inline fun getCodeforcesPage(
+        path: String,
+        locale: CodeforcesLocale,
+        block: HttpRequestBuilder.() -> Unit = {}
+    ): String {
+        return getCodeforcesPage(path = path) {
+            parameter("locale", locale)
+            block()
         }
+    }
+
+    suspend fun getPage(page: BasePage, locale: CodeforcesLocale): String {
+        return getCodeforcesPage(path = page.path, locale = locale)
     }
 
     suspend fun getHandleSuggestionsPage(str: String): String {
         return getCodeforcesPage(path = "data/handles") {
             parameter("q", str)
         }
-    }
-
-    suspend fun getPage(page: BasePage, locale: CodeforcesLocale): String {
-        return getCodeforcesPage(path = page.path, locale = locale)
     }
 
     suspend fun getUserPage(handle: String): String {
@@ -219,38 +250,6 @@ object CodeforcesApi: PlatformApi {
             parameter("days", days)
         }
     }
-
-    suspend fun getUserBlogEntries(handle: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
-        return getCodeforcesApi(method = "user.blogEntries") {
-            parameter("handle", handle)
-            parameter("locale", locale)
-        }
-    }
-
-    suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale): CodeforcesBlogEntry {
-        return getCodeforcesApi(method = "blogEntry.view") {
-            parameter("blogEntryId", blogEntryId)
-            parameter("locale", locale)
-        }
-    }
-
-    suspend fun getContestStandings(
-        contestId: Int,
-        handles: Collection<String>,
-        includeUnofficial: Boolean
-        //TODO: participantTypes: Collection<CodeforcesParticipationType>
-    ): CodeforcesContestStandings {
-        return getCodeforcesApi(method = "contest.standings") {
-            parameter("contestId", contestId)
-            parameter("handles", handles.joinToString(separator = ";"))
-            parameter("showUnofficial", includeUnofficial)
-        }
-    }
-
-    suspend fun getContestStandings(contestId: Int, handle: String, includeUnofficial: Boolean): CodeforcesContestStandings {
-        return getContestStandings(contestId, listOf(handle), includeUnofficial)
-    }
-
 
     object urls {
         const val main = "https://codeforces.com"
