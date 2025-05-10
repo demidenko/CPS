@@ -5,10 +5,10 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.community.settings.CodeforcesLostHint
-import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
-import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.community.settings.settingsCommunity
+import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostDao
+import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
@@ -96,6 +96,20 @@ class CodeforcesCommunityLostRecentWorker(
             valid
         }
 
+    private suspend fun getRecentBlogEntries(locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
+        suspend fun extractFrom(page: String) =
+            CodeforcesUtils.extractRecentBlogEntries(
+                source = CodeforcesApi.getPageSource(path = "/$page", locale = locale)
+            )
+
+        // "/groups" has less size than "/recent" and hopefully will be cached by cf
+        return runCatching {
+            extractFrom("groups")
+        }.getOrElse {
+            extractFrom("recent-actions")
+        }
+    }
+
     override suspend fun runWork(): Result {
         val settings = context.settingsCommunity
         val dao = context.lostBlogEntriesDao
@@ -103,10 +117,7 @@ class CodeforcesCommunityLostRecentWorker(
         val locale = settings.codeforcesLocale()
         val minRatingColorTag = settings.codeforcesLostMinRatingTag()
 
-        val recentBlogEntries =
-            CodeforcesUtils.extractRecentBlogEntries(
-                source = CodeforcesApi.getPageSource(path = "/recent-actions", locale = locale)
-            )
+        val recentBlogEntries = getRecentBlogEntries(locale = locale)
 
         //get current suspects with removing old ones
         val suspects = dao.getSuspectsRemoveOld(minRatingColorTag)
