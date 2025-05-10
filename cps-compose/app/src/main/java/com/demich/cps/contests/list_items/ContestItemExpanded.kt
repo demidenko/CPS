@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,7 +27,7 @@ import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.context
-import com.demich.cps.utils.localCurrentTime
+import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
 
 @Composable
@@ -93,17 +92,6 @@ private fun ContestTitle(
     )
 }
 
-//TODO: use this (and fix clist has contestPending by default)
-@Composable
-@ReadOnlyComposable
-private fun Contest.properLink(): String? {
-    if (platform == Contest.Platform.codeforces && getPhase(currentTime = localCurrentTime) == Contest.Phase.BEFORE) {
-        val contestId = id.toIntOrNull() ?: return null
-        return CodeforcesApi.urls.contestPending(contestId = contestId)
-    }
-    return link
-}
-
 @Composable
 private fun ContestItemDatesAndMenuButton(
     contest: Contest,
@@ -111,8 +99,7 @@ private fun ContestItemDatesAndMenuButton(
     onDeleteRequest: () -> Unit
 ) {
     ContestItemDatesAndMenuButton(
-        dateRange = contest.dateRange(),
-        contestLink = contest.link,
+        contest = contest,
         collisionType = collisionType,
         modifier = Modifier.fillMaxWidth(),
         onDeleteRequest = onDeleteRequest
@@ -139,9 +126,8 @@ private fun ContestCounter(
 
 @Composable
 private fun ContestItemDatesAndMenuButton(
-    dateRange: String,
+    contest: Contest,
     collisionType: DangerType,
-    contestLink: String?,
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
@@ -151,13 +137,13 @@ private fun ContestItemDatesAndMenuButton(
             color = cpsColors.contentAdditional
         )) {
             AttentionText(
-                text = dateRange,
+                text = contest.dateRange(),
                 collisionType = collisionType,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
         ContestItemMenuButton(
-            contestLink = contestLink,
+            contest = contest,
             modifier = Modifier.align(Alignment.CenterEnd),
             onDeleteRequest = onDeleteRequest
         )
@@ -166,7 +152,7 @@ private fun ContestItemDatesAndMenuButton(
 
 @Composable
 private fun ContestItemMenuButton(
-    contestLink: String?,
+    contest: Contest,
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
@@ -178,9 +164,9 @@ private fun ContestItemMenuButton(
         iconSize = 22.dp,
         modifier = modifier
     ) {
-        if (contestLink != null) {
+        if (contest.link != null) {
             CPSDropdownMenuItem(title = "Open in browser", icon = CPSIcons.OpenInBrowser) {
-                context.openUrlInBrowser(contestLink)
+                contest.properLink()?.let { context.openUrlInBrowser(it) }
             }
         }
         CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete) {
@@ -194,4 +180,15 @@ private fun ContestItemMenuButton(
             onConfirmRequest = onDeleteRequest
         )
     }
+}
+
+private fun Contest.properLink(): String? {
+    if (platform == Contest.Platform.codeforces) {
+        val contestId = id.toIntOrNull() ?: return link
+        return when (getPhase(currentTime = getCurrentTime())) {
+            Contest.Phase.BEFORE -> CodeforcesApi.urls.contestPending(contestId = contestId)
+            else -> CodeforcesApi.urls.contest(contestId = contestId)
+        }
+    }
+    return link
 }

@@ -18,7 +18,7 @@ class CodeforcesContestsLoader: ContestsLoader(type = ContestsLoaderType.codefor
                 title = contest.name,
                 startTime = contest.startTime,
                 duration = contest.duration,
-                link = CodeforcesApi.urls.contestPending(contestId = contest.id)
+                link = CodeforcesApi.urls.contest(contestId = contest.id)
             )
         }
 }
