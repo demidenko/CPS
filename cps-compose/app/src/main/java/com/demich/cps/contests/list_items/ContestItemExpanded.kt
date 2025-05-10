@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,6 +20,7 @@ import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.dateRange
 import com.demich.cps.contests.isVirtual
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSDropdownMenuButton
 import com.demich.cps.ui.CPSIcons
@@ -26,6 +28,7 @@ import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.context
+import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
 
 @Composable
@@ -88,6 +91,17 @@ private fun ContestTitle(
         isVirtual = contest.isVirtual,
         modifier = Modifier.fillMaxWidth()
     )
+}
+
+//TODO: use this (and fix clist has contestPending by default)
+@Composable
+@ReadOnlyComposable
+private fun Contest.properLink(): String? {
+    if (platform == Contest.Platform.codeforces && getPhase(currentTime = localCurrentTime) == Contest.Phase.BEFORE) {
+        val contestId = id.toIntOrNull() ?: return null
+        return CodeforcesApi.urls.contestPending(contestId = contestId)
+    }
+    return link
 }
 
 @Composable
