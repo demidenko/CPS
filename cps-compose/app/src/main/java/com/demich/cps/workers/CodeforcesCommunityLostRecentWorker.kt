@@ -8,6 +8,7 @@ import com.demich.cps.community.settings.CodeforcesLostHint
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.community.settings.settingsCommunity
+import com.demich.cps.features.codeforces.lost.database.CodeforcesLostDao
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
@@ -87,6 +88,14 @@ class CodeforcesCommunityLostRecentWorker(
     private fun isNew(blogCreationTime: Instant) = workerStartTime - blogCreationTime < 24.hours
     private fun isOldLost(blogCreationTime: Instant) = workerStartTime - blogCreationTime > 7.days
 
+    private suspend fun CodeforcesLostDao.getSuspectsRemoveOld(minRatingColorTag: CodeforcesColorTag) =
+        getSuspects().partition {
+            isNew(it.blogEntry.creationTime) && it.blogEntry.authorColorTag >= minRatingColorTag
+        }.let { (valid, invalid) ->
+            remove(invalid)
+            valid
+        }
+
     override suspend fun runWork(): Result {
         val settings = context.settingsCommunity
         val dao = context.lostBlogEntriesDao
@@ -94,19 +103,13 @@ class CodeforcesCommunityLostRecentWorker(
         val locale = settings.codeforcesLocale()
         val minRatingColorTag = settings.codeforcesLostMinRatingTag()
 
-        //get current suspects with removing old ones
-        val suspects: List<CodeforcesLostBlogEntry>
-        dao.getSuspects().partition {
-            isNew(it.blogEntry.creationTime) && it.blogEntry.authorColorTag >= minRatingColorTag
-        }.let { (valid, invalid) ->
-            suspects = valid
-            dao.remove(invalid)
-        }
-
         val recentBlogEntries =
             CodeforcesUtils.extractRecentBlogEntries(
                 source = CodeforcesApi.getPageSource(path = "/recent-actions", locale = locale)
             )
+
+        //get current suspects with removing old ones
+        val suspects = dao.getSuspectsRemoveOld(minRatingColorTag)
 
         //catch new suspects from recent actions
         findSuspects(
@@ -149,6 +152,7 @@ class CodeforcesCommunityLostRecentWorker(
 
 }
 
+//TODO: use cf api.recentActions to get many blogEntries by one request
 private class CachedBlogEntryApi(
     val locale: CodeforcesLocale,
     val onUpdate: suspend (CodeforcesBlogEntry) -> Unit
