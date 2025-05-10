@@ -123,7 +123,7 @@ object CodeforcesApi: PlatformApi {
         }.body<CodeforcesAPIResponse<T>>().result
     }
 
-    private suspend inline fun getCodeforcesWeb(
+    private suspend inline fun getCodeforcesPage(
         path: String,
         block: HttpRequestBuilder.() -> Unit = {}
     ): String {
@@ -131,6 +131,17 @@ object CodeforcesApi: PlatformApi {
             url(path)
             block()
         }.bodyAsText()
+    }
+
+    private suspend inline fun getCodeforcesPage(
+        path: String,
+        locale: CodeforcesLocale,
+        block: HttpRequestBuilder.() -> Unit = {}
+    ): String {
+        return getCodeforcesPage(path = path) {
+            parameter("locale", locale)
+            block()
+        }
     }
 
 
@@ -186,36 +197,25 @@ object CodeforcesApi: PlatformApi {
     }
 
     suspend fun getHandleSuggestionsPage(str: String): String {
-        return getCodeforcesWeb(path = "data/handles") {
+        return getCodeforcesPage(path = "data/handles") {
             parameter("q", str)
         }
     }
 
-    private suspend inline fun getPageSource(
-        path: String,
-        locale: CodeforcesLocale,
-        block: HttpRequestBuilder.() -> Unit = {}
-    ): String {
-        return getCodeforcesWeb(path = path) {
-            parameter("locale", locale)
-            block()
-        }
-    }
-
     suspend fun getPage(page: BasePage, locale: CodeforcesLocale): String {
-        return getPageSource(path = "/${page.path}", locale = locale)
+        return getCodeforcesPage(path = page.path, locale = locale)
     }
 
     suspend fun getUserPage(handle: String): String {
-        return getPageSource(path = urls.user(handle), locale = CodeforcesLocale.EN)
+        return getCodeforcesPage(path = urls.user(handle), locale = CodeforcesLocale.EN)
     }
 
     suspend fun getContestPage(contestId: Int): String {
-        return getPageSource(path = urls.contest(contestId), locale = CodeforcesLocale.EN)
+        return getCodeforcesPage(path = urls.contest(contestId), locale = CodeforcesLocale.EN)
     }
 
     suspend fun getTopCommentsPage(locale: CodeforcesLocale, days: Int = 2): String {
-        return getPageSource(path = "/topComments", locale = locale) {
+        return getCodeforcesPage(path = "topComments", locale = locale) {
             parameter("days", days)
         }
     }
