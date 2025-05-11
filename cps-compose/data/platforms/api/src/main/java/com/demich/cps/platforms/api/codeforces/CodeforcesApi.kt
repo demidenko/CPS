@@ -1,5 +1,6 @@
 package com.demich.cps.platforms.api.codeforces
 
+import com.demich.cps.platforms.api.DelayedSemaphore
 import com.demich.cps.platforms.api.PlatformApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
@@ -29,8 +30,6 @@ import io.ktor.client.statement.request
 import io.ktor.http.appendPathSegments
 import io.ktor.http.setCookie
 import korlibs.crypto.sha1
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -93,7 +92,7 @@ object CodeforcesApi: PlatformApi {
         return false
     }
 
-    private val semaphore = Semaphore(permits = 4)
+    private val semaphore = DelayedSemaphore(permits = 4, limit = 50.milliseconds)
     private suspend inline fun HttpClient.getWithPermit(block: HttpRequestBuilder.() -> Unit) =
         semaphore.withPermit { get(block) }
 
