@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
+import java.util.Collections
 
 
 @Composable
@@ -83,6 +83,16 @@ class CodeforcesCommunityController internal constructor(
 
     val currentTab: CodeforcesTitle
         get() = tabs[pagerState.currentPage]
+
+    // relies that tabs are always fixed!
+    // not saved/restored!
+    val visitedTabs by tabs.toMutableList().let { list ->
+        derivedStateOf {
+            val pos = list.indexOf(currentTab)
+            for (i in pos downTo 1) Collections.swap(list, i, i-1)
+            list
+        }
+    }
 
     fun isTabVisible(tab: CodeforcesTitle) = tab == currentTab && !pagerState.isScrollInProgress
 
@@ -163,10 +173,17 @@ private fun flowOfBadgeCount(
     }
 
 private fun CodeforcesCommunityController.touchFlows(context: Context) {
-    flowOfMainBlogEntries(context)
-    when (topType) {
-        CodeforcesCommunityController.TopType.BlogEntries -> flowOfTopBlogEntries(context)
-        CodeforcesCommunityController.TopType.Comments -> flowOfTopComments(context)
+    visitedTabs.forEach { tab ->
+        when (tab) {
+            CodeforcesTitle.MAIN -> flowOfMainBlogEntries(context)
+            CodeforcesTitle.TOP -> {
+                when (topType) {
+                    CodeforcesCommunityController.TopType.BlogEntries -> flowOfTopBlogEntries(context)
+                    CodeforcesCommunityController.TopType.Comments -> flowOfTopComments(context)
+                }
+            }
+            CodeforcesTitle.RECENT -> flowOfRecent(context)
+            else -> { }
+        }
     }
-    flowOfRecent(context)
 }

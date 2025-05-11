@@ -85,16 +85,10 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         }
     }
 
-    private val reloadableTitles get() = listOf(
-        CodeforcesTitle.MAIN,
-        CodeforcesTitle.TOP,
-        CodeforcesTitle.RECENT
-    )
-
-    override fun reloadAll(context: Context) {
+    override fun reload(titles: List<CodeforcesTitle>, context: Context) {
         viewModelScope.launch {
             val locale = context.settingsCommunity.codeforcesLocale()
-            reloadableTitles.forEach { reload(title = it, locale = locale) }
+            titles.forEach { reload(title = it, locale = locale) }
         }
     }
 

@@ -12,8 +12,8 @@ interface CodeforcesCommunityDataManger {
     fun flowOfLoadingStatus(): Flow<LoadingStatus>
     fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus>
 
-    fun reloadAll(context: Context)
     fun reload(title: CodeforcesTitle, context: Context)
+    fun reload(titles: List<CodeforcesTitle>, context: Context)
 
     fun flowOfMainBlogEntries(context: Context): StateFlow<List<CodeforcesBlogEntry>>
     fun flowOfTopBlogEntries(context: Context): StateFlow<List<CodeforcesBlogEntry>>
