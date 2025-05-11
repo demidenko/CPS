@@ -14,13 +14,13 @@ import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.collectAsState
+import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import java.util.Collections
 
 
 @Composable
@@ -89,7 +89,7 @@ class CodeforcesCommunityController internal constructor(
     val visitedTabs by tabs.toMutableList().let { list ->
         derivedStateOf {
             val pos = list.indexOf(currentTab)
-            for (i in pos downTo 1) Collections.swap(list, i, i-1)
+            for (i in pos downTo 1) list.swap(i, i-1)
             list
         }
     }

@@ -1,7 +1,7 @@
 package com.demich.cps.utils
 
+import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.serialization.json.Json
-import java.util.Collections
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -49,10 +49,7 @@ inline fun<T, R: Comparable<R>> List<T>.minOfWithIndex(selector: (T) -> R): Inde
     return IndexedValue(indexOfMinValue, minValue)
 }
 
-fun<T> List<T>.swapped(i: Int, j: Int): List<T> =
-    toMutableList().apply {
-        Collections.swap(this, i, j)
-    }
+fun <T> List<T>.swapped(i: Int, j: Int): List<T> = toMutableList().apply { swap(i, j) }
 
 inline fun<T, R> List<T>.forEachRangeEqualBy(selector: (T) -> R, block: (Int, Int) -> Unit) {
     var r = 0
