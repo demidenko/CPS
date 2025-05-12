@@ -7,6 +7,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.platforms.api.cpsHttpClient
@@ -165,6 +166,13 @@ object CodeforcesApi: PlatformApi {
             parameter("contestId", contestId)
             parameter("handle", handle)
             parameter("count", 1e9.toInt())
+        }
+    }
+
+    suspend fun getRecentActions(locale: CodeforcesLocale, maxCount: Int): List<CodeforcesRecentAction> {
+        return getCodeforcesApi(method = "recentActions") {
+            parameter("maxCount", maxCount.coerceIn(0, 100))
+            parameter("locale", locale)
         }
     }
 
