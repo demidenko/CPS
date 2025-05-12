@@ -178,7 +178,7 @@ private class CachedBlogEntryApi(
         }
 }
 
-private fun Collection<CodeforcesBlogEntry>.filterIdGreaterThen(id: Int) = filter { it.id > id }
+private fun Collection<CodeforcesBlogEntry>.filterIdGreaterThan(id: Int) = filter { it.id > id }
 
 private suspend fun Collection<CodeforcesBlogEntry>.fixAndFilterColorTag(minRatingColorTag: CodeforcesColorTag) =
     fixedHandleColors().filter { it.authorColorTag >= minRatingColorTag }
@@ -232,7 +232,7 @@ private suspend inline fun findSuspects(
      */
     blogEntries
         // TODO: `.invoke()` instead of `()` https://youtrack.jetbrains.com/issue/KT-74111/
-        .filterIdGreaterThen(lastNotNewIdItem.invoke()?.blogEntryId ?: Int.MIN_VALUE)
+        .filterIdGreaterThan(lastNotNewIdItem.invoke()?.blogEntryId ?: Int.MIN_VALUE)
         .fixAndFilterColorTag(minRatingColorTag)
         .filterNewEntries(isFinalFilter = true) { isNew(cachedApi.getCreationTime(blogEntryId = it.id)) }
         .forEach {
