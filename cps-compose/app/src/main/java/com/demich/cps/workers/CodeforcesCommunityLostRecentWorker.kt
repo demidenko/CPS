@@ -163,7 +163,6 @@ class CodeforcesCommunityLostRecentWorker(
 
 }
 
-//TODO: use cf api.recentActions to get many blogEntries by one request
 private class CachedBlogEntryApi(
     val locale: CodeforcesLocale,
     val onUpdate: suspend (CodeforcesBlogEntry) -> Unit
@@ -176,6 +175,18 @@ private class CachedBlogEntryApi(
                 .also { onUpdate(it) }
                 .creationTime
         }
+
+    suspend fun useRecentActions() {
+        CodeforcesApi.runCatching { getRecentActions(locale = locale) }
+            .getOrElse { return }
+            .forEach {
+                it.blogEntry?.let { blogEntry ->
+                    if (cache.put(key = blogEntry.id, value = blogEntry.creationTime) == null) {
+                        onUpdate(blogEntry)
+                    }
+                }
+            }
+    }
 }
 
 private fun Collection<CodeforcesBlogEntry>.filterIdGreaterThan(id: Int) = filter { it.id > id }
@@ -234,6 +245,9 @@ private suspend inline fun findSuspects(
         // TODO: `.invoke()` instead of `()` https://youtrack.jetbrains.com/issue/KT-74111/
         .filterIdGreaterThan(lastNotNewIdItem.invoke()?.blogEntryId ?: Int.MIN_VALUE)
         .fixAndFilterColorTag(minRatingColorTag)
+        .also {
+            if (it.size > 1) cachedApi.useRecentActions()
+        }
         .filterNewEntries(isFinalFilter = true) { isNew(cachedApi.getCreationTime(blogEntryId = it.id)) }
         .forEach {
             val blogEntry = it.copy(
