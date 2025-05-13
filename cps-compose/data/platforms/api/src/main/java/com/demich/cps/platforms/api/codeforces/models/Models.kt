@@ -146,6 +146,7 @@ data class CodeforcesComment(
     @Serializable(with = InstantAsSecondsSerializer::class)
     val creationTime: Instant,
     val commentatorHandle: String,
+    @SerialName("text")
     val html: String,
     val rating: Int,
     val commentatorHandleColorTag: CodeforcesColorTag = CodeforcesColorTag.BLACK
@@ -157,7 +158,7 @@ data class CodeforcesRecentAction(
     @Serializable(with = InstantAsSecondsSerializer::class)
     val time: Instant,
     val blogEntry: CodeforcesBlogEntry? = null,
-    val comment: CodeforcesComment
+    val comment: CodeforcesComment? = null
 )
 
 enum class CodeforcesContestPhase {

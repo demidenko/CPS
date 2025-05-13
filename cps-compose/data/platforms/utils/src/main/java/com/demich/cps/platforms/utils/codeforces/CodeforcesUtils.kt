@@ -129,6 +129,7 @@ object CodeforcesUtils {
 
             //<span class="notice">Пользователь создал или обновил текст</span>
             //<span class="notice">Комментарий удален по причине нарушения правил Codeforces</span>
+            //TODO: use outerHtml() to match api response
             val commentHtml = commentBox.selectFirst("div.ttypography")?.html()
                 ?: ""
 

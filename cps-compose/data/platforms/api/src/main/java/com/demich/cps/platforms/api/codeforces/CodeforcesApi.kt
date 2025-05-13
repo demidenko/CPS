@@ -169,7 +169,7 @@ object CodeforcesApi: PlatformApi {
         }
     }
 
-    suspend fun getRecentActions(locale: CodeforcesLocale, maxCount: Int): List<CodeforcesRecentAction> {
+    suspend fun getRecentActions(locale: CodeforcesLocale, maxCount: Int = Int.MAX_VALUE): List<CodeforcesRecentAction> {
         return getCodeforcesApi(method = "recentActions") {
             parameter("maxCount", maxCount.coerceIn(0, 100))
             parameter("locale", locale)

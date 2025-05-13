@@ -87,7 +87,7 @@ private fun CodeforcesRecent.makeRecentBlogEntries(): List<RecentBlogEntryData> 
         RecentBlogEntryData(
             blogEntry = blogEntry,
             comments = commentsGrouped[blogEntry.id]
-                ?.map { it.comment }
+                ?.mapNotNull { it.comment } //TODO: nulls skipped
                 ?.distinctBy { it.commentatorHandle }
                 ?: emptyList()
         )

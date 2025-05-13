@@ -60,10 +60,11 @@ fun CodeforcesComments(
         state = lazyListState,
         modifier = modifier,
         items = comments,
-        key = { it.comment.id }
+        key = { it.comment?.id ?: -1 }
     ) { recentAction ->
+        // TODO: maybe without "!!"?
         val blogEntry = recentAction.blogEntry!!
-        val comment = recentAction.comment
+        val comment = recentAction.comment!!
         Comment(
             comment = comment,
             blogEntryTitle = blogEntry.title.takeIf { showTitle },
