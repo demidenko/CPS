@@ -118,6 +118,7 @@ class CodeforcesCommunityLostRecentWorker(
         val minRatingColorTag = settings.codeforcesLostMinRatingTag()
 
         val recentBlogEntries = getRecentBlogEntries(locale = locale)
+        //TODO: use api.recentActions on fail but !![only for findSuspects step]!!
 
         //get current suspects with removing old ones
         val suspects = dao.getSuspectsRemoveOld(minRatingColorTag)
