@@ -21,7 +21,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 abstract class CPSWorker(
@@ -30,7 +30,10 @@ abstract class CPSWorker(
 ): CoroutineWorker(work.context, parameters) {
 
     protected val context get() = work.context
-    protected val workerStartTime by lazy { getCurrentTime() }
+
+    private var startTime = getCurrentTime()
+    private fun resetStartTime() { startTime = getCurrentTime() }
+    protected val workerStartTime get() = startTime
 
     final override suspend fun doWork(): Result {
         if (!work.isEnabled()) {
@@ -58,6 +61,7 @@ abstract class CPSWorker(
     private suspend fun smartRunWork(): Result {
         suspend fun call(): Result {
             setProgressInfo(ProgressBarInfo(total = 0))
+            resetStartTime()
             return runCatching { runWork() }.getOrElse {
                 when {
                     it.isResponseException -> Result.retry()
@@ -129,7 +133,7 @@ abstract class CPSWorker(
 
     private suspend fun CPSWorkersDataStore.append(event: ExecutionEvent) {
         executions.edit {
-            val dateThreshold = workerStartTime - 1.days
+            val dateThreshold = event.start - 24.hours
             update(work.name) { list ->
                 buildList {
                     list.filterTo(this) { it.start >= dateThreshold }
