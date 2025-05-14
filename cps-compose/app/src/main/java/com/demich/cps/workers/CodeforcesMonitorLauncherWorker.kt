@@ -90,6 +90,8 @@ class CodeforcesMonitorLauncherWorker(
                         something = true
                         if (first == null) first = it
                         if (predicate(it)) return Pair(it, first)
+                    } else {
+                        // TODO: break on false (also check empty list)
                     }
                 }
 
