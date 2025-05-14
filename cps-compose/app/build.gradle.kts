@@ -52,7 +52,7 @@ android {
     applicationVariants.all {
         outputs.filterIsInstance<com.android.build.gradle.internal.api.BaseVariantOutputImpl>()
             .forEach {
-                it.outputFileName = "cps-${versionCode}-${buildType.name}"
+                it.outputFileName = "cps-${versionCode}-${buildType.name}.apk"
             }
     }
 }
