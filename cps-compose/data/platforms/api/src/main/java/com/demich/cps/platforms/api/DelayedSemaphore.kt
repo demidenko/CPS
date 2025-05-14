@@ -12,6 +12,7 @@ import kotlin.time.Duration
 internal class DelayedSemaphore(
     permits: Int,
     val limit: Duration
+    //TODO: permitsPerSecond???
 ) {
     private val mutex = Mutex()
     private val semaphore = Semaphore(permits = permits)
