@@ -7,6 +7,7 @@ import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.utils.removeOld
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlinx.datetime.Instant
@@ -43,15 +44,15 @@ class CodeforcesMonitorLauncherWorker(
         val info = dataStore.getSavedInfo() ?: return Result.success()
         if (info.status != STATUS.OK) return Result.success()
 
-        val newSubmissions = getNewSubmissions(
-            handle = info.handle,
-            lastSubmissionId = dataStore.monitorLastSubmissionId()
-        )
-
         with(dataStore) {
-            newSubmissions.firstOrNull { submission ->
+            val (firstParticipation, firstSubmission) = getFirstNewSubmissions(
+                handle = info.handle,
+                lastSubmissionId = monitorLastSubmissionId()
+            ) { submission ->
                 submission.author.participantType.contestParticipant()
-            }?.let { submission ->
+            }
+
+            firstParticipation?.let { submission ->
                 if (monitorCanceledContests().none { it == submission.contestId }) {
                     CodeforcesMonitorWorker.start(
                         contestId = submission.contestId,
@@ -61,7 +62,7 @@ class CodeforcesMonitorLauncherWorker(
                 }
             }
 
-            newSubmissions.firstOrNull()?.let {
+            firstSubmission?.let {
                 monitorLastSubmissionId(it.id)
             }
 
@@ -73,24 +74,32 @@ class CodeforcesMonitorLauncherWorker(
         return Result.success()
     }
 
-    private suspend inline fun getNewSubmissions(
+    private suspend inline fun getFirstNewSubmissions(
         handle: String,
-        lastSubmissionId: Long?
-    ) = buildList {
-            var from = 1L
-            var step = 1L
-            while (true) {
-                val items = CodeforcesApi.getUserSubmissions(handle = handle, from = from, count = step)
-                    .filter { isActual(it.creationTime) }
-                    .filter { lastSubmissionId == null || it.id > lastSubmissionId }
+        lastSubmissionId: Long?,
+        predicate: (CodeforcesSubmission) -> Boolean
+    ): Pair<CodeforcesSubmission?, CodeforcesSubmission?> {
+        var first: CodeforcesSubmission? = null
+        var from = 1L
+        var step = 1L
+        while (true) {
+            var something = false
+            CodeforcesApi.getUserSubmissions(handle = handle, from = from, count = step)
+                .forEach {
+                    if (isActual(it.creationTime) && (lastSubmissionId == null || it.id > lastSubmissionId)) {
+                        something = true
+                        if (first == null) first = it
+                        if (predicate(it)) return Pair(it, first)
+                    }
+                }
 
-                if (items.isEmpty()) break
-                addAll(items)
+            if (!something) break
 
-                from += step
-                step += 10
-            }
+            from += step
+            step += 10
         }
+        return Pair(null, first)
+    }
 
     private suspend fun enqueueToCodeforcesContest() {
         with(context.contestsListDao.getContests(Contest.Platform.codeforces)) {
