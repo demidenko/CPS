@@ -11,6 +11,7 @@ import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.joinAllWithCounter
 import com.demich.cps.utils.jsonCPS
+import com.demich.cps.utils.update
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
@@ -40,16 +41,10 @@ abstract class CPSWorker(
         val workersInfo = CPSWorkersDataStore(context)
 
         val result = withContext(Dispatchers.IO) {
-            workersInfo.append(ExecutionEvent(start = workerStartTime))
-
+            val event = ExecutionEvent(start = workerStartTime)
+            workersInfo.append(event)
             smartRunWork().also { result ->
-                workersInfo.append(
-                    ExecutionEvent(
-                        start = workerStartTime,
-                        end = getCurrentTime(),
-                        resultType = result.toType()
-                    )
-                )
+                workersInfo.append(event.copy(end = getCurrentTime(), resultType = result.toType()))
                 if (result.toType() != ResultType.SUCCESS) {
                     work.enqueueAsap()
                 }
@@ -134,17 +129,16 @@ abstract class CPSWorker(
 
     private suspend fun CPSWorkersDataStore.append(event: ExecutionEvent) {
         executions.edit {
-            val list = mutableListOf<ExecutionEvent>()
             val dateThreshold = workerStartTime - 1.days
-            this[work.name]?.filterTo(list) { it.start >= dateThreshold }
-
-            if (list.isNotEmpty() && list.last().start == event.start) {
-                list[list.size - 1] = event
-            } else {
-                list.add(event)
+            update(work.name) { list ->
+                buildList {
+                    list.filterTo(this) { it.start >= dateThreshold }
+                    indexOfFirst { it.start == event.start }.let { index ->
+                        if (index == -1) add(event)
+                        else set(index, event)
+                    }
+                }
             }
-
-            this[work.name] = list
         }
     }
 }

@@ -13,7 +13,6 @@ import com.demich.cps.contests.loading.asContestsReceiver
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.append
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
@@ -27,7 +26,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -75,7 +73,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             },
             onResult = { platform, loaderType, result ->
                 result.onFailure { error ->
-                    errors.update { it.append(platform, loaderType to error) }
+                    errors.edit { edit(platform) { add(loaderType to error) } }
                 }
                 lastResult[platform] = result
             }

@@ -61,10 +61,13 @@ inline fun<T, R> List<T>.forEachRangeEqualBy(selector: (T) -> R, block: (Int, In
     }
 }
 
-fun<K, V> Map<K, List<V>>.append(key: K, value: V): Map<K, List<V>> =
-    toMutableMap().apply {
-        this[key] = this[key]?.let { it + value } ?: listOf(value)
-    }
+inline fun <K, V> MutableMap<K, List<V>>.update(key: K, block: (List<V>) -> List<V>) {
+    set(key, block(get(key) ?: emptyList()))
+}
+
+inline fun <K, V> MutableMap<K, List<V>>.edit(key: K, block: MutableList<V>.() -> Unit) {
+    set(key, (get(key)?.toMutableList() ?: mutableListOf()).apply(block))
+}
 
 fun <T> List<T>.subList(range: IntRange): List<T> {
     if (range.isEmpty()) return emptyList()
