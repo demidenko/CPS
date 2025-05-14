@@ -48,6 +48,13 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    applicationVariants.all {
+        outputs.filterIsInstance<com.android.build.gradle.internal.api.BaseVariantOutputImpl>()
+            .forEach {
+                it.outputFileName = "cps-${versionCode}-${buildType.name}"
+            }
+    }
 }
 
 dependencies {
