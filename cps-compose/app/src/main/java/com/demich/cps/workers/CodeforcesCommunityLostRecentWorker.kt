@@ -38,51 +38,6 @@ class CodeforcesCommunityLostRecentWorker(
                     repeatInterval = 30.minutes
                 )
         }
-
-        /*suspend fun updateInfo(context: Context, progress: MutableStateFlow<Pair<Int,Int>?>) {
-            val blogsDao = getLostBlogsDao(context)
-
-            val blogEntries = blogsDao.getLost().sortedByDescending { it.id }
-
-            progress.value = 0 to blogEntries.size
-            var done = 0
-
-            val users = CodeforcesUtils.getUsersInfo(blogEntries.map { it.authorHandle })
-            val locale = NewsFragment.getCodeforcesContentLanguage(context)
-
-            blogEntries.forEach { originalBlogEntry ->
-                var blogEntry = originalBlogEntry.copy()
-
-                //updates author's handle color
-                users[blogEntry.authorHandle]?.takeIf { it.status==STATUS.OK }?.let { user ->
-                    blogEntry = blogEntry.copy(
-                        authorColorTag = CodeforcesUtils.getTagByRating(user.rating)
-                    )
-                }
-
-                CodeforcesAPI.getBlogEntry(blogEntry.id,locale)?.let { response ->
-                    if(response.status == CodeforcesAPIStatus.FAILED && response.isBlogNotFound(blogEntry.id)){
-                        //remove deleted
-                        blogsDao.remove(blogEntry)
-                    } else {
-                        //update title and author's handle
-                        if(response.status == CodeforcesAPIStatus.OK) response.result?.let { freshBlogEntry ->
-                            val title = freshBlogEntry.title.removeSurrounding("<p>", "</p>")
-                            blogEntry = blogEntry.copy(
-                                authorHandle = freshBlogEntry.authorHandle,
-                                title = fromHTML(title).toString()
-                            )
-                        }
-                    }
-                }
-
-                if(blogEntry != originalBlogEntry) blogsDao.update(blogEntry)
-
-                progress.value = ++done to blogEntries.size
-            }
-
-            progress.value = null
-        }*/
     }
 
     private fun isNew(blogCreationTime: Instant) = workerStartTime - blogCreationTime < 24.hours
