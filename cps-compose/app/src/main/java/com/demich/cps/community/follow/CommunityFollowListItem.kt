@@ -123,13 +123,28 @@ private fun UserOnlineInfo(
     fontSize: TextUnit,
     time: Instant
 ) {
+    UserOnlineInfo(
+        modifier = modifier,
+        fontSize = fontSize,
+        text = "online: " + timeAgo(fromTime = time, toTime = localCurrentTime),
+        showWarning = localCurrentTime - time > 365.days
+    )
+}
+
+@Composable
+private fun UserOnlineInfo(
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit,
+    text: String,
+    showWarning: Boolean
+) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Text(
-            text = "online: " + timeAgo(fromTime = time, toTime = localCurrentTime),
+            text = text,
             color = cpsColors.contentAdditional,
             fontSize = fontSize
         )
-        if (localCurrentTime - time > 365.days) {
+        if (showWarning) {
             AttentionIcon(
                 dangerType = DangerType.WARNING,
                 modifier = Modifier.padding(start = 3.dp)
