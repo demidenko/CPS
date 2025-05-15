@@ -8,24 +8,45 @@ import kotlinx.coroutines.sync.withPermit
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 internal class DelayedSemaphore(
     permits: Int,
-    val limit: Duration
-    //TODO: permitsPerSecond???
+    val minDelay: Duration,
+    val window: Duration = 1.seconds,
+    val permitsPerWindow: Int
 ) {
+    init {
+        require(minDelay.isPositive())
+        require(window.isPositive())
+        require(permitsPerWindow > 0)
+    }
+
     private val mutex = Mutex()
     private val semaphore = Semaphore(permits = permits)
-    private var lastRun = Instant.DISTANT_PAST
+
+    private val recentRuns = ArrayDeque<Instant>()
 
     suspend inline fun <T> withPermit(action: () -> T): T =
         semaphore.withPermit {
             mutex.withLock {
-                (currentTime() - lastRun).let {
-                    //if it < 0 ????
-                    if (it < limit) delay(limit - it)
+                currentTime().let { t ->
+                    // just in fantastic case
+                    while (recentRuns.isNotEmpty() && recentRuns.last() > t) recentRuns.removeLast()
                 }
-                lastRun = currentTime()
+                while (currentTime().let { t -> recentRuns.count { it >= t - window } + 1 > permitsPerWindow }) {
+                    while (recentRuns.isNotEmpty() && recentRuns.first() + window < currentTime()) {
+                        recentRuns.removeFirst()
+                    }
+                    recentRuns.firstOrNull()?.let {
+                        delay(it + window - currentTime())
+                    }
+                }
+                recentRuns.lastOrNull()?.let { lastRun ->
+                    val d = currentTime() - lastRun
+                    delay(minDelay - d)
+                }
+                recentRuns.addLast(currentTime())
             }
             action()
         }

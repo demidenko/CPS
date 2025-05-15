@@ -93,7 +93,12 @@ object CodeforcesApi: PlatformApi {
         return false
     }
 
-    private val semaphore = DelayedSemaphore(permits = 4, limit = 50.milliseconds)
+    private val semaphore = DelayedSemaphore(
+        permits = 4,
+        minDelay = 50.milliseconds,
+        permitsPerWindow = 4
+    )
+
     private suspend inline fun HttpClient.getWithPermit(block: HttpRequestBuilder.() -> Unit) =
         semaphore.withPermit { get(block) }
 
