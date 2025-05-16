@@ -13,9 +13,20 @@ import kotlin.time.Duration.Companion.seconds
 internal class DelayedSemaphore(
     permits: Int,
     val minDelay: Duration,
-    val window: Duration = 1.seconds,
+    val window: Duration,
     val permitsPerWindow: Int
 ) {
+    constructor(
+        permits: Int,
+        minDelay: Duration,
+        permitsPerSecond: Int
+    ): this(
+        permits = permits,
+        minDelay = minDelay,
+        window = 1.seconds,
+        permitsPerWindow = permitsPerSecond
+    )
+
     init {
         require(minDelay.isPositive())
         require(window.isPositive())
