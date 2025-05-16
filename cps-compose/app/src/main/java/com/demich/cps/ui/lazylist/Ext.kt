@@ -10,7 +10,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.demich.cps.ui.EmptyMessageBox
-import com.demich.cps.utils.subList
 
 fun LazyListLayoutInfo.visibleItemsInfo(requiredVisiblePart: Float): List<LazyListItemInfo> {
     require(requiredVisiblePart in 0f..1f)
@@ -32,7 +31,7 @@ fun LazyListLayoutInfo.visibleItemsInfo(requiredVisiblePart: Float): List<LazyLi
     }
 
     if (firstVisible > lastVisible) return emptyList()
-    return visibleItems.subList(firstVisible .. lastVisible)
+    return visibleItems.subList(fromIndex = firstVisible, toIndex = lastVisible + 1)
 }
 
 fun LazyListState.visibleRange(requiredVisiblePart: Float): IntRange =

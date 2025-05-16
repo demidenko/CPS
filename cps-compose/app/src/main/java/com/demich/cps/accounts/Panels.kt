@@ -24,6 +24,7 @@ import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.*
+import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
@@ -128,7 +129,7 @@ private fun PanelMovingButtons(
     val scope = rememberCoroutineScope()
     fun saveSwapped(i: Int, j: Int) {
         scope.launch {
-            context.settingsUI.accountsOrder(newValue = visibleOrder.swapped(i, j))
+            context.settingsUI.accountsOrder(newValue = visibleOrder.toMutableList().apply { swap(i, j) })
         }
     }
     val index = visibleOrder.indexOf(type)

@@ -1,6 +1,5 @@
 package com.demich.cps.utils
 
-import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.serialization.json.Json
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -27,15 +26,20 @@ val jsonCPS = Json {
     allowStructuredMapKeys = true
 }
 
-inline fun<T> List<T>.forEach(from: Int, to: Int = size, block: (T) -> Unit) =
-    (from until to).forEach { block(get(it)) }
+inline fun <T> List<T>.forEach(from: Int, to: Int = size, block: (T) -> Unit) {
+    var i = from
+    while (i < to) {
+        block(get(i))
+        ++i
+    }
+}
 
 
 fun Int.toSignedString(zeroAsPositive: Boolean = false): String =
     if (this > 0 || this == 0 && zeroAsPositive) "+${this}" else "$this"
 
 
-inline fun<T, R: Comparable<R>> List<T>.minOfWithIndex(selector: (T) -> R): IndexedValue<R> {
+inline fun <T, R: Comparable<R>> List<T>.minOfWithIndex(selector: (T) -> R): IndexedValue<R> {
     if (isEmpty()) throw NoSuchElementException()
     var indexOfMinValue = 0
     var minValue = selector(get(indexOfMinValue))
@@ -49,9 +53,7 @@ inline fun<T, R: Comparable<R>> List<T>.minOfWithIndex(selector: (T) -> R): Inde
     return IndexedValue(indexOfMinValue, minValue)
 }
 
-fun <T> List<T>.swapped(i: Int, j: Int): List<T> = toMutableList().apply { swap(i, j) }
-
-inline fun<T, R> List<T>.forEachRangeEqualBy(selector: (T) -> R, block: (Int, Int) -> Unit) {
+inline fun <T, R> List<T>.forEachRangeEqualBy(selector: (T) -> R, block: (Int, Int) -> Unit) {
     var r = 0
     while (r < size) {
         val l = r++
@@ -62,14 +64,10 @@ inline fun<T, R> List<T>.forEachRangeEqualBy(selector: (T) -> R, block: (Int, In
 }
 
 inline fun <K, V> MutableMap<K, List<V>>.update(key: K, block: (List<V>) -> List<V>) {
-    set(key, block(get(key) ?: emptyList()))
+    set(key, block(getOrElse(key) { emptyList() }))
 }
 
 inline fun <K, V> MutableMap<K, List<V>>.edit(key: K, block: MutableList<V>.() -> Unit) {
-    set(key, (get(key)?.toMutableList() ?: mutableListOf()).apply(block))
-}
-
-fun <T> List<T>.subList(range: IntRange): List<T> {
-    if (range.isEmpty()) return emptyList()
-    return subList(fromIndex = range.first, toIndex = range.last + 1)
+    val list = get(key)?.toMutableList() ?: mutableListOf()
+    set(key, list.apply(block))
 }
