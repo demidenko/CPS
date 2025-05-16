@@ -1,6 +1,7 @@
 package com.demich.cps.platforms.api.codeforces
 
-import com.demich.cps.platforms.api.DelayedSemaphore
+import com.demich.cps.platforms.api.BuildConfig
+import com.demich.cps.platforms.api.RateLimitingSemaphore
 import com.demich.cps.platforms.api.PlatformApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
@@ -92,9 +93,9 @@ object CodeforcesApi: PlatformApi {
         return false
     }
 
-    private val semaphore = DelayedSemaphore(
+    private val semaphore = RateLimitingSemaphore(
         permits = 4,
-        permitsPerSecond = 3,
+        permitsPerSecond = if (BuildConfig.DEBUG) 1 else 3,
         minDelay = 50.milliseconds
     )
 

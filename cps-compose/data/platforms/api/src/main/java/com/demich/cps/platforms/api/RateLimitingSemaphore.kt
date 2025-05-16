@@ -10,7 +10,7 @@ import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-internal class DelayedSemaphore(
+internal class RateLimitingSemaphore(
     permits: Int,
     val minDelay: Duration,
     val window: Duration,
