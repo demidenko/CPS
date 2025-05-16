@@ -122,14 +122,13 @@ private class ContestsSmartSorter: ContestsSorter {
             saveToSorted(contests, currentTime)
             updateFirstFinished(currentTime)
             return true
-        } else {
-            if (currentTime >= nextReorderTime) {
-                if (!sortedLast.isSortedWith(Contest.getComparator(currentTime))) {
-                    saveToSorted(sortedLast, currentTime)
-                }
-                updateFirstFinished(currentTime)
-                return true
+        }
+        if (currentTime >= nextReorderTime) {
+            if (!sortedLast.isSortedWith(Contest.getComparator(currentTime))) {
+                saveToSorted(sortedLast, currentTime)
             }
+            updateFirstFinished(currentTime)
+            return true
         }
         return false
     }
