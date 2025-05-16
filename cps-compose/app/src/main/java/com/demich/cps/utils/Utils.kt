@@ -26,14 +26,6 @@ val jsonCPS = Json {
     allowStructuredMapKeys = true
 }
 
-inline fun <T> List<T>.forEach(from: Int, to: Int = size, block: (T) -> Unit) {
-    var i = from
-    while (i < to) {
-        block(get(i))
-        ++i
-    }
-}
-
 
 fun Int.toSignedString(zeroAsPositive: Boolean = false): String =
     if (this > 0 || this == 0 && zeroAsPositive) "+${this}" else "$this"

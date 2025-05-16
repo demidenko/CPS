@@ -11,7 +11,6 @@ import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.ACMPApi
 import com.demich.cps.platforms.utils.ACMPUtils
 import com.demich.cps.ui.theme.CPSColors
-import com.demich.cps.utils.forEach
 
 
 class ACMPAccountManager :
@@ -47,8 +46,14 @@ class ACMPAccountManager :
             val words = userInfo.userName.split(' ')
             if (words.size < 3) append(userInfo.userName)
             else {
-                append(words[0])
-                words.forEach(from = 1) { append(" ${it[0]}.") }
+                words.forEachIndexed { index, word ->
+                    if (index == 0) append(word)
+                    else {
+                        append(' ')
+                        append(word[0])
+                        append('.')
+                    }
+                }
             }
             if (userInfo.solvedTasks > 0) append(" [${userInfo.solvedTasks} / ${userInfo.rating}]")
         }

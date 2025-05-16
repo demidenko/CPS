@@ -6,7 +6,6 @@ import com.demich.cps.accounts.HandleColorBound
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingRevolutionsProvider
 import com.demich.cps.accounts.userinfo.RatedUserInfo
-import com.demich.cps.utils.forEach
 import com.demich.cps.utils.forEachRangeEqualBy
 import com.demich.kotlin_stdlib_boost.isSortedWith
 
@@ -50,5 +49,13 @@ internal class RatingGraphRectangles(
             }
             prevX = rectangles[l].first.x
         }
+    }
+}
+
+private inline fun <T> List<T>.forEach(from: Int, to: Int = size, block: (T) -> Unit) {
+    var i = from
+    while (i < to) {
+        block(get(i))
+        ++i
     }
 }
