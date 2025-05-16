@@ -14,7 +14,6 @@ import com.demich.cps.platforms.api.cpsHttpClient
 import com.demich.cps.platforms.api.defaultJson
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpResponseValidator
@@ -99,16 +98,16 @@ object CodeforcesApi: PlatformApi {
         minDelay = 50.milliseconds
     )
 
-    private suspend inline fun HttpClient.getWithPermit(block: HttpRequestBuilder.() -> Unit) =
-        semaphore.withPermit { get(block) }
+    private suspend inline fun getWithPermit(block: HttpRequestBuilder.() -> Unit) =
+        semaphore.withPermit { client.get(block) }
 
     //TODO: find proper solution (intercept / retry plugins not works)
     private suspend inline fun getCodeforces(block: HttpRequestBuilder.() -> Unit): HttpResponse {
         runCatching {
-            return client.getWithPermit(block)
+            return getWithPermit(block)
         }.getOrElse { exception ->
             if (exception is CodeforcesPOWException) {
-                return client.getWithPermit {
+                return getWithPermit {
                     cookie(name = "pow", value = proofOfWork(exception.pow))
                     block()
                 }
