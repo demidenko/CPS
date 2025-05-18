@@ -18,6 +18,7 @@ import androidx.work.WorkManager
 import com.demich.cps.notifications.NotificationBuilder
 import com.demich.cps.utils.getCurrentTime
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
@@ -97,23 +98,26 @@ abstract class CPSPeriodicWork(
         if (isEnabled()) enqueue()
     }
 
-    private fun enqueueAt(time: Instant) =
+    private suspend fun getWorkInfo(): WorkInfo? = flowOfWorkInfo().first()
+
+    private suspend fun enqueueAt(time: Instant) {
         enqueueWork(policy = ExistingPeriodicWorkPolicy.UPDATE) {
             //TODO: ignores default even if default closer
             setNextScheduleTimeOverride(time)
         }
+    }
 
-    fun enqueueAt(time: Instant, repeatInterval: Duration) {
+    suspend fun enqueueAt(time: Instant, repeatInterval: Duration) {
         if (getCurrentTime() + repeatInterval < time) return
         enqueueAt(time)
     }
 
-    fun enqueueIn(duration: Duration, repeatInterval: Duration) {
+    suspend fun enqueueIn(duration: Duration, repeatInterval: Duration) {
         if (repeatInterval < duration) return
         enqueueAt(time = getCurrentTime() + duration)
     }
 
-    fun enqueueAsap() =
+    suspend fun enqueueAsap() =
         enqueueAt(time = getCurrentTime() + PeriodicWorkRequest.minPeriodicInterval)
 }
 
@@ -180,3 +184,9 @@ val WorkInfo?.stateOrCancelled: WorkInfo.State
 
 val WorkInfo?.isRunning: Boolean
     get() = this?.state == WorkInfo.State.RUNNING
+
+private val WorkInfo.repeatInterval: Duration?
+    get() = this.periodicityInfo?.repeatIntervalMillis?.milliseconds
+
+private val WorkInfo.nextScheduleTime: Instant
+    get() = Instant.fromEpochMilliseconds(nextScheduleTimeMillis)
