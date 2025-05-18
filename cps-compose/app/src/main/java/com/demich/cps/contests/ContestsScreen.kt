@@ -318,16 +318,16 @@ fun contestsBottomBarBuilder(
     val isAnyPlatformEnabled by anyPlatformEnabledState()
 
     if (isAnyPlatformEnabled) {
+        FilterIconButton(filterState = filterState)
+    }
+
+    if (isAnyPlatformEnabled) {
         ContestsPageSwitchButton(
             contestsPage = contestsListState.contestsPage,
             onClick = {
                 contestsListState.contestsPage = it
             }
         )
-    }
-
-    if (isAnyPlatformEnabled) {
-        FilterIconButton(filterState = filterState)
     }
 
     CPSReloadingButton(
