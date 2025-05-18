@@ -13,6 +13,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.platforms.api.cpsHttpClient
 import com.demich.cps.platforms.api.defaultJson
+import com.demich.cps.platforms.api.isServerError
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
 import io.ktor.client.call.body
@@ -28,6 +29,7 @@ import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.appendPathSegments
 import io.ktor.http.setCookie
 import korlibs.crypto.sha1
@@ -48,7 +50,7 @@ object CodeforcesApi: PlatformApi {
 
         HttpResponseValidator {
             validateResponse { response ->
-                if (response.status.value == 200) {
+                if (response.status == HttpStatusCode.OK) {
                     val text = response.bodyAsText()
 
                     if (isTemporarilyUnavailable(text)) {
@@ -88,7 +90,7 @@ object CodeforcesApi: PlatformApi {
 
     private val callLimitExceededWaitTime: Duration get() = 500.milliseconds
     private fun Throwable.shouldRetry(): Boolean {
-        if (this is ResponseException && response.status.value in 500 until 600) return true
+        if (this is ResponseException && response.status.isServerError()) return true
         if (this is CodeforcesApiCallLimitExceededException) return true
         return false
     }
