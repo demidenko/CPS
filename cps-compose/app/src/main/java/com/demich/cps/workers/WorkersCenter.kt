@@ -117,8 +117,13 @@ abstract class CPSPeriodicWork(
         enqueueAt(time = getCurrentTime() + duration)
     }
 
-    suspend fun enqueueAsap() =
-        enqueueAt(time = getCurrentTime() + PeriodicWorkRequest.minPeriodicInterval)
+    suspend fun enqueueAsap() {
+        val time = getCurrentTime() + PeriodicWorkRequest.minPeriodicInterval
+        getWorkInfo()?.nextScheduleTime?.let {
+            if (it < time) return
+        }
+        enqueueAt(time = time)
+    }
 }
 
 internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
