@@ -95,11 +95,19 @@ object CodeforcesApi: PlatformApi {
         return false
     }
 
-    private val semaphore = RateLimitingSemaphore(
-        permits = 4,
-        permitsPerSecond = if (BuildConfig.DEBUG) 1 else 3,
-        minDelay = 50.milliseconds
-    )
+    private val semaphore = when {
+        BuildConfig.DEBUG -> RateLimitingSemaphore(
+            permits = 3,
+            permitsPerSecond = 1,
+            minDelay = 200.milliseconds
+        )
+        else -> RateLimitingSemaphore(
+            permits = 4,
+            permitsPerSecond = 3,
+            minDelay = 50.milliseconds
+        )
+    }
+
 
     private suspend inline fun getWithPermit(block: HttpRequestBuilder.() -> Unit) =
         semaphore.withPermit { client.get(block) }
