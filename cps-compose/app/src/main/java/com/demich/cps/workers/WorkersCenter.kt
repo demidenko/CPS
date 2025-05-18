@@ -185,8 +185,11 @@ val WorkInfo?.stateOrCancelled: WorkInfo.State
 val WorkInfo?.isRunning: Boolean
     get() = this?.state == WorkInfo.State.RUNNING
 
-private val WorkInfo.repeatInterval: Duration?
+val WorkInfo.repeatInterval: Duration?
     get() = this.periodicityInfo?.repeatIntervalMillis?.milliseconds
 
-val WorkInfo.nextScheduleTime: Instant
-    get() = Instant.fromEpochMilliseconds(nextScheduleTimeMillis)
+val WorkInfo.nextScheduleTime: Instant?
+    get() = when (state) {
+        WorkInfo.State.ENQUEUED -> Instant.fromEpochMilliseconds(nextScheduleTimeMillis)
+        else -> null
+    }

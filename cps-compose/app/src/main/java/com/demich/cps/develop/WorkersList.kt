@@ -120,8 +120,8 @@ private fun WorkerDialog(work: CPSPeriodicWork, onDismissRequest: () -> Unit) {
     CPSYesNoDialog(
         title = {
             Column {
-                workInfo?.let {
-                    Text(text = "next in ${timeDifference(localCurrentTime, it.nextScheduleTime)}")
+                workInfo?.nextScheduleTime?.let { nextTime ->
+                    Text(text = "next in ${timeDifference(localCurrentTime, nextTime)}")
                 }
                 Text(
                     text = "restart ${work.name}?",
