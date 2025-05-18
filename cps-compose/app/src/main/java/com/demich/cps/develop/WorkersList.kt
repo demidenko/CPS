@@ -62,6 +62,7 @@ import com.demich.cps.workers.getCPSWorks
 import com.demich.cps.workers.getProgressInfo
 import com.demich.cps.workers.isRunning
 import com.demich.cps.workers.nextScheduleTime
+import com.demich.cps.workers.repeatInterval
 import com.demich.cps.workers.stateOrCancelled
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -120,6 +121,9 @@ private fun WorkerDialog(work: CPSPeriodicWork, onDismissRequest: () -> Unit) {
     CPSYesNoDialog(
         title = {
             Column {
+                workInfo?.repeatInterval?.let {
+                    Text(text = "repeat interval = $it")
+                }
                 workInfo?.nextScheduleTime?.let { nextTime ->
                     Text(text = "next in ${timeDifference(localCurrentTime, nextTime)}")
                 }
