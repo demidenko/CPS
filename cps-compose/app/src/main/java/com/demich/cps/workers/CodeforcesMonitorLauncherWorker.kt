@@ -22,14 +22,13 @@ class CodeforcesMonitorLauncherWorker(
     parameters = parameters
 ) {
     companion object {
-        private val repeatInterval get() = 45.minutes
         fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_monitor_launcher", context = context) {
             override suspend fun isEnabled() =
                 CodeforcesAccountManager().getSettings(context).monitorEnabled()
 
             override val requestBuilder
                 get() = CPSPeriodicWorkRequestBuilder<CodeforcesMonitorLauncherWorker>(
-                    repeatInterval = repeatInterval
+                    repeatInterval = 45.minutes
                 )
         }
     }
@@ -115,7 +114,7 @@ class CodeforcesMonitorLauncherWorker(
                     else -> null
                 }
             }?.let {
-                work.enqueueAt(time = it + 5.minutes, repeatInterval)
+                work.enqueueAtIfEarlier(time = it + 5.minutes)
             }
         }
     }

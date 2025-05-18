@@ -82,10 +82,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
 
     fun reloadEnabledPlatforms(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            ContestsWorker.getWork(context).enqueueIn(
-                duration = ContestsWorker.workRepeatInterval,
-                repeatInterval = ContestsWorker.workRepeatInterval
-            )
+            ContestsWorker.getWork(context).enqueueInRepeatInterval()
             reloadEnabledPlatforms(
                 settings = context.settingsContests,
                 contestsInfo = ContestsInfoDataStore(context),
