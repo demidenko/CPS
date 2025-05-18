@@ -188,5 +188,5 @@ val WorkInfo?.isRunning: Boolean
 private val WorkInfo.repeatInterval: Duration?
     get() = this.periodicityInfo?.repeatIntervalMillis?.milliseconds
 
-private val WorkInfo.nextScheduleTime: Instant
+val WorkInfo.nextScheduleTime: Instant
     get() = Instant.fromEpochMilliseconds(nextScheduleTimeMillis)

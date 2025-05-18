@@ -61,6 +61,7 @@ import com.demich.cps.workers.CodeforcesMonitorWorker
 import com.demich.cps.workers.getCPSWorks
 import com.demich.cps.workers.getProgressInfo
 import com.demich.cps.workers.isRunning
+import com.demich.cps.workers.nextScheduleTime
 import com.demich.cps.workers.stateOrCancelled
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -120,8 +121,7 @@ private fun WorkerDialog(work: CPSPeriodicWork, onDismissRequest: () -> Unit) {
         title = {
             Column {
                 workInfo?.let {
-                    val nextTime = Instant.fromEpochMilliseconds(it.nextScheduleTimeMillis)
-                    Text(text = "next in ${timeDifference(localCurrentTime, nextTime)}")
+                    Text(text = "next in ${timeDifference(localCurrentTime, it.nextScheduleTime)}")
                 }
                 Text(
                     text = "restart ${work.name}?",
