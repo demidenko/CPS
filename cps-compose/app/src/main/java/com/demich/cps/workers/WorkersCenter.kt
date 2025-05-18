@@ -25,11 +25,14 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.toJavaDuration
 
 
+private val Context.workManager: WorkManager
+    get() = WorkManager.getInstance(this)
+
 abstract class CPSWork(
     val name: String,
     val context: Context
 ) {
-    val workManager get() = WorkManager.getInstance(context)
+    val workManager: WorkManager get() = context.workManager
 
     fun stop() {
         workManager.cancelUniqueWork(name)
@@ -37,7 +40,7 @@ abstract class CPSWork(
 
     fun flowOfWorkInfo(): Flow<WorkInfo?> =
         workManager.getWorkInfosForUniqueWorkFlow(name)
-            .map { it.getOrNull(0) }
+            .map { it.firstOrNull() }
 }
 
 abstract class CPSOneTimeWork(
@@ -50,8 +53,11 @@ abstract class CPSOneTimeWork(
         policy: ExistingWorkPolicy,
         block: OneTimeWorkRequest.Builder.() -> Unit = {}
     ) {
-        val request = requestBuilder.apply(block).build()
-        workManager.enqueueUniqueWork(name, policy, request)
+        workManager.enqueueUniqueWork(
+            uniqueWorkName = name,
+            existingWorkPolicy = policy,
+            request = requestBuilder.apply(block).build()
+        )
     }
 
     fun enqueue(replace: Boolean) =
@@ -70,8 +76,11 @@ abstract class CPSPeriodicWork(
         policy: ExistingPeriodicWorkPolicy,
         block: PeriodicWorkRequest.Builder.() -> Unit = {}
     ) {
-        val request = requestBuilder.apply(block).build()
-        workManager.enqueueUniquePeriodicWork(name, policy, request)
+        workManager.enqueueUniquePeriodicWork(
+            uniqueWorkName = name,
+            existingPeriodicWorkPolicy = policy,
+            request = requestBuilder.apply(block).build()
+        )
     }
 
     private fun start(restart: Boolean) =
@@ -145,7 +154,8 @@ fun Context.getCPSWorks() = listOf(
 
 suspend fun Context.enqueueEnabledWorkers() {
     //accounts renamed to profiles but work still in database
-    WorkManager.getInstance(this).cancelUniqueWork(uniqueWorkName = "accounts")
+    //TODO: get all enqueued (somehow) and cancel not from list
+    workManager.cancelUniqueWork(uniqueWorkName = "accounts")
 
     getCPSWorks().forEach { it.enqueueIfEnabled() }
 }
