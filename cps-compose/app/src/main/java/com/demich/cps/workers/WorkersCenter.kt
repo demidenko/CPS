@@ -148,8 +148,8 @@ internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
         )
     ).apply {
         setBackoffCriteria(
-            BackoffPolicy.LINEAR,
-            PeriodicWorkRequest.minPeriodicInterval.toJavaDuration()
+            backoffPolicy = BackoffPolicy.LINEAR,
+            duration = PeriodicWorkRequest.minPeriodicInterval.toJavaDuration()
         )
     }
 
@@ -195,7 +195,7 @@ val WorkInfo?.isRunning: Boolean
     get() = this?.state == WorkInfo.State.RUNNING
 
 val WorkInfo.repeatInterval: Duration?
-    get() = this.periodicityInfo?.repeatIntervalMillis?.milliseconds
+    get() = periodicityInfo?.repeatIntervalMillis?.milliseconds
 
 val WorkInfo.nextScheduleTime: Instant?
     get() = when (state) {

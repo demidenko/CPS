@@ -2,12 +2,20 @@ package com.demich.cps.platforms.api
 
 object ProjectEulerApi: PlatformApi {
 
+    private suspend fun getPage(page: String): String {
+        return client.getText(urlString = "${urls.main}/$page")
+    }
+
+    suspend fun getNewsPage(): String {
+        return getPage(page = "news")
+    }
+
     suspend fun getRSSPage(): String {
-        return client.getText(urlString = "${urls.main}/rss2_euler.xml")
+        return getPage(page = "rss2_euler.xml")
     }
 
     suspend fun getRecentPage(): String {
-        return client.getText(urlString = "${urls.main}/recent")
+        return getPage(page = "recent")
     }
 
     object urls {
