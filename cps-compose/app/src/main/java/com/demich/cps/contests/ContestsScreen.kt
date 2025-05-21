@@ -360,9 +360,8 @@ private fun anyPlatformEnabledState(): State<Boolean> {
     val context = context
     return collectAsState {
         context.settingsContests.flowOf { prefs ->
-            val any1 = prefs[enabledPlatforms].any { it != Contest.Platform.unknown }
-            val any2 = prefs[clistAdditionalResources].isNotEmpty()
-            any1 || any2
+            prefs[enabledPlatforms].any { it != Contest.Platform.unknown }
+                    || prefs[clistAdditionalResources].isNotEmpty()
         }
     }
 }
