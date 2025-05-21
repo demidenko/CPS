@@ -39,7 +39,7 @@ class UtilityWorker(
 
     private suspend fun removeOldCodeforcesNewEntries() {
         with(CodeforcesNewEntriesDataStore(context)) {
-            commonNewEntries.removeOldMarkedItems()
+            commonNewEntries.removeOlderThan(days = 30)
         }
     }
 }

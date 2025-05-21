@@ -47,14 +47,14 @@ class NewEntriesDataStoreItem (
         if (ids.isEmpty()) return
         val date = getCurrentDate()
         item.edit {
-            for (id in ids) this.markAtLeast(id, type, date)
+            for (id in ids) markAtLeast(id, type, date)
         }
     }
 
-    suspend fun removeOldMarkedItems() {
+    suspend fun removeOlderThan(days: Int) {
         val currentDate = getCurrentDate()
         item.update { types ->
-            types.filterValues { it.date.daysUntil(currentDate) < 30 }
+            types.filterValues { it.date.daysUntil(currentDate) <= days }
         }
     }
 }
