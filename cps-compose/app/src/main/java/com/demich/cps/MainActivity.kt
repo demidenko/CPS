@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,9 +26,7 @@ import com.demich.cps.accounts.accountsBottomBarBuilder
 import com.demich.cps.accounts.accountsViewModel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.community.CommunityScreen
-import com.demich.cps.community.codeforces.CodeforcesUserBlogScreen
-import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
-import com.demich.cps.community.codeforces.codeforcesUserBlogBottomBarBuilder
+import com.demich.cps.community.codeforces.NavContentCodeforcesBlog
 import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
 import com.demich.cps.community.communityBottomBarBuilder
 import com.demich.cps.community.communityMenuBuilder
@@ -47,10 +44,8 @@ import com.demich.cps.navigation.ScreenTypes
 import com.demich.cps.navigation.getScreen
 import com.demich.cps.navigation.rememberCPSNavigator
 import com.demich.cps.ui.CPSScaffold
-import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.context
-import com.demich.cps.utils.currentDataKey
 import com.demich.cps.workers.enqueueEnabledWorkers
 import kotlinx.coroutines.launch
 
@@ -163,18 +158,7 @@ private fun CPSContent() {
             holder.setSubtitle("community", "codeforces", "follow", "list")
         }
         cpsComposable(ScreenTypes.communityCodeforcesBlog) { holder ->
-            val handle = (holder.screen as Screen.CommunityCodeforcesBlog).handle
-            val newsViewModel = codeforcesCommunityViewModel()
-            val blogEntriesResult by newsViewModel
-                .flowOfBlogEntriesResult(handle, context, key = currentDataKey)
-                .collectAsState()
-            val filterState = rememberFilterState()
-            CodeforcesUserBlogScreen(
-                blogEntriesResult = { blogEntriesResult },
-                filterState = filterState
-            )
-            holder.bottomBar = codeforcesUserBlogBottomBarBuilder(filterState = filterState)
-            holder.setSubtitle("community", "codeforces", "blog")
+            NavContentCodeforcesBlog(holder = holder)
         }
 
         cpsComposable(ScreenTypes.contests) { holder ->
