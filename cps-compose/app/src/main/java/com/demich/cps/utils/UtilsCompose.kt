@@ -81,14 +81,14 @@ inline fun<T, K> rememberWith(
 inline fun<T> collectAsState(crossinline block: () -> Flow<T>): State<T> =
     remember(block).let { flow ->
         if (flow is StateFlow<T>) flow.collectAsState()
-        else flow.collectAsState(initial = remember(flow) { runBlocking { flow.first() } })
+        else flow.collectAsState(initial = remember { runBlocking { flow.first() } })
     }
 
 @Composable
 inline fun<T> collectAsStateWithLifecycle(crossinline block: () -> Flow<T>): State<T> =
     remember(block).let { flow ->
         if (flow is StateFlow<T>) flow.collectAsStateWithLifecycle()
-        else flow.collectAsStateWithLifecycle(initialValue = remember(flow) { runBlocking { flow.first() } })
+        else flow.collectAsStateWithLifecycle(initialValue = remember { runBlocking { flow.first() } })
     }
 
 @Composable
