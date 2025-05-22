@@ -4,15 +4,15 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
-import android.net.Uri
 import android.text.Html
 import android.text.Spanned
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 
 fun Context.showToast(title: String) = Toast.makeText(this, title, Toast.LENGTH_LONG).show()
 
-private fun intentActionView(url: String) = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+private fun intentActionView(url: String) = Intent(Intent.ACTION_VIEW, url.toUri())
 
 fun Context.openUrlInBrowser(url: String) = startActivity(intentActionView(url))
 
