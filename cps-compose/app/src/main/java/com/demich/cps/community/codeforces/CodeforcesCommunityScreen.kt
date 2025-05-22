@@ -3,21 +3,32 @@
 package com.demich.cps.community.codeforces
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.Icon
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.demich.cps.contests.database.Contest
 import com.demich.cps.community.CommunityTab
 import com.demich.cps.community.CommunityTabRow
+import com.demich.cps.contests.database.Contest
 import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.*
+import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.ProvideTimeEachMinute
+import com.demich.cps.utils.clickableNoRipple
+import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.context
 import kotlinx.coroutines.launch
 
 enum class CodeforcesTitle {

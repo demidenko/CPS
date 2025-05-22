@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import com.demich.cps.community.codeforces.CodeforcesCommunityBottomBar
 import com.demich.cps.community.codeforces.CodeforcesCommunityController
 import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
+import com.demich.cps.community.codeforces.loadingStatusState
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder

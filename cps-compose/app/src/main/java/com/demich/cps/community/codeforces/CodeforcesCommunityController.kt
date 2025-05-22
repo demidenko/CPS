@@ -9,6 +9,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
+import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntriesDataStoreItem
 import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
@@ -102,6 +103,7 @@ class CodeforcesCommunityController internal constructor(
 
     var topType by mutableStateOf(data.topType)
 
+    //TODO: merge to sealed class
     var recentShowComments by mutableStateOf(data.recentShowComments)
     var recentFilterByBlogEntry: CodeforcesBlogEntry? by mutableStateOf(data.recentFilterByBlogEntry)
 
@@ -121,12 +123,6 @@ class CodeforcesCommunityController internal constructor(
             else -> flowOf(0)
         }
 
-    @Composable
-    fun loadingStatusState() = collectAsState { flowOfLoadingStatus() }
-
-    @Composable
-    fun loadingStatusState(title: CodeforcesTitle) = collectAsState { flowOfLoadingStatus(title) }
-
     fun flowOfLostBlogEntries(context: Context) =
         context.lostBlogEntriesDao.flowOfLost().map { blogEntries ->
             blogEntries.sortedByDescending { it.timeStamp }
@@ -137,6 +133,15 @@ class CodeforcesCommunityController internal constructor(
         BlogEntries, Comments
     }
 }
+
+@Composable
+fun CodeforcesCommunityController.loadingStatusState(): State<LoadingStatus> =
+    collectAsState { flowOfLoadingStatus() }
+
+//TODO: remember(key = title)???
+@Composable
+fun CodeforcesCommunityController.loadingStatusState(title: CodeforcesTitle): State<LoadingStatus> =
+    collectAsState { flowOfLoadingStatus(title) }
 
 private fun controllerSaver(
     viewModel: CodeforcesCommunityViewModel,
