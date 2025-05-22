@@ -37,13 +37,7 @@ import com.demich.cps.community.follow.CommunityFollowScreen
 import com.demich.cps.community.follow.communityFollowListBottomBarBuilder
 import com.demich.cps.community.settings.CommunitySettingsScreen
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.contests.ContestsListState
-import com.demich.cps.contests.ContestsScreen
-import com.demich.cps.contests.combinedLoadingStatusState
-import com.demich.cps.contests.contestsBottomBarBuilder
-import com.demich.cps.contests.contestsMenuBuilder
-import com.demich.cps.contests.contestsViewModel
-import com.demich.cps.contests.rememberContestsListState
+import com.demich.cps.contests.NavContentContestsScreen
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.develop.DevelopScreen
 import com.demich.cps.develop.developAdditionalBottomBarBuilder
@@ -55,7 +49,6 @@ import com.demich.cps.navigation.rememberCPSNavigator
 import com.demich.cps.ui.CPSScaffold
 import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.ui.theme.CPSTheme
-import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.utils.currentDataKey
 import com.demich.cps.workers.enqueueEnabledWorkers
@@ -185,35 +178,10 @@ private fun CPSContent() {
         }
 
         cpsComposable(ScreenTypes.contests) { holder ->
-            val context = context
-            val contestsViewModel = contestsViewModel()
-            val contestsListState = rememberContestsListState()
-            val filterState = rememberFilterState()
-            val loadingStatus by combinedLoadingStatusState()
-            val isReloading = { loadingStatus == LoadingStatus.LOADING }
-            val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
-            ContestsScreen(
-                contestsListState = contestsListState,
-                filterState = filterState,
-                isReloading = isReloading,
-                onReload = onReload
+            NavContentContestsScreen(
+                holder = holder,
+                onOpenSettings = { navigator.navigateTo(Screen.ContestsSettings) }
             )
-            holder.bottomBar = contestsBottomBarBuilder(
-                contestsListState = contestsListState,
-                filterState = filterState,
-                loadingStatus = { loadingStatus },
-                onReloadClick = onReload
-            )
-            holder.menu = contestsMenuBuilder(
-                onOpenSettings = { navigator.navigateTo(Screen.ContestsSettings) },
-                isReloading = isReloading
-            )
-
-            when (contestsListState.contestsPage) {
-                ContestsListState.ContestsPage.Finished -> holder.setSubtitle("contests", "finished")
-                ContestsListState.ContestsPage.RunningOrFuture -> holder.setSubtitle("contests")
-            }
-
         }
         cpsComposable(ScreenTypes.contestsSettings) { holder ->
             ContestsSettingsScreen()

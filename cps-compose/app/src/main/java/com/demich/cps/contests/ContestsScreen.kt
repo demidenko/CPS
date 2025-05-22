@@ -43,6 +43,7 @@ import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
 import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.settings.settingsContests
+import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.ui.AnimatedVisibleByNotNull
@@ -56,6 +57,7 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.filter.FilterIconButton
 import com.demich.cps.ui.filter.FilterState
 import com.demich.cps.ui.filter.FilterTextField
+import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
@@ -83,13 +85,12 @@ import kotlinx.datetime.Instant
 fun ContestsScreen(
     contestsListState: ContestsListState,
     filterState: FilterState,
+    anyPlatformEnabled: Boolean,
     isReloading: () -> Boolean,
     onReload: () -> Unit
 ) {
     val context = context
     val contestsViewModel = contestsViewModel()
-
-    val anyPlatformEnabled by anyPlatformEnabledState()
 
     Column {
         CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
@@ -297,7 +298,49 @@ private fun ColumnScope.LoadingError(
     }
 }
 
-fun contestsMenuBuilder(
+@Composable
+fun NavContentContestsScreen(
+    holder: CPSNavigator.DuringCompositionHolder,
+    onOpenSettings: () -> Unit
+) {
+    val context = context
+    val contestsViewModel = contestsViewModel()
+    val contestsListState = rememberContestsListState()
+    val filterState = rememberFilterState()
+    val loadingStatus by combinedLoadingStatusState()
+    val anyPlatformEnabled by anyPlatformEnabledState()
+
+    val isReloading = { loadingStatus == LoadingStatus.LOADING }
+    val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
+
+    ContestsScreen(
+        contestsListState = contestsListState,
+        filterState = filterState,
+        anyPlatformEnabled = anyPlatformEnabled,
+        isReloading = isReloading,
+        onReload = onReload
+    )
+
+    holder.bottomBar = contestsBottomBarBuilder(
+        contestsListState = contestsListState,
+        filterState = filterState,
+        anyPlatformEnabled = anyPlatformEnabled,
+        loadingStatus = { loadingStatus },
+        onReloadClick = onReload
+    )
+
+    holder.menu = contestsMenuBuilder(
+        onOpenSettings = onOpenSettings,
+        isReloading = isReloading
+    )
+
+    when (contestsListState.contestsPage) {
+        ContestsListState.ContestsPage.Finished -> holder.setSubtitle("contests", "finished")
+        ContestsListState.ContestsPage.RunningOrFuture -> holder.setSubtitle("contests")
+    }
+}
+
+private fun contestsMenuBuilder(
     onOpenSettings: () -> Unit,
     isReloading: () -> Boolean
 ): CPSMenuBuilder = {
@@ -309,19 +352,18 @@ fun contestsMenuBuilder(
     )
 }
 
-fun contestsBottomBarBuilder(
+private fun contestsBottomBarBuilder(
     contestsListState: ContestsListState,
     filterState: FilterState,
+    anyPlatformEnabled: Boolean,
     loadingStatus: () -> LoadingStatus,
     onReloadClick: () -> Unit
 ): AdditionalBottomBarBuilder = {
-    val isAnyPlatformEnabled by anyPlatformEnabledState()
-
-    if (isAnyPlatformEnabled) {
+    if (anyPlatformEnabled) {
         FilterIconButton(filterState = filterState)
     }
 
-    if (isAnyPlatformEnabled) {
+    if (anyPlatformEnabled) {
         ContestsPageSwitchButton(
             contestsPage = contestsListState.contestsPage,
             onClick = {
@@ -332,7 +374,7 @@ fun contestsBottomBarBuilder(
 
     CPSReloadingButton(
         loadingStatus = loadingStatus(),
-        enabled = isAnyPlatformEnabled,
+        enabled = anyPlatformEnabled,
         onClick = onReloadClick
     )
 }
