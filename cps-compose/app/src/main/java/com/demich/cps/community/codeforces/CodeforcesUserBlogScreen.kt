@@ -22,7 +22,6 @@ import com.demich.cps.utils.ProvideTimeEachMinute
 import com.demich.cps.utils.context
 import com.demich.cps.utils.currentDataKey
 import com.demich.cps.utils.filterByTokensAsSubsequence
-import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 fun CodeforcesUserBlogScreen(
@@ -32,7 +31,6 @@ fun CodeforcesUserBlogScreen(
     LaunchedEffect(filterState, blogEntriesResult) {
         //available = res != null && res.isSuccess && res.value.isNotEmpty()
         snapshotFlow { blogEntriesResult()?.map { it.isNotEmpty() } }
-            .distinctUntilChanged()
             .collect { result ->
                 filterState.available = result?.getOrNull() == true
             }
