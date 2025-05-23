@@ -1,10 +1,17 @@
 package com.demich.datastore_itemized
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.*
-import kotlinx.coroutines.flow.*
-import kotlinx.serialization.encodeToString
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
+import java.util.EnumSet
 
 
 abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
@@ -87,8 +94,8 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
         itemStringSetConvertible(
             name = name,
             defaultValue = defaultValue,
-            encode = { it.mapTo(mutableSetOf(), Enum<T>::name) },
-            decode = { it.mapTo(mutableSetOf(), ::enumValueOf) }
+            encode = { it.mapTo(mutableSetOf()) { it.name } },
+            decode = { it.mapTo(EnumSet.noneOf(T::class.java)) { enumValueOf(it) } }
         )
 
     protected inline fun<reified T> Json.item(name: String, noinline defaultValue: () -> T): DataStoreItem<T> =
