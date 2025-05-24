@@ -1,5 +1,12 @@
 package com.demich.cps.platforms.utils
 
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.UtcOffset
+import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
 import org.jsoup.Jsoup
 
 object ProjectEulerUtils {
@@ -25,8 +32,8 @@ object ProjectEulerUtils {
         override val id: String
     ): NewsPostEntry
 
-    fun extractNews(source: String): List<NewsPost?> =
-        Jsoup.parse(source).select("item")
+    fun extractNewsFromRSSPage(rssPage: String): List<NewsPost?> =
+        Jsoup.parse(rssPage).select("item")
             .map { item ->
                 val idFull = item.expectFirst("guid").text()
                 val id = idFull.removePrefix("news_id_")
@@ -41,5 +48,31 @@ object ProjectEulerUtils {
                 }
             }
 
+    fun extractProblemsFromRssPage(rssPage: String, block: (Int, Instant) -> Unit) {
+        val format = DateTimeComponents.Format {
+            //04 Apr 2025 23:00:00 +0100
+            dayOfMonth(padding = Padding.NONE)
+            char(' ')
+            monthName(names = MonthNames.ENGLISH_ABBREVIATED)
+            char(' ')
+            year()
+            char(' ')
+            time(LocalTime.Formats.ISO)
+            char(' ')
+            offset(UtcOffset.Formats.FOUR_DIGITS)
+        }
+        Jsoup.parse(rssPage).select("item").forEach { item ->
+            val idFull = item.expectFirst("guid").text()
+            val id = idFull.removePrefix("problem_id_")
+            if (id != idFull) {
+                val description = item.expectFirst("description").text()
+                val date = Instant.parse(
+                    input = description.run { substring(startIndex = indexOf(',') + 2) },
+                    format = format
+                )
+                block(id.toInt(), date)
+            }
+        }
+    }
 }
 

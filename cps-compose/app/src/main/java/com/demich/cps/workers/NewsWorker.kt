@@ -73,9 +73,11 @@ class NewsWorker(
     }
 
     private suspend fun projectEulerNews() {
+        val rssPage = ProjectEulerApi.getRSSPage()
+
         settings.scanNewsFeed(
             newsFeed = project_euler_news,
-            posts = ProjectEulerUtils.extractNews(source = ProjectEulerApi.getRSSPage())
+            posts = ProjectEulerUtils.extractNewsFromRSSPage(rssPage = rssPage)
         ) {
             notificationChannels.project_euler.news(it.id.toInt()).notify(context) {
                 setSubText("Project Euler news")
