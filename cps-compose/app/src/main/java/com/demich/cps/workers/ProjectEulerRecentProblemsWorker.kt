@@ -3,7 +3,7 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
-import com.demich.cps.*
+import com.demich.cps.R
 import com.demich.cps.community.settings.CommunitySettingsDataStore
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.attachUrl
@@ -11,7 +11,9 @@ import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.notifications.setBigContent
 import com.demich.cps.platforms.api.ProjectEulerApi
 import com.demich.cps.platforms.utils.ProjectEulerUtils
+import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 class ProjectEulerRecentProblemsWorker(
     context: Context,
@@ -27,12 +29,19 @@ class ProjectEulerRecentProblemsWorker(
 
             override val requestBuilder: PeriodicWorkRequest.Builder
                 get() = CPSPeriodicWorkRequestBuilder<ProjectEulerRecentProblemsWorker>(
-                    repeatInterval = 1.hours
+                    repeatInterval = 6.hours
                 )
         }
     }
 
     override suspend fun runWork(): Result {
+        scanNews()
+        //TODO: improve logic with hint: sync with recent news worker, wait if time is close
+        enqueueByHint()
+        return Result.success()
+    }
+
+    private suspend fun scanNews() {
         context.settingsCommunity.scanNewsFeed(
             newsFeed = CommunitySettingsDataStore.NewsFeed.project_euler_problems,
             posts = ProjectEulerUtils.extractRecentProblems(ProjectEulerApi.getRecentPage())
@@ -49,7 +58,15 @@ class ProjectEulerRecentProblemsWorker(
                 attachUrl(url = ProjectEulerApi.urls.problem(problemId), context = context)
             }
         }
+    }
 
-        return Result.success()
+    private suspend fun enqueueByHint() {
+        val rssPage = ProjectEulerApi.getRSSPage()
+
+        val nextDate = ProjectEulerUtils.extractProblemsFromRssPage(rssPage)
+            .minOfNotNull { (id, date) -> date.takeIf { it > workerStartTime } }
+            ?: return
+
+        work.enqueueAtIfEarlier(nextDate + 1.minutes)
     }
 }

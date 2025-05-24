@@ -48,7 +48,7 @@ object ProjectEulerUtils {
                 }
             }
 
-    fun extractProblemsFromRssPage(rssPage: String, block: (Int, Instant) -> Unit) {
+    fun extractProblemsFromRssPage(rssPage: String): List<Pair<Int, Instant>> {
         val format = DateTimeComponents.Format {
             //04 Apr 2025 23:00:00 +0100
             dayOfMonth(padding = Padding.NONE)
@@ -61,7 +61,7 @@ object ProjectEulerUtils {
             char(' ')
             offset(UtcOffset.Formats.FOUR_DIGITS)
         }
-        Jsoup.parse(rssPage).select("item").forEach { item ->
+        return Jsoup.parse(rssPage).select("item").mapNotNull { item ->
             val idFull = item.expectFirst("guid").text()
             val id = idFull.removePrefix("problem_id_")
             if (id != idFull) {
@@ -70,7 +70,9 @@ object ProjectEulerUtils {
                     input = description.run { substring(startIndex = indexOf(',') + 2) },
                     format = format
                 )
-                block(id.toInt(), date)
+                id.toInt() to date
+            } else {
+                null
             }
         }
     }
