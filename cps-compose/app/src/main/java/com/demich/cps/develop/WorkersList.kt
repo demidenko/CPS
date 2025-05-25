@@ -121,25 +121,36 @@ fun WorkersList(modifier: Modifier = Modifier) {
 
 @Composable
 private fun WorkerDialog(work: CPSPeriodicWork, onDismissRequest: () -> Unit) {
+    val workInfo by work.workInfoAsState()
+    val events by work.eventsState()
+
     CPSDialog(
-        title = work.name,
         modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismissRequest
     ) {
-        val context = context
-        val workInfo by work.workInfoAsState()
-        val events by collectAsStateWithLifecycle {
-            CPSWorkersDataStore(context).executions.flow.map { it.getOrElse(work.name) { emptyList() } }
-        }
+        Text(
+            text = work.name,
+            fontWeight = FontWeight.SemiBold,
+            style = CPSDefaults.MonospaceTextStyle
+        )
 
         Column(modifier = Modifier.fillMaxWidth()) {
+            when (val state = workInfo.stateOrCancelled) {
+                WorkInfo.State.ENQUEUED -> {
+                    workInfo?.nextScheduleTime?.let { nextTime ->
+                        val d = nextTime - localCurrentTime
+                        Text(text = "next in ${d.dropSeconds()}")
+                    }
+                }
+                else -> {
+                    Text(text = "$state")
+                }
+            }
+
             workInfo?.repeatInterval?.let {
                 Text(text = "repeat interval = $it")
             }
-            workInfo?.nextScheduleTime?.let { nextTime ->
-                val d = nextTime - localCurrentTime
-                Text(text = "next in ${d.dropSeconds()}")
-            }
+
             Text(text = buildString {
                 append("events = ")
                 append(events.count { it.resultType == CPSWorker.ResultType.SUCCESS })
@@ -196,13 +207,21 @@ private fun CPSWork.workInfoAsState(): State<WorkInfo?> =
         .collectAsStateWithLifecycle(initialValue = null)
 
 @Composable
+private fun CPSWork.eventsState(): State<List<CPSWorker.ExecutionEvent>> =
+    collectAsStateWithLifecycle {
+        CPSWorkersDataStore(context).executions.flow.map {
+            it.getOrElse(name) { emptyList() }
+        }
+    }
+
+@Composable
 private fun WorkerItem(
     work: CPSPeriodicWork,
     executionEvents: List<CPSWorker.ExecutionEvent>?,
     modifier: Modifier = Modifier
 ) {
     val workInfo by work.workInfoAsState()
-    val lastExecutionEvent = executionEvents?.lastOrNull()
+    val lastExecutionEvent = executionEvents?.maxByOrNull { it.start }
 
     WorkerItem(
         name = work.name,
@@ -236,7 +255,7 @@ private fun CodeforcesMonitorWorkItem(
 
 private fun Duration.toNiceString(): String {
     if (this < 1.seconds) return toString(unit = DurationUnit.MILLISECONDS)
-    return toString(unit = DurationUnit.SECONDS, decimals = 1)
+    return toString(unit = DurationUnit.SECONDS, decimals = 1).replace(',', '.')
 }
 
 private fun Duration.dropSeconds(): Duration {
