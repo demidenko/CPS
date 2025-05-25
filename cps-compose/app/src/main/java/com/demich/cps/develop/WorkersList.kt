@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
@@ -40,6 +41,7 @@ import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.bottomprogressbar.CPSProgressIndicator
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
+import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
@@ -51,7 +53,6 @@ import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.timeAgo
-import com.demich.cps.utils.timeDifference
 import com.demich.cps.workers.CPSOneTimeWork
 import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.cps.workers.CPSWork
@@ -65,10 +66,13 @@ import com.demich.cps.workers.nextScheduleTime
 import com.demich.cps.workers.repeatInterval
 import com.demich.cps.workers.stateOrCancelled
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 @Composable
 fun WorkersList(modifier: Modifier = Modifier) {
@@ -117,25 +121,34 @@ fun WorkersList(modifier: Modifier = Modifier) {
 
 @Composable
 private fun WorkerDialog(work: CPSPeriodicWork, onDismissRequest: () -> Unit) {
-    val workInfo by work.workInfoAsState()
-    CPSYesNoDialog(
-        title = {
-            Column {
-                workInfo?.repeatInterval?.let {
-                    Text(text = "repeat interval = $it")
-                }
-                workInfo?.nextScheduleTime?.let { nextTime ->
-                    Text(text = "next in ${timeDifference(localCurrentTime, nextTime)}")
-                }
-                Text(
-                    text = "restart ${work.name}?",
-                    style = CPSDefaults.MonospaceTextStyle
-                )
+    CPSDialog(
+        title = work.name,
+        modifier = Modifier.fillMaxWidth(),
+        onDismissRequest = onDismissRequest
+    ) {
+        val context = context
+        val workInfo by work.workInfoAsState()
+        val events by collectAsStateWithLifecycle {
+            CPSWorkersDataStore(context).executions.flow.map { it.getOrElse(work.name) { emptyList() } }
+        }
+
+        Column(modifier = Modifier.fillMaxWidth()) {
+            workInfo?.repeatInterval?.let {
+                Text(text = "repeat interval = $it")
             }
-        },
-        onDismissRequest = onDismissRequest,
-        onConfirmRequest = { work.startImmediate() }
-    )
+            workInfo?.nextScheduleTime?.let { nextTime ->
+                val d = nextTime - localCurrentTime
+                Text(text = "next in ${d.dropSeconds()}")
+            }
+            Text(text = buildString {
+                append("events = ")
+                append(events.count { it.resultType == CPSWorker.ResultType.SUCCESS })
+                append(" / ")
+                append(events.size)
+            })
+        }
+        Button(onClick = { work.startImmediate() }) { Text(text = "restart") }
+    }
 }
 
 @Composable
@@ -222,10 +235,12 @@ private fun CodeforcesMonitorWorkItem(
 }
 
 private fun Duration.toNiceString(): String {
-    val ms = inWholeMilliseconds
-    if (ms < 1000) return "${ms}ms"
-    val s = ((ms + 50) / 100).toDouble() / 10
-    return "${s}s"
+    if (this < 1.seconds) return toString(unit = DurationUnit.MILLISECONDS)
+    return toString(unit = DurationUnit.SECONDS, decimals = 1)
+}
+
+private fun Duration.dropSeconds(): Duration {
+    return inWholeMinutes.minutes
 }
 
 @Composable
