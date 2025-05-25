@@ -158,7 +158,14 @@ private fun WorkerDialog(work: CPSPeriodicWork, onDismissRequest: () -> Unit) {
                 append(events.size)
             })
         }
-        Button(onClick = { work.startImmediate() }) { Text(text = "restart") }
+
+        Button(
+            content = { Text(text = "restart") },
+            onClick = {
+                work.startImmediate()
+                onDismissRequest()
+            }
+        )
     }
 }
 

@@ -16,11 +16,11 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.launchWhileActive
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -29,8 +29,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -233,16 +231,6 @@ private fun Flow<CodeforcesContestPhase>.collectSystemTestPercentage(
         }
     }.launchIn(scope)
 }
-
-
-private fun CoroutineScope.launchWhileActive(block: suspend CoroutineScope.() -> Duration) =
-    launch {
-        while (isActive) {
-            val delayNext = block()
-            if (delayNext == Duration.INFINITE) break
-            if (delayNext > Duration.ZERO) delay(delayNext)
-        }
-    }
 
 
 private fun needCheckSubmissions(
