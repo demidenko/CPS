@@ -87,7 +87,7 @@ abstract class CPSPeriodicWork(
     private fun start(restart: Boolean) =
         enqueueWork(
             policy = if (restart) ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE
-                    else ExistingPeriodicWorkPolicy.KEEP
+                    else ExistingPeriodicWorkPolicy.UPDATE
         )
 
     fun startImmediate() = start(restart = true)
