@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlin.reflect.KProperty
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -31,9 +32,8 @@ abstract class CPSWorker(
 
     protected val context get() = work.context
 
-    private var startTime = getCurrentTime()
-    private fun resetStartTime() { startTime = getCurrentTime() }
-    protected val workerStartTime get() = startTime
+    private val timeHolder = TimeHolder()
+    protected val workerStartTime by timeHolder
 
     final override suspend fun doWork(): Result {
         if (!work.isEnabled()) {
@@ -65,7 +65,7 @@ abstract class CPSWorker(
             isSuccess = { it.toType() == ResultType.SUCCESS }
         ) {
             setProgressInfo(ProgressBarInfo(total = 0))
-            resetStartTime()
+            timeHolder.reset()
             runCatching { runWork() }.getOrElse {
                 when {
                     it.isResponseException -> Result.retry()
@@ -159,4 +159,13 @@ class CPSWorkersDataStore(context: Context): ItemizedDataStore(context.workersDa
     }
 
     val executions = jsonCPS.itemMap<String, List<CPSWorker.ExecutionEvent>>("executions")
+}
+
+
+private class TimeHolder {
+    private var time = getCurrentTime()
+    fun reset() {
+        time = getCurrentTime()
+    }
+    operator fun getValue(thisRef: Any?, property: KProperty<*>) = time
 }
