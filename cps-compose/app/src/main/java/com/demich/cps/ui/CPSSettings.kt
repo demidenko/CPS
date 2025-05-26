@@ -44,7 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.dialogs.CPSDialogSelectEnum
+import com.demich.cps.ui.dialogs.CPSDialogSelect
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.collectItemAsState
@@ -299,7 +299,7 @@ fun<T: Enum<T>> SettingsEnumItemContent(
     }
 
     if (showChangeDialog) {
-        CPSDialogSelectEnum(
+        CPSDialogSelect(
             title = title,
             options = options,
             selectedOption = selectedOption,

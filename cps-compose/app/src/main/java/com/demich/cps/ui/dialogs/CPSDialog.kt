@@ -176,7 +176,7 @@ fun CPSAskDialog(
 }
 
 @Composable
-fun<T: Enum<T>> CPSDialogSelectEnum(
+fun <T> CPSDialogSelect(
     title: String,
     options: Iterable<T>,
     selectedOption: T,
