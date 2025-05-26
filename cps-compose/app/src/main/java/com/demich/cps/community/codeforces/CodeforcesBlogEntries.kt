@@ -64,9 +64,9 @@ fun CodeforcesBlogEntries(
                     top = 1.dp,
                     bottom = 4.dp
                 )
-                .animateItemPlacement()
+                .animateItem()
         )
-        Divider(modifier = Modifier.animateItemPlacement())
+        Divider(modifier = Modifier.animateItem())
     }
 }
 

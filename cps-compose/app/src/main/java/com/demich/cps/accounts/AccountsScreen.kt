@@ -72,7 +72,7 @@ fun AccountsScreen(
                 visibleOrder = visibleOrder,
                 modifier = Modifier
                     .padding(start = 10.dp)
-                    .animateItemPlacement()
+                    .animateItem()
             )
         }
     }

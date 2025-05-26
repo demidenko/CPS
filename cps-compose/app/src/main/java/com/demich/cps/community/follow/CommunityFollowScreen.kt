@@ -102,7 +102,7 @@ private fun CodeforcesFollowList(
         key = CodeforcesUserBlog::id
     ) { userBlog ->
         ContentWithCPSDropdownMenu(
-            modifier = Modifier.animateItemPlacement(),
+            modifier = Modifier.animateItem(),
             content = {
                 CommunityFollowListItem(
                     userInfo = userBlog.userInfo,
@@ -128,7 +128,7 @@ private fun CodeforcesFollowList(
                 )
             }
         )
-        Divider(modifier = Modifier.animateItemPlacement())
+        Divider(modifier = Modifier.animateItem())
     }
 
     showDeleteDialogForBlog?.let { userBlog ->

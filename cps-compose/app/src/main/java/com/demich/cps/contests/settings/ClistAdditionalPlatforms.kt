@@ -128,9 +128,9 @@ private fun ClistResourcesList(
                     .fillMaxWidth()
                     .clickable { onItemClick(resource) }
                     .padding(all = 2.dp)
-                    .animateItemPlacement()
+                    .animateItem()
             )
-            Divider(modifier = Modifier.animateItemPlacement())
+            Divider(modifier = Modifier.animateItem())
         }
     }
 }
