@@ -128,35 +128,33 @@ private fun WorkerDialog(work: CPSPeriodicWork, onDismissRequest: () -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismissRequest
     ) {
-        Text(
-            text = work.name,
-            fontWeight = FontWeight.SemiBold,
-            style = CPSDefaults.MonospaceTextStyle
-        )
+        ProvideTextStyle(value = CPSDefaults.MonospaceTextStyle) {
+            Text(text = work.name, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 5.dp))
 
-        Column(modifier = Modifier.fillMaxWidth()) {
-            when (val state = workInfo.stateOrCancelled) {
-                WorkInfo.State.ENQUEUED -> {
-                    workInfo?.nextScheduleTime?.let { nextTime ->
-                        val d = nextTime - localCurrentTime
-                        Text(text = "next in ${d.dropSeconds()}")
+            Column(modifier = Modifier.fillMaxWidth()) {
+                when (val state = workInfo.stateOrCancelled) {
+                    WorkInfo.State.ENQUEUED -> {
+                        workInfo?.nextScheduleTime?.let { nextTime ->
+                            val d = nextTime - localCurrentTime
+                            Text(text = "next: in ${d.dropSeconds()}")
+                        }
+                    }
+                    else -> {
+                        Text(text = "$state")
                     }
                 }
-                else -> {
-                    Text(text = "$state")
+
+                workInfo?.repeatInterval?.let {
+                    Text(text = "repeat interval: $it")
                 }
-            }
 
-            workInfo?.repeatInterval?.let {
-                Text(text = "repeat interval = $it")
+                Text(text = buildString {
+                    append("events: ")
+                    append(events.count { it.resultType == CPSWorker.ResultType.SUCCESS })
+                    append(" / ")
+                    append(events.size)
+                })
             }
-
-            Text(text = buildString {
-                append("events = ")
-                append(events.count { it.resultType == CPSWorker.ResultType.SUCCESS })
-                append(" / ")
-                append(events.size)
-            })
         }
 
         Button(
