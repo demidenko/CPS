@@ -77,10 +77,11 @@ abstract class CPSPeriodicWork(
         policy: ExistingPeriodicWorkPolicy,
         block: PeriodicWorkRequest.Builder.() -> Unit = {}
     ) {
+        val requestBuilder = runCatching { requestBuilder() }.getOrElse { return }
         workManager.enqueueUniquePeriodicWork(
             uniqueWorkName = name,
             existingPeriodicWorkPolicy = policy,
-            request = requestBuilder().apply(block).build()
+            request = requestBuilder.apply(block).build()
         )
     }
 

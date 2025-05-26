@@ -1,15 +1,12 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.contests.ContestsInfoDataStore
 import com.demich.cps.contests.ContestsReloader
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.loading.asContestsReceiver
 import com.demich.cps.contests.settings.settingsContests
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
 
 class ContestsWorker(
     context: Context,
@@ -20,10 +17,13 @@ class ContestsWorker(
 ), ContestsReloader {
     companion object {
         fun getWork(context: Context) = object : CPSPeriodicWork(name = "contests", context = context) {
-            override suspend fun isEnabled() = context.settingsContests.enabledAutoUpdate()
+            private val settings get() = context.settingsContests
+
+            override suspend fun isEnabled() = settings.autoUpdateInterval() != null
+
             override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<ContestsWorker>(
-                    repeatInterval = 1.hours,
+                    repeatInterval = requireNotNull(settings.autoUpdateInterval()),
                     batteryNotLow = true
                 )
         }
