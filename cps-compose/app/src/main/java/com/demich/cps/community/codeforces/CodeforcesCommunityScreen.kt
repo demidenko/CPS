@@ -1,8 +1,5 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package com.demich.cps.community.codeforces
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -75,7 +72,7 @@ private fun CodeforcesPager(
     val newEntriesState = rememberNewEntriesState()
     ProvideTimeEachMinute {
         HorizontalPager(
-            beyondBoundsPageCount = controller.tabs.size - 1,
+            beyondViewportPageCount = controller.tabs.size - 1,
             state = controller.pagerState,
             key = { index -> controller.tabs[index] },
             modifier = modifier

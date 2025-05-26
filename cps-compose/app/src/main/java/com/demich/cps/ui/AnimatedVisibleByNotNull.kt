@@ -3,7 +3,6 @@ package com.demich.cps.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -11,7 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun<T: Any> AnimatedVisibleByNotNull(
     value: () -> T?,

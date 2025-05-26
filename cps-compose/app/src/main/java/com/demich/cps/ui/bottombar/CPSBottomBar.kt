@@ -84,7 +84,7 @@ private fun BottomBarBodyMain(
         modifier = modifier,
         rootScreens = rootScreens,
         selectedRootScreenType = if (layoutSettingsEnabled) null else selectedRootScreenType(),
-        indication = if (layoutSettingsEnabled) null else rememberRipple(bounded = false, radius = 48.dp),
+        indication = null, //TODO: if (layoutSettingsEnabled) null else rememberRipple(bounded = false, radius = 48.dp),
         layoutType = layoutType,
         onSelect = { screen ->
             scope.launch { context.settingsUI.startScreenRoute(screen.routePath) }

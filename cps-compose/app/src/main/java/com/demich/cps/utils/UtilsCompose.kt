@@ -11,7 +11,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -28,7 +27,6 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
@@ -122,14 +120,12 @@ fun AnnotatedString.Builder.append(
 fun Modifier.clickableNoRipple(
     enabled: Boolean = true,
     onClick: () -> Unit
-) = this.composed {
-    clickable(
-        enabled = enabled,
-        indication = null,
-        interactionSource = remember { MutableInteractionSource() },
-        onClick = onClick
-    )
-}
+) = clickable(
+    enabled = enabled,
+    indication = null,
+    interactionSource = null,
+    onClick = onClick
+)
 
 fun Modifier.ignoreInputEvents(enabled: Boolean) =
     if (!enabled) this
