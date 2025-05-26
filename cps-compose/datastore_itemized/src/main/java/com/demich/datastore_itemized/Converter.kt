@@ -12,7 +12,7 @@ internal abstract class Converter<T, S: Any>(
     internal val name: String get() = key.name
 
     protected abstract fun fromPrefs(s: S?): T
-    protected abstract fun toPrefs(t: T & Any): S
+    protected abstract fun toPrefs(t: T): S?
 
     fun flowFrom(prefs: Flow<Preferences>): Flow<T> =
         prefs.map { it[key] }.distinctUntilChanged().map(::fromPrefs)
@@ -20,8 +20,9 @@ internal abstract class Converter<T, S: Any>(
     fun getFrom(prefs: Preferences): T = fromPrefs(prefs[key])
 
     fun setTo(prefs: MutablePreferences, value: T) {
-        if (value == null) prefs.remove(key)
-        else prefs[key] = toPrefs(value)
+        toPrefs(value)
+            ?.let { prefs[key] = it }
+            ?: prefs.remove(key)
     }
 
     fun removeFrom(prefs: MutablePreferences) {
@@ -31,7 +32,7 @@ internal abstract class Converter<T, S: Any>(
     internal fun mapGetter(transform: (T) -> T): Converter<T, S> =
         object : Converter<T, S>(key = key) {
             override fun fromPrefs(s: S?) = transform(this@Converter.fromPrefs(s))
-            override fun toPrefs(t: T & Any) = this@Converter.toPrefs(t)
+            override fun toPrefs(t: T) = this@Converter.toPrefs(t)
         }
 }
 
@@ -47,7 +48,7 @@ internal class ValueNullable<T: Any>(
     key: Preferences.Key<T>
 ): Converter<T?, T>(key) {
     override fun fromPrefs(s: T?): T? = s
-    override fun toPrefs(t: T): T = t
+    override fun toPrefs(t: T?): T? = t
 }
 
 internal class ValueConvertible<T, S: Any>(
@@ -56,6 +57,10 @@ internal class ValueConvertible<T, S: Any>(
     private val encode: (T) -> S,
     private val decode: (S) -> T
 ): Converter<T, S>(key) {
-    override fun fromPrefs(s: S?): T = s?.runCatching(decode)?.getOrNull() ?: defaultValue()
-    override fun toPrefs(t: T & Any): S = encode(t)
+    override fun fromPrefs(s: S?): T {
+        if (s == null) return defaultValue()
+        return runCatching { decode(s) }.getOrElse { defaultValue() }
+    }
+
+    override fun toPrefs(t: T): S = encode(t)
 }
