@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -84,7 +84,7 @@ private fun BottomBarBodyMain(
         modifier = modifier,
         rootScreens = rootScreens,
         selectedRootScreenType = if (layoutSettingsEnabled) null else selectedRootScreenType(),
-        indication = null, //TODO: if (layoutSettingsEnabled) null else rememberRipple(bounded = false, radius = 48.dp),
+        indication = if (layoutSettingsEnabled) null else ripple(bounded = false, radius = 48.dp),
         layoutType = layoutType,
         onSelect = { screen ->
             scope.launch { context.settingsUI.startScreenRoute(screen.routePath) }
