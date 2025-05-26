@@ -1,7 +1,6 @@
 package com.demich.cps.community.codeforces
 
 import android.content.Context
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
@@ -64,7 +63,6 @@ internal data class CodeforcesCommunityControllerData(
     val recentFilterByBlogEntry: CodeforcesBlogEntry?
 )
 
-@OptIn(ExperimentalFoundationApi::class)
 @Stable
 class CodeforcesCommunityController internal constructor(
     viewModel: CodeforcesCommunityViewModel,

@@ -1,6 +1,5 @@
 package com.demich.cps.contests.settings
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
@@ -113,7 +112,6 @@ private fun filter(resources: List<ClistResource>, searchFilter: String) =
     resources.filter { it.name.contains(searchFilter, ignoreCase = true) }
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ClistResourcesList(
     resources: () -> List<ClistResource>,

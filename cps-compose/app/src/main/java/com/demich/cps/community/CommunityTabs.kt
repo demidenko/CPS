@@ -2,7 +2,6 @@ package com.demich.cps.community
 
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,7 +25,6 @@ import com.demich.cps.ui.AnimatedVisibleByNotNull
 import kotlin.math.max
 import kotlin.math.min
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CommunityTabRow(
     modifier: Modifier = Modifier,
@@ -53,7 +51,6 @@ fun CommunityTabRow(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CommunityTab(
     title: String,
@@ -112,7 +109,6 @@ private fun tabColor(
 }
 
 //copy from accompanist
-@OptIn(ExperimentalFoundationApi::class)
 private fun Modifier.pagerTabIndicatorOffset(
     pagerState: PagerState,
     tabPositions: List<TabPosition>,

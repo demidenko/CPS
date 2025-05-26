@@ -1,6 +1,5 @@
 package com.demich.cps.community.follow
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -62,7 +61,6 @@ fun CommunityFollowScreen(
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CodeforcesFollowList(
     userBlogs: () -> List<CodeforcesUserBlog>,

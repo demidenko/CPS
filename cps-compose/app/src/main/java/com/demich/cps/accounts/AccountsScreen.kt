@@ -1,6 +1,5 @@
 package com.demich.cps.accounts
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,7 +25,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AccountsScreen(
     onExpandAccount: (AccountManagerType) -> Unit,
