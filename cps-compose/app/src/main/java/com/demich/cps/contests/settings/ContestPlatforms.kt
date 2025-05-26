@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsLoaderType
+import com.demich.cps.platforms.api.ClistResource
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
@@ -38,13 +39,20 @@ internal fun ContestPlatformsSettingsItem() {
     val scope = rememberCoroutineScope()
 
     val enabledPlatforms by collectItemAsState { context.settingsContests.enabledPlatforms }
+    val clistResources by collectItemAsState { context.settingsContests.clistAdditionalResources }
 
     ExpandableSettingsItem(
         title = "Platforms",
-        collapsedContent = { ContestPlatformsSettingsItemContent(enabledPlatforms) },
+        collapsedContent = {
+            ContestPlatformsSettingsItemContent(
+                enabledPlatforms = enabledPlatforms,
+                clistResources = clistResources
+            )
+        },
         expandedContent = {
             ContestPlatformsSettingsItemExpandedContent(
                 enabledPlatforms = enabledPlatforms,
+                clistResources = clistResources,
                 onCheckedChange = { platform, checked ->
                     require(platform != Contest.Platform.unknown)
                     scope.launch {
@@ -60,12 +68,19 @@ internal fun ContestPlatformsSettingsItem() {
 
 @Composable
 private fun ContestPlatformsSettingsItemContent(
-    enabledPlatforms: Set<Contest.Platform>
+    enabledPlatforms: Set<Contest.Platform>,
+    clistResources: List<ClistResource>
 ) {
     ProvideTextStyle(TextStyle(fontSize = 15.sp, color = cpsColors.contentAdditional)) {
         SettingsSubtitleOfEnabled(
-            enabled = enabledPlatforms - Contest.Platform.unknown,
-            allSize = Contest.platformsExceptUnknown.size
+            enabled = remember(key1 = enabledPlatforms, key2 = clistResources) {
+                buildList {
+                    enabledPlatforms.sortedBy { it.ordinal }.forEach {
+                        if (it != Contest.Platform.unknown) add(it.name)
+                    }
+                    clistResources.forEach { add(it.name) }
+                }
+            }
         )
     }
 }
@@ -73,6 +88,7 @@ private fun ContestPlatformsSettingsItemContent(
 @Composable
 private fun ContestPlatformsSettingsItemExpandedContent(
     enabledPlatforms: Set<Contest.Platform>,
+    clistResources: List<ClistResource>,
     onCheckedChange: (Contest.Platform, Boolean) -> Unit
 ) {
     Column {
@@ -84,7 +100,7 @@ private fun ContestPlatformsSettingsItemExpandedContent(
                 onCheckedChange = { onCheckedChange(platform, it) }
             )
         }
-        ClistAdditionalRow()
+        ClistAdditionalRow(resources = clistResources)
     }
 }
 
@@ -134,10 +150,7 @@ private fun LoadersSetupButton(
 }
 
 @Composable
-private fun ClistAdditionalRow() {
-    val context = context
-    val resources by collectItemAsState { context.settingsContests.clistAdditionalResources }
-
+private fun ClistAdditionalRow(resources: List<ClistResource>) {
     var showDialog by remember { mutableStateOf(false) }
 
     Row(verticalAlignment = Alignment.CenterVertically) {

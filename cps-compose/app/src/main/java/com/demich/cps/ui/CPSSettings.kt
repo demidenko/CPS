@@ -365,16 +365,27 @@ fun SettingsSubtitle(
 }
 
 @Composable
+fun SettingsSubtitleOfEnabled(
+    enabled: Collection<String>,
+    allSize: Int? = null
+) {
+    when (enabled.size) {
+        0 -> SettingsSubtitle("none selected")
+        allSize -> SettingsSubtitle("all selected")
+        else -> WordsWithCounterOnOverflow(words = enabled)
+    }
+}
+
+@Composable
 fun<T: Enum<T>> SettingsSubtitleOfEnabled(
     enabled: Set<T>,
     allSize: Int? = null,
     name: (T) -> String = { it.name }
 ) {
-    when (enabled.size) {
-        0 -> SettingsSubtitle("none selected")
-        allSize -> SettingsSubtitle("all selected")
-        else -> WordsWithCounterOnOverflow(words = enabled.sortedBy { it.ordinal }.map(name))
-    }
+    SettingsSubtitleOfEnabled(
+        enabled = enabled.sortedBy { it.ordinal }.map(name),
+        allSize = allSize
+    )
 }
 
 @Composable
