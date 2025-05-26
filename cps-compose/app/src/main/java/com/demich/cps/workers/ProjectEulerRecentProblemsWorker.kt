@@ -27,8 +27,8 @@ class ProjectEulerRecentProblemsWorker(
             override suspend fun isEnabled() =
                 context.settingsCommunity.enabledNewsFeeds().contains(CommunitySettingsDataStore.NewsFeed.project_euler_problems)
 
-            override val requestBuilder: PeriodicWorkRequest.Builder
-                get() = CPSPeriodicWorkRequestBuilder<ProjectEulerRecentProblemsWorker>(
+            override suspend fun requestBuilder() =
+                CPSPeriodicWorkRequestBuilder<ProjectEulerRecentProblemsWorker>(
                     repeatInterval = 6.hours
                 )
         }

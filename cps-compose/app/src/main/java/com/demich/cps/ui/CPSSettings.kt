@@ -242,14 +242,17 @@ fun SettingsSwitchItemWithWork(
     stopWorkOnUnchecked: Boolean = true
 ) {
     val context = context
+    val scope = rememberCoroutineScope()
     SettingsSwitchItem(
         item = item,
         title = title,
         description = description
     ) { checked ->
-        with(workGetter(context)) {
-            if (checked) startImmediate()
-            else if (stopWorkOnUnchecked) stop()
+        scope.launch {
+            with(workGetter(context)) {
+                if (checked) startImmediate()
+                else if (stopWorkOnUnchecked) stop()
+            }
         }
     }
 }

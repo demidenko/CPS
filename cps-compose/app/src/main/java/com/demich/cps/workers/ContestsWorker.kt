@@ -21,8 +21,8 @@ class ContestsWorker(
     companion object {
         fun getWork(context: Context) = object : CPSPeriodicWork(name = "contests", context = context) {
             override suspend fun isEnabled() = context.settingsContests.enabledAutoUpdate()
-            override val requestBuilder: PeriodicWorkRequest.Builder
-                get() = CPSPeriodicWorkRequestBuilder<ContestsWorker>(
+            override suspend fun requestBuilder() =
+                CPSPeriodicWorkRequestBuilder<ContestsWorker>(
                     repeatInterval = 1.hours,
                     batteryNotLow = true
                 )

@@ -17,7 +17,7 @@ class CodeforcesCommunityFollowWorker(
     companion object {
         fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_follow", context = context) {
             override suspend fun isEnabled() = context.settingsCommunity.codeforcesFollowEnabled()
-            override val requestBuilder get() =
+            override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<CodeforcesCommunityFollowWorker>(
                     repeatInterval = 6.hours,
                     batteryNotLow = true

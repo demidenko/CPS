@@ -33,8 +33,8 @@ class CodeforcesCommunityLostRecentWorker(
     companion object {
         fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_lost", context = context) {
             override suspend fun isEnabled() = context.settingsCommunity.codeforcesLostEnabled()
-            override val requestBuilder: PeriodicWorkRequest.Builder
-                get() = CPSPeriodicWorkRequestBuilder<CodeforcesCommunityLostRecentWorker>(
+            override suspend fun requestBuilder() =
+                CPSPeriodicWorkRequestBuilder<CodeforcesCommunityLostRecentWorker>(
                     repeatInterval = 30.minutes
                 )
         }

@@ -26,8 +26,8 @@ class CodeforcesMonitorLauncherWorker(
             override suspend fun isEnabled() =
                 CodeforcesAccountManager().getSettings(context).monitorEnabled()
 
-            override val requestBuilder
-                get() = CPSPeriodicWorkRequestBuilder<CodeforcesMonitorLauncherWorker>(
+            override suspend fun requestBuilder() =
+                CPSPeriodicWorkRequestBuilder<CodeforcesMonitorLauncherWorker>(
                     repeatInterval = 45.minutes
                 )
         }

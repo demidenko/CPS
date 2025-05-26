@@ -71,28 +71,28 @@ abstract class CPSPeriodicWork(
 ): CPSWork(name, context) {
     abstract suspend fun isEnabled(): Boolean
 
-    abstract val requestBuilder: PeriodicWorkRequest.Builder
+    abstract suspend fun requestBuilder(): PeriodicWorkRequest.Builder
 
-    private inline fun enqueueWork(
+    private suspend inline fun enqueueWork(
         policy: ExistingPeriodicWorkPolicy,
         block: PeriodicWorkRequest.Builder.() -> Unit = {}
     ) {
         workManager.enqueueUniquePeriodicWork(
             uniqueWorkName = name,
             existingPeriodicWorkPolicy = policy,
-            request = requestBuilder.apply(block).build()
+            request = requestBuilder().apply(block).build()
         )
     }
 
-    private fun start(restart: Boolean) =
+    private suspend fun start(restart: Boolean) =
         enqueueWork(
             policy = if (restart) ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE
                     else ExistingPeriodicWorkPolicy.UPDATE
         )
 
-    fun startImmediate() = start(restart = true)
+    suspend fun startImmediate() = start(restart = true)
 
-    private fun enqueue() = start(restart = false)
+    private suspend fun enqueue() = start(restart = false)
 
     suspend fun enqueueIfEnabled() {
         if (isEnabled()) enqueue()

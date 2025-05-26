@@ -20,6 +20,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -65,8 +66,10 @@ import com.demich.cps.workers.isRunning
 import com.demich.cps.workers.nextScheduleTime
 import com.demich.cps.workers.repeatInterval
 import com.demich.cps.workers.stateOrCancelled
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
@@ -76,6 +79,8 @@ import kotlin.time.DurationUnit
 
 @Composable
 fun WorkersList(modifier: Modifier = Modifier) {
+    val scope = rememberCoroutineScope()
+
     var showMonitorDialog by remember { mutableStateOf(false) }
     var showRestartDialogFor: CPSPeriodicWork? by remember { mutableStateOf(null) }
     ProvideTimeEachMinute {
@@ -88,6 +93,7 @@ fun WorkersList(modifier: Modifier = Modifier) {
         showRestartDialogFor?.let { work ->
             WorkerDialog(
                 work = work,
+                scope = scope,
                 onDismissRequest = { showRestartDialogFor = null }
             )
         }
@@ -120,7 +126,11 @@ fun WorkersList(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun WorkerDialog(work: CPSPeriodicWork, onDismissRequest: () -> Unit) {
+private fun WorkerDialog(
+    work: CPSPeriodicWork,
+    scope: CoroutineScope,
+    onDismissRequest: () -> Unit
+) {
     val workInfo by work.workInfoAsState()
     val events by work.eventsState()
 
@@ -160,7 +170,7 @@ private fun WorkerDialog(work: CPSPeriodicWork, onDismissRequest: () -> Unit) {
         Button(
             content = { Text(text = "restart") },
             onClick = {
-                work.startImmediate()
+                scope.launch { work.startImmediate() }
                 onDismissRequest()
             }
         )

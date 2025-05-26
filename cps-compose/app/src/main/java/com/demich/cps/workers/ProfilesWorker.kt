@@ -29,8 +29,8 @@ class ProfilesWorker(
     companion object {
         fun getWork(context: Context) = object : CPSPeriodicWork(name = "profiles", context = context) {
             override suspend fun isEnabled() = true //TODO something proper
-            override val requestBuilder: PeriodicWorkRequest.Builder
-                get() = CPSPeriodicWorkRequestBuilder<ProfilesWorker>(
+            override suspend fun requestBuilder() =
+                CPSPeriodicWorkRequestBuilder<ProfilesWorker>(
                     repeatInterval = 15.minutes
                 )
         }

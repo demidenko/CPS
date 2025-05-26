@@ -33,8 +33,8 @@ class CodeforcesUpsolvingSuggestionsWorker(
             override suspend fun isEnabled() =
                 CodeforcesAccountManager().getSettings(context).upsolvingSuggestionsEnabled()
 
-            override val requestBuilder: PeriodicWorkRequest.Builder
-                get() = CPSPeriodicWorkRequestBuilder<CodeforcesUpsolvingSuggestionsWorker>(
+            override suspend fun requestBuilder() =
+                CPSPeriodicWorkRequestBuilder<CodeforcesUpsolvingSuggestionsWorker>(
                     repeatInterval = 12.hours,
                     batteryNotLow = true
                 )

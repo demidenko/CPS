@@ -33,8 +33,8 @@ class NewsWorker(
                 return enabledFeeds.isNotEmpty()
             }
 
-            override val requestBuilder: PeriodicWorkRequest.Builder
-                get() = CPSPeriodicWorkRequestBuilder<NewsWorker>(
+            override suspend fun requestBuilder() =
+                CPSPeriodicWorkRequestBuilder<NewsWorker>(
                     repeatInterval = 6.hours,
                     batteryNotLow = true
                 )
