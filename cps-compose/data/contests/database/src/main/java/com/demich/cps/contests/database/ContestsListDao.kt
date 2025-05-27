@@ -21,11 +21,15 @@ abstract class ContestsListDao {
     //@Query("delete from $contestsTableName where platform = :platform")
     //abstract suspend fun remove(platform: Contest.Platform)
 
+    @Query("delete from $contestsTableName where platform = :platform and id not in (:ids)")
+    abstract suspend fun removeNotIn(platform: Contest.Platform, ids: Set<String>)
+
     @Transaction
     open suspend fun replace(platform: Contest.Platform, contests: List<Contest>) {
         require(contests.all { it.platform == platform })
         val ids = contests.mapTo(mutableSetOf()) { it.id }
-        remove(getContests(platform).filter { it.id !in ids })
+        // remove(getContests(platform).filter { it.id !in ids })
+        removeNotIn(platform, ids)
         insert(contests)
     }
 
