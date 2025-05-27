@@ -103,19 +103,20 @@ class CodeforcesMonitorLauncherWorker(
     }
 
     private suspend fun enqueueToCodeforcesContest() {
-        with(context.contestsListDao.getContests(Contest.Platform.codeforces)) {
-            minOfNotNull {
-                when (it.getPhase(workerStartTime)) {
-                    Contest.Phase.RUNNING -> {
-                        work.enqueueAsap()
-                        return
-                    }
-                    Contest.Phase.BEFORE -> it.startTime
-                    else -> null
+        context.contestsListDao.getContestsNotFinished(
+            platform = Contest.Platform.codeforces,
+            currentTime = workerStartTime
+        ).minOfNotNull {
+            when (it.getPhase(workerStartTime)) {
+                Contest.Phase.RUNNING -> {
+                    work.enqueueAsap()
+                    return
                 }
-            }?.let {
-                work.enqueueAtIfEarlier(time = it + 5.minutes)
+                Contest.Phase.BEFORE -> it.startTime
+                else -> null
             }
+        }?.let {
+            work.enqueueAtIfEarlier(time = it + 5.minutes)
         }
     }
 }

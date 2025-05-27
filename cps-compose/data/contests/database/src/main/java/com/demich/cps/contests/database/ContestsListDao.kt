@@ -3,6 +3,7 @@ package com.demich.cps.contests.database
 import android.content.Context
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
 
 val Context.contestsListDao: ContestsListDao
     get() = ContestsDatabase.getInstance(this).contestsDao()
@@ -33,5 +34,8 @@ abstract class ContestsListDao {
 
     @Query("select * from $contestsTableName where platform = :platform")
     abstract suspend fun getContests(platform: Contest.Platform): List<Contest>
+
+    @Query("select * from $contestsTableName where platform = :platform and endTime > :currentTime")
+    abstract suspend fun getContestsNotFinished(platform: Contest.Platform, currentTime: Instant): List<Contest>
 
 }
