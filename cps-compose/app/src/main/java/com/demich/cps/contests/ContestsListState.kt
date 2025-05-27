@@ -25,6 +25,9 @@ val Contest.compositeId: ContestCompositeId
 val Contest.isVirtual: Boolean
     get() = duration < eventDuration
 
+private fun isParallel(c1: Contest, c2: Contest): Boolean =
+    c1.platform == c2.platform && c1.startTime == c2.startTime && c1.endTime == c2.endTime
+
 @Composable
 internal fun rememberContestsListState(): ContestsListState {
     val contestsViewModel = contestsViewModel()
@@ -84,7 +87,7 @@ class ContestsListState(
             val l = it.startTime
             val r = it.endTime
             when {
-                it.compositeId == contest.compositeId -> null
+                isParallel(it, contest) -> null
                 it.isVirtual -> null
                 l >= contest.endTime -> l - contest.endTime
                 r <= contest.startTime -> contest.startTime - r
