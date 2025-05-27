@@ -29,17 +29,17 @@ private fun isParallel(c1: Contest, c2: Contest): Boolean =
     c1.platform == c2.platform && c1.startTime == c2.startTime && c1.endTime == c2.endTime
 
 @Composable
-internal fun rememberContestsListState(): ContestsListState {
+internal fun rememberContestsListViewState(): ContestsListViewState {
     val contestsViewModel = contestsViewModel()
 
     val expandedContestsState = collectAsState { contestsViewModel.flowOfExpandedContests() }
 
     val contestsPageState = rememberSaveable {
-        mutableStateOf(ContestsListState.ContestsPage.RunningOrFuture)
+        mutableStateOf(ContestsListViewState.ContestsPage.RunningOrFuture)
     }
 
     return remember(contestsViewModel, expandedContestsState) {
-        ContestsListState(
+        ContestsListViewState(
             contestsViewModel = contestsViewModel,
             expandedContestsState = expandedContestsState,
             contestsPageState = contestsPageState
@@ -71,7 +71,7 @@ internal interface ContestsIdsHolder {
 }
 
 @Stable
-class ContestsListState(
+class ContestsListViewState(
     contestsViewModel: ContestsViewModel,
     expandedContestsState: State<Map<ContestCompositeId, Contest>>,
     contestsPageState: MutableState<ContestsPage>

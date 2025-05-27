@@ -82,7 +82,7 @@ import kotlinx.datetime.Instant
 
 @Composable
 fun ContestsScreen(
-    contestsListState: ContestsListState,
+    viewState: ContestsListViewState,
     filterState: FilterState,
     anyPlatformEnabled: Boolean,
     isReloading: () -> Boolean,
@@ -95,7 +95,7 @@ fun ContestsScreen(
         CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
         if (anyPlatformEnabled) {
             ContestsReloadableContent(
-                contestsListState = contestsListState,
+                viewState = viewState,
                 filterState = filterState,
                 isReloading = isReloading,
                 onReload = onReload,
@@ -118,7 +118,7 @@ fun ContestsScreen(
 
 @Composable
 private fun ContestsReloadableContent(
-    contestsListState: ContestsListState,
+    viewState: ContestsListViewState,
     filterState: FilterState,
     isReloading: () -> Boolean,
     onReload: () -> Unit,
@@ -130,7 +130,7 @@ private fun ContestsReloadableContent(
         modifier = modifier
     ) {
         ContestsContent(
-            contestsListState = contestsListState,
+            viewState = viewState,
             filterState = filterState
         )
     }
@@ -138,7 +138,7 @@ private fun ContestsReloadableContent(
 
 @Composable
 private fun ContestsContent(
-    contestsListState: ContestsListState,
+    viewState: ContestsListViewState,
     filterState: FilterState
 ) {
     val context = context
@@ -159,7 +159,7 @@ private fun ContestsContent(
                 .fillMaxWidth()
         )
         ContestsPager(
-            contestsListState = contestsListState,
+            viewState = viewState,
             filterState = filterState,
             modifier = Modifier
                 .fillMaxSize()
@@ -169,7 +169,7 @@ private fun ContestsContent(
 
 @Composable
 private fun ContestsPager(
-    contestsListState: ContestsListState,
+    viewState: ContestsListViewState,
     filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
@@ -178,22 +178,22 @@ private fun ContestsPager(
         currentTimeState: State<Instant>
     ) = produceSortedContestsWithTime()
 
-    LaunchedEffect(contestsState, filterState, contestsListState) {
+    LaunchedEffect(contestsState, filterState, viewState) {
         snapshotFlow { contestsState.value.contests }
             .collect { contests ->
                 filterState.available = contests.isNotEmpty()
-                contestsListState.applyContests(contests)
+                viewState.applyContests(contests)
             }
     }
 
     val saveableStateHolder = rememberSaveableStateHolder()
 
     ProvideCurrentTime(currentTimeState) {
-        val page = contestsListState.contestsPage
+        val page = viewState.contestsPage
         saveableStateHolder.SaveableStateProvider(key = page) {
             ContestsPage(
                 contests = { contestsState.value.sublist(page) },
-                contestsListState = contestsListState,
+                viewState = viewState,
                 filterState = filterState,
                 modifier = modifier
             )
@@ -213,7 +213,7 @@ private fun FilterState.filterContests(contests: List<Contest>) =
 @Composable
 private fun ContestsPage(
     contests: () -> List<Contest>,
-    contestsListState: ContestsListState,
+    viewState: ContestsListViewState,
     filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
@@ -228,7 +228,7 @@ private fun ContestsPage(
 
     ContestsColumn(
         contests = { filtered },
-        contestsListState = contestsListState,
+        viewState = viewState,
         modifier = modifier,
         onDeleteRequest = { contest ->
             scope.launch {
@@ -242,7 +242,7 @@ private fun ContestsPage(
 @Composable
 private fun ContestsColumn(
     contests: () -> List<Contest>,
-    contestsListState: ContestsListState,
+    viewState: ContestsListViewState,
     onDeleteRequest: (Contest) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -253,12 +253,12 @@ private fun ContestsColumn(
     ) { contest ->
         ContestItem(
             contest = contest,
-            isExpanded = { contestsListState.isExpanded(contest) },
-            collisionType = { contestsListState.collisionType(contest) },
+            isExpanded = { viewState.isExpanded(contest) },
+            collisionType = { viewState.collisionType(contest) },
             onDeleteRequest = { onDeleteRequest(contest) },
             modifier = Modifier
                 .fillMaxWidth()
-                .clickableNoRipple { contestsListState.toggleExpanded(contest) }
+                .clickableNoRipple { viewState.toggleExpanded(contest) }
                 .contestItemPaddings()
                 .animateItem(placementSpec = spring())
                 .animateContentSize(spring())
@@ -303,7 +303,7 @@ fun NavContentContestsScreen(
 ) {
     val context = context
     val contestsViewModel = contestsViewModel()
-    val contestsListState = rememberContestsListState()
+    val viewState = rememberContestsListViewState()
     val filterState = rememberFilterState()
     val loadingStatus by combinedLoadingStatusState()
     val anyPlatformEnabled by anyPlatformEnabledState()
@@ -312,7 +312,7 @@ fun NavContentContestsScreen(
     val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
 
     ContestsScreen(
-        contestsListState = contestsListState,
+        viewState = viewState,
         filterState = filterState,
         anyPlatformEnabled = anyPlatformEnabled,
         isReloading = isReloading,
@@ -320,7 +320,7 @@ fun NavContentContestsScreen(
     )
 
     holder.bottomBar = contestsBottomBarBuilder(
-        contestsListState = contestsListState,
+        viewState = viewState,
         filterState = filterState,
         anyPlatformEnabled = anyPlatformEnabled,
         loadingStatus = { loadingStatus },
@@ -332,9 +332,9 @@ fun NavContentContestsScreen(
         isReloading = isReloading
     )
 
-    when (contestsListState.contestsPage) {
-        ContestsListState.ContestsPage.Finished -> holder.setSubtitle("contests", "finished")
-        ContestsListState.ContestsPage.RunningOrFuture -> holder.setSubtitle("contests")
+    when (viewState.contestsPage) {
+        ContestsListViewState.ContestsPage.Finished -> holder.setSubtitle("contests", "finished")
+        ContestsListViewState.ContestsPage.RunningOrFuture -> holder.setSubtitle("contests")
     }
 }
 
@@ -351,7 +351,7 @@ private fun contestsMenuBuilder(
 }
 
 private fun contestsBottomBarBuilder(
-    contestsListState: ContestsListState,
+    viewState: ContestsListViewState,
     filterState: FilterState,
     anyPlatformEnabled: Boolean,
     loadingStatus: () -> LoadingStatus,
@@ -363,9 +363,9 @@ private fun contestsBottomBarBuilder(
 
     if (anyPlatformEnabled) {
         ContestsPageSwitchButton(
-            contestsPage = contestsListState.contestsPage,
+            contestsPage = viewState.contestsPage,
             onClick = {
-                contestsListState.contestsPage = it
+                viewState.contestsPage = it
             }
         )
     }
@@ -379,16 +379,16 @@ private fun contestsBottomBarBuilder(
 
 @Composable
 private fun ContestsPageSwitchButton(
-    contestsPage: ContestsListState.ContestsPage,
-    onClick: (ContestsListState.ContestsPage) -> Unit
+    contestsPage: ContestsListViewState.ContestsPage,
+    onClick: (ContestsListViewState.ContestsPage) -> Unit
 ) {
     CPSIconButton(
         icon = CPSIcons.Swap,
         onClick = {
             onClick(
                 when (contestsPage) {
-                    ContestsListState.ContestsPage.Finished -> ContestsListState.ContestsPage.RunningOrFuture
-                    ContestsListState.ContestsPage.RunningOrFuture -> ContestsListState.ContestsPage.Finished
+                    ContestsListViewState.ContestsPage.Finished -> ContestsListViewState.ContestsPage.RunningOrFuture
+                    ContestsListViewState.ContestsPage.RunningOrFuture -> ContestsListViewState.ContestsPage.Finished
                 }
             )
         }
@@ -408,7 +408,7 @@ private fun anyPlatformEnabledState(): State<Boolean> {
 
 
 @Composable
-fun combinedLoadingStatusState(): State<LoadingStatus> {
+private fun combinedLoadingStatusState(): State<LoadingStatus> {
     val context = context
     val contestsViewModel = contestsViewModel()
 
