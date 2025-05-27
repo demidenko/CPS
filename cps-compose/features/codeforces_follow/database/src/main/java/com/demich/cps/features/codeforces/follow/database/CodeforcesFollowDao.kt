@@ -40,12 +40,6 @@ interface CodeforcesFollowDao {
     @Query("DELETE FROM $cfFollowTableName WHERE handle LIKE :handle")
     suspend fun remove(handle: String)
 
-
-    private suspend fun setBlogEntries(handle: String, blogEntries: List<Int>) {
-        val userBlog = getUserBlog(handle) ?: return
-        if (userBlog.blogEntries != blogEntries) update(userBlog.copy(blogEntries = blogEntries))
-    }
-
     private suspend fun changeHandle(fromHandle: String, toHandle: String) {
         if (fromHandle == toHandle) return
         val fromUserBlog = getUserBlog(fromHandle) ?: return
@@ -68,6 +62,27 @@ interface CodeforcesFollowDao {
         ))
     }
 
+    private suspend inline fun addBlogEntries(
+        handle: String,
+        blogEntries: List<CodeforcesBlogEntry>,
+        onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
+    ) {
+        val userBlog = getUserBlog(handle) ?: return
+        val currentIds = userBlog.blogEntries?.toSet()
+        val newIds = mutableListOf<Int>()
+        blogEntries.forEach {
+            if (currentIds == null || it.id !in currentIds) {
+                newIds.add(it.id)
+                if (currentIds != null) onNewBlogEntry(it)
+            }
+        }
+        if (currentIds == null) {
+            update(userBlog.copy(blogEntries = newIds))
+        } else {
+            if (newIds.isNotEmpty()) update(userBlog.copy(blogEntries = newIds + currentIds))
+        }
+    }
+
     suspend fun getAndReloadBlogEntries(
         handle: String,
         locale: CodeforcesLocale,
@@ -78,12 +93,7 @@ interface CodeforcesFollowDao {
             locale = locale,
             applyUserInfo = ::applyUserInfo
         ).onSuccess { blogEntries ->
-            getUserBlog(handle)?.blogEntries?.toSet()?.let { saved ->
-                for (blogEntry in blogEntries) {
-                    if (blogEntry.id !in saved) onNewBlogEntry(blogEntry)
-                }
-            }
-            setBlogEntries(handle, blogEntries.map { it.id })
+            addBlogEntries(handle, blogEntries, onNewBlogEntry)
         }
     }
 
