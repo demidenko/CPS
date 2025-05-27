@@ -62,7 +62,7 @@ interface CodeforcesFollowDao {
         ))
     }
 
-    private suspend inline fun addBlogEntries(
+    private suspend fun addBlogEntries(
         handle: String,
         blogEntries: List<CodeforcesBlogEntry>,
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
@@ -83,16 +83,31 @@ interface CodeforcesFollowDao {
         }
     }
 
+    //TODO: refactor this
     suspend fun getAndReloadBlogEntries(
         handle: String,
         locale: CodeforcesLocale,
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
     ): Result<List<CodeforcesBlogEntry>> {
-        return getBlogEntries(
-            handle = handle,
-            locale = locale,
-            applyUserInfo = ::applyUserInfo
-        ).onSuccess { blogEntries ->
+        return CodeforcesApi.runCatching {
+            getUserBlogEntries(handle = handle, locale = locale)
+        }.recoverCatching {
+            if (it is CodeforcesApiNotAllowedReadBlogException) {
+                return@recoverCatching emptyList()
+            }
+            if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
+                val userInfo = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
+                applyUserInfo(handle, userInfo)
+                if (userInfo.status == STATUS.OK) {
+                    return@recoverCatching getAndReloadBlogEntries(
+                        handle = userInfo.handle,
+                        locale = locale,
+                        onNewBlogEntry = onNewBlogEntry
+                    ).getOrThrow()
+                }
+            }
+            throw it
+        }.onSuccess { blogEntries ->
             addBlogEntries(handle, blogEntries, onNewBlogEntry)
         }
     }
@@ -113,33 +128,5 @@ interface CodeforcesFollowDao {
     @Transaction
     suspend fun applyUsersInfo(result: Map<String, CodeforcesUserInfo>) {
         result.forEach { (handle, info) -> applyUserInfo(handle, info) }
-    }
-}
-
-
-
-private suspend fun getBlogEntries(
-    handle: String,
-    locale: CodeforcesLocale,
-    applyUserInfo: suspend (String, CodeforcesUserInfo) -> Unit
-): Result<List<CodeforcesBlogEntry>> {
-    return CodeforcesApi.runCatching {
-        getUserBlogEntries(handle = handle, locale = locale)
-    }.recoverCatching {
-        if (it is CodeforcesApiNotAllowedReadBlogException) {
-            return@recoverCatching emptyList()
-        }
-        if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
-            val userInfo = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
-            applyUserInfo(handle, userInfo)
-            if (userInfo.status == STATUS.OK) {
-                return getBlogEntries(
-                    handle = userInfo.handle,
-                    locale = locale,
-                    applyUserInfo = applyUserInfo
-                )
-            }
-        }
-        throw it
     }
 }
