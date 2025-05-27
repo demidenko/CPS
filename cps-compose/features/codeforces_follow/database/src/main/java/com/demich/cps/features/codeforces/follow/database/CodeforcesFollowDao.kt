@@ -101,6 +101,7 @@ interface CodeforcesFollowDao {
         applyUsersInfo(CodeforcesUtils.getUsersInfo(handles = getHandles(), doRedirect = true))
     }
 
+    @Transaction
     suspend fun applyUserInfo(handle: String, info: CodeforcesUserInfo) {
         when (info.status) {
             STATUS.OK -> setOKUserInfo(handle, info)
