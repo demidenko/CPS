@@ -167,11 +167,19 @@ fun Context.getCPSWorks() = listOf(
 ).map { it(this) }
 
 suspend fun Context.enqueueEnabledWorkers() {
-    //accounts renamed to profiles but work still in database
-    //TODO: get all enqueued (somehow) and cancel not from list
-    workManager.cancelUniqueWork(uniqueWorkName = "accounts")
+    val works = getCPSWorks()
 
-    getCPSWorks().forEach { it.enqueueIfEnabled() }
+    //TODO: get all enqueued (somehow) and cancel not from list
+    CPSWorkersDataStore(this).apply {
+        val validNames = works.map { it.name }
+        val invalidNames = executions().keys.filter { it !in validNames }
+        if (invalidNames.isNotEmpty()) {
+            workManager.apply { invalidNames.forEach(::cancelUniqueWork) }
+            executions.update { it.filterKeys { it in validNames } }
+        }
+    }
+
+    works.forEach { it.enqueueIfEnabled() }
 }
 
 internal suspend fun CoroutineWorker.setForeground(builder: NotificationBuilder) {
