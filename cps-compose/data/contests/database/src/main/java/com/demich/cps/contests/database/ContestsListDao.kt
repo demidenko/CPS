@@ -10,26 +10,35 @@ val Context.contestsListDao: ContestsListDao
 
 internal const val contestsTableName = "contests_list"
 
+private const val SQLITE_MAX_VARIABLE_NUMBER = 1000 //actually is 32k https://www.sqlite.org/limits.html#9
+
 @Dao
 abstract class ContestsListDao {
     @Upsert
     protected abstract suspend fun insert(contests: List<Contest>)
 
     @Delete
-    protected abstract  suspend fun remove(contests: List<Contest>)
+    protected abstract suspend fun remove(contests: List<Contest>)
 
     //@Query("delete from $contestsTableName where platform = :platform")
     //abstract suspend fun remove(platform: Contest.Platform)
 
-    //DON'T USE! "in (:ids)" is not optimized (joins all to one string) and limited by 32k items (throws exception otherwise)
-    //@Query("delete from $contestsTableName where platform = :platform and id not in (:ids)")
-    //abstract suspend fun removeNotIn(platform: Contest.Platform, ids: Set<String>)
+    @Query("delete from $contestsTableName where platform = :platform and id not in (:ids)")
+    protected abstract suspend fun __queryRemoveNotIn(platform: Contest.Platform, ids: Set<String>)
+
+    private suspend fun removeNotIn(platform: Contest.Platform, ids: Set<String>) {
+        if (ids.size < SQLITE_MAX_VARIABLE_NUMBER) {
+            __queryRemoveNotIn(platform, ids)
+        } else {
+            remove(getContests(platform).filter { it.id !in ids })
+        }
+    }
 
     @Transaction
     open suspend fun replace(platform: Contest.Platform, contests: List<Contest>) {
         require(contests.all { it.platform == platform })
         val ids = contests.mapTo(mutableSetOf()) { it.id }
-        remove(getContests(platform).filter { it.id !in ids })
+        removeNotIn(platform, ids)
         insert(contests)
     }
 
