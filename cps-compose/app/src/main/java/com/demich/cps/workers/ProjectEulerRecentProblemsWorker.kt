@@ -49,7 +49,7 @@ class ProjectEulerRecentProblemsWorker(
                 contentTitle = "Problem $problemId"
                 bigContent = post.name
                 smallIcon = R.drawable.ic_logo_projecteuler
-                color = context.getColor(R.color.project_euler_main)
+                colorResId = R.color.project_euler_main
                 // setShowWhen(true) TODO: set release time
                 autoCancel = true
                 url = ProjectEulerApi.urls.problem(problemId)

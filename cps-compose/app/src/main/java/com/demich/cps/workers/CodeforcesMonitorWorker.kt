@@ -105,10 +105,10 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         notificationChannels.codeforces.submission_result(submission.id).notify(context) {
             if (submission.verdict == CodeforcesProblemVerdict.OK) {
                 smallIcon = R.drawable.ic_problem_ok
-                color = context.getColor(R.color.success)
+                colorResId = R.color.success
             } else {
                 smallIcon = R.drawable.ic_problem_fail
-                color = context.getColor(R.color.fail)
+                colorResId = R.color.fail
             }
             val problemName = "${submission.contestId}${submission.problem.index}"
             val result = submission.makeVerdict()

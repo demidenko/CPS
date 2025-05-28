@@ -2,6 +2,8 @@ package com.demich.cps.notifications
 
 import android.content.Context
 import android.widget.RemoteViews
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
 import com.demich.cps.utils.makePendingIntentOpenUrl
 import kotlinx.datetime.Instant
@@ -32,9 +34,14 @@ class NotificationBuildScope(
             builder.setSmallIcon(value)
         }
 
-    var color: Int = 0
+    var color: Color = Color.Black
         set(value) {
-            builder.setColor(value)
+            builder.setColor(value.toArgb())
+        }
+
+    var colorResId: Int = 0
+        set(value) {
+            builder.setColor(context.getColor(value))
         }
 
     var time: Instant? = null

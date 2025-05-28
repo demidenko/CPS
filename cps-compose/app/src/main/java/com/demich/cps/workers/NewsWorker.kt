@@ -81,7 +81,7 @@ class NewsWorker(
                 //TODO: still <p> .. </p>
                 bigContent = post.descriptionHtml.asHtmlToSpanned()
                 smallIcon = R.drawable.ic_community
-                color = context.getColor(R.color.project_euler_main)
+                colorResId = R.color.project_euler_main
                 time = null
                 autoCancel = true
                 url = ProjectEulerApi.urls.news

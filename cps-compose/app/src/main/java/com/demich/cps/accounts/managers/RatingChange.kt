@@ -1,7 +1,6 @@
 package com.demich.cps.accounts.managers
 
 import android.content.Context
-import androidx.compose.ui.graphics.toArgb
 import com.demich.cps.R
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.notifications.NotificationChannelSingleId
@@ -85,8 +84,7 @@ fun notifyRatingChange(
         contentTitle = "$handle new rating: ${ratingChange.rating}"
         contentText = "${difference.toSignedString()} (rank: ${ratingChange.rank})"
         subText = "${manager.type.name} rating changes"
-        color = manager.originalColor(manager.getHandleColor(ratingChange.rating))
-            .toArgb() //TODO not original but cpsColors
+        color = manager.originalColor(manager.getHandleColor(ratingChange.rating)) //TODO not original but cpsColors
         ratingChange.url?.let { url = it }
         time = ratingChange.date
     }
