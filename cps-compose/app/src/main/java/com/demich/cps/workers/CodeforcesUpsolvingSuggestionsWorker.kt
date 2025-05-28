@@ -1,11 +1,9 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
-import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
@@ -124,11 +122,11 @@ private suspend inline fun getSuggestions(
 private fun notifyProblemForUpsolve(problem: CodeforcesProblem, context: Context) {
     val problemId = problem.problemId
     notificationChannels.codeforces.upsolving_suggestion(problemId).notify(context) {
-        setSmallIcon(R.drawable.ic_training)
-        setContentTitle("Consider to upsolve problem $problemId")
-        setSubText("codeforces upsolving suggestion")
-        setShowWhen(false)
-        setAutoCancel(true)
-        attachUrl(url = CodeforcesApi.urls.problem(problem.contestId, problem.index), context = context)
+        smallIcon = R.drawable.ic_training
+        contentTitle = "Consider to upsolve problem $problemId"
+        subText = "codeforces upsolving suggestion"
+        time = null
+        autoCancel = true
+        url = CodeforcesApi.urls.problem(problem.contestId, problem.index)
     }
 }

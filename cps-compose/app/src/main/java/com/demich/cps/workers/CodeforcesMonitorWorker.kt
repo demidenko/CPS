@@ -12,7 +12,6 @@ import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorNotifier
 import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.monitors.launchIn
-import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
@@ -94,10 +93,10 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
 
     private fun createNotificationBuilder(handle: String) =
         notificationChannels.codeforces.contest_monitor.builder(context) {
-            setSmallIcon(R.drawable.ic_monitor)
-            setSubText(handle)
-            setShowWhen(false)
-            setSilent(true)
+            smallIcon = R.drawable.ic_monitor
+            subText = handle
+            time = null
+            silent = true
             setStyle(NotificationCompat.DecoratedCustomViewStyle())
             //TODO intent open contest screen
         }
@@ -105,18 +104,18 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
     private fun notify(submission: CodeforcesSubmission) =
         notificationChannels.codeforces.submission_result(submission.id).notify(context) {
             if (submission.verdict == CodeforcesProblemVerdict.OK) {
-                setSmallIcon(R.drawable.ic_problem_ok)
+                smallIcon = R.drawable.ic_problem_ok
                 color = context.getColor(R.color.success)
             } else {
-                setSmallIcon(R.drawable.ic_problem_fail)
+                smallIcon = R.drawable.ic_problem_fail
                 color = context.getColor(R.color.fail)
             }
             val problemName = "${submission.contestId}${submission.problem.index}"
             val result = submission.makeVerdict()
-            setContentTitle("Problem $problemName: $result")
-            setSubText("Codeforces system testing result")
-            setShowWhen(false)
-            setAutoCancel(true)
-            attachUrl(url = CodeforcesApi.urls.submission(submission), context)
+            contentTitle = "Problem $problemName: $result"
+            subText = "Codeforces system testing result"
+            time = null
+            autoCancel = true
+            url = CodeforcesApi.urls.submission(submission)
         }
 }

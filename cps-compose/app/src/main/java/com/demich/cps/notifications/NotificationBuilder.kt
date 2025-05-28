@@ -20,7 +20,7 @@ class NotificationBuilder internal constructor(
         context = context
     )
 
-    fun edit(block: NotificationCompat.Builder.() -> Unit) = builder.block()
+    fun edit(block: NotificationBuildScope.() -> Unit) = builderScope.block()
 
     fun build(): Notification = builder.build()
 

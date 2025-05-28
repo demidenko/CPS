@@ -1,17 +1,13 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
-import com.demich.cps.*
+import com.demich.cps.R
 import com.demich.cps.community.settings.CommunitySettingsDataStore
 import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed.atcoder_news
 import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed.project_euler_news
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.notifications.setBigContent
-import com.demich.cps.notifications.setWhen
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.ProjectEulerApi
 import com.demich.cps.platforms.utils.AtCoderUtils
@@ -59,15 +55,15 @@ class NewsWorker(
         settings.scanNewsFeed(
             newsFeed = atcoder_news,
             posts = AtCoderUtils.extractNews(source = AtCoderApi.getMainPage())
-        ) {
-            notificationChannels.atcoder.news(it.id.toInt()).notify(context) {
-                setSubText("atcoder news")
-                setBigContent(it.title.trim()) //TODO: title + content html
-                setSmallIcon(R.drawable.ic_community)
-                it.time?.let { time -> setWhen(time) }
-                attachUrl(url = AtCoderApi.urls.post(it.id.toInt()), context = context)
+        ) { post ->
+            notificationChannels.atcoder.news(post.id.toInt()).notify(context) {
+                subText = "atcoder news"
+                bigContent = post.title.trim() //TODO: title + content html
+                smallIcon = R.drawable.ic_community
+                post.time?.let { time = it }
+                url = AtCoderApi.urls.post(post.id.toInt())
                 //setColor
-                setAutoCancel(true)
+                autoCancel = true
             }
         }
     }
@@ -78,17 +74,17 @@ class NewsWorker(
         settings.scanNewsFeed(
             newsFeed = project_euler_news,
             posts = ProjectEulerUtils.extractNewsFromRSSPage(rssPage = rssPage)
-        ) {
-            notificationChannels.project_euler.news(it.id.toInt()).notify(context) {
-                setSubText("Project Euler news")
-                setContentTitle(it.title)
+        ) { post ->
+            notificationChannels.project_euler.news(post.id.toInt()).notify(context) {
+                subText = "Project Euler news"
+                contentTitle = post.title
                 //TODO: still <p> .. </p>
-                setBigContent(it.descriptionHtml.asHtmlToSpanned())
-                setSmallIcon(R.drawable.ic_community)
-                setColor(context.getColor(R.color.project_euler_main))
-                setShowWhen(false)
-                setAutoCancel(true)
-                attachUrl(url = ProjectEulerApi.urls.news, context = context)
+                bigContent = post.descriptionHtml.asHtmlToSpanned()
+                smallIcon = R.drawable.ic_community
+                color = context.getColor(R.color.project_euler_main)
+                time = null
+                autoCancel = true
+                url = ProjectEulerApi.urls.news
             }
         }
     }

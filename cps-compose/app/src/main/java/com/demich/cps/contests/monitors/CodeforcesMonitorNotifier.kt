@@ -56,7 +56,7 @@ class CodeforcesMonitorNotifier(
     private fun setContestName(contestName: String): Boolean {
         if (_contestName == contestName) return false
         _contestName = contestName
-        notificationBuilder.edit { setSubText("$contestName • $handle") }
+        notificationBuilder.edit { subText = "$contestName • $handle" }
         return true
     }
 

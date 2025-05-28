@@ -4,14 +4,12 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import androidx.core.os.bundleOf
-import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.AtCoderAccountManager
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.toRatingChange
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.notifications.attachUrl
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
@@ -83,13 +81,13 @@ class ProfilesWorker(
         val oldContribution = getNotifiedCodeforcesContribution() ?: userInfo.contribution
 
         notificationChannels.codeforces.contribution_changes.notify(context) {
-            setSubText(handle)
-            setContentTitle("Contribution change: ${oldContribution.toSignedString()} → ${newContribution.toSignedString()}")
-            setSmallIcon(R.drawable.ic_person)
-            setSilent(true)
-            setAutoCancel(true)
-            setShowWhen(false)
-            attachUrl(url = userInfo.userPageUrl, context = context)
+            subText = handle
+            contentTitle = "Contribution change: ${oldContribution.toSignedString()} → ${newContribution.toSignedString()}"
+            smallIcon = R.drawable.ic_person
+            silent = true
+            autoCancel = true
+            time = null
+            url = userInfo.userPageUrl
             addExtras(bundleOf(KEY_CF_CONTRIBUTION to oldContribution))
         }
     }

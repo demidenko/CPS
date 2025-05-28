@@ -8,7 +8,7 @@ class NotificationChannelSingleId internal constructor(
     val notificationId: Int,
     val channelInfo: NotificationChannelInfo
 ) {
-    fun builder(context: Context, block: NotificationCompat.Builder.() -> Unit): NotificationBuilder {
+    fun builder(context: Context, block: NotificationBuildScope.() -> Unit): NotificationBuilder {
         val notificationManager = NotificationManagerCompat.from(context).apply {
             createNotificationChannel(channelInfo)
         }
@@ -20,7 +20,7 @@ class NotificationChannelSingleId internal constructor(
         ).apply { edit(block) }
     }
 
-    fun notify(context: Context, block: NotificationCompat.Builder.() -> Unit) =
+    fun notify(context: Context, block: NotificationBuildScope.() -> Unit) =
         builder(context, block).notify()
 }
 

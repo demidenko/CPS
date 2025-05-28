@@ -5,14 +5,12 @@ import androidx.compose.ui.graphics.toArgb
 import com.demich.cps.R
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.notifications.NotificationChannelSingleId
-import com.demich.cps.notifications.attachUrl
-import com.demich.cps.notifications.setWhen
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.AtCoderRatingChange
 import com.demich.cps.platforms.api.CodeChefRatingChange
+import com.demich.cps.platforms.api.DmojRatingChange
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
-import com.demich.cps.platforms.api.DmojRatingChange
 import com.demich.cps.utils.toSignedString
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -83,13 +81,13 @@ fun notifyRatingChange(
 ) {
     channel.notify(context) {
         val difference = ratingChange.rating - (ratingChange.oldRating ?: 0)
-        setSmallIcon(if (difference < 0) R.drawable.ic_rating_down else R.drawable.ic_rating_up)
-        setContentTitle("$handle new rating: ${ratingChange.rating}")
-        setContentText("${difference.toSignedString()} (rank: ${ratingChange.rank})")
-        setSubText("${manager.type.name} rating changes")
+        smallIcon = if (difference < 0) R.drawable.ic_rating_down else R.drawable.ic_rating_up
+        contentTitle = "$handle new rating: ${ratingChange.rating}"
+        contentText = "${difference.toSignedString()} (rank: ${ratingChange.rank})"
+        subText = "${manager.type.name} rating changes"
         color = manager.originalColor(manager.getHandleColor(ratingChange.rating))
             .toArgb() //TODO not original but cpsColors
-        ratingChange.url?.let { attachUrl(it, context) }
-        setWhen(ratingChange.date)
+        ratingChange.url?.let { url = it }
+        time = ratingChange.date
     }
 }
