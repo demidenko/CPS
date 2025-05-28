@@ -15,12 +15,12 @@ class NotificationBuilder internal constructor(
     private val notificationManager: NotificationManagerCompat,
     private val context: Context
 ) {
-    private val builderScope = NotificationBuildScope(
+    val builderScope = NotificationBuildScope(
         builder = builder,
         context = context
     )
 
-    fun edit(block: NotificationBuildScope.() -> Unit) = builderScope.block()
+    inline fun edit(block: NotificationBuildScope.() -> Unit) = builderScope.block()
 
     fun build(): Notification = builder.build()
 
