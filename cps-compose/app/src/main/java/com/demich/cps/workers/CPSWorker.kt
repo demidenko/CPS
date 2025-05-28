@@ -67,6 +67,7 @@ abstract class CPSWorker(
             setProgressInfo(ProgressBarInfo(total = 0))
             timeHolder.reset()
             runCatching { runWork() }.getOrElse {
+                println("${work.name}: $it")
                 when {
                     it.isResponseException -> Result.retry()
                     it is CodeforcesApiException -> Result.retry()

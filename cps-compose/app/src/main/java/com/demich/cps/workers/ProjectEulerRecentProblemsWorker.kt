@@ -32,13 +32,13 @@ class ProjectEulerRecentProblemsWorker(
     }
 
     override suspend fun runWork(): Result {
-        scanNews()
+        scanProblems()
         //TODO: improve logic with hint: sync with recent news worker, wait if time is close
         enqueueByHint()
         return Result.success()
     }
 
-    private suspend fun scanNews() {
+    private suspend fun scanProblems() {
         context.settingsCommunity.scanNewsFeed(
             newsFeed = CommunitySettingsDataStore.NewsFeed.project_euler_problems,
             posts = ProjectEulerUtils.extractRecentProblems(ProjectEulerApi.getRecentPage())
@@ -50,7 +50,7 @@ class ProjectEulerRecentProblemsWorker(
                 bigContent = post.name
                 smallIcon = R.drawable.ic_logo_projecteuler
                 colorResId = R.color.project_euler_main
-                // setShowWhen(true) TODO: set release time
+                time = post.date
                 autoCancel = true
                 url = ProjectEulerApi.urls.problem(problemId)
             }
