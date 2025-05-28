@@ -1,10 +1,12 @@
 package com.demich.cps.accounts.managers
 
 import android.content.Context
+import com.demich.cps.R
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.utils.jsonCPS
+import com.demich.cps.utils.toSignedString
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreWrapper
 
@@ -52,5 +54,24 @@ abstract class RatedAccountDataStore<U: RatedUserInfo>(
             manager = manager,
             context = context
         )
+    }
+}
+
+private fun notifyRatingChange(
+    channel: NotificationChannelSingleId,
+    ratingChange: RatingChange,
+    handle: String,
+    manager: RatedAccountManager<out RatedUserInfo>,
+    context: Context
+) {
+    channel.notify(context) {
+        val difference = ratingChange.rating - (ratingChange.oldRating ?: 0)
+        smallIcon = if (difference < 0) R.drawable.ic_rating_down else R.drawable.ic_rating_up
+        contentTitle = "$handle new rating: ${ratingChange.rating}"
+        contentText = "${difference.toSignedString()} (rank: ${ratingChange.rank})"
+        subText = "${manager.type.name} rating changes"
+        color = manager.originalColor(manager.getHandleColor(ratingChange.rating)) //TODO not original but cpsColors
+        ratingChange.url?.let { url = it }
+        time = ratingChange.date
     }
 }
