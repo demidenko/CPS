@@ -9,12 +9,12 @@ import org.jsoup.Jsoup
 import kotlin.collections.set
 
 object ClistUtils {
-    suspend fun makeResourceIds(
+    fun makeResourceIds(
         platforms: Collection<Contest.Platform>,
-        additionalResources: suspend () -> Collection<ClistResource> = { emptyList() }
+        additionalResources: Collection<ClistResource> = emptyList()
     ): List<Int> = buildList {
         for (platform in platforms) {
-            if (platform == Contest.Platform.unknown) addAll(additionalResources().map { it.id })
+            if (platform == Contest.Platform.unknown) addAll(additionalResources.map { it.id })
             else add(getClistApiResourceId(platform))
         }
     }

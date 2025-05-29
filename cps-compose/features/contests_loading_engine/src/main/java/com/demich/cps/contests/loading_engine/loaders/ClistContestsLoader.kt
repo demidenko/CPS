@@ -15,14 +15,14 @@ import kotlinx.datetime.format.char
 import kotlin.time.Duration.Companion.seconds
 
 class ClistContestsLoader(
-    val apiAccess: suspend () -> ClistApi.ApiAccess,
-    val additionalResources: suspend () -> Collection<ClistResource>
+    val apiAccess: ClistApi.ApiAccess,
+    val additionalResources: Collection<ClistResource>
 ): ContestsLoaderMultiple(type = ContestsLoaderType.clist_api) {
     override suspend fun loadContests(
         platforms: Set<Contest.Platform>,
         dateConstraints: ContestDateConstraints
     ) = ClistApi.getContests(
-        apiAccess = apiAccess(),
+        apiAccess = apiAccess,
         maxStartTime = dateConstraints.maxStartTime,
         minEndTime = dateConstraints.minEndTime,
         resourceIds = ClistUtils.makeResourceIds(platforms, additionalResources)

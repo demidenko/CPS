@@ -1,6 +1,7 @@
 package com.demich.cps.contests
 
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.loading.ContestDateBaseConstraints
 import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.loading.ContestsLoadingResult
 import com.demich.cps.contests.loading.ContestsReceiver
@@ -10,6 +11,8 @@ import com.demich.cps.contests.loading_engine.loaders.ClistContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.CodeforcesContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.DmojContestsLoader
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
+import com.demich.cps.platforms.api.ClistApi
+import com.demich.cps.platforms.api.ClistResource
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.coroutineScope
@@ -76,8 +79,25 @@ private suspend fun contestsLoadingFlows(
     platforms: Collection<Contest.Platform>,
     settings: ContestsSettingsDataStore
 ): Map<Contest.Platform, Flow<ContestsLoadingResult>> {
+
+    val clistApiAccess: ClistApi.ApiAccess
+    val clistAdditionalResources: List<ClistResource>
+    val contestsDateConstraints: ContestDateBaseConstraints
+    val contestsLoadersPriorityLists: Map<Contest.Platform, List<ContestsLoaderType>>
+    settings.snapshot().let {
+        clistApiAccess = it[settings.clistApiAccess]
+        clistAdditionalResources = it[settings.clistAdditionalResources]
+        contestsDateConstraints = it[settings.contestsDateConstraints]
+        contestsLoadersPriorityLists = it[settings.contestsLoadersPriorityLists]
+    }
+
     if (Contest.Platform.unknown in platforms) {
-        if (settings.clistAdditionalResources().isEmpty()) {
+        if (clistAdditionalResources.isEmpty()) {
+            /*
+            why this exists:
+            example: priorityList = cf: [cf-api, clist-api], clistAdditional = []
+            without this clist-api wil always executes with cf-api
+             */
             val fakeFlow = flowOf(
                 ContestsLoadingResult(
                     platform = Contest.Platform.unknown,
@@ -93,13 +113,13 @@ private suspend fun contestsLoadingFlows(
     }
 
     return contestsLoadingFlows(
-        setup = settings.contestsLoadersPriorityLists().filterKeys { it in platforms },
-        dateConstraints = settings.contestsDateConstraints().at(currentTime = getCurrentTime()),
+        setup = contestsLoadersPriorityLists.filterKeys { it in platforms },
+        dateConstraints = contestsDateConstraints.at(currentTime = getCurrentTime()),
     ) { loaderType ->
         when (loaderType) {
             ContestsLoaderType.clist_api -> ClistContestsLoader(
-                apiAccess = settings.clistApiAccess::invoke,
-                additionalResources = settings.clistAdditionalResources::invoke
+                apiAccess = clistApiAccess,
+                additionalResources = clistAdditionalResources
             )
             ContestsLoaderType.codeforces_api -> CodeforcesContestsLoader()
             ContestsLoaderType.atcoder_parse -> AtCoderContestsLoader()
