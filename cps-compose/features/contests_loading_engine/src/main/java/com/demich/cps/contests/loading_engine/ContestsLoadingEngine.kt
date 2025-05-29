@@ -3,6 +3,7 @@ package com.demich.cps.contests.loading_engine
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsLoaderType
+import com.demich.cps.contests.loading.ContestsLoadingResult
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoaderMultiple
 import com.demich.cps.contests.loading_engine.loaders.correctAtCoderTitle
@@ -35,11 +36,6 @@ fun contestsLoadingFlows(
     }
 }
 
-class ContestsLoadingResult(
-    val loaderType: ContestsLoaderType,
-    val result: Result<List<Contest>>
-)
-
 private fun contestsLoadingFlow(
     platform: Contest.Platform,
     priorities: List<ContestsLoaderType>,
@@ -59,10 +55,13 @@ private fun contestsLoadingFlow(
                     getContests(platform = platform, dateConstraints = dateConstraints)
                 }
             }
+
         emit(ContestsLoadingResult(
+            platform = platform,
             loaderType = loaderType,
             result = result.map { it.map { it.correctTitle() } }
         ))
+
         if (result.isSuccess) break
     }
 }

@@ -2,8 +2,8 @@ package com.demich.cps.contests
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsLoaderType
+import com.demich.cps.contests.loading.ContestsLoadingResult
 import com.demich.cps.contests.loading.ContestsReceiver
-import com.demich.cps.contests.loading_engine.ContestsLoadingResult
 import com.demich.cps.contests.loading_engine.contestsLoadingFlows
 import com.demich.cps.contests.loading_engine.loaders.AtCoderContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ClistContestsLoader
@@ -62,11 +62,7 @@ interface ContestsReloader {
                 resultsFlow.onStart {
                     contestsReceiver.onStartLoading(platform)
                 }.onEach {
-                    contestsReceiver.onResult(
-                        platform = platform,
-                        loaderType = it.loaderType,
-                        result = it.result
-                    )
+                    contestsReceiver.onResult(it)
                 }.onCompletion {
                     contestsReceiver.onFinish(platform)
                 }.launchIn(this)
@@ -84,6 +80,7 @@ private suspend fun contestsLoadingFlows(
         if (settings.clistAdditionalResources().isEmpty()) {
             val fakeFlow = flowOf(
                 ContestsLoadingResult(
+                    platform = Contest.Platform.unknown,
                     loaderType = ContestsLoaderType.clist_api,
                     result = Result.success(emptyList())
                 )

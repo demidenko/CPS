@@ -8,26 +8,26 @@ interface ContestsReceiver {
 
     fun onFinish(platform: Contest.Platform)
 
-    suspend fun onResult(
-        platform: Contest.Platform,
-        loaderType: ContestsLoaderType,
-        result: Result<List<Contest>>
-    )
+    suspend fun onResult(loadingResult: ContestsLoadingResult)
 }
+
+data class ContestsLoadingResult(
+    val platform: Contest.Platform,
+    val loaderType: ContestsLoaderType,
+    val result: Result<List<Contest>>
+)
 
 fun ContestsListDao.asContestsReceiver(
     onStartLoading: (Contest.Platform) -> Unit = {},
     onFinish: (Contest.Platform) -> Unit = {},
-    onResult: (Contest.Platform, ContestsLoaderType, Result<List<Contest>>) -> Unit = { _, _, _ -> }
+    onResult: (ContestsLoadingResult) -> Unit = {}
 ) = object : ContestsReceiver {
     override fun onStartLoading(platform: Contest.Platform) = onStartLoading(platform)
     override fun onFinish(platform: Contest.Platform) = onFinish(platform)
-    override suspend fun onResult(
-        platform: Contest.Platform,
-        loaderType: ContestsLoaderType,
-        result: Result<List<Contest>>
-    ) {
-        result.onSuccess { replace(platform = platform, contests = it) }
-        onResult(platform, loaderType, result)
+    override suspend fun onResult(loadingResult: ContestsLoadingResult) {
+        loadingResult.apply {
+            result.onSuccess { replace(platform = platform, contests = it) }
+        }
+        onResult(loadingResult)
     }
 }

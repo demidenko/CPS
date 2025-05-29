@@ -48,8 +48,8 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
     private val loadingStatuses = MutableStateFlow(emptyMap<Contest.Platform, LoadingStatus>())
     private val errors = MutableStateFlow(emptyMap<Contest.Platform, List<Pair<ContestsLoaderType,Throwable>>>())
 
-    private suspend fun ContestsListDao.removePlatform(platform: Contest.Platform) {
-        replace(platform, emptyList())
+    private suspend fun removePlatform(dao: ContestsListDao, platform: Contest.Platform) {
+        dao.replace(platform, emptyList())
         errors.edit { remove(platform) }
         setLoadingStatus(platform, LoadingStatus.PENDING)
     }
@@ -68,14 +68,14 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
                 setLoadingStatus(platform, LoadingStatus.LOADING)
                 errors.edit { remove(platform) }
             },
-            onFinish = { platform ->
-                setLoadingStatus(platform, lastResult.getValue(platform).toLoadingStatus())
-            },
-            onResult = { platform, loaderType, result ->
+            onResult = { (platform, loaderType, result) ->
                 result.onFailure { error ->
                     errors.edit { edit(platform) { add(loaderType to error) } }
                 }
                 lastResult[platform] = result
+            },
+            onFinish = { platform ->
+                setLoadingStatus(platform, lastResult.getValue(platform).toLoadingStatus())
             }
         )
     }
@@ -100,7 +100,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             val lastReloaded = listInfo.lastReloadedPlatforms()
             (lastReloaded - enabled).takeIf { it.isNotEmpty() }?.let { toRemove ->
                 listInfo.lastReloadedPlatforms.edit { removeAll(toRemove) }
-                toRemove.forEach { platform -> dao.removePlatform(platform) }
+                toRemove.forEach { platform -> removePlatform(dao, platform) }
             }
 
             val toReload = (enabled - lastReloaded).toMutableSet()
