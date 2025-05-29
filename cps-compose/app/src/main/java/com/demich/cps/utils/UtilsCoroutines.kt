@@ -43,7 +43,7 @@ suspend fun List<suspend () -> Unit>.joinAllWithCounter(block: suspend (Int) -> 
         val mutex = Mutex()
         var counter = 0
         block(counter)
-        map { job ->
+        forEach { job ->
             launch {
                 try {
                     job()
@@ -54,7 +54,7 @@ suspend fun List<suspend () -> Unit>.joinAllWithCounter(block: suspend (Int) -> 
                     }
                 }
             }
-        }.joinAll()
+        }
     }
 }
 
