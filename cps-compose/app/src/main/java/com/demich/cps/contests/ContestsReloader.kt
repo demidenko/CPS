@@ -86,7 +86,7 @@ private suspend fun loadContests(
     ) { loaderType ->
         when (loaderType) {
             ContestsLoaderType.clist_api -> ClistContestsLoader(
-                apiAccess = settings.clistApiAccess(),
+                apiAccess = settings.clistApiAccess::invoke,
                 additionalResources = settings.clistAdditionalResources::invoke
             )
             ContestsLoaderType.codeforces_api -> CodeforcesContestsLoader()

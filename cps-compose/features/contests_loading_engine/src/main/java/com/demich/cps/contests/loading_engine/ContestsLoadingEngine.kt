@@ -22,7 +22,7 @@ suspend fun launchContestsLoading(
     setup: Map<Contest.Platform, List<ContestsLoaderType>>,
     dateConstraints: ContestDateConstraints,
     contestsReceiver: ContestsReceiver,
-    createLoader: suspend (ContestsLoaderType) -> ContestsLoader
+    createLoader: (ContestsLoaderType) -> ContestsLoader
 ) {
     val memoizer = MultipleLoadersMemoizer(setup, dateConstraints)
 
