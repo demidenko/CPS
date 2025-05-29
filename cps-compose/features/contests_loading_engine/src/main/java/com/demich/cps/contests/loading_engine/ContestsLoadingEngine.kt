@@ -10,7 +10,11 @@ import com.demich.cps.contests.loading_engine.loaders.correctAtCoderTitle
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -27,30 +31,41 @@ suspend fun launchContestsLoading(
 
     coroutineScope {
         setup.forEach { (platform, priorities) ->
-            launch {
-                loadUntilSuccess(
+            loadUntilSuccess(
+                platform = platform,
+                priorities = priorities,
+                dateConstraints = dateConstraints,
+                memoizer = memoizer,
+                getLoader = possibleLoaders::getValue
+            ).onStart {
+                contestsReceiver.onStartLoading(platform)
+            }.onEach {
+                contestsReceiver.onResult(
                     platform = platform,
-                    priorities = priorities,
-                    dateConstraints = dateConstraints,
-                    contestsReceiver = contestsReceiver,
-                    memoizer = memoizer,
-                    getLoader = possibleLoaders::getValue
+                    loaderType = it.loaderType,
+                    result = it.result
                 )
-            }
+            }.onCompletion {
+                if (it != null) throw it
+                contestsReceiver.onFinish(platform)
+            }.launchIn(this)
         }
     }
 }
 
-private suspend fun loadUntilSuccess(
+private class LoadingResult(
+    val loaderType: ContestsLoaderType,
+    val result: Result<List<Contest>>
+)
+
+private fun loadUntilSuccess(
     platform: Contest.Platform,
     priorities: List<ContestsLoaderType>,
     dateConstraints: ContestDateConstraints,
-    contestsReceiver: ContestsReceiver,
     memoizer: MultipleLoadersMemoizer,
     getLoader: (ContestsLoaderType) -> ContestsLoader
-) {
+) = flow {
     require(priorities.isNotEmpty())
-    contestsReceiver.onStartLoading(platform)
     for (loaderType in priorities) {
         val loader = getLoader(loaderType)
         val result: Result<List<Contest>> =
@@ -63,14 +78,12 @@ private suspend fun loadUntilSuccess(
                     getContests(platform = platform, dateConstraints = dateConstraints)
                 }
             }
-        contestsReceiver.onResult(
-            platform = platform,
+        emit(LoadingResult(
             loaderType = loaderType,
             result = result.map { it.map { it.correctTitle() } }
-        )
+        ))
         if (result.isSuccess) break
     }
-    contestsReceiver.onFinish(platform)
 }
 
 private fun Contest.correctTitle(): Contest {
