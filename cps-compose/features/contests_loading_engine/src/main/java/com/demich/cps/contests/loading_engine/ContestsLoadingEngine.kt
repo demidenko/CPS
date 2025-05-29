@@ -6,7 +6,7 @@ import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoaderMultiple
-import com.demich.cps.contests.loading_engine.loaders.fixAtCoderTitle
+import com.demich.cps.contests.loading_engine.loaders.correctAtCoderTitle
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -66,20 +66,20 @@ private suspend fun loadUntilSuccess(
         contestsReceiver.onResult(
             platform = platform,
             loaderType = loaderType,
-            result = result.map { it.map(::titleFix) }
+            result = result.map { it.map { it.correctTitle() } }
         )
         if (result.isSuccess) break
     }
     contestsReceiver.onFinish(platform)
 }
 
-private fun titleFix(contest: Contest): Contest {
-    val fixedTitle = when (contest.platform) {
-        Contest.Platform.atcoder -> fixAtCoderTitle(contest.title)
-        else -> contest.title
+private fun Contest.correctTitle(): Contest {
+    val fixedTitle = when (platform) {
+        Contest.Platform.atcoder -> correctAtCoderTitle(title)
+        else -> title
     }.trim()
-    return if (contest.title == fixedTitle) contest
-    else contest.copy(title = fixedTitle)
+    return if (title == fixedTitle) this
+    else copy(title = fixedTitle)
 }
 
 typealias ContestsLoadResult = Result<Map<Contest.Platform, List<Contest>>>

@@ -12,7 +12,7 @@ class AtCoderContestsLoader: ContestsLoader(type = ContestsLoaderType.atcoder_pa
 }
 
 
-internal fun fixAtCoderTitle(origin: String): String {
+internal fun correctAtCoderTitle(origin: String): String {
     val s = origin
         .replace("（", " (")
         .replace("）",") ")
