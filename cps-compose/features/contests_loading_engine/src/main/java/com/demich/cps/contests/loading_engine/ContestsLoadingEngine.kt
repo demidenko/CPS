@@ -76,15 +76,15 @@ private fun Contest.correctTitle(): Contest {
     else copy(title = fixedTitle)
 }
 
-typealias ContestsLoadResult = Result<Map<Contest.Platform, List<Contest>>>
+private typealias ContestsResult = Result<Map<Contest.Platform, List<Contest>>>
 
 private class MultipleLoadersMemoizer(
     private val setup: Map<Contest.Platform, List<ContestsLoaderType>>,
     private val dateConstraints: ContestDateConstraints
 ) {
     private val mutex = Mutex()
-    private val results = mutableMapOf<ContestsLoaderType, Deferred<ContestsLoadResult>>()
-    suspend fun getContestsResult(loader: ContestsLoaderMultiple): ContestsLoadResult {
+    private val results = mutableMapOf<ContestsLoaderType, Deferred<ContestsResult>>()
+    suspend fun getContestsResult(loader: ContestsLoaderMultiple): ContestsResult {
         return coroutineScope {
             mutex.withLock {
                 results.getOrPut(loader.type) {
@@ -94,7 +94,7 @@ private class MultipleLoadersMemoizer(
         }.await()
     }
 
-    private suspend fun runLoader(loader: ContestsLoaderMultiple): ContestsLoadResult {
+    private suspend fun runLoader(loader: ContestsLoaderMultiple): ContestsResult {
         val platforms = setup.mapNotNull { (platform, loaderTypes) ->
             if (loader.type in loaderTypes) platform else null
         }
