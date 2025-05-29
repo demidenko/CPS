@@ -49,10 +49,17 @@ private fun ColumnScope.DialogContent() {
 
     LaunchedEffect(dataLoader) {
         dataLoader.execute(id = Unit) {
-            val alreadySupported = Contest.platformsExceptUnknown.mapToSet(ClistUtils::getClistApiResourceId)
-            ClistApi.getResources(apiAccess = context.settingsContests.clistApiAccess())
+            val settings = context.settingsContests
+            val alreadySupported = Contest.platformsExceptUnknown.mapToSet { ClistUtils.getClistApiResourceId(it) }
+            ClistApi.getResources(apiAccess = settings.clistApiAccess())
                 .filter { it.id !in alreadySupported }
                 .sortedBy { it.name }
+                .also { list ->
+                    val res = list.associateBy { it.id }
+                    settings.clistAdditionalResources.update {
+                        it.mapNotNull { res[it.id] }
+                    }
+                }
         }
     }
 
