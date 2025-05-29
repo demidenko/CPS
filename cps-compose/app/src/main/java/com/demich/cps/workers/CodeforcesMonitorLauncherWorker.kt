@@ -28,7 +28,7 @@ class CodeforcesMonitorLauncherWorker(
 
             override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<CodeforcesMonitorLauncherWorker>(
-                    repeatInterval = 45.minutes
+                    repeatInterval = 1.hours
                 )
         }
     }

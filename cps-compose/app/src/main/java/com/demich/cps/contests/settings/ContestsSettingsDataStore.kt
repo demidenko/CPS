@@ -11,7 +11,6 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.hours
 
 val Context.settingsContests: ContestsSettingsDataStore
     get() = ContestsSettingsDataStore(this)
@@ -48,6 +47,6 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         }
     }
 
-    val autoUpdateInterval = jsonCPS.item<Duration?>(name = "autoupdate_interval", defaultValue = 1.hours)
+    val autoUpdateInterval = jsonCPS.item<Duration?>(name = "autoupdate_interval", defaultValue = null)
 }
 
