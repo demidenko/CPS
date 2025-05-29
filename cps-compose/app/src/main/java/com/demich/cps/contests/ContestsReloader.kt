@@ -1,9 +1,10 @@
 package com.demich.cps.contests
 
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading.ContestsLoaderType
-import com.demich.cps.contests.loading_engine.launchContestsLoading
+import com.demich.cps.contests.loading.ContestsReceiver
+import com.demich.cps.contests.loading_engine.ContestsLoadingResult
+import com.demich.cps.contests.loading_engine.contestsLoadingFlows
 import com.demich.cps.contests.loading_engine.loaders.AtCoderContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ClistContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.CodeforcesContestsLoader
@@ -11,6 +12,13 @@ import com.demich.cps.contests.loading_engine.loaders.DmojContestsLoader
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.edit
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 
 interface ContestsReloader {
     suspend fun reloadEnabledPlatforms(
@@ -46,43 +54,50 @@ interface ContestsReloader {
             contestsInfo.clistLastReloadedAdditionalResources.edit { addAll(ids) }
         }
 
-        loadContests(
-            platforms = platforms,
-            settings = settings,
-            contestsReceiver = contestsReceiver
-        )
+        coroutineScope {
+            contestsLoadingFlows(
+                platforms = platforms,
+                settings = settings
+            ).forEach { (platform, resultsFlow) ->
+                resultsFlow.onStart {
+                    contestsReceiver.onStartLoading(platform)
+                }.onEach {
+                    contestsReceiver.onResult(
+                        platform = platform,
+                        loaderType = it.loaderType,
+                        result = it.result
+                    )
+                }.onCompletion {
+                    contestsReceiver.onFinish(platform)
+                }.launchIn(this)
+            }
+        }
     }
 }
 
 
-private suspend fun loadContests(
+private suspend fun contestsLoadingFlows(
     platforms: Collection<Contest.Platform>,
-    settings: ContestsSettingsDataStore,
-    contestsReceiver: ContestsReceiver
-) {
+    settings: ContestsSettingsDataStore
+): Map<Contest.Platform, Flow<ContestsLoadingResult>> {
     if (Contest.Platform.unknown in platforms) {
         if (settings.clistAdditionalResources().isEmpty()) {
-            //fake loading
-            contestsReceiver.onStartLoading(platform = Contest.Platform.unknown)
-            contestsReceiver.onResult(
-                platform = Contest.Platform.unknown,
-                result = Result.success(emptyList()),
-                loaderType = ContestsLoaderType.clist_api
+            val fakeFlow = flowOf(
+                ContestsLoadingResult(
+                    loaderType = ContestsLoaderType.clist_api,
+                    result = Result.success(emptyList())
+                )
             )
-            contestsReceiver.onFinish(platform = Contest.Platform.unknown)
-            //continue without unknown
-            loadContests(
+            return contestsLoadingFlows(
                 platforms = platforms - Contest.Platform.unknown,
                 settings = settings,
-                contestsReceiver = contestsReceiver
-            )
-            return
+            ) + Pair(Contest.Platform.unknown, fakeFlow)
         }
     }
-    launchContestsLoading(
+
+    return contestsLoadingFlows(
         setup = settings.contestsLoadersPriorityLists().filterKeys { it in platforms },
         dateConstraints = settings.contestsDateConstraints().at(currentTime = getCurrentTime()),
-        contestsReceiver = contestsReceiver
     ) { loaderType ->
         when (loaderType) {
             ContestsLoaderType.clist_api -> ClistContestsLoader(

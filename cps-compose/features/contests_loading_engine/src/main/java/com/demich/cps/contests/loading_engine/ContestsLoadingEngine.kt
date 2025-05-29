@@ -3,69 +3,50 @@ package com.demich.cps.contests.loading_engine
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsLoaderType
-import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoaderMultiple
 import com.demich.cps.contests.loading_engine.loaders.correctAtCoderTitle
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-suspend fun launchContestsLoading(
+fun contestsLoadingFlows(
     setup: Map<Contest.Platform, List<ContestsLoaderType>>,
     dateConstraints: ContestDateConstraints,
-    contestsReceiver: ContestsReceiver,
     createLoader: (ContestsLoaderType) -> ContestsLoader
-) {
+): Map<Contest.Platform, Flow<ContestsLoadingResult>> {
     val memoizer = MultipleLoadersMemoizer(setup, dateConstraints)
 
     val possibleLoaders = setup.flatMapTo(mutableSetOf()) { it.value }
         .associateWith { createLoader(it) }
 
-    coroutineScope {
-        setup.forEach { (platform, priorities) ->
-            loadUntilSuccess(
-                platform = platform,
-                priorities = priorities,
-                dateConstraints = dateConstraints,
-                memoizer = memoizer,
-                getLoader = possibleLoaders::getValue
-            ).onStart {
-                contestsReceiver.onStartLoading(platform)
-            }.onEach {
-                contestsReceiver.onResult(
-                    platform = platform,
-                    loaderType = it.loaderType,
-                    result = it.result
-                )
-            }.onCompletion {
-                if (it != null) throw it
-                contestsReceiver.onFinish(platform)
-            }.launchIn(this)
-        }
+    return setup.mapValues { (platform, priorities) ->
+        contestsLoadingFlow(
+            platform = platform,
+            priorities = priorities,
+            dateConstraints = dateConstraints,
+            memoizer = memoizer,
+            getLoader = possibleLoaders::getValue
+        )
     }
 }
 
-private class LoadingResult(
+class ContestsLoadingResult(
     val loaderType: ContestsLoaderType,
     val result: Result<List<Contest>>
 )
 
-private fun loadUntilSuccess(
+private fun contestsLoadingFlow(
     platform: Contest.Platform,
     priorities: List<ContestsLoaderType>,
     dateConstraints: ContestDateConstraints,
     memoizer: MultipleLoadersMemoizer,
     getLoader: (ContestsLoaderType) -> ContestsLoader
 ) = flow {
-    require(priorities.isNotEmpty())
     for (loaderType in priorities) {
         val loader = getLoader(loaderType)
         val result: Result<List<Contest>> =
@@ -78,7 +59,7 @@ private fun loadUntilSuccess(
                     getContests(platform = platform, dateConstraints = dateConstraints)
                 }
             }
-        emit(LoadingResult(
+        emit(ContestsLoadingResult(
             loaderType = loaderType,
             result = result.map { it.map { it.correctTitle() } }
         ))
