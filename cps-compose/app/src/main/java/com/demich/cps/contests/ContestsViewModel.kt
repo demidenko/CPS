@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -96,7 +97,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             val settings = context.settingsContests
             val listInfo = ContestsInfoDataStore(context)
             val dao = context.contestsListDao
-            val enabled = settings.enabledPlatforms()
+            val enabled = settings.flowOfEnabledPlatforms().first()
             val lastReloaded = listInfo.lastReloadedPlatforms()
             (lastReloaded - enabled).takeIf { it.isNotEmpty() }?.let { toRemove ->
                 listInfo.lastReloadedPlatforms.edit { removeAll(toRemove) }

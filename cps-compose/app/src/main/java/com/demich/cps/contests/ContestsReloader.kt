@@ -17,7 +17,7 @@ import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -34,7 +34,7 @@ interface ContestsReloader {
             prefs[clistLastReloadedAdditionalResources] = emptySet()
         }
         reload(
-            platforms = settings.enabledPlatforms(),
+            platforms = settings.flowOfEnabledPlatforms().first(),
             settings = settings,
             contestsInfo = contestsInfo,
             contestsReceiver = contestsReceiver
@@ -89,27 +89,6 @@ private suspend fun contestsLoadingFlows(
         clistAdditionalResources = it[settings.clistAdditionalResources]
         contestsDateConstraints = it[settings.contestsDateConstraints]
         contestsLoadersPriorityLists = it[settings.contestsLoadersPriorityLists]
-    }
-
-    if (Contest.Platform.unknown in platforms) {
-        if (clistAdditionalResources.isEmpty()) {
-            /*
-            why this exists:
-            example: priorityList = cf: [cf-api, clist-api], clistAdditional = []
-            without this clist-api wil always executes with cf-api
-             */
-            val fakeFlow = flowOf(
-                ContestsLoadingResult(
-                    platform = Contest.Platform.unknown,
-                    loaderType = ContestsLoaderType.clist_api,
-                    result = Result.success(emptyList())
-                )
-            )
-            return contestsLoadingFlows(
-                platforms = platforms - Contest.Platform.unknown,
-                settings = settings,
-            ) + Pair(Contest.Platform.unknown, fakeFlow)
-        }
     }
 
     return contestsLoadingFlows(

@@ -74,7 +74,6 @@ import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.workers.ContestsWorker
 import com.demich.cps.workers.isRunning
-import com.demich.datastore_itemized.flowOf
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -399,10 +398,7 @@ private fun ContestsPageSwitchButton(
 private fun anyPlatformEnabledState(): State<Boolean> {
     val context = context
     return collectAsState {
-        context.settingsContests.flowOf { prefs ->
-            prefs[enabledPlatforms].any { it != Contest.Platform.unknown }
-                    || prefs[clistAdditionalResources].isNotEmpty()
-        }
+        context.settingsContests.flowOfEnabledPlatforms().map { it.isNotEmpty() }
     }
 }
 

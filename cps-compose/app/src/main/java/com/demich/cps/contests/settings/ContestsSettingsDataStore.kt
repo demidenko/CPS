@@ -9,6 +9,9 @@ import com.demich.cps.platforms.api.ClistResource
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
+import com.demich.datastore_itemized.edit
+import com.demich.datastore_itemized.flowOf
+import kotlinx.coroutines.flow.Flow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
@@ -21,9 +24,18 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         private val Context.contests_settings_dataStore by dataStoreWrapper("contests_settings")
     }
 
-    val enabledPlatforms = itemEnumSet<Contest.Platform>(name = "enabled_platforms").mapGetter { platforms ->
-        //This set must contain Platform.unknown
-        Contest.Platform.unknown.let { if (it in platforms) platforms else platforms + it }
+    private val enabledPlatforms = itemEnumSet<Contest.Platform>(name = "enabled_platforms")
+    fun flowOfEnabledPlatforms(): Flow<Set<Contest.Platform>> = flowOf {
+        buildSet {
+            addAll(it[enabledPlatforms])
+            if (it[clistAdditionalResources].isNotEmpty()) add(Contest.Platform.unknown)
+        }
+    }
+    suspend fun changeEnabled(platform: Contest.Platform, enabled: Boolean) {
+        require(platform != Contest.Platform.unknown)
+        enabledPlatforms.edit {
+            if (enabled) add(platform) else remove(platform)
+        }
     }
 
     val clistApiAccess = jsonCPS.item(name = "clist_api_access", defaultValue = ClistApi.ApiAccess("", ""))
