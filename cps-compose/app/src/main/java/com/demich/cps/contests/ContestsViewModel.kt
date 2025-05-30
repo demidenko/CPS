@@ -117,12 +117,12 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
                 val current = currentSettings.contestsDateConstraints
                 if (prev != current) {
                     //TODO: delete contests if current in prev
-                    toReload.addAll(currentSettings.enabledPlatforms)
+                    toReload.addAll(Contest.platforms)
                 }
             }
 
             reload(
-                platforms = toReload,
+                platforms = toReload.intersect(currentSettings.enabledPlatforms),
                 settings = settings,
                 contestsInfo = infoDataStore,
                 contestsReceiver = dao.asContestsReceiver()
