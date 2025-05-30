@@ -5,6 +5,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 open class ItemizedPreferences internal constructor(
     protected open val preferences: Preferences
@@ -44,13 +47,21 @@ class ItemizedMutablePreferences internal constructor(
     }
 }
 
-fun<D: ItemizedDataStore, R> D.flowOf(transform: D.(ItemizedPreferences) -> R): Flow<R> =
+fun <D: ItemizedDataStore, R> D.flowOf(transform: D.(ItemizedPreferences) -> R): Flow<R> =
     dataStore.data.map { transform(ItemizedPreferences(it)) }
 
-suspend fun<D: ItemizedDataStore> D.edit(block: D.(ItemizedMutablePreferences) -> Unit) {
+suspend fun <D: ItemizedDataStore> D.edit(block: D.(ItemizedMutablePreferences) -> Unit) {
     dataStore.edit {
         val prefs = ItemizedMutablePreferences(it)
         block(prefs)
         prefs.saveMutableMaps()
     }
+}
+
+@OptIn(ExperimentalContracts::class)
+suspend inline fun <D: ItemizedDataStore, R> D.fromSnapshot(block: D.(ItemizedPreferences) -> R): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    return block(snapshot())
 }

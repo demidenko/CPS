@@ -9,6 +9,7 @@ import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.loading.ContestsLoadingResult
 import com.demich.cps.contests.loading.asContestsReceiver
+import com.demich.cps.contests.settings.makeSnapshot
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine

@@ -11,10 +11,7 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.flowOf
-import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
@@ -63,21 +60,5 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
     }
 
     val autoUpdateInterval = jsonCPS.item<Duration?>(name = "autoupdate_interval", defaultValue = null)
-
-    suspend fun makeSnapshot(): ContestsSettingsSnapshot =
-        snapshot().let {
-            ContestsSettingsSnapshot(
-                enabledPlatforms = flowOfEnabledPlatforms().first(),
-                clistAdditionalResources = it[clistAdditionalResources].mapToSet { it.id },
-                contestsDateConstraints = it[contestsDateConstraints]
-            )
-        }
 }
 
-
-@Serializable
-class ContestsSettingsSnapshot(
-    val enabledPlatforms: Set<Contest.Platform>,
-    val clistAdditionalResources: Set<Int>,
-    val contestsDateConstraints: ContestDateBaseConstraints
-)

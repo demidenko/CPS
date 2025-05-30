@@ -19,6 +19,7 @@ import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.launchWhileActive
 import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
+import com.demich.datastore_itemized.fromSnapshot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
@@ -254,7 +255,7 @@ private fun needCheckSubmissions(
 //optimized for read
 private suspend inline fun CodeforcesMonitorDataStore.ifNeedCheckSubmissions(
     block: (List<CodeforcesMonitorProblemResult>) -> Unit
-) = snapshot().let { prefs ->
+) = fromSnapshot { prefs ->
     if (needCheckSubmissions(contestInfo = prefs[contestInfo], participationType = prefs[participationType])) {
         val problemResults = prefs[problemResults]
         val info = prefs[submissionsInfo]
