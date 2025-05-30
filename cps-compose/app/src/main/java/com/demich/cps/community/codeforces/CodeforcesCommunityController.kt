@@ -40,7 +40,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
             tabsState = tabsState,
             data = CodeforcesCommunityControllerData(
                 selectedTab = defaultTab,
-                topType = CodeforcesCommunityController.TopType.BlogEntries,
+                topPageType = CodeforcesCommunityController.TopPageType.BlogEntries,
                 recentShowComments = false,
                 recentFilterByBlogEntry = null
             )
@@ -58,7 +58,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
 @Serializable
 internal data class CodeforcesCommunityControllerData(
     val selectedTab: CodeforcesTitle,
-    val topType: CodeforcesCommunityController.TopType,
+    val topPageType: CodeforcesCommunityController.TopPageType,
     val recentShowComments: Boolean,
     val recentFilterByBlogEntry: CodeforcesBlogEntry?
 )
@@ -99,7 +99,7 @@ class CodeforcesCommunityController internal constructor(
         pagerState.animateScrollToPage(page = tabs.indexOf(tab))
 
 
-    var topType by mutableStateOf(data.topType)
+    var topPageType by mutableStateOf(data.topPageType)
 
     //TODO: merge to sealed class
     var recentShowComments by mutableStateOf(data.recentShowComments)
@@ -127,7 +127,7 @@ class CodeforcesCommunityController internal constructor(
                 .map { it.blogEntry }
         }
 
-    enum class TopType {
+    enum class TopPageType {
         BlogEntries, Comments
     }
 }
@@ -148,7 +148,7 @@ private fun controllerSaver(
     save = {
         jsonCPS.encodeToString(CodeforcesCommunityControllerData(
             selectedTab = it.currentTab,
-            topType = it.topType,
+            topPageType = it.topPageType,
             recentShowComments = it.recentShowComments,
             recentFilterByBlogEntry = it.recentFilterByBlogEntry
         ))
@@ -180,9 +180,9 @@ private fun CodeforcesCommunityController.touchFlows(context: Context) {
         when (tab) {
             CodeforcesTitle.MAIN -> flowOfMainBlogEntries(context)
             CodeforcesTitle.TOP -> {
-                when (topType) {
-                    CodeforcesCommunityController.TopType.BlogEntries -> flowOfTopBlogEntries(context)
-                    CodeforcesCommunityController.TopType.Comments -> flowOfTopComments(context)
+                when (topPageType) {
+                    CodeforcesCommunityController.TopPageType.BlogEntries -> flowOfTopBlogEntries(context)
+                    CodeforcesCommunityController.TopPageType.Comments -> flowOfTopComments(context)
                 }
             }
             CodeforcesTitle.RECENT -> flowOfRecent(context)

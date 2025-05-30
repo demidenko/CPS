@@ -11,10 +11,10 @@ fun CodeforcesCommunityBottomBar(
     when (controller.currentTab) {
         CodeforcesTitle.TOP -> {
             CommentsModeButton(
-                isOn = controller.topType == CodeforcesCommunityController.TopType.Comments
+                isOn = controller.topPageType == CodeforcesCommunityController.TopPageType.Comments
             ) { isOn ->
-                controller.topType = if (isOn) CodeforcesCommunityController.TopType.Comments
-                else CodeforcesCommunityController.TopType.BlogEntries
+                controller.topPageType = if (isOn) CodeforcesCommunityController.TopPageType.Comments
+                else CodeforcesCommunityController.TopPageType.BlogEntries
             }
         }
         CodeforcesTitle.RECENT -> {
