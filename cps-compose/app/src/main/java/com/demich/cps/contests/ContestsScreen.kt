@@ -110,7 +110,7 @@ fun ContestsScreen(
     }
 
     DisposableEffect(contestsViewModel) {
-//        contestsViewModel.syncEnabledAndLastReloaded(context)
+        contestsViewModel.applyChangedSettings(context)
         onDispose { }
     }
 }

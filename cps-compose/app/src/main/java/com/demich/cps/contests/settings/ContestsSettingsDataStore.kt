@@ -11,6 +11,7 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.flowOf
+import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -66,7 +67,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         snapshot().let {
             ContestsSettingsSnapshot(
                 enabledPlatforms = it[enabledPlatforms],
-                clistAdditionalResources = it[clistAdditionalResources]
+                clistAdditionalResources = it[clistAdditionalResources].mapToSet { it.id }
             )
         }
 }
@@ -74,7 +75,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
 
 @Serializable
 class ContestsSettingsSnapshot(
-    val enabledPlatforms: Set<Contest.Platform>? = null,
-    val clistAdditionalResources: List<ClistResource>? = null,
-//    val contestsDateConstraints: ContestDateBaseConstraints? = null
+    val enabledPlatforms: Set<Contest.Platform>,
+    val clistAdditionalResources: Set<Int>,
+//    val contestsDateConstraints: ContestDateBaseConstraints
 )

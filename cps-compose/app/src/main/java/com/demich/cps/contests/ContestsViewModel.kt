@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.database.ContestsListDao
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.loading.ContestsLoadingResult
@@ -47,12 +46,6 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
     private val loadingStatuses = MutableStateFlow(emptyMap<Contest.Platform, LoadingStatus>())
     private val errors = MutableStateFlow(emptyMap<Contest.Platform, List<Pair<ContestsLoaderType,Throwable>>>())
 
-    private suspend fun removePlatform(dao: ContestsListDao, platform: Contest.Platform) {
-        dao.replace(platform, emptyList())
-        errors.edit { remove(platform) }
-        setLoadingStatus(platform, LoadingStatus.PENDING)
-    }
-
     private fun setLoadingStatus(platform: Contest.Platform, loadingStatus: LoadingStatus) =
         loadingStatuses.edit {
             if (loadingStatus == LoadingStatus.LOADING) check(this[platform] != LoadingStatus.LOADING)
@@ -85,6 +78,46 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
                 settings = context.settingsContests,
                 contestsInfo = ContestsInfoDataStore(context),
                 contestsReceiver = context.contestsListDao.asContestsReceiver()
+            )
+        }
+    }
+
+    fun applyChangedSettings(context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val infoDataStore = ContestsInfoDataStore(context)
+            val snapshot = infoDataStore.settingsSnapshot()
+            infoDataStore.settingsSnapshot.update { null }
+            if (snapshot == null) return@launch
+
+            val settings = context.settingsContests
+            val currentSettings = settings.makeSnapshot()
+
+            val dao = context.contestsListDao
+            val toReload = mutableListOf<Contest.Platform>()
+
+            snapshot.enabledPlatforms.let { prev ->
+                val current = currentSettings.enabledPlatforms
+                (prev - current).forEach { platform ->
+                    dao.replace(platform, emptyList())
+                    errors.edit { remove(platform) }
+                    setLoadingStatus(platform, LoadingStatus.PENDING)
+                }
+
+                toReload.addAll(current - prev)
+            }
+
+            snapshot.clistAdditionalResources.let { prev ->
+                val current = currentSettings.clistAdditionalResources
+                if (prev != current) {
+                    toReload.add(Contest.Platform.unknown)
+                }
+            }
+
+            reload(
+                platforms = toReload,
+                settings = settings,
+                contestsInfo = infoDataStore,
+                contestsReceiver = dao.asContestsReceiver()
             )
         }
     }

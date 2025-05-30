@@ -46,7 +46,7 @@ interface ContestsReloader {
 
         coroutineScope {
             contestsLoadingFlows(
-                platforms = platforms,
+                platforms = platforms.toSet(),
                 settings = settings
             ).forEach { (platform, resultsFlow) ->
                 launch {
@@ -67,7 +67,7 @@ interface ContestsReloader {
 
 
 private suspend fun contestsLoadingFlows(
-    platforms: Collection<Contest.Platform>,
+    platforms: Set<Contest.Platform>,
     settings: ContestsSettingsDataStore
 ): Map<Contest.Platform, Flow<ContestsLoadingResult>> {
 
