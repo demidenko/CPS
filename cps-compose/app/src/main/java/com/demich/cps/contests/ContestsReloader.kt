@@ -14,7 +14,6 @@ import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.platforms.api.ClistApi
 import com.demich.cps.platforms.api.ClistResource
 import com.demich.cps.utils.getCurrentTime
-import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -27,10 +26,6 @@ interface ContestsReloader {
         contestsInfo: ContestsInfoDataStore,
         contestsReceiver: ContestsReceiver
     ) {
-        contestsInfo.edit { prefs ->
-            prefs[lastReloadedPlatforms] = emptySet()
-            prefs[clistLastReloadedAdditionalResources] = emptySet()
-        }
         reload(
             platforms = settings.flowOfEnabledPlatforms().first(),
             settings = settings,
@@ -47,12 +42,6 @@ interface ContestsReloader {
     ) {
         if (platforms.isEmpty()) {
             return
-        }
-
-        contestsInfo.lastReloadedPlatforms.edit { addAll(platforms) }
-        if (Contest.Platform.unknown in platforms) {
-            val ids = settings.clistAdditionalResources().map { it.id }
-            contestsInfo.clistLastReloadedAdditionalResources.edit { addAll(ids) }
         }
 
         coroutineScope {

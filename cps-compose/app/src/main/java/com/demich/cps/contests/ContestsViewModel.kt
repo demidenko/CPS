@@ -10,7 +10,6 @@ import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.loading.ContestsLoadingResult
 import com.demich.cps.contests.loading.asContestsReceiver
-import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
@@ -18,20 +17,16 @@ import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.toLoadingStatus
 import com.demich.cps.workers.ContestsWorker
-import com.demich.datastore_itemized.edit
-import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun contestsViewModel(): ContestsViewModel = sharedViewModel()
@@ -92,42 +87,6 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
                 contestsReceiver = context.contestsListDao.asContestsReceiver()
             )
         }
-    }
-
-    fun syncEnabledAndLastReloaded(context: Context) {
-        viewModelScope.launch {
-            val settings = context.settingsContests
-            val listInfo = ContestsInfoDataStore(context)
-            val dao = context.contestsListDao
-            val enabled = settings.flowOfEnabledPlatforms().first()
-            val lastReloaded = listInfo.lastReloadedPlatforms()
-            (lastReloaded - enabled).takeIf { it.isNotEmpty() }?.let { toRemove ->
-                listInfo.lastReloadedPlatforms.edit { removeAll(toRemove) }
-                toRemove.forEach { platform -> removePlatform(dao, platform) }
-            }
-
-            val toReload = (enabled - lastReloaded).toMutableSet()
-
-            if (needToReloadClistAdditional(settings, listInfo)) {
-                listInfo.clistLastReloadedAdditionalResources.update { emptySet() }
-                toReload.add(Contest.Platform.unknown)
-            }
-
-            withContext(Dispatchers.IO) {
-                reload(
-                    platforms = toReload,
-                    settings = settings,
-                    contestsInfo = listInfo,
-                    contestsReceiver = dao.asContestsReceiver()
-                )
-            }
-        }
-    }
-
-    private suspend fun needToReloadClistAdditional(settings: ContestsSettingsDataStore, listInfo: ContestsInfoDataStore): Boolean {
-        val enabled: Set<Int> = settings.clistAdditionalResources().mapToSet { it.id }
-        val lastReloaded: Set<Int> = listInfo.clistLastReloadedAdditionalResources()
-        return enabled != lastReloaded //hope it is proper equals
     }
 
     private val expandedContests = MutableStateFlow(emptyMap<ContestCompositeId, Contest>())
