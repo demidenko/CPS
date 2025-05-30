@@ -85,9 +85,8 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
     fun applyChangedSettings(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             val infoDataStore = ContestsInfoDataStore(context)
-            val snapshot = infoDataStore.settingsSnapshot()
+            val snapshot = infoDataStore.settingsSnapshot() ?: return@launch
             infoDataStore.settingsSnapshot.update { null }
-            if (snapshot == null) return@launch
 
             val settings = context.settingsContests
             val currentSettings = settings.makeSnapshot()
