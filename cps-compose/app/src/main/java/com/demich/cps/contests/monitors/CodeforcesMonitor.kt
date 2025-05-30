@@ -21,11 +21,14 @@ import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.fromSnapshot
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -223,21 +226,20 @@ private fun flowOfSystemTestPercentage(
     }
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 private fun Flow<CodeforcesContestPhase>.collectSystemTestPercentage(
     contestId: Int,
     scope: CoroutineScope,
     delay: Duration,
     onSetPercentage: suspend (Int) -> Unit
 ): Job {
-    var job: Job? = null
-    return distinctUntilChanged().onEach { phase ->
+    return distinctUntilChanged().flatMapLatest { phase ->
         if (phase == CodeforcesContestPhase.SYSTEM_TEST) {
-            job = flowOfSystemTestPercentage(contestId = contestId, delay = delay)
+            flowOfSystemTestPercentage(contestId = contestId, delay = delay)
                 .filterNotNull()
                 .onEach(onSetPercentage)
-                .launchIn(scope)
         } else {
-            job?.cancel()
+            emptyFlow()
         }
     }.launchIn(scope)
 }
