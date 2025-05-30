@@ -8,7 +8,7 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestsListDao
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.loading.ContestsLoaderType
-import com.demich.cps.contests.loading.ContestsReceiver
+import com.demich.cps.contests.loading.ContestsLoadingResult
 import com.demich.cps.contests.loading.asContestsReceiver
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
@@ -27,6 +27,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -62,23 +65,22 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             else this[platform] = loadingStatus
         }
 
-    private fun ContestsListDao.makeReceiver(): ContestsReceiver {
-        val lastResult = mutableMapOf<Contest.Platform, Result<*>>()
-        return asContestsReceiver(
-            onStartLoading = { platform ->
-                setLoadingStatus(platform, LoadingStatus.LOADING)
-                errors.edit { remove(platform) }
-            },
-            onResult = { (platform, loaderType, result) ->
-                result.onFailure { error ->
-                    errors.edit { edit(platform) { add(loaderType to error) } }
-                }
-                lastResult[platform] = result
-            },
-            onFinish = { platform ->
-                setLoadingStatus(platform, lastResult.getValue(platform).toLoadingStatus())
+    override fun transform(
+        platform: Contest.Platform,
+        flow: Flow<ContestsLoadingResult>
+    ) = flow.run {
+        var lastStatus: LoadingStatus = LoadingStatus.PENDING
+        onStart {
+            setLoadingStatus(platform, LoadingStatus.LOADING)
+            errors.edit { remove(platform) }
+        }.onEach { (platform, loaderType, result) ->
+            result.onFailure { error ->
+                errors.edit { edit(platform) { add(loaderType to error) } }
             }
-        )
+            lastStatus = result.toLoadingStatus()
+        }.onCompletion {
+            setLoadingStatus(platform, lastStatus)
+        }
     }
 
     fun reloadEnabledPlatforms(context: Context) {
@@ -87,7 +89,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             reloadEnabledPlatforms(
                 settings = context.settingsContests,
                 contestsInfo = ContestsInfoDataStore(context),
-                contestsReceiver = context.contestsListDao.makeReceiver()
+                contestsReceiver = context.contestsListDao.asContestsReceiver()
             )
         }
     }
@@ -116,7 +118,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
                     platforms = toReload,
                     settings = settings,
                     contestsInfo = listInfo,
-                    contestsReceiver = dao.makeReceiver()
+                    contestsReceiver = dao.asContestsReceiver()
                 )
             }
         }

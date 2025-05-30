@@ -18,10 +18,8 @@ import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.launch
 
 interface ContestsReloader {
     suspend fun reloadEnabledPlatforms(
@@ -62,15 +60,19 @@ interface ContestsReloader {
                 platforms = platforms,
                 settings = settings
             ).forEach { (platform, resultsFlow) ->
-                resultsFlow.onStart {
-                    contestsReceiver.onStartLoading(platform)
-                }.onEach {
-                    contestsReceiver.onResult(it)
-                }.onCompletion {
-                    contestsReceiver.onFinish(platform)
-                }.launchIn(this)
+                launch {
+                    val last = transform(platform, resultsFlow).last()
+                    last.result.onSuccess { contestsReceiver.save(platform, it) }
+                }
             }
         }
+    }
+
+    fun transform(
+        platform: Contest.Platform,
+        flow: Flow<ContestsLoadingResult>
+    ): Flow<ContestsLoadingResult> {
+        return flow
     }
 }
 
