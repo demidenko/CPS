@@ -43,6 +43,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.demich.datastore_itemized.DataStoreItem
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -190,15 +191,24 @@ fun animateColorAsState(
 
 
 @Composable
+fun LaunchedEffectOneTime(
+    block: suspend CoroutineScope.() -> Unit
+) {
+    val state = rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(state) {
+        if (!state.value) {
+            block()
+            state.value = true
+        }
+    }
+}
+
+@Composable
 fun rememberFocusOnCreationRequester(): FocusRequester {
     val requester = remember { FocusRequester() }
-    val focusedState = rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(requester, focusedState) {
-        if (!focusedState.value) {
-            withFrameMillis {  }
-            requester.requestFocus()
-            focusedState.value = true
-        }
+    LaunchedEffectOneTime {
+        withFrameMillis {  }
+        requester.requestFocus()
     }
     return requester
 }
