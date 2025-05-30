@@ -1,9 +1,7 @@
 package com.demich.cps.navigation
 
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavBackStackEntry
 import com.demich.cps.accounts.managers.AccountManagerType
-import com.demich.cps.ui.CPSIcons
 
 enum class ScreenTypes(
     val route: String
@@ -30,7 +28,7 @@ sealed class Screen(
 
     val routePath get() = createPath(screenType.route)
 
-    data object Profiles: RootScreen(ScreenTypes.profiles, icon = CPSIcons.Profile)
+    data object Profiles: RootScreen(ScreenTypes.profiles)
 
     data class ProfileExpanded(override val type: AccountManagerType)
         : ProfileScreen(ScreenTypes.profileExpanded, type, true)
@@ -38,7 +36,7 @@ sealed class Screen(
     data class ProfileSettings(override val type: AccountManagerType)
         : ProfileScreen(ScreenTypes.profileSettings, type, false)
 
-    data object Community: RootScreen(ScreenTypes.community, icon = CPSIcons.Community)
+    data object Community: RootScreen(ScreenTypes.community)
     data object CommunitySettings: Screen(ScreenTypes.communitySettings, rootScreenType = ScreenTypes.community, enableBottomBar = false)
     data object CommunityFollowList: Screen(ScreenTypes.communityFollowList, rootScreenType = ScreenTypes.community)
     data class CommunityCodeforcesBlog(val handle: String)
@@ -46,16 +44,15 @@ sealed class Screen(
             override fun createPath(pattern: String) = pattern.replace("{handle}", handle)
         }
 
-    data object Contests: RootScreen(ScreenTypes.contests, icon = CPSIcons.Contest)
+    data object Contests: RootScreen(ScreenTypes.contests)
     data object ContestsSettings: Screen(ScreenTypes.contestsSettings, rootScreenType = ScreenTypes.contests, enableBottomBar = false)
 
-    data object Development: RootScreen(ScreenTypes.develop, icon = CPSIcons.Development)
+    data object Development: RootScreen(ScreenTypes.develop)
 
 }
 
 sealed class RootScreen(
-    screenType: ScreenTypes,
-    val icon: ImageVector
+    screenType: ScreenTypes
 ): Screen(
     screenType = screenType,
     rootScreenType = screenType

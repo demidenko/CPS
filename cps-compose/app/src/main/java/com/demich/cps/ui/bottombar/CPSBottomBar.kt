@@ -16,11 +16,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.RootScreen
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTypes
+import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
@@ -94,6 +96,14 @@ private fun BottomBarBodyMain(
     )
 }
 
+private val RootScreen.bottomBarIcon: ImageVector
+    get() = when (this) {
+        Screen.Profiles -> CPSIcons.Profile
+        Screen.Community -> CPSIcons.Community
+        Screen.Contests -> CPSIcons.Contest
+        Screen.Development -> CPSIcons.Development
+    }
+
 @Composable
 private fun BottomBarNavigationItems(
     modifier: Modifier = Modifier,
@@ -110,7 +120,7 @@ private fun BottomBarNavigationItems(
     ) {
         rootScreens.forEach { screen ->
             CPSBottomNavigationItem(
-                icon = screen.icon,
+                icon = screen.bottomBarIcon,
                 isSelected = screen.screenType == selectedRootScreenType,
                 onClick = {
                     if (screen.screenType != selectedRootScreenType) onSelect(screen)
