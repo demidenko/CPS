@@ -93,7 +93,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             val currentSettings = settings.makeSnapshot()
 
             val dao = context.contestsListDao
-            val toReload = mutableListOf<Contest.Platform>()
+            val toReload = mutableSetOf<Contest.Platform>()
 
             snapshot.enabledPlatforms.let { prev ->
                 val current = currentSettings.enabledPlatforms
@@ -110,6 +110,14 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
                 val current = currentSettings.clistAdditionalResources
                 if (prev != current) {
                     toReload.add(Contest.Platform.unknown)
+                }
+            }
+
+            snapshot.contestsDateConstraints.let { prev ->
+                val current = currentSettings.contestsDateConstraints
+                if (prev != current) {
+                    //TODO: delete contests if current in prev
+                    toReload.addAll(currentSettings.enabledPlatforms)
                 }
             }
 

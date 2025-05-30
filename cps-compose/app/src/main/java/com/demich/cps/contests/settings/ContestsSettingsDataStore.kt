@@ -67,7 +67,8 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         snapshot().let {
             ContestsSettingsSnapshot(
                 enabledPlatforms = it[enabledPlatforms],
-                clistAdditionalResources = it[clistAdditionalResources].mapToSet { it.id }
+                clistAdditionalResources = it[clistAdditionalResources].mapToSet { it.id },
+                contestsDateConstraints = it[contestsDateConstraints]
             )
         }
 }
@@ -77,5 +78,5 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
 class ContestsSettingsSnapshot(
     val enabledPlatforms: Set<Contest.Platform>,
     val clistAdditionalResources: Set<Int>,
-//    val contestsDateConstraints: ContestDateBaseConstraints
+    val contestsDateConstraints: ContestDateBaseConstraints
 )
