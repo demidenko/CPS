@@ -41,8 +41,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
             data = CodeforcesCommunityControllerData(
                 selectedTab = defaultTab,
                 topPageType = CodeforcesCommunityController.TopPageType.BlogEntries,
-                recentShowComments = false,
-                recentFilterByBlogEntry = null
+                recentPageType = CodeforcesCommunityController.RecentPageType.RecentFeed
             )
         )
     }
@@ -59,8 +58,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
 internal data class CodeforcesCommunityControllerData(
     val selectedTab: CodeforcesTitle,
     val topPageType: CodeforcesCommunityController.TopPageType,
-    val recentShowComments: Boolean,
-    val recentFilterByBlogEntry: CodeforcesBlogEntry?
+    val recentPageType: CodeforcesCommunityController.RecentPageType
 )
 
 @Stable
@@ -100,11 +98,7 @@ class CodeforcesCommunityController internal constructor(
 
 
     var topPageType by mutableStateOf(data.topPageType)
-
-    //TODO: merge to sealed class
-    var recentShowComments by mutableStateOf(data.recentShowComments)
-    var recentFilterByBlogEntry: CodeforcesBlogEntry? by mutableStateOf(data.recentFilterByBlogEntry)
-
+    var recentPageType by mutableStateOf(data.recentPageType)
 
     fun flowOfBadgeCount(tab: CodeforcesTitle, context: Context): Flow<Int> =
         when (tab) {
@@ -130,6 +124,16 @@ class CodeforcesCommunityController internal constructor(
     enum class TopPageType {
         BlogEntries, Comments
     }
+
+    @Serializable
+    sealed interface RecentPageType {
+        @Serializable
+        data object RecentFeed : RecentPageType
+        @Serializable
+        data object RecentComments : RecentPageType
+        @Serializable
+        data class BlogEntryRecentComments(val blogEntry: CodeforcesBlogEntry) : RecentPageType
+    }
 }
 
 @Composable
@@ -149,8 +153,7 @@ private fun controllerSaver(
         jsonCPS.encodeToString(CodeforcesCommunityControllerData(
             selectedTab = it.currentTab,
             topPageType = it.topPageType,
-            recentShowComments = it.recentShowComments,
-            recentFilterByBlogEntry = it.recentFilterByBlogEntry
+            recentPageType = it.recentPageType
         ))
     },
     restore = {

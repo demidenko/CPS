@@ -10,6 +10,7 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.managers.toHandleSpan
+import com.demich.cps.community.codeforces.CodeforcesCommunityController.RecentPageType
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
@@ -33,40 +34,45 @@ fun CodeforcesCommunityRecentPage(
     val saveableStateHolder = rememberSaveableStateHolder()
 
     CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.RECENT) {
-        val blogEntry = controller.recentFilterByBlogEntry
-        if (blogEntry != null) {
-            BackHandler(
-                enabled = { controller.isTabVisible(CodeforcesTitle.RECENT) },
-                onBackPressed = { controller.recentFilterByBlogEntry = null }
-            ) {
-                RecentCommentsInBlogEntry(
-                    comments = { recent.comments },
-                    blogEntry = recent.blogEntries.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
-                    modifier = Modifier.fillMaxSize()
-                )
+        when (val type = controller.recentPageType) {
+            is RecentPageType.BlogEntryRecentComments -> {
+                val blogEntry = type.blogEntry
+                BackHandler(
+                    enabled = { controller.isTabVisible(CodeforcesTitle.RECENT) },
+                    onBackPressed = { controller.recentPageType = RecentPageType.RecentFeed }
+                ) {
+                    RecentCommentsInBlogEntry(
+                        comments = { recent.comments },
+                        blogEntry = recent.blogEntries.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
-        } else
-        if (controller.recentShowComments) {
-            saveableStateHolder.SaveableStateProvider(key = true) {
-                CodeforcesComments(
-                    comments = { recent.comments },
-                    modifier = Modifier.fillMaxSize()
-                )
+
+            RecentPageType.RecentComments -> {
+                saveableStateHolder.SaveableStateProvider(key = true) {
+                    CodeforcesComments(
+                        comments = { recent.comments },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
-        } else {
-            saveableStateHolder.SaveableStateProvider(key = false) {
-                RecentBlogEntriesPage(
-                    recent = { recent },
-                    modifier = Modifier.fillMaxSize(),
-                    onBrowseComment = { blogEntry, comment ->
-                        context.openUrlInBrowser(CodeforcesApi.urls.comment(
-                            blogEntryId = blogEntry.id,
-                            commentId = comment.id
-                        ))
-                    },
-                    onBrowseBlogEntry = { context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(it.id)) },
-                    onOpenComments = { controller.recentFilterByBlogEntry = it }
-                )
+
+            RecentPageType.RecentFeed -> {
+                saveableStateHolder.SaveableStateProvider(key = false) {
+                    RecentBlogEntriesPage(
+                        recent = { recent },
+                        modifier = Modifier.fillMaxSize(),
+                        onBrowseComment = { blogEntry, comment ->
+                            context.openUrlInBrowser(CodeforcesApi.urls.comment(
+                                blogEntryId = blogEntry.id,
+                                commentId = comment.id
+                            ))
+                        },
+                        onBrowseBlogEntry = { context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(it.id)) },
+                        onOpenComments = { controller.recentPageType = RecentPageType.BlogEntryRecentComments(it) }
+                    )
+                }
             }
         }
     }
