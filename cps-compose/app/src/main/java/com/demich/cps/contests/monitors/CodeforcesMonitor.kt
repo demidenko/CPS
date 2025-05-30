@@ -52,9 +52,13 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
     val ratingChangeWaiter = RatingChangeWaiter(contestId, handle, onRatingChange)
 
     val mainJob = scope.launchWhileActive {
-        getStandingsData(contestId, handle) {
-            return@launchWhileActive Duration.ZERO
-        }
+        getStandingsData(
+            contestId = contestId,
+            handle = handle,
+            onOfficialChanged = {
+                return@launchWhileActive Duration.ZERO
+            }
+        )
 
         ifNeedCheckSubmissions { problemResults ->
             getSubmissions(
@@ -103,12 +107,11 @@ private suspend inline fun CodeforcesMonitorDataStore.getStandingsData(
     handle: String,
     onOfficialChanged: () -> Unit
 ) {
-    val participationType = participationType()
     CodeforcesApi.runCatching {
         getContestStandings(
             contestId = contestId,
             handle = handle,
-            includeUnofficial = !participationType.isOfficial()
+            includeUnofficial = !participationType().isOfficial()
         )
     }.onFailure { e ->
         lastRequest(false)
@@ -120,9 +123,12 @@ private suspend inline fun CodeforcesMonitorDataStore.getStandingsData(
         }
     }.onSuccess { standings ->
         lastRequest(true)
-        applyStandings(standings)
-        val newParticipationType = participationType()
-        if (isOfficialChanged(old = participationType, new = newParticipationType)) {
+        var officialChanged = false
+        applyStandings(
+            standings = standings,
+            onOfficialChanged = { officialChanged = true }
+        )
+        if (officialChanged) {
             onOfficialChanged()
         }
     }
@@ -136,16 +142,16 @@ private fun isOfficialChanged(
     new: CodeforcesParticipationType
 ): Boolean = new.isOfficial() != old.isOfficial()
 
-//optimized for write
 private suspend fun CodeforcesMonitorDataStore.applyStandings(
-    standings: CodeforcesContestStandings
+    standings: CodeforcesContestStandings,
+    onOfficialChanged: () -> Unit
 ) = edit { prefs ->
     prefs[contestInfo] = standings.contest
 
     val row = standings.rows.find { row -> row.party.participantType.contestParticipant() }
-    val results = row?.problemResults ?: emptyList()
+    val results = row?.problemResults
     prefs[problemResults] = standings.problems.mapIndexed { index, problem ->
-        val result = results.getOrNull(index)
+        val result = results?.getOrNull(index)
         CodeforcesMonitorProblemResult(
             problemIndex = problem.index,
             points = result?.points ?: 0.0,
@@ -157,7 +163,10 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
         party.participantType.let {
             val old = prefs[participationType]
             prefs[participationType] = it
-            if (isOfficialChanged(old = old, new = it)) return@edit
+            if (isOfficialChanged(old = old, new = it)) {
+                onOfficialChanged()
+                return@edit
+            }
         }
         prefs[contestantRank] = rank
     }
@@ -263,7 +272,6 @@ private fun needCheckSubmissions(
     return list.any { it.isPreliminary() }
 }
 
-//optimized for read
 private suspend inline fun CodeforcesMonitorDataStore.ifNeedCheckSubmissions(
     block: (List<CodeforcesMonitorProblemResult>) -> Unit
 ) = fromSnapshot { prefs ->
