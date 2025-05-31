@@ -12,6 +12,8 @@ object CPSDefaults {
 
     val scrollBarWidth get() = 5.dp
 
+    val tabsRowHeight get() = 45.dp
+
     val MonospaceTextStyle
         get() = TextStyle(
             fontFamily = FontFamily.Monospace,

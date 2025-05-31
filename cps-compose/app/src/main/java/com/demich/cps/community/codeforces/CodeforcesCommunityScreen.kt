@@ -1,11 +1,13 @@
 package com.demich.cps.community.codeforces
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.Icon
@@ -21,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.community.CommunityTab
 import com.demich.cps.community.CommunityTabRow
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
@@ -101,15 +104,27 @@ private fun TabsHeader(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-        Icon(
-            painter = platformIconPainter(platform = Contest.Platform.codeforces),
-            contentDescription = null,
-            tint = cpsColors.content,
+        Box(
             modifier = Modifier
-                .padding(start = 8.dp, end = 6.dp)
-                .size(24.dp)
-        )
-        CommunityTabRow(pagerState = controller.pagerState) {
+                .height(CPSDefaults.tabsRowHeight)
+                .padding(vertical = 10.dp)
+                .padding(start = 6.dp, end = 10.dp)
+        ) {
+            Icon(
+                painter = platformIconPainter(platform = Contest.Platform.codeforces),
+                contentDescription = null,
+                tint = cpsColors.content,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .aspectRatio(1f)
+                    .fillMaxSize()
+            )
+        }
+
+        CommunityTabRow(
+            modifier = Modifier.fillMaxWidth(),
+            pagerState = controller.pagerState
+        ) {
             controller.tabs.forEach { title ->
                 CodeforcesCommunityTab(
                     title = title,
