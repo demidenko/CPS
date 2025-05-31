@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -154,7 +155,13 @@ fun CodeforcesCommunityController.loadingStatusState(title: CodeforcesTitle): St
     val context = context
     return remember(title) {
         flowOfLoadingStatus(title, context)
-    }.collectAsStateWithLifecycle(initialValue = LoadingStatus.PENDING) //TODO: be sure this fake is ok
+    }.run {
+        if (title == CodeforcesTitle.LOST) {
+            collectAsStateWithLifecycle(initialValue = LoadingStatus.PENDING)
+        } else {
+            collectAsState(initial = LoadingStatus.PENDING) //TODO: be sure this fake is ok
+        }
+    }
 }
 
 
