@@ -6,11 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -149,12 +147,11 @@ class CodeforcesCommunityController internal constructor(
 fun CodeforcesCommunityController.loadingStatusState(): State<LoadingStatus> =
     collectAsState { flowOfLoadingStatus() }
 
+//TODO: remember(key = title)???
 @Composable
 fun CodeforcesCommunityController.loadingStatusState(title: CodeforcesTitle): State<LoadingStatus> {
     val context = context
-    return remember(title) {
-        flowOfLoadingStatus(title, context)
-    }.collectAsState(initial = LoadingStatus.PENDING)
+    return collectAsState { flowOfLoadingStatus(title, context) }
 }
 
 
