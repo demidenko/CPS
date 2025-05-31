@@ -26,15 +26,16 @@ private val LocalCurrentTime = compositionLocalOf<Instant> {
     throw IllegalAccessException("current time not provided")
 }
 
-private fun flowOfTruncatedCurrentTime(period: Duration): Flow<Instant> =
-    flow {
-        require(period.isPositive())
+private fun flowOfTruncatedCurrentTime(period: Duration): Flow<Instant> {
+    require(period.isPositive())
+    return flow {
         while (currentCoroutineContext().isActive) {
             val currentTime = getCurrentTime()
             emit(currentTime.truncateBy(period))
             delay(duration = period - currentTime % period)
         }
     }
+}
 
 fun flowOfCurrentTimeEachSecond(): Flow<Instant> =
     flowOfTruncatedCurrentTime(period = 1.seconds)

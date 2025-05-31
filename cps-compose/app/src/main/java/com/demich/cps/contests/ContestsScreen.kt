@@ -23,7 +23,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -34,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.list_items.ContestItem
@@ -406,20 +406,14 @@ private fun anyPlatformEnabledState(): State<Boolean> {
 @Composable
 private fun combinedLoadingStatusState(): State<LoadingStatus> {
     val context = context
-    val contestsViewModel = contestsViewModel()
-
-    return produceState(
-        initialValue = LoadingStatus.PENDING,
-        key1 = contestsViewModel
-    ) {
-        contestsViewModel.flowOfLoadingStatus()
+    val viewModel = contestsViewModel()
+    return remember(viewModel) {
+        viewModel.flowOfLoadingStatus()
             .combine(ContestsWorker.getWork(context).flowOfWorkInfo()) { loadingStatus, workInfo ->
                 if (workInfo.isRunning) LoadingStatus.LOADING
                 else loadingStatus
-            }.collect {
-                value = it
             }
-    }
+    }.collectAsStateWithLifecycle(initialValue = LoadingStatus.PENDING)
 }
 
 @Composable
