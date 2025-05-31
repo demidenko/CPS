@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun<U: UserInfo> AccountPanel(
@@ -76,7 +77,7 @@ fun<U: UserInfo> AccountPanel(
         if (visibleOrder == null) {
             PanelUIButtons(
                 loadingStatus = loadingStatus,
-                lastClickMillis = lastClick.toEpochMilliseconds(),
+                lastClick = lastClick,
                 onReloadRequest = onReloadRequest,
                 onExpandRequest = onExpandRequest,
                 modifier = Modifier.align(Alignment.CenterEnd)
@@ -95,13 +96,13 @@ fun<U: UserInfo> AccountPanel(
 @Composable
 private fun PanelUIButtons(
     loadingStatus: LoadingStatus,
-    lastClickMillis: Long,
+    lastClick: Instant,
     modifier: Modifier = Modifier,
     onReloadRequest: () -> Unit,
     onExpandRequest: () -> Unit
 ) {
     Row(modifier = modifier) {
-        val uiAlpha by hidingState(lastClickMillis)
+        val uiAlpha by hidingState(lastClick)
         if (loadingStatus != LoadingStatus.LOADING && uiAlpha > 0f) {
             CPSIconButton(
                 icon = CPSIcons.Expand,
@@ -174,21 +175,21 @@ private fun PanelMovingButtons(
 
 @Composable
 private fun hidingState(
-    lastClickMillis: Long
-): State<Float> = produceState(initialValue = 0f, key1 = lastClickMillis) {
-    val delayMillis = 3000
-    val durationMillis = 2000
+    lastClick: Instant
+): State<Float> = produceState(initialValue = 0f, key1 = lastClick) {
+    val delay = 3.seconds
+    val hideDuration = 2.seconds
     value = 1f
     while (isActive) {
-        val dist = getCurrentTime().toEpochMilliseconds() - lastClickMillis
-        if (dist > delayMillis + durationMillis) {
+        val dist = getCurrentTime() - lastClick
+        if (dist > delay + hideDuration) {
             value = 0f
             break
         }
-        if (dist < delayMillis) {
-            delay(delayMillis - dist)
+        if (dist < delay) {
+            delay(delay - dist)
         } else {
-            value = (durationMillis - (dist - delayMillis)).toFloat() / durationMillis
+            value = ((hideDuration - (dist - delay)) / hideDuration).toFloat()
             delay(100)
         }
     }
