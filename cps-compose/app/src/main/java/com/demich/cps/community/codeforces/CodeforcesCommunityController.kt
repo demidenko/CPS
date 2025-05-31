@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +14,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
@@ -154,7 +154,7 @@ fun CodeforcesCommunityController.loadingStatusState(title: CodeforcesTitle): St
     val context = context
     return remember(title) {
         flowOfLoadingStatus(title, context)
-    }.collectAsState(initial = LoadingStatus.PENDING) //TODO: be sure this fake is ok
+    }.collectAsStateWithLifecycle(initialValue = LoadingStatus.PENDING) //TODO: be sure this fake is ok
 }
 
 
