@@ -15,20 +15,23 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntriesDataStoreItem
 import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
+import com.demich.cps.workers.CodeforcesCommunityLostRecentWorker
+import com.demich.cps.workers.isRunning
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 
@@ -152,16 +155,18 @@ fun CodeforcesCommunityController.loadingStatusState(): State<LoadingStatus> =
 
 @Composable
 fun CodeforcesCommunityController.loadingStatusState(title: CodeforcesTitle): State<LoadingStatus> {
-    val context = context
-    return remember(title) {
-        flowOfLoadingStatus(title, context)
-    }.run {
-        if (title == CodeforcesTitle.LOST) {
-            collectAsStateWithLifecycle(initialValue = LoadingStatus.PENDING)
-        } else {
-            collectAsState(initial = LoadingStatus.PENDING) //TODO: be sure this fake is ok
+    if (title == CodeforcesTitle.LOST) {
+        val context = context
+        return collectAsStateWithLifecycle {
+            CodeforcesCommunityLostRecentWorker.getWork(context)
+                .flowOfWorkInfo()
+                .onStart { emit(null) } //just in case of slow first emit by workdao
+                .map { if (it.isRunning) LoadingStatus.LOADING else LoadingStatus.PENDING }
         }
     }
+
+    return remember(title) { flowOfLoadingStatus(title) }
+        .collectAsState(initial = LoadingStatus.PENDING) //TODO: be sure this fake is ok
 }
 
 

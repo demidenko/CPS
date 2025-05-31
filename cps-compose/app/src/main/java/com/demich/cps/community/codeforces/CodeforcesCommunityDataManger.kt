@@ -10,10 +10,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface CodeforcesCommunityDataManger {
     fun flowOfLoadingStatus(): Flow<LoadingStatus>
-    fun flowOfLoadingStatus(title: CodeforcesTitle, context: Context): Flow<LoadingStatus>
+    fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus>
 
     fun reload(titles: List<CodeforcesTitle>, context: Context)
-
     fun reload(title: CodeforcesTitle, context: Context) {
         reload(titles = listOf(title), context = context)
     }

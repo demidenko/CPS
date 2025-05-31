@@ -18,15 +18,11 @@ import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.sharedViewModel
-import com.demich.cps.workers.CodeforcesCommunityLostRecentWorker
-import com.demich.cps.workers.isRunning
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -44,7 +40,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
             recentActions.loadingStatusFlow
         ).combine()
 
-    override fun flowOfLoadingStatus(title: CodeforcesTitle, context: Context): Flow<LoadingStatus> {
+    override fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus> {
         return when (title) {
             CodeforcesTitle.MAIN -> mainBlogEntries.loadingStatusFlow
             CodeforcesTitle.TOP -> {
@@ -52,12 +48,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
                     .combine()
             }
             CodeforcesTitle.RECENT -> recentActions.loadingStatusFlow
-            CodeforcesTitle.LOST -> {
-                CodeforcesCommunityLostRecentWorker.getWork(context)
-                    .flowOfWorkInfo()
-                    .map { if (it.isRunning) LoadingStatus.LOADING else LoadingStatus.PENDING }
-                    .onStart { emit(LoadingStatus.PENDING) } //just in case of slow first emit by workdao
-            }
+            CodeforcesTitle.LOST -> throw IllegalArgumentException(title.name)
         }
     }
 
