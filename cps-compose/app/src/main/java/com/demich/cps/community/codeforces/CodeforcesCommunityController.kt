@@ -149,8 +149,11 @@ fun CodeforcesCommunityController.loadingStatusState(): State<LoadingStatus> =
 
 //TODO: remember(key = title)???
 @Composable
-fun CodeforcesCommunityController.loadingStatusState(title: CodeforcesTitle): State<LoadingStatus> =
-    collectAsState { flowOfLoadingStatus(title) }
+fun CodeforcesCommunityController.loadingStatusState(title: CodeforcesTitle): State<LoadingStatus> {
+    val context = context
+    return collectAsState { flowOfLoadingStatus(title, context) }
+}
+
 
 private fun controllerSaver(
     viewModel: CodeforcesCommunityViewModel,

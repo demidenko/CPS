@@ -41,6 +41,7 @@ abstract class CPSWork(
 
     fun flowOfWorkInfo(): Flow<WorkInfo?> =
         workManager.getWorkInfosForUniqueWorkFlow(name)
+//            .onStart { emit(emptyList()) }
             .map { it.firstOrNull() }
 }
 
