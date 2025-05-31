@@ -2,22 +2,29 @@ package com.demich.cps.community.codeforces
 
 import android.content.Context
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import com.demich.cps.community.settings.settingsCommunity
+import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntriesDataStoreItem
+import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
-import com.demich.cps.utils.collectAsState
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
@@ -100,7 +107,7 @@ class CodeforcesCommunityController internal constructor(
     var topPageType by mutableStateOf(data.topPageType)
     var recentPageType by mutableStateOf(data.recentPageType)
 
-    fun flowOfBadgeCount(tab: CodeforcesTitle, context: Context): Flow<Int> =
+    fun flowOfBadgeCount(tab: CodeforcesTitle, context: Context): Flow<Int>? =
         when (tab) {
             CodeforcesTitle.MAIN -> flowOfBadgeCount(
                 isTabVisibleFlow = snapshotFlow { currentTab == CodeforcesTitle.MAIN },
@@ -112,7 +119,7 @@ class CodeforcesCommunityController internal constructor(
                 blogEntriesFlow = flowOfLostBlogEntries(context),
                 newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
             )
-            else -> flowOf(0)
+            else -> null
         }
 
     fun flowOfLostBlogEntries(context: Context) =

@@ -10,7 +10,10 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -120,15 +123,26 @@ private fun TabsHeader(
     }
 }
 
+
+@Composable
+private fun CodeforcesCommunityController.badgeCountState(title: CodeforcesTitle): State<Int> {
+    val context = context
+    val flow = remember(title, this) { flowOfBadgeCount(tab = title, context = context) }
+    return if (flow == null) {
+        remember { mutableIntStateOf(0) }
+    } else {
+        collectAsState { flow }
+    }
+}
+
 @Composable
 private fun CodeforcesCommunityTab(
     title: CodeforcesTitle,
     controller: CodeforcesCommunityController,
     modifier: Modifier = Modifier
 ) {
-    val context = context
     val loadingStatus by controller.loadingStatusState(title)
-    val badgeCount by collectAsState { controller.flowOfBadgeCount(tab = title, context) }
+    val badgeCount by controller.badgeCountState(title)
     CodeforcesCommunityTab(
         title = title,
         index = controller.tabs.indexOf(title),
