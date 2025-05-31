@@ -154,7 +154,7 @@ fun CodeforcesCommunityController.loadingStatusState(title: CodeforcesTitle): St
     val context = context
     return remember(title) {
         flowOfLoadingStatus(title, context)
-    }.collectAsState(initial = LoadingStatus.PENDING)
+    }.collectAsState(initial = LoadingStatus.PENDING) //TODO: be sure this fake is ok
 }
 
 

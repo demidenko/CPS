@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -55,6 +56,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
                 CodeforcesCommunityLostRecentWorker.getWork(context)
                     .flowOfWorkInfo()
                     .map { if (it.isRunning) LoadingStatus.LOADING else LoadingStatus.PENDING }
+                    .onStart { emit(LoadingStatus.PENDING) } //just in case of slow first emit by workdao
             }
         }
     }
