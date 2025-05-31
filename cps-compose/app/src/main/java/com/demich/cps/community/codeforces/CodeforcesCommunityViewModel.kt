@@ -86,13 +86,6 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         }
     }
 
-    override fun reload(title: CodeforcesTitle, context: Context) {
-        viewModelScope.launch {
-            val locale = context.settingsCommunity.codeforcesLocale()
-            reload(title = title, locale = locale)
-        }
-    }
-
     override fun reload(titles: List<CodeforcesTitle>, context: Context) {
         viewModelScope.launch {
             val locale = context.settingsCommunity.codeforcesLocale()
