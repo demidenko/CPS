@@ -17,6 +17,7 @@ import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.toLoadingStatus
 import com.demich.cps.workers.ContestsWorker
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -72,7 +73,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
     }
 
     fun reloadEnabledPlatforms(context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             ContestsWorker.getWork(context).enqueueInRepeatInterval()
             reloadEnabledPlatforms(
                 settings = context.settingsContests,
@@ -83,7 +84,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
     }
 
     fun applyChangedSettings(context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             val infoDataStore = ContestsInfoDataStore(context)
             val snapshot = infoDataStore.settingsSnapshot() ?: return@launch
             infoDataStore.settingsSnapshot.update { null }
