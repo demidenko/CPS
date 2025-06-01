@@ -77,7 +77,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     }
 
     override fun reload(titles: List<CodeforcesTitle>, context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             val locale = context.settingsCommunity.codeforcesLocale()
             titles.forEach { reload(title = it, locale = locale) }
         }
@@ -93,13 +93,13 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         CodeforcesUtils.extractRecentActions(source = CodeforcesApi.getPage(page = CodeforcesApi.BasePage.recent, locale = locale))
 
     fun addToFollowList(userInfo: CodeforcesUserInfo, context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             context.followListDao.addNewUser(userInfo)
         }
     }
 
     override fun addToFollowList(handle: String, context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             context.settingsCommunity.codeforcesFollowEnabled(newValue = true)
             context.followListDao.addNewUser(handle)
         }
@@ -108,7 +108,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     private val followLoadingStatus = MutableStateFlow(LoadingStatus.PENDING)
     fun flowOfFollowUpdateLoadingStatus(): StateFlow<LoadingStatus> = followLoadingStatus
     override fun updateFollowUsersInfo(context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             if (!followLoadingStatus.compareAndSet(LoadingStatus.PENDING, LoadingStatus.LOADING)) return@launch
             context.followListDao.updateUsers()
             followLoadingStatus.value = LoadingStatus.PENDING
