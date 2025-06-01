@@ -16,8 +16,7 @@ import com.demich.cps.utils.update
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.coroutineScope
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KProperty
@@ -43,7 +42,7 @@ abstract class CPSWorker(
 
         val workersInfo = CPSWorkersDataStore(context)
 
-        val result = withContext(Dispatchers.IO) { //TODO: is Dispatchers.IO needed?
+        val result = coroutineScope {
             val event = ExecutionEvent(start = workerStartTime)
             workersInfo.append(event)
             smartRunWork().also { result ->
