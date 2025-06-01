@@ -20,11 +20,13 @@ import com.demich.cps.utils.getCurrentTime
 import com.demich.kotlin_stdlib_boost.isSortedWith
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import com.demich.kotlin_stdlib_boost.partitionIndex
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
@@ -162,7 +164,7 @@ internal fun produceSortedContestsWithTime(
                     contestsState.value = sorter.contests
                 }
                 currentTimeState.value = currentTime
-            }.collect()
+            }.flowOn(Dispatchers.Default).collect()
         }
     }
 
