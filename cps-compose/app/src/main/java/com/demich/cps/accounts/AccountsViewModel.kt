@@ -19,7 +19,6 @@ import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
@@ -48,7 +47,7 @@ class AccountsViewModel: ViewModel() {
 
     fun<U: UserInfo> reload(manager: AccountManager<U>, context: Context) {
         if (loadingStatuses.value[manager.type] == LoadingStatus.LOADING) return
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val dataStore = manager.dataStore(context)
             val savedInfo = dataStore.getSavedInfo() ?: return@launch
 
@@ -84,7 +83,7 @@ class AccountsViewModel: ViewModel() {
             progress(progressBarInfo)
             supported.map { (type, userId) ->
                 val manager = allAccountManagers.first { it.type == type }
-                launch(Dispatchers.IO) {
+                launch {
                     //wait for loading stops
                     loadingStatuses.takeWhile { it[type] == LoadingStatus.LOADING }.collect()
                     if (userId.equals(manager.dataStore(context).getSavedInfo()?.userId, ignoreCase = true)) {

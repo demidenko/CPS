@@ -3,7 +3,6 @@ package com.demich.cps.utils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +23,7 @@ class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
                 flow.value = null
                 currentId = id
                 job?.cancel()
-                job = scope.launch(Dispatchers.IO) {
+                job = scope.launch {
                     kotlin.runCatching { block() }.let {
                         if (isActive && currentId == id) flow.value = it
                     }

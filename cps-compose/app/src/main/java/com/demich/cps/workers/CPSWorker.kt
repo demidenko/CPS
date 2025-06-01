@@ -43,7 +43,7 @@ abstract class CPSWorker(
 
         val workersInfo = CPSWorkersDataStore(context)
 
-        val result = withContext(Dispatchers.IO) {
+        val result = withContext(Dispatchers.IO) { //TODO: is Dispatchers.IO needed?
             val event = ExecutionEvent(start = workerStartTime)
             workersInfo.append(event)
             smartRunWork().also { result ->

@@ -16,13 +16,12 @@ import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): CoroutineWorker(context, params) {
 
@@ -62,7 +61,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         val notificationBuilder = createNotificationBuilder(handle)
             .also { setForeground(it) }
 
-        withContext(Dispatchers.IO) {
+        coroutineScope {
             monitor.launchIn(
                 scope = this,
                 onRatingChange = { ratingChange ->

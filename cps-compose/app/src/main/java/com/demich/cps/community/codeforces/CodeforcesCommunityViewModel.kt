@@ -19,13 +19,11 @@ import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun codeforcesCommunityViewModel(): CodeforcesCommunityViewModel = sharedViewModel()
@@ -94,13 +92,13 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         CodeforcesUtils.extractRecentActions(source = CodeforcesApi.getPage(page = CodeforcesApi.BasePage.recent, locale = locale))
 
     fun addToFollowList(userInfo: CodeforcesUserInfo, context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             context.followListDao.addNewUser(userInfo)
         }
     }
 
     override fun addToFollowList(handle: String, context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             context.settingsCommunity.codeforcesFollowEnabled(newValue = true)
             context.followListDao.addNewUser(handle)
         }
@@ -111,7 +109,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     override fun updateFollowUsersInfo(context: Context) {
         viewModelScope.launch {
             if (!followLoadingStatus.compareAndSet(LoadingStatus.PENDING, LoadingStatus.LOADING)) return@launch
-            withContext(Dispatchers.IO) { context.followListDao.updateUsers() }
+            context.followListDao.updateUsers()
             followLoadingStatus.value = LoadingStatus.PENDING
         }
     }
@@ -160,8 +158,8 @@ private class CodeforcesDataLoader<T: Any>(
             LoadingStatus.LOADING
         }
         scope.launch {
-            withContext(Dispatchers.IO) {
-                kotlin.runCatching { getData(locale) }
+            runCatching {
+                getData(locale)
             }.onFailure {
                 loadingStatus.value = LoadingStatus.FAILED
             }.onSuccess {
