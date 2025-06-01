@@ -16,6 +16,8 @@ import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
+import com.demich.datastore_itemized.edit
+import com.demich.datastore_itemized.fromSnapshot
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
@@ -36,16 +38,18 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
             val monitor = CodeforcesMonitorDataStore(context)
 
             val replace: Boolean
-            if (contestId == monitor.contestId() && handle == monitor.handle()) {
+            if (monitor.fromSnapshot { contestId == it[this.contestId] && handle == it[this.handle] }) {
                 if (getWork(context).flowOfWorkInfo().first().isRunning)
                     replace = false
                 else
                     replace = true
             } else {
                 replace = true
-                monitor.reset()
-                monitor.handle(handle)
-                monitor.contestId(contestId)
+                monitor.edit {
+                    it.clear()
+                    it[this.handle] = handle
+                    it[this.contestId] = contestId
+                }
             }
 
             getWork(context).enqueue(replace)
