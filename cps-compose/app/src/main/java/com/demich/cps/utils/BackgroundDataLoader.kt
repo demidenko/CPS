@@ -3,10 +3,11 @@ package com.demich.cps.utils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 //TODO: data is still existing even after close screen
@@ -23,9 +24,10 @@ class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
                 flow.value = null
                 currentId = id
                 job?.cancel()
-                job = scope.launch {
+                job = scope.launch(Dispatchers.Default) {
                     kotlin.runCatching { block() }.let {
-                        if (isActive && currentId == id) flow.value = it
+                        ensureActive()
+                        if (currentId == id) flow.value = it
                     }
                 }
             }

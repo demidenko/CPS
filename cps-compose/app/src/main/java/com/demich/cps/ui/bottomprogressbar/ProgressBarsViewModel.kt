@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +41,7 @@ class ProgressBarsViewModel: ViewModel() {
         coroutineScope: CoroutineScope = viewModelScope,
         block: suspend CoroutineScope.((ProgressBarInfo) -> Unit) -> Unit
     ) {
-        coroutineScope.launch {
+        coroutineScope.launch(Dispatchers.Default) {
             var progressBarInfo: ProgressBarInfo? by object {
                 operator fun getValue(thisObj: Any?, property: KProperty<*>): ProgressBarInfo? =
                     progressesStateFlow.value[id]

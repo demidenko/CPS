@@ -19,6 +19,7 @@ import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -157,7 +158,7 @@ private class CodeforcesDataLoader<T: Any>(
             if (it == LoadingStatus.LOADING) return
             LoadingStatus.LOADING
         }
-        scope.launch {
+        scope.launch(Dispatchers.Default) {
             runCatching {
                 getData(locale)
             }.onFailure {

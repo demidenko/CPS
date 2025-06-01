@@ -65,6 +65,7 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberFocusOnCreationRequester
 import com.demich.cps.utils.showToast
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -165,6 +166,7 @@ private fun<U: UserInfo> DialogContent(
         )
     }
 
+    //TODO: reworks this to flows???
     LaunchedEffect(userId) {
         if (firstLaunch) {
             firstLaunch = false
@@ -206,7 +208,7 @@ private fun <T> CoroutineScope.launchLoading(
     saveData: (T) -> Unit
 ) {
     loadingInProgressState.value = true
-    launch {
+    launch(Dispatchers.Default) {
         val data = getData()
         loadingInProgressState.value = false
         ensureActive()
