@@ -22,7 +22,6 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -30,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -67,14 +67,13 @@ import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberFocusOnCreationRequester
 import com.demich.cps.utils.showToast
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.transformLatest
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val suggestionsMinLength = 3
 const val debounceDelay: Long = 300
@@ -117,8 +116,8 @@ private fun<U: UserInfo> DialogContent(
 ) {
     val context = context
 
-    val textFieldValueState = remember {
-        mutableStateOf((initialUserInfo?.userId ?: "").toTextFieldValue())
+    val textFieldValueState = rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(initialUserInfo?.userId.orEmpty().toTextFieldValue())
     }
     var textFieldValue by textFieldValueState
     val userId by rememberUpdatedState(newValue = textFieldValue.text)
@@ -128,30 +127,25 @@ private fun<U: UserInfo> DialogContent(
         manager = manager,
         initialUserInfo = initialUserInfo
     )
-    val (userInfo, loadingInProgress) = userInfoResult
 
-    var suggestionsResult: Result<List<UserSuggestion>> by remember { mutableStateOf(Result.success(emptyList())) }
-    val loadingSuggestionsInProgressState = remember { mutableStateOf(false) }
-    var blockSuggestionsReload by remember { mutableStateOf(false) }
+    var blockSuggestionsReload by remember { mutableStateOf(true) }
 
     val focusRequester = rememberFocusOnCreationRequester()
-    var firstLaunch by remember { mutableStateOf(true) }
 
     UserIdTextField(
         manager = manager,
-        userInfo = userInfo,
+        userInfo = userInfoResult.userInfo,
         textFieldValue = textFieldValue,
         onValueChange = {
+            blockSuggestionsReload = false
             if (it.text.all(charValidator)) {
-                blockSuggestionsReload = false
                 textFieldValue = it
             } else {
                 // keyboard suggestion can contain invalid char (like space in the end)
-                blockSuggestionsReload = false
                 textFieldValue = it.copy(text = it.text.filter(charValidator))
             }
         },
-        loadingInProgress = loadingInProgress,
+        loadingInProgress = userInfoResult.isLoading,
         modifier = Modifier
             .focusRequester(focusRequester)
             .fillMaxWidth(),
@@ -167,6 +161,9 @@ private fun<U: UserInfo> DialogContent(
     }
 
     if (manager is UserSuggestionsProvider) {
+        var suggestionsResult: Result<List<UserSuggestion>> by remember { mutableStateOf(Result.success(emptyList())) }
+        val loadingSuggestionsInProgressState = remember { mutableStateOf(false) }
+
         SuggestionsList(
             suggestionsResult = suggestionsResult,
             isLoading = loadingSuggestionsInProgressState.value,
@@ -176,30 +173,25 @@ private fun<U: UserInfo> DialogContent(
                 textFieldValue = suggestion.userId.toTextFieldValue()
             }
         )
-    }
 
-    //TODO: reworks this to flow
-    LaunchedEffect(userId) {
-        if (firstLaunch) {
-            firstLaunch = false
-            return@LaunchedEffect
-        }
-        if (userId.length < suggestionsMinLength) {
-            suggestionsResult = Result.success(emptyList())
-            loadingSuggestionsInProgressState.value = false
-            blockSuggestionsReload = false
-        }
-        if (userId.isBlank()) {
-            return@LaunchedEffect
-        }
-        delay(debounceDelay)
-        if (manager is UserSuggestionsProvider && userId.length >= suggestionsMinLength) {
+        //TODO: rework this to flow
+        LaunchedEffect(userId) {
+            // if (userId.isBlank()) ???
+            if (userId.length < suggestionsMinLength) {
+                suggestionsResult = Result.success(emptyList())
+                loadingSuggestionsInProgressState.value = false
+                blockSuggestionsReload = false
+                return@LaunchedEffect
+            }
+            delay(debounceDelay)
             if (!blockSuggestionsReload) {
-                launchLoading(
-                    loadingInProgressState = loadingSuggestionsInProgressState,
-                    getData = { manager.runCatching { getSuggestions(userId) } },
-                    saveData = { suggestionsResult = it }
-                )
+                loadingSuggestionsInProgressState.value = true
+                val data = withContext(Dispatchers.Default) {
+                    manager.runCatching { getSuggestions(userId) }
+                }
+                loadingSuggestionsInProgressState.value = false
+                ensureActive()
+                suggestionsResult = data
             } else {
                 blockSuggestionsReload = false
             }
@@ -233,19 +225,6 @@ private fun <U: UserInfo> collectUserInfoState(
     }.collectAsState(initial = UserInfoLoadingResult(initialUserInfo, false))
 }
 
-private fun <T> CoroutineScope.launchLoading(
-    loadingInProgressState: MutableState<Boolean>,
-    getData: suspend () -> T,
-    saveData: (T) -> Unit
-) {
-    loadingInProgressState.value = true
-    launch(Dispatchers.Default) {
-        val data = getData()
-        loadingInProgressState.value = false
-        ensureActive()
-        saveData(data)
-    }
-}
 
 @Composable
 private fun<U: UserInfo> UserIdTextField(
