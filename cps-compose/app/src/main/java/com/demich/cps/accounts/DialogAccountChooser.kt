@@ -24,11 +24,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
@@ -68,9 +71,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 
 const val suggestionsMinLength = 3
+const val debounceDelay: Long = 300
 
 @Composable
 fun<U: UserInfo> DialogAccountChooser(
@@ -110,13 +117,18 @@ private fun<U: UserInfo> DialogContent(
 ) {
     val context = context
 
-    var textFieldValue by remember {
+    val textFieldValueState = remember {
         mutableStateOf((initialUserInfo?.userId ?: "").toTextFieldValue())
     }
+    var textFieldValue by textFieldValueState
     val userId by rememberUpdatedState(newValue = textFieldValue.text)
 
-    var userInfo by remember { mutableStateOf(initialUserInfo) }
-    val loadingInProgressState = remember { mutableStateOf(false) }
+    val userInfoResult by collectUserInfoState(
+        textState = textFieldValueState,
+        manager = manager,
+        initialUserInfo = initialUserInfo
+    )
+    val (userInfo, loadingInProgress) = userInfoResult
 
     var suggestionsResult: Result<List<UserSuggestion>> by remember { mutableStateOf(Result.success(emptyList())) }
     val loadingSuggestionsInProgressState = remember { mutableStateOf(false) }
@@ -139,7 +151,7 @@ private fun<U: UserInfo> DialogContent(
                 textFieldValue = it.copy(text = it.text.filter(charValidator))
             }
         },
-        loadingInProgress = loadingInProgressState.value,
+        loadingInProgress = loadingInProgress,
         modifier = Modifier
             .focusRequester(focusRequester)
             .fillMaxWidth(),
@@ -166,7 +178,7 @@ private fun<U: UserInfo> DialogContent(
         )
     }
 
-    //TODO: reworks this to flows???
+    //TODO: reworks this to flow
     LaunchedEffect(userId) {
         if (firstLaunch) {
             firstLaunch = false
@@ -177,17 +189,10 @@ private fun<U: UserInfo> DialogContent(
             loadingSuggestionsInProgressState.value = false
             blockSuggestionsReload = false
         }
-        userInfo = null
         if (userId.isBlank()) {
-            loadingInProgressState.value = false
             return@LaunchedEffect
         }
-        delay(300)
-        launchLoading(
-            loadingInProgressState = loadingInProgressState,
-            getData = { manager.getUserInfo(userId) },
-            saveData = { userInfo = it }
-        )
+        delay(debounceDelay)
         if (manager is UserSuggestionsProvider && userId.length >= suggestionsMinLength) {
             if (!blockSuggestionsReload) {
                 launchLoading(
@@ -200,6 +205,32 @@ private fun<U: UserInfo> DialogContent(
             }
         }
     }
+}
+
+
+private data class UserInfoLoadingResult<U: UserInfo>(
+    val userInfo: U?,
+    val isLoading: Boolean
+)
+
+@Composable
+private fun <U: UserInfo> collectUserInfoState(
+    textState: State<TextFieldValue>,
+    manager: AccountManager<U>,
+    initialUserInfo: U?
+): State<UserInfoLoadingResult<U>> {
+    return remember(textState, manager) {
+        snapshotFlow { textState.value.text }
+            .distinctUntilChanged()
+            .drop(1)
+            .transformLatest { userId ->
+                emit(UserInfoLoadingResult<U>(null, false))
+                if (userId.isBlank()) return@transformLatest
+                delay(debounceDelay)
+                emit(UserInfoLoadingResult<U>(null, true))
+                emit(UserInfoLoadingResult(manager.getUserInfo(userId), false))
+            }
+    }.collectAsState(initial = UserInfoLoadingResult(initialUserInfo, false))
 }
 
 private fun <T> CoroutineScope.launchLoading(
