@@ -73,11 +73,11 @@ private fun CodeforcesFollowList(
 
     LaunchedEffect(listState, userBlogs) {
         /* Cases:
-            1) delete not first -> removing animation
-            2) delete first + scroll on top -> removing animation
-            3) delete first + scroll not top -> ?? (whatever)
-            4) add new + scroll on top -> adding animation + scroll to top
-            5) add new + scroll not top -> adding animation + scroll to top
+            1) delete not first -> removing animation [ok by default]
+            2) delete first + no scroll -> removing animation [ok by default]
+            3) delete first + scroll on top -> removing animation [ok by default]
+            4) delete first + scroll not top -> ?? (whatever) [ok by default]
+            5) add first -> adding animation + scroll to top [NO by default]
          */
         snapshotFlow { userBlogs().let { it.size to it.firstOrNull()?.id } }
             .distinctUntilChangedBy { it.second } //wait for first id changed
