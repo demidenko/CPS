@@ -52,16 +52,16 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     }
 
     private val mainBlogEntries = dataLoader(emptyList()) { getBlogEntries(page = CodeforcesApi.BasePage.main, locale = it) }
-    override fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.getDataFlow(context)
+    override fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.flowOfData(context)
 
     private val topBlogEntries = dataLoader(emptyList()) { getBlogEntries(page = CodeforcesApi.BasePage.top, locale = it) }
-    override fun flowOfTopBlogEntries(context: Context) = topBlogEntries.getDataFlow(context)
+    override fun flowOfTopBlogEntries(context: Context) = topBlogEntries.flowOfData(context)
 
     private val topComments = dataLoader(emptyList()) { getTopComments(locale = it) }
-    override fun flowOfTopComments(context: Context) = topComments.getDataFlow(context)
+    override fun flowOfTopComments(context: Context) = topComments.flowOfData(context)
 
     private val recentActions = dataLoader(CodeforcesRecent(emptyList(), emptyList())) { getRecentActions(locale = it) }
-    override fun flowOfRecent(context: Context) = recentActions.getDataFlow(context)
+    override fun flowOfRecent(context: Context) = recentActions.flowOfData(context)
 
     private fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
         when (title) {
@@ -139,7 +139,7 @@ private class CodeforcesDataLoader<T: Any>(
     private val dataFlow: MutableStateFlow<T> = MutableStateFlow(init)
 
     private var inactive = true
-    fun getDataFlow(context: Context): StateFlow<T> {
+    fun flowOfData(context: Context): StateFlow<T> {
         if (inactive) {
             inactive = false
             scope.launch {
