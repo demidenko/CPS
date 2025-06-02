@@ -2,12 +2,12 @@ package com.demich.cps.community.settings
 
 import android.content.Context
 import com.demich.cps.community.codeforces.CodeforcesTitle
-import com.demich.cps.utils.jsonCPS
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.NewsPostEntry
 import com.demich.cps.platforms.utils.scanNewsPostEntries
 import com.demich.cps.utils.isRuSystemLanguage
+import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
@@ -85,6 +85,8 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
             }
         )
     }
+
+    val renderAllTabs = itemBoolean(name = "tabs_render_all", defaultValue = true)
 }
 
 @Serializable

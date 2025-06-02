@@ -6,11 +6,29 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.*
+import androidx.compose.material.Badge
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.RadioButton
+import androidx.compose.material.RadioButtonDefaults
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -40,7 +58,7 @@ fun IconSp(
     painter: Painter,
     modifier: Modifier = Modifier,
     size: TextUnit,
-    color: Color = cpsColors.content
+    color: Color = LocalContentColor.current
 ) {
     Icon(
         painter = painter,
@@ -55,7 +73,7 @@ fun IconSp(
     imageVector: ImageVector,
     modifier: Modifier = Modifier,
     size: TextUnit,
-    color: Color = cpsColors.content
+    color: Color = LocalContentColor.current
 ) {
     IconSp(
         painter = rememberVectorPainter(image = imageVector),

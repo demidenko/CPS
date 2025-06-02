@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.community.CommunityTab
 import com.demich.cps.community.CommunityTabRow
+import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSSwipeRefreshBox
@@ -31,6 +32,7 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.ProvideTimeEachMinute
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import kotlinx.coroutines.launch
 
@@ -75,10 +77,13 @@ private fun CodeforcesPager(
     controller: CodeforcesCommunityController,
     modifier: Modifier = Modifier
 ) {
+    val context = context
+    val renderAllTabs by collectItemAsState { context.settingsCommunity.renderAllTabs }
+
     val newEntriesState = rememberNewEntriesState()
     ProvideTimeEachMinute {
         HorizontalPager(
-            beyondViewportPageCount = controller.tabs.size - 1,
+            beyondViewportPageCount = if (renderAllTabs) controller.tabs.size - 1 else 0,
             state = controller.pagerState,
             key = { index -> controller.tabs[index] },
             modifier = modifier

@@ -40,9 +40,9 @@ import com.demich.cps.ui.SettingsSwitchItemContent
 import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
 import com.demich.cps.ui.platformIconPainter
+import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberWith
 import com.demich.cps.workers.CodeforcesCommunityFollowWorker
 import com.demich.cps.workers.CodeforcesCommunityLostRecentWorker
 import com.demich.cps.workers.NewsWorker
@@ -56,8 +56,11 @@ import kotlinx.coroutines.runBlocking
 
 @Composable
 fun CommunitySettingsScreen() {
-    val requiredPermissions by rememberWith(context) {
-        flowOfNotificationPermissionsRequired(this)
+    val context = context
+    val devEnabled by collectItemAsState { context.settingsUI.devModeEnabled }
+
+    val requiredPermissions by remember {
+        flowOfNotificationPermissionsRequired(context)
     }.collectAsState(initial = false)
 
     SettingsColumn(
@@ -79,6 +82,15 @@ fun CommunitySettingsScreen() {
             painter = rememberVectorPainter(image = CPSIcons.NewsFeeds)
         ) {
             NewsFeedsSettingsItem()
+        }
+
+        if (devEnabled) {
+            SettingsSectionHeader(
+                title = "dev",
+                painter = rememberVectorPainter(image = CPSIcons.Development)
+            ) {
+                RenderAllTabs()
+            }
         }
     }
 }
@@ -235,5 +247,20 @@ private fun NewsFeedsSettingsItem() {
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun RenderAllTabs() {
+    val context = context
+    val scope = rememberCoroutineScope()
+    val settings = context.settingsCommunity
+    SettingsSwitchItem(
+        item = settings.renderAllTabs,
+        title = "Render all tabs"
+    ) {
+        scope.launch {
+            settings.renderAllTabs(newValue = it)
+        }
     }
 }
