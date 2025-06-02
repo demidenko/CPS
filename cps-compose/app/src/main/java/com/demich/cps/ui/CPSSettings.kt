@@ -113,7 +113,7 @@ inline fun ColumnScope.SettingsSectionHeader(
 }
 
 @Composable
-fun SettingsItem(
+inline fun SettingsItem(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
@@ -129,7 +129,7 @@ fun SettingsItem(
 }
 
 @Composable
-fun SettingsItemContent(
+inline fun SettingsItemContent(
     title: String,
     description: String = "",
     trailerContent: @Composable () -> Unit
@@ -159,7 +159,7 @@ fun SettingsItemContent(
 }
 
 @Composable
-fun SettingsItem(
+inline fun SettingsItem(
     modifier: Modifier = Modifier,
     title: String,
     description: String = "",
