@@ -117,6 +117,10 @@ abstract class CPSPeriodicWork(
         enqueueAt(time)
     }
 
+    suspend fun enqueueInIfEarlier(duration: Duration) {
+        enqueueAtIfEarlier(time = getCurrentTime() + duration)
+    }
+
     suspend fun enqueueInRepeatInterval() {
         getWorkInfo()?.repeatInterval?.let {
             enqueueAt(time = getCurrentTime() + it)

@@ -55,8 +55,9 @@ class CodeforcesCommunityFollowWorker(
             }
         }
 
-        val interval = nextEnqueueIn(blogsCount = blogs.size, proceeded = proceeded.size).coerceAtLeast(2.hours)
-        work.enqueueAtIfEarlier(time = workerStartTime + interval)
+        work.enqueueInIfEarlier(
+            duration = nextEnqueueIn(blogsCount = blogs.size, proceeded = proceeded.size).coerceAtLeast(2.hours)
+        )
 
         return Result.success()
     }
