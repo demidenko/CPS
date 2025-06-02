@@ -5,8 +5,10 @@ import androidx.work.WorkerParameters
 import com.demich.cps.community.follow.followListDao
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 
 class CodeforcesCommunityFollowWorker(
@@ -53,8 +55,17 @@ class CodeforcesCommunityFollowWorker(
             }
         }
 
-        //TODO: consider reschedule worker earlier on low count of api-queries
+        val interval = nextEnqueueIn(blogsCount = blogs.size, proceeded = proceeded.size).coerceAtLeast(2.hours)
+        work.enqueueAtIfEarlier(time = workerStartTime + interval)
 
         return Result.success()
     }
+}
+
+
+private fun nextEnqueueIn(
+    blogsCount: Int,
+    proceeded: Int
+): Duration {
+    return 30.minutes * proceeded
 }
