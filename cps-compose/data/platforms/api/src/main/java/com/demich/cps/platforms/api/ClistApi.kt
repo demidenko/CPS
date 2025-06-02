@@ -1,18 +1,31 @@
 package com.demich.cps.platforms.api
 
-import io.ktor.client.request.*
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.parameter
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlin.time.Duration.Companion.minutes
 
 object ClistApi: PlatformApi {
-    override val client = cpsHttpClient(json = defaultJson) { }
+    override val client = cpsHttpClient(json = defaultJson) {
+        defaultRequest {
+            url(urls.main)
+        }
+
+        install(RateLimitPlugin) {
+            // from https://clist.by/api/v4/doc/ #Throttle
+            window = 1.minutes
+            requestsPerWindow = 10
+        }
+    }
 
     suspend fun getUserPage(login: String): String {
         return client.getText(urls.user(login))
     }
 
     suspend fun getUsersSearchPage(str: String): String {
-        return client.getText("${urls.main}/coders") {
+        return client.getText("coders") {
             parameter("search", str)
         }
     }
