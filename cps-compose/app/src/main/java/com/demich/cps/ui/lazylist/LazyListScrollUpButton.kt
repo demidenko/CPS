@@ -27,7 +27,7 @@ fun LazyListScrollUpButton(
         derivedStateOf { listState.firstVisibleItemIndex }
     }
 
-    //TODO: hide on scrolling to top, animate alfa
+    //TODO: hide on user scrolling down; animate alfa on idle (like scrollbar)
     if (firstIndex > 0) {
         ScrollUpButton(modifier) {
             scope.launch { listState.animateScrollToItem(0) }
@@ -40,7 +40,7 @@ private fun ScrollUpButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    //TODO: finish
+    //TODO: finish me!
     Box(
         modifier = modifier
             .size(48.dp)
