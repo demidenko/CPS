@@ -2,12 +2,14 @@ package com.demich.cps.ui.lazylist
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 @Composable
 inline fun <T> LazyColumnOfData(
@@ -35,15 +37,12 @@ inline fun <T> LazyColumnOfData(
         }
 
         if (scrollToStartButtonEnabled) {
-            ScrollUpButton(listState = state, modifier = Modifier.align(Alignment.BottomEnd))
+            LazyListScrollUpButton(
+                listState = state,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 8.dp, end = 8.dp)
+            )
         }
     }
-}
-
-@Composable
-fun ScrollUpButton(
-    modifier: Modifier = Modifier,
-    listState: LazyListState
-) {
-    //TODO
 }
