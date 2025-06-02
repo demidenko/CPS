@@ -46,7 +46,7 @@ fun LazyListState.visibleRange(requiredVisiblePart: Float): IntRange =
 
 inline fun <T> LazyListScope.itemsNotEmpty(
     items: List<T>,
-    noinline onEmptyMessage: @Composable () -> Unit = { Text(text = "List is empty") },
+    crossinline onEmptyMessage: @Composable () -> Unit = { Text(text = "List is empty") },
     noinline key: ((item: T) -> Any)? = null,
     noinline contentType: (item: T) -> Any? = { null },
     crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit

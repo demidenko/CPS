@@ -305,19 +305,18 @@ fun<T> TextButtonsSelectRow(
 
 
 @Composable
-fun EmptyMessageBox(
+inline fun EmptyMessageBox(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    crossinline content: @Composable () -> Unit
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-    ) {
-        ProvideContentColor(cpsColors.contentAdditional) {
-            ProvideTextStyle(
-                value = TextStyle(fontWeight = FontWeight.Medium),
-                content = content
-            )
+    ProvideContentColor(cpsColors.contentAdditional) {
+        ProvideTextStyle(value = TextStyle(fontWeight = FontWeight.Medium)) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = modifier
+            ) {
+                content()
+            }
         }
     }
 }
@@ -333,9 +332,9 @@ fun CPSCountBadge(count: Int) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CPSSwipeRefreshBox(
-    isRefreshing: () -> Boolean,
-    onRefresh: () -> Unit,
+inline fun CPSSwipeRefreshBox(
+    noinline isRefreshing: () -> Boolean,
+    noinline onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
