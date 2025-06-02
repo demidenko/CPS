@@ -75,8 +75,8 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.withContext
 
-const val suggestionsMinLength = 3
-const val debounceDelay: Long = 300
+private const val suggestionsMinLength = 3
+private const val debounceDelay: Long = 300
 
 @Composable
 fun<U: UserInfo> DialogAccountChooser(
