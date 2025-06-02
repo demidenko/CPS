@@ -110,7 +110,10 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     override fun updateFollowUsersInfo(context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
             if (!followLoadingStatus.compareAndSet(LoadingStatus.PENDING, LoadingStatus.LOADING)) return@launch
-            context.followListDao.updateUsers()
+            context.followListDao.run {
+                updateUsers()
+                updateFailedBlogEntries()
+            }
             followLoadingStatus.value = LoadingStatus.PENDING
         }
     }

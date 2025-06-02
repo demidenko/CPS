@@ -50,6 +50,9 @@ abstract class CodeforcesFollowList(
 
     suspend fun updateUsers() {
         dao.updateUsersInfo()
+    }
+
+    suspend fun updateFailedBlogEntries() {
         dao.getAllBlogs().forEach {
             if (it.blogEntries == null) getAndReloadBlogEntries(handle = it.handle)
         }
