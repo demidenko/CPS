@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.community.follow.followListDao
 import com.demich.cps.community.settings.settingsCommunity
+import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
 
@@ -29,16 +31,29 @@ class CodeforcesCommunityFollowWorker(
     //save handles between run after fast retry
     private val proceeded = mutableSetOf<String>()
 
+    //note that cf can have different lastOnlineTime from api and web sources
+    private fun CodeforcesUserBlog.isUserInactive() =
+        workerStartTime - userInfo.lastOnlineTime > 7.days
+
     override suspend fun runWork(): Result {
         val dao = context.followListDao
-        val savedHandles = dao.getHandles().shuffled()
+        val blogs = dao.blogs()
 
-        savedHandles.forEachWithProgress { handle ->
+        //TODO: consider skip this if blogs.size is small
+        //update userInfo to keep fresh lastOnlineTime
+        dao.updateUsers()
+
+        blogs.filter {
+            it.blogEntries == null || !it.isUserInactive()
+        }.forEachWithProgress {
+            val handle = it.handle
             if (handle !in proceeded) {
                 dao.getAndReloadBlogEntries(handle).getOrThrow()
                 proceeded.add(handle)
             }
         }
+
+        //TODO: consider reschedule worker earlier on low count of api-queries
 
         return Result.success()
     }

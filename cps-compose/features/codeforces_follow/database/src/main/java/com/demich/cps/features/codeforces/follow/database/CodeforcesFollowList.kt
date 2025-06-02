@@ -17,7 +17,7 @@ abstract class CodeforcesFollowList(
 
     fun flowOfAllBlogs() = dao.flowOfAllBlogs()
 
-    suspend fun getHandles() = dao.getHandles()
+    suspend fun blogs() = dao.getAllBlogs()
 
     suspend fun getAndReloadBlogEntries(handle: String) =
         dao.getAndReloadBlogEntries(
