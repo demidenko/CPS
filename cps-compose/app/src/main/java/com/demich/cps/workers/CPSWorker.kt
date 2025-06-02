@@ -8,15 +8,16 @@ import androidx.work.workDataOf
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import com.demich.cps.platforms.api.isResponseException
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
-import com.demich.cps.utils.firstSuccessOrLast
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.joinAllWithCounter
 import com.demich.cps.utils.jsonCPS
+import com.demich.cps.utils.repeatUntilSuccessOrLast
 import com.demich.cps.utils.update
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KProperty
@@ -58,9 +59,9 @@ abstract class CPSWorker(
 
     protected abstract suspend fun runWork(): Result
     private suspend fun smartRunWork(): Result =
-        firstSuccessOrLast(
+        repeatUntilSuccessOrLast(
             times = 2,
-            delay = 5.seconds,
+            between = { delay(5.seconds) },
             isSuccess = { it.toType() == ResultType.SUCCESS }
         ) {
             setProgressInfo(ProgressBarInfo(total = 0))

@@ -7,7 +7,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -66,19 +65,3 @@ fun CoroutineScope.launchWhileActive(block: suspend CoroutineScope.() -> Duratio
             if (delayNext > Duration.ZERO) delay(delayNext)
         }
     }
-
-suspend inline fun <R> firstSuccessOrLast(
-    times: Int,
-    delay: Duration,
-    isSuccess: (R) -> Boolean,
-    block: () -> R
-): R {
-    require(times > 0)
-    repeat(times - 1) {
-        block().let {
-            if (isSuccess(it)) return it
-        }
-        delay(duration = delay)
-    }
-    return block()
-}
