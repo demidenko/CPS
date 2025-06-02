@@ -76,7 +76,7 @@ import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.withContext
 
 private const val suggestionsMinLength = 3
-private const val debounceDelay: Long = 300
+private const val requestDebounceDelay: Long = 300
 
 @Composable
 fun<U: UserInfo> DialogAccountChooser(
@@ -183,7 +183,7 @@ private fun<U: UserInfo> DialogContent(
                 blockSuggestionsReload = false
                 return@LaunchedEffect
             }
-            delay(debounceDelay)
+            delay(requestDebounceDelay)
             if (!blockSuggestionsReload) {
                 loadingSuggestionsInProgressState.value = true
                 val data = withContext(Dispatchers.Default) {
@@ -218,7 +218,7 @@ private fun <U: UserInfo> collectUserInfoState(
             .transformLatest { userId ->
                 emit(UserInfoLoadingResult<U>(null, false))
                 if (userId.isBlank()) return@transformLatest
-                delay(debounceDelay)
+                delay(requestDebounceDelay)
                 emit(UserInfoLoadingResult<U>(null, true))
                 emit(UserInfoLoadingResult(manager.getUserInfo(userId), false))
             }
