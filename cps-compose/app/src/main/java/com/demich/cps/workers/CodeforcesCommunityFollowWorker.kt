@@ -45,15 +45,16 @@ class CodeforcesCommunityFollowWorker(
         //update userInfo to keep fresh lastOnlineTime
         dao.updateUsers()
 
-        blogs.filter {
-            it.blogEntries == null || !it.isUserInactive()
-        }.forEachWithProgress {
-            val handle = it.handle
-            if (handle !in proceeded) {
-                dao.getAndReloadBlogEntries(handle).getOrThrow()
-                proceeded.add(handle)
+        blogs
+            .filter { it.blogEntries == null || !it.isUserInactive() }
+            .sortedByDescending { it.userInfo.lastOnlineTime }
+            .forEachWithProgress {
+                val handle = it.handle
+                if (handle !in proceeded) {
+                    dao.getAndReloadBlogEntries(handle).getOrThrow()
+                    proceeded.add(handle)
+                }
             }
-        }
 
         work.enqueueInIfEarlier(
             duration = nextEnqueueIn(blogsCount = blogs.size, proceeded = proceeded.size).coerceAtLeast(2.hours)
