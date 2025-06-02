@@ -1,8 +1,8 @@
 package com.demich.cps.platforms.api.codeforces
 
 import com.demich.cps.platforms.api.BuildConfig
-import com.demich.cps.platforms.api.RateLimitingSemaphore
 import com.demich.cps.platforms.api.PlatformApi
+import com.demich.cps.platforms.api.RateLimitPlugin
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
@@ -33,9 +33,12 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.appendPathSegments
 import io.ktor.http.setCookie
 import korlibs.crypto.sha1
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 object CodeforcesApi: PlatformApi {
     private val json get() = defaultJson
@@ -57,6 +60,7 @@ object CodeforcesApi: PlatformApi {
                         throw CodeforcesTemporarilyUnavailableException()
                     }
 
+                    //TODO: rework this to plugin
                     if (isBrowserChecker(text)) {
                         response.setCookie().firstOrNull { it.name == "pow" }?.let {
                             val pow = it.value
@@ -83,6 +87,18 @@ object CodeforcesApi: PlatformApi {
             }
             delayMillis { callLimitExceededWaitTime.inWholeMilliseconds }
         }
+
+        install(RateLimitPlugin) {
+            if (BuildConfig.DEBUG) {
+                window = 1.seconds
+                requestsPerWindow = 1
+                minimumDelay = 200.milliseconds
+            } else {
+                window = 1.seconds
+                requestsPerWindow = 3
+                minimumDelay = 50.milliseconds
+            }
+        }
     }
 
     class CodeforcesTemporarilyUnavailableException: CodeforcesApiException("Codeforces Temporarily Unavailable")
@@ -96,16 +112,8 @@ object CodeforcesApi: PlatformApi {
     }
 
     private val semaphore = when {
-        BuildConfig.DEBUG -> RateLimitingSemaphore(
-            permits = 3,
-            permitsPerSecond = 1,
-            minDelay = 200.milliseconds
-        )
-        else -> RateLimitingSemaphore(
-            permits = 4,
-            permitsPerSecond = 3,
-            minDelay = 50.milliseconds
-        )
+        BuildConfig.DEBUG -> Semaphore(permits = 3)
+        else -> Semaphore(permits = 4)
     }
 
 
