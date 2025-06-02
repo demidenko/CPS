@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import com.demich.cps.navigation.CPSNavigator
@@ -20,12 +21,14 @@ import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.utils.ProvideTimeEachMinute
 import com.demich.cps.utils.context
-import com.demich.cps.utils.currentDataKey
 import com.demich.cps.utils.filterByTokensAsSubsequence
+import com.demich.cps.utils.randomUuid
+import com.demich.cps.utils.rememberUUIDState
 
 @Composable
 fun CodeforcesUserBlogScreen(
     blogEntriesResult: () -> Result<List<CodeforcesBlogEntry>>?,
+    onRetry: () -> Unit,
     filterState: FilterState
 ) {
     LaunchedEffect(filterState, blogEntriesResult) {
@@ -39,6 +42,7 @@ fun CodeforcesUserBlogScreen(
     Column {
         CodeforcesUserBlogContent(
             blogEntriesResult = blogEntriesResult,
+            onRetry = onRetry,
             filterState = filterState,
             modifier = Modifier.weight(1f)
         )
@@ -52,12 +56,14 @@ fun CodeforcesUserBlogScreen(
 @Composable
 private fun CodeforcesUserBlogContent(
     blogEntriesResult: () -> Result<List<CodeforcesBlogEntry>>?,
+    onRetry: () -> Unit,
     filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
     LoadingContentBox(
         dataResult = blogEntriesResult,
         failedText = { it.niceMessage ?: "Blog load error" },
+        onRetry = onRetry,
         modifier = modifier.fillMaxSize()
     ) { blogEntries ->
         ProvideTimeEachMinute {
@@ -78,14 +84,16 @@ fun NavContentCodeforcesBlog(
 ) {
     val handle = (holder.screen as Screen.CommunityCodeforcesBlog).handle
 
+    var dataKey by rememberUUIDState
     val blogEntriesResult by codeforcesCommunityViewModel()
-        .flowOfBlogEntriesResult(handle, context, key = currentDataKey)
+        .flowOfBlogEntriesResult(handle, context, key = dataKey)
         .collectAsState()
 
     val filterState = rememberFilterState()
 
     CodeforcesUserBlogScreen(
         blogEntriesResult = { blogEntriesResult },
+        onRetry = { dataKey = randomUuid() },
         filterState = filterState
     )
 

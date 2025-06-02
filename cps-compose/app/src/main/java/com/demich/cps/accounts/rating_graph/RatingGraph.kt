@@ -50,6 +50,7 @@ internal enum class RatingFilterType {
 @Composable
 fun RatingGraph(
     ratingChangesResult: () -> Result<List<RatingChange>>?,
+    onRetry: () -> Unit,
     manager: RatedAccountManager<out RatedUserInfo>,
     modifier: Modifier = Modifier,
     graphHeight: Dp = 240.dp,
@@ -57,6 +58,7 @@ fun RatingGraph(
 ) {
     LoadingContentBox(
         dataResult = ratingChangesResult,
+        onRetry = onRetry,
         failedText = { "Failed to get rating history" },
         modifier = modifier
             .heightIn(min = graphHeight)

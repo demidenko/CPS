@@ -16,11 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
@@ -225,7 +227,8 @@ inline fun<reified T: ViewModel> sharedViewModel(): T =
     viewModel(viewModelStoreOwner = context as ComponentActivity)
 
 
-val currentDataKey: Int
+val rememberUUIDState: MutableIntState
     @Composable
-    get() = rememberSaveable { Random.nextInt() }
-    //get() = currentCompositeKeyHash //hash is cached in if else
+    get() = rememberSaveable { mutableIntStateOf(randomUuid()) }
+
+fun randomUuid(): Int = Random.nextInt()
