@@ -137,7 +137,7 @@ private fun Scaffold(
 }
 
 @Composable
-private fun ScaffoldContent(
+private inline fun ScaffoldContent(
     modifier: Modifier = Modifier,
     statusBar: @Composable () -> Unit,
     topBar: @Composable () -> Unit,

@@ -10,15 +10,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun<T> LazyColumnOfData(
+inline fun <T> LazyColumnOfData(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     scrollBarEnabled: Boolean = true,
     scrollToStartButtonEnabled: Boolean = false,
-    items: () -> List<T>,
-    key: ((item: T) -> Any)? = null,
-    contentType: (item: T) -> Any? = { null },
-    itemContent: @Composable LazyItemScope.(item: T) -> Unit
+    crossinline items: () -> List<T>,
+    noinline key: ((item: T) -> Any)? = null,
+    noinline contentType: (item: T) -> Any? = { null },
+    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
     Box(modifier = modifier) {
         LazyColumnWithScrollBar(
@@ -35,13 +35,13 @@ fun<T> LazyColumnOfData(
         }
 
         if (scrollToStartButtonEnabled) {
-            ScrollButton(listState = state, modifier = Modifier.align(Alignment.BottomEnd))
+            ScrollUpButton(listState = state, modifier = Modifier.align(Alignment.BottomEnd))
         }
     }
 }
 
 @Composable
-private fun ScrollButton(
+fun ScrollUpButton(
     modifier: Modifier = Modifier,
     listState: LazyListState
 ) {
