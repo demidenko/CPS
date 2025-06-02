@@ -35,7 +35,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -46,16 +45,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.dialogs.CPSDialogSelect
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.workers.ProfilesWorker
 import com.demich.cps.workers.CPSPeriodicWork
+import com.demich.cps.workers.ProfilesWorker
 import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.launch
 
 @Composable
-fun SettingsColumn(
+inline fun SettingsColumn(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -74,7 +74,7 @@ fun SettingsColumn(
 }
 
 @Composable
-fun SettingsColumn(
+inline fun SettingsColumn(
     requiredNotificationsPermission: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
@@ -86,29 +86,30 @@ fun SettingsColumn(
 }
 
 @Composable
-fun SettingsSectionHeader(
+inline fun ColumnScope.SettingsSectionHeader(
     title: String,
     painter: Painter,
     modifier: Modifier = Modifier,
-    color: Color = cpsColors.accent
+    content: ColumnScope.() -> Unit
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconSp(
-            painter = painter,
-            size = 18.sp,
-            color = color,
-            modifier = Modifier.padding(horizontal = 6.dp)
-        )
-        Text(
-            text = title,
-            fontSize = 14.sp,
-            color = color,
-            fontWeight = FontWeight.SemiBold,
-        )
+        ProvideContentColor(color = cpsColors.accent) {
+            IconSp(
+                painter = painter,
+                size = 18.sp,
+                modifier = Modifier.padding(horizontal = 6.dp)
+            )
+            Text(
+                text = title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
     }
+    content()
 }
 
 @Composable

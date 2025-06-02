@@ -67,17 +67,19 @@ fun CommunitySettingsScreen() {
         SettingsSectionHeader(
             title = "codeforces",
             painter = platformIconPainter(platform = Contest.Platform.codeforces)
-        )
-        CodeforcesDefaultTabSettingsItem()
-        CodeforcesFollowSettingsItem()
-        CodeforcesLostSettingsItem()
-        CodeforcesRuEnabledSettingsItem()
+        ) {
+            CodeforcesDefaultTabSettingsItem()
+            CodeforcesFollowSettingsItem()
+            CodeforcesLostSettingsItem()
+            CodeforcesRuEnabledSettingsItem()
+        }
 
         SettingsSectionHeader(
             title = "news feeds",
             painter = rememberVectorPainter(image = CPSIcons.NewsFeeds)
-        )
-        NewsFeedsSettingsItem()
+        ) {
+            NewsFeedsSettingsItem()
+        }
     }
 }
 
