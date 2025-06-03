@@ -9,7 +9,8 @@ object ACMPUtils {
     fun extractUserInfo(source: String, id: String): ACMPUserInfo =
         with(Jsoup.parse(source)) {
             val userName = title().trim()
-            val box = body().select("h4").firstOrNull { it.text() == "Общая статистика" }?.parent()!!
+            val box = body().select("h4").first { it.text() == "Общая статистика" }.parent()
+            requireNotNull(box)
             val bs = box.select("b.btext").map { it.text() }
             val solvedTasks = bs.first { it.startsWith("Решенные задачи") }.let {
                 it.substring(it.indexOf('(')+1, it.indexOf(')')).toInt()

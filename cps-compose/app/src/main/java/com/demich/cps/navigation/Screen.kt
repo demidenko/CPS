@@ -98,5 +98,5 @@ fun NavBackStackEntry.getScreen(): Screen {
 
 
 private fun NavBackStackEntry.requireString(key: String): String =
-    arguments?.getString(key)!!
+    requireNotNull(arguments?.getString(key))
 

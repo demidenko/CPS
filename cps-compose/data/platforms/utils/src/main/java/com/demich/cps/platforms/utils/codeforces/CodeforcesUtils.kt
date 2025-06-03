@@ -200,7 +200,7 @@ object CodeforcesUtils {
         val usedIds = mutableSetOf<Int>()
         var index = 0
         for (comment in comments) {
-            val blogEntry = comment.blogEntry!!
+            val blogEntry = requireNotNull(comment.blogEntry)
             val id = blogEntry.id
             if (id !in blogEntriesIds) {
                 blogEntriesIds.add(id)

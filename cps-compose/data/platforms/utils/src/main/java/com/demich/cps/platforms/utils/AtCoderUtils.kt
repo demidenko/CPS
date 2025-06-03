@@ -41,7 +41,7 @@ object AtCoderUtils {
 
     private fun extractContestOrNull(timeElement: Element): Contest? {
         return kotlin.runCatching {
-            val row = timeElement.parents().find { it.normalName() == "tr" }!!
+            val row = timeElement.parents().first { it.normalName() == "tr" }
             val td = row.select("td")
 
             val timeString = timeElement.text()

@@ -60,22 +60,19 @@ fun CodeforcesComments(
         state = lazyListState,
         modifier = modifier,
         items = comments,
-        key = { it.comment?.id ?: -1 }
+        key = { requireNotNull(it.comment).id }
     ) { recentAction ->
-        // TODO: maybe without "!!"?
-        val blogEntry = recentAction.blogEntry!!
-        val comment = recentAction.comment!!
+        val blogEntry = recentAction.blogEntry
+        val comment = requireNotNull(recentAction.comment)
         Comment(
             comment = comment,
-            blogEntryTitle = blogEntry.title.takeIf { showTitle },
+            blogEntryTitle = blogEntry?.title.takeIf { showTitle },
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    context.openUrlInBrowser(
-                        CodeforcesApi.urls.comment(
-                        blogEntryId = blogEntry.id,
-                        commentId = comment.id
-                    ))
+                    if (blogEntry != null) context.openUrlInBrowser(
+                        CodeforcesApi.urls.comment(blogEntryId = blogEntry.id, commentId = comment.id)
+                    )
                 }
                 .padding(start = 3.dp, end = 5.dp, bottom = 3.dp)
                 .animateContentSize()

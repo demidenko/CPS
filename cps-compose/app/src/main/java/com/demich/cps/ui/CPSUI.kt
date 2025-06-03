@@ -175,7 +175,7 @@ fun CPSCheckBox(
     modifier: Modifier = Modifier,
     checked: Boolean,
     enabled: Boolean = true,
-    onCheckedChange: ((Boolean) -> Unit)? = null
+    onCheckedChange: (Boolean) -> Unit
 ) {
     Checkbox(
         modifier = modifier,
@@ -194,7 +194,7 @@ fun CPSCheckBoxTitled(
     checked: Boolean,
     title: @Composable () -> Unit,
     enabled: Boolean = true,
-    onCheckedChange: ((Boolean) -> Unit)? = null
+    onCheckedChange: (Boolean) -> Unit
 ) {
     Row(
         modifier = modifier,
