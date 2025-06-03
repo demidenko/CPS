@@ -58,7 +58,7 @@ class ProgressBarsViewModel: ViewModel() {
                 progressBarInfo = it
             }
             progressBarInfo?.let {
-                //TODO: remove this delay
+                // compose doest not catch fast changes so this delay is necessary
                 if (it.total > 0) delay(1.seconds)
             }
             progressBarInfo = null

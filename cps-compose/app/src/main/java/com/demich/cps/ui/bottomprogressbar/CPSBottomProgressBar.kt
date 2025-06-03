@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectAsState
+import kotlinx.coroutines.flow.map
 
 
 @Composable
@@ -33,15 +34,24 @@ fun CPSBottomProgressBarsColumn(
     modifier: Modifier = Modifier
 ) {
     val progressBarsViewModel = progressBarsViewModel()
-    val progresses by collectAsState { progressBarsViewModel.flowOfProgresses() }
-    LazyColumn(modifier = modifier) {
+    val progresses by collectAsState {
+        progressBarsViewModel.flowOfProgresses().map { it.entries.toList() }
+    }
+
+    //TODO: still shit animation of top item
+    LazyColumn(
+        modifier = modifier,
+        reverseLayout = true
+    ) {
         items(
-            items = progresses.toList(),
-            key = { it.first }
+            items = progresses,
+            key = { it.key }
         ) {
             CPSBottomProgressBar(
-                progressBarInfo = it.second,
-                modifier = Modifier.padding(all = 3.dp)
+                progressBarInfo = it.value,
+                modifier = Modifier
+                    .padding(all = 3.dp)
+                    .animateItem()
             )
         }
     }
