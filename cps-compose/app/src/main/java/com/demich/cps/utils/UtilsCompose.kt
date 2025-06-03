@@ -25,6 +25,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.withFrameMillis
@@ -152,20 +153,12 @@ fun animateColorAsState(
     enabled: Boolean,
     animationSpec: AnimationSpec<Float>
 ): State<Color> {
-    val fractionState = animateFloatAsState(
-        targetValue = if (enabled) 1f else 0f,
-        animationSpec = animationSpec,
-        label = "color_fraction"
+    return animateColorAsState(
+        enabledColorState = rememberUpdatedState(enabledColor),
+        disabledColor = disabledColor,
+        enabled = enabled,
+        animationSpec = animationSpec
     )
-    return remember(disabledColor, enabledColor, fractionState) {
-        derivedStateOf {
-            lerp(
-                start = disabledColor,
-                stop = enabledColor,
-                fraction = fractionState.value
-            )
-        }
-    }
 }
 
 @Composable
@@ -175,15 +168,16 @@ fun animateColorAsState(
     enabled: Boolean,
     animationSpec: AnimationSpec<Float>
 ): State<Color> {
+    val disabledColorState = rememberUpdatedState(disabledColor)
     val fractionState = animateFloatAsState(
         targetValue = if (enabled) 1f else 0f,
         animationSpec = animationSpec,
         label = "color_fraction"
     )
-    return remember(disabledColor, enabledColorState, fractionState) {
+    return remember(disabledColorState, enabledColorState, fractionState) {
         derivedStateOf {
             lerp(
-                start = disabledColor,
+                start = disabledColorState.value,
                 stop = enabledColorState.value,
                 fraction = fractionState.value
             )

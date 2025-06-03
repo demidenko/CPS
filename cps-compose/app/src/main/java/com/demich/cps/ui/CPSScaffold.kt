@@ -67,6 +67,15 @@ fun CPSScaffold(
 }
 
 @Composable
+private fun backgroundColorState(enabled: Boolean) =
+    animateColorAsState(
+        enabledColor = cpsColors.backgroundAdditional,
+        disabledColor = cpsColors.backgroundNavigation,
+        enabled = enabled,
+        animationSpec = switchAnimationSpec()
+    )
+
+@Composable
 private fun Scaffold(
     modifier: Modifier = Modifier,
     navigator: CPSNavigator,
@@ -75,12 +84,7 @@ private fun Scaffold(
     onEnableBottomBarSettings: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    val bottomBarBackgroundColor by animateColorAsState(
-        enabledColor = cpsColors.backgroundAdditional,
-        disabledColor = cpsColors.backgroundNavigation,
-        enabled = bottomBarSettingsEnabled,
-        animationSpec = switchAnimationSpec()
-    )
+    val bottomBarBackgroundColor by backgroundColorState(bottomBarSettingsEnabled)
 
     Column(modifier = modifier.let {
         if (navigator.isBottomBarEnabled) it
