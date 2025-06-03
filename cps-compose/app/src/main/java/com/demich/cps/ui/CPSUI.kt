@@ -362,17 +362,17 @@ fun WordsWithCounterOnOverflow(
     modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier) {
-        var counter by remember { mutableStateOf("") }
+        var hasOverflow by remember { mutableStateOf(false) }
         Text(
             text = words.joinToString(),
             modifier = Modifier.weight(1f),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            onTextLayout = {
-                counter = if (it.hasVisualOverflow) "(${words.size})" else ""
-            }
+            onTextLayout = { hasOverflow = it.hasVisualOverflow }
         )
-        Text(text = counter)
+        if (hasOverflow) {
+            Text(text = "(${words.size})")
+        }
     }
 }
 
