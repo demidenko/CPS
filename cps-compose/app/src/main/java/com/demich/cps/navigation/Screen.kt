@@ -20,8 +20,7 @@ enum class ScreenTypes(
 
 sealed class Screen(
     val screenType: ScreenTypes,
-    val rootScreenType: ScreenTypes,
-    val enableBottomBar: Boolean = true
+    val rootScreenType: ScreenTypes
 ) {
 
     protected open fun createPath(pattern: String): String = pattern
@@ -30,22 +29,31 @@ sealed class Screen(
 
     data object Profiles: RootScreen(ScreenTypes.profiles)
 
-    data class ProfileExpanded(override val type: AccountManagerType)
-        : ProfileScreen(ScreenTypes.profileExpanded, type, true)
+    data class ProfileExpanded(override val type: AccountManagerType):
+        ProfileScreen(ScreenTypes.profileExpanded, type)
 
-    data class ProfileSettings(override val type: AccountManagerType)
-        : ProfileScreen(ScreenTypes.profileSettings, type, false)
+    data class ProfileSettings(override val type: AccountManagerType):
+        ProfileScreen(ScreenTypes.profileSettings, type),
+        SettingsScreen
 
     data object Community: RootScreen(ScreenTypes.community)
-    data object CommunitySettings: Screen(ScreenTypes.communitySettings, rootScreenType = ScreenTypes.community, enableBottomBar = false)
+
+    data object CommunitySettings:
+        Screen(ScreenTypes.communitySettings, rootScreenType = ScreenTypes.community),
+        SettingsScreen
+
     data object CommunityFollowList: Screen(ScreenTypes.communityFollowList, rootScreenType = ScreenTypes.community)
-    data class CommunityCodeforcesBlog(val handle: String)
-        : Screen(ScreenTypes.communityCodeforcesBlog, rootScreenType = ScreenTypes.community) {
+
+    data class CommunityCodeforcesBlog(val handle: String):
+        Screen(ScreenTypes.communityCodeforcesBlog, rootScreenType = ScreenTypes.community) {
             override fun createPath(pattern: String) = pattern.replace("{handle}", handle)
         }
 
     data object Contests: RootScreen(ScreenTypes.contests)
-    data object ContestsSettings: Screen(ScreenTypes.contestsSettings, rootScreenType = ScreenTypes.contests, enableBottomBar = false)
+
+    data object ContestsSettings:
+        Screen(ScreenTypes.contestsSettings, rootScreenType = ScreenTypes.contests),
+        SettingsScreen
 
     data object Development: RootScreen(ScreenTypes.develop)
 
@@ -58,14 +66,14 @@ sealed class RootScreen(
     rootScreenType = screenType
 )
 
+interface SettingsScreen
+
 sealed class ProfileScreen(
     screenType: ScreenTypes,
-    open val type: AccountManagerType,
-    enableBottomBar: Boolean
+    open val type: AccountManagerType
 ): Screen(
     screenType = screenType,
-    rootScreenType = ScreenTypes.profiles,
-    enableBottomBar = enableBottomBar
+    rootScreenType = ScreenTypes.profiles
 ) {
     final override fun createPath(pattern: String): String =
         pattern.replace("{manager}", type.name)
