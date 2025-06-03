@@ -332,9 +332,9 @@ fun CPSCountBadge(count: Int) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CPSSwipeRefreshBox(
+inline fun CPSSwipeRefreshBox(
     isRefreshing: () -> Boolean,
-    onRefresh: () -> Unit,
+    noinline onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
