@@ -47,6 +47,7 @@ import com.demich.cps.ui.CPSScaffold
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.context
 import com.demich.cps.workers.enqueueEnabledWorkers
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity: ComponentActivity() {
@@ -55,7 +56,7 @@ class MainActivity: ComponentActivity() {
 
         enableEdgeToEdge()
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.Default) {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 appStartUp(this@MainActivity)
             }
