@@ -31,7 +31,7 @@ fun FilterTextField(
         OutlinedTextField(
             modifier = modifier
                 .consumeWindowInsets(WindowInsets.navigationBars) //order matters!!
-                .consumeWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight))
+                .consumeWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight)) //TODO: actually wrong when no bottombar
                 .imePadding()
                 .focusRequester(focusRequester),
             singleLine = true,
