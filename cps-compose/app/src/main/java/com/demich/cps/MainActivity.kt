@@ -20,7 +20,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.demich.cps.accounts.AccountExpandedScreen
 import com.demich.cps.accounts.AccountSettingsScreen
-import com.demich.cps.accounts.NavContentAccountsScreen
+import com.demich.cps.accounts.NavContentProfilesScreen
 import com.demich.cps.accounts.accountExpandedMenuBuilder
 import com.demich.cps.accounts.accountsViewModel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
@@ -92,9 +92,9 @@ private fun CPSContent() {
 
     val navBuilder: NavGraphBuilder.() -> Unit = {
         cpsComposable(ScreenTypes.profiles) { holder ->
-            NavContentAccountsScreen(
+            NavContentProfilesScreen(
                 holder = holder,
-                onExpandAccount = { type -> navigator.navigateTo(Screen.ProfileExpanded(type)) }
+                onExpandProfile = { type -> navigator.navigateTo(Screen.ProfileExpanded(type)) }
             )
         }
         cpsComposable(ScreenTypes.profileExpanded) { holder ->

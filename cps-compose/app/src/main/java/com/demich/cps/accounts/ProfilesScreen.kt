@@ -43,15 +43,15 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-private fun AccountsScreen(
-    recordedAccounts: List<UserInfoWithManager<out UserInfo>>,
-    onExpandAccount: (AccountManagerType) -> Unit,
+private fun ProfilesScreen(
+    profiles: List<UserInfoWithManager<out UserInfo>>,
+    onExpandProfile: (AccountManagerType) -> Unit,
     reorderEnabled: Boolean,
 ) {
     val context = context
-    val accountsViewModel = accountsViewModel()
+    val viewModel = accountsViewModel()
 
-    val visibleOrder = if (reorderEnabled) recordedAccounts.map { it.type } else null
+    val profilesTypes = if (reorderEnabled) profiles.map { it.type } else null
 
     LazyColumn(
         horizontalAlignment = Alignment.Start,
@@ -62,15 +62,15 @@ private fun AccountsScreen(
             .background(cpsColors.background)
     ) {
         itemsNotEmpty(
-            items = recordedAccounts,
+            items = profiles,
             key = { it.type },
             onEmptyMessage = { Text(text = "Profiles are not defined") }
         ) { userInfoWithManager ->
             AccountPanel(
                 userInfoWithManager = userInfoWithManager,
-                onReloadRequest = { accountsViewModel.reload(userInfoWithManager.manager, context) },
-                onExpandRequest = { onExpandAccount(userInfoWithManager.type) },
-                visibleOrder = visibleOrder,
+                onReloadRequest = { viewModel.reload(userInfoWithManager.manager, context) },
+                onExpandRequest = { onExpandProfile(userInfoWithManager.type) },
+                visibleOrder = profilesTypes,
                 modifier = Modifier
                     .padding(start = 10.dp)
                     .animateItem()
@@ -80,21 +80,21 @@ private fun AccountsScreen(
 }
 
 @Composable
-fun NavContentAccountsScreen(
+fun NavContentProfilesScreen(
     holder: CPSNavigator.DuringCompositionHolder,
-    onExpandAccount: (AccountManagerType) -> Unit
+    onExpandProfile: (AccountManagerType) -> Unit
 ) {
     var reorderEnabled by rememberSaveable { mutableStateOf(false) }
-    val recordedAccounts by recordedAccountsState()
+    val profilesOrder by profilesOrderState()
     
-    AccountsScreen(
-        recordedAccounts = recordedAccounts,
-        onExpandAccount = onExpandAccount,
+    ProfilesScreen(
+        profiles = profilesOrder,
+        onExpandProfile = onExpandProfile,
         reorderEnabled = reorderEnabled
     )
     
     holder.menu = {
-        if (recordedAccounts.size > 1) {
+        if (profilesOrder.size > 1) {
             CPSDropdownMenuItem(
                 title = "Reorder",
                 icon = CPSIcons.Reorder,
@@ -103,8 +103,8 @@ fun NavContentAccountsScreen(
         }
     }
 
-    holder.bottomBar = accountsBottomBarBuilder(
-        recordedAccounts = recordedAccounts,
+    holder.bottomBar = profilesBottomBarBuilder(
+        profiles = profilesOrder,
         reorderEnabled = reorderEnabled,
         onReorderDone = { reorderEnabled = false }
     )
@@ -113,22 +113,22 @@ fun NavContentAccountsScreen(
 }
 
 @Composable
-private fun recordedAccountsState() = with(context) {
+private fun profilesOrderState() = with(context) {
     collectAsState {
         combine(
             flows = allAccountManagers.map { it.flowOfInfoWithManager(this) }
         ) {
             it.filterNotNull()
-        }.combine(settingsUI.accountsOrder.flow) { accounts, order ->
+        }.combine(settingsUI.accountsOrder.flow) { profiles, order ->
             order.mapNotNull { type ->
-                accounts.find { it.type == type }
+                profiles.find { it.type == type }
             }
         }
     }
 }
 
-private fun accountsBottomBarBuilder(
-    recordedAccounts: List<UserInfoWithManager<out UserInfo>>,
+private fun profilesBottomBarBuilder(
+    profiles: List<UserInfoWithManager<out UserInfo>>,
     reorderEnabled: Boolean,
     onReorderDone: () -> Unit
 ): AdditionalBottomBarBuilder = {
@@ -138,33 +138,33 @@ private fun accountsBottomBarBuilder(
             onClick = onReorderDone
         )
     } else {
-        AddAccountButton(recordedAccounts = recordedAccounts)
-        ReloadAccountsButton(recordedAccounts = recordedAccounts)
+        AddProfileButton(availableProfiles = profiles)
+        ReloadProfilesButton(profiles = profiles)
     }
 }
 
 @Composable
-private fun ReloadAccountsButton(
-    recordedAccounts: List<UserInfoWithManager<out UserInfo>>
+private fun ReloadProfilesButton(
+    profiles: List<UserInfoWithManager<out UserInfo>>
 ) {
     val context = context
-    val accountsViewModel = accountsViewModel()
+    val viewModel = accountsViewModel()
 
     val loadingStatus by collectAsState {
-        accountsViewModel.flowOfLoadingStatus(allAccountManagers)
+        viewModel.flowOfLoadingStatus(allAccountManagers)
     }
 
     CPSReloadingButton(
         loadingStatus = loadingStatus,
-        enabled = recordedAccounts.isNotEmpty(),
+        enabled = profiles.isNotEmpty(),
         onClick = {
-            allAccountManagers.forEach { accountsViewModel.reload(it, context) }
+            allAccountManagers.forEach { viewModel.reload(it, context) }
         }
     )
 }
 
 @Composable
-private fun AddAccountMenuItem(type: AccountManagerType, onSelect: () -> Unit) {
+private fun AddProfileMenuItem(type: AccountManagerType, onSelect: () -> Unit) {
     DropdownMenuItem(
         onClick = onSelect,
         content = {
@@ -180,11 +180,11 @@ private fun AddAccountMenuItem(type: AccountManagerType, onSelect: () -> Unit) {
 }
 
 @Composable
-private fun AddAccountButton(
-    recordedAccounts: List<UserInfoWithManager<out UserInfo>>
+private fun AddProfileButton(
+    availableProfiles: List<UserInfoWithManager<out UserInfo>>
 ) {
     var showMenu by remember { mutableStateOf(false) }
-    var chosenManager: AccountManagerType? by remember { mutableStateOf(null) }
+    var selectedType: AccountManagerType? by remember { mutableStateOf(null) }
 
     val scope = rememberCoroutineScope()
     val progressBarsViewModel = progressBarsViewModel()
@@ -202,32 +202,32 @@ private fun AddAccountButton(
             onDismissRequest = { showMenu = false },
             modifier = Modifier.background(cpsColors.backgroundAdditional)
         ) {
-            val types = remember(recordedAccounts) {
+            val types = remember(availableProfiles) {
                 val allTypes = allAccountManagers.map { it.type }
-                val recordedTypes = recordedAccounts.map { it.type }
-                allTypes - recordedTypes + AccountManagerType.clist
+                val availableTypes = availableProfiles.map { it.type }
+                allTypes - availableTypes + AccountManagerType.clist
             }
 
             types.forEach { type ->
-                AddAccountMenuItem(type = type) {
+                AddProfileMenuItem(type = type) {
                     showMenu = false
-                    chosenManager = type
+                    selectedType = type
                 }
             }
         }
     }
 
-    chosenManager?.let { type ->
+    selectedType?.let { type ->
         if (type == AccountManagerType.clist) {
             CListImportDialog(
-                onDismissRequest = { chosenManager = null }
+                onDismissRequest = { selectedType = null }
             )
         } else {
             ChangeSavedInfoDialog(
                 manager = allAccountManagers.first { it.type == type },
                 initialUserInfo = null,
                 scope = scope,
-                onDismissRequest = { chosenManager = null }
+                onDismissRequest = { selectedType = null }
             )
         }
     }
