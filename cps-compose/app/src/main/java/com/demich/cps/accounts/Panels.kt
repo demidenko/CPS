@@ -2,10 +2,22 @@ package com.demich.cps.accounts
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -14,7 +26,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.accounts.managers.*
+import com.demich.cps.accounts.managers.AccountManagerType
+import com.demich.cps.accounts.managers.RatedAccountManager
+import com.demich.cps.accounts.managers.UserInfoWithManager
+import com.demich.cps.accounts.managers.colorFor
+import com.demich.cps.accounts.managers.makeHandleSpan
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserInfo
@@ -23,7 +39,11 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.*
+import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.append
+import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.context
+import com.demich.cps.utils.getCurrentTime
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onEach
@@ -33,7 +53,7 @@ import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-fun<U: UserInfo> AccountPanel(
+fun <U: UserInfo> ProfilePanel(
     userInfoWithManager: UserInfoWithManager<U>,
     modifier: Modifier = Modifier,
     visibleOrder: List<AccountManagerType>? = null,
@@ -130,7 +150,7 @@ private fun PanelMovingButtons(
     val scope = rememberCoroutineScope()
     fun saveSwapped(i: Int, j: Int) {
         scope.launch {
-            context.settingsUI.accountsOrder(newValue = visibleOrder.toMutableList().apply { swap(i, j) })
+            context.settingsUI.profilesOrder(newValue = visibleOrder.toMutableList().apply { swap(i, j) })
         }
     }
     val index = visibleOrder.indexOf(type)

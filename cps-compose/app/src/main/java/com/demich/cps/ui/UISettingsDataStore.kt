@@ -1,9 +1,9 @@
 package com.demich.cps.ui
 
 import android.content.Context
-import com.demich.cps.ui.bottombar.NavigationLayoutType
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.navigation.ScreenTypes
+import com.demich.cps.ui.bottombar.NavigationLayoutType
 import com.demich.cps.ui.theme.DarkLightMode
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
@@ -32,7 +32,7 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
     val statusBarDisabledManagers = itemEnumSet<AccountManagerType>(name = "status_bar_disabled_managers")
     val statusBarRankSelector = itemEnum(name = "status_bar_rank_selector", defaultValue = StatusBarRankSelector.Max)
 
-    val accountsOrder = jsonCPS.itemList<AccountManagerType>(name = "accounts_order").mapGetter { order ->
+    val profilesOrder = jsonCPS.itemList<AccountManagerType>(name = "profiles_order").mapGetter { order ->
         order + AccountManagerType.entries.filter { it !in order }
     }
 

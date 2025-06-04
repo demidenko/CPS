@@ -66,7 +66,7 @@ private fun ProfilesScreen(
             key = { it.type },
             onEmptyMessage = { Text(text = "Profiles are not defined") }
         ) { userInfoWithManager ->
-            AccountPanel(
+            ProfilePanel(
                 userInfoWithManager = userInfoWithManager,
                 onReloadRequest = { viewModel.reload(userInfoWithManager.manager, context) },
                 onExpandRequest = { onExpandProfile(userInfoWithManager.type) },
@@ -119,7 +119,7 @@ private fun profilesOrderState() = with(context) {
             flows = allAccountManagers.map { it.flowOfInfoWithManager(this) }
         ) {
             it.filterNotNull()
-        }.combine(settingsUI.accountsOrder.flow) { profiles, order ->
+        }.combine(settingsUI.profilesOrder.flow) { profiles, order ->
             order.mapNotNull { type ->
                 profiles.find { it.type == type }
             }
