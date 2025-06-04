@@ -4,25 +4,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.accounts.userinfo.UserInfo
+import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
+import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.collectAsState
 import kotlinx.coroutines.launch
 
 @Composable
-fun AccountExpandedScreen(
+private fun AccountExpandedScreen(
     type: AccountManagerType,
     showDeleteDialog: Boolean,
     onDeleteRequest: (AccountManager<out UserInfo>) -> Unit,
@@ -62,7 +66,7 @@ private fun<U: UserInfo> AccountExpandedContent(
     }
 }
 
-fun accountExpandedMenuBuilder(
+private fun accountExpandedMenuBuilder(
     type: AccountManagerType,
     onOpenSettings: () -> Unit,
     onShowDeleteDialog: () -> Unit
@@ -80,4 +84,30 @@ fun accountExpandedMenuBuilder(
                 ?.let { url -> context.openUrlInBrowser(url) }
         }
     }
+}
+
+@Composable
+fun NavContentProfilesExpandedScreen(
+    holder: CPSNavigator.DuringCompositionHolder,
+    type: AccountManagerType,
+    onOpenSettings: () -> Unit,
+    onDeleteRequest: (AccountManager<out UserInfo>) -> Unit
+) {
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+
+    AccountExpandedScreen(
+        type = type,
+        showDeleteDialog = showDeleteDialog,
+        onDeleteRequest = onDeleteRequest,
+        onDismissDeleteDialog = { showDeleteDialog = false },
+        setBottomBarContent = holder.bottomBarSetter
+    )
+
+    holder.menu = accountExpandedMenuBuilder(
+        type = type,
+        onShowDeleteDialog = { showDeleteDialog = true },
+        onOpenSettings = onOpenSettings
+    )
+
+    holder.setSubtitle("profiles", type.name)
 }

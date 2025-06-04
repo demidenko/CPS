@@ -7,21 +7,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.demich.cps.accounts.AccountExpandedScreen
+import com.demich.cps.accounts.NavContentProfilesExpandedScreen
 import com.demich.cps.accounts.NavContentProfilesScreen
 import com.demich.cps.accounts.ProfileSettingsScreen
-import com.demich.cps.accounts.accountExpandedMenuBuilder
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.profilesViewModel
 import com.demich.cps.community.CommunityScreen
@@ -98,26 +93,18 @@ private fun CPSContent() {
             )
         }
         cpsComposable(ScreenTypes.profileExpanded) { holder ->
+            val type = (holder.screen as Screen.ProfileExpanded).type
             val context = context
             val profilesViewModel = profilesViewModel()
-            val type = (holder.screen as Screen.ProfileExpanded).type
-            var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
-            AccountExpandedScreen(
+            NavContentProfilesExpandedScreen(
+                holder = holder,
                 type = type,
-                showDeleteDialog = showDeleteDialog,
+                onOpenSettings = { navigator.navigateTo(Screen.ProfileSettings(type)) },
                 onDeleteRequest = { manager ->
                     profilesViewModel.delete(manager, context)
                     navigator.popBack()
-                },
-                onDismissDeleteDialog = { showDeleteDialog = false },
-                setBottomBarContent = holder.bottomBarSetter
+                }
             )
-            holder.menu = accountExpandedMenuBuilder(
-                type = type,
-                onShowDeleteDialog = { showDeleteDialog = true },
-                onOpenSettings = { navigator.navigateTo(Screen.ProfileSettings(type)) }
-            )
-            holder.setSubtitle("profiles", type.name)
         }
         cpsComposable(ScreenTypes.profileSettings) { holder ->
             val type = (holder.screen as Screen.ProfileSettings).type
