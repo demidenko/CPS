@@ -48,10 +48,10 @@ private fun AccountsScreen(
     onExpandAccount: (AccountManagerType) -> Unit,
     reorderEnabled: Boolean,
 ) {
-    val accountsViewModel = accountsViewModel()
-    val visibleOrder = if (reorderEnabled) recordedAccounts.map { it.type } else null
-
     val context = context
+    val accountsViewModel = accountsViewModel()
+
+    val visibleOrder = if (reorderEnabled) recordedAccounts.map { it.type } else null
 
     LazyColumn(
         horizontalAlignment = Alignment.Start,
@@ -104,7 +104,8 @@ fun NavContentAccountsScreen(
     }
 
     holder.bottomBar = accountsBottomBarBuilder(
-        reorderEnabled = { reorderEnabled },
+        recordedAccounts = recordedAccounts,
+        reorderEnabled = reorderEnabled,
         onReorderDone = { reorderEnabled = false }
     )
     
@@ -126,23 +127,26 @@ private fun recordedAccountsState() = with(context) {
     }
 }
 
-fun accountsBottomBarBuilder(
-    reorderEnabled: () -> Boolean,
+private fun accountsBottomBarBuilder(
+    recordedAccounts: List<UserInfoWithManager<out UserInfo>>,
+    reorderEnabled: Boolean,
     onReorderDone: () -> Unit
 ): AdditionalBottomBarBuilder = {
-    if (reorderEnabled()) {
+    if (reorderEnabled) {
         CPSIconButton(
             icon = CPSIcons.ReorderDone,
             onClick = onReorderDone
         )
     } else {
-        AddAccountButton()
-        ReloadAccountsButton()
+        AddAccountButton(recordedAccounts = recordedAccounts)
+        ReloadAccountsButton(recordedAccounts = recordedAccounts)
     }
 }
 
 @Composable
-private fun ReloadAccountsButton() {
+private fun ReloadAccountsButton(
+    recordedAccounts: List<UserInfoWithManager<out UserInfo>>
+) {
     val context = context
     val accountsViewModel = accountsViewModel()
 
@@ -150,18 +154,13 @@ private fun ReloadAccountsButton() {
         accountsViewModel.flowOfLoadingStatus(allAccountManagers)
     }
 
-    val anyRecordedAccount by collectAsState {
-        combine(flows = allAccountManagers.map { it.dataStore(context).flowOfInfo() }) {
-            it.any { userInfo -> userInfo != null }
-        }
-    }
-
     CPSReloadingButton(
         loadingStatus = loadingStatus,
-        enabled = anyRecordedAccount
-    ) {
-        allAccountManagers.forEach { accountsViewModel.reload(it, context) }
-    }
+        enabled = recordedAccounts.isNotEmpty(),
+        onClick = {
+            allAccountManagers.forEach { accountsViewModel.reload(it, context) }
+        }
+    )
 }
 
 @Composable
@@ -181,22 +180,15 @@ private fun AddAccountMenuItem(type: AccountManagerType, onSelect: () -> Unit) {
 }
 
 @Composable
-private fun AddAccountButton() {
+private fun AddAccountButton(
+    recordedAccounts: List<UserInfoWithManager<out UserInfo>>
+) {
     var showMenu by remember { mutableStateOf(false) }
     var chosenManager: AccountManagerType? by remember { mutableStateOf(null) }
 
-    val context = context
     val scope = rememberCoroutineScope()
     val progressBarsViewModel = progressBarsViewModel()
     val clistImportIsRunning by collectAsState { progressBarsViewModel.flowOfClistImportIsRunning() }
-
-    val types by collectAsState {
-        combine(flows = allAccountManagers.map { it.flowOfInfoWithManager(context) }) {
-            val allTypes = allAccountManagers.map { it.type }
-            val recordedTypes = it.mapNotNull { it?.type }
-            allTypes - recordedTypes + AccountManagerType.clist
-        }
-    }
 
     Box {
         CPSIconButton(
@@ -210,6 +202,12 @@ private fun AddAccountButton() {
             onDismissRequest = { showMenu = false },
             modifier = Modifier.background(cpsColors.backgroundAdditional)
         ) {
+            val types = remember(recordedAccounts) {
+                val allTypes = allAccountManagers.map { it.type }
+                val recordedTypes = recordedAccounts.map { it.type }
+                allTypes - recordedTypes + AccountManagerType.clist
+            }
+
             types.forEach { type ->
                 AddAccountMenuItem(type = type) {
                     showMenu = false
@@ -221,7 +219,9 @@ private fun AddAccountButton() {
 
     chosenManager?.let { type ->
         if (type == AccountManagerType.clist) {
-            CListImportDialog { chosenManager = null }
+            CListImportDialog(
+                onDismissRequest = { chosenManager = null }
+            )
         } else {
             ChangeSavedInfoDialog(
                 manager = allAccountManagers.first { it.type == type },
