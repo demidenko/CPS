@@ -20,9 +20,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.demich.cps.accounts.AccountExpandedScreen
 import com.demich.cps.accounts.AccountSettingsScreen
-import com.demich.cps.accounts.AccountsScreen
+import com.demich.cps.accounts.NavContentAccountsScreen
 import com.demich.cps.accounts.accountExpandedMenuBuilder
-import com.demich.cps.accounts.accountsBottomBarBuilder
 import com.demich.cps.accounts.accountsViewModel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.community.CommunityScreen
@@ -93,18 +92,10 @@ private fun CPSContent() {
 
     val navBuilder: NavGraphBuilder.() -> Unit = {
         cpsComposable(ScreenTypes.profiles) { holder ->
-            var reorderEnabled by rememberSaveable { mutableStateOf(false) }
-            AccountsScreen(
-                onExpandAccount = { type -> navigator.navigateTo(Screen.ProfileExpanded(type)) },
-                onSetAdditionalMenu = holder.menuSetter,
-                reorderEnabled = { reorderEnabled },
-                enableReorder = { reorderEnabled = true }
+            NavContentAccountsScreen(
+                holder = holder,
+                onExpandAccount = { type -> navigator.navigateTo(Screen.ProfileExpanded(type)) }
             )
-            holder.bottomBar = accountsBottomBarBuilder(
-                reorderEnabled = { reorderEnabled },
-                onReorderDone = { reorderEnabled = false }
-            )
-            holder.setSubtitle("profiles")
         }
         cpsComposable(ScreenTypes.profileExpanded) { holder ->
             val context = context

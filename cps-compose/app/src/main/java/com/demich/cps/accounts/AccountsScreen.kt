@@ -10,11 +10,11 @@ import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,12 +22,13 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.CListAccountManager
+import com.demich.cps.accounts.managers.UserInfoWithManager
 import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.accounts.userinfo.UserInfo
+import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
@@ -42,27 +43,13 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun AccountsScreen(
+private fun AccountsScreen(
+    recordedAccounts: List<UserInfoWithManager<out UserInfo>>,
     onExpandAccount: (AccountManagerType) -> Unit,
-    onSetAdditionalMenu: (CPSMenuBuilder) -> Unit,
-    reorderEnabled: () -> Boolean,
-    enableReorder: () -> Unit
+    reorderEnabled: Boolean,
 ) {
     val accountsViewModel = accountsViewModel()
-    val recordedAccounts by recordedAccountsState()
-
-    val visibleOrder by remember {
-        derivedStateOf { if (reorderEnabled()) recordedAccounts.map { it.type } else null }
-    }
-    if (recordedAccounts.size > 1) {
-        onSetAdditionalMenu {
-            CPSDropdownMenuItem(
-                title = "Reorder",
-                icon = CPSIcons.Reorder,
-                onClick = enableReorder
-            )
-        }
-    }
+    val visibleOrder = if (reorderEnabled) recordedAccounts.map { it.type } else null
 
     val context = context
 
@@ -90,7 +77,38 @@ fun AccountsScreen(
             )
         }
     }
+}
 
+@Composable
+fun NavContentAccountsScreen(
+    holder: CPSNavigator.DuringCompositionHolder,
+    onExpandAccount: (AccountManagerType) -> Unit
+) {
+    var reorderEnabled by rememberSaveable { mutableStateOf(false) }
+    val recordedAccounts by recordedAccountsState()
+    
+    AccountsScreen(
+        recordedAccounts = recordedAccounts,
+        onExpandAccount = onExpandAccount,
+        reorderEnabled = reorderEnabled
+    )
+    
+    holder.menu = {
+        if (recordedAccounts.size > 1) {
+            CPSDropdownMenuItem(
+                title = "Reorder",
+                icon = CPSIcons.Reorder,
+                onClick = { reorderEnabled = true }
+            )
+        }
+    }
+
+    holder.bottomBar = accountsBottomBarBuilder(
+        reorderEnabled = { reorderEnabled },
+        onReorderDone = { reorderEnabled = false }
+    )
+    
+    holder.setSubtitle("profiles")
 }
 
 @Composable
