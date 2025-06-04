@@ -60,13 +60,13 @@ fun <U: UserInfo> ProfilePanel(
     onReloadRequest: () -> Unit,
     onExpandRequest: () -> Unit
 ) {
-    val accountsViewModel = accountsViewModel()
+    val profilesViewModel = profilesViewModel()
     val (userInfo, manager) = userInfoWithManager
 
     var lastClick by remember { mutableStateOf(Instant.DISTANT_PAST) }
 
     val loadingStatus by collectAsState {
-        accountsViewModel.flowOfLoadingStatus(manager)
+        profilesViewModel.flowOfLoadingStatus(manager)
             .onEach {
                 if (it == LoadingStatus.LOADING) lastClick = Instant.DISTANT_PAST
             }

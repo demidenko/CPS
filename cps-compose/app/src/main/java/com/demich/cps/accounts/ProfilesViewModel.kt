@@ -29,9 +29,9 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 @Composable
-fun accountsViewModel(): AccountsViewModel = sharedViewModel()
+fun profilesViewModel(): ProfilesViewModel = sharedViewModel()
 
-class AccountsViewModel: ViewModel() {
+class ProfilesViewModel: ViewModel() {
     private val loadingStatuses = MutableStateFlow(emptyMap<AccountManagerType, LoadingStatus>())
 
     fun flowOfLoadingStatus(manager: AccountManager<out UserInfo>): Flow<LoadingStatus> =

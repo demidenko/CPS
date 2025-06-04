@@ -19,11 +19,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.demich.cps.accounts.AccountExpandedScreen
-import com.demich.cps.accounts.AccountSettingsScreen
 import com.demich.cps.accounts.NavContentProfilesScreen
+import com.demich.cps.accounts.ProfileSettingsScreen
 import com.demich.cps.accounts.accountExpandedMenuBuilder
-import com.demich.cps.accounts.accountsViewModel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.accounts.profilesViewModel
 import com.demich.cps.community.CommunityScreen
 import com.demich.cps.community.codeforces.NavContentCodeforcesBlog
 import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
@@ -99,14 +99,14 @@ private fun CPSContent() {
         }
         cpsComposable(ScreenTypes.profileExpanded) { holder ->
             val context = context
-            val accountsViewModel = accountsViewModel()
+            val profilesViewModel = profilesViewModel()
             val type = (holder.screen as Screen.ProfileExpanded).type
             var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
             AccountExpandedScreen(
                 type = type,
                 showDeleteDialog = showDeleteDialog,
                 onDeleteRequest = { manager ->
-                    accountsViewModel.delete(manager, context)
+                    profilesViewModel.delete(manager, context)
                     navigator.popBack()
                 },
                 onDismissDeleteDialog = { showDeleteDialog = false },
@@ -121,7 +121,7 @@ private fun CPSContent() {
         }
         cpsComposable(ScreenTypes.profileSettings) { holder ->
             val type = (holder.screen as Screen.ProfileSettings).type
-            AccountSettingsScreen(type)
+            ProfileSettingsScreen(type)
             holder.setSubtitle("profiles", type.name, "settings")
         }
 

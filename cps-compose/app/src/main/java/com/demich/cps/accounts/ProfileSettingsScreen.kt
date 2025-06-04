@@ -27,15 +27,15 @@ import com.demich.cps.utils.rememberWith
 import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
-fun AccountSettingsScreen(
+fun ProfileSettingsScreen(
     type: AccountManagerType
 ) {
     val manager = remember(type) { allAccountManagers.first { it.type == type } }
-    AccountSettingsScreen(manager = manager)
+    ProfileSettingsScreen(manager = manager)
 }
 
 @Composable
-private fun <U: UserInfo> AccountSettingsScreen(
+private fun <U: UserInfo> ProfileSettingsScreen(
     manager: AccountManager<U>
 ) {
     val context = context

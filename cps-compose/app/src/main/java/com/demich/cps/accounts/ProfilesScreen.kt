@@ -49,7 +49,7 @@ private fun ProfilesScreen(
     reorderEnabled: Boolean,
 ) {
     val context = context
-    val viewModel = accountsViewModel()
+    val viewModel = profilesViewModel()
 
     val profilesTypes = if (reorderEnabled) profiles.map { it.type } else null
 
@@ -148,7 +148,7 @@ private fun ReloadProfilesButton(
     profiles: List<UserInfoWithManager<out UserInfo>>
 ) {
     val context = context
-    val viewModel = accountsViewModel()
+    val viewModel = profilesViewModel()
 
     val loadingStatus by collectAsState {
         viewModel.flowOfLoadingStatus(allAccountManagers)
@@ -254,7 +254,7 @@ private fun CListImportDialog(
     onDismissRequest: () -> Unit
 ) {
     val context = context
-    val accountsViewModel = accountsViewModel()
+    val profilesViewModel = profilesViewModel()
     val progressBarsViewModel = progressBarsViewModel()
     val cListAccountManager = remember { CListAccountManager() }
     DialogAccountChooser(
@@ -262,7 +262,7 @@ private fun CListImportDialog(
         initialUserInfo = null,
         onDismissRequest = onDismissRequest,
         onResult = { userInfo ->
-            accountsViewModel.runClistImport(
+            profilesViewModel.runClistImport(
                 cListUserInfo = userInfo,
                 progressBarsViewModel = progressBarsViewModel,
                 context = context

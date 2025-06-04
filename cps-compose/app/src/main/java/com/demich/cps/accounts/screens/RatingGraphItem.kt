@@ -5,8 +5,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.demich.cps.accounts.accountsViewModel
 import com.demich.cps.accounts.managers.RatedAccountManager
+import com.demich.cps.accounts.profilesViewModel
 import com.demich.cps.accounts.rating_graph.RatingGraph
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.utils.randomUuid
@@ -18,10 +18,10 @@ internal fun<U: RatedUserInfo> RatingGraphItem(
     userInfo: U,
     modifier: Modifier = Modifier
 ) {
-    val accountsViewModel = accountsViewModel()
+    val viewModel = profilesViewModel()
     var dataKey by rememberUUIDState
 
-    val ratingChangesResult by accountsViewModel
+    val ratingChangesResult by viewModel
         .flowOfRatingResult(manager, userInfo.userId, key = dataKey)
         .collectAsState()
 
