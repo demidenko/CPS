@@ -51,19 +51,6 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
         atcoder_news,
         project_euler_news,
         project_euler_problems
-        ;
-
-        val shortName: String get() = when (this) {
-            atcoder_news -> "atcoder"
-            project_euler_news -> "pe_news"
-            project_euler_problems -> "pe_problems"
-        }
-
-        val link: String get() = when (this) {
-            atcoder_news -> "atcoder.jp"
-            project_euler_news -> "projecteuler.net/news"
-            project_euler_problems -> "projecteuler.net/recent"
-        }
     }
 
     val enabledNewsFeeds = itemEnumSet<NewsFeed>(name = "news_feeds")

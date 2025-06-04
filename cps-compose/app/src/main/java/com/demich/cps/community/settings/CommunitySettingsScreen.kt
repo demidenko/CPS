@@ -20,9 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.community.codeforces.CodeforcesTitle
+import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
@@ -41,6 +43,7 @@ import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.settingsUI
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.workers.CodeforcesCommunityFollowWorker
@@ -206,6 +209,29 @@ private fun CodeforcesRuEnabledSettingsItem() {
     )
 }
 
+
+private val NewsFeed.title: String get() =
+    when (this) {
+        NewsFeed.atcoder_news -> "AtCoder news"
+        NewsFeed.project_euler_news -> "Project Euler news"
+        NewsFeed.project_euler_problems -> "Project Euler recent problems"
+    }
+
+private val NewsFeed.shortName: String get() =
+    when (this) {
+        NewsFeed.atcoder_news -> "atcoder"
+        NewsFeed.project_euler_news -> "pe_news"
+        NewsFeed.project_euler_problems -> "pe_problems"
+    }
+
+private val NewsFeed.link: String get() =
+    when (this) {
+        NewsFeed.atcoder_news -> "atcoder.jp"
+        NewsFeed.project_euler_news -> "projecteuler.net/news"
+        NewsFeed.project_euler_problems -> "projecteuler.net/recent"
+    }
+
+
 @Composable
 private fun NewsFeedsSettingsItem() {
     val context = context
@@ -229,15 +255,20 @@ private fun NewsFeedsSettingsItem() {
     if (showDialog) {
         CPSDialogMultiSelectEnum(
             title = title,
-            options = CommunitySettingsDataStore.NewsFeed.entries,
+            options = NewsFeed.entries,
             selectedOptions = remember { runBlocking { enabledSettingsItem() } },
-            optionTitle = { Text(it.link) },
+            optionTitle = {
+                Column {
+                    Text(it.title)
+                    Text(it.link, color = cpsColors.contentAdditional, fontSize = 15.sp)
+                }
+            },
             onDismissRequest = { showDialog = false },
             onSaveSelected = { current ->
                 scope.launch {
                     val newSelectedFeeds = current - enabledSettingsItem()
                     enabledSettingsItem(newValue = current)
-                    val pe_recent = CommunitySettingsDataStore.NewsFeed.project_euler_problems
+                    val pe_recent = NewsFeed.project_euler_problems
                     if ((newSelectedFeeds - pe_recent).isNotEmpty()) {
                         NewsWorker.getWork(context).startImmediate()
                     }
