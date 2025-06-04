@@ -246,7 +246,8 @@ private fun<U: UserInfo> UserIdTextField(
         singleLine = true,
         textStyle = TextStyle(fontSize = inputTextSize, fontFamily = FontFamily.Monospace),
         colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = cpsColors.background
+            backgroundColor = cpsColors.background,
+            placeholderColor = cpsColors.contentAdditional
         ),
         onValueChange = onValueChange,
         placeholder = {
@@ -254,8 +255,7 @@ private fun<U: UserInfo> UserIdTextField(
                 text = buildString {
                     append(manager.userIdTitle)
                     if (manager is UserSuggestionsProvider) append(" or search query")
-                },
-                color = cpsColors.contentAdditional
+                }
             )
         },
         label = {
