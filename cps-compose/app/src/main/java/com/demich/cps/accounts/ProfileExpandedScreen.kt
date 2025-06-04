@@ -26,7 +26,7 @@ import com.demich.cps.utils.openUrlInBrowser
 import kotlinx.coroutines.launch
 
 @Composable
-private fun AccountExpandedScreen(
+private fun ProfileExpandedScreen(
     type: AccountManagerType,
     showDeleteDialog: Boolean,
     onDeleteRequest: (AccountManager<out UserInfo>) -> Unit,
@@ -34,14 +34,14 @@ private fun AccountExpandedScreen(
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
     val manager = remember(type) { allAccountManagers.first { it.type == type } }
-    AccountExpandedContent(
+    ProfileExpandedContent(
         manager = manager,
         setBottomBarContent = setBottomBarContent
     )
 
     if (showDeleteDialog) {
         CPSDeleteDialog(
-            title = "Delete $type account?",
+            title = "Delete $type profile?",
             onConfirmRequest = { onDeleteRequest(manager) },
             onDismissRequest = onDismissDeleteDialog
         )
@@ -49,7 +49,7 @@ private fun AccountExpandedScreen(
 }
 
 @Composable
-private fun<U: UserInfo> AccountExpandedContent(
+private fun<U: UserInfo> ProfileExpandedContent(
     manager: AccountManager<U>,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
@@ -66,7 +66,7 @@ private fun<U: UserInfo> AccountExpandedContent(
     }
 }
 
-private fun accountExpandedMenuBuilder(
+private fun profileExpandedMenuBuilder(
     type: AccountManagerType,
     onOpenSettings: () -> Unit,
     onShowDeleteDialog: () -> Unit
@@ -95,7 +95,7 @@ fun NavContentProfilesExpandedScreen(
 ) {
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
-    AccountExpandedScreen(
+    ProfileExpandedScreen(
         type = type,
         showDeleteDialog = showDeleteDialog,
         onDeleteRequest = onDeleteRequest,
@@ -103,7 +103,7 @@ fun NavContentProfilesExpandedScreen(
         setBottomBarContent = holder.bottomBarSetter
     )
 
-    holder.menu = accountExpandedMenuBuilder(
+    holder.menu = profileExpandedMenuBuilder(
         type = type,
         onShowDeleteDialog = { showDeleteDialog = true },
         onOpenSettings = onOpenSettings
