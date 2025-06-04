@@ -70,7 +70,6 @@ import com.demich.cps.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.withContext
@@ -120,9 +119,8 @@ private fun<U: UserInfo> DialogContent(
         mutableStateOf(initialUserInfo?.userId.orEmpty().toTextFieldValue())
     }
     var textFieldValue by textFieldValueState
-    val userId by rememberUpdatedState(newValue = textFieldValue.text)
 
-    val userInfoResult by collectUserInfoState(
+    val userInfoResult by userInfoState(
         textState = textFieldValueState,
         manager = manager,
         initialUserInfo = initialUserInfo
@@ -135,6 +133,7 @@ private fun<U: UserInfo> DialogContent(
     UserIdTextField(
         manager = manager,
         userInfo = userInfoResult.userInfo,
+        loadingInProgress = userInfoResult.isLoading,
         textFieldValue = textFieldValue,
         onValueChange = {
             blockSuggestionsReload = false
@@ -145,14 +144,13 @@ private fun<U: UserInfo> DialogContent(
                 textFieldValue = it.copy(text = it.text.filter(charValidator))
             }
         },
-        loadingInProgress = userInfoResult.isLoading,
         modifier = Modifier
             .focusRequester(focusRequester)
             .fillMaxWidth(),
         inputTextSize = 18.sp,
         resultTextSize = 14.sp
     ) {
-        if (userId.all(manager::isValidForUserId)) {
+        if (it.userId.all(manager::isValidForUserId)) {
             onResult(it)
             onDismissRequest()
         } else {
@@ -161,6 +159,7 @@ private fun<U: UserInfo> DialogContent(
     }
 
     if (manager is UserSuggestionsProvider) {
+        val userId by rememberUpdatedState(newValue = textFieldValue.text)
         var suggestionsResult: Result<List<UserSuggestion>> by remember { mutableStateOf(Result.success(emptyList())) }
         val loadingSuggestionsInProgressState = remember { mutableStateOf(false) }
 
@@ -206,14 +205,13 @@ private data class UserInfoLoadingResult<U: UserInfo>(
 )
 
 @Composable
-private fun <U: UserInfo> collectUserInfoState(
+private fun <U: UserInfo> userInfoState(
     textState: State<TextFieldValue>,
     manager: AccountManager<U>,
     initialUserInfo: U?
-): State<UserInfoLoadingResult<U>> {
-    return remember(textState, manager) {
+): State<UserInfoLoadingResult<U>> =
+    remember(textState, manager) {
         snapshotFlow { textState.value.text }
-            .distinctUntilChanged()
             .drop(1)
             .transformLatest { userId ->
                 emit(UserInfoLoadingResult<U>(null, false))
@@ -223,16 +221,15 @@ private fun <U: UserInfo> collectUserInfoState(
                 emit(UserInfoLoadingResult(manager.getUserInfo(userId), false))
             }
     }.collectAsState(initial = UserInfoLoadingResult(initialUserInfo, false))
-}
 
 
 @Composable
 private fun<U: UserInfo> UserIdTextField(
     manager: AccountManager<U>,
     userInfo: U?,
+    loadingInProgress: Boolean,
     textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
-    loadingInProgress: Boolean,
     modifier: Modifier,
     inputTextSize: TextUnit,
     resultTextSize: TextUnit,
