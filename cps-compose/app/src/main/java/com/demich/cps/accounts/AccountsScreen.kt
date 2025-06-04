@@ -1,28 +1,44 @@
 package com.demich.cps.accounts
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
-import com.demich.cps.accounts.managers.*
+import com.demich.cps.accounts.managers.AccountManager
+import com.demich.cps.accounts.managers.AccountManagerType
+import com.demich.cps.accounts.managers.CListAccountManager
+import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.accounts.userinfo.UserInfo
-import com.demich.cps.ui.*
+import com.demich.cps.ui.CPSDefaults
+import com.demich.cps.ui.CPSIconButton
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.CPSMenuBuilder
+import com.demich.cps.ui.CPSReloadingButton
+import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.lazylist.itemsNotEmpty
+import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.context
 import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.context
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 
 @Composable
@@ -156,6 +172,14 @@ private fun AddAccountButton() {
     val progressBarsViewModel = progressBarsViewModel()
     val clistImportIsRunning by collectAsState { progressBarsViewModel.flowOfClistImportIsRunning() }
 
+    val types by collectAsState {
+        combine(flows = allAccountManagers.map { it.flowOfInfoWithManager(context) }) {
+            val allTypes = allAccountManagers.map { it.type }
+            val recordedTypes = it.mapNotNull { it?.type }
+            allTypes - recordedTypes + AccountManagerType.clist
+        }
+    }
+
     Box {
         CPSIconButton(
             icon = CPSIcons.Add,
@@ -168,11 +192,7 @@ private fun AddAccountButton() {
             onDismissRequest = { showMenu = false },
             modifier = Modifier.background(cpsColors.backgroundAdditional)
         ) {
-            remember {
-                runBlocking {
-                    allAccountManagers.filter { it.dataStore(context).getSavedInfo() == null }
-                }.map { it.type }.plus(AccountManagerType.clist)
-            }.forEach { type ->
+            types.forEach { type ->
                 AddAccountMenuItem(type = type) {
                     showMenu = false
                     chosenManager = type
@@ -185,26 +205,29 @@ private fun AddAccountButton() {
         if (type == AccountManagerType.clist) {
             CListImportDialog { chosenManager = null }
         } else {
-            allAccountManagers.first { it.type == type }
-                .ChangeSavedInfoDialog(
-                    scope = scope,
-                    onDismissRequest = { chosenManager = null }
-                )
+            ChangeSavedInfoDialog(
+                manager = allAccountManagers.first { it.type == type },
+                initialUserInfo = null,
+                scope = scope,
+                onDismissRequest = { chosenManager = null }
+            )
         }
     }
 }
 
 @Composable
-internal fun<U: UserInfo> AccountManager<U>.ChangeSavedInfoDialog(
+internal fun <U: UserInfo> ChangeSavedInfoDialog(
+    manager: AccountManager<U>,
+    initialUserInfo: U?,
     scope: CoroutineScope,
     onDismissRequest: () -> Unit
 ) {
-    val dataStore = dataStore(context)
+    val context = context
     DialogAccountChooser(
-        manager = this,
-        initialUserInfo = runBlocking { dataStore.getSavedInfo() },
+        manager = manager,
+        initialUserInfo = initialUserInfo,
         onDismissRequest = onDismissRequest,
-        onResult = { userInfo -> scope.launch { dataStore.setSavedInfo(userInfo) } }
+        onResult = { userInfo -> scope.launch { manager.dataStore(context).setSavedInfo(userInfo) } }
     )
 }
 

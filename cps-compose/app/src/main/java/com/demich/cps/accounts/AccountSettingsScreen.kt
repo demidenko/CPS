@@ -30,11 +30,18 @@ import kotlinx.coroutines.flow.emptyFlow
 fun AccountSettingsScreen(
     type: AccountManagerType
 ) {
+    val manager = remember(type) { allAccountManagers.first { it.type == type } }
+    AccountSettingsScreen(manager = manager)
+}
+
+@Composable
+private fun <U: UserInfo> AccountSettingsScreen(
+    manager: AccountManager<U>
+) {
     val context = context
     val scope = rememberCoroutineScope()
     var showChangeDialog by remember { mutableStateOf(false) }
 
-    val manager = remember(type) { allAccountManagers.first { it.type == type } }
     val userInfo by collectAsState { manager.dataStore(context).flowOfInfo() }
 
     userInfo?.let {
@@ -43,19 +50,21 @@ fun AccountSettingsScreen(
             userInfo = it,
             onUserIdClick = { showChangeDialog = true }
         )
-    }
 
-    if (showChangeDialog) {
-        manager.ChangeSavedInfoDialog(
-            scope = scope,
-            onDismissRequest = { showChangeDialog = false }
-        )
+        if (showChangeDialog) {
+            ChangeSavedInfoDialog(
+                manager = manager,
+                initialUserInfo = userInfo,
+                scope = scope,
+                onDismissRequest = { showChangeDialog = false }
+            )
+        }
     }
 }
 
 @Composable
-private fun UserInfoSettings(
-    manager: AccountManager<out UserInfo>,
+private fun <U: UserInfo> UserInfoSettings(
+    manager: AccountManager<U>,
     userInfo: UserInfo,
     onUserIdClick: () -> Unit
 ) {
