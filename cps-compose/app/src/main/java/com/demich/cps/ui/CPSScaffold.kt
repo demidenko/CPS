@@ -126,7 +126,8 @@ private fun Scaffold(
         }
         if (navigator.isBottomBarEnabled) {
             CPSBottomBar(
-                navigator = navigator,
+                selectedRootScreenType = { navigator.currentScreen?.rootScreenType },
+                onNavigateToScreen = navigator::navigateTo,
                 additionalBottomBar = navigator.additionalBottomBar,
                 layoutSettingsEnabled = bottomBarSettingsEnabled,
                 onEnableLayoutSettings = onEnableBottomBarSettings,

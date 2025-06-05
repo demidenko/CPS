@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.RootScreen
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTypes
@@ -34,7 +33,8 @@ typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
 
 @Composable
 fun CPSBottomBar(
-    navigator: CPSNavigator,
+    selectedRootScreenType: () -> ScreenTypes?,
+    onNavigateToScreen: (RootScreen) -> Unit,
     additionalBottomBar: AdditionalBottomBarBuilder?,
     layoutSettingsEnabled: Boolean,
     onEnableLayoutSettings: () -> Unit,
@@ -51,8 +51,8 @@ fun CPSBottomBar(
         BottomBarVerticalDivider()
         BottomBarBodyMain(
             modifier = Modifier.weight(1f).fillMaxHeight(),
-            selectedRootScreenType = { navigator.currentScreen?.rootScreenType },
-            onNavigateToScreen = navigator::navigateTo,
+            selectedRootScreenType = selectedRootScreenType,
+            onNavigateToScreen = onNavigateToScreen,
             layoutSettingsEnabled = layoutSettingsEnabled,
             onEnableLayoutSettings = onEnableLayoutSettings
         )
