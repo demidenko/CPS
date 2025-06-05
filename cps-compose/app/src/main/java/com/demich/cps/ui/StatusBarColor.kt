@@ -3,14 +3,10 @@ package com.demich.cps.ui
 import android.content.Context
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.managers.AccountManagerType
@@ -22,7 +18,6 @@ import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.ProfileScreen
 import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.background
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
@@ -31,20 +26,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 @Composable
-fun StatusBarBox(navigator: CPSNavigator) {
-    //TODO: single time recomposition after change color / offcolor (???)
-    val statusBarColor by statusBarColor(navigator)
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .background { statusBarColor }
-        .statusBarsPadding()
-    )
-}
-
-@Composable
-private fun statusBarColor(navigator: CPSNavigator): State<Color> {
+fun statusBarColorState(navigator: CPSNavigator): State<Color> {
     val context = context
-
     val coloredStatusBar by collectItemAsState { context.settingsUI.coloredStatusBar }
 
     val rank by collectAsState {
@@ -54,27 +37,31 @@ private fun statusBarColor(navigator: CPSNavigator): State<Color> {
         ) { rankGetter, currentScreen -> rankGetter[currentScreen] }
     }
 
-    return statusBarColor(coloredStatusBar = coloredStatusBar, rank = rank)
-}
-
-@Composable
-private fun statusBarColor(
-    coloredStatusBar: Boolean,
-    rank: RatedRank?,
-    offColor: Color = cpsColors.background
-): State<Color> {
-    return statusBarColor(
-        isStatusBarEnabled = coloredStatusBar && rank != null,
-        color = rank?.run { manager.colorFor(handleColor) } ?: offColor,
-        offColor = offColor
+    return statusBarColorState(
+        coloredStatusBar = coloredStatusBar,
+        rank = rank,
+        offColor = cpsColors.background
     )
 }
 
 @Composable
-private fun statusBarColor(
-    isStatusBarEnabled: Boolean,
-    color: Color,
-    offColor: Color,
+private fun statusBarColorState(
+    coloredStatusBar: Boolean,
+    rank: RatedRank?,
+    offColor: Color
+): State<Color> {
+    return statusBarColorState(
+        enabled = coloredStatusBar && rank != null,
+        enabledColor = rank?.run { manager.colorFor(handleColor) } ?: offColor,
+        disabledColor = offColor
+    )
+}
+
+@Composable
+private fun statusBarColorState(
+    enabled: Boolean,
+    enabledColor: Color,
+    disabledColor: Color,
     durationMillis: Int = CPSDefaults.buttonOnOffDurationMillis
 ): State<Color> {
     /*
@@ -82,13 +69,13 @@ private fun statusBarColor(
         with statusbar=off switching dark/light mode MUST be as fast as everywhere else
     */
     val statusBarColorState = animateColorAsState(
-        targetValue = color,
+        targetValue = enabledColor,
         animationSpec = tween(durationMillis = durationMillis)
     )
     return com.demich.cps.utils.animateColorAsState(
         enabledColorState = statusBarColorState,
-        disabledColor = offColor,
-        enabled = isStatusBarEnabled,
+        disabledColor = disabledColor,
+        enabled = enabled,
         animationSpec = tween(durationMillis = durationMillis)
     )
 }

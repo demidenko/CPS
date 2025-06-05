@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
@@ -97,7 +98,7 @@ private fun Scaffold(
                 .fillMaxWidth()
         ) {
             ScaffoldContent(
-                statusBar = { StatusBarBox(navigator = navigator) },
+                statusBar = { StatusBar(navigator = navigator) },
                 topBar = { navigator.TopBar() },
                 content = content,
                 modifier = Modifier.fillMaxSize()
@@ -180,4 +181,15 @@ private fun Scrim(
             drawRect(color = Color.Black.copy(alpha = alpha))
         }
     }
+}
+
+@Composable
+private fun StatusBar(navigator: CPSNavigator) {
+    //TODO: single time recomposition after change color / offcolor (???)
+    val statusBarColor by statusBarColorState(navigator)
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .background { statusBarColor }
+        .statusBarsPadding()
+    )
 }
