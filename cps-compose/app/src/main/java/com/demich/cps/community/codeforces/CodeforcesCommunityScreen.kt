@@ -1,5 +1,6 @@
 package com.demich.cps.community.codeforces
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -111,6 +112,7 @@ private fun TabsHeader(
     ) {
         Box(
             modifier = Modifier
+                .background(cpsColors.background)
                 .height(CPSDefaults.tabsRowHeight)
                 .padding(vertical = 10.dp)
                 .padding(start = 6.dp, end = 10.dp)
