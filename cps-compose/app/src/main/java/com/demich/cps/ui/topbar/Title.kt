@@ -1,6 +1,7 @@
 package com.demich.cps.ui.topbar
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ProvideTextStyle
@@ -10,12 +11,13 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.randomUuid
+import kotlin.math.max
 
 @Composable
 internal fun Title(
@@ -26,7 +28,8 @@ internal fun Title(
     ProvideTextStyle(
         value = CPSDefaults.MonospaceTextStyle.copy(
             fontSize = fontSize,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            color = cpsColors.contentAdditional
         )
     ) {
         Column(modifier = modifier) {
@@ -35,33 +38,65 @@ internal fun Title(
                 color = cpsColors.content,
                 maxLines = 1
             )
-            SubTitle(
-                text = subtitle,
-                color = cpsColors.contentAdditional
-            )
+            SubTitle(text = subtitle)
         }
     }
 }
 
 @Composable
 internal fun SubTitle(
-    text: () -> String,
-    color: Color
+    text: () -> String
 ) {
-    //TODO: improve animation by longest common subseq
-
-    val prefixes by remember(text) {
+    val letters: List<Pair<Char, Int>> by remember(text) {
+        var prev = ""
+        var ids = intArrayOf()
         derivedStateOf {
-            text().runningFold("") { pref, it -> pref + it }.drop(1)
+            val cur = text()
+            val newIds = IntArray(cur.length) { randomUuid() }
+            lcsTransitions(prev, cur) { i, j -> newIds[j] = ids[i] }
+            cur.toList().zip(newIds.asList()).also {
+                prev = cur
+                ids = newIds
+            }
         }
     }
 
-    LazyRow {
+    LazyRow(modifier = Modifier.fillMaxWidth()) {
         items(
-            items = prefixes,
+            items = letters,
             key = { it }
         ) {
-            Text(text = "${it.last()}", color = color, modifier = Modifier.animateItem())
+            Text(
+                text = "${it.first}",
+                modifier = Modifier.animateItem()
+            )
+        }
+    }
+}
+
+
+// longest common subsequence
+private inline fun lcsTransitions(a: String, b: String, block: (Int, Int) -> Unit) {
+    val d = Array(a.length + 1) { IntArray(b.length + 1) }
+    for (i in 0 .. a.length)
+    for (j in 0 .. b.length) {
+        d[i][j] = when {
+            i == 0 || j == 0 -> 0
+            a[i-1] == b[j-1] -> d[i-1][j-1] + 1
+            else -> max(d[i-1][j], d[i][j-1])
+        }
+    }
+    var i = a.length
+    var j = b.length
+    while (i > 0 && j > 0) {
+        when {
+            d[i][j] == d[i-1][j-1]+1 && a[i-1] == b[j-1] -> {
+                block(i-1, j-1)
+                --i
+                --j
+            }
+            d[i][j] == d[i-1][j] -> --i
+            d[i][j] == d[i][j-1] -> --j
         }
     }
 }
