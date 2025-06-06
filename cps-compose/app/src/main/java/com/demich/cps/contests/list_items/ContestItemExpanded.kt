@@ -117,10 +117,7 @@ private fun ContestCounter(
             Contest.Phase.RUNNING -> "ends in $counter"
             Contest.Phase.FINISHED -> "finished"
         },
-        style = CPSDefaults.MonospaceTextStyle.copy(
-            fontSize = 15.sp,
-            color = cpsColors.contentAdditional
-        )
+        style = contestSubtitleTextStyle()
     )
 }
 
@@ -132,10 +129,7 @@ private fun ContestItemDatesAndMenuButton(
     onDeleteRequest: () -> Unit
 ) {
     Box(modifier = modifier) {
-        ProvideTextStyle(CPSDefaults.MonospaceTextStyle.copy(
-            fontSize = 15.sp,
-            color = cpsColors.contentAdditional
-        )) {
+        ProvideTextStyle(contestSubtitleTextStyle()) {
             AttentionText(
                 text = contest.dateRange(),
                 collisionType = collisionType,

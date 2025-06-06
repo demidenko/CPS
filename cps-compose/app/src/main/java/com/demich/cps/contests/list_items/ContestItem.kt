@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -129,10 +130,7 @@ private fun ContestItemFooter(
     collisionType: DangerType,
     modifier: Modifier = Modifier
 ) {
-    ProvideTextStyle(CPSDefaults.MonospaceTextStyle.copy(
-        fontSize = 15.sp,
-        color = cpsColors.contentAdditional
-    )) {
+    ProvideTextStyle(contestSubtitleTextStyle()) {
         Box(modifier = modifier) {
             AttentionText(
                 text = date,
@@ -146,3 +144,12 @@ private fun ContestItemFooter(
         }
     }
 }
+
+
+@Composable
+@ReadOnlyComposable
+internal fun contestSubtitleTextStyle() =
+    CPSDefaults.MonospaceTextStyle.copy(
+        fontSize = 15.5.sp,
+        color = cpsColors.contentAdditional
+    )
