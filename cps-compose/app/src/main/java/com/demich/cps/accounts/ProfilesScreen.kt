@@ -93,15 +93,18 @@ fun NavContentProfilesScreen(
         reorderEnabled = reorderEnabled
     )
     
-    holder.menu = {
+    holder.menu =
         if (profilesOrder.size > 1) {
-            CPSDropdownMenuItem(
-                title = "Reorder",
-                icon = CPSIcons.Reorder,
-                onClick = { reorderEnabled = true }
-            )
+            {
+                CPSDropdownMenuItem(
+                    title = "Reorder",
+                    icon = CPSIcons.Reorder,
+                    onClick = { reorderEnabled = true }
+                )
+            }
+        } else {
+            null
         }
-    }
 
     holder.bottomBar = profilesBottomBarBuilder(
         profiles = profilesOrder,
