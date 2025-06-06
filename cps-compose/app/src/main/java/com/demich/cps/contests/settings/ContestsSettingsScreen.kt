@@ -22,7 +22,8 @@ fun ContestsSettingsScreen() {
     LaunchedEffectOneTime {
         val snapshot = context.settingsContests.makeSnapshot()
         ContestsInfoDataStore(context).settingsSnapshot.update {
-            snapshot
+            // do not override
+            it ?: snapshot
         }
     }
 }
