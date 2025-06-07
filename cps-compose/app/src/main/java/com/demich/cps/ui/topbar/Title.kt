@@ -18,6 +18,7 @@ import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.randomUuid
 import kotlin.math.max
+import kotlin.math.min
 
 @Composable
 internal fun Title(
@@ -54,7 +55,7 @@ internal fun SubTitle(
             val cur = text()
             val prefix = longestCommonPrefix(cur, prev)
             val newIds = LongArray(cur.length) { if (it < prefix) ids[it] else randomUuid() }
-            lcsIndices(
+            subsetIndices(
                 a = prev.substring(startIndex = prefix),
                 b = cur.substring(startIndex = prefix)
             ) { i, j ->
@@ -103,6 +104,19 @@ private inline fun lcsIndices(a: String, b: String, block: (Int, Int) -> Unit) {
             }
             d[i][j] == d[i-1][j] -> --i
             d[i][j] == d[i][j-1] -> --j
+        }
+    }
+}
+
+private inline fun subsetIndices(a: String, b: String, block: (Int, Int) -> Unit) {
+    //TODO: speedup by not using maps
+    val ga = a.indices.groupBy { a[it] }
+    val gb = b.indices.groupBy { b[it] }
+    ga.forEach { (char, va) ->
+        val vb = gb.getOrDefault(char, emptyList())
+        //TODO: use random for biggest list
+        repeat(times = min(va.size, vb.size)) {
+            block(va[it], vb[it])
         }
     }
 }
