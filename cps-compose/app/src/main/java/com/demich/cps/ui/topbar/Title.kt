@@ -52,8 +52,14 @@ internal fun SubTitle(
         var ids = intArrayOf()
         derivedStateOf {
             val cur = text()
-            val newIds = IntArray(cur.length) { randomUuid() }
-            lcsTransitions(prev, cur) { i, j -> newIds[j] = ids[i] }
+            val prefix = longestCommonPrefix(cur, prev)
+            val newIds = IntArray(cur.length) { if (it < prefix) ids[it] else randomUuid() }
+            lcsTransitions(
+                a = prev.substring(startIndex = prefix),
+                b = cur.substring(startIndex = prefix)
+            ) { i, j ->
+                newIds[prefix + j] = ids[prefix + i]
+            }
             cur.toList().zip(newIds.asList()).also {
                 prev = cur
                 ids = newIds
@@ -99,4 +105,10 @@ private inline fun lcsTransitions(a: String, b: String, block: (Int, Int) -> Uni
             d[i][j] == d[i][j-1] -> --j
         }
     }
+}
+
+private fun longestCommonPrefix(a: String, b: String): Int {
+    var i = 0
+    while (i < a.length && i < b.length && a[i] == b[i]) ++i
+    return i
 }
