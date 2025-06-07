@@ -16,13 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.MutableLongState
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -221,8 +221,8 @@ inline fun<reified T: ViewModel> sharedViewModel(): T =
     viewModel(viewModelStoreOwner = context as ComponentActivity)
 
 
-val rememberUUIDState: MutableIntState
+val rememberUUIDState: MutableLongState
     @Composable
-    get() = rememberSaveable { mutableIntStateOf(randomUuid()) }
+    get() = rememberSaveable { mutableLongStateOf(randomUuid()) }
 
-fun randomUuid(): Int = Random.nextInt()
+fun randomUuid(): Long = Random.nextLong()

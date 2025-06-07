@@ -47,13 +47,13 @@ internal fun Title(
 internal fun SubTitle(
     text: () -> String
 ) {
-    val letters: List<Pair<Char, Int>> by remember(text) {
+    val letters: List<Pair<Char, Long>> by remember(text) {
         var prev = ""
-        var ids = intArrayOf()
+        var ids = longArrayOf()
         derivedStateOf {
             val cur = text()
             val prefix = longestCommonPrefix(cur, prev)
-            val newIds = IntArray(cur.length) { if (it < prefix) ids[it] else randomUuid() }
+            val newIds = LongArray(cur.length) { if (it < prefix) ids[it] else randomUuid() }
             lcsTransitions(
                 a = prev.substring(startIndex = prefix),
                 b = cur.substring(startIndex = prefix)
