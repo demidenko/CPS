@@ -54,7 +54,7 @@ internal fun SubTitle(
             val cur = text()
             val prefix = longestCommonPrefix(cur, prev)
             val newIds = LongArray(cur.length) { if (it < prefix) ids[it] else randomUuid() }
-            lcsTransitions(
+            lcsIndices(
                 a = prev.substring(startIndex = prefix),
                 b = cur.substring(startIndex = prefix)
             ) { i, j ->
@@ -82,7 +82,7 @@ internal fun SubTitle(
 
 
 // longest common subsequence
-private inline fun lcsTransitions(a: String, b: String, block: (Int, Int) -> Unit) {
+private inline fun lcsIndices(a: String, b: String, block: (Int, Int) -> Unit) {
     val d = Array(a.length + 1) { IntArray(b.length + 1) }
     for (i in 0 .. a.length)
     for (j in 0 .. b.length) {
