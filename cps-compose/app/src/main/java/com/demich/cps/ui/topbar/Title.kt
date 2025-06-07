@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.randomUuid
-import com.demich.kotlin_stdlib_boost.randomSubsequence
+import com.demich.kotlin_stdlib_boost.takeRandom
 import kotlin.math.max
 import kotlin.math.min
 
@@ -116,8 +116,8 @@ private inline fun subsetIndices(a: String, b: String, block: (Int, Int) -> Unit
     ga.forEach { (char, va) ->
         val vb = gb.getOrElse(char) { return@forEach }
         val n = min(va.size, vb.size)
-        val sa = va.randomSubsequence(n)
-        val sb = vb.randomSubsequence(n)
+        val sa = va.takeRandom(n)
+        val sb = vb.takeRandom(n)
         repeat(n) { block(sa[it], sb[it]) }
     }
 }

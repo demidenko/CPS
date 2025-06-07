@@ -1,7 +1,12 @@
 package com.demich.kotlin_stdlib_boost
 
-fun <T> List<T>.randomSubsequence(n: Int): List<T> {
-    require(n >= 0)
+/**
+ * Returns a list containing [n] random elements, preserving order.
+ *
+ * @throws IllegalArgumentException if [n] is negative.
+ */
+fun <T> List<T>.takeRandom(n: Int): List<T> {
+    require(n >= 0) { "Requested element count $n is less than zero." }
     return when (n) {
         0 -> emptyList()
         size -> toList()
