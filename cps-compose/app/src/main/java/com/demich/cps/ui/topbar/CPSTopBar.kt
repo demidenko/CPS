@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSDropdownMenuButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
@@ -35,7 +36,7 @@ fun CPSTopBar(
         backgroundColor = cpsColors.background,
         elevation = 0.dp,
         contentPadding = PaddingValues(start = 10.dp),
-        modifier = Modifier.height(56.dp)
+        modifier = Modifier.height(CPSDefaults.topBarHeight)
     ) {
         Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
             Title(
