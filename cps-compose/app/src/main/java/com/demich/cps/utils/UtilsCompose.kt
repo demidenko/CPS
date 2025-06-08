@@ -139,13 +139,14 @@ fun Modifier.clickableNoRipple(
 )
 
 fun Modifier.ignoreInputEvents(enabled: Boolean) =
-    if (!enabled) this
-    else this.pointerInput(Unit) {
-        awaitPointerEventScope {
-            while (true) {
-                awaitPointerEvent(PointerEventPass.Initial)
-                    .changes
-                    .forEach { it.consume() }
+    ifThen(enabled) {
+        pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    awaitPointerEvent(PointerEventPass.Initial)
+                        .changes
+                        .forEach { it.consume() }
+                }
             }
         }
     }
