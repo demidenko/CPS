@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.demich.cps.utils.edit
-import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -30,7 +30,7 @@ data class ProgressBarInfo(
 }
 
 @Composable
-fun progressBarsViewModel(): ProgressBarsViewModel = sharedViewModel()
+fun progressBarsViewModel(): ProgressBarsViewModel = viewModel()
 
 class ProgressBarsViewModel: ViewModel() {
     private val progressesStateFlow = MutableStateFlow(emptyMap<String, ProgressBarInfo>())

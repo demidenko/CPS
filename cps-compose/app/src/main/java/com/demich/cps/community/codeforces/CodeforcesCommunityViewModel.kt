@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.community.follow.followListDao
 import com.demich.cps.community.settings.settingsCommunity
@@ -17,7 +18,6 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.combine
-import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @Composable
-fun codeforcesCommunityViewModel(): CodeforcesCommunityViewModel = sharedViewModel()
+fun codeforcesCommunityViewModel(): CodeforcesCommunityViewModel = viewModel()
 
 class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 
