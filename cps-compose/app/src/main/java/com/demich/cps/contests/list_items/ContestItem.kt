@@ -130,7 +130,7 @@ private fun ContestCounter(
         modifier = modifier,
         text = when (phase) {
             Contest.Phase.BEFORE -> "in " + contestTimeDifference(localCurrentTime, contest.startTime)
-            Contest.Phase.RUNNING -> "ends " + contestTimeDifference(localCurrentTime, contest.endTime)
+            Contest.Phase.RUNNING -> "left " + contestTimeDifference(localCurrentTime, contest.endTime)
             Contest.Phase.FINISHED -> ""
         }
     )
