@@ -246,6 +246,7 @@ private fun ContestsColumn(
     modifier: Modifier = Modifier
 ) {
     LazyColumnOfData(
+        scrollUpButtonEnabled = true,
         modifier = modifier,
         items = contests,
         key = { it.compositeId }

@@ -3,7 +3,12 @@ package com.demich.cps.community.codeforces
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -20,7 +25,8 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.author
-import com.demich.cps.ui.*
+import com.demich.cps.ui.CPSDefaults
+import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.lazylist.visibleItemsInfo
 import com.demich.cps.ui.theme.cpsColors
@@ -36,6 +42,7 @@ fun CodeforcesBlogEntries(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     scrollBarEnabled: Boolean = false,
+    scrollUpButtonEnabled: Boolean = false,
     onLongClick: ((CodeforcesBlogEntry) -> Unit)? = null,
     label: (@Composable (CodeforcesBlogEntry) -> Unit)? = null
 ) {
@@ -44,6 +51,7 @@ fun CodeforcesBlogEntries(
         state = lazyListState,
         modifier = modifier,
         scrollBarEnabled = scrollBarEnabled,
+        scrollUpButtonEnabled = scrollUpButtonEnabled,
         items = blogEntriesState::blogEntries,
         key = CodeforcesBlogEntry::id,
         contentType = { CodeforcesBlogEntryContentType }

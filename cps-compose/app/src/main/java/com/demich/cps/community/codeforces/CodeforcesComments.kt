@@ -58,6 +58,7 @@ fun CodeforcesComments(
     val context = context
     LazyColumnOfData(
         state = lazyListState,
+        scrollUpButtonEnabled = true,
         modifier = modifier,
         items = comments,
         key = { requireNotNull(it.comment).id }

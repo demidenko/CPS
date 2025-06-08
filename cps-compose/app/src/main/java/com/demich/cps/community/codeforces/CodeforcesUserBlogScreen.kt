@@ -72,6 +72,7 @@ private fun CodeforcesUserBlogContent(
                     filterState.filterUserBlogEntries(blogEntries)
                 },
                 scrollBarEnabled = true,
+                scrollUpButtonEnabled = true,
                 modifier = Modifier.fillMaxSize()
             )
         }
