@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.contestDate
-import com.demich.cps.contests.contestTimeDifference
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.dateRange
 import com.demich.cps.contests.dateShortRange
@@ -50,6 +49,7 @@ private fun ContestItemContent(
     contest: Contest,
     collisionType: DangerType
 ) {
+    //TODO: call recomposes two times
     val phase = contest.getPhase(localCurrentTime)
     ContestItemHeader(
         platform = contest.platform,
@@ -128,11 +128,12 @@ private fun ContestCounter(
 ) {
     Text(
         modifier = modifier,
-        text = when (phase) {
-            Contest.Phase.BEFORE -> "in " + contestTimeDifference(localCurrentTime, contest.startTime)
-            Contest.Phase.RUNNING -> "left " + contestTimeDifference(localCurrentTime, contest.endTime)
-            Contest.Phase.FINISHED -> ""
-        }
+        text = counter(
+            contest = contest,
+            phase = phase,
+            before = { "in $it" },
+            running = { "left $it" }
+        )
     )
 }
 

@@ -28,6 +28,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
 
 @Composable
@@ -36,23 +37,23 @@ internal fun ContestExpandedItemContent(
     collisionType: DangerType,
     onDeleteRequest: () -> Unit
 ) {
-    val data = dataByCurrentTime(contest)
+    val phase = contest.getPhase(localCurrentTime)
     ContestPlatform(
         platform = contest.platform,
         platformName = contest.platformName()
     )
     ContestTitle(
         contest = contest,
-        phase = data.phase,
+        phase = phase,
     )
     ContestItemDatesAndMenuButton(
         contest = contest,
-        collisionType = if (data.phase == Contest.Phase.BEFORE) collisionType else DangerType.SAFE,
+        collisionType = if (phase == Contest.Phase.BEFORE) collisionType else DangerType.SAFE,
         onDeleteRequest = onDeleteRequest
     )
     ContestCounter(
-        phase = data.phase,
-        counter = data.counter
+        contest = contest,
+        phase = phase
     )
 }
 
@@ -108,15 +109,17 @@ private fun ContestItemDatesAndMenuButton(
 
 @Composable
 private fun ContestCounter(
-    phase: Contest.Phase,
-    counter: String
+    contest: Contest,
+    phase: Contest.Phase
 ) {
     Text(
-        text = when (phase) {
-            Contest.Phase.BEFORE -> "starts in $counter"
-            Contest.Phase.RUNNING -> "ends in $counter"
-            Contest.Phase.FINISHED -> "finished"
-        },
+        text = counter(
+            contest = contest,
+            phase = phase,
+            before = { "starts in $it" },
+            running = { "ends in $it" },
+            finished = { "finished" }
+        ),
         style = contestSubtitleTextStyle()
     )
 }
