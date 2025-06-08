@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.contestDate
+import com.demich.cps.contests.contestTimeDifference
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.dateRange
 import com.demich.cps.contests.dateShortRange
@@ -22,6 +23,7 @@ import com.demich.cps.contests.isVirtual
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
+import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.toSystemDateTime
 
 @Composable
@@ -48,17 +50,17 @@ private fun ContestItemContent(
     contest: Contest,
     collisionType: DangerType
 ) {
-    val data = dataByCurrentTime(contest)
+    val phase = contest.getPhase(localCurrentTime)
     ContestItemHeader(
         platform = contest.platform,
         contestTitle = contest.title,
-        phase = data.phase,
+        phase = phase,
         isVirtual = contest.isVirtual,
         modifier = Modifier.fillMaxWidth()
     )
     ContestItemFooter(
         contest = contest,
-        data = data,
+        phase = phase,
         collisionType = collisionType,
         modifier = Modifier.fillMaxWidth()
     )
@@ -94,57 +96,45 @@ fun ContestItemHeader(
 @Composable
 private fun ContestItemFooter(
     contest: Contest,
-    data: ContestData,
-    collisionType: DangerType,
-    modifier: Modifier = Modifier
-) {
-    val date: String
-    val counter: String
-    when (data.phase) {
-        Contest.Phase.BEFORE -> {
-            date = contest.dateShortRange()
-            counter = "in " + data.counter
-        }
-        Contest.Phase.RUNNING -> {
-            date = "ends " + contest.endTime.toSystemDateTime().contestDate()
-            counter = "left " + data.counter
-        }
-        Contest.Phase.FINISHED -> {
-            date = contest.dateRange()
-            counter = ""
-        }
-    }
-
-    ContestItemFooter(
-        date = date,
-        counter = counter,
-        collisionType = if (data.phase == Contest.Phase.BEFORE) collisionType else DangerType.SAFE,
-        modifier = modifier
-    )
-}
-
-@Composable
-private fun ContestItemFooter(
-    date: String,
-    counter: String,
+    phase: Contest.Phase,
     collisionType: DangerType,
     modifier: Modifier = Modifier
 ) {
     ProvideTextStyle(contestSubtitleTextStyle()) {
         Box(modifier = modifier) {
             AttentionText(
-                text = date,
+                text = when (phase) {
+                    Contest.Phase.BEFORE -> contest.dateShortRange()
+                    Contest.Phase.RUNNING -> "ends " + contest.endTime.toSystemDateTime().contestDate()
+                    Contest.Phase.FINISHED -> contest.dateRange()
+                },
                 collisionType = collisionType,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
-            Text(
-                text = counter,
+            ContestCounter(
+                contest = contest,
+                phase = phase,
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
         }
     }
 }
 
+@Composable
+private fun ContestCounter(
+    contest: Contest,
+    phase: Contest.Phase,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        modifier = modifier,
+        text = when (phase) {
+            Contest.Phase.BEFORE -> "in " + contestTimeDifference(localCurrentTime, contest.startTime)
+            Contest.Phase.RUNNING -> "ends " + contestTimeDifference(localCurrentTime, contest.endTime)
+            Contest.Phase.FINISHED -> ""
+        }
+    )
+}
 
 @Composable
 @ReadOnlyComposable
