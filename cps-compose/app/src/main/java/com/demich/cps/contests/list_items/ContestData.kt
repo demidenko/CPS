@@ -10,15 +10,14 @@ internal fun Contest.platformName() = host ?: platform.name
 
 @Composable
 @ReadOnlyComposable
-internal inline fun counter(
-    contest: Contest,
+internal inline fun Contest.counter(
     phase: Contest.Phase,
     before: (String) -> String,
     running: (String) -> String,
     finished: () -> String = { "" }
 ): String =
     when (phase) {
-        Contest.Phase.BEFORE -> before(contestTimeDifference(localCurrentTime, contest.startTime))
-        Contest.Phase.RUNNING -> running(contestTimeDifference(localCurrentTime, contest.endTime))
+        Contest.Phase.BEFORE -> before(contestTimeDifference(localCurrentTime, startTime))
+        Contest.Phase.RUNNING -> running(contestTimeDifference(localCurrentTime, endTime))
         Contest.Phase.FINISHED -> finished()
     }

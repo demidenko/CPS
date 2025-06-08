@@ -113,8 +113,7 @@ private fun ContestCounter(
     phase: Contest.Phase
 ) {
     Text(
-        text = counter(
-            contest = contest,
+        text = contest.counter(
             phase = phase,
             before = { "starts in $it" },
             running = { "ends in $it" },

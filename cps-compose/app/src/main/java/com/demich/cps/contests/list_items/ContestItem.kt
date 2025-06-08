@@ -128,8 +128,7 @@ private fun ContestCounter(
 ) {
     Text(
         modifier = modifier,
-        text = counter(
-            contest = contest,
+        text = contest.counter(
             phase = phase,
             before = { "in $it" },
             running = { "left $it" }
