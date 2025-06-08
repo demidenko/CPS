@@ -109,11 +109,11 @@ private fun TabsHeader(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
+            .height(CPSDefaults.tabsRowHeight)
     ) {
         Box(
             modifier = Modifier
                 .background(cpsColors.background)
-                .height(CPSDefaults.tabsRowHeight)
                 .padding(vertical = 10.dp)
                 .padding(start = 6.dp, end = 10.dp)
         ) {
@@ -129,7 +129,7 @@ private fun TabsHeader(
         }
 
         CommunityTabRow(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             pagerState = controller.pagerState
         ) {
             controller.tabs.forEach { title ->

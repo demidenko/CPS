@@ -4,7 +4,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.BadgedBox
 import androidx.compose.material.TabPosition
@@ -23,7 +22,6 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.ui.CPSCountBadge
-import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
 import kotlin.math.max
 import kotlin.math.min
@@ -35,7 +33,7 @@ fun CommunityTabRow(
     tabs: @Composable () -> Unit
 ) {
     TabRow(
-        modifier = modifier.height(CPSDefaults.tabsRowHeight),
+        modifier = modifier,
         selectedTabIndex = pagerState.currentPage,
         backgroundColor = cpsColors.background,
         indicator = { tabPositions ->
