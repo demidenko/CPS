@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 fun LazyListScrollUpButton(
     modifier: Modifier = Modifier,
     listState: LazyListState,
-    scrollListenerState: HorizontalScrollListenerState,
+    scrollListenerState: VerticalScrollListenerState,
     enter: EnterTransition,
     exit: ExitTransition
 ) {
@@ -50,7 +50,7 @@ fun LazyListScrollUpButton(
 }
 
 
-class HorizontalScrollListenerState: NestedScrollConnection {
+class VerticalScrollListenerState: NestedScrollConnection {
     private var lastY by mutableFloatStateOf(0f)
     val scrolledUp: Boolean get() = lastY > 0
 
@@ -65,8 +65,8 @@ class HorizontalScrollListenerState: NestedScrollConnection {
 }
 
 @Composable
-fun rememberScrollListenerState(): HorizontalScrollListenerState {
-    return remember { HorizontalScrollListenerState() }
+fun rememberScrollListenerState(): VerticalScrollListenerState {
+    return remember { VerticalScrollListenerState() }
 }
 
 @Composable

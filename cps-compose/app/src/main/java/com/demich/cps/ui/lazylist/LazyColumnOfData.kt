@@ -27,7 +27,7 @@ inline fun <T> LazyColumnOfData(
     crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
     Box(modifier = modifier) {
-        val scrollListenerState: HorizontalScrollListenerState? =
+        val scrollListenerState: VerticalScrollListenerState? =
             if (scrollUpButtonEnabled) rememberScrollListenerState() else null
 
         LazyColumnWithScrollBar(
