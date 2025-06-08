@@ -8,16 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.theme.cpsColors
@@ -27,16 +23,21 @@ import kotlinx.coroutines.launch
 fun LazyListScrollUpButton(
     modifier: Modifier = Modifier,
     listState: LazyListState,
-    scrollListenerState: VerticalScrollListenerState,
     enter: EnterTransition,
     exit: ExitTransition
 ) {
     val scope = rememberCoroutineScope()
 
+    val visible by remember(listState) {
+        derivedStateOf {
+            listState.lastScrolledBackward && listState.firstVisibleItemIndex > 0
+        }
+    }
+
     //TODO:
     // animate alfa on idle (like scrollbar)
     AnimatedVisibility(
-        visible = scrollListenerState.scrolledUp && listState.firstVisibleItemIndex > 0,
+        visible = visible,
         modifier = modifier,
         enter = enter,
         exit = exit
@@ -47,26 +48,6 @@ fun LazyListScrollUpButton(
             }
         )
     }
-}
-
-
-class VerticalScrollListenerState: NestedScrollConnection {
-    private var lastY by mutableFloatStateOf(0f)
-    val scrolledUp: Boolean get() = lastY > 0
-
-    override fun onPostScroll(
-        consumed: Offset,
-        available: Offset,
-        source: NestedScrollSource
-    ): Offset {
-        lastY = consumed.y
-        return super.onPostScroll(consumed, available, source)
-    }
-}
-
-@Composable
-fun rememberScrollListenerState(): VerticalScrollListenerState {
-    return remember { VerticalScrollListenerState() }
 }
 
 @Composable
