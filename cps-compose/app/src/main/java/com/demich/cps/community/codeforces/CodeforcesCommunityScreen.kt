@@ -46,7 +46,7 @@ fun CodeforcesCommunityScreen(
     controller: CodeforcesCommunityController
 ) {
     Column {
-        TabsHeader(
+        CodeforcesPagerHeader(
             controller = controller,
             modifier = Modifier.fillMaxWidth()
         )
@@ -101,7 +101,7 @@ private fun CodeforcesPager(
 }
 
 @Composable
-private fun TabsHeader(
+private fun CodeforcesPagerHeader(
     controller: CodeforcesCommunityController,
     modifier: Modifier = Modifier
 ) {
