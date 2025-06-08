@@ -1,5 +1,7 @@
 package com.demich.cps.ui.lazylist
 
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.demich.cps.ui.CPSDefaults
 
 @Composable
 inline fun <T> LazyColumnOfData(
@@ -39,9 +42,14 @@ inline fun <T> LazyColumnOfData(
         if (scrollToStartButtonEnabled) {
             LazyListScrollUpButton(
                 listState = state,
+                enter = slideInVertically { it },
+                exit = slideOutVertically { it }, //TODO: bad exit finish because of padding
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(bottom = 8.dp, end = 8.dp)
+                    .padding(
+                        bottom = 8.dp,
+                        end = 4.dp + (if (scrollBarEnabled) CPSDefaults.scrollBarWidth else 0.dp)
+                    )
             )
         }
     }

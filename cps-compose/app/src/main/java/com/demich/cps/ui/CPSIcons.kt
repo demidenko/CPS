@@ -1,12 +1,52 @@
 package com.demich.cps.ui
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
+import androidx.compose.material.icons.automirrored.filled.Dvr
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.automirrored.filled.PlaylistAddCheck
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.Wysiwyg
 import androidx.compose.material.icons.automirrored.rounded.ReadMore
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.AllOut
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.BrightnessAuto
+import androidx.compose.material.icons.filled.BrightnessMedium
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PermDataSetting
+import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.filled.Reorder
+import androidx.compose.material.icons.filled.RssFeed
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SettingsApplications
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material.icons.filled.UnfoldMore
+import androidx.compose.material.icons.filled.WebAsset
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.rounded.*
+import androidx.compose.material.icons.rounded.ChatBubble
+import androidx.compose.material.icons.rounded.DeleteForever
+import androidx.compose.material.icons.rounded.Forum
+import androidx.compose.material.icons.rounded.Newspaper
+import androidx.compose.material.icons.rounded.PeopleAlt
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.twotone.Error
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
@@ -57,6 +97,7 @@ object CPSIcons {
     val BlogEntry get() = Icons.AutoMirrored.Filled.Wysiwyg
     val ArrowRight get() = Icons.AutoMirrored.Filled.ArrowRightAlt
     val ArrowBack get() = Icons.AutoMirrored.Filled.ArrowBack
+    val ArrowUp get() = Icons.Default.ArrowUpward
     val Attention get() = Icons.TwoTone.Error
     val NewsFeeds get() = Icons.Default.RssFeed
     val Monitor get() = Icons.AutoMirrored.Filled.Dvr
