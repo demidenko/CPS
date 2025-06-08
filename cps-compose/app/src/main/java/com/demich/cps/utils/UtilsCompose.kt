@@ -1,7 +1,6 @@
 package com.demich.cps.utils
 
 import android.content.Context
-import androidx.activity.ComponentActivity
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.AnimationSpec
@@ -43,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
@@ -197,8 +197,8 @@ fun exitInColumn(): ExitTransition = shrinkVertically() + fadeOut()
 
 
 @Composable
-inline fun<reified T: ViewModel> sharedViewModel(): T =
-    viewModel(viewModelStoreOwner = context as ComponentActivity)
+inline fun <reified VM : ViewModel> sharedViewModel(): VM =
+    viewModel(viewModelStoreOwner = requireNotNull(LocalViewModelStoreOwner.current))
 
 
 val rememberUUIDState: MutableLongState
