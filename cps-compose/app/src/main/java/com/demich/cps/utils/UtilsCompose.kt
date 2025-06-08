@@ -20,7 +20,6 @@ import androidx.compose.runtime.MutableLongState
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,14 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlin.random.Random
 
@@ -79,27 +72,6 @@ inline fun<T, K> rememberWith(
 ): T = remember(key1 = key) {
         with(receiver = key, block = calculation)
     }
-
-@Composable
-inline fun<T> collectAsState(crossinline block: () -> Flow<T>): State<T> =
-    remember(block).let { flow ->
-        if (flow is StateFlow<T>) flow.collectAsState()
-        else flow.collectAsState(initial = remember { runBlocking { flow.first() } })
-    }
-
-@Composable
-inline fun<T> collectAsStateWithLifecycle(crossinline block: () -> Flow<T>): State<T> =
-    remember(block).let { flow ->
-        if (flow is StateFlow<T>) flow.collectAsStateWithLifecycle()
-        else flow.collectAsStateWithLifecycle(initialValue = remember { runBlocking { flow.first() } })
-    }
-
-@Composable
-inline fun <T> collectItemAsState(crossinline block: @DisallowComposableCalls () -> DataStoreItem<T>): State<T> =
-    remember {
-        val item = block()
-        item.flow to runBlocking { item() }
-    }.run { first.collectAsState(initial = second) }
 
 
 inline fun Dp.plusIf(condition: Boolean, value: () -> Dp): Dp =
