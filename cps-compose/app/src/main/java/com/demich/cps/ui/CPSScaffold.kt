@@ -40,6 +40,7 @@ import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.animateColorAsState
 import com.demich.cps.utils.background
+import com.demich.cps.utils.ifThen
 
 @Stable
 private fun<T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessMediumLow)
@@ -87,10 +88,10 @@ private fun Scaffold(
 ) {
     val bottomBarBackgroundColor by backgroundColorState(bottomBarSettingsEnabled)
 
-    Column(modifier = modifier.let {
-        if (navigator.isBottomBarEnabled) it
-        else it.windowInsetsPadding(WindowInsets.navigationBars)
-    }) {
+    Column(
+        modifier = modifier
+            .ifThen(!navigator.isBottomBarEnabled) { windowInsetsPadding(WindowInsets.navigationBars) }
+    ) {
         Box(
             contentAlignment = Alignment.BottomCenter,
             modifier = Modifier

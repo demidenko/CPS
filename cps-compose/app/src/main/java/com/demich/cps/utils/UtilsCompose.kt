@@ -105,6 +105,9 @@ inline fun <T> collectItemAsState(crossinline block: @DisallowComposableCalls ()
 inline fun Dp.plusIf(condition: Boolean, value: () -> Dp): Dp =
     if (condition) this + value() else this
 
+inline fun Modifier.ifThen(condition: Boolean, block: Modifier.() -> Modifier): Modifier =
+    if (condition) then(block()) else this
+
 fun AnnotatedString.Builder.append(
     text: String,
     color: Color = Color.Unspecified,

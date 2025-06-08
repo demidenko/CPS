@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.ifThen
 
 @Composable
 fun LazyColumnWithScrollBar(
@@ -25,15 +26,17 @@ fun LazyColumnWithScrollBar(
     content: LazyListScope.() -> Unit
 ) {
     LazyColumn(
-        modifier = if (scrollBarEnabled) modifier.drawScrollBar(
-            state = state,
-            activeColor = cpsColors.content.copy(alpha = 0.6f),
-            inactiveColor = cpsColors.content.copy(alpha = 0.37f),
-            scrollBarWidth = CPSDefaults.scrollBarWidth,
-            minimumScrollBarHeight = 10.dp,
-            enterAnimationSpec = snap(),
-            exitAnimationSpec = tween(delayMillis = 600, easing = LinearEasing)
-        ) else modifier,
+        modifier = modifier.ifThen(scrollBarEnabled) {
+            drawScrollBar(
+                state = state,
+                activeColor = cpsColors.content.copy(alpha = 0.6f),
+                inactiveColor = cpsColors.content.copy(alpha = 0.37f),
+                scrollBarWidth = CPSDefaults.scrollBarWidth,
+                minimumScrollBarHeight = 10.dp,
+                enterAnimationSpec = snap(),
+                exitAnimationSpec = tween(delayMillis = 600, easing = LinearEasing)
+            )
+        },
         state = state,
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
