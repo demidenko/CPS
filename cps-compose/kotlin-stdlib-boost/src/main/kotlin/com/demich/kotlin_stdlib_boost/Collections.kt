@@ -8,9 +8,16 @@ fun <T> MutableList<T>.swap(i: Int, j: Int) =
 inline fun <T, R> Iterable<T>.mapToSet(transform: (T) -> R): Set<R> =
     mapTo(mutableSetOf(), transform)
 
-fun <T> List<T>.isSortedWith(comparator: Comparator<in T>): Boolean {
-    if (size < 2) return true
-    for (i in 1 until size) if (comparator.compare(get(i-1),get(i)) > 0) return false
+fun <T> Iterable<T>.isSortedWith(comparator: Comparator<in T>): Boolean {
+    if (this is Collection<T> && size < 2) return true
+    val iterator = iterator()
+    if (!iterator.hasNext()) return true
+    var current = iterator.next()
+    while (iterator.hasNext()) {
+        val next = iterator.next()
+        if (comparator.compare(current, next) > 0) return false
+        current = next
+    }
     return true
 }
 
