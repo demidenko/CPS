@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.CPSDefaults
 
@@ -19,17 +20,25 @@ inline fun <T> LazyColumnOfData(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     scrollBarEnabled: Boolean = true,
-    scrollToStartButtonEnabled: Boolean = false,
+    scrollUpButtonEnabled: Boolean = false,
     crossinline items: () -> List<T>,
     noinline key: ((item: T) -> Any)? = null,
     noinline contentType: (item: T) -> Any? = { null },
     crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
     Box(modifier = modifier) {
+        val scrollListenerState: HorizontalScrollListenerState? =
+            if (scrollUpButtonEnabled) rememberScrollListenerState() else null
+
         LazyColumnWithScrollBar(
-            modifier = Modifier.fillMaxSize(),
             state = state,
-            scrollBarEnabled = scrollBarEnabled
+            scrollBarEnabled = scrollBarEnabled,
+            modifier = Modifier
+                .fillMaxSize()
+                .let {
+                    if (scrollListenerState != null) it.nestedScroll(scrollListenerState)
+                    else it
+                }
         ) {
             itemsNotEmpty(
                 items = items(),
@@ -39,9 +48,10 @@ inline fun <T> LazyColumnOfData(
             )
         }
 
-        if (scrollToStartButtonEnabled) {
+        if (scrollListenerState != null) {
             LazyListScrollUpButton(
                 listState = state,
+                scrollListenerState = scrollListenerState,
                 enter = slideInVertically { it },
                 exit = slideOutVertically { it }, //TODO: bad exit finish because of padding
                 modifier = Modifier
