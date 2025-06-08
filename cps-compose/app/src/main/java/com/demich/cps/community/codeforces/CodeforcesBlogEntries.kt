@@ -32,6 +32,7 @@ import com.demich.cps.ui.lazylist.visibleItemsInfo
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.localCurrentTime
+import com.demich.cps.utils.plusIf
 import com.demich.cps.utils.timeAgo
 
 
@@ -68,7 +69,7 @@ fun CodeforcesBlogEntries(
                 )
                 .padding(
                     start = 5.dp,
-                    end = 4.dp + (if (scrollBarEnabled) CPSDefaults.scrollBarWidth else 0.dp),
+                    end = 4.dp.plusIf(scrollBarEnabled) { CPSDefaults.scrollBarWidth },
                     top = 1.dp,
                     bottom = 4.dp
                 )

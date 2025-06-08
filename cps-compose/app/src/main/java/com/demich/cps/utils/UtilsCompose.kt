@@ -41,6 +41,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -100,6 +101,9 @@ inline fun <T> collectItemAsState(crossinline block: @DisallowComposableCalls ()
         item.flow to runBlocking { item() }
     }.run { first.collectAsState(initial = second) }
 
+
+inline fun Dp.plusIf(condition: Boolean, value: () -> Dp): Dp =
+    if (condition) this + value() else this
 
 fun AnnotatedString.Builder.append(
     text: String,

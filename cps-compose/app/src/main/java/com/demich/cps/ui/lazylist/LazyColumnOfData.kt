@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.CPSDefaults
+import com.demich.cps.utils.plusIf
 
 @Composable
 inline fun <T> LazyColumnOfData(
@@ -48,7 +49,7 @@ inline fun <T> LazyColumnOfData(
                     .align(Alignment.BottomEnd)
                     .padding(
                         bottom = 8.dp,
-                        end = 4.dp + (if (scrollBarEnabled) CPSDefaults.scrollBarWidth else 0.dp)
+                        end = 4.dp.plusIf(scrollBarEnabled) { CPSDefaults.scrollBarWidth }
                     )
             )
         }
