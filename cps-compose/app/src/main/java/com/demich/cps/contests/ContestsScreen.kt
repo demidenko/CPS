@@ -200,6 +200,12 @@ private fun ContestsPager(
     }
 }
 
+private fun SortedContests.sublist(page: ContestsListViewState.ContestsPage): List<Contest> =
+    when (page) {
+        ContestsListViewState.ContestsPage.Finished -> finished
+        ContestsListViewState.ContestsPage.RunningOrFuture -> runningOrFuture
+    }
+
 private fun FilterState.filterContests(contests: List<Contest>) =
     contests.filterByTokensAsSubsequence(filter) {
         sequence {
