@@ -1,5 +1,6 @@
 package com.demich.cps.develop
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -41,6 +42,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.bottomprogressbar.CPSProgressIndicator
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
+import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
@@ -99,29 +101,32 @@ fun WorkersList(modifier: Modifier = Modifier) {
         }
     }
 
-
     val context = context
     val progressBarsViewModel = progressBarsViewModel()
     if (showMonitorDialog) {
         CodeforcesMonitorDialog(onDismissRequest = { showMonitorDialog = false }) { contestId ->
-            progressBarsViewModel.doJob(id = "run_cf_monitor $contestId") { progress ->
-                val handle = CodeforcesAccountManager()
-                    .dataStore(context)
-                    .getSavedInfo()?.handle ?: return@doJob
-                var progressInfo = ProgressBarInfo(total = 5, title = "cf monitor")
-                progress(progressInfo)
-                repeat(progressInfo.total) {
-                    delay(1.seconds)
-                    progressInfo++
-                    progress(progressInfo)
-                }
-                CodeforcesMonitorWorker.start(
-                    contestId = contestId,
-                    context = context,
-                    handle = handle
-                )
-            }
+            progressBarsViewModel.startCodeforcesMonitor(contestId, context)
         }
+    }
+}
+
+private fun ProgressBarsViewModel.startCodeforcesMonitor(contestId: Int, context: Context) {
+    doJob(id = "run_cf_monitor $contestId") { progress ->
+        val handle = CodeforcesAccountManager()
+            .dataStore(context)
+            .getSavedInfo()?.handle ?: return@doJob
+        var progressInfo = ProgressBarInfo(total = 5, title = "cf monitor")
+        progress(progressInfo)
+        repeat(progressInfo.total) {
+            delay(1.seconds)
+            progressInfo++
+            progress(progressInfo)
+        }
+        CodeforcesMonitorWorker.start(
+            contestId = contestId,
+            context = context,
+            handle = handle
+        )
     }
 }
 

@@ -33,6 +33,7 @@ import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
+import com.demich.cps.utils.randomUuid
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -52,9 +53,7 @@ fun developAdditionalBottomBarBuilder(): AdditionalBottomBarBuilder = {
     val progressBarsViewModel = progressBarsViewModel()
 
     CPSIconButton(icon = CPSIcons.Add) {
-        progressBarsViewModel.doJob(
-            id = Random.nextLong().toString()
-        ) { progress ->
+        progressBarsViewModel.doJob(id = randomUuid().toString()) { progress ->
             val total = Random.nextInt(5, 15)
             progress(ProgressBarInfo(total = total, title = total.toString()))
             repeat(total) {
