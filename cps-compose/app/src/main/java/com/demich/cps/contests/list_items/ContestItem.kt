@@ -62,7 +62,7 @@ private fun ContestItemContent(
     ContestItemFooter(
         contest = contest,
         phase = phase,
-        collisionType = collisionType,
+        collisionType = if (phase == Contest.Phase.BEFORE) collisionType else DangerType.SAFE,
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -109,7 +109,7 @@ private fun ContestItemFooter(
                     Contest.Phase.RUNNING -> "ends " + contest.endTime.toSystemDateTime().contestDate()
                     Contest.Phase.FINISHED -> contest.dateRange()
                 },
-                collisionType = if (phase == Contest.Phase.BEFORE) collisionType else DangerType.SAFE,
+                collisionType = collisionType,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
             ContestCounter(
