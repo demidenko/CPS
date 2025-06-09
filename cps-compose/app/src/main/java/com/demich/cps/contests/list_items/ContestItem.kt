@@ -23,6 +23,7 @@ import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.localCurrentTime
+import com.demich.cps.utils.timerShort
 import com.demich.cps.utils.toSystemDateTime
 
 @Composable
@@ -130,8 +131,8 @@ private fun ContestCounter(
         modifier = modifier,
         text = contest.counter(
             phase = phase,
-            before = { "in $it" },
-            running = { "left $it" }
+            before = { "in ${it.timerShort()}" },
+            running = { "left ${it.timerShort()}" }
         )
     )
 }

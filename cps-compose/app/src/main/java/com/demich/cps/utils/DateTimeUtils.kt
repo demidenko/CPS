@@ -54,3 +54,8 @@ fun Duration.toRoundedTimeString(): String =
         this < 365.days * 2 -> "${inWholeDays / 31} months"
         else -> "${inWholeDays / 365} years"
     }
+
+fun Duration.timerShort(): String {
+    if (this < 48.hours) return toHHMMSS()
+    return toRoundedTimeString()
+}
