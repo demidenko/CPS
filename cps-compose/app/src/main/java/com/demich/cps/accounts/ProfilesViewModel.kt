@@ -9,7 +9,7 @@ import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
-import com.demich.cps.accounts.managers.allAccountManagers
+import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.userinfo.ClistUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserInfo
@@ -83,7 +83,7 @@ class ProfilesViewModel: ViewModel() {
             var progressBarInfo = ProgressBarInfo(title = "clist import", total = supported.size)
             progress(progressBarInfo)
             supported.map { (type, userId) ->
-                val manager = allAccountManagers.first { it.type == type }
+                val manager = accountManagerOf(type)
                 launch {
                     //wait for loading stops
                     loadingStatuses.takeWhile { it[type] == LoadingStatus.LOADING }.collect()

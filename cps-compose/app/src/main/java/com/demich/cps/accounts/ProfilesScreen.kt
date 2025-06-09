@@ -23,6 +23,7 @@ import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.CListAccountManager
 import com.demich.cps.accounts.managers.UserInfoWithManager
+import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.navigation.CPSNavigator
@@ -227,7 +228,7 @@ private fun AddProfileButton(
             )
         } else {
             ChangeSavedInfoDialog(
-                manager = allAccountManagers.first { it.type == type },
+                manager = accountManagerOf(type),
                 initialUserInfo = null,
                 scope = scope,
                 onDismissRequest = { selectedType = null }

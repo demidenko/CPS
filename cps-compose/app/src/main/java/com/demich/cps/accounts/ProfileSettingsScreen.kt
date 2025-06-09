@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.AccountSettingsProvider
-import com.demich.cps.accounts.managers.allAccountManagers
+import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.SettingsColumn
 import com.demich.cps.ui.SettingsItem
@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.emptyFlow
 fun ProfileSettingsScreen(
     type: AccountManagerType
 ) {
-    val manager = remember(type) { allAccountManagers.first { it.type == type } }
+    val manager = remember(type) { accountManagerOf(type) }
     ProfileSettingsScreen(manager = manager)
 }
 

@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.AccountManagerType
-import com.demich.cps.accounts.managers.allAccountManagers
+import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.ui.CPSIcons
@@ -33,7 +33,7 @@ private fun ProfileExpandedScreen(
     onDismissDeleteDialog: () -> Unit,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
-    val manager = remember(type) { allAccountManagers.first { it.type == type } }
+    val manager = remember(type) { accountManagerOf(type) }
     ProfileExpandedContent(
         manager = manager,
         setBottomBarContent = setBottomBarContent
@@ -78,7 +78,7 @@ private fun profileExpandedMenuBuilder(
     CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings, onClick = onOpenSettings)
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         scope.launch {
-            allAccountManagers.first { it.type == type }
+            accountManagerOf(type)
                 .dataStore(context).getSavedInfo()
                 ?.userPageUrl
                 ?.let { url -> context.openUrlInBrowser(url) }

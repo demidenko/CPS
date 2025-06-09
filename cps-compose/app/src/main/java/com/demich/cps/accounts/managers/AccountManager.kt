@@ -35,6 +35,8 @@ val allAccountManagers: List<AccountManager<out UserInfo>>
 val allRatedAccountManagers: List<RatedAccountManager<out RatedUserInfo>>
     get() = allAccountManagers.filterIsInstance<RatedAccountManager<*>>()
 
+fun accountManagerOf(type: AccountManagerType) =
+    allAccountManagers.first { it.type == type }
 
 abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
 
