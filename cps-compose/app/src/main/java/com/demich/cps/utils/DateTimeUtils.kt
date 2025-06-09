@@ -29,6 +29,10 @@ fun Instant.truncateBy(period: Duration): Instant = this - this % period
 private fun Duration.dropSeconds(): Duration = inWholeMinutes.minutes
 
 
+fun Duration.toDHHMMSS(): String = toComponents { days, hours, minutes, seconds, _ ->
+    String.format(null, "%d days %02d:%02d:%02d", days, hours, minutes, seconds)
+}
+
 fun Duration.toHHMMSS(): String = toComponents { hours, minutes, seconds, _ ->
     String.format(null, "%02d:%02d:%02d", hours, minutes, seconds)
 }
@@ -55,7 +59,8 @@ fun Duration.toRoundedTimeString(): String =
         else -> "${inWholeDays / 365} years"
     }
 
-fun Duration.timerShort(): String {
-    if (this < 48.hours) return toHHMMSS()
-    return toRoundedTimeString()
-}
+fun Duration.timerShort(): String =
+    if (this < 48.hours) toHHMMSS() else toRoundedTimeString()
+
+fun Duration.timerFull(): String =
+    if (this < 48.hours) toHHMMSS() else toDHHMMSS()

@@ -30,7 +30,7 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.timerShort
+import com.demich.cps.utils.timerFull
 
 @Composable
 internal fun ContestExpandedItemContent(
@@ -116,8 +116,8 @@ private fun ContestCounter(
     Text(
         text = contest.counter(
             phase = phase,
-            before = { "starts in ${it.timerShort()}" },
-            running = { "ends in ${it.timerShort()}" },
+            before = { "starts in ${it.timerFull()}" },
+            running = { "ends in ${it.timerFull()}" },
             finished = { "finished" }
         ),
         style = contestSubtitleTextStyle()
