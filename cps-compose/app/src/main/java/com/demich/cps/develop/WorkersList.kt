@@ -55,6 +55,8 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.localCurrentTime
+import com.demich.cps.utils.toDropSecondsString
+import com.demich.cps.utils.toExecTimeString
 import com.demich.cps.workers.CPSOneTimeWork
 import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.cps.workers.CPSWork
@@ -74,9 +76,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
 
 @Composable
 fun WorkersList(modifier: Modifier = Modifier) {
@@ -271,16 +271,6 @@ private fun CodeforcesMonitorWorkItem(
         Text(text = "contestId = $contestId")
     }
 }
-
-private fun Duration.toExecTimeString(): String {
-    if (this < 1.seconds) return toString(unit = DurationUnit.MILLISECONDS)
-    return toString(unit = DurationUnit.SECONDS, decimals = 1).replace(',', '.')
-}
-
-private fun Duration.dropSeconds(): Duration = inWholeMinutes.minutes
-
-private fun Duration.toDropSecondsString(): String =
-    if (this < 1.minutes) "<1m" else dropSeconds().toString()
 
 @Composable
 private fun WorkerItem(

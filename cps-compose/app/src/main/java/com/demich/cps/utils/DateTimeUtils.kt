@@ -10,6 +10,8 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 fun getCurrentTime() = Clock.System.now()
 
@@ -24,6 +26,8 @@ operator fun Instant.rem(period: Duration): Duration {
 
 fun Instant.truncateBy(period: Duration): Instant = this - this % period
 
+private fun Duration.dropSeconds(): Duration = inWholeMinutes.minutes
+
 
 fun Duration.toHHMMSS(): String = toComponents { hours, minutes, seconds, _ ->
     String.format(null, "%02d:%02d:%02d", hours, minutes, seconds)
@@ -32,6 +36,14 @@ fun Duration.toHHMMSS(): String = toComponents { hours, minutes, seconds, _ ->
 fun Duration.toMMSS(): String = toComponents { minutes, seconds, _ ->
     String.format(null, "%02d:%02d", minutes, seconds)
 }
+
+fun Duration.toExecTimeString(): String {
+    if (this < 1.seconds) return toString(unit = DurationUnit.MILLISECONDS)
+    return toString(unit = DurationUnit.SECONDS, decimals = 1).replace(',', '.')
+}
+
+fun Duration.toDropSecondsString(): String =
+    if (this < 1.minutes) "<1m" else dropSeconds().toString()
 
 fun timeDifference(t: Duration): String =
     when {
