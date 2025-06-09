@@ -54,7 +54,9 @@ internal fun DateConstraintsSettingsItem() {
 
     ExpandableSettingsItem(
         title = "Date constraints",
-        collapsedContent = { SettingsSubtitle(makeInfoString(dateConstraints)) },
+        collapsedContent = {
+            SettingsSubtitle(text = dateConstraints.makeInfoString())
+        },
         expandedContent = {
             Column {
                 DurationRow(
@@ -77,10 +79,8 @@ internal fun DateConstraintsSettingsItem() {
     )
 }
 
-private fun makeInfoString(dateConstraints: ContestDateBaseConstraints): String =
-    with(dateConstraints) {
-        "duration ≤ $maxDuration; start ≤ now + $nowToStartTimeMaxDuration; now - $endTimeToNowMaxDuration ≤ end"
-    }
+private fun ContestDateBaseConstraints.makeInfoString(): String =
+    "duration ≤ $maxDuration; start ≤ now + $nowToStartTimeMaxDuration; now - $endTimeToNowMaxDuration ≤ end"
 
 @Composable
 private fun DurationRow(
