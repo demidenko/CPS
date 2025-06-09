@@ -101,8 +101,8 @@ private fun ContestItemFooter(
     collisionType: DangerType,
     modifier: Modifier = Modifier
 ) {
-    ProvideTextStyle(contestSubtitleTextStyle()) {
-        Box(modifier = modifier) {
+    Box(modifier = modifier) {
+        ProvideTextStyle(contestSubtitleTextStyle()) {
             AttentionText(
                 text = when (phase) {
                     Contest.Phase.BEFORE -> contest.dateShortRange()

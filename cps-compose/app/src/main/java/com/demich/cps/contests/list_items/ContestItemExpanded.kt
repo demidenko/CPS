@@ -115,15 +115,16 @@ private fun ContestCounter(
     contest: Contest,
     phase: Contest.Phase
 ) {
-    Text(
-        text = contest.counter(
-            phase = phase,
-            before = { "starts in ${it.timerFull()}" },
-            running = { "ends in ${it.timerFull()}" },
-            finished = { "finished" }
-        ),
-        style = contestSubtitleTextStyle()
-    )
+    ProvideTextStyle(contestSubtitleTextStyle()) {
+        Text(
+            text = contest.counter(
+                phase = phase,
+                before = { "starts in ${it.timerFull()}" },
+                running = { "ends in ${it.timerFull()}" },
+                finished = { "finished" }
+            )
+        )
+    }
 }
 
 @Composable
