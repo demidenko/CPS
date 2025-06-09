@@ -45,15 +45,12 @@ fun Duration.toExecTimeString(): String {
 fun Duration.toDropSecondsString(): String =
     if (this < 1.minutes) "<1m" else dropSeconds().toString()
 
-fun timeDifference(t: Duration): String =
+fun Duration.toRoundedTimeString(): String =
     when {
-        t < 2.minutes -> "minute"
-        t < 2.hours -> "${t.inWholeMinutes} minutes"
-        t < 24.hours * 2 -> "${t.inWholeHours} hours"
-        t < 31.days * 2 -> "${t.inWholeDays} days"
-        t < 365.days * 2 -> "${t.inWholeDays / 31} months"
-        else -> "${t.inWholeDays / 365} years"
+        this < 2.minutes -> "minute"
+        this < 2.hours -> "$inWholeMinutes minutes"
+        this < 24.hours * 2 -> "$inWholeHours hours"
+        this < 31.days * 2 -> "$inWholeDays days"
+        this < 365.days * 2 -> "${inWholeDays / 31} months"
+        else -> "${inWholeDays / 365} years"
     }
-
-fun timeDifference(fromTime: Instant, toTime: Instant) = timeDifference(toTime - fromTime)
-

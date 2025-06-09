@@ -2,8 +2,8 @@ package com.demich.cps.contests
 
 import androidx.compose.ui.text.intl.Locale
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.utils.timeDifference
 import com.demich.cps.utils.toHHMMSS
+import com.demich.cps.utils.toRoundedTimeString
 import com.demich.cps.utils.toSystemDateTime
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.hours
 fun contestTimeDifference(fromTime: Instant, toTime: Instant): String {
     val t: Duration = toTime - fromTime
     if(t < 48.hours) return t.toHHMMSS()
-    return timeDifference(t)
+    return t.toRoundedTimeString()
 }
 
 private object Formats {
