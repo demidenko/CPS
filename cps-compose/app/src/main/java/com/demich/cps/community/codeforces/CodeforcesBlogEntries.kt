@@ -31,9 +31,8 @@ import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.lazylist.visibleItemsInfo
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
-import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.plusIf
-import com.demich.cps.utils.timeAgo
+import com.demich.cps.utils.toTimeAgoString
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -98,10 +97,7 @@ private fun BlogEntryInfo(
         authorHandle = blogEntry.author.toHandleSpan(),
         rating = blogEntry.rating,
         commentsCount = blogEntry.commentsCount,
-        timeAgo = timeAgo(
-            fromTime = blogEntry.creationTime,
-            toTime = localCurrentTime
-        ),
+        timeAgo = blogEntry.creationTime.toTimeAgoString(),
         markNew = markNew,
         label = label,
         modifier = modifier

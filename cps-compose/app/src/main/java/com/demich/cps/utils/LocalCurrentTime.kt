@@ -59,3 +59,9 @@ fun ProvideTimeEachSecond(content: @Composable () -> Unit) =
 @Composable
 fun ProvideTimeEachMinute(content: @Composable () -> Unit) =
     ProvideCurrentTime(currentTimeState = currentTimeAsState(1.minutes), content = content)
+
+
+@Composable
+@ReadOnlyComposable
+fun Instant.toTimeAgoString(): String =
+    timeDifference(fromTime = this, toTime = localCurrentTime) + " ago"

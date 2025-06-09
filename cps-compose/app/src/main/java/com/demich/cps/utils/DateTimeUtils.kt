@@ -45,4 +45,3 @@ fun timeDifference(t: Duration): String =
 
 fun timeDifference(fromTime: Instant, toTime: Instant) = timeDifference(toTime - fromTime)
 
-fun timeAgo(fromTime: Instant, toTime: Instant) = timeDifference(fromTime, toTime) + " ago"

@@ -25,7 +25,7 @@ import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.localCurrentTime
-import com.demich.cps.utils.timeAgo
+import com.demich.cps.utils.toTimeAgoString
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
 
@@ -126,7 +126,7 @@ private fun UserOnlineInfo(
     UserOnlineInfo(
         modifier = modifier,
         fontSize = fontSize,
-        text = "online: " + timeAgo(fromTime = time, toTime = localCurrentTime),
+        text = "online: " + time.toTimeAgoString(),
         showWarning = localCurrentTime - time > 365.days
     )
 }
