@@ -90,7 +90,9 @@ private fun ContestTitle(
         title = contest.title,
         phase = phase,
         isVirtual = contest.isVirtual,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .fillMaxWidth()
     )
 }
 
