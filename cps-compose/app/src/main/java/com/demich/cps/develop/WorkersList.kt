@@ -55,7 +55,6 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.localCurrentTime
-import com.demich.cps.utils.timeAgo
 import com.demich.cps.workers.CPSOneTimeWork
 import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.cps.workers.CPSWork
@@ -151,7 +150,7 @@ private fun WorkerDialog(
                     WorkInfo.State.ENQUEUED -> {
                         workInfo?.nextScheduleTime?.let { nextTime ->
                             val d = nextTime - localCurrentTime
-                            Text(text = "next: in ${d.dropSeconds()}")
+                            Text(text = "next: in ${d.toDropSecondsString()}")
                         }
                     }
                     else -> {
@@ -273,14 +272,15 @@ private fun CodeforcesMonitorWorkItem(
     }
 }
 
-private fun Duration.toNiceString(): String {
+private fun Duration.toExecTimeString(): String {
     if (this < 1.seconds) return toString(unit = DurationUnit.MILLISECONDS)
     return toString(unit = DurationUnit.SECONDS, decimals = 1).replace(',', '.')
 }
 
-private fun Duration.dropSeconds(): Duration {
-    return inWholeMinutes.minutes
-}
+private fun Duration.dropSeconds(): Duration = inWholeMinutes.minutes
+
+private fun Duration.toDropSecondsString(): String =
+    if (this < 1.minutes) "<1m" else dropSeconds().toString()
 
 @Composable
 private fun WorkerItem(
@@ -305,10 +305,16 @@ private fun WorkerItem(
                     modifier = Modifier.padding(end = 3.dp)
                 )
             }
-            Text(text = lastExecTime?.let { timeAgo(fromTime = it, toTime = localCurrentTime) } ?: "never")
+
+            Text(
+                text = lastExecTime?.let {
+                    (localCurrentTime - it).toDropSecondsString() + " ago"
+                } ?: "never"
+            )
+
             if (lastDuration != null) {
                 Text(
-                    text = "(${lastDuration.toNiceString()})",
+                    text = "(${lastDuration.toExecTimeString()})",
                     modifier = Modifier.padding(start = 3.dp)
                 )
             }
