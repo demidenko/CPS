@@ -75,6 +75,7 @@ import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.workers.ContestsWorker
 import com.demich.cps.workers.isRunning
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
@@ -173,12 +174,13 @@ private fun ContestsPager(
     modifier: Modifier = Modifier
 ) {
     val (
-        contestsState: State<SortedContests>,
+        contestsState: State<SortedContests?>,
         currentTimeState: State<Instant>
     ) = produceSortedContestsWithTime()
 
     LaunchedEffect(contestsState, filterState, viewState) {
-        snapshotFlow { contestsState.value.contests }
+        snapshotFlow { contestsState.value?.contests }
+            .filterNotNull()
             .collect { contests ->
                 filterState.available = contests.isNotEmpty()
                 viewState.applyContests(contests)
@@ -191,7 +193,7 @@ private fun ContestsPager(
         val page = viewState.contestsPage
         saveableStateHolder.SaveableStateProvider(key = page) {
             ContestsPage(
-                contests = { contestsState.value.sublist(page) },
+                contests = { contestsState.value?.sublist(page) },
                 viewState = viewState,
                 filterState = filterState,
                 modifier = modifier
@@ -217,7 +219,7 @@ private fun FilterState.filterContests(contests: List<Contest>) =
 
 @Composable
 private fun ContestsPage(
-    contests: () -> List<Contest>,
+    contests: () -> List<Contest>?,
     viewState: ContestsListViewState,
     filterState: FilterState,
     modifier: Modifier = Modifier
@@ -225,9 +227,11 @@ private fun ContestsPage(
     val context = context
     val scope = rememberCoroutineScope()
 
-    val filtered by remember(contests, filterState) {
+    val filtered: List<Contest>? by remember(contests, filterState) {
         derivedStateOf {
-            filterState.filterContests(contests())
+            contests()?.let {
+                filterState.filterContests(it)
+            }
         }
     }
 
@@ -246,7 +250,7 @@ private fun ContestsPage(
 
 @Composable
 private fun ContestsColumn(
-    contests: () -> List<Contest>,
+    contests: () -> List<Contest>?,
     viewState: ContestsListViewState,
     onDeleteRequest: (Contest) -> Unit,
     modifier: Modifier = Modifier

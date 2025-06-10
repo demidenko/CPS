@@ -24,8 +24,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
 
@@ -132,15 +130,12 @@ private class ContestsSmartSorter: ContestsSorter {
 @Composable
 internal fun produceSortedContestsWithTime(
 
-): Pair<State<SortedContests>, State<Instant>> {
+): Pair<State<SortedContests?>, State<Instant>> {
     val context = context
 
     val states = remember {
-        val initContests = runBlocking { flowOfContests(context).first() }
         val currentTime = getCurrentTime().truncateBy(1.seconds)
-        val sorter = ContestsBruteSorter()
-        sorter.apply(initContests, currentTime)
-        val contestsState = mutableStateOf(sorter.contests)
+        val contestsState = mutableStateOf<SortedContests?>(null)
         val currentTimeState = mutableStateOf(currentTime)
         Pair(contestsState, currentTimeState)
     }
