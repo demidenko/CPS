@@ -43,7 +43,7 @@ fun Duration.toExecTimeString(): String {
 }
 
 fun Duration.toDropSecondsString(): String =
-    if (this < 1.minutes) "<1m" else dropSeconds().toString()
+    1.minutes.let { if (this < it) "<$it" else dropSeconds().toString() }
 
 fun Duration.toRoundedTimeString(): String =
     when {
