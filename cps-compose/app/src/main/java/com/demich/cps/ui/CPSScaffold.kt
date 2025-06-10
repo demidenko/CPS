@@ -78,7 +78,7 @@ private fun Scaffold(
         onEnableBottomBarSettings = onEnableBottomBarSettings,
         topBars = { navigator.TopBarWithStatusBar(modifier = Modifier.fillMaxWidth()) },
         content = content,
-        additionalBottomBar = navigator.additionalBottomBar,
+        additionalBottomBar = { navigator.additionalBottomBar ?: {} }
     )
 }
 
@@ -93,7 +93,7 @@ private fun Scaffold(
     onEnableBottomBarSettings: () -> Unit,
     topBars: @Composable () -> Unit,
     content: @Composable () -> Unit,
-    additionalBottomBar: AdditionalBottomBarBuilder?
+    additionalBottomBar: () -> AdditionalBottomBarBuilder
 ) {
     Column(modifier = modifier) {
         Box(
@@ -148,7 +148,7 @@ private fun BottomBarAndNavBar(
     bottomBarSettingsEnabled: Boolean,
     onDisableBottomBarSettings: () -> Unit,
     onEnableBottomBarSettings: () -> Unit,
-    additionalBottomBar: AdditionalBottomBarBuilder?
+    additionalBottomBar: () -> AdditionalBottomBarBuilder
 ) {
     val backgroundColor by bottomBarBackgroundColorState(bottomBarSettingsEnabled)
     val enabled = bottomBarEnabled()
