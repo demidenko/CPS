@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ inline fun <T> LazyColumnOfData(
         ) {
             itemsNotEmpty(
                 items = items(),
+                onEmptyMessage = { Text(text = "List is empty") },
                 key = key,
                 itemContent = itemContent,
                 contentType = contentType

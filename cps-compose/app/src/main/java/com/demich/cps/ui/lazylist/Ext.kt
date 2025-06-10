@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.demich.cps.ui.EmptyMessageBox
@@ -46,7 +45,7 @@ fun LazyListState.visibleRange(requiredVisiblePart: Float): IntRange =
 
 inline fun <T> LazyListScope.itemsNotEmpty(
     items: List<T>,
-    crossinline onEmptyMessage: @Composable () -> Unit = { Text(text = "List is empty") },
+    crossinline onEmptyMessage: @Composable () -> Unit,
     noinline key: ((item: T) -> Any)? = null,
     noinline contentType: (item: T) -> Any? = { null },
     crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
