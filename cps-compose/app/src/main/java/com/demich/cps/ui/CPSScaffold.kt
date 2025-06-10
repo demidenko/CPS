@@ -1,8 +1,10 @@
 package com.demich.cps.ui
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -51,7 +53,8 @@ fun CPSScaffold(
 ) {
     Surface(
         modifier = modifier,
-        color = cpsColors.background
+        color = cpsColors.background,
+        contentColor = cpsColors.content
     ) {
         var bottomBarSettingsEnabled by rememberSaveable { mutableStateOf(false) }
 
@@ -156,6 +159,9 @@ private fun Scaffold(
                     else Color.Unspecified
                 }
                 .navigationBarsPadding()
+                .animateContentSize(
+                    animationSpec = if (bottomBarEnabled) switchAnimationSpec() else snap()
+                )
         ) {
             if (bottomBarEnabled) {
                 CPSBottomBar(
