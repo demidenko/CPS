@@ -22,7 +22,7 @@ inline fun <T> LazyColumnOfData(
     state: LazyListState = rememberLazyListState(),
     scrollBarEnabled: Boolean = true,
     scrollUpButtonEnabled: Boolean = false,
-    crossinline items: () -> List<T>,
+    crossinline items: () -> List<T>?,
     noinline key: ((item: T) -> Any)? = null,
     noinline contentType: (item: T) -> Any? = { null },
     crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
@@ -33,13 +33,15 @@ inline fun <T> LazyColumnOfData(
             scrollBarEnabled = scrollBarEnabled,
             modifier = Modifier.fillMaxSize()
         ) {
-            itemsNotEmpty(
-                items = items(),
-                onEmptyMessage = { Text(text = "List is empty") },
-                key = key,
-                itemContent = itemContent,
-                contentType = contentType
-            )
+            items()?.let {
+                itemsNotEmpty(
+                    items = it,
+                    onEmptyMessage = { Text(text = "List is empty") },
+                    key = key,
+                    itemContent = itemContent,
+                    contentType = contentType
+                )
+            }
         }
 
         if (scrollUpButtonEnabled) {
