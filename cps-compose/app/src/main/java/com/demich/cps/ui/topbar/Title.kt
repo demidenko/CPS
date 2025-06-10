@@ -1,7 +1,6 @@
 package com.demich.cps.ui.topbar
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ProvideTextStyle
@@ -46,7 +45,8 @@ internal fun Title(
 }
 
 @Composable
-internal fun SubTitle(
+private fun SubTitle(
+    modifier: Modifier = Modifier,
     text: () -> String
 ) {
     val letters: List<Pair<Char, Long>> by remember(text) {
@@ -62,14 +62,14 @@ internal fun SubTitle(
             ) { i, j ->
                 newIds[prefix + j] = ids[prefix + i]
             }
-            cur.toList().zip(newIds.asList()).also {
+            cur.asIterable().zip(newIds.asIterable()).also {
                 prev = cur
                 ids = newIds
             }
         }
     }
 
-    LazyRow(modifier = Modifier.fillMaxWidth()) {
+    LazyRow(modifier = modifier) {
         items(
             items = letters,
             key = { it }
