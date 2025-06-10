@@ -17,7 +17,6 @@ import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.ProfileScreen
 import com.demich.cps.navigation.Screen
-import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
@@ -26,12 +25,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 @Composable
-fun ratedProfilesColorState(navigator: CPSNavigator): State<Color> {
-    // TODO: upstream recomposition trigger on [rank] or [cpsColors.background] change
+fun ratedProfilesColorState(
+    navigator: CPSNavigator,
+    offColor: Color
+): State<Color> {
+    // TODO: upstream recomposition trigger on [rank] or [cpsColors] change
 
     val context = context
-    val coloredStatusBar by collectItemAsState { context.settingsUI.coloredStatusBar }
-
     val rank by collectAsState {
         combine(
             flow = makeFlowOfRankGetter(context),
@@ -39,21 +39,10 @@ fun ratedProfilesColorState(navigator: CPSNavigator): State<Color> {
         ) { rankGetter, currentScreen -> rankGetter[currentScreen] }
     }
 
-    return ratedProfilesColorState(
-        coloredStatusBar = coloredStatusBar,
-        rank = rank,
-        offColor = cpsColors.background
-    )
-}
+    val ratedColorEnabled by collectItemAsState { context.settingsUI.coloredStatusBar }
 
-@Composable
-private fun ratedProfilesColorState(
-    coloredStatusBar: Boolean,
-    rank: RatedRank?,
-    offColor: Color
-): State<Color> {
     return colorState(
-        enabled = coloredStatusBar && rank != null,
+        enabled = ratedColorEnabled && rank != null,
         enabledColor = rank?.run { manager.colorFor(handleColor) } ?: offColor,
         disabledColor = offColor
     )

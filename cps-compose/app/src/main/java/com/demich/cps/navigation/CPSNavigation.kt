@@ -22,6 +22,7 @@ import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.ratedProfilesColorState
 import com.demich.cps.ui.settingsUI
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.topbar.CPSTopBar
 import com.demich.cps.utils.background
 import com.demich.cps.utils.collectAsState
@@ -141,7 +142,7 @@ class CPSNavigator(
 
     @Composable
     fun TopBarWithStatusBar(modifier: Modifier = Modifier) {
-        val statusBarColor by ratedProfilesColorState(navigator = this)
+        val statusBarColor by ratedProfilesColorState(navigator = this, offColor = cpsColors.background)
         Box(
             modifier
                 .background { statusBarColor }
