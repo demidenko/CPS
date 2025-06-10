@@ -1,23 +1,16 @@
 package com.demich.cps.ui
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -27,15 +20,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.RootScreen
 import com.demich.cps.navigation.ScreenTypes
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
-import com.demich.cps.ui.bottombar.BottomBarSettings
 import com.demich.cps.ui.bottombar.CPSBottomBar
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.cpsColors
@@ -43,7 +33,7 @@ import com.demich.cps.utils.animateColorAsState
 import com.demich.cps.utils.background
 
 @Stable
-private fun<T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessMediumLow)
+internal fun <T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessMediumLow)
 
 @Composable
 fun CPSScaffold(
@@ -82,7 +72,7 @@ private fun Scaffold(
         modifier = modifier,
         selectedRootScreenType = { navigator.currentScreen?.rootScreenType },
         onNavigateToScreen = navigator::navigateTo,
-        bottomBarEnabled = navigator.isBottomBarEnabled,
+        bottomBarEnabled = { navigator.isBottomBarEnabled },
         bottomBarSettingsEnabled = bottomBarSettingsEnabled,
         onDisableBottomBarSettings = onDisableBottomBarSettings,
         onEnableBottomBarSettings = onEnableBottomBarSettings,
@@ -93,20 +83,11 @@ private fun Scaffold(
 }
 
 @Composable
-private fun backgroundColorState(enabled: Boolean) =
-    animateColorAsState(
-        enabledColor = cpsColors.backgroundAdditional,
-        disabledColor = cpsColors.backgroundNavigation,
-        enabled = enabled,
-        animationSpec = switchAnimationSpec()
-    )
-
-@Composable
 private fun Scaffold(
     modifier: Modifier = Modifier,
     selectedRootScreenType: () -> ScreenTypes?,
     onNavigateToScreen: (RootScreen) -> Unit,
-    bottomBarEnabled: Boolean,
+    bottomBarEnabled: () -> Boolean,
     bottomBarSettingsEnabled: Boolean,
     onDisableBottomBarSettings: () -> Unit,
     onEnableBottomBarSettings: () -> Unit,
@@ -114,8 +95,6 @@ private fun Scaffold(
     content: @Composable () -> Unit,
     additionalBottomBar: AdditionalBottomBarBuilder?
 ) {
-    val bottomBarBackgroundColor by backgroundColorState(bottomBarSettingsEnabled)
-
     Column(modifier = modifier) {
         Box(
             contentAlignment = Alignment.BottomCenter,
@@ -123,7 +102,7 @@ private fun Scaffold(
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            ScaffoldContent(
+            TopBarsAndContent(
                 topBars = topBars,
                 content = content,
                 modifier = Modifier.fillMaxSize()
@@ -134,53 +113,71 @@ private fun Scaffold(
                 animationSpec = switchAnimationSpec(),
                 modifier = Modifier.fillMaxSize()
             )
-            androidx.compose.animation.AnimatedVisibility(
-                visible = bottomBarSettingsEnabled,
-                exit = shrinkVertically(switchAnimationSpec()),
-                enter = expandVertically(switchAnimationSpec())
-            ) {
-                BottomBarSettings(
-                    onCloseRequest = onDisableBottomBarSettings,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
-                        .background { bottomBarBackgroundColor }
-                        .pointerInput(Unit) {} //for not send to scrim
-                        .padding(horizontal = 8.dp)
-                )
-            }
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background {
-                    if (bottomBarEnabled) bottomBarBackgroundColor
-                    else Color.Unspecified
-                }
-                .navigationBarsPadding()
-                .animateContentSize(
-                    animationSpec = if (bottomBarEnabled) switchAnimationSpec() else snap()
-                )
-        ) {
-            if (bottomBarEnabled) {
-                CPSBottomBar(
-                    selectedRootScreenType = selectedRootScreenType,
-                    onNavigateToScreen = onNavigateToScreen,
-                    additionalBottomBar = additionalBottomBar,
-                    layoutSettingsEnabled = bottomBarSettingsEnabled,
-                    onEnableLayoutSettings = onEnableBottomBarSettings,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(CPSDefaults.bottomBarHeight)
-                )
+        BottomBarAndNavBar(
+            selectedRootScreenType = selectedRootScreenType,
+            onNavigateToScreen = onNavigateToScreen,
+            bottomBarEnabled = bottomBarEnabled,
+            bottomBarSettingsEnabled = bottomBarSettingsEnabled,
+            onDisableBottomBarSettings = onDisableBottomBarSettings,
+            onEnableBottomBarSettings = onEnableBottomBarSettings,
+            additionalBottomBar = additionalBottomBar,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+private fun bottomBarBackgroundColorState(enabled: Boolean) =
+    animateColorAsState(
+        enabledColor = cpsColors.backgroundAdditional,
+        disabledColor = cpsColors.backgroundNavigation,
+        enabled = enabled,
+        animationSpec = switchAnimationSpec()
+    )
+
+
+//TODO: merge bottomBarEnabled and bottomBarSettingsEnabled to sealed?
+@Composable
+private fun BottomBarAndNavBar(
+    modifier: Modifier = Modifier,
+    selectedRootScreenType: () -> ScreenTypes?,
+    onNavigateToScreen: (RootScreen) -> Unit,
+    bottomBarEnabled: () -> Boolean,
+    bottomBarSettingsEnabled: Boolean,
+    onDisableBottomBarSettings: () -> Unit,
+    onEnableBottomBarSettings: () -> Unit,
+    additionalBottomBar: AdditionalBottomBarBuilder?
+) {
+    val backgroundColor by bottomBarBackgroundColorState(bottomBarSettingsEnabled)
+    val enabled = bottomBarEnabled()
+    Box(
+        modifier = modifier
+            .background {
+                if (enabled) backgroundColor
+                else Color.Unspecified
             }
+            .navigationBarsPadding()
+    ) {
+        if (enabled) {
+            CPSBottomBar(
+                selectedRootScreenType = selectedRootScreenType,
+                onNavigateToScreen = onNavigateToScreen,
+                additionalBottomBar = additionalBottomBar,
+                settingsEnabled = bottomBarSettingsEnabled,
+                onEnableSettings = onEnableBottomBarSettings,
+                onDisableSettings = onDisableBottomBarSettings,
+                backgroundColor = { backgroundColor },
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
         }
     }
 }
 
 @Composable
-private inline fun ScaffoldContent(
+private inline fun TopBarsAndContent(
     modifier: Modifier = Modifier,
     topBars: @Composable () -> Unit,
     content: @Composable () -> Unit

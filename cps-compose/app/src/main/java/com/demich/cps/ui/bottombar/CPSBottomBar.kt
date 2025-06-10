@@ -1,5 +1,7 @@
 package com.demich.cps.ui.bottombar
 
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,7 +9,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,15 +21,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.RootScreen
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTypes
+import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.settingsUI
+import com.demich.cps.ui.switchAnimationSpec
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.background
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.ignoreInputEvents
@@ -36,13 +49,56 @@ fun CPSBottomBar(
     selectedRootScreenType: () -> ScreenTypes?,
     onNavigateToScreen: (RootScreen) -> Unit,
     additionalBottomBar: AdditionalBottomBarBuilder?,
-    layoutSettingsEnabled: Boolean,
-    onEnableLayoutSettings: () -> Unit,
+    settingsEnabled: Boolean,
+    onEnableSettings: () -> Unit,
+    onDisableSettings: () -> Unit,
+    backgroundColor: () -> Color,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier) {
+        androidx.compose.animation.AnimatedVisibility(
+            visible = settingsEnabled,
+            exit = shrinkVertically(switchAnimationSpec()),
+            enter = expandVertically(switchAnimationSpec()),
+            modifier = Modifier
+                .placeAboveParent()
+                .fillMaxWidth()
+        ) {
+            BottomBarSettings(
+                onCloseRequest = onDisableSettings,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
+                    .background(backgroundColor)
+                    .pointerInput(Unit) {} //for not send to scrim
+                    .padding(horizontal = 8.dp)
+            )
+        }
+
+        BottomBarRow(
+            selectedRootScreenType = selectedRootScreenType,
+            onNavigateToScreen = onNavigateToScreen,
+            additionalBottomBar = additionalBottomBar,
+            settingsEnabled = settingsEnabled,
+            onEnableSettings = onEnableSettings,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(CPSDefaults.bottomBarHeight)
+        )
+    }
+}
+
+@Composable
+private fun BottomBarRow(
+    selectedRootScreenType: () -> ScreenTypes?,
+    onNavigateToScreen: (RootScreen) -> Unit,
+    additionalBottomBar: AdditionalBottomBarBuilder?,
+    settingsEnabled: Boolean,
+    onEnableSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.ignoreInputEvents(enabled = layoutSettingsEnabled)
+        modifier = modifier.ignoreInputEvents(enabled = settingsEnabled)
     ) {
         BottomBarBodyAdditional(
             modifier = Modifier.weight(1f),
@@ -53,8 +109,8 @@ fun CPSBottomBar(
             modifier = Modifier.weight(1f).fillMaxHeight(),
             selectedRootScreenType = selectedRootScreenType,
             onNavigateToScreen = onNavigateToScreen,
-            layoutSettingsEnabled = layoutSettingsEnabled,
-            onEnableLayoutSettings = onEnableLayoutSettings
+            settingsEnabled = settingsEnabled,
+            onEnableSettings = onEnableSettings
         )
     }
 }
@@ -63,8 +119,8 @@ fun CPSBottomBar(
 private fun BottomBarBodyMain(
     selectedRootScreenType: () -> ScreenTypes?,
     onNavigateToScreen: (RootScreen) -> Unit,
-    layoutSettingsEnabled: Boolean,
-    onEnableLayoutSettings: () -> Unit,
+    settingsEnabled: Boolean,
+    onEnableSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -85,14 +141,14 @@ private fun BottomBarBodyMain(
     BottomBarNavigationItems(
         modifier = modifier,
         rootScreens = rootScreens,
-        selectedRootScreenType = if (layoutSettingsEnabled) null else selectedRootScreenType(),
-        indication = if (layoutSettingsEnabled) null else ripple(bounded = false, radius = 48.dp),
+        selectedRootScreenType = if (settingsEnabled) null else selectedRootScreenType(),
+        indication = if (settingsEnabled) null else ripple(bounded = false, radius = 48.dp),
         layoutType = layoutType,
         onSelect = { screen ->
             scope.launch { context.settingsUI.startScreenRoute(screen.routePath) }
             onNavigateToScreen(screen)
         },
-        onLongPress = onEnableLayoutSettings
+        onLongPress = onEnableSettings
     )
 }
 
@@ -153,4 +209,11 @@ private fun BottomBarVerticalDivider() {
             .width(1.dp)
             .background(cpsColors.divider)
     )
+}
+
+private fun Modifier.placeAboveParent() = layout { measurable, constrains ->
+    val placeable = measurable.measure(constrains)
+    layout(width = placeable.width, height = 0) {
+        placeable.placeRelative(x = 0, y = -placeable.height)
+    }
 }
