@@ -187,7 +187,7 @@ private fun Scrim(
 @Composable
 private fun StatusBar(navigator: CPSNavigator) {
     //TODO: single time recomposition after change color / offcolor (???)
-    val statusBarColor by statusBarColorState(navigator)
+    val statusBarColor by ratedProfilesColorState(navigator)
     Box(modifier = Modifier
         .fillMaxWidth()
         .background { statusBarColor }

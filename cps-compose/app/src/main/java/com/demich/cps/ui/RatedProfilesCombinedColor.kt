@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 @Composable
-fun statusBarColorState(navigator: CPSNavigator): State<Color> {
+fun ratedProfilesColorState(navigator: CPSNavigator): State<Color> {
     val context = context
     val coloredStatusBar by collectItemAsState { context.settingsUI.coloredStatusBar }
 
@@ -37,7 +37,7 @@ fun statusBarColorState(navigator: CPSNavigator): State<Color> {
         ) { rankGetter, currentScreen -> rankGetter[currentScreen] }
     }
 
-    return statusBarColorState(
+    return ratedProfilesColorState(
         coloredStatusBar = coloredStatusBar,
         rank = rank,
         offColor = cpsColors.background
@@ -45,12 +45,12 @@ fun statusBarColorState(navigator: CPSNavigator): State<Color> {
 }
 
 @Composable
-private fun statusBarColorState(
+private fun ratedProfilesColorState(
     coloredStatusBar: Boolean,
     rank: RatedRank?,
     offColor: Color
 ): State<Color> {
-    return statusBarColorState(
+    return colorState(
         enabled = coloredStatusBar && rank != null,
         enabledColor = rank?.run { manager.colorFor(handleColor) } ?: offColor,
         disabledColor = offColor
@@ -58,7 +58,7 @@ private fun statusBarColorState(
 }
 
 @Composable
-private fun statusBarColorState(
+private fun colorState(
     enabled: Boolean,
     enabledColor: Color,
     disabledColor: Color,
