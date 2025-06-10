@@ -12,7 +12,7 @@ android {
         applicationId = "com.demich.cps"
         targetSdk = 35
 
-        versionCode = 448
+        versionCode = 449
         versionName = "1.9.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
