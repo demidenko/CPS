@@ -74,7 +74,7 @@ class CPSNavigator(
 
     val isBottomBarEnabled: Boolean
         get() = currentScreen.let {
-            it == null || it !is SettingsScreen
+            it == null || it !is NoBottomBarScreen
         }
 
     fun navigateTo(screen: Screen) {

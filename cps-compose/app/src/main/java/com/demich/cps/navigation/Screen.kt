@@ -34,13 +34,13 @@ sealed class Screen(
 
     data class ProfileSettings(override val type: AccountManagerType):
         ProfileScreen(ScreenTypes.profileSettings, type),
-        SettingsScreen
+        NoBottomBarScreen
 
     data object Community: RootScreen(ScreenTypes.community)
 
     data object CommunitySettings:
         Screen(ScreenTypes.communitySettings, rootScreenType = ScreenTypes.community),
-        SettingsScreen
+        NoBottomBarScreen
 
     data object CommunityFollowList: Screen(ScreenTypes.communityFollowList, rootScreenType = ScreenTypes.community)
 
@@ -53,7 +53,7 @@ sealed class Screen(
 
     data object ContestsSettings:
         Screen(ScreenTypes.contestsSettings, rootScreenType = ScreenTypes.contests),
-        SettingsScreen
+        NoBottomBarScreen
 
     data object Development: RootScreen(ScreenTypes.develop)
 
@@ -66,7 +66,7 @@ sealed class RootScreen(
     rootScreenType = screenType
 )
 
-interface SettingsScreen
+interface NoBottomBarScreen
 
 sealed class ProfileScreen(
     screenType: ScreenTypes,
