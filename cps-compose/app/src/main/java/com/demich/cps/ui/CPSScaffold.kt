@@ -10,14 +10,11 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -33,6 +30,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.CPSNavigator
+import com.demich.cps.navigation.RootScreen
+import com.demich.cps.navigation.ScreenTypes
+import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottombar.BottomBarSettings
 import com.demich.cps.ui.bottombar.CPSBottomBar
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
@@ -68,6 +68,29 @@ fun CPSScaffold(
 }
 
 @Composable
+private fun Scaffold(
+    modifier: Modifier = Modifier,
+    navigator: CPSNavigator,
+    bottomBarSettingsEnabled: Boolean,
+    onDisableBottomBarSettings: () -> Unit,
+    onEnableBottomBarSettings: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    Scaffold(
+        modifier = modifier,
+        selectedRootScreenType = { navigator.currentScreen?.rootScreenType },
+        onNavigateToScreen = navigator::navigateTo,
+        bottomBarEnabled = navigator.isBottomBarEnabled,
+        bottomBarSettingsEnabled = bottomBarSettingsEnabled,
+        onDisableBottomBarSettings = onDisableBottomBarSettings,
+        onEnableBottomBarSettings = onEnableBottomBarSettings,
+        topBars = { navigator.TopBarWithStatusBar(modifier = Modifier.fillMaxWidth()) },
+        content = content,
+        additionalBottomBar = navigator.additionalBottomBar,
+    )
+}
+
+@Composable
 private fun backgroundColorState(enabled: Boolean) =
     animateColorAsState(
         enabledColor = cpsColors.backgroundAdditional,
@@ -79,17 +102,21 @@ private fun backgroundColorState(enabled: Boolean) =
 @Composable
 private fun Scaffold(
     modifier: Modifier = Modifier,
-    navigator: CPSNavigator,
+    selectedRootScreenType: () -> ScreenTypes?,
+    onNavigateToScreen: (RootScreen) -> Unit,
+    bottomBarEnabled: Boolean,
     bottomBarSettingsEnabled: Boolean,
     onDisableBottomBarSettings: () -> Unit,
     onEnableBottomBarSettings: () -> Unit,
-    content: @Composable () -> Unit
+    topBars: @Composable () -> Unit,
+    content: @Composable () -> Unit,
+    additionalBottomBar: AdditionalBottomBarBuilder?
 ) {
     val bottomBarBackgroundColor by backgroundColorState(bottomBarSettingsEnabled)
 
+    //TODO: unite navigationBarsPadding's
     Column(
-        modifier = modifier
-            .ifThen(!navigator.isBottomBarEnabled) { windowInsetsPadding(WindowInsets.navigationBars) }
+        modifier = modifier.ifThen(!bottomBarEnabled) { navigationBarsPadding() }
     ) {
         Box(
             contentAlignment = Alignment.BottomCenter,
@@ -98,9 +125,7 @@ private fun Scaffold(
                 .fillMaxWidth()
         ) {
             ScaffoldContent(
-                topBars = {
-                    navigator.TopBarWithStatusBar(modifier = Modifier.fillMaxWidth())
-                },
+                topBars = topBars,
                 content = content,
                 modifier = Modifier.fillMaxSize()
             )
@@ -126,11 +151,11 @@ private fun Scaffold(
                 )
             }
         }
-        if (navigator.isBottomBarEnabled) {
+        if (bottomBarEnabled) {
             CPSBottomBar(
-                selectedRootScreenType = { navigator.currentScreen?.rootScreenType },
-                onNavigateToScreen = navigator::navigateTo,
-                additionalBottomBar = navigator.additionalBottomBar,
+                selectedRootScreenType = selectedRootScreenType,
+                onNavigateToScreen = onNavigateToScreen,
+                additionalBottomBar = additionalBottomBar,
                 layoutSettingsEnabled = bottomBarSettingsEnabled,
                 onEnableLayoutSettings = onEnableBottomBarSettings,
                 modifier = Modifier
