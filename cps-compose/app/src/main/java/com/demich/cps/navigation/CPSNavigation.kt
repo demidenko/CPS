@@ -142,7 +142,11 @@ class CPSNavigator(
 
     @Composable
     fun TopBarWithStatusBar(modifier: Modifier = Modifier) {
-        val statusBarColor by ratedProfilesColorState(navigator = this, offColor = cpsColors.background)
+        val statusBarColor by ratedProfilesColorState(
+            navigator = this,
+            disabledColor = cpsColors.background
+        )
+
         Box(
             modifier
                 .background { statusBarColor }

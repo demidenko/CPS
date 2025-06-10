@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.map
 @Composable
 fun ratedProfilesColorState(
     navigator: CPSNavigator,
-    offColor: Color
+    disabledColor: Color
 ): State<Color> {
     // TODO: upstream recomposition trigger on [rank] or [cpsColors] change
 
@@ -39,12 +39,13 @@ fun ratedProfilesColorState(
         ) { rankGetter, currentScreen -> rankGetter[currentScreen] }
     }
 
+    // TODO: assume !enabled is rank = null ?
     val ratedColorEnabled by collectItemAsState { context.settingsUI.coloredStatusBar }
 
     return colorState(
         enabled = ratedColorEnabled && rank != null,
-        enabledColor = rank?.run { manager.colorFor(handleColor) } ?: offColor,
-        disabledColor = offColor
+        enabledColor = rank?.run { manager.colorFor(handleColor) } ?: disabledColor,
+        disabledColor = disabledColor
     )
 }
 
