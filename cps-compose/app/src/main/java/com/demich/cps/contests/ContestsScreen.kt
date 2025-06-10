@@ -208,8 +208,8 @@ private fun SortedContests.sublist(page: ContestsListViewState.ContestsPage): Li
         ContestsListViewState.ContestsPage.RunningOrFuture -> runningOrFuture
     }
 
-private fun FilterState.filterContests(contests: List<Contest>) =
-    contests.filterByTokensAsSubsequence(filter) {
+private fun List<Contest>.filterBy(state: FilterState) =
+    filterByTokensAsSubsequence(state.filter) {
         sequence {
             yield(title)
             if (platform != Contest.Platform.unknown) yield(platform.name)
@@ -229,9 +229,7 @@ private fun ContestsPage(
 
     val filtered: List<Contest>? by remember(contests, filterState) {
         derivedStateOf {
-            contests()?.let {
-                filterState.filterContests(it)
-            }
+            contests()?.filterBy(filterState)
         }
     }
 

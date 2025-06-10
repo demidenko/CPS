@@ -69,7 +69,7 @@ private fun CodeforcesUserBlogContent(
         ProvideTimeEachMinute {
             CodeforcesBlogEntries(
                 blogEntriesState = rememberCodeforcesBlogEntriesState {
-                    filterState.filterUserBlogEntries(blogEntries)
+                    blogEntries.filterBy(filterState)
                 },
                 scrollBarEnabled = true,
                 scrollUpButtonEnabled = true,
@@ -105,7 +105,7 @@ fun NavContentCodeforcesBlog(
     holder.setSubtitle("community", "codeforces", "blog")
 }
 
-private fun FilterState.filterUserBlogEntries(blogEntries: List<CodeforcesBlogEntry>) =
-    blogEntries.filterByTokensAsSubsequence(filter) {
+private fun List<CodeforcesBlogEntry>.filterBy(state: FilterState) =
+    filterByTokensAsSubsequence(state.filter) {
         sequenceOf(title)
     }
