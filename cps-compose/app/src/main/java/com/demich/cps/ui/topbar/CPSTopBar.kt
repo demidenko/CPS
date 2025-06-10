@@ -27,7 +27,7 @@ import com.demich.cps.ui.theme.cpsColors
 @Composable
 fun CPSTopBar(
     subtitle: () -> String,
-    additionalMenu: CPSMenuBuilder?,
+    additionalMenu: () -> CPSMenuBuilder?,
 ) {
     var showUIPanel by rememberSaveable { mutableStateOf(false) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
@@ -65,7 +65,7 @@ fun CPSTopBar(
             CPSDropdownMenuItem(title = "About", icon = CPSIcons.Info) {
                 showAbout = true
             }
-            additionalMenu?.let {
+            additionalMenu()?.let {
                 Divider(color = cpsColors.divider)
                 it()
             }

@@ -3,7 +3,9 @@ package com.demich.cps.navigation
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
@@ -18,8 +20,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
+import com.demich.cps.ui.ratedProfilesColorState
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.topbar.CPSTopBar
+import com.demich.cps.utils.background
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberWith
@@ -107,7 +111,6 @@ class CPSNavigator(
             get() = bottomBarBuilderState.value
             set(value) { if (screen == currentScreen) bottomBarBuilderState.value = value }
 
-        val menuSetter: (CPSMenuBuilder) -> Unit get() = { menu = it }
         val bottomBarSetter: (AdditionalBottomBarBuilder) -> Unit get() = { bottomBar = it }
 
         fun setSubtitle(vararg words: String) {
@@ -137,11 +140,18 @@ class CPSNavigator(
     }
 
     @Composable
-    fun TopBar() {
-        CPSTopBar(
-            subtitle = { subtitleState.value },
-            additionalMenu = menuBuilderState.value
-        )
+    fun TopBarWithStatusBar(modifier: Modifier = Modifier) {
+        val statusBarColor by ratedProfilesColorState(navigator = this)
+        Box(
+            modifier
+                .background { statusBarColor }
+                .statusBarsPadding()
+        ) {
+            CPSTopBar(
+                subtitle = { subtitleState.value },
+                additionalMenu = { menuBuilderState.value }
+            )
+        }
     }
 
     val additionalBottomBar get() = bottomBarBuilderState.value

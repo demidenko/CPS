@@ -27,6 +27,8 @@ import kotlinx.coroutines.flow.map
 
 @Composable
 fun ratedProfilesColorState(navigator: CPSNavigator): State<Color> {
+    // TODO: upstream recomposition trigger on [rank] or [cpsColors.background] change
+
     val context = context
     val coloredStatusBar by collectItemAsState { context.settingsUI.coloredStatusBar }
 

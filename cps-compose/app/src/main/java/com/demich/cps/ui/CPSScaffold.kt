@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
@@ -99,8 +98,9 @@ private fun Scaffold(
                 .fillMaxWidth()
         ) {
             ScaffoldContent(
-                statusBar = { StatusBar(navigator = navigator) },
-                topBar = { navigator.TopBar() },
+                topBars = {
+                    navigator.TopBarWithStatusBar(modifier = Modifier.fillMaxWidth())
+                },
                 content = content,
                 modifier = Modifier.fillMaxSize()
             )
@@ -146,14 +146,12 @@ private fun Scaffold(
 @Composable
 private inline fun ScaffoldContent(
     modifier: Modifier = Modifier,
-    statusBar: @Composable () -> Unit,
-    topBar: @Composable () -> Unit,
+    topBars: @Composable () -> Unit,
     content: @Composable () -> Unit
 ) {
     Box(modifier = modifier) {
         Column(modifier = Modifier.fillMaxSize()) {
-            statusBar()
-            topBar()
+            topBars()
             content()
         }
         CPSBottomProgressBarsColumn(
@@ -182,15 +180,4 @@ private fun Scrim(
             drawRect(color = Color.Black.copy(alpha = alpha))
         }
     }
-}
-
-@Composable
-private fun StatusBar(navigator: CPSNavigator) {
-    //TODO: single time recomposition after change color / offcolor (???)
-    val statusBarColor by ratedProfilesColorState(navigator)
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .background { statusBarColor }
-        .statusBarsPadding()
-    )
 }
