@@ -39,7 +39,6 @@ import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.animateColorAsState
 import com.demich.cps.utils.background
-import com.demich.cps.utils.ifThen
 
 @Stable
 private fun<T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessMediumLow)
@@ -57,12 +56,12 @@ fun CPSScaffold(
         var bottomBarSettingsEnabled by rememberSaveable { mutableStateOf(false) }
 
         Scaffold(
+            modifier = Modifier.fillMaxSize(),
             navigator = navigator,
             bottomBarSettingsEnabled = bottomBarSettingsEnabled,
             onDisableBottomBarSettings = { bottomBarSettingsEnabled = false },
             onEnableBottomBarSettings = { bottomBarSettingsEnabled = true }.withVibration(),
-            content = content,
-            modifier = Modifier.fillMaxSize()
+            content = content
         )
     }
 }
@@ -114,15 +113,12 @@ private fun Scaffold(
 ) {
     val bottomBarBackgroundColor by backgroundColorState(bottomBarSettingsEnabled)
 
-    //TODO: unite navigationBarsPadding's
-    Column(
-        modifier = modifier.ifThen(!bottomBarEnabled) { navigationBarsPadding() }
-    ) {
+    Column(modifier = modifier) {
         Box(
             contentAlignment = Alignment.BottomCenter,
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
+                .weight(1f)
         ) {
             ScaffoldContent(
                 topBars = topBars,
@@ -151,19 +147,28 @@ private fun Scaffold(
                 )
             }
         }
-        if (bottomBarEnabled) {
-            CPSBottomBar(
-                selectedRootScreenType = selectedRootScreenType,
-                onNavigateToScreen = onNavigateToScreen,
-                additionalBottomBar = additionalBottomBar,
-                layoutSettingsEnabled = bottomBarSettingsEnabled,
-                onEnableLayoutSettings = onEnableBottomBarSettings,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background { bottomBarBackgroundColor }
-                    .navigationBarsPadding()
-                    .height(CPSDefaults.bottomBarHeight)
-            )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background {
+                    if (bottomBarEnabled) bottomBarBackgroundColor
+                    else Color.Unspecified
+                }
+                .navigationBarsPadding()
+        ) {
+            if (bottomBarEnabled) {
+                CPSBottomBar(
+                    selectedRootScreenType = selectedRootScreenType,
+                    onNavigateToScreen = onNavigateToScreen,
+                    additionalBottomBar = additionalBottomBar,
+                    layoutSettingsEnabled = bottomBarSettingsEnabled,
+                    onEnableLayoutSettings = onEnableBottomBarSettings,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(CPSDefaults.bottomBarHeight)
+                )
+            }
         }
     }
 }
