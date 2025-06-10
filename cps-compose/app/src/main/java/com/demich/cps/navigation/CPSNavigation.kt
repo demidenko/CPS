@@ -104,11 +104,11 @@ class CPSNavigator(
         val screen: Screen
     ) {
         var menu: CPSMenuBuilder?
-            get() = menuBuilderState.value
+            get() = error("read not allowed, use state instead")
             set(value) { if (screen == currentScreen) menuBuilderState.value = value }
 
         var bottomBar: AdditionalBottomBarBuilder?
-            get() = bottomBarBuilderState.value
+            get() = error("read not allowed, use state instead")
             set(value) { if (screen == currentScreen) bottomBarBuilderState.value = value }
 
         val bottomBarSetter: (AdditionalBottomBarBuilder) -> Unit get() = { bottomBar = it }
