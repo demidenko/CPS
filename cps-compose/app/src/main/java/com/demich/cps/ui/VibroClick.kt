@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
 
+//TODO: see LocalHapticFeedback in compose 1.8.0
+
 //https://stackoverflow.com/a/70853761
 
 private fun View.vibrate() = reallyPerformHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)

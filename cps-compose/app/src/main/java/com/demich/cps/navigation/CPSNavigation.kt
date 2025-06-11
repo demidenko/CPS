@@ -159,5 +159,6 @@ class CPSNavigator(
         }
     }
 
-    val additionalBottomBar get() = bottomBarBuilderState.value
+    val additionalBottomBar: AdditionalBottomBarBuilder
+        get() = bottomBarBuilderState.value ?: {}
 }

@@ -47,55 +47,35 @@ fun CPSScaffold(
         color = cpsColors.background,
         contentColor = cpsColors.content
     ) {
-        var bottomBarSettingsEnabled by rememberSaveable { mutableStateOf(false) }
-
-        Scaffold(
+        NavBarShelf(
             modifier = Modifier.fillMaxSize(),
-            navigator = navigator,
-            bottomBarSettingsEnabled = bottomBarSettingsEnabled,
-            onDisableBottomBarSettings = { bottomBarSettingsEnabled = false },
-            onEnableBottomBarSettings = { bottomBarSettingsEnabled = true }.withVibration(),
-            content = content
+            selectedRootScreenType = { navigator.currentScreen?.rootScreenType },
+            onNavigateToScreen = navigator::navigateTo,
+            bottomBarEnabled = navigator::isBottomBarEnabled,
+            content = {
+                TopBarsAndContent(
+                    topBars = { navigator.TopBarWithStatusBar(modifier = Modifier.fillMaxWidth()) },
+                    content = content,
+                    modifier = Modifier.fillMaxSize()
+                )
+            },
+            additionalBottomBar = navigator::additionalBottomBar
         )
     }
 }
 
-@Composable
-private fun Scaffold(
-    modifier: Modifier = Modifier,
-    navigator: CPSNavigator,
-    bottomBarSettingsEnabled: Boolean,
-    onDisableBottomBarSettings: () -> Unit,
-    onEnableBottomBarSettings: () -> Unit,
-    content: @Composable () -> Unit
-) {
-    Scaffold(
-        modifier = modifier,
-        selectedRootScreenType = { navigator.currentScreen?.rootScreenType },
-        onNavigateToScreen = navigator::navigateTo,
-        bottomBarEnabled = { navigator.isBottomBarEnabled },
-        bottomBarSettingsEnabled = bottomBarSettingsEnabled,
-        onDisableBottomBarSettings = onDisableBottomBarSettings,
-        onEnableBottomBarSettings = onEnableBottomBarSettings,
-        topBars = { navigator.TopBarWithStatusBar(modifier = Modifier.fillMaxWidth()) },
-        content = content,
-        additionalBottomBar = { navigator.additionalBottomBar ?: {} }
-    )
-}
 
 @Composable
-private fun Scaffold(
+private fun NavBarShelf(
     modifier: Modifier = Modifier,
     selectedRootScreenType: () -> ScreenTypes?,
     onNavigateToScreen: (RootScreen) -> Unit,
     bottomBarEnabled: () -> Boolean,
-    bottomBarSettingsEnabled: Boolean,
-    onDisableBottomBarSettings: () -> Unit,
-    onEnableBottomBarSettings: () -> Unit,
-    topBars: @Composable () -> Unit,
     content: @Composable () -> Unit,
     additionalBottomBar: () -> AdditionalBottomBarBuilder
 ) {
+    var settingsEnabled by rememberSaveable { mutableStateOf(false) }
+
     Column(modifier = modifier) {
         Box(
             contentAlignment = Alignment.BottomCenter,
@@ -103,16 +83,11 @@ private fun Scaffold(
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            TopBarsAndContent(
-                topBars = topBars,
-                content = content,
-                modifier = Modifier.fillMaxSize()
-            )
+            content()
 
-            //TODO: move to cpsBottomBar as header??
             Scrim(
-                show = bottomBarSettingsEnabled,
-                onDismiss = onDisableBottomBarSettings,
+                show = settingsEnabled,
+                onDismiss = { settingsEnabled = false },
                 animationSpec = switchAnimationSpec(),
                 modifier = Modifier.fillMaxSize()
             )
@@ -122,9 +97,9 @@ private fun Scaffold(
             selectedRootScreenType = selectedRootScreenType,
             onNavigateToScreen = onNavigateToScreen,
             bottomBarEnabled = bottomBarEnabled,
-            bottomBarSettingsEnabled = bottomBarSettingsEnabled,
-            onDisableBottomBarSettings = onDisableBottomBarSettings,
-            onEnableBottomBarSettings = onEnableBottomBarSettings,
+            bottomBarSettingsEnabled = settingsEnabled,
+            onDisableBottomBarSettings = { settingsEnabled = false },
+            onEnableBottomBarSettings = { settingsEnabled = true }.withVibration(),
             additionalBottomBar = additionalBottomBar,
             modifier = Modifier.fillMaxWidth()
         )
@@ -167,7 +142,7 @@ private fun BottomBarAndNavBar(
             CPSBottomBar(
                 selectedRootScreenType = selectedRootScreenType,
                 onNavigateToScreen = onNavigateToScreen,
-                additionalBottomBar = additionalBottomBar,
+                additionalContent = additionalBottomBar,
                 settingsEnabled = bottomBarSettingsEnabled,
                 onEnableSettings = onEnableBottomBarSettings,
                 onDisableSettings = onDisableBottomBarSettings,

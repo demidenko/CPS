@@ -48,7 +48,7 @@ typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
 fun CPSBottomBar(
     selectedRootScreenType: () -> ScreenTypes?,
     onNavigateToScreen: (RootScreen) -> Unit,
-    additionalBottomBar: () -> AdditionalBottomBarBuilder,
+    additionalContent: () -> AdditionalBottomBarBuilder,
     settingsEnabled: Boolean,
     onEnableSettings: () -> Unit,
     onDisableSettings: () -> Unit,
@@ -77,7 +77,7 @@ fun CPSBottomBar(
         BottomBarRow(
             selectedRootScreenType = selectedRootScreenType,
             onNavigateToScreen = onNavigateToScreen,
-            additionalBottomBar = additionalBottomBar,
+            additionalContent = additionalContent,
             settingsEnabled = settingsEnabled,
             onEnableSettings = onEnableSettings,
             modifier = Modifier
@@ -91,7 +91,7 @@ fun CPSBottomBar(
 private fun BottomBarRow(
     selectedRootScreenType: () -> ScreenTypes?,
     onNavigateToScreen: (RootScreen) -> Unit,
-    additionalBottomBar: () -> AdditionalBottomBarBuilder,
+    additionalContent: () -> AdditionalBottomBarBuilder,
     settingsEnabled: Boolean,
     onEnableSettings: () -> Unit,
     modifier: Modifier = Modifier
@@ -102,7 +102,7 @@ private fun BottomBarRow(
     ) {
         BottomBarBodyAdditional(
             modifier = Modifier.weight(1f),
-            content = additionalBottomBar()
+            content = additionalContent()
         )
         BottomBarVerticalDivider()
         BottomBarBodyMain(
