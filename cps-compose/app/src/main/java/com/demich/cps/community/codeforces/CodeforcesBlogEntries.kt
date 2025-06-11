@@ -1,6 +1,5 @@
 package com.demich.cps.community.codeforces
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -35,7 +34,6 @@ import com.demich.cps.utils.plusIf
 import com.demich.cps.utils.toTimeAgoString
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CodeforcesBlogEntries(
     blogEntriesState: CodeforcesBlogEntriesState,

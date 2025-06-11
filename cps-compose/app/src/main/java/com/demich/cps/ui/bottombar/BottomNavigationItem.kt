@@ -1,7 +1,6 @@
 package com.demich.cps.ui.bottombar
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -19,7 +18,6 @@ import androidx.compose.ui.unit.lerp
 import com.demich.cps.ui.theme.cpsColors
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun CPSBottomNavigationItem(
     icon: ImageVector,
