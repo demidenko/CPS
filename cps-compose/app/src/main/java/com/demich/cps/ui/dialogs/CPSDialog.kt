@@ -43,7 +43,6 @@ fun CPSDialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(
 //            usePlatformDefaultWidth = false, //affects height!!!
-            decorFitsSystemWindows = false
         )
     ) {
         Card(
