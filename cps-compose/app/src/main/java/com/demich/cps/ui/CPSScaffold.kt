@@ -59,7 +59,7 @@ fun CPSScaffold(
                     modifier = Modifier.fillMaxSize()
                 )
             },
-            additionalBottomBar = navigator::additionalBottomBar
+            additionalBottomBar = { navigator.additionalBottomBar }
         )
     }
 }
