@@ -14,7 +14,6 @@ import androidx.compose.material.icons.automirrored.rounded.ReadMore
 import androidx.compose.material.icons.filled.AllOut
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.BrightnessAuto
 import androidx.compose.material.icons.filled.BrightnessMedium
 import androidx.compose.material.icons.filled.Close
@@ -40,6 +39,7 @@ import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.filled.WebAsset
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.ChatBubble
 import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.material.icons.rounded.Forum
@@ -97,7 +97,7 @@ object CPSIcons {
     val BlogEntry get() = Icons.AutoMirrored.Filled.Wysiwyg
     val ArrowRight get() = Icons.AutoMirrored.Filled.ArrowRightAlt
     val ArrowBack get() = Icons.AutoMirrored.Filled.ArrowBack
-    val ArrowUp get() = Icons.Default.ArrowUpward
+    val ArrowUp get() = Icons.Rounded.ArrowUpward
     val Attention get() = Icons.TwoTone.Error
     val NewsFeeds get() = Icons.Default.RssFeed
     val Monitor get() = Icons.AutoMirrored.Filled.Dvr

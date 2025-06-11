@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.theme.cpsColors
@@ -43,6 +44,7 @@ fun LazyListScrollUpButton(
         exit = exit
     ) {
         ScrollUpButton(
+            backgroundColor = cpsColors.backgroundAdditional,
             onClick = {
                 scope.launch { listState.animateScrollToItem(0) }
             }
@@ -53,12 +55,13 @@ fun LazyListScrollUpButton(
 @Composable
 private fun ScrollUpButton(
     modifier: Modifier = Modifier,
+    backgroundColor: Color,
     onClick: () -> Unit
 ) {
     Box(
         modifier = modifier
             .clip(CircleShape)
-            .background(cpsColors.backgroundAdditional)
+            .background(backgroundColor)
     ) {
         CPSIconButton(
             icon = CPSIcons.ArrowUp,
