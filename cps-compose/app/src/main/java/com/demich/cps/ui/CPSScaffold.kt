@@ -178,7 +178,7 @@ private fun Scrim(
     onDismiss: () -> Unit
 ) {
     val alpha by animateFloatAsState(
-        targetValue = if (show) 0.32f else 0f,
+        targetValue = if (show) 0.6f else 0f,
         animationSpec = animationSpec,
         label = "scrim_alpha"
     )
