@@ -4,7 +4,6 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -183,13 +182,9 @@ private fun Scrim(
         animationSpec = animationSpec,
         label = "scrim_alpha"
     )
-    if (alpha > 0f) {
-        Canvas(
-            modifier = modifier.ifThen(show) {
-                pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
-            }
-        ) {
-            drawRect(color = Color.Black.copy(alpha = alpha))
-        }
-    }
+    Box(
+        modifier = modifier.ifThen(show) {
+            pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
+        }.background { Color.Black.copy(alpha = alpha) }
+    )
 }
