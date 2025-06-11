@@ -19,10 +19,10 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
 import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.BackHandler
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.collectAsState
-import com.demich.cps.utils.rememberWith
+import com.demich.cps.utils.rememberFrom
 
 @Composable
 fun CodeforcesCommunityRecentPage(
@@ -110,11 +110,10 @@ private fun RecentCommentsInBlogEntry(
     blogEntry: CodeforcesBlogEntry,
     modifier: Modifier = Modifier
 ) {
-    val filteredComments by rememberWith(blogEntry) {
+    val filteredComments by rememberFrom(blogEntry) {
+        val id = it.id
         derivedStateOf {
-            comments().filter {
-                it.blogEntry?.id == id
-            }
+            comments().filter { it.blogEntry?.id == id }
         }
     }
 

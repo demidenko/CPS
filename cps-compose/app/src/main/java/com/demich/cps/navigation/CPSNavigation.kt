@@ -27,7 +27,7 @@ import com.demich.cps.ui.topbar.CPSTopBar
 import com.demich.cps.utils.background
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberWith
+import com.demich.cps.utils.rememberFrom
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
@@ -127,8 +127,8 @@ class CPSNavigator(
         modifier: Modifier = Modifier,
         builder: NavGraphBuilder.() -> Unit
     ) {
-        val startRoute = rememberWith(context) {
-            runBlocking { settingsUI.startScreenRoute() }
+        val startRoute = rememberFrom(context) {
+            runBlocking { it.settingsUI.startScreenRoute() }
         }
         androidx.navigation.compose.NavHost(
             navController = navController,

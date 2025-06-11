@@ -15,7 +15,7 @@ import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberWith
+import com.demich.cps.utils.rememberFrom
 import kotlinx.coroutines.launch
 
 
@@ -25,7 +25,7 @@ internal fun UIPanel(
     onClosePanel: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val settingsUI = rememberWith(key = context) { settingsUI }
+    val settingsUI = rememberFrom(key = context) { it.settingsUI }
 
     val useOriginalColors by collectItemAsState { settingsUI.useOriginalColors }
     val darkLightMode by collectItemAsState { settingsUI.darkLightMode }

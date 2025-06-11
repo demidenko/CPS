@@ -66,12 +66,12 @@ inline fun<reified T> Json.saver() =
     )
 
 @Composable
-inline fun<T, K> rememberWith(
+inline fun <T, K> rememberFrom(
     key: K,
-    crossinline calculation: @DisallowComposableCalls K.() -> T
+    crossinline calculation: @DisallowComposableCalls (K) -> T
 ): T = remember(key1 = key) {
-        with(receiver = key, block = calculation)
-    }
+    key.let(calculation)
+}
 
 
 inline fun Dp.plusIf(condition: Boolean, value: () -> Dp): Dp =

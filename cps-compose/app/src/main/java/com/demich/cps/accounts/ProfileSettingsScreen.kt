@@ -23,7 +23,7 @@ import com.demich.cps.ui.SettingsItem
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberWith
+import com.demich.cps.utils.rememberFrom
 import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
@@ -68,9 +68,9 @@ private fun <U: UserInfo> UserInfoSettings(
     userInfo: UserInfo,
     onUserIdClick: () -> Unit
 ) {
-    val requiredPermission by rememberWith(context) {
+    val requiredPermission by rememberFrom(context) {
         (manager as? AccountSettingsProvider)
-            ?.flowOfRequiredNotificationsPermission(this)
+            ?.flowOfRequiredNotificationsPermission(it)
             ?: emptyFlow()
     }.collectAsState(initial = false)
 
