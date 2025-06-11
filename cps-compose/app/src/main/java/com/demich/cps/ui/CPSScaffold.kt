@@ -31,6 +31,7 @@ import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.animateColorAsState
 import com.demich.cps.utils.background
+import com.demich.cps.utils.ifThen
 
 @Stable
 internal fun <T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessMediumLow)
@@ -208,10 +209,11 @@ private fun Scrim(
         label = "scrim_alpha"
     )
     if (alpha > 0f) {
-        Canvas(modifier = modifier.let {
-            if (!show) it
-            else it.pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
-        }) {
+        Canvas(
+            modifier = modifier.ifThen(show) {
+                pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
+            }
+        ) {
             drawRect(color = Color.Black.copy(alpha = alpha))
         }
     }
