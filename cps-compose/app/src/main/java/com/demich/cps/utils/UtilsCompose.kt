@@ -41,6 +41,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import kotlin.random.Random
@@ -191,6 +194,11 @@ fun enterInColumn(): EnterTransition = expandVertically() + fadeIn()
 
 @Stable
 fun exitInColumn(): ExitTransition = shrinkVertically() + fadeOut()
+
+
+@Composable
+inline fun <reified VM : ViewModel> sharedViewModel(): VM =
+    viewModel(viewModelStoreOwner = requireNotNull(LocalViewModelStoreOwner.current))
 
 
 val rememberUUIDState: MutableLongState

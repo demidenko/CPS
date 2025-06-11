@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.loading.ContestsLoaderType
@@ -15,6 +14,7 @@ import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
+import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.toLoadingStatus
 import com.demich.cps.workers.ContestsWorker
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 @Composable
-fun contestsViewModel(): ContestsViewModel = viewModel()
+fun contestsViewModel(): ContestsViewModel = sharedViewModel()
 
 class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
 

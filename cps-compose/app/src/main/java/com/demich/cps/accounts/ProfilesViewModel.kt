@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.RatedAccountManager
@@ -19,6 +18,7 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
+import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +29,7 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 @Composable
-fun profilesViewModel(): ProfilesViewModel = viewModel()
+fun profilesViewModel(): ProfilesViewModel = sharedViewModel()
 
 class ProfilesViewModel: ViewModel() {
     private val loadingStatuses = MutableStateFlow(emptyMap<AccountManagerType, LoadingStatus>())
