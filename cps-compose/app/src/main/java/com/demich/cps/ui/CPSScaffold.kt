@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -182,9 +184,14 @@ private fun Scrim(
         animationSpec = animationSpec,
         label = "scrim_alpha"
     )
-    Box(
-        modifier = modifier.ifThen(show) {
-            pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
-        }.background { Color.Black.copy(alpha = alpha) }
-    )
+
+    val visible by remember { derivedStateOf { alpha > 0 } }
+
+    if (visible) {
+        Box(
+            modifier = modifier.ifThen(show) {
+                pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
+            }.background { Color.Black.copy(alpha = alpha) }
+        )
+    }
 }
