@@ -117,7 +117,8 @@ private fun Comment(
         CommentInfo(
             authorHandle = authorHandle,
             rating = rating,
-            timeAgo = timeAgo
+            timeAgo = timeAgo,
+            modifier = Modifier.fillMaxWidth()
         )
         CommentBox(
             commentHtml = commentHtml,
@@ -136,7 +137,7 @@ private fun CommentInfo(
     timeAgo: String,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier.fillMaxWidth()) {
+    Box(modifier = modifier) {
         Row(
             modifier = Modifier.align(Alignment.TopStart)
         ) {

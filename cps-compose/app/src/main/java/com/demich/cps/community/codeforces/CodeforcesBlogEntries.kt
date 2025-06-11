@@ -116,14 +116,16 @@ private fun BlogEntryInfo(
     Column(modifier = modifier) {
         BlogEntryInfoHeader(
             title = title,
-            rating = rating
+            rating = rating,
+            modifier = Modifier.fillMaxWidth()
         )
         BlogEntryInfoFooter(
             authorHandle = authorHandle,
             timeAgo = timeAgo,
             commentsCount = commentsCount,
             markNew = markNew,
-            label = label
+            label = label,
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -131,9 +133,10 @@ private fun BlogEntryInfo(
 @Composable
 private fun BlogEntryInfoHeader(
     title: String,
-    rating: Int
+    rating: Int,
+    modifier: Modifier = Modifier
 ) {
-    Row(modifier = Modifier.fillMaxWidth()) {
+    Row(modifier = modifier) {
         Text(
             text = title,
             fontSize = 19.sp,
@@ -154,9 +157,10 @@ private fun BlogEntryInfoFooter(
     timeAgo: String,
     commentsCount: Int,
     markNew: Boolean,
-    label: (@Composable () -> Unit)?
+    label: (@Composable () -> Unit)?,
+    modifier: Modifier = Modifier
 ) {
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = modifier) {
         Row(
             modifier = Modifier
                 .align(Alignment.TopStart)
