@@ -86,8 +86,9 @@ internal data class CodeforcesMonitorSubmissionInfo(
 
 fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?> =
     flowOf { prefs ->
-        val contestId = prefs[contestId] ?: return@flowOf null
-        val contest = prefs[contestInfo].copy(id = contestId)
+        val contest = prefs[contestInfo]
+        prefs[contestId].let { if (it != contest.id) return@flowOf null }
+
         val phase = when (contest.phase) {
             CodeforcesContestPhase.CODING -> {
                 CodeforcesMonitorData.ContestPhase.Coding(endTime = contest.startTime + contest.duration)
@@ -99,10 +100,12 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
                 CodeforcesMonitorData.ContestPhase.Other(phase = contest.phase)
             }
         }
+
         val contestantRank = CodeforcesMonitorData.ContestRank(
             rank = prefs[contestantRank],
             participationType = prefs[participationType]
         )
+
         val problems = prefs[problemResults].map { problem ->
             val index = problem.problemIndex
             CodeforcesMonitorData.ProblemInfo(
@@ -122,6 +125,7 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
                 }
             )
         }
+
         CodeforcesMonitorData(
             contestInfo = contest,
             contestPhase = phase,
