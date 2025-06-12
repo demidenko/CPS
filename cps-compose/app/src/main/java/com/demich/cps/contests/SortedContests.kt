@@ -83,7 +83,11 @@ private class ContestsBruteSorter: ContestsSorter {
 
 private class ContestsSmartSorter: ContestsSorter {
     private class SortedList(data: List<Contest>, time: Instant) {
-        val list: List<Contest> = data.sortedWith(Contest.comparatorAt(time))
+        val list: List<Contest> = data.let {
+            val comparator = Contest.comparatorAt(time)
+            if (it.isSortedWith(comparator)) it
+            else it.sortedWith(comparator)
+        }
 
         val sortedAt: Instant = time
 
@@ -119,9 +123,7 @@ private class ContestsSmartSorter: ContestsSorter {
         }
         with(sortedLast) {
             if (currentTime >= nextReorderTime) {
-                if (!list.isSortedWith(Contest.comparatorAt(currentTime))) {
-                    sortedLast = SortedList(list, currentTime)
-                }
+                sortedLast = SortedList(list, currentTime)
                 updateFirstFinished(currentTime)
                 return true
             }
