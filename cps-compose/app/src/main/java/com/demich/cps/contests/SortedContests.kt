@@ -83,47 +83,48 @@ private class ContestsBruteSorter: ContestsSorter {
 
 private class ContestsSmartSorter: ContestsSorter {
     private class SortedList(data: List<Contest>, time: Instant) {
-        val list: List<Contest> = data.let {
-            val comparator = Contest.comparatorAt(time)
-            if (it.isSortedWith(comparator)) it
-            else it.sortedWith(comparator)
-        }
+        val list: List<Contest> =
+            data.let {
+                val comparator = Contest.comparatorAt(time)
+                if (it.isSortedWith(comparator)) it
+                else it.sortedWith(comparator)
+            }
 
         val sortedAt: Instant = time
 
-        val nextReorderTime: Instant = list.minOfNotNull {
-            when {
-                sortedAt < it.startTime -> it.startTime
-                sortedAt < it.endTime -> it.endTime
-                else -> null
-            }
-        } ?: Instant.DISTANT_FUTURE
+        val nextReorderTime: Instant =
+            list.minOfNotNull {
+                when {
+                    sortedAt < it.startTime -> it.startTime
+                    sortedAt < it.endTime -> it.endTime
+                    else -> null
+                }
+            } ?: Instant.DISTANT_FUTURE
+
+        val firstFinished: Int =
+            list.firstFinished(sortedAt)
     }
 
     private var last: List<Contest> = emptyList()
     private var sortedLast = SortedList(last, Instant.DISTANT_PAST)
-    private var firstFinished: Int = 0
 
     override val contests: SortedContests
         get() = SortedContests(
             contests = sortedLast.list,
-            firstFinished = firstFinished
+            firstFinished = sortedLast.firstFinished
         )
 
-    private fun update(contests: List<Contest>, currentTime: Instant) {
-        sortedLast = SortedList(contests, currentTime)
-        firstFinished = sortedLast.list.firstFinished(currentTime)
-    }
-
     override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
-        if (last != contests || currentTime < sortedLast.sortedAt) {
-            last = contests
-            update(contests, currentTime)
-            return true
-        }
-        if (currentTime >= sortedLast.nextReorderTime) {
-            update(sortedLast.list, currentTime)
-            return true
+        with(sortedLast) {
+            if (last != contests || currentTime < sortedAt) {
+                last = contests
+                sortedLast = SortedList(contests, currentTime)
+                return true
+            }
+            if (currentTime >= nextReorderTime) {
+                sortedLast = SortedList(list, currentTime)
+                return true
+            }
         }
         return false
     }
