@@ -135,22 +135,22 @@ internal fun produceSortedContestsWithTime(
 ): Pair<State<SortedContests>, State<Instant>> {
     val context = context
 
-    val states = remember {
+    val init = remember {
         val initContests = runBlocking { flowOfContests(context).first() }
         val currentTime = getCurrentTime().truncateBy(1.seconds)
-        val sorter = ContestsBruteSorter()
+        val sorter = ContestsSmartSorter()
         sorter.apply(initContests, currentTime)
         val contestsState = mutableStateOf(sorter.contests)
         val currentTimeState = mutableStateOf(currentTime)
-        Pair(contestsState, currentTimeState)
+        Pair(Pair(contestsState, currentTimeState), sorter)
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(lifecycleOwner, states) {
+    LaunchedEffect(lifecycleOwner, init) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            val (states, sorter: ContestsSorter) = init
             val (contestsState, currentTimeState) = states
-            val sorter: ContestsSorter = ContestsSmartSorter()
             flowOfContests(context).combine(flowOfCurrentTimeEachSecond()) { contests, currentTime ->
                 if (sorter.apply(contests, currentTime)) {
                     contestsState.value = sorter.contests
@@ -160,5 +160,5 @@ internal fun produceSortedContestsWithTime(
         }
     }
 
-    return states
+    return init.first
 }
