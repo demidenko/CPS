@@ -82,47 +82,49 @@ private class ContestsBruteSorter: ContestsSorter {
 }
 
 private class ContestsSmartSorter: ContestsSorter {
-    private var last: List<Contest> = emptyList()
-    private var sortedLast: List<Contest> = emptyList()
-    private var firstFinished: Int = 0
-    private var sortedAt: Instant = Instant.DISTANT_PAST
-    private var nextReorderTime: Instant = Instant.DISTANT_FUTURE
+    private class SortedList(data: List<Contest>, time: Instant) {
+        val list: List<Contest> = data.sortedWith(Contest.comparatorAt(time))
 
-    override val contests: SortedContests
-        get() = SortedContests(
-            contests = sortedLast,
-            firstFinished = firstFinished
-        )
+        val sortedAt: Instant = time
 
-    private fun saveToSorted(contests: List<Contest>, currentTime: Instant) {
-        sortedLast = contests.sortedWith(Contest.comparatorAt(currentTime))
-        sortedAt = currentTime
-        nextReorderTime = contests.minOfNotNull {
+        val nextReorderTime: Instant = list.minOfNotNull {
             when {
-                currentTime < it.startTime -> it.startTime
-                currentTime < it.endTime -> it.endTime
+                sortedAt < it.startTime -> it.startTime
+                sortedAt < it.endTime -> it.endTime
                 else -> null
             }
         } ?: Instant.DISTANT_FUTURE
     }
 
+    private var last: List<Contest> = emptyList()
+    private var sortedLast = SortedList(last, Instant.DISTANT_PAST)
+    private var firstFinished: Int = 0
+
+    override val contests: SortedContests
+        get() = SortedContests(
+            contests = sortedLast.list,
+            firstFinished = firstFinished
+        )
+
     private fun updateFirstFinished(currentTime: Instant) {
-        firstFinished = sortedLast.firstFinished(currentTime)
+        firstFinished = sortedLast.list.firstFinished(currentTime)
     }
 
     override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
-        if (last != contests || currentTime < sortedAt) {
+        if (last != contests || currentTime < sortedLast.sortedAt) {
             last = contests
-            saveToSorted(contests, currentTime)
+            sortedLast = SortedList(contests, currentTime)
             updateFirstFinished(currentTime)
             return true
         }
-        if (currentTime >= nextReorderTime) {
-            if (!sortedLast.isSortedWith(Contest.comparatorAt(currentTime))) {
-                saveToSorted(sortedLast, currentTime)
+        with(sortedLast) {
+            if (currentTime >= nextReorderTime) {
+                if (!list.isSortedWith(Contest.comparatorAt(currentTime))) {
+                    sortedLast = SortedList(list, currentTime)
+                }
+                updateFirstFinished(currentTime)
+                return true
             }
-            updateFirstFinished(currentTime)
-            return true
         }
         return false
     }
