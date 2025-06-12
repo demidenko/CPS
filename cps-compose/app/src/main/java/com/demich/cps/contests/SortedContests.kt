@@ -110,23 +110,20 @@ private class ContestsSmartSorter: ContestsSorter {
             firstFinished = firstFinished
         )
 
-    private fun updateFirstFinished(currentTime: Instant) {
+    private fun update(contests: List<Contest>, currentTime: Instant) {
+        sortedLast = SortedList(contests, currentTime)
         firstFinished = sortedLast.list.firstFinished(currentTime)
     }
 
     override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
         if (last != contests || currentTime < sortedLast.sortedAt) {
             last = contests
-            sortedLast = SortedList(contests, currentTime)
-            updateFirstFinished(currentTime)
+            update(contests, currentTime)
             return true
         }
-        with(sortedLast) {
-            if (currentTime >= nextReorderTime) {
-                sortedLast = SortedList(list, currentTime)
-                updateFirstFinished(currentTime)
-                return true
-            }
+        if (currentTime >= sortedLast.nextReorderTime) {
+            update(sortedLast.list, currentTime)
+            return true
         }
         return false
     }
