@@ -5,20 +5,33 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.DialogAccountChooser
 import com.demich.cps.accounts.managers.makeHandleSpan
-import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
-import com.demich.cps.ui.*
+import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
+import com.demich.cps.ui.CPSIconButton
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.lazylist.LazyColumnOfData
-import com.demich.cps.utils.*
+import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.ProvideTimeEachMinute
+import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.collectAsStateWithLifecycle
+import com.demich.cps.utils.context
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
@@ -37,7 +50,7 @@ fun CommunityFollowScreen(
 
     val followLoadingStatus by collectAsState { communityViewModel.flowOfFollowUpdateLoadingStatus() }
 
-    val userBlogs by collectAsState {
+    val userBlogs by collectAsStateWithLifecycle {
         context.followListDao.flowOfAllBlogs().map {
             it.sortedByDescending { it.id }
         }
