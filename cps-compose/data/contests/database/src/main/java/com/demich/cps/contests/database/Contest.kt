@@ -84,7 +84,7 @@ data class Contest (
         val platforms: List<Platform> get() = Platform.entries
         val platformsExceptUnknown: List<Platform> = platforms - Platform.unknown
 
-        fun getComparator(currentTime: Instant) = Comparator<Contest> { c1, c2 ->
+        fun comparatorAt(currentTime: Instant) = Comparator<Contest> { c1, c2 ->
             val phase1 = c1.getPhase(currentTime)
             val phase2 = c2.getPhase(currentTime)
             if (phase1 != phase2) {

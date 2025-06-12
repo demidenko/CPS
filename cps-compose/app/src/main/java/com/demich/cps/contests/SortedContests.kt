@@ -72,7 +72,7 @@ private class ContestsBruteSorter: ContestsSorter {
         private set
 
     override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
-        val sorted = contests.sortedWith(Contest.getComparator(currentTime))
+        val sorted = contests.sortedWith(Contest.comparatorAt(currentTime))
         this.contests = SortedContests(
             contests = sorted,
             firstFinished = sorted.firstFinished(currentTime)
@@ -95,7 +95,7 @@ private class ContestsSmartSorter: ContestsSorter {
         )
 
     private fun saveToSorted(contests: List<Contest>, currentTime: Instant) {
-        sortedLast = contests.sortedWith(Contest.getComparator(currentTime))
+        sortedLast = contests.sortedWith(Contest.comparatorAt(currentTime))
         sortedAt = currentTime
         nextReorderTime = contests.minOfNotNull {
             when {
@@ -118,7 +118,7 @@ private class ContestsSmartSorter: ContestsSorter {
             return true
         }
         if (currentTime >= nextReorderTime) {
-            if (!sortedLast.isSortedWith(Contest.getComparator(currentTime))) {
+            if (!sortedLast.isSortedWith(Contest.comparatorAt(currentTime))) {
                 saveToSorted(sortedLast, currentTime)
             }
             updateFirstFinished(currentTime)
