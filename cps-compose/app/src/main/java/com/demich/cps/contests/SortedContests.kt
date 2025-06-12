@@ -82,9 +82,9 @@ private class ContestsBruteSorter: ContestsSorter {
 }
 
 private class ContestsSmartSorter: ContestsSorter {
-    private class SortedList(data: List<Contest>, time: Instant) {
-        val list: List<Contest> =
-            data.let {
+    private class SortedData(contests: List<Contest>, time: Instant) {
+        val sorted: List<Contest> =
+            contests.let {
                 val comparator = Contest.comparatorAt(time)
                 if (it.isSortedWith(comparator)) it
                 else it.sortedWith(comparator)
@@ -93,7 +93,7 @@ private class ContestsSmartSorter: ContestsSorter {
         val sortedAt: Instant = time
 
         val nextReorderTime: Instant =
-            list.minOfNotNull {
+            sorted.minOfNotNull {
                 when {
                     sortedAt < it.startTime -> it.startTime
                     sortedAt < it.endTime -> it.endTime
@@ -101,16 +101,15 @@ private class ContestsSmartSorter: ContestsSorter {
                 }
             } ?: Instant.DISTANT_FUTURE
 
-        val firstFinished: Int =
-            list.firstFinished(sortedAt)
+        val firstFinished: Int = sorted.firstFinished(sortedAt)
     }
 
     private var last: List<Contest> = emptyList()
-    private var sortedLast = SortedList(last, Instant.DISTANT_PAST)
+    private var sortedLast = SortedData(last, Instant.DISTANT_PAST)
 
     override val contests: SortedContests
         get() = SortedContests(
-            contests = sortedLast.list,
+            contests = sortedLast.sorted,
             firstFinished = sortedLast.firstFinished
         )
 
@@ -118,11 +117,11 @@ private class ContestsSmartSorter: ContestsSorter {
         with(sortedLast) {
             if (last != contests || currentTime < sortedAt) {
                 last = contests
-                sortedLast = SortedList(contests, currentTime)
+                sortedLast = SortedData(contests, currentTime)
                 return true
             }
             if (currentTime >= nextReorderTime) {
-                sortedLast = SortedList(list, currentTime)
+                sortedLast = SortedData(sorted, currentTime)
                 return true
             }
         }
