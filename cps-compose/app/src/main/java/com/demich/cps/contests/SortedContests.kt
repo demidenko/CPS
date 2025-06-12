@@ -115,12 +115,12 @@ private class ContestsSmartSorter: ContestsSorter {
 
     override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
         with(sortedLast) {
-            if (last != contests || currentTime < sortedAt) {
+            if (last != contests) {
                 last = contests
                 sortedLast = SortedData(contests, currentTime)
                 return true
             }
-            if (currentTime >= nextReorderTime) {
+            if (currentTime >= nextReorderTime || currentTime < sortedAt) {
                 sortedLast = SortedData(sorted, currentTime)
                 return true
             }
