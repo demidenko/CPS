@@ -15,10 +15,18 @@ data class CodeforcesMonitorData(
 ) {
     val contestId: Int get() = contestInfo.id
 
-    sealed class ContestPhase(open val phase: CodeforcesContestPhase) {
-        data class Coding(val endTime: Instant): ContestPhase(CodeforcesContestPhase.CODING)
-        data class SystemTesting(val percentage: Int?): ContestPhase(CodeforcesContestPhase.SYSTEM_TEST)
-        data class Other(override val phase: CodeforcesContestPhase): ContestPhase(phase)
+    sealed interface ContestPhase {
+        val phase: CodeforcesContestPhase
+
+        data class Coding(val endTime: Instant): ContestPhase {
+            override val phase get() = CodeforcesContestPhase.CODING
+        }
+
+        data class SystemTesting(val percentage: Int?): ContestPhase {
+            override val phase get() = CodeforcesContestPhase.SYSTEM_TEST
+        }
+
+        data class Other(override val phase: CodeforcesContestPhase): ContestPhase
     }
 
     data class ContestRank(
