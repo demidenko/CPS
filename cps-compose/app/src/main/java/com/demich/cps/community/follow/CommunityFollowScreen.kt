@@ -5,37 +5,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.DialogAccountChooser
 import com.demich.cps.accounts.managers.makeHandleSpan
-import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
-import com.demich.cps.ui.CPSIconButton
-import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.ContentWithCPSDropdownMenu
+import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
+import com.demich.cps.ui.*
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.lazylist.LazyColumnOfData
-import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.ProvideTimeEachMinute
-import com.demich.cps.utils.collectAsState
-import com.demich.cps.utils.context
+import com.demich.cps.utils.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
@@ -51,11 +37,11 @@ fun CommunityFollowScreen(
 
     val followLoadingStatus by collectAsState { communityViewModel.flowOfFollowUpdateLoadingStatus() }
 
-    val userBlogs by remember {
+    val userBlogs by collectAsState {
         context.followListDao.flowOfAllBlogs().map {
             it.sortedByDescending { it.id }
         }
-    }.collectAsStateWithLifecycle(initialValue = null)
+    }
 
     ProvideTimeEachMinute {
         CodeforcesFollowList(
@@ -77,7 +63,7 @@ fun CommunityFollowScreen(
 
 @Composable
 private fun CodeforcesFollowList(
-    userBlogs: () -> List<CodeforcesUserBlog>?,
+    userBlogs: () -> List<CodeforcesUserBlog>,
     isRefreshing: () -> Boolean,
     onOpenBlog: (String) -> Unit,
     onDeleteUser: (String) -> Unit,
@@ -93,8 +79,7 @@ private fun CodeforcesFollowList(
             4) delete first + scroll not top -> ?? (whatever) [ok by default]
             5) add first -> adding animation + scroll to top [NO by default]
          */
-        snapshotFlow { userBlogs()?.let { it.size to it.firstOrNull()?.id } }
-            .filterNotNull()
+        snapshotFlow { userBlogs().let { it.size to it.firstOrNull()?.id } }
             .distinctUntilChangedBy { it.second } //wait for first id changed
             .drop(1) //ignore first because of first composition
             .collect { (listSize, _) ->
