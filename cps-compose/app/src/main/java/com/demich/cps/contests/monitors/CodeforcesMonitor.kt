@@ -24,7 +24,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.transformLatest
@@ -81,7 +81,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
     }
 
     val systestPercentageJob = scope.launch {
-        contestInfo.flow.map { it.phase }
+        contestInfo.flow.mapNotNull { it?.phase }
             .toSystemTestPercentageFlow(contestId = contestId, delay = 5.seconds)
             .collect {
                 sysTestPercentage(newValue = it)
@@ -111,7 +111,7 @@ private suspend inline fun CodeforcesMonitorDataStore.getStandingsData(
     }.onFailure { e ->
         lastRequest(false)
         if (e is CodeforcesApiContestNotStartedException && e.contestId == contestId) {
-            contestInfo.update { it.copy(phase = CodeforcesContestPhase.BEFORE) }
+            contestInfo.update { it?.copy(phase = CodeforcesContestPhase.BEFORE) }
         }
         if (e is CodeforcesApiContestNotFoundException && e.contestId == contestId) {
             reset()
@@ -168,10 +168,10 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
 }
 
 private suspend fun getDelay(
-    contest: CodeforcesContest,
+    contest: CodeforcesContest?,
     ratingChangeWaiter: RatingChangeWaiter
 ): Duration {
-    return when (contest.phase) {
+    return when (contest?.phase) {
         CodeforcesContestPhase.CODING -> 10.seconds
         CodeforcesContestPhase.PENDING_SYSTEM_TEST -> 15.seconds
         CodeforcesContestPhase.SYSTEM_TEST -> 3.seconds
@@ -256,7 +256,8 @@ private fun needCheckSubmissions(
 private suspend inline fun CodeforcesMonitorDataStore.ifNeedCheckSubmissions(
     block: (List<CodeforcesMonitorProblemResult>) -> Unit
 ) = fromSnapshot { prefs ->
-    if (needCheckSubmissions(contestInfo = prefs[contestInfo], participationType = prefs[participationType])) {
+    val contestInfo = prefs[contestInfo] ?: return@fromSnapshot
+    if (needCheckSubmissions(contestInfo = contestInfo, participationType = prefs[participationType])) {
         val problemResults = prefs[problemResults]
         val info = prefs[submissionsInfo]
         if (problemResults.any { needCheckSubmissions(it, info) }) block(problemResults)

@@ -3,7 +3,6 @@ package com.demich.cps.contests.monitors
 import android.content.Context
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemStatus
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
@@ -15,9 +14,7 @@ import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.flowOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
-import kotlin.time.Duration
 
 class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf_monitor_dataStore) {
     companion object {
@@ -28,17 +25,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     val lastRequest = jsonCPS.item<Boolean?>(name = "last_request", defaultValue = null)
 
-    //TODO: item<CodeforcesContest?> with default = null
-    internal val contestInfo = jsonCPS.item(name = "contest_info") {
-        CodeforcesContest(
-            id = -1,
-            name = "",
-            phase = CodeforcesContestPhase.UNDEFINED,
-            type = CodeforcesContestType.UNDEFINED,
-            duration = Duration.ZERO,
-            startTime = Instant.DISTANT_PAST
-        )
-    }
+    internal val contestInfo = jsonCPS.item<CodeforcesContest?>(name = "contest_info", defaultValue = null)
 
     internal val participationType = itemEnum(name = "participation_type", defaultValue = CodeforcesParticipationType.NOT_PARTICIPATED)
 
@@ -93,7 +80,7 @@ internal data class CodeforcesMonitorSubmissionInfo(
 
 fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?> =
     flowOf { prefs ->
-        val contest = prefs[contestInfo]
+        val contest = prefs[contestInfo] ?: return@flowOf null
         prefs[args].let { if (it?.contestId != contest.id) return@flowOf null }
         if (contest.phase == CodeforcesContestPhase.UNDEFINED) return@flowOf null
 
@@ -148,6 +135,7 @@ fun CodeforcesMonitorDataStore.flowOfContestId(): Flow<Int?> =
         val contestInfo = prefs[contestInfo]
         val contestId = prefs[args]?.contestId
         when {
+            contestInfo == null -> null
             contestInfo.id != contestId -> null
             contestInfo.phase == CodeforcesContestPhase.UNDEFINED -> null
             else -> contestId
