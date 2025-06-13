@@ -61,7 +61,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
         )
 
         ifNeedCheckSubmissions { problemResults ->
-            getSubmissions(
+            getSubmissionsOrNull(
                 contestId = contestId,
                 handle = handle
             )?.let { submissions ->
@@ -81,7 +81,10 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
         getDelay(
             contest = contestInfo(),
             ratingChangeWaiter = ratingChangeWaiter
-        )
+        ).let { duration ->
+            if (lastRequest() == false) duration.coerceAtMost(10.seconds)
+            else duration
+        }
     }
 
     val percentageJob = contestInfo.flow.map { it.phase }
@@ -208,6 +211,7 @@ private class RatingChangeWaiter(
         CodeforcesApi.runCatching {
             getContestRatingChanges(contestId)
         }.getOrElse {
+            //TODO: take this failure
             if (it is CodeforcesApiContestRatingUnavailableException) {
                 //unrated contest
                 return true
@@ -282,7 +286,7 @@ private suspend inline fun CodeforcesMonitorDataStore.ifNeedCheckSubmissions(
     }
 }
 
-private suspend fun getSubmissions(contestId: Int, handle: String) =
+private suspend fun getSubmissionsOrNull(contestId: Int, handle: String): List<CodeforcesSubmission>? =
     CodeforcesApi.runCatching {
         getContestSubmissions(contestId = contestId, handle = handle)
     }.map { submissions ->
@@ -290,7 +294,7 @@ private suspend fun getSubmissions(contestId: Int, handle: String) =
                it.author.participantType.contestParticipant()
             && it.verdict != CodeforcesProblemVerdict.SKIPPED
         }
-    }.getOrNull()
+    }.getOrNull() //TODO: take this failure
 
 private fun List<CodeforcesMonitorProblemResult>.makeMapWith(submissions: List<CodeforcesSubmission>) =
     submissions.groupBy(
