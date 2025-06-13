@@ -17,7 +17,6 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.launchWhileActive
-import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.fromSnapshot
 import kotlinx.coroutines.CoroutineScope
@@ -64,9 +63,9 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
                     it.testset == CodeforcesTestset.TESTS
                     && it.verdict.isResult()
                     && it.id !in notified
-                }.forEach {
-                    onSubmissionFinalResult(it)
-                    notifiedSubmissionsIds.add(it.id)
+                }.takeIf { it.isNotEmpty() }?.let { newSubmissions ->
+                    newSubmissions.forEach { onSubmissionFinalResult(it) }
+                    notifiedSubmissionsIds.edit { newSubmissions.forEach { add(it.id) } }
                 }
                 submissionsInfo.update { problemResults.makeMapWith(submissions) }
             }
