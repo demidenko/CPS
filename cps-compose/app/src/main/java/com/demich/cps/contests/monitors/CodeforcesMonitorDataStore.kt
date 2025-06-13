@@ -14,6 +14,7 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.flowOf
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -139,4 +140,4 @@ fun CodeforcesMonitorDataStore.flowOfContestId(): Flow<Int?> =
         prefs[contestId]?.takeIf {
             prefs[contestInfo].phase != CodeforcesContestPhase.UNDEFINED
         }
-    }
+    }.distinctUntilChanged()
