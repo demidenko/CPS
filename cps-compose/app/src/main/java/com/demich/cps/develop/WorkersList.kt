@@ -260,7 +260,7 @@ private fun CodeforcesMonitorWorkItem(
 ) {
     val context = context
     val workInfo by work.workInfoAsState()
-    val contestId by collectItemAsState { CodeforcesMonitorDataStore(context).contestId }
+    val monitorArgs by collectItemAsState { CodeforcesMonitorDataStore(context).args }
 
     WorkerItem(
         modifier = modifier,
@@ -268,7 +268,7 @@ private fun CodeforcesMonitorWorkItem(
         workState = workInfo.stateOrCancelled,
         progressInfo = { null }
     ) {
-        Text(text = "contestId = $contestId")
+        Text(text = "contestId = ${monitorArgs?.contestId}")
     }
 }
 
@@ -403,7 +403,7 @@ private fun CodeforcesMonitorDialog(onDismissRequest: () -> Unit, onStart: (Int)
     val context = context
     var contestId: String by rememberSaveable {
         mutableStateOf(value = runBlocking {
-            CodeforcesMonitorDataStore(context).contestId()?.toString() ?: ""
+            CodeforcesMonitorDataStore(context).args()?.contestId?.toString() ?: ""
         })
     }
     CPSYesNoDialog(

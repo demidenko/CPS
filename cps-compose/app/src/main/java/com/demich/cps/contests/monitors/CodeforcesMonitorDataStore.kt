@@ -24,8 +24,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
         private val Context.cf_monitor_dataStore by dataStoreWrapper(name = "cf_monitor")
     }
 
-    val contestId = itemIntNullable(name = "contest_id")
-    val handle = itemString(name = "handle", defaultValue = "")
+    internal val args = jsonCPS.item<CodeforcesMonitorArgs?>(name = "args", defaultValue = null)
 
     val lastRequest = jsonCPS.item<Boolean?>(name = "last_request", defaultValue = null)
 
@@ -54,6 +53,12 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     suspend fun reset() = resetAll()
 }
+
+@Serializable
+internal data class CodeforcesMonitorArgs(
+    val contestId: Int,
+    val handle: String
+)
 
 @Serializable
 internal data class CodeforcesMonitorProblemResult(
@@ -88,7 +93,7 @@ internal data class CodeforcesMonitorSubmissionInfo(
 fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?> =
     flowOf { prefs ->
         val contest = prefs[contestInfo]
-        prefs[contestId].let { if (it != contest.id) return@flowOf null }
+        prefs[args].let { if (it?.contestId != contest.id) return@flowOf null }
 
         val phase = when (contest.phase) {
             CodeforcesContestPhase.CODING -> {
@@ -137,7 +142,7 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
 
 fun CodeforcesMonitorDataStore.flowOfContestId(): Flow<Int?> =
     flowOf { prefs ->
-        prefs[contestId]?.takeIf {
+        prefs[args]?.contestId?.takeIf {
             prefs[contestInfo].phase != CodeforcesContestPhase.UNDEFINED
         }
     }.distinctUntilChanged()

@@ -41,8 +41,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
     onRatingChange: (CodeforcesRatingChange) -> Unit,
     onSubmissionFinalResult: (CodeforcesSubmission) -> Unit
 ) {
-    val contestId = contestId() ?: return
-    val handle = handle()
+    val (contestId: Int, handle: String) = args() ?: return
 
     val ratingChangeWaiter = RatingChangeWaiter(contestId, handle, onRatingChange)
 
@@ -90,8 +89,8 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
             }
     }
 
-    this.contestId.flow
-        .takeWhile { it == contestId }
+    this.args.flow
+        .takeWhile { it?.contestId == contestId }
         .onCompletion {
             systestPercentageJob.cancel()
             mainJob.cancel()

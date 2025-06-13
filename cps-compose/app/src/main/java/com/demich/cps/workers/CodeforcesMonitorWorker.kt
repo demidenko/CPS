@@ -8,6 +8,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.contests.monitors.CodeforcesMonitorArgs
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorNotifier
 import com.demich.cps.contests.monitors.flowOfContestData
@@ -17,7 +18,6 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.datastore_itemized.edit
-import com.demich.datastore_itemized.fromSnapshot
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
@@ -36,9 +36,10 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
 
         suspend fun start(contestId: Int, handle: String, context: Context) {
             val monitor = CodeforcesMonitorDataStore(context)
+            val startArgs = CodeforcesMonitorArgs(contestId, handle)
 
             val replace: Boolean
-            if (monitor.fromSnapshot { contestId == it[this.contestId] && handle == it[this.handle] }) {
+            if (monitor.args() == startArgs) {
                 if (getWork(context).flowOfWorkInfo().first().isRunning)
                     replace = false
                 else
@@ -47,8 +48,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                 replace = true
                 monitor.edit {
                     it.clear()
-                    it[this.handle] = handle
-                    it[this.contestId] = contestId
+                    it[args] = startArgs
                 }
             }
 
@@ -59,8 +59,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
     override suspend fun doWork(): Result {
         val monitor = CodeforcesMonitorDataStore(context)
 
-        val contestId = monitor.contestId.flow.filterNotNull().first()
-        val handle = monitor.handle()
+        val (contestId, handle) = monitor.args.flow.filterNotNull().first()
 
         val notificationBuilder = createNotificationBuilder(handle)
             .also { setForeground(it) }
