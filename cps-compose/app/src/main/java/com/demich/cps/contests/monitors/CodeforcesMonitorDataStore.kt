@@ -95,6 +95,7 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
     flowOf { prefs ->
         val contest = prefs[contestInfo]
         prefs[args].let { if (it?.contestId != contest.id) return@flowOf null }
+        if (contest.phase == CodeforcesContestPhase.UNDEFINED) return@flowOf null
 
         val phase = when (contest.phase) {
             CodeforcesContestPhase.CODING -> {
@@ -141,7 +142,7 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
         )
     }
 
-// shortcut for flowOfContestData().map { it?.contestId } + check for UNDEFINED
+// shortcut for flowOfContestData().map { it?.contestId }
 fun CodeforcesMonitorDataStore.flowOfContestId(): Flow<Int?> =
     flowOf { prefs ->
         val contestInfo = prefs[contestInfo]
