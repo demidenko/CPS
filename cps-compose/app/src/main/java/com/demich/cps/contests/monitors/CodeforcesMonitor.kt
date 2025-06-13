@@ -21,20 +21,15 @@ import com.demich.datastore_itemized.add
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.fromSnapshot
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -87,19 +82,18 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
         }
     }
 
-    val percentageJob = contestInfo.flow.map { it.phase }
-        .collectSystemTestPercentage(
-            contestId = contestId,
-            scope = scope,
-            delay = 5.seconds
-        ) {
-            sysTestPercentage(it)
-        }
+    val systestPercentageJob = scope.launch {
+        contestInfo.flow.map { it.phase }
+            .toSystemTestPercentageFlow(contestId = contestId, delay = 5.seconds)
+            .collect {
+                sysTestPercentage(newValue = it)
+            }
+    }
 
     this.contestId.flow
         .takeWhile { it == contestId }
         .onCompletion {
-            percentageJob.cancel()
+            systestPercentageJob.cancel()
             mainJob.cancel()
         }
         .launchIn(scope)
@@ -226,35 +220,20 @@ private class RatingChangeWaiter(
 }
 
 
-private fun flowOfSystemTestPercentage(
+private fun Flow<CodeforcesContestPhase>.toSystemTestPercentageFlow(
     contestId: Int,
     delay: Duration
-): Flow<Int?> = flow {
-    while (true) {
-        CodeforcesApi.runCatching { getContestPage(contestId) }
-            .onSuccess {
-                emit(CodeforcesUtils.extractContestSystemTestingPercentageOrNull(it))
-            }
-        delay(duration = delay)
-    }
-}
-
-@OptIn(ExperimentalCoroutinesApi::class)
-private fun Flow<CodeforcesContestPhase>.collectSystemTestPercentage(
-    contestId: Int,
-    scope: CoroutineScope,
-    delay: Duration,
-    onSetPercentage: suspend (Int) -> Unit
-): Job {
-    return distinctUntilChanged().flatMapLatest { phase ->
-        if (phase == CodeforcesContestPhase.SYSTEM_TEST) {
-            flowOfSystemTestPercentage(contestId = contestId, delay = delay)
-                .filterNotNull()
-                .onEach(onSetPercentage)
-        } else {
-            emptyFlow()
+): Flow<Int> = distinctUntilChanged().transformLatest { phase ->
+    if (phase == CodeforcesContestPhase.SYSTEM_TEST) {
+        while (true) {
+            CodeforcesApi.runCatching { getContestPage(contestId) }
+                .map { CodeforcesUtils.extractContestSystemTestingPercentageOrNull(it) }
+                .onSuccess {
+                    if (it != null) emit(it)
+                }
+            delay(duration = delay)
         }
-    }.launchIn(scope)
+    }
 }
 
 
