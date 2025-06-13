@@ -13,11 +13,9 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.platforms.api.cpsHttpClient
 import com.demich.cps.platforms.api.defaultJson
-import com.demich.cps.platforms.api.isServerError
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
 import io.ktor.client.call.body
-import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.defaultRequest
@@ -36,7 +34,6 @@ import korlibs.crypto.sha1
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.Serializable
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -45,7 +42,8 @@ object CodeforcesApi: PlatformApi {
 
     override val client = cpsHttpClient(
         json = json,
-        useCookies = true
+        useCookies = true,
+        retryOnExceptionIf = { it is CodeforcesApiCallLimitExceededException }
     ) {
         defaultRequest {
             url(urls.main)
@@ -80,14 +78,6 @@ object CodeforcesApi: PlatformApi {
             }
         }
 
-        //careful!!! only one install and retry block is used in ktor
-        install(HttpRequestRetry) {
-            retryOnExceptionIf(maxRetries = 10) { requestBuilder, throwable ->
-                throwable.shouldRetry()
-            }
-            delayMillis { callLimitExceededWaitTime.inWholeMilliseconds }
-        }
-
         install(RateLimitPlugin) {
             if (BuildConfig.DEBUG) {
                 window = 1.seconds
@@ -103,13 +93,6 @@ object CodeforcesApi: PlatformApi {
 
     class CodeforcesTemporarilyUnavailableException: CodeforcesApiException("Codeforces Temporarily Unavailable")
     private class CodeforcesPOWException(val pow: String): CodeforcesApiException("pow = $pow")
-
-    private val callLimitExceededWaitTime: Duration get() = 500.milliseconds
-    private fun Throwable.shouldRetry(): Boolean {
-        if (this is ResponseException && response.status.isServerError()) return true
-        if (this is CodeforcesApiCallLimitExceededException) return true
-        return false
-    }
 
     private val semaphore = when {
         BuildConfig.DEBUG -> Semaphore(permits = 3)
