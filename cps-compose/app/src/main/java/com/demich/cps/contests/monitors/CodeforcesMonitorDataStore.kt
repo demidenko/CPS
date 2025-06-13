@@ -28,6 +28,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     val lastRequest = jsonCPS.item<Boolean?>(name = "last_request", defaultValue = null)
 
+    //TODO: item<CodeforcesContest?> with default = null
     internal val contestInfo = jsonCPS.item(name = "contest_info") {
         CodeforcesContest(
             id = -1,

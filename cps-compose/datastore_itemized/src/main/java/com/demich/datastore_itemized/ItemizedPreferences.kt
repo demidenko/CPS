@@ -12,38 +12,22 @@ import kotlin.contracts.contract
 open class ItemizedPreferences internal constructor(
     protected open val preferences: Preferences
 ) {
-    operator fun<T> get(item: DataStoreItem<T>): T =
+    operator fun <T> get(item: DataStoreItem<T>): T =
         item.converter.getFrom(preferences)
 }
 
 class ItemizedMutablePreferences internal constructor(
     override val preferences: MutablePreferences
 ): ItemizedPreferences(preferences) {
-    operator fun<T> set(item: DataStoreItem<T>, value: T) =
+    operator fun <T> set(item: DataStoreItem<T>, value: T) =
         item.converter.setTo(preferences, value)
 
     fun clear() {
         preferences.clear()
     }
 
-    fun<T> remove(item: DataStoreItem<T>) {
+    fun <T> remove(item: DataStoreItem<T>) {
         item.converter.removeFrom(preferences)
-    }
-
-    //maps editing
-    private inner class ConverterMap<K, V>(private val item: DataStoreItem<Map<K, V>>) {
-        val map: MutableMap<K, V> = get<Map<K, V>>(item).toMutableMap()
-        fun save() { set(item, map) }
-    }
-
-    private val mutableMaps = mutableMapOf<String, ConverterMap<*, *>>()
-
-    @Suppress("UNCHECKED_CAST")
-    operator fun<K, V> get(item: DataStoreItem<Map<K, V>>): MutableMap<K, V> =
-        mutableMaps.getOrPut(item.converter.name) { ConverterMap(item) }.map as MutableMap<K, V>
-
-    internal fun saveMutableMaps() {
-        mutableMaps.values.forEach { it.save() }
     }
 }
 
@@ -54,7 +38,6 @@ suspend fun <D: ItemizedDataStore> D.edit(block: D.(ItemizedMutablePreferences) 
     dataStore.edit {
         val prefs = ItemizedMutablePreferences(it)
         block(prefs)
-        prefs.saveMutableMaps()
     }
 }
 
