@@ -231,12 +231,10 @@ private fun flowOfSystemTestPercentage(
     delay: Duration
 ): Flow<Int?> = flow {
     while (true) {
-        CodeforcesApi.runCatching {
-            val page = getContestPage(contestId)
-            CodeforcesUtils.extractContestSystemTestingPercentageOrNull(page)
-        }.onSuccess {
-            emit(it)
-        }
+        CodeforcesApi.runCatching { getContestPage(contestId) }
+            .onSuccess {
+                emit(CodeforcesUtils.extractContestSystemTestingPercentageOrNull(it))
+            }
         delay(duration = delay)
     }
 }
