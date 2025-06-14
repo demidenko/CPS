@@ -12,6 +12,7 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
 import kotlinx.coroutines.flow.map
 
+@androidx.annotation.Keep //navigation agr type
 enum class AccountManagerType {
     codeforces,
     atcoder,
