@@ -10,15 +10,18 @@ class CodeforcesContestsLoader: ContestsLoader(type = ContestsLoaderType.codefor
         platform: Contest.Platform,
         dateConstraints: ContestDateConstraints
     ) = CodeforcesApi.getContests()
-        .filter { dateConstraints.check(startTime = it.startTime, duration = it.duration) }
-        .map { contest ->
-            Contest(
-                platform = Contest.Platform.codeforces,
-                id = contest.id.toString(),
-                title = contest.name,
-                startTime = contest.startTime,
-                duration = contest.duration,
-                link = CodeforcesApi.urls.contest(contestId = contest.id)
-            )
+        .mapNotNull {
+            if (dateConstraints.check(startTime = it.startTime, duration = it.duration)) {
+                Contest(
+                    platform = Contest.Platform.codeforces,
+                    id = it.id.toString(),
+                    title = it.name,
+                    startTime = it.startTime,
+                    duration = it.duration,
+                    link = CodeforcesApi.urls.contest(contestId = it.id)
+                )
+            } else {
+                null
+            }
         }
 }

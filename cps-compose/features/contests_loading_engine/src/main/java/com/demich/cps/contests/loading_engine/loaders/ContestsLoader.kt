@@ -10,7 +10,7 @@ abstract class ContestsLoader(val type: ContestsLoaderType) {
         platform: Contest.Platform,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
-        return loadContests(platform = platform).filterWith(dateConstraints)
+        return loadContests(platform = platform).filterBy(dateConstraints)
     }
 
     protected open suspend fun loadContests(
@@ -42,7 +42,7 @@ abstract class ContestsLoaderMultiple(type: ContestsLoaderType): ContestsLoader(
         platforms: Set<Contest.Platform>,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
-        return loadContests(platforms = platforms).filterWith(dateConstraints)
+        return loadContests(platforms = platforms).filterBy(dateConstraints)
     }
 
     protected open suspend fun loadContests(
@@ -75,5 +75,10 @@ abstract class ContestsLoaderMultiple(type: ContestsLoaderType): ContestsLoader(
     ) = loadContests(platforms = setOf(platform), dateConstraints = dateConstraints)
 }
 
-private fun List<Contest>.filterWith(dateConstraints: ContestDateConstraints) =
-    filter { contest -> dateConstraints.check(startTime = contest.startTime, duration = contest.duration) }
+internal fun ContestDateConstraints.check(contest: Contest): Boolean =
+    check(startTime = contest.startTime, duration = contest.duration)
+
+private fun List<Contest>.filterBy(dateConstraints: ContestDateConstraints): List<Contest> =
+    if (all { dateConstraints.check(it) }) this
+    else filter { dateConstraints.check(it) }
+

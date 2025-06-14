@@ -40,7 +40,7 @@ private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: Contest
 
     return mapNotNull { clistContest ->
         val contest = clistContest.toContest { Instant.parse(it, format) }
-        if (!dateConstraints.check(startTime = contest.startTime, duration = contest.duration)) {
+        if (!dateConstraints.check(contest)) {
             return@mapNotNull null
         }
         when (contest.platform) {
