@@ -73,26 +73,26 @@ sealed interface Screen {
 
 }
 
-// navigation lib.....
 fun NavBackStackEntry.getScreen(): Screen {
-    toRouteOrNull<Screen.Profiles>()?.let { return it }
-    toRouteOrNull<Screen.ProfileExpanded>()?.let { return it }
-    toRouteOrNull<Screen.ProfileSettings>()?.let { return it }
-
-    toRouteOrNull<Screen.Community>()?.let { return it }
-    toRouteOrNull<Screen.CommunitySettings>()?.let { return it }
-    toRouteOrNull<Screen.CommunityFollowList>()?.let { return it }
-    toRouteOrNull<Screen.CommunityCodeforcesBlog>()?.let { return it }
-
-    toRouteOrNull<Screen.Contests>()?.let { return it }
-    toRouteOrNull<Screen.ContestsSettings>()?.let { return it }
-
-    toRouteOrNull<Screen.Development>()?.let { return it }
+    screenClasses.forEach {
+        if (destination.hasRoute(it)) return toRoute(it)
+    }
 
     error("unknown route ${destination.route}")
 }
 
-private inline fun <reified S: Screen> NavBackStackEntry.toRouteOrNull(): S? {
-    if (destination.hasRoute<S>()) return toRoute<S>()
-    return null
-}
+private val screenClasses = listOf(
+    Screen.Contests::class,
+    Screen.Community::class,
+    Screen.Profiles::class,
+    Screen.Development::class,
+
+    Screen.ProfileExpanded::class,
+    Screen.ProfileSettings::class,
+
+    Screen.CommunitySettings::class,
+    Screen.CommunityFollowList::class,
+    Screen.CommunityCodeforcesBlog::class,
+
+    Screen.ContestsSettings::class
+)
