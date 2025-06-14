@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
@@ -17,7 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.ratedProfilesColorState
@@ -122,6 +125,22 @@ class CPSNavigator(
         }
     }
 
+    inline fun <reified T: Screen> NavGraphBuilder.navEntry(
+        crossinline content: @Composable (DuringCompositionHolder<T>) -> Unit
+    ) {
+        composable<T> {
+            Surface {
+                val holder = remember {
+                    DuringCompositionHolder(it.toRoute<T>()).apply {
+                        menu = null
+                        bottomBar = null
+                    }
+                }
+                content(holder)
+            }
+        }
+    }
+
     @Composable
     fun NavHost(
         modifier: Modifier = Modifier,
@@ -162,3 +181,4 @@ class CPSNavigator(
     val additionalBottomBar: AdditionalBottomBarBuilder
         get() = bottomBarBuilderState.value ?: {}
 }
+

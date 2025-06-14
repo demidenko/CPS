@@ -5,17 +5,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import com.demich.cps.accounts.NavContentProfilesExpandedScreen
 import com.demich.cps.accounts.NavContentProfilesScreen
 import com.demich.cps.accounts.ProfileSettingsScreen
@@ -34,7 +30,6 @@ import com.demich.cps.contests.NavContentContestsScreen
 import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.develop.DevelopScreen
 import com.demich.cps.develop.developAdditionalBottomBarBuilder
-import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.rememberCPSNavigator
 import com.demich.cps.ui.CPSScaffold
@@ -66,35 +61,21 @@ class MainActivity: ComponentActivity() {
     }
 }
 
-private inline fun <reified T: Screen> NavGraphBuilder.cpsComposable(
-    navigator: CPSNavigator,
-    crossinline content: @Composable (CPSNavigator.DuringCompositionHolder<T>) -> Unit
-) {
-    composable<T> {
-        Surface {
-            val holder = remember {
-                navigator.DuringCompositionHolder(it.toRoute<T>()).apply {
-                    menu = null
-                    bottomBar = null
-                }
-            }
-            content(holder)
-        }
-    }
-}
 
 @Composable
 private fun CPSContent() {
     val navigator = rememberCPSNavigator()
 
     val navBuilder: NavGraphBuilder.() -> Unit = {
-        cpsComposable<Screen.Profiles>(navigator) { holder ->
+        with(navigator) { //second receiver
+        navEntry<Screen.Profiles> { holder ->
             NavContentProfilesScreen(
                 holder = holder,
                 onExpandProfile = { type -> navigator.navigateTo(Screen.ProfileExpanded(type)) }
             )
         }
-        cpsComposable<Screen.ProfileExpanded>(navigator) { holder ->
+
+        navEntry<Screen.ProfileExpanded> { holder ->
             val context = context
             val profilesViewModel = profilesViewModel()
             NavContentProfilesExpandedScreen(
@@ -109,13 +90,14 @@ private fun CPSContent() {
                 }
             )
         }
-        cpsComposable<Screen.ProfileSettings>(navigator) { holder ->
+
+        navEntry<Screen.ProfileSettings> { holder ->
             val type = holder.screen.managerType
             ProfileSettingsScreen(type)
             holder.setSubtitle("profiles", type.name, "settings")
         }
 
-        cpsComposable<Screen.Community>(navigator) { holder ->
+        navEntry<Screen.Community> { holder ->
             val controller = rememberCodeforcesCommunityController()
             CommunityScreen(controller = controller)
             holder.menu = communityMenuBuilder(
@@ -128,36 +110,41 @@ private fun CPSContent() {
             )
             holder.setSubtitle("community", "codeforces", controller.currentTab.name)
         }
-        cpsComposable<Screen.CommunitySettings>(navigator) { holder ->
+
+        navEntry<Screen.CommunitySettings> { holder ->
             CommunitySettingsScreen()
             holder.setSubtitle("community", "settings")
         }
-        cpsComposable<Screen.CommunityFollowList>(navigator) { holder ->
+
+        navEntry<Screen.CommunityFollowList> { holder ->
             CommunityFollowScreen { handle ->
                 navigator.navigateTo(Screen.CommunityCodeforcesBlog(handle = handle))
             }
             holder.bottomBar = communityFollowListBottomBarBuilder()
             holder.setSubtitle("community", "codeforces", "follow", "list")
         }
-        cpsComposable<Screen.CommunityCodeforcesBlog>(navigator) { holder ->
+
+        navEntry<Screen.CommunityCodeforcesBlog> { holder ->
             NavContentCodeforcesBlog(holder = holder)
         }
 
-        cpsComposable<Screen.Contests>(navigator) { holder ->
+        navEntry<Screen.Contests> { holder ->
             NavContentContestsScreen(
                 holder = holder,
                 onOpenSettings = { navigator.navigateTo(Screen.ContestsSettings) }
             )
         }
-        cpsComposable<Screen.ContestsSettings>(navigator) { holder ->
+
+        navEntry<Screen.ContestsSettings> { holder ->
             ContestsSettingsScreen()
             holder.setSubtitle("contests", "settings")
         }
 
-        cpsComposable<Screen.Development>(navigator) { holder ->
+        navEntry<Screen.Development> { holder ->
             DevelopScreen()
             holder.bottomBar = developAdditionalBottomBarBuilder()
             holder.setSubtitle("develop")
+        }
         }
     }
 
