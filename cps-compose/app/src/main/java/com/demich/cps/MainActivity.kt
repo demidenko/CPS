@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -70,13 +71,15 @@ private inline fun <reified T: Screen> NavGraphBuilder.cpsComposable(
     crossinline content: @Composable (CPSNavigator.DuringCompositionHolder<T>) -> Unit
 ) {
     composable<T> {
-        val holder = remember {
-            navigator.DuringCompositionHolder(it.toRoute<T>()).apply {
-                menu = null
-                bottomBar = null
+        Surface {
+            val holder = remember {
+                navigator.DuringCompositionHolder(it.toRoute<T>()).apply {
+                    menu = null
+                    bottomBar = null
+                }
             }
+            content(holder)
         }
-        content(holder)
     }
 }
 
