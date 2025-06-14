@@ -27,6 +27,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.datastore_itemized.edit
+import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -100,8 +101,10 @@ fun LoadersPriorityList(
                 onOptionSelected = { newType ->
                     check(newType != loaderType)
                     val newList = priorityList.toMutableList()
-                    newList.remove(newType)
-                    newList[newList.indexOf(loaderType)] = newType
+                    val i = newList.indexOf(newType)
+                    val j = newList.indexOf(loaderType)
+                    if (i == -1) newList[j] = newType
+                    else newList.swap(i, j)
                     onListChange(newList)
                 }
             )
