@@ -77,9 +77,7 @@ class CPSNavigator(
     fun flowOfCurrentScreen(): Flow<Screen?> = navController.flowOfCurrentScreen()
 
     val isBottomBarEnabled: Boolean
-        get() = currentScreen.let {
-            it == null || it !is Screen.NoBottomBarScreen
-        }
+        get() = currentScreen !is Screen.NoBottomBarScreen
 
     fun navigateTo(screen: Screen) {
         val currentScreen = currentScreen ?: return
