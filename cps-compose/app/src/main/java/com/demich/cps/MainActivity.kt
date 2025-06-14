@@ -65,7 +65,7 @@ class MainActivity: ComponentActivity() {
     }
 }
 
-inline fun <reified T: Screen> NavGraphBuilder.cpsComposable(
+private inline fun <reified T: Screen> NavGraphBuilder.cpsComposable(
     navigator: CPSNavigator,
     crossinline content: @Composable (CPSNavigator.DuringCompositionHolder<T>) -> Unit
 ) {
@@ -92,13 +92,14 @@ private fun CPSContent() {
             )
         }
         cpsComposable<Screen.ProfileExpanded>(navigator) { holder ->
-            val type = holder.screen.managerType
             val context = context
             val profilesViewModel = profilesViewModel()
             NavContentProfilesExpandedScreen(
                 holder = holder,
-                type = type,
-                onOpenSettings = { navigator.navigateTo(Screen.ProfileSettings(type)) },
+                onOpenSettings = {
+                    val type = holder.screen.managerType
+                    navigator.navigateTo(Screen.ProfileSettings(type))
+                },
                 onDeleteRequest = { manager ->
                     profilesViewModel.delete(manager, context)
                     navigator.popBack()

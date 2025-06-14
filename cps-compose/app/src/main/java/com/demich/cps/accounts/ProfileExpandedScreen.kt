@@ -90,10 +90,10 @@ private fun profileExpandedMenuBuilder(
 @Composable
 fun NavContentProfilesExpandedScreen(
     holder: CPSNavigator.DuringCompositionHolder<Screen.ProfileExpanded>,
-    type: AccountManagerType,
     onOpenSettings: () -> Unit,
     onDeleteRequest: (AccountManager<out UserInfo>) -> Unit
 ) {
+    val type = holder.screen.managerType
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
     ProfileExpandedScreen(
