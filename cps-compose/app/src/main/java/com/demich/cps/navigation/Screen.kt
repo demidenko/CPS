@@ -90,9 +90,10 @@ private val screenClasses = listOf(
     Screen.ProfileExpanded::class,
     Screen.ProfileSettings::class,
 
-    Screen.CommunitySettings::class,
+    Screen.ContestsSettings::class,
+
     Screen.CommunityFollowList::class,
     Screen.CommunityCodeforcesBlog::class,
+    Screen.CommunitySettings::class
 
-    Screen.ContestsSettings::class
 )
