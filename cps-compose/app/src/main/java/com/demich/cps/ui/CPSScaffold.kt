@@ -24,8 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import com.demich.cps.navigation.CPSNavigator
-import com.demich.cps.navigation.RootScreen
-import com.demich.cps.navigation.ScreenTypes
+import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottombar.CPSBottomBar
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
@@ -50,7 +49,7 @@ fun CPSScaffold(
     ) {
         NavBarShelf(
             modifier = Modifier.fillMaxSize(),
-            selectedRootScreenType = { navigator.currentScreen?.rootScreenType },
+            selectedRootScreen = { navigator.currentScreen?.rootScreen },
             onNavigateToScreen = navigator::navigateTo,
             bottomBarEnabled = navigator::isBottomBarEnabled,
             content = {
@@ -69,8 +68,8 @@ fun CPSScaffold(
 @Composable
 private fun NavBarShelf(
     modifier: Modifier = Modifier,
-    selectedRootScreenType: () -> ScreenTypes?,
-    onNavigateToScreen: (RootScreen) -> Unit,
+    selectedRootScreen: () -> Screen.RootScreen?,
+    onNavigateToScreen: (Screen.RootScreen) -> Unit,
     bottomBarEnabled: () -> Boolean,
     content: @Composable () -> Unit,
     additionalBottomBar: () -> AdditionalBottomBarBuilder
@@ -95,7 +94,7 @@ private fun NavBarShelf(
         }
 
         BottomBarAndNavBar(
-            selectedRootScreenType = selectedRootScreenType,
+            selectedRootScreen = selectedRootScreen,
             onNavigateToScreen = onNavigateToScreen,
             bottomBarEnabled = bottomBarEnabled,
             bottomBarSettingsEnabled = settingsEnabled,
@@ -121,8 +120,8 @@ private fun bottomBarBackgroundColorState(enabled: Boolean) =
 @Composable
 private fun BottomBarAndNavBar(
     modifier: Modifier = Modifier,
-    selectedRootScreenType: () -> ScreenTypes?,
-    onNavigateToScreen: (RootScreen) -> Unit,
+    selectedRootScreen: () -> Screen.RootScreen?,
+    onNavigateToScreen: (Screen.RootScreen) -> Unit,
     bottomBarEnabled: () -> Boolean,
     bottomBarSettingsEnabled: Boolean,
     onDisableBottomBarSettings: () -> Unit,
@@ -141,7 +140,7 @@ private fun BottomBarAndNavBar(
     ) {
         if (enabled) {
             CPSBottomBar(
-                selectedRootScreenType = selectedRootScreenType,
+                selectedRootScreen = selectedRootScreen,
                 onNavigateToScreen = onNavigateToScreen,
                 additionalContent = additionalBottomBar,
                 settingsEnabled = bottomBarSettingsEnabled,

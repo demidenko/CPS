@@ -75,15 +75,15 @@ class CPSNavigator(
 
     val isBottomBarEnabled: Boolean
         get() = currentScreen.let {
-            it == null || it !is NoBottomBarScreen
+            it == null || it !is Screen.NoBottomBarScreen
         }
 
     fun navigateTo(screen: Screen) {
         val currentScreen = currentScreen ?: return
-        if (screen.rootScreenType != currentScreen.rootScreenType) {
+        if (screen.rootScreen != currentScreen.rootScreen) {
             //switch stack
-            navController.navigate(route = screen.routePath) {
-                popUpTo(currentScreen.rootScreenType.route) {
+            navController.navigate(route = screen) {
+                popUpTo(currentScreen.rootScreen) {
                     saveState = true
                     inclusive = true
                 }
@@ -92,7 +92,7 @@ class CPSNavigator(
             }
         } else {
             if (screen != currentScreen) {
-                navController.navigate(route = screen.routePath)
+                navController.navigate(route = screen)
             }
         }
     }
@@ -101,8 +101,8 @@ class CPSNavigator(
         navController.popBackStack()
     }
 
-    inner class DuringCompositionHolder(
-        val screen: Screen
+    inner class DuringCompositionHolder<T: Screen>(
+        val screen: T
     ) {
         var menu: CPSMenuBuilder?
             get() = error("read not allowed, use state instead")
@@ -127,12 +127,12 @@ class CPSNavigator(
         modifier: Modifier = Modifier,
         builder: NavGraphBuilder.() -> Unit
     ) {
-        val startRoute = rememberFrom(context) {
-            runBlocking { it.settingsUI.startScreenRoute() }
+        val startScreen: Screen = rememberFrom(context) {
+            runBlocking { it.settingsUI.startRootScreen() }
         }
         androidx.navigation.compose.NavHost(
             navController = navController,
-            startDestination = startRoute,
+            startDestination = startScreen,
             modifier = modifier.fillMaxSize(),
             enterTransition = { fadeIn(tween(500)) },
             exitTransition = { fadeOut(tween(500)) },

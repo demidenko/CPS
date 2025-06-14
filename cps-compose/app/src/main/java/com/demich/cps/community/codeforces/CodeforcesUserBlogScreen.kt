@@ -81,9 +81,9 @@ private fun CodeforcesUserBlogContent(
 
 @Composable
 fun NavContentCodeforcesBlog(
-    holder: CPSNavigator.DuringCompositionHolder
+    holder: CPSNavigator.DuringCompositionHolder<Screen.CommunityCodeforcesBlog>
 ) {
-    val handle = (holder.screen as Screen.CommunityCodeforcesBlog).handle
+    val handle = holder.screen.handle
 
     var dataKey by rememberUUIDState
     val blogEntriesResult by codeforcesCommunityViewModel()

@@ -28,9 +28,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
-import com.demich.cps.navigation.RootScreen
 import com.demich.cps.navigation.Screen
-import com.demich.cps.navigation.ScreenTypes
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.settingsUI
@@ -46,8 +44,8 @@ typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
 
 @Composable
 fun CPSBottomBar(
-    selectedRootScreenType: () -> ScreenTypes?,
-    onNavigateToScreen: (RootScreen) -> Unit,
+    selectedRootScreen: () -> Screen.RootScreen?,
+    onNavigateToScreen: (Screen.RootScreen) -> Unit,
     additionalContent: () -> AdditionalBottomBarBuilder,
     settingsEnabled: Boolean,
     onEnableSettings: () -> Unit,
@@ -75,7 +73,7 @@ fun CPSBottomBar(
         }
 
         BottomBarRow(
-            selectedRootScreenType = selectedRootScreenType,
+            selectedRootScreen = selectedRootScreen,
             onNavigateToScreen = onNavigateToScreen,
             additionalContent = additionalContent,
             settingsEnabled = settingsEnabled,
@@ -89,8 +87,8 @@ fun CPSBottomBar(
 
 @Composable
 private fun BottomBarRow(
-    selectedRootScreenType: () -> ScreenTypes?,
-    onNavigateToScreen: (RootScreen) -> Unit,
+    selectedRootScreen: () -> Screen.RootScreen?,
+    onNavigateToScreen: (Screen.RootScreen) -> Unit,
     additionalContent: () -> AdditionalBottomBarBuilder,
     settingsEnabled: Boolean,
     onEnableSettings: () -> Unit,
@@ -107,7 +105,7 @@ private fun BottomBarRow(
         BottomBarVerticalDivider()
         BottomBarBodyMain(
             modifier = Modifier.weight(1f).fillMaxHeight(),
-            selectedRootScreenType = selectedRootScreenType,
+            selectedRootScreen = selectedRootScreen,
             onNavigateToScreen = onNavigateToScreen,
             settingsEnabled = settingsEnabled,
             onEnableSettings = onEnableSettings
@@ -117,8 +115,8 @@ private fun BottomBarRow(
 
 @Composable
 private fun BottomBarBodyMain(
-    selectedRootScreenType: () -> ScreenTypes?,
-    onNavigateToScreen: (RootScreen) -> Unit,
+    selectedRootScreen: () -> Screen.RootScreen?,
+    onNavigateToScreen: (Screen.RootScreen) -> Unit,
     settingsEnabled: Boolean,
     onEnableSettings: () -> Unit,
     modifier: Modifier = Modifier
@@ -141,18 +139,18 @@ private fun BottomBarBodyMain(
     BottomBarNavigationItems(
         modifier = modifier,
         rootScreens = rootScreens,
-        selectedRootScreenType = if (settingsEnabled) null else selectedRootScreenType(),
+        selectedRootScreen = if (settingsEnabled) null else selectedRootScreen(),
         indication = if (settingsEnabled) null else ripple(bounded = false, radius = 48.dp),
         layoutType = layoutType,
         onSelect = { screen ->
-            scope.launch { context.settingsUI.startScreenRoute(screen.routePath) }
+            scope.launch { context.settingsUI.startRootScreen(screen) }
             onNavigateToScreen(screen)
         },
         onLongPress = onEnableSettings
     )
 }
 
-private val RootScreen.bottomBarIcon: ImageVector
+private val Screen.RootScreen.bottomBarIcon: ImageVector
     get() = when (this) {
         Screen.Profiles -> CPSIcons.Profile
         Screen.Community -> CPSIcons.Community
@@ -163,11 +161,11 @@ private val RootScreen.bottomBarIcon: ImageVector
 @Composable
 private fun BottomBarNavigationItems(
     modifier: Modifier = Modifier,
-    rootScreens: List<RootScreen>,
-    selectedRootScreenType: ScreenTypes?,
+    rootScreens: List<Screen.RootScreen>,
+    selectedRootScreen: Screen.RootScreen?,
     indication: Indication?,
     layoutType: NavigationLayoutType,
-    onSelect: (RootScreen) -> Unit,
+    onSelect: (Screen.RootScreen) -> Unit,
     onLongPress: () -> Unit
 ) {
     BottomBarNavigationItems(
@@ -177,9 +175,9 @@ private fun BottomBarNavigationItems(
         rootScreens.forEach { screen ->
             CPSBottomNavigationItem(
                 icon = screen.bottomBarIcon,
-                isSelected = screen.screenType == selectedRootScreenType,
+                isSelected = screen == selectedRootScreen,
                 onClick = {
-                    if (screen.screenType != selectedRootScreenType) onSelect(screen)
+                    if (screen != selectedRootScreen) onSelect(screen)
                 },
                 onLongPress = onLongPress,
                 indication = indication,

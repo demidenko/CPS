@@ -43,6 +43,7 @@ import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
 import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.navigation.CPSNavigator
+import com.demich.cps.navigation.Screen
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.ui.AnimatedVisibleByNotNull
@@ -304,7 +305,7 @@ private fun ColumnScope.LoadingError(
 
 @Composable
 fun NavContentContestsScreen(
-    holder: CPSNavigator.DuringCompositionHolder,
+    holder: CPSNavigator.DuringCompositionHolder<Screen.Contests>,
     onOpenSettings: () -> Unit
 ) {
     val context = context

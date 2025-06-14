@@ -16,6 +16,7 @@ import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.navigation.CPSNavigator
+import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
@@ -88,7 +89,7 @@ private fun profileExpandedMenuBuilder(
 
 @Composable
 fun NavContentProfilesExpandedScreen(
-    holder: CPSNavigator.DuringCompositionHolder,
+    holder: CPSNavigator.DuringCompositionHolder<Screen.ProfileExpanded>,
     type: AccountManagerType,
     onOpenSettings: () -> Unit,
     onDeleteRequest: (AccountManager<out UserInfo>) -> Unit

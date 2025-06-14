@@ -27,6 +27,7 @@ import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.navigation.CPSNavigator
+import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -82,7 +83,7 @@ private fun ProfilesScreen(
 
 @Composable
 fun NavContentProfilesScreen(
-    holder: CPSNavigator.DuringCompositionHolder,
+    holder: CPSNavigator.DuringCompositionHolder<Screen.Profiles>,
     onExpandProfile: (AccountManagerType) -> Unit
 ) {
     var reorderEnabled by rememberSaveable { mutableStateOf(false) }

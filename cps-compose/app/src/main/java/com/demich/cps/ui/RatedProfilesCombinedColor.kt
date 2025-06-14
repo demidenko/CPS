@@ -15,7 +15,6 @@ import com.demich.cps.accounts.managers.allRatedAccountManagers
 import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.navigation.CPSNavigator
-import com.demich.cps.navigation.ProfileScreen
 import com.demich.cps.navigation.Screen
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
@@ -122,7 +121,7 @@ private class RankGetter(
 
     operator fun get(screen: Screen?): RatedRank? =
         when (screen) {
-            is ProfileScreen -> validRanks.find { it.manager.type == screen.type }
+            is Screen.ProfileScreen -> validRanks.find { it.manager.type == screen.managerType }
             else -> rank
         }
 }

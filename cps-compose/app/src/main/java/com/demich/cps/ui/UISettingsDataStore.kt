@@ -2,7 +2,7 @@ package com.demich.cps.ui
 
 import android.content.Context
 import com.demich.cps.accounts.managers.AccountManagerType
-import com.demich.cps.navigation.ScreenTypes
+import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.bottombar.NavigationLayoutType
 import com.demich.cps.ui.theme.DarkLightMode
 import com.demich.cps.utils.jsonCPS
@@ -36,7 +36,8 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
         order + AccountManagerType.entries.filter { it !in order }
     }
 
-    val startScreenRoute = itemString(name = "start_screen_route", defaultValue = ScreenTypes.profiles.route)
+    // val startScreenRoute = itemString(name = "start_screen_route", defaultValue = ScreenTypes.profiles.route)
+    val startRootScreen = jsonCPS.item<Screen.RootScreen>(name = "start_root_screen", defaultValue = Screen.Profiles)
     val navigationLayoutType = itemEnum(name = "navigation_bar_layout", defaultValue = NavigationLayoutType.start)
 
 }
