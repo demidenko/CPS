@@ -24,8 +24,8 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.context
 import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.context
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -48,7 +48,7 @@ fun LoadersPriorityListDialog(
         modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismissRequest
     ) {
-        Text(text = "$platform loading priority list = ")
+        Text(text = "$platform fetch priority list = ")
         LoadersPriorityList(
             modifier = Modifier.padding(vertical = 4.dp),
             priorityList = priorityList,
@@ -69,7 +69,7 @@ fun LoadersPriorityListDialog(
                 tint = cpsColors.contentAdditional
             )
             Text(
-                text = "Order in which contest api-loaders are executed until success.",
+                text = "Order of execution of fetching contests until success.",
                 color = cpsColors.contentAdditional,
                 fontSize = 14.sp
             )
