@@ -1,8 +1,8 @@
 package com.demich.cps.contests
 
-import androidx.compose.ui.text.intl.Locale
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.utils.RUSSIAN_ABBREVIATED
+import com.demich.cps.utils.isRuSystemLanguage
 import com.demich.cps.utils.toSystemDateTime
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -15,11 +15,7 @@ import kotlin.time.Duration.Companion.hours
 
 private object Formats {
     //TODO: setup date format in setting
-    private val dateSeparator =
-        when (Locale.current.language) {
-            "ru" -> '.'
-            else -> '/'
-        }
+    private val dateSeparator = if (isRuSystemLanguage()) '.' else '/'
 
     val HHMM = LocalTime.Format {
         hour()
@@ -36,11 +32,9 @@ private object Formats {
     val ddMME = LocalDate.Format {
         date(ddMM)
         char(' ')
-        dayOfWeek(
-            names = when (Locale.current.language) {
-                "ru" -> DayOfWeekNames.RUSSIAN_ABBREVIATED
-                else -> DayOfWeekNames.ENGLISH_ABBREVIATED
-            }
+        dayOfWeek(names =
+            if (isRuSystemLanguage()) DayOfWeekNames.RUSSIAN_ABBREVIATED
+            else DayOfWeekNames.ENGLISH_ABBREVIATED
         )
     }
 

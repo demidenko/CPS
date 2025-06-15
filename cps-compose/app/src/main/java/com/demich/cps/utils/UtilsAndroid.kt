@@ -3,10 +3,10 @@ package com.demich.cps.utils
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
 import android.text.Html
 import android.text.Spanned
 import android.widget.Toast
+import androidx.compose.ui.text.intl.Locale
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 
@@ -28,4 +28,4 @@ fun String.asHtmlToSpanned(): Spanned =
     Html.fromHtml(this, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
 fun isRuSystemLanguage(): Boolean =
-    Resources.getSystem().configuration.locales.get(0)?.language == "ru"
+    Locale.current.language == "ru"
