@@ -29,7 +29,7 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottombar.CPSBottomBar
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.animateColorAsState
+import com.demich.cps.utils.animateToggleColorAsState
 import com.demich.cps.utils.background
 import com.demich.cps.utils.ifThen
 
@@ -108,10 +108,10 @@ private fun NavBarShelf(
 
 @Composable
 private fun bottomBarBackgroundColorState(enabled: Boolean) =
-    animateColorAsState(
+    animateToggleColorAsState(
         enabledColor = cpsColors.backgroundAdditional,
         disabledColor = cpsColors.backgroundNavigation,
-        enabled = enabled,
+        isEnabled = enabled,
         animationSpec = switchAnimationSpec()
     )
 

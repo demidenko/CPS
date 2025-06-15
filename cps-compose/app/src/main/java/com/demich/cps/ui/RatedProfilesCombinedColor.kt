@@ -2,7 +2,6 @@ package com.demich.cps.ui
 
 import android.content.Context
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
@@ -16,6 +15,7 @@ import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
+import com.demich.cps.utils.animateToggleColorAsState
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
@@ -52,8 +52,7 @@ fun ratedProfilesColorState(
 private fun colorState(
     enabled: Boolean,
     enabledColor: Color,
-    disabledColor: Color,
-    durationMillis: Int = CPSDefaults.buttonOnOffDurationMillis
+    disabledColor: Color
 ): State<Color> {
     /*
         Important:
@@ -61,13 +60,13 @@ private fun colorState(
     */
     val statusBarColorState = animateColorAsState(
         targetValue = enabledColor,
-        animationSpec = tween(durationMillis = durationMillis)
+        animationSpec = CPSDefaults.toggleAnimationSpec()
     )
-    return com.demich.cps.utils.animateColorAsState(
+    return animateToggleColorAsState(
         enabledColorState = statusBarColorState,
         disabledColor = disabledColor,
-        enabled = enabled,
-        animationSpec = tween(durationMillis = durationMillis)
+        isEnabled = enabled,
+        animationSpec = CPSDefaults.toggleAnimationSpec()
     )
 }
 

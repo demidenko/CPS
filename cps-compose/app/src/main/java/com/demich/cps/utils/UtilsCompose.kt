@@ -127,30 +127,30 @@ fun Modifier.background(color: () -> Color) =
     this.drawBehind { drawRect(color = color()) }
 
 @Composable
-fun animateColorAsState(
+fun animateToggleColorAsState(
     enabledColor: Color,
     disabledColor: Color,
-    enabled: Boolean,
+    isEnabled: Boolean,
     animationSpec: AnimationSpec<Float>
 ): State<Color> {
-    return animateColorAsState(
+    return animateToggleColorAsState(
         enabledColorState = rememberUpdatedState(enabledColor),
         disabledColor = disabledColor,
-        enabled = enabled,
+        isEnabled = isEnabled,
         animationSpec = animationSpec
     )
 }
 
 @Composable
-fun animateColorAsState(
+fun animateToggleColorAsState(
     enabledColorState: State<Color>,
     disabledColor: Color,
-    enabled: Boolean,
+    isEnabled: Boolean,
     animationSpec: AnimationSpec<Float>
 ): State<Color> {
     val disabledColorState = rememberUpdatedState(disabledColor)
     val fractionState = animateFloatAsState(
-        targetValue = if (enabled) 1f else 0f,
+        targetValue = if (isEnabled) 1f else 0f,
         animationSpec = animationSpec,
         label = "color_fraction"
     )

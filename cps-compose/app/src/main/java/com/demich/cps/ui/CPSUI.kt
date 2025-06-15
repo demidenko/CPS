@@ -1,7 +1,6 @@
 package com.demich.cps.ui
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -106,7 +105,7 @@ private fun CPSIcon(
 ) {
     val alpha by animateFloatAsState(
         targetValue = if (onState) 1f else ContentAlpha.disabled,
-        animationSpec = tween(CPSDefaults.buttonOnOffDurationMillis),
+        animationSpec = CPSDefaults.toggleAnimationSpec(),
         label = "icon_alpha"
     )
     Icon(
