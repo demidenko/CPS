@@ -2,6 +2,7 @@ package com.demich.cps.contests
 
 import androidx.compose.ui.text.intl.Locale
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.utils.RUSSIAN_ABBREVIATED
 import com.demich.cps.utils.toSystemDateTime
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -13,6 +14,13 @@ import kotlinx.datetime.format.char
 import kotlin.time.Duration.Companion.hours
 
 private object Formats {
+    //TODO: setup date format in setting
+    private val dateSeparator =
+        when (Locale.current.language) {
+            "ru" -> '.'
+            else -> '/'
+        }
+
     val HHMM = LocalTime.Format {
         hour()
         char(':')
@@ -21,7 +29,7 @@ private object Formats {
 
     val ddMM = LocalDate.Format {
         dayOfMonth()
-        char('.')
+        char(dateSeparator)
         monthNumber()
     }
 
@@ -30,10 +38,16 @@ private object Formats {
         char(' ')
         dayOfWeek(
             names = when (Locale.current.language) {
-                "ru" -> DayOfWeekNames(listOf("пн", "вт", "ср", "чт", "пт", "сб", "вс"))
+                "ru" -> DayOfWeekNames.RUSSIAN_ABBREVIATED
                 else -> DayOfWeekNames.ENGLISH_ABBREVIATED
             }
         )
+    }
+
+    val ddMMYYYY = LocalDate.Format {
+        date(ddMM)
+        char(dateSeparator)
+        year()
     }
 }
 
@@ -63,9 +77,7 @@ fun Contest.dateRange(): String {
 
 fun Instant.ratingChangeDate(): String =
     toSystemDateTime().format(LocalDateTime.Format {
-        date(Formats.ddMM)
-        char('.')
-        year()
+        date(Formats.ddMMYYYY)
         char(' ')
         time(Formats.HHMM)
     })

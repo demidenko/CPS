@@ -4,6 +4,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -60,3 +61,6 @@ fun Duration.timerShort(): String =
 
 fun Duration.timerFull(): String =
     if (this < 48.hours) toHHMMSS() else toDHHMMSS()
+
+val DayOfWeekNames.Companion.RUSSIAN_ABBREVIATED: DayOfWeekNames
+    get() = DayOfWeekNames(listOf("пн", "вт", "ср", "чт", "пт", "сб", "вс"))
