@@ -22,9 +22,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.demich.cps.ui.CPSMenuBuilder
+import com.demich.cps.ui.StartScreenDataStore
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.ratedProfilesColorState
-import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.topbar.CPSTopBar
 import com.demich.cps.utils.background
@@ -145,7 +145,7 @@ class CPSNavigator(
         builder: NavGraphBuilder.() -> Unit
     ) {
         val startScreen: Screen = rememberFrom(context) {
-            runBlocking { it.settingsUI.startRootScreen() }
+            runBlocking { StartScreenDataStore(it).startRootScreen() }
         }
         androidx.navigation.compose.NavHost(
             navController = navController,

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.StartScreenDataStore
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.switchAnimationSpec
 import com.demich.cps.ui.theme.cpsColors
@@ -143,7 +144,7 @@ private fun BottomBarBodyMain(
         indication = if (settingsEnabled) null else ripple(bounded = false, radius = 48.dp),
         layoutType = layoutType,
         onSelect = { screen ->
-            scope.launch { context.settingsUI.startRootScreen(screen) }
+            scope.launch { StartScreenDataStore(context).startRootScreen(screen) }
             onNavigateToScreen(screen)
         },
         onLongPress = onEnableSettings
