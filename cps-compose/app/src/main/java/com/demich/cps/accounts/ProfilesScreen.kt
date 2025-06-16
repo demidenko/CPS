@@ -25,6 +25,7 @@ import com.demich.cps.accounts.managers.CListAccountManager
 import com.demich.cps.accounts.managers.UserInfoWithManager
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.managers.allAccountManagers
+import com.demich.cps.accounts.managers.flowWithUserInfo
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
@@ -121,7 +122,7 @@ fun NavContentProfilesScreen(
 private fun profilesOrderState() = with(context) {
     collectAsState {
         combine(
-            flows = allAccountManagers.map { it.flowOfInfoWithManager(this) }
+            flows = allAccountManagers.map { it.flowWithUserInfo(this) }
         ) {
             it.filterNotNull()
         }.combine(settingsUI.profilesOrder.flow) { profiles, order ->

@@ -46,11 +46,6 @@ abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
 
     abstract fun dataStore(context: Context): AccountDataStore<U>
 
-    fun flowOfInfoWithManager(context: Context) =
-        dataStore(context).flowOfInfo().map { info ->
-            info?.let { UserInfoWithManager(it, this) }
-        }
-
     open fun isValidForUserId(char: Char): Boolean = true
 
     abstract suspend fun getUserInfo(data: String): U
@@ -76,6 +71,11 @@ data class UserInfoWithManager<U: UserInfo>(
 ) {
     val type: AccountManagerType get() = manager.type
 }
+
+fun <U: UserInfo> AccountManager<U>.flowWithUserInfo(context: Context) =
+    dataStore(context).flowOfInfo().map { info ->
+        info?.let { UserInfoWithManager(it, this) }
+    }
 
 interface UserSuggestionsProvider {
     suspend fun getSuggestions(str: String): List<UserSuggestion>
