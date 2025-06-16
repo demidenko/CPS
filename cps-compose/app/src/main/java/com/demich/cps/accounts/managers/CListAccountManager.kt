@@ -39,7 +39,7 @@ class CListAccountManager :
         }
 
     override fun dataStore(context: Context): AccountDataStore<ClistUserInfo> {
-        throw IllegalAccessException("CList account manager can not provide data store")
+        error("CList account manager can not provide data store")
     }
 
 }
