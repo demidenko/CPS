@@ -27,6 +27,8 @@ import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.accounts.userinfo.hasRating
+import com.demich.cps.accounts.userinfo.ratingToString
 import com.demich.cps.platforms.api.CodeChefApi
 import com.demich.cps.platforms.api.isRedirect
 import com.demich.cps.platforms.utils.CodeChefUtils

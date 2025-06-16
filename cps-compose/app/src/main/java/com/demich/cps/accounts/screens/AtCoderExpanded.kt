@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.managers.AtCoderAccountManager
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
+import com.demich.cps.accounts.userinfo.hasRating
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder

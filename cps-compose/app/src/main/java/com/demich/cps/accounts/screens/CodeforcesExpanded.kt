@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
+import com.demich.cps.accounts.userinfo.hasRating
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -32,11 +33,11 @@ import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.saver
 import kotlinx.coroutines.flow.map
 

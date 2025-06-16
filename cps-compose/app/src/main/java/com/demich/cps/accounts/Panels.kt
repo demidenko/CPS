@@ -34,6 +34,7 @@ import com.demich.cps.accounts.managers.makeHandleSpan
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserInfo
+import com.demich.cps.accounts.userinfo.ratingToString
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSReloadingButton

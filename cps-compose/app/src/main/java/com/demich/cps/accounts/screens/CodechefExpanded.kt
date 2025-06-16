@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.demich.cps.accounts.managers.CodeChefAccountManager
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
+import com.demich.cps.accounts.userinfo.hasRating
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder

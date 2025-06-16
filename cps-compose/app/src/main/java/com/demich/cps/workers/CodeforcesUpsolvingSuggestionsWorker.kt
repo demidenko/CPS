@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.accounts.userinfo.hasRating
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
