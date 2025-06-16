@@ -171,7 +171,7 @@ fun communityFollowListBottomBarBuilder(): AdditionalBottomBarBuilder = {
             manager = LocalCodeforcesAccountManager.current,
             initialUserInfo = null,
             onDismissRequest = { showChooseDialog = false },
-            onResult = { communityViewModel.addToFollowList(userInfo = it, context = context) }
+            onResult = { communityViewModel.addToFollowList(result = it.asResult(), context = context) }
         )
     }
 }

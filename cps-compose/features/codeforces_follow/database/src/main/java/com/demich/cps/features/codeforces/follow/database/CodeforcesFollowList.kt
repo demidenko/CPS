@@ -2,7 +2,8 @@ package com.demich.cps.features.codeforces.follow.database
 
 import android.content.Context
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
-import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.ProfileResult
+import com.demich.cps.accounts.userinfo.toStatusUserInfo
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
@@ -26,22 +27,23 @@ abstract class CodeforcesFollowList(
             onNewBlogEntry = ::notifyNewBlogEntry
         )
 
-    suspend fun addNewUser(userInfo: CodeforcesUserInfo) {
-        if (dao.getUserBlog(userInfo.handle) != null) return
+    suspend fun addNewUser(result: ProfileResult<CodeforcesUserInfo>) {
+        val handle = result.userId
+        if (dao.getUserBlog(handle) != null) return
         dao.insert(
             CodeforcesUserBlog(
-                handle = userInfo.handle,
+                handle = handle,
                 blogEntries = null,
-                userInfo = userInfo
+                userInfo = result.toStatusUserInfo()
             )
         )
-        getAndReloadBlogEntries(handle = userInfo.handle)
+        getAndReloadBlogEntries(handle = handle)
     }
 
     suspend fun addNewUser(handle: String) {
         if (dao.getUserBlog(handle) != null) return
         //TODO: sync?? parallel? (addNewUser loads blog without info)
-        addNewUser(userInfo = CodeforcesUserInfo(handle = handle, status = STATUS.FAILED))
+        addNewUser(ProfileResult.Failed(handle))
         dao.applyProfileResult(
             handle = handle,
             result = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)

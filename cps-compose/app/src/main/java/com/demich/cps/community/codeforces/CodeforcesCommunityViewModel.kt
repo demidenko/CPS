@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.community.follow.followListDao
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
@@ -92,9 +93,9 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     private suspend fun getRecentActions(locale: CodeforcesLocale) =
         CodeforcesUtils.extractRecentActions(source = CodeforcesApi.getPage(page = CodeforcesApi.BasePage.recent, locale = locale))
 
-    fun addToFollowList(userInfo: CodeforcesUserInfo, context: Context) {
+    fun addToFollowList(result: ProfileResult<CodeforcesUserInfo>, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
-            context.followListDao.addNewUser(userInfo)
+            context.followListDao.addNewUser(result)
         }
     }
 
