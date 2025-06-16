@@ -6,7 +6,9 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogException
@@ -52,8 +54,8 @@ interface CodeforcesFollowDao {
         update(fromUserBlog.copy(handle = toHandle))
     }
 
-    private suspend fun setOKUserInfo(handle: String, info: CodeforcesUserInfo) {
-        if (info.status != STATUS.OK) return
+    private suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
+        require(info.status == STATUS.OK)
         if (info.handle != handle) changeHandle(handle, info.handle)
         val userBlog = getUserBlog(info.handle) ?: return
         if (userBlog.userInfo != info) update(userBlog.copy(
@@ -96,11 +98,11 @@ interface CodeforcesFollowDao {
                 return@recoverCatching emptyList()
             }
             if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
-                val userInfo = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
-                applyUserInfo(handle, userInfo)
-                if (userInfo.status == STATUS.OK) {
+                val profileResult = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true).asResult()
+                applyProfileResult(handle, profileResult)
+                if (profileResult is ProfileResult.Success) {
                     return@recoverCatching getAndReloadBlogEntries(
-                        handle = userInfo.handle,
+                        handle = profileResult.userInfo.handle,
                         locale = locale,
                         onNewBlogEntry = onNewBlogEntry
                     ).getOrThrow()
@@ -117,16 +119,16 @@ interface CodeforcesFollowDao {
     }
 
     @Transaction
-    suspend fun applyUserInfo(handle: String, info: CodeforcesUserInfo) {
-        when (info.status) {
-            STATUS.OK -> setOKUserInfo(handle, info)
-            STATUS.NOT_FOUND -> remove(handle)
-            STATUS.FAILED -> { }
+    suspend fun applyProfileResult(handle: String, result: ProfileResult<CodeforcesUserInfo>) {
+        when (result) {
+            is ProfileResult.Success -> setUserInfo(handle, result.userInfo)
+            is ProfileResult.NotFound -> remove(handle)
+            is ProfileResult.Failed -> { }
         }
     }
 
     @Transaction
     suspend fun applyUsersInfo(result: Map<String, CodeforcesUserInfo>) {
-        result.forEach { (handle, info) -> applyUserInfo(handle, info) }
+        result.forEach { (handle, info) -> applyProfileResult(handle, info.asResult()) }
     }
 }

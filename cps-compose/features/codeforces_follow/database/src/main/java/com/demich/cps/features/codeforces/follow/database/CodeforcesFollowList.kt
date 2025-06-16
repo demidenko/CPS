@@ -3,6 +3,7 @@ package com.demich.cps.features.codeforces.follow.database
 import android.content.Context
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
@@ -42,9 +43,9 @@ abstract class CodeforcesFollowList(
         if (dao.getUserBlog(handle) != null) return
         //TODO: sync?? parallel? (addNewUser loads blog without info)
         addNewUser(userInfo = CodeforcesUserInfo(handle = handle, status = STATUS.FAILED))
-        dao.applyUserInfo(
+        dao.applyProfileResult(
             handle = handle,
-            info = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
+            result = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true).asResult()
         )
     }
 
