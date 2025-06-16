@@ -24,3 +24,10 @@ data class CodeforcesUserInfo(
     override val userPageUrl: String
         get() = CodeforcesApi.urls.user(handle)
 }
+
+fun ProfileResult<CodeforcesUserInfo>.toStatusUserInfo() =
+    when (this) {
+        is ProfileResult.Success -> userInfo
+        is ProfileResult.NotFound -> CodeforcesUserInfo(status = STATUS.NOT_FOUND, handle = userId)
+        is ProfileResult.Failed -> CodeforcesUserInfo(status = STATUS.FAILED, handle = userId)
+    }

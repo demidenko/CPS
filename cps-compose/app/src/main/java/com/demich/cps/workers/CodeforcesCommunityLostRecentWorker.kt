@@ -3,7 +3,6 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.community.settings.CodeforcesLostHint
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
@@ -219,7 +218,7 @@ private suspend inline fun findSuspects(
 private suspend fun Collection<CodeforcesBlogEntry>.fixedHandleColors(): List<CodeforcesBlogEntry> {
     val authors = CodeforcesUtils.getUsersInfo(handles = map { it.authorHandle }, doRedirect = false)
     return map { blogEntry ->
-        val result = authors.getValue(blogEntry.authorHandle).asResult()
+        val result = authors.getValue(blogEntry.authorHandle)
         require(result is ProfileResult.Success)
         if (blogEntry.authorColorTag == CodeforcesColorTag.ADMIN) blogEntry
         else blogEntry.copy(authorColorTag = CodeforcesUtils.colorTagFrom(result.userInfo.rating))

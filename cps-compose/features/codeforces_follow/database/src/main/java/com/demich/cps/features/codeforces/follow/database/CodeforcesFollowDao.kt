@@ -8,7 +8,6 @@ import androidx.room.Update
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.STATUS
-import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogException
@@ -98,7 +97,7 @@ interface CodeforcesFollowDao {
                 return@recoverCatching emptyList()
             }
             if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
-                val profileResult = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true).asResult()
+                val profileResult = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
                 applyProfileResult(handle, profileResult)
                 if (profileResult is ProfileResult.Success) {
                     return@recoverCatching getAndReloadBlogEntries(
@@ -115,7 +114,7 @@ interface CodeforcesFollowDao {
     }
 
     suspend fun updateUsersInfo() {
-        applyUsersInfo(CodeforcesUtils.getUsersInfo(handles = getHandles(), doRedirect = true))
+        applyProfilesResults(CodeforcesUtils.getUsersInfo(handles = getHandles(), doRedirect = true))
     }
 
     @Transaction
@@ -128,7 +127,7 @@ interface CodeforcesFollowDao {
     }
 
     @Transaction
-    suspend fun applyUsersInfo(result: Map<String, CodeforcesUserInfo>) {
-        result.forEach { (handle, info) -> applyProfileResult(handle, info.asResult()) }
+    suspend fun applyProfilesResults(results: Map<String, ProfileResult<CodeforcesUserInfo>>) {
+        results.forEach { (handle, result) -> applyProfileResult(handle, result) }
     }
 }

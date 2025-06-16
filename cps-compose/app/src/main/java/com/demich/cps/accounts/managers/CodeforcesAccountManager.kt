@@ -17,6 +17,7 @@ import com.demich.cps.accounts.screens.CodeforcesUserInfoExpandedContent
 import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.accounts.userinfo.toStatusUserInfo
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
@@ -60,7 +61,7 @@ class CodeforcesAccountManager :
 
 
     override suspend fun getUserInfo(data: String): CodeforcesUserInfo =
-        CodeforcesUtils.getUserInfo(handle = data, doRedirect = true)
+        CodeforcesUtils.getUserInfo(handle = data, doRedirect = true).toStatusUserInfo()
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
         buildList {
