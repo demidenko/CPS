@@ -53,9 +53,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.ProfileSuggestionsProvider
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LoadingIndicator
@@ -260,7 +262,7 @@ private fun<U: UserInfo> UserIdTextField(
         },
         label = {
             Text(
-                text = manager.makeUserInfoSpan(userInfo),
+                text = manager.makeSpan(userInfo?.asResult()),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = resultTextSize
@@ -403,14 +405,14 @@ private fun AccountChooserHeader(
 
 @Composable
 @ReadOnlyComposable
-private fun<U: UserInfo> AccountManager<U>.makeUserInfoSpan(userInfo: U?): AnnotatedString {
-    if (userInfo == null) return AnnotatedString("")
+private fun <U: UserInfo> AccountManager<U>.makeSpan(profileResult: ProfileResult<U>?): AnnotatedString {
+    if (profileResult == null) return AnnotatedString("")
     return buildAnnotatedString {
         withStyle(SpanStyle(color = cpsColors.content)) {
-            when (userInfo.status) {
-                STATUS.OK -> append(makeOKInfoSpan(userInfo, cpsColors))
-                STATUS.NOT_FOUND -> append(text = "User not found", fontStyle = FontStyle.Italic)
-                STATUS.FAILED -> append(text = "Loading failed", fontStyle = FontStyle.Italic)
+            when (profileResult) {
+                is ProfileResult.Success<U> -> append(makeOKInfoSpan(profileResult.userInfo, cpsColors))
+                is ProfileResult.NotFound -> append(text = "User not found", fontStyle = FontStyle.Italic)
+                is ProfileResult.Failed -> append(text = "Loading failed", fontStyle = FontStyle.Italic)
             }
         }
     }

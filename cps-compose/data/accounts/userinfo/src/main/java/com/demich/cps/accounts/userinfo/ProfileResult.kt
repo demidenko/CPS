@@ -19,7 +19,7 @@ sealed interface ProfileResult<out U: UserInfo> {
     }
 }
 
-fun <U: UserInfo> U.toResult(): ProfileResult<U> =
+fun <U: UserInfo> U.asResult(): ProfileResult<U> =
     when (status) {
         STATUS.OK -> ProfileResult.Success(this)
         STATUS.NOT_FOUND -> ProfileResult.NotFound(userId)
