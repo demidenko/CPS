@@ -18,3 +18,10 @@ sealed interface ProfileResult<out U: UserInfo> {
             get() = userInfo.userId
     }
 }
+
+fun <U: UserInfo> U.toResult(): ProfileResult<U> =
+    when (status) {
+        STATUS.OK -> ProfileResult.Success(this)
+        STATUS.NOT_FOUND -> ProfileResult.NotFound(userId)
+        STATUS.FAILED -> ProfileResult.Failed(userId)
+    }
