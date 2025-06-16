@@ -8,6 +8,7 @@ import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.screens.AtCoderUserInfoExpandedContent
 import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.notifications.NotificationChannelSingleId
@@ -81,14 +82,16 @@ class AtCoderAccountManager :
 
     @Composable
     override fun ExpandedContent(
-        userInfo: AtCoderUserInfo,
+        profileResult: ProfileResult<AtCoderUserInfo>,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier
-    ) = AtCoderUserInfoExpandedContent(
-        userInfo = userInfo,
-        setBottomBarContent = setBottomBarContent,
-        modifier = modifier
-    )
+    ) {
+        AtCoderUserInfoExpandedContent(
+            profileResult = profileResult,
+            setBottomBarContent = setBottomBarContent,
+            modifier = modifier
+        )
+    }
 
     override fun dataStore(context: Context) = AtCoderAccountDataStore(this, context)
     override fun getSettings(context: Context) = AtCoderAccountSettingsDataStore(context)

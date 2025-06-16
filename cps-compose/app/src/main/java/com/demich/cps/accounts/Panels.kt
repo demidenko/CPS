@@ -34,6 +34,7 @@ import com.demich.cps.accounts.managers.makeHandleSpan
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.UserInfo
+import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.accounts.userinfo.ratingToString
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -93,7 +94,7 @@ fun <U: UserInfo> ProfilePanel(
             }
         }
     ) {
-        manager.PanelContent(userInfo)
+        manager.PanelContent(userInfo.asResult())
 
         if (visibleOrder == null) {
             PanelUIButtons(

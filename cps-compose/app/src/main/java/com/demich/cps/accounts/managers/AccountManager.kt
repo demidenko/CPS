@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
@@ -53,15 +54,17 @@ abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
     abstract fun makeOKInfoSpan(userInfo: U, cpsColors: CPSColors): AnnotatedString
 
     @Composable
-    open fun PanelContent(userInfo: U) {}
+    open fun PanelContent(profileResult: ProfileResult<U>) {}
 
     @Composable
     open fun ExpandedContent(
-        userInfo: U,
+        profileResult: ProfileResult<U>,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier
-     ) = Box(modifier) {
-        PanelContent(userInfo)
+    ) {
+        Box(modifier) {
+            PanelContent(profileResult)
+        }
     }
 }
 

@@ -25,10 +25,12 @@ import com.demich.cps.accounts.SmallAccountPanelTwoLines
 import com.demich.cps.accounts.screens.CodeChefUserInfoExpandedContent
 import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.accounts.userinfo.hasRating
 import com.demich.cps.accounts.userinfo.ratingToString
+import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.CodeChefApi
 import com.demich.cps.platforms.api.isRedirect
 import com.demich.cps.platforms.utils.CodeChefUtils
@@ -150,11 +152,11 @@ class CodeChefAccountManager :
     }
 
     @Composable
-    override fun PanelContent(userInfo: CodeChefUserInfo) {
+    override fun PanelContent(profileResult: ProfileResult<CodeChefUserInfo>) {
         SmallAccountPanelTwoLines(
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    userInfo.rating?.let {
+                    profileResult.userInfoOrNull()?.rating?.let {
                         StarBox(
                             rating = it,
                             textColor = cpsColors.background,
@@ -163,14 +165,15 @@ class CodeChefAccountManager :
                         )
                     }
                     Text(
-                        text = userInfo.handle,
+                        text = profileResult.userId,
                         fontSize = 30.sp
                     )
                 }
             },
             additionalTitle = {
                 //TODO: code copied from default (except rated color)
-                if (userInfo.status == STATUS.OK) {
+                if (profileResult is ProfileResult.Success) {
+                    val userInfo = profileResult.userInfo
                     Text(
                         text = userInfo.ratingToString(),
                         fontSize = 25.sp,
@@ -185,14 +188,16 @@ class CodeChefAccountManager :
 
     @Composable
     override fun ExpandedContent(
-        userInfo: CodeChefUserInfo,
+        profileResult: ProfileResult<CodeChefUserInfo>,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier
-    ) = CodeChefUserInfoExpandedContent(
-        userInfo = userInfo,
-        setBottomBarContent = setBottomBarContent,
-        modifier = modifier
-    )
+    ) {
+        CodeChefUserInfoExpandedContent(
+            profileResult = profileResult,
+            setBottomBarContent = setBottomBarContent,
+            modifier = modifier
+        )
+    }
 
     override fun dataStore(context: Context) = simpleAccountDataStore(context)
 }

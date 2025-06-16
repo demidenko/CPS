@@ -15,6 +15,7 @@ import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.userinfo.UserInfo
+import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.CPSIcons
@@ -58,7 +59,7 @@ private fun<U: UserInfo> ProfileExpandedContent(
     val userInfo by collectAsState { manager.dataStore(context).flowOfInfo() }
     userInfo?.let {
         manager.ExpandedContent(
-            userInfo = it,
+            profileResult = it.asResult(),
             setBottomBarContent = setBottomBarContent,
             modifier = Modifier
                 .padding(all = 10.dp)

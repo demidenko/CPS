@@ -11,6 +11,7 @@ import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.screens.DmojUserInfoExpandedContent
 import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.DmojUserInfo
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.DmojApi
@@ -88,14 +89,16 @@ class DmojAccountManager :
 
     @Composable
     override fun ExpandedContent(
-        userInfo: DmojUserInfo,
+        profileResult: ProfileResult<DmojUserInfo>,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier
-    ) = DmojUserInfoExpandedContent(
-        userInfo = userInfo,
-        setBottomBarContent = setBottomBarContent,
-        modifier = modifier
-    )
+    ) {
+        DmojUserInfoExpandedContent(
+            profileResult = profileResult,
+            setBottomBarContent = setBottomBarContent,
+            modifier = modifier
+        )
+    }
 
     override fun dataStore(context: Context) = simpleAccountDataStore(context)
 }

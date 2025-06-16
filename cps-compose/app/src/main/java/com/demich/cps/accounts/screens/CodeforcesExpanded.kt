@@ -24,8 +24,9 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
-import com.demich.cps.accounts.userinfo.asResult
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.hasRating
+import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -44,7 +45,7 @@ import kotlinx.coroutines.flow.map
 
 @Composable
 fun CodeforcesUserInfoExpandedContent(
-    userInfo: CodeforcesUserInfo,
+    profileResult: ProfileResult<CodeforcesUserInfo>,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
     modifier: Modifier
 ) {
@@ -56,19 +57,24 @@ fun CodeforcesUserInfoExpandedContent(
 
     Box(modifier = modifier) {
         Column {
-            manager.SmallRatedAccountPanel(userInfo.asResult())
-            if (userInfo.contribution != 0) {
-                Contribution(contribution = userInfo.contribution)
+            manager.SmallRatedAccountPanel(profileResult)
+            if (profileResult is ProfileResult.Success) {
+                val userInfo = profileResult.userInfo
+                if (userInfo.contribution != 0) {
+                    Contribution(contribution = userInfo.contribution)
+                }
             }
         }
         Box(modifier = Modifier.align(Alignment.BottomCenter)) {
             //TODO: saveables as pager
             when (showItem) {
                 ItemType.RATING -> {
-                    RatingGraphItem(
-                        manager = manager,
-                        userInfo = userInfo
-                    )
+                    if (profileResult is ProfileResult.Success) {
+                        RatingGraphItem(
+                            manager = manager,
+                            userInfo = profileResult.userInfo
+                        )
+                    }
                 }
                 ItemType.UPSOLVING -> {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -99,7 +105,7 @@ fun CodeforcesUserInfoExpandedContent(
                 onClick = { showItem = ItemType.UPSOLVING }
             )
         }
-        if (userInfo.hasRating()) {
+        if (profileResult.userInfoOrNull()?.hasRating() == true) {
             CPSIconButton(
                 icon = CPSIcons.RatingGraph,
                 enabled = showItem != ItemType.RATING,

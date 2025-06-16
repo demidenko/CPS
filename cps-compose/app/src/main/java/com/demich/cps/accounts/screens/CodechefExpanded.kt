@@ -10,8 +10,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.managers.CodeChefAccountManager
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.hasRating
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -19,33 +21,38 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 
 @Composable
 fun CodeChefUserInfoExpandedContent(
-    userInfo: CodeChefUserInfo,
+    profileResult: ProfileResult<CodeChefUserInfo>,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
     modifier: Modifier
 ) {
     val manager = remember { CodeChefAccountManager() }
 
-    var showRatingGraph by rememberSaveable { mutableStateOf(false) }
-
     Box(modifier = modifier) {
-        manager.PanelContent(userInfo)
-        if (showRatingGraph) {
-            RatingGraphItem(
-                manager = manager,
-                userInfo = userInfo,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-            )
-        }
-    }
-    setBottomBarContent {
-        if (userInfo.hasRating()) {
-            CPSIconButton(
-                icon = CPSIcons.RatingGraph,
-                enabled = !showRatingGraph,
-                onClick = { showRatingGraph = true }
-            )
+        manager.SmallRatedAccountPanel(profileResult)
+
+        if (profileResult is ProfileResult.Success) {
+            val userInfo = profileResult.userInfo
+            var showRatingGraph by rememberSaveable { mutableStateOf(false) }
+
+            if (showRatingGraph) {
+                RatingGraphItem(
+                    manager = manager,
+                    userInfo = userInfo,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                )
+            }
+
+            setBottomBarContent {
+                if (userInfo.hasRating()) {
+                    CPSIconButton(
+                        icon = CPSIcons.RatingGraph,
+                        enabled = !showRatingGraph,
+                        onClick = { showRatingGraph = true }
+                    )
+                }
+            }
         }
     }
 }

@@ -16,6 +16,7 @@ import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.screens.CodeforcesUserInfoExpandedContent
 import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.accounts.userinfo.toStatusUserInfo
 import com.demich.cps.notifications.NotificationChannelSingleId
@@ -148,14 +149,16 @@ class CodeforcesAccountManager :
 
     @Composable
     override fun ExpandedContent(
-        userInfo: CodeforcesUserInfo,
+        profileResult: ProfileResult<CodeforcesUserInfo>,
         setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
         modifier: Modifier
-    ) = CodeforcesUserInfoExpandedContent(
-        userInfo = userInfo,
-        setBottomBarContent = setBottomBarContent,
-        modifier = modifier
-    )
+    ) {
+        CodeforcesUserInfoExpandedContent(
+            profileResult = profileResult,
+            setBottomBarContent = setBottomBarContent,
+            modifier = modifier
+        )
+    }
 
     override fun dataStore(context: Context) = CodeforcesAccountDataStore(this, context)
     override fun getSettings(context: Context) = CodeforcesAccountSettingsDataStore(context)

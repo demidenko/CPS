@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
@@ -43,8 +44,9 @@ class TimusAccountManager :
         }
 
     @Composable
-    override fun PanelContent(userInfo: TimusUserInfo) {
-        if (userInfo.status == STATUS.OK) {
+    override fun PanelContent(profileResult: ProfileResult<TimusUserInfo>) {
+        if (profileResult is ProfileResult.Success) {
+            val userInfo = profileResult.userInfo
             SmallAccountPanelTypeArchive(
                 title = userInfo.userName,
                 infoArgs = listOf(
@@ -54,7 +56,7 @@ class TimusAccountManager :
             )
         } else {
             SmallAccountPanelTypeArchive(
-                title = userInfo.id,
+                title = profileResult.userId,
                 infoArgs = emptyList()
             )
         }
