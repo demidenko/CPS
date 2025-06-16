@@ -22,7 +22,7 @@ import com.demich.cps.utils.append
 
 class DmojAccountManager :
     RatedAccountManager<DmojUserInfo>(AccountManagerType.dmoj),
-    UserSuggestionsProvider
+    ProfileSuggestionsProvider
 {
     override val urlHomePage get() = DmojApi.urls.main
 
@@ -46,7 +46,7 @@ class DmojAccountManager :
             return DmojUserInfo(status = STATUS.FAILED, handle = data)
         }
 
-    override suspend fun getSuggestions(str: String): List<UserSuggestion> {
+    override suspend fun fetchSuggestions(str: String): List<UserSuggestion> {
         return DmojApi.getSuggestions(str).map {
             UserSuggestion(title = it.text, userId = it.id)
         }

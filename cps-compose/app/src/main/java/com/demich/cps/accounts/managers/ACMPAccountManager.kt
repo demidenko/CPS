@@ -15,7 +15,7 @@ import com.demich.cps.ui.theme.CPSColors
 
 class ACMPAccountManager :
     AccountManager<ACMPUserInfo>(AccountManagerType.acmp),
-    UserSuggestionsProvider
+    ProfileSuggestionsProvider
 {
     override val userIdTitle get() = "id"
     override val urlHomePage get() = ACMPApi.urls.main
@@ -36,7 +36,7 @@ class ACMPAccountManager :
         }
     }
 
-    override suspend fun getSuggestions(str: String): List<UserSuggestion> {
+    override suspend fun fetchSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
         return ACMPUtils.extractUsersSuggestions(source = ACMPApi.getUsersSearch(str))
     }

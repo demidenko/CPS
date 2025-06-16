@@ -77,8 +77,9 @@ fun <U: UserInfo> AccountManager<U>.flowWithUserInfo(context: Context) =
         info?.let { UserInfoWithManager(it, this) }
     }
 
-interface UserSuggestionsProvider {
-    suspend fun getSuggestions(str: String): List<UserSuggestion>
+interface ProfileSuggestionsProvider {
+    suspend fun fetchSuggestions(str: String): List<UserSuggestion>
+
     fun isValidForSearch(char: Char): Boolean = true
 }
 

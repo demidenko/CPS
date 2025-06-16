@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.AccountManager
-import com.demich.cps.accounts.managers.UserSuggestionsProvider
+import com.demich.cps.accounts.managers.ProfileSuggestionsProvider
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
@@ -98,7 +98,7 @@ fun<U: UserInfo> DialogAccountChooser(
             onDismissRequest = onDismissRequest,
             onResult = onResult,
             charValidator = when (manager) {
-                is UserSuggestionsProvider -> manager::isValidForSearch
+                is ProfileSuggestionsProvider -> manager::isValidForSearch
                 else -> manager::isValidForUserId
             }
         )
@@ -158,7 +158,7 @@ private fun<U: UserInfo> DialogContent(
         }
     }
 
-    if (manager is UserSuggestionsProvider) {
+    if (manager is ProfileSuggestionsProvider) {
         val userId by rememberUpdatedState(newValue = textFieldValue.text)
         var suggestionsResult: Result<List<UserSuggestion>> by remember { mutableStateOf(Result.success(emptyList())) }
         val loadingSuggestionsInProgressState = remember { mutableStateOf(false) }
@@ -186,7 +186,7 @@ private fun<U: UserInfo> DialogContent(
             if (!blockSuggestionsReload) {
                 loadingSuggestionsInProgressState.value = true
                 val data = withContext(Dispatchers.Default) {
-                    manager.runCatching { getSuggestions(userId) }
+                    manager.runCatching { fetchSuggestions(userId) }
                 }
                 loadingSuggestionsInProgressState.value = false
                 ensureActive()
@@ -254,7 +254,7 @@ private fun<U: UserInfo> UserIdTextField(
             Text(
                 text = buildString {
                     append(manager.userIdTitle)
-                    if (manager is UserSuggestionsProvider) append(" or search query")
+                    if (manager is ProfileSuggestionsProvider) append(" or search query")
                 }
             )
         },

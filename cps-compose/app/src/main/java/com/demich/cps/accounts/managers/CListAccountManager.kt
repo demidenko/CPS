@@ -13,7 +13,7 @@ import com.demich.cps.ui.theme.CPSColors
 
 class CListAccountManager :
     AccountManager<ClistUserInfo>(AccountManagerType.clist),
-    UserSuggestionsProvider
+    ProfileSuggestionsProvider
 {
     override val userIdTitle = "login"
     override val urlHomePage = ClistApi.urls.main
@@ -29,7 +29,7 @@ class CListAccountManager :
             else ClistUserInfo(status = STATUS.FAILED, login = data)
         }
 
-    override suspend fun getSuggestions(str: String): List<UserSuggestion> =
+    override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
         ClistUtils.extractLoginSuggestions(source = ClistApi.getUsersSearchPage(str))
             .map { UserSuggestion(userId = it) }
 

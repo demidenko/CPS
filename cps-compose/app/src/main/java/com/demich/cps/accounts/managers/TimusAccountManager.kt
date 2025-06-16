@@ -14,7 +14,7 @@ import com.demich.cps.ui.theme.CPSColors
 
 class TimusAccountManager :
     AccountManager<TimusUserInfo>(AccountManagerType.timus),
-    UserSuggestionsProvider
+    ProfileSuggestionsProvider
 {
     override val userIdTitle get() = "id"
     override val urlHomePage get() = TimusApi.urls.main
@@ -32,7 +32,7 @@ class TimusAccountManager :
             TimusUserInfo(status = STATUS.FAILED, id = data)
         }
 
-    override suspend fun getSuggestions(str: String): List<UserSuggestion> {
+    override suspend fun fetchSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
         return TimusUtils.extractUsersSuggestions(source = TimusApi.getSearchPage(str))
     }

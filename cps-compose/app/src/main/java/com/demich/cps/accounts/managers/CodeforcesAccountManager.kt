@@ -42,13 +42,12 @@ import com.demich.datastore_itemized.flowOf
 import com.demich.kotlin_stdlib_boost.binarySearchFirstFalse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
-import kotlin.text.contains
 
 
 class CodeforcesAccountManager :
     RatedAccountManager<CodeforcesUserInfo>(AccountManagerType.codeforces),
     AccountSettingsProvider,
-    UserSuggestionsProvider,
+    ProfileSuggestionsProvider,
     RatingRevolutionsProvider
 {
     override val urlHomePage get() = CodeforcesApi.urls.main
@@ -63,7 +62,7 @@ class CodeforcesAccountManager :
     override suspend fun getUserInfo(data: String): CodeforcesUserInfo =
         CodeforcesUtils.getUserInfo(handle = data, doRedirect = true)
 
-    override suspend fun getSuggestions(str: String): List<UserSuggestion> =
+    override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
         buildList {
             val s = CodeforcesApi.getHandleSuggestionsPage(str)
             CodeforcesUtils.extractHandleSuggestions(source = s) { handle ->

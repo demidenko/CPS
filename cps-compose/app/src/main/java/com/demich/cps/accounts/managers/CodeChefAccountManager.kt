@@ -36,12 +36,11 @@ import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
 import com.demich.kotlin_stdlib_boost.partitionIndex
-import kotlin.text.contains
 
 
 class CodeChefAccountManager :
     RatedAccountManager<CodeChefUserInfo>(AccountManagerType.codechef),
-    UserSuggestionsProvider
+    ProfileSuggestionsProvider
 {
     companion object {
         private const val star = "★"
@@ -66,7 +65,7 @@ class CodeChefAccountManager :
             else CodeChefUserInfo(status = STATUS.FAILED, handle = data)
         }
 
-    override suspend fun getSuggestions(str: String): List<UserSuggestion> =
+    override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
         CodeChefApi.getSuggestions(str).list.map {
             UserSuggestion(
                 userId = it.username,

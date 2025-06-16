@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.Flow
 class AtCoderAccountManager :
     RatedAccountManager<AtCoderUserInfo>(AccountManagerType.atcoder),
     AccountSettingsProvider,
-    UserSuggestionsProvider
+    ProfileSuggestionsProvider
 {
     override val urlHomePage get() = AtCoderApi.urls.main
 
@@ -44,7 +44,7 @@ class AtCoderAccountManager :
         }
     }
 
-    override suspend fun getSuggestions(str: String): List<UserSuggestion> =
+    override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
         AtCoderUtils.extractUserSuggestions(source = AtCoderApi.getSuggestionsPage(str))
 
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
