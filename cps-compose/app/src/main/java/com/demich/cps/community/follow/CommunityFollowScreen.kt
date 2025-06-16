@@ -117,7 +117,7 @@ private fun CodeforcesFollowList(
             modifier = Modifier.animateItem(),
             content = {
                 CommunityFollowListItem(
-                    userInfo = userBlog.userInfo,
+                    profileResult = userBlog.userInfo.asResult(),
                     blogEntriesCount = userBlog.blogEntries?.size,
                     modifier = Modifier
                         .padding(horizontal = 8.dp, vertical = 5.dp)

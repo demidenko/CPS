@@ -15,7 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
-import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.ProfileResult
+import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.ui.AttentionIcon
@@ -31,7 +32,7 @@ import kotlin.time.Duration.Companion.days
 
 @Composable
 fun CommunityFollowListItem(
-    userInfo: CodeforcesUserInfo,
+    profileResult: ProfileResult<CodeforcesUserInfo>,
     blogEntriesCount: Int?,
     modifier: Modifier = Modifier
 ) {
@@ -42,8 +43,8 @@ fun CommunityFollowListItem(
         ) {
             Text(
                 text = CodeforcesHandle(
-                    handle = userInfo.handle,
-                    colorTag = CodeforcesUtils.colorTagFrom(userInfo.rating)
+                    handle = profileResult.userId,
+                    colorTag = CodeforcesUtils.colorTagFrom(profileResult.userInfoOrNull()?.rating)
                 ).toHandleSpan(),
                 fontSize = 18.sp,
                 maxLines = 1,
@@ -60,9 +61,9 @@ fun CommunityFollowListItem(
                 )
             }
         }
-        if (userInfo.status == STATUS.OK) {
+        if (profileResult is ProfileResult.Success) {
             CommunityFollowListItemInfo(
-                userInfo = userInfo,
+                userInfo = profileResult.userInfo,
                 modifier = Modifier.fillMaxWidth(),
                 fontSize = 13.sp
             )
