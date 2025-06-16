@@ -22,10 +22,10 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.CListAccountManager
-import com.demich.cps.accounts.managers.UserInfoWithManager
+import com.demich.cps.accounts.managers.ProfileResultWithManager
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.managers.allAccountManagers
-import com.demich.cps.accounts.managers.flowWithUserInfo
+import com.demich.cps.accounts.managers.flowWithProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
@@ -47,7 +47,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 private fun ProfilesScreen(
-    profiles: List<UserInfoWithManager<out UserInfo>>,
+    profiles: List<ProfileResultWithManager<out UserInfo>>,
     onExpandProfile: (AccountManagerType) -> Unit,
     reorderEnabled: Boolean,
 ) {
@@ -68,11 +68,11 @@ private fun ProfilesScreen(
             items = profiles,
             key = { it.type },
             onEmptyMessage = { Text(text = "Profiles are not defined") }
-        ) { userInfoWithManager ->
+        ) { profileResultWithManager ->
             ProfilePanel(
-                userInfoWithManager = userInfoWithManager,
-                onReloadRequest = { viewModel.reload(userInfoWithManager.manager, context) },
-                onExpandRequest = { onExpandProfile(userInfoWithManager.type) },
+                profileResultWithManager = profileResultWithManager,
+                onReloadRequest = { viewModel.reload(profileResultWithManager.manager, context) },
+                onExpandRequest = { onExpandProfile(profileResultWithManager.type) },
                 visibleOrder = profilesTypes,
                 modifier = Modifier
                     .padding(start = 10.dp)
@@ -122,7 +122,7 @@ fun NavContentProfilesScreen(
 private fun profilesOrderState() = with(context) {
     collectAsState {
         combine(
-            flows = allAccountManagers.map { it.flowWithUserInfo(this) }
+            flows = allAccountManagers.map { it.flowWithProfileResult(this) }
         ) {
             it.filterNotNull()
         }.combine(settingsUI.profilesOrder.flow) { profiles, order ->
@@ -134,7 +134,7 @@ private fun profilesOrderState() = with(context) {
 }
 
 private fun profilesBottomBarBuilder(
-    profiles: List<UserInfoWithManager<out UserInfo>>,
+    profiles: List<ProfileResultWithManager<out UserInfo>>,
     reorderEnabled: Boolean,
     onReorderDone: () -> Unit
 ): AdditionalBottomBarBuilder = {
@@ -151,7 +151,7 @@ private fun profilesBottomBarBuilder(
 
 @Composable
 private fun ReloadProfilesButton(
-    profiles: List<UserInfoWithManager<out UserInfo>>
+    profiles: List<ProfileResultWithManager<out UserInfo>>
 ) {
     val context = context
     val viewModel = profilesViewModel()
@@ -187,7 +187,7 @@ private fun AddProfileMenuItem(type: AccountManagerType, onSelect: () -> Unit) {
 
 @Composable
 private fun AddProfileButton(
-    availableProfiles: List<UserInfoWithManager<out UserInfo>>
+    availableProfiles: List<ProfileResultWithManager<out UserInfo>>
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var selectedType: AccountManagerType? by remember { mutableStateOf(null) }

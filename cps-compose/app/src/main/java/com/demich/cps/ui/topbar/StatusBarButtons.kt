@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.allRatedAccountManagers
-import com.demich.cps.accounts.managers.flowWithUserInfo
+import com.demich.cps.accounts.managers.flowWithProfileResult
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
@@ -46,7 +46,7 @@ internal fun StatusBarButtons() {
     val coloredStatusBar by collectItemAsState { settingsUI.coloredStatusBar }
 
     val recordedAccountManagers by collectAsState {
-        combine(allRatedAccountManagers.map { it.flowWithUserInfo(context) }) { array ->
+        combine(allRatedAccountManagers.map { it.flowWithProfileResult(context) }) { array ->
             array.mapNotNull { it?.manager?.type }
         }.combine(settingsUI.profilesOrder.flow) { managers, order ->
             managers.sortedBy { order.indexOf(it) }

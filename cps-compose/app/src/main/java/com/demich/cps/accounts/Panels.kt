@@ -27,14 +27,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.AccountManagerType
+import com.demich.cps.accounts.managers.ProfileResultWithManager
 import com.demich.cps.accounts.managers.RatedAccountManager
-import com.demich.cps.accounts.managers.UserInfoWithManager
 import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.managers.makeHandleSpan
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.UserInfo
-import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.accounts.userinfo.ratingToString
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -56,14 +55,14 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun <U: UserInfo> ProfilePanel(
-    userInfoWithManager: UserInfoWithManager<U>,
+    profileResultWithManager: ProfileResultWithManager<U>,
     modifier: Modifier = Modifier,
     visibleOrder: List<AccountManagerType>? = null,
     onReloadRequest: () -> Unit,
     onExpandRequest: () -> Unit
 ) {
     val profilesViewModel = profilesViewModel()
-    val (userInfo, manager) = userInfoWithManager
+    val (result, manager) = profileResultWithManager
 
     var lastClick by remember { mutableStateOf(Instant.DISTANT_PAST) }
 
@@ -94,7 +93,7 @@ fun <U: UserInfo> ProfilePanel(
             }
         }
     ) {
-        manager.PanelContent(userInfo.asResult())
+        manager.PanelContent(result)
 
         if (visibleOrder == null) {
             PanelUIButtons(

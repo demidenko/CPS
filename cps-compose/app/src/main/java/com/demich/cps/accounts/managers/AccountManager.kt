@@ -9,6 +9,7 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
 import kotlinx.coroutines.flow.map
@@ -68,16 +69,16 @@ abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
     }
 }
 
-data class UserInfoWithManager<U: UserInfo>(
-    val userInfo: U,
+data class ProfileResultWithManager<U: UserInfo>(
+    val profileResult: ProfileResult<U>,
     val manager: AccountManager<U>
 ) {
     val type: AccountManagerType get() = manager.type
 }
 
-fun <U: UserInfo> AccountManager<U>.flowWithUserInfo(context: Context) =
+fun <U: UserInfo> AccountManager<U>.flowWithProfileResult(context: Context) =
     dataStore(context).flowOfInfo().map { info ->
-        info?.let { UserInfoWithManager(it, this) }
+        info?.let { ProfileResultWithManager(it.asResult(), this) }
     }
 
 interface ProfileSuggestionsProvider {
