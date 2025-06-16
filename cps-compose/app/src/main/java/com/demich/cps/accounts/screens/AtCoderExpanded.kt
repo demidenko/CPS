@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.managers.AtCoderAccountManager
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
+import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.accounts.userinfo.hasRating
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -29,7 +30,7 @@ fun AtCoderUserInfoExpandedContent(
     var showRatingGraph by rememberSaveable { mutableStateOf(false) }
 
     Box(modifier = modifier) {
-        manager.SmallRatedAccountPanel(userInfo)
+        manager.SmallRatedAccountPanel(userInfo.asResult())
         if (showRatingGraph) {
             RatingGraphItem(
                 manager = manager,

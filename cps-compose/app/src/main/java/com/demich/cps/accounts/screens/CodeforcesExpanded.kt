@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
+import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.accounts.userinfo.hasRating
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.ui.CPSIconButton
@@ -55,7 +56,7 @@ fun CodeforcesUserInfoExpandedContent(
 
     Box(modifier = modifier) {
         Column {
-            manager.SmallRatedAccountPanel(userInfo)
+            manager.SmallRatedAccountPanel(userInfo.asResult())
             if (userInfo.contribution != 0) {
                 Contribution(contribution = userInfo.contribution)
             }

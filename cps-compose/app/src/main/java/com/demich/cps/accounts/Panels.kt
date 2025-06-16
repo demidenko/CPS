@@ -31,8 +31,8 @@ import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.UserInfoWithManager
 import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.managers.makeHandleSpan
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.ratingToString
 import com.demich.cps.ui.CPSIconButton
@@ -230,18 +230,19 @@ fun SmallAccountPanelTwoLines(
 }
 
 @Composable
-fun<U: RatedUserInfo> RatedAccountManager<U>.SmallRatedAccountPanel(
-    userInfo: U,
+fun <U: RatedUserInfo> RatedAccountManager<U>.SmallRatedAccountPanel(
+    profileResult: ProfileResult<U>,
     title: @Composable () -> Unit = {
         Text(
-            text = makeHandleSpan(userInfo),
+            text = makeHandleSpan(profileResult),
             fontSize = 30.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
     },
     additionalTitle: @Composable () -> Unit = {
-        if (userInfo.status == STATUS.OK) {
+        if (profileResult is ProfileResult.Success) {
+            val userInfo = profileResult.userInfo
             Text(
                 text = userInfo.ratingToString(),
                 fontSize = 25.sp,

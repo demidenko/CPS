@@ -10,6 +10,7 @@ import com.demich.cps.accounts.HandleColorBound
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.accounts.userinfo.ratingToString
 import com.demich.cps.ui.theme.CPSColors
 import kotlinx.datetime.Instant
@@ -58,7 +59,7 @@ abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagerType):
         }
 
     @Composable
-    override fun PanelContent(userInfo: U) = SmallRatedAccountPanel(userInfo)
+    override fun PanelContent(userInfo: U) = SmallRatedAccountPanel(userInfo.asResult())
 
     abstract val rankedHandleColorsList: Array<HandleColor>
 
