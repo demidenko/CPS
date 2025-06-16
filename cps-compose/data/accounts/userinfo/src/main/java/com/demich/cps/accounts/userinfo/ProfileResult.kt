@@ -25,3 +25,6 @@ fun <U: UserInfo> U.asResult(): ProfileResult<U> =
         STATUS.NOT_FOUND -> ProfileResult.NotFound(userId)
         STATUS.FAILED -> ProfileResult.Failed(userId)
     }
+
+fun <U: UserInfo> ProfileResult<U>.userInfoOrNull(): U? =
+    if (this is ProfileResult.Success) userInfo else null

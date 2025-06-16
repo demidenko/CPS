@@ -9,7 +9,8 @@ import com.demich.cps.R
 import com.demich.cps.accounts.managers.AtCoderAccountManager
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.toRatingChange
-import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.asResult
+import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
@@ -54,8 +55,8 @@ class ProfilesWorker(
     }
 
     private suspend fun codeforcesRating() {
-        val userInfo = codeforcesAccountManager.dataStore(context).getSavedInfo() ?: return
-        if (userInfo.status != STATUS.OK) return
+        val userInfo = codeforcesAccountManager.dataStore(context).getSavedInfo()?.asResult()
+            ?.userInfoOrNull() ?: return
 
         val lastRatingChange = CodeforcesApi.runCatching {
             getUserRatingChanges(handle = userInfo.handle)
@@ -66,13 +67,13 @@ class ProfilesWorker(
 
     private suspend fun codeforcesContribution() {
         val dataStore = codeforcesAccountManager.dataStore(context)
-        val userInfo = dataStore.getSavedInfo() ?: return
-        if (userInfo.status != STATUS.OK) return
+        val userInfo = dataStore.getSavedInfo()?.asResult()
+            ?.userInfoOrNull() ?: return
 
         val handle = userInfo.handle
         val newContribution = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = false)
-            .takeIf { it.status == STATUS.OK }
-            ?.contribution ?: return
+            .asResult()
+            .userInfoOrNull()?.contribution ?: return
 
         if (newContribution == userInfo.contribution) return
 
@@ -94,8 +95,8 @@ class ProfilesWorker(
 
     private suspend fun atcoderRating() {
         val dataStore = atcoderAccountManager.dataStore(context)
-        val userInfo = dataStore.getSavedInfo() ?: return
-        if (userInfo.status != STATUS.OK) return
+        val userInfo = dataStore.getSavedInfo()?.asResult()
+            ?.userInfoOrNull() ?: return
 
         val lastRatingChange = AtCoderApi.runCatching {
             getRatingChanges(handle = userInfo.handle)
