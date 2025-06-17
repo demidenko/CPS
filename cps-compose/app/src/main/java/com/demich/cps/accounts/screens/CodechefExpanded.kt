@@ -10,7 +10,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.managers.CodeChefAccountManager
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
@@ -27,7 +26,7 @@ fun CodeChefUserInfoExpandedContent(
     val manager = remember { CodeChefAccountManager() }
 
     Box(modifier = modifier) {
-        manager.SmallRatedAccountPanel(profileResult)
+        manager.PanelContent(profileResult)
 
         if (profileResult is ProfileResult.Success) {
             val userInfo = profileResult.userInfo

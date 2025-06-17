@@ -21,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
@@ -56,7 +55,7 @@ fun CodeforcesUserInfoExpandedContent(
 
     Box(modifier = modifier) {
         Column {
-            manager.SmallRatedAccountPanel(profileResult)
+            manager.PanelContent(profileResult)
             if (profileResult is ProfileResult.Success) {
                 val userInfo = profileResult.userInfo
                 if (userInfo.contribution != 0) {

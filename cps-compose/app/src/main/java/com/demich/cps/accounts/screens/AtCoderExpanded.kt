@@ -10,7 +10,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.managers.AtCoderAccountManager
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
@@ -27,7 +26,7 @@ fun AtCoderUserInfoExpandedContent(
     val manager = remember { AtCoderAccountManager() }
 
     Box(modifier = modifier) {
-        manager.SmallRatedAccountPanel(profileResult)
+        manager.PanelContent(profileResult)
 
         if (profileResult is ProfileResult.Success) {
             val userInfo = profileResult.userInfo
