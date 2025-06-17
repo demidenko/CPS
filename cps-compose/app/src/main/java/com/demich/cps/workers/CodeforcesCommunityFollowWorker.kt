@@ -5,6 +5,7 @@ import androidx.work.WorkerParameters
 import com.demich.cps.community.follow.followListDao
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
+import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -33,9 +34,12 @@ class CodeforcesCommunityFollowWorker(
     //save handles between run after fast retry
     private val proceeded = mutableSetOf<String>()
 
+    private fun CodeforcesUserBlog.userLastOnlineTime(): Instant =
+        userInfo.lastOnlineTime
+
     //note that cf can have different lastOnlineTime from api and web sources
     private fun CodeforcesUserBlog.isUserInactive() =
-        workerStartTime - userInfo.lastOnlineTime > 7.days
+        workerStartTime - userLastOnlineTime() > 7.days
 
     override suspend fun runWork(): Result {
         val dao = context.followListDao
@@ -47,7 +51,7 @@ class CodeforcesCommunityFollowWorker(
 
         blogs
             .filter { it.blogEntries == null || !it.isUserInactive() }
-            .sortedByDescending { it.userInfo.lastOnlineTime }
+            .sortedByDescending { it.userLastOnlineTime() }
             .forEachWithProgress {
                 val handle = it.handle
                 if (handle !in proceeded) {
