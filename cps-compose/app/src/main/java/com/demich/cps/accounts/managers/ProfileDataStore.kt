@@ -21,11 +21,8 @@ abstract class ProfileDataStore<U: UserInfo>(
     protected inline fun <reified T: UserInfo> makeUserInfoItem(): DataStoreItem<T?> =
         jsonCPS.item(name = "user_info", defaultValue = null)
 
-    abstract suspend fun onResetProfile()
+    protected abstract suspend fun onResetProfile()
 
-    fun flowOfProfile() = userInfo.flow.map { it?.asResult() }
-
-    protected abstract fun ProfileResult<U>.convert(): U
     suspend fun getProfile(): ProfileResult<U>? = userInfo()?.asResult()
 
     suspend fun setProfile(profileResult: ProfileResult<U>) {
@@ -39,6 +36,10 @@ abstract class ProfileDataStore<U: UserInfo>(
     suspend fun deleteProfile() {
         userInfo(newValue = null)
     }
+
+    fun flowOfProfile() = userInfo.flow.map { it?.asResult() }
+
+    protected abstract fun ProfileResult<U>.convert(): U
 }
 
 abstract class ProfileUniqueDataStore<U: UserInfo>(
