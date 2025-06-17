@@ -8,7 +8,6 @@ import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.accounts.userinfo.ACMPUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.accounts.userinfo.toStatusUserInfo
 import com.demich.cps.platforms.api.ACMPApi
 import com.demich.cps.platforms.utils.ACMPUtils
 import com.demich.cps.ui.theme.CPSColors
@@ -83,6 +82,4 @@ class ACMPAccountManager :
 
     override fun dataStore(context: Context) = simpleProfileDataStore(context)
 
-    override fun convert(profileResult: ProfileResult<ACMPUserInfo>): ACMPUserInfo =
-        profileResult.toStatusUserInfo()
 }

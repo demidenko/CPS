@@ -29,7 +29,6 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.accounts.userinfo.hasRating
 import com.demich.cps.accounts.userinfo.ratingToString
-import com.demich.cps.accounts.userinfo.toStatusUserInfo
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.CodeChefApi
 import com.demich.cps.platforms.api.isRedirect
@@ -203,6 +202,4 @@ class CodeChefAccountManager :
 
     override fun dataStore(context: Context) = simpleProfileDataStore(context)
 
-    override fun convert(profileResult: ProfileResult<CodeChefUserInfo>): CodeChefUserInfo =
-        profileResult.toStatusUserInfo()
 }

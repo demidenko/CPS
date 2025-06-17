@@ -36,8 +36,6 @@ abstract class ProfileDataStore<U: UserInfo>(
     }
 
     fun flowOfProfile() = profileItem.flow
-
-    protected abstract fun ProfileResult<U>.convert(): U
 }
 
 abstract class ProfileUniqueDataStore<U: UserInfo>(
@@ -61,8 +59,6 @@ internal inline fun<reified U: UserInfo> AccountManager<U>.simpleProfileDataStor
 
         override suspend fun onResetProfile() { }
 
-        override fun ProfileResult<U>.convert(): U =
-            this@simpleProfileDataStore.convert(this)
     }
 
 

@@ -50,27 +50,6 @@ fun <U: UserInfo> U.asResult(): ProfileResult<U> =
         STATUS.FAILED -> ProfileResult.Failed(userId)
     }
 
-fun ProfileResult<ACMPUserInfo>.toStatusUserInfo() =
-    when (this) {
-        is ProfileResult.Success -> userInfo
-        is ProfileResult.NotFound -> ACMPUserInfo(status = STATUS.NOT_FOUND, id = userId)
-        is ProfileResult.Failed -> ACMPUserInfo(status = STATUS.FAILED, id = userId)
-    }
-
-fun ProfileResult<AtCoderUserInfo>.toStatusUserInfo() =
-    when (this) {
-        is ProfileResult.Success -> userInfo
-        is ProfileResult.NotFound -> AtCoderUserInfo(status = STATUS.NOT_FOUND, handle = userId)
-        is ProfileResult.Failed -> AtCoderUserInfo(status = STATUS.FAILED, handle = userId)
-    }
-
-fun ProfileResult<CodeChefUserInfo>.toStatusUserInfo() =
-    when (this) {
-        is ProfileResult.Success -> userInfo
-        is ProfileResult.NotFound -> CodeChefUserInfo(status = STATUS.NOT_FOUND, handle = userId)
-        is ProfileResult.Failed -> CodeChefUserInfo(status = STATUS.FAILED, handle = userId)
-    }
-
 fun ProfileResult<CodeforcesUserInfo>.toStatusUserInfo() =
     when (this) {
         is ProfileResult.Success -> userInfo
@@ -78,16 +57,3 @@ fun ProfileResult<CodeforcesUserInfo>.toStatusUserInfo() =
         is ProfileResult.Failed -> CodeforcesUserInfo(status = STATUS.FAILED, handle = userId)
     }
 
-fun ProfileResult<DmojUserInfo>.toStatusUserInfo() =
-    when (this) {
-        is ProfileResult.Success -> userInfo
-        is ProfileResult.NotFound -> DmojUserInfo(status = STATUS.NOT_FOUND, handle = userId)
-        is ProfileResult.Failed -> DmojUserInfo(status = STATUS.FAILED, handle = userId)
-    }
-
-fun ProfileResult<TimusUserInfo>.toStatusUserInfo() =
-    when (this) {
-        is ProfileResult.Success -> userInfo
-        is ProfileResult.NotFound -> TimusUserInfo(status = STATUS.NOT_FOUND, id = userId)
-        is ProfileResult.Failed -> TimusUserInfo(status = STATUS.FAILED, id = userId)
-    }

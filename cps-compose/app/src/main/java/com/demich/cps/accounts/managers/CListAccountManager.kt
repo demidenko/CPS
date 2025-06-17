@@ -44,7 +44,4 @@ class CListAccountManager :
         error("CList account manager can not provide data store")
     }
 
-    override fun convert(profileResult: ProfileResult<ClistUserInfo>): ClistUserInfo {
-        error("CList account manager can not provide data store")
-    }
 }

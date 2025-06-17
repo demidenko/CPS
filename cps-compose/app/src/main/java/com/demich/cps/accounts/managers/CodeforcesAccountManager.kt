@@ -18,7 +18,6 @@ import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.accounts.userinfo.toStatusUserInfo
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
@@ -235,8 +234,6 @@ class CodeforcesAccountManager :
             //https://codeforces.com/blog/entry/126
         )
 
-    override fun convert(profileResult: ProfileResult<CodeforcesUserInfo>): CodeforcesUserInfo =
-        profileResult.toStatusUserInfo()
 }
 
 @Composable
@@ -254,7 +251,6 @@ class CodeforcesProfileDataStore(manager: CodeforcesAccountManager, context: Con
     }
 
     override val profileItem = makeProfileItem<CodeforcesUserInfo>()
-    override fun ProfileResult<CodeforcesUserInfo>.convert(): CodeforcesUserInfo = toStatusUserInfo()
 
     override val ratingChangeNotificationChannel: NotificationChannelSingleId
         get() = notificationChannels.codeforces.rating_changes

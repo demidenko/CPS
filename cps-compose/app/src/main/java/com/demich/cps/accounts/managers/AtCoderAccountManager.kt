@@ -10,7 +10,6 @@ import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.accounts.userinfo.toStatusUserInfo
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
@@ -109,8 +108,6 @@ class AtCoderAccountManager :
     override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
         AtCoderProfileSettingsDataStore(context).observeRating.flow
 
-    override fun convert(profileResult: ProfileResult<AtCoderUserInfo>): AtCoderUserInfo =
-        profileResult.toStatusUserInfo()
 }
 
 class AtCoderProfileDataStore(manager: AtCoderAccountManager, context: Context):
@@ -121,7 +118,6 @@ class AtCoderProfileDataStore(manager: AtCoderAccountManager, context: Context):
     }
 
     override val profileItem = makeProfileItem<AtCoderUserInfo>()
-    override fun ProfileResult<AtCoderUserInfo>.convert(): AtCoderUserInfo = toStatusUserInfo()
 
     override val ratingChangeNotificationChannel: NotificationChannelSingleId
         get() = notificationChannels.atcoder.rating_changes

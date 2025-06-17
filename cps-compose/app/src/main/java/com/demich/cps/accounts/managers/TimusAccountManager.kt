@@ -7,7 +7,6 @@ import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.accounts.userinfo.toStatusUserInfo
 import com.demich.cps.platforms.api.TimusApi
 import com.demich.cps.platforms.utils.TimusUtils
 import com.demich.cps.ui.theme.CPSColors
@@ -66,6 +65,4 @@ class TimusAccountManager :
 
     override fun dataStore(context: Context) = simpleProfileDataStore(context)
 
-    override fun convert(profileResult: ProfileResult<TimusUserInfo>): TimusUserInfo =
-        profileResult.toStatusUserInfo()
 }

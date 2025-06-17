@@ -66,8 +66,6 @@ abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
             PanelContent(profileResult)
         }
     }
-
-    abstract fun convert(profileResult: ProfileResult<U>): U
 }
 
 data class ProfileResultWithManager<U: UserInfo>(
