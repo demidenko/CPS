@@ -26,6 +26,7 @@ import com.demich.cps.accounts.managers.ProfileResultWithManager
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.accounts.managers.flowWithProfileResult
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
@@ -229,9 +230,9 @@ private fun AddProfileButton(
                 onDismissRequest = { selectedType = null }
             )
         } else {
-            ChangeSavedInfoDialog(
+            ChangeSavedProfileDialog(
                 manager = accountManagerOf(type),
-                initialUserInfo = null,
+                initial = null,
                 scope = scope,
                 onDismissRequest = { selectedType = null }
             )
@@ -240,18 +241,18 @@ private fun AddProfileButton(
 }
 
 @Composable
-internal fun <U: UserInfo> ChangeSavedInfoDialog(
+internal fun <U: UserInfo> ChangeSavedProfileDialog(
     manager: AccountManager<U>,
-    initialUserInfo: U?,
+    initial: ProfileResult<U>?,
     scope: CoroutineScope,
     onDismissRequest: () -> Unit
 ) {
     val context = context
     DialogAccountChooser(
         manager = manager,
-        initialUserInfo = initialUserInfo,
+        initial = initial,
         onDismissRequest = onDismissRequest,
-        onResult = { userInfo -> scope.launch { manager.dataStore(context).setSavedInfo(userInfo) } }
+        onResult = { scope.launch { manager.dataStore(context).setProfile(it) } }
     )
 }
 
@@ -265,14 +266,16 @@ private fun CListImportDialog(
     val cListAccountManager = remember { CListAccountManager() }
     DialogAccountChooser(
         manager = cListAccountManager,
-        initialUserInfo = null,
+        initial = null,
         onDismissRequest = onDismissRequest,
-        onResult = { userInfo ->
-            profilesViewModel.runClistImport(
-                cListUserInfo = userInfo,
-                progressBarsViewModel = progressBarsViewModel,
-                context = context
-            )
+        onResult = {
+            if (it is ProfileResult.Success) {
+                profilesViewModel.runClistImport(
+                    cListUserInfo = it.userInfo,
+                    progressBarsViewModel = progressBarsViewModel,
+                    context = context
+                )
+            }
         }
     )
 }

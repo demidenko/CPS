@@ -9,7 +9,7 @@ import com.demich.cps.R
 import com.demich.cps.accounts.managers.AtCoderAccountManager
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.toRatingChange
-import com.demich.cps.accounts.userinfo.asResult
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
@@ -55,7 +55,7 @@ class ProfilesWorker(
     }
 
     private suspend fun codeforcesRating() {
-        val userInfo = codeforcesAccountManager.dataStore(context).getSavedInfo()?.asResult()
+        val userInfo = codeforcesAccountManager.dataStore(context).getProfile()
             ?.userInfoOrNull() ?: return
 
         val lastRatingChange = CodeforcesApi.runCatching {
@@ -67,7 +67,7 @@ class ProfilesWorker(
 
     private suspend fun codeforcesContribution() {
         val dataStore = codeforcesAccountManager.dataStore(context)
-        val userInfo = dataStore.getSavedInfo()?.asResult()
+        val userInfo = dataStore.getProfile()
             ?.userInfoOrNull() ?: return
 
         val handle = userInfo.handle
@@ -76,7 +76,7 @@ class ProfilesWorker(
 
         if (newContribution == userInfo.contribution) return
 
-        dataStore.setSavedInfo(userInfo.copy(contribution = newContribution))
+        dataStore.setProfile(ProfileResult.Success(userInfo.copy(contribution = newContribution)))
 
         val oldContribution = getNotifiedCodeforcesContribution() ?: userInfo.contribution
 
@@ -94,7 +94,7 @@ class ProfilesWorker(
 
     private suspend fun atcoderRating() {
         val dataStore = atcoderAccountManager.dataStore(context)
-        val userInfo = dataStore.getSavedInfo()?.asResult()
+        val userInfo = dataStore.getProfile()
             ?.userInfoOrNull() ?: return
 
         val lastRatingChange = AtCoderApi.runCatching {

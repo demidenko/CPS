@@ -15,7 +15,7 @@ import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.userinfo.UserInfo
-import com.demich.cps.accounts.userinfo.asResult
+import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.CPSIcons
@@ -56,10 +56,10 @@ private fun<U: UserInfo> ProfileExpandedContent(
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
     val context = context
-    val userInfo by collectAsState { manager.dataStore(context).flowOfInfo() }
-    userInfo?.let {
+    val profileResult by collectAsState { manager.dataStore(context).flowOfProfile() }
+    profileResult?.let {
         manager.ExpandedContent(
-            profileResult = it.asResult(),
+            profileResult = it,
             setBottomBarContent = setBottomBarContent,
             modifier = Modifier
                 .padding(all = 10.dp)
@@ -81,7 +81,8 @@ private fun profileExpandedMenuBuilder(
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         scope.launch {
             accountManagerOf(type)
-                .dataStore(context).getSavedInfo()
+                .dataStore(context).getProfile()
+                ?.userInfoOrNull()
                 ?.userPageUrl
                 ?.let { url -> context.openUrlInBrowser(url) }
         }

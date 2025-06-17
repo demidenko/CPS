@@ -7,8 +7,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.accounts.userinfo.ACMPUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.accounts.userinfo.toStatusUserInfo
 import com.demich.cps.platforms.api.ACMPApi
 import com.demich.cps.platforms.utils.ACMPUtils
 import com.demich.cps.ui.theme.CPSColors
@@ -23,16 +23,18 @@ class ACMPAccountManager :
 
     override fun isValidForUserId(char: Char): Boolean = char in '0'..'9'
 
-    override suspend fun getUserInfo(data: String): ACMPUserInfo {
+    override suspend fun fetchProfile(data: String): ProfileResult<ACMPUserInfo> {
         return ACMPUtils.runCatching {
-            extractUserInfo(
-                source = ACMPApi.getUserPage(id = data.toInt()),
-                id = data
+            ProfileResult.Success(
+                userInfo = extractUserInfo(
+                    source = ACMPApi.getUserPage(id = data.toInt()),
+                    id = data
+                )
             )
         }.getOrElse { e ->
             when (e) {
-                is ACMPApi.ACMPPageNotFoundException -> ACMPUserInfo(status = STATUS.NOT_FOUND, id = data)
-                else -> ACMPUserInfo(status = STATUS.FAILED, id = data)
+                is ACMPApi.ACMPPageNotFoundException -> ProfileResult.NotFound(data)
+                else -> ProfileResult.Failed(data)
             }
         }
     }
@@ -81,4 +83,6 @@ class ACMPAccountManager :
 
     override fun dataStore(context: Context) = simpleAccountDataStore(context)
 
+    override fun convert(profileResult: ProfileResult<ACMPUserInfo>): ACMPUserInfo =
+        profileResult.toStatusUserInfo()
 }

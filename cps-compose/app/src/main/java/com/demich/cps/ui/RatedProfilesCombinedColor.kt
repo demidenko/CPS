@@ -12,7 +12,9 @@ import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.allRatedAccountManagers
 import com.demich.cps.accounts.managers.colorFor
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
+import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.utils.animateToggleColorAsState
@@ -78,8 +80,8 @@ private data class RatedRank(
     val manager: RatedAccountManager<out RatedUserInfo>
 )
 
-private fun<U: RatedUserInfo> RatedAccountManager<U>.getRank(userInfo: U?): RatedRank? {
-    val rating = userInfo?.rating ?: return null
+private fun <U: RatedUserInfo> RatedAccountManager<U>.getRank(profile: ProfileResult<U>?): RatedRank? {
+    val rating = profile?.userInfoOrNull()?.rating ?: return null
     val handleColor = getHandleColor(rating)
     val rank = when (handleColor) {
         HandleColor.RED -> Double.POSITIVE_INFINITY
@@ -102,8 +104,8 @@ private fun<U: RatedUserInfo> RatedAccountManager<U>.getRank(userInfo: U?): Rate
 }
 
 
-private fun<U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(context: Context): Flow<RatedRank?> =
-    dataStore(context).flowOfInfo().map { getRank(it) }
+private fun <U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(context: Context): Flow<RatedRank?> =
+    dataStore(context).flowOfProfile().map { getRank(it) }
 
 private class RankGetter(
     private val validRanks: List<RatedRank>,

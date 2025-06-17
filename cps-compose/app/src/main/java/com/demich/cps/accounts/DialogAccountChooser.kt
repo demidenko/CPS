@@ -54,10 +54,8 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.ProfileSuggestionsProvider
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.LoadingIndicator
@@ -80,11 +78,11 @@ private const val suggestionsMinLength = 3
 private const val requestDebounceDelay: Long = 300
 
 @Composable
-fun<U: UserInfo> DialogAccountChooser(
+fun <U: UserInfo> DialogAccountChooser(
     manager: AccountManager<U>,
-    initialUserInfo: U?,
+    initial: ProfileResult<U>?,
     onDismissRequest: () -> Unit,
-    onResult: (U) -> Unit
+    onResult: (ProfileResult<U>) -> Unit
 ) {
     CPSDialog(onDismissRequest = onDismissRequest) {
         AccountChooserHeader(
@@ -96,7 +94,7 @@ fun<U: UserInfo> DialogAccountChooser(
 
         DialogContent(
             manager = manager,
-            initialUserInfo = initialUserInfo,
+            initial = initial,
             onDismissRequest = onDismissRequest,
             onResult = onResult,
             charValidator = when (manager) {
@@ -110,22 +108,22 @@ fun<U: UserInfo> DialogAccountChooser(
 @Composable
 private fun<U: UserInfo> DialogContent(
     manager: AccountManager<U>,
-    initialUserInfo: U?,
+    initial: ProfileResult<U>?,
     onDismissRequest: () -> Unit,
-    onResult: (U) -> Unit,
+    onResult: (ProfileResult<U>) -> Unit,
     charValidator: (Char) -> Boolean
 ) {
     val context = context
 
     val textFieldValueState = rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(initialUserInfo?.userId.orEmpty().toTextFieldValue())
+        mutableStateOf(initial?.userId.orEmpty().toTextFieldValue())
     }
     var textFieldValue by textFieldValueState
 
-    val userInfoResult by userInfoState(
+    val profileLoading by profileState(
         textState = textFieldValueState,
         manager = manager,
-        initialUserInfo = initialUserInfo
+        initial = initial
     )
 
     var blockSuggestionsReload by remember { mutableStateOf(true) }
@@ -134,8 +132,8 @@ private fun<U: UserInfo> DialogContent(
 
     UserIdTextField(
         manager = manager,
-        userInfo = userInfoResult.userInfo,
-        loadingInProgress = userInfoResult.isLoading,
+        profileResult = profileLoading.profile,
+        loadingInProgress = profileLoading.isLoading,
         textFieldValue = textFieldValue,
         onValueChange = {
             blockSuggestionsReload = false
@@ -201,45 +199,45 @@ private fun<U: UserInfo> DialogContent(
 }
 
 
-private data class UserInfoLoadingResult<U: UserInfo>(
-    val userInfo: U?,
+private data class ProfileLoadingResult<U: UserInfo>(
+    val profile: ProfileResult<U>?,
     val isLoading: Boolean
 )
 
 @Composable
-private fun <U: UserInfo> userInfoState(
+private fun <U: UserInfo> profileState(
     textState: State<TextFieldValue>,
     manager: AccountManager<U>,
-    initialUserInfo: U?
-): State<UserInfoLoadingResult<U>> =
+    initial: ProfileResult<U>?
+): State<ProfileLoadingResult<U>> =
     remember(textState, manager) {
         snapshotFlow { textState.value.text }
             .drop(1)
             .transformLatest { userId ->
-                emit(UserInfoLoadingResult<U>(null, false))
+                emit(ProfileLoadingResult<U>(null, false))
                 if (userId.isBlank()) return@transformLatest
                 delay(requestDebounceDelay)
-                emit(UserInfoLoadingResult<U>(null, true))
-                emit(UserInfoLoadingResult(manager.getUserInfo(userId), false))
+                emit(ProfileLoadingResult<U>(null, true))
+                emit(ProfileLoadingResult(manager.fetchProfile(userId), false))
             }
-    }.collectAsState(initial = UserInfoLoadingResult(initialUserInfo, false))
+    }.collectAsState(initial = ProfileLoadingResult(initial, false))
 
 
 @Composable
 private fun<U: UserInfo> UserIdTextField(
     manager: AccountManager<U>,
-    userInfo: U?,
+    profileResult: ProfileResult<U>?,
     loadingInProgress: Boolean,
     textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier,
     inputTextSize: TextUnit,
     resultTextSize: TextUnit,
-    onDoneRequest: (U) -> Unit
+    onDoneRequest: (ProfileResult<U>) -> Unit
 ) {
     val onDoneRequestWithCheck = {
-        if (userInfo != null && userInfo.status != STATUS.NOT_FOUND && !loadingInProgress) {
-            onDoneRequest(userInfo)
+        if (profileResult != null && profileResult !is ProfileResult.NotFound && !loadingInProgress) {
+            onDoneRequest(profileResult)
         }
     }
     TextField(
@@ -262,7 +260,7 @@ private fun<U: UserInfo> UserIdTextField(
         },
         label = {
             Text(
-                text = manager.makeSpan(userInfo?.asResult()),
+                text = manager.makeSpan(profileResult),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = resultTextSize
@@ -271,7 +269,7 @@ private fun<U: UserInfo> UserIdTextField(
         trailingIcon = {
             TextFieldMainIcon(
                 loadingInProgress = loadingInProgress,
-                userInfoStatus = userInfo?.status ?: STATUS.NOT_FOUND,
+                profileNotFound = profileResult == null || profileResult is ProfileResult.NotFound,
                 iconSize = 32.dp,
                 onDoneClick = onDoneRequestWithCheck
             )
@@ -284,11 +282,11 @@ private fun<U: UserInfo> UserIdTextField(
 @Composable
 private fun TextFieldMainIcon(
     loadingInProgress: Boolean,
-    userInfoStatus: STATUS,
+    profileNotFound: Boolean,
     iconSize: Dp,
     onDoneClick: () -> Unit
 ) {
-    if (loadingInProgress || userInfoStatus != STATUS.NOT_FOUND) {
+    if (loadingInProgress || !profileNotFound) {
         IconButton(
             onClick = onDoneClick,
             enabled = !loadingInProgress

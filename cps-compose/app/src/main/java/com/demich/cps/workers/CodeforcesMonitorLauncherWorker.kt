@@ -3,7 +3,6 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
-import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
@@ -41,8 +40,7 @@ class CodeforcesMonitorLauncherWorker(
 
         val dataStore = CodeforcesAccountManager().dataStore(context)
 
-        val info = dataStore.getSavedInfo()?.asResult()
-            ?.userInfoOrNull() ?: return Result.success()
+        val info = dataStore.getProfile()?.userInfoOrNull() ?: return Result.success()
 
         with(dataStore) {
             val (firstParticipation, firstSubmission) = getFirstNewSubmissions(

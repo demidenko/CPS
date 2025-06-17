@@ -3,7 +3,7 @@ package com.demich.cps.accounts.managers
 import android.content.Context
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.userinfo.ClistUserInfo
-import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.ClistApi
 import com.demich.cps.platforms.api.isPageNotFound
@@ -18,15 +18,17 @@ class CListAccountManager :
     override val userIdTitle = "login"
     override val urlHomePage = ClistApi.urls.main
 
-    override suspend fun getUserInfo(data: String): ClistUserInfo =
+    override suspend fun fetchProfile(data: String): ProfileResult<ClistUserInfo> =
         ClistUtils.runCatching {
-            extractUserInfo(
-                source = ClistApi.getUserPage(login = data),
-                login = data
+            ProfileResult.Success(
+                userInfo = extractUserInfo(
+                    source = ClistApi.getUserPage(login = data),
+                    login = data
+                )
             )
         }.getOrElse { e ->
-            if (e.isPageNotFound) ClistUserInfo(status = STATUS.NOT_FOUND, login = data)
-            else ClistUserInfo(status = STATUS.FAILED, login = data)
+            if (e.isPageNotFound) ProfileResult.NotFound(data)
+            else ProfileResult.Failed(data)
         }
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
@@ -42,4 +44,7 @@ class CListAccountManager :
         error("CList account manager can not provide data store")
     }
 
+    override fun convert(profileResult: ProfileResult<ClistUserInfo>): ClistUserInfo {
+        error("CList account manager can not provide data store")
+    }
 }

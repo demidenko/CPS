@@ -5,6 +5,7 @@ import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.hasRating
+import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
@@ -43,7 +44,8 @@ class CodeforcesUpsolvingSuggestionsWorker(
     override suspend fun runWork(): Result {
         val dataStore = CodeforcesAccountManager().dataStore(context)
 
-        val handle = dataStore.getSavedInfo()
+        val handle = dataStore.getProfile()
+            ?.userInfoOrNull()
             ?.takeIf { it.hasRating() }
             ?.handle
             ?: return Result.success()

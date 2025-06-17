@@ -17,6 +17,7 @@ import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.AccountSettingsProvider
 import com.demich.cps.accounts.managers.accountManagerOf
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.SettingsColumn
 import com.demich.cps.ui.SettingsItem
@@ -42,19 +43,19 @@ private fun <U: UserInfo> ProfileSettingsScreen(
     val scope = rememberCoroutineScope()
     var showChangeDialog by remember { mutableStateOf(false) }
 
-    val userInfo by collectAsState { manager.dataStore(context).flowOfInfo() }
+    val profileResult by collectAsState { manager.dataStore(context).flowOfProfile() }
 
-    userInfo?.let {
+    profileResult?.let {
         UserInfoSettings(
             manager = manager,
-            userInfo = it,
+            profileResult = it,
             onUserIdClick = { showChangeDialog = true }
         )
 
         if (showChangeDialog) {
-            ChangeSavedInfoDialog(
+            ChangeSavedProfileDialog(
                 manager = manager,
-                initialUserInfo = userInfo,
+                initial = it,
                 scope = scope,
                 onDismissRequest = { showChangeDialog = false }
             )
@@ -65,7 +66,7 @@ private fun <U: UserInfo> ProfileSettingsScreen(
 @Composable
 private fun <U: UserInfo> UserInfoSettings(
     manager: AccountManager<U>,
-    userInfo: UserInfo,
+    profileResult: ProfileResult<U>,
     onUserIdClick: () -> Unit
 ) {
     val requiredPermission by rememberFrom(context) {
@@ -76,7 +77,7 @@ private fun <U: UserInfo> UserInfoSettings(
 
     SettingsColumn(requiredNotificationsPermission = requiredPermission) {
         UserIdSettingsItem(
-            userId = userInfo.userId,
+            userId = profileResult.userId,
             userIdTitle = manager.userIdTitle,
             modifier = Modifier.clickable(onClick = onUserIdClick)
         )

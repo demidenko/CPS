@@ -2,8 +2,8 @@ package com.demich.cps.accounts.managers
 
 import android.content.Context
 import com.demich.cps.R
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.toSignedString
@@ -24,7 +24,6 @@ abstract class RatedAccountDataStore<U: RatedUserInfo>(
     protected abstract fun U.withNewRating(rating: Int): U
 
     suspend fun applyRatingChange(ratingChange: RatingChange) {
-        val info = userInfo() ?: return
         val prev = lastRatingChange()
 
         if (prev != null) {
@@ -38,19 +37,25 @@ abstract class RatedAccountDataStore<U: RatedUserInfo>(
         if (prev == null) return //TODO: consider cases
 
         //update userInfo
+        val profile = getProfile() ?: return
 
-        val newUserInfo = manager.getUserInfo(data = info.handle)
-        if (newUserInfo.status != STATUS.FAILED) {
-            userInfo(newValue = newUserInfo)
+        val newProfile = manager.fetchProfile(data = profile.userId)
+        if (newProfile is ProfileResult.Failed) {
+            if (profile is ProfileResult.Success) {
+                val newUserInfo = profile.userInfo.withNewRating(rating = ratingChange.rating)
+                userInfo(newValue = newUserInfo)
+            } else {
+                // TODO ??????????
+            }
         } else {
-            userInfo(newValue = info.withNewRating(rating = ratingChange.rating))
+            userInfo(newValue = newProfile.convert())
         }
 
         //notify
         notifyRatingChange(
             channel = ratingChangeNotificationChannel,
             ratingChange = ratingChange,
-            handle = info.handle,
+            handle = profile.userId,
             manager = manager,
             context = context
         )

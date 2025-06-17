@@ -9,7 +9,6 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
 import kotlinx.coroutines.flow.map
@@ -50,7 +49,7 @@ abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
 
     open fun isValidForUserId(char: Char): Boolean = true
 
-    abstract suspend fun getUserInfo(data: String): U
+    abstract suspend fun fetchProfile(data: String): ProfileResult<U>
 
     abstract fun makeOKInfoSpan(userInfo: U, cpsColors: CPSColors): AnnotatedString
 
@@ -67,6 +66,8 @@ abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
             PanelContent(profileResult)
         }
     }
+
+    abstract fun convert(profileResult: ProfileResult<U>): U
 }
 
 data class ProfileResultWithManager<U: UserInfo>(
@@ -77,8 +78,8 @@ data class ProfileResultWithManager<U: UserInfo>(
 }
 
 fun <U: UserInfo> AccountManager<U>.flowWithProfileResult(context: Context) =
-    dataStore(context).flowOfInfo().map { info ->
-        info?.let { ProfileResultWithManager(it.asResult(), this) }
+    dataStore(context).flowOfProfile().map { result ->
+        result?.let { ProfileResultWithManager(it, this) }
     }
 
 interface ProfileSuggestionsProvider {

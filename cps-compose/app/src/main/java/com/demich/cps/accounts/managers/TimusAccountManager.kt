@@ -5,9 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.accounts.userinfo.toStatusUserInfo
 import com.demich.cps.platforms.api.TimusApi
 import com.demich.cps.platforms.utils.TimusUtils
 import com.demich.cps.ui.theme.CPSColors
@@ -23,14 +23,16 @@ class TimusAccountManager :
     override fun isValidForUserId(char: Char): Boolean = char in '0'..'9'
     override fun isValidForSearch(char: Char): Boolean = true
 
-    override suspend fun getUserInfo(data: String): TimusUserInfo =
+    override suspend fun fetchProfile(data: String): ProfileResult<TimusUserInfo> =
         TimusUtils.runCatching {
-            extractUserInfo(
-                source = TimusApi.getUserPage(data.toInt()),
-                handle = data
+            ProfileResult.Success(
+                userInfo = extractUserInfo(
+                    source = TimusApi.getUserPage(data.toInt()),
+                    handle = data
+                )
             )
         }.getOrElse {
-            TimusUserInfo(status = STATUS.FAILED, id = data)
+            ProfileResult.Failed(data)
         }
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> {
@@ -63,4 +65,7 @@ class TimusAccountManager :
     }
 
     override fun dataStore(context: Context) = simpleAccountDataStore(context)
+
+    override fun convert(profileResult: ProfileResult<TimusUserInfo>): TimusUserInfo =
+        profileResult.toStatusUserInfo()
 }

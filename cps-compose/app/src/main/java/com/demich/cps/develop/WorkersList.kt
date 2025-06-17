@@ -113,7 +113,7 @@ private fun ProgressBarsViewModel.startCodeforcesMonitor(contestId: Int, context
     doJob(id = "run_cf_monitor $contestId") { progress ->
         val handle = CodeforcesAccountManager()
             .dataStore(context)
-            .getSavedInfo()?.handle ?: return@doJob
+            .getProfile()?.userId ?: return@doJob
         var progressInfo = ProgressBarInfo(total = 5, title = "cf monitor")
         progress(progressInfo)
         repeat(progressInfo.total) {

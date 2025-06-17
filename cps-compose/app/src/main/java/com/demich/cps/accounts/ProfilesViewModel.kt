@@ -10,7 +10,7 @@ import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.userinfo.ClistUserInfo
-import com.demich.cps.accounts.userinfo.STATUS
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
@@ -46,28 +46,28 @@ class ProfilesViewModel: ViewModel() {
             else this[manager.type] = loadingStatus
         }
 
-    fun<U: UserInfo> reload(manager: AccountManager<U>, context: Context) {
+    fun <U: UserInfo> reload(manager: AccountManager<U>, context: Context) {
         if (loadingStatuses.value[manager.type] == LoadingStatus.LOADING) return
         viewModelScope.launch(Dispatchers.Default) {
             val dataStore = manager.dataStore(context)
-            val savedInfo = dataStore.getSavedInfo() ?: return@launch
+            val savedProfile = dataStore.getProfile() ?: return@launch
 
             setLoadingStatus(manager, LoadingStatus.LOADING)
-            val info = manager.getUserInfo(savedInfo.userId)
+            val profileResult = manager.fetchProfile(savedProfile.userId)
 
-            if (info.status == STATUS.FAILED) {
+            if (profileResult is ProfileResult.NotFound) {
                 setLoadingStatus(manager, LoadingStatus.FAILED)
             } else {
                 setLoadingStatus(manager, LoadingStatus.PENDING)
-                dataStore.setSavedInfo(info)
+                dataStore.setProfile(profileResult)
             }
         }
     }
 
-    fun<U: UserInfo> delete(manager: AccountManager<U>, context: Context) {
+    fun <U: UserInfo> delete(manager: AccountManager<U>, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
             setLoadingStatus(manager, LoadingStatus.PENDING)
-            manager.dataStore(context).deleteSavedInfo()
+            manager.dataStore(context).deleteProfile()
         }
     }
 
@@ -87,7 +87,8 @@ class ProfilesViewModel: ViewModel() {
                 launch {
                     //wait for loading stops
                     loadingStatuses.takeWhile { it[type] == LoadingStatus.LOADING }.collect()
-                    if (userId.equals(manager.dataStore(context).getSavedInfo()?.userId, ignoreCase = true)) {
+                    val savedUserId = manager.dataStore(context).getProfile()?.userId
+                    if (userId.equals(savedUserId, ignoreCase = true)) {
                         //if userId is same just reload to prevent replace by FAILED
                         reload(manager, context)
                     } else {
@@ -102,8 +103,8 @@ class ProfilesViewModel: ViewModel() {
         }
     }
 
-    private suspend fun<U: UserInfo> getAndSave(manager: AccountManager<U>, userId: String, context: Context) {
-        manager.dataStore(context).setSavedInfo(manager.getUserInfo(userId))
+    private suspend fun <U: UserInfo> getAndSave(manager: AccountManager<U>, userId: String, context: Context) {
+        manager.dataStore(context).setProfile(manager.fetchProfile(userId))
     }
 
     private val ratingLoader = backgroundDataLoader<List<RatingChange>>()

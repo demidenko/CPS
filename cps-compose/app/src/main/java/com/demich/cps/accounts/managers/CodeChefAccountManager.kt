@@ -26,10 +26,10 @@ import com.demich.cps.accounts.screens.CodeChefUserInfoExpandedContent
 import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.accounts.userinfo.hasRating
 import com.demich.cps.accounts.userinfo.ratingToString
+import com.demich.cps.accounts.userinfo.toStatusUserInfo
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.CodeChefApi
 import com.demich.cps.platforms.api.isRedirect
@@ -58,15 +58,17 @@ class CodeChefAccountManager :
         else -> false
     }
 
-    override suspend fun getUserInfo(data: String): CodeChefUserInfo =
+    override suspend fun fetchProfile(data: String): ProfileResult<CodeChefUserInfo> =
         CodeChefUtils.runCatching {
-            extractUserInfo(
-                source = CodeChefApi.getUserPage(handle = data),
-                handle = data
+            ProfileResult.Success(
+                userInfo = extractUserInfo(
+                    source = CodeChefApi.getUserPage(handle = data),
+                    handle = data
+                )
             )
         }.getOrElse { e ->
-            if (e.isRedirect) CodeChefUserInfo(status = STATUS.NOT_FOUND, handle = data)
-            else CodeChefUserInfo(status = STATUS.FAILED, handle = data)
+            if (e.isRedirect) ProfileResult.NotFound(data)
+            else ProfileResult.Failed(data)
         }
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
@@ -200,4 +202,7 @@ class CodeChefAccountManager :
     }
 
     override fun dataStore(context: Context) = simpleAccountDataStore(context)
+
+    override fun convert(profileResult: ProfileResult<CodeChefUserInfo>): CodeChefUserInfo =
+        profileResult.toStatusUserInfo()
 }

@@ -61,8 +61,8 @@ class CodeforcesAccountManager :
     }
 
 
-    override suspend fun getUserInfo(data: String): CodeforcesUserInfo =
-        CodeforcesUtils.getUserInfo(handle = data, doRedirect = true).toStatusUserInfo()
+    override suspend fun fetchProfile(data: String): ProfileResult<CodeforcesUserInfo> =
+        CodeforcesUtils.getUserInfo(handle = data, doRedirect = true)
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
         buildList {
@@ -235,6 +235,9 @@ class CodeforcesAccountManager :
             )
             //https://codeforces.com/blog/entry/126
         )
+
+    override fun convert(profileResult: ProfileResult<CodeforcesUserInfo>): CodeforcesUserInfo =
+        profileResult.toStatusUserInfo()
 }
 
 @Composable
@@ -252,6 +255,7 @@ class CodeforcesAccountDataStore(manager: CodeforcesAccountManager, context: Con
     }
 
     override val userInfo = makeUserInfoItem<CodeforcesUserInfo>()
+    override fun ProfileResult<CodeforcesUserInfo>.convert(): CodeforcesUserInfo = toStatusUserInfo()
 
     override val ratingChangeNotificationChannel: NotificationChannelSingleId
         get() = notificationChannels.codeforces.rating_changes

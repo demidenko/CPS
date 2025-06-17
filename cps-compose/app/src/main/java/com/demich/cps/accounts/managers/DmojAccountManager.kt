@@ -14,6 +14,7 @@ import com.demich.cps.accounts.userinfo.DmojUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.accounts.userinfo.toStatusUserInfo
 import com.demich.cps.platforms.api.DmojApi
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
@@ -32,19 +33,19 @@ class DmojAccountManager :
         else -> false
     }
 
-    override suspend fun getUserInfo(data: String): DmojUserInfo =
+    override suspend fun fetchProfile(data: String): ProfileResult<DmojUserInfo> =
         DmojApi.runCatching {
             val res = getUser(handle = data)
-            DmojUserInfo(
-                status = STATUS.OK,
-                handle = res.username,
-                rating = res.rating
+            ProfileResult.Success(
+                userInfo = DmojUserInfo(
+                    status = STATUS.OK,
+                    handle = res.username,
+                    rating = res.rating
+                )
             )
         }.getOrElse {
-            if (it.isPageNotFound) {
-                return DmojUserInfo(status = STATUS.NOT_FOUND, handle = data)
-            }
-            return DmojUserInfo(status = STATUS.FAILED, handle = data)
+            if (it.isPageNotFound) ProfileResult.NotFound(data)
+            else ProfileResult.Failed(data)
         }
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> {
@@ -101,4 +102,7 @@ class DmojAccountManager :
     }
 
     override fun dataStore(context: Context) = simpleAccountDataStore(context)
+
+    override fun convert(profileResult: ProfileResult<DmojUserInfo>): DmojUserInfo =
+        profileResult.toStatusUserInfo()
 }

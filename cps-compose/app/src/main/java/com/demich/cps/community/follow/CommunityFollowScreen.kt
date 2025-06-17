@@ -169,9 +169,9 @@ fun communityFollowListBottomBarBuilder(): AdditionalBottomBarBuilder = {
     if (showChooseDialog) {
         DialogAccountChooser(
             manager = LocalCodeforcesAccountManager.current,
-            initialUserInfo = null,
+            initial = null,
             onDismissRequest = { showChooseDialog = false },
-            onResult = { communityViewModel.addToFollowList(result = it.asResult(), context = context) }
+            onResult = { communityViewModel.addToFollowList(result = it, context = context) }
         )
     }
 }

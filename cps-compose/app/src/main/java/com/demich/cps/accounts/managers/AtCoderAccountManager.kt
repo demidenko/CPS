@@ -9,8 +9,8 @@ import com.demich.cps.accounts.screens.AtCoderUserInfoExpandedContent
 import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.accounts.userinfo.toStatusUserInfo
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
@@ -36,12 +36,14 @@ class AtCoderAccountManager :
         else -> false
     }
 
-    override suspend fun getUserInfo(data: String): AtCoderUserInfo {
+    override suspend fun fetchProfile(data: String): ProfileResult<AtCoderUserInfo> {
         return AtCoderUtils.runCatching {
-            extractUserInfo(source = AtCoderApi.getUserPage(handle = data))
+            ProfileResult.Success(
+                userInfo = extractUserInfo(source = AtCoderApi.getUserPage(handle = data))
+            )
         }.getOrElse { e ->
-            if (e.isPageNotFound) AtCoderUserInfo(status = STATUS.NOT_FOUND, handle = data)
-            else AtCoderUserInfo(status = STATUS.FAILED, handle = data)
+            if (e.isPageNotFound) ProfileResult.NotFound(data)
+            else ProfileResult.Failed(data)
         }
     }
 
@@ -108,6 +110,8 @@ class AtCoderAccountManager :
     override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
         AtCoderAccountSettingsDataStore(context).observeRating.flow
 
+    override fun convert(profileResult: ProfileResult<AtCoderUserInfo>): AtCoderUserInfo =
+        profileResult.toStatusUserInfo()
 }
 
 class AtCoderAccountDataStore(manager: AtCoderAccountManager, context: Context):
@@ -118,6 +122,7 @@ class AtCoderAccountDataStore(manager: AtCoderAccountManager, context: Context):
     }
 
     override val userInfo = makeUserInfoItem<AtCoderUserInfo>()
+    override fun ProfileResult<AtCoderUserInfo>.convert(): AtCoderUserInfo = toStatusUserInfo()
 
     override val ratingChangeNotificationChannel: NotificationChannelSingleId
         get() = notificationChannels.atcoder.rating_changes
