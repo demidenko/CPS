@@ -55,7 +55,7 @@ class ProfilesViewModel: ViewModel() {
             setLoadingStatus(manager, LoadingStatus.LOADING)
             val profileResult = manager.fetchProfile(savedProfile.userId)
 
-            if (profileResult is ProfileResult.NotFound) {
+            if (profileResult is ProfileResult.Failed) {
                 setLoadingStatus(manager, LoadingStatus.FAILED)
             } else {
                 setLoadingStatus(manager, LoadingStatus.PENDING)
