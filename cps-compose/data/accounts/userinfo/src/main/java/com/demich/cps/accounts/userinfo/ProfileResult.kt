@@ -41,19 +41,3 @@ val jsonProfile = Json {
 
 fun <U: UserInfo> ProfileResult<U>.userInfoOrNull(): U? =
     if (this is ProfileResult.Success) userInfo else null
-
-// temporary converters
-fun <U: UserInfo> U.asResult(): ProfileResult<U> =
-    when (status) {
-        STATUS.OK -> ProfileResult.Success(this)
-        STATUS.NOT_FOUND -> ProfileResult.NotFound(userId)
-        STATUS.FAILED -> ProfileResult.Failed(userId)
-    }
-
-fun ProfileResult<CodeforcesUserInfo>.toStatusUserInfo() =
-    when (this) {
-        is ProfileResult.Success -> userInfo
-        is ProfileResult.NotFound -> CodeforcesUserInfo(status = STATUS.NOT_FOUND, handle = userId)
-        is ProfileResult.Failed -> CodeforcesUserInfo(status = STATUS.FAILED, handle = userId)
-    }
-

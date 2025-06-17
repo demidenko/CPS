@@ -20,7 +20,6 @@ import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.DialogAccountChooser
 import com.demich.cps.accounts.managers.makeHandleSpan
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.ui.CPSIconButton
@@ -148,7 +147,10 @@ private fun CodeforcesFollowList(
     showDeleteDialogForBlog?.let { userBlog ->
         CPSDeleteDialog(
             title = buildAnnotatedString {
-                val result = userBlog.userInfo?.asResult() ?: ProfileResult.Failed(userBlog.handle)
+                val result = userBlog.userInfo.let {
+                    if (it == null) ProfileResult.Failed(userId = userBlog.handle)
+                    else ProfileResult.Success(userInfo = it)
+                }
                 append("Delete ")
                 append(LocalCodeforcesAccountManager.current.makeHandleSpan(profileResult = result))
                 append(" from follow list?")
