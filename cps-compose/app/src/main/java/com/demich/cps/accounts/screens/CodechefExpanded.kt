@@ -14,7 +14,6 @@ import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.managers.CodeChefAccountManager
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.hasRating
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
@@ -45,7 +44,7 @@ fun CodeChefUserInfoExpandedContent(
             }
 
             setBottomBarContent {
-                if (userInfo.hasRating()) {
+                if (userInfo.rating != null) {
                     CPSIconButton(
                         icon = CPSIcons.RatingGraph,
                         enabled = !showRatingGraph,

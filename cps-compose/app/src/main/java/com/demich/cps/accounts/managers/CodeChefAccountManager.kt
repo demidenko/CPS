@@ -27,7 +27,6 @@ import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.accounts.userinfo.hasRating
 import com.demich.cps.accounts.userinfo.ratingToString
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.CodeChefApi
@@ -178,7 +177,7 @@ class CodeChefAccountManager :
                     Text(
                         text = userInfo.ratingToString(),
                         fontSize = 25.sp,
-                        color = if (userInfo.hasRating()) cpsColors.content else cpsColors.contentAdditional,
+                        color = if (userInfo.rating != null) cpsColors.content else cpsColors.contentAdditional,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )

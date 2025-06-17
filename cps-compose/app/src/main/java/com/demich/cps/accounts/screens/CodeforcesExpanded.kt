@@ -25,7 +25,6 @@ import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.hasRating
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.ui.CPSIconButton
@@ -105,7 +104,7 @@ fun CodeforcesUserInfoExpandedContent(
                 onClick = { showItem = ItemType.UPSOLVING }
             )
         }
-        if (profileResult.userInfoOrNull()?.hasRating() == true) {
+        if (profileResult.userInfoOrNull()?.rating != null) {
             CPSIconButton(
                 icon = CPSIcons.RatingGraph,
                 enabled = showItem != ItemType.RATING,

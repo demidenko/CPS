@@ -9,7 +9,5 @@ abstract class RatedUserInfo: UserInfo() {
 
 }
 
-fun RatedUserInfo.hasRating(): Boolean = rating != null
-
 fun RatedUserInfo.ratingToString(): String =
     rating?.toString() ?: "[not rated]"
