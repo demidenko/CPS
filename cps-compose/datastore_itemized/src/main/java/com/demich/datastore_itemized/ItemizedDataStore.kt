@@ -30,13 +30,13 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
         }
     }
 
-    private fun<T: Any> item(key: Preferences.Key<T>, defaultValue: T): DataStoreItem<T> =
+    private fun <T: Any> item(key: Preferences.Key<T>, defaultValue: T): DataStoreItem<T> =
         DataStoreItem(converter = ValueWithDefault(key, defaultValue), dataStore = dataStore)
 
-    private fun<T: Any> itemNullable(key: Preferences.Key<T>): DataStoreItem<T?> =
+    private fun <T: Any> itemNullable(key: Preferences.Key<T>): DataStoreItem<T?> =
         DataStoreItem(converter = ValueNullable(key), dataStore = dataStore)
 
-    protected fun<T> itemStringConvertible(
+    protected fun <T> itemStringConvertible(
         name: String,
         defaultValue: () -> T,
         encode: (T) -> String,
@@ -46,7 +46,7 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
         dataStore = dataStore
     )
 
-    protected fun<T> itemStringSetConvertible(
+    protected fun <T> itemStringSetConvertible(
         name: String,
         defaultValue: () -> T,
         encode: (T) -> Set<String>,
@@ -79,7 +79,10 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
     protected fun itemStringNullable(name: String): DataStoreItem<String?> =
         itemNullable(stringPreferencesKey(name))
 
-    protected inline fun<reified T: Enum<T>> itemEnum(name: String, defaultValue: T): DataStoreItem<T> =
+    protected inline fun <reified T: Enum<T>> itemEnum(
+        name: String,
+        defaultValue: T
+    ): DataStoreItem<T> =
         itemStringConvertible(
             name = name,
             defaultValue = { defaultValue },
@@ -87,7 +90,7 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
             decode = ::enumValueOf
         )
 
-    protected inline fun<reified T: Enum<T>> itemEnumSet(
+    protected inline fun <reified T: Enum<T>> itemEnumSet(
         name: String,
         noinline defaultValue: () -> Set<T> = ::emptySet
     ): DataStoreItem<Set<T>> =
@@ -98,7 +101,10 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
             decode = { it.mapTo(EnumSet.noneOf(T::class.java)) { enumValueOf(it) } }
         )
 
-    protected inline fun<reified T> Json.item(name: String, noinline defaultValue: () -> T): DataStoreItem<T> =
+    protected inline fun <reified T> Json.item(
+        name: String,
+        noinline defaultValue: () -> T
+    ): DataStoreItem<T> =
         itemStringConvertible(
             name = name,
             defaultValue = defaultValue,
@@ -106,26 +112,32 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
             decode = ::decodeFromString
         )
 
-    protected inline fun<reified T> Json.item(name: String, defaultValue: T): DataStoreItem<T> =
-        item(name = name, defaultValue = { defaultValue })
+    protected inline fun <reified T> Json.item(
+        name: String,
+        defaultValue: T
+    ): DataStoreItem<T> = item(name = name, defaultValue = { defaultValue })
 
-    protected inline fun<reified T> Json.itemList(
+    protected inline fun <reified T: Any> Json.itemNullable(
+        name: String
+    ): DataStoreItem<T?> = item(name = name, defaultValue = { null })
+
+    protected inline fun <reified T> Json.itemList(
         name: String,
         noinline defaultValue: () -> List<T> = ::emptyList
-    ): DataStoreItem<List<T>> = item(name, defaultValue)
+    ): DataStoreItem <List<T>> = item(name, defaultValue)
 
-    protected inline fun<reified T> Json.itemSet(
+    protected inline fun <reified T> Json.itemSet(
         name: String,
         noinline defaultValue: () -> Set<T> = ::emptySet
     ): DataStoreItem<Set<T>> = item(name, defaultValue)
 
-    protected inline fun<reified K, reified V> Json.itemMap(
+    protected inline fun <reified K, reified V> Json.itemMap(
         name: String,
         noinline defaultValue: () -> Map<K, V> = ::emptyMap
     ): DataStoreItem<Map<K, V>> = item(name, defaultValue)
 
 
-    protected fun<T> DataStoreItem<T>.mapGetter(transform: (T) -> T): DataStoreItem<T> =
+    protected fun <T> DataStoreItem<T>.mapGetter(transform: (T) -> T): DataStoreItem<T> =
         DataStoreItem(
             dataStore = dataStore,
             converter = converter.mapGetter(transform)
