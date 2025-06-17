@@ -408,7 +408,7 @@ private fun <U: UserInfo> AccountManager<U>.makeSpan(profileResult: ProfileResul
     return buildAnnotatedString {
         withStyle(SpanStyle(color = cpsColors.content)) {
             when (profileResult) {
-                is ProfileResult.Success<U> -> append(makeOKInfoSpan(profileResult.userInfo, cpsColors))
+                is ProfileResult.Success<U> -> append(makeUserInfoSpan(profileResult.userInfo, cpsColors))
                 is ProfileResult.NotFound -> append(text = "User not found", fontStyle = FontStyle.Italic)
                 is ProfileResult.Failed -> append(text = "Loading failed", fontStyle = FontStyle.Italic)
             }

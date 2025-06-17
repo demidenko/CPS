@@ -35,7 +35,7 @@ class CListAccountManager :
         ClistUtils.extractLoginSuggestions(source = ClistApi.getUsersSearchPage(str))
             .map { UserSuggestion(userId = it) }
 
-    override fun makeOKInfoSpan(userInfo: ClistUserInfo, cpsColors: CPSColors): AnnotatedString =
+    override fun makeUserInfoSpan(userInfo: ClistUserInfo, cpsColors: CPSColors): AnnotatedString =
         with(userInfo) {
             AnnotatedString("$login (${accounts.size})")
         }

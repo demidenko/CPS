@@ -47,7 +47,7 @@ abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagerType):
         if (rating == null) AnnotatedString(text = text)
         else makeRatedSpan(text, rating, cpsColors)
 
-    final override fun makeOKInfoSpan(userInfo: U, cpsColors: CPSColors): AnnotatedString =
+    final override fun makeUserInfoSpan(userInfo: U, cpsColors: CPSColors): AnnotatedString =
         with(userInfo) {
             makeOKSpan(
                 text = handle + " " + ratingToString(),

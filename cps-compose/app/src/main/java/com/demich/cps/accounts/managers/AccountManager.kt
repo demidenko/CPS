@@ -51,7 +51,7 @@ abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
 
     abstract suspend fun fetchProfile(data: String): ProfileResult<U>
 
-    abstract fun makeOKInfoSpan(userInfo: U, cpsColors: CPSColors): AnnotatedString
+    abstract fun makeUserInfoSpan(userInfo: U, cpsColors: CPSColors): AnnotatedString
 
     @Composable
     open fun PanelContent(profileResult: ProfileResult<U>) {}

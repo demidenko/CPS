@@ -43,7 +43,7 @@ class ACMPAccountManager :
         return ACMPUtils.extractUsersSuggestions(source = ACMPApi.getUsersSearch(str))
     }
 
-    override fun makeOKInfoSpan(userInfo: ACMPUserInfo, cpsColors: CPSColors): AnnotatedString =
+    override fun makeUserInfoSpan(userInfo: ACMPUserInfo, cpsColors: CPSColors): AnnotatedString =
         buildAnnotatedString {
             val words = userInfo.userName.split(' ')
             if (words.size < 3) append(userInfo.userName)

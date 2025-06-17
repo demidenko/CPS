@@ -37,7 +37,7 @@ class TimusAccountManager :
         return TimusUtils.extractUsersSuggestions(source = TimusApi.getSearchPage(str))
     }
 
-    override fun makeOKInfoSpan(userInfo: TimusUserInfo, cpsColors: CPSColors): AnnotatedString =
+    override fun makeUserInfoSpan(userInfo: TimusUserInfo, cpsColors: CPSColors): AnnotatedString =
         with(userInfo) {
             AnnotatedString("$userName $solvedTasks")
         }
