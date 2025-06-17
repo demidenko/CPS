@@ -253,7 +253,7 @@ class CodeforcesProfileDataStore(manager: CodeforcesAccountManager, context: Con
         private val Context.dataStore by profileDataStoreWrapper(AccountManagerType.codeforces)
     }
 
-    override val userInfo = makeUserInfoItem<CodeforcesUserInfo>()
+    override val profileItem = makeProfileItem<CodeforcesUserInfo>()
     override fun ProfileResult<CodeforcesUserInfo>.convert(): CodeforcesUserInfo = toStatusUserInfo()
 
     override val ratingChangeNotificationChannel: NotificationChannelSingleId

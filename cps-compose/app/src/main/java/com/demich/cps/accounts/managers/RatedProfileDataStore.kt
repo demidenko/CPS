@@ -43,12 +43,12 @@ abstract class RatedProfileDataStore<U: RatedUserInfo>(
         if (newProfile is ProfileResult.Failed) {
             if (profile is ProfileResult.Success) {
                 val newUserInfo = profile.userInfo.withNewRating(rating = ratingChange.rating)
-                userInfo(newValue = newUserInfo)
+                profileItem(newValue = ProfileResult.Success(newUserInfo))
             } else {
                 // TODO ??????????
             }
         } else {
-            userInfo(newValue = newProfile.convert())
+            profileItem(newValue = newProfile)
         }
 
         //notify

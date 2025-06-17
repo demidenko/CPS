@@ -120,7 +120,7 @@ class AtCoderProfileDataStore(manager: AtCoderAccountManager, context: Context):
         private val Context.dataStore by profileDataStoreWrapper(type = AccountManagerType.atcoder)
     }
 
-    override val userInfo = makeUserInfoItem<AtCoderUserInfo>()
+    override val profileItem = makeProfileItem<AtCoderUserInfo>()
     override fun ProfileResult<AtCoderUserInfo>.convert(): AtCoderUserInfo = toStatusUserInfo()
 
     override val ratingChangeNotificationChannel: NotificationChannelSingleId

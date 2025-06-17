@@ -4,40 +4,38 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
-import com.demich.cps.accounts.userinfo.asResult
-import com.demich.cps.utils.jsonCPS
+import com.demich.cps.accounts.userinfo.jsonProfile
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreWrapper
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 abstract class ProfileDataStore<U: UserInfo>(
     dataStoreWrapper: DataStoreWrapper
 ): ItemizedDataStore(dataStoreWrapper) {
-    protected abstract val userInfo: DataStoreItem<U?>
-    protected inline fun <reified T: UserInfo> makeUserInfoItem(): DataStoreItem<T?> =
-        jsonCPS.itemNullable(name = "user_info")
+    protected abstract val profileItem: DataStoreItem<ProfileResult<U>?>
+    protected inline fun <reified T: UserInfo> makeProfileItem(): DataStoreItem<ProfileResult<T>?> =
+        jsonProfile.itemNullable(name = "profile_result")
 
     protected abstract suspend fun onResetProfile()
 
-    suspend fun getProfile(): ProfileResult<U>? = userInfo()?.asResult()
+    suspend fun getProfile(): ProfileResult<U>? = profileItem()
 
     suspend fun setProfile(profileResult: ProfileResult<U>) {
         val oldUserId = getProfile()?.userId
-        userInfo(newValue = profileResult.convert())
+        profileItem(newValue = profileResult)
         if (!oldUserId.equals(profileResult.userId, ignoreCase = true)) {
             onResetProfile()
         }
     }
 
     suspend fun deleteProfile() {
-        userInfo(newValue = null)
+        profileItem(newValue = null)
     }
 
-    fun flowOfProfile() = userInfo.flow.map { it?.asResult() }
+    fun flowOfProfile() = profileItem.flow
 
     protected abstract fun ProfileResult<U>.convert(): U
 }
@@ -47,9 +45,9 @@ abstract class ProfileUniqueDataStore<U: UserInfo>(
 ): ProfileDataStore<U>(dataStoreWrapper) {
     final override suspend fun onResetProfile() {
         edit { prefs ->
-            prefs[userInfo].let {
+            prefs[profileItem].let {
                 prefs.clear()
-                prefs[userInfo] = it
+                prefs[profileItem] = it
             }
         }
     }
@@ -59,7 +57,7 @@ internal val Context.multipleProfilesDataStoreWrapper by dataStoreWrapper("multi
 
 internal inline fun<reified U: UserInfo> AccountManager<U>.simpleProfileDataStore(context: Context): ProfileDataStore<U> =
     object : ProfileDataStore<U>(context.multipleProfilesDataStoreWrapper) {
-        override val userInfo = jsonCPS.itemNullable<U>(name = "${type}_user_info")
+        override val profileItem = jsonProfile.itemNullable<ProfileResult<U>>(name = "${type}_profile_result")
 
         override suspend fun onResetProfile() { }
 
