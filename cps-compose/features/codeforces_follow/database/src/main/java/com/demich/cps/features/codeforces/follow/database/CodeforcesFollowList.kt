@@ -28,6 +28,8 @@ abstract class CodeforcesFollowList(
         )
 
     suspend fun addNewUser(result: ProfileResult<CodeforcesUserInfo>) {
+        if (result is ProfileResult.NotFound) return
+
         val handle = result.userId
         if (dao.getUserBlog(handle) != null) return
         dao.insert(
