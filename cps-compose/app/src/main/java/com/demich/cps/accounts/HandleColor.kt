@@ -27,5 +27,5 @@ data class HandleColorBound(
     val ratingUpperBound: Int
 )
 
-infix fun HandleColor.to(rating: Int): HandleColorBound =
+infix fun HandleColor.until(rating: Int): HandleColorBound =
     HandleColorBound(handleColor = this, ratingUpperBound = rating)

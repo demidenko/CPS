@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.screens.AtCoderUserInfoExpandedContent
-import com.demich.cps.accounts.to
+import com.demich.cps.accounts.until
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
@@ -55,13 +55,13 @@ class AtCoderAccountManager :
 
     override val ratingsUpperBounds by lazy {
         listOf(
-            HandleColor.GRAY to 400,
-            HandleColor.BROWN to 800,
-            HandleColor.GREEN to 1200,
-            HandleColor.CYAN to 1600,
-            HandleColor.BLUE to 2000,
-            HandleColor.YELLOW to 2400,
-            HandleColor.ORANGE to 2800
+            HandleColor.GRAY until 400,
+            HandleColor.BROWN until 800,
+            HandleColor.GREEN until 1200,
+            HandleColor.CYAN until 1600,
+            HandleColor.BLUE until 2000,
+            HandleColor.YELLOW until 2400,
+            HandleColor.ORANGE until 2800
         )
     }
 

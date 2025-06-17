@@ -14,7 +14,7 @@ import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.R
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.screens.CodeforcesUserInfoExpandedContent
-import com.demich.cps.accounts.to
+import com.demich.cps.accounts.until
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
@@ -87,7 +87,7 @@ class CodeforcesAccountManager :
                 CodeforcesUtils.colorTagFrom(rating) <= colorTag
             }
             val handleColor = requireNotNull(colorTag.toHandleColor())
-            handleColor to rating
+            handleColor until rating
         }
     }
 
@@ -201,35 +201,35 @@ class CodeforcesAccountManager :
         get() = listOf(
             //https://codeforces.com/blog/entry/59228
             Instant.fromEpochSeconds(1525364996L) to listOf(
-                HandleColor.GRAY to 1200,
-                HandleColor.GREEN to 1400,
-                HandleColor.CYAN to 1600,
-                HandleColor.BLUE to 1900,
-                HandleColor.VIOLET to 2200,
-                HandleColor.ORANGE to 2400
+                HandleColor.GRAY until 1200,
+                HandleColor.GREEN until 1400,
+                HandleColor.CYAN until 1600,
+                HandleColor.BLUE until 1900,
+                HandleColor.VIOLET until 2200,
+                HandleColor.ORANGE until 2400
             ),
             //https://codeforces.com/blog/entry/20638
             Instant.fromEpochSeconds(1443721088L) to listOf(
-                HandleColor.GRAY to 1200,
-                HandleColor.GREEN to 1500,
-                HandleColor.BLUE to 1700,
-                HandleColor.VIOLET to 1900,
-                HandleColor.ORANGE to 2200
+                HandleColor.GRAY until 1200,
+                HandleColor.GREEN until 1500,
+                HandleColor.BLUE until 1700,
+                HandleColor.VIOLET until 1900,
+                HandleColor.ORANGE until 2200
             ),
             //https://codeforces.com/blog/entry/3064
             Instant.fromEpochSeconds(1320620562L) to listOf(
-                HandleColor.GRAY to 1200,
-                HandleColor.GREEN to 1500,
-                HandleColor.BLUE to 1650,
-                HandleColor.VIOLET to 1800,
-                HandleColor.ORANGE to 2000
+                HandleColor.GRAY until 1200,
+                HandleColor.GREEN until 1500,
+                HandleColor.BLUE until 1650,
+                HandleColor.VIOLET until 1800,
+                HandleColor.ORANGE until 2000
             ),
             //https://codeforces.com/blog/entry/1383
             Instant.fromEpochSeconds(1298914585L) to listOf(
-                HandleColor.GRAY to 1200,
-                HandleColor.GREEN to 1500,
-                HandleColor.BLUE to 1650,
-                HandleColor.YELLOW to 2000
+                HandleColor.GRAY until 1200,
+                HandleColor.GREEN until 1500,
+                HandleColor.BLUE until 1650,
+                HandleColor.YELLOW until 2000
             )
             //https://codeforces.com/blog/entry/126
         )

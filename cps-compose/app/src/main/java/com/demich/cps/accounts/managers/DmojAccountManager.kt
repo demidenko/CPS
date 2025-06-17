@@ -9,7 +9,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.screens.DmojUserInfoExpandedContent
-import com.demich.cps.accounts.to
+import com.demich.cps.accounts.until
 import com.demich.cps.accounts.userinfo.DmojUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
@@ -56,11 +56,11 @@ class DmojAccountManager :
 
     override val ratingsUpperBounds by lazy {
         listOf(
-            HandleColor.GRAY to 1000,
-            HandleColor.GREEN to 1300,
-            HandleColor.BLUE to 1600,
-            HandleColor.VIOLET to 1900,
-            HandleColor.ORANGE to 2400
+            HandleColor.GRAY until 1000,
+            HandleColor.GREEN until 1300,
+            HandleColor.BLUE until 1600,
+            HandleColor.VIOLET until 1900,
+            HandleColor.ORANGE until 2400
         )
     }
 

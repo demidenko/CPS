@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.SmallAccountPanelTwoLines
 import com.demich.cps.accounts.screens.CodeChefUserInfoExpandedContent
-import com.demich.cps.accounts.to
+import com.demich.cps.accounts.until
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
@@ -82,12 +82,12 @@ class CodeChefAccountManager :
 
     override val ratingsUpperBounds by lazy {
         listOf(
-            HandleColor.GRAY to 1400,
-            HandleColor.GREEN to 1600,
-            HandleColor.BLUE to 1800,
-            HandleColor.VIOLET to 2000,
-            HandleColor.YELLOW to 2200,
-            HandleColor.ORANGE to 2500
+            HandleColor.GRAY until 1400,
+            HandleColor.GREEN until 1600,
+            HandleColor.BLUE until 1800,
+            HandleColor.VIOLET until 2000,
+            HandleColor.YELLOW until 2200,
+            HandleColor.ORANGE until 2500
         )
     }
 
