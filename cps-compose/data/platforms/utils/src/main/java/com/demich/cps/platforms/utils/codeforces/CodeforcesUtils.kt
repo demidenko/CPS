@@ -2,7 +2,6 @@ package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
@@ -235,12 +234,6 @@ object CodeforcesUtils {
 
     private suspend fun getUserPageOrNull(handle: String): String? =
         CodeforcesApi.runCatching { getUserPage(handle) }.getOrNull()
-
-    private suspend fun getRealHandle(handle: String): Pair<String, STATUS> {
-        val page = getUserPageOrNull(handle) ?: return handle to STATUS.FAILED
-        val realHandle = extractRealHandleOrNull(page)?.handle ?: return handle to STATUS.NOT_FOUND
-        return realHandle to STATUS.OK
-    }
 
     suspend fun getRealColorTagOrNull(handle: String): CodeforcesColorTag? {
         return getUserPageOrNull(handle)?.let { extractRealHandleOrNull(it)?.colorTag }
