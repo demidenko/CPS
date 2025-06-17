@@ -124,7 +124,7 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
     protected inline fun <reified T> Json.itemList(
         name: String,
         noinline defaultValue: () -> List<T> = ::emptyList
-    ): DataStoreItem <List<T>> = item(name, defaultValue)
+    ): DataStoreItem<List<T>> = item(name, defaultValue)
 
     protected inline fun <reified T> Json.itemSet(
         name: String,
