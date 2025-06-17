@@ -59,6 +59,6 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         }
     }
 
-    val autoUpdateInterval = jsonCPS.item<Duration?>(name = "autoupdate_interval", defaultValue = null)
+    val autoUpdateInterval = jsonCPS.itemNullable<Duration>(name = "autoupdate_interval")
 }
 

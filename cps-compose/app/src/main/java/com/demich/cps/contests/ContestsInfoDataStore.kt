@@ -16,8 +16,5 @@ class ContestsInfoDataStore(context: Context): ItemizedDataStore(context.contest
         emptyTimedCollection<ContestCompositeId>()
     }
 
-    val settingsSnapshot = jsonCPS.item<ContestsSettingsSnapshot?>(
-        name = "settings_snapshot",
-        defaultValue = null
-    )
+    val settingsSnapshot = jsonCPS.itemNullable<ContestsSettingsSnapshot>(name = "settings_snapshot")
 }

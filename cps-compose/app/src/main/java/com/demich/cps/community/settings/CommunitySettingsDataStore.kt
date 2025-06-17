@@ -34,7 +34,7 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
 
     val codeforcesLostEnabled = itemBoolean(name = "cf_lost_enabled", defaultValue = false)
     val codeforcesLostMinRatingTag = itemEnum(name = "cf_lost_min_rating", defaultValue = CodeforcesColorTag.ORANGE)
-    val codeforcesLostHintNotNew = jsonCPS.item<CodeforcesLostHint?>(name = "cf_lost_hint", defaultValue = null)
+    val codeforcesLostHintNotNew = jsonCPS.itemNullable<CodeforcesLostHint>(name = "cf_lost_hint")
 
     fun flowOfCodeforcesTabs(): Flow<List<CodeforcesTitle>> {
         return codeforcesLostEnabled.flow.map { lostEnabled ->

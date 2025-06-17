@@ -19,7 +19,7 @@ abstract class ProfileDataStore<U: UserInfo>(
 ): ItemizedDataStore(dataStoreWrapper) {
     protected abstract val userInfo: DataStoreItem<U?>
     protected inline fun <reified T: UserInfo> makeUserInfoItem(): DataStoreItem<T?> =
-        jsonCPS.item(name = "user_info", defaultValue = null)
+        jsonCPS.itemNullable(name = "user_info")
 
     protected abstract suspend fun onResetProfile()
 
@@ -59,10 +59,7 @@ internal val Context.multipleProfilesDataStoreWrapper by dataStoreWrapper("multi
 
 internal inline fun<reified U: UserInfo> AccountManager<U>.simpleProfileDataStore(context: Context): ProfileDataStore<U> =
     object : ProfileDataStore<U>(context.multipleProfilesDataStoreWrapper) {
-        override val userInfo = jsonCPS.item<U?>(
-            name = "${type}_user_info",
-            defaultValue = null
-        )
+        override val userInfo = jsonCPS.itemNullable<U>(name = "${type}_user_info")
 
         override suspend fun onResetProfile() { }
 

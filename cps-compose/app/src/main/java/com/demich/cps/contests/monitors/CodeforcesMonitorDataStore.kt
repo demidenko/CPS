@@ -21,11 +21,11 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
         private val Context.cf_monitor_dataStore by dataStoreWrapper(name = "cf_monitor")
     }
 
-    internal val args = jsonCPS.item<CodeforcesMonitorArgs?>(name = "args", defaultValue = null)
+    internal val args = jsonCPS.itemNullable<CodeforcesMonitorArgs>(name = "args")
 
-    val lastRequest = jsonCPS.item<Boolean?>(name = "last_request", defaultValue = null)
+    val lastRequest = jsonCPS.itemNullable<Boolean>(name = "last_request")
 
-    internal val contestInfo = jsonCPS.item<CodeforcesContest?>(name = "contest_info", defaultValue = null)
+    internal val contestInfo = jsonCPS.itemNullable<CodeforcesContest>(name = "contest_info")
 
     internal val participationType = itemEnum(name = "participation_type", defaultValue = CodeforcesParticipationType.NOT_PARTICIPATED)
 

@@ -18,7 +18,7 @@ abstract class RatedProfileDataStore<U: RatedUserInfo>(
     ProfileUniqueDataStore<U>(dataStoreWrapper)
 {
     private val lastRatingChange: DataStoreItem<RatingChange?> =
-        jsonCPS.item(name = "last_rating_change", defaultValue = null)
+        jsonCPS.itemNullable(name = "last_rating_change")
 
     protected abstract val ratingChangeNotificationChannel: NotificationChannelSingleId
     protected abstract fun U.withNewRating(rating: Int): U
