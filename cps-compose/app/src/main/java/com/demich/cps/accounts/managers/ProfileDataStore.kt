@@ -14,7 +14,7 @@ import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-abstract class AccountDataStore<U: UserInfo>(
+abstract class ProfileDataStore<U: UserInfo>(
     dataStoreWrapper: DataStoreWrapper
 ): ItemizedDataStore(dataStoreWrapper) {
     protected abstract val userInfo: DataStoreItem<U?>
@@ -41,9 +41,9 @@ abstract class AccountDataStore<U: UserInfo>(
     }
 }
 
-abstract class AccountUniqueDataStore<U: UserInfo>(
+abstract class ProfileUniqueDataStore<U: UserInfo>(
     dataStoreWrapper: DataStoreWrapper
-): AccountDataStore<U>(dataStoreWrapper) {
+): ProfileDataStore<U>(dataStoreWrapper) {
     final override suspend fun onResetProfile() {
         edit { prefs ->
             prefs[userInfo].let {
@@ -56,8 +56,8 @@ abstract class AccountUniqueDataStore<U: UserInfo>(
 
 internal val Context.multipleProfilesDataStoreWrapper by dataStoreWrapper("multiple_profiles")
 
-internal inline fun<reified U: UserInfo> AccountManager<U>.simpleAccountDataStore(context: Context): AccountDataStore<U> =
-    object : AccountDataStore<U>(context.multipleProfilesDataStoreWrapper) {
+internal inline fun<reified U: UserInfo> AccountManager<U>.simpleProfileDataStore(context: Context): ProfileDataStore<U> =
+    object : ProfileDataStore<U>(context.multipleProfilesDataStoreWrapper) {
         override val userInfo = jsonCPS.item<U?>(
             name = "${type}_user_info",
             defaultValue = null
@@ -66,11 +66,11 @@ internal inline fun<reified U: UserInfo> AccountManager<U>.simpleAccountDataStor
         override suspend fun onResetProfile() { }
 
         override fun ProfileResult<U>.convert(): U =
-            this@simpleAccountDataStore.convert(this)
+            this@simpleProfileDataStore.convert(this)
     }
 
 
-interface AccountSettingsProvider {
+interface ProfileSettingsProvider {
     fun getSettings(context: Context): ItemizedDataStore
 
     @Composable
@@ -78,3 +78,9 @@ interface AccountSettingsProvider {
 
     fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean>? = null
 }
+
+fun profileDataStoreWrapper(type: AccountManagerType) =
+    dataStoreWrapper(name = type.name + "_profile_datastore")
+
+fun profileSettingsDataStoreWrapper(type: AccountManagerType) =
+    dataStoreWrapper(name = type.name + "_profile_settings")

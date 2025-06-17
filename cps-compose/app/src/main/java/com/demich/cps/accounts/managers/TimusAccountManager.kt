@@ -64,7 +64,7 @@ class TimusAccountManager :
         }
     }
 
-    override fun dataStore(context: Context) = simpleAccountDataStore(context)
+    override fun dataStore(context: Context) = simpleProfileDataStore(context)
 
     override fun convert(profileResult: ProfileResult<TimusUserInfo>): TimusUserInfo =
         profileResult.toStatusUserInfo()

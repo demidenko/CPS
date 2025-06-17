@@ -101,7 +101,7 @@ class DmojAccountManager :
         )
     }
 
-    override fun dataStore(context: Context) = simpleAccountDataStore(context)
+    override fun dataStore(context: Context) = simpleProfileDataStore(context)
 
     override fun convert(profileResult: ProfileResult<DmojUserInfo>): DmojUserInfo =
         profileResult.toStatusUserInfo()

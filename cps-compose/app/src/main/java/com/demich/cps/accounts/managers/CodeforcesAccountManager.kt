@@ -39,7 +39,6 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
 import com.demich.datastore_itemized.ItemizedDataStore
-import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.flowOf
 import com.demich.kotlin_stdlib_boost.binarySearchFirstFalse
 import kotlinx.coroutines.flow.Flow
@@ -48,7 +47,7 @@ import kotlinx.datetime.Instant
 
 class CodeforcesAccountManager :
     RatedAccountManager<CodeforcesUserInfo>(AccountManagerType.codeforces),
-    AccountSettingsProvider,
+    ProfileSettingsProvider,
     ProfileSuggestionsProvider,
     RatingRevolutionsProvider
 {
@@ -160,8 +159,8 @@ class CodeforcesAccountManager :
         )
     }
 
-    override fun dataStore(context: Context) = CodeforcesAccountDataStore(this, context)
-    override fun getSettings(context: Context) = CodeforcesAccountSettingsDataStore(context)
+    override fun dataStore(context: Context) = CodeforcesProfileDataStore(this, context)
+    override fun getSettings(context: Context) = CodeforcesProfileSettingsDataStore(context)
 
     @Composable
     override fun SettingsItems() {
@@ -247,11 +246,11 @@ fun CodeforcesHandle.toHandleSpan() =
         .makeHandleSpan(handle = handle, tag = colorTag, cpsColors = cpsColors)
 
 
-class CodeforcesAccountDataStore(manager: CodeforcesAccountManager, context: Context):
-    RatedAccountDataStore<CodeforcesUserInfo>(manager, context, context.account_codeforces_dataStore)
+class CodeforcesProfileDataStore(manager: CodeforcesAccountManager, context: Context):
+    RatedProfileDataStore<CodeforcesUserInfo>(manager, context, context.dataStore)
 {
     companion object {
-        private val Context.account_codeforces_dataStore by dataStoreWrapper(AccountManagerType.codeforces.name)
+        private val Context.dataStore by profileDataStoreWrapper(AccountManagerType.codeforces)
     }
 
     override val userInfo = makeUserInfoItem<CodeforcesUserInfo>()
@@ -269,12 +268,11 @@ class CodeforcesAccountDataStore(manager: CodeforcesAccountManager, context: Con
     val upsolvingSuggestedProblems = jsonCPS.item(name = "upsolving_suggested_problems", defaultValue = emptyTimedCollection<CodeforcesProblem>())
 }
 
-class CodeforcesAccountSettingsDataStore(context: Context):
-    ItemizedDataStore(context.account_settings_codeforces_dataStore)
+class CodeforcesProfileSettingsDataStore(context: Context):
+    ItemizedDataStore(context.dataStore)
 {
     companion object {
-        private val Context.account_settings_codeforces_dataStore
-            by dataStoreWrapper(AccountManagerType.codeforces.name + "_account_settings")
+        private val Context.dataStore by profileSettingsDataStoreWrapper(AccountManagerType.codeforces)
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)

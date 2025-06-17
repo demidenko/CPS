@@ -40,7 +40,7 @@ class CListAccountManager :
             AnnotatedString("$login (${accounts.size})")
         }
 
-    override fun dataStore(context: Context): AccountDataStore<ClistUserInfo> {
+    override fun dataStore(context: Context): ProfileDataStore<ClistUserInfo> {
         error("CList account manager can not provide data store")
     }
 

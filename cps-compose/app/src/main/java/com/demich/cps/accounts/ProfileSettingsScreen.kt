@@ -15,7 +15,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.AccountManagerType
-import com.demich.cps.accounts.managers.AccountSettingsProvider
+import com.demich.cps.accounts.managers.ProfileSettingsProvider
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
@@ -70,7 +70,7 @@ private fun <U: UserInfo> UserInfoSettings(
     onUserIdClick: () -> Unit
 ) {
     val requiredPermission by rememberFrom(context) {
-        (manager as? AccountSettingsProvider)
+        (manager as? ProfileSettingsProvider)
             ?.flowOfRequiredNotificationsPermission(it)
             ?: emptyFlow()
     }.collectAsState(initial = false)
@@ -81,7 +81,7 @@ private fun <U: UserInfo> UserInfoSettings(
             userIdTitle = manager.userIdTitle,
             modifier = Modifier.clickable(onClick = onUserIdClick)
         )
-        if (manager is AccountSettingsProvider) {
+        if (manager is ProfileSettingsProvider) {
             manager.SettingsItems()
         }
     }

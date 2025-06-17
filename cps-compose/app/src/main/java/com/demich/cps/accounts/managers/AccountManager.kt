@@ -45,7 +45,7 @@ abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
     abstract val userIdTitle: String
     abstract val urlHomePage: String
 
-    abstract fun dataStore(context: Context): AccountDataStore<U>
+    abstract fun dataStore(context: Context): ProfileDataStore<U>
 
     open fun isValidForUserId(char: Char): Boolean = true
 

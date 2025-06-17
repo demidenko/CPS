@@ -81,7 +81,7 @@ class ACMPAccountManager :
         }
     }
 
-    override fun dataStore(context: Context) = simpleAccountDataStore(context)
+    override fun dataStore(context: Context) = simpleProfileDataStore(context)
 
     override fun convert(profileResult: ProfileResult<ACMPUserInfo>): ACMPUserInfo =
         profileResult.toStatusUserInfo()

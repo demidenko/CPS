@@ -20,13 +20,12 @@ import com.demich.cps.ui.SettingsSwitchItemWithProfilesWork
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.utils.context
 import com.demich.datastore_itemized.ItemizedDataStore
-import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.coroutines.flow.Flow
 
 
 class AtCoderAccountManager :
     RatedAccountManager<AtCoderUserInfo>(AccountManagerType.atcoder),
-    AccountSettingsProvider,
+    ProfileSettingsProvider,
     ProfileSuggestionsProvider
 {
     override val urlHomePage get() = AtCoderApi.urls.main
@@ -95,8 +94,8 @@ class AtCoderAccountManager :
         )
     }
 
-    override fun dataStore(context: Context) = AtCoderAccountDataStore(this, context)
-    override fun getSettings(context: Context) = AtCoderAccountSettingsDataStore(context)
+    override fun dataStore(context: Context) = AtCoderProfileDataStore(this, context)
+    override fun getSettings(context: Context) = AtCoderProfileSettingsDataStore(context)
 
     @Composable
     override fun SettingsItems() {
@@ -108,17 +107,17 @@ class AtCoderAccountManager :
     }
 
     override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
-        AtCoderAccountSettingsDataStore(context).observeRating.flow
+        AtCoderProfileSettingsDataStore(context).observeRating.flow
 
     override fun convert(profileResult: ProfileResult<AtCoderUserInfo>): AtCoderUserInfo =
         profileResult.toStatusUserInfo()
 }
 
-class AtCoderAccountDataStore(manager: AtCoderAccountManager, context: Context):
-    RatedAccountDataStore<AtCoderUserInfo>(manager, context, context.account_atcoder_dataStore)
+class AtCoderProfileDataStore(manager: AtCoderAccountManager, context: Context):
+    RatedProfileDataStore<AtCoderUserInfo>(manager, context, context.dataStore)
 {
     companion object {
-        private val Context.account_atcoder_dataStore by dataStoreWrapper(AccountManagerType.atcoder.name)
+        private val Context.dataStore by profileDataStoreWrapper(type = AccountManagerType.atcoder)
     }
 
     override val userInfo = makeUserInfoItem<AtCoderUserInfo>()
@@ -130,12 +129,11 @@ class AtCoderAccountDataStore(manager: AtCoderAccountManager, context: Context):
     override fun AtCoderUserInfo.withNewRating(rating: Int) = copy(rating = rating)
 }
 
-class AtCoderAccountSettingsDataStore(context: Context):
-    ItemizedDataStore(context.account_settings_atcoder_dataStore)
+class AtCoderProfileSettingsDataStore(context: Context):
+    ItemizedDataStore(context.dataStore)
 {
     companion object {
-        private val Context.account_settings_atcoder_dataStore
-            by dataStoreWrapper(AccountManagerType.atcoder.name + "_account_settings")
+        private val Context.dataStore by profileSettingsDataStoreWrapper(AccountManagerType.atcoder)
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)
