@@ -10,5 +10,5 @@ data class CodeforcesUserBlog(
     val id: Int = 0,
     val handle: String,
     val blogEntries: List<Int>?,
-    val userInfo: CodeforcesUserInfo
+    val userInfo: CodeforcesUserInfo?
 )

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.accounts.DialogAccountChooser
 import com.demich.cps.accounts.managers.makeHandleSpan
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.asResult
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
@@ -147,8 +148,9 @@ private fun CodeforcesFollowList(
     showDeleteDialogForBlog?.let { userBlog ->
         CPSDeleteDialog(
             title = buildAnnotatedString {
+                val result = userBlog.userInfo?.asResult() ?: ProfileResult.Failed(userBlog.handle)
                 append("Delete ")
-                append(LocalCodeforcesAccountManager.current.makeHandleSpan(profileResult = userBlog.userInfo.asResult()))
+                append(LocalCodeforcesAccountManager.current.makeHandleSpan(profileResult = result))
                 append(" from follow list?")
             },
             onDismissRequest = { showDeleteDialogForBlog = null },

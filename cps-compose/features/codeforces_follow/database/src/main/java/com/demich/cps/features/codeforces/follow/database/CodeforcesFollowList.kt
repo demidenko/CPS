@@ -3,7 +3,7 @@ package com.demich.cps.features.codeforces.follow.database
 import android.content.Context
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.toStatusUserInfo
+import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
@@ -36,7 +36,7 @@ abstract class CodeforcesFollowList(
             CodeforcesUserBlog(
                 handle = handle,
                 blogEntries = null,
-                userInfo = result.toStatusUserInfo()
+                userInfo = result.userInfoOrNull()
             )
         )
         getAndReloadBlogEntries(handle = handle)

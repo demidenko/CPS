@@ -35,7 +35,7 @@ class CodeforcesCommunityFollowWorker(
     private val proceeded = mutableSetOf<String>()
 
     private fun CodeforcesUserBlog.userLastOnlineTime(): Instant =
-        userInfo.lastOnlineTime
+        userInfo?.lastOnlineTime ?: Instant.DISTANT_PAST
 
     //note that cf can have different lastOnlineTime from api and web sources
     private fun CodeforcesUserBlog.isUserInactive() =
