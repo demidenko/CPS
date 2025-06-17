@@ -1,29 +1,32 @@
 package com.demich.cps.platforms.utils
 
+import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import org.jsoup.Jsoup
 
 object TimusUtils {
-    fun extractUserInfo(source: String, handle: String): TimusUserInfo {
+    fun extractProfile(source: String, handle: String): ProfileResult<TimusUserInfo> {
         with(Jsoup.parse(source)) {
             val userName = selectFirst("h2.author_name")?.text()
-                ?: return TimusUserInfo(status = STATUS.NOT_FOUND, id = handle)
+                ?: return ProfileResult.NotFound(userId = handle)
             val rows =
                 if (selectFirst("div.author_none_solved") != null)
                     listOf("0", "0", "0", "0")
                 else select("td.author_stats_value").map { row ->
                     row.text().let { it.substring(0, it.indexOf(" out of ")) }
                 }
-            return TimusUserInfo(
-                status = STATUS.OK,
-                id = handle,
-                userName = userName,
-                rating = rows[3].toInt(),
-                solvedTasks = rows[1].toInt(),
-                rankTasks = rows[0].toInt(),
-                rankRating = rows[2].toInt()
+            return ProfileResult.Success(
+                userInfo = TimusUserInfo(
+                    status = STATUS.OK,
+                    id = handle,
+                    userName = userName,
+                    rating = rows[3].toInt(),
+                    solvedTasks = rows[1].toInt(),
+                    rankTasks = rows[0].toInt(),
+                    rankRating = rows[2].toInt()
+                )
             )
         }
     }

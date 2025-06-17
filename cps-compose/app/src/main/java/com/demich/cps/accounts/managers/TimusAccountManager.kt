@@ -24,11 +24,9 @@ class TimusAccountManager :
 
     override suspend fun fetchProfile(data: String): ProfileResult<TimusUserInfo> =
         TimusUtils.runCatching {
-            ProfileResult.Success(
-                userInfo = extractUserInfo(
-                    source = TimusApi.getUserPage(data.toInt()),
-                    handle = data
-                )
+            extractProfile(
+                source = TimusApi.getUserPage(data.toInt()),
+                handle = data
             )
         }.getOrElse {
             ProfileResult.Failed(data)
