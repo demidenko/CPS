@@ -1,7 +1,6 @@
 package com.demich.cps.platforms.utils
 
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.AtCoderApi
@@ -19,7 +18,6 @@ object AtCoderUtils {
     fun extractUserInfo(source: String): AtCoderUserInfo =
         with(Jsoup.parse(source)) {
             AtCoderUserInfo(
-                status = STATUS.OK,
                 handle = expectFirst("a.username").text(),
                 rating = select("th.no-break").find { it.text() == "Rating" }
                     ?.nextElementSibling()

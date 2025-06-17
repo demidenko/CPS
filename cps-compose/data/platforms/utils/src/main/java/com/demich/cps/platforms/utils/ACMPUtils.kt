@@ -1,7 +1,6 @@
 package com.demich.cps.platforms.utils
 
 import com.demich.cps.accounts.userinfo.ACMPUserInfo
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import org.jsoup.Jsoup
 
@@ -22,7 +21,6 @@ object ACMPUtils {
                 it.substring(it.indexOf(':')+2, it.indexOf('/')-1).toInt()
             }
             ACMPUserInfo(
-                status = STATUS.OK,
                 id = id,
                 userName = userName,
                 rating = rating,

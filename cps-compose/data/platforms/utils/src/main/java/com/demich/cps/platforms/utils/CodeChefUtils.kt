@@ -1,7 +1,6 @@
 package com.demich.cps.platforms.utils
 
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
-import com.demich.cps.accounts.userinfo.STATUS
 import org.jsoup.Jsoup
 
 object CodeChefUtils {
@@ -18,7 +17,6 @@ object CodeChefUtils {
                 .selectFirst("span.m-username--link")
                 ?.text() ?: handle
             return CodeChefUserInfo(
-                status = STATUS.OK,
                 handle = userName,
                 rating = rating
             )

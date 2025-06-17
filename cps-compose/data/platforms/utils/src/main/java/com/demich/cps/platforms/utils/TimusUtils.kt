@@ -1,7 +1,6 @@
 package com.demich.cps.platforms.utils
 
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import org.jsoup.Jsoup
@@ -19,7 +18,6 @@ object TimusUtils {
                 }
             return ProfileResult.Success(
                 userInfo = TimusUserInfo(
-                    status = STATUS.OK,
                     id = handle,
                     userName = userName,
                     rating = rows[3].toInt(),

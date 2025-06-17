@@ -1,12 +1,10 @@
 package com.demich.cps.platforms.utils
 
 import com.demich.cps.accounts.userinfo.ClistUserInfo
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.ClistContest
 import com.demich.cps.platforms.api.ClistResource
 import org.jsoup.Jsoup
-import kotlin.collections.set
 
 object ClistUtils {
     fun makeResourceIds(
@@ -84,7 +82,6 @@ object ClistUtils {
         }
 
         return ClistUserInfo(
-            status = STATUS.OK,
             login = login,
             accounts = accounts
         )

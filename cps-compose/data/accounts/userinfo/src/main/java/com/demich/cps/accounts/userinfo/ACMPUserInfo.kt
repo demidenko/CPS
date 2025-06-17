@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ACMPUserInfo(
-    override val status: STATUS,
     val id: String,
     val userName: String = "",
     val rating: Int = 0,

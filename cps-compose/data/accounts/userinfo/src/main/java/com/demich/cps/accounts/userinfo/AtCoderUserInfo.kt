@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AtCoderUserInfo(
-    override val status: STATUS,
     override val handle: String,
     override val rating: Int? = null
 ): RatedUserInfo() {

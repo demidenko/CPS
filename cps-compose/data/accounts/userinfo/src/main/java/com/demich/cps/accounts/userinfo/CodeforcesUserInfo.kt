@@ -7,14 +7,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CodeforcesUserInfo(
-    override val status: STATUS,
     override val handle: String,
     override val rating: Int? = null,
     val contribution: Int = 0,
     val lastOnlineTime: Instant = Instant.DISTANT_PAST
 ): RatedUserInfo() {
     constructor(codeforcesUser: CodeforcesUser): this(
-        status = STATUS.OK,
         handle = codeforcesUser.handle,
         rating = codeforcesUser.rating,
         contribution = codeforcesUser.contribution,

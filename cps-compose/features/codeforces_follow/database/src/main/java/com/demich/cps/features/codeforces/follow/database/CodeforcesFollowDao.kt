@@ -7,7 +7,6 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogException
@@ -54,7 +53,6 @@ interface CodeforcesFollowDao {
     }
 
     private suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
-        require(info.status == STATUS.OK)
         if (info.handle != handle) changeHandle(handle, info.handle)
         val userBlog = getUserBlog(info.handle) ?: return
         if (userBlog.userInfo != info) update(userBlog.copy(

@@ -10,7 +10,6 @@ import com.demich.cps.accounts.HandleColorBound
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.ratingToString
 import com.demich.cps.ui.theme.CPSColors
 import kotlinx.datetime.Instant
@@ -50,7 +49,6 @@ abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagerType):
 
     final override fun makeOKInfoSpan(userInfo: U, cpsColors: CPSColors): AnnotatedString =
         with(userInfo) {
-            check(status == STATUS.OK)
             makeOKSpan(
                 text = handle + " " + ratingToString(),
                 rating = rating,

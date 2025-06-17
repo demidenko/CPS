@@ -12,7 +12,6 @@ import com.demich.cps.accounts.screens.DmojUserInfoExpandedContent
 import com.demich.cps.accounts.to
 import com.demich.cps.accounts.userinfo.DmojUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.STATUS
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.DmojApi
 import com.demich.cps.platforms.api.isPageNotFound
@@ -37,7 +36,6 @@ class DmojAccountManager :
             val res = getUser(handle = data)
             ProfileResult.Success(
                 userInfo = DmojUserInfo(
-                    status = STATUS.OK,
                     handle = res.username,
                     rating = res.rating
                 )

@@ -10,6 +10,7 @@ interface RoomJsonConverter<T> {
 private val defaultJsonRoom = Json {
     encodeDefaults = true
     allowStructuredMapKeys = true
+    ignoreUnknownKeys = true
 }
 
 val RoomJsonConverter<*>.jsonRoom get() = defaultJsonRoom
