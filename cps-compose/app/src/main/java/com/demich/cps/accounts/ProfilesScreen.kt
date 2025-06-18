@@ -63,7 +63,6 @@ private fun ProfilesScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = 10.dp)
-            .background(cpsColors.background)
     ) {
         itemsNotEmpty(
             items = profiles,

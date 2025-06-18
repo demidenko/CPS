@@ -41,6 +41,7 @@ class CPSColors(
 
     internal fun materialColors() = materialInitColors().copy(
         background = background,
+        surface = background,
         primary = accent,
         onBackground = content,
         error = error

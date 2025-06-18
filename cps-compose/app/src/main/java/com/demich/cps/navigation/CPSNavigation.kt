@@ -127,7 +127,7 @@ class CPSNavigator(
         crossinline content: @Composable (DuringCompositionHolder<T>) -> Unit
     ) {
         composable<T> {
-            Surface {
+            Surface(modifier = Modifier.fillMaxSize()) {
                 val holder = remember {
                     DuringCompositionHolder(it.toRoute<T>()).apply {
                         menu = null
