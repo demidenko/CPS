@@ -33,13 +33,15 @@ internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::Ra
     //TODO: do not delay on connection errors (no onResponse call)
     onRequest { request, _ ->
         mutex.withLock {
-            while (true) {
+            while (recentRuns.isNotEmpty()) {
+                val t = recentRuns.first()
+
                 // remove unnecessary
-                while (recentRuns.isNotEmpty() && recentRuns.first() + maxWindow < currentTime()) {
+                if (t + maxWindow < currentTime()) {
                     recentRuns.removeFirst()
+                    continue
                 }
 
-                val t = recentRuns.firstOrNull() ?: break
                 val limit = limits.firstOrNull { !executionAllowed(it) } ?: break
                 delay(t + limit.window - currentTime())
             }
