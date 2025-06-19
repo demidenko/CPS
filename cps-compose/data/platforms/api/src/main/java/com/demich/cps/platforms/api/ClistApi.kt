@@ -6,6 +6,7 @@ import io.ktor.client.request.parameter
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 object ClistApi: PlatformApi {
     override val client = cpsHttpClient(json = defaultJson) {
@@ -14,8 +15,8 @@ object ClistApi: PlatformApi {
         }
 
         install(RateLimitPlugin) {
-            // from https://clist.by/api/v4/doc/ #Throttle
-            10 per 1.minutes
+            10 per 1.minutes // https://clist.by/api/v4/doc/ #Throttle
+            2 per 1.seconds
         }
     }
 

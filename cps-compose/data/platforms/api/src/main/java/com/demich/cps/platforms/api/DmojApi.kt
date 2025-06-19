@@ -17,9 +17,8 @@ object DmojApi: PlatformApi {
             url(urls.main)
         }
 
-        // https://docs.dmoj.ca/#/site/api?id=rate-limiting "90 requests per minute"
         install(RateLimitPlugin) {
-            3 per 2.seconds
+            3 per 2.seconds // https://docs.dmoj.ca/#/site/api?id=rate-limiting "90 requests per minute"
         }
     }
 
