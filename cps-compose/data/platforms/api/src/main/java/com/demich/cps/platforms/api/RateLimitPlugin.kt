@@ -74,11 +74,19 @@ internal class RateLimitPluginConfig {
 
 
 private fun MutableList<RateLimitPluginConfig.RateLimit>.removeUseless() {
-    //we need only nested items i.e. [a.count < b.count and a.window < b.window]
+    // we need only nested items i.e. [a.count < b.count and a.window < b.window]
+    // additionally check fractions i.e. [10 per minute] is useless if there are [1 per 7 seconds]
     sortBy { it.count }
     var sz = 0
     forEach {
         while (sz > 0 && get(sz - 1).run { count == it.count && window < it.window }) sz -= 1
+        repeat(sz) { index ->
+            val item = get(index)
+            if (it.count % item.count == 0) {
+                val k = it.count / item.count
+                if (item.window * k > it.window) return@forEach
+            }
+        }
         if (sz == 0 || get(sz - 1).run { count < it.count && window < it.window}) {
             set(sz, it)
             sz += 1
