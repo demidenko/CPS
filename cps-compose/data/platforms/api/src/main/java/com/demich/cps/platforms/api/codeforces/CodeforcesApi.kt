@@ -311,10 +311,8 @@ private fun isBrowserChecker(str: String): Boolean {
 
 private fun isTemporarilyUnavailable(str: String): Boolean {
     if (str.length > 2000) return false //trick based on full msg length
-    ifBetweenFirstLast(str, "<body>", "</body>") { body ->
-        ifBetweenFirstLast(body, "<p>", "</p>") { msg ->
-            return msg == "Codeforces is temporarily unavailable. Please, return in several minutes. Please try <a href=\"https://m1.codeforces.com/\">m1.codeforces.com</a>, <a href=\"https://m2.codeforces.com/\">m2.codeforces.com</a> or <a href=\"https://m3.codeforces.com/\">m3.codeforces.com</a>"
-        }
+    ifBetweenFirstFirst(str, "<p>", "</p>") { msg ->
+        return msg.startsWith("Codeforces is temporarily unavailable. Please, return in several minutes. Please try")
     }
     /* full message:
 <!DOCTYPE html>
