@@ -65,29 +65,6 @@ internal class CodeforcesAPIErrorResponse(private val comment: String) {
     }
 }
 
-
-open class CodeforcesApiException
-internal constructor(comment: String): Throwable(message = comment)
-
-class CodeforcesApiCallLimitExceededException
-internal constructor(comment: String): CodeforcesApiException(comment)
-
-class CodeforcesApiHandleNotFoundException
-internal constructor(comment: String, val handle: String): CodeforcesApiException(comment)
-
-class CodeforcesApiNotAllowedReadBlogException
-internal constructor(comment: String): CodeforcesApiException(comment)
-
-class CodeforcesApiContestRatingUnavailableException
-internal constructor(comment: String): CodeforcesApiException(comment)
-
-class CodeforcesApiContestNotStartedException
-internal constructor(comment: String, val contestId: Int): CodeforcesApiException(comment)
-
-class CodeforcesApiContestNotFoundException
-internal constructor(comment: String, val contestId: Int): CodeforcesApiException(comment)
-
-
 private inline fun String.ifSurrounded(prefix: String, suffix: String, block: (String) -> Unit) {
     if (prefix.length + suffix.length <= length && startsWith(prefix) && endsWith(suffix)) {
         block(substring(startIndex = prefix.length, endIndex = length - suffix.length))
