@@ -104,7 +104,7 @@ class CodeforcesAccountManager :
             HandleColor.YELLOW -> Color(0xFFBBBB00)
             HandleColor.ORANGE -> Color(0xFFFF8C00)
             HandleColor.RED -> Color(0xFFFF0000)
-            else -> throw UnknownHandleColorException(handleColor, this)
+            else -> illegalHandleColorError(handleColor)
         }
 
     private fun CodeforcesColorTag.toHandleColor(): HandleColor? =

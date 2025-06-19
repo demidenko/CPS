@@ -66,10 +66,8 @@ abstract class RatedAccountManager<U: RatedUserInfo>(): AccountManager<U>() {
 
 }
 
-
-class UnknownHandleColorException(color: HandleColor, manager: RatedAccountManager<*>):
-    IllegalArgumentException("Manager ${manager.type.name} does not support color ${color.name}")
-
+fun RatedAccountManager<*>.illegalHandleColorError(handleColor: HandleColor): Nothing =
+    throw IllegalArgumentException("Manager ${type.name} does not support color ${handleColor.name}")
 
 interface RatingRevolutionsProvider {
     //list of (last time, bounds)

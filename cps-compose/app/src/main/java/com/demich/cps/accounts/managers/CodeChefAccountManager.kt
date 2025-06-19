@@ -101,7 +101,7 @@ class CodeChefAccountManager :
             HandleColor.YELLOW -> Color(255, 191, 0)
             HandleColor.ORANGE -> Color(255, 127, 0)
             HandleColor.RED -> Color(208,1,27)
-            else -> throw UnknownHandleColorException(handleColor, this)
+            else -> illegalHandleColorError(handleColor)
         }
 
     override val rankedHandleColorsList = HandleColor.rankedCodeChef

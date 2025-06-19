@@ -75,7 +75,7 @@ class DmojAccountManager :
             HandleColor.VIOLET -> Color(0xFF800080)
             HandleColor.ORANGE -> Color(0xFFFFB100)
             HandleColor.RED -> Color(0xFFEE0000)
-            else -> throw UnknownHandleColorException(handleColor, this)
+            else -> illegalHandleColorError(handleColor)
         }
 
     override fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString {
