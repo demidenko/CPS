@@ -73,7 +73,7 @@ object CodeforcesApi: PlatformApi {
                 if (exception !is ResponseException) return@handleResponseExceptionWithRequest
                 val response = exception.response
                 json.runCatching { decodeFromString<CodeforcesAPIErrorResponse>(response.bodyAsText()) }
-                    .onSuccess { throw it.mapOrThis() }
+                    .onSuccess { throw it.toApiException() }
                     .onFailure { throw exception }
             }
         }
@@ -290,11 +290,6 @@ object CodeforcesApi: PlatformApi {
         recent("recent-actions"),
         groups("groups")
     }
-}
-
-
-abstract class CodeforcesApiException(message: String?): Throwable(message) {
-    constructor(): this(null)
 }
 
 private enum class CodeforcesAPIStatus {
