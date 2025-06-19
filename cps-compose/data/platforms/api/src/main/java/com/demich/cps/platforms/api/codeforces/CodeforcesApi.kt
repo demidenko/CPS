@@ -82,8 +82,8 @@ object CodeforcesApi: PlatformApi {
                 1 per 1.seconds
             } else {
                 3 per 1.seconds
-                1 per 50.milliseconds
             }
+            1 per 50.milliseconds
         }
     }
 

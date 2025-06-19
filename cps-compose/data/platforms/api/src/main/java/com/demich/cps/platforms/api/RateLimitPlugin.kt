@@ -13,6 +13,7 @@ import kotlin.time.Duration.Companion.seconds
 internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::RateLimitPluginConfig) {
     val limits = pluginConfig.limits.also {
         if (it.isEmpty()) it.add(RateLimitPluginConfig.RateLimit(count = 3, window = 2.seconds))
+        it.removeUseless()
     }
 
     val maxWindow = limits.maxOf { it.window }
@@ -69,4 +70,19 @@ internal class RateLimitPluginConfig {
     infix fun Int.per(window: Duration) {
         limits.add(RateLimit(count = this, window = window))
     }
+}
+
+
+private fun MutableList<RateLimitPluginConfig.RateLimit>.removeUseless() {
+    //we need only nested items i.e. [a.count < b.count and a.window < b.window]
+    sortBy { it.count }
+    var sz = 0
+    forEach {
+        while (sz > 0 && get(sz - 1).run { count == it.count && window < it.window }) sz -= 1
+        if (sz == 0 || get(sz - 1).run { count < it.count && window < it.window}) {
+            set(sz, it)
+            sz += 1
+        }
+    }
+    while (size > sz) removeAt(lastIndex)
 }
