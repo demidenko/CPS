@@ -15,8 +15,7 @@ object ClistApi: PlatformApi {
 
         install(RateLimitPlugin) {
             // from https://clist.by/api/v4/doc/ #Throttle
-            window = 1.minutes
-            requestsPerWindow = 10
+            limits.add(10 per 1.minutes)
         }
     }
 

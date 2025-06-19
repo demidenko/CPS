@@ -7,38 +7,42 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 
 internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::RateLimitPluginConfig) {
-    val minDelay = pluginConfig.minimumDelay
-    val window = pluginConfig.window
-    val requestsPerWindow = pluginConfig.requestsPerWindow
+    val limits = pluginConfig.limits.also {
+        require(it.isNotEmpty()) { "No rate limits are set" }
+    }
+    val maxWindow = limits.maxOf { it.window }
 
     val mutex = Mutex()
     val recentRuns = ArrayDeque<Instant>()
 
-    fun runsInCurrentWindow(): Int {
+    fun canStartNew(rateLimit: RateLimitPluginConfig.RateLimit): Boolean {
+        val (count, window) = rateLimit
         val t = currentTime()
-        return recentRuns.count { it >= t - window }
+        val runsInCurrentWindow = recentRuns.count { it >= t - window }
+        return runsInCurrentWindow + 1 <= count
     }
 
     //TODO: do not delay on connection errors (no onResponse call)
     onRequest { request, _ ->
         mutex.withLock {
-            while (runsInCurrentWindow() + 1 > requestsPerWindow) {
-                while (recentRuns.isNotEmpty() && recentRuns.first() + window < currentTime()) {
+            while (limits.any { !canStartNew(it) }) {
+                // remove unnecessary
+                while (recentRuns.isNotEmpty() && recentRuns.first() + maxWindow < currentTime()) {
                     recentRuns.removeFirst()
                 }
-                recentRuns.firstOrNull()?.let {
-                    delay(it + window - currentTime())
+
+                limits.forEach {
+                    if (!canStartNew(it)) {
+                        recentRuns.firstOrNull()?.let { t ->
+                            delay(t + it.window - currentTime())
+                        }
+                    }
                 }
             }
-            recentRuns.lastOrNull()?.let { lastRun ->
-                val d = currentTime() - lastRun
-                delay(minDelay - d)
-            }
+
             recentRuns.addLast(currentTime())
         }
     }
@@ -49,9 +53,12 @@ internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::Ra
 }
 
 internal class RateLimitPluginConfig {
-    var minimumDelay: Duration = 50.milliseconds
-    var window: Duration = 1.seconds
-    var requestsPerWindow: Int = 3
+    val limits = mutableListOf<RateLimit>()
+
+    internal data class RateLimit(val count: Int, val window: Duration)
+
+    infix fun Int.per(window: Duration): RateLimit =
+        RateLimit(count = this, window = window)
 }
 
 private fun currentTime(): Instant = Clock.System.now()

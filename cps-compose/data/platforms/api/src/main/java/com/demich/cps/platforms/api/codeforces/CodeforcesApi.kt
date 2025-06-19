@@ -14,7 +14,6 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.platforms.api.cpsHttpClient
 import com.demich.cps.platforms.api.defaultJson
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
-import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.ResponseException
@@ -80,13 +79,10 @@ object CodeforcesApi: PlatformApi {
 
         install(RateLimitPlugin) {
             if (BuildConfig.DEBUG) {
-                window = 1.seconds
-                requestsPerWindow = 1
-                minimumDelay = 200.milliseconds
+                limits.add(1 per 1.seconds)
             } else {
-                window = 1.seconds
-                requestsPerWindow = 3
-                minimumDelay = 50.milliseconds
+                limits.add(3 per 1.seconds)
+                limits.add(1 per 50.milliseconds)
             }
         }
     }
