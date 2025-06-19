@@ -40,7 +40,8 @@ val allRatedAccountManagers: List<RatedAccountManager<out RatedUserInfo>>
 fun accountManagerOf(type: AccountManagerType) =
     allAccountManagers.first { it.type == type }
 
-abstract class AccountManager<U: UserInfo>(val type: AccountManagerType) {
+abstract class AccountManager<U: UserInfo> {
+    abstract val type: AccountManagerType
 
     abstract val userIdTitle: String
     abstract val urlHomePage: String

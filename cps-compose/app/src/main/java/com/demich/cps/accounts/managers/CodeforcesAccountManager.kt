@@ -45,11 +45,12 @@ import kotlinx.datetime.Instant
 
 
 class CodeforcesAccountManager :
-    RatedAccountManager<CodeforcesUserInfo>(AccountManagerType.codeforces),
+    RatedAccountManager<CodeforcesUserInfo>(),
     ProfileSettingsProvider,
     ProfileSuggestionsProvider,
     RatingRevolutionsProvider
 {
+    override val type get() = AccountManagerType.codeforces
     override val urlHomePage get() = CodeforcesApi.urls.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)

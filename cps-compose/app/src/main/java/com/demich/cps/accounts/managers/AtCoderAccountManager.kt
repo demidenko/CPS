@@ -23,10 +23,11 @@ import kotlinx.coroutines.flow.Flow
 
 
 class AtCoderAccountManager :
-    RatedAccountManager<AtCoderUserInfo>(AccountManagerType.atcoder),
+    RatedAccountManager<AtCoderUserInfo>(),
     ProfileSettingsProvider,
     ProfileSuggestionsProvider
 {
+    override val type get() = AccountManagerType.atcoder
     override val urlHomePage get() = AtCoderApi.urls.main
 
     override fun isValidForUserId(char: Char): Boolean = when(char) {

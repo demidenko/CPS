@@ -14,9 +14,10 @@ import com.demich.cps.ui.theme.CPSColors
 
 
 class ACMPAccountManager :
-    AccountManager<ACMPUserInfo>(AccountManagerType.acmp),
+    AccountManager<ACMPUserInfo>(),
     ProfileSuggestionsProvider
 {
+    override val type get() = AccountManagerType.acmp
     override val userIdTitle get() = "id"
     override val urlHomePage get() = ACMPApi.urls.main
 

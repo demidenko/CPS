@@ -41,13 +41,14 @@ import com.demich.kotlin_stdlib_boost.partitionIndex
 
 
 class CodeChefAccountManager :
-    RatedAccountManager<CodeChefUserInfo>(AccountManagerType.codechef),
+    RatedAccountManager<CodeChefUserInfo>(),
     ProfileSuggestionsProvider
 {
     companion object {
         private const val star = "★"
     }
 
+    override val type get() = AccountManagerType.codechef
     override val urlHomePage get() = CodeChefApi.urls.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)

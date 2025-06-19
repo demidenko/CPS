@@ -14,9 +14,7 @@ import com.demich.cps.accounts.userinfo.ratingToString
 import com.demich.cps.ui.theme.CPSColors
 import kotlinx.datetime.Instant
 
-abstract class RatedAccountManager<U: RatedUserInfo>(type: AccountManagerType):
-    AccountManager<U>(type)
-{
+abstract class RatedAccountManager<U: RatedUserInfo>(): AccountManager<U>() {
     override val userIdTitle get() = "handle"
 
     abstract val ratingsUpperBounds: List<HandleColorBound>

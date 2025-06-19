@@ -13,9 +13,10 @@ import com.demich.cps.ui.theme.CPSColors
 
 
 class TimusAccountManager :
-    AccountManager<TimusUserInfo>(AccountManagerType.timus),
+    AccountManager<TimusUserInfo>(),
     ProfileSuggestionsProvider
 {
+    override val type get() = AccountManagerType.timus
     override val userIdTitle get() = "id"
     override val urlHomePage get() = TimusApi.urls.main
 

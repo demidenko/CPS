@@ -21,9 +21,10 @@ import com.demich.cps.utils.append
 
 
 class DmojAccountManager :
-    RatedAccountManager<DmojUserInfo>(AccountManagerType.dmoj),
+    RatedAccountManager<DmojUserInfo>(),
     ProfileSuggestionsProvider
 {
+    override val type get() = AccountManagerType.dmoj
     override val urlHomePage get() = DmojApi.urls.main
 
     override fun isValidForUserId(char: Char): Boolean = when(char) {

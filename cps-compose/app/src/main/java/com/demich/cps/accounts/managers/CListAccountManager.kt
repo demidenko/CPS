@@ -12,9 +12,10 @@ import com.demich.cps.ui.theme.CPSColors
 
 
 class CListAccountManager :
-    AccountManager<ClistUserInfo>(AccountManagerType.clist),
+    AccountManager<ClistUserInfo>(),
     ProfileSuggestionsProvider
 {
+    override val type get() = AccountManagerType.clist
     override val userIdTitle = "login"
     override val urlHomePage = ClistApi.urls.main
 
