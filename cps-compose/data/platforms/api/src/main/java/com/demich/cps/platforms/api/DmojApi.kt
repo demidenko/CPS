@@ -3,15 +3,24 @@ package com.demich.cps.platforms.api
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
 import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.request.*
+import io.ktor.client.request.parameter
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.jsonObject
+import kotlin.time.Duration.Companion.seconds
 
 object DmojApi: PlatformApi {
     private val json get() = defaultJson
     override val client = cpsHttpClient(json = json) {
         defaultRequest {
             url(urls.main)
+        }
+
+        // https://docs.dmoj.ca/#/site/api?id=rate-limiting "90 requests per minute"
+        install(RateLimitPlugin) {
+            requestsPerWindow = 3
+            window = 2.seconds
         }
     }
 
