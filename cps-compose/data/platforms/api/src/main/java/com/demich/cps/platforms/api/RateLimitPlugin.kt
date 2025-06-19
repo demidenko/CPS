@@ -7,16 +7,20 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 
 internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::RateLimitPluginConfig) {
     val limits = pluginConfig.limits.also {
-        require(it.isNotEmpty()) { "No rate limits are set" }
+        if (it.isEmpty()) it.add(RateLimitPluginConfig.RateLimit(count = 3, window = 2.seconds))
     }
+
     val maxWindow = limits.maxOf { it.window }
 
     val mutex = Mutex()
     val recentRuns = ArrayDeque<Instant>()
+
+    fun currentTime(): Instant = Clock.System.now()
 
     fun canStartNew(rateLimit: RateLimitPluginConfig.RateLimit): Boolean {
         val (count, window) = rateLimit
@@ -53,12 +57,16 @@ internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::Ra
 }
 
 internal class RateLimitPluginConfig {
-    val limits = mutableListOf<RateLimit>()
+    internal val limits = mutableListOf<RateLimit>()
 
-    internal data class RateLimit(val count: Int, val window: Duration)
+    internal data class RateLimit(val count: Int, val window: Duration) {
+        init {
+            require(count > 0) { "count must be positive"}
+            require(window.isPositive()) { "window must be positive"}
+        }
+    }
 
-    infix fun Int.per(window: Duration): RateLimit =
-        RateLimit(count = this, window = window)
+    infix fun Int.per(window: Duration) {
+        limits.add(RateLimit(count = this, window = window))
+    }
 }
-
-private fun currentTime(): Instant = Clock.System.now()

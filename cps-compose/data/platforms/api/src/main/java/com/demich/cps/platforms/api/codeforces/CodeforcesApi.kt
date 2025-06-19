@@ -79,10 +79,10 @@ object CodeforcesApi: PlatformApi {
 
         install(RateLimitPlugin) {
             if (BuildConfig.DEBUG) {
-                limits.add(1 per 1.seconds)
+                1 per 1.seconds
             } else {
-                limits.add(3 per 1.seconds)
-                limits.add(1 per 50.milliseconds)
+                3 per 1.seconds
+                1 per 50.milliseconds
             }
         }
     }
