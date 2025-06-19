@@ -65,7 +65,7 @@ class DmojAccountManager :
         )
     }
 
-    override val rankedHandleColorsList = HandleColor.rankedDmoj
+    override val rankedHandleColors = HandleColor.rankedDmoj
 
     override fun originalColor(handleColor: HandleColor) =
         when (handleColor) {

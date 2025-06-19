@@ -104,7 +104,7 @@ class CodeChefAccountManager :
             else -> illegalHandleColorError(handleColor)
         }
 
-    override val rankedHandleColorsList = HandleColor.rankedCodeChef
+    override val rankedHandleColors = HandleColor.rankedCodeChef
 
     private fun getRatingStarNumber(rating: Int): Int {
         return ratingsUpperBounds.partitionIndex { rating >= it.ratingUpperBound } + 1

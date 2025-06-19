@@ -86,8 +86,8 @@ private fun <U: RatedUserInfo> RatedAccountManager<U>.getRank(profile: ProfileRe
     val rank = when (handleColor) {
         HandleColor.RED -> Double.POSITIVE_INFINITY
         else -> {
-            val i = rankedHandleColorsList.indexOfFirst { handleColor == it }
-            val j = rankedHandleColorsList.indexOfLast { handleColor == it }
+            val i = rankedHandleColors.indexOfFirst { handleColor == it }
+            val j = rankedHandleColors.indexOfLast { handleColor == it }
             val pos = ratingsUpperBounds.indexOfFirst { it.handleColor == handleColor }
             check(i != -1 && j >= i && pos != -1)
             val lower = if (pos > 0) ratingsUpperBounds[pos-1].ratingUpperBound else 0

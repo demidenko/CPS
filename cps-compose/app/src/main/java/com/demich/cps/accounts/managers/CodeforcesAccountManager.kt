@@ -92,7 +92,7 @@ class CodeforcesAccountManager :
         }
     }
 
-    override val rankedHandleColorsList = HandleColor.rankedCodeforces
+    override val rankedHandleColors = HandleColor.rankedCodeforces
 
     override fun originalColor(handleColor: HandleColor): Color =
         when (handleColor) {

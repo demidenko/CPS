@@ -66,7 +66,7 @@ class AtCoderAccountManager :
         )
     }
 
-    override val rankedHandleColorsList = HandleColor.rankedAtCoder
+    override val rankedHandleColors = HandleColor.rankedAtCoder
 
     override fun originalColor(handleColor: HandleColor): Color =
         when (handleColor) {
