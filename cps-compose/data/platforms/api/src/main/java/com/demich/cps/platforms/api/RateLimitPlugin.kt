@@ -23,29 +23,25 @@ internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::Ra
 
     fun currentTime(): Instant = Clock.System.now()
 
-    fun canStartNew(rateLimit: RateLimitPluginConfig.RateLimit): Boolean {
+    fun executionAllowed(rateLimit: RateLimitPluginConfig.RateLimit): Boolean {
         val (count, window) = rateLimit
         val t = currentTime()
         val runsInCurrentWindow = recentRuns.count { it >= t - window }
-        return runsInCurrentWindow + 1 <= count
+        return runsInCurrentWindow < count
     }
 
     //TODO: do not delay on connection errors (no onResponse call)
     onRequest { request, _ ->
         mutex.withLock {
-            while (limits.any { !canStartNew(it) }) {
+            while (true) {
                 // remove unnecessary
                 while (recentRuns.isNotEmpty() && recentRuns.first() + maxWindow < currentTime()) {
                     recentRuns.removeFirst()
                 }
 
-                limits.forEach {
-                    if (!canStartNew(it)) {
-                        recentRuns.firstOrNull()?.let { t ->
-                            delay(t + it.window - currentTime())
-                        }
-                    }
-                }
+                val t = recentRuns.firstOrNull() ?: break
+                val limit = limits.firstOrNull { !executionAllowed(it) } ?: break
+                delay(t + limit.window - currentTime())
             }
 
             recentRuns.addLast(currentTime())
