@@ -3,11 +3,9 @@ package com.demich.cps.platforms.api.codeforces
 import kotlinx.serialization.Serializable
 
 @Serializable
-class CodeforcesAPIErrorResponse internal constructor(
-    private val comment: String
-): CodeforcesApiException(comment) {
+internal class CodeforcesAPIErrorResponse(private val comment: String): CodeforcesApiException(comment) {
 
-    internal fun mapOrThis(): CodeforcesApiException {
+    fun mapOrThis(): CodeforcesApiException {
         if (isCallLimitExceeded()) return CodeforcesApiCallLimitExceededException(comment)
 
         ifIsHandleNotFound { return CodeforcesApiHandleNotFoundException(comment, handle = it) }
