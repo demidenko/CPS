@@ -24,27 +24,24 @@ val CodeforcesComment.commentator: CodeforcesHandle
     )
 
 
-private fun Element.extractColorTag(): CodeforcesColorTag {
-    val str = runCatching {
-        classNames()
-            .first { name -> name.startsWith("user-") }
-            .removePrefix("user-")
-            .uppercase(Locale.ENGLISH)
-    }.getOrElse {
-        return CodeforcesColorTag.BLACK
-    }
+private fun Element.extractColorTag(): CodeforcesColorTag? {
+    val str = classNames()
+        .firstOrNull { name -> name.startsWith("user-") }
+        ?.removePrefix("user-")
+        ?.uppercase(Locale.ENGLISH)
+        ?: return null
 
     return kotlin.runCatching {
         enumValueOf<CodeforcesColorTag>(str)
     }.getOrElse {
         str.toIntOrNull()?.let {
             CodeforcesUtils.colorTagFrom(it)
-        } ?: CodeforcesColorTag.BLACK
+        }
     }
 }
 
 internal fun Element.extractRatedUser(): CodeforcesHandle =
     CodeforcesHandle(
         handle = text(),
-        colorTag = extractColorTag()
+        colorTag = extractColorTag() ?: CodeforcesColorTag.BLACK
     )
