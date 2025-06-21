@@ -38,7 +38,7 @@ data class CodeforcesUser(
     val rating: Int? = null,
 
     // User contribution
-    val contribution: Int = 0,
+    val contribution: Int,
 
     // Time, when user was last seen online, in unix format
     @SerialName("lastOnlineTimeSeconds")
