@@ -143,7 +143,7 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
 ) = edit { prefs ->
     prefs[contestInfo] = standings.contest
 
-    val row = standings.rows.find { row -> row.party.participantType.contestParticipant() }
+    val row = standings.rows.find { row -> row.party.participantType.isContestParticipant() }
     val results = row?.problemResults
     prefs[problemResults] = standings.problems.mapIndexed { index, problem ->
         val result = results?.getOrNull(index)
@@ -239,7 +239,7 @@ private fun needCheckSubmissions(
     contestInfo: CodeforcesContest,
     participationType: CodeforcesParticipationType
 ): Boolean {
-    if (!participationType.contestParticipant()) return false
+    if (!participationType.isContestParticipant()) return false
     if (contestInfo.type == CodeforcesContestType.ICPC) return false
     return contestInfo.phase.isSystemTestOrFinished()
 }
@@ -269,7 +269,7 @@ private suspend fun getSubmissionsOrNull(contestId: Int, handle: String): List<C
         getContestSubmissions(contestId = contestId, handle = handle)
     }.map { submissions ->
         submissions.filter {
-               it.author.participantType.contestParticipant()
+               it.author.participantType.isContestParticipant()
             && it.verdict != CodeforcesProblemVerdict.SKIPPED
         }
     }.getOrNull() //TODO: take this failure

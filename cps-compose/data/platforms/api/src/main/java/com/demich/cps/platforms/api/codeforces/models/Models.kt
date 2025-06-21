@@ -257,7 +257,8 @@ enum class CodeforcesParticipationType {
     NOT_PARTICIPATED,
     CONTESTANT, PRACTICE, VIRTUAL, MANAGER, OUT_OF_COMPETITION;
 
-    fun contestParticipant(): Boolean = (this == CONTESTANT || this == OUT_OF_COMPETITION)
+    fun isContestParticipant(): Boolean =
+        this == CONTESTANT || this == OUT_OF_COMPETITION
 }
 
 enum class CodeforcesProblemStatus {
@@ -270,7 +271,11 @@ enum class CodeforcesProblemVerdict {
     SKIPPED, TESTING, REJECTED
     ;
 
-    fun isResult(): Boolean = (this != WAITING && this != TESTING && this != SKIPPED)
+    fun isResult(): Boolean =
+        when (this) {
+            WAITING, TESTING, SKIPPED -> false
+            else -> true
+        }
 }
 
 enum class CodeforcesTestset {
