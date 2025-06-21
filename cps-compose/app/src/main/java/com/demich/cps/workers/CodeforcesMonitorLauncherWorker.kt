@@ -81,19 +81,19 @@ class CodeforcesMonitorLauncherWorker(
         var from = 1L
         var step = 1L
         while (true) {
-            var something = false
+            var flagBreak = false
             CodeforcesApi.getUserSubmissions(handle = handle, from = from, count = step)
+                .also { if (it.isEmpty()) flagBreak = true }
                 .forEach {
                     if (isActual(it.creationTime) && (lastSubmissionId == null || it.id > lastSubmissionId)) {
-                        something = true
                         if (first == null) first = it
                         if (predicate(it)) return Pair(it, first)
                     } else {
-                        // TODO: break on false (also check empty list)
+                        flagBreak = true
                     }
                 }
 
-            if (!something) break
+            if (flagBreak) break
 
             from += step
             step += 10
