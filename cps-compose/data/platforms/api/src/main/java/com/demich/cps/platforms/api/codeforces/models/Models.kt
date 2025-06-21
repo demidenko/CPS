@@ -33,9 +33,15 @@ enum class CodeforcesColorTag {
 
 @Serializable
 data class CodeforcesUser(
+    // Codeforces user handle.
     val handle: String,
+
     val rating: Int? = null,
+
+    // User contribution.
     val contribution: Int = 0,
+
+    // Time, when user was last seen online, in unix format.
     @SerialName("lastOnlineTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val lastOnlineTime: Instant = Instant.DISTANT_PAST
@@ -44,12 +50,21 @@ data class CodeforcesUser(
 @Serializable
 data class CodeforcesContest(
     val id: Int,
+
+    // Localized.
     val name: String,
+
     val phase: CodeforcesContestPhase,
+
+    // Scoring system used for the contest.
     val type: CodeforcesContestType,
+
+    // Duration of the contest in seconds.
     @SerialName("durationSeconds")
     @Serializable(with = DurationAsSecondsSerializer::class)
     val duration: Duration,
+
+    // Contest start time in unix format. Can be absent.
     @SerialName("startTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val startTime: Instant
@@ -71,17 +86,28 @@ data class CodeforcesContestStandings(
 
     @Serializable
     data class CodeforcesContestParticipant(
+        // Id of the contest, in which party is participating. Can be absent.
         val contestId: Int,
+
         val participantType: CodeforcesParticipationType,
+
+        // Members of the party.
         val members: List<CodeforcesUser>
     )
 }
 
 @Serializable
 data class CodeforcesProblem(
+    // Localized.
     val name: String,
+
+    // Usually, a letter or letter with digit(s) indicating the problem index in a contest.
     val index: String,
+
+    // Id of the contest, containing the problem. Can be absent.
     val contestId: Int = -1,
+
+    // Maximum amount of points for the problem. Can be absent.
     val points: Double = 0.0
 ) {
     val problemId: String get() = "$contestId$index"
@@ -124,11 +150,23 @@ data class CodeforcesBlogEntry(
 @Serializable
 data class CodeforcesRatingChange(
     val contestId: Int,
+
+    // Localized.
     val contestName: String,
+
+    // Codeforces user handle.
     val handle: String,
+
+    // Place of the user in the contest.
     val rank: Int,
+
+    // User rating before the contest.
     val oldRating: Int,
+
+    // User rating after the contest.
     val newRating: Int,
+
+    // Time, when rating for the contest was update, in unix-format.
     @SerialName("ratingUpdateTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val ratingUpdateTime: Instant
@@ -149,10 +187,15 @@ data class CodeforcesComment(
 
 @Serializable
 data class CodeforcesRecentAction(
+    // Action time, in unix format.
     @SerialName("timeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val time: Instant,
+
+    // BlogEntry in short form. Can be absent.
     val blogEntry: CodeforcesBlogEntry? = null,
+
+    // Can be absent.
     val comment: CodeforcesComment? = null
 )
 
