@@ -67,13 +67,6 @@ class CodeforcesCommunityLostRecentWorker(
     override suspend fun runWork(): Result {
         val settings = context.settingsCommunity
 
-        val lastNotNewIdItem = settings.codeforcesLostHintNotNew.apply {
-            //ensure hint in case isNew logic changes
-            update {
-                if (it == null || !isNew(it.creationTime)) it else null
-            }
-        }
-
         val locale = settings.codeforcesLocale()
         val minRatingColorTag = settings.codeforcesLostMinRatingTag()
 
@@ -90,7 +83,7 @@ class CodeforcesCommunityLostRecentWorker(
             locale = locale,
             minRatingColorTag = minRatingColorTag,
             isNew = ::isNew,
-            lastNotNewIdItem = lastNotNewIdItem
+            lastNotNewIdItem = settings.codeforcesLostHintNotNew
         ) {
             dao.insert(
                 CodeforcesLostBlogEntry(
@@ -188,6 +181,17 @@ private suspend inline fun findSuspects(
         }
     }
 
+    val hint = lastNotNewIdItem.let { item ->
+        val hint = item()
+        //ensure hint in case isNew logic changes
+        if (hint != null && isNew(hint.creationTime)) {
+            item.invoke(newValue = null)
+            null
+        } else {
+            hint
+        }
+    }
+
     /*
     These 3 filters can be in arbitrary order but
     .filterIdGreaterThen should be before .filterNewEntries
@@ -200,7 +204,7 @@ private suspend inline fun findSuspects(
      */
     blogEntries
         // TODO: `.invoke()` instead of `()` https://youtrack.jetbrains.com/issue/KT-74111/
-        .filterIdGreaterThan(lastNotNewIdItem.invoke()?.blogEntryId ?: Int.MIN_VALUE)
+        .filterIdGreaterThan(hint?.blogEntryId ?: Int.MIN_VALUE)
         .fixAndFilterColorTag(minRatingColorTag)
         .also {
             if (it.size > 1) cachedApi.useRecentActions()
