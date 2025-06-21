@@ -208,7 +208,7 @@ private suspend inline fun findSuspects(
             val blogEntry = it.copy(
                 creationTime = cachedApi.getCreationTime(blogEntryId = it.id),
                 rating = 0,
-                commentsCount = 0
+                commentsCount = null
             )
             onSuspect(blogEntry)
         }

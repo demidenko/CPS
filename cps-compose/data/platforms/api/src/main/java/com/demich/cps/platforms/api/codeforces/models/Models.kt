@@ -172,7 +172,7 @@ data class CodeforcesBlogEntry(
 
     val rating: Int,
 
-    val commentsCount: Int = 0,
+    val commentsCount: Int? = null,
 
     val authorColorTag: CodeforcesColorTag = CodeforcesColorTag.BLACK
 )

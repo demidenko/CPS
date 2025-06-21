@@ -94,7 +94,7 @@ private fun BlogEntryInfo(
         title = blogEntry.title,
         authorHandle = blogEntry.author.toHandleSpan(),
         rating = blogEntry.rating,
-        commentsCount = blogEntry.commentsCount,
+        commentsCount = blogEntry.commentsCount ?: 0,
         timeAgo = blogEntry.creationTime.toTimeAgoString(),
         markNew = markNew,
         label = label,
