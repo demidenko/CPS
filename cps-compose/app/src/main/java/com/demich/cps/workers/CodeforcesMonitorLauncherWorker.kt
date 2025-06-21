@@ -47,7 +47,7 @@ class CodeforcesMonitorLauncherWorker(
                 handle = info.handle,
                 lastSubmissionId = monitorLastSubmissionId()
             ) { submission ->
-                submission.author.participantType.isContestParticipant()
+                submission.author.isContestParticipant()
             }
 
             firstParticipation?.let { submission ->

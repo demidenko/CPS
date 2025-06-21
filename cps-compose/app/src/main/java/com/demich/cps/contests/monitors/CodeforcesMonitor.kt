@@ -143,7 +143,7 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
 ) = edit { prefs ->
     prefs[contestInfo] = standings.contest
 
-    val row = standings.rows.find { row -> row.party.participantType.isContestParticipant() }
+    val row = standings.rows.find { row -> row.party.isContestParticipant() }
     val results = row?.problemResults
     prefs[problemResults] = standings.problems.mapIndexed { index, problem ->
         val result = results?.getOrNull(index)
@@ -269,7 +269,7 @@ private suspend fun getSubmissionsOrNull(contestId: Int, handle: String): List<C
         getContestSubmissions(contestId = contestId, handle = handle)
     }.map { submissions ->
         submissions.filter {
-               it.author.participantType.isContestParticipant()
+               it.author.isContestParticipant()
             && it.verdict != CodeforcesProblemVerdict.SKIPPED
         }
     }.getOrNull() //TODO: take this failure

@@ -92,7 +92,9 @@ data class CodeforcesContestStandings(
     @Serializable
     data class CodeforcesContestParticipant(
         val participantType: CodeforcesParticipationType
-    )
+    ) {
+        fun isContestParticipant() = participantType.isContestParticipant()
+    }
 }
 
 @Serializable
