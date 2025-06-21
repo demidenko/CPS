@@ -148,7 +148,8 @@ object CodeforcesUtils {
                     title = blogEntryTitle,
                     authorHandle = blogEntryAuthor.handle,
                     authorColorTag = blogEntryAuthor.colorTag,
-                    creationTime = Instant.DISTANT_PAST
+                    creationTime = Instant.DISTANT_PAST,
+                    rating = 0
                 )
             )
         }.getOrNull()
@@ -168,7 +169,8 @@ object CodeforcesUtils {
                 title = blogEntryTitle,
                 authorHandle = author.handle,
                 authorColorTag = author.colorTag,
-                creationTime = Instant.DISTANT_PAST
+                creationTime = Instant.DISTANT_PAST,
+                rating = 0
             )
         }.getOrNull()
     }

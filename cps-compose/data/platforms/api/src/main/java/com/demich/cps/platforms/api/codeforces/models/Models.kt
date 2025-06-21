@@ -170,7 +170,7 @@ data class CodeforcesBlogEntry(
     @Serializable(with = InstantAsSecondsSerializer::class)
     val creationTime: Instant,
 
-    val rating: Int = 0,
+    val rating: Int,
 
     val commentsCount: Int = 0,
 
