@@ -113,7 +113,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                 colorResId = R.color.fail
             }
             val problemName = "${submission.contestId}${submission.problem.index}"
-            val result = submission.makeVerdict()
+            val result = submission.verdictString()
             contentTitle = "Problem $problemName: $result"
             subText = "Codeforces system testing result"
             time = null
@@ -121,3 +121,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
             url = CodeforcesApi.urls.submission(submission)
         }
 }
+
+private fun CodeforcesSubmission.verdictString() =
+    if (verdict == CodeforcesProblemVerdict.OK) "OK"
+    else "${verdict.name} #${passedTestCount+1}"

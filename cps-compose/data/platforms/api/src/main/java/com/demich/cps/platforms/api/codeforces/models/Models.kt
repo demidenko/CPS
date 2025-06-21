@@ -106,12 +106,7 @@ data class CodeforcesSubmission(
     @Serializable(with = InstantAsSecondsSerializer::class)
     val creationTime: Instant,
     val testset: CodeforcesTestset
-) {
-    fun makeVerdict(): String {
-        if (verdict == CodeforcesProblemVerdict.OK) return "OK"
-        return "${verdict.name} #${passedTestCount+1}"
-    }
-}
+)
 
 @Serializable
 data class CodeforcesBlogEntry(
