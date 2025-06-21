@@ -66,10 +66,6 @@ class CodeforcesCommunityLostRecentWorker(
 
     override suspend fun runWork(): Result {
         val settings = context.settingsCommunity
-        val dao = context.lostBlogEntriesDao
-
-        val locale = settings.codeforcesLocale()
-        val minRatingColorTag = settings.codeforcesLostMinRatingTag()
 
         val lastNotNewIdItem = settings.codeforcesLostHintNotNew.apply {
             //ensure hint in case isNew logic changes
@@ -78,9 +74,13 @@ class CodeforcesCommunityLostRecentWorker(
             }
         }
 
+        val locale = settings.codeforcesLocale()
+        val minRatingColorTag = settings.codeforcesLostMinRatingTag()
+
         val recentBlogEntries = getRecentBlogEntries(locale = locale)
         //TODO: use api.recentActions on fail but !![only for findSuspects step]!!
 
+        val dao = context.lostBlogEntriesDao
         //get current suspects with removing old ones
         val suspects = dao.getSuspectsRemoveOld(minRatingColorTag)
 
