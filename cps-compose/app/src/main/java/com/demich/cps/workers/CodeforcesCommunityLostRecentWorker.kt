@@ -71,6 +71,13 @@ class CodeforcesCommunityLostRecentWorker(
         val locale = settings.codeforcesLocale()
         val minRatingColorTag = settings.codeforcesLostMinRatingTag()
 
+        val lastNotNewIdItem = settings.codeforcesLostHintNotNew.apply {
+            //ensure hint in case isNew logic changes
+            update {
+                if (it == null || !isNew(it.creationTime)) it else null
+            }
+        }
+
         val recentBlogEntries = getRecentBlogEntries(locale = locale)
         //TODO: use api.recentActions on fail but !![only for findSuspects step]!!
 
@@ -83,7 +90,7 @@ class CodeforcesCommunityLostRecentWorker(
             locale = locale,
             minRatingColorTag = minRatingColorTag,
             isNew = ::isNew,
-            lastNotNewIdItem = settings.codeforcesLostHintNotNew
+            lastNotNewIdItem = lastNotNewIdItem
         ) {
             dao.insert(
                 CodeforcesLostBlogEntry(
@@ -170,11 +177,6 @@ private suspend inline fun findSuspects(
     lastNotNewIdItem: DataStoreItem<CodeforcesLostHint?>,
     onSuspect: (CodeforcesBlogEntry) -> Unit
 ) {
-    //ensure hint in case isNew logic changes
-    lastNotNewIdItem.update {
-        if (it == null || !isNew(it.creationTime)) it else null
-    }
-
     val cachedApi = CachedBlogEntryApi(locale = locale) { blogEntry ->
         val time = blogEntry.creationTime
         if (!isNew(time)) {
