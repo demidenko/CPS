@@ -43,7 +43,7 @@ data class CodeforcesUser(
     // Time, when user was last seen online, in unix format
     @SerialName("lastOnlineTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
-    val lastOnlineTime: Instant = Instant.DISTANT_PAST
+    val lastOnlineTime: Instant
 )
 
 @Serializable
