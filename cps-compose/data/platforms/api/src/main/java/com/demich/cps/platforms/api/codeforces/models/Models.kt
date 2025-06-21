@@ -94,9 +94,6 @@ data class CodeforcesContestStandings(
 
     @Serializable
     data class CodeforcesContestParticipant(
-        // Id of the contest, in which party is participating. Can be absent.
-        val contestId: Int = -1,
-
         val participantType: CodeforcesParticipationType,
 
         // Members of the party
