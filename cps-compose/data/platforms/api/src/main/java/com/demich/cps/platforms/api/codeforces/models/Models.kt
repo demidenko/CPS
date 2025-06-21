@@ -28,20 +28,19 @@ enum class CodeforcesColorTag {
     RED,
     LEGENDARY,
     ADMIN
-    ;
 }
 
 @Serializable
 data class CodeforcesUser(
-    // Codeforces user handle.
+    // Codeforces user handle
     val handle: String,
 
     val rating: Int? = null,
 
-    // User contribution.
+    // User contribution
     val contribution: Int = 0,
 
-    // Time, when user was last seen online, in unix format.
+    // Time, when user was last seen online, in unix format
     @SerialName("lastOnlineTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val lastOnlineTime: Instant = Instant.DISTANT_PAST
@@ -51,15 +50,15 @@ data class CodeforcesUser(
 data class CodeforcesContest(
     val id: Int,
 
-    // Localized.
+    // Localized
     val name: String,
 
     val phase: CodeforcesContestPhase,
 
-    // Scoring system used for the contest.
+    // Scoring system used for the contest
     val type: CodeforcesContestType,
 
-    // Duration of the contest in seconds.
+    // Duration of the contest in seconds
     @SerialName("durationSeconds")
     @Serializable(with = DurationAsSecondsSerializer::class)
     val duration: Duration,
@@ -73,14 +72,23 @@ data class CodeforcesContest(
 @Serializable
 data class CodeforcesContestStandings(
     val contest: CodeforcesContest,
+
     val problems: List<CodeforcesProblem>,
+
     val rows: List<CodeforcesContestStandingsRow>
 ) {
     @Serializable
     data class CodeforcesContestStandingsRow(
+        // Party place in the contest
         val rank: Int,
+
+        // Total amount of points, scored by the party
         val points: Double,
+
+        // Party that took a corresponding place in the contest
         val party: CodeforcesContestParticipant,
+
+        // Party results for each problem. Order of the problems is the same as in "problems" field of the returned object
         val problemResults: List<CodeforcesProblemResult>
     )
 
@@ -91,17 +99,17 @@ data class CodeforcesContestStandings(
 
         val participantType: CodeforcesParticipationType,
 
-        // Members of the party.
+        // Members of the party
         val members: List<CodeforcesUser>
     )
 }
 
 @Serializable
 data class CodeforcesProblem(
-    // Localized.
+    // Localized
     val name: String,
 
-    // Usually, a letter or letter with digit(s) indicating the problem index in a contest.
+    // Usually, a letter or letter with digit(s) indicating the problem index in a contest
     val index: String,
 
     // Id of the contest, containing the problem. Can be absent.
@@ -116,34 +124,59 @@ data class CodeforcesProblem(
 @Serializable
 data class CodeforcesProblemResult(
     val points: Double,
+
+    // If type is PRELIMINARY then points can decrease (if, for example, solution will fail during system test). Otherwise, party can only increase points for this problem by submitting better solutions
     val type: CodeforcesProblemStatus,
+
+    // Number of incorrect submissions
     val rejectedAttemptCount: Int
 )
 
 @Serializable
 data class CodeforcesSubmission(
+    // Can be absent.
     val contestId: Int,
+
     val problem: CodeforcesProblem,
+
     val author: CodeforcesContestStandings.CodeforcesContestParticipant,
+
+    // Can be absent.
     val verdict: CodeforcesProblemVerdict = CodeforcesProblemVerdict.WAITING,
+
+    // Number of passed tests
     val passedTestCount: Int,
+
     val id: Long,
+
+    // Time, when submission was created, in unix-format
     @SerialName("creationTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val creationTime: Instant,
+
+    // Testset used for judging the submission
     val testset: CodeforcesTestset
 )
 
 @Serializable
 data class CodeforcesBlogEntry(
     val id: Int,
+
+    // Localized
     val title: String,
+
+    // Author user handle
     val authorHandle: String,
+
+    // Time, when blog entry was created, in unix format
     @SerialName("creationTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val creationTime: Instant,
+
     val rating: Int = 0,
+
     val commentsCount: Int = 0,
+
     val authorColorTag: CodeforcesColorTag = CodeforcesColorTag.BLACK
 )
 
@@ -151,22 +184,22 @@ data class CodeforcesBlogEntry(
 data class CodeforcesRatingChange(
     val contestId: Int,
 
-    // Localized.
+    // Localized
     val contestName: String,
 
-    // Codeforces user handle.
+    // Codeforces user handle
     val handle: String,
 
-    // Place of the user in the contest.
+    // Place of the user in the contest. This field contains user rank on the moment of rating update. If afterwards rank changes (e.g. someone get disqualified), this field will not be update and will contain old rank
     val rank: Int,
 
-    // User rating before the contest.
+    // User rating before the contest
     val oldRating: Int,
 
-    // User rating after the contest.
+    // User rating after the contest
     val newRating: Int,
 
-    // Time, when rating for the contest was update, in unix-format.
+    // Time, when rating for the contest was update, in unix-format
     @SerialName("ratingUpdateTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val ratingUpdateTime: Instant
@@ -175,24 +208,30 @@ data class CodeforcesRatingChange(
 @Serializable
 data class CodeforcesComment(
     val id: Long,
+
+    // Time, when comment was created, in unix format
     @SerialName("creationTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val creationTime: Instant,
+
     val commentatorHandle: String,
+
     @SerialName("text")
     val html: String,
+
     val rating: Int,
+
     val commentatorHandleColorTag: CodeforcesColorTag = CodeforcesColorTag.BLACK
 )
 
 @Serializable
 data class CodeforcesRecentAction(
-    // Action time, in unix format.
+    // Action time, in unix format
     @SerialName("timeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val time: Instant,
 
-    // BlogEntry in short form. Can be absent.
+    // In short form. Can be absent.
     val blogEntry: CodeforcesBlogEntry? = null,
 
     // Can be absent.
