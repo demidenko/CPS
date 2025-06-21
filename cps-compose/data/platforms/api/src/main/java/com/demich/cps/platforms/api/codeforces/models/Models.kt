@@ -94,10 +94,7 @@ data class CodeforcesContestStandings(
 
     @Serializable
     data class CodeforcesContestParticipant(
-        val participantType: CodeforcesParticipationType,
-
-        // Members of the party
-        val members: List<CodeforcesUser>
+        val participantType: CodeforcesParticipationType
     )
 }
 
