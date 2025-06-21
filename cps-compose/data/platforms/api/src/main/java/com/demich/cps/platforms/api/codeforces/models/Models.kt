@@ -33,9 +33,15 @@ enum class CodeforcesColorTag {
 
 @Serializable
 data class CodeforcesUser(
+    // Codeforces user handle.
     val handle: String,
+
     val rating: Int? = null,
+
+    // User contribution.
     val contribution: Int = 0,
+
+    // Time, when user was last seen online, in unix format.
     @SerialName("lastOnlineTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val lastOnlineTime: Instant = Instant.DISTANT_PAST
@@ -71,8 +77,12 @@ data class CodeforcesContestStandings(
 
     @Serializable
     data class CodeforcesContestParticipant(
+        // Id of the contest, in which party is participating. Can be absent.
         val contestId: Int,
+
         val participantType: CodeforcesParticipationType,
+
+        // Members of the party.
         val members: List<CodeforcesUser>
     )
 }
@@ -149,10 +159,15 @@ data class CodeforcesComment(
 
 @Serializable
 data class CodeforcesRecentAction(
+    // Action time, in unix format.
     @SerialName("timeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val time: Instant,
+
+    // BlogEntry in short form. Can be absent.
     val blogEntry: CodeforcesBlogEntry? = null,
+
+    // Can be absent.
     val comment: CodeforcesComment? = null
 )
 
