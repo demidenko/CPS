@@ -82,9 +82,6 @@ data class CodeforcesContestStandings(
         // Party place in the contest
         val rank: Int,
 
-        // Total amount of points, scored by the party
-        val points: Double,
-
         // Party that took a corresponding place in the contest
         val party: CodeforcesContestParticipant,
 
@@ -117,10 +114,7 @@ data class CodeforcesProblemResult(
     val points: Double,
 
     // If type is PRELIMINARY then points can decrease (if, for example, solution will fail during system test). Otherwise, party can only increase points for this problem by submitting better solutions
-    val type: CodeforcesProblemStatus,
-
-    // Number of incorrect submissions
-    val rejectedAttemptCount: Int
+    val type: CodeforcesProblemStatus
 )
 
 @Serializable
