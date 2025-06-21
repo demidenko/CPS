@@ -113,10 +113,7 @@ data class CodeforcesProblem(
     val index: String,
 
     // Id of the contest, containing the problem. Can be absent.
-    val contestId: Int = -1,
-
-    // Maximum amount of points for the problem. Can be absent.
-    val points: Double = 0.0
+    val contestId: Int = -1
 ) {
     val problemId: String get() = "$contestId$index"
 }
