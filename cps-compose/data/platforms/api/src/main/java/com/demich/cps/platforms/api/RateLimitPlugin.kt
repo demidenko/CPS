@@ -11,9 +11,9 @@ import kotlin.time.Duration.Companion.seconds
 
 
 internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::RateLimitPluginConfig) {
-    val limits = pluginConfig.limits.also {
+    val limits = pluginConfig.limits.let {
         if (it.isEmpty()) it.add(RateLimitPluginConfig.RateLimit(count = 3, window = 2.seconds))
-        it.removeUseless()
+        removeUseless(it)
     }
 
     val maxWindow = limits.maxOf { it.window }
@@ -70,25 +70,27 @@ internal class RateLimitPluginConfig {
     }
 }
 
+private fun RateLimitPluginConfig.RateLimit.isUselessIf(other: RateLimitPluginConfig.RateLimit): Boolean {
+    if (window <= other.window && count >= other.count) {
+        return true
+    }
+    if (count % other.count == 0) {
+        // [10 per minute] is useless if there are [1 per 7 seconds]
+        val k = count / other.count
+        return window <= other.window * k
+    }
+    // TODO: if (window % other.window == 0)
+    return false
+}
 
-private fun MutableList<RateLimitPluginConfig.RateLimit>.removeUseless() {
-    // we need only nested items i.e. [a.count < b.count and a.window < b.window]
-    // additionally check fractions i.e. [10 per minute] is useless if there are [1 per 7 seconds]
-    sortBy { it.count }
-    var sz = 0
-    forEach {
-        while (sz > 0 && get(sz - 1).run { count == it.count && window < it.window }) sz -= 1
-        repeat(sz) { index ->
-            val item = get(index)
-            if (it.count % item.count == 0) {
-                val k = it.count / item.count
-                if (item.window * k > it.window) return@forEach
+
+private fun removeUseless(limits: List<RateLimitPluginConfig.RateLimit>) =
+    buildList {
+        limits.forEachIndexed { index, limit ->
+            if (none { limit.isUselessIf(it) }) {
+                if((index+1 until limits.size).none { limit.isUselessIf(limits[it]) }) {
+                    add(limit)
+                }
             }
         }
-        if (sz == 0 || get(sz - 1).run { count < it.count && window < it.window}) {
-            set(sz, it)
-            sz += 1
-        }
     }
-    while (size > sz) removeAt(lastIndex)
-}
