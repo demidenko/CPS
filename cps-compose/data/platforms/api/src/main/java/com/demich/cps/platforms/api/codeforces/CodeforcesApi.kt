@@ -85,7 +85,7 @@ object CodeforcesApi: PlatformApi {
     }
 
     class CodeforcesTemporarilyUnavailableException: CodeforcesApiException("Codeforces Temporarily Unavailable")
-    private class CodeforcesPOWException(val pow: String): CodeforcesApiException("pow = $pow")
+    private class CodeforcesPOWException(val pow: String): Throwable("pow = $pow")
 
     private val semaphore = when {
         BuildConfig.DEBUG -> Semaphore(permits = 3)
@@ -98,16 +98,13 @@ object CodeforcesApi: PlatformApi {
 
     //TODO: find proper solution (intercept / retry plugins not works)
     private suspend inline fun getCodeforces(block: HttpRequestBuilder.() -> Unit): HttpResponse {
-        runCatching {
+        try {
             return getWithPermit(block)
-        }.getOrElse { exception ->
-            if (exception is CodeforcesPOWException) {
-                return getWithPermit {
-                    cookie(name = "pow", value = proofOfWork(exception.pow))
-                    block()
-                }
+        } catch (exception: CodeforcesPOWException) {
+            return getWithPermit {
+                cookie(name = "pow", value = proofOfWork(exception.pow))
+                block()
             }
-            throw exception
         }
     }
 
