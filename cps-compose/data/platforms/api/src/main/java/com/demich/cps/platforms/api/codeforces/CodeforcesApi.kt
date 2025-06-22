@@ -37,10 +37,8 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object CodeforcesApi: PlatformApi {
-    private val json get() = defaultJson
-
     override val client = cpsHttpClient(
-        json = json,
+        json = defaultJson,
         useCookies = true,
         retryOnExceptionIf = { it is CodeforcesApiCallLimitExceededException }
     ) {
@@ -71,9 +69,8 @@ object CodeforcesApi: PlatformApi {
             handleResponseExceptionWithRequest { exception, _ ->
                 if (exception !is ResponseException) return@handleResponseExceptionWithRequest
                 val response = exception.response
-                json.runCatching { decodeFromString<CodeforcesAPIErrorResponse>(response.bodyAsText()) }
+                runCatching { response.body<CodeforcesAPIErrorResponse>() }
                     .onSuccess { throw it.toApiException() }
-                    .onFailure { throw exception }
             }
         }
 

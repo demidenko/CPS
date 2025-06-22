@@ -3,7 +3,7 @@ package com.demich.cps.platforms.api.codeforces
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal class CodeforcesAPIErrorResponse(private val comment: String) {
+internal class CodeforcesAPIErrorResponse(val comment: String) {
 
     fun toApiException(): CodeforcesApiException {
         if (isCallLimitExceeded()) return CodeforcesApiCallLimitExceededException(comment)
