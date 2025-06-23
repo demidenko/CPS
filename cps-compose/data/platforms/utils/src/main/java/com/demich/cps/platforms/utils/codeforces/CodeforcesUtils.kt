@@ -223,13 +223,6 @@ object CodeforcesUtils {
         return CodeforcesRecent(blogEntries, comments)
     }
 
-    inline fun extractHandleSuggestions(source: String, block: (String) -> Unit) {
-        source.splitToSequence('\n').filter { !it.contains('=') }.forEach {
-            val i = it.indexOf('|')
-            if (i != -1) block(it.substring(i + 1))
-        }
-    }
-
     private inline fun extractProblemWithAcceptedCount(
         problemRow: Element,
         contestId: Int,
@@ -286,4 +279,14 @@ suspend fun CodeforcesPageContentProvider.getRealColorTagOrNull(handle: String):
         ?.selectRatedUser()
         ?.extractRatedUser()
         ?.colorTag
+}
+
+suspend inline fun CodeforcesPageContentProvider.getHandleSuggestions(
+    str: String,
+    block: (String) -> Unit
+) {
+    getHandleSuggestionsPage(str).splitToSequence('\n').filter { !it.contains('=') }.forEach {
+        val i = it.indexOf('|')
+        if (i != -1) block(it.substring(i + 1))
+    }
 }

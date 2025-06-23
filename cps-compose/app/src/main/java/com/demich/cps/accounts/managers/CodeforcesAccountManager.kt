@@ -27,6 +27,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
 import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.ui.SettingsSwitchItemWithProfilesWork
 import com.demich.cps.ui.SettingsSwitchItemWithWork
@@ -67,8 +68,7 @@ class CodeforcesAccountManager :
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
         buildList {
-            val s = CodeforcesClient.getHandleSuggestionsPage(str)
-            CodeforcesUtils.extractHandleSuggestions(source = s) { handle ->
+            CodeforcesClient.getHandleSuggestions(str = str) { handle ->
                 add(UserSuggestion(title = handle, userId = handle))
             }
         }.asReversed()
