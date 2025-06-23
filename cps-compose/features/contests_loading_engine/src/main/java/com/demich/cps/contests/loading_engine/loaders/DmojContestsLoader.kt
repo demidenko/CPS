@@ -6,7 +6,9 @@ import com.demich.cps.platforms.api.clients.DmojClient
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
 
-class DmojContestsLoader: ContestsLoader(ContestsLoaderType.dmoj_api) {
+class DmojContestsLoader: ContestsLoader() {
+    override val type get() = ContestsLoaderType.dmoj_api
+
     override suspend fun loadContests(platform: Contest.Platform) =
         DmojClient.getContests().map { contest ->
             val startTime = Instant.parse(contest.start_time)

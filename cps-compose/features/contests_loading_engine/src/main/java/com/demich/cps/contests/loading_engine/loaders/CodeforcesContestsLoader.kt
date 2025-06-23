@@ -6,7 +6,9 @@ import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 
-class CodeforcesContestsLoader(val api: CodeforcesApi): ContestsLoader(type = ContestsLoaderType.codeforces_api) {
+class CodeforcesContestsLoader(val api: CodeforcesApi): ContestsLoader() {
+    override val type get() = ContestsLoaderType.codeforces_api
+
     override suspend fun loadContests(
         platform: Contest.Platform,
         dateConstraints: ContestDateConstraints

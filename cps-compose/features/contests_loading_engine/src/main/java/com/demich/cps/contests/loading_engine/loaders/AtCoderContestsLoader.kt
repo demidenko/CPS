@@ -6,7 +6,9 @@ import com.demich.cps.platforms.api.clients.AtCoderClient
 import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.kotlin_stdlib_boost.splitTrailingBrackets
 
-class AtCoderContestsLoader: ContestsLoader(type = ContestsLoaderType.atcoder_parse) {
+class AtCoderContestsLoader: ContestsLoader() {
+    override val type get() = ContestsLoaderType.atcoder_parse
+
     override suspend fun loadContests(platform: Contest.Platform): List<Contest> =
         AtCoderUtils.extractContests(source = AtCoderClient.getContestsPage())
 }

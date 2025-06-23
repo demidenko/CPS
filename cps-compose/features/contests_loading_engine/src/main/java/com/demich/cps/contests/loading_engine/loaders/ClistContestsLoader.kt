@@ -17,7 +17,9 @@ import kotlin.time.Duration.Companion.seconds
 class ClistContestsLoader(
     val apiAccess: ClistClient.ApiAccess,
     val additionalResources: Collection<ClistResource>
-): ContestsLoaderMultiple(type = ContestsLoaderType.clist_api) {
+): ContestsLoaderMultiple() {
+    override val type get() = ContestsLoaderType.clist_api
+
     override suspend fun loadContests(
         platforms: Set<Contest.Platform>,
         dateConstraints: ContestDateConstraints
