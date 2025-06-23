@@ -9,6 +9,7 @@ import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostDao
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.platforms.api.codeforces.CodeforcesClient
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
@@ -84,6 +85,7 @@ class CodeforcesCommunityLostRecentWorker(
             locale = locale,
             minRatingColorTag = minRatingColorTag,
             isNew = ::isNew,
+            api = CodeforcesClient,
             lastNotNewIdItem = settings.codeforcesLostHintNotNew
         ) {
             dao.insert(
@@ -119,30 +121,28 @@ class CodeforcesCommunityLostRecentWorker(
 
 }
 
-private class CachedBlogEntryApi(
-    val locale: CodeforcesLocale,
-    val onUpdate: suspend (CodeforcesBlogEntry) -> Unit
-) {
-    private val cache = mutableMapOf<Int, Instant>()
+private class CachedBlogEntriesCodeforcesApi(
+    private val originApi: CodeforcesApi,
+    val onNewBlogEntry: suspend (CodeforcesBlogEntry) -> Unit
+): CodeforcesApi by originApi {
+    private val cache = mutableMapOf<Int, CodeforcesBlogEntry>()
 
-    suspend inline fun getCreationTime(blogEntryId: Int): Instant =
-        cache.getOrPut(blogEntryId) {
-            CodeforcesClient.getBlogEntry(blogEntryId = blogEntryId, locale = locale)
-                .also { onUpdate(it) }
-                .creationTime
+    override suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale) =
+        cache.getOrPut(key = blogEntryId) {
+            originApi.getBlogEntry(blogEntryId, locale)
+                .also { onNewBlogEntry(it) }
         }
 
-    suspend fun useRecentActions() {
-        CodeforcesClient.runCatching { getRecentActions(locale = locale) }
-            .getOrElse { return }
-            .forEach {
+    override suspend fun getRecentActions(locale: CodeforcesLocale, maxCount: Int) =
+        originApi.getRecentActions(locale = locale, maxCount = maxCount).apply {
+            forEach {
                 it.blogEntry?.let { blogEntry ->
-                    if (cache.put(key = blogEntry.id, value = blogEntry.creationTime) == null) {
-                        onUpdate(blogEntry)
+                    if (cache.put(key = blogEntry.id, value = blogEntry) == null) {
+                        onNewBlogEntry(blogEntry)
                     }
                 }
             }
-    }
+        }
 }
 
 private fun Collection<CodeforcesBlogEntry>.filterIdGreaterThan(id: Int) = filter { it.id > id }
@@ -169,9 +169,10 @@ private suspend inline fun findSuspects(
     minRatingColorTag: CodeforcesColorTag,
     crossinline isNew: (Instant) -> Boolean,
     lastNotNewIdItem: DataStoreItem<CodeforcesLostHint?>,
+    api: CodeforcesApi,
     onSuspect: (CodeforcesBlogEntry) -> Unit
 ) {
-    val cachedApi = CachedBlogEntryApi(locale = locale) { blogEntry ->
+    val cachedApi = CachedBlogEntriesCodeforcesApi(api) { blogEntry ->
         val time = blogEntry.creationTime
         if (!isNew(time)) {
             //save hint
@@ -208,12 +209,12 @@ private suspend inline fun findSuspects(
         .filterIdGreaterThan(hint?.blogEntryId ?: Int.MIN_VALUE)
         .fixAndFilterColorTag(minRatingColorTag)
         .also {
-            if (it.size > 1) cachedApi.useRecentActions()
+            if (it.size > 1) cachedApi.getRecentActions(locale = locale)
         }
-        .filterNewEntries(isFinalFilter = true) { isNew(cachedApi.getCreationTime(blogEntryId = it.id)) }
+        .filterNewEntries(isFinalFilter = true) { isNew(cachedApi.getBlogEntry(it.id, locale).creationTime) }
         .forEach {
             val blogEntry = it.copy(
-                creationTime = cachedApi.getCreationTime(blogEntryId = it.id),
+                creationTime = cachedApi.getBlogEntry(it.id, locale).creationTime,
                 rating = 0,
                 commentsCount = null
             )
