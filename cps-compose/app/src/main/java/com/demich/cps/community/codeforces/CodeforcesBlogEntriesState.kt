@@ -9,7 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.utils.NewEntryInfo
 import com.demich.cps.utils.NewEntryType
@@ -62,7 +62,7 @@ abstract class CodeforcesBlogEntriesState {
     protected open fun onOpenBlogEntry(blogEntry: CodeforcesBlogEntry) = Unit
     fun openBlogEntry(blogEntry: CodeforcesBlogEntry, context: Context) {
         onOpenBlogEntry(blogEntry)
-        context.openUrlInBrowser(url = CodeforcesApi.urls.blogEntry(blogEntryId = blogEntry.id))
+        context.openUrlInBrowser(url = CodeforcesUrls.blogEntry(blogEntryId = blogEntry.id))
     }
 
     open fun isNew(id: Int): Boolean = false

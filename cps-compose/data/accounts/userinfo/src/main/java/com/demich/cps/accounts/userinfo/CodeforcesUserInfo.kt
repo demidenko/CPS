@@ -1,6 +1,6 @@
 package com.demich.cps.accounts.userinfo
 
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -20,5 +20,5 @@ data class CodeforcesUserInfo(
     )
 
     override val userPageUrl: String
-        get() = CodeforcesApi.urls.user(handle)
+        get() = CodeforcesUrls.user(handle)
 }

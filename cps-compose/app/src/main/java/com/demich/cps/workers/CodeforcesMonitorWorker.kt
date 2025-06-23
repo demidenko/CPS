@@ -14,7 +14,7 @@ import com.demich.cps.contests.monitors.CodeforcesMonitorNotifier
 import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.monitors.launchIn
 import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.datastore_itemized.edit
@@ -118,7 +118,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
             subText = "Codeforces system testing result"
             time = null
             autoCancel = true
-            url = CodeforcesApi.urls.submission(submission)
+            url = CodeforcesUrls.submission(submission)
         }
 }
 

@@ -44,7 +44,7 @@ import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.ui.CPSIconButton
@@ -471,7 +471,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
             requestFailed = requestFailed,
             modifier = modifier,
             onOpenInBrowser = {
-                context.openUrlInBrowser(url = CodeforcesApi.urls.contest(contestId))
+                context.openUrlInBrowser(url = CodeforcesUrls.contest(contestId))
             },
             onStop = {
                 scope.launch {

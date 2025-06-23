@@ -4,7 +4,7 @@ import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.AtCoderRatingChange
 import com.demich.cps.platforms.api.CodeChefRatingChange
 import com.demich.cps.platforms.api.DmojRatingChange
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -32,7 +32,7 @@ internal fun CodeforcesRatingChange.toRatingChange() =
         date = ratingUpdateTime,
         title = contestName,
         rank = rank,
-        url = CodeforcesApi.urls.contestsWith(handle)
+        url = CodeforcesUrls.contestsWith(handle)
     )
 
 internal fun AtCoderRatingChange.toRatingChange(handle: String) =

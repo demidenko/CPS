@@ -43,7 +43,7 @@ object CodeforcesApi: PlatformApi {
         retryOnExceptionIf = { it is CodeforcesApiCallLimitExceededException }
     ) {
         defaultRequest {
-            url(urls.main)
+            url(CodeforcesUrls.main)
         }
 
         HttpResponseValidator {
@@ -241,11 +241,11 @@ object CodeforcesApi: PlatformApi {
     }
 
     suspend fun getUserPage(handle: String): String {
-        return getCodeforcesPage(path = urls.user(handle), locale = CodeforcesLocale.EN)
+        return getCodeforcesPage(path = CodeforcesUrls.user(handle), locale = CodeforcesLocale.EN)
     }
 
     suspend fun getContestPage(contestId: Int): String {
-        return getCodeforcesPage(path = urls.contest(contestId), locale = CodeforcesLocale.EN)
+        return getCodeforcesPage(path = CodeforcesUrls.contest(contestId), locale = CodeforcesLocale.EN)
     }
 
     suspend fun getTopCommentsPage(locale: CodeforcesLocale, days: Int = 2): String {
@@ -254,32 +254,32 @@ object CodeforcesApi: PlatformApi {
         }
     }
 
-    object urls {
-        const val main = "https://codeforces.com"
-
-        fun user(handle: String) = "$main/profile/$handle"
-
-        fun blogEntry(blogEntryId: Int) = "$main/blog/entry/$blogEntryId"
-
-        fun comment(blogEntryId: Int, commentId: Long) = blogEntry(blogEntryId) + "#comment-$commentId"
-
-        fun contest(contestId: Int) = "$main/contest/$contestId"
-
-        fun contestPending(contestId: Int) = "$main/contests/$contestId"
-
-        fun contestsWith(handle: String) = "$main/contests/with/$handle"
-
-        fun submission(submission: CodeforcesSubmission) = contest(submission.contestId) + "/submission/${submission.id}"
-
-        fun problem(contestId: Int, problemIndex: String) = contest(contestId) + "/problem/$problemIndex"
-    }
-
     enum class BasePage(val path: String) {
         main(""),
         top("top"),
         recent("recent-actions"),
         groups("groups")
     }
+}
+
+object CodeforcesUrls {
+    const val main = "https://codeforces.com"
+
+    fun user(handle: String) = "$main/profile/$handle"
+
+    fun blogEntry(blogEntryId: Int) = "$main/blog/entry/$blogEntryId"
+
+    fun comment(blogEntryId: Int, commentId: Long) = blogEntry(blogEntryId) + "#comment-$commentId"
+
+    fun contest(contestId: Int) = "$main/contest/$contestId"
+
+    fun contestPending(contestId: Int) = "$main/contests/$contestId"
+
+    fun contestsWith(handle: String) = "$main/contests/with/$handle"
+
+    fun submission(submission: CodeforcesSubmission) = contest(submission.contestId) + "/submission/${submission.id}"
+
+    fun problem(contestId: Int, problemIndex: String) = contest(contestId) + "/problem/$problemIndex"
 }
 
 private enum class CodeforcesAPIStatus {

@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.RecentPageType
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
@@ -64,12 +64,12 @@ fun CodeforcesCommunityRecentPage(
                         recent = { recent },
                         modifier = Modifier.fillMaxSize(),
                         onBrowseComment = { blogEntry, comment ->
-                            context.openUrlInBrowser(CodeforcesApi.urls.comment(
+                            context.openUrlInBrowser(CodeforcesUrls.comment(
                                 blogEntryId = blogEntry.id,
                                 commentId = comment.id
                             ))
                         },
-                        onBrowseBlogEntry = { context.openUrlInBrowser(CodeforcesApi.urls.blogEntry(it.id)) },
+                        onBrowseBlogEntry = { context.openUrlInBrowser(CodeforcesUrls.blogEntry(it.id)) },
                         onOpenComments = { controller.recentPageType = RecentPageType.BlogEntryRecentComments(it) }
                     )
                 }

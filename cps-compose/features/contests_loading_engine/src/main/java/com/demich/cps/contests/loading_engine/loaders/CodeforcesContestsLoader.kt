@@ -4,6 +4,7 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 
 class CodeforcesContestsLoader: ContestsLoader(type = ContestsLoaderType.codeforces_api) {
     override suspend fun loadContests(
@@ -18,7 +19,7 @@ class CodeforcesContestsLoader: ContestsLoader(type = ContestsLoaderType.codefor
                     title = it.name,
                     startTime = it.startTime,
                     duration = it.duration,
-                    link = CodeforcesApi.urls.contest(contestId = it.id)
+                    link = CodeforcesUrls.contest(contestId = it.id)
                 )
             } else {
                 null

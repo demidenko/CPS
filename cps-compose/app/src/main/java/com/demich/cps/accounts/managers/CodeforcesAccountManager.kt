@@ -21,6 +21,7 @@ import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
@@ -51,7 +52,7 @@ class CodeforcesAccountManager :
     RatingRevolutionsProvider
 {
     override val type get() = AccountManagerType.codeforces
-    override val urlHomePage get() = CodeforcesApi.urls.main
+    override val urlHomePage get() = CodeforcesUrls.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)
     override fun isValidForUserId(char: Char) = when(char) {

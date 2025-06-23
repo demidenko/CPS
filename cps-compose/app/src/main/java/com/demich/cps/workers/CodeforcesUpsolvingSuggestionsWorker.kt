@@ -7,6 +7,7 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
@@ -129,6 +130,6 @@ private fun notifyProblemForUpsolve(problem: CodeforcesProblem, context: Context
         subText = "codeforces upsolving suggestion"
         time = null
         autoCancel = true
-        url = CodeforcesApi.urls.problem(problem.contestId, problem.index)
+        url = CodeforcesUrls.problem(problem.contestId, problem.index)
     }
 }

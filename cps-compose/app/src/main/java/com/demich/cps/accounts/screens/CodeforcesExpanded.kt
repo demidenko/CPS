@@ -25,7 +25,7 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.userInfoOrNull
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ListTitle
@@ -158,7 +158,7 @@ private fun UpsolvingSuggestionsList(
             modifier = Modifier
                 .clickable {
                     context.openUrlInBrowser(
-                        CodeforcesApi.urls.problem(
+                        CodeforcesUrls.problem(
                             contestId = it.contestId,
                             problemIndex = it.index
                         )

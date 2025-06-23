@@ -19,7 +19,7 @@ import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.dateRange
 import com.demich.cps.contests.isVirtual
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSDropdownMenuButton
 import com.demich.cps.ui.CPSIcons
@@ -186,8 +186,8 @@ private fun Contest.properLink(): String? {
     if (platform == Contest.Platform.codeforces) {
         val contestId = id.toIntOrNull() ?: return link
         return when (getPhase(currentTime = getCurrentTime())) {
-            Contest.Phase.BEFORE -> CodeforcesApi.urls.contestPending(contestId = contestId)
-            else -> CodeforcesApi.urls.contest(contestId = contestId)
+            Contest.Phase.BEFORE -> CodeforcesUrls.contestPending(contestId = contestId)
+            else -> CodeforcesUrls.contest(contestId = contestId)
         }
     }
     return link
