@@ -13,7 +13,7 @@ import kotlinx.coroutines.async
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.seconds
 
-object CodeChefApi: PlatformClient {
+object CodeChefClient: PlatformClient {
     private val json get() = defaultJson
 
     override val client = cpsHttpClient(

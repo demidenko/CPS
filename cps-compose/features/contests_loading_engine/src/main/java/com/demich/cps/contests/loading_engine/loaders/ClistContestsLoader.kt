@@ -3,7 +3,7 @@ package com.demich.cps.contests.loading_engine.loaders
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsLoaderType
-import com.demich.cps.platforms.api.ClistApi
+import com.demich.cps.platforms.api.ClistClient
 import com.demich.cps.platforms.api.ClistContest
 import com.demich.cps.platforms.api.ClistResource
 import com.demich.cps.platforms.utils.ClistUtils
@@ -15,13 +15,13 @@ import kotlinx.datetime.format.char
 import kotlin.time.Duration.Companion.seconds
 
 class ClistContestsLoader(
-    val apiAccess: ClistApi.ApiAccess,
+    val apiAccess: ClistClient.ApiAccess,
     val additionalResources: Collection<ClistResource>
 ): ContestsLoaderMultiple(type = ContestsLoaderType.clist_api) {
     override suspend fun loadContests(
         platforms: Set<Contest.Platform>,
         dateConstraints: ContestDateConstraints
-    ) = ClistApi.getContests(
+    ) = ClistClient.getContests(
         apiAccess = apiAccess,
         maxStartTime = dateConstraints.maxStartTime,
         minEndTime = dateConstraints.minEndTime,

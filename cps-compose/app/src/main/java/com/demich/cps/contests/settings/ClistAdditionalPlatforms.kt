@@ -23,7 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.platforms.api.ClistApi
+import com.demich.cps.platforms.api.ClistClient
 import com.demich.cps.platforms.api.ClistResource
 import com.demich.cps.platforms.api.niceMessage
 import com.demich.cps.platforms.utils.ClistUtils
@@ -67,7 +67,7 @@ private fun ColumnScope.DialogContent() {
         dataLoader.execute(id = dataKey) {
             val settings = context.settingsContests
             val alreadySupported = Contest.platformsExceptUnknown.mapToSet { ClistUtils.getClistApiResourceId(it) }
-            ClistApi.getResources(apiAccess = settings.clistApiAccess())
+            ClistClient.getResources(apiAccess = settings.clistApiAccess())
                 .filter { it.id !in alreadySupported }
                 .sortedBy { it.name }
                 .also { list ->

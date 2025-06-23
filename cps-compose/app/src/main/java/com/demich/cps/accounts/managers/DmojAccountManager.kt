@@ -13,7 +13,7 @@ import com.demich.cps.accounts.until
 import com.demich.cps.accounts.userinfo.DmojUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.platforms.api.DmojApi
+import com.demich.cps.platforms.api.DmojClient
 import com.demich.cps.platforms.api.DmojUrls
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
@@ -34,7 +34,7 @@ class DmojAccountManager :
     }
 
     override suspend fun fetchProfile(data: String): ProfileResult<DmojUserInfo> =
-        DmojApi.runCatching {
+        DmojClient.runCatching {
             val res = getUser(handle = data)
             ProfileResult.Success(
                 userInfo = DmojUserInfo(
@@ -48,13 +48,13 @@ class DmojAccountManager :
         }
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> {
-        return DmojApi.getSuggestions(str).map {
+        return DmojClient.getSuggestions(str).map {
             UserSuggestion(title = it.text, userId = it.id)
         }
     }
 
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
-        DmojApi.getRatingChanges(handle = userId).map { it.toRatingChange() }
+        DmojClient.getRatingChanges(handle = userId).map { it.toRatingChange() }
 
     override val ratingsUpperBounds by lazy {
         listOf(

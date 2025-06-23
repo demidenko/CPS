@@ -5,7 +5,7 @@ import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.userinfo.ClistUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.platforms.api.ClistApi
+import com.demich.cps.platforms.api.ClistClient
 import com.demich.cps.platforms.api.ClistUrls
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.platforms.utils.ClistUtils
@@ -24,7 +24,7 @@ class CListAccountManager :
         ClistUtils.runCatching {
             ProfileResult.Success(
                 userInfo = extractUserInfo(
-                    source = ClistApi.getUserPage(login = data),
+                    source = ClistClient.getUserPage(login = data),
                     login = data
                 )
             )
@@ -34,7 +34,7 @@ class CListAccountManager :
         }
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
-        ClistUtils.extractLoginSuggestions(source = ClistApi.getUsersSearchPage(str))
+        ClistUtils.extractLoginSuggestions(source = ClistClient.getUsersSearchPage(str))
             .map { UserSuggestion(userId = it) }
 
     override fun makeUserInfoSpan(userInfo: ClistUserInfo, cpsColors: CPSColors): AnnotatedString =

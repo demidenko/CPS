@@ -6,7 +6,7 @@ import io.ktor.client.request.parameter
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
-object AtCoderApi: PlatformClient {
+object AtCoderClient: PlatformClient {
     private val json get() = defaultJson
 
     suspend fun getUserPage(handle: String): String  {

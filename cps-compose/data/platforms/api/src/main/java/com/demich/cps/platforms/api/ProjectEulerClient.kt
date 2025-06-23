@@ -1,6 +1,6 @@
 package com.demich.cps.platforms.api
 
-object ProjectEulerApi: PlatformClient {
+object ProjectEulerClient: PlatformClient {
 
     private suspend fun getPage(page: String): String {
         return client.getText(urlString = "${ProjectEulerUrls.main}/$page")

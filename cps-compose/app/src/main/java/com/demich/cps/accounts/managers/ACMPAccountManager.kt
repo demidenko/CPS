@@ -8,7 +8,7 @@ import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.accounts.userinfo.ACMPUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.platforms.api.ACMPApi
+import com.demich.cps.platforms.api.ACMPClient
 import com.demich.cps.platforms.api.ACMPUrls
 import com.demich.cps.platforms.utils.ACMPUtils
 import com.demich.cps.ui.theme.CPSColors
@@ -28,13 +28,13 @@ class ACMPAccountManager :
         return ACMPUtils.runCatching {
             ProfileResult.Success(
                 userInfo = extractUserInfo(
-                    source = ACMPApi.getUserPage(id = data.toInt()),
+                    source = ACMPClient.getUserPage(id = data.toInt()),
                     id = data
                 )
             )
         }.getOrElse { e ->
             when (e) {
-                is ACMPApi.ACMPPageNotFoundException -> ProfileResult.NotFound(data)
+                is ACMPClient.ACMPPageNotFoundException -> ProfileResult.NotFound(data)
                 else -> ProfileResult.Failed(data)
             }
         }
@@ -42,7 +42,7 @@ class ACMPAccountManager :
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
-        return ACMPUtils.extractUsersSuggestions(source = ACMPApi.getUsersSearch(str))
+        return ACMPUtils.extractUsersSuggestions(source = ACMPClient.getUsersSearch(str))
     }
 
     override fun makeUserInfoSpan(userInfo: ACMPUserInfo, cpsColors: CPSColors): AnnotatedString =

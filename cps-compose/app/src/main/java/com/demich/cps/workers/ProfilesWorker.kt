@@ -12,7 +12,7 @@ import com.demich.cps.accounts.managers.toRatingChange
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.platforms.api.AtCoderApi
+import com.demich.cps.platforms.api.AtCoderClient
 import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.toSignedString
@@ -97,7 +97,7 @@ class ProfilesWorker(
         val userInfo = dataStore.getProfile()
             ?.userInfoOrNull() ?: return
 
-        val lastRatingChange = AtCoderApi.runCatching {
+        val lastRatingChange = AtCoderClient.runCatching {
             getRatingChanges(handle = userInfo.handle)
         }.getOrNull()?.lastOrNull() ?: return
 

@@ -7,7 +7,7 @@ import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.platforms.api.TimusApi
+import com.demich.cps.platforms.api.TimusClient
 import com.demich.cps.platforms.api.TimusUrls
 import com.demich.cps.platforms.utils.TimusUtils
 import com.demich.cps.ui.theme.CPSColors
@@ -27,7 +27,7 @@ class TimusAccountManager :
     override suspend fun fetchProfile(data: String): ProfileResult<TimusUserInfo> =
         TimusUtils.runCatching {
             extractProfile(
-                source = TimusApi.getUserPage(data.toInt()),
+                source = TimusClient.getUserPage(data.toInt()),
                 handle = data
             )
         }.getOrElse {
@@ -36,7 +36,7 @@ class TimusAccountManager :
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
-        return TimusUtils.extractUsersSuggestions(source = TimusApi.getSearchPage(str))
+        return TimusUtils.extractUsersSuggestions(source = TimusClient.getSearchPage(str))
     }
 
     override fun makeUserInfoSpan(userInfo: TimusUserInfo, cpsColors: CPSColors): AnnotatedString =

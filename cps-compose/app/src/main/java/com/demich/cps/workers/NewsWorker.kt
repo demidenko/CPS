@@ -8,9 +8,9 @@ import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed.atc
 import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed.project_euler_news
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.platforms.api.AtCoderApi
+import com.demich.cps.platforms.api.AtCoderClient
 import com.demich.cps.platforms.api.AtCoderUrls
-import com.demich.cps.platforms.api.ProjectEulerApi
+import com.demich.cps.platforms.api.ProjectEulerClient
 import com.demich.cps.platforms.api.ProjectEulerUrls
 import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.platforms.utils.ProjectEulerUtils
@@ -56,7 +56,7 @@ class NewsWorker(
     private suspend fun atcoderNews() {
         settings.scanNewsFeed(
             newsFeed = atcoder_news,
-            posts = AtCoderUtils.extractNews(source = AtCoderApi.getMainPage())
+            posts = AtCoderUtils.extractNews(source = AtCoderClient.getMainPage())
         ) { post ->
             notificationChannels.atcoder.news(post.id.toInt()).notify(context) {
                 subText = "atcoder news"
@@ -71,7 +71,7 @@ class NewsWorker(
     }
 
     private suspend fun projectEulerNews() {
-        val rssPage = ProjectEulerApi.getRSSPage()
+        val rssPage = ProjectEulerClient.getRSSPage()
 
         settings.scanNewsFeed(
             newsFeed = project_euler_news,

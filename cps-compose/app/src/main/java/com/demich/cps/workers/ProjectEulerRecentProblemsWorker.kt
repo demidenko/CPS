@@ -6,7 +6,7 @@ import com.demich.cps.R
 import com.demich.cps.community.settings.CommunitySettingsDataStore
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.platforms.api.ProjectEulerApi
+import com.demich.cps.platforms.api.ProjectEulerClient
 import com.demich.cps.platforms.api.ProjectEulerUrls
 import com.demich.cps.platforms.utils.ProjectEulerUtils
 import com.demich.kotlin_stdlib_boost.minOfNotNull
@@ -42,7 +42,7 @@ class ProjectEulerRecentProblemsWorker(
     private suspend fun scanProblems() {
         context.settingsCommunity.scanNewsFeed(
             newsFeed = CommunitySettingsDataStore.NewsFeed.project_euler_problems,
-            posts = ProjectEulerUtils.extractRecentProblems(ProjectEulerApi.getRecentPage())
+            posts = ProjectEulerUtils.extractRecentProblems(ProjectEulerClient.getRecentPage())
         ) { post ->
             val problemId = post.id.toInt()
             notificationChannels.project_euler.problems(problemId).notify(context) {
@@ -59,7 +59,7 @@ class ProjectEulerRecentProblemsWorker(
     }
 
     private suspend fun enqueueByHint() {
-        val rssPage = ProjectEulerApi.getRSSPage()
+        val rssPage = ProjectEulerClient.getRSSPage()
 
         val nextDate = ProjectEulerUtils.extractProblemsFromRssPage(rssPage)
             .minOfNotNull { (id, date) -> date.takeIf { it > workerStartTime } }

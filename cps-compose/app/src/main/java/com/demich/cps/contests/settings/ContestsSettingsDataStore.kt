@@ -4,7 +4,7 @@ import android.content.Context
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateBaseConstraints
 import com.demich.cps.contests.loading.ContestsLoaderType
-import com.demich.cps.platforms.api.ClistApi
+import com.demich.cps.platforms.api.ClistClient
 import com.demich.cps.platforms.api.ClistResource
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
@@ -38,7 +38,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         }
     }
 
-    val clistApiAccess = jsonCPS.item(name = "clist_api_access", defaultValue = ClistApi.ApiAccess("", ""))
+    val clistApiAccess = jsonCPS.item(name = "clist_api_access", defaultValue = ClistClient.ApiAccess("", ""))
     val clistAdditionalResources = jsonCPS.itemList<ClistResource>(name = "clist_additional_resources")
 
     val contestsDateConstraints = jsonCPS.item(name = "contests_date_constraints") {

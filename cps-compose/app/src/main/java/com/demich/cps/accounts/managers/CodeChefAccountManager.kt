@@ -29,7 +29,7 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.accounts.userinfo.ratingToString
 import com.demich.cps.accounts.userinfo.userInfoOrNull
-import com.demich.cps.platforms.api.CodeChefApi
+import com.demich.cps.platforms.api.CodeChefClient
 import com.demich.cps.platforms.api.CodeChefUrls
 import com.demich.cps.platforms.api.isRedirect
 import com.demich.cps.platforms.utils.CodeChefUtils
@@ -62,7 +62,7 @@ class CodeChefAccountManager :
         CodeChefUtils.runCatching {
             ProfileResult.Success(
                 userInfo = extractUserInfo(
-                    source = CodeChefApi.getUserPage(handle = data),
+                    source = CodeChefClient.getUserPage(handle = data),
                     handle = data
                 )
             )
@@ -72,7 +72,7 @@ class CodeChefAccountManager :
         }
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
-        CodeChefApi.getSuggestions(str).list.map {
+        CodeChefClient.getSuggestions(str).list.map {
             UserSuggestion(
                 userId = it.username,
                 info = it.rating.toString()
@@ -80,7 +80,7 @@ class CodeChefAccountManager :
         }
 
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
-        CodeChefApi.getRatingChanges(handle = userId).map { it.toRatingChange() }
+        CodeChefClient.getRatingChanges(handle = userId).map { it.toRatingChange() }
 
     override val ratingsUpperBounds by lazy {
         listOf(
