@@ -14,7 +14,7 @@ import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.clients.AtCoderClient
 import com.demich.cps.platforms.api.codeforces.CodeforcesClient
-import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.utils.toSignedString
 import kotlin.time.Duration.Companion.minutes
 
@@ -71,7 +71,7 @@ class ProfilesWorker(
             ?.userInfoOrNull() ?: return
 
         val handle = userInfo.handle
-        val newContribution = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = false)
+        val newContribution = CodeforcesClient.getProfile(handle = handle, doRedirect = false)
             .userInfoOrNull()?.contribution ?: return
 
         if (newContribution == userInfo.contribution) return

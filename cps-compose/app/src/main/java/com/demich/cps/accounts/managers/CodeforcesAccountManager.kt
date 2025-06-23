@@ -27,6 +27,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.ui.SettingsSwitchItemWithProfilesWork
 import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
@@ -62,7 +63,7 @@ class CodeforcesAccountManager :
 
 
     override suspend fun fetchProfile(data: String): ProfileResult<CodeforcesUserInfo> =
-        CodeforcesUtils.getUserInfo(handle = data, doRedirect = true)
+        CodeforcesClient.getProfile(handle = data, doRedirect = true)
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
         buildList {

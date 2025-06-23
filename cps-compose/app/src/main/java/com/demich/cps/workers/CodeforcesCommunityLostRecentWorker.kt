@@ -13,6 +13,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.getProfiles
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.kotlin_stdlib_boost.mapToSet
 import com.demich.kotlin_stdlib_boost.partitionIndex
@@ -222,7 +223,7 @@ private suspend inline fun findSuspects(
 
 //Required against new year color chaos
 private suspend fun Collection<CodeforcesBlogEntry>.fixedHandleColors(): List<CodeforcesBlogEntry> {
-    val authors = CodeforcesUtils.getUsersInfo(handles = map { it.authorHandle }, doRedirect = false)
+    val authors = CodeforcesClient.getProfiles(handles = map { it.authorHandle }, doRedirect = false)
     return map { blogEntry ->
         val result = authors.getValue(blogEntry.authorHandle)
         require(result is ProfileResult.Success)

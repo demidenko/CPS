@@ -12,7 +12,8 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogEx
 import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
-import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.getProfile
+import com.demich.cps.platforms.utils.codeforces.getProfiles
 import kotlinx.coroutines.flow.Flow
 
 internal const val cfFollowTableName = "FollowList"
@@ -95,7 +96,7 @@ interface CodeforcesFollowDao {
                 return@recoverCatching emptyList()
             }
             if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
-                val profileResult = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
+                val profileResult = CodeforcesClient.getProfile(handle = handle, doRedirect = true)
                 applyProfileResult(handle, profileResult)
                 if (profileResult is ProfileResult.Success) {
                     return@recoverCatching getAndReloadBlogEntries(
@@ -112,7 +113,7 @@ interface CodeforcesFollowDao {
     }
 
     suspend fun updateUsersInfo() {
-        applyProfilesResults(CodeforcesUtils.getUsersInfo(handles = getHandles(), doRedirect = true))
+        applyProfilesResults(CodeforcesClient.getProfiles(handles = getHandles(), doRedirect = true))
     }
 
     @Transaction

@@ -4,9 +4,10 @@ import android.content.Context
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.userInfoOrNull
+import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
-import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.getProfile
 
 abstract class CodeforcesFollowList(
     protected val context: Context,
@@ -48,7 +49,7 @@ abstract class CodeforcesFollowList(
         addNewUser(ProfileResult.Failed(handle))
         dao.applyProfileResult(
             handle = handle,
-            result = CodeforcesUtils.getUserInfo(handle = handle, doRedirect = true)
+            result = CodeforcesClient.getProfile(handle = handle, doRedirect = true)
         )
     }
 

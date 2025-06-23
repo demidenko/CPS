@@ -4,6 +4,7 @@ import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesClient
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
@@ -246,48 +247,6 @@ object CodeforcesUtils {
         return userBox.selectRatedUser()?.extractRatedUser()
     }
 
-
-    suspend fun getUsersInfo(handles: Collection<String>, doRedirect: Boolean) =
-        getUsersInfo(handles.toSet(), doRedirect)
-
-    //TODO: non recursive O(n) version
-    suspend fun getUsersInfo(
-        handles: Set<String>,
-        doRedirect: Boolean
-    ): Map<String, ProfileResult<CodeforcesUserInfo>> {
-        return CodeforcesClient.runCatching {
-            getUsers(handles = handles, checkHistoricHandles = doRedirect)
-                .apply { check(size == handles.size) }
-        }.map { infos ->
-            //relying to cf api return in same order
-            handles.zip(infos.map { ProfileResult.Success(CodeforcesUserInfo(it)) }).toMap()
-        }.getOrElse { e ->
-            if (e is CodeforcesApiHandleNotFoundException) {
-                val badHandle = e.handle
-                return@getOrElse getUsersInfo(handles = handles - badHandle, doRedirect = doRedirect)
-                    .plus(badHandle to ProfileResult.NotFound(badHandle))
-            }
-            handles.associateWith { ProfileResult.Failed(it) }
-        }.apply {
-            check(handles.all { it in this })
-        }
-    }
-
-    suspend fun getUserInfo(handle: String, doRedirect: Boolean): ProfileResult<CodeforcesUserInfo> {
-        //return getUsersInfo(setOf(handle), doRedirect).getValue(handle)
-        return CodeforcesClient.runCatching {
-            ProfileResult.Success(
-                userInfo = CodeforcesUserInfo(getUser(handle = handle, checkHistoricHandles = doRedirect))
-            )
-        }.getOrElse { e ->
-            if (e is CodeforcesApiHandleNotFoundException && e.handle == handle) {
-                ProfileResult.NotFound(handle)
-            } else {
-                ProfileResult.Failed(handle)
-            }
-        }
-    }
-
     private inline fun extractProblemWithAcceptedCount(
         problemRow: Element,
         contestId: Int,
@@ -335,4 +294,45 @@ object CodeforcesUtils {
             rating < 3000 -> CodeforcesColorTag.RED
             else -> CodeforcesColorTag.LEGENDARY
         }
+}
+
+suspend fun CodeforcesApi.getProfiles(handles: Collection<String>, doRedirect: Boolean) =
+    getProfiles(handles.toSet(), doRedirect)
+
+//TODO: non recursive O(n) version (coping map is n^2, getUsers is n^2 in total, can be improved by mitm)
+suspend fun CodeforcesApi.getProfiles(
+    handles: Set<String>,
+    doRedirect: Boolean
+): Map<String, ProfileResult<CodeforcesUserInfo>> {
+    return runCatching {
+        getUsers(handles = handles, checkHistoricHandles = doRedirect)
+            .apply { check(size == handles.size) }
+    }.map { users ->
+        //relying to cf api return in same order
+        handles.zip(users.map { ProfileResult.Success(CodeforcesUserInfo(it)) }).toMap()
+    }.getOrElse { e ->
+        if (e is CodeforcesApiHandleNotFoundException) {
+            val badHandle = e.handle
+            return@getOrElse getProfiles(handles = handles - badHandle, doRedirect = doRedirect)
+                .plus(badHandle to ProfileResult.NotFound(badHandle))
+        }
+        handles.associateWith { ProfileResult.Failed(it) }
+    }.apply {
+        check(handles.all { it in this })
+    }
+}
+
+suspend fun CodeforcesApi.getProfile(handle: String, doRedirect: Boolean): ProfileResult<CodeforcesUserInfo> {
+    // shortcut for getProfiles(setOf(handle), doRedirect).getValue(handle)
+    return runCatching {
+        ProfileResult.Success(
+            userInfo = CodeforcesUserInfo(getUser(handle = handle, checkHistoricHandles = doRedirect))
+        )
+    }.getOrElse { e ->
+        if (e is CodeforcesApiHandleNotFoundException && e.handle == handle) {
+            ProfileResult.NotFound(handle)
+        } else {
+            ProfileResult.Failed(handle)
+        }
+    }
 }
