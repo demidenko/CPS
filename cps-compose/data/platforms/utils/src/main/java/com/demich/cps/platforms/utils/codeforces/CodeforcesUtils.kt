@@ -20,6 +20,17 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import kotlin.math.max
 
+private fun Element.expectContent(): Element = expectFirst("div.content-with-sidebar")
+
+private fun Element.selectSidebar(): Element? = selectFirst("div#sidebar")
+private fun Element.expectSidebar(): Element = requireNotNull(selectSidebar())
+
+private fun Element.expectDivInfo(): Element = expectFirst("div.info")
+
+private fun Element.selectRatedUser(): Element? = selectFirst("a.rated-user")
+private fun Element.expectRatedUser(): Element = requireNotNull(selectRatedUser())
+
+private fun Element.expectHumanTimeTitle(): String = expectFirst(".format-humantime").attr("title")
 
 object CodeforcesUtils {
     private object DateTimeParser {
@@ -50,18 +61,6 @@ object CodeforcesUtils {
         fun parse(input: String): Instant =
             LocalDateTime.parse(input, dateTimeFormat).toInstant(moscowTimeZone)
     }
-
-    private fun Element.expectContent(): Element = expectFirst("div.content-with-sidebar")
-
-    private fun Element.selectSidebar(): Element? = selectFirst("div#sidebar")
-    private fun Element.expectSidebar(): Element = requireNotNull(selectSidebar())
-
-    private fun Element.expectDivInfo(): Element = expectFirst("div.info")
-
-    private fun Element.selectRatedUser(): Element? = selectFirst("a.rated-user")
-    private fun Element.expectRatedUser(): Element = requireNotNull(selectRatedUser())
-
-    private fun Element.expectHumanTimeTitle(): String = expectFirst(".format-humantime").attr("title")
 
     private fun String.extractTime(): Instant = DateTimeParser.parse(this)
 
