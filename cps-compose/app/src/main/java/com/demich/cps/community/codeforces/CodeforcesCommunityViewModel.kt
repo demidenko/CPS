@@ -9,6 +9,7 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.community.follow.followListDao
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.api.codeforces.CodeforcesClient
+import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
@@ -52,10 +53,14 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         }
     }
 
-    private val mainBlogEntries = dataLoader(emptyList()) { getBlogEntries(page = CodeforcesClient.BasePage.main, locale = it) }
+    private val mainBlogEntries = dataLoader(emptyList()) {
+        getBlogEntries(page = CodeforcesPageContentProvider.BasePage.main, locale = it)
+    }
     override fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.flowOfData(context)
 
-    private val topBlogEntries = dataLoader(emptyList()) { getBlogEntries(page = CodeforcesClient.BasePage.top, locale = it) }
+    private val topBlogEntries = dataLoader(emptyList()) {
+        getBlogEntries(page = CodeforcesPageContentProvider.BasePage.top, locale = it)
+    }
     override fun flowOfTopBlogEntries(context: Context) = topBlogEntries.flowOfData(context)
 
     private val topComments = dataLoader(emptyList()) { getTopComments(locale = it) }
@@ -84,14 +89,14 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         }
     }
 
-    private suspend fun getBlogEntries(page: CodeforcesClient.BasePage, locale: CodeforcesLocale) =
+    private suspend fun getBlogEntries(page: CodeforcesPageContentProvider.BasePage, locale: CodeforcesLocale) =
         CodeforcesUtils.extractBlogEntries(source = CodeforcesClient.getPage(page = page, locale = locale))
 
     private suspend fun getTopComments(locale: CodeforcesLocale) =
         CodeforcesUtils.extractComments(source = CodeforcesClient.getTopCommentsPage(locale = locale))
 
     private suspend fun getRecentActions(locale: CodeforcesLocale) =
-        CodeforcesUtils.extractRecentActions(source = CodeforcesClient.getPage(page = CodeforcesClient.BasePage.recent, locale = locale))
+        CodeforcesUtils.extractRecentActions(source = CodeforcesClient.getPage(page = CodeforcesPageContentProvider.BasePage.recent, locale = locale))
 
     fun addToFollowList(result: ProfileResult<CodeforcesUserInfo>, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {

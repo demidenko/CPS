@@ -36,7 +36,7 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-object CodeforcesClient: PlatformClient, CodeforcesApi {
+object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentProvider {
     override val client = cpsHttpClient(
         json = defaultJson,
         useCookies = true,
@@ -209,36 +209,24 @@ object CodeforcesClient: PlatformClient, CodeforcesApi {
         }
     }
 
-    suspend fun getPage(page: BasePage, locale: CodeforcesLocale): String {
-        return getCodeforcesPage(path = page.path, locale = locale)
-    }
+    override suspend fun getPage(page: CodeforcesPageContentProvider.BasePage, locale: CodeforcesLocale) =
+        getCodeforcesPage(path = page.path, locale = locale)
 
-    suspend fun getHandleSuggestionsPage(str: String): String {
-        return getCodeforcesPage(path = "data/handles") {
+    override suspend fun getHandleSuggestionsPage(str: String) =
+        getCodeforcesPage(path = "data/handles") {
             parameter("q", str)
         }
-    }
 
-    suspend fun getUserPage(handle: String): String {
-        return getCodeforcesPage(path = CodeforcesUrls.user(handle), locale = CodeforcesLocale.EN)
-    }
+    override suspend fun getUserPage(handle: String) =
+        getCodeforcesPage(path = CodeforcesUrls.user(handle), locale = CodeforcesLocale.EN)
 
-    suspend fun getContestPage(contestId: Int): String {
-        return getCodeforcesPage(path = CodeforcesUrls.contest(contestId), locale = CodeforcesLocale.EN)
-    }
+    override suspend fun getContestPage(contestId: Int) =
+        getCodeforcesPage(path = CodeforcesUrls.contest(contestId), locale = CodeforcesLocale.EN)
 
-    suspend fun getTopCommentsPage(locale: CodeforcesLocale, days: Int = 2): String {
-        return getCodeforcesPage(path = "topComments", locale = locale) {
+    override suspend fun getTopCommentsPage(locale: CodeforcesLocale, days: Int) =
+        getCodeforcesPage(path = "topComments", locale = locale) {
             parameter("days", days)
         }
-    }
-
-    enum class BasePage(val path: String) {
-        main(""),
-        top("top"),
-        recent("recent-actions"),
-        groups("groups")
-    }
 }
 
 object CodeforcesUrls {

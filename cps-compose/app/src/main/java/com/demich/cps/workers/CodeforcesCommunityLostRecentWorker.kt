@@ -10,6 +10,7 @@ import com.demich.cps.features.codeforces.lost.database.CodeforcesLostDao
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesClient
+import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
@@ -53,16 +54,16 @@ class CodeforcesCommunityLostRecentWorker(
         }
 
     private suspend fun getRecentBlogEntries(locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
-        suspend fun extractFrom(page: CodeforcesClient.BasePage) =
+        suspend fun extractFrom(page: CodeforcesPageContentProvider.BasePage) =
             CodeforcesUtils.extractRecentBlogEntries(
                 source = CodeforcesClient.getPage(page = page, locale = locale)
             )
 
         // "/groups" has less size than "/recent" and hopefully will be cached by cf
         return runCatching {
-            extractFrom(CodeforcesClient.BasePage.groups)
+            extractFrom(CodeforcesPageContentProvider.BasePage.groups)
         }.getOrElse {
-            extractFrom(CodeforcesClient.BasePage.recent)
+            extractFrom(CodeforcesPageContentProvider.BasePage.recent)
         }
     }
 
