@@ -4,8 +4,8 @@ import android.content.Context
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateBaseConstraints
 import com.demich.cps.contests.loading.ContestsLoaderType
-import com.demich.cps.platforms.api.ClistClient
-import com.demich.cps.platforms.api.ClistResource
+import com.demich.cps.platforms.api.clients.ClistClient
+import com.demich.cps.platforms.api.clients.ClistResource
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper

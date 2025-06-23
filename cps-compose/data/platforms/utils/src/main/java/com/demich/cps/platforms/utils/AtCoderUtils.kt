@@ -3,7 +3,7 @@ package com.demich.cps.platforms.utils
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.platforms.api.AtCoderUrls
+import com.demich.cps.platforms.api.clients.AtCoderUrls
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime

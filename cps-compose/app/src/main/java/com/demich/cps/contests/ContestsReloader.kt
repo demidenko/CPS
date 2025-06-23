@@ -11,8 +11,8 @@ import com.demich.cps.contests.loading_engine.loaders.ClistContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.CodeforcesContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.DmojContestsLoader
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
-import com.demich.cps.platforms.api.ClistClient
-import com.demich.cps.platforms.api.ClistResource
+import com.demich.cps.platforms.api.clients.ClistClient
+import com.demich.cps.platforms.api.clients.ClistResource
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.fromSnapshot
 import kotlinx.coroutines.coroutineScope

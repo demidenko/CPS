@@ -1,5 +1,11 @@
-package com.demich.cps.platforms.api
+package com.demich.cps.platforms.api.clients
 
+import com.demich.cps.platforms.api.PlatformClient
+import com.demich.cps.platforms.api.RateLimitPlugin
+import com.demich.cps.platforms.api.cpsHttpClient
+import com.demich.cps.platforms.api.defaultJson
+import com.demich.cps.platforms.api.getAs
+import com.demich.cps.platforms.api.getText
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.parameter

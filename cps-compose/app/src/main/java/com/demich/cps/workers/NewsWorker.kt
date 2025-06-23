@@ -8,8 +8,8 @@ import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed.atc
 import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed.project_euler_news
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.platforms.api.AtCoderClient
-import com.demich.cps.platforms.api.AtCoderUrls
+import com.demich.cps.platforms.api.clients.AtCoderClient
+import com.demich.cps.platforms.api.clients.AtCoderUrls
 import com.demich.cps.platforms.api.clients.ProjectEulerClient
 import com.demich.cps.platforms.api.clients.ProjectEulerUrls
 import com.demich.cps.platforms.utils.AtCoderUtils

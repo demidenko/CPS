@@ -3,9 +3,9 @@ package com.demich.cps.contests.loading_engine.loaders
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsLoaderType
-import com.demich.cps.platforms.api.ClistClient
-import com.demich.cps.platforms.api.ClistContest
-import com.demich.cps.platforms.api.ClistResource
+import com.demich.cps.platforms.api.clients.ClistClient
+import com.demich.cps.platforms.api.clients.ClistContest
+import com.demich.cps.platforms.api.clients.ClistResource
 import com.demich.cps.platforms.utils.ClistUtils
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate

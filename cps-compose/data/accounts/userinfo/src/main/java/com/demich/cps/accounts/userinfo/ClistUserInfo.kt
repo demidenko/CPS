@@ -1,6 +1,6 @@
 package com.demich.cps.accounts.userinfo
 
-import com.demich.cps.platforms.api.ClistUrls
+import com.demich.cps.platforms.api.clients.ClistUrls
 
 data class ClistUserInfo(
     val login: String,

@@ -1,6 +1,6 @@
 package com.demich.cps.accounts.userinfo
 
-import com.demich.cps.platforms.api.AtCoderUrls
+import com.demich.cps.platforms.api.clients.AtCoderUrls
 import kotlinx.serialization.Serializable
 
 @Serializable

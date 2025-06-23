@@ -5,8 +5,8 @@ import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.userinfo.ClistUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.platforms.api.ClistClient
-import com.demich.cps.platforms.api.ClistUrls
+import com.demich.cps.platforms.api.clients.ClistClient
+import com.demich.cps.platforms.api.clients.ClistUrls
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.platforms.utils.ClistUtils
 import com.demich.cps.ui.theme.CPSColors
