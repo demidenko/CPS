@@ -6,6 +6,7 @@ import com.demich.cps.accounts.userinfo.ClistUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.ClistApi
+import com.demich.cps.platforms.api.ClistUrls
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.platforms.utils.ClistUtils
 import com.demich.cps.ui.theme.CPSColors
@@ -17,7 +18,7 @@ class CListAccountManager :
 {
     override val type get() = AccountManagerType.clist
     override val userIdTitle = "login"
-    override val urlHomePage = ClistApi.urls.main
+    override val urlHomePage = ClistUrls.main
 
     override suspend fun fetchProfile(data: String): ProfileResult<ClistUserInfo> =
         ClistUtils.runCatching {

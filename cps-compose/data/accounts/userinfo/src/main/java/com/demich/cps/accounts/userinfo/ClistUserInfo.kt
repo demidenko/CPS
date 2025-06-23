@@ -1,6 +1,6 @@
 package com.demich.cps.accounts.userinfo
 
-import com.demich.cps.platforms.api.ClistApi
+import com.demich.cps.platforms.api.ClistUrls
 
 data class ClistUserInfo(
     val login: String,
@@ -10,5 +10,5 @@ data class ClistUserInfo(
         get() = login
 
     override val userPageUrl: String
-        get() = ClistApi.urls.user(login)
+        get() = ClistUrls.user(login)
 }

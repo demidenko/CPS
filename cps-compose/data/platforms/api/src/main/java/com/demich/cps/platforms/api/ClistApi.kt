@@ -11,7 +11,7 @@ import kotlin.time.Duration.Companion.seconds
 object ClistApi: PlatformClient {
     override val client = cpsHttpClient(json = defaultJson) {
         defaultRequest {
-            url(urls.main)
+            url(ClistUrls.main)
         }
 
         install(RateLimitPlugin) {
@@ -21,7 +21,7 @@ object ClistApi: PlatformClient {
     }
 
     suspend fun getUserPage(login: String): String {
-        return client.getText(urls.user(login))
+        return client.getText(ClistUrls.user(login))
     }
 
     suspend fun getUsersSearchPage(str: String): String {
@@ -39,7 +39,7 @@ object ClistApi: PlatformClient {
         //TODO: what if meta.total_count changes?
         var offset = 0
         do {
-            val result = client.getAs<ClistApiResponse<T>>("${urls.api}/$page") {
+            val result = client.getAs<ClistApiResponse<T>>("${ClistUrls.api}/$page") {
                 parameter("format", "json")
                 parameter("username", apiAccess.login)
                 parameter("api_key", apiAccess.key)
@@ -74,19 +74,19 @@ object ClistApi: PlatformClient {
         return getApiJsonObjects(page = "resource", apiAccess = apiAccess)
     }
 
-    object urls {
-        const val main = "https://clist.by"
-        fun user(login: String) = "$main/coder/$login"
-
-        const val api = "$main/api/v4"
-        val apiHelp get() = "$api/doc/"
-    }
-
     @Serializable
     data class ApiAccess(
         val login: String,
         val key: String
     )
+}
+
+object ClistUrls {
+    const val main = "https://clist.by"
+    fun user(login: String) = "$main/coder/$login"
+
+    const val api = "$main/api/v4"
+    val apiHelp get() = "$api/doc/"
 }
 
 @Serializable

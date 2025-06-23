@@ -6,8 +6,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -16,15 +21,19 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.platforms.api.ClistUrls
+import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.SettingsItemWithInfo
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.*
-import com.demich.cps.platforms.api.ClistApi
-import com.demich.cps.ui.CPSDefaults
+import com.demich.cps.utils.append
+import com.demich.cps.utils.context
+import com.demich.cps.utils.jsonCPS
+import com.demich.cps.utils.openUrlInBrowser
+import com.demich.cps.utils.saver
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -78,7 +87,7 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
                     .padding(start = 4.dp)
             )
             CPSIconButton(icon = CPSIcons.Help) {
-                context.openUrlInBrowser(ClistApi.urls.apiHelp)
+                context.openUrlInBrowser(ClistUrls.apiHelp)
             }
         }
 
