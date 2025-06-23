@@ -1,6 +1,6 @@
 package com.demich.cps.accounts.userinfo
 
-import com.demich.cps.platforms.api.TimusUrls
+import com.demich.cps.platforms.api.clients.TimusUrls
 import kotlinx.serialization.Serializable
 
 

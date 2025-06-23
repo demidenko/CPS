@@ -10,8 +10,8 @@ import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderClient
 import com.demich.cps.platforms.api.AtCoderUrls
-import com.demich.cps.platforms.api.ProjectEulerClient
-import com.demich.cps.platforms.api.ProjectEulerUrls
+import com.demich.cps.platforms.api.clients.ProjectEulerClient
+import com.demich.cps.platforms.api.clients.ProjectEulerUrls
 import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.platforms.utils.ProjectEulerUtils
 import com.demich.cps.utils.asHtmlToSpanned

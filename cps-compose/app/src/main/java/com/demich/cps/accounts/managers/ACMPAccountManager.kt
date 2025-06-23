@@ -8,8 +8,8 @@ import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.accounts.userinfo.ACMPUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.platforms.api.ACMPClient
-import com.demich.cps.platforms.api.ACMPUrls
+import com.demich.cps.platforms.api.clients.ACMPClient
+import com.demich.cps.platforms.api.clients.ACMPUrls
 import com.demich.cps.platforms.utils.ACMPUtils
 import com.demich.cps.ui.theme.CPSColors
 
