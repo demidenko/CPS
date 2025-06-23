@@ -9,6 +9,7 @@ import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed.pro
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
+import com.demich.cps.platforms.api.AtCoderUrls
 import com.demich.cps.platforms.api.ProjectEulerApi
 import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.platforms.utils.ProjectEulerUtils
@@ -61,7 +62,7 @@ class NewsWorker(
                 bigContent = post.title.trim() //TODO: title + content html
                 smallIcon = R.drawable.ic_community
                 post.time?.let { time = it }
-                url = AtCoderApi.urls.post(post.id.toInt())
+                url = AtCoderUrls.post(post.id.toInt())
                 //setColor
                 autoCancel = true
             }

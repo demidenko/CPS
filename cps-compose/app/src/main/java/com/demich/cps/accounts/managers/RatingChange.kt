@@ -1,7 +1,7 @@
 package com.demich.cps.accounts.managers
 
-import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.AtCoderRatingChange
+import com.demich.cps.platforms.api.AtCoderUrls
 import com.demich.cps.platforms.api.CodeChefRatingChange
 import com.demich.cps.platforms.api.DmojRatingChange
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
@@ -42,7 +42,7 @@ internal fun AtCoderRatingChange.toRatingChange(handle: String) =
         rank = Place,
         date = EndTime,
         title = ContestName,
-        url = AtCoderApi.urls.userContestResult(handle, getContestId())
+        url = AtCoderUrls.userContestResult(handle, getContestId())
     )
 
 internal fun CodeChefRatingChange.toRatingChange() =

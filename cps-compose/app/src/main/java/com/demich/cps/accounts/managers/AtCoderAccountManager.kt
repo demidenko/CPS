@@ -13,6 +13,7 @@ import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
+import com.demich.cps.platforms.api.AtCoderUrls
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.ui.SettingsSwitchItemWithProfilesWork
@@ -28,7 +29,7 @@ class AtCoderAccountManager :
     ProfileSuggestionsProvider
 {
     override val type get() = AccountManagerType.atcoder
-    override val urlHomePage get() = AtCoderApi.urls.main
+    override val urlHomePage get() = AtCoderUrls.main
 
     override fun isValidForUserId(char: Char): Boolean = when(char) {
         in 'a'..'z', in 'A'..'Z', in '0'..'9', in "_" -> true

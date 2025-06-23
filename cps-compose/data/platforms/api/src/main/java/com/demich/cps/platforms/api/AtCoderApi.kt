@@ -10,17 +10,17 @@ object AtCoderApi: PlatformClient {
     private val json get() = defaultJson
 
     suspend fun getUserPage(handle: String): String  {
-        return client.getText(urlString = urls.user(handle)) {
+        return client.getText(urlString = AtCoderUrls.user(handle)) {
             parameter("graph", "rating")
         }
     }
 
     suspend fun getMainPage(): String  {
-        return client.getText(urlString = urls.main)
+        return client.getText(urlString = AtCoderUrls.main)
     }
 
     suspend fun getContestsPage(): String {
-        return client.getText(urlString = urls.main + "/contests")
+        return client.getText(urlString = AtCoderUrls.main + "/contests")
     }
 
     suspend fun getRatingChanges(handle: String): List<AtCoderRatingChange> {
@@ -37,23 +37,22 @@ object AtCoderApi: PlatformClient {
     }
 
     suspend fun getSuggestionsPage(str: String): String {
-        return client.getText(urlString = urls.main + "/ranking/all") {
+        return client.getText(urlString = AtCoderUrls.main + "/ranking/all") {
             parameter("f.UserScreenName", str)
             parameter("contestType", "algo")
             parameter("orderBy", "rating")
             parameter("desc", true)
         }
     }
-
-    object urls {
-        const val main = "https://atcoder.jp"
-        fun user(handle: String) = "$main/users/$handle"
-        fun userContestResult(handle: String, contestId: String) = "$main/users/$handle/history/share/$contestId"
-        fun contest(id: String) = "$main/contests/$id"
-        fun post(id: Int) = "$main/posts/$id"
-    }
 }
 
+object AtCoderUrls {
+    const val main = "https://atcoder.jp"
+    fun user(handle: String) = "$main/users/$handle"
+    fun userContestResult(handle: String, contestId: String) = "$main/users/$handle/history/share/$contestId"
+    fun contest(id: String) = "$main/contests/$id"
+    fun post(id: Int) = "$main/posts/$id"
+}
 
 @Serializable
 data class AtCoderRatingChange(

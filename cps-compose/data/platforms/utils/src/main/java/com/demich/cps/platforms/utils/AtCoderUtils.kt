@@ -3,7 +3,7 @@ package com.demich.cps.platforms.utils
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.platforms.api.AtCoderApi
+import com.demich.cps.platforms.api.AtCoderUrls
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
@@ -58,7 +58,7 @@ object AtCoderUtils {
                 platform = Contest.Platform.atcoder,
                 title = title.text().trim(),
                 id = id,
-                link = AtCoderApi.urls.contest(id),
+                link = AtCoderUrls.contest(id),
                 startTime = startTime,
                 duration = duration
             )

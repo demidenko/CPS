@@ -1,6 +1,6 @@
 package com.demich.cps.accounts.userinfo
 
-import com.demich.cps.platforms.api.AtCoderApi
+import com.demich.cps.platforms.api.AtCoderUrls
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -9,5 +9,5 @@ data class AtCoderUserInfo(
     override val rating: Int? = null
 ): RatedUserInfo() {
     override val userPageUrl: String
-        get() = AtCoderApi.urls.user(handle)
+        get() = AtCoderUrls.user(handle)
 }
