@@ -3,6 +3,7 @@ package com.demich.cps.platforms.api
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import io.ktor.client.network.sockets.SocketTimeoutException
 import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.ResponseException
 import io.ktor.http.HttpStatusCode
@@ -16,6 +17,8 @@ val Throwable.niceMessage: String? get() =
         is ResponseException -> HttpStatusCode.fromValue(response.status.value).toString()
 
         is CodeforcesApiException -> message
+
+        is HttpRequestTimeoutException -> "Request timeout"
 
         is kotlinx.serialization.SerializationException -> "Serialization failed"
 
