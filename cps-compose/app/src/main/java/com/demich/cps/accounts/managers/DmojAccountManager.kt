@@ -14,6 +14,7 @@ import com.demich.cps.accounts.userinfo.DmojUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.DmojApi
+import com.demich.cps.platforms.api.DmojUrls
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
@@ -25,7 +26,7 @@ class DmojAccountManager :
     ProfileSuggestionsProvider
 {
     override val type get() = AccountManagerType.dmoj
-    override val urlHomePage get() = DmojApi.urls.main
+    override val urlHomePage get() = DmojUrls.main
 
     override fun isValidForUserId(char: Char): Boolean = when(char) {
         in 'a'..'z', in 'A'..'Z', in '0'..'9', in "_" -> true

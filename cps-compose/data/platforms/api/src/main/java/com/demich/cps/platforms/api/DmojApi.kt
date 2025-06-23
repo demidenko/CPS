@@ -14,7 +14,7 @@ object DmojApi: PlatformClient {
     private val json get() = defaultJson
     override val client = cpsHttpClient(json = json) {
         defaultRequest {
-            url(urls.main)
+            url(DmojUrls.main)
         }
 
         install(RateLimitPlugin) {
@@ -64,11 +64,11 @@ object DmojApi: PlatformClient {
         }
         return emptyList()
     }
+}
 
-    object urls {
-        const val main = "https://dmoj.ca"
-        fun user(username: String) = "$main/user/$username"
-    }
+object DmojUrls {
+    const val main = "https://dmoj.ca"
+    fun user(username: String) = "$main/user/$username"
 }
 
 @Serializable
