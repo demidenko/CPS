@@ -36,7 +36,7 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-object CodeforcesApi: PlatformClient {
+object CodeforcesClient: PlatformClient {
     override val client = cpsHttpClient(
         json = defaultJson,
         useCookies = true,

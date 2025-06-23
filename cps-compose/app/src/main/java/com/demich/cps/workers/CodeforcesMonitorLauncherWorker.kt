@@ -6,7 +6,7 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.utils.removeOld
 import com.demich.kotlin_stdlib_boost.minOfNotNull
@@ -82,7 +82,7 @@ class CodeforcesMonitorLauncherWorker(
         var step = 1L
         while (true) {
             var flagBreak = false
-            CodeforcesApi.getUserSubmissions(handle = handle, from = from, count = step)
+            CodeforcesClient.getUserSubmissions(handle = handle, from = from, count = step)
                 .also { if (it.isEmpty()) flagBreak = true }
                 .forEach {
                     if (isActual(it.creationTime) && (lastSubmissionId == null || it.id > lastSubmissionId)) {

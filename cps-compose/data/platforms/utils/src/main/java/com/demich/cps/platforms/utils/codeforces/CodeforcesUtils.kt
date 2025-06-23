@@ -2,8 +2,8 @@ package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
+import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
@@ -235,7 +235,7 @@ object CodeforcesUtils {
     }
 
     private suspend fun getUserPageOrNull(handle: String): String? =
-        CodeforcesApi.runCatching { getUserPage(handle) }.getOrNull()
+        CodeforcesClient.runCatching { getUserPage(handle) }.getOrNull()
 
     suspend fun getRealColorTagOrNull(handle: String): CodeforcesColorTag? {
         return getUserPageOrNull(handle)?.let { extractRealHandleOrNull(it)?.colorTag }
@@ -255,7 +255,7 @@ object CodeforcesUtils {
         handles: Set<String>,
         doRedirect: Boolean
     ): Map<String, ProfileResult<CodeforcesUserInfo>> {
-        return CodeforcesApi.runCatching {
+        return CodeforcesClient.runCatching {
             getUsers(handles = handles, checkHistoricHandles = doRedirect)
                 .apply { check(size == handles.size) }
         }.map { infos ->
@@ -275,7 +275,7 @@ object CodeforcesUtils {
 
     suspend fun getUserInfo(handle: String, doRedirect: Boolean): ProfileResult<CodeforcesUserInfo> {
         //return getUsersInfo(setOf(handle), doRedirect).getValue(handle)
-        return CodeforcesApi.runCatching {
+        return CodeforcesClient.runCatching {
             ProfileResult.Success(
                 userInfo = CodeforcesUserInfo(getUser(handle = handle, checkHistoricHandles = doRedirect))
             )

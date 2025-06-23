@@ -6,7 +6,7 @@ import com.demich.cps.R
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
@@ -57,7 +57,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
 
         val suggestedProblems = suggestedItem()
 
-        CodeforcesApi.getUserRatingChanges(handle)
+        CodeforcesClient.getUserRatingChanges(handle)
             .filter { it.ratingUpdateTime >= dateThreshold }
             .sortedByDescending { it.ratingUpdateTime }
             .forEachWithProgress { ratingChange ->
@@ -91,11 +91,11 @@ private suspend inline fun getSuggestions(
     val contestId = ratingChange.contestId
     val (userSubmissions, acceptedStats) = awaitPair(
         blockFirst = {
-            CodeforcesApi.getContestSubmissions(contestId = contestId, handle = handle)
+            CodeforcesClient.getContestSubmissions(contestId = contestId, handle = handle)
         },
         blockSecond = {
             CodeforcesUtils.extractContestAcceptedStatistics(
-                source = CodeforcesApi.getContestPage(contestId = contestId),
+                source = CodeforcesClient.getContestPage(contestId = contestId),
                 contestId = contestId
             )
         }

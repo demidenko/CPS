@@ -1,9 +1,9 @@
 package com.demich.cps.contests.monitors
 
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingUnavailableException
+import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
@@ -102,7 +102,7 @@ private suspend inline fun CodeforcesMonitorDataStore.getStandingsData(
     handle: String,
     onOfficialChanged: () -> Unit
 ) {
-    CodeforcesApi.runCatching {
+    CodeforcesClient.runCatching {
         getContestStandings(
             contestId = contestId,
             handle = handle,
@@ -200,7 +200,7 @@ private class RatingChangeWaiter(
     }
 
     private suspend fun isRatingChangeDone(): Boolean {
-        CodeforcesApi.runCatching {
+        CodeforcesClient.runCatching {
             getContestRatingChanges(contestId)
         }.getOrElse {
             //TODO: take this failure
@@ -224,7 +224,7 @@ private fun Flow<CodeforcesContestPhase>.toSystemTestPercentageFlow(
 ): Flow<Int> = distinctUntilChanged().transformLatest { phase ->
     if (phase == CodeforcesContestPhase.SYSTEM_TEST) {
         while (true) {
-            CodeforcesApi.runCatching { getContestPage(contestId) }
+            CodeforcesClient.runCatching { getContestPage(contestId) }
                 .map { CodeforcesUtils.extractContestSystemTestingPercentageOrNull(it) }
                 .onSuccess {
                     if (it != null) emit(it)
@@ -265,7 +265,7 @@ private suspend inline fun CodeforcesMonitorDataStore.ifNeedCheckSubmissions(
 }
 
 private suspend fun getSubmissionsOrNull(contestId: Int, handle: String): List<CodeforcesSubmission>? =
-    CodeforcesApi.runCatching {
+    CodeforcesClient.runCatching {
         getContestSubmissions(contestId = contestId, handle = handle)
     }.map { submissions ->
         submissions.filter {

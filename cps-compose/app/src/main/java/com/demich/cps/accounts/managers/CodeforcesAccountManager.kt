@@ -20,7 +20,7 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
@@ -66,14 +66,14 @@ class CodeforcesAccountManager :
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
         buildList {
-            val s = CodeforcesApi.getHandleSuggestionsPage(str)
+            val s = CodeforcesClient.getHandleSuggestionsPage(str)
             CodeforcesUtils.extractHandleSuggestions(source = s) { handle ->
                 add(UserSuggestion(title = handle, userId = handle))
             }
         }.asReversed()
 
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
-        CodeforcesApi.getUserRatingChanges(handle = userId).map { it.toRatingChange() }
+        CodeforcesClient.getUserRatingChanges(handle = userId).map { it.toRatingChange() }
 
     override val ratingsUpperBounds by lazy {
         listOf(

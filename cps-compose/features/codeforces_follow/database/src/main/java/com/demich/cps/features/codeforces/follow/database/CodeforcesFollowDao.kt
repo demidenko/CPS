@@ -7,9 +7,9 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogException
+import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
@@ -88,7 +88,7 @@ interface CodeforcesFollowDao {
         locale: CodeforcesLocale,
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
     ): Result<List<CodeforcesBlogEntry>> {
-        return CodeforcesApi.runCatching {
+        return CodeforcesClient.runCatching {
             getUserBlogEntries(handle = handle, locale = locale)
         }.recoverCatching {
             if (it is CodeforcesApiNotAllowedReadBlogException) {

@@ -8,7 +8,7 @@ import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostDao
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
@@ -51,16 +51,16 @@ class CodeforcesCommunityLostRecentWorker(
         }
 
     private suspend fun getRecentBlogEntries(locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
-        suspend fun extractFrom(page: CodeforcesApi.BasePage) =
+        suspend fun extractFrom(page: CodeforcesClient.BasePage) =
             CodeforcesUtils.extractRecentBlogEntries(
-                source = CodeforcesApi.getPage(page = page, locale = locale)
+                source = CodeforcesClient.getPage(page = page, locale = locale)
             )
 
         // "/groups" has less size than "/recent" and hopefully will be cached by cf
         return runCatching {
-            extractFrom(CodeforcesApi.BasePage.groups)
+            extractFrom(CodeforcesClient.BasePage.groups)
         }.getOrElse {
-            extractFrom(CodeforcesApi.BasePage.recent)
+            extractFrom(CodeforcesClient.BasePage.recent)
         }
     }
 
@@ -126,13 +126,13 @@ private class CachedBlogEntryApi(
 
     suspend inline fun getCreationTime(blogEntryId: Int): Instant =
         cache.getOrPut(blogEntryId) {
-            CodeforcesApi.getBlogEntry(blogEntryId = blogEntryId, locale = locale)
+            CodeforcesClient.getBlogEntry(blogEntryId = blogEntryId, locale = locale)
                 .also { onUpdate(it) }
                 .creationTime
         }
 
     suspend fun useRecentActions() {
-        CodeforcesApi.runCatching { getRecentActions(locale = locale) }
+        CodeforcesClient.runCatching { getRecentActions(locale = locale) }
             .getOrElse { return }
             .forEach {
                 it.blogEntry?.let { blogEntry ->

@@ -13,7 +13,7 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.toSignedString
 import kotlin.time.Duration.Companion.minutes
@@ -58,7 +58,7 @@ class ProfilesWorker(
         val userInfo = codeforcesAccountManager.dataStore(context).getProfile()
             ?.userInfoOrNull() ?: return
 
-        val lastRatingChange = CodeforcesApi.runCatching {
+        val lastRatingChange = CodeforcesClient.runCatching {
             getUserRatingChanges(handle = userInfo.handle)
         }.getOrNull()?.lastOrNull() ?: return
 
