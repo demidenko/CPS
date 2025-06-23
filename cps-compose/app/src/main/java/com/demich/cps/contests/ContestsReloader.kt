@@ -13,6 +13,7 @@ import com.demich.cps.contests.loading_engine.loaders.DmojContestsLoader
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.platforms.api.clients.ClistClient
 import com.demich.cps.platforms.api.clients.ClistResource
+import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.fromSnapshot
 import kotlinx.coroutines.coroutineScope
@@ -92,7 +93,7 @@ private suspend fun contestsLoadingFlows(
                 apiAccess = clistApiAccess,
                 additionalResources = clistAdditionalResources
             )
-            ContestsLoaderType.codeforces_api -> CodeforcesContestsLoader()
+            ContestsLoaderType.codeforces_api -> CodeforcesContestsLoader(api = CodeforcesClient)
             ContestsLoaderType.atcoder_parse -> AtCoderContestsLoader()
             ContestsLoaderType.dmoj_api -> DmojContestsLoader()
         }
