@@ -9,6 +9,7 @@ import com.demich.cps.accounts.userinfo.ACMPUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.ACMPApi
+import com.demich.cps.platforms.api.ACMPUrls
 import com.demich.cps.platforms.utils.ACMPUtils
 import com.demich.cps.ui.theme.CPSColors
 
@@ -19,7 +20,7 @@ class ACMPAccountManager :
 {
     override val type get() = AccountManagerType.acmp
     override val userIdTitle get() = "id"
-    override val urlHomePage get() = ACMPApi.urls.main
+    override val urlHomePage get() = ACMPUrls.main
 
     override fun isValidForUserId(char: Char): Boolean = char in '0'..'9'
 

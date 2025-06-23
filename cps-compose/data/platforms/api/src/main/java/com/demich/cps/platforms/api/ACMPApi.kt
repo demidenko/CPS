@@ -30,12 +30,8 @@ object ACMPApi: PlatformClient {
         block: HttpRequestBuilder.() -> Unit = {}
     ): String = this.get(urlString = urlString, block = block).bodyAsText()
 
-    suspend fun getMainPage(): String {
-        return client.getText(urls.main)
-    }
-
     suspend fun getUserPage(id: Int): String {
-        with(client.get(urls.user(id))) {
+        with(client.get(ACMPUrls.user(id))) {
             //acmp redirects to main page if user not found
             if (request.url.parameters.isEmpty()) throw ACMPPageNotFoundException()
             return bodyAsText()
@@ -43,13 +39,13 @@ object ACMPApi: PlatformClient {
     }
 
     suspend fun getUsersSearch(str: String): String {
-        return client.getText(urls.main + "/index.asp?main=rating") {
+        return client.getText(ACMPUrls.main + "/index.asp?main=rating") {
             url.encodedParameters.append("str", URLEncoder.encode(str, windows1251.name()))
         }
     }
+}
 
-    object urls {
-        const val main = "https://acmp.ru"
-        fun user(id: Int) = "$main/index.asp?main=user&id=$id"
-    }
+object ACMPUrls {
+    const val main = "https://acmp.ru"
+    fun user(id: Int) = "$main/index.asp?main=user&id=$id"
 }

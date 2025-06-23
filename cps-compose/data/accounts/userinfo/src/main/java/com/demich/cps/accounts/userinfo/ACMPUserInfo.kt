@@ -1,6 +1,6 @@
 package com.demich.cps.accounts.userinfo
 
-import com.demich.cps.platforms.api.ACMPApi
+import com.demich.cps.platforms.api.ACMPUrls
 import kotlinx.serialization.Serializable
 
 
@@ -16,5 +16,5 @@ data class ACMPUserInfo(
         get() = id
 
     override val userPageUrl: String
-        get() = ACMPApi.urls.user(id.toInt())
+        get() = ACMPUrls.user(id.toInt())
 }
