@@ -3,7 +3,7 @@ package com.demich.cps.platforms.api
 object ProjectEulerApi: PlatformClient {
 
     private suspend fun getPage(page: String): String {
-        return client.getText(urlString = "${urls.main}/$page")
+        return client.getText(urlString = "${ProjectEulerUrls.main}/$page")
     }
 
     suspend fun getNewsPage(): String {
@@ -17,11 +17,11 @@ object ProjectEulerApi: PlatformClient {
     suspend fun getRecentPage(): String {
         return getPage(page = "recent")
     }
+}
 
-    object urls {
-        const val main = "https://projecteuler.net"
-        val news get() = "$main/news"
+object ProjectEulerUrls {
+    const val main = "https://projecteuler.net"
+    val news get() = "$main/news"
 
-        fun problem(id: Int) = "$main/problem=$id"
-    }
+    fun problem(id: Int) = "$main/problem=$id"
 }

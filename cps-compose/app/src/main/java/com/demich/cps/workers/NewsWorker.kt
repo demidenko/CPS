@@ -11,6 +11,7 @@ import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.AtCoderApi
 import com.demich.cps.platforms.api.AtCoderUrls
 import com.demich.cps.platforms.api.ProjectEulerApi
+import com.demich.cps.platforms.api.ProjectEulerUrls
 import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.platforms.utils.ProjectEulerUtils
 import com.demich.cps.utils.asHtmlToSpanned
@@ -85,7 +86,7 @@ class NewsWorker(
                 colorResId = R.color.project_euler_main
                 time = null
                 autoCancel = true
-                url = ProjectEulerApi.urls.news
+                url = ProjectEulerUrls.news
             }
         }
     }

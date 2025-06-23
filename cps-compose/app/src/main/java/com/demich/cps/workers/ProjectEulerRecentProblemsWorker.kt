@@ -7,6 +7,7 @@ import com.demich.cps.community.settings.CommunitySettingsDataStore
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.ProjectEulerApi
+import com.demich.cps.platforms.api.ProjectEulerUrls
 import com.demich.cps.platforms.utils.ProjectEulerUtils
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlin.time.Duration.Companion.hours
@@ -52,7 +53,7 @@ class ProjectEulerRecentProblemsWorker(
                 colorResId = R.color.project_euler_main
                 time = post.date
                 autoCancel = true
-                url = ProjectEulerApi.urls.problem(problemId)
+                url = ProjectEulerUrls.problem(problemId)
             }
         }
     }
