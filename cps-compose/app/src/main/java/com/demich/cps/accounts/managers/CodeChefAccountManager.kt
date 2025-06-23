@@ -30,6 +30,7 @@ import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.accounts.userinfo.ratingToString
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.CodeChefApi
+import com.demich.cps.platforms.api.CodeChefUrls
 import com.demich.cps.platforms.api.isRedirect
 import com.demich.cps.platforms.utils.CodeChefUtils
 import com.demich.cps.ui.CPSIcons
@@ -49,7 +50,7 @@ class CodeChefAccountManager :
     }
 
     override val type get() = AccountManagerType.codechef
-    override val urlHomePage get() = CodeChefApi.urls.main
+    override val urlHomePage get() = CodeChefUrls.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)
     override fun isValidForUserId(char: Char) = when(char) {

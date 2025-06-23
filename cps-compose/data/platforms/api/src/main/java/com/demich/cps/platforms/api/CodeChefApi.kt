@@ -47,7 +47,7 @@ object CodeChefApi: PlatformClient {
         suspend operator fun invoke(): String {
             val d = tokenDeferred ?: client.async {
                 println("codechef x-csrf-token start recalc...")
-                extractCSRFToken(source = client.getText("${urls.main}/ratings/all")).also {
+                extractCSRFToken(source = client.getText("${CodeChefUrls.main}/ratings/all")).also {
                     println("codechef x-csrf-token = $it")
                     check(it.length == 64)
                 }
@@ -77,11 +77,11 @@ object CodeChefApi: PlatformClient {
     }
 
     suspend fun getUserPage(handle: String): String {
-        return client.getText(urls.user(handle))
+        return client.getText(CodeChefUrls.user(handle))
     }
 
     suspend fun getSuggestions(str: String): CodeChefSearchResult {
-        return getCodeChef("${urls.main}/api/ratings/all") {
+        return getCodeChef("${CodeChefUrls.main}/api/ratings/all") {
             parameter("itemsPerPage", 40)
             parameter("order", "asc")
             parameter("page", 1)
@@ -102,11 +102,11 @@ object CodeChefApi: PlatformClient {
         }
         return emptyList()
     }
+}
 
-    object urls {
-        const val main = "https://www.codechef.com"
-        fun user(username: String) = "$main/users/$username"
-    }
+object CodeChefUrls {
+    const val main = "https://www.codechef.com"
+    fun user(username: String) = "$main/users/$username"
 }
 
 @Serializable
