@@ -14,6 +14,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.getRealColorTagOrNull
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.backgroundDataLoader
@@ -127,7 +128,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         blogEntriesLoader.execute(id = "$handle#$key") {
             val (result, colorTag) = awaitPair(
                 blockFirst = { context.followListDao.getAndReloadBlogEntries(handle) },
-                blockSecond = { CodeforcesUtils.getRealColorTagOrNull(handle) }
+                blockSecond = { CodeforcesClient.getRealColorTagOrNull(handle) }
             )
             result.getOrThrow().map {
                 it.copy(

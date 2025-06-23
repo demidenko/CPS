@@ -1,6 +1,6 @@
 package com.demich.cps.platforms.utils.codeforces
 
-import com.demich.cps.platforms.api.codeforces.CodeforcesClient
+import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
@@ -230,18 +230,6 @@ object CodeforcesUtils {
         }
     }
 
-    private suspend fun getUserPageOrNull(handle: String): String? =
-        CodeforcesClient.runCatching { getUserPage(handle) }.getOrNull()
-
-    suspend fun getRealColorTagOrNull(handle: String): CodeforcesColorTag? {
-        return getUserPageOrNull(handle)?.let { extractRealHandleOrNull(it)?.colorTag }
-    }
-
-    private fun extractRealHandleOrNull(page: String): CodeforcesHandle? {
-        val userBox = Jsoup.parse(page).selectFirst("div.userbox") ?: return null
-        return userBox.selectRatedUser()?.extractRatedUser()
-    }
-
     private inline fun extractProblemWithAcceptedCount(
         problemRow: Element,
         contestId: Int,
@@ -289,4 +277,13 @@ object CodeforcesUtils {
             rating < 3000 -> CodeforcesColorTag.RED
             else -> CodeforcesColorTag.LEGENDARY
         }
+}
+
+
+suspend fun CodeforcesPageContentProvider.getRealColorTagOrNull(handle: String): CodeforcesColorTag? {
+    val page = runCatching { getUserPage(handle) }.getOrElse { return null }
+    return Jsoup.parse(page).selectFirst("div.userbox")
+        ?.selectRatedUser()
+        ?.extractRatedUser()
+        ?.colorTag
 }
