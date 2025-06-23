@@ -49,7 +49,7 @@ abstract class CodeforcesFollowList(
         addNewUser(ProfileResult.Failed(handle))
         dao.applyProfileResult(
             handle = handle,
-            result = CodeforcesClient.getProfile(handle = handle, doRedirect = true)
+            result = CodeforcesClient.getProfile(handle = handle, recoverHandle = true)
         )
     }
 

@@ -96,7 +96,7 @@ interface CodeforcesFollowDao {
                 return@recoverCatching emptyList()
             }
             if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
-                val profileResult = CodeforcesClient.getProfile(handle = handle, doRedirect = true)
+                val profileResult = CodeforcesClient.getProfile(handle = handle, recoverHandle = true)
                 applyProfileResult(handle, profileResult)
                 if (profileResult is ProfileResult.Success) {
                     return@recoverCatching getAndReloadBlogEntries(
@@ -113,7 +113,7 @@ interface CodeforcesFollowDao {
     }
 
     suspend fun updateUsersInfo() {
-        applyProfilesResults(CodeforcesClient.getProfiles(handles = getHandles(), doRedirect = true))
+        applyProfilesResults(CodeforcesClient.getProfiles(handles = getHandles(), recoverHandle = true))
     }
 
     @Transaction

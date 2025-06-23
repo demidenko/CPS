@@ -71,7 +71,7 @@ class ProfilesWorker(
             ?.userInfoOrNull() ?: return
 
         val handle = userInfo.handle
-        val newContribution = CodeforcesClient.getProfile(handle = handle, doRedirect = false)
+        val newContribution = CodeforcesClient.getProfile(handle = handle, recoverHandle = false)
             .userInfoOrNull()?.contribution ?: return
 
         if (newContribution == userInfo.contribution) return

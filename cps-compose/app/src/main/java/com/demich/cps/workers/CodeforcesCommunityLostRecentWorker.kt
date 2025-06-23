@@ -222,7 +222,7 @@ private suspend inline fun findSuspects(
 
 //Required against new year color chaos
 private suspend fun Collection<CodeforcesBlogEntry>.fixedHandleColors(): List<CodeforcesBlogEntry> {
-    val authors = CodeforcesClient.getProfiles(handles = map { it.authorHandle }, doRedirect = false)
+    val authors = CodeforcesClient.getProfiles(handles = map { it.authorHandle }, recoverHandle = false)
     return map { blogEntry ->
         val result = authors.getValue(blogEntry.authorHandle)
         require(result is ProfileResult.Success)

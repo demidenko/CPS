@@ -295,16 +295,16 @@ object CodeforcesUtils {
         }
 }
 
-suspend fun CodeforcesApi.getProfiles(handles: Collection<String>, doRedirect: Boolean) =
-    getProfiles(handles.toSet(), doRedirect)
+suspend fun CodeforcesApi.getProfiles(handles: Collection<String>, recoverHandle: Boolean) =
+    getProfiles(handles.toSet(), recoverHandle)
 
 //TODO: non recursive O(n) version (coping map is n^2, getUsers is n^2 in total, can be improved by mitm)
 suspend fun CodeforcesApi.getProfiles(
     handles: Set<String>,
-    doRedirect: Boolean
+    recoverHandle: Boolean
 ): Map<String, ProfileResult<CodeforcesUserInfo>> {
     return runCatching {
-        getUsers(handles = handles, checkHistoricHandles = doRedirect)
+        getUsers(handles = handles, checkHistoricHandles = recoverHandle)
             .apply { check(size == handles.size) }
     }.map { users ->
         //relying to cf api return in same order
@@ -312,7 +312,7 @@ suspend fun CodeforcesApi.getProfiles(
     }.getOrElse { e ->
         if (e is CodeforcesApiHandleNotFoundException) {
             val badHandle = e.handle
-            return@getOrElse getProfiles(handles = handles - badHandle, doRedirect = doRedirect)
+            return@getOrElse getProfiles(handles = handles - badHandle, recoverHandle = recoverHandle)
                 .plus(badHandle to ProfileResult.NotFound(badHandle))
         }
         handles.associateWith { ProfileResult.Failed(it) }
@@ -321,11 +321,11 @@ suspend fun CodeforcesApi.getProfiles(
     }
 }
 
-suspend fun CodeforcesApi.getProfile(handle: String, doRedirect: Boolean): ProfileResult<CodeforcesUserInfo> {
-    // shortcut for getProfiles(setOf(handle), doRedirect).getValue(handle)
+suspend fun CodeforcesApi.getProfile(handle: String, recoverHandle: Boolean): ProfileResult<CodeforcesUserInfo> {
+    // shortcut for getProfiles(setOf(handle), recoverHandle).getValue(handle)
     return runCatching {
         ProfileResult.Success(
-            userInfo = CodeforcesUserInfo(getUser(handle = handle, checkHistoricHandles = doRedirect))
+            userInfo = CodeforcesUserInfo(getUser(handle = handle, checkHistoricHandles = recoverHandle))
         )
     }.getOrElse { e ->
         if (e is CodeforcesApiHandleNotFoundException && e.handle == handle) {
