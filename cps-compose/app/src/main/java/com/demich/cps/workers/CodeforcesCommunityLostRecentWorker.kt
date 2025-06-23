@@ -183,7 +183,8 @@ private suspend inline fun findSuspects(
     }
 
     val hint = lastNotNewIdItem.let { item ->
-        val hint = item()
+        // TODO: `.invoke()` instead of `()` https://youtrack.jetbrains.com/issue/KT-74111/
+        val hint = item.invoke()
         //ensure hint in case isNew logic changes
         if (hint != null && isNew(hint.creationTime)) {
             item.invoke(newValue = null)
@@ -204,7 +205,6 @@ private suspend inline fun findSuspects(
     So as result choose #2 or #3
      */
     blogEntries
-        // TODO: `.invoke()` instead of `()` https://youtrack.jetbrains.com/issue/KT-74111/
         .filterIdGreaterThan(hint?.blogEntryId ?: Int.MIN_VALUE)
         .fixAndFilterColorTag(minRatingColorTag)
         .also {
