@@ -3,7 +3,6 @@ package com.demich.cps.platforms.api.codeforces
 import com.demich.cps.platforms.api.BuildConfig
 import com.demich.cps.platforms.api.PlatformClient
 import com.demich.cps.platforms.api.RateLimitPlugin
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings

@@ -8,8 +8,8 @@ import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostDao
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesClient
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale

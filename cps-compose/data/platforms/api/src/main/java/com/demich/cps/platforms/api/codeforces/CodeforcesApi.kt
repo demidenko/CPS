@@ -1,4 +1,13 @@
-package com.demich.cps.platforms.api.codeforces.models
+package com.demich.cps.platforms.api.codeforces
+
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 
 interface CodeforcesApi {
     // api methods from https://codeforces.com/apiHelp/methods
