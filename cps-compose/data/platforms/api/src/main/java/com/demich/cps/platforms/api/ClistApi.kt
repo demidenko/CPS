@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-object ClistApi: PlatformApi {
+object ClistApi: PlatformClient {
     override val client = cpsHttpClient(json = defaultJson) {
         defaultRequest {
             url(urls.main)

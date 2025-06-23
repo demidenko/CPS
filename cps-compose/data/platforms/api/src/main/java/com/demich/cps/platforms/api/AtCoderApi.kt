@@ -2,11 +2,11 @@ package com.demich.cps.platforms.api
 
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
-import io.ktor.client.request.*
+import io.ktor.client.request.parameter
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
-object AtCoderApi: PlatformApi {
+object AtCoderApi: PlatformClient {
     private val json get() = defaultJson
 
     suspend fun getUserPage(handle: String): String  {

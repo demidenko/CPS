@@ -1,13 +1,16 @@
 package com.demich.cps.platforms.api
 
-import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.Charsets
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.request
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
-object ACMPApi: PlatformApi {
+object ACMPApi: PlatformClient {
     private val windows1251 = Charset.forName("windows-1251")
     override val client = cpsHttpClient {
         Charsets {

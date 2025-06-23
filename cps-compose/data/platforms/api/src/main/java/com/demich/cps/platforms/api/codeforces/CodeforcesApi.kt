@@ -1,7 +1,7 @@
 package com.demich.cps.platforms.api.codeforces
 
 import com.demich.cps.platforms.api.BuildConfig
-import com.demich.cps.platforms.api.PlatformApi
+import com.demich.cps.platforms.api.PlatformClient
 import com.demich.cps.platforms.api.RateLimitPlugin
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
@@ -36,7 +36,7 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-object CodeforcesApi: PlatformApi {
+object CodeforcesApi: PlatformClient {
     override val client = cpsHttpClient(
         json = defaultJson,
         useCookies = true,

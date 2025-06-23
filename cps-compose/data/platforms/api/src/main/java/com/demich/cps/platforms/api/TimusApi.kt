@@ -1,8 +1,8 @@
 package com.demich.cps.platforms.api
 
-import io.ktor.client.request.*
+import io.ktor.client.request.parameter
 
-object TimusApi: PlatformApi {
+object TimusApi: PlatformClient {
 
     suspend fun getUserPage(id: Int): String {
         return client.getText(urlString = urls.user(id)) {
