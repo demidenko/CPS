@@ -1,6 +1,6 @@
 package com.demich.cps.accounts.userinfo
 
-import com.demich.cps.platforms.api.TimusApi
+import com.demich.cps.platforms.api.TimusUrls
 import kotlinx.serialization.Serializable
 
 
@@ -17,5 +17,5 @@ data class TimusUserInfo(
         get() = id
 
     override val userPageUrl: String
-        get() = TimusApi.urls.user(id.toInt())
+        get() = TimusUrls.user(id.toInt())
 }

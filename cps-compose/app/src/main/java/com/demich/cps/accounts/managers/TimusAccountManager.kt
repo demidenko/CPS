@@ -8,6 +8,7 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.TimusApi
+import com.demich.cps.platforms.api.TimusUrls
 import com.demich.cps.platforms.utils.TimusUtils
 import com.demich.cps.ui.theme.CPSColors
 
@@ -18,7 +19,7 @@ class TimusAccountManager :
 {
     override val type get() = AccountManagerType.timus
     override val userIdTitle get() = "id"
-    override val urlHomePage get() = TimusApi.urls.main
+    override val urlHomePage get() = TimusUrls.main
 
     override fun isValidForUserId(char: Char): Boolean = char in '0'..'9'
     override fun isValidForSearch(char: Char): Boolean = true
