@@ -3,6 +3,7 @@ package com.demich.cps.platforms.api.codeforces
 import com.demich.cps.platforms.api.BuildConfig
 import com.demich.cps.platforms.api.PlatformClient
 import com.demich.cps.platforms.api.RateLimitPlugin
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
@@ -36,7 +37,7 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-object CodeforcesClient: PlatformClient {
+object CodeforcesClient: PlatformClient, CodeforcesApi {
     override val client = cpsHttpClient(
         json = defaultJson,
         useCookies = true,
@@ -108,7 +109,6 @@ object CodeforcesClient: PlatformClient {
         }
     }
 
-    //api methods from https://codeforces.com/apiHelp/methods
     private suspend inline fun <reified T> getCodeforcesApi(
         method: String,
         block: HttpRequestBuilder.() -> Unit = {}
@@ -119,69 +119,55 @@ object CodeforcesClient: PlatformClient {
         }.body<CodeforcesAPIResponse<T>>().result
     }
 
-    suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale): CodeforcesBlogEntry {
-        return getCodeforcesApi(method = "blogEntry.view") {
+    override suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale): CodeforcesBlogEntry =
+        getCodeforcesApi(method = "blogEntry.view") {
             parameter("blogEntryId", blogEntryId)
             parameter("locale", locale)
         }
-    }
 
-    //TODO: Sequence instead of List?
-    suspend fun getContests(): List<CodeforcesContest> {
-        return getCodeforcesApi(method = "contest.list") {
+    override suspend fun getContests(): List<CodeforcesContest> =
+        getCodeforcesApi(method = "contest.list") {
             parameter("gym", false)
         }
-    }
 
-    //TODO: Sequence instead of List
-    suspend fun getContestRatingChanges(contestId: Int): List<CodeforcesRatingChange> {
-        return getCodeforcesApi(method = "contest.ratingChanges" ) {
+    override suspend fun getContestRatingChanges(contestId: Int): List<CodeforcesRatingChange> =
+        getCodeforcesApi(method = "contest.ratingChanges" ) {
             parameter("contestId", contestId)
         }
-    }
 
-    suspend fun getContestStandings(
+    override suspend fun getContestStandings(
         contestId: Int,
         handles: Collection<String>,
         includeUnofficial: Boolean
-        //TODO: participantTypes: Collection<CodeforcesParticipationType>
-    ): CodeforcesContestStandings {
-        return getCodeforcesApi(method = "contest.standings") {
+    ): CodeforcesContestStandings =
+        getCodeforcesApi(method = "contest.standings") {
             parameter("contestId", contestId)
             parameter("handles", handles.joinToString(separator = ";"))
             parameter("showUnofficial", includeUnofficial)
         }
-    }
 
-    suspend fun getContestStandings(contestId: Int, handle: String, includeUnofficial: Boolean): CodeforcesContestStandings {
-        return getContestStandings(contestId, listOf(handle), includeUnofficial)
-    }
-
-    suspend fun getContestSubmissions(contestId: Int, handle: String): List<CodeforcesSubmission> {
-        return getCodeforcesApi(method = "contest.status") {
+    override suspend fun getContestSubmissions(contestId: Int, handle: String): List<CodeforcesSubmission> =
+        getCodeforcesApi(method = "contest.status") {
             parameter("contestId", contestId)
             parameter("handle", handle)
             parameter("count", 1e9.toInt())
         }
-    }
 
-    suspend fun getRecentActions(locale: CodeforcesLocale, maxCount: Int = Int.MAX_VALUE): List<CodeforcesRecentAction> {
-        return getCodeforcesApi(method = "recentActions") {
+    override suspend fun getRecentActions(locale: CodeforcesLocale, maxCount: Int): List<CodeforcesRecentAction> =
+        getCodeforcesApi(method = "recentActions") {
             parameter("maxCount", maxCount.coerceIn(0, 100))
             parameter("locale", locale)
         }
-    }
 
-    suspend fun getUserBlogEntries(handle: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
-        return getCodeforcesApi(method = "user.blogEntries") {
+    override suspend fun getUserBlogEntries(handle: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> =
+        getCodeforcesApi(method = "user.blogEntries") {
             parameter("handle", handle)
             parameter("locale", locale)
         }
-    }
 
-    suspend fun getUsers(
+    override suspend fun getUsers(
         handles: Collection<String>,
-        checkHistoricHandles: Boolean = false
+        checkHistoricHandles: Boolean
     ): List<CodeforcesUser> {
         if (handles.isEmpty()) return emptyList()
         return getCodeforcesApi(method = "user.info") {
@@ -190,25 +176,19 @@ object CodeforcesClient: PlatformClient {
         }
     }
 
-    suspend fun getUser(handle: String, checkHistoricHandles: Boolean = false): CodeforcesUser {
-        return getUsers(listOf(handle), checkHistoricHandles).first()
-    }
-
-    suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange> {
-        return getCodeforcesApi(method = "user.rating") {
+    override suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange> =
+        getCodeforcesApi(method = "user.rating") {
             parameter("handle", handle)
         }
-    }
 
-    suspend fun getUserSubmissions(handle: String, count: Long, from: Long): List<CodeforcesSubmission> {
-        return getCodeforcesApi(method = "user.status") {
+    override suspend fun getUserSubmissions(handle: String, count: Long, from: Long): List<CodeforcesSubmission> =
+        getCodeforcesApi(method = "user.status") {
             parameter("handle", handle)
             parameter("count", count)
             parameter("from", from)
         }
-    }
 
-    //raw pages methods
+    // raw pages methods
     private suspend inline fun getCodeforcesPage(
         path: String,
         block: HttpRequestBuilder.() -> Unit = {}
