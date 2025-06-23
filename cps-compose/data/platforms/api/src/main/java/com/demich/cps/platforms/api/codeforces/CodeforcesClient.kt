@@ -209,9 +209,6 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
         }
     }
 
-    override suspend fun getPage(page: CodeforcesPageContentProvider.BasePage, locale: CodeforcesLocale) =
-        getCodeforcesPage(path = page.path, locale = locale)
-
     override suspend fun getHandleSuggestionsPage(str: String) =
         getCodeforcesPage(path = "data/handles") {
             parameter("q", str)
@@ -223,10 +220,22 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
     override suspend fun getContestPage(contestId: Int) =
         getCodeforcesPage(path = CodeforcesUrls.contest(contestId), locale = CodeforcesLocale.EN)
 
+    override suspend fun getMainPage(locale: CodeforcesLocale) =
+        getCodeforcesPage(path = "", locale = locale)
+
+    override suspend fun getRecentActionsPage(locale: CodeforcesLocale) =
+        getCodeforcesPage(path = "recent-actions", locale = locale)
+
+    override suspend fun getTopBlogEntriesPage(locale: CodeforcesLocale) =
+        getCodeforcesPage(path = "top", locale = locale)
+
     override suspend fun getTopCommentsPage(locale: CodeforcesLocale, days: Int) =
         getCodeforcesPage(path = "topComments", locale = locale) {
             parameter("days", days)
         }
+
+    override suspend fun getGroupsPage(locale: CodeforcesLocale) =
+        getCodeforcesPage(path = "groups", locale = locale)
 }
 
 object CodeforcesUrls {
