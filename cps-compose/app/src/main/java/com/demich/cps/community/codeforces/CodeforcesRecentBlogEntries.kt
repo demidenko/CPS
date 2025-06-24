@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
-import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.platforms.utils.codeforces.commentator
 import com.demich.cps.ui.CPSDropdownMenuScope
@@ -35,7 +35,7 @@ import com.demich.cps.ui.theme.cpsColors
 
 @Composable
 internal fun CodeforcesRecentBlogEntries(
-    recent: () -> CodeforcesRecent,
+    recent: () -> CodeforcesRecentFeed,
     modifier: Modifier = Modifier,
     onBrowseBlogEntry: (CodeforcesBlogEntry) -> Unit,
     menuBuilder: @Composable CPSDropdownMenuScope.(RecentBlogEntryData) -> Unit
@@ -81,7 +81,7 @@ internal data class RecentBlogEntryData(
     val isLowRated: Boolean get() = blogEntry.rating < 0
 }
 
-private fun CodeforcesRecent.makeRecentBlogEntries(): List<RecentBlogEntryData> {
+private fun CodeforcesRecentFeed.makeRecentBlogEntries(): List<RecentBlogEntryData> {
     val commentsGrouped = comments.groupBy { it.blogEntry?.id }
     return blogEntries.map { blogEntry ->
         RecentBlogEntryData(

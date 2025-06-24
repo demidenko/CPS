@@ -190,7 +190,7 @@ object CodeforcesUtils {
             .mapNotNull(::extractRecentBlogEntryOrNull)
     }
 
-    fun extractRecentActions(source: String): CodeforcesRecent {
+    fun extractRecentActions(source: String): CodeforcesRecentFeed {
         val comments = extractComments(source)
         //blog entry with low rating disappeared from blogEntries but has comments, need to merge
         val blogEntries = extractRecentBlogEntries(source).toMutableList()
@@ -220,7 +220,7 @@ object CodeforcesUtils {
                 index = max(index, curIndex + 1)
             }
         }
-        return CodeforcesRecent(blogEntries, comments)
+        return CodeforcesRecentFeed(blogEntries, comments)
     }
 
     private inline fun extractProblemWithAcceptedCount(

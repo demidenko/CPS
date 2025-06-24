@@ -15,7 +15,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
-import com.demich.cps.platforms.utils.codeforces.CodeforcesRecent
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.BackHandler
 import com.demich.cps.ui.CPSIcons
@@ -81,7 +81,7 @@ fun CodeforcesCommunityRecentPage(
 
 @Composable
 private fun RecentBlogEntriesPage(
-    recent: () -> CodeforcesRecent,
+    recent: () -> CodeforcesRecentFeed,
     modifier: Modifier = Modifier,
     onBrowseComment: (CodeforcesBlogEntry, CodeforcesComment) -> Unit,
     onBrowseBlogEntry: (CodeforcesBlogEntry) -> Unit,
