@@ -13,7 +13,14 @@ suspend fun CodeforcesPageContentProvider.getRecentFeed(locale: CodeforcesLocale
     val usedIds = mutableSetOf<Int>()
     var index = 0
     for (comment in comments) {
-        val blogEntry = requireNotNull(comment.blogEntry)
+        val blogEntry = requireNotNull(comment.blogEntry).let {
+            CodeforcesRecentFeedBlogEntry(
+                id = it.id,
+                title = it.title,
+                author = it.author,
+                isLowRated = false
+            )
+        }
         val id = blogEntry.id
         if (id !in blogEntriesIds) {
             blogEntriesIds.add(id)
@@ -21,7 +28,7 @@ suspend fun CodeforcesPageContentProvider.getRecentFeed(locale: CodeforcesLocale
                 //mark low rated
                 blogEntries.add(
                     index = index,
-                    element = blogEntry.copy(rating = -1)
+                    element = blogEntry.copy(isLowRated = true)
                 )
             } else {
                 //latest recent comments has no blog entries in recent action, so most likely not low rated

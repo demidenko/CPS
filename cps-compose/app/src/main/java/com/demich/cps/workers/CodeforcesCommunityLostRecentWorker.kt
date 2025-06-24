@@ -13,6 +13,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.getProfiles
 import com.demich.datastore_itemized.DataStoreItem
@@ -52,7 +53,7 @@ class CodeforcesCommunityLostRecentWorker(
             valid
         }
 
-    private suspend fun getRecentBlogEntries(locale: CodeforcesLocale): List<CodeforcesBlogEntry> {
+    private suspend fun getRecentBlogEntries(locale: CodeforcesLocale): List<CodeforcesRecentFeedBlogEntry> {
         suspend fun extractFrom(page: suspend () -> String) =
             CodeforcesUtils.extractRecentBlogEntries(source = page())
 
@@ -143,14 +144,14 @@ private class CachedBlogEntriesCodeforcesApi(
         }
 }
 
-private fun Collection<CodeforcesBlogEntry>.filterIdGreaterThan(id: Int) = filter { it.id > id }
+private fun Collection<CodeforcesRecentFeedBlogEntry>.filterIdGreaterThan(id: Int) = filter { it.id > id }
 
-private suspend fun Collection<CodeforcesBlogEntry>.fixAndFilterColorTag(minRatingColorTag: CodeforcesColorTag) =
-    fixedHandleColors().filter { it.authorColorTag >= minRatingColorTag }
+private suspend fun Collection<CodeforcesRecentFeedBlogEntry>.fixAndFilterColorTag(minRatingColorTag: CodeforcesColorTag) =
+    fixedHandleColors().filter { it.author.colorTag >= minRatingColorTag }
 
-private inline fun Collection<CodeforcesBlogEntry>.filterNewEntries(
+private inline fun Collection<CodeforcesRecentFeedBlogEntry>.filterNewEntries(
     isFinalFilter: Boolean = false,
-    isNew: (CodeforcesBlogEntry) -> Boolean
+    isNew: (CodeforcesRecentFeedBlogEntry) -> Boolean
 ) = sortedBy { it.id }.run {
     val indexOfFirstNew =
         if (isFinalFilter) {
@@ -162,7 +163,7 @@ private inline fun Collection<CodeforcesBlogEntry>.filterNewEntries(
 }
 
 private suspend inline fun findSuspects(
-    blogEntries: Collection<CodeforcesBlogEntry>,
+    blogEntries: Collection<CodeforcesRecentFeedBlogEntry>,
     locale: CodeforcesLocale,
     minRatingColorTag: CodeforcesColorTag,
     crossinline isNew: (Instant) -> Boolean,
@@ -211,8 +212,8 @@ private suspend inline fun findSuspects(
         }
         .filterNewEntries(isFinalFilter = true) { isNew(cachedApi.getBlogEntry(it.id, locale).creationTime) }
         .forEach {
-            val blogEntry = it.copy(
-                creationTime = cachedApi.getBlogEntry(it.id, locale).creationTime,
+            val blogEntry = cachedApi.getBlogEntry(it.id, locale).copy(
+                authorColorTag = it.author.colorTag,
                 rating = 0,
                 commentsCount = null
             )
@@ -221,12 +222,12 @@ private suspend inline fun findSuspects(
 }
 
 //Required against new year color chaos
-private suspend fun Collection<CodeforcesBlogEntry>.fixedHandleColors(): List<CodeforcesBlogEntry> {
-    val authors = CodeforcesClient.getProfiles(handles = map { it.authorHandle }, recoverHandle = false)
+private suspend fun Collection<CodeforcesRecentFeedBlogEntry>.fixedHandleColors(): List<CodeforcesRecentFeedBlogEntry> {
+    val authors = CodeforcesClient.getProfiles(handles = map { it.author.handle }, recoverHandle = false)
     return map { blogEntry ->
-        val result = authors.getValue(blogEntry.authorHandle)
+        val result = authors.getValue(blogEntry.author.handle)
         require(result is ProfileResult.Success)
-        if (blogEntry.authorColorTag == CodeforcesColorTag.ADMIN) blogEntry
-        else blogEntry.copy(authorColorTag = CodeforcesUtils.colorTagFrom(result.userInfo.rating))
+        if (blogEntry.author.colorTag == CodeforcesColorTag.ADMIN) blogEntry
+        else blogEntry.copy(author = blogEntry.author.copy(colorTag = CodeforcesUtils.colorTagFrom(result.userInfo.rating)))
     }
 }

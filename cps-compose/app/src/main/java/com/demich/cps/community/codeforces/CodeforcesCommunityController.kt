@@ -18,6 +18,7 @@ import androidx.compose.runtime.snapshotFlow
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntriesDataStoreItem
 import com.demich.cps.utils.collectAsState
@@ -145,7 +146,7 @@ class CodeforcesCommunityController internal constructor(
         @Serializable
         data object RecentComments : RecentPageType
         @Serializable
-        data class BlogEntryRecentComments(val blogEntry: CodeforcesBlogEntry) : RecentPageType
+        data class BlogEntryRecentComments(val blogEntry: CodeforcesRecentFeedBlogEntry) : RecentPageType
     }
 }
 

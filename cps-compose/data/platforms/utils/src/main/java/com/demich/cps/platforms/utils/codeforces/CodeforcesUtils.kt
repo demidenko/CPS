@@ -150,7 +150,7 @@ object CodeforcesUtils {
         }.getOrNull()
     }
 
-    private fun extractRecentBlogEntryOrNull(item: Element): CodeforcesBlogEntry? {
+    private fun extractRecentBlogEntryOrNull(item: Element): CodeforcesRecentFeedBlogEntry? {
         return kotlin.runCatching {
             val author = item.expectRatedUser().extractRatedUser()
             val blogEntryId: Int
@@ -159,13 +159,11 @@ object CodeforcesUtils {
                 blogEntryId = it.attr("href").removePrefix("/blog/entry/").toInt()
                 blogEntryTitle = it.text()
             }
-            CodeforcesBlogEntry(
+            CodeforcesRecentFeedBlogEntry(
                 id = blogEntryId,
                 title = blogEntryTitle,
-                authorHandle = author.handle,
-                authorColorTag = author.colorTag,
-                creationTime = Instant.DISTANT_PAST,
-                rating = 0
+                author = author,
+                isLowRated = false
             )
         }.getOrNull()
     }
@@ -183,7 +181,7 @@ object CodeforcesUtils {
             .mapNotNull(::extractCommentOrNull)
     }
 
-    fun extractRecentBlogEntries(source: String): List<CodeforcesBlogEntry> {
+    fun extractRecentBlogEntries(source: String): List<CodeforcesRecentFeedBlogEntry> {
         return Jsoup.parse(source).expectSidebar().expectFirst("div.recent-actions")
             .select("li")
             .mapNotNull(::extractRecentBlogEntryOrNull)

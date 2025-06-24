@@ -23,10 +23,9 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.toHandleSpan
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
-import com.demich.cps.platforms.utils.codeforces.author
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.commentator
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
@@ -37,7 +36,7 @@ import com.demich.cps.ui.theme.cpsColors
 internal fun CodeforcesRecentBlogEntries(
     recent: () -> CodeforcesRecentFeed,
     modifier: Modifier = Modifier,
-    onBrowseBlogEntry: (CodeforcesBlogEntry) -> Unit,
+    onBrowseBlogEntry: (CodeforcesRecentFeedBlogEntry) -> Unit,
     menuBuilder: @Composable CPSDropdownMenuScope.(RecentBlogEntryData) -> Unit
 ) {
     val recentData by remember(recent) {
@@ -75,10 +74,10 @@ internal fun Modifier.recentBlogEntryPaddings() =
 
 @Immutable
 internal data class RecentBlogEntryData(
-    val blogEntry: CodeforcesBlogEntry,
+    val blogEntry: CodeforcesRecentFeedBlogEntry,
     val comments: List<CodeforcesComment>, //only first comment per each commentator
 ) {
-    val isLowRated: Boolean get() = blogEntry.rating < 0
+    val isLowRated: Boolean get() = blogEntry.isLowRated
 }
 
 private fun CodeforcesRecentFeed.makeRecentBlogEntries(): List<RecentBlogEntryData> {

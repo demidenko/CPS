@@ -12,11 +12,10 @@ import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.RecentPageType
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
-import com.demich.cps.platforms.utils.codeforces.author
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.ui.BackHandler
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.utils.collectAsState
@@ -83,9 +82,9 @@ fun CodeforcesCommunityRecentPage(
 private fun RecentBlogEntriesPage(
     recent: () -> CodeforcesRecentFeed,
     modifier: Modifier = Modifier,
-    onBrowseComment: (CodeforcesBlogEntry, CodeforcesComment) -> Unit,
-    onBrowseBlogEntry: (CodeforcesBlogEntry) -> Unit,
-    onOpenComments: (CodeforcesBlogEntry) -> Unit
+    onBrowseComment: (CodeforcesRecentFeedBlogEntry, CodeforcesComment) -> Unit,
+    onBrowseBlogEntry: (CodeforcesRecentFeedBlogEntry) -> Unit,
+    onOpenComments: (CodeforcesRecentFeedBlogEntry) -> Unit
 ) {
     CodeforcesRecentBlogEntries(
         recent = recent,
@@ -107,7 +106,7 @@ private fun RecentBlogEntriesPage(
 @Composable
 private fun RecentCommentsInBlogEntry(
     comments: () -> List<CodeforcesRecentAction>,
-    blogEntry: CodeforcesBlogEntry,
+    blogEntry: CodeforcesRecentFeedBlogEntry,
     modifier: Modifier = Modifier
 ) {
     val filteredComments by rememberFrom(blogEntry) {
