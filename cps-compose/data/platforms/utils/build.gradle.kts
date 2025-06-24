@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -28,6 +29,7 @@ dependencies {
     implementation(project(":data:contests:database"))
 
     implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.serialization)
 
     implementation(libs.jsoup)
 }

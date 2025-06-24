@@ -3,9 +3,11 @@ package com.demich.cps.platforms.utils.codeforces
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
+import kotlinx.serialization.Serializable
 import org.jsoup.nodes.Element
 import java.util.Locale
 
+@Serializable
 data class CodeforcesHandle(
     val handle: String,
     val colorTag: CodeforcesColorTag
