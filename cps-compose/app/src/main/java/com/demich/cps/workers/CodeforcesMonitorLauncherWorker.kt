@@ -80,20 +80,17 @@ class CodeforcesMonitorLauncherWorker(
         var first: CodeforcesSubmission? = null
         var from = 1L
         var step = 1L
-        while (true) {
-            var flagBreak = false
+        loop@while (true) {
             CodeforcesClient.getUserSubmissions(handle = handle, from = from, count = step)
-                .also { if (it.isEmpty()) flagBreak = true }
+                .also { if (it.isEmpty()) break@loop }
                 .forEach {
                     if (isActual(it.creationTime) && (lastSubmissionId == null || it.id > lastSubmissionId)) {
                         if (first == null) first = it
                         if (predicate(it)) return Pair(it, first)
                     } else {
-                        flagBreak = true
+                        break@loop
                     }
                 }
-
-            if (flagBreak) break
 
             from += step
             step += 10
