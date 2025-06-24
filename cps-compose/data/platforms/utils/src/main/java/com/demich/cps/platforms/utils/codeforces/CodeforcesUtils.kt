@@ -14,7 +14,6 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import kotlin.math.max
 
 private fun Element.expectContent(): Element = expectFirst("div.content-with-sidebar")
 
@@ -188,39 +187,6 @@ object CodeforcesUtils {
         return Jsoup.parse(source).expectSidebar().expectFirst("div.recent-actions")
             .select("li")
             .mapNotNull(::extractRecentBlogEntryOrNull)
-    }
-
-    fun extractRecentActions(source: String): CodeforcesRecentFeed {
-        val comments = extractComments(source)
-        //blog entry with low rating disappeared from blogEntries but has comments, need to merge
-        val blogEntries = extractRecentBlogEntries(source).toMutableList()
-        val blogEntriesIds = blogEntries.mapTo(mutableSetOf()) { it.id }
-        val usedIds = mutableSetOf<Int>()
-        var index = 0
-        for (comment in comments) {
-            val blogEntry = requireNotNull(comment.blogEntry)
-            val id = blogEntry.id
-            if (id !in blogEntriesIds) {
-                blogEntriesIds.add(id)
-                if (index < blogEntries.size) {
-                    //mark low rated
-                    blogEntries.add(
-                        index = index,
-                        element = blogEntry.copy(rating = -1)
-                    )
-                } else {
-                    //latest recent comments has no blog entries in recent action, so most likely not low rated
-                    check(index == blogEntries.size)
-                    blogEntries.add(blogEntry)
-                }
-            }
-            if (id !in usedIds) {
-                usedIds.add(id)
-                val curIndex = blogEntries.indexOfFirst { it.id == id }
-                index = max(index, curIndex + 1)
-            }
-        }
-        return CodeforcesRecentFeed(blogEntries, comments)
     }
 
     private inline fun extractProblemWithAcceptedCount(

@@ -15,6 +15,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.getRealColorTagOrNull
+import com.demich.cps.platforms.utils.codeforces.getRecentFeed
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.backgroundDataLoader
@@ -62,7 +63,9 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     private val topComments = dataLoader(emptyList()) { getTopComments(locale = it) }
     override fun flowOfTopComments(context: Context) = topComments.flowOfData(context)
 
-    private val recentActions = dataLoader(CodeforcesRecentFeed(emptyList(), emptyList())) { getRecentActions(locale = it) }
+    private val recentActions = dataLoader(CodeforcesRecentFeed(emptyList(), emptyList())) {
+        CodeforcesClient.getRecentFeed(locale = it)
+    }
     override fun flowOfRecent(context: Context) = recentActions.flowOfData(context)
 
     private fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
@@ -93,9 +96,6 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 
     private suspend fun getTopComments(locale: CodeforcesLocale) =
         CodeforcesUtils.extractComments(source = CodeforcesClient.getTopCommentsPage(locale = locale))
-
-    private suspend fun getRecentActions(locale: CodeforcesLocale) =
-        CodeforcesUtils.extractRecentActions(source = CodeforcesClient.getRecentActionsPage(locale = locale))
 
     fun addToFollowList(result: ProfileResult<CodeforcesUserInfo>, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
