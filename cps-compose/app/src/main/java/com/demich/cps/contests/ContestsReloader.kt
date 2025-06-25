@@ -12,6 +12,7 @@ import com.demich.cps.contests.loading_engine.loaders.CodeforcesContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.DmojContestsLoader
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.platforms.api.clist.ClistApi
+import com.demich.cps.platforms.api.clist.ClistClient
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.utils.getCurrentTime
@@ -90,6 +91,7 @@ private suspend fun contestsLoadingFlows(
     ) { loaderType ->
         when (loaderType) {
             ContestsLoaderType.clist_api -> ClistContestsLoader(
+                api = ClistClient,
                 apiAccess = clistApiAccess,
                 additionalResources = clistAdditionalResources
             )
