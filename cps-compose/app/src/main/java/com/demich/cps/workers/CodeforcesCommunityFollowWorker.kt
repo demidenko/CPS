@@ -2,7 +2,7 @@ package com.demich.cps.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.demich.cps.community.follow.followListDao
+import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import kotlinx.datetime.Instant
@@ -42,12 +42,12 @@ class CodeforcesCommunityFollowWorker(
         workerStartTime - userLastOnlineTime() > 7.days
 
     override suspend fun runWork(): Result {
-        val dao = context.followListDao
-        val blogs = dao.blogs()
+        val repository = context.followRepository
+        val blogs = repository.blogs()
 
         //TODO: consider skip this if blogs.size is small
         //update userInfo to keep fresh lastOnlineTime
-        dao.updateUsers()
+        repository.updateUsers()
 
         blogs
             .filter { it.blogEntries == null || !it.isUserInactive() }
@@ -55,7 +55,7 @@ class CodeforcesCommunityFollowWorker(
             .forEachWithProgress {
                 val handle = it.handle
                 if (handle !in proceeded) {
-                    dao.getAndReloadBlogEntries(handle).getOrThrow()
+                    repository.getAndReloadBlogEntries(handle).getOrThrow()
                     proceeded.add(handle)
                 }
             }

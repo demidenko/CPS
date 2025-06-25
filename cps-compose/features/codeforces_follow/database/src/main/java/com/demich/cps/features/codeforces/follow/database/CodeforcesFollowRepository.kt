@@ -12,7 +12,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.platforms.utils.codeforces.getProfiles
 
-abstract class CodeforcesFollowList(
+abstract class CodeforcesFollowRepository(
     private val api: CodeforcesApi,
     context: Context
 ) {

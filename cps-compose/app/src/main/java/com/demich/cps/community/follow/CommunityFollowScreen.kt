@@ -52,7 +52,7 @@ fun CommunityFollowScreen(
     val followLoadingStatus by collectAsState { communityViewModel.flowOfFollowUpdateLoadingStatus() }
 
     val userBlogs by collectAsStateWithLifecycle {
-        context.followListDao.flowOfAllBlogs().map {
+        context.followRepository.flowOfAllBlogs().map {
             it.sortedByDescending { it.id }
         }
     }
@@ -64,7 +64,7 @@ fun CommunityFollowScreen(
             onOpenBlog = onShowBlogScreen,
             onDeleteUser = { handle ->
                 scope.launch {
-                    context.followListDao.remove(handle)
+                    context.followRepository.remove(handle)
                 }
             },
             modifier = Modifier.fillMaxSize()

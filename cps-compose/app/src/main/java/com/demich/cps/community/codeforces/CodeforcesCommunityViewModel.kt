@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.community.follow.followListDao
+import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
@@ -99,14 +99,14 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 
     fun addToFollowList(result: ProfileResult<CodeforcesUserInfo>, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
-            context.followListDao.addNewUser(result)
+            context.followRepository.addNewUser(result)
         }
     }
 
     override fun addToFollowList(handle: String, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
             context.settingsCommunity.codeforcesFollowEnabled(newValue = true)
-            context.followListDao.addNewUser(handle)
+            context.followRepository.addNewUser(handle)
         }
     }
 
@@ -115,7 +115,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     override fun updateFollowUsersInfo(context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
             if (!followLoadingStatus.compareAndSet(LoadingStatus.PENDING, LoadingStatus.LOADING)) return@launch
-            context.followListDao.run {
+            context.followRepository.run {
                 updateUsers()
                 updateFailedBlogEntries()
             }
@@ -127,7 +127,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     fun flowOfBlogEntriesResult(handle: String, context: Context, key: Long) =
         blogEntriesLoader.execute(id = "$handle#$key") {
             val (result, colorTag) = awaitPair(
-                blockFirst = { context.followListDao.getAndReloadBlogEntries(handle) },
+                blockFirst = { context.followRepository.getAndReloadBlogEntries(handle) },
                 blockSecond = { CodeforcesClient.getRealColorTagOrNull(handle) }
             )
             result.getOrThrow().map {
