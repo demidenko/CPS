@@ -71,7 +71,3 @@ object DmojClient: PlatformClient, DmojApi, DmojPageContentProvider {
     }
 }
 
-object DmojUrls {
-    const val main = "https://dmoj.ca"
-    fun user(username: String) = "$main/user/$username"
-}

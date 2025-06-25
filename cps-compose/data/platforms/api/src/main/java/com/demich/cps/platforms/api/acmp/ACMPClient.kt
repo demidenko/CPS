@@ -44,7 +44,3 @@ object ACMPClient: PlatformClient, ACMPPageContentProvider {
     }
 }
 
-object ACMPUrls {
-    const val main = "https://acmp.ru"
-    fun user(id: Int) = "$main/index.asp?main=user&id=$id"
-}

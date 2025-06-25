@@ -108,11 +108,6 @@ object CodeChefClient: PlatformClient, CodeChefApi, CodeChefPageContentProvider 
     }
 }
 
-object CodeChefUrls {
-    const val main = "https://www.codechef.com"
-    fun user(username: String) = "$main/users/$username"
-}
-
 private fun extractCSRFToken(source: String): String {
     var i = source.indexOf("window.csrfToken")
     check(i != -1)

@@ -81,14 +81,6 @@ object ClistClient: PlatformClient, ClistApi, ClistPageContentProvider {
     }
 }
 
-object ClistUrls {
-    const val main = "https://clist.by"
-    fun user(login: String) = "$main/coder/$login"
-
-    const val api = "$main/api/v4"
-    val apiHelp get() = "$api/doc/"
-}
-
 @Serializable
 private class ClistApiResponse<T>(
     val objects: List<T>,
