@@ -15,7 +15,7 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.dmoj.DmojClient
 import com.demich.cps.platforms.api.dmoj.DmojUrls
-import com.demich.cps.platforms.api.isPageNotFound
+import com.demich.cps.platforms.clients.isPageNotFound
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.utils.append

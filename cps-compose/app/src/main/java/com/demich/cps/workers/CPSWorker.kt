@@ -6,7 +6,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
-import com.demich.cps.platforms.api.isResponseException
+import com.demich.cps.platforms.clients.isResponseException
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.joinAllWithCounter

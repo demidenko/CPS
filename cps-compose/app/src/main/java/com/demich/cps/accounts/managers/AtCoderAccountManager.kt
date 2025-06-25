@@ -14,7 +14,7 @@ import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.atcoder.AtCoderClient
 import com.demich.cps.platforms.api.atcoder.AtCoderUrls
-import com.demich.cps.platforms.api.isPageNotFound
+import com.demich.cps.platforms.clients.isPageNotFound
 import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.ui.SettingsSwitchItemWithProfilesWork
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder

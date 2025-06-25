@@ -1,4 +1,4 @@
-package com.demich.cps.platforms.api
+package com.demich.cps.platforms.clients
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import io.ktor.client.network.sockets.SocketTimeoutException

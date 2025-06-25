@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.niceMessage
+import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.filter.FilterIconButton
 import com.demich.cps.ui.filter.FilterState

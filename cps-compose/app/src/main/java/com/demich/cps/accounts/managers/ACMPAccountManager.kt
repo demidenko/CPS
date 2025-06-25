@@ -10,7 +10,7 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.acmp.ACMPClient
 import com.demich.cps.platforms.api.acmp.ACMPUrls
-import com.demich.cps.platforms.api.isRedirect
+import com.demich.cps.platforms.clients.isRedirect
 import com.demich.cps.platforms.utils.ACMPUtils
 import com.demich.cps.ui.theme.CPSColors
 

@@ -1,7 +1,7 @@
 package com.demich.cps.contests.loading
 
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.platforms.api.niceMessage
+import com.demich.cps.platforms.clients.niceMessage
 
 enum class ContestsLoaderType(val supportedPlatforms: Set<Contest.Platform>) {
     clist_api(Contest.platforms.toSet()),
