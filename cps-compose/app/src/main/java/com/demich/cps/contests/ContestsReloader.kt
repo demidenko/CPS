@@ -13,6 +13,7 @@ import com.demich.cps.contests.loading_engine.loaders.DmojContestsLoader
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
+import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.ClistClient
 import com.demich.cps.platforms.clients.DmojClient
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
@@ -97,7 +98,7 @@ private suspend fun contestsLoadingFlows(
                 additionalResources = clistAdditionalResources
             )
             ContestsLoaderType.codeforces_api -> CodeforcesContestsLoader(api = CodeforcesClient)
-            ContestsLoaderType.atcoder_parse -> AtCoderContestsLoader()
+            ContestsLoaderType.atcoder_parse -> AtCoderContestsLoader(api = AtCoderClient)
             ContestsLoaderType.dmoj_api -> DmojContestsLoader(api = DmojClient)
         }
     }
