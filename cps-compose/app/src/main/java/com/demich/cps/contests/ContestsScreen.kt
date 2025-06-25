@@ -37,7 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.list_items.ContestItem
-import com.demich.cps.contests.loading.makeCombinedMessage
+import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
 import com.demich.cps.contests.monitors.flowOfContestData
@@ -46,6 +46,7 @@ import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
+import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -482,4 +483,17 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
             }
         )
     }
+}
+
+private fun makeCombinedMessage(
+    errors: List<Pair<ContestsLoaderType, Throwable>>,
+    exposeAll: Boolean
+): String {
+    if (errors.isEmpty()) return ""
+    return errors.groupBy(
+        keySelector = { (_, e) ->
+            e.niceMessage ?: if (exposeAll) "$e" else "Some error..."
+        },
+        valueTransform = { it.first }
+    ).entries.joinToString(separator = "; ") { (msg, list) -> "${list.distinct()}: $msg" }
 }

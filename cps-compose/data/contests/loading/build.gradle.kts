@@ -24,9 +24,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":data:platforms:api"))
-    implementation(project(":data:platforms:clients"))
-    implementation(project(":data:platforms:utils"))
     implementation(project(":data:contests:database"))
 
     implementation(libs.kotlinx.serialization)
