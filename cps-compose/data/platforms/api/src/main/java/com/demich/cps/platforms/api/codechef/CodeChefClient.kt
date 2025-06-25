@@ -1,4 +1,4 @@
-package com.demich.cps.platforms.api.clients
+package com.demich.cps.platforms.api.codechef
 
 import com.demich.cps.platforms.api.PlatformClient
 import com.demich.cps.platforms.api.cpsHttpClient
@@ -15,10 +15,9 @@ import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
-import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.seconds
 
-object CodeChefClient: PlatformClient {
+object CodeChefClient: PlatformClient, CodeChefApi, CodeChefPageContentProvider {
     private val json get() = defaultJson
 
     override val client = cpsHttpClient(
@@ -61,7 +60,7 @@ object CodeChefClient: PlatformClient {
         }
     }
 
-    private suspend inline fun<reified T> getCodeChef(
+    private suspend inline fun <reified T> getCodeChef(
         urlString: String,
         crossinline block: HttpRequestBuilder.() -> Unit = {}
     ): T {
@@ -71,7 +70,7 @@ object CodeChefClient: PlatformClient {
                 block()
             }
         }
-        return kotlin.runCatching {
+        return runCatching {
             callGet()
         }.getOrElse {
             if (it is CodeChefCSRFTokenExpiredException) {
@@ -81,11 +80,11 @@ object CodeChefClient: PlatformClient {
         }
     }
 
-    suspend fun getUserPage(handle: String): String {
+    override suspend fun getUserPage(handle: String): String {
         return client.getText(CodeChefUrls.user(handle))
     }
 
-    suspend fun getSuggestions(str: String): CodeChefSearchResult {
+    override suspend fun getSuggestions(str: String): CodeChefSearchResult {
         return getCodeChef("${CodeChefUrls.main}/api/ratings/all") {
             parameter("itemsPerPage", 40)
             parameter("order", "asc")
@@ -95,7 +94,7 @@ object CodeChefClient: PlatformClient {
         }
     }
 
-    suspend fun getRatingChanges(handle: String): List<CodeChefRatingChange> {
+    override suspend fun getRatingChanges(handle: String): List<CodeChefRatingChange> {
         ifBetweenFirstFirst(
             str = getUserPage(handle = handle),
             from = "var all_rating",
@@ -113,28 +112,6 @@ object CodeChefUrls {
     const val main = "https://www.codechef.com"
     fun user(username: String) = "$main/users/$username"
 }
-
-@Serializable
-data class CodeChefUser(
-    val name: String,
-    val username: String,
-    val rating: Int
-)
-
-@Serializable
-data class CodeChefSearchResult(
-    val list: List<CodeChefUser>
-)
-
-
-@Serializable
-data class CodeChefRatingChange(
-    val code: String,
-    val name: String,
-    val rating: String,
-    val rank: String,
-    val end_date: String
-)
 
 private fun extractCSRFToken(source: String): String {
     var i = source.indexOf("window.csrfToken")
