@@ -1,6 +1,6 @@
-package com.demich.cps.platforms.api.codeforces
+package com.demich.cps.platforms.clients.codeforces
 
-import com.demich.cps.platforms.api.decodeAES
+import com.demich.cps.platforms.clients.decodeAES
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
