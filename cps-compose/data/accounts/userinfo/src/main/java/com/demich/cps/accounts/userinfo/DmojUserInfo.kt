@@ -1,6 +1,6 @@
 package com.demich.cps.accounts.userinfo
 
-import com.demich.cps.platforms.api.clients.DmojUrls
+import com.demich.cps.platforms.api.dmoj.DmojUrls
 import kotlinx.serialization.Serializable
 
 

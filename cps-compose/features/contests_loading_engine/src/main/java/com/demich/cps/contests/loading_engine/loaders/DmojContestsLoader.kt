@@ -2,7 +2,7 @@ package com.demich.cps.contests.loading_engine.loaders
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsLoaderType
-import com.demich.cps.platforms.api.clients.DmojClient
+import com.demich.cps.platforms.api.dmoj.DmojClient
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
 
