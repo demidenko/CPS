@@ -1,4 +1,4 @@
-package com.demich.cps.platforms.api.clients
+package com.demich.cps.platforms.api.acmp
 
 import com.demich.cps.platforms.api.PlatformClient
 import com.demich.cps.platforms.api.cpsHttpClient
@@ -12,7 +12,7 @@ import io.ktor.client.statement.request
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
-object ACMPClient: PlatformClient {
+object ACMPClient: PlatformClient, ACMPPageContentProvider {
     private val windows1251 = Charset.forName("windows-1251")
     override val client = cpsHttpClient {
         Charsets {
@@ -32,7 +32,7 @@ object ACMPClient: PlatformClient {
         block: HttpRequestBuilder.() -> Unit = {}
     ): String = this.get(urlString = urlString, block = block).bodyAsText()
 
-    suspend fun getUserPage(id: Int): String {
+    override suspend fun getUserPage(id: Int): String {
         with(client.get(ACMPUrls.user(id))) {
             //acmp redirects to main page if user not found
             if (request.url.parameters.isEmpty()) throw ACMPPageNotFoundException()
@@ -40,7 +40,7 @@ object ACMPClient: PlatformClient {
         }
     }
 
-    suspend fun getUsersSearch(str: String): String {
+    override suspend fun getUsersSearch(str: String): String {
         return client.getText(ACMPUrls.main + "/index.asp?main=rating") {
             url.encodedParameters.append("str", URLEncoder.encode(str, windows1251.name()))
         }
