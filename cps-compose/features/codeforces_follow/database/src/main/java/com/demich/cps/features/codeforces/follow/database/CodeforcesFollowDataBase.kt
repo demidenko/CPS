@@ -22,9 +22,8 @@ internal abstract class CodeforcesFollowDataBase: RoomDatabase() {
     abstract fun followListDao(): CodeforcesFollowDao
 
     companion object: InstanceProvider<CodeforcesFollowDataBase>({
-        Room.databaseBuilder(
+        Room.databaseBuilder<CodeforcesFollowDataBase>(
             name = "codeforces_follow_db",
-            klass = CodeforcesFollowDataBase::class.java,
             context = it
         )
     })

@@ -1,6 +1,11 @@
 package com.demich.cps.contests.database
 
-import androidx.room.*
+import androidx.room.AutoMigration
+import androidx.room.Database
+import androidx.room.RenameColumn
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -25,9 +30,8 @@ internal abstract class ContestsDatabase: RoomDatabase() {
     abstract fun contestsDao(): ContestsListDao
 
     companion object: InstanceProvider<ContestsDatabase>({
-        Room.databaseBuilder(
+        Room.databaseBuilder<ContestsDatabase>(
             name = "contests_db",
-            klass = ContestsDatabase::class.java,
             context = it
         ).addMigrations(migration_3_4_AddEndTimeColumn)
     })

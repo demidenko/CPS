@@ -1,12 +1,15 @@
 package com.demich.cps.features.codeforces.lost.database
 
-import androidx.room.*
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import com.demich.cps.features.room.InstanceProvider
 import com.demich.cps.features.room.InstantSecondsConverter
 import com.demich.cps.features.room.RoomJsonConverter
 import com.demich.cps.features.room.jsonRoom
-import kotlinx.serialization.encodeToString
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 
 
 @Database(
@@ -21,9 +24,8 @@ internal abstract class CodeforcesLostDataBase: RoomDatabase() {
     abstract fun lostBlogEntriesDao(): CodeforcesLostDao
 
     companion object: InstanceProvider<CodeforcesLostDataBase>({
-        Room.databaseBuilder(
+        Room.databaseBuilder<CodeforcesLostDataBase>(
             name = "codeforces_lost_db",
-            klass = CodeforcesLostDataBase::class.java,
             context = it
         )
     })
