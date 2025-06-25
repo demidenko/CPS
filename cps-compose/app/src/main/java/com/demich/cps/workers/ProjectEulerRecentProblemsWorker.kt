@@ -6,8 +6,8 @@ import com.demich.cps.R
 import com.demich.cps.community.settings.CommunitySettingsDataStore
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.platforms.api.projecteuler.ProjectEulerClient
 import com.demich.cps.platforms.api.projecteuler.ProjectEulerUrls
+import com.demich.cps.platforms.clients.ProjectEulerClient
 import com.demich.cps.platforms.utils.ProjectEulerUtils
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlin.time.Duration.Companion.hours

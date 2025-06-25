@@ -1,7 +1,7 @@
-package com.demich.cps.platforms.api.timus
+package com.demich.cps.platforms.clients
 
-import com.demich.cps.platforms.api.PlatformClient
-import com.demich.cps.platforms.api.getText
+import com.demich.cps.platforms.api.timus.TimusPageContentProvider
+import com.demich.cps.platforms.api.timus.TimusUrls
 import io.ktor.client.request.parameter
 
 object TimusClient: PlatformClient, TimusPageContentProvider {

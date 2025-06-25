@@ -1,5 +1,12 @@
-package com.demich.cps.platforms.api.codeforces
+package com.demich.cps.platforms.clients.codeforces
 
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiCallLimitExceededException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingUnavailableException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogException
 import kotlinx.serialization.Serializable
 
 @Serializable

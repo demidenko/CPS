@@ -1,7 +1,7 @@
-package com.demich.cps.platforms.api.projecteuler
+package com.demich.cps.platforms.clients
 
-import com.demich.cps.platforms.api.PlatformClient
-import com.demich.cps.platforms.api.getText
+import com.demich.cps.platforms.api.projecteuler.ProjectEulerPageContentProvider
+import com.demich.cps.platforms.api.projecteuler.ProjectEulerUrls
 
 object ProjectEulerClient: PlatformClient, ProjectEulerPageContentProvider {
 

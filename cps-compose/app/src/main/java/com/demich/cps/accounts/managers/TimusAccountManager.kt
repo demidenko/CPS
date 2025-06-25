@@ -7,8 +7,8 @@ import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
-import com.demich.cps.platforms.api.timus.TimusClient
 import com.demich.cps.platforms.api.timus.TimusUrls
+import com.demich.cps.platforms.clients.TimusClient
 import com.demich.cps.platforms.utils.TimusUtils
 import com.demich.cps.ui.theme.CPSColors
 

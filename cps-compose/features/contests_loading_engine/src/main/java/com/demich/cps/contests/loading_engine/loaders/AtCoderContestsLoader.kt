@@ -2,7 +2,7 @@ package com.demich.cps.contests.loading_engine.loaders
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsLoaderType
-import com.demich.cps.platforms.api.atcoder.AtCoderClient
+import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.kotlin_stdlib_boost.splitTrailingBrackets
 

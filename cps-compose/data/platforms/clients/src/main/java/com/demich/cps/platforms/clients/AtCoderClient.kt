@@ -1,8 +1,8 @@
-package com.demich.cps.platforms.api.atcoder
+package com.demich.cps.platforms.clients
 
-import com.demich.cps.platforms.api.PlatformClient
-import com.demich.cps.platforms.api.defaultJson
-import com.demich.cps.platforms.api.getText
+import com.demich.cps.platforms.api.atcoder.AtCoderApi
+import com.demich.cps.platforms.api.atcoder.AtCoderRatingChange
+import com.demich.cps.platforms.api.atcoder.AtCoderUrls
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
 import io.ktor.client.request.parameter

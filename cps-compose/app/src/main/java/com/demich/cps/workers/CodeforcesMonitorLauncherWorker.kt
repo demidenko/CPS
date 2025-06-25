@@ -6,8 +6,8 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
-import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
+import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.utils.removeOld
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlinx.datetime.Instant

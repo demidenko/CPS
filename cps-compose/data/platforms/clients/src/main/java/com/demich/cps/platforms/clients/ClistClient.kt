@@ -1,11 +1,10 @@
-package com.demich.cps.platforms.api.clist
+package com.demich.cps.platforms.clients
 
-import com.demich.cps.platforms.api.PlatformClient
-import com.demich.cps.platforms.api.RateLimitPlugin
-import com.demich.cps.platforms.api.cpsHttpClient
-import com.demich.cps.platforms.api.defaultJson
-import com.demich.cps.platforms.api.getAs
-import com.demich.cps.platforms.api.getText
+import com.demich.cps.platforms.api.clist.ClistApi
+import com.demich.cps.platforms.api.clist.ClistContest
+import com.demich.cps.platforms.api.clist.ClistPageContentProvider
+import com.demich.cps.platforms.api.clist.ClistResource
+import com.demich.cps.platforms.api.clist.ClistUrls
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.parameter

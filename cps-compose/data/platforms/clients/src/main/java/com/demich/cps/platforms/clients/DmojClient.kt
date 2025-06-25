@@ -1,11 +1,12 @@
-package com.demich.cps.platforms.api.dmoj
+package com.demich.cps.platforms.clients
 
-import com.demich.cps.platforms.api.PlatformClient
-import com.demich.cps.platforms.api.RateLimitPlugin
-import com.demich.cps.platforms.api.cpsHttpClient
-import com.demich.cps.platforms.api.defaultJson
-import com.demich.cps.platforms.api.getAs
-import com.demich.cps.platforms.api.getText
+import com.demich.cps.platforms.api.dmoj.DmojApi
+import com.demich.cps.platforms.api.dmoj.DmojContest
+import com.demich.cps.platforms.api.dmoj.DmojPageContentProvider
+import com.demich.cps.platforms.api.dmoj.DmojRatingChange
+import com.demich.cps.platforms.api.dmoj.DmojSuggestion
+import com.demich.cps.platforms.api.dmoj.DmojUrls
+import com.demich.cps.platforms.api.dmoj.DmojUserResult
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
 import io.ktor.client.plugins.defaultRequest

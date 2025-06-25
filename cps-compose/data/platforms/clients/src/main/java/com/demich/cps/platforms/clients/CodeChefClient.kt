@@ -1,10 +1,10 @@
-package com.demich.cps.platforms.api.codechef
+package com.demich.cps.platforms.clients
 
-import com.demich.cps.platforms.api.PlatformClient
-import com.demich.cps.platforms.api.cpsHttpClient
-import com.demich.cps.platforms.api.defaultJson
-import com.demich.cps.platforms.api.getAs
-import com.demich.cps.platforms.api.getText
+import com.demich.cps.platforms.api.codechef.CodeChefApi
+import com.demich.cps.platforms.api.codechef.CodeChefPageContentProvider
+import com.demich.cps.platforms.api.codechef.CodeChefRatingChange
+import com.demich.cps.platforms.api.codechef.CodeChefSearchResult
+import com.demich.cps.platforms.api.codechef.CodeChefUrls
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
 import io.ktor.client.plugins.HttpResponseValidator

@@ -1,8 +1,11 @@
-package com.demich.cps.platforms.api.codeforces
+package com.demich.cps.platforms.clients.codeforces
 
 import com.demich.cps.platforms.api.BuildConfig
-import com.demich.cps.platforms.api.PlatformClient
-import com.demich.cps.platforms.api.RateLimitPlugin
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiCallLimitExceededException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
+import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
@@ -11,8 +14,10 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
-import com.demich.cps.platforms.api.cpsHttpClient
-import com.demich.cps.platforms.api.defaultJson
+import com.demich.cps.platforms.clients.PlatformClient
+import com.demich.cps.platforms.clients.RateLimitPlugin
+import com.demich.cps.platforms.clients.cpsHttpClient
+import com.demich.cps.platforms.clients.defaultJson
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpResponseValidator

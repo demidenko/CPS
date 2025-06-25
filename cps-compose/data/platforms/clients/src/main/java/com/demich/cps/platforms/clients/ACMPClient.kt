@@ -1,7 +1,7 @@
-package com.demich.cps.platforms.api.acmp
+package com.demich.cps.platforms.clients
 
-import com.demich.cps.platforms.api.PlatformClient
-import com.demich.cps.platforms.api.cpsHttpClient
+import com.demich.cps.platforms.api.acmp.ACMPPageContentProvider
+import com.demich.cps.platforms.api.acmp.ACMPUrls
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.Charsets
 import io.ktor.client.request.HttpRequestBuilder

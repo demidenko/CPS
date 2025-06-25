@@ -1,4 +1,4 @@
-package com.demich.cps.platforms.api
+package com.demich.cps.platforms.clients
 
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig

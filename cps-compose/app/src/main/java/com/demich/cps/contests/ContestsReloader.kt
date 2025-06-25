@@ -12,9 +12,9 @@ import com.demich.cps.contests.loading_engine.loaders.CodeforcesContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.DmojContestsLoader
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.platforms.api.clist.ClistApi
-import com.demich.cps.platforms.api.clist.ClistClient
 import com.demich.cps.platforms.api.clist.ClistResource
-import com.demich.cps.platforms.api.codeforces.CodeforcesClient
+import com.demich.cps.platforms.clients.ClistClient
+import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.fromSnapshot
 import kotlinx.coroutines.coroutineScope

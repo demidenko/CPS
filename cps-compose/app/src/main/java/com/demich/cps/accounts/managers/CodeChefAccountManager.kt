@@ -29,8 +29,8 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.accounts.userinfo.ratingToString
 import com.demich.cps.accounts.userinfo.userInfoOrNull
-import com.demich.cps.platforms.api.codechef.CodeChefClient
 import com.demich.cps.platforms.api.codechef.CodeChefUrls
+import com.demich.cps.platforms.clients.CodeChefClient
 import com.demich.cps.platforms.clients.isRedirect
 import com.demich.cps.platforms.utils.CodeChefUtils
 import com.demich.cps.ui.CPSIcons
