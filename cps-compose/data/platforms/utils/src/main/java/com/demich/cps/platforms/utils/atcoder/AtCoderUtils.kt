@@ -1,9 +1,10 @@
-package com.demich.cps.platforms.utils
+package com.demich.cps.platforms.utils.atcoder
 
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.atcoder.AtCoderUrls
+import com.demich.cps.platforms.utils.NewsPostEntry
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime

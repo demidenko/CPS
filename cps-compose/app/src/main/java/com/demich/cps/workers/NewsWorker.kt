@@ -12,8 +12,8 @@ import com.demich.cps.platforms.api.atcoder.AtCoderUrls
 import com.demich.cps.platforms.api.projecteuler.ProjectEulerUrls
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.ProjectEulerClient
-import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.platforms.utils.ProjectEulerUtils
+import com.demich.cps.platforms.utils.atcoder.AtCoderUtils
 import com.demich.cps.utils.asHtmlToSpanned
 import kotlin.time.Duration.Companion.hours
 
