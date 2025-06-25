@@ -1,11 +1,11 @@
 package com.demich.cps.features.codeforces.follow.database
 
+import android.content.Context
 import androidx.room.AutoMigration
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.demich.cps.features.room.InstanceProvider
+import com.demich.cps.features.room.instanceDelegate
 
 @Database(
     entities = [CodeforcesUserBlog::class],
@@ -20,11 +20,7 @@ import com.demich.cps.features.room.InstanceProvider
 )
 internal abstract class CodeforcesFollowDataBase: RoomDatabase() {
     abstract fun followListDao(): CodeforcesFollowDao
-
-    companion object: InstanceProvider<CodeforcesFollowDataBase>({
-        Room.databaseBuilder<CodeforcesFollowDataBase>(
-            name = "codeforces_follow_db",
-            context = it
-        )
-    })
 }
+
+internal val Context.followDataBase by
+    instanceDelegate<CodeforcesFollowDataBase>(name = "codeforces_follow_db")

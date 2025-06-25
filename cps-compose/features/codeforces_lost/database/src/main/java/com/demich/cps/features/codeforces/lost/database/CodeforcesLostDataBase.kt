@@ -1,13 +1,13 @@
 package com.demich.cps.features.codeforces.lost.database
 
+import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.demich.cps.features.room.InstanceProvider
 import com.demich.cps.features.room.InstantSecondsConverter
 import com.demich.cps.features.room.RoomJsonConverter
+import com.demich.cps.features.room.instanceDelegate
 import com.demich.cps.features.room.jsonRoom
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 
@@ -22,14 +22,11 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 )
 internal abstract class CodeforcesLostDataBase: RoomDatabase() {
     abstract fun lostBlogEntriesDao(): CodeforcesLostDao
-
-    companion object: InstanceProvider<CodeforcesLostDataBase>({
-        Room.databaseBuilder<CodeforcesLostDataBase>(
-            name = "codeforces_lost_db",
-            context = it
-        )
-    })
 }
+
+internal val Context.lostDataBase by instanceDelegate<CodeforcesLostDataBase>(
+    name = "codeforces_lost_db"
+)
 
 internal class CodeforcesBlogEntryConverter: RoomJsonConverter<CodeforcesBlogEntry> {
     @TypeConverter

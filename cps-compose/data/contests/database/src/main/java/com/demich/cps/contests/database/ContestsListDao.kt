@@ -1,12 +1,16 @@
 package com.demich.cps.contests.database
 
 import android.content.Context
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 
 val Context.contestsListDao: ContestsListDao
-    get() = ContestsDatabase.getInstance(this).contestsDao()
+    get() = contestsDatabase.contestsDao()
 
 internal const val contestsTableName = "contests_list"
 

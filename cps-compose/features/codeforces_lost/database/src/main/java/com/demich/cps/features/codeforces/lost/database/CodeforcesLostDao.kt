@@ -8,7 +8,7 @@ import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 val Context.lostBlogEntriesDao: CodeforcesLostDao
-    get() = CodeforcesLostDataBase.getInstance(this).lostBlogEntriesDao()
+    get() = lostDataBase.lostBlogEntriesDao()
 
 
 internal const val cfLostTableName = "BlogEntries"

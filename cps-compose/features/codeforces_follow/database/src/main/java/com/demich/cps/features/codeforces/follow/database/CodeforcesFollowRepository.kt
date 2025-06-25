@@ -17,7 +17,7 @@ abstract class CodeforcesFollowRepository(
     context: Context
 ) {
     private val dao: CodeforcesFollowDao =
-        CodeforcesFollowDataBase.getInstance(context).followListDao()
+        context.followDataBase.followListDao()
 
     suspend fun remove(handle: String) = dao.remove(handle)
 
