@@ -212,12 +212,15 @@ private suspend inline fun findSuspects(
         }
         .filterNewEntries(isFinalFilter = true) { isNew(cachedApi.getBlogEntry(it.id, locale).creationTime) }
         .forEach {
-            val blogEntry = cachedApi.getBlogEntry(it.id, locale).copy(
-                authorColorTag = it.author.colorTag,
-                rating = 0,
-                commentsCount = null
+            val blogEntry = cachedApi.getBlogEntry(it.id, locale)
+            onSuspect(
+                blogEntry.copy(
+                    authorColorTag = it.author.colorTag,
+                    title = CodeforcesUtils.extractTitle(blogEntry),
+                    rating = 0,
+                    commentsCount = null
+                )
             )
-            onSuspect(blogEntry)
         }
 }
 
