@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.Flow
 internal const val cfFollowTableName = "FollowList"
 
 @Dao
-interface CodeforcesFollowDao {
+internal interface CodeforcesFollowDao {
     @Query("SELECT * FROM $cfFollowTableName")
     suspend fun getAllBlogs(): List<CodeforcesUserBlog>
 
@@ -52,7 +52,8 @@ interface CodeforcesFollowDao {
         update(fromUserBlog.copy(handle = toHandle))
     }
 
-    private suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
+    @Transaction
+    suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
         if (info.handle != handle) changeHandle(handle, info.handle)
         val userBlog = getUserBlog(info.handle) ?: return
         if (userBlog.userInfo != info) update(userBlog.copy(
@@ -61,7 +62,7 @@ interface CodeforcesFollowDao {
         ))
     }
 
-    private suspend fun addBlogEntries(
+    suspend fun addBlogEntries(
         handle: String,
         blogEntries: List<CodeforcesBlogEntry>,
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
@@ -113,7 +114,6 @@ interface CodeforcesFollowDao {
         }
     }
 
-    @Transaction
     suspend fun applyProfileResult(handle: String, result: ProfileResult<CodeforcesUserInfo>) {
         when (result) {
             is ProfileResult.Success -> setUserInfo(handle, result.userInfo)
@@ -124,6 +124,6 @@ interface CodeforcesFollowDao {
 
     @Transaction
     suspend fun applyProfilesResults(results: Map<String, ProfileResult<CodeforcesUserInfo>>) {
-        results.forEach { (handle, result) -> applyProfileResult(handle, result) }
+        results.forEach { applyProfileResult(handle = it.key, result = it.value) }
     }
 }
