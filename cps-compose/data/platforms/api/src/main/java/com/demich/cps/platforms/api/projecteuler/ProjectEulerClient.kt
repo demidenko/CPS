@@ -1,23 +1,23 @@
-package com.demich.cps.platforms.api.clients
+package com.demich.cps.platforms.api.projecteuler
 
 import com.demich.cps.platforms.api.PlatformClient
 import com.demich.cps.platforms.api.getText
 
-object ProjectEulerClient: PlatformClient {
+object ProjectEulerClient: PlatformClient, ProjectEulerPageContentProvider {
 
     private suspend fun getPage(page: String): String {
         return client.getText(urlString = "${ProjectEulerUrls.main}/$page")
     }
 
-    suspend fun getNewsPage(): String {
+    override suspend fun getNewsPage(): String {
         return getPage(page = "news")
     }
 
-    suspend fun getRSSPage(): String {
+    override suspend fun getRSSPage(): String {
         return getPage(page = "rss2_euler.xml")
     }
 
-    suspend fun getRecentPage(): String {
+    override suspend fun getRecentPage(): String {
         return getPage(page = "recent")
     }
 }
