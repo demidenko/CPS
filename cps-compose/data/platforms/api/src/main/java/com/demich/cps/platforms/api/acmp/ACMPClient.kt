@@ -6,22 +6,22 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.Charsets
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.request
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
 object ACMPClient: PlatformClient, ACMPPageContentProvider {
     private val windows1251 = Charset.forName("windows-1251")
     override val client = cpsHttpClient {
+        followRedirects = false
+
         Charsets {
             register(windows1251)
             responseCharsetFallback = windows1251
         }
     }
-
-    class ACMPPageNotFoundException : Throwable()
 
     //TODO: ktor can't get charset from client
     private suspend fun HttpResponse.bodyAsText() = bodyAsText(fallbackCharset = windows1251)
@@ -33,15 +33,12 @@ object ACMPClient: PlatformClient, ACMPPageContentProvider {
     ): String = this.get(urlString = urlString, block = block).bodyAsText()
 
     override suspend fun getUserPage(id: Int): String {
-        with(client.get(ACMPUrls.user(id))) {
-            //acmp redirects to main page if user not found
-            if (request.url.parameters.isEmpty()) throw ACMPPageNotFoundException()
-            return bodyAsText()
-        }
+        return client.get(ACMPUrls.user(id)).bodyAsText()
     }
 
     override suspend fun getUsersSearch(str: String): String {
-        return client.getText(ACMPUrls.main + "/index.asp?main=rating") {
+        return client.getText(ACMPUrls.main + "/index.asp") {
+            parameter("main", "rating")
             url.encodedParameters.append("str", URLEncoder.encode(str, windows1251.name()))
         }
     }
