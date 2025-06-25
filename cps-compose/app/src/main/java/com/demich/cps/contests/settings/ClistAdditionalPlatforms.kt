@@ -23,8 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.platforms.api.clients.ClistClient
-import com.demich.cps.platforms.api.clients.ClistResource
+import com.demich.cps.platforms.api.clist.ClistClient
+import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.api.niceMessage
 import com.demich.cps.platforms.utils.ClistUtils
 import com.demich.cps.ui.CPSIcons

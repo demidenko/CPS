@@ -11,8 +11,8 @@ import com.demich.cps.contests.loading_engine.loaders.ClistContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.CodeforcesContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.DmojContestsLoader
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
-import com.demich.cps.platforms.api.clients.ClistClient
-import com.demich.cps.platforms.api.clients.ClistResource
+import com.demich.cps.platforms.api.clist.ClistApi
+import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.fromSnapshot
@@ -73,7 +73,7 @@ private suspend fun contestsLoadingFlows(
     settings: ContestsSettingsDataStore
 ): Map<Contest.Platform, Flow<ContestsLoadingResult>> {
 
-    val clistApiAccess: ClistClient.ApiAccess
+    val clistApiAccess: ClistApi.ApiAccess
     val clistAdditionalResources: List<ClistResource>
     val contestsDateConstraints: ContestDateBaseConstraints
     val contestsLoadersPriorityLists: Map<Contest.Platform, List<ContestsLoaderType>>

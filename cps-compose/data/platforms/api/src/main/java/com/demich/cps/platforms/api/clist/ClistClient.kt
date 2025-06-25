@@ -1,4 +1,4 @@
-package com.demich.cps.platforms.api.clients
+package com.demich.cps.platforms.api.clist
 
 import com.demich.cps.platforms.api.PlatformClient
 import com.demich.cps.platforms.api.RateLimitPlugin
@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-object ClistClient: PlatformClient {
+object ClistClient: PlatformClient, ClistApi, ClistPageContentProvider {
     override val client = cpsHttpClient(json = defaultJson) {
         defaultRequest {
             url(ClistUrls.main)
@@ -26,19 +26,19 @@ object ClistClient: PlatformClient {
         }
     }
 
-    suspend fun getUserPage(login: String): String {
+    override suspend fun getUserPage(login: String): String {
         return client.getText(ClistUrls.user(login))
     }
 
-    suspend fun getUsersSearchPage(str: String): String {
+    override suspend fun getUsersSearchPage(str: String): String {
         return client.getText("coders") {
             parameter("search", str)
         }
     }
 
-    private suspend inline fun<reified T> getApiJsonObjects(
+    private suspend inline fun <reified T> getApiJsonObjects(
         page: String,
-        apiAccess: ApiAccess,
+        apiAccess: ClistApi.ApiAccess,
         responseSizeLimit: Int = 1000,
         block: HttpRequestBuilder.() -> Unit = {}
     ): List<T> = buildList {
@@ -62,8 +62,8 @@ object ClistClient: PlatformClient {
         } while (offset < totalCount)
     }
 
-    suspend fun getContests(
-        apiAccess: ApiAccess,
+    override suspend fun getContests(
+        apiAccess: ClistApi.ApiAccess,
         resourceIds: List<Int>,
         maxStartTime: Instant,
         minEndTime: Instant
@@ -76,15 +76,9 @@ object ClistClient: PlatformClient {
         }
     }
 
-    suspend fun getResources(apiAccess: ApiAccess): List<ClistResource> {
+    override suspend fun getResources(apiAccess: ClistApi.ApiAccess): List<ClistResource> {
         return getApiJsonObjects(page = "resource", apiAccess = apiAccess)
     }
-
-    @Serializable
-    data class ApiAccess(
-        val login: String,
-        val key: String
-    )
 }
 
 object ClistUrls {
@@ -108,22 +102,4 @@ private class PageInfo(
     //val offset: Int,
     //val previous: String?,
     val total_count: Int?
-)
-
-@Serializable
-data class ClistContest(
-    val resource_id: Int,
-    val id: Long,
-    val start: String,
-    val end: String,
-    val duration: Long,
-    val event: String,
-    val href: String,
-    val host: String
-)
-
-@Serializable
-data class ClistResource(
-    val id: Int,
-    val name: String
 )
