@@ -7,13 +7,12 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogException
-import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.getProfile
-import com.demich.cps.platforms.utils.codeforces.getProfiles
 import kotlinx.coroutines.flow.Flow
 
 internal const val cfFollowTableName = "FollowList"
@@ -87,21 +86,23 @@ interface CodeforcesFollowDao {
     suspend fun getAndReloadBlogEntries(
         handle: String,
         locale: CodeforcesLocale,
+        api: CodeforcesApi,
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
     ): Result<List<CodeforcesBlogEntry>> {
-        return CodeforcesClient.runCatching {
+        return api.runCatching {
             getUserBlogEntries(handle = handle, locale = locale)
         }.recoverCatching {
             if (it is CodeforcesApiNotAllowedReadBlogException) {
                 return@recoverCatching emptyList()
             }
             if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
-                val profileResult = CodeforcesClient.getProfile(handle = handle, recoverHandle = true)
+                val profileResult = api.getProfile(handle = handle, recoverHandle = true)
                 applyProfileResult(handle, profileResult)
                 if (profileResult is ProfileResult.Success) {
                     return@recoverCatching getAndReloadBlogEntries(
                         handle = profileResult.userInfo.handle,
                         locale = locale,
+                        api = api,
                         onNewBlogEntry = onNewBlogEntry
                     ).getOrThrow()
                 }
@@ -110,10 +111,6 @@ interface CodeforcesFollowDao {
         }.onSuccess { blogEntries ->
             addBlogEntries(handle, blogEntries, onNewBlogEntry)
         }
-    }
-
-    suspend fun updateUsersInfo() {
-        applyProfilesResults(CodeforcesClient.getProfiles(handles = getHandles(), recoverHandle = true))
     }
 
     @Transaction

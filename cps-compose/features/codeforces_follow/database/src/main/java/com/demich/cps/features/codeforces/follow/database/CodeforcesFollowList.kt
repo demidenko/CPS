@@ -8,6 +8,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.getProfile
+import com.demich.cps.platforms.utils.codeforces.getProfiles
 
 abstract class CodeforcesFollowList(
     protected val context: Context,
@@ -25,6 +26,7 @@ abstract class CodeforcesFollowList(
         dao.getAndReloadBlogEntries(
             handle = handle,
             locale = getLocale(),
+            api = CodeforcesClient,
             onNewBlogEntry = ::notifyNewBlogEntry
         )
 
@@ -54,7 +56,8 @@ abstract class CodeforcesFollowList(
     }
 
     suspend fun updateUsers() {
-        dao.updateUsersInfo()
+        val profiles = CodeforcesClient.getProfiles(handles = dao.getHandles(), recoverHandle = true)
+        dao.applyProfilesResults(profiles)
     }
 
     suspend fun updateFailedBlogEntries() {
