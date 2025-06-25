@@ -13,7 +13,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 val Context.followListDao: FollowList
     get() = FollowList(context = this)
 
-class FollowList(context: Context): CodeforcesFollowList(api = CodeforcesClient, context = context) {
+class FollowList(val context: Context): CodeforcesFollowList(api = CodeforcesClient, context = context) {
 
     override suspend fun getLocale() = context.settingsCommunity.codeforcesLocale()
 

@@ -7,12 +7,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogException
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
-import com.demich.cps.platforms.utils.codeforces.getProfile
 import kotlinx.coroutines.flow.Flow
 
 internal const val cfFollowTableName = "FollowList"
@@ -80,37 +75,6 @@ internal interface CodeforcesFollowDao {
             update(userBlog.copy(blogEntries = newIds))
         } else {
             if (newIds.isNotEmpty()) update(userBlog.copy(blogEntries = newIds + currentIds))
-        }
-    }
-
-    //TODO: refactor this
-    suspend fun getAndReloadBlogEntries(
-        handle: String,
-        locale: CodeforcesLocale,
-        api: CodeforcesApi,
-        onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
-    ): Result<List<CodeforcesBlogEntry>> {
-        return api.runCatching {
-            getUserBlogEntries(handle = handle, locale = locale)
-        }.recoverCatching {
-            if (it is CodeforcesApiNotAllowedReadBlogException) {
-                return@recoverCatching emptyList()
-            }
-            if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
-                val profileResult = api.getProfile(handle = handle, recoverHandle = true)
-                applyProfileResult(handle, profileResult)
-                if (profileResult is ProfileResult.Success) {
-                    return@recoverCatching getAndReloadBlogEntries(
-                        handle = profileResult.userInfo.handle,
-                        locale = locale,
-                        api = api,
-                        onNewBlogEntry = onNewBlogEntry
-                    ).getOrThrow()
-                }
-            }
-            throw it
-        }.onSuccess { blogEntries ->
-            addBlogEntries(handle, blogEntries, onNewBlogEntry)
         }
     }
 

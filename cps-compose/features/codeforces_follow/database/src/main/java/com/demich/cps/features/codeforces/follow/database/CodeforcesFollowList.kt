@@ -5,14 +5,16 @@ import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogException
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.platforms.utils.codeforces.getProfiles
 
 abstract class CodeforcesFollowList(
-    protected val context: Context,
-    protected val api: CodeforcesApi
+    private val api: CodeforcesApi,
+    context: Context
 ) {
     private val dao: CodeforcesFollowDao =
         CodeforcesFollowDataBase.getInstance(context).followListDao()
@@ -24,12 +26,34 @@ abstract class CodeforcesFollowList(
     suspend fun blogs() = dao.getAllBlogs()
 
     suspend fun getAndReloadBlogEntries(handle: String) =
-        dao.getAndReloadBlogEntries(
-            handle = handle,
-            locale = getLocale(),
-            api = api,
-            onNewBlogEntry = ::notifyNewBlogEntry
-        )
+        getAndReloadBlogEntries(handle = handle, locale = getLocale())
+
+    //TODO: refactor this
+    private suspend fun getAndReloadBlogEntries(
+        handle: String,
+        locale: CodeforcesLocale
+    ): Result<List<CodeforcesBlogEntry>> {
+        return api.runCatching {
+            getUserBlogEntries(handle = handle, locale = locale)
+        }.recoverCatching {
+            if (it is CodeforcesApiNotAllowedReadBlogException) {
+                return@recoverCatching emptyList()
+            }
+            if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
+                val profileResult = api.getProfile(handle = handle, recoverHandle = true)
+                dao.applyProfileResult(handle, profileResult)
+                if (profileResult is ProfileResult.Success) {
+                    return@recoverCatching getAndReloadBlogEntries(
+                        handle = profileResult.userInfo.handle,
+                        locale = locale
+                    ).getOrThrow()
+                }
+            }
+            throw it
+        }.onSuccess { blogEntries ->
+            dao.addBlogEntries(handle, blogEntries, ::notifyNewBlogEntry)
+        }
+    }
 
     suspend fun addNewUser(result: ProfileResult<CodeforcesUserInfo>) {
         if (result is ProfileResult.NotFound) return
