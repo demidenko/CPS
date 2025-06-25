@@ -4,7 +4,7 @@ import android.content.Context
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.userInfoOrNull
-import com.demich.cps.platforms.api.codeforces.CodeforcesClient
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.getProfile
@@ -12,6 +12,7 @@ import com.demich.cps.platforms.utils.codeforces.getProfiles
 
 abstract class CodeforcesFollowList(
     protected val context: Context,
+    protected val api: CodeforcesApi
 ) {
     private val dao: CodeforcesFollowDao =
         CodeforcesFollowDataBase.getInstance(context).followListDao()
@@ -26,7 +27,7 @@ abstract class CodeforcesFollowList(
         dao.getAndReloadBlogEntries(
             handle = handle,
             locale = getLocale(),
-            api = CodeforcesClient,
+            api = api,
             onNewBlogEntry = ::notifyNewBlogEntry
         )
 
@@ -51,12 +52,12 @@ abstract class CodeforcesFollowList(
         addNewUser(ProfileResult.Failed(handle))
         dao.applyProfileResult(
             handle = handle,
-            result = CodeforcesClient.getProfile(handle = handle, recoverHandle = true)
+            result = api.getProfile(handle = handle, recoverHandle = true)
         )
     }
 
     suspend fun updateUsers() {
-        val profiles = CodeforcesClient.getProfiles(handles = dao.getHandles(), recoverHandle = true)
+        val profiles = api.getProfiles(handles = dao.getHandles(), recoverHandle = true)
         dao.applyProfilesResults(profiles)
     }
 
