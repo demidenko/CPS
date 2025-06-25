@@ -12,8 +12,8 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.platforms.api.clients.AtCoderClient
-import com.demich.cps.platforms.api.clients.AtCoderUrls
+import com.demich.cps.platforms.api.atcoder.AtCoderClient
+import com.demich.cps.platforms.api.atcoder.AtCoderUrls
 import com.demich.cps.platforms.api.isPageNotFound
 import com.demich.cps.platforms.utils.AtCoderUtils
 import com.demich.cps.ui.SettingsSwitchItemWithProfilesWork

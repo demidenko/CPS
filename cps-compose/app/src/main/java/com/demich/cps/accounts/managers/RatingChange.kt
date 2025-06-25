@@ -1,7 +1,7 @@
 package com.demich.cps.accounts.managers
 
-import com.demich.cps.platforms.api.clients.AtCoderRatingChange
-import com.demich.cps.platforms.api.clients.AtCoderUrls
+import com.demich.cps.platforms.api.atcoder.AtCoderRatingChange
+import com.demich.cps.platforms.api.atcoder.AtCoderUrls
 import com.demich.cps.platforms.api.clients.CodeChefRatingChange
 import com.demich.cps.platforms.api.clients.DmojRatingChange
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls

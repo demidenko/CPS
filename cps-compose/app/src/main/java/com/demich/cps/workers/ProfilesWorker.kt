@@ -12,7 +12,7 @@ import com.demich.cps.accounts.managers.toRatingChange
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.notifications.notificationChannels
-import com.demich.cps.platforms.api.clients.AtCoderClient
+import com.demich.cps.platforms.api.atcoder.AtCoderClient
 import com.demich.cps.platforms.api.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.utils.toSignedString
