@@ -14,6 +14,7 @@ import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.clients.ClistClient
+import com.demich.cps.platforms.clients.DmojClient
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.fromSnapshot
@@ -97,7 +98,7 @@ private suspend fun contestsLoadingFlows(
             )
             ContestsLoaderType.codeforces_api -> CodeforcesContestsLoader(api = CodeforcesClient)
             ContestsLoaderType.atcoder_parse -> AtCoderContestsLoader()
-            ContestsLoaderType.dmoj_api -> DmojContestsLoader()
+            ContestsLoaderType.dmoj_api -> DmojContestsLoader(api = DmojClient)
         }
     }
 }
