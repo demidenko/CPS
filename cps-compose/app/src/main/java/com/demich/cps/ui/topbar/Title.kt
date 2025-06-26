@@ -1,6 +1,7 @@
 package com.demich.cps.ui.topbar
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ProvideTextStyle
@@ -12,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
@@ -39,7 +41,10 @@ internal fun Title(
                 color = cpsColors.content,
                 maxLines = 1
             )
-            SubTitle(text = subtitle)
+            SubTitle(
+                text = subtitle,
+                modifier = Modifier.padding(top = 2.dp)
+            )
         }
     }
 }

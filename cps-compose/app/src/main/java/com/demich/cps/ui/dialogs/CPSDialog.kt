@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -23,6 +24,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -45,18 +48,21 @@ fun CPSDialog(
 //            usePlatformDefaultWidth = false, //affects height!!!
         )
     ) {
-        Card(
-            shape = RoundedCornerShape(12.dp),
-            backgroundColor = cpsColors.backgroundAdditional,
-            modifier = Modifier
-                .imePadding()
-                .padding(vertical = 12.dp)
-        ) {
-            Column(
-                modifier = modifier.padding(all = 18.dp),
-                horizontalAlignment = horizontalAlignment,
-                content = content
-            )
+        //TODO: remove it (includeFontPadding = false)
+        ProvideTextStyle(TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = true))) {
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                backgroundColor = cpsColors.backgroundAdditional,
+                modifier = Modifier
+                    .imePadding()
+                    .padding(vertical = 12.dp)
+            ) {
+                Column(
+                    modifier = modifier.padding(all = 18.dp),
+                    horizontalAlignment = horizontalAlignment,
+                    content = content
+                )
+            }
         }
     }
 }

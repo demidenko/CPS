@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -15,6 +16,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -124,17 +127,21 @@ class CPSNavigator(
     }
 
     inline fun <reified T: Screen> NavGraphBuilder.navEntry(
+        includeFontPadding: Boolean = true,
         crossinline content: @Composable (DuringCompositionHolder<T>) -> Unit
     ) {
         composable<T> {
-            Surface(modifier = Modifier.fillMaxSize()) {
-                val holder = remember {
-                    DuringCompositionHolder(it.toRoute<T>()).apply {
-                        menu = null
-                        bottomBar = null
+            //TODO: remove it (includeFontPadding = false)
+            ProvideTextStyle(TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = includeFontPadding))) {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    val holder = remember {
+                        DuringCompositionHolder(it.toRoute<T>()).apply {
+                            menu = null
+                            bottomBar = null
+                        }
                     }
+                    content(holder)
                 }
-                content(holder)
             }
         }
     }

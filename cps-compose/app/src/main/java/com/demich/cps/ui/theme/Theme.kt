@@ -8,13 +8,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -67,13 +65,9 @@ fun CPSTheme(content: @Composable () -> Unit) {
             )
         ) {
             CompositionLocalProvider(
-                LocalContentAlpha provides 1f //because MaterialTheme override
-            ) {
-                ProvideTextStyle(
-                    value = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = true)),
-                    content = content
-                )
-            }
+                value = LocalContentAlpha provides 1f, //because MaterialTheme override
+                content = content
+            )
         }
     }
 }
