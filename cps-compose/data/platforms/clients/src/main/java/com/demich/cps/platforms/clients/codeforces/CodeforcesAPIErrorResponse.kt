@@ -12,6 +12,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal class CodeforcesAPIErrorResponse(val comment: String) {
 
+    /* example:
+    {
+        "status": "FAILED",
+        "comment": "contestId: Contest with id 0 not found"
+    }
+     */
+
     fun toApiException(): CodeforcesApiException {
         if (isCallLimitExceeded()) return CodeforcesApiCallLimitExceededException(comment)
 
