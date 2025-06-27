@@ -7,6 +7,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingUnavail
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiUnspecifiedException
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -30,7 +31,7 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
 
         if (isNotAllowedToReadThatBlog()) return CodeforcesApiNotAllowedReadBlogException(comment)
 
-        return CodeforcesApiException(comment)
+        return CodeforcesApiUnspecifiedException(comment)
     }
 
     private fun isCallLimitExceeded() = comment == "Call limit exceeded"

@@ -3,8 +3,8 @@ package com.demich.cps.platforms.clients.codeforces
 import com.demich.cps.platforms.api.BuildConfig
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiCallLimitExceededException
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.api.codeforces.CodeforcesTemporarilyUnavailableException
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
@@ -89,7 +89,6 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
         }
     }
 
-    class CodeforcesTemporarilyUnavailableException: CodeforcesApiException("Codeforces Temporarily Unavailable")
     private class CodeforcesPOWException(val pow: String): Throwable("pow = $pow")
 
     private val semaphore = when {
