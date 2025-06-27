@@ -35,7 +35,7 @@ import com.demich.cps.ui.StartScreenDataStore
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.switchAnimationSpec
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.background
+import com.demich.cps.utils.backgroundColor
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.ignoreInputEvents
@@ -67,7 +67,7 @@ fun CPSBottomBar(
                 onCloseRequest = onDisableSettings,
                 modifier = Modifier
                     .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
-                    .background(backgroundColor)
+                    .backgroundColor(backgroundColor)
                     .pointerInput(Unit) {} //for not send to scrim
                     .padding(horizontal = 8.dp)
             )

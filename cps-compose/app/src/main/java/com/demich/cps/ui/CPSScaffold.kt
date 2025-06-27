@@ -30,7 +30,7 @@ import com.demich.cps.ui.bottombar.CPSBottomBar
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.animateToggleColorAsState
-import com.demich.cps.utils.background
+import com.demich.cps.utils.backgroundColor
 import com.demich.cps.utils.ifThen
 
 @Stable
@@ -132,7 +132,7 @@ private fun BottomBarAndNavBar(
     val enabled = bottomBarEnabled()
     Box(
         modifier = modifier
-            .background {
+            .backgroundColor {
                 if (enabled) backgroundColor
                 else Color.Unspecified
             }
@@ -190,7 +190,7 @@ private fun Scrim(
         Box(
             modifier = modifier.ifThen(show) {
                 pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
-            }.background { Color.Black.copy(alpha = alpha) }
+            }.backgroundColor { Color.Black.copy(alpha = alpha) }
         )
     }
 }

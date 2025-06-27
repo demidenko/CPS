@@ -123,7 +123,7 @@ fun Modifier.ignoreInputEvents(enabled: Boolean) =
         }
     }
 
-fun Modifier.background(color: () -> Color) =
+inline fun Modifier.backgroundColor(crossinline color: () -> Color): Modifier =
     this.drawBehind { drawRect(color = color()) }
 
 @Composable

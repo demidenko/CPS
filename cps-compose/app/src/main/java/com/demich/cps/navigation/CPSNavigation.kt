@@ -30,7 +30,7 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.ratedProfilesColorState
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.topbar.CPSTopBar
-import com.demich.cps.utils.background
+import com.demich.cps.utils.backgroundColor
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberFrom
@@ -173,7 +173,7 @@ class CPSNavigator(
 
         Box(
             modifier
-                .background { statusBarColor }
+                .backgroundColor { statusBarColor }
                 .statusBarsPadding()
         ) {
             CPSTopBar(
