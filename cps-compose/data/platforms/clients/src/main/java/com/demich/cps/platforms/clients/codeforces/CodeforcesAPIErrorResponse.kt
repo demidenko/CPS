@@ -36,10 +36,14 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
         comment.ifSurrounded("handle: User with handle ", " not found", block)
     }
 
-    //user blog response
     private fun isHandleFieldIncorrectLength(): Boolean {
+        //user blog responses
         if (comment == "handle: Field should contain between 3 and 24 characters, inclusive") return true
         if (comment == "handle: Поле должно содержать от 3 до 24 символов, включительно") return true
+
+        //userinfo responses
+        if (comment == "handles: Field should not be empty") return true
+        if (comment == "handles: Поле должно быть не пусто") return true
         return false
     }
 
