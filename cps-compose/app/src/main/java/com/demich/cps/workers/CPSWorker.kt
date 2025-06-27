@@ -6,6 +6,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
+import com.demich.cps.platforms.api.codeforces.CodeforcesTemporarilyUnavailableException
 import com.demich.cps.platforms.clients.isResponseException
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.utils.getCurrentTime
@@ -70,7 +71,8 @@ abstract class CPSWorker(
                 println("${work.name}: $it")
                 when {
                     it.isResponseException -> Result.retry()
-                    it is CodeforcesApiException -> Result.retry()
+                    it is CodeforcesApiException -> Result.failure()
+                    it is CodeforcesTemporarilyUnavailableException -> Result.retry()
                     else -> Result.failure()
                 }
             }
