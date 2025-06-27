@@ -9,6 +9,7 @@ import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.loading.ContestsLoadingResult
 import com.demich.cps.contests.loading.asContestsReceiver
+import com.demich.cps.contests.settings.differenceFrom
 import com.demich.cps.contests.settings.makeSnapshot
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
@@ -90,39 +91,17 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             infoDataStore.settingsSnapshot.update { null }
 
             val settings = context.settingsContests
-            val currentSettings = settings.makeSnapshot()
+            val diff = settings.makeSnapshot().differenceFrom(snapshot)
 
             val dao = context.contestsListDao
-            val toReload = mutableSetOf<Contest.Platform>()
-
-            snapshot.enabledPlatforms.let { prev ->
-                val current = currentSettings.enabledPlatforms
-                (prev - current).forEach { platform ->
-                    dao.replace(platform, emptyList())
-                    errors.edit { remove(platform) }
-                    setLoadingStatus(platform, LoadingStatus.PENDING)
-                }
-
-                toReload.addAll(current - prev)
-            }
-
-            snapshot.clistAdditionalResources.let { prev ->
-                val current = currentSettings.clistAdditionalResources
-                if (prev != current) {
-                    toReload.add(Contest.Platform.unknown)
-                }
-            }
-
-            snapshot.contestsDateConstraints.let { prev ->
-                val current = currentSettings.contestsDateConstraints
-                if (prev != current) {
-                    //TODO: delete contests if current in prev
-                    toReload.addAll(Contest.platforms)
-                }
+            diff.toRemove.forEach { platform ->
+                dao.replace(platform, emptyList())
+                errors.edit { remove(platform) }
+                setLoadingStatus(platform, LoadingStatus.PENDING)
             }
 
             reload(
-                platforms = toReload.intersect(currentSettings.enabledPlatforms),
+                platforms = diff.toReload,
                 settings = settings,
                 contestsInfo = infoDataStore,
                 contestsReceiver = dao.asContestsReceiver()

@@ -21,3 +21,40 @@ suspend fun ContestsSettingsDataStore.makeSnapshot(): ContestsSettingsSnapshot =
             contestsDateConstraints = it[contestsDateConstraints]
         )
     }
+
+
+class ContestsSettingsSnapshotDiff(
+    val toReload: Set<Contest.Platform>,
+    val toRemove: Set<Contest.Platform>
+)
+
+fun ContestsSettingsSnapshot.differenceFrom(snapshot: ContestsSettingsSnapshot): ContestsSettingsSnapshotDiff {
+    val toReload = mutableSetOf<Contest.Platform>()
+    val toRemove: Set<Contest.Platform>
+
+    snapshot.enabledPlatforms.let { prev ->
+        val current = enabledPlatforms
+        toRemove = prev - current
+        toReload.addAll(current - prev)
+    }
+
+    snapshot.clistAdditionalResources.let { prev ->
+        val current = clistAdditionalResources
+        if (prev != current) {
+            toReload.add(Contest.Platform.unknown)
+        }
+    }
+
+    snapshot.contestsDateConstraints.let { prev ->
+        val current = contestsDateConstraints
+        if (prev != current) {
+            //TODO: delete contests if current in prev
+            toReload.addAll(Contest.platforms)
+        }
+    }
+
+    return ContestsSettingsSnapshotDiff(
+        toReload = toReload.intersect(enabledPlatforms),
+        toRemove = toRemove
+    )
+}
