@@ -8,6 +8,7 @@ import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.ItemizedPreferences
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.flowOf
@@ -25,12 +26,13 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
     }
 
     private val enabledPlatforms = itemEnumSet<Contest.Platform>(name = "enabled_platforms")
-    fun flowOfEnabledPlatforms(): Flow<Set<Contest.Platform>> = flowOf {
+    fun enabledPlatforms(prefs: ItemizedPreferences) =
         buildSet {
-            addAll(it[enabledPlatforms])
-            if (it[clistAdditionalResources].isNotEmpty()) add(Contest.Platform.unknown)
+            addAll(prefs[enabledPlatforms])
+            if (prefs[clistAdditionalResources].isNotEmpty()) add(Contest.Platform.unknown)
         }
-    }
+    fun flowOfEnabledPlatforms(): Flow<Set<Contest.Platform>> = flowOf { enabledPlatforms(it) }
+
     suspend fun changeEnabled(platform: Contest.Platform, enabled: Boolean) {
         require(platform != Contest.Platform.unknown)
         enabledPlatforms.edit {
