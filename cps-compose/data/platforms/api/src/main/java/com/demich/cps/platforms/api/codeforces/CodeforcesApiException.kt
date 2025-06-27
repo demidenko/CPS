@@ -1,6 +1,6 @@
 package com.demich.cps.platforms.api.codeforces
 
-open class CodeforcesApiException(comment: String): Throwable(message = comment)
+open class CodeforcesApiException(val comment: String): Throwable(message = comment)
 
 class CodeforcesApiCallLimitExceededException(comment: String): CodeforcesApiException(comment)
 

@@ -16,7 +16,7 @@ val Throwable.niceMessage: String? get() =
 
         is ResponseException -> HttpStatusCode.fromValue(response.status.value).toString()
 
-        is CodeforcesApiException -> message
+        is CodeforcesApiException -> comment
 
         is HttpRequestTimeoutException -> "Request timeout"
 
