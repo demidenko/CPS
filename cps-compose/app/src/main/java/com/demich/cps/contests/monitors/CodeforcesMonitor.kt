@@ -1,5 +1,6 @@
 package com.demich.cps.contests.monitors
 
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingUnavailableException
@@ -45,16 +46,17 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
     val ratingChangeWaiter = RatingChangeWaiter(contestId, handle, onRatingChange)
 
     val mainJob = scope.launchWhileActive {
-        getStandingsData(
+        CodeforcesClient.getStandingsData(
             contestId = contestId,
             handle = handle,
+            monitor = this@launchIn,
             onOfficialChanged = {
                 return@launchWhileActive Duration.ZERO
             }
         )
 
         ifNeedCheckSubmissions { problemResults ->
-            getSubmissionsOrNull(
+            CodeforcesClient.getSubmissionsOrNull(
                 contestId = contestId,
                 handle = handle
             )?.let { submissions ->
@@ -67,7 +69,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
                     newSubmissions.forEach { onSubmissionFinalResult(it) }
                     notifiedSubmissionsIds.edit { newSubmissions.forEach { add(it.id) } }
                 }
-                submissionsInfo.update { problemResults.makeMapWith(submissions) }
+                submissionsInfo(newValue = problemResults.makeMapWith(submissions))
             }
         }
 
@@ -97,29 +99,30 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
         .launchIn(scope)
 }
 
-private suspend inline fun CodeforcesMonitorDataStore.getStandingsData(
+private suspend inline fun CodeforcesApi.getStandingsData(
     contestId: Int,
     handle: String,
+    monitor: CodeforcesMonitorDataStore,
     onOfficialChanged: () -> Unit
 ) {
-    CodeforcesClient.runCatching {
+    runCatching {
         getContestStandings(
             contestId = contestId,
             handle = handle,
-            includeUnofficial = !participationType().isOfficial()
+            includeUnofficial = !monitor.participationType().isOfficial()
         )
     }.onFailure { e ->
-        lastRequest(false)
+        monitor.lastRequest(false)
         if (e is CodeforcesApiContestNotStartedException && e.contestId == contestId) {
-            contestInfo.update { it?.copy(phase = CodeforcesContestPhase.BEFORE) }
+            monitor.contestInfo.update { it?.copy(phase = CodeforcesContestPhase.BEFORE) }
         }
         if (e is CodeforcesApiContestNotFoundException && e.contestId == contestId) {
-            reset()
+            monitor.reset()
         }
     }.onSuccess { standings ->
-        lastRequest(true)
+        monitor.lastRequest(true)
         var officialChanged = false
-        applyStandings(
+        monitor.applyStandings(
             standings = standings,
             onOfficialChanged = { officialChanged = true }
         )
@@ -264,8 +267,11 @@ private suspend inline fun CodeforcesMonitorDataStore.ifNeedCheckSubmissions(
     }
 }
 
-private suspend fun getSubmissionsOrNull(contestId: Int, handle: String): List<CodeforcesSubmission>? =
-    CodeforcesClient.runCatching {
+private suspend fun CodeforcesApi.getSubmissionsOrNull(
+    contestId: Int,
+    handle: String
+): List<CodeforcesSubmission>? =
+    runCatching {
         getContestSubmissions(contestId = contestId, handle = handle)
     }.map { submissions ->
         submissions.filter {
