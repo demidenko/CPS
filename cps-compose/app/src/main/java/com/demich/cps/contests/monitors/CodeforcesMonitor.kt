@@ -4,6 +4,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingUnavailableException
+import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
@@ -14,7 +15,6 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset
-import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.launchWhileActive
@@ -38,15 +38,22 @@ import kotlin.time.Duration.Companion.seconds
 
 suspend fun CodeforcesMonitorDataStore.launchIn(
     scope: CoroutineScope,
+    api: CodeforcesApi,
+    pageContentProvider: CodeforcesPageContentProvider,
     onRatingChange: (CodeforcesRatingChange) -> Unit,
     onSubmissionFinalResult: (CodeforcesSubmission) -> Unit
 ) {
     val (contestId: Int, handle: String) = args() ?: return
 
-    val ratingChangeWaiter = RatingChangeWaiter(contestId, handle, onRatingChange)
+    val ratingChangeWaiter = RatingChangeWaiter(
+        contestId = contestId,
+        handle = handle,
+        api = api,
+        onRatingChange = onRatingChange
+    )
 
     val mainJob = scope.launchWhileActive {
-        CodeforcesClient.getStandingsData(
+        api.getStandingsData(
             contestId = contestId,
             handle = handle,
             monitor = this@launchIn,
@@ -56,7 +63,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
         )
 
         ifNeedCheckSubmissions { problemResults ->
-            CodeforcesClient.getSubmissionsOrNull(
+            api.getSubmissionsOrNull(
                 contestId = contestId,
                 handle = handle
             )?.let { submissions ->
@@ -84,7 +91,11 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
 
     val systestPercentageJob = scope.launch {
         contestInfo.flow.mapNotNull { it?.phase }
-            .toSystemTestPercentageFlow(contestId = contestId, delay = 5.seconds)
+            .toSystemTestPercentageFlow(
+                contestId = contestId,
+                delay = 5.seconds,
+                pageContentProvider = pageContentProvider
+            )
             .collect {
                 sysTestPercentage(newValue = it)
             }
@@ -189,6 +200,7 @@ private suspend fun getDelay(
 private class RatingChangeWaiter(
     val contestId: Int,
     val handle: String,
+    val api: CodeforcesApi,
     val onRatingChange: (CodeforcesRatingChange) -> Unit
 ) {
     suspend fun getDelayOnFinished(contestEnd: Instant): Duration {
@@ -203,7 +215,7 @@ private class RatingChangeWaiter(
     }
 
     private suspend fun isRatingChangeDone(): Boolean {
-        CodeforcesClient.runCatching {
+        api.runCatching {
             getContestRatingChanges(contestId)
         }.getOrElse {
             //TODO: take this failure
@@ -223,11 +235,12 @@ private class RatingChangeWaiter(
 
 private fun Flow<CodeforcesContestPhase>.toSystemTestPercentageFlow(
     contestId: Int,
-    delay: Duration
+    delay: Duration,
+    pageContentProvider: CodeforcesPageContentProvider
 ): Flow<Int> = distinctUntilChanged().transformLatest { phase ->
     if (phase == CodeforcesContestPhase.SYSTEM_TEST) {
         while (true) {
-            CodeforcesClient.runCatching { getContestPage(contestId) }
+            pageContentProvider.runCatching { getContestPage(contestId) }
                 .map { CodeforcesUtils.extractContestSystemTestingPercentageOrNull(it) }
                 .onSuccess {
                     if (it != null) emit(it)

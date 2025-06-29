@@ -17,6 +17,7 @@ import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
+import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -67,6 +68,8 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         coroutineScope {
             monitor.launchIn(
                 scope = this,
+                api = CodeforcesClient,
+                pageContentProvider = CodeforcesClient,
                 onRatingChange = { ratingChange ->
                     launch { CodeforcesAccountManager().applyRatingChange(ratingChange, context) }
                 },
