@@ -34,20 +34,18 @@ class CodeforcesCommunityFollowWorker(
     //save handles between run after fast retry
     private val proceeded = mutableSetOf<String>()
 
-    private fun CodeforcesUserBlog.userLastOnlineTime(): Instant =
-        userInfo?.lastOnlineTime ?: Instant.DISTANT_PAST
-
     //note that cf can have different lastOnlineTime from api and web sources
     private fun CodeforcesUserBlog.isUserInactive() =
         workerStartTime - userLastOnlineTime() > 7.days
 
     override suspend fun runWork(): Result {
         val repository = context.followRepository
-        val blogs = repository.blogs()
 
         //TODO: consider skip this if blogs.size is small
         //update userInfo to keep fresh lastOnlineTime
         repository.updateUsers()
+
+        val blogs = repository.blogs()
 
         //TODO: problem is work have not runed to long and user posted blog then inactive
         blogs
@@ -69,6 +67,8 @@ class CodeforcesCommunityFollowWorker(
     }
 }
 
+private fun CodeforcesUserBlog.userLastOnlineTime(): Instant =
+    userInfo?.lastOnlineTime ?: Instant.DISTANT_PAST
 
 private fun nextEnqueueIn(
     blogsCount: Int,
