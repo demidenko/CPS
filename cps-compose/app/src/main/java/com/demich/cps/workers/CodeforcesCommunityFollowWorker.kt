@@ -45,11 +45,15 @@ class CodeforcesCommunityFollowWorker(
         //update userInfo to keep fresh lastOnlineTime
         repository.updateUsers()
 
+        val lastSuccessItem = WorkersHintsDataStore(context).followLastSuccessTime
         val blogs = repository.blogs()
 
-        //TODO: problem is work have not runed to long and user posted blog then inactive
         blogs
-            .filter { it.blogEntries == null || !it.isUserInactive() }
+            .let {
+                val lastSuccess = lastSuccessItem()
+                if (lastSuccess == null || workerStartTime - lastSuccess > 1.days) it
+                else it.filter { blog -> blog.blogEntries == null || !blog.isUserInactive() }
+            }
             .sortedByDescending { it.userLastOnlineTime() }
             .forEachWithProgress {
                 val handle = it.handle
@@ -62,6 +66,8 @@ class CodeforcesCommunityFollowWorker(
         work.enqueueInIfEarlier(
             duration = nextEnqueueIn(blogsCount = blogs.size, proceeded = proceeded.size).coerceAtLeast(2.hours)
         )
+
+        lastSuccessItem(newValue = workerStartTime)
 
         return Result.success()
     }
