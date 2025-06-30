@@ -104,7 +104,7 @@ inline fun ColumnScope.SettingsSectionHeader(
             )
             Text(
                 text = title,
-                fontSize = 14.sp,
+                fontSize = CPSDefaults.settingsSectionTitle,
                 fontWeight = FontWeight.SemiBold,
             )
         }
@@ -150,7 +150,7 @@ inline fun SettingsItemContent(
                 Text(
                     text = description,
                     color = cpsColors.contentAdditional,
-                    fontSize = 14.sp
+                    fontSize = CPSDefaults.settingsDescription
                 )
             }
         }
@@ -348,7 +348,10 @@ fun<T> SettingsItemWithInfo(
                 fontSize = CPSDefaults.settingsTitle,
                 fontWeight = FontWeight.SemiBold
             )
-            ProvideTextStyle(TextStyle(fontSize = 15.sp, color = cpsColors.contentAdditional)) {
+            ProvideTextStyle(TextStyle(
+                fontSize = CPSDefaults.settingsSubtitle,
+                color = cpsColors.contentAdditional
+            )) {
                 infoContent(value)
             }
         }
@@ -361,7 +364,7 @@ fun SettingsSubtitle(
 ) {
     Text(
         text = text,
-        fontSize = 15.sp,
+        fontSize = CPSDefaults.settingsSubtitle,
         color = cpsColors.contentAdditional,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
