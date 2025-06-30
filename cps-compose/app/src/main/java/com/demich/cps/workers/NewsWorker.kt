@@ -54,7 +54,7 @@ class NewsWorker(
     }
 
     private suspend fun atcoderNews() {
-        settings.scanNewsFeed(
+        hintsDataStore.scanNewsFeed(
             newsFeed = atcoder_news,
             posts = AtCoderUtils.extractNews(source = AtCoderClient.getMainPage())
         ) { post ->
@@ -73,7 +73,7 @@ class NewsWorker(
     private suspend fun projectEulerNews() {
         val rssPage = ProjectEulerClient.getRSSPage()
 
-        settings.scanNewsFeed(
+        hintsDataStore.scanNewsFeed(
             newsFeed = project_euler_news,
             posts = ProjectEulerUtils.extractNewsFromRSSPage(rssPage = rssPage)
         ) { post ->

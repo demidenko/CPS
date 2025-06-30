@@ -40,7 +40,7 @@ class ProjectEulerRecentProblemsWorker(
     }
 
     private suspend fun scanProblems() {
-        context.settingsCommunity.scanNewsFeed(
+        hintsDataStore.scanNewsFeed(
             newsFeed = CommunitySettingsDataStore.NewsFeed.project_euler_problems,
             posts = ProjectEulerUtils.extractRecentProblems(ProjectEulerClient.getRecentPage())
         ) { post ->
