@@ -49,6 +49,7 @@ class CodeforcesCommunityFollowWorker(
         //update userInfo to keep fresh lastOnlineTime
         repository.updateUsers()
 
+        //TODO: problem is work have not runed to long and user posted blog then inactive
         blogs
             .filter { it.blogEntries == null || !it.isUserInactive() }
             .sortedByDescending { it.userLastOnlineTime() }
