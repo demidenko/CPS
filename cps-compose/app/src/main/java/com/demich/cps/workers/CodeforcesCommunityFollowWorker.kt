@@ -45,7 +45,7 @@ class CodeforcesCommunityFollowWorker(
         //update userInfo to keep fresh lastOnlineTime
         repository.updateUsers()
 
-        val lastSuccessItem = WorkersHintsDataStore(context).followLastSuccessTime
+        val lastSuccessItem = hintsDataStore.followLastSuccessTime
         val blogs = repository.blogs()
 
         blogs

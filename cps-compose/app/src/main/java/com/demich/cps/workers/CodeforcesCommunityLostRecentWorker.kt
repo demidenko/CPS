@@ -3,7 +3,6 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.community.settings.CodeforcesLostHint
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostDao
@@ -20,6 +19,7 @@ import com.demich.datastore_itemized.DataStoreItem
 import com.demich.kotlin_stdlib_boost.mapToSet
 import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -85,7 +85,7 @@ class CodeforcesCommunityLostRecentWorker(
             minRatingColorTag = minRatingColorTag,
             isNew = ::isNew,
             api = CodeforcesClient,
-            lastNotNewIdItem = settings.codeforcesLostHintNotNew
+            lastNotNewIdItem = hintsDataStore.codeforcesLostHintNotNew
         ) {
             dao.insert(
                 CodeforcesLostBlogEntry(
@@ -117,8 +117,13 @@ class CodeforcesCommunityLostRecentWorker(
 
         return Result.success()
     }
-
 }
+
+@Serializable
+data class CodeforcesLostHint(
+    val blogEntryId: Int,
+    val creationTime: Instant
+)
 
 private class CachedBlogEntriesCodeforcesApi(
     private val originApi: CodeforcesApi,

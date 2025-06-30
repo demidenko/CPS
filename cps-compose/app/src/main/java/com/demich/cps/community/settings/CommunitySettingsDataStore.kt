@@ -13,8 +13,6 @@ import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Instant
-import kotlinx.serialization.Serializable
 
 val Context.settingsCommunity: CommunitySettingsDataStore
     get() = CommunitySettingsDataStore(this)
@@ -34,7 +32,6 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
 
     val codeforcesLostEnabled = itemBoolean(name = "cf_lost_enabled", defaultValue = false)
     val codeforcesLostMinRatingTag = itemEnum(name = "cf_lost_min_rating", defaultValue = CodeforcesColorTag.ORANGE)
-    val codeforcesLostHintNotNew = jsonCPS.itemNullable<CodeforcesLostHint>(name = "cf_lost_hint")
 
     fun flowOfCodeforcesTabs(): Flow<List<CodeforcesTitle>> {
         return codeforcesLostEnabled.flow.map { lostEnabled ->
@@ -75,9 +72,3 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
 
     val renderAllTabs = itemBoolean(name = "tabs_render_all", defaultValue = true)
 }
-
-@Serializable
-data class CodeforcesLostHint(
-    val blogEntryId: Int,
-    val creationTime: Instant
-)
