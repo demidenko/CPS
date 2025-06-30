@@ -143,7 +143,7 @@ inline fun SettingsItemContent(
         ) {
             Text(
                 text = title,
-                fontSize = 18.sp,
+                fontSize = CPSDefaults.settingsTitle,
                 fontWeight = FontWeight.SemiBold
             )
             if (description.isNotBlank()) {
@@ -293,7 +293,7 @@ fun<T: Enum<T>> SettingsEnumItemContent(
         TextButton(onClick = { showChangeDialog = true }) {
             Text(
                 text = optionToString(selectedOption),
-                fontSize = 18.sp,
+                fontSize = CPSDefaults.settingsTitle,
                 color = cpsColors.accent
             )
         }
@@ -345,7 +345,7 @@ fun<T> SettingsItemWithInfo(
         Column {
             Text(
                 text = title,
-                fontSize = 18.sp,
+                fontSize = CPSDefaults.settingsTitle,
                 fontWeight = FontWeight.SemiBold
             )
             ProvideTextStyle(TextStyle(fontSize = 15.sp, color = cpsColors.contentAdditional)) {
@@ -420,7 +420,7 @@ fun ExpandableSettingsItem(
             Column {
                 Text(
                     text = title,
-                    fontSize = 18.sp,
+                    fontSize = CPSDefaults.settingsTitle,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
                         .fillMaxWidth()
