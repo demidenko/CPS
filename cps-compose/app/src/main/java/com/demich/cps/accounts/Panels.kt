@@ -151,7 +151,7 @@ private fun PanelMovingButtons(
     val scope = rememberCoroutineScope()
     fun saveSwapped(i: Int, j: Int) {
         scope.launch {
-            context.settingsUI.profilesOrder(newValue = visibleOrder.toMutableList().apply { swap(i, j) })
+            context.settingsUI.profilesOrder.setValue(visibleOrder.toMutableList().apply { swap(i, j) })
         }
     }
     val index = visibleOrder.indexOf(type)

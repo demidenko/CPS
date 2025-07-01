@@ -61,7 +61,7 @@ class CodeforcesMonitorLauncherWorker(
             }
 
             firstSubmission?.let {
-                monitorLastSubmissionId(it.id)
+                monitorLastSubmissionId.setValue(it.id)
             }
 
             monitorCanceledContests.removeOld { !isActual(it) }

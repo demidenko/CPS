@@ -39,7 +39,7 @@ internal fun UIPanel(
         ) {
             CPSIconButton(icon = CPSIcons.Colors, onState = useOriginalColors) {
                 scope.launch {
-                    settingsUI.useOriginalColors(!useOriginalColors)
+                    settingsUI.useOriginalColors.setValue(!useOriginalColors)
                 }
             }
             StatusBarButtons()
@@ -48,7 +48,7 @@ internal fun UIPanel(
                 isSystemInDarkMode = isSystemInDarkTheme()
             ) { mode ->
                 scope.launch {
-                    settingsUI.darkLightMode(mode)
+                    settingsUI.darkLightMode.setValue(mode)
                 }
             }
         }

@@ -37,7 +37,7 @@ fun CPSAboutDialog(onDismissRequest: () -> Unit) {
     val onClick = remember {
         patternClickListener(pattern = "._.._...", getCurrentTime = ::getCurrentTime) {
             showDevModeLine = true
-            scope.launch { context.settingsUI.devModeEnabled(true) }
+            scope.launch { context.settingsUI.devModeEnabled.setValue(true) }
         }
     }
 
@@ -52,7 +52,7 @@ fun CPSAboutDialog(onDismissRequest: () -> Unit) {
             devModeEnabled = devModeEnabled,
             showDevModeLine = showDevModeLine,
             onDevModeChange = { checked ->
-                scope.launch { context.settingsUI.devModeEnabled(checked) }
+                scope.launch { context.settingsUI.devModeEnabled.setValue(checked) }
             }
         )
     }

@@ -81,7 +81,7 @@ private fun LayoutSelectRow() {
             selectedValue = layoutType,
             onSelect = {
                 scope.launch {
-                    context.settingsUI.navigationLayoutType(it)
+                    context.settingsUI.navigationLayoutType.setValue(it)
                 }
             }
         ) {

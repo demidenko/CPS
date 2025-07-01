@@ -144,7 +144,7 @@ private fun BottomBarBodyMain(
         indication = if (settingsEnabled) null else ripple(bounded = false, radius = 48.dp),
         layoutType = layoutType,
         onSelect = { screen ->
-            scope.launch { StartScreenDataStore(context).startRootScreen(screen) }
+            scope.launch { StartScreenDataStore(context).startRootScreen.setValue(screen) }
             onNavigateToScreen(screen)
         },
         onLongPress = onEnableSettings

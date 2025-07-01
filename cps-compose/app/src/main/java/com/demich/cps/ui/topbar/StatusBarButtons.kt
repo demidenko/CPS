@@ -71,7 +71,7 @@ internal fun StatusBarButtons() {
             if (noneEnabled) {
                 showPopup = true
             } else {
-                scope.launch { settingsUI.coloredStatusBar(!coloredStatusBar) }
+                scope.launch { settingsUI.coloredStatusBar.setValue(!coloredStatusBar) }
             }
         }
         if (coloredStatusBar) Box {
@@ -83,7 +83,7 @@ internal fun StatusBarButtons() {
                 expanded = showPopup,
                 rankSelector = rankSelector,
                 onSetRankSelector = {
-                    scope.launch { settingsUI.statusBarRankSelector(it) }
+                    scope.launch { settingsUI.statusBarRankSelector.setValue(it) }
                 },
                 disabledManagers = disabledManagers,
                 onCheckedChange = { type, checked ->

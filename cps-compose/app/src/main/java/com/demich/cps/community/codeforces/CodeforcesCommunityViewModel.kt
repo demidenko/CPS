@@ -105,7 +105,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 
     override fun addToFollowList(handle: String, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
-            context.settingsCommunity.codeforcesFollowEnabled(newValue = true)
+            context.settingsCommunity.codeforcesFollowEnabled.setValue(true)
             context.followRepository.addNewUser(handle)
         }
     }

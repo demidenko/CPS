@@ -67,7 +67,7 @@ class CodeforcesCommunityFollowWorker(
             duration = nextEnqueueIn(blogsCount = blogs.size, proceeded = proceeded.size).coerceAtLeast(2.hours)
         )
 
-        lastSuccessItem(newValue = workerStartTime)
+        lastSuccessItem.setValue(workerStartTime)
 
         return Result.success()
     }
