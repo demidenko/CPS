@@ -16,14 +16,11 @@ internal constructor(
     //getter
     suspend operator fun invoke(): T = converter.getFrom(dataStore.data.first())
 
-    //setter
-    suspend operator fun invoke(newValue: T) {
+    suspend fun setValue(value: T) {
         dataStore.edit { prefs ->
-            converter.setTo(prefs, newValue)
+            converter.setTo(prefs, value)
         }
     }
-
-    suspend fun setValue(value: T) = invoke(newValue = value)
 
     suspend fun update(transform: (T) -> T) {
         dataStore.edit { prefs ->
