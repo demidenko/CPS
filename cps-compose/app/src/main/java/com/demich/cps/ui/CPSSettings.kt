@@ -228,7 +228,7 @@ fun SettingsSwitchItem(
         description = description
     ) {
         scope.launch {
-            item(it)
+            item.setValue(it)
             onCheckedChange(it)
         }
     }
@@ -307,7 +307,7 @@ fun<T: Enum<T>> SettingsEnumItemContent(
             optionTitle = { Text(text = optionToString(it)) },
             onDismissRequest = { showChangeDialog = false },
             onSelectOption = {
-                scope.launch { item(newValue = it) }
+                scope.launch { item.setValue(it) }
             }
         )
     }

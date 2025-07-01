@@ -45,9 +45,7 @@ internal fun DateConstraintsSettingsItem() {
 
     fun saveConstraints(newConstraints: ContestDateRelativeConstraints) {
         scope.launch {
-            settings.contestsDateConstraints(
-                newValue = newConstraints
-            )
+            settings.contestsDateConstraints.setValue(newConstraints)
         }
     }
 

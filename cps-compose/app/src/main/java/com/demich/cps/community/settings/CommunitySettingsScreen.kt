@@ -142,7 +142,7 @@ private fun CodeforcesLostSettingsItem() {
                 description = stringResource(id = R.string.community_settings_cf_lost_description),
                 onCheckedChange = { checked ->
                     scope.launch {
-                        settings.codeforcesLostEnabled(newValue = checked)
+                        settings.codeforcesLostEnabled.setValue(checked)
                         with(CodeforcesCommunityLostRecentWorker.getWork(context)) {
                             if (checked) startImmediate() else stop()
                         }
@@ -201,8 +201,8 @@ private fun CodeforcesRuEnabledSettingsItem() {
         checked = locale == CodeforcesLocale.RU,
         onCheckedChange = { checked ->
             scope.launch {
-                context.settingsCommunity.codeforcesLocale(
-                    newValue = if (checked) CodeforcesLocale.RU else CodeforcesLocale.EN
+                context.settingsCommunity.codeforcesLocale.setValue(
+                    value = if (checked) CodeforcesLocale.RU else CodeforcesLocale.EN
                 )
             }
         }
@@ -267,7 +267,7 @@ private fun NewsFeedsSettingsItem() {
             onSaveSelected = { current ->
                 scope.launch {
                     val newSelectedFeeds = current - enabledSettingsItem()
-                    enabledSettingsItem(newValue = current)
+                    enabledSettingsItem.setValue(current)
                     val pe_recent = NewsFeed.project_euler_problems
                     if ((newSelectedFeeds - pe_recent).isNotEmpty()) {
                         NewsWorker.getWork(context).startImmediate()
@@ -291,7 +291,7 @@ private fun RenderAllTabs() {
         title = "Render all tabs"
     ) {
         scope.launch {
-            settings.renderAllTabs(newValue = it)
+            settings.renderAllTabs.setValue(it)
         }
     }
 }

@@ -115,7 +115,7 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
             modifier = Modifier.padding(top = 8.dp)
         ) {
             scope.launch {
-                context.settingsContests.clistApiAccess(newValue = apiAccess)
+                context.settingsContests.clistApiAccess.setValue(apiAccess)
                 onDismissRequest()
             }
         }

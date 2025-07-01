@@ -42,7 +42,7 @@ internal fun DeletedContestsSettingsItem() {
                 onDismissRequest = { showDialog = false },
                 onConfirmRequest = {
                     scope.launch {
-                        settings.ignoredContests(newValue = emptyTimedCollection())
+                        settings.ignoredContests.setValue(emptyTimedCollection())
                     }
                 }
             )
