@@ -30,31 +30,31 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
         }
     }
 
+    private fun <T> dataStoreItem(converter: Converter<T, *>): DataStoreItem<T> =
+        DataStoreItem(dataStore = dataStore, converter = converter)
+
     private fun <T: Any> item(key: Preferences.Key<T>, defaultValue: T): DataStoreItem<T> =
-        DataStoreItem(converter = ValueWithDefault(key, defaultValue), dataStore = dataStore)
+        dataStoreItem(converter = ValueWithDefault(key, defaultValue))
 
     private fun <T: Any> itemNullable(key: Preferences.Key<T>): DataStoreItem<T?> =
-        DataStoreItem(converter = ValueNullable(key), dataStore = dataStore)
+        dataStoreItem(converter = ValueNullable(key))
+
 
     protected fun <T> itemStringConvertible(
         name: String,
         defaultValue: () -> T,
         encode: (T) -> String,
         decode: (String) -> T
-    ): DataStoreItem<T> = DataStoreItem(
-        converter = ValueConvertible(stringPreferencesKey(name), defaultValue, encode, decode),
-        dataStore = dataStore
-    )
+    ): DataStoreItem<T> =
+        dataStoreItem(converter = ValueConvertible(stringPreferencesKey(name), defaultValue, encode, decode))
 
     protected fun <T> itemStringSetConvertible(
         name: String,
         defaultValue: () -> T,
         encode: (T) -> Set<String>,
         decode: (Set<String>) -> T
-    ): DataStoreItem<T> = DataStoreItem(
-        converter = ValueConvertible(stringSetPreferencesKey(name), defaultValue, encode, decode),
-        dataStore = dataStore
-    )
+    ): DataStoreItem<T> =
+        dataStoreItem(converter = ValueConvertible(stringSetPreferencesKey(name), defaultValue, encode, decode))
 
 
 
@@ -138,8 +138,5 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
 
 
     protected fun <T> DataStoreItem<T>.mapGetter(transform: (T) -> T): DataStoreItem<T> =
-        DataStoreItem(
-            dataStore = dataStore,
-            converter = converter.mapGetter(transform)
-        )
+        dataStoreItem(converter = converter.mapGetter(transform))
 }
