@@ -25,14 +25,14 @@ abstract class ProfileDataStore<U: UserInfo>(
 
     suspend fun setProfile(profileResult: ProfileResult<U>) {
         val oldUserId = getProfile()?.userId
-        profileItem(newValue = profileResult)
+        profileItem.setValue(profileResult)
         if (!oldUserId.equals(profileResult.userId, ignoreCase = true)) {
             onResetProfile()
         }
     }
 
     suspend fun deleteProfile() {
-        profileItem(newValue = null)
+        profileItem.setValue(null)
     }
 
     fun flowOfProfile() = profileItem.asFlow()

@@ -32,7 +32,7 @@ abstract class RatedProfileDataStore<U: RatedUserInfo>(
         }
 
         //save
-        lastRatingChange(newValue = ratingChange.copy(title = "", url = null))
+        lastRatingChange.setValue(ratingChange.copy(title = "", url = null))
 
         if (prev == null) return //TODO: consider cases
 
@@ -43,12 +43,12 @@ abstract class RatedProfileDataStore<U: RatedUserInfo>(
         if (newProfile is ProfileResult.Failed) {
             if (profile is ProfileResult.Success) {
                 val newUserInfo = profile.userInfo.withNewRating(rating = ratingChange.rating)
-                profileItem(newValue = ProfileResult.Success(newUserInfo))
+                profileItem.setValue(ProfileResult.Success(newUserInfo))
             } else {
                 // TODO ??????????
             }
         } else {
-            profileItem(newValue = newProfile)
+            profileItem.setValue(newProfile)
         }
 
         //notify
