@@ -15,7 +15,7 @@ import kotlin.time.Instant
 
 internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::RateLimitPluginConfig) {
     val limits = pluginConfig.limits.let {
-        if (it.isEmpty()) it.add(RateLimitPluginConfig.RateLimit(count = 3, window = 2.seconds))
+        if (it.isEmpty()) it.add(RateLimit(count = 3, window = 2.seconds))
         removeUseless(it)
     }
 
@@ -26,11 +26,10 @@ internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::Ra
 
     fun currentTime(): Instant = Clock.System.now()
 
-    fun executionAllowed(rateLimit: RateLimitPluginConfig.RateLimit): Boolean {
-        val (count, window) = rateLimit
+    fun executionAllowed(limit: RateLimit): Boolean {
         val t = currentTime()
-        val runsInCurrentWindow = recentRuns.count { it >= t - window }
-        return runsInCurrentWindow < count
+        val runsInCurrentWindow = recentRuns.count { it >= t - limit.window }
+        return runsInCurrentWindow < limit.count
     }
 
     //TODO: do not delay on connection errors (no onResponse call)
@@ -61,19 +60,19 @@ internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::Ra
 internal class RateLimitPluginConfig {
     internal val limits = mutableListOf<RateLimit>()
 
-    internal data class RateLimit(val count: Int, val window: Duration) {
-        init {
-            require(count > 0) { "count must be positive"}
-            require(window.isPositive()) { "window must be positive"}
-        }
-    }
-
     infix fun Int.per(window: Duration) {
         limits.add(RateLimit(count = this, window = window))
     }
 }
 
-private fun RateLimitPluginConfig.RateLimit.isUselessIf(other: RateLimitPluginConfig.RateLimit): Boolean {
+internal class RateLimit(val count: Int, val window: Duration) {
+    init {
+        require(count > 0) { "count must be positive"}
+        require(window.isPositive()) { "window must be positive"}
+    }
+}
+
+private fun RateLimit.isUselessIf(other: RateLimit): Boolean {
     if (window <= other.window && count >= other.count) {
         return true
     }
@@ -87,11 +86,11 @@ private fun RateLimitPluginConfig.RateLimit.isUselessIf(other: RateLimitPluginCo
 }
 
 
-private fun removeUseless(limits: List<RateLimitPluginConfig.RateLimit>) =
+private fun removeUseless(limits: List<RateLimit>) =
     buildList {
         limits.forEachIndexed { index, limit ->
             if (none { limit.isUselessIf(it) }) {
-                if((index+1 until limits.size).none { limit.isUselessIf(limits[it]) }) {
+                if ((index+1 until limits.size).none { limit.isUselessIf(limits[it]) }) {
                     add(limit)
                 }
             }
