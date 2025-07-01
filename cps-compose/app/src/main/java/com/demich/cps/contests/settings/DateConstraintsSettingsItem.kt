@@ -43,7 +43,7 @@ internal fun DateConstraintsSettingsItem() {
     val settings = remember { context.settingsContests }
     val dateConstraints by collectItemAsState { settings.contestsDateConstraints }
 
-    fun saveConstraints(newConstraints: ContestDateBaseConstraints) {
+    fun saveConstraints(newConstraints: ContestDateRelativeConstraints) {
         scope.launch {
             settings.contestsDateConstraints(
                 newValue = newConstraints
@@ -78,7 +78,7 @@ internal fun DateConstraintsSettingsItem() {
     )
 }
 
-private fun ContestDateBaseConstraints.makeInfoString(): String =
+private fun ContestDateRelativeConstraints.makeInfoString(): String =
     "duration ≤ $maxDuration; start ≤ now + $nowToStartTimeMaxDuration; now - $endTimeToNowMaxDuration ≤ end"
 
 @Composable

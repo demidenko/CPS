@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 class ContestsSettingsSnapshot(
     val enabledPlatforms: Set<Contest.Platform>,
     val clistAdditionalResources: Set<Int>,
-    val contestsDateConstraints: ContestDateBaseConstraints
+    val contestsDateConstraints: ContestDateRelativeConstraints
 )
 
 suspend fun ContestsSettingsDataStore.makeSnapshot(): ContestsSettingsSnapshot =

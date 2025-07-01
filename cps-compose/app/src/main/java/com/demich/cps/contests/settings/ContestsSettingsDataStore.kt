@@ -46,7 +46,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
     val clistAdditionalResources = jsonCPS.itemList<ClistResource>(name = "clist_additional_resources")
 
     val contestsDateConstraints = jsonCPS.item(name = "contests_date_constraints") {
-        ContestDateBaseConstraints(
+        ContestDateRelativeConstraints(
             maxDuration = 30.days,
             nowToStartTimeMaxDuration = 120.days,
             endTimeToNowMaxDuration = 7.days
@@ -67,7 +67,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
 }
 
 @Serializable
-data class ContestDateBaseConstraints(
+data class ContestDateRelativeConstraints(
     val maxDuration: Duration,
     val nowToStartTimeMaxDuration: Duration,
     val endTimeToNowMaxDuration: Duration,
