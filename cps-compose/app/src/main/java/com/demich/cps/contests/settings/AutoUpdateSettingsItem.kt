@@ -39,7 +39,7 @@ internal fun AutoUpdateSettingsItem() {
             onDismiss = { showDialog = false },
             onSelectOption = {
                 scope.launch {
-                    context.settingsContests.autoUpdateInterval(newValue = it)
+                    context.settingsContests.autoUpdateInterval.setValue(it)
                     with(ContestsWorker.getWork(context)) {
                         if (it == null) stop()
                         else enqueueIfEnabled()

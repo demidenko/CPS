@@ -192,7 +192,7 @@ private suspend inline fun findSuspects(
         val hint = item.invoke()
         //ensure hint in case isNew logic changes
         if (hint != null && isNew(hint.creationTime)) {
-            item.invoke(newValue = null)
+            item.setValue(null)
             null
         } else {
             hint

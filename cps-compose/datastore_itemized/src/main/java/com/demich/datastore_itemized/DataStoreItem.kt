@@ -23,6 +23,8 @@ internal constructor(
         }
     }
 
+    suspend fun setValue(value: T) = invoke(newValue = value)
+
     suspend fun update(transform: (T) -> T) {
         dataStore.edit { prefs ->
             converter.setTo(prefs, transform(converter.getFrom(prefs)))

@@ -76,7 +76,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
                     newSubmissions.forEach { onSubmissionFinalResult(it) }
                     notifiedSubmissionsIds.edit { newSubmissions.forEach { add(it.id) } }
                 }
-                submissionsInfo(newValue = problemResults.makeMapWith(submissions))
+                submissionsInfo.setValue(problemResults.makeMapWith(submissions))
             }
         }
 
@@ -97,7 +97,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
                 pageContentProvider = pageContentProvider
             )
             .collect {
-                sysTestPercentage(newValue = it)
+                sysTestPercentage.setValue(it)
             }
     }
 
@@ -123,7 +123,7 @@ private suspend inline fun CodeforcesApi.getStandingsData(
             includeUnofficial = !monitor.participationType().isOfficial()
         )
     }.onFailure { e ->
-        monitor.lastRequest(false)
+        monitor.lastRequest.setValue(false)
         if (e is CodeforcesApiContestNotStartedException && e.contestId == contestId) {
             monitor.contestInfo.update { it?.copy(phase = CodeforcesContestPhase.BEFORE) }
         }
@@ -131,7 +131,7 @@ private suspend inline fun CodeforcesApi.getStandingsData(
             monitor.reset()
         }
     }.onSuccess { standings ->
-        monitor.lastRequest(true)
+        monitor.lastRequest.setValue(true)
         var officialChanged = false
         monitor.applyStandings(
             standings = standings,
