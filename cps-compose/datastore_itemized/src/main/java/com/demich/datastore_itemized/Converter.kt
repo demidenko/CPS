@@ -9,8 +9,6 @@ import kotlinx.coroutines.flow.map
 internal abstract class Converter<T, S: Any>(
     private val key: Preferences.Key<S>
 ) {
-    internal val name: String get() = key.name
-
     protected abstract fun fromPrefs(s: S?): T
     protected abstract fun toPrefs(t: T): S?
 
@@ -29,7 +27,7 @@ internal abstract class Converter<T, S: Any>(
         prefs.remove(key)
     }
 
-    internal fun mapGetter(transform: (T) -> T): Converter<T, S> =
+    fun mapGetter(transform: (T) -> T): Converter<T, S> =
         object : Converter<T, S>(key = key) {
             override fun fromPrefs(s: S?) = transform(this@Converter.fromPrefs(s))
             override fun toPrefs(t: T) = this@Converter.toPrefs(t)
