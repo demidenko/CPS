@@ -48,7 +48,7 @@ internal fun StatusBarButtons() {
     val recordedAccountManagers by collectAsState {
         combine(allRatedAccountManagers.map { it.flowWithProfileResult(context) }) { array ->
             array.mapNotNull { it?.manager?.type }
-        }.combine(settingsUI.profilesOrder.flow) { managers, order ->
+        }.combine(settingsUI.profilesOrder.asFlow()) { managers, order ->
             managers.sortedBy { order.indexOf(it) }
         }
     }

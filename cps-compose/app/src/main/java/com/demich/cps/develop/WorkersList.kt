@@ -192,7 +192,7 @@ private fun WorkersList(
     val monitorWork = remember { CodeforcesMonitorWorker.getWork(context) }
 
     val executionEvents by collectAsStateWithLifecycle {
-        CPSWorkersDataStore(context).executions.flow
+        CPSWorkersDataStore(context).executions.asFlow()
     }
 
     LazyColumn(modifier = modifier) {
@@ -228,7 +228,7 @@ private fun CPSWork.workInfoAsState(): State<WorkInfo?> =
 @Composable
 private fun CPSWork.eventsState(): State<List<CPSWorker.ExecutionEvent>> =
     collectAsStateWithLifecycle {
-        CPSWorkersDataStore(context).executions.flow.map {
+        CPSWorkersDataStore(context).executions.asFlow().map {
             it.getOrElse(name) { emptyList() }
         }
     }

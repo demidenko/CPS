@@ -148,7 +148,7 @@ private fun ContestsContent(
     val errorsMessage by collectAsState {
         combine(
             flow = contestsViewModel.flowOfLoadingErrors(),
-            flow2 = context.settingsUI.devModeEnabled.flow,
+            flow2 = context.settingsUI.devModeEnabled.asFlow(),
             transform = ::makeCombinedMessage
         )
     }
@@ -458,7 +458,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     //TODO: restart killed worker if data not null
 
     val requestFailed by collectAsStateWithLifecycle {
-        monitor.lastRequest.flow.map { it == false }
+        monitor.lastRequest.asFlow().map { it == false }
     }
 
     AnimatedVisibleByNotNull(

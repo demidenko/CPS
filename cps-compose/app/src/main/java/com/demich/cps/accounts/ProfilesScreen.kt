@@ -125,7 +125,7 @@ private fun profilesOrderState() = with(context) {
             flows = allAccountManagers.map { it.flowWithProfileResult(this) }
         ) {
             it.filterNotNull()
-        }.combine(settingsUI.profilesOrder.flow) { profiles, order ->
+        }.combine(settingsUI.profilesOrder.asFlow()) { profiles, order ->
             order.mapNotNull { type ->
                 profiles.find { it.type == type }
             }

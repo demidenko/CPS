@@ -31,7 +31,7 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
     val codeforcesLostMinRatingTag = itemEnum(name = "cf_lost_min_rating", defaultValue = CodeforcesColorTag.ORANGE)
 
     fun flowOfCodeforcesTabs(): Flow<List<CodeforcesTitle>> {
-        return codeforcesLostEnabled.flow.map { lostEnabled ->
+        return codeforcesLostEnabled.asFlow().map { lostEnabled ->
             buildList {
                 add(CodeforcesTitle.MAIN)
                 add(CodeforcesTitle.TOP)

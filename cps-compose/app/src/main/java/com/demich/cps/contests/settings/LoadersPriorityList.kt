@@ -42,7 +42,7 @@ fun LoadersPriorityListDialog(
 
     val settings = remember { context.settingsContests }
     val priorityList by collectAsState {
-        settings.contestsLoadersPriorityLists.flow.map { it.getValue(platform) }
+        settings.contestsLoadersPriorityLists.asFlow().map { it.getValue(platform) }
     }
 
     CPSDialog(

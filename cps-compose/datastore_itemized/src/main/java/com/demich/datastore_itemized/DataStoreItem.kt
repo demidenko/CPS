@@ -11,8 +11,7 @@ internal constructor(
     private val dataStore: DataStore<Preferences>,
     internal val converter: Converter<T, *>
 ) {
-    val flow: Flow<T>
-        get() = converter.flowFrom(dataStore.data)
+    fun asFlow(): Flow<T> = converter.flowFrom(dataStore.data)
 
     //getter
     suspend operator fun invoke(): T = converter.getFrom(dataStore.data.first())

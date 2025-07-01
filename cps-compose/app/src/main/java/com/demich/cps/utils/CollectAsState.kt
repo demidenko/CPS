@@ -32,5 +32,5 @@ inline fun <T> collectItemAsState(
 ): State<T> =
     remember {
         val item = block()
-        item.flow to runBlocking { item() }
+        item.asFlow() to runBlocking { item() }
     }.run { first.collectAsState(initial = second) }

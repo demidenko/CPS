@@ -60,7 +60,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
     override suspend fun doWork(): Result {
         val monitor = CodeforcesMonitorDataStore(context)
 
-        val (contestId, handle) = monitor.args.flow.filterNotNull().first()
+        val (contestId, handle) = monitor.args.asFlow().filterNotNull().first()
 
         val notificationBuilder = createNotificationBuilder(handle)
             .also { setForeground(it) }

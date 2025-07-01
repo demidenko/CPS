@@ -31,7 +31,7 @@ import kotlin.time.Duration.Companion.seconds
 
 private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestCompositeId>> =
     combine(
-        flow = ContestsInfoDataStore(context).ignoredContests.flow,
+        flow = ContestsInfoDataStore(context).ignoredContests.asFlow(),
         flow2 = CodeforcesMonitorDataStore(context).flowOfContestId()
     ) { ignored, monitorContestId ->
         buildSet {

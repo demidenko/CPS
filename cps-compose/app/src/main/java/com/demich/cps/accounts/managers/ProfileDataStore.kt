@@ -35,7 +35,7 @@ abstract class ProfileDataStore<U: UserInfo>(
         profileItem(newValue = null)
     }
 
-    fun flowOfProfile() = profileItem.flow
+    fun flowOfProfile() = profileItem.asFlow()
 }
 
 abstract class ProfileUniqueDataStore<U: UserInfo>(

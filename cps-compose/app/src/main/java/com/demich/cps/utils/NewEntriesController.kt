@@ -37,7 +37,7 @@ private fun MutableMap<Int, NewEntryInfo>.markAtLeast(
 class NewEntriesDataStoreItem (
     private val item: DataStoreItem<Map<Int, NewEntryInfo>>
 ) {
-    val flow get() = item.flow
+    val flow get() = item.asFlow()
 
     private fun getCurrentDate(): LocalDate = getCurrentTime().toSystemDateTime().date
 

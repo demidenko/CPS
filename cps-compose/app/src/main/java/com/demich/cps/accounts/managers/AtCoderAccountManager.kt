@@ -108,7 +108,7 @@ class AtCoderAccountManager :
     }
 
     override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
-        AtCoderProfileSettingsDataStore(context).observeRating.flow
+        AtCoderProfileSettingsDataStore(context).observeRating.asFlow()
 
 }
 

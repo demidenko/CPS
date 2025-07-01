@@ -90,7 +90,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
     }
 
     val systestPercentageJob = scope.launch {
-        contestInfo.flow.mapNotNull { it?.phase }
+        contestInfo.asFlow().mapNotNull { it?.phase }
             .toSystemTestPercentageFlow(
                 contestId = contestId,
                 delay = 5.seconds,
@@ -101,7 +101,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
             }
     }
 
-    this.args.flow
+    this.args.asFlow()
         .takeWhile { it?.contestId == contestId }
         .onCompletion {
             systestPercentageJob.cancel()

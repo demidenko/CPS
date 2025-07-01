@@ -130,8 +130,8 @@ private class RankGetter(
 private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
     combine(
         flow = combine(allRatedAccountManagers.map { it.flowOfRatedRank(context) }) { it }, //TODO: optimize
-        flow2 = context.settingsUI.statusBarDisabledManagers.flow,
-        flow3 = context.settingsUI.statusBarRankSelector.flow
+        flow2 = context.settingsUI.statusBarDisabledManagers.asFlow(),
+        flow3 = context.settingsUI.statusBarRankSelector.asFlow()
     ) { ranks, disabledManagers, rankSelector ->
         RankGetter(
             validRanks = ranks.filterNotNull(),
