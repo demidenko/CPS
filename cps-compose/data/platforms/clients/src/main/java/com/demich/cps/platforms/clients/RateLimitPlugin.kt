@@ -8,16 +8,13 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.time.Clock
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 
 internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::RateLimitPluginConfig) {
-    val limits = pluginConfig.limits.let {
-        if (it.isEmpty()) it.add(RateLimit(count = 3, window = 2.seconds))
-        removeUseless(it)
-    }
+    val limits = removeUseless(pluginConfig.limits)
+    require(limits.isNotEmpty()) { "No limits specified" }
 
     val maxWindow = limits.maxOf { it.window }
 
