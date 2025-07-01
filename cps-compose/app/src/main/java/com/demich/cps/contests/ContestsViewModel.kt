@@ -78,7 +78,6 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             ContestsWorker.getWork(context).enqueueInRepeatInterval()
             reloadEnabledPlatforms(
                 settings = context.settingsContests,
-                contestsInfo = ContestsInfoDataStore(context),
                 contestsReceiver = context.contestsListDao.asContestsReceiver()
             )
         }
@@ -103,7 +102,6 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             reload(
                 platforms = diff.toReload,
                 settings = settings,
-                contestsInfo = infoDataStore,
                 contestsReceiver = dao.asContestsReceiver()
             )
         }

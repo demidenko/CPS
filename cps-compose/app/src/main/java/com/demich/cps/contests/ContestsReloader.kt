@@ -28,13 +28,11 @@ import kotlinx.coroutines.launch
 interface ContestsReloader {
     suspend fun reloadEnabledPlatforms(
         settings: ContestsSettingsDataStore,
-        contestsInfo: ContestsInfoDataStore,
         contestsReceiver: ContestsReceiver
     ) {
         reload(
             platforms = settings.flowOfEnabledPlatforms().first(),
             settings = settings,
-            contestsInfo = contestsInfo,
             contestsReceiver = contestsReceiver
         )
     }
@@ -42,7 +40,6 @@ interface ContestsReloader {
     suspend fun reload(
         platforms: Collection<Contest.Platform>,
         settings: ContestsSettingsDataStore,
-        contestsInfo: ContestsInfoDataStore,
         contestsReceiver: ContestsReceiver
     ) {
         if (platforms.isEmpty()) {
