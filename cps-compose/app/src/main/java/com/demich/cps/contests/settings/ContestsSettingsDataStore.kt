@@ -2,7 +2,7 @@ package com.demich.cps.contests.settings
 
 import android.content.Context
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.loading.ContestDateBaseConstraints
+import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
@@ -13,6 +13,8 @@ import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.flowOf
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
@@ -64,3 +66,15 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
     val autoUpdateInterval = jsonCPS.itemNullable<Duration>(name = "autoupdate_interval")
 }
 
+@Serializable
+data class ContestDateBaseConstraints(
+    val maxDuration: Duration,
+    val nowToStartTimeMaxDuration: Duration,
+    val endTimeToNowMaxDuration: Duration,
+) {
+    fun at(currentTime: Instant) = ContestDateConstraints(
+        maxStartTime = currentTime + nowToStartTimeMaxDuration,
+        minEndTime = currentTime - endTimeToNowMaxDuration,
+        maxDuration = maxDuration
+    )
+}

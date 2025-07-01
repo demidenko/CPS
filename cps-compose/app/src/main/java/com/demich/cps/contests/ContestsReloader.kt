@@ -1,7 +1,6 @@
 package com.demich.cps.contests
 
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.loading.ContestDateBaseConstraints
 import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.loading.ContestsLoadingResult
 import com.demich.cps.contests.loading.ContestsReceiver
@@ -10,6 +9,7 @@ import com.demich.cps.contests.loading_engine.loaders.AtCoderContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ClistContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.CodeforcesContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.DmojContestsLoader
+import com.demich.cps.contests.settings.ContestDateBaseConstraints
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
