@@ -11,7 +11,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
-import com.demich.cps.utils.NewEntryInfo
+import com.demich.cps.utils.NewEntriesMap
 import com.demich.cps.utils.NewEntryType
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.collectItemAsState
@@ -26,7 +26,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 
 abstract class NewEntriesState {
-    abstract val types: Map<Int, NewEntryInfo>
+    abstract val types: NewEntriesMap
     abstract suspend fun markSeen(ids: List<Int>)
     abstract fun markOpened(id: Int)
     fun getType(id: Int) = types.getType(id)

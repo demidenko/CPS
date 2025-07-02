@@ -23,7 +23,9 @@ data class NewEntryInfo(
     val date: LocalDate
 )
 
-fun Map<Int, NewEntryInfo>.getType(id: Int): NewEntryType =
+typealias NewEntriesMap = Map<Int, NewEntryInfo>
+
+fun NewEntriesMap.getType(id: Int): NewEntryType =
     this[id]?.type ?: NewEntryType.UNSEEN
 
 private fun MutableMap<Int, NewEntryInfo>.markAtLeast(
@@ -36,8 +38,8 @@ private fun MutableMap<Int, NewEntryInfo>.markAtLeast(
 }
 
 class NewEntriesDataStoreItem (
-    private val item: DataStoreItem<Map<Int, NewEntryInfo>>
-): DataStoreValue<Map<Int, NewEntryInfo>> by item {
+    private val item: DataStoreItem<NewEntriesMap>
+): DataStoreValue<NewEntriesMap> by item {
     private fun getCurrentDate(): LocalDate = getCurrentTime().toSystemDateTime().date
 
     suspend fun markAtLeast(id: Int, type: NewEntryType) = markAtLeast(listOf(id), type)
@@ -63,7 +65,7 @@ data class NewEntryTypeCounters(
     val seenCount: Int
 )
 
-fun combineToCounters(flowOfIds: Flow<List<Int>>, flowOfTypes: Flow<Map<Int, NewEntryInfo>>) =
+fun combineToCounters(flowOfIds: Flow<List<Int>>, flowOfTypes: Flow<NewEntriesMap>) =
     combine(flowOfIds, flowOfTypes) { ids, types ->
         NewEntryTypeCounters(
             unseenCount = ids.count { types.getType(it) == NewEntryType.UNSEEN },
