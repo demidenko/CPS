@@ -91,7 +91,7 @@ private suspend fun contestsLoadingFlows(
             ContestsLoaderType.clist_api -> ClistContestsLoader(
                 api = ClistClient,
                 apiAccess = clistApiAccess,
-                additionalResources = clistAdditionalResources
+                resources = clistAdditionalResources
             )
             ContestsLoaderType.codeforces_api -> CodeforcesContestsLoader(api = CodeforcesClient)
             ContestsLoaderType.atcoder_parse -> AtCoderContestsLoader(api = AtCoderClient)

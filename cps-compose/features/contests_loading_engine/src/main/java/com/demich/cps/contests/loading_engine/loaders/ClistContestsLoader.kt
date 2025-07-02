@@ -17,7 +17,7 @@ import kotlin.time.Duration.Companion.seconds
 class ClistContestsLoader(
     val api: ClistApi,
     val apiAccess: ClistApi.ApiAccess,
-    val additionalResources: Collection<ClistResource>
+    val resources: Collection<ClistResource>
 ): ContestsLoaderMultiple() {
     override val type get() = ContestsLoaderType.clist_api
 
@@ -28,7 +28,7 @@ class ClistContestsLoader(
         apiAccess = apiAccess,
         maxStartTime = dateConstraints.maxStartTime,
         minEndTime = dateConstraints.minEndTime,
-        resourceIds = ClistUtils.makeResourceIds(platforms, additionalResources)
+        resourceIds = ClistUtils.makeResourceIds(platforms, resources)
     ).mapAndFilterResult(dateConstraints)
 }
 
