@@ -12,8 +12,8 @@ import kotlin.contracts.contract
 open class ItemizedPreferences internal constructor(
     protected open val preferences: Preferences
 ) {
-    operator fun <T> get(item: DataStoreItem<T>): T =
-        item.saver.restore(preferences)
+    operator fun <T> get(item: DataStoreValue<T>): T =
+        item.reader.restore(preferences)
 }
 
 class ItemizedMutablePreferences internal constructor(
