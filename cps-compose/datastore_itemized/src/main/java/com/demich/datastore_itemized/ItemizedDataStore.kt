@@ -26,18 +26,18 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
     protected suspend fun resetItems(items: Collection<DataStoreItem<*>>) {
         if (items.isEmpty()) return
         dataStore.edit { prefs ->
-            items.forEach { it.converter.removeFrom(prefs) }
+            items.forEach { it.saver.removeFrom(prefs) }
         }
     }
 
-    private fun <T> dataStoreItem(converter: PreferencesSaver<T>): DataStoreItem<T> =
-        DataStoreItem(dataStore = dataStore, converter = converter)
+    private fun <T> dataStoreItem(saver: PreferencesSaver<T>): DataStoreItem<T> =
+        DataStoreItem(dataStore = dataStore, saver = saver)
 
     private fun <T: Any> item(key: Preferences.Key<T>, defaultValue: T): DataStoreItem<T> =
-        dataStoreItem(converter = ValueWithDefault(key, defaultValue))
+        dataStoreItem(saver = ValueWithDefault(key, defaultValue))
 
     private fun <T: Any> itemNullable(key: Preferences.Key<T>): DataStoreItem<T?> =
-        dataStoreItem(converter = ValueNullable(key))
+        dataStoreItem(saver = ValueNullable(key))
 
 
     protected fun <T> itemStringConvertible(
@@ -46,7 +46,7 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
         encode: (T) -> String,
         decode: (String) -> T
     ): DataStoreItem<T> =
-        dataStoreItem(converter = ValueConvertible(stringPreferencesKey(name), defaultValue, encode, decode))
+        dataStoreItem(saver = ValueConvertible(stringPreferencesKey(name), defaultValue, encode, decode))
 
     protected fun <T> itemStringSetConvertible(
         name: String,
@@ -54,7 +54,7 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
         encode: (T) -> Set<String>,
         decode: (Set<String>) -> T
     ): DataStoreItem<T> =
-        dataStoreItem(converter = ValueConvertible(stringSetPreferencesKey(name), defaultValue, encode, decode))
+        dataStoreItem(saver = ValueConvertible(stringSetPreferencesKey(name), defaultValue, encode, decode))
 
 
 
@@ -138,7 +138,7 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
 
 
     protected fun <T> DataStoreItem<T>.mapGetter(transform: (T) -> T): DataStoreItem<T> =
-        dataStoreItem(converter = object : PreferencesSaver<T> by converter {
-            override fun restore(prefs: Preferences): T = transform(converter.restore(prefs))
+        dataStoreItem(saver = object : PreferencesSaver<T> by saver {
+            override fun restore(prefs: Preferences): T = transform(saver.restore(prefs))
         })
 }

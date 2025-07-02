@@ -12,25 +12,25 @@ import kotlinx.coroutines.flow.map
 class DataStoreItem<T>
 internal constructor(
     private val dataStore: DataStore<Preferences>,
-    internal val converter: PreferencesSaver<T>
+    internal val saver: PreferencesSaver<T>
 ) {
     fun asFlow(): Flow<T> =
         dataStore.data
-            .distinctUntilChanged(converter::prefsEquivalent)
-            .map(converter::restore)
+            .distinctUntilChanged(saver::prefsEquivalent)
+            .map(saver::restore)
 
     //getter
-    suspend operator fun invoke(): T = converter.restore(dataStore.data.first())
+    suspend operator fun invoke(): T = saver.restore(dataStore.data.first())
 
     suspend fun setValue(value: T) {
         dataStore.edit { prefs ->
-            converter.save(prefs, value)
+            saver.save(prefs, value)
         }
     }
 
     suspend fun update(transform: (T) -> T) {
         dataStore.edit { prefs ->
-            converter.save(prefs, transform(converter.restore(prefs)))
+            saver.save(prefs, transform(saver.restore(prefs)))
         }
     }
 }
