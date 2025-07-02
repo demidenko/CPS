@@ -10,16 +10,9 @@ import kotlinx.coroutines.flow.map
 
 class DataStoreItem<T>
 internal constructor(
-    private val dataStore: DataStore<Preferences>,
+    dataStore: DataStore<Preferences>,
     internal val saver: PreferencesSaver<T>
-): DataStoreValue<T> {
-    override fun asFlow(): Flow<T> =
-        dataStore.data
-            .distinctUntilChanged(saver::prefsEquivalent)
-            .map(saver::restore)
-
-    override suspend operator fun invoke(): T =
-        saver.restore(dataStore.data.first())
+): DataStoreValue<T>(dataStore = dataStore, reader = saver) {
 
     suspend fun setValue(value: T) {
         dataStore.edit { prefs ->
@@ -34,8 +27,21 @@ internal constructor(
     }
 }
 
-interface DataStoreValue<T> {
-    suspend operator fun invoke(): T
+abstract class DataStoreValue<T>
+internal constructor(
+    protected val dataStore: DataStore<Preferences>,
+    internal val reader: PreferencesReader<T>
+) {
+    constructor(dataStoreValue: DataStoreValue<T>): this(
+        dataStore = dataStoreValue.dataStore,
+        reader = dataStoreValue.reader
+    )
 
-    fun asFlow(): Flow<T>
+    suspend operator fun invoke(): T =
+        reader.restore(dataStore.data.first())
+
+    fun asFlow(): Flow<T> =
+        dataStore.data
+            .distinctUntilChanged(reader::prefsEquivalent)
+            .map(reader::restore)
 }
