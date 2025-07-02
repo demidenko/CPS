@@ -13,14 +13,14 @@ open class ItemizedPreferences internal constructor(
     protected open val preferences: Preferences
 ) {
     operator fun <T> get(item: DataStoreItem<T>): T =
-        item.converter.getFrom(preferences)
+        item.converter.restore(preferences)
 }
 
 class ItemizedMutablePreferences internal constructor(
     override val preferences: MutablePreferences
 ): ItemizedPreferences(preferences) {
     operator fun <T> set(item: DataStoreItem<T>, value: T) =
-        item.converter.setTo(preferences, value)
+        item.converter.save(preferences, value)
 
     fun clear() {
         preferences.clear()

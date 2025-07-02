@@ -8,16 +8,16 @@ import kotlinx.coroutines.flow.map
 
 internal abstract class Converter<T, S: Any>(
     private val key: Preferences.Key<S>
-) {
+): PreferencesSaver<T> {
     protected abstract fun fromPrefs(s: S?): T
     protected abstract fun toPrefs(t: T): S?
 
     fun flowFrom(prefs: Flow<Preferences>): Flow<T> =
         prefs.map { it[key] }.distinctUntilChanged().map(::fromPrefs)
 
-    fun getFrom(prefs: Preferences): T = fromPrefs(prefs[key])
+    override fun restore(prefs: Preferences): T = fromPrefs(prefs[key])
 
-    fun setTo(prefs: MutablePreferences, value: T) {
+    override fun save(prefs: MutablePreferences, value: T) {
         toPrefs(value)
             ?.let { prefs[key] = it }
             ?: prefs.remove(key)

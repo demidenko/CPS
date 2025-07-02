@@ -1,6 +1,7 @@
 package com.demich.datastore_itemized
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
@@ -14,17 +15,23 @@ internal constructor(
     fun asFlow(): Flow<T> = converter.flowFrom(dataStore.data)
 
     //getter
-    suspend operator fun invoke(): T = converter.getFrom(dataStore.data.first())
+    suspend operator fun invoke(): T = converter.restore(dataStore.data.first())
 
     suspend fun setValue(value: T) {
         dataStore.edit { prefs ->
-            converter.setTo(prefs, value)
+            converter.save(prefs, value)
         }
     }
 
     suspend fun update(transform: (T) -> T) {
         dataStore.edit { prefs ->
-            converter.setTo(prefs, transform(converter.getFrom(prefs)))
+            converter.save(prefs, transform(converter.restore(prefs)))
         }
     }
+}
+
+internal interface PreferencesSaver<T> {
+    fun save(prefs: MutablePreferences, value: T)
+
+    fun restore(prefs: Preferences): T
 }
