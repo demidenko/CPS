@@ -25,11 +25,10 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 
-abstract class NewEntriesState {
-    abstract val types: NewEntriesMap
-    abstract suspend fun markSeen(ids: List<Int>)
-    abstract fun markOpened(id: Int)
-    fun getType(id: Int) = types.getType(id)
+interface NewEntriesState {
+    val types: NewEntriesMap
+    suspend fun markSeen(ids: List<Int>)
+    fun markOpened(id: Int)
 }
 
 @Composable
@@ -39,7 +38,7 @@ fun rememberNewEntriesState(): NewEntriesState {
     val item = remember { CodeforcesNewEntriesDataStore(context).commonNewEntries }
     val typesState = collectItemAsState { item }
     return remember(scope, item, typesState) {
-        object : NewEntriesState() {
+        object : NewEntriesState {
             override val types by typesState
 
             override suspend fun markSeen(ids: List<Int>) {
@@ -110,7 +109,7 @@ fun rememberCodeforcesBlogEntriesState(
 
             override fun isNew(id: Int): Boolean {
                 if (!showNewEntries) return false
-                val type = newEntriesState.getType(id)
+                val type = newEntriesState.types.getType(id)
                 return type == NewEntryType.UNSEEN || type == NewEntryType.SEEN
             }
         }
