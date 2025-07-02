@@ -3,7 +3,7 @@ package com.demich.datastore_itemized
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
 
 internal abstract class Converter<T, S: Any>(
@@ -13,7 +13,7 @@ internal abstract class Converter<T, S: Any>(
     protected abstract fun toPrefs(t: T): S?
 
     fun flowFrom(prefs: Flow<Preferences>): Flow<T> =
-        prefs.map { it[key] }.distinctUntilChanged().map(::fromPrefs)
+        prefs.distinctUntilChangedBy { it[key] }.map(::restore)
 
     override fun restore(prefs: Preferences): T = fromPrefs(prefs[key])
 
