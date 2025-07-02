@@ -13,7 +13,6 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.flowOf
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.serialization.Serializable
 
 class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf_monitor_dataStore) {
@@ -140,4 +139,4 @@ fun CodeforcesMonitorDataStore.flowOfContestId(): Flow<Int?> =
             contestInfo.phase == CodeforcesContestPhase.UNDEFINED -> null
             else -> contestId
         }
-    }.distinctUntilChanged()
+    }

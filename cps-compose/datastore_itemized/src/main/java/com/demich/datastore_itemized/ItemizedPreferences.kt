@@ -4,6 +4,7 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -32,7 +33,7 @@ class ItemizedMutablePreferences internal constructor(
 }
 
 fun <D: ItemizedDataStore, R> D.flowOf(transform: D.(ItemizedPreferences) -> R): Flow<R> =
-    dataStore.data.map { transform(ItemizedPreferences(it)) }
+    dataStore.data.map { transform(ItemizedPreferences(it)) }.distinctUntilChanged()
 
 suspend fun <D: ItemizedDataStore> D.edit(block: D.(ItemizedMutablePreferences) -> Unit) {
     dataStore.edit {
