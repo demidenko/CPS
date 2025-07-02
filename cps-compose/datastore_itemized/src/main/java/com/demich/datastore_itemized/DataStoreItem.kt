@@ -34,4 +34,6 @@ internal interface PreferencesSaver<T> {
     fun save(prefs: MutablePreferences, value: T)
 
     fun restore(prefs: Preferences): T
+
+    fun removeFrom(prefs: MutablePreferences)
 }

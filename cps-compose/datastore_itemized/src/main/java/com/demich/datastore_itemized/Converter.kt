@@ -23,7 +23,7 @@ internal abstract class Converter<T, S: Any>(
             ?: prefs.remove(key)
     }
 
-    fun removeFrom(prefs: MutablePreferences) {
+    override fun removeFrom(prefs: MutablePreferences) {
         prefs.remove(key)
     }
 
