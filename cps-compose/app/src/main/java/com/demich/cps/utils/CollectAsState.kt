@@ -6,7 +6,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.DataStoreValue
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -28,7 +28,7 @@ inline fun <T> collectAsStateWithLifecycle(crossinline block: () -> Flow<T>): St
 
 @Composable
 inline fun <T> collectItemAsState(
-    crossinline block: @DisallowComposableCalls () -> DataStoreItem<T>
+    crossinline block: @DisallowComposableCalls () -> DataStoreValue<T>
 ): State<T> =
     remember {
         val item = block()

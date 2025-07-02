@@ -52,6 +52,7 @@ import com.demich.cps.utils.context
 import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.cps.workers.ProfilesWorker
 import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.DataStoreValue
 import kotlinx.coroutines.launch
 
 @Composable
@@ -336,7 +337,7 @@ fun<T: Enum<T>> SettingsEnumItem(
 @Composable
 fun<T> SettingsItemWithInfo(
     modifier: Modifier = Modifier,
-    item: DataStoreItem<T>,
+    item: DataStoreValue<T>,
     title: String,
     infoContent: @Composable (T) -> Unit
 ) {
