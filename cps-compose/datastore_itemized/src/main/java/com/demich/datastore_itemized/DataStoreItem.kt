@@ -1,7 +1,6 @@
 package com.demich.datastore_itemized
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
@@ -33,14 +32,4 @@ internal constructor(
             saver.save(prefs, transform(saver.restore(prefs)))
         }
     }
-}
-
-internal interface PreferencesSaver<T> {
-    fun save(prefs: MutablePreferences, value: T)
-
-    fun restore(prefs: Preferences): T
-
-    fun removeFrom(prefs: MutablePreferences)
-
-    fun prefsEquivalent(old: Preferences, new: Preferences): Boolean
 }
