@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class ContestsSettingsSnapshot(
     val enabledPlatforms: Set<Contest.Platform>,
-    val clistAdditionalResources: Set<Int>,
+    val clistResourcesIds: Set<Int>,
     val contestsDateConstraints: ContestDateRelativeConstraints
 )
 
@@ -16,7 +16,7 @@ suspend fun ContestsSettingsDataStore.makeSnapshot(): ContestsSettingsSnapshot =
     fromSnapshot {
         ContestsSettingsSnapshot(
             enabledPlatforms = it[enabledPlatforms],
-            clistAdditionalResources = it[clistAdditionalResources].mapToSet { it.id },
+            clistResourcesIds = it[clistAdditionalResources].mapToSet { it.id },
             contestsDateConstraints = it[contestsDateConstraints]
         )
     }
@@ -37,8 +37,8 @@ fun ContestsSettingsSnapshot.differenceFrom(snapshot: ContestsSettingsSnapshot):
         toReload.addAll(current - prev)
     }
 
-    snapshot.clistAdditionalResources.let { prev ->
-        val current = clistAdditionalResources
+    snapshot.clistResourcesIds.let { prev ->
+        val current = clistResourcesIds
         if (prev != current) {
             toReload.add(Contest.Platform.unknown)
         }
