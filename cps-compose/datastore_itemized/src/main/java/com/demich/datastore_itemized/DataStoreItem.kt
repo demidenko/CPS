@@ -12,14 +12,14 @@ class DataStoreItem<T>
 internal constructor(
     private val dataStore: DataStore<Preferences>,
     internal val saver: PreferencesSaver<T>
-) {
-    fun asFlow(): Flow<T> =
+): DataStoreValue<T> {
+    override fun asFlow(): Flow<T> =
         dataStore.data
             .distinctUntilChanged(saver::prefsEquivalent)
             .map(saver::restore)
 
-    //getter
-    suspend operator fun invoke(): T = saver.restore(dataStore.data.first())
+    override suspend operator fun invoke(): T =
+        saver.restore(dataStore.data.first())
 
     suspend fun setValue(value: T) {
         dataStore.edit { prefs ->
@@ -32,4 +32,10 @@ internal constructor(
             saver.save(prefs, transform(saver.restore(prefs)))
         }
     }
+}
+
+interface DataStoreValue<T> {
+    suspend operator fun invoke(): T
+
+    fun asFlow(): Flow<T>
 }
