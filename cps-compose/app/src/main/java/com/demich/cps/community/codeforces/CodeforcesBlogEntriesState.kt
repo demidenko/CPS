@@ -13,8 +13,8 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.utils.NewEntryInfo
 import com.demich.cps.utils.NewEntryType
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectAsStateWithLifecycle
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getType
 import com.demich.cps.utils.openUrlInBrowser
@@ -37,7 +37,7 @@ fun rememberNewEntriesState(): NewEntriesState {
     val context = context
     val scope = rememberCoroutineScope()
     val item = remember { CodeforcesNewEntriesDataStore(context).commonNewEntries }
-    val typesState = collectAsState { item.flow }
+    val typesState = collectItemAsState { item }
     return remember(scope, item, typesState) {
         object : NewEntriesState() {
             override val types by typesState

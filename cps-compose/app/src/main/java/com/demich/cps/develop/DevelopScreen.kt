@@ -70,7 +70,7 @@ private fun NewEntriesCfInfo(
 ) {
     val context = context
     val count by collectAsState {
-        CodeforcesNewEntriesDataStore(context).commonNewEntries.flow.map { it.size }
+        CodeforcesNewEntriesDataStore(context).commonNewEntries.asFlow().map { it.size }
     }
     Text(
         modifier = modifier,

@@ -1,6 +1,7 @@
 package com.demich.cps.utils
 
 import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.DataStoreValue
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -36,9 +37,7 @@ private fun MutableMap<Int, NewEntryInfo>.markAtLeast(
 
 class NewEntriesDataStoreItem (
     private val item: DataStoreItem<Map<Int, NewEntryInfo>>
-) {
-    val flow get() = item.asFlow()
-
+): DataStoreValue<Map<Int, NewEntryInfo>> by item {
     private fun getCurrentDate(): LocalDate = getCurrentTime().toSystemDateTime().date
 
     suspend fun markAtLeast(id: Int, type: NewEntryType) = markAtLeast(listOf(id), type)

@@ -196,7 +196,7 @@ private fun flowOfBadgeCount(
 ): Flow<Int> =
     combineToCounters(
         flowOfIds = blogEntriesFlow.map { it.map { it.id } },
-        flowOfTypes = newEntriesItem.flow
+        flowOfTypes = newEntriesItem.asFlow()
     ).combine(isTabVisibleFlow) { counters, isTabVisible ->
         if (isTabVisible) counters.seenCount + counters.unseenCount
         else counters.unseenCount
