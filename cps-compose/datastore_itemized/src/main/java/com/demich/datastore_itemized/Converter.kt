@@ -2,18 +2,12 @@ package com.demich.datastore_itemized
 
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.map
 
 internal abstract class Converter<T, S: Any>(
     private val key: Preferences.Key<S>
 ): PreferencesSaver<T> {
     protected abstract fun fromPrefs(s: S?): T
     protected abstract fun toPrefs(t: T): S?
-
-    fun flowFrom(prefs: Flow<Preferences>): Flow<T> =
-        prefs.distinctUntilChangedBy { it[key] }.map(::restore)
 
     override fun restore(prefs: Preferences): T = fromPrefs(prefs[key])
 
@@ -26,6 +20,9 @@ internal abstract class Converter<T, S: Any>(
     override fun removeFrom(prefs: MutablePreferences) {
         prefs.remove(key)
     }
+
+    override fun prefsEquivalent(old: Preferences, new: Preferences) =
+        old[key] == new[key]
 
     fun mapGetter(transform: (T) -> T): Converter<T, S> =
         object : Converter<T, S>(key = key) {
