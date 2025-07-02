@@ -28,7 +28,6 @@ import com.demich.cps.ui.ExpandableSettingsItem
 import com.demich.cps.ui.SettingsSubtitleOfEnabled
 import com.demich.cps.ui.WordsWithCounterOnOverflow
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import kotlinx.coroutines.launch
@@ -38,7 +37,7 @@ internal fun ContestPlatformsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val enabledPlatforms by collectAsState { context.settingsContests.flowOfEnabledPlatforms() }
+    val enabledPlatforms by collectItemAsState { context.settingsContests.enabledPlatforms }
     val clistResources by collectItemAsState { context.settingsContests.clistAdditionalResources }
 
     ExpandableSettingsItem(

@@ -407,7 +407,7 @@ private fun ContestsPageSwitchButton(
 private fun anyPlatformEnabledState(): State<Boolean> {
     val context = context
     return collectAsState {
-        context.settingsContests.flowOfEnabledPlatforms().map { it.isNotEmpty() }
+        context.settingsContests.enabledPlatforms.asFlow().map { it.isNotEmpty() }
     }
 }
 

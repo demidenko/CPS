@@ -21,7 +21,6 @@ import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.fromSnapshot
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 
@@ -31,7 +30,7 @@ interface ContestsReloader {
         contestsReceiver: ContestsReceiver
     ) {
         reload(
-            platforms = settings.flowOfEnabledPlatforms().first(),
+            platforms = settings.enabledPlatforms(),
             settings = settings,
             contestsReceiver = contestsReceiver
         )
