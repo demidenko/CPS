@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
 class DataStoreItem<T>
 internal constructor(
     private val dataStore: DataStore<Preferences>,
-    internal val converter: Converter<T, *>
+    internal val converter: PreferencesSaver<T>
 ) {
     fun asFlow(): Flow<T> =
         dataStore.data

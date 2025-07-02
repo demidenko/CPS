@@ -23,12 +23,6 @@ internal abstract class Converter<T, S: Any>(
 
     override fun prefsEquivalent(old: Preferences, new: Preferences) =
         old[key] == new[key]
-
-    fun mapGetter(transform: (T) -> T): Converter<T, S> =
-        object : Converter<T, S>(key = key) {
-            override fun fromPrefs(s: S?) = transform(this@Converter.fromPrefs(s))
-            override fun toPrefs(t: T) = this@Converter.toPrefs(t)
-        }
 }
 
 internal class ValueWithDefault<T: Any>(

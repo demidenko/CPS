@@ -30,7 +30,7 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
         }
     }
 
-    private fun <T> dataStoreItem(converter: Converter<T, *>): DataStoreItem<T> =
+    private fun <T> dataStoreItem(converter: PreferencesSaver<T>): DataStoreItem<T> =
         DataStoreItem(dataStore = dataStore, converter = converter)
 
     private fun <T: Any> item(key: Preferences.Key<T>, defaultValue: T): DataStoreItem<T> =
@@ -138,5 +138,7 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
 
 
     protected fun <T> DataStoreItem<T>.mapGetter(transform: (T) -> T): DataStoreItem<T> =
-        dataStoreItem(converter = converter.mapGetter(transform))
+        dataStoreItem(converter = object : PreferencesSaver<T> by converter {
+            override fun restore(prefs: Preferences): T = transform(converter.restore(prefs))
+        })
 }
