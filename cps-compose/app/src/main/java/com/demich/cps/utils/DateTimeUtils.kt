@@ -14,6 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 fun getCurrentXTime(): kotlinx.datetime.Instant = kotlinx.datetime.Clock.System.now()
+fun getCurrentTime(): kotlin.time.Instant = kotlin.time.Clock.System.now()
 
 fun Instant.toSystemDateTime(): LocalDateTime =
     toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
