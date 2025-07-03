@@ -33,7 +33,7 @@ sealed interface Screen {
     }
 
     @Serializable
-    data class ProfileSettings(override val managerType: AccountManagerType): Screen, ProfileScreen {
+    data class ProfileSettings(override val managerType: AccountManagerType): Screen, ProfileScreen, NoBottomBarScreen {
         override val rootScreen: RootScreen
             get() = Profiles
     }
