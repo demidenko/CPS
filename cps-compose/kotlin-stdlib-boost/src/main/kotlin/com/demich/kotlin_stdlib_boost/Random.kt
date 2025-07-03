@@ -17,16 +17,17 @@ fun <T> List<T>.takeRandom(n: Int): List<T> {
         }
         else -> {
             // TODO: optimize (c++ std::sample???)
+            val flip = n > size - n
             val marked = BooleanArray(size)
-            var count = 0
-            while (count < n) {
+            var need = if (flip) size - n else n
+            while (need > 0) {
                 val i = indices.random()
                 if (!marked[i]) {
                     marked[i] = true
-                    ++count
+                    --need
                 }
             }
-            filterIndexedTo(ArrayList<T>(/*initialCapacity = */n)) { it, _ -> marked[it] }
+            filterIndexedTo(ArrayList<T>(/*initialCapacity = */n)) { it, _ -> marked[it] != flip }
         }
     }
 }
