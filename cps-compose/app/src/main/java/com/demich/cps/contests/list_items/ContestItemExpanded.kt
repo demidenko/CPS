@@ -27,7 +27,7 @@ import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.context
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.getCurrentXTime
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.timerFull
@@ -185,7 +185,7 @@ private fun ContestItemMenuButton(
 private fun Contest.properLink(): String? {
     if (platform == Contest.Platform.codeforces) {
         val contestId = id.toIntOrNull() ?: return link
-        return when (getPhase(currentTime = getCurrentTime())) {
+        return when (getPhase(currentTime = getCurrentXTime())) {
             Contest.Phase.BEFORE -> CodeforcesUrls.contestPending(contestId = contestId)
             else -> CodeforcesUrls.contest(contestId = contestId)
         }

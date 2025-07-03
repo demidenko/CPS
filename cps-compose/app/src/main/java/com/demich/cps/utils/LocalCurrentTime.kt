@@ -28,7 +28,7 @@ private fun flowOfTruncatedCurrentTime(period: Duration): Flow<Instant> {
     require(period.isPositive())
     return flow {
         while (true) {
-            val currentTime = getCurrentTime()
+            val currentTime = getCurrentXTime()
             emit(currentTime.truncateBy(period))
             delay(duration = period - currentTime % period)
         }
@@ -42,7 +42,7 @@ fun flowOfCurrentTimeEachSecond(): Flow<Instant> =
 fun currentTimeAsState(period: Duration): State<Instant> {
     return remember(key1 = period) {
         flowOfTruncatedCurrentTime(period = period)
-    }.collectAsStateWithLifecycle(initialValue = remember { getCurrentTime().truncateBy(period) })
+    }.collectAsStateWithLifecycle(initialValue = remember { getCurrentXTime().truncateBy(period) })
 }
 
 @Composable

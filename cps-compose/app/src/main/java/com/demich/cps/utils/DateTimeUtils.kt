@@ -1,6 +1,5 @@
 package com.demich.cps.utils
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -14,7 +13,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
-fun getCurrentTime() = Clock.System.now()
+fun getCurrentXTime(): kotlinx.datetime.Instant = kotlinx.datetime.Clock.System.now()
 
 fun Instant.toSystemDateTime(): LocalDateTime =
     toLocalDateTime(timeZone = TimeZone.currentSystemDefault())

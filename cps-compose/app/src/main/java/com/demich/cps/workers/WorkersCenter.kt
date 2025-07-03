@@ -16,7 +16,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.demich.cps.notifications.NotificationBuilder
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.getCurrentXTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -112,23 +112,23 @@ abstract class CPSPeriodicWork(
 
     suspend fun enqueueAtIfEarlier(time: Instant) {
         getWorkInfo()?.repeatInterval?.let {
-            if (getCurrentTime() + it < time) return
+            if (getCurrentXTime() + it < time) return
         }
         enqueueAt(time)
     }
 
     suspend fun enqueueInIfEarlier(duration: Duration) {
-        enqueueAtIfEarlier(time = getCurrentTime() + duration)
+        enqueueAtIfEarlier(time = getCurrentXTime() + duration)
     }
 
     suspend fun enqueueInRepeatInterval() {
         getWorkInfo()?.repeatInterval?.let {
-            enqueueAt(time = getCurrentTime() + it)
+            enqueueAt(time = getCurrentXTime() + it)
         }
     }
 
     suspend fun enqueueAsap() {
-        val time = getCurrentTime() + PeriodicWorkRequest.minPeriodicInterval
+        val time = getCurrentXTime() + PeriodicWorkRequest.minPeriodicInterval
         getWorkInfo()?.nextScheduleTime?.let {
             if (it < time) return
         }

@@ -9,7 +9,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import com.demich.cps.platforms.api.codeforces.CodeforcesTemporarilyUnavailableException
 import com.demich.cps.platforms.clients.isResponseException
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.getCurrentXTime
 import com.demich.cps.utils.joinAllWithCounter
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.repeatUntilSuccessOrLast
@@ -48,7 +48,7 @@ abstract class CPSWorker(
             val event = ExecutionEvent(start = workerStartTime)
             workersInfo.append(event)
             smartRunWork().also { result ->
-                workersInfo.append(event.copy(end = getCurrentTime(), resultType = result.toType()))
+                workersInfo.append(event.copy(end = getCurrentXTime(), resultType = result.toType()))
                 if (result.toType() != ResultType.SUCCESS) {
                     work.enqueueAsap()
                 }
@@ -169,9 +169,9 @@ class CPSWorkersDataStore(context: Context): ItemizedDataStore(context.workersDa
 
 
 private class TimeHolder {
-    private var time = getCurrentTime()
+    private var time = getCurrentXTime()
     fun reset() {
-        time = getCurrentTime()
+        time = getCurrentXTime()
     }
     operator fun getValue(thisRef: Any?, property: KProperty<*>) = time
 }

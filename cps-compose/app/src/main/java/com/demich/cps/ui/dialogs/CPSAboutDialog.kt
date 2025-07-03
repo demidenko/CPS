@@ -20,7 +20,7 @@ import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.getCurrentXTime
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
@@ -35,7 +35,7 @@ fun CPSAboutDialog(onDismissRequest: () -> Unit) {
     var showDevModeLine by remember { mutableStateOf(devModeEnabled) }
 
     val onClick = remember {
-        patternClickListener(pattern = "._.._...", getCurrentTime = ::getCurrentTime) {
+        patternClickListener(pattern = "._.._...", getCurrentTime = ::getCurrentXTime) {
             showDevModeLine = true
             scope.launch { context.settingsUI.devModeEnabled.setValue(true) }
         }

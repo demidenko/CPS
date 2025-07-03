@@ -28,7 +28,7 @@ import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.getCurrentXTime
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.saver
 import com.demich.kotlin_stdlib_boost.partitionIndex
@@ -91,7 +91,7 @@ private fun RatingGraphWithHeader(
     //TODO: saveables not reset after ratings changes
     val translator = rememberCoordinateTranslator()
 
-    val currentTime = remember { getCurrentTime() }
+    val currentTime = remember { getCurrentXTime() }
     var filterType by rememberSaveable {
         translator.setWindow(
             createBounds(ratingChanges = ratingChanges, filterType = RatingFilterType.ALL, now = currentTime)
