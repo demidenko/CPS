@@ -45,7 +45,6 @@ import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.ui.CPSIconButton
@@ -451,10 +450,9 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     val monitor = remember { CodeforcesMonitorDataStore(context) }
 
     val contestDataState = collectAsStateWithLifecycle {
-        monitor.flowOfContestData().map { data ->
-            data?.takeIf { it.contestPhase.phase != CodeforcesContestPhase.UNDEFINED }
-        }
+        monitor.flowOfContestData()
     }
+
     //TODO: restart killed worker if data not null
 
     val requestFailed by collectAsStateWithLifecycle {
