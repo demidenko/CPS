@@ -44,14 +44,14 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.append
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.getCurrentXTime
+import com.demich.cps.utils.getCurrentTime
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
 @Composable
 fun <U: UserInfo> ProfilePanel(
@@ -83,7 +83,7 @@ fun <U: UserInfo> ProfilePanel(
                 detectTapGestures(
                     onPress = {
                         if (tryAwaitRelease()) {
-                            lastClick = getCurrentXTime()
+                            lastClick = getCurrentTime()
                         }
                     },
                     onDoubleTap = {
@@ -202,7 +202,7 @@ private fun hidingState(
     val hideDuration = 2.seconds
     value = 1f
     while (isActive) {
-        val dist = getCurrentXTime() - lastClick
+        val dist = getCurrentTime() - lastClick
         if (dist > delay + hideDuration) {
             value = 0f
             break
