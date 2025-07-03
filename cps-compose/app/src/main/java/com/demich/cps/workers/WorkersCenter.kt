@@ -159,17 +159,22 @@ internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
         )
     }
 
-fun Context.getCPSWorks() = listOf(
-    ProfilesWorker::getWork,
-    NewsWorker::getWork,
-    ContestsWorker::getWork,
-    CodeforcesCommunityFollowWorker::getWork,
-    CodeforcesCommunityLostRecentWorker::getWork,
-    CodeforcesMonitorLauncherWorker::getWork,
-    CodeforcesUpsolvingSuggestionsWorker::getWork,
-    ProjectEulerRecentProblemsWorker::getWork,
-    UtilityWorker::getWork
-).map { it(this) }
+interface CPSPeriodicWorkProvider {
+    fun getWork(context: Context): CPSPeriodicWork
+}
+
+fun Context.getCPSWorks(): List<CPSPeriodicWork> =
+    listOf<CPSPeriodicWorkProvider>(
+        ProfilesWorker,
+        NewsWorker,
+        ContestsWorker,
+        CodeforcesCommunityFollowWorker,
+        CodeforcesCommunityLostRecentWorker,
+        CodeforcesMonitorLauncherWorker,
+        CodeforcesUpsolvingSuggestionsWorker,
+        ProjectEulerRecentProblemsWorker,
+        UtilityWorker
+    ).map { it.getWork(this) }
 
 suspend fun Context.enqueueEnabledWorkers() {
     val works = getCPSWorks()

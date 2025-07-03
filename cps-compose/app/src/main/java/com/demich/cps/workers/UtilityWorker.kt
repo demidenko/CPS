@@ -14,8 +14,8 @@ class UtilityWorker(
     work = getWork(context),
     parameters = parameters
 ) {
-    companion object {
-        fun getWork(context: Context) = object : CPSPeriodicWork(name = "utility", context = context) {
+    companion object : CPSPeriodicWorkProvider {
+        override fun getWork(context: Context) = object : CPSPeriodicWork(name = "utility", context = context) {
             override suspend fun isEnabled() = true
             override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<UtilityWorker>(

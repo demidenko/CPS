@@ -32,8 +32,8 @@ class CodeforcesCommunityLostRecentWorker(
     work = getWork(context),
     parameters = parameters
 ) {
-    companion object {
-        fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_lost", context = context) {
+    companion object : CPSPeriodicWorkProvider {
+        override fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_lost", context = context) {
             override suspend fun isEnabled() = context.settingsCommunity.codeforcesLostEnabled()
             override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<CodeforcesCommunityLostRecentWorker>(

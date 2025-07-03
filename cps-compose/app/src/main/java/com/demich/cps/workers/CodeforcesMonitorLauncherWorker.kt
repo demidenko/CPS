@@ -21,8 +21,8 @@ class CodeforcesMonitorLauncherWorker(
     work = getWork(context),
     parameters = parameters
 ) {
-    companion object {
-        fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_monitor_launcher", context = context) {
+    companion object : CPSPeriodicWorkProvider {
+        override fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_monitor_launcher", context = context) {
             override suspend fun isEnabled() =
                 CodeforcesAccountManager().getSettings(context).monitorEnabled()
 

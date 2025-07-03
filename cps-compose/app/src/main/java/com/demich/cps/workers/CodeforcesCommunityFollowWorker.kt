@@ -19,15 +19,14 @@ class CodeforcesCommunityFollowWorker(
     work = getWork(context),
     parameters = parameters
 ) {
-    companion object {
-        fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_follow", context = context) {
+    companion object : CPSPeriodicWorkProvider {
+        override fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_follow", context = context) {
             override suspend fun isEnabled() = context.settingsCommunity.codeforcesFollowEnabled()
             override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<CodeforcesCommunityFollowWorker>(
                     repeatInterval = 6.hours,
                     batteryNotLow = true
                 )
-
         }
     }
 

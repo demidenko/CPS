@@ -14,8 +14,8 @@ class ContestsWorker(
     work = getWork(context),
     parameters = parameters
 ), ContestsReloader {
-    companion object {
-        fun getWork(context: Context) = object : CPSPeriodicWork(name = "contests", context = context) {
+    companion object : CPSPeriodicWorkProvider {
+        override fun getWork(context: Context) = object : CPSPeriodicWork(name = "contests", context = context) {
             private val settings get() = context.settingsContests
 
             override suspend fun isEnabled() = settings.autoUpdateInterval() != null

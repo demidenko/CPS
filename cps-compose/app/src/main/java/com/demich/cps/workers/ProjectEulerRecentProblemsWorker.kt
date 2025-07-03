@@ -20,8 +20,8 @@ class ProjectEulerRecentProblemsWorker(
     work = getWork(context),
     parameters = parameters
 ) {
-    companion object {
-        fun getWork(context: Context) = object : CPSPeriodicWork(name = "pe_recent", context = context) {
+    companion object : CPSPeriodicWorkProvider {
+        override fun getWork(context: Context) = object : CPSPeriodicWork(name = "pe_recent", context = context) {
             override suspend fun isEnabled() =
                 context.settingsCommunity.enabledNewsFeeds().contains(CommunitySettingsDataStore.NewsFeed.project_euler_problems)
 
