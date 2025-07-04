@@ -39,10 +39,9 @@ class NewsWorker(
         }
     }
 
-    val settings by lazy { context.settingsCommunity }
     override suspend fun runWork(): Result {
         val jobs = buildList {
-            settings.enabledNewsFeeds().let { enabled ->
+            context.settingsCommunity.enabledNewsFeeds().let { enabled ->
                 if (atcoder_news in enabled) add(::atcoderNews)
                 if (project_euler_news in enabled) add(::projectEulerNews)
             }
