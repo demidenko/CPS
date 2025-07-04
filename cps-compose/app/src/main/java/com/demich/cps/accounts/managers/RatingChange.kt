@@ -6,7 +6,6 @@ import com.demich.cps.platforms.api.codechef.CodeChefRatingChange
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.dmoj.DmojRatingChange
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -15,11 +14,12 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.datetime.toInstant
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class RatingChange(
     val rating: Int,
-    val date: Instant,
+    val date: kotlinx.datetime.Instant,
     val title: String = "",
     val oldRating: Int? = null,
     val rank: Int,
@@ -61,7 +61,7 @@ internal fun CodeChefRatingChange.toRatingChange() =
 internal fun DmojRatingChange.toRatingChange() =
     RatingChange(
         rating = rating,
-        date = Instant.fromEpochMilliseconds(timestamp.toLong()),
+        date = Instant.fromEpochMilliseconds(timestamp.toLong()).toDeprecatedInstant(),
         title = label,
         rank = ranking
     )
