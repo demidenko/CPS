@@ -19,14 +19,6 @@ object InstantAsSecondsSerializer: KSerializer<Instant> {
         Instant.fromEpochSeconds(decoder.decodeLong())
 }
 
-object DeprecatedInstantAsSecondsSerializer: KSerializer<kotlinx.datetime.Instant> {
-    override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("Instant", PrimitiveKind.LONG)
-    override fun serialize(encoder: Encoder, value: kotlinx.datetime.Instant) = encoder.encodeLong(value.epochSeconds)
-    override fun deserialize(decoder: Decoder): kotlinx.datetime.Instant =
-        kotlinx.datetime.Instant.fromEpochSeconds(decoder.decodeLong())
-}
-
 object DurationAsSecondsSerializer: KSerializer<Duration> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("Duration_Seconds", PrimitiveKind.LONG)
