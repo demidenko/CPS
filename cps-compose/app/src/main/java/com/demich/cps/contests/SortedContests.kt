@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -67,7 +66,7 @@ private interface ContestsSorter {
 }
 
 private fun List<Contest>.firstFinished(currentTime: Instant) =
-    partitionIndex { it.getPhase(currentTime.toDeprecatedInstant()) != Contest.Phase.FINISHED }
+    partitionIndex { it.getPhase(currentTime) != Contest.Phase.FINISHED }
 
 private class ContestsBruteSorter: ContestsSorter {
     override var contests: SortedContests = SortedContests(emptyList(), 0)

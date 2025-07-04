@@ -101,12 +101,11 @@ class CodeforcesMonitorLauncherWorker(
     }
 
     private suspend fun enqueueToCodeforcesContest() {
-        val currentTime = workerStartTime.toDeprecatedInstant()
         context.contestsListDao.getContestsNotFinished(
             platform = Contest.Platform.codeforces,
-            currentTime = currentTime
+            currentTime = workerStartTime.toDeprecatedInstant()
         ).minOfNotNull {
-            when (it.getPhase(currentTime)) {
+            when (it.getPhase(workerStartTime)) {
                 Contest.Phase.RUNNING -> {
                     work.enqueueAsap()
                     return

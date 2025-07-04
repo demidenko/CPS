@@ -1,7 +1,7 @@
 package com.demich.cps.contests.database
 
 import androidx.room.Entity
-import kotlinx.datetime.toDeprecatedInstant
+import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration
 import kotlin.time.Instant
 
@@ -21,9 +21,9 @@ data class Contest (
 ) {
     val eventDuration: Duration get() = endTime - startTime
 
-    fun getPhase(currentTime: kotlinx.datetime.Instant): Phase = when {
-        currentTime >= endTime -> Phase.FINISHED
-        currentTime < startTime -> Phase.BEFORE
+    fun getPhase(currentTime: Instant): Phase = when {
+        currentTime >= endTime.toStdlibInstant() -> Phase.FINISHED
+        currentTime < startTime.toStdlibInstant() -> Phase.BEFORE
         else -> Phase.RUNNING
     }
 
@@ -86,8 +86,8 @@ data class Contest (
         val platformsExceptUnknown: List<Platform> = platforms - Platform.unknown
 
         fun comparatorAt(currentTime: Instant) = Comparator<Contest> { c1, c2 ->
-            val phase1 = c1.getPhase(currentTime.toDeprecatedInstant())
-            val phase2 = c2.getPhase(currentTime.toDeprecatedInstant())
+            val phase1 = c1.getPhase(currentTime)
+            val phase2 = c2.getPhase(currentTime)
             if (phase1 != phase2) {
                 compareValuesBy(phase1, phase2) {
                     when (it) {

@@ -27,11 +27,10 @@ import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.context
-import com.demich.cps.utils.getCurrentXTime
+import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.timerFull
-import kotlinx.datetime.toDeprecatedInstant
 
 @Composable
 internal fun ContestExpandedItemContent(
@@ -39,7 +38,7 @@ internal fun ContestExpandedItemContent(
     collisionType: DangerType,
     onDeleteRequest: () -> Unit
 ) {
-    val phase = contest.getPhase(localCurrentTime.toDeprecatedInstant())
+    val phase = contest.getPhase(localCurrentTime)
     ContestPlatform(
         platform = contest.platform,
         platformName = contest.platformName()
@@ -186,7 +185,7 @@ private fun ContestItemMenuButton(
 private fun Contest.properLink(): String? {
     if (platform == Contest.Platform.codeforces) {
         val contestId = id.toIntOrNull() ?: return link
-        return when (getPhase(currentTime = getCurrentXTime())) {
+        return when (getPhase(currentTime = getCurrentTime())) {
             Contest.Phase.BEFORE -> CodeforcesUrls.contestPending(contestId = contestId)
             else -> CodeforcesUrls.contest(contestId = contestId)
         }
