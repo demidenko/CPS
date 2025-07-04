@@ -1,7 +1,13 @@
 package com.demich.cps.accounts.rating_graph
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,6 +30,7 @@ import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.toSignedString
 import kotlinx.datetime.Instant
+import kotlinx.datetime.toStdlibInstant
 
 @Composable
 internal fun ContestResult(
@@ -63,7 +70,7 @@ private fun ContestResult(
             )
             Text(
                 text = ratingChange.run {
-                    date.ratingChangeDate() + "  rank: $rank"
+                    date.toStdlibInstant().ratingChangeDate() + "  rank: $rank"
                 },
                 fontSize = subTitleFontSize,
                 color = cpsColors.contentAdditional

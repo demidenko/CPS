@@ -4,7 +4,6 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.utils.RUSSIAN_ABBREVIATED
 import com.demich.cps.utils.isRuSystemLanguage
 import com.demich.cps.utils.toSystemDateTime
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -13,6 +12,7 @@ import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Instant
 
 private object Formats {
     //TODO: setup date format in setting
@@ -71,7 +71,7 @@ fun Contest.dateRange(): String {
 }
 
 fun Instant.ratingChangeDate(): String =
-    toStdlibInstant().toSystemDateTime().format(LocalDateTime.Format {
+    toSystemDateTime().format(LocalDateTime.Format {
         date(Formats.ddMMYYYY)
         char(' ')
         time(Formats.HHMM)
