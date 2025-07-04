@@ -74,7 +74,7 @@ private class ContestsBruteSorter: ContestsSorter {
         private set
 
     override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
-        val sorted = contests.sortedWith(Contest.comparatorAt(currentTime.toDeprecatedInstant()))
+        val sorted = contests.sortedWith(Contest.comparatorAt(currentTime))
         this.contests = SortedContests(
             contests = sorted,
             firstFinished = sorted.firstFinished(currentTime)
@@ -87,7 +87,7 @@ private class ContestsSmartSorter: ContestsSorter {
     private class SortedData(contests: List<Contest>, time: Instant) {
         val sorted: List<Contest> =
             contests.let {
-                val comparator = Contest.comparatorAt(time.toDeprecatedInstant())
+                val comparator = Contest.comparatorAt(time)
                 if (it.isSortedWith(comparator)) it
                 else it.sortedWith(comparator)
             }
