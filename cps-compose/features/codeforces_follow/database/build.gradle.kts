@@ -35,7 +35,6 @@ dependencies {
     implementation(project(":data:accounts:userinfo"))
 
     implementation(libs.kotlinx.serialization)
-    implementation(libs.kotlinx.datetime)
 
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
