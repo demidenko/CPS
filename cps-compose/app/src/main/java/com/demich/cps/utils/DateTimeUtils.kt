@@ -1,6 +1,5 @@
 package com.demich.cps.utils
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.DayOfWeekNames
@@ -16,16 +15,16 @@ import kotlin.time.DurationUnit
 fun getCurrentXTime(): kotlinx.datetime.Instant = kotlinx.datetime.Clock.System.now()
 fun getCurrentTime(): kotlin.time.Instant = kotlin.time.Clock.System.now()
 
-fun Instant.toSystemDateTime(): LocalDateTime =
+fun kotlinx.datetime.Instant.toSystemDateTime(): LocalDateTime =
     toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
 
-operator fun Instant.rem(period: Duration): Duration {
+operator fun kotlinx.datetime.Instant.rem(period: Duration): Duration {
     val periodMillis = period.inWholeMilliseconds
     val thisMillis = toEpochMilliseconds()
     return (thisMillis % periodMillis).milliseconds
 }
 
-fun Instant.truncateBy(period: Duration): Instant = this - this % period
+fun kotlinx.datetime.Instant.truncateBy(period: Duration): kotlinx.datetime.Instant = this - this % period
 
 private fun Duration.dropSeconds(): Duration = inWholeMinutes.minutes
 
