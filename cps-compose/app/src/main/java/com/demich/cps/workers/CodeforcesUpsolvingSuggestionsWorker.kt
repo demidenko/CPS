@@ -11,7 +11,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
-import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.getContestAcceptedStatistics
 import com.demich.cps.utils.add
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.removeOlderThan
@@ -94,10 +94,7 @@ private suspend inline fun getSuggestions(
             CodeforcesClient.getContestSubmissions(contestId = contestId, handle = handle)
         },
         blockSecond = {
-            CodeforcesUtils.extractContestAcceptedStatistics(
-                source = CodeforcesClient.getContestPage(contestId = contestId),
-                contestId = contestId
-            )
+            CodeforcesClient.getContestAcceptedStatistics(contestId = contestId)
         }
     )
 

@@ -4,7 +4,6 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.MonthNames
@@ -185,34 +184,6 @@ object CodeforcesUtils {
         return Jsoup.parse(source).expectSidebar().expectFirst("div.recent-actions")
             .select("li")
             .mapNotNull(::extractRecentBlogEntryOrNull)
-    }
-
-    private inline fun extractProblemWithAcceptedCount(
-        problemRow: Element,
-        contestId: Int,
-        block: (CodeforcesProblem, Int) -> Unit
-    ) {
-        val td = problemRow.select("td")
-        if (td.isEmpty()) return
-        val acceptedCount = td[3].text().trim().run {
-            if (!startsWith('x')) return
-            substring(1).toInt()
-        }
-        val problem = CodeforcesProblem(
-            index = td[0].text().trim(),
-            name = td[1].expectFirst("a").text(),
-            contestId = contestId
-        )
-        block(problem, acceptedCount)
-    }
-
-    fun extractContestAcceptedStatistics(source: String, contestId: Int): Map<CodeforcesProblem, Int> {
-        return buildMap {
-            Jsoup.parse(source).expectFirst("table.problems").select("tr")
-                .forEach {
-                    extractProblemWithAcceptedCount(it, contestId, ::put)
-                }
-        }
     }
 
     fun extractContestSystemTestingPercentageOrNull(source: String): Int? {
