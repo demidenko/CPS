@@ -1,7 +1,6 @@
 package com.demich.cps.contests.database
 
 import androidx.room.Entity
-import kotlinx.datetime.Instant
 import kotlin.time.Duration
 
 @Entity(
@@ -12,15 +11,15 @@ data class Contest (
     val platform: Platform,
     val id: String,
     val title: String,
-    val startTime: Instant,
-    val endTime: Instant,
+    val startTime: kotlinx.datetime.Instant,
+    val endTime: kotlinx.datetime.Instant,
     val duration: Duration,
     val link: String? = null,
     val host: String? = null
 ) {
     val eventDuration: Duration get() = endTime - startTime
 
-    fun getPhase(currentTime: Instant): Phase = when {
+    fun getPhase(currentTime: kotlinx.datetime.Instant): Phase = when {
         currentTime >= endTime -> Phase.FINISHED
         currentTime < startTime -> Phase.BEFORE
         else -> Phase.RUNNING
@@ -30,8 +29,8 @@ data class Contest (
         platform: Platform,
         id: String,
         title: String,
-        startTime: Instant,
-        endTime: Instant,
+        startTime: kotlinx.datetime.Instant,
+        endTime: kotlinx.datetime.Instant,
         link: String? = null,
         host: String? = null
     ): this(
@@ -49,7 +48,7 @@ data class Contest (
         platform: Platform,
         id: String,
         title: String,
-        startTime: Instant,
+        startTime: kotlinx.datetime.Instant,
         duration: Duration,
         link: String? = null,
         host: String? = null
@@ -84,7 +83,7 @@ data class Contest (
         val platforms: List<Platform> get() = Platform.entries
         val platformsExceptUnknown: List<Platform> = platforms - Platform.unknown
 
-        fun comparatorAt(currentTime: Instant) = Comparator<Contest> { c1, c2 ->
+        fun comparatorAt(currentTime: kotlinx.datetime.Instant) = Comparator<Contest> { c1, c2 ->
             val phase1 = c1.getPhase(currentTime)
             val phase2 = c2.getPhase(currentTime)
             if (phase1 != phase2) {
