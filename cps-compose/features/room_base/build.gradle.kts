@@ -24,7 +24,6 @@ android {
 
 dependencies {
     implementation(libs.kotlinx.serialization)
-    implementation(libs.kotlinx.datetime)
 
     implementation(libs.androidx.room.ktx)
 }
