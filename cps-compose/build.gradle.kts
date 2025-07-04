@@ -1,8 +1,6 @@
 import com.android.build.gradle.AppExtension
-import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.tasks.asJavaVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -25,47 +23,41 @@ tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
 
+val javaVersion = JavaLanguageVersion.of(21).asJavaVersion()
 
-fun BaseExtension.baseConfig() {
+fun BaseExtension.baseAndroidConfig() {
     compileSdkVersion(apiLevel = 35)
 
     defaultConfig.apply {
         minSdk = 26
     }
 
-    val javaVersion = JavaLanguageVersion.of(21).asJavaVersion()
-    tasks.withType<KotlinCompile> {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
-        }
-    }
     compileOptions.apply {
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
     }
 }
 
-subprojects {
-    project.plugins.applyBaseConfig(project)
+fun Project.configureKotlin() {
+    tasks.withType<KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
+            optIn.add("kotlin.time.ExperimentalTime")
+        }
+    }
 }
 
-fun PluginContainer.applyBaseConfig(project: Project) {
-    whenPluginAdded {
-        when (this) {
-            is AppPlugin -> {
-                project.extensions
-                    .getByType<AppExtension>()
-                    .apply {
-                        baseConfig()
-                    }
-            }
-            is LibraryPlugin -> {
-                project.extensions
-                    .getByType<LibraryExtension>()
-                    .apply {
-                        baseConfig()
-                    }
-            }
+subprojects {
+    pluginManager.withPlugin("com.android.application") {
+        configure<AppExtension> {
+            baseAndroidConfig()
         }
+        configureKotlin()
+    }
+    pluginManager.withPlugin("com.android.library") {
+        configure<LibraryExtension> {
+            baseAndroidConfig()
+        }
+        configureKotlin()
     }
 }

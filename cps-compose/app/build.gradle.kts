@@ -57,10 +57,6 @@ android {
     }
 }
 
-kotlin {
-    compilerOptions.optIn.add("kotlin.time.ExperimentalTime")
-}
-
 dependencies {
     implementation(project(":kotlin-stdlib-boost"))
     implementation(project(":datastore_itemized"))
