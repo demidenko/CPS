@@ -9,8 +9,8 @@ import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.demich.cps.features.room.DeprecatedInstantSecondsConverter
 import com.demich.cps.features.room.DurationSecondsConverter
-import com.demich.cps.features.room.InstantSecondsConverter
 import com.demich.cps.features.room.instanceDelegate
 
 
@@ -23,7 +23,7 @@ import com.demich.cps.features.room.instanceDelegate
     ]
 )
 @TypeConverters(
-    InstantSecondsConverter::class,
+    DeprecatedInstantSecondsConverter::class,
     DurationSecondsConverter::class
 )
 internal abstract class ContestsDatabase: RoomDatabase() {

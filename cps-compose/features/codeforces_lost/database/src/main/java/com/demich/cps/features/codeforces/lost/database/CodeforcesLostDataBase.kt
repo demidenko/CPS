@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.demich.cps.features.room.InstantSecondsConverter
+import com.demich.cps.features.room.DeprecatedInstantSecondsConverter
 import com.demich.cps.features.room.RoomJsonConverter
 import com.demich.cps.features.room.instanceDelegate
 import com.demich.cps.features.room.jsonRoom
@@ -17,7 +17,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
     version = 1
 )
 @TypeConverters(
-    InstantSecondsConverter::class,
+    DeprecatedInstantSecondsConverter::class,
     CodeforcesBlogEntryConverter::class
 )
 internal abstract class CodeforcesLostDataBase: RoomDatabase() {
