@@ -3,6 +3,7 @@ package com.demich.cps.utils
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.DayOfWeekNames
+import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -11,20 +12,21 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
+import kotlin.time.Instant
 
-fun getCurrentXTime(): kotlinx.datetime.Instant = kotlinx.datetime.Clock.System.now()
-fun getCurrentTime(): kotlin.time.Instant = kotlin.time.Clock.System.now()
+fun getCurrentTime(): Instant = kotlin.time.Clock.System.now()
+fun getCurrentXTime() = getCurrentTime().toDeprecatedInstant()
 
-fun kotlin.time.Instant.toSystemDateTime(): LocalDateTime =
+fun Instant.toSystemDateTime(): LocalDateTime =
     toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
 
-operator fun kotlin.time.Instant.rem(period: Duration): Duration {
+operator fun Instant.rem(period: Duration): Duration {
     val periodMillis = period.inWholeMilliseconds
     val thisMillis = toEpochMilliseconds()
     return (thisMillis % periodMillis).milliseconds
 }
 
-fun kotlin.time.Instant.truncateBy(period: Duration): kotlin.time.Instant = this - this % period
+fun Instant.truncateBy(period: Duration): Instant = this - this % period
 
 private fun Duration.dropSeconds(): Duration = inWholeMinutes.minutes
 
