@@ -5,6 +5,7 @@ import androidx.work.WorkerParameters
 import com.demich.cps.community.codeforces.CodeforcesNewEntriesDataStore
 import com.demich.cps.contests.ContestsInfoDataStore
 import com.demich.cps.utils.removeOlderThan
+import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.days
 
 class UtilityWorker(
@@ -34,7 +35,7 @@ class UtilityWorker(
     }
 
     private suspend fun removeOldIgnoredContests() {
-        ContestsInfoDataStore(context).ignoredContests.removeOlderThan(workerStartTime - 30.days)
+        ContestsInfoDataStore(context).ignoredContests.removeOlderThan(workerStartTime.toStdlibInstant() - 30.days)
     }
 
     private suspend fun removeOldCodeforcesNewEntries() {

@@ -65,7 +65,7 @@ class CodeforcesMonitorLauncherWorker(
                 monitorLastSubmissionId.setValue(it.id)
             }
 
-            monitorCanceledContests.removeOld { !isActual(it.toStdlibInstant()) }
+            monitorCanceledContests.removeOld { !isActual(it) }
         }
 
         enqueueToCodeforcesContest()

@@ -71,7 +71,7 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.filterByTokensAsSubsequence
-import com.demich.cps.utils.getCurrentXTime
+import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.workers.ContestsWorker
 import com.demich.cps.workers.isRunning
@@ -239,7 +239,7 @@ private fun ContestsPage(
         onDeleteRequest = { contest ->
             scope.launch {
                 ContestsInfoDataStore(context)
-                    .ignoredContests.add(contest.compositeId, getCurrentXTime())
+                    .ignoredContests.add(contest.compositeId, getCurrentTime())
             }
         }
     )
@@ -475,7 +475,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
             onStop = {
                 scope.launch {
                     CodeforcesAccountManager().dataStore(context)
-                        .monitorCanceledContests.add(contestId, getCurrentXTime())
+                        .monitorCanceledContests.add(contestId, getCurrentTime())
                     monitor.reset()
                 }
             }

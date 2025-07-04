@@ -16,6 +16,7 @@ import com.demich.cps.utils.add
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.removeOlderThan
 import com.demich.kotlin_stdlib_boost.mapToSet
+import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
@@ -50,7 +51,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
             ?.handle
             ?: return Result.success()
 
-        val dateThreshold = workerStartTime - 90.days
+        val dateThreshold = workerStartTime.toStdlibInstant() - 90.days
         val suggestedItem = dataStore.upsolvingSuggestedProblems.also {
             it.removeOlderThan(dateThreshold)
         }
@@ -58,7 +59,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
         val suggestedProblems = suggestedItem()
 
         CodeforcesClient.getUserRatingChanges(handle)
-            .filter { it.ratingUpdateTime >= dateThreshold }
+            .filter { it.ratingUpdateTime.toStdlibInstant() >= dateThreshold }
             .sortedByDescending { it.ratingUpdateTime }
             .forEachWithProgress { ratingChange ->
                 getSuggestions(
@@ -72,7 +73,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
                         }
                     }
                 ) { problem ->
-                    suggestedItem.add(problem, ratingChange.ratingUpdateTime)
+                    suggestedItem.add(problem, ratingChange.ratingUpdateTime.toStdlibInstant())
                     notifyProblemForUpsolve(problem, context)
                 }
             }
