@@ -11,6 +11,7 @@ import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.utils.removeOld
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlinx.datetime.Instant
+import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -112,7 +113,7 @@ class CodeforcesMonitorLauncherWorker(
                 else -> null
             }
         }?.let {
-            work.enqueueAtIfEarlier(time = it + 5.minutes)
+            work.enqueueAtIfEarlier(time = it.toStdlibInstant() + 5.minutes)
         }
     }
 }
