@@ -15,7 +15,7 @@ class CodeforcesContestsLoader(val api: CodeforcesApi): ContestsLoader() {
         dateConstraints: ContestDateConstraints
     ) = api.getContests()
         .mapNotNull {
-            if (dateConstraints.check(startTime = it.startTime.toDeprecatedInstant(), duration = it.duration)) {
+            if (dateConstraints.check(startTime = it.startTime, duration = it.duration)) {
                 Contest(
                     platform = Contest.Platform.codeforces,
                     id = it.id.toString(),

@@ -24,6 +24,4 @@ android {
 
 dependencies {
     implementation(project(":data:contests:database"))
-
-    implementation(libs.kotlinx.datetime)
 }

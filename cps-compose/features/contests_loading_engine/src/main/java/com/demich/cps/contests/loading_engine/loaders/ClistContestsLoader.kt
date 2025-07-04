@@ -13,7 +13,6 @@ import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import kotlinx.datetime.parse
 import kotlinx.datetime.toDeprecatedInstant
-import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
@@ -29,8 +28,8 @@ class ClistContestsLoader(
         dateConstraints: ContestDateConstraints
     ) = api.getContests(
         apiAccess = apiAccess,
-        maxStartTime = dateConstraints.maxStartTime.toStdlibInstant(),
-        minEndTime = dateConstraints.minEndTime.toStdlibInstant(),
+        maxStartTime = dateConstraints.maxStartTime,
+        minEndTime = dateConstraints.minEndTime,
         resourceIds = ClistUtils.makeResourceIds(platforms, resources)
     ).mapAndFilterResult(dateConstraints)
 }

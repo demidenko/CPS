@@ -11,10 +11,10 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Instant
 
 val Context.settingsContests: ContestsSettingsDataStore
     get() = ContestsSettingsDataStore(this)

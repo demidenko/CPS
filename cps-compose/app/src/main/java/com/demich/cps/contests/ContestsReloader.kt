@@ -17,7 +17,7 @@ import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.ClistClient
 import com.demich.cps.platforms.clients.DmojClient
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
-import com.demich.cps.utils.getCurrentXTime
+import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.fromSnapshot
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -85,7 +85,7 @@ private suspend fun contestsLoadingFlows(
 
     return contestsLoadingFlows(
         setup = contestsLoadersPriorityLists.filterKeys { it in platforms },
-        dateConstraints = contestsDateConstraints.at(currentTime = getCurrentXTime()),
+        dateConstraints = contestsDateConstraints.at(currentTime = getCurrentTime()),
     ) { loaderType ->
         when (loaderType) {
             ContestsLoaderType.clist_api -> ClistContestsLoader(

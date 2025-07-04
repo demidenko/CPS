@@ -1,7 +1,7 @@
 package com.demich.cps.contests.loading
 
-import kotlinx.datetime.Instant
 import kotlin.time.Duration
+import kotlin.time.Instant
 
 data class ContestDateConstraints(
     val maxStartTime: Instant = Instant.DISTANT_FUTURE,
