@@ -18,13 +18,13 @@ fun getCurrentTime(): kotlin.time.Instant = kotlin.time.Clock.System.now()
 fun kotlinx.datetime.Instant.toSystemDateTime(): LocalDateTime =
     toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
 
-operator fun kotlinx.datetime.Instant.rem(period: Duration): Duration {
+operator fun kotlin.time.Instant.rem(period: Duration): Duration {
     val periodMillis = period.inWholeMilliseconds
     val thisMillis = toEpochMilliseconds()
     return (thisMillis % periodMillis).milliseconds
 }
 
-fun kotlinx.datetime.Instant.truncateBy(period: Duration): kotlinx.datetime.Instant = this - this % period
+fun kotlin.time.Instant.truncateBy(period: Duration): kotlin.time.Instant = this - this % period
 
 private fun Duration.dropSeconds(): Duration = inWholeMinutes.minutes
 

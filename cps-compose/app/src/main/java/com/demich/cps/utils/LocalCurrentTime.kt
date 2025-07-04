@@ -11,6 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Instant
+import kotlinx.datetime.toDeprecatedInstant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -28,8 +29,8 @@ private fun flowOfTruncatedCurrentTime(period: Duration): Flow<Instant> {
     require(period.isPositive())
     return flow {
         while (true) {
-            val currentTime = getCurrentXTime()
-            emit(currentTime.truncateBy(period))
+            val currentTime = getCurrentTime()
+            emit(currentTime.truncateBy(period).toDeprecatedInstant())
             delay(duration = period - currentTime % period)
         }
     }
@@ -42,7 +43,7 @@ fun flowOfCurrentTimeEachSecond(): Flow<Instant> =
 fun currentTimeAsState(period: Duration): State<Instant> {
     return remember(key1 = period) {
         flowOfTruncatedCurrentTime(period = period)
-    }.collectAsStateWithLifecycle(initialValue = remember { getCurrentXTime().truncateBy(period) })
+    }.collectAsStateWithLifecycle(initialValue = remember { getCurrentTime().truncateBy(period).toDeprecatedInstant() })
 }
 
 @Composable
