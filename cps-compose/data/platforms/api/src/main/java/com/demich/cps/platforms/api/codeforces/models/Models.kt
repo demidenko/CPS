@@ -216,8 +216,8 @@ data class CodeforcesComment(
 data class CodeforcesRecentAction(
     // Action time, in unix format
     @SerialName("timeSeconds")
-    @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val time: kotlinx.datetime.Instant,
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val time: Instant, //TODO: unused
 
     // In short form. Can be absent.
     val blogEntry: CodeforcesBlogEntry? = null,

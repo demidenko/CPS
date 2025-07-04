@@ -130,7 +130,7 @@ object CodeforcesUtils {
                 ?: ""
 
             CodeforcesRecentAction(
-                time = commentCreationTime.toDeprecatedInstant(),
+                time = commentCreationTime,
                 comment = CodeforcesComment(
                     id = commentId,
                     commentatorHandle = commentator.handle,
