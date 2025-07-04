@@ -8,10 +8,10 @@ import com.demich.cps.platforms.api.clist.ClistUrls
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.parameter
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
 object ClistClient: PlatformClient, ClistApi, ClistPageContentProvider {
     override val client = cpsHttpClient(json = defaultJson) {

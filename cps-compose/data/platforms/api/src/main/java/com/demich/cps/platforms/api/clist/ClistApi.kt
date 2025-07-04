@@ -1,7 +1,7 @@
 package com.demich.cps.platforms.api.clist
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 interface ClistApi {
 
