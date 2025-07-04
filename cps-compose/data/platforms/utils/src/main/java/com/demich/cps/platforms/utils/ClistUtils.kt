@@ -4,9 +4,25 @@ import com.demich.cps.accounts.userinfo.ClistUserInfo
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistResource
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.char
+import kotlinx.datetime.parse
 import org.jsoup.Jsoup
+import kotlin.time.Instant
 
 object ClistUtils {
+    private val contestDateFormat = DateTimeComponents.Format {
+        //YYYY-MM-DDThh:mm:ss
+        date(LocalDate.Formats.ISO)
+        char('T')
+        time(LocalTime.Formats.ISO)
+    }
+
+    fun parseContestDate(str: String): Instant =
+        Instant.parse(str, contestDateFormat)
+
     fun makeResourceIds(
         platforms: Collection<Contest.Platform>,
         additionalResources: Collection<ClistResource> = emptyList()

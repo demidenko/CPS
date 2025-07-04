@@ -7,13 +7,7 @@ import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.utils.ClistUtils
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.char
-import kotlinx.datetime.parse
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.Instant
 
 class ClistContestsLoader(
     val api: ClistApi,
@@ -34,16 +28,9 @@ class ClistContestsLoader(
 }
 
 
-private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: ContestDateConstraints): List<Contest> {
-    val format = DateTimeComponents.Format {
-        //YYYY-MM-DDThh:mm:ss
-        date(LocalDate.Formats.ISO)
-        char('T')
-        time(LocalTime.Formats.ISO)
-    }
-
-    return mapNotNull { clistContest ->
-        val contest = clistContest.toContest { Instant.parse(it, format) }
+private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: ContestDateConstraints): List<Contest> =
+    mapNotNull { clistContest ->
+        val contest = clistContest.toContest()
         if (!dateConstraints.check(contest)) {
             return@mapNotNull null
         }
@@ -52,9 +39,8 @@ private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: Contest
             else -> contest
         }
     }
-}
 
-private inline fun ClistContest.toContest(parseDate: (String) -> Instant): Contest {
+private fun ClistContest.toContest(): Contest {
     val platform = Contest.platformsExceptUnknown
         .find { ClistUtils.getClistApiResourceId(it) == resource_id }
         ?: Contest.Platform.unknown
@@ -63,8 +49,8 @@ private inline fun ClistContest.toContest(parseDate: (String) -> Instant): Conte
         platform = platform,
         id = ClistUtils.extractContestId(this, platform),
         title = event,
-        startTime = parseDate(start),
-        endTime = parseDate(end),
+        startTime = ClistUtils.parseContestDate(start),
+        endTime = ClistUtils.parseContestDate(end),
         duration = duration.seconds,
         link = href,
         host = host.takeIf { platform == Contest.Platform.unknown }
