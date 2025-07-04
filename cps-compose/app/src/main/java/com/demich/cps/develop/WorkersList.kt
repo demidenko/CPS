@@ -74,7 +74,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -150,7 +149,7 @@ private fun WorkerDialog(
             Column(modifier = Modifier.fillMaxWidth()) {
                 when (val state = workInfo.stateOrCancelled) {
                     WorkInfo.State.ENQUEUED -> {
-                        workInfo?.nextScheduleTime?.toDeprecatedInstant()?.let { nextTime ->
+                        workInfo?.nextScheduleTime?.let { nextTime ->
                             val d = nextTime - localCurrentTime
                             Text(text = "next: in ${d.toDropSecondsString()}")
                         }
@@ -300,7 +299,7 @@ private fun WorkerItem(
 
             Text(
                 text = lastExecTime?.let {
-                    (localCurrentTime.toStdlibInstant() - it).toDropSecondsString() + " ago"
+                    (localCurrentTime - it).toDropSecondsString() + " ago"
                 } ?: "never"
             )
 

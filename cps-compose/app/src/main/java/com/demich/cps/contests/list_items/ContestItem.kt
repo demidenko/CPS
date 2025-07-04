@@ -25,6 +25,7 @@ import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.timerShort
 import com.demich.cps.utils.toSystemDateTime
+import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.datetime.toStdlibInstant
 
 @Composable
@@ -52,7 +53,7 @@ private fun ContestItemContent(
     collisionType: DangerType
 ) {
     //TODO: call recomposes two times
-    val phase = contest.getPhase(localCurrentTime)
+    val phase = contest.getPhase(localCurrentTime.toDeprecatedInstant())
     ContestItemHeader(
         platform = contest.platform,
         contestTitle = contest.title,

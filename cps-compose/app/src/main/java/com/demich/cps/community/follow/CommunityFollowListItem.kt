@@ -128,7 +128,7 @@ private fun UserOnlineInfo(
         modifier = modifier,
         fontSize = fontSize,
         text = "online: " + time.toTimeAgoString(),
-        showWarning = localCurrentTime.toStdlibInstant() - time > 365.days
+        showWarning = localCurrentTime - time > 365.days
     )
 }
 

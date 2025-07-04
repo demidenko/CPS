@@ -31,6 +31,7 @@ import com.demich.cps.utils.getCurrentXTime
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.timerFull
+import kotlinx.datetime.toDeprecatedInstant
 
 @Composable
 internal fun ContestExpandedItemContent(
@@ -38,7 +39,7 @@ internal fun ContestExpandedItemContent(
     collisionType: DangerType,
     onDeleteRequest: () -> Unit
 ) {
-    val phase = contest.getPhase(localCurrentTime)
+    val phase = contest.getPhase(localCurrentTime.toDeprecatedInstant())
     ContestPlatform(
         platform = contest.platform,
         platformName = contest.platformName()
