@@ -23,7 +23,7 @@ class WorkersHintsDataStore(context: Context): ItemizedDataStore(context.dataSto
     val newsFeedsLastIds = jsonCPS.itemMap<NewsFeed,String>(name = "news_feeds_last_id")
 }
 
-suspend fun <T: NewsPostEntry> WorkersHintsDataStore.scanNewsFeed(
+suspend inline fun <T: NewsPostEntry> WorkersHintsDataStore.scanNewsFeed(
     newsFeed: NewsFeed,
     posts: List<T?>,
     onNewPost: (T) -> Unit

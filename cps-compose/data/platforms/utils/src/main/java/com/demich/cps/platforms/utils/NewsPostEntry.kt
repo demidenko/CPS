@@ -4,10 +4,10 @@ interface NewsPostEntry {
     val id: String
 }
 
-suspend fun<T: NewsPostEntry> scanNewsPostEntries(
+inline fun <T: NewsPostEntry> scanNewsPostEntries(
     posts: List<T?>,
-    getLastId: suspend () -> String?,
-    setLastId: suspend (String) -> Unit,
+    getLastId: () -> String?,
+    setLastId: (String) -> Unit,
     onNewPost: (T) -> Unit
 ) {
     val lastId = getLastId()
