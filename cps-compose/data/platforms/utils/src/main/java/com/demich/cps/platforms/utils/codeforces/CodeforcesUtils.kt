@@ -34,7 +34,7 @@ object CodeforcesUtils {
         private val dateTimeFormat = LocalDateTime.Format {
             alternativeParsing({
                 //RU format: "dd.MM.yyyy HH:mm"
-                dayOfMonth()
+                day()
                 char('.')
                 monthNumber()
                 char('.')
@@ -43,7 +43,7 @@ object CodeforcesUtils {
                 //EN format: "MMM/dd/yyyy HH:mm"
                 monthName(MonthNames.ENGLISH_ABBREVIATED)
                 char('/')
-                dayOfMonth()
+                day()
                 char('/')
                 year()
             }

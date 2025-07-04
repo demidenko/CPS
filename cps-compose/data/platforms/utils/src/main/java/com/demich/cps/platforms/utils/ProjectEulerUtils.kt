@@ -25,7 +25,7 @@ object ProjectEulerUtils {
     fun extractRecentProblems(source: String): List<RecentProblem?> {
         val format = LocalDateTime.Format {
             //5th April 2025, 02:00 pm
-            dayOfMonth(padding = Padding.NONE)
+            day(padding = Padding.NONE)
             alternativeParsing(
                 { chars("st") },
                 { chars("nd") },
@@ -83,7 +83,7 @@ object ProjectEulerUtils {
     fun extractProblemsFromRssPage(rssPage: String): List<Pair<Int, Instant>> {
         val format = DateTimeComponents.Format {
             //04 Apr 2025 23:00:00 +0100
-            dayOfMonth(padding = Padding.NONE)
+            day(padding = Padding.NONE)
             char(' ')
             monthName(names = MonthNames.ENGLISH_ABBREVIATED)
             char(' ')

@@ -25,7 +25,7 @@ private object Formats {
     }
 
     val ddMM = LocalDate.Format {
-        dayOfMonth()
+        day()
         char(dateSeparator)
         monthNumber()
     }
