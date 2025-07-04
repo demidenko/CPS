@@ -75,7 +75,7 @@ class CodeforcesCommunityFollowWorker(
 }
 
 private fun CodeforcesUserBlog.userLastOnlineTime(): Instant =
-    userInfo?.lastOnlineTime?.toStdlibInstant() ?: Instant.DISTANT_PAST
+    userInfo?.lastOnlineTime ?: Instant.DISTANT_PAST
 
 private fun nextEnqueueIn(
     blogsCount: Int,
