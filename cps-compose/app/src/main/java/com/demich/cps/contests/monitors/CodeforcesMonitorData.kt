@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Immutable
 data class CodeforcesMonitorData(

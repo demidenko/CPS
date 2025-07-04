@@ -13,6 +13,7 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.flowOf
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.toStdlibInstant
 import kotlinx.serialization.Serializable
 
 class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf_monitor_dataStore) {
@@ -85,7 +86,7 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
 
         val phase = when (contest.phase) {
             CodeforcesContestPhase.CODING -> {
-                CodeforcesMonitorData.ContestPhase.Coding(endTime = contest.startTime + contest.duration)
+                CodeforcesMonitorData.ContestPhase.Coding(endTime = contest.startTime.toStdlibInstant() + contest.duration)
             }
             CodeforcesContestPhase.SYSTEM_TEST -> {
                 CodeforcesMonitorData.ContestPhase.SystemTesting(percentage = prefs[sysTestPercentage])
