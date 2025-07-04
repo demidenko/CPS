@@ -189,8 +189,8 @@ data class CodeforcesRatingChange(
 
     // Time, when rating for the contest was update, in unix-format
     @SerialName("ratingUpdateTimeSeconds")
-    @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val ratingUpdateTime: kotlinx.datetime.Instant
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val ratingUpdateTime: Instant
 )
 
 @Serializable

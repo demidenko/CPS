@@ -30,7 +30,7 @@ internal fun CodeforcesRatingChange.toRatingChange() =
     RatingChange(
         rating = newRating,
         oldRating = oldRating,
-        date = ratingUpdateTime,
+        date = ratingUpdateTime.toDeprecatedInstant(),
         title = contestName,
         rank = rank,
         url = CodeforcesUrls.contestsWith(handle)

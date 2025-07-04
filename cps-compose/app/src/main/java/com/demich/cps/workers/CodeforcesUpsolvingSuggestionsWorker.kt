@@ -59,7 +59,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
         val suggestedProblems = suggestedItem()
 
         CodeforcesClient.getUserRatingChanges(handle)
-            .filter { it.ratingUpdateTime.toStdlibInstant() >= dateThreshold }
+            .filter { it.ratingUpdateTime >= dateThreshold }
             .sortedByDescending { it.ratingUpdateTime }
             .forEachWithProgress { ratingChange ->
                 getSuggestions(
@@ -73,7 +73,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
                         }
                     }
                 ) { problem ->
-                    suggestedItem.add(problem, ratingChange.ratingUpdateTime.toStdlibInstant())
+                    suggestedItem.add(problem, ratingChange.ratingUpdateTime)
                     notifyProblemForUpsolve(problem, context)
                 }
             }
