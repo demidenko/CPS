@@ -15,7 +15,7 @@ import kotlin.time.DurationUnit
 fun getCurrentXTime(): kotlinx.datetime.Instant = kotlinx.datetime.Clock.System.now()
 fun getCurrentTime(): kotlin.time.Instant = kotlin.time.Clock.System.now()
 
-fun kotlinx.datetime.Instant.toSystemDateTime(): LocalDateTime =
+fun kotlin.time.Instant.toSystemDateTime(): LocalDateTime =
     toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
 
 operator fun kotlin.time.Instant.rem(period: Duration): Duration {
