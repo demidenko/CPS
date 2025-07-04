@@ -1,7 +1,6 @@
 package com.demich.cps.contests.database
 
 import androidx.room.Entity
-import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration
 import kotlin.time.Instant
 
@@ -13,8 +12,8 @@ data class Contest (
     val platform: Platform,
     val id: String,
     val title: String,
-    val startTime: kotlinx.datetime.Instant,
-    val endTime: kotlinx.datetime.Instant,
+    val startTime: Instant,
+    val endTime: Instant,
     val duration: Duration,
     val link: String? = null,
     val host: String? = null
@@ -22,8 +21,8 @@ data class Contest (
     val eventDuration: Duration get() = endTime - startTime
 
     fun getPhase(currentTime: Instant): Phase = when {
-        currentTime >= endTime.toStdlibInstant() -> Phase.FINISHED
-        currentTime < startTime.toStdlibInstant() -> Phase.BEFORE
+        currentTime >= endTime -> Phase.FINISHED
+        currentTime < startTime -> Phase.BEFORE
         else -> Phase.RUNNING
     }
 
@@ -31,8 +30,8 @@ data class Contest (
         platform: Platform,
         id: String,
         title: String,
-        startTime: kotlinx.datetime.Instant,
-        endTime: kotlinx.datetime.Instant,
+        startTime: Instant,
+        endTime: Instant,
         link: String? = null,
         host: String? = null
     ): this(
@@ -50,7 +49,7 @@ data class Contest (
         platform: Platform,
         id: String,
         title: String,
-        startTime: kotlinx.datetime.Instant,
+        startTime: Instant,
         duration: Duration,
         link: String? = null,
         host: String? = null

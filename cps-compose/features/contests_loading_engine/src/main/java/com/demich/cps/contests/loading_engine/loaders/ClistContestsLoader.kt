@@ -12,7 +12,6 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import kotlinx.datetime.parse
-import kotlinx.datetime.toDeprecatedInstant
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
@@ -64,8 +63,8 @@ private inline fun ClistContest.toContest(parseDate: (String) -> Instant): Conte
         platform = platform,
         id = ClistUtils.extractContestId(this, platform),
         title = event,
-        startTime = parseDate(start).toDeprecatedInstant(),
-        endTime = parseDate(end).toDeprecatedInstant(),
+        startTime = parseDate(start),
+        endTime = parseDate(end),
         duration = duration.seconds,
         link = href,
         host = host.takeIf { platform == Contest.Platform.unknown }

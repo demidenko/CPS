@@ -3,7 +3,6 @@ package com.demich.cps.contests.loading_engine.loaders
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.platforms.api.dmoj.DmojApi
-import kotlinx.datetime.toDeprecatedInstant
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
@@ -18,8 +17,8 @@ class DmojContestsLoader(val api: DmojApi): ContestsLoader() {
                 platform = Contest.Platform.dmoj,
                 id = contest.key,
                 title = contest.name,
-                startTime = startTime.toDeprecatedInstant(),
-                endTime = endTime.toDeprecatedInstant(),
+                startTime = startTime,
+                endTime = endTime,
                 duration = contest.time_limit?.seconds ?: (endTime - startTime)
             )
         }

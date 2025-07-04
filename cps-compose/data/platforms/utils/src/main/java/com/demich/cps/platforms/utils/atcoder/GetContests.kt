@@ -9,7 +9,6 @@ import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.char
 import kotlinx.datetime.parse
-import kotlinx.datetime.toDeprecatedInstant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import kotlin.time.Duration.Companion.hours
@@ -59,7 +58,7 @@ private fun extractContestOrNull(
             title = title.text().trim(),
             id = id,
             link = AtCoderUrls.contest(id),
-            startTime = startTime.toDeprecatedInstant(),
+            startTime = startTime,
             duration = duration
         )
     }.getOrNull()

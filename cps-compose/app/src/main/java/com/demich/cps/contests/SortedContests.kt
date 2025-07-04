@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
@@ -96,8 +95,8 @@ private class ContestsSmartSorter: ContestsSorter {
         val nextReorderTime: Instant =
             sorted.minOfNotNull {
                 when {
-                    sortedAt < it.startTime.toStdlibInstant() -> it.startTime.toStdlibInstant()
-                    sortedAt < it.endTime.toStdlibInstant() -> it.endTime.toStdlibInstant()
+                    sortedAt < it.startTime -> it.startTime
+                    sortedAt < it.endTime -> it.endTime
                     else -> null
                 }
             } ?: Instant.DISTANT_FUTURE

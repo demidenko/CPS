@@ -10,7 +10,6 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.char
-import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
 
@@ -52,8 +51,8 @@ private fun LocalDateTime.formatTime() = time.format(Formats.HHMM)
 fun LocalDateTime.contestDate() = "${formatDate()} ${formatTime()}"
 
 fun Contest.dateShortRange(): String {
-    val startLocalDateTime = startTime.toStdlibInstant().toSystemDateTime()
-    val endLocalDateTime = endTime.toStdlibInstant().toSystemDateTime()
+    val startLocalDateTime = startTime.toSystemDateTime()
+    val endLocalDateTime = endTime.toSystemDateTime()
     val start = startLocalDateTime.contestDate()
     val end = if (eventDuration < 24.hours) endLocalDateTime.formatTime() else "..."
     return "$start-$end"
@@ -61,8 +60,8 @@ fun Contest.dateShortRange(): String {
 
 fun Contest.dateRange(): String {
     //TODO: show year
-    val startLocalDateTime = startTime.toStdlibInstant().toSystemDateTime()
-    val endLocalDateTime = endTime.toStdlibInstant().toSystemDateTime()
+    val startLocalDateTime = startTime.toSystemDateTime()
+    val endLocalDateTime = endTime.toSystemDateTime()
     val start = startLocalDateTime.contestDate()
     val end = endLocalDateTime.run {
         if (date == startLocalDateTime.date) formatTime() else contestDate()

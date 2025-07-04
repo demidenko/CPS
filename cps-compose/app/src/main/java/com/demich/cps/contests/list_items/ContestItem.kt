@@ -25,7 +25,6 @@ import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.timerShort
 import com.demich.cps.utils.toSystemDateTime
-import kotlinx.datetime.toStdlibInstant
 
 @Composable
 fun ContestItem(
@@ -107,7 +106,7 @@ private fun ContestItemFooter(
             AttentionText(
                 text = when (phase) {
                     Contest.Phase.BEFORE -> contest.dateShortRange()
-                    Contest.Phase.RUNNING -> "ends " + contest.endTime.toStdlibInstant().toSystemDateTime().contestDate()
+                    Contest.Phase.RUNNING -> "ends " + contest.endTime.toSystemDateTime().contestDate()
                     Contest.Phase.FINISHED -> contest.dateRange()
                 },
                 collisionType = collisionType,

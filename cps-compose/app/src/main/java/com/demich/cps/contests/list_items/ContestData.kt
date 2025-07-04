@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.utils.localCurrentTime
-import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration
 
 internal fun Contest.platformName() = host ?: platform.name
@@ -18,7 +17,7 @@ internal inline fun Contest.counter(
     finished: () -> String = { "" }
 ): String =
     when (phase) {
-        Contest.Phase.BEFORE -> before(startTime.toStdlibInstant() - localCurrentTime)
-        Contest.Phase.RUNNING -> running(endTime.toStdlibInstant() - localCurrentTime)
+        Contest.Phase.BEFORE -> before(startTime - localCurrentTime)
+        Contest.Phase.RUNNING -> running(endTime - localCurrentTime)
         Contest.Phase.FINISHED -> finished()
     }

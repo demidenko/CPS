@@ -10,8 +10,6 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.utils.removeOld
 import com.demich.kotlin_stdlib_boost.minOfNotNull
-import kotlinx.datetime.toDeprecatedInstant
-import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
@@ -103,7 +101,7 @@ class CodeforcesMonitorLauncherWorker(
     private suspend fun enqueueToCodeforcesContest() {
         context.contestsListDao.getContestsNotFinished(
             platform = Contest.Platform.codeforces,
-            currentTime = workerStartTime.toDeprecatedInstant()
+            currentTime = workerStartTime
         ).minOfNotNull {
             when (it.getPhase(workerStartTime)) {
                 Contest.Phase.RUNNING -> {
@@ -114,7 +112,7 @@ class CodeforcesMonitorLauncherWorker(
                 else -> null
             }
         }?.let {
-            work.enqueueAtIfEarlier(time = it.toStdlibInstant() + 5.minutes)
+            work.enqueueAtIfEarlier(time = it + 5.minutes)
         }
     }
 }

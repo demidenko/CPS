@@ -3,7 +3,6 @@ package com.demich.cps.contests.loading_engine.loaders
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsLoaderType
-import kotlinx.datetime.toStdlibInstant
 
 
 abstract class ContestsLoader {
@@ -79,7 +78,7 @@ abstract class ContestsLoaderMultiple: ContestsLoader() {
 }
 
 internal fun ContestDateConstraints.check(contest: Contest): Boolean =
-    check(startTime = contest.startTime.toStdlibInstant(), duration = contest.duration)
+    check(startTime = contest.startTime, duration = contest.duration)
 
 private fun List<Contest>.filterBy(dateConstraints: ContestDateConstraints): List<Contest> =
     if (all { dateConstraints.check(it) }) this
