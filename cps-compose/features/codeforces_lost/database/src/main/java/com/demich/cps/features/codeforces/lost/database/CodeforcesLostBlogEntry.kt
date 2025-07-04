@@ -3,7 +3,7 @@ package com.demich.cps.features.codeforces.lost.database
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Entity(tableName = cfLostTableName)
 data class CodeforcesLostBlogEntry(

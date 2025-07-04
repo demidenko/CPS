@@ -93,7 +93,7 @@ class CodeforcesCommunityLostRecentWorker(
                 CodeforcesLostBlogEntry(
                     blogEntry = it,
                     isSuspect = true,
-                    timeStamp = Instant.DISTANT_PAST.toDeprecatedInstant()
+                    timeStamp = Instant.DISTANT_PAST
                 )
             )
         }
@@ -112,7 +112,7 @@ class CodeforcesCommunityLostRecentWorker(
             if (blogEntry.id !in recentIds) {
                 dao.insert(blogEntry.copy(
                     isSuspect = false,
-                    timeStamp = workerStartTime.toDeprecatedInstant()
+                    timeStamp = workerStartTime
                 ))
             }
         }
