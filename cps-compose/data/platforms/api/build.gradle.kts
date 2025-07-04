@@ -31,5 +31,4 @@ dependencies {
     implementation(project(":kotlin-stdlib-boost"))
 
     implementation(libs.kotlinx.serialization)
-    implementation(libs.kotlinx.datetime)
 }
