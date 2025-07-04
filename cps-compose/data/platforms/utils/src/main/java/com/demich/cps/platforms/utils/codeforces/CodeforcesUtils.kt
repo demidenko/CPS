@@ -6,7 +6,6 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.alternativeParsing
@@ -15,6 +14,7 @@ import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.datetime.toInstant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import kotlin.time.Instant
 
 private fun Element.expectContent(): Element = expectFirst("div.content-with-sidebar")
 
@@ -55,7 +55,7 @@ object CodeforcesUtils {
         }
 
         fun parse(input: String): Instant =
-            LocalDateTime.parse(input, dateTimeFormat).toInstant(moscowTimeZone).toDeprecatedInstant()
+            LocalDateTime.parse(input, dateTimeFormat).toInstant(moscowTimeZone)
     }
 
     private fun String.extractTime(): Instant = DateTimeParser.parse(this)
@@ -89,7 +89,7 @@ object CodeforcesUtils {
                 title = title,
                 authorHandle = author.handle,
                 authorColorTag = author.colorTag,
-                creationTime = creationTime,
+                creationTime = creationTime.toDeprecatedInstant(),
                 rating = rating,
                 commentsCount = commentsCount
             )
@@ -130,21 +130,21 @@ object CodeforcesUtils {
                 ?: ""
 
             CodeforcesRecentAction(
-                time = commentCreationTime,
+                time = commentCreationTime.toDeprecatedInstant(),
                 comment = CodeforcesComment(
                     id = commentId,
                     commentatorHandle = commentator.handle,
                     commentatorHandleColorTag = commentator.colorTag,
                     html = commentHtml,
                     rating = commentRating,
-                    creationTime = commentCreationTime
+                    creationTime = commentCreationTime.toDeprecatedInstant()
                 ),
                 blogEntry = CodeforcesBlogEntry(
                     id = blogEntryId,
                     title = blogEntryTitle,
                     authorHandle = blogEntryAuthor.handle,
                     authorColorTag = blogEntryAuthor.colorTag,
-                    creationTime = Instant.DISTANT_PAST,
+                    creationTime = Instant.DISTANT_PAST.toDeprecatedInstant(),
                     rating = 0
                 )
             )
