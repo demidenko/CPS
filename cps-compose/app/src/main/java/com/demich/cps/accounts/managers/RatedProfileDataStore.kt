@@ -9,6 +9,7 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.toSignedString
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreWrapper
+import kotlinx.datetime.toStdlibInstant
 
 abstract class RatedProfileDataStore<U: RatedUserInfo>(
     private val manager: RatedAccountManager<U>,
@@ -77,6 +78,6 @@ private fun notifyRatingChange(
         subText = "${manager.type.name} rating changes"
         color = manager.originalColor(manager.getHandleColor(ratingChange.rating)) //TODO not original but cpsColors
         ratingChange.url?.let { url = it }
-        time = ratingChange.date
+        time = ratingChange.date.toStdlibInstant()
     }
 }

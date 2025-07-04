@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
 import com.demich.cps.utils.makePendingIntentOpenUrl
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 //default values and getters don't matters, setter just send value to builder
 class NotificationBuildScope(

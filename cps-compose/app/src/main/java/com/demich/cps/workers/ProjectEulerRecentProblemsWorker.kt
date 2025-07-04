@@ -52,7 +52,7 @@ class ProjectEulerRecentProblemsWorker(
                 bigContent = post.name
                 smallIcon = R.drawable.ic_logo_projecteuler
                 colorResId = R.color.project_euler_main
-                time = post.date
+                time = post.date.toStdlibInstant()
                 autoCancel = true
                 url = ProjectEulerUrls.problem(problemId)
             }
