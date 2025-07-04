@@ -10,22 +10,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.Instant
 import kotlinx.datetime.toDeprecatedInstant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-val localCurrentTime: Instant
+val localCurrentTime: kotlinx.datetime.Instant
     @Composable
     @ReadOnlyComposable
     get() = LocalCurrentTime.current
 
-private val LocalCurrentTime = compositionLocalOf<Instant> {
+private val LocalCurrentTime = compositionLocalOf<kotlinx.datetime.Instant> {
     throw IllegalAccessException("current time not provided")
 }
 
-private fun flowOfTruncatedCurrentTime(period: Duration): Flow<Instant> {
+private fun flowOfTruncatedCurrentTime(period: Duration): Flow<kotlinx.datetime.Instant> {
     require(period.isPositive())
     return flow {
         while (true) {
@@ -36,18 +35,18 @@ private fun flowOfTruncatedCurrentTime(period: Duration): Flow<Instant> {
     }
 }
 
-fun flowOfCurrentTimeEachSecond(): Flow<Instant> =
+fun flowOfCurrentTimeEachSecond(): Flow<kotlinx.datetime.Instant> =
     flowOfTruncatedCurrentTime(period = 1.seconds)
 
 @Composable
-fun currentTimeAsState(period: Duration): State<Instant> {
+fun currentTimeAsState(period: Duration): State<kotlinx.datetime.Instant> {
     return remember(key1 = period) {
         flowOfTruncatedCurrentTime(period = period)
     }.collectAsStateWithLifecycle(initialValue = remember { getCurrentTime().truncateBy(period).toDeprecatedInstant() })
 }
 
 @Composable
-fun ProvideCurrentTime(currentTimeState: State<Instant>, content: @Composable () -> Unit) {
+fun ProvideCurrentTime(currentTimeState: State<kotlinx.datetime.Instant>, content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalCurrentTime provides currentTimeState.value, content = content)
 }
 
@@ -62,5 +61,5 @@ fun ProvideTimeEachMinute(content: @Composable () -> Unit) =
 
 @Composable
 @ReadOnlyComposable
-fun Instant.toTimeAgoString(): String =
+fun kotlinx.datetime.Instant.toTimeAgoString(): String =
     (localCurrentTime - this).toRoundedTimeString() + " ago"
