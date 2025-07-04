@@ -1,6 +1,5 @@
 package com.demich.cps.platforms.api
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -11,12 +10,12 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 
-object InstantAsSecondsSerializer: KSerializer<Instant> {
+object DeprecatedInstantAsSecondsSerializer: KSerializer<kotlinx.datetime.Instant> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("Instant", PrimitiveKind.LONG)
-    override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeLong(value.epochSeconds)
-    override fun deserialize(decoder: Decoder): Instant =
-        Instant.fromEpochSeconds(decoder.decodeLong())
+    override fun serialize(encoder: Encoder, value: kotlinx.datetime.Instant) = encoder.encodeLong(value.epochSeconds)
+    override fun deserialize(decoder: Decoder): kotlinx.datetime.Instant =
+        kotlinx.datetime.Instant.fromEpochSeconds(decoder.decodeLong())
 }
 
 object DurationAsSecondsSerializer: KSerializer<Duration> {

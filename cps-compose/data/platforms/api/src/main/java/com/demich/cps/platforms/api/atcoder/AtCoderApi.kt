@@ -1,6 +1,6 @@
 package com.demich.cps.platforms.api.atcoder
 
-import com.demich.cps.platforms.api.InstantAsSecondsSerializer
+import com.demich.cps.platforms.api.DeprecatedInstantAsSecondsSerializer
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
@@ -21,7 +21,7 @@ data class AtCoderRatingChange(
     val NewRating: Int,
     val OldRating: Int,
     val Place: Int,
-    @Serializable(with = InstantAsSecondsSerializer::class)
+    @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
     val EndTime: Instant,
     val ContestName: String,
     val StandingsUrl: String
