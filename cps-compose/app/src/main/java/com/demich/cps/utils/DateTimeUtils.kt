@@ -3,7 +3,6 @@ package com.demich.cps.utils
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.DayOfWeekNames
-import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -15,7 +14,6 @@ import kotlin.time.DurationUnit
 import kotlin.time.Instant
 
 fun getCurrentTime(): Instant = kotlin.time.Clock.System.now()
-fun getCurrentXTime() = getCurrentTime().toDeprecatedInstant()
 
 fun Instant.toSystemDateTime(): LocalDateTime =
     toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
