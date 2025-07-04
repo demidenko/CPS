@@ -9,6 +9,7 @@ import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.alternativeParsing
 import kotlinx.datetime.format.char
+import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.datetime.toInstant
 import org.jsoup.Jsoup
 
@@ -51,7 +52,7 @@ object ProjectEulerUtils {
                     RecentProblem(
                         name = nameCell.text(),
                         id = idCell.text(),
-                        date = format.parse(dateStr).toInstant(peUtcOffset)
+                        date = format.parse(dateStr).toInstant(peUtcOffset).toDeprecatedInstant()
                     )
                 }
             }

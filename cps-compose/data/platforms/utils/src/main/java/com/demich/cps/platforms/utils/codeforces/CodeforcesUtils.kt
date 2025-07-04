@@ -11,6 +11,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.alternativeParsing
 import kotlinx.datetime.format.char
+import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.datetime.toInstant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -54,7 +55,7 @@ object CodeforcesUtils {
         }
 
         fun parse(input: String): Instant =
-            LocalDateTime.parse(input, dateTimeFormat).toInstant(moscowTimeZone)
+            LocalDateTime.parse(input, dateTimeFormat).toInstant(moscowTimeZone).toDeprecatedInstant()
     }
 
     private fun String.extractTime(): Instant = DateTimeParser.parse(this)

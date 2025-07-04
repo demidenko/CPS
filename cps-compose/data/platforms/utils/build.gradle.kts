@@ -23,6 +23,10 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions.optIn.add("kotlin.time.ExperimentalTime")
+}
+
 dependencies {
     implementation(project(":data:platforms:api"))
     implementation(project(":data:accounts:userinfo"))

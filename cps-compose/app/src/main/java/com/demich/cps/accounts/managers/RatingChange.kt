@@ -12,6 +12,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.char
+import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.datetime.toInstant
 import kotlinx.serialization.Serializable
 
@@ -54,7 +55,7 @@ internal fun CodeChefRatingChange.toRatingChange() =
             date(LocalDate.Formats.ISO)
             char(' ')
             time(LocalTime.Formats.ISO)
-        }.parse(end_date).toInstant(TimeZone.of("IST"))
+        }.parse(end_date).toInstant(TimeZone.of("IST")).toDeprecatedInstant()
     )
 
 internal fun DmojRatingChange.toRatingChange() =

@@ -58,9 +58,7 @@ android {
 }
 
 kotlin {
-    compilerOptions {
-        optIn.add("kotlin.time.ExperimentalTime")
-    }
+    compilerOptions.optIn.add("kotlin.time.ExperimentalTime")
 }
 
 dependencies {
