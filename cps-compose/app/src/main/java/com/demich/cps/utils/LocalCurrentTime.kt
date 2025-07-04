@@ -25,30 +25,30 @@ private val LocalCurrentTime = compositionLocalOf<kotlinx.datetime.Instant> {
     throw IllegalAccessException("current time not provided")
 }
 
-private fun flowOfTruncatedCurrentTime(period: Duration): Flow<kotlinx.datetime.Instant> {
+private fun flowOfTruncatedCurrentTime(period: Duration): Flow<kotlin.time.Instant> {
     require(period.isPositive())
     return flow {
         while (true) {
             val currentTime = getCurrentTime()
-            emit(currentTime.truncateBy(period).toDeprecatedInstant())
+            emit(currentTime.truncateBy(period))
             delay(duration = period - currentTime % period)
         }
     }
 }
 
-fun flowOfCurrentTimeEachSecond(): Flow<kotlinx.datetime.Instant> =
+fun flowOfCurrentTimeEachSecond(): Flow<kotlin.time.Instant> =
     flowOfTruncatedCurrentTime(period = 1.seconds)
 
 @Composable
-fun currentTimeAsState(period: Duration): State<kotlinx.datetime.Instant> {
+fun currentTimeAsState(period: Duration): State<kotlin.time.Instant> {
     return remember(key1 = period) {
         flowOfTruncatedCurrentTime(period = period)
-    }.collectAsStateWithLifecycle(initialValue = remember { getCurrentTime().truncateBy(period).toDeprecatedInstant() })
+    }.collectAsStateWithLifecycle(initialValue = remember { getCurrentTime().truncateBy(period) })
 }
 
 @Composable
-fun ProvideCurrentTime(currentTimeState: State<kotlinx.datetime.Instant>, content: @Composable () -> Unit) {
-    CompositionLocalProvider(LocalCurrentTime provides currentTimeState.value, content = content)
+fun ProvideCurrentTime(currentTimeState: State<kotlin.time.Instant>, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalCurrentTime provides currentTimeState.value.toDeprecatedInstant(), content = content)
 }
 
 @Composable

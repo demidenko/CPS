@@ -78,7 +78,7 @@ import com.demich.cps.workers.isRunning
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Composable
 fun ContestsScreen(

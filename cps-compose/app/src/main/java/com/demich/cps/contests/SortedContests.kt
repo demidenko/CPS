@@ -135,7 +135,7 @@ private class ContestsSmartSorter: ContestsSorter {
 @Composable
 internal fun produceSortedContestsWithTime(
 
-): Pair<State<SortedContests>, State<kotlinx.datetime.Instant>> {
+): Pair<State<SortedContests>, State<Instant>> {
     val context = context
 
     val init = remember {
@@ -144,7 +144,7 @@ internal fun produceSortedContestsWithTime(
         val sorter = ContestsSmartSorter()
         sorter.apply(initContests, currentTime)
         val contestsState = mutableStateOf(sorter.contests)
-        val currentTimeState = mutableStateOf(currentTime.toDeprecatedInstant())
+        val currentTimeState = mutableStateOf(currentTime)
         Pair(Pair(contestsState, currentTimeState), sorter)
     }
 
@@ -155,7 +155,7 @@ internal fun produceSortedContestsWithTime(
             val (states, sorter: ContestsSorter) = init
             val (contestsState, currentTimeState) = states
             flowOfContests(context).combine(flowOfCurrentTimeEachSecond()) { contests, currentTime ->
-                if (sorter.apply(contests, currentTime.toStdlibInstant())) {
+                if (sorter.apply(contests, currentTime)) {
                     contestsState.value = sorter.contests
                 }
                 currentTimeState.value = currentTime

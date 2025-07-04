@@ -38,7 +38,6 @@ import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.currentTimeAsState
 import com.demich.cps.utils.rememberFrom
 import com.demich.cps.utils.timerShort
-import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -142,7 +141,7 @@ private fun PhaseTitle(
             PhaseTitle(
                 phase = contestPhase.phase,
                 modifier = modifier,
-                info = (contestPhase.endTime - currentTime.toStdlibInstant()).coerceAtLeast(Duration.ZERO).timerShort()
+                info = (contestPhase.endTime - currentTime).coerceAtLeast(Duration.ZERO).timerShort()
             )
         }
         is CodeforcesMonitorData.ContestPhase.SystemTesting -> {
