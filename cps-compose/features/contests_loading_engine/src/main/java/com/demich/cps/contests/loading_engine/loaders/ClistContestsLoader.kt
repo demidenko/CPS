@@ -7,12 +7,14 @@ import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.utils.ClistUtils
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
+import kotlinx.datetime.parse
+import kotlinx.datetime.toDeprecatedInstant
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
 class ClistContestsLoader(
     val api: ClistApi,
@@ -62,8 +64,8 @@ private inline fun ClistContest.toContest(parseDate: (String) -> Instant): Conte
         platform = platform,
         id = ClistUtils.extractContestId(this, platform),
         title = event,
-        startTime = parseDate(start),
-        endTime = parseDate(end),
+        startTime = parseDate(start).toDeprecatedInstant(),
+        endTime = parseDate(end).toDeprecatedInstant(),
         duration = duration.seconds,
         link = href,
         host = host.takeIf { platform == Contest.Platform.unknown }
