@@ -1,23 +1,21 @@
 package com.demich.cps.utils
 
 import com.demich.datastore_itemized.DataStoreItem
-import kotlinx.datetime.toDeprecatedInstant
-import kotlinx.datetime.toStdlibInstant
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 @Serializable
 class TimedCollection<T>(
-    private val m: Map<T, kotlinx.datetime.Instant> = emptyMap()
+    private val m: Map<T, Instant> = emptyMap()
 ): Collection<T> by m.keys {
     fun valuesSortedByTime(): List<T> =
         m.entries.sortedBy { it.value }.map { it.key }
 
     fun add(value: T, time: Instant): TimedCollection<T> =
-        TimedCollection(m.plus(value to time.toDeprecatedInstant()))
+        TimedCollection(m.plus(value to time))
 
     fun internalFilterByTime(predicate: (Instant) -> Boolean): TimedCollection<T> =
-        TimedCollection(m.filterValues { predicate(it.toStdlibInstant()) })
+        TimedCollection(m.filterValues(predicate))
 
     fun filterByValue(predicate: (T) -> Boolean): TimedCollection<T> =
         TimedCollection(m.filterKeys(predicate))
