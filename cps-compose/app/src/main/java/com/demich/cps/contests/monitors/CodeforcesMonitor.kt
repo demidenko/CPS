@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
-import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -191,7 +190,7 @@ private suspend fun getDelay(
         CodeforcesContestPhase.PENDING_SYSTEM_TEST -> 15.seconds
         CodeforcesContestPhase.SYSTEM_TEST -> 3.seconds
         CodeforcesContestPhase.FINISHED -> {
-            ratingChangeWaiter.getDelayOnFinished(contestEnd = contest.startTime.toStdlibInstant() + contest.duration)
+            ratingChangeWaiter.getDelayOnFinished(contestEnd = contest.startTime + contest.duration)
         }
         else -> 5.seconds
     }

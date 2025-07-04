@@ -5,6 +5,7 @@ import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
+import kotlinx.datetime.toDeprecatedInstant
 
 class CodeforcesContestsLoader(val api: CodeforcesApi): ContestsLoader() {
     override val type get() = ContestsLoaderType.codeforces_api
@@ -14,12 +15,12 @@ class CodeforcesContestsLoader(val api: CodeforcesApi): ContestsLoader() {
         dateConstraints: ContestDateConstraints
     ) = api.getContests()
         .mapNotNull {
-            if (dateConstraints.check(startTime = it.startTime, duration = it.duration)) {
+            if (dateConstraints.check(startTime = it.startTime.toDeprecatedInstant(), duration = it.duration)) {
                 Contest(
                     platform = Contest.Platform.codeforces,
                     id = it.id.toString(),
                     title = it.name,
-                    startTime = it.startTime,
+                    startTime = it.startTime.toDeprecatedInstant(),
                     duration = it.duration,
                     link = CodeforcesUrls.contest(contestId = it.id)
                 )

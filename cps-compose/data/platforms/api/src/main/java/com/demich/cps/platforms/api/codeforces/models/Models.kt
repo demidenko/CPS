@@ -66,8 +66,8 @@ data class CodeforcesContest(
 
     // Contest start time in unix format. Can be absent.
     @SerialName("startTimeSeconds")
-    @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val startTime: kotlinx.datetime.Instant
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val startTime: Instant
 )
 
 @Serializable
