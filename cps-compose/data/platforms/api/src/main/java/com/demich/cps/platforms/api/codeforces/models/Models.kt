@@ -43,8 +43,8 @@ data class CodeforcesUser(
 
     // Time, when user was last seen online, in unix format
     @SerialName("lastOnlineTimeSeconds")
-    @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val lastOnlineTime: kotlinx.datetime.Instant
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val lastOnlineTime: Instant
 )
 
 @Serializable

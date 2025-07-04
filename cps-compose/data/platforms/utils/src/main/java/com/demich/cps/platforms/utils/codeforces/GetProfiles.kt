@@ -5,6 +5,7 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
+import kotlinx.datetime.toDeprecatedInstant
 
 suspend fun CodeforcesApi.getProfiles(
     handles: Collection<String>,
@@ -57,5 +58,5 @@ fun CodeforcesUser.toUserInfo(): CodeforcesUserInfo =
         handle = handle,
         rating = rating,
         contribution = contribution,
-        lastOnlineTime = lastOnlineTime
+        lastOnlineTime = lastOnlineTime.toDeprecatedInstant()
     )
